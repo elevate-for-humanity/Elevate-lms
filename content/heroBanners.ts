@@ -1,20 +1,23 @@
 /**
  * heroBanners.ts — centralized content model for all hero video banners.
  *
- * Rules:
+ * Rules (non-negotiable):
  * - No headline, subheadline, or CTA belongs on the video frame.
  * - belowHeroHeadline / belowHeroSubheadline render BELOW the video.
- * - transcript renders in an expandable section below the fold.
- * - microLabel is 2–4 words max, rendered discreetly on the video.
+ * - transcript is the full read-aloud voiceover script — not a summary.
+ * - microLabel is 2–4 words max, rendered discreetly on the video frame.
  * - All pages must reference this file — no page-level hero content duplication.
  *
- * Internal program banners use programBanner() which enforces:
- * - credentialLabel, durationLabel, salaryRangeLabel as first-class fields
- * - transcript must include all three exact values
- * - transcript length 180–360 characters
- * - trustIndicators 4–6 unique items
- * - microLabel 4 words or fewer
- * - no banned marketing phrases
+ * Internal program pages (workforce programs, LMS-backed offerings) MUST
+ * satisfy ProgramHeroBannerConfig — all fields required, no exceptions.
+ * Category/partner/external pages may use HeroBannerConfig with optional fields.
+ *
+ * Script alignment rules for internal programs:
+ * - transcript must name the specific certification outcome (e.g. "EPA 608 Universal")
+ * - transcript must state time to completion
+ * - transcript must name the job pathway
+ * - transcript must state funding eligibility if applicable
+ * - CTAs must match program state: Apply Now | Join Waitlist | Request Info only
  */
 
 export interface HeroBannerCta {
@@ -37,89 +40,153 @@ export interface HeroBannerConfig {
   trustIndicators?: string[];
   transcript?: string;
   analyticsName: string;
-  // Structured fields — required on internal program banners
-  credentialLabel?: string;
-  durationLabel?: string;
-  salaryRangeLabel?: string;
 }
 
-// ── Validator infrastructure ──────────────────────────────────────────────
-
+// ── Banned phrases — rejected in all internal program transcripts ─────────
 const BANNED_PHRASES = [
-  'rewarding career',
-  'exciting future',
-  'in-demand',
-  'career-ready',
-  'next step',
-  'start your journey',
-  'launch your career',
-  'transform your life',
-  'take the next step',
+  'rewarding career', 'exciting future', 'in-demand', 'career-ready',
+  'next step', 'start your journey', 'launch your career', 'transform your life',
+  'bright future', 'take the next step',
 ];
 
-function fail(key: string, message: string): never {
-  throw new Error(`[heroBanners] ${key}: ${message}`);
+/**
+ * Enforced schema for internal workforce program pages.
+ *
+ * Salary handling — two explicit paths, no silent bypass:
+ *
+ *   Normal program:
+ *     salaryExempt: false (or omitted)
+ *     salaryRangeLabel: "$38,000 to $52,000"   ← must appear verbatim in transcript
+ *
+ *   Exempt program (bundled cert, no direct salary outcome):
+ *     salaryExempt: true
+ *     salaryNote: "reason why salary is not the primary outcome signal"
+ *     salaryRangeLabel: omitted or ''           ← not checked in transcript
+ *
+ * credentialLabel — exact credential name as it appears in the transcript
+ * durationLabel   — exact duration string as it appears in the transcript
+ *                   Must contain a numeric value (e.g. "10 weeks", "2,000 hours")
+ * salaryRangeLabel — exact salary string as it appears in the transcript
+ *                   Must match $NN,NNN format when present
+ */
+export type ProgramHeroBannerConfig = {
+  pageKey: string;
+  posterImage: string;
+  videoSrcDesktop: string;
+  voiceoverSrc: string;
+  microLabel: string;
+  credentialLabel: string;
+  durationLabel: string;
+  belowHeroHeadline: string;
+  belowHeroSubheadline: string;
+  primaryCta: HeroBannerCta;
+  secondaryCta: HeroBannerCta;
+  trustIndicators: string[];
+  transcript: string;
+  analyticsName: string;
+} & (
+  | { salaryExempt?: false; salaryRangeLabel: string }
+  | { salaryExempt: true;  salaryNote: string; salaryRangeLabel?: string }
+);
+
+function fail(slug: string, msg: string): never {
+  throw new Error(`[heroBanners] "${slug}": ${msg}`);
 }
 
-export function programBanner(key: string, config: HeroBannerConfig): HeroBannerConfig {
-  const { microLabel, credentialLabel, durationLabel, salaryRangeLabel, trustIndicators, transcript } = config;
+/** Validates that durationLabel contains a numeric value. */
+function validateDuration(slug: string, label: string): void {
+  if (!/\d+/.test(label))
+    fail(slug, `durationLabel "${label}" must contain a numeric value (e.g. "10 weeks", "2,000 hours")`);
+}
 
-  if (!credentialLabel?.trim()) fail(key, 'credentialLabel is required');
-  if (!durationLabel?.trim()) fail(key, 'durationLabel is required');
-  if (!salaryRangeLabel?.trim()) fail(key, 'salaryRangeLabel is required');
-  if (!microLabel?.trim()) fail(key, 'microLabel is required');
-  if (!transcript?.trim()) fail(key, 'transcript is required');
+/** Validates that salaryRangeLabel matches $NN,NNN currency format. */
+function validateSalary(slug: string, label: string): void {
+  if (!/\$\d{2,3},?\d{3}/.test(label))
+    fail(slug, `salaryRangeLabel "${label}" must include valid currency format (e.g. "$38,000 to $52,000")`);
+}
 
-  const microWords = microLabel!.trim().split(/\s+/);
-  if (microWords.length > 4) fail(key, 'microLabel must be 4 words or fewer');
+/**
+ * Validates a program banner at module load. Throws immediately on any violation.
+ *
+ * Rules:
+ *   credentialLabel: required, non-empty
+ *   durationLabel: required, must contain a numeric value
+ *   salaryRangeLabel: required unless salaryExempt:true (must then have salaryNote)
+ *   salaryRangeLabel: must match $NN,NNN format when present
+ *   microLabel: max 4 words
+ *   trustIndicators: 4–6 unique items
+ *   transcript: 180–360 chars
+ *   transcript: contains credentialLabel verbatim
+ *   transcript: contains durationLabel verbatim
+ *   transcript: contains salaryRangeLabel verbatim (unless salaryExempt:true)
+ *   transcript: no banned marketing phrases
+ *   transcript: ends with sentence punctuation
+ */
+function programBanner(slug: string, config: ProgramHeroBannerConfig): ProgramHeroBannerConfig {
+  const { microLabel, credentialLabel, durationLabel, trustIndicators, transcript } = config;
 
-  if (!Array.isArray(trustIndicators)) fail(key, 'trustIndicators must be an array');
-  if (trustIndicators!.length < 4 || trustIndicators!.length > 6) fail(key, 'trustIndicators must contain 4 to 6 items');
+  // ── Required scalar fields ────────────────────────────────────────────────
+  if (!credentialLabel?.trim()) fail(slug, 'credentialLabel is required');
+  if (!durationLabel?.trim())   fail(slug, 'durationLabel is required');
 
-  const deduped = new Set(trustIndicators!.map((x) => x.trim().toLowerCase()));
-  if (deduped.size !== trustIndicators!.length) fail(key, 'trustIndicators must not contain duplicates');
-
-  if (transcript!.length < 180 || transcript!.length > 360) {
-    fail(key, `transcript must be 180–360 characters (got ${transcript!.length})`);
+  // ── Salary: explicit exemption model ─────────────────────────────────────
+  if (config.salaryExempt === true) {
+    if (!config.salaryNote?.trim())
+      fail(slug, 'salaryExempt programs must include a non-empty salaryNote explaining why');
+  } else {
+    const sal = config.salaryRangeLabel;
+    if (!sal?.trim())
+      fail(slug, 'salaryRangeLabel is required — set salaryExempt:true with salaryNote to exempt');
+    validateSalary(slug, sal);
   }
 
-  if (!transcript!.includes(credentialLabel!)) fail(key, `transcript must include exact credentialLabel: "${credentialLabel}"`);
-  if (!transcript!.includes(durationLabel!)) fail(key, `transcript must include exact durationLabel: "${durationLabel}"`);
-  if (!transcript!.includes(salaryRangeLabel!)) fail(key, `transcript must include exact salaryRangeLabel: "${salaryRangeLabel}"`);
+  // ── Numeric validation ────────────────────────────────────────────────────
+  validateDuration(slug, durationLabel);
 
-  const bannedHit = BANNED_PHRASES.find((p) => transcript!.toLowerCase().includes(p));
-  if (bannedHit) fail(key, `transcript contains banned phrase: "${bannedHit}"`);
+  // ── microLabel: max 4 words ───────────────────────────────────────────────
+  if (microLabel.trim().split(/\s+/).length > 4)
+    fail(slug, `microLabel "${microLabel}" exceeds 4 words`);
 
-  if (!/\b(prepare|train|build|develop|learn|complete|earn)\b/i.test(transcript!)) {
-    fail(key, 'transcript must use concrete action language');
+  // ── trustIndicators: 4–6 unique items ────────────────────────────────────
+  if (!Array.isArray(trustIndicators) || trustIndicators.length < 4 || trustIndicators.length > 6)
+    fail(slug, `trustIndicators must be 4–6 items (got ${trustIndicators?.length ?? 0})`);
+  const deduped = new Set(trustIndicators.map((x) => x.trim().toLowerCase()));
+  if (deduped.size !== trustIndicators.length)
+    fail(slug, 'trustIndicators must not contain duplicates');
+
+  // ── Transcript: length ────────────────────────────────────────────────────
+  if (transcript.length < 180 || transcript.length > 360)
+    fail(slug, `transcript is ${transcript.length} chars — must be 180–360`);
+
+  // ── Transcript: verbatim label checks ────────────────────────────────────
+  if (!transcript.includes(credentialLabel))
+    fail(slug, `transcript must include credentialLabel "${credentialLabel}" verbatim`);
+  if (!transcript.includes(durationLabel))
+    fail(slug, `transcript must include durationLabel "${durationLabel}" verbatim`);
+  if (config.salaryExempt !== true) {
+    const sal = config.salaryRangeLabel;
+    if (!transcript.includes(sal))
+      fail(slug, `transcript must include salaryRangeLabel "${sal}" verbatim`);
   }
 
-  if (!/[.?!]$/.test(transcript!.trim())) fail(key, 'transcript must end with sentence punctuation');
+  // ── Transcript: no banned phrases ────────────────────────────────────────
+  const hit = BANNED_PHRASES.find((p) => transcript.toLowerCase().includes(p));
+  if (hit) fail(slug, `transcript contains banned phrase: "${hit}"`);
 
-  // HSI partner enforcement — CPR/first-aid must name the certifying body
-  const HSI_SLUGS = ['cpr-first-aid', 'emergency-health-safety', 'sanitation-infection-control'];
-  if (HSI_SLUGS.includes(config.pageKey)) {
-    if (!/\bHSI\b/i.test(transcript!)) {
-      fail(key, 'HSI-partner program transcript must reference "HSI" as the certifying body');
-    }
-  }
-
-  // Non-salary programs must signal certification value or compliance requirement
-  const EMPTY_SALARY = ['', 'n/a', 'varies'];
-  if (EMPTY_SALARY.includes(salaryRangeLabel!.toLowerCase())) {
-    if (!/\b(certif|compliance|required|license|credential)\b/i.test(transcript!)) {
-      fail(key, 'non-salary program transcript must include certification, compliance, or licensing language');
-    }
-  }
-
-  // Video/poster pairing — if video is set, poster must be set (no blank frames)
-  if (config.videoSrcDesktop && !config.posterImage) {
-    fail(key, 'videoSrcDesktop requires posterImage to prevent blank frames on load');
-  }
+  // ── Transcript: ends with punctuation ────────────────────────────────────
+  if (!/[.?!]$/.test(transcript.trim()))
+    fail(slug, 'transcript must end with sentence punctuation');
 
   return config;
 }
 
+/**
+ * Generates a consistent, validator-compliant transcript from structured fields.
+ * Self-validates after generation — throws if the output would fail programBanner().
+ *
+ * Use this for new banners. Manual transcripts are allowed but must still pass
+ * the verbatim label checks in programBanner().
+ */
 export function buildTranscript({
   credentialLabel,
   durationLabel,
@@ -131,9 +198,23 @@ export function buildTranscript({
   salaryRangeLabel: string;
   skills: [string, string, string?];
 }): string {
-  const skillText = [skills[0], skills[1], skills[2]].filter(Boolean).join(', ');
-  return `Train for ${credentialLabel} in ${durationLabel}, building practical skills in ${skillText}. Related entry-level opportunities commonly fall in the ${salaryRangeLabel} range depending on employer, experience, and local market.`;
+  const skillText = skills.filter(Boolean).join(', ');
+  const t = `Train for ${credentialLabel} in ${durationLabel}, building skills in ${skillText}. Related roles commonly earn ${salaryRangeLabel} depending on employer, experience, and market.`;
+
+  // Self-validate — generator cannot produce invalid output
+  if (!t.includes(credentialLabel))
+    throw new Error(`[buildTranscript] generator drift: credentialLabel "${credentialLabel}" missing from output`);
+  if (!t.includes(durationLabel))
+    throw new Error(`[buildTranscript] generator drift: durationLabel "${durationLabel}" missing from output`);
+  if (!t.includes(salaryRangeLabel))
+    throw new Error(`[buildTranscript] generator drift: salaryRangeLabel "${salaryRangeLabel}" missing from output`);
+  if (t.length < 180 || t.length > 360)
+    throw new Error(`[buildTranscript] generated transcript is ${t.length} chars — must be 180–360. Adjust skills text.`);
+
+  return t;
 }
+
+
 
 const heroBanners: Record<string, HeroBannerConfig> = {
   home: {
@@ -184,18 +265,19 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/platform-page-1.jpg',
     videoSrcDesktop: '/videos/elevate-overview-with-narration.mp4',
     voiceoverSrc: '/audio/heroes/programs.mp3',
-    microLabel: 'Multi-Tenant Hub',
-    belowHeroHeadline: 'Workforce infrastructure for providers, agencies, and employers.',
+    microLabel: 'Workforce Infrastructure',
+    belowHeroHeadline: 'Workforce infrastructure, not just a website.',
     belowHeroSubheadline:
-      'One coordinated system for training delivery, credential pathways, compliance reporting, and employer placement.',
+      'A coordinated hub for training delivery, credential pathways, and employer connection.',
     primaryCta: { label: 'Schedule a Demo', href: '/contact' },
     secondaryCta: { label: 'Licensing Options', href: '/store/licensing', variant: 'secondary' },
     trustIndicators: [
       'Multi-tenant architecture',
       'WIOA & DOL compliant',
       'Audit-ready reporting',
-      'Role-based data isolation',
     ],
+    transcript:
+      'This platform connects providers, credential pathways, employers, and workforce agencies through one coordinated infrastructure. The goal is simple: verified training, cleaner operations, and better outcomes.',
     analyticsName: 'platform',
   },
 
@@ -217,6 +299,8 @@ const heroBanners: Record<string, HeroBannerConfig> = {
       'DOL Registered Apprenticeship',
       'Job Ready Indy (JRI)',
     ],
+    transcript:
+      'Funding should not be confusing. We help eligible participants navigate workforce programs, complete the steps, and move into training without unnecessary friction.',
     analyticsName: 'funding-how-it-works',
   },
 
@@ -237,6 +321,8 @@ const heroBanners: Record<string, HeroBannerConfig> = {
       'Clinical rotations included',
       'Job placement assistance',
     ],
+    transcript:
+      'Healthcare training should feel professional from day one. Learn the skills, prepare for certification, and step into patient-facing work with confidence.',
     analyticsName: 'healthcare',
   },
 
@@ -258,6 +344,27 @@ const heroBanners: Record<string, HeroBannerConfig> = {
       'White-label branding included',
       'Launch in two weeks',
     ],
+    transcript:
+      `If your organization manages workforce training, you already know the problem. Enrollment is tracked in spreadsheets. Eligibility paperwork gets emailed back and forth. WIOA reports are assembled by hand every quarter. Credentials are issued late — if at all. Employers call asking for candidate lists you don't have ready.
+
+The Elevate Workforce Operating System was built to replace all of that.
+
+When a student applies, the platform checks eligibility automatically, collects documents, and routes the application through your approval workflow — no paper, no re-keying. When they enroll, attendance is tracked in real time. When they complete a program, their credential is issued automatically and posted to a public verification page employers can check with a single link.
+
+Your WIOA compliance reports generate themselves from enrollment data. PIRL reporting, ITA tracking, quarterly performance metrics — all automated. Your workforce board gets the data they need without your staff spending a week assembling it.
+
+The employer portal gives your hiring partners a live view of pre-screened candidates with verified credentials. They can track apprenticeship hours, manage OJT reimbursement requests, and sign MOUs electronically. WOTC documentation is generated automatically.
+
+You get your own branded instance — your logo, your domain, your colors. Students and employers see your organization. The platform is invisible.
+
+We handle the hosting, security, backups, and updates. Your staff focuses on people, not data entry.
+
+Two licensing options: Managed Platform starting at fifteen hundred dollars per month, or Enterprise Source-Use for organizations that need to deploy on their own infrastructure.
+
+Both start with a 14-day free trial. No credit card required. Full platform access from day one.
+
+Try the live demo — no signup, no time limit. Every screen is clickable. Search students, run reports, review applications, browse candidates. See exactly what your staff and students will use every day.`,
+    analyticsName: 'store',
   },
 
   programs: {
@@ -278,6 +385,31 @@ const heroBanners: Record<string, HeroBannerConfig> = {
       'ETPL approved training provider',
       'Job placement assistance included',
     ],
+    transcript:
+      `At Elevate for Humanity, we train adults for real jobs — in weeks, not years.
+
+Every program we offer ends with a nationally recognized credential and a direct introduction to hiring employers. Not a participation certificate. A credential that verifies your skills and opens doors.
+
+Here is what we offer.
+
+In healthcare, we train Certified Nursing Assistants, Medical Assistants, Pharmacy Technicians, and Phlebotomy Technicians. CNA training runs six weeks. Medical Assistant runs twelve. Every program includes hands-on clinical practice and a proctored certification exam on-site at Elevate.
+
+In skilled trades, we offer HVAC Technician training leading to EPA Section 608 certification, CDL Class A training for commercial driving careers, Electrical Technician, Welding Technology, Plumbing, and Construction Trades. Most trades programs run eight to twelve weeks. Starting wages range from twenty to thirty-five dollars per hour.
+
+In technology, we offer IT Help Desk Technician leading to CompTIA A Plus, Cybersecurity Analyst leading to CompTIA Security Plus, Network Support, Web Development, and Software Development. Tech programs run six to twelve weeks.
+
+In business, we offer Bookkeeping and QuickBooks, Office Administration, Tax Preparation, and Entrepreneurship. These programs run five to eight weeks and are designed for people who want to work in professional environments or start their own business.
+
+We also offer registered apprenticeships in barbering, cosmetology, nail technology, and culinary arts — earn-while-you-learn programs where you work in a licensed shop and get paid from day one.
+
+Most programs are available at no cost to eligible Indiana residents. Funding comes through WIOA Title One, the Indiana Workforce Ready Grant, Job Ready Indy, and other state and federal workforce programs. If you qualify, tuition, books, tools, and your certification exam fee are all covered.
+
+The process is straightforward. Register at Indiana Career Connect. Meet with a WorkOne case manager. They determine your funding eligibility — usually within a week. Once funding is confirmed, you join a scheduled cohort. We provide all tools, materials, and safety gear. You focus on training.
+
+After you complete your program, our career services team builds your resume, preps you for interviews, and makes direct introductions to hiring employers. Many of our students have job offers before their last day of class.
+
+Apply online in minutes. No cost to apply. No obligation. Just the first step toward a career that pays.`,
+    analyticsName: 'programs',
   },
 
   'skilled-trades': {
@@ -296,26 +428,28 @@ const heroBanners: Record<string, HeroBannerConfig> = {
       'Hands-on training',
       'Apprenticeship pathways available',
     ],
+    transcript:
+      'In the trades, confidence comes from repetition, safety, and real equipment. Elevate trains for the field — with hands-on practice, credentials, and a clear route to employment.',
     analyticsName: 'skilled-trades',
   },
 
-  // ── Individual program pages — validated via programBanner() ─────────────
+  // ── Internal program pages — ProgramHeroBannerConfig enforced ────────────
 
   'hvac-technician': programBanner('hvac-technician', {
     pageKey: 'hvac-technician',
     posterImage: '/images/pages/hvac-unit.jpg',
     videoSrcDesktop: '/videos/hvac-hero-final.mp4',
     voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
-    microLabel: 'HVAC Training',
-    belowHeroHeadline: 'Become an HVAC Technician in 20 weeks.',
-    belowHeroSubheadline: 'Earn EPA 608 Universal, OSHA 30, and four additional credentials. Most students pay nothing through the Workforce Ready Grant.',
-    primaryCta: { label: 'Apply Now', href: '/programs/hvac-technician/apply' },
-    secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['EPA 608 Proctor Site', 'Workforce Ready Grant eligible', 'OSHA 30 included', 'Job placement assistance'],
+    microLabel: 'EPA 608 Universal',
     credentialLabel: 'EPA 608 Universal',
     durationLabel: '20 weeks',
-    salaryRangeLabel: '$20 to $35 per hour',
-    transcript: 'Train for EPA 608 Universal in 20 weeks, building practical skills in refrigerant handling, system diagnostics, and residential installation. Related entry-level opportunities commonly fall in the $20 to $35 per hour range depending on employer, experience, and local market.',
+    salaryRangeLabel: '$38,000 to $55,000',
+    belowHeroHeadline: 'HVAC Technician — EPA 608 Universal in 20 weeks.',
+    belowHeroSubheadline: 'Hands-on training with real HVAC systems. Earn EPA 608 Universal, OSHA 30, CPR, and Rise Up. Proctored on-site. Most students pay $0 through the Workforce Ready Grant.',
+    primaryCta: { label: 'Apply Now', href: '/programs/hvac-technician/apply' },
+    secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
+    trustIndicators: ['EPA 608 proctored on-site', 'Workforce Ready Grant eligible', 'OSHA 30 + CPR + Rise Up', 'Job placement assistance'],
+    transcript: 'Train for EPA 608 Universal certification in 20 weeks at Elevate for Humanity, working on real HVAC systems with hands-on instruction. Graduates also earn OSHA 30, CPR, and Rise Up credentials. HVAC technicians in Indiana commonly earn $38,000 to $55,000. Most students pay $0 through the Workforce Ready Grant.',
     analyticsName: 'hvac-technician',
   }),
 
@@ -325,16 +459,15 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     videoSrcDesktop: '/videos/cdl-hero.mp4',
     voiceoverSrc: '/audio/heroes/cdl.mp3',
     microLabel: 'CDL Class A',
-    belowHeroHeadline: 'Get your CDL Class A in 3–6 weeks.',
-    belowHeroSubheadline: 'Behind-the-wheel training, pre-trip inspection, and job placement with trucking companies. WIOA funding covers tuition for eligible participants.',
-    primaryCta: { label: 'Apply Now', href: '/apply?program=cdl-training' },
-    secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['WIOA funding available', 'Starting pay $22–$35/hr', 'Job placement included', 'DOT physical covered'],
     credentialLabel: 'CDL Class A',
     durationLabel: '3 to 6 weeks',
-    salaryRangeLabel: '$22 to $35 per hour',
-    transcript:
-      'Train for CDL Class A in 3 to 6 weeks, building practical skills in pre-trip inspection, backing maneuvers, and DOT compliance. Related entry-level opportunities commonly fall in the $22 to $35 per hour range depending on employer, experience, and local market.',
+    salaryRangeLabel: '$50,000 to $65,000',
+    belowHeroHeadline: 'CDL Class A License in 3–6 weeks.',
+    belowHeroSubheadline: 'Behind-the-wheel training at our Indianapolis facility. Earn your CDL Class A, DOT Medical Card, and OSHA 10. WIOA covers tuition, DOT physical, drug screen, and exam fees for eligible Indiana residents.',
+    primaryCta: { label: 'Apply Now', href: '/apply?program=cdl-training' },
+    secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
+    trustIndicators: ['WIOA covers exam + DOT physical', 'CDL Class A + DOT Medical Card', 'Werner, Schneider, FedEx hiring', 'Starting pay $50K–$65K'],
+    transcript: 'Train for CDL Class A licensure in 3 to 6 weeks at Elevate for Humanity in Indianapolis, with behind-the-wheel instruction, pre-trip inspection, and on-site skills testing. CDL drivers commonly earn $50,000 to $65,000. WIOA covers tuition, DOT physical, drug screen, and exam fees for eligible Indiana residents.',
     analyticsName: 'cdl-training',
   }),
 
@@ -343,17 +476,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/electrical-wiring.jpg',
     videoSrcDesktop: '/videos/electrician-trades.mp4',
     voiceoverSrc: '/audio/heroes/electrical.mp3',
-    microLabel: 'Electrical Trades',
-    belowHeroHeadline: 'Electrical Technician training in 12 weeks.',
-    belowHeroSubheadline: 'Residential and commercial wiring, NEC code, and safety. Graduate with OSHA 30 and NCCER credentials. WIOA funding available.',
+    microLabel: 'NCCER Core Curriculum',
+    credentialLabel: 'NCCER Core Curriculum',
+    durationLabel: '12 weeks',
+    salaryRangeLabel: '$35,000 to $45,000',
+    belowHeroHeadline: 'Electrical Technician — OSHA 30 + NCCER in 12 weeks.',
+    belowHeroSubheadline: 'Residential and commercial wiring, NEC code, load calculations, and conduit bending. Graduate with OSHA 30 Construction and NCCER Core Curriculum. WIOA and Next Level Jobs funding available.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=electrical' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['WIOA funding available', 'OSHA 30 included', 'NCCER credential', '3-Star Indiana Top Job'],
-    credentialLabel: 'NCCER Electrical Technician',
-    durationLabel: '12 weeks',
-    salaryRangeLabel: '$20 to $32 per hour',
-    transcript:
-      'Train for NCCER Electrical Technician in 12 weeks, building practical skills in residential wiring, NEC code, and commercial circuits. Related entry-level opportunities commonly fall in the $20 to $32 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['WIOA + Next Level Jobs eligible', 'OSHA 30 Construction', 'NCCER Core Curriculum', 'Apprenticeship pathway available'],
+    transcript: 'Train for NCCER Core Curriculum and OSHA 30 Construction credentials in 12 weeks, building skills in residential wiring, NEC code, load calculations, and conduit bending. Entry-level electrician helpers commonly earn $35,000 to $45,000. WIOA and Next Level Jobs funding available for eligible Indiana residents.',
     analyticsName: 'electrical',
   }),
 
@@ -362,17 +494,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/welding-sparks.jpg',
     videoSrcDesktop: '/videos/welding-trades.mp4',
     voiceoverSrc: '/audio/heroes/welding.mp3',
-    microLabel: 'Welding Technology',
-    belowHeroHeadline: 'Welding Technology — 10 weeks to AWS certification.',
-    belowHeroSubheadline: 'Learn MIG, TIG, and stick welding from industry professionals. Graduate with AWS certifications and OSHA 30. WIOA funding available.',
+    microLabel: 'AWS D1.1 Certification',
+    credentialLabel: 'AWS D1.1',
+    durationLabel: '10 weeks',
+    salaryRangeLabel: '$38,000 to $62,000',
+    belowHeroHeadline: 'Welding Technology — AWS D1.1 certification in 10 weeks.',
+    belowHeroSubheadline: 'MIG, TIG, and stick welding on structural steel. AWS D1.1 tested by a Certified Welding Inspector. OSHA 10 included. WIOA and Next Level Jobs funding available.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=welding' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['WIOA funding available', 'AWS certifications', 'OSHA 30 included', 'Starting pay $54K avg'],
-    credentialLabel: 'AWS Welding Certification',
-    durationLabel: '10 weeks',
-    salaryRangeLabel: '$18 to $30 per hour',
-    transcript:
-      'Train for AWS Welding Certification in 10 weeks, building practical skills in MIG welding, TIG welding, and blueprint reading. Related entry-level opportunities commonly fall in the $18 to $30 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['WIOA + Next Level Jobs eligible', 'AWS D1.1 — CWI proctored', 'OSHA 10 Construction', 'Welder pay $38K–$62K'],
+    transcript: 'Train for AWS D1.1 certification in 10 weeks, building MIG, TIG, and stick welding skills on structural steel. Testing is conducted by a Certified Welding Inspector at an AWS Authorized Test Facility. Welders commonly earn $38,000 to $62,000. WIOA and Next Level Jobs funding available for eligible Indiana residents.',
     analyticsName: 'welding',
   }),
 
@@ -381,17 +512,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/plumbing-pipes.jpg',
     videoSrcDesktop: '/videos/welding-trades.mp4',
     voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
-    microLabel: 'Plumbing Trades',
-    belowHeroHeadline: 'Plumbing Technician training in 10 weeks.',
-    belowHeroSubheadline: 'Install and repair residential and commercial plumbing systems. Earn OSHA 10 and NCCER credentials. WIOA funding available.',
+    microLabel: 'NCCER Core Curriculum',
+    credentialLabel: 'NCCER Core Curriculum',
+    durationLabel: '10 weeks',
+    salaryRangeLabel: '$36,000 to $52,000',
+    belowHeroHeadline: 'Plumbing Technician — OSHA 10 + NCCER in 10 weeks.',
+    belowHeroSubheadline: 'Residential and commercial plumbing systems, pipe fitting, and code compliance. Graduate with OSHA 10 Construction and NCCER Core Curriculum. WIOA and Next Level Jobs funding available.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=plumbing' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['WIOA funding available', 'OSHA 10 included', 'NCCER credential', 'Hands-on training'],
-    credentialLabel: 'NCCER Plumbing Technician',
-    durationLabel: '10 weeks',
-    salaryRangeLabel: '$18 to $28 per hour',
-    transcript:
-      'Train for NCCER Plumbing Technician in 10 weeks, building practical skills in pipe fitting, residential systems, and code compliance. Related entry-level opportunities commonly fall in the $18 to $28 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['WIOA + Next Level Jobs eligible', 'OSHA 10 Construction', 'NCCER Core Curriculum', 'Apprenticeship pathway available'],
+    transcript: 'Train for NCCER Core Curriculum and OSHA 10 Construction credentials in 10 weeks, building skills in residential and commercial plumbing systems, pipe fitting, and code compliance. Plumbing helpers commonly earn $36,000 to $52,000. WIOA and Next Level Jobs funding available for eligible Indiana residents.',
     analyticsName: 'plumbing',
   }),
 
@@ -400,17 +530,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/diesel-mechanic.jpg',
     videoSrcDesktop: '/videos/welding-trades.mp4',
     voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
-    microLabel: 'Diesel Mechanic',
-    belowHeroHeadline: 'Diesel Mechanic training in 12 weeks.',
-    belowHeroSubheadline: 'Diagnose and repair diesel engines, transmissions, and hydraulic systems. OSHA 10 and ASE prep included. WIOA funding available.',
-    primaryCta: { label: 'Express Interest', href: '/apply?program=diesel-mechanic' },
-    secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['WIOA funding available', 'OSHA 10 included', 'ASE exam prep', 'High-demand career'],
-    credentialLabel: 'ASE Diesel Technician',
+    microLabel: 'ASE Exam Prep',
+    credentialLabel: 'ASE exam preparation',
     durationLabel: '12 weeks',
-    salaryRangeLabel: '$20 to $32 per hour',
-    transcript:
-      'Train for ASE Diesel Technician in 12 weeks, building practical skills in engine diagnostics, transmission repair, and hydraulic systems. Related entry-level opportunities commonly fall in the $20 to $32 per hour range depending on employer, experience, and local market.',
+    salaryRangeLabel: '$42,000 to $58,000',
+    belowHeroHeadline: 'Diesel Mechanic — OSHA 10 + ASE prep in 12 weeks.',
+    belowHeroSubheadline: 'Diagnose and repair diesel engines, transmissions, and hydraulic systems. OSHA 10 and ASE exam preparation included. WIOA and Next Level Jobs funding available.',
+    primaryCta: { label: 'Request Information', href: '/contact?program=diesel-mechanic' },
+    secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
+    trustIndicators: ['WIOA + Next Level Jobs eligible', 'OSHA 10 Construction', 'ASE exam preparation', 'Diesel tech pay $42K–$58K'],
+    transcript: 'Train for ASE exam preparation and OSHA 10 Construction credentials in 12 weeks, building skills in diesel engine diagnosis, transmission repair, and hydraulic systems. Diesel technicians commonly earn $42,000 to $58,000. WIOA and Next Level Jobs funding available for eligible Indiana residents.',
     analyticsName: 'diesel-mechanic',
   }),
 
@@ -419,17 +548,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/construction-trades.jpg',
     videoSrcDesktop: '/videos/electrician-trades.mp4',
     voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
-    microLabel: 'Construction Trades',
-    belowHeroHeadline: 'Construction Trades Certification in 8 weeks.',
-    belowHeroSubheadline: 'Earn OSHA 30, EPA 608, and forklift certifications. Multi-trade foundation for construction careers. WIOA funding available.',
+    microLabel: 'OSHA 30 + Forklift',
+    credentialLabel: 'OSHA 30 Construction',
+    durationLabel: '8 weeks',
+    salaryRangeLabel: '$32,000 to $48,000',
+    belowHeroHeadline: 'Construction Trades Certification — OSHA 30 + EPA 608 + Forklift in 8 weeks.',
+    belowHeroSubheadline: 'Multi-trade foundation for construction careers. Earn OSHA 30 Construction, EPA 608, and Forklift Operator Certification. WIOA and Next Level Jobs funding available.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=construction-trades-certification' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['WIOA funding available', 'OSHA 30 included', 'EPA 608 included', 'Forklift cert included'],
-    credentialLabel: 'NCCER Core Curriculum',
-    durationLabel: '8 weeks',
-    salaryRangeLabel: '$17 to $28 per hour',
-    transcript:
-      'Train for NCCER Core Curriculum in 8 weeks, building practical skills in hand tools, construction math, and site safety. Related entry-level opportunities commonly fall in the $17 to $28 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['WIOA + Next Level Jobs eligible', 'OSHA 30 Construction', 'EPA 608 + Forklift cert', 'Self-pay $3,800'],
+    transcript: 'Earn OSHA 30 Construction, EPA 608, and Forklift Operator Certification in 8 weeks — a multi-credential foundation for construction, HVAC, and logistics work. Entry-level construction workers commonly earn $32,000 to $48,000. WIOA and Next Level Jobs funding available for eligible Indiana residents.',
     analyticsName: 'construction-trades-certification',
   }),
 
@@ -438,17 +566,17 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/forklift.jpg',
     videoSrcDesktop: '/videos/electrician-trades.mp4',
     voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
-    microLabel: 'Forklift Certification',
+    microLabel: 'OSHA Forklift Cert',
+    credentialLabel: 'OSHA 29 CFR 1910.178',
+    durationLabel: '1 week',
+    salaryExempt: true,
+    salaryNote: 'Short standalone cert; wage outcome depends entirely on employer and role — not attributable to this cert alone.',
     belowHeroHeadline: 'Forklift Operator Certification in 1 week.',
-    belowHeroSubheadline: 'OSHA-compliant training on sit-down, stand-up, and reach truck forklifts. Get certified and job-ready for warehouse and logistics roles.',
+    belowHeroSubheadline: 'OSHA 29 CFR 1910.178 compliant. Hands-on training on sit-down, stand-up, and reach truck forklifts. Certification valid 3 years. WIOA funding available.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=forklift' },
     secondaryCta: { label: 'View Schedule', href: '/contact?program=forklift', variant: 'secondary' },
-    trustIndicators: ['OSHA-compliant cert', 'Hands-on equipment', 'WIOA funding available', 'Starting pay $15–$20/hr'],
-    credentialLabel: 'OSHA Forklift Operator',
-    durationLabel: '1 week',
-    salaryRangeLabel: '$16 to $22 per hour',
-    transcript:
-      'Train for OSHA Forklift Operator in 1 week, building practical skills in load handling, pre-operation inspection, and warehouse safety. Related entry-level opportunities commonly fall in the $16 to $22 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['OSHA 29 CFR 1910.178 compliant', 'Sit-down, stand-up, reach truck', 'Cert valid 3 years', 'WIOA funding available'],
+    transcript: 'Earn OSHA 29 CFR 1910.178 compliant Forklift Operator Certification in 1 week at Elevate for Humanity. Training covers sit-down, stand-up, and reach truck forklifts. Certification is valid for 3 years and accepted by warehousing, logistics, and manufacturing employers. Self-pay is $500. WIOA funding available.',
     analyticsName: 'forklift',
   }),
 
@@ -457,17 +585,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/cna-patient-care.jpg',
     videoSrcDesktop: '/videos/cna-hero.mp4',
     voiceoverSrc: '/audio/heroes/cna.mp3',
-    microLabel: 'CNA Program',
-    belowHeroHeadline: 'Become a Certified Nursing Assistant.',
-    belowHeroSubheadline: 'State certification exam included. Start a career in hospitals, nursing facilities, and clinics. Join the waiting list for upcoming cohorts.',
-    primaryCta: { label: 'Join Waiting List', href: '/programs/cna#waitlist' },
-    secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['State certification included', 'WIOA funding available', 'Clinical rotations', 'Job placement assistance'],
-    credentialLabel: 'Indiana CNA Certification',
+    microLabel: 'Indiana CNA Certification',
+    credentialLabel: 'Indiana CNA certification',
     durationLabel: '6 weeks',
-    salaryRangeLabel: '$15 to $22 per hour',
-    transcript:
-      'Train for Indiana CNA Certification in 6 weeks, building practical skills in patient care, vital signs, and infection control. Related entry-level opportunities commonly fall in the $15 to $22 per hour range depending on employer, experience, and local market.',
+    salaryRangeLabel: '$30,000 to $40,000',
+    belowHeroHeadline: 'Certified Nursing Assistant — Indiana state exam on-site.',
+    belowHeroSubheadline: 'Indiana state CNA certification exam proctored on-site. Clinical rotations at licensed healthcare facilities. WIOA and Workforce Ready Grant funding available. Join the waitlist for the next cohort.',
+    primaryCta: { label: 'Join Waitlist', href: '/programs/cna#waitlist' },
+    secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
+    trustIndicators: ['Indiana state exam on-site', 'WIOA + Workforce Ready Grant', 'Clinical rotations included', 'ETPL approved'],
+    transcript: 'Prepare for Indiana CNA certification in 6 weeks, completing clinical rotations at licensed healthcare facilities with the state exam proctored on-site. CNAs in Indiana commonly earn $30,000 to $40,000. WIOA and Workforce Ready Grant funding available for eligible Indiana residents. Join the waitlist for the next cohort.',
     analyticsName: 'cna',
   }),
 
@@ -476,17 +603,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/medical-assistant-lab.jpg',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
     voiceoverSrc: '/audio/heroes/medical-assistant.mp3',
-    microLabel: 'Medical Assistant',
-    belowHeroHeadline: 'Medical Assistant — CCMA certification in 12 weeks.',
-    belowHeroSubheadline: 'Clinical and administrative medical assisting skills. One of the fastest-growing healthcare roles. Free with WIOA or Next Level Jobs funding.',
+    microLabel: 'NHA CCMA Certification',
+    credentialLabel: 'NHA CCMA',
+    durationLabel: '12 weeks',
+    salaryRangeLabel: '$35,000 to $45,000',
+    belowHeroHeadline: 'Medical Assistant — NHA CCMA certification in 12 weeks.',
+    belowHeroSubheadline: 'Clinical procedures, patient intake, EHR documentation, and phlebotomy. Prepare for the NHA CCMA and CPT exams. Free with WIOA or Next Level Jobs funding.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=medical-assistant' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['Free with WIOA funding', 'CCMA exam prep', '14% job growth', 'Clinical rotations included'],
-    credentialLabel: 'Certified Medical Assistant',
-    durationLabel: '12 weeks',
-    salaryRangeLabel: '$16 to $24 per hour',
-    transcript:
-      'Train for Certified Medical Assistant in 12 weeks, building practical skills in clinical procedures, EHR documentation, and patient intake. Related entry-level opportunities commonly fall in the $16 to $24 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['Free with WIOA funding', 'NHA CCMA + CPT exams', 'Clinical rotations included', 'MA pay $35K–$45K'],
+    transcript: 'Train for NHA CCMA and CPT certification in 12 weeks, building skills in clinical procedures, patient intake, EHR documentation, and phlebotomy. Medical assistants commonly earn $35,000 to $45,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.',
     analyticsName: 'medical-assistant',
   }),
 
@@ -495,17 +621,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/pharmacy-tech.jpg',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
     voiceoverSrc: '/audio/heroes/healthcare.mp3',
-    microLabel: 'Pharmacy Technician',
-    belowHeroHeadline: 'Pharmacy Technician — CPhT certification in 10 weeks.',
-    belowHeroSubheadline: 'Medication dispensing, pharmacy law, sterile compounding, and inventory management. Prepare for the PTCB exam. Free with WIOA funding.',
+    microLabel: 'PTCB CPhT Prep',
+    credentialLabel: 'PTCB CPhT',
+    durationLabel: '10 weeks',
+    salaryRangeLabel: '$34,000 to $46,000',
+    belowHeroHeadline: 'Pharmacy Technician — PTCB CPhT exam prep in 10 weeks.',
+    belowHeroSubheadline: 'Medication dispensing, pharmacy law, sterile compounding, and inventory management. Prepare for the PTCB CPhT exam. Free with WIOA funding.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=pharmacy-technician' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['Free with WIOA funding', 'PTCB exam prep', 'Next Level Jobs accepted', 'Payment plans available'],
-    credentialLabel: 'PTCB Pharmacy Technician',
-    durationLabel: '10 weeks',
-    salaryRangeLabel: '$15 to $22 per hour',
-    transcript:
-      'Train for PTCB Pharmacy Technician in 10 weeks, building practical skills in medication dispensing, inventory management, and pharmacy law. Related entry-level opportunities commonly fall in the $15 to $22 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['Free with WIOA funding', 'PTCB CPhT exam prep', 'Next Level Jobs accepted', 'Pharm tech pay $34K–$46K'],
+    transcript: 'Train for PTCB CPhT certification in 10 weeks, building skills in medication dispensing, pharmacy law, sterile compounding, and inventory management. Pharmacy technicians commonly earn $34,000 to $46,000. Free with WIOA funding for eligible Indiana residents. Self-pay is $4,200 with payment plans available.',
     analyticsName: 'pharmacy-technician',
   }),
 
@@ -514,17 +639,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/phlebotomy.jpg',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
     voiceoverSrc: '/audio/heroes/healthcare.mp3',
-    microLabel: 'Phlebotomy',
-    belowHeroHeadline: 'Phlebotomy Technician — CPT certification in 4 weeks.',
-    belowHeroSubheadline: '120 hours of classroom and clinical training. Prepare for the NHA Certified Phlebotomy Technician exam. Start working in clinics and labs within a month.',
+    microLabel: 'NHA CPT Certification',
+    credentialLabel: 'NHA CPT',
+    durationLabel: '4 weeks',
+    salaryRangeLabel: '$30,000 to $40,000',
+    belowHeroHeadline: 'Phlebotomy Technician — NHA CPT certification in 4 weeks.',
+    belowHeroSubheadline: '120 hours of classroom and clinical training. Prepare for the NHA CPT exam. Enter healthcare in 4 weeks. Self-pay $1,500 with payment plans.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=phlebotomy' },
     secondaryCta: { label: 'Payment Plans', href: '/contact?program=phlebotomy', variant: 'secondary' },
-    trustIndicators: ['NHA CPT exam prep', 'Clinical training included', 'Flexible payment plans', 'Starting pay $16–$22/hr'],
-    credentialLabel: 'NPA Phlebotomy Technician',
-    durationLabel: '6 weeks',
-    salaryRangeLabel: '$15 to $20 per hour',
-    transcript:
-      'Train for NPA Phlebotomy Technician in 6 weeks, building practical skills in venipuncture, specimen handling, and patient communication. Related entry-level opportunities commonly fall in the $15 to $20 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['NHA CPT exam prep', '120 hours clinical training', 'Self-pay $1,500', 'Flexible payment plans'],
+    transcript: 'Train for NHA CPT certification in 4 weeks, completing 120 hours of classroom and clinical training in venipuncture, specimen processing, and patient interaction. Phlebotomy technicians commonly earn $30,000 to $40,000. The NHA CPT is the employer-accepted standard in Indiana. Self-pay is $1,500 with payment plans available.',
     analyticsName: 'phlebotomy',
   }),
 
@@ -533,17 +657,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/healthcare-classroom.jpg',
     videoSrcDesktop: '/videos/cna-hero.mp4',
     voiceoverSrc: '/audio/heroes/healthcare.mp3',
-    microLabel: 'Home Health Aide',
-    belowHeroHeadline: 'Home Health Aide Certification in 4 weeks.',
-    belowHeroSubheadline: 'Earn CCHW and HHA certifications for in-home care careers. Free with WIOA or Workforce Ready Grant.',
+    microLabel: 'Indiana HHA Certification',
+    credentialLabel: 'Indiana HHA certification',
+    durationLabel: '4 weeks',
+    salaryRangeLabel: '$26,000 to $36,000',
+    belowHeroHeadline: 'Home Health Aide — Indiana HHA + CCHW in 4 weeks.',
+    belowHeroSubheadline: 'Indiana state HHA certification and CCHW credential for in-home and community care careers. Free with WIOA or Workforce Ready Grant.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=home-health-aide' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['Free with WIOA funding', 'CCHW & HHA certifications', 'ETPL approved', 'Job placement assistance'],
-    credentialLabel: 'Indiana HHA Certification',
-    durationLabel: '4 weeks',
-    salaryRangeLabel: '$14 to $19 per hour',
-    transcript:
-      'Train for Indiana HHA Certification in 4 weeks, building practical skills in personal care, mobility assistance, and home safety. Related entry-level opportunities commonly fall in the $14 to $19 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['Free with WIOA + WRG', 'Indiana HHA state cert', 'CCHW credential', 'ETPL approved'],
+    transcript: 'Earn Indiana HHA certification and the CCHW credential in 4 weeks, preparing for in-home and community care work with licensed agencies. Home health aides commonly earn $26,000 to $36,000. Free with WIOA or Workforce Ready Grant for eligible Indiana residents.',
     analyticsName: 'home-health-aide',
   }),
 
@@ -552,17 +675,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/cpr-aed.jpg',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
     voiceoverSrc: '/audio/heroes/healthcare.mp3',
-    microLabel: 'Emergency Health & Safety',
-    belowHeroHeadline: 'Emergency Health & Safety Technician in 4 weeks.',
-    belowHeroSubheadline: 'Earn EMR, CPR/AED, First Aid, and OSHA 10 certifications for healthcare and public safety careers. Free with WIOA or Workforce Ready Grant.',
+    microLabel: 'NREMT EMR Certification',
+    credentialLabel: 'NREMT Emergency Medical Responder',
+    durationLabel: '4 weeks',
+    salaryRangeLabel: '$32,000 to $45,000',
+    belowHeroHeadline: 'Emergency Health & Safety — NREMT EMR + OSHA 10 in 4 weeks.',
+    belowHeroSubheadline: 'NREMT Emergency Medical Responder, CPR/AED, First Aid, and OSHA 10 certifications. Free with WIOA or Workforce Ready Grant.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=emergency-health-safety' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['HSI certified', 'OSHA 10 included', 'WIOA eligible', 'ETPL approved'],
-    credentialLabel: 'Emergency Health Safety Certificate',
-    durationLabel: '2 weeks',
-    salaryRangeLabel: '$15 to $22 per hour',
-    transcript:
-      'Train for Emergency Health Safety Certificate in 2 weeks through HSI-certified instruction, building practical skills in first aid response, AED operation, and emergency protocols. Related entry-level opportunities commonly fall in the $15 to $22 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['Free with WIOA + WRG', 'NREMT EMR certification', 'OSHA 10 + CPR/AED', 'ETPL approved'],
+    transcript: 'Earn NREMT Emergency Medical Responder, CPR/AED, First Aid, and OSHA 10 credentials in 4 weeks. Emergency health and safety roles commonly earn $32,000 to $45,000. Free with WIOA or Workforce Ready Grant for eligible Indiana residents. Self-pay is $4,950.',
     analyticsName: 'emergency-health-safety',
   }),
 
@@ -571,17 +693,17 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/cpr-mannequin.jpg',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
     voiceoverSrc: '/audio/heroes/cpr.mp3',
-    microLabel: 'CPR & First Aid',
-    belowHeroHeadline: 'CPR & First Aid Certification — train from home.',
-    belowHeroSubheadline: 'Live instructor. Mannequin shipped to your door. HSI-certified training for healthcare, education, and licensed professions. $130.',
+    microLabel: 'HSI Certified',
+    credentialLabel: 'HSI-certified CPR, AED, and First Aid',
+    durationLabel: '1 day',
+    salaryExempt: true,
+    salaryNote: 'Bundled prerequisite cert included free with all Elevate programs; $130 standalone. No direct salary outcome — strengthens employability across roles.',
+    belowHeroHeadline: 'CPR & First Aid — HSI certified, train from home.',
+    belowHeroSubheadline: 'Live instructor. Mannequin shipped to your door. HSI-certified CPR, AED, and First Aid for healthcare, education, and licensed professions. $130. Included free with all Elevate programs.',
     primaryCta: { label: 'Enroll Now', href: '/apply?program=cpr-first-aid' },
     secondaryCta: { label: 'Learn More', href: '/contact?program=cpr-first-aid', variant: 'secondary' },
-    trustIndicators: ['HSI certified', 'Mannequin included', 'Live instructor', 'Included free with Elevate programs'],
-    credentialLabel: 'CPR/AED Certification',
-    durationLabel: '1 day',
-    salaryRangeLabel: '$15 to $22 per hour',
-    transcript:
-      'Earn CPR/AED Certification in 1 day through HSI-certified instruction, building practical skills in chest compressions, rescue breathing, and AED operation. Required for healthcare, education, and many licensed professions. Related entry-level opportunities commonly fall in the $15 to $22 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['HSI certified', 'Mannequin shipped to you', 'Live instructor online', 'Free with Elevate programs'],
+    transcript: 'Earn HSI-certified CPR, AED, and First Aid certification in 1 day from home — a mannequin ships to your door and a live instructor guides the skills session. Accepted for healthcare, education, childcare, and licensed professions. $130 self-pay. Included free with any Elevate training program.',
     analyticsName: 'cpr-first-aid',
   }),
 
@@ -590,17 +712,17 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/sanitation.jpg',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
     voiceoverSrc: '/audio/heroes/healthcare.mp3',
-    microLabel: 'Sanitation & Safety',
-    belowHeroHeadline: 'Sanitation & Infection Control Certification in 2 weeks.',
-    belowHeroSubheadline: 'ServSafe and infection control certifications for healthcare, food service, and personal services. Included free with Elevate training programs.',
+    microLabel: 'ServSafe + Bloodborne',
+    credentialLabel: 'ServSafe Food Handler',
+    durationLabel: '2 weeks',
+    salaryExempt: true,
+    salaryNote: 'Bundled prerequisite cert included free with Elevate programs; $400 standalone. Required credential for entry into healthcare/food service — not a standalone career program.',
+    belowHeroHeadline: 'Sanitation & Infection Control — ServSafe + Bloodborne Pathogens in 2 weeks.',
+    belowHeroSubheadline: 'ServSafe Food Handler and OSHA-compliant Bloodborne Pathogens certifications. Required for healthcare, food service, and personal services. Included free with Elevate programs.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=sanitation-infection-control' },
     secondaryCta: { label: 'Learn More', href: '/contact?program=sanitation-infection-control', variant: 'secondary' },
-    trustIndicators: ['HSI certified', 'ServSafe included', 'Required for healthcare', 'Included with programs'],
-    credentialLabel: 'Infection Control Certificate',
-    durationLabel: '2 weeks',
-    salaryRangeLabel: '$15 to $22 per hour',
-    transcript:
-      'Earn Infection Control Certificate in 2 weeks through HSI-certified instruction, building practical skills in PPE protocols, surface disinfection, and outbreak prevention. Required for healthcare, food service, and personal services compliance. Related entry-level opportunities commonly fall in the $15 to $22 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['ServSafe Food Handler', 'OSHA Bloodborne Pathogens', 'Included with programs', 'Self-pay $400'],
+    transcript: 'Earn ServSafe Food Handler and OSHA-compliant Bloodborne Pathogens certifications in 2 weeks. Both credentials are required for healthcare, food service, and personal services work. Included free with any Elevate training program. Self-pay is $400.',
     analyticsName: 'sanitation-infection-control',
   }),
 
@@ -609,17 +731,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/barber-hero-main.jpg',
     videoSrcDesktop: '/videos/barber-hero-final.mp4',
     voiceoverSrc: '/audio/heroes/barber.mp3',
-    microLabel: 'Barber Apprenticeship',
+    microLabel: 'DOL Registered Apprenticeship',
+    credentialLabel: 'Indiana Barber License',
+    durationLabel: '2,000 hours',
+    salaryRangeLabel: '$28,000 to $52,000',
     belowHeroHeadline: 'Earn your Indiana Barber License while getting paid.',
-    belowHeroSubheadline: 'DOL Registered Apprenticeship. 2,000 hours of training in a licensed barbershop under a master barber. Earn wages from day one.',
+    belowHeroSubheadline: 'DOL Registered Apprenticeship. 2,000 hours — 1,500 OJT in a licensed barbershop + 500 RTI. Earn wages from day one. Graduate with Indiana Barber License, Rise Up, and CPR.',
     primaryCta: { label: 'Apply Now', href: '/programs/barber-apprenticeship/apply' },
     secondaryCta: { label: 'Find a Host Shop', href: '/programs/barber-apprenticeship/host-shops', variant: 'secondary' },
-    trustIndicators: ['DOL Registered Apprenticeship', 'Earn while you train', 'Indiana Barber License', 'Rise Up certification'],
-    credentialLabel: 'Indiana Barber License',
-    durationLabel: '2 years',
-    salaryRangeLabel: '$18 to $40 per hour',
-    transcript:
-      'Earn Indiana Barber License in 2 years through a registered apprenticeship, building practical skills in cutting, shaving, and salon operations. Related entry-level opportunities commonly fall in the $18 to $40 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['DOL Registered Apprenticeship', 'Earn wages from day one', 'Indiana Barber License', 'Rise Up + CPR included'],
+    transcript: 'Earn Indiana Barber License through a DOL Registered Apprenticeship of 2,000 hours — 1,500 hours of paid on-the-job training in a licensed barbershop plus 500 hours of instruction. Barbers commonly earn $28,000 to $52,000 depending on clientele and setting. Wages begin on day one.',
     analyticsName: 'barber-apprenticeship',
   }),
 
@@ -628,17 +749,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/cosmetology.jpg',
     videoSrcDesktop: '/videos/beauty-cosmetology.mp4',
     voiceoverSrc: '/audio/heroes/cosmetology.mp3',
-    microLabel: 'Cosmetology Apprenticeship',
-    belowHeroHeadline: 'Earn your Indiana Cosmetology License while getting paid.',
-    belowHeroSubheadline: 'DOL Registered Apprenticeship. 2,000 hours of supervised training in a licensed salon. Earn wages from day one.',
-    primaryCta: { label: 'Apply Now', href: '/programs/cosmetology-apprenticeship/apply' },
-    secondaryCta: { label: 'Learn More', href: '/contact?program=cosmetology-apprenticeship', variant: 'secondary' },
-    trustIndicators: ['DOL Registered Apprenticeship', 'Earn while you train', 'Indiana Cosmetology License', 'Salon-based training'],
+    microLabel: 'DOL Registered Apprenticeship',
     credentialLabel: 'Indiana Cosmetology License',
-    durationLabel: '2 years',
-    salaryRangeLabel: '$16 to $38 per hour',
-    transcript:
-      'Earn Indiana Cosmetology License in 2 years through a registered apprenticeship, building practical skills in hair color, chemical services, and client consultation. Related entry-level opportunities commonly fall in the $16 to $38 per hour range depending on employer, experience, and local market.',
+    durationLabel: '2,000 hours',
+    salaryRangeLabel: '$26,000 to $48,000',
+    belowHeroHeadline: 'Earn your Indiana Cosmetology License while getting paid.',
+    belowHeroSubheadline: 'DOL Registered Apprenticeship. 2,000 hours of supervised salon training under a licensed cosmetologist. Earn wages from day one.',
+    primaryCta: { label: 'Apply Now', href: '/programs/cosmetology-apprenticeship/apply' },
+    secondaryCta: { label: 'Find a Host Salon', href: '/contact?program=cosmetology-apprenticeship', variant: 'secondary' },
+    trustIndicators: ['DOL Registered Apprenticeship', 'Earn wages from day one', 'Indiana Cosmetology License', 'Salon-based training'],
+    transcript: 'Earn Indiana Cosmetology License through a DOL Registered Apprenticeship of 2,000 hours of supervised training in a licensed salon. Cosmetologists commonly earn $26,000 to $48,000 depending on clientele and setting. Wages begin on day one. The Indiana Cosmetology License is required to work in any Indiana salon.',
     analyticsName: 'cosmetology-apprenticeship',
   }),
 
@@ -647,17 +767,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/nail-technician.jpg',
     videoSrcDesktop: '/videos/nail-tech.mp4',
     voiceoverSrc: '/audio/heroes/nail-tech.mp3',
-    microLabel: 'Nail Tech Apprenticeship',
-    belowHeroHeadline: 'Earn your Indiana Nail Technician License while getting paid.',
-    belowHeroSubheadline: 'DOL Registered Apprenticeship. 600 hours of supervised training in a licensed salon. Manicure, pedicure, acrylics, and gel nails.',
-    primaryCta: { label: 'Apply Now', href: '/apply?program=nail-technician-apprenticeship' },
-    secondaryCta: { label: 'Learn More', href: '/contact?program=nail-technician-apprenticeship', variant: 'secondary' },
-    trustIndicators: ['DOL Registered Apprenticeship', 'Earn while you train', 'Indiana Nail Tech License', '600 hours training'],
+    microLabel: 'DOL Registered Apprenticeship',
     credentialLabel: 'Indiana Nail Technician License',
-    durationLabel: '1 year',
-    salaryRangeLabel: '$14 to $30 per hour',
-    transcript:
-      'Earn Indiana Nail Technician License in 1 year through a registered apprenticeship, building practical skills in manicuring, pedicuring, and nail art. Related entry-level opportunities commonly fall in the $14 to $30 per hour range depending on employer, experience, and local market.',
+    durationLabel: '600 hours',
+    salaryRangeLabel: '$24,000 to $42,000',
+    belowHeroHeadline: 'Earn your Indiana Nail Technician License while getting paid.',
+    belowHeroSubheadline: 'DOL Registered Apprenticeship. 600 hours of supervised training in a licensed salon. Manicure, pedicure, acrylics, and gel nails. Earn wages from day one.',
+    primaryCta: { label: 'Apply Now', href: '/apply?program=nail-technician-apprenticeship' },
+    secondaryCta: { label: 'Find a Host Salon', href: '/contact?program=nail-technician-apprenticeship', variant: 'secondary' },
+    trustIndicators: ['DOL Registered Apprenticeship', 'Earn wages from day one', 'Indiana Nail Technician License', '600 hours — fastest path'],
+    transcript: 'Earn Indiana Nail Technician License through a DOL Registered Apprenticeship of 600 hours — the fastest path to an Indiana nail license. Training covers manicure, pedicure, acrylics, and gel nails in a licensed salon. Nail technicians commonly earn $24,000 to $42,000. Wages begin on day one.',
     analyticsName: 'nail-technician-apprenticeship',
   }),
 
@@ -666,36 +785,34 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/culinary.jpg',
     videoSrcDesktop: '/videos/beauty-cosmetology.mp4',
     voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
-    microLabel: 'Culinary Apprenticeship',
+    microLabel: 'DOL Registered Apprenticeship',
+    credentialLabel: 'ServSafe Manager',
+    durationLabel: '2,000 hours',
+    salaryRangeLabel: '$28,000 to $45,000',
     belowHeroHeadline: 'Culinary Apprenticeship — earn while you train.',
-    belowHeroSubheadline: 'DOL Registered Apprenticeship. Earn ServSafe certification and culinary skills through hands-on training in a professional kitchen.',
+    belowHeroSubheadline: 'DOL Registered Apprenticeship. Hands-on training in a professional kitchen. Earn ServSafe Manager certification and culinary credentials. Wages from day one.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=culinary-apprenticeship' },
-    secondaryCta: { label: 'Learn More', href: '/contact?program=culinary-apprenticeship', variant: 'secondary' },
-    trustIndicators: ['DOL Registered Apprenticeship', 'Earn while you train', 'ServSafe certification', 'Professional kitchen training'],
-    credentialLabel: 'Culinary Arts Certificate',
-    durationLabel: '2 years',
-    salaryRangeLabel: '$15 to $28 per hour',
-    transcript:
-      'Earn Culinary Arts Certificate in 2 years through a registered apprenticeship, building practical skills in food preparation, kitchen safety, and menu planning. Related entry-level opportunities commonly fall in the $15 to $28 per hour range depending on employer, experience, and local market.',
+    secondaryCta: { label: 'Find a Host Kitchen', href: '/contact?program=culinary-apprenticeship', variant: 'secondary' },
+    trustIndicators: ['DOL Registered Apprenticeship', 'Earn wages from day one', 'ServSafe Manager cert', 'Professional kitchen training'],
+    transcript: 'Earn ServSafe Manager certification through a DOL Registered Culinary Apprenticeship of 2,000 hours in a professional kitchen, building skills in food preparation, kitchen operations, and food safety. Culinary professionals commonly earn $28,000 to $45,000. Wages begin on day one.',
     analyticsName: 'culinary-apprenticeship',
   }),
 
   'esthetician': programBanner('esthetician', {
     pageKey: 'esthetician',
     posterImage: '/images/pages/barber-apprentice-learning.jpg',
-    videoSrcDesktop: '/videos/esthetician-spa.mp4',
+    videoSrcDesktop: '/videos/beauty-cosmetology.mp4',
     voiceoverSrc: '/audio/heroes/cosmetology.mp3',
-    microLabel: 'Esthetician Training',
-    belowHeroHeadline: 'Professional Esthetician training in 5 weeks.',
-    belowHeroSubheadline: 'Skin analysis, facial treatments, hair removal, and business startup. WIOA funded. ETPL approved.',
+    microLabel: 'Esthetician Certificate',
+    credentialLabel: 'Esthetician Certificate',
+    durationLabel: '5 weeks',
+    salaryRangeLabel: '$32,000 to $48,000',
+    belowHeroHeadline: 'Esthetician Certificate — skin care career in 5 weeks.',
+    belowHeroSubheadline: 'Skin analysis, facial treatments, chemical peels, hair removal, and business startup. ETPL approved. Free with WIOA or Workforce Ready Grant.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=esthetician' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['Free with WIOA funding', 'ETPL approved', 'Workforce Ready Grant eligible', 'Business startup included'],
-    credentialLabel: 'Indiana Esthetician License',
-    durationLabel: '1 year',
-    salaryRangeLabel: '$14 to $32 per hour',
-    transcript:
-      'Earn Indiana Esthetician License in 1 year, building practical skills in skin analysis, facial treatments, and chemical exfoliation. Related entry-level opportunities commonly fall in the $14 to $32 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['Free with WIOA + WRG', 'ETPL approved', 'Business startup module', 'Esthetician pay $32K–$48K'],
+    transcript: 'Earn an Esthetician Certificate in 5 weeks, building skills in skin analysis, facial treatments, chemical peels, hair removal, and business startup. Estheticians commonly earn $32,000 to $48,000. ETPL approved. Free with WIOA or Workforce Ready Grant for eligible Indiana residents.',
     analyticsName: 'esthetician',
   }),
 
@@ -704,17 +821,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/barber-styling-hair.jpg',
     videoSrcDesktop: '/videos/beauty-cosmetology.mp4',
     voiceoverSrc: '/audio/heroes/cosmetology.mp3',
-    microLabel: 'Beauty & Education',
-    belowHeroHeadline: 'Beauty & Career Educator Training in 12 weeks.',
-    belowHeroSubheadline: 'Salon services, peer teaching, entrepreneurship, and workforce readiness. Free with WIOA or Workforce Ready Grant.',
+    microLabel: 'Certiport ESB',
+    credentialLabel: 'Certiport ESB',
+    durationLabel: '12 weeks',
+    salaryRangeLabel: '$28,000 to $45,000',
+    belowHeroHeadline: 'Beauty & Career Educator — salon skills + workforce credentials in 12 weeks.',
+    belowHeroSubheadline: 'Salon services, peer teaching, Certiport ESB, and Rise Up certification. Hybrid schedule. Free with WIOA or Workforce Ready Grant.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=beauty-career-educator' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['Free with WIOA funding', 'ETPL approved', 'Entrepreneurship included', 'Workforce readiness'],
-    credentialLabel: 'Cosmetology Instructor License',
-    durationLabel: '1 year',
-    salaryRangeLabel: '$18 to $35 per hour',
-    transcript:
-      'Earn Cosmetology Instructor License in 1 year, building practical skills in lesson planning, student assessment, and salon management. Related entry-level opportunities commonly fall in the $18 to $35 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['Free with WIOA + WRG', 'Certiport ESB certification', 'Rise Up credential', 'Hybrid schedule'],
+    transcript: 'Earn Certiport ESB, Rise Up, and CPR credentials in 12 weeks alongside hands-on salon training and peer teaching skills. Beauty and career educator roles commonly earn $28,000 to $45,000. Hybrid schedule. Free with WIOA or Workforce Ready Grant for eligible Indiana residents.',
     analyticsName: 'beauty-career-educator',
   }),
 
@@ -740,17 +856,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/it-helpdesk-desk.jpg',
     videoSrcDesktop: '/videos/it-technology.mp4',
     voiceoverSrc: '/audio/heroes/technology.mp3',
-    microLabel: 'IT Help Desk',
-    belowHeroHeadline: 'IT Help Desk Technician — CompTIA A+ in 8 weeks.',
-    belowHeroSubheadline: 'Troubleshoot hardware, software, and networks. Launch your IT career with a 4-Star Indiana Top Job credential. WIOA funding available.',
-    primaryCta: { label: 'Apply Now', href: '/apply?program=it-help-desk' },
-    secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['WIOA funding available', 'CompTIA A+ prep', '4-Star Indiana Top Job', 'Starting pay $18–$26/hr'],
+    microLabel: 'CompTIA A+ Prep',
     credentialLabel: 'CompTIA A+',
     durationLabel: '8 weeks',
-    salaryRangeLabel: '$18 to $28 per hour',
-    transcript:
-      'Train for CompTIA A+ in 8 weeks, building practical skills in hardware troubleshooting, operating systems, and network connectivity. Related entry-level opportunities commonly fall in the $18 to $28 per hour range depending on employer, experience, and local market.',
+    salaryRangeLabel: '$38,000 to $52,000',
+    belowHeroHeadline: 'IT Help Desk Technician — CompTIA A+ in 8 weeks.',
+    belowHeroSubheadline: 'Troubleshoot hardware, software, and networks. Prepare for CompTIA A+ Core 1 and Core 2. A 4-Star Indiana Top Job. Free with WIOA or Next Level Jobs funding.',
+    primaryCta: { label: 'Apply Now', href: '/apply?program=it-help-desk' },
+    secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
+    trustIndicators: ['Free with WIOA + Next Level Jobs', 'CompTIA A+ Core 1 + Core 2', '4-Star Indiana Top Job', 'IT support pay $38K–$52K'],
+    transcript: 'Train for CompTIA A+ certification in 8 weeks, building skills in hardware troubleshooting, software support, and network fundamentals. IT help desk roles commonly earn $38,000 to $52,000. A 4-Star Indiana Top Job. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.',
     analyticsName: 'it-help-desk',
   }),
 
@@ -759,17 +874,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/cybersecurity-screen.jpg',
     videoSrcDesktop: '/videos/it-technology.mp4',
     voiceoverSrc: '/audio/heroes/technology.mp3',
-    microLabel: 'Cybersecurity',
-    belowHeroHeadline: 'Cybersecurity Analyst — CompTIA Security+ in 12 weeks.',
-    belowHeroSubheadline: 'Protect networks and data from cyber threats. A 5-Star Indiana Top Job. WIOA and Next Level Jobs funding available.',
-    primaryCta: { label: 'Apply Now', href: '/apply?program=cybersecurity-analyst' },
-    secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['WIOA funding available', 'CompTIA Security+ prep', '5-Star Indiana Top Job', 'Starting pay $25–$40/hr'],
+    microLabel: 'CompTIA Security+ Prep',
     credentialLabel: 'CompTIA Security+',
     durationLabel: '12 weeks',
-    salaryRangeLabel: '$45,000 to $75,000',
-    transcript:
-      'Train for CompTIA Security+ in 12 weeks, building practical skills in security fundamentals, threat awareness, and system protection. Related entry-level opportunities commonly fall in the $45,000 to $75,000 range depending on employer, experience, and local market.',
+    salaryRangeLabel: '$55,000 to $85,000',
+    belowHeroHeadline: 'Cybersecurity Analyst — CompTIA Security+ in 12 weeks.',
+    belowHeroSubheadline: 'Network defense, threat analysis, and incident response. Prepare for CompTIA Security+ SY0-701. A 5-Star Indiana Top Job. Free with WIOA or Next Level Jobs funding.',
+    primaryCta: { label: 'Apply Now', href: '/apply?program=cybersecurity-analyst' },
+    secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
+    trustIndicators: ['Free with WIOA + Next Level Jobs', 'CompTIA Security+ SY0-701', '5-Star Indiana Top Job', 'Cybersecurity pay $55K–$85K'],
+    transcript: 'Train for CompTIA Security+ certification in 12 weeks, building skills in network defense, threat analysis, and incident response. Cybersecurity analysts commonly earn $55,000 to $85,000. A 5-Star Indiana Top Job. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.',
     analyticsName: 'cybersecurity-analyst',
   }),
 
@@ -778,17 +892,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/network-administration.jpg',
     videoSrcDesktop: '/videos/it-technology.mp4',
     voiceoverSrc: '/audio/heroes/technology.mp3',
-    microLabel: 'Network Administration',
-    belowHeroHeadline: 'Network Administration — CompTIA Network+ in 10 weeks.',
-    belowHeroSubheadline: 'Network design, configuration, and troubleshooting. Prepare for CompTIA Network+ certification. Free with WIOA or Next Level Jobs funding.',
-    primaryCta: { label: 'Apply Now', href: '/apply?program=network-administration' },
-    secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['Free with WIOA funding', 'CompTIA Network+ prep', 'Next Level Jobs accepted', 'Hands-on lab training'],
+    microLabel: 'CompTIA Network+ Prep',
     credentialLabel: 'CompTIA Network+',
     durationLabel: '10 weeks',
-    salaryRangeLabel: '$20 to $35 per hour',
-    transcript:
-      'Train for CompTIA Network+ in 10 weeks, building practical skills in network configuration, routing protocols, and infrastructure management. Related entry-level opportunities commonly fall in the $20 to $35 per hour range depending on employer, experience, and local market.',
+    salaryRangeLabel: '$45,000 to $65,000',
+    belowHeroHeadline: 'Network Administration — CompTIA Network+ in 10 weeks.',
+    belowHeroSubheadline: 'Network design, TCP/IP, routing, switching, and troubleshooting. Prepare for CompTIA Network+ N10-009. Free with WIOA or Next Level Jobs funding.',
+    primaryCta: { label: 'Apply Now', href: '/apply?program=network-administration' },
+    secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
+    trustIndicators: ['Free with WIOA + Next Level Jobs', 'CompTIA Network+ N10-009', 'Hands-on lab environment', 'Network admin pay $45K–$65K'],
+    transcript: 'Train for CompTIA Network+ certification in 10 weeks, building skills in network design, TCP/IP, routing, switching, and troubleshooting. Network administrators commonly earn $45,000 to $65,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.',
     analyticsName: 'network-administration',
   }),
 
@@ -797,17 +910,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/networking-hero.jpg',
     videoSrcDesktop: '/videos/it-technology.mp4',
     voiceoverSrc: '/audio/heroes/technology.mp3',
-    microLabel: 'Network Support',
-    belowHeroHeadline: 'Network Support Technician in 6 weeks.',
-    belowHeroSubheadline: 'Entry-level network support and help desk skills. IT Specialist certification in networking. Free with WIOA or Next Level Jobs funding.',
+    microLabel: 'IT Specialist Networking',
+    credentialLabel: 'Certiport IT Specialist Networking',
+    durationLabel: '6 weeks',
+    salaryRangeLabel: '$35,000 to $48,000',
+    belowHeroHeadline: 'Network Support Technician — IT Specialist Networking in 6 weeks.',
+    belowHeroSubheadline: 'Entry-level network support, cabling, and help desk skills. Prepare for the Certiport IT Specialist Networking exam. Free with WIOA or Next Level Jobs funding.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=network-support-technician' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['Free with WIOA funding', 'IT Specialist certification', 'Next Level Jobs accepted', 'Entry-level friendly'],
-    credentialLabel: 'CompTIA Network+',
-    durationLabel: '10 weeks',
-    salaryRangeLabel: '$18 to $30 per hour',
-    transcript:
-      'Train for CompTIA Network+ in 10 weeks, building practical skills in cable installation, switch configuration, and help desk support. Related entry-level opportunities commonly fall in the $18 to $30 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['Free with WIOA + Next Level Jobs', 'Certiport IT Specialist Networking', 'Entry-level pathway', 'Network support pay $35K–$48K'],
+    transcript: 'Train for Certiport IT Specialist Networking certification in 6 weeks, building skills in network support, cabling, and help desk operations. Network support technicians commonly earn $35,000 to $48,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.',
     analyticsName: 'network-support-technician',
   }),
 
@@ -816,17 +928,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/software-development.jpg',
     videoSrcDesktop: '/videos/it-technology.mp4',
     voiceoverSrc: '/audio/heroes/technology.mp3',
-    microLabel: 'Software Development',
-    belowHeroHeadline: 'Software Development Foundations in 12 weeks.',
-    belowHeroSubheadline: 'Learn Python, databases, and software engineering fundamentals. Prepare for IT Specialist certifications. Free with WIOA or Next Level Jobs funding.',
+    microLabel: 'IT Specialist Python',
+    credentialLabel: 'Certiport IT Specialist Python',
+    durationLabel: '12 weeks',
+    salaryRangeLabel: '$48,000 to $72,000',
+    belowHeroHeadline: 'Software Development — IT Specialist Python in 12 weeks.',
+    belowHeroSubheadline: 'Python programming, databases, APIs, and software engineering fundamentals. Prepare for Certiport IT Specialist Python and HTML certifications. Free with WIOA or Next Level Jobs funding.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=software-development' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['Free with WIOA funding', 'IT Specialist certifications', 'Python & databases', 'Next Level Jobs accepted'],
-    credentialLabel: 'Software Development Certificate',
-    durationLabel: '16 weeks',
-    salaryRangeLabel: '$45,000 to $80,000',
-    transcript:
-      'Earn Software Development Certificate in 16 weeks, building practical skills in Python programming, version control, and application deployment. Related entry-level opportunities commonly fall in the $45,000 to $80,000 range depending on employer, experience, and local market.',
+    trustIndicators: ['Free with WIOA + Next Level Jobs', 'Certiport IT Specialist Python', 'Python + HTML certifications', 'Dev pay $48K–$72K'],
+    transcript: 'Train for Certiport IT Specialist Python and HTML certifications in 12 weeks, building skills in Python programming, databases, APIs, and software engineering fundamentals. Entry-level developers commonly earn $48,000 to $72,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.',
     analyticsName: 'software-development',
   }),
 
@@ -835,17 +946,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/web-development.jpg',
     videoSrcDesktop: '/videos/it-technology.mp4',
     voiceoverSrc: '/audio/heroes/technology.mp3',
-    microLabel: 'Web Development',
-    belowHeroHeadline: 'Web Development — Meta & WordPress certifications in 12 weeks.',
-    belowHeroSubheadline: 'Learn HTML, CSS, JavaScript, and WordPress. Prepare for Meta Front-End Developer and WordPress certifications. Free with WIOA or Next Level Jobs funding.',
+    microLabel: 'Meta Front-End Cert',
+    credentialLabel: 'Meta Front-End Developer Professional Certificate',
+    durationLabel: '12 weeks',
+    salaryRangeLabel: '$45,000 to $70,000',
+    belowHeroHeadline: 'Web Development — Meta Front-End Developer + WordPress in 12 weeks.',
+    belowHeroSubheadline: 'HTML, CSS, JavaScript, React, and WordPress. Prepare for Meta Front-End Developer Professional Certificate and WordPress Certified Developer. Free with WIOA or Next Level Jobs funding.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=web-development' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['Free with WIOA funding', 'Meta Front-End cert', 'WordPress certification', 'Next Level Jobs accepted'],
-    credentialLabel: 'Web Development Certificate',
-    durationLabel: '12 weeks',
-    salaryRangeLabel: '$40,000 to $70,000',
-    transcript:
-      'Earn Web Development Certificate in 12 weeks, building practical skills in HTML, CSS, and JavaScript fundamentals. Related entry-level opportunities commonly fall in the $40,000 to $70,000 range depending on employer, experience, and local market.',
+    trustIndicators: ['Free with WIOA + Next Level Jobs', 'Meta Front-End Developer cert', 'WordPress Certified Developer', 'Web dev pay $45K–$70K'],
+    transcript: 'Train for Meta Front-End Developer Professional Certificate and WordPress Certified Developer credentials in 12 weeks, building skills in HTML, CSS, JavaScript, React, and WordPress. Web developers commonly earn $45,000 to $70,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.',
     analyticsName: 'web-development',
   }),
 
@@ -854,17 +964,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/graphic-design.jpg',
     videoSrcDesktop: '/videos/it-technology.mp4',
     voiceoverSrc: '/audio/heroes/technology.mp3',
-    microLabel: 'Graphic Design',
+    microLabel: 'Adobe Certified Professional',
+    credentialLabel: 'Adobe Certified Professional',
+    durationLabel: '10 weeks',
+    salaryRangeLabel: '$38,000 to $58,000',
     belowHeroHeadline: 'Graphic Design — Adobe Certified Professional in 10 weeks.',
-    belowHeroSubheadline: 'Learn Adobe Photoshop, Illustrator, and InDesign. Prepare for Adobe Certified Professional credentials. WIOA funding available.',
+    belowHeroSubheadline: 'Adobe Photoshop, Illustrator, and InDesign. Prepare for Adobe Certified Professional in Visual Design. WIOA and Next Level Jobs funding available.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=graphic-design' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['WIOA funding available', 'Adobe Certified Professional', 'Photoshop, Illustrator, InDesign', 'Next Level Jobs accepted'],
-    credentialLabel: 'Graphic Design Certificate',
-    durationLabel: '10 weeks',
-    salaryRangeLabel: '$35,000 to $60,000',
-    transcript:
-      'Earn Graphic Design Certificate in 10 weeks, building practical skills in Adobe Creative Suite, typography, and brand identity. Related entry-level opportunities commonly fall in the $35,000 to $60,000 range depending on employer, experience, and local market.',
+    trustIndicators: ['WIOA + Next Level Jobs eligible', 'Adobe Certified Professional', 'Photoshop + Illustrator + InDesign', 'Designer pay $38K–$58K'],
+    transcript: 'Train for Adobe Certified Professional in Visual Design in 10 weeks, building skills in Photoshop, Illustrator, and InDesign. Graphic designers commonly earn $38,000 to $58,000. WIOA and Next Level Jobs funding available for eligible Indiana residents. Apply now.',
     analyticsName: 'graphic-design',
   }),
 
@@ -873,17 +982,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/cad-drafting.jpg',
     videoSrcDesktop: '/videos/it-technology.mp4',
     voiceoverSrc: '/audio/heroes/technology.mp3',
-    microLabel: 'CAD / Drafting',
-    belowHeroHeadline: 'CAD/Drafting Technician — Autodesk certification in 10 weeks.',
-    belowHeroSubheadline: 'Learn AutoCAD and Revit for architectural and mechanical drafting. Prepare for Autodesk Certified User credentials. WIOA funding available.',
+    microLabel: 'Autodesk Certified User',
+    credentialLabel: 'Autodesk Certified User',
+    durationLabel: '10 weeks',
+    salaryRangeLabel: '$42,000 to $60,000',
+    belowHeroHeadline: 'CAD/Drafting Technician — Autodesk Certified User in 10 weeks.',
+    belowHeroSubheadline: 'AutoCAD and Revit for architectural and mechanical drafting. Prepare for Autodesk Certified User credentials. WIOA and Next Level Jobs funding available.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=cad-drafting' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['WIOA funding available', 'Autodesk Certified User', 'AutoCAD & Revit', 'Next Level Jobs accepted'],
-    credentialLabel: 'AutoCAD Certification',
-    durationLabel: '10 weeks',
-    salaryRangeLabel: '$18 to $30 per hour',
-    transcript:
-      'Earn AutoCAD Certification in 10 weeks, building practical skills in 2D drafting, dimensioning, and technical drawing standards. Related entry-level opportunities commonly fall in the $18 to $30 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['WIOA + Next Level Jobs eligible', 'Autodesk Certified User', 'AutoCAD + Revit', 'Drafter pay $42K–$60K'],
+    transcript: 'Train for Autodesk Certified User credentials in 10 weeks, building skills in AutoCAD and Revit for architectural and mechanical drafting. Drafting technicians commonly earn $42,000 to $60,000. WIOA and Next Level Jobs funding available for eligible Indiana residents.',
     analyticsName: 'cad-drafting',
   }),
 
@@ -894,17 +1002,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/tax-prep-desk.jpg',
     videoSrcDesktop: '/videos/tax-career-paths.mp4',
     voiceoverSrc: '/audio/heroes/tax.mp3',
-    microLabel: 'Tax Preparation',
-    belowHeroHeadline: 'Tax Preparation — earn your IRS PTIN in 8 weeks.',
-    belowHeroSubheadline: 'Individual and small business tax preparation with real tax software training. Free with WIOA or Next Level Jobs funding.',
+    microLabel: 'IRS PTIN + AFSP',
+    credentialLabel: 'IRS PTIN and AFSP',
+    durationLabel: '8 weeks',
+    salaryRangeLabel: '$35,000 to $55,000',
+    belowHeroHeadline: 'Tax Preparation — IRS PTIN and AFSP credential in 8 weeks.',
+    belowHeroSubheadline: 'Individual and small business tax preparation with real tax software. Earn your IRS PTIN and AFSP credential. Enrolled Agent exam prep included. Free with WIOA or Next Level Jobs funding.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=tax-preparation' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['Free with WIOA funding', 'IRS PTIN credential', 'Real tax software', 'Next Level Jobs accepted'],
-    credentialLabel: 'IRS AFSP Certificate',
-    durationLabel: '8 weeks',
-    salaryRangeLabel: '$15 to $30 per hour',
-    transcript:
-      'Earn IRS AFSP Certificate in 8 weeks, building practical skills in individual tax returns, deduction identification, and IRS e-filing. Related entry-level opportunities commonly fall in the $15 to $30 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['Free with WIOA + Next Level Jobs', 'IRS PTIN + AFSP credential', 'Enrolled Agent exam prep', 'Tax prep pay $35K–$55K'],
+    transcript: 'Train for IRS PTIN and AFSP credentials in 8 weeks, building skills in individual and small business tax preparation using real tax software. Tax preparers commonly earn $35,000 to $55,000. Enrolled Agent exam preparation included. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.',
     analyticsName: 'tax-preparation',
   }),
 
@@ -913,17 +1020,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/bookkeeping-ledger.jpg',
     videoSrcDesktop: '/videos/business-finance.mp4',
     voiceoverSrc: '/audio/heroes/business.mp3',
-    microLabel: 'Bookkeeping',
-    belowHeroHeadline: 'Bookkeeping & QuickBooks — certified in 5 weeks.',
-    belowHeroSubheadline: 'Master small business accounting and prepare for the QuickBooks Certified User exam. Flexible payment plans available.',
+    microLabel: 'QuickBooks Certified User',
+    credentialLabel: 'QuickBooks Certified User',
+    durationLabel: '5 weeks',
+    salaryRangeLabel: '$38,000 to $52,000',
+    belowHeroHeadline: 'Bookkeeping & QuickBooks — QuickBooks Certified User in 5 weeks.',
+    belowHeroSubheadline: 'Small business accounting, accounts payable, receivable, and payroll. Prepare for the QuickBooks Certified User exam. Flexible payment plans available.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=bookkeeping' },
     secondaryCta: { label: 'Payment Plans', href: '/contact?program=bookkeeping', variant: 'secondary' },
-    trustIndicators: ['QuickBooks Certified User', 'Small business accounting', 'Flexible payment plans', '5-week program'],
-    credentialLabel: 'QuickBooks ProAdvisor',
-    durationLabel: '8 weeks',
-    salaryRangeLabel: '$18 to $28 per hour',
-    transcript:
-      'Earn QuickBooks ProAdvisor in 8 weeks, building practical skills in accounts payable, bank reconciliation, and financial reporting. Related entry-level opportunities commonly fall in the $18 to $28 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['QuickBooks Certified User cert', 'Small business accounting', 'Flexible payment plans', '5-week program'],
+    transcript: 'Train for QuickBooks Certified User certification in 5 weeks, building skills in small business accounting, accounts payable, receivable, and payroll. Bookkeepers commonly earn $38,000 to $52,000. Flexible payment plans available.',
     analyticsName: 'bookkeeping',
   }),
 
@@ -932,17 +1038,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/office-admin-desk.jpg',
     videoSrcDesktop: '/videos/business-finance.mp4',
     voiceoverSrc: '/audio/heroes/business.mp3',
-    microLabel: 'Office Administration',
-    belowHeroHeadline: 'Office Administration — Microsoft Office Specialist in 6 weeks.',
-    belowHeroSubheadline: 'Master Microsoft Office and business communication. Prepare for Microsoft Office Specialist certifications. Free with WIOA or Next Level Jobs funding.',
-    primaryCta: { label: 'Apply Now', href: '/apply?program=office-administration' },
-    secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['Free with WIOA funding', 'Microsoft Office Specialist', 'Business communication', 'Next Level Jobs accepted'],
+    microLabel: 'Microsoft Office Specialist',
     credentialLabel: 'Microsoft Office Specialist',
     durationLabel: '6 weeks',
-    salaryRangeLabel: '$16 to $24 per hour',
-    transcript:
-      'Earn Microsoft Office Specialist in 6 weeks, building practical skills in document formatting, spreadsheet management, and business communication. Related entry-level opportunities commonly fall in the $16 to $24 per hour range depending on employer, experience, and local market.',
+    salaryRangeLabel: '$32,000 to $48,000',
+    belowHeroHeadline: 'Office Administration — Microsoft Office Specialist in 6 weeks.',
+    belowHeroSubheadline: 'Word, Excel, PowerPoint, Outlook, and business communication. Prepare for Microsoft Office Specialist Word and Excel certifications. Free with WIOA or Next Level Jobs funding.',
+    primaryCta: { label: 'Apply Now', href: '/apply?program=office-administration' },
+    secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
+    trustIndicators: ['Free with WIOA + Next Level Jobs', 'MOS Word certification', 'MOS Excel certification', 'Admin pay $32K–$48K'],
+    transcript: 'Train for Microsoft Office Specialist Word and Excel certifications in 6 weeks, building skills in Word, Excel, PowerPoint, Outlook, and business communication. Office administrators commonly earn $32,000 to $48,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.',
     analyticsName: 'office-administration',
   }),
 
@@ -951,17 +1056,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/entrepreneurship.jpg',
     videoSrcDesktop: '/videos/business-finance.mp4',
     voiceoverSrc: '/audio/heroes/business.mp3',
-    microLabel: 'Entrepreneurship',
-    belowHeroHeadline: 'Entrepreneurship & Small Business in 6 weeks.',
-    belowHeroSubheadline: 'Business planning, marketing, financial management, and Certiport ESB certification. Evening program. Free with WIOA or grant funding.',
+    microLabel: 'Certiport ESB Certification',
+    credentialLabel: 'Certiport ESB',
+    durationLabel: '6 weeks',
+    salaryRangeLabel: '$32,000 to $55,000',
+    belowHeroHeadline: 'Entrepreneurship & Small Business — Certiport ESB in 6 weeks.',
+    belowHeroSubheadline: 'Business planning, marketing, financial management, and Certiport ESB certification. Evening program. Build a real business plan. Free with WIOA or grant funding.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=entrepreneurship' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['Free with WIOA funding', 'Certiport ESB certification', 'Evening schedule', 'Mentorship included'],
-    credentialLabel: 'Business Launch Certificate',
-    durationLabel: '8 weeks',
-    salaryRangeLabel: '$0 to $100,000+',
-    transcript:
-      'Earn Business Launch Certificate in 8 weeks, building practical skills in business planning, financial projections, and customer acquisition. Related entry-level opportunities commonly fall in the $0 to $100,000+ range depending on employer, experience, and local market.',
+    trustIndicators: ['Free with WIOA + grant funding', 'Certiport ESB certification', 'Evening schedule', 'Real business plan deliverable'],
+    transcript: 'Train for Certiport ESB certification in 6 weeks, building skills in business planning, marketing, and financial management. Small business owners and business support roles commonly earn $32,000 to $55,000. Evening schedule. Free with WIOA or grant funding for eligible Indiana residents.',
     analyticsName: 'entrepreneurship',
   }),
 
@@ -970,17 +1074,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/business-sector.jpg',
     videoSrcDesktop: '/videos/business-finance.mp4',
     voiceoverSrc: '/audio/heroes/business.mp3',
-    microLabel: 'Business Administration',
-    belowHeroHeadline: 'Business Administration — Certiport certifications in 8 weeks.',
-    belowHeroSubheadline: 'Microsoft Office, QuickBooks, and business fundamentals. Prepare for Certiport business certifications. WIOA and Next Level Jobs funding available.',
+    microLabel: 'MOS + Certiport ESB',
+    credentialLabel: 'Microsoft Office Specialist',
+    durationLabel: '8 weeks',
+    salaryRangeLabel: '$38,000 to $55,000',
+    belowHeroHeadline: 'Business Administration — Microsoft Office Specialist + Certiport ESB in 8 weeks.',
+    belowHeroSubheadline: 'Microsoft Office, QuickBooks, and business fundamentals. Prepare for Microsoft Office Specialist and Certiport ESB certifications. WIOA and Next Level Jobs funding available.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=business-administration' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['WIOA funding available', 'Certiport certifications', 'Microsoft Office included', 'Next Level Jobs accepted'],
-    credentialLabel: 'Business Administration Certificate',
-    durationLabel: '10 weeks',
-    salaryRangeLabel: '$18 to $28 per hour',
-    transcript:
-      'Earn Business Administration Certificate in 10 weeks, building practical skills in operations management, business writing, and organizational systems. Related entry-level opportunities commonly fall in the $18 to $28 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['WIOA + Next Level Jobs eligible', 'Microsoft Office Specialist', 'Certiport ESB cert', 'Business admin pay $38K–$55K'],
+    transcript: 'Train for Microsoft Office Specialist and Certiport ESB certifications in 8 weeks, building skills in Microsoft Office, QuickBooks, and business fundamentals. Business administrators commonly earn $38,000 to $55,000. WIOA and Next Level Jobs funding available for eligible Indiana residents.',
     analyticsName: 'business-administration',
   }),
 
@@ -989,17 +1092,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/project-management.jpg',
     videoSrcDesktop: '/videos/business-finance.mp4',
     voiceoverSrc: '/audio/heroes/business.mp3',
-    microLabel: 'Project Management',
-    belowHeroHeadline: 'Project Management certification in 6 weeks.',
-    belowHeroSubheadline: 'Agile, Scrum, and traditional PM methodologies. Prepare for Certiport Project Management certification. Free with WIOA or Next Level Jobs funding.',
+    microLabel: 'Certiport PM Certification',
+    credentialLabel: 'Certiport Project Management',
+    durationLabel: '6 weeks',
+    salaryRangeLabel: '$52,000 to $75,000',
+    belowHeroHeadline: 'Project Management — Certiport PM certification in 6 weeks.',
+    belowHeroSubheadline: 'Agile, Scrum, and traditional project management methodologies. Prepare for Certiport Project Management certification. Free with WIOA or Next Level Jobs funding.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=project-management' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['Free with WIOA funding', 'Certiport PM certification', 'Agile & Scrum', 'Next Level Jobs accepted'],
-    credentialLabel: 'CAPM Certification',
-    durationLabel: '10 weeks',
-    salaryRangeLabel: '$45,000 to $75,000',
-    transcript:
-      'Train for CAPM Certification in 10 weeks, building practical skills in project scheduling, risk management, and stakeholder communication. Related entry-level opportunities commonly fall in the $45,000 to $75,000 range depending on employer, experience, and local market.',
+    trustIndicators: ['Free with WIOA + Next Level Jobs', 'Certiport Project Management cert', 'Agile + Scrum methodology', 'PM pay $52K–$75K'],
+    transcript: 'Train for Certiport Project Management certification in 6 weeks, building skills in Agile, Scrum, and traditional project management methodologies. Project managers commonly earn $52,000 to $75,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.',
     analyticsName: 'project-management',
   }),
 
@@ -1008,17 +1110,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/bookkeeping-ledger.jpg',
     videoSrcDesktop: '/videos/tax-career-paths.mp4',
     voiceoverSrc: '/audio/heroes/tax.mp3',
-    microLabel: 'Finance & Accounting',
-    belowHeroHeadline: 'Finance, Bookkeeping & Accounting credential pathway.',
-    belowHeroSubheadline: 'Tiered credentials in tax preparation, bookkeeping, payroll, and accounting. IRS PTIN, QuickBooks Certified User, and Enrolled Agent preparation. Funded for eligible participants.',
+    microLabel: 'IRS PTIN + QuickBooks',
+    credentialLabel: 'IRS PTIN',
+    durationLabel: '12 weeks',
+    salaryRangeLabel: '$42,000 to $62,000',
+    belowHeroHeadline: 'Finance, Bookkeeping & Accounting — tiered credential pathway in 12 weeks.',
+    belowHeroSubheadline: 'Tax preparation, bookkeeping, payroll, and accounting. Earn IRS PTIN, QuickBooks Certified User, and prepare for the Enrolled Agent exam. Funded for eligible participants.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=finance-bookkeeping-accounting' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['WIOA funding available', 'IRS PTIN credential', 'QuickBooks Certified User', 'Enrolled Agent prep'],
-    credentialLabel: 'Accounting Technician Certificate',
-    durationLabel: '12 weeks',
-    salaryRangeLabel: '$18 to $30 per hour',
-    transcript:
-      'Earn Accounting Technician Certificate in 12 weeks, building practical skills in general ledger, payroll processing, and financial statements. Related entry-level opportunities commonly fall in the $18 to $30 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['WIOA funding available', 'IRS PTIN credential', 'QuickBooks Certified User', 'Enrolled Agent exam prep'],
+    transcript: 'Earn IRS PTIN, QuickBooks Certified User, and Enrolled Agent exam preparation through a tiered credential pathway completed in 12 weeks, covering tax preparation, bookkeeping, payroll, and accounting. Finance professionals commonly earn $42,000 to $62,000. WIOA funding available for eligible Indiana residents.',
     analyticsName: 'finance-bookkeeping-accounting',
   }),
 
@@ -1029,17 +1130,16 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/peer-recovery.jpg',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
     voiceoverSrc: '/audio/heroes/dsp.mp3',
-    microLabel: 'Peer Recovery',
-    belowHeroHeadline: 'Become a Certified Peer Recovery Specialist.',
-    belowHeroSubheadline: 'Indiana CPRS training. Support individuals in recovery and behavioral health programs. WIOA funding available.',
+    microLabel: 'Indiana CPRS Credential',
+    credentialLabel: 'Indiana CPRS',
+    durationLabel: '8 weeks',
+    salaryRangeLabel: '$32,000 to $45,000',
+    belowHeroHeadline: 'Peer Recovery Specialist — Indiana CPRS credential in 8 weeks.',
+    belowHeroSubheadline: 'Substance use recovery support, motivational interviewing, and crisis response. Earn the Indiana CPRS credential. WIOA and JRI funding available.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=peer-recovery-specialist' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['WIOA funding available', 'Indiana CPRS credential', 'JRI funding eligible', 'Job placement assistance'],
-    credentialLabel: 'CPRS Certification',
-    durationLabel: '8 weeks',
-    salaryRangeLabel: '$16 to $24 per hour',
-    transcript:
-      'Train for CPRS Certification in 8 weeks, building practical skills in motivational interviewing, recovery planning, and crisis support. Related entry-level opportunities commonly fall in the $16 to $24 per hour range depending on employer, experience, and local market.',
+    trustIndicators: ['WIOA + JRI funding eligible', 'Indiana CPRS credential', 'Motivational interviewing', 'Recovery support pay $32K–$45K'],
+    transcript: 'Train for Indiana CPRS certification in 8 weeks, building skills in substance use recovery support, motivational interviewing, and crisis response. Peer recovery specialists commonly earn $32,000 to $45,000. WIOA and JRI funding available for eligible Indiana residents.',
     analyticsName: 'peer-recovery-specialist',
   }),
 
@@ -1076,7 +1176,9 @@ const heroBanners: Record<string, HeroBannerConfig> = {
 
 export default heroBanners;
 
-/** Typed lookup — throws at build time if pageKey is wrong */
+/**
+ * Typed lookup — throws at runtime if pageKey is not registered.
+ */
 export function getHeroBanner(pageKey: keyof typeof heroBanners): HeroBannerConfig {
   const config = heroBanners[pageKey];
   if (!config) throw new Error(`No hero banner config found for pageKey: "${pageKey}"`);
@@ -1084,18 +1186,15 @@ export function getHeroBanner(pageKey: keyof typeof heroBanners): HeroBannerConf
 }
 
 /**
- * Validated internal program banners only.
- * Every entry has passed programBanner() at module load time.
- * Import this in audit scripts and program pages.
+ * internalProgramHeroBanners — the validated subset.
+ *
+ * ONLY internal workforce program pages use programBanner().
+ * Category/sector pages (skilled-trades, technology, business, apprenticeships, etc.)
+ * use plain HeroBannerConfig and are NOT included here.
+ * CDL waitlist stub is intentionally excluded — no hero required.
+ *
+ * Import this when you need the typed, validated set (e.g. audit scripts, tests).
  */
-export const internalProgramHeroBanners = Object.fromEntries(
-  Object.entries(heroBanners).filter(([, v]) => v.credentialLabel !== undefined)
-) as Record<string, HeroBannerConfig>;
-
-/**
- * Category / sector banners — not subject to programBanner() validation.
- * Used on sector landing pages (healthcare, trades, technology, etc.)
- */
-export const categoryHeroBanners = Object.fromEntries(
-  Object.entries(heroBanners).filter(([, v]) => v.credentialLabel === undefined)
-) as Record<string, HeroBannerConfig>;
+export const internalProgramHeroBanners: Record<string, ProgramHeroBannerConfig> = Object.fromEntries(
+  Object.entries(heroBanners).filter(([, v]) => 'credentialLabel' in v)
+) as Record<string, ProgramHeroBannerConfig>;

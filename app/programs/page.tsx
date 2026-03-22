@@ -110,10 +110,9 @@ export default function ProgramsPage() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* Hero */}
+      {/* Hero — uses homepage hero banner */}
       <HeroVideo
         videoSrcDesktop={hero.videoSrcDesktop}
-        videoSrcMobile={hero.videoSrcMobile}
         posterImage={hero.posterImage}
         voiceoverSrc={hero.voiceoverSrc}
         microLabel={hero.microLabel}

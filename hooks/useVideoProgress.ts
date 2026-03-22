@@ -4,13 +4,24 @@ import { useEffect, useRef, RefObject } from 'react';
 
 type UseVideoProgressOptions = {
   lessonId?: string | number;
+  /**
+   * User or enrollment identity to namespace the storage key.
+   * Without this, two users on the same device share resume state.
+   * Pass the authenticated user's ID or enrollment ID.
+   */
+  userId?: string;
   /** Fraction of video watched before marking complete (default: 0.8) */
   threshold?: number;
   /** How often to persist resume position to localStorage, in seconds (default: 5) */
   saveIntervalSeconds?: number;
 };
 
-const storageKey = (lessonId: string | number) => `video_resume_${lessonId}`;
+/**
+ * Storage key includes both userId and lessonId to prevent cross-user
+ * contamination on shared devices and admin testing accounts.
+ */
+const storageKey = (lessonId: string | number, userId?: string) =>
+  userId ? `video_resume_${userId}_${lessonId}` : `video_resume_${lessonId}`;
 
 /**
  * Attaches progress tracking to a <video> element.
@@ -21,7 +32,7 @@ const storageKey = (lessonId: string | number) => `video_resume_${lessonId}`;
  */
 export function useVideoProgress(
   ref: RefObject<HTMLVideoElement>,
-  { lessonId, threshold = 0.8, saveIntervalSeconds = 5 }: UseVideoProgressOptions = {}
+  { lessonId, userId, threshold = 0.8, saveIntervalSeconds = 5 }: UseVideoProgressOptions = {}
 ) {
   const hasReportedComplete = useRef(false);
   const lastSavedTime = useRef(0);
@@ -33,7 +44,7 @@ export function useVideoProgress(
 
     const restorePosition = () => {
       try {
-        const saved = localStorage.getItem(storageKey(lessonId));
+        const saved = localStorage.getItem(storageKey(lessonId, userId));
         if (saved) {
           const savedTime = parseFloat(saved);
           // Only restore if there is meaningful progress and the video is longer
@@ -58,7 +69,7 @@ export function useVideoProgress(
       video.addEventListener('loadedmetadata', restorePosition, { once: true });
       return () => video.removeEventListener('loadedmetadata', restorePosition);
     }
-  }, [ref, lessonId]);
+  }, [ref, lessonId, userId]);
 
   // Save position periodically and report completion.
   useEffect(() => {
@@ -70,7 +81,7 @@ export function useVideoProgress(
 
     const savePosition = (time: number) => {
       try {
-        localStorage.setItem(storageKey(lessonId), String(time));
+        localStorage.setItem(storageKey(lessonId, userId), String(time));
         lastSavedTime.current = time;
       } catch {
         // ignore
@@ -79,7 +90,7 @@ export function useVideoProgress(
 
     const clearPosition = () => {
       try {
-        localStorage.removeItem(storageKey(lessonId));
+        localStorage.removeItem(storageKey(lessonId, userId));
       } catch {
         // ignore
       }
@@ -131,5 +142,5 @@ export function useVideoProgress(
         savePosition(video.currentTime);
       }
     };
-  }, [ref, lessonId, threshold, saveIntervalSeconds]);
+  }, [ref, lessonId, userId, threshold, saveIntervalSeconds]);
 }

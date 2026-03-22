@@ -33,6 +33,7 @@ import { lessonUuidToSimulationKey } from '@/lib/lms/hvac-simulations';
 import { HVAC_QUICK_CHECKS } from '@/lib/courses/hvac-quick-checks';
 import { ExplainSimply } from '@/components/lms/ai/ExplainSimply';
 import { TranslateToggle } from '@/components/lms/ai/TranslateToggle';
+import LessonContentRenderer from '@/components/lms/LessonContentRenderer';
 
 const LessonVideoWithSimulation = dynamic(
   () => import('@/components/lms/LessonVideoWithSimulation'),
@@ -578,241 +579,40 @@ export default function LessonPage() {
 
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto">
-        {/* Content area — routes by step_type first, then content_type for legacy */}
-        {/* Checkpoint: module-boundary gate with reflection prompt */}
-        {(lesson.step_type === 'checkpoint') && !lesson.quiz_questions?.length ? (
-          <div className="max-w-4xl mx-auto p-4 md:p-8">
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
-                  <ClipboardList className="w-5 h-5 text-amber-600" />
-                </div>
-                <div>
-                  <div className="text-xs font-semibold uppercase tracking-wide text-amber-600">Module Checkpoint</div>
-                  <h2 className="text-xl font-bold text-slate-900">{lesson.title}</h2>
-                </div>
-              </div>
-              {lesson.content && (
-                <div className="prose max-w-none mb-6"
-                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }} />
-              )}
-              <div className="bg-white rounded-lg p-6 border border-amber-100">
-                <p className="text-sm font-semibold text-slate-700 mb-2">Reflection</p>
-                <p className="text-slate-600 text-sm">{lesson.description || 'Review the key concepts from this module before continuing.'}</p>
-              </div>
-            </div>
-          </div>
-        ) : lesson.step_type === 'lab' ? (
-          <div className="max-w-4xl mx-auto p-4 md:p-8">
-            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-brand-blue-100 flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-brand-blue-600" />
-                </div>
-                <div>
-                  <div className="text-xs font-semibold uppercase tracking-wide text-brand-blue-600">Hands-On Lab</div>
-                  <h2 className="text-xl font-bold text-slate-900">{lesson.title}</h2>
-                </div>
-              </div>
-              {lesson.content && (
-                <div className="prose max-w-none"
-                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }} />
-              )}
-              <StepSubmissionForm
-                lessonId={lessonId}
-                courseId={courseId}
-                stepType="lab"
-                lessonTitle={lesson.title}
-              />
-            </div>
-          </div>
-        ) : lesson.step_type === 'assignment' ? (
-          <div className="max-w-4xl mx-auto p-4 md:p-8">
-            <div className="bg-purple-50 border border-purple-200 rounded-xl p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                  <MessageSquare className="w-5 h-5 text-purple-600" />
-                </div>
-                <div>
-                  <div className="text-xs font-semibold uppercase tracking-wide text-purple-600">Assignment</div>
-                  <h2 className="text-xl font-bold text-slate-900">{lesson.title}</h2>
-                </div>
-              </div>
-              {lesson.content && (
-                <div className="prose max-w-none"
-                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }} />
-              )}
-              <StepSubmissionForm
-                lessonId={lessonId}
-                courseId={courseId}
-                stepType="assignment"
-                lessonTitle={lesson.title}
-              />
-            </div>
-          </div>
-        ) : lesson.content_type === 'scorm' && lesson.scorm_package_id ? (
-          <div className="h-[70vh]">
-            <iframe
-              src={`/api/scorm/content/${lesson.scorm_package_id}/${lesson.scorm_launch_path || 'index.html'}`}
-              className="w-full h-full border-0"
-              title={lesson.title}
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
-            />
-          </div>
-        ) : (lesson.step_type === 'checkpoint' || lesson.content_type === 'quiz') && (lesson.quiz_questions?.length > 0 || lesson.quiz_id) ? (
-          <div className="max-w-4xl mx-auto p-4 md:p-8">
-            <QuizPlayer
-              questions={lesson.quiz_questions || []}
-              title={lesson.title}
-              onComplete={async (score, answers) => {
-                const passingScore = lesson.passing_score || 70;
-                const passed = score >= passingScore;
-
-                // For checkpoint and exam steps, record the score via the engine API.
-                // This is what the module gate reads — must be written before markComplete.
-                if (lesson.step_type === 'checkpoint' || lesson.step_type === 'exam') {
-                  try {
-                    await fetch(`/api/lessons/${lessonId}/checkpoint`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        courseId,
-                        moduleOrder: lesson.module_order ?? 0,
-                        score,
-                        passingScore,
-                        answers: answers ?? {},
-                      }),
-                    });
-
-                    if (passed) {
-                      setPassedCheckpointIds(prev => new Set<string>([...Array.from(prev), lessonId]));
-                      setCheckpointBlocked(false);
-                    }
-                  } catch {
-                    // Non-fatal — fail open so the lesson still renders
-                  }
-                }
-
+        {/* Canonical content renderer — routes by lesson_type only via getLessonRenderMode */}
+        <LessonContentRenderer
+          lesson={lesson}
+          lessonId={lessonId}
+          courseId={courseId}
+          isCompleted={isCompleted}
+          onComplete={markComplete}
+          onQuizComplete={async (score, answers) => {
+            const passingScore = (lesson.passing_score as number) || 70;
+            const passed = score >= passingScore;
+            const lt = (lesson.lesson_type ?? lesson.step_type) as string;
+            if (lt === 'checkpoint' || lt === 'final_exam' || lt === 'exam') {
+              try {
+                await fetch(`/api/lessons/${lessonId}/checkpoint`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    courseId,
+                    moduleOrder: lesson.module_order ?? 0,
+                    score,
+                    passingScore,
+                    answers: answers ?? {},
+                  }),
+                });
                 if (passed) {
-                  markComplete();
+                  setPassedCheckpointIds(prev => new Set<string>([...Array.from(prev), lessonId]));
+                  setCheckpointBlocked(false);
                 }
-              }}
-              passingScore={lesson.passing_score || 70}
-            />
-          </div>
-        ) : lesson.video_url && !lesson.video_url.includes('/generated/lessons/') && lessonUuidToSimulationKey[lessonId] ? (
-          <div className="max-w-4xl mx-auto p-4 md:p-8">
-            {/* Video + 3D simulation lesson */}
-            <LessonVideoWithSimulation
-              lessonKey={lessonUuidToSimulationKey[lessonId]}
-              videoUrl={lesson.video_url}
-              minimumTimeSeconds={120}
-              onMinimumTimeReached={() => {
-                // Simulation unlocked — no action needed yet
-              }}
-              onSimulationComplete={() => {
-                if (!isCompleted) {
-                  setIsCompleted(true);
-                  markComplete();
-                }
-              }}
-            />
-            {/* Show lesson content below simulation */}
-            {lesson.content && (
-              <div className="mt-6 bg-white rounded-xl p-8 shadow-sm">
-                <div
-                  className="prose max-w-none"
-                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }}
-                />
-              </div>
-            )}
-            {/* Quick Check quiz below simulation lessons */}
-            {HVAC_QUICK_CHECKS[lessonId] && (
-              <div className="mt-8">
-                <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                  <ClipboardList className="w-6 h-6 text-brand-blue-600" />
-                  Quick Check — Test Your Understanding
-                </h3>
-                <QuizPlayer
-                  questions={HVAC_QUICK_CHECKS[lessonId]}
-                  title="Quick Check"
-                  passingScore={60}
-                  onComplete={(score) => {
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        ) : lesson.video_url && !lesson.video_url.includes('/generated/lessons/') ? (
-          <div className="max-w-4xl mx-auto p-4 md:p-8">
-            {/* Video/audio lesson with real media file */}
-            <InteractiveVideoPlayer
-              videoUrl={lesson.video_url}
-              title={lesson.title}
-              onComplete={() => {
-                if (!isCompleted) {
-                  setIsCompleted(true);
-                  markComplete();
-                }
-              }}
-            />
-            {/* Show lesson content below video */}
-            {lesson.content && (
-              <div className="mt-6 bg-white rounded-xl p-8 shadow-sm">
-                <div
-                  className="prose max-w-none"
-                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }}
-                />
-              </div>
-            )}
-            {/* Quick Check quiz below video lessons */}
-            {HVAC_QUICK_CHECKS[lessonId] && (
-              <div className="mt-8">
-                <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                  <ClipboardList className="w-6 h-6 text-brand-blue-600" />
-                  Quick Check — Test Your Understanding
-                </h3>
-                <QuizPlayer
-                  questions={HVAC_QUICK_CHECKS[lessonId]}
-                  title="Quick Check"
-                  passingScore={60}
-                  onComplete={(score) => {
-                    // Quick checks don't block progress — just reinforcement
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        ) : (
-          /* Reading / text / video-without-file lesson — show rich content */
-          <div className="bg-white py-8">
-            <div className="max-w-4xl mx-auto px-4">
-              <div className="bg-white rounded-xl p-8 shadow-sm">
-                {lesson.content ? (
-                  <>
-                    <div
-                      className="prose max-w-none"
-                      dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }}
-                    />
-                    {/* AI reading aids — only for text lessons with real content */}
-                    <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap gap-3">
-                      <ExplainSimply content={lesson.content} />
-                      <TranslateToggle content={lesson.content} />
-                    </div>
-                  </>
-                ) : (
-                  <div>
-                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-4">
-                      <BookOpen className="w-4 h-4" />
-                      <span>Lesson {currentIndex + 1} of {lessons.length}</span>
-                    </div>
-                    <p className="text-slate-600">{lesson.description || 'No content available for this lesson.'}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+              } catch { /* non-fatal */ }
+            }
+            if (passed) markComplete();
+          }}
+        />
+
 
         {/* Lesson Content */}
         <div className="max-w-4xl mx-auto p-4 md:p-8">

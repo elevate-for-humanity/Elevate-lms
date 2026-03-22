@@ -62,9 +62,8 @@ export default function SplitMediaBlock({
           sizes="(max-width: 1024px) 100vw, 50vw"
         />
       ) : (
-        /* Clean placeholder — swap with real asset later */
         <div className="absolute inset-0 flex items-center justify-center bg-slate-100">
-          <span className="text-slate-400 text-sm font-medium">Media coming soon</span>
+          <span className="text-slate-400 text-sm font-medium">No image provided</span>
         </div>
       )}
     </div>

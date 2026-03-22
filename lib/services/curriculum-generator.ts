@@ -1,577 +1,386 @@
 /**
- * Idempotent curriculum generator.
+ * CurriculumGenerator
  *
- * Writes program curriculum into curriculum_lessons, curriculum_quizzes,
- * curriculum_recaps, and modules.
+ * Idempotent curriculum generator. Writes program curriculum into the
+ * learner-visible tables: course_modules and course_lessons.
  *
- * Identity keys (enforced by DB unique constraints from migration 000003):
- *   modules              → (program_id, slug)
- *   curriculum_lessons   → (program_id, lesson_slug)
- *   curriculum_quizzes   → (lesson_id, quiz_order)
- *   curriculum_recaps    → (lesson_id, recap_order)
+ * Write path (canonical, learner-visible):
+ *   course_modules  — keyed on (course_id, order_index)
+ *   course_lessons  — keyed on (course_id, slug)
  *
- * Each lesson is linked to a credential_exam_domain via credential_domain_id,
- * enabling coverage reporting and exam eligibility checks.
+ * Draft/audit trail (secondary, admin-editor-visible):
+ *   curriculum_lessons — still written for the admin curriculum editor
+ *   modules            — still written for program-level module registry
  *
- * ## Overwrite strategy
+ * Identity resolution:
+ *   blueprint.programSlug → programs.id → courses.id (via courses.program_id)
+ *   module.orderIndex → course_modules.order_index
+ *   order_index = module.orderIndex * 1000 + lesson.order (matches HVAC convention)
  *
- * Pass `mode` to control what happens when content already exists:
+ * Content:
+ *   BlueprintLessonRef has no scriptText. course_lessons.content is seeded
+ *   with a structured placeholder. Pass { seedMode: true } to allow this
+ *   explicitly — seedMode is loud and logs every placeholder lesson.
+ *   In production, lessons with no scriptText are skipped unless seedMode=true.
  *
- *   'seed_missing'  (default) — skip any lesson whose slug already exists in
- *                               the DB. Safe to re-run after human edits.
- *                               Modules are always upserted (title/order only).
- *
- *   'force'         — always upsert every row. Overwrites human edits.
- *                     Use only for initial seeding on a pristine program or
- *                     when you explicitly want to reset generated content.
- *
- * ## Domain linkage
- *
- * For credential-bearing programs (credentialId provided), every lesson MUST
- * supply a credentialDomainKey that resolves to a credential_exam_domains row.
- * A missing or unresolvable key is treated as an error and the lesson is NOT
- * written. This prevents silent coverage gaps in exam eligibility reporting.
- *
- * For non-exam programs (credentialId = null), credentialDomainKey is ignored.
- *
- * ## UUID stability note
- *
- * Domain IDs are resolved by (credential_id, domain_key), not by the seeded
- * UUID values. This is safe across environments. Do not hard-code domain UUIDs
- * in calling code — always pass domain_key and let the generator resolve.
- *
- * Usage:
- *   const gen = new CurriculumGenerator(programId, credentialId, 'seed_missing');
- *   await gen.upsertModule(moduleDef);
- *   await gen.upsertLesson(lessonDef);
- *   const summary = gen.summarize();
+ * Note: BlueprintLessonRef.stepType does not exist on the current type.
+ *   All blueprint lessons are seeded as 'lesson' type. Set step_type to
+ *   'checkpoint' manually in the DB for module-boundary quiz lessons, or
+ *   extend BlueprintLessonRef with stepType when the blueprint data is ready.
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
+import type {
+  CourseBlueprint,
+  BlueprintModule,
+  BlueprintLessonRef,
+} from '@/lib/curriculum/blueprints/types';
 
-// ─── Input types ──────────────────────────────────────────────────────────────
+// ── Types ─────────────────────────────────────────────────────────────────────
 
-export interface ModuleDef {
-  /** Stable machine key. Used as the idempotency key. e.g. 'core', 'type_i' */
-  slug: string;
-  title: string;
-  description?: string;
-  /** 1-based position within the program */
-  orderIndex: number;
-}
-
-export interface QuizDef {
-  question: string;
-  /** Exactly 4 options */
-  options: [string, string, string, string];
-  /** 0-based index of the correct option */
-  correctAnswer: number;
-  explanation: string;
-  /** 0-based position within the lesson. Used as idempotency key. */
-  quizOrder: number;
-}
-
-export interface RecapDef {
-  title: string;
-  description?: string;
-  /** 0-based position within the lesson. Used as idempotency key. */
-  recapOrder: number;
-}
-
-export interface LessonDef {
+export interface GeneratorOptions {
   /**
-   * Stable slug. Used as the idempotency key.
-   * Format: {module-slug}-{lesson-number}, e.g. 'core-01'
-   * Must be unique within the program.
+   * Allow lessons with no scriptText to be seeded with placeholder content.
+   * Every bypassed lesson is logged. Not for production content.
    */
+  seedMode?: boolean;
+  /** Validate and log but do not write to DB. */
+  dryRun?: boolean;
+}
+
+export interface LessonResult {
   lessonSlug: string;
-  lessonTitle: string;
-  /** Module this lesson belongs to (must already be upserted) */
-  moduleSlug: string;
-  /** 0-based position within the module */
-  lessonOrder: number;
-  /** 0-based module position (denormalized for query performance) */
   moduleOrder: number;
-  moduleTitle: string;
-  scriptText?: string;
-  keyTerms?: { term: string; definition: string }[];
-  jobApplication?: string;
-  watchFor?: string[];
-  diagramRef?: string;
-  videoFile?: string;
-  audioFile?: string;
-  captionFile?: string;
-  diagramFile?: string;
-  durationMinutes?: number;
-  /**
-   * domain_key from credential_exam_domains.
-   * Links this lesson to the exam domain it covers.
-   * Required for coverage reporting. Omit only for non-exam programs.
-   */
-  credentialDomainKey?: string;
-  /** training_courses.id — links this lesson to the LMS course page */
-  courseId?: string;
-  /**
-   * Lesson type. Controls rendering and completion rules.
-   * Defaults to 'lesson' if omitted.
-   * Set to 'checkpoint' on module-boundary lessons that gate the next module.
-   */
-  stepType?: 'lesson' | 'quiz' | 'checkpoint' | 'lab' | 'assignment' | 'exam' | 'certification';
-  /**
-   * Minimum score (0–100) required to pass.
-   * Required for checkpoint/quiz/exam step types.
-   * Defaults to 0 for plain lessons (no pass threshold).
-   * curriculum_lessons.passing_score is NOT NULL — always written explicitly.
-   */
-  passingScore?: number;
-  quizzes?: QuizDef[];
-  recaps?: RecapDef[];
+  lessonOrder: number;
+  status: 'upserted' | 'skipped' | 'dry_run';
+  reason?: string;
 }
 
-/**
- * Controls what happens when a lesson already exists in the DB.
- *
- * 'seed_missing' — skip existing lessons. Safe after human edits. (default)
- * 'force'        — always overwrite. Use only for initial seeding or explicit resets.
- */
-export type GeneratorMode = 'seed_missing' | 'force';
+export interface ModuleResult {
+  moduleSlug: string;
+  moduleOrder: number;
+  courseModuleId: string | null;
+  lessons: LessonResult[];
+}
 
-export interface GeneratorSummary {
+export interface GeneratorResult {
+  programSlug: string;
   programId: string;
-  mode: GeneratorMode;
-  modulesUpserted: number;
-  lessonsSkipped: number;
-  lessonsUpserted: number;
-  quizzesUpserted: number;
-  recapsUpserted: number;
-  errors: string[];
+  courseId: string;
+  modules: ModuleResult[];
+  totalLessons: number;
+  upserted: number;
+  skipped: number;
 }
 
-// ─── CurriculumGenerator ──────────────────────────────────────────────────────
+// ── Content packing ───────────────────────────────────────────────────────────
+
+function packContent(lesson: BlueprintLessonRef, seedMode: boolean): Record<string, unknown> {
+  return {
+    version: 1,
+    // Placeholder content — replace with real scriptText before publishing
+    instructionalContent: seedMode
+      ? `<p><em>Lesson content for "${lesson.title}" — pending authoring.</em></p>`
+      : '',
+    keyTerms: [],
+    objectives: [],
+    domainKey: lesson.domainKey ?? null,
+  };
+}
+
+// ── Generator ─────────────────────────────────────────────────────────────────
 
 export class CurriculumGenerator {
-  private programId: string;
-  private credentialId: string | null;
-  private mode: GeneratorMode;
-  private db: ReturnType<typeof createAdminClient>;
+  private db: SupabaseClient;
 
-  /** module slug → DB UUID, populated by upsertModule */
-  private moduleIdMap = new Map<string, string>();
-  /** lesson slug → DB UUID, populated by upsertLesson */
-  private lessonIdMap = new Map<string, string>();
-  /** domain key → DB UUID, populated lazily by resolveDomainId */
-  private domainIdCache = new Map<string, string>();
-  /** lesson slugs that already existed in DB at generation time */
-  private existingSlugs = new Set<string>();
+  constructor(supabaseUrl: string, serviceRoleKey: string) {
+    this.db = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { persistSession: false },
+    });
+  }
 
-  private summary: GeneratorSummary;
+  async generate(
+    blueprint: CourseBlueprint,
+    options: GeneratorOptions = {}
+  ): Promise<GeneratorResult> {
+    const { seedMode = false, dryRun = false } = options;
 
-  constructor(
-    programId: string,
-    credentialId: string | null = null,
-    mode: GeneratorMode = 'seed_missing'
-  ) {
-    this.programId = programId;
-    this.credentialId = credentialId;
-    this.mode = mode;
-    this.db = createAdminClient();
-    this.summary = {
+    if (seedMode) {
+      logger.warn(
+        '[CurriculumGenerator] seedMode=true — placeholder content will be written. Not for production.'
+      );
+    }
+
+    // ── 1. Resolve program_id from programSlug ────────────────────────────────
+    const { data: program, error: programErr } = await this.db
+      .from('programs')
+      .select('id')
+      .eq('slug', blueprint.programSlug)
+      .single();
+
+    if (programErr || !program) {
+      throw new Error(
+        `[CurriculumGenerator] No program found for slug="${blueprint.programSlug}". ` +
+          `Ensure a programs row exists with slug="${blueprint.programSlug}" before generating.`
+      );
+    }
+
+    const programId = program.id as string;
+
+    // ── 2. Resolve course_id from program_id ──────────────────────────────────
+    const { data: course, error: courseErr } = await this.db
+      .from('courses')
+      .select('id')
+      .eq('program_id', programId)
+      .single();
+
+    if (courseErr || !course) {
+      throw new Error(
+        `[CurriculumGenerator] No course found for program_id=${programId} ` +
+          `(programSlug="${blueprint.programSlug}"). ` +
+          `Create a courses row with program_id=${programId} before generating.`
+      );
+    }
+
+    const courseId = course.id as string;
+
+    const result: GeneratorResult = {
+      programSlug: blueprint.programSlug,
       programId,
-      mode,
-      modulesUpserted: 0,
-      lessonsSkipped: 0,
-      lessonsUpserted: 0,
-      quizzesUpserted: 0,
-      recapsUpserted: 0,
-      errors: [],
+      courseId,
+      modules: [],
+      totalLessons: 0,
+      upserted: 0,
+      skipped: 0,
+    };
+
+    // ── 3. Process each module ────────────────────────────────────────────────
+    for (const mod of blueprint.modules) {
+      if (!mod.lessons?.length) {
+        logger.warn('[CurriculumGenerator] Module has no lessons — skipping', {
+          moduleSlug: mod.slug,
+          courseId,
+        });
+        continue;
+      }
+
+      const moduleResult = await this.processModule(
+        mod,
+        courseId,
+        programId,
+        seedMode,
+        dryRun
+      );
+      result.modules.push(moduleResult);
+      result.totalLessons += moduleResult.lessons.length;
+      result.upserted += moduleResult.lessons.filter(
+        (l) => l.status === 'upserted' || l.status === 'dry_run'
+      ).length;
+      result.skipped += moduleResult.lessons.filter((l) => l.status === 'skipped').length;
+    }
+
+    logger.info(
+      `[CurriculumGenerator] ${dryRun ? 'DRY RUN ' : ''}Complete: ` +
+        `program=${blueprint.programSlug} course=${courseId} ` +
+        `modules=${result.modules.length} lessons=${result.totalLessons} ` +
+        `upserted=${result.upserted} skipped=${result.skipped}`
+    );
+
+    return result;
+  }
+
+  private async processModule(
+    mod: BlueprintModule,
+    courseId: string,
+    programId: string,
+    seedMode: boolean,
+    dryRun: boolean
+  ): Promise<ModuleResult> {
+    const moduleResult: ModuleResult = {
+      moduleSlug: mod.slug,
+      moduleOrder: mod.orderIndex,
+      courseModuleId: null,
+      lessons: [],
+    };
+
+    if (!dryRun) {
+      // ── 3a. Upsert course_modules (learner-visible) ─────────────────────────
+      const { data: courseModule, error: cmErr } = await this.db
+        .from('course_modules')
+        .upsert(
+          {
+            course_id: courseId,
+            title: mod.title,
+            order_index: mod.orderIndex,
+            type: 'standard',
+          },
+          { onConflict: 'course_id,order_index', ignoreDuplicates: false }
+        )
+        .select('id')
+        .single();
+
+      if (cmErr || !courseModule) {
+        logger.error('[CurriculumGenerator] course_modules upsert failed', {
+          moduleSlug: mod.slug,
+          courseId,
+          error: cmErr?.message,
+        });
+        // Non-fatal — lessons will have null module_id
+      } else {
+        moduleResult.courseModuleId = courseModule.id as string;
+      }
+
+      // ── 3b. Upsert modules (program-level registry / admin editor) ──────────
+      await this.db
+        .from('modules')
+        .upsert(
+          {
+            program_id: programId,
+            title: mod.title,
+            order_index: mod.orderIndex,
+          },
+          { onConflict: 'program_id,order_index', ignoreDuplicates: false }
+        );
+    }
+
+    for (const lesson of mod.lessons!) {
+      const lessonResult = await this.processLesson(
+        lesson,
+        mod,
+        courseId,
+        programId,
+        moduleResult.courseModuleId,
+        seedMode,
+        dryRun
+      );
+      moduleResult.lessons.push(lessonResult);
+    }
+
+    return moduleResult;
+  }
+
+  private async processLesson(
+    lesson: BlueprintLessonRef,
+    mod: BlueprintModule,
+    courseId: string,
+    programId: string,
+    courseModuleId: string | null,
+    seedMode: boolean,
+    dryRun: boolean
+  ): Promise<LessonResult> {
+    const orderIndex = mod.orderIndex * 1000 + lesson.order;
+
+    if (!seedMode) {
+      // Production mode: no scriptText means no content — skip
+      logger.warn('[CurriculumGenerator] Skipping lesson — no scriptText (use seedMode=true to seed placeholder)', {
+        slug: lesson.slug,
+        courseId,
+        moduleOrder: mod.orderIndex,
+        lessonOrder: lesson.order,
+      });
+      return {
+        lessonSlug: lesson.slug,
+        moduleOrder: mod.orderIndex,
+        lessonOrder: lesson.order,
+        status: 'skipped',
+        reason: 'no scriptText — use seedMode=true to seed placeholder content',
+      };
+    }
+
+    logger.info('[CurriculumGenerator] seedMode: writing placeholder content', {
+      slug: lesson.slug,
+      courseId,
+    });
+
+    if (dryRun) {
+      return {
+        lessonSlug: lesson.slug,
+        moduleOrder: mod.orderIndex,
+        lessonOrder: lesson.order,
+        status: 'dry_run',
+      };
+    }
+
+    const content = packContent(lesson, seedMode);
+
+    // ── 4a. Upsert course_lessons (canonical learner-visible write) ───────────
+    const { error: clErr } = await this.db
+      .from('course_lessons')
+      .upsert(
+        {
+          course_id: courseId,
+          module_id: courseModuleId,
+          slug: lesson.slug,
+          title: lesson.title,
+          lesson_type: 'lesson', // default; set checkpoint/quiz in DB after seeding
+          order_index: orderIndex,
+          content,
+          passing_score: null,
+          quiz_questions: null,
+          is_published: false,
+        },
+        { onConflict: 'course_id,slug', ignoreDuplicates: false }
+      );
+
+    if (clErr) {
+      logger.error('[CurriculumGenerator] course_lessons upsert failed', {
+        slug: lesson.slug,
+        courseId,
+        error: clErr.message,
+      });
+      return {
+        lessonSlug: lesson.slug,
+        moduleOrder: mod.orderIndex,
+        lessonOrder: lesson.order,
+        status: 'skipped',
+        reason: `course_lessons upsert error: ${clErr.message}`,
+      };
+    }
+
+    // ── 4b. Upsert curriculum_lessons (draft/admin-editor trail) ─────────────
+    // Non-fatal — learner path is course_lessons only.
+    await this.db
+      .from('curriculum_lessons')
+      .upsert(
+        {
+          program_id: programId,
+          course_id: courseId,
+          lesson_slug: lesson.slug,
+          lesson_title: lesson.title,
+          step_type: 'lesson',
+          module_order: mod.orderIndex,
+          lesson_order: lesson.order,
+          script_text: '',
+          status: 'draft',
+        },
+        { onConflict: 'program_id,lesson_slug', ignoreDuplicates: false }
+      );
+
+    return {
+      lessonSlug: lesson.slug,
+      moduleOrder: mod.orderIndex,
+      lessonOrder: lesson.order,
+      status: 'upserted',
     };
   }
-
-  /**
-   * Pre-loads the set of lesson slugs that already exist for this program.
-   * Called automatically by generate(). Can be called manually before
-   * individual upsertLesson() calls if using the generator incrementally.
-   */
-  async loadExistingSlugs(): Promise<void> {
-    if (!this.db) return;
-    const { data } = await this.db
-      .from('curriculum_lessons')
-      .select('lesson_slug')
-      .eq('program_id', this.programId);
-    for (const row of data ?? []) {
-      this.existingSlugs.add(row.lesson_slug);
-    }
-  }
-
-  // ── Domain resolution ───────────────────────────────────────────────────────
-
-  /**
-   * Resolves a credential_exam_domain UUID from its domain_key.
-   * Results are cached per generator instance.
-   *
-   * Returns null only when credentialId is null (non-exam program).
-   * When credentialId is set and the key is not found, returns the sentinel
-   * string 'NOT_FOUND' so callers can distinguish "no credential" from
-   * "credential set but domain missing" — the latter is always an error.
-   */
-  private async resolveDomainId(domainKey: string): Promise<string | 'NOT_FOUND' | null> {
-    // Non-exam program: domain linkage is not applicable
-    if (!this.credentialId) return null;
-    if (!domainKey) return null;
-
-    if (this.domainIdCache.has(domainKey)) {
-      return this.domainIdCache.get(domainKey)!;
-    }
-
-    const { data } = await this.db!
-      .from('credential_exam_domains')
-      .select('id')
-      .eq('credential_id', this.credentialId)
-      .eq('domain_key', domainKey)
-      .maybeSingle();
-
-    if (data?.id) {
-      this.domainIdCache.set(domainKey, data.id);
-      return data.id;
-    }
-
-    // Domain key not found for a credential-bearing program — caller must treat as error
-    return 'NOT_FOUND';
-  }
-
-  // ── Module upsert ───────────────────────────────────────────────────────────
-
-  /**
-   * Upserts a module row. Idempotent on (program_id, slug).
-   * Must be called before upsertLesson for any lesson in this module.
-   */
-  async upsertModule(def: ModuleDef): Promise<string | null> {
-    if (!this.db) {
-      this.summary.errors.push(`upsertModule(${def.slug}): database unavailable`);
-      return null;
-    }
-
-    const { data, error } = await this.db
-      .from('modules')
-      .upsert(
-        {
-          program_id:  this.programId,
-          slug:        def.slug,
-          title:       def.title,
-          description: def.description ?? null,
-          order_index: def.orderIndex,
-          updated_at:  new Date().toISOString(),
-        },
-        { onConflict: 'program_id,slug' }
-      )
-      .select('id')
-      .single();
-
-    if (error || !data) {
-      const msg = `upsertModule(${def.slug}): ${error?.message ?? 'no row returned'}`;
-      this.summary.errors.push(msg);
-      logger.error('curriculum-generator: ' + msg);
-      return null;
-    }
-
-    this.moduleIdMap.set(def.slug, data.id);
-    this.summary.modulesUpserted++;
-    return data.id;
-  }
-
-  // ── Lesson upsert ───────────────────────────────────────────────────────────
-
-  /**
-   * Upserts a lesson and its quizzes + recaps.
-   * Idempotent on (program_id, lesson_slug).
-   *
-   * In 'seed_missing' mode, skips lessons whose slug already exists in the DB.
-   * In 'force' mode, always overwrites.
-   *
-   * The module referenced by moduleSlug must have been upserted first.
-   * Quizzes are idempotent on (lesson_id, quiz_order).
-   * Recaps are idempotent on (lesson_id, recap_order).
-   *
-   * For credential-bearing programs, credentialDomainKey is required and must
-   * resolve to a known domain. A missing or unresolvable key aborts the lesson.
-   */
-  async upsertLesson(def: LessonDef): Promise<string | null> {
-    if (!this.db) {
-      this.summary.errors.push(`upsertLesson(${def.lessonSlug}): database unavailable`);
-      return null;
-    }
-
-    // seed_missing: skip lessons that already exist
-    if (this.mode === 'seed_missing' && this.existingSlugs.has(def.lessonSlug)) {
-      this.summary.lessonsSkipped++;
-      // Still populate the ID map so callers can reference the lesson
-      const { data } = await this.db
-        .from('curriculum_lessons')
-        .select('id')
-        .eq('program_id', this.programId)
-        .eq('lesson_slug', def.lessonSlug)
-        .maybeSingle();
-      if (data?.id) this.lessonIdMap.set(def.lessonSlug, data.id);
-      return data?.id ?? null;
-    }
-
-    const moduleId = this.moduleIdMap.get(def.moduleSlug) ?? null;
-    if (!moduleId) {
-      const msg = `upsertLesson(${def.lessonSlug}): module '${def.moduleSlug}' not found — call upsertModule first`;
-      this.summary.errors.push(msg);
-      logger.error('curriculum-generator: ' + msg);
-      return null;
-    }
-
-    // Resolve domain — hard error for credential-bearing programs
-    let credentialDomainId: string | null = null;
-    if (def.credentialDomainKey) {
-      const resolved = await this.resolveDomainId(def.credentialDomainKey);
-      if (resolved === 'NOT_FOUND') {
-        const msg = `upsertLesson(${def.lessonSlug}): credential domain '${def.credentialDomainKey}' not found for credential ${this.credentialId} — lesson not written`;
-        this.summary.errors.push(msg);
-        logger.error('curriculum-generator: ' + msg);
-        return null;
-      }
-      credentialDomainId = resolved;
-    } else if (this.credentialId) {
-      // Credential-bearing program but no domain key supplied — hard error
-      const msg = `upsertLesson(${def.lessonSlug}): credentialDomainKey is required for credential-bearing programs (credentialId=${this.credentialId}) — lesson not written`;
-      this.summary.errors.push(msg);
-      logger.error('curriculum-generator: ' + msg);
-      return null;
-    }
-
-    // Content enforcement — lesson body is required for all lesson types.
-    // Assessment lessons (checkpoint/quiz/exam) additionally require quizzes.
-    const assessmentTypes = ['checkpoint', 'quiz', 'exam'];
-    const isAssessment = assessmentTypes.includes(def.stepType ?? 'lesson');
-
-    if (!def.scriptText || def.scriptText.trim().length < 50) {
-      const msg = `upsertLesson(${def.lessonSlug}): script_text is required and must be at least 50 characters — lesson not written`;
-      this.summary.errors.push(msg);
-      logger.error('curriculum-generator: ' + msg);
-      return null;
-    }
-
-    if (isAssessment && (!def.quizzes || def.quizzes.length === 0)) {
-      const msg = `upsertLesson(${def.lessonSlug}): step_type '${def.stepType}' requires at least one quiz question — lesson not written`;
-      this.summary.errors.push(msg);
-      logger.error('curriculum-generator: ' + msg);
-      return null;
-    }
-
-    const { data: lessonRow, error: lessonErr } = await this.db
-
-      .from('curriculum_lessons')
-      .upsert(
-        {
-          program_id:           this.programId,
-          course_id:            def.courseId ?? null,
-          module_id:            moduleId,
-          lesson_slug:          def.lessonSlug,
-          lesson_title:         def.lessonTitle,
-          lesson_order:         def.lessonOrder,
-          module_order:         def.moduleOrder,
-          module_title:         def.moduleTitle,
-          script_text:          def.scriptText,
-          key_terms:            def.keyTerms ?? [],
-          job_application:      def.jobApplication ?? null,
-          watch_for:            def.watchFor ?? [],
-          diagram_ref:          def.diagramRef ?? null,
-          video_file:           def.videoFile ?? null,
-          audio_file:           def.audioFile ?? null,
-          caption_file:         def.captionFile ?? null,
-          diagram_file:         def.diagramFile ?? null,
-          duration_minutes:     def.durationMinutes ?? null,
-          credential_domain_id: credentialDomainId,
-          step_type:            def.stepType ?? 'lesson',
-          // NOT NULL column — 0 for plain lessons, explicit threshold for checkpoints/quizzes/exams
-          passing_score:        def.passingScore ?? (def.stepType && def.stepType !== 'lesson' ? 80 : 0),
-          status:               'published',
-          updated_at:           new Date().toISOString(),
-        },
-        { onConflict: 'program_id,lesson_slug' }
-      )
-      .select('id')
-      .single();
-
-    if (lessonErr || !lessonRow) {
-      const msg = `upsertLesson(${def.lessonSlug}): ${lessonErr?.message ?? 'no row returned'}`;
-      this.summary.errors.push(msg);
-      logger.error('curriculum-generator: ' + msg);
-      return null;
-    }
-
-    const lessonId = lessonRow.id;
-    this.lessonIdMap.set(def.lessonSlug, lessonId);
-    this.summary.lessonsUpserted++;
-
-    // Upsert quizzes
-    if (def.quizzes?.length) {
-      await this.upsertQuizzes(lessonId, def.lessonSlug, def.quizzes);
-    }
-
-    // Upsert recaps
-    if (def.recaps?.length) {
-      await this.upsertRecaps(lessonId, def.lessonSlug, def.recaps);
-    }
-
-    return lessonId;
-  }
-
-  // ── Quiz upsert ─────────────────────────────────────────────────────────────
-
-  private async upsertQuizzes(
-    lessonId: string,
-    lessonSlug: string,
-    quizzes: QuizDef[]
-  ): Promise<void> {
-    for (const q of quizzes) {
-      const { error } = await this.db!
-        .from('curriculum_quizzes')
-        .upsert(
-          {
-            lesson_id:      lessonId,
-            question:       q.question,
-            options:        q.options,
-            correct_answer: q.correctAnswer,
-            explanation:    q.explanation ?? null,
-            quiz_order:     q.quizOrder,
-          },
-          { onConflict: 'lesson_id,quiz_order' }
-        );
-
-      if (error) {
-        const msg = `upsertQuiz(${lessonSlug}[${q.quizOrder}]): ${error.message}`;
-        this.summary.errors.push(msg);
-        logger.error('curriculum-generator: ' + msg);
-      } else {
-        this.summary.quizzesUpserted++;
-      }
-    }
-  }
-
-  // ── Recap upsert ────────────────────────────────────────────────────────────
-
-  private async upsertRecaps(
-    lessonId: string,
-    lessonSlug: string,
-    recaps: RecapDef[]
-  ): Promise<void> {
-    for (const r of recaps) {
-      const { error } = await this.db!
-        .from('curriculum_recaps')
-        .upsert(
-          {
-            lesson_id:   lessonId,
-            title:       r.title,
-            description: r.description ?? null,
-            recap_order: r.recapOrder,
-          },
-          { onConflict: 'lesson_id,recap_order' }
-        );
-
-      if (error) {
-        const msg = `upsertRecap(${lessonSlug}[${r.recapOrder}]): ${error.message}`;
-        this.summary.errors.push(msg);
-        logger.error('curriculum-generator: ' + msg);
-      } else {
-        this.summary.recapsUpserted++;
-      }
-    }
-  }
-
-  // ── Bulk helpers ────────────────────────────────────────────────────────────
-
-  /**
-   * Upserts all modules in order, then all lessons.
-   * Modules are processed first so lesson → module FK is always satisfied.
-   *
-   * In 'seed_missing' mode, pre-loads existing lesson slugs so each
-   * upsertLesson() call can skip without a per-row DB read.
-   */
-  async generate(modules: ModuleDef[], lessons: LessonDef[]): Promise<GeneratorSummary> {
-    if (this.mode === 'seed_missing') {
-      await this.loadExistingSlugs();
-    }
-
-    for (const mod of modules.sort((a, b) => a.orderIndex - b.orderIndex)) {
-      await this.upsertModule(mod);
-    }
-
-    for (const lesson of lessons.sort(
-      (a, b) => a.moduleOrder - b.moduleOrder || a.lessonOrder - b.lessonOrder
-    )) {
-      await this.upsertLesson(lesson);
-    }
-
-    return this.summarize();
-  }
-
-  // ── Summary ─────────────────────────────────────────────────────────────────
-
-  summarize(): GeneratorSummary {
-    return { ...this.summary };
-  }
-
-  /**
-   * Returns the DB UUID for a lesson slug, or null if not yet upserted.
-   * Useful for post-generation media job creation.
-   */
-  getLessonId(lessonSlug: string): string | null {
-    return this.lessonIdMap.get(lessonSlug) ?? null;
-  }
-
-  getModuleId(moduleSlug: string): string | null {
-    return this.moduleIdMap.get(moduleSlug) ?? null;
-  }
 }
 
-// ─── Standalone helpers ───────────────────────────────────────────────────────
+// ── Convenience function ──────────────────────────────────────────────────────
 
-/**
- * Resolves a program UUID from its slug.
- * Returns null if not found.
- */
-export async function resolveProgramId(slug: string): Promise<string | null> {
-  const db = createAdminClient();
-  if (!db) return null;
-  const { data } = await db
-    .from('programs')
-    .select('id')
-    .eq('slug', slug)
-    .maybeSingle();
-  return data?.id ?? null;
-}
+export async function buildCourseFromBlueprint(
+  blueprint: CourseBlueprint,
+  options: GeneratorOptions = {}
+): Promise<GeneratorResult> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-/**
- * Resolves the primary credential UUID for a program.
- * Returns null if no primary credential is mapped.
- */
-export async function resolvePrimaryCredentialId(programId: string): Promise<string | null> {
-  const db = createAdminClient();
-  if (!db) return null;
-  const { data } = await db
-    .from('program_credentials')
-    .select('credential_id')
-    .eq('program_id', programId)
-    .eq('is_primary', true)
-    .maybeSingle();
-  return data?.credential_id ?? null;
-}
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error(
+      '[buildCourseFromBlueprint] NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required.'
+    );
+  }
 
-/**
- * Checks whether a program already has curriculum lessons in the DB.
- * Use this to skip generation when content already exists.
- */
-export async function hasCurriculumContent(programId: string): Promise<boolean> {
-  const db = createAdminClient();
-  if (!db) return false;
-  const { count } = await db
-    .from('curriculum_lessons')
-    .select('id', { count: 'exact', head: true })
-    .eq('program_id', programId);
-  return (count ?? 0) > 0;
+  const generator = new CurriculumGenerator(supabaseUrl, serviceRoleKey);
+  return generator.generate(blueprint, options);
 }

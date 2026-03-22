@@ -35,12 +35,16 @@
 
 ## Repository Size
 
-| Metric | Count |
-|--------|-------|
-| `page.tsx` files | 1,486 |
-| `route.ts` files (API) | 1,079 |
-| Supabase migrations | 278 |
-| `console.log` occurrences | ~1,521 across 118 files — use `lib/logger.ts` instead |
+These are point-in-time snapshots. Re-run the commands to get current counts — do not trust the numbers without verifying.
+
+| Metric | Count | Last verified | Command |
+|--------|-------|---------------|---------|
+| `page.tsx` files | 1,498 | 2026-03-22 | `find app -name "page.tsx" \| wc -l` |
+| `route.ts` files (API) | 1,122 | 2026-03-22 | `find app -name "route.ts" \| wc -l` |
+| Supabase migrations | 346 | 2026-03-22 | `ls supabase/migrations/ \| wc -l` |
+| `console.log` occurrences | ~1,585 across 129 files | 2026-03-22 | `grep -r "console\.log" --include="*.ts" --include="*.tsx" \| wc -l` |
+
+Use `import { logger } from '@/lib/logger'` for all new logging. When you update any metric, update the verification date in the same edit.
 
 ---
 
@@ -163,12 +167,29 @@ The lesson page runs both paths in parallel for backward compatibility. New prog
 
 ### Migrations Pending (apply in Supabase Dashboard)
 
-These files exist in `supabase/migrations/` but have **not** been applied to the live DB:
+**Verified:** these files exist in `supabase/migrations/` (confirmed 2026-03-22).  
+**Unverified:** whether they have been applied to the live DB. Do not assume either state without checking.
 
-| File | Effect |
-|------|--------|
-| `20260401000005_curriculum_lessons_quiz_questions.sql` | Adds `quiz_questions` to `curriculum_lessons`, backfills HVAC data, fixes `lms_lessons` view |
-| `20260402000003_programs_lms_columns.sql` | Adds `short_description` and `display_order` to `programs`; backfills `short_description` from `excerpt` |
+| File | Effect | Live DB status |
+|------|--------|----------------|
+| `20260401000005_curriculum_lessons_quiz_questions.sql` | Adds `quiz_questions` to `curriculum_lessons`, backfills HVAC data, fixes `lms_lessons` view | **UNVERIFIED** — check before use |
+| `20260402000003_programs_lms_columns.sql` | Adds `short_description` and `display_order` to `programs`; backfills `short_description` from `excerpt` | **UNVERIFIED** — check before use |
+
+**To verify**, run in Supabase Dashboard SQL Editor:
+
+```sql
+-- Check curriculum_lessons columns
+SELECT column_name FROM information_schema.columns
+WHERE table_schema = 'public' AND table_name = 'curriculum_lessons'
+ORDER BY column_name;
+
+-- Check programs columns
+SELECT column_name FROM information_schema.columns
+WHERE table_schema = 'public' AND table_name = 'programs'
+  AND column_name IN ('short_description', 'display_order');
+```
+
+When you confirm a migration is applied, update the Live DB status column and add the verification date.
 
 Until `20260401000005` is applied:
 - `curriculum_lessons.quiz_questions` column does not exist
@@ -222,11 +243,31 @@ The public LMS uses "Programs" (`/lms/programs`) while the authenticated app use
 
 ### Supabase Access
 
-**Canonical** (`lib/supabase/`): `server.ts`, `client.ts`, `admin.ts`, `public.ts`, `server-db.ts`, `static.ts`
+**Canonical modules** (`lib/supabase/`): `server.ts`, `client.ts`, `admin.ts`, `public.ts`, `server-db.ts`, `static.ts`
 
-Import from `@/lib/supabase/*`. The following deprecated shims still have 78 active importers — do not add new imports from them:
+Import from the specific sub-module that matches your execution context. Do not import from the barrel (`@/lib/supabase`) — it is not used in practice.
+
+#### Client selection
+
+| Context | Import | Notes |
+|---------|--------|-------|
+| Server components, API routes | `import { createClient } from '@/lib/supabase/server'` | Respects user session and RLS |
+| Client components (browser) | `import { createBrowserClient } from '@/lib/supabase/client'` | Browser-only |
+| Admin / privileged operations | `import { createAdminClient } from '@/lib/supabase/admin'` | **Bypasses RLS** — see warning below |
+
+#### RLS warning
+
+`createAdminClient` bypasses Row Level Security. Use it only when the operation explicitly requires elevated privileges (provisioning, cron jobs, admin dashboards reading cross-tenant data). Using it in user-driven flows is a security bug. When in doubt, use `createClient`.
+
+If you use `createAdminClient` in a route or service, add an inline comment explaining why RLS bypass is required.
+
+#### Deprecated shims — 79 active importers remain
+
+Do not add new imports from these files:
 
 `lib/supabaseServer.ts`, `lib/supabase-server.ts`, `lib/supabaseAdmin.ts`, `lib/supabase-admin.ts`, `lib/supabaseClient.ts`, `lib/supabaseClients.ts`, `lib/supabase.ts`, `lib/supabase-lazy.ts`, `lib/supabase-api.ts`, `lib/getSupabaseServerClient.ts`
+
+If you edit a file that imports from a deprecated shim, migrate that import to `@/lib/supabase/*` as part of your change.
 
 ### Rate Limiting
 
@@ -248,25 +289,92 @@ if (rateLimited) return rateLimited;
 | `public` | 10 req / 1 min | Public AI tutor, unauthenticated reads |
 
 **Dead — do not import:**
-- `lib/rateLimit.ts` — in-memory, broken in serverless, `@deprecated`. All importers migrated.
+- `lib/rateLimit.ts` — in-memory, broken in serverless, `@deprecated`. Zero active importers. **File still exists on disk** — do not import it; delete it when confirmed safe.
 - `lib/rateLimiter.ts` — **deleted**
 - `lib/api/rate-limiter.ts` — **deleted**
 
-### API Auth Pattern
+### Cron Route Authentication
+
+Cron routes must verify `CRON_SECRET` before performing any work. Do not leave cron endpoints protected only by obscurity or pathname.
 
 ```ts
-// Any authenticated user
-import { apiAuthGuard } from '@/lib/admin/guards';
-const auth = await apiAuthGuard(request);
-if (auth.error) return auth.error;
-
-// Admin or super_admin only
-import { apiRequireAdmin } from '@/lib/admin/guards';
-const auth = await apiRequireAdmin(request);
-if (auth.error) return auth.error;
+const cronSecret = process.env.CRON_SECRET;
+if (request.headers.get('authorization') !== `Bearer ${cronSecret}`) {
+  return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+}
 ```
 
-⚠️ **`apiRequireAdmin` previously only allowed `'admin'`** — this was fixed in PR #50. It now allows `['admin', 'super_admin', 'staff']`. If you see identity-only checks on admin routes, add an explicit role check:
+Any new cron route must implement this check as the first operation in the handler.
+
+---
+
+### API Auth Pattern
+
+There are multiple auth modules. They are not interchangeable. Match the module to the execution context.
+
+#### Guard selection
+
+| Context | Function | Import from | On failure |
+|---------|----------|-------------|------------|
+| Server component / page layout | `requireAdmin()` | `@/lib/auth` | Throws redirect to `/login` |
+| API route / route handler | `apiRequireAdmin()` | `@/lib/authGuards` | Returns `NextResponse` 401/403 |
+
+**Page components:**
+
+```ts
+import { requireAdmin } from '@/lib/auth';
+await requireAdmin(); // throws redirect if not authorized
+```
+
+**API routes:**
+
+```ts
+import { apiRequireAdmin } from '@/lib/authGuards';
+const auth = await apiRequireAdmin(); // no arguments
+if (auth instanceof NextResponse) return auth; // failed — return the error response
+// auth.user, auth.role, auth.profile are available here
+```
+
+```ts
+import { apiAuthGuard } from '@/lib/authGuards';
+const auth = await apiAuthGuard(); // no arguments
+if (!auth.authorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+```
+
+⚠️ `apiRequireAdmin` and `apiAuthGuard` take **no arguments**. Do not pass `request`. Any example showing `apiRequireAdmin(request)` is wrong.
+
+#### `@/lib/admin/guards` is a wrapper, not the source
+
+`lib/admin/guards.ts` re-exports `apiAuthGuard` and `apiRequireAdmin` from `@/lib/authGuards` and adds Netlify context helpers (`isProd`, `isPreview`, `DEV_TOOL_ROUTES`). Import from `@/lib/admin/guards` only when you also need those Netlify helpers. For all other cases import from the real source.
+
+#### Additional guards in `@/lib/authGuards`
+
+```ts
+import { apiRequireInstructor, apiRequireStudent } from '@/lib/authGuards';
+```
+
+#### `lib/auth/` — primary auth subsystem
+
+`lib/auth/` contains 16 files used across ~246 files in the codebase. Before writing any new auth helper, check whether an equivalent already exists here.
+
+| File | Purpose |
+|------|---------|
+| `require-role.ts` | Generic role guard for page components |
+| `require-admin.ts` | Admin page guard |
+| `require-program-holder.ts` | Program holder scope guard |
+| `require-api-role.ts` | API role guard |
+| `require-org-admin.ts` | Org admin scope guard |
+| `org-guard.ts` | Org-level access control |
+| `validate-redirect.ts` | Redirect URL validation — security-critical, do not hand-roll |
+| `role-destinations.ts` | Role → dashboard path mapping |
+| `two-factor.ts` | 2FA helpers |
+| `sso-config.ts` | SSO configuration |
+
+Do not duplicate redirect validation, role checks, program enrollment checks, or page protection helpers. Use the existing implementations.
+
+#### `apiRequireAdmin` role coverage
+
+`apiRequireAdmin` allows `['admin', 'super_admin', 'staff']` (fixed in PR #50). If you encounter identity-only checks on admin routes that predate this fix, add an explicit role check:
 
 ```ts
 const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
@@ -313,13 +421,24 @@ if (error) return safeDbError(error, 'DB query failed');
 
 Never return `error.message` directly in a response body. `lib/safe-error.ts` (root) has been deleted — import only from `@/lib/api/safe-error`.
 
-### Auth Redirect Parameter
+### Auth Redirect Parameters
 
-Use `?redirect=<path>` (not `?next=`):
+Both `?redirect=` and `?next=` are active in the codebase. They serve different flows. Do not collapse them into one rule and do not blindly replace one with the other.
+
+| Param | Used by | Purpose |
+|-------|---------|---------|
+| `?redirect=` | Login page (`/login`) | Returns user to their intended page after password auth |
+| `?next=` | OAuth callback (`/auth/callback`), email-confirm flows, password reset | Supabase-driven post-auth destination |
+
+**Login page redirect** (pre-auth page protection):
 
 ```ts
 redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
 ```
+
+**OAuth / email-confirm flows** — `?next=` is read by `app/auth/callback/route.ts`. Do not remove or rename this param in those flows.
+
+**Security rule:** All redirect targets must be validated through `validateRedirect()` from `@/lib/auth/validate-redirect` before use. Do not implement ad hoc allowlists or string-prefix checks inline.
 
 ---
 
@@ -519,7 +638,7 @@ const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
 - ✅ All blue-* → brand-blue-* across app/ and components/
 - ✅ 27+ public pages rewritten with real content
 - ✅ Auth flow: signin/signup redirect to real forms
-- ✅ Dead rate limit files deleted (`lib/rateLimiter.ts`, `lib/api/rate-limiter.ts`)
+- ✅ Dead rate limit files deleted (`lib/rateLimiter.ts`, `lib/api/rate-limiter.ts`) — `lib/rateLimit.ts` still exists, 0 importers, pending deletion
 - ✅ Dead error helper deleted (`lib/safe-error.ts` root duplicate)
 - ✅ 11 routes migrated from dead `lib/rateLimit` to canonical `applyRateLimit`
 - ✅ Checkpoint gating migration written (`20260327000003_checkpoint_gating.sql`)
@@ -564,9 +683,9 @@ Do not tighten without replacing admin remediation and enrollment-management beh
 
 ## Remaining Technical Debt
 
-- ~1,521 `console.log` calls — use `import { logger } from '@/lib/logger'`
-- 78 files import from deprecated Supabase shims — migrate to `lib/supabase/*` gradually
-- `lib/rateLimit.ts` still exists (`@deprecated`, 0 active importers) — delete when confirmed
+- ~1,585 `console.log` calls across 129 files (2026-03-22) — use `import { logger } from '@/lib/logger'`
+- 79 files import from deprecated Supabase shims — migrate to `lib/supabase/*` gradually
+- `lib/rateLimit.ts` still exists on disk (`@deprecated`, 0 active importers) — safe to delete; do not import
 - `lib/curriculum/blueprints/prs.ts` may be superseded by `prs-indiana.ts` — verify
 - `app/api/auth/login/route.ts` — deprecated duplicate of `/api/auth/signin`
 - 8 certificate-related tables have no migration source — verify in Supabase Dashboard
@@ -622,6 +741,28 @@ Design tokens: `lib/page-design-tokens.ts`
 
 All hero videos use `useHeroVideo` hook. No `muted`/`autoPlay` attributes on `<video>` elements.
 The hook attempts unmuted play and falls back silently. No mute button shown.
+
+---
+
+## Agent Operating Rules
+
+These rules apply to every agent working in this codebase. They exist because the most common failure mode is writing elegant-looking code that follows the wrong abstraction.
+
+1. **Prefer existing helpers over new abstractions.** Before writing a new auth helper, rate limiter, error handler, or redirect validator, check whether one already exists. This codebase has ~5,700 TypeScript files. The helper you need almost certainly exists.
+
+2. **Match auth helper to execution context.** Page components use `@/lib/auth`. API routes use `@/lib/authGuards`. Using the wrong one produces either a broken redirect or a returned response object where a thrown redirect was expected.
+
+3. **Match Supabase client to privilege level.** `createClient` for user-scoped operations. `createAdminClient` only when RLS bypass is explicitly required and documented inline. Never use admin client as a convenience fallback.
+
+4. **Never improvise redirect handling.** Both `?redirect=` and `?next=` are active. Both serve distinct flows. Use `validateRedirect()` from `@/lib/auth/validate-redirect` for any user-supplied destination. Do not implement inline allowlists.
+
+5. **Do not trust stale counts.** Repo metrics in this file have a last-verified date. Re-run the provided commands before making scale-dependent decisions.
+
+6. **Do not describe migrations or cleanup as complete unless the repo state reflects it.** A migration file existing in `supabase/migrations/` does not mean it is applied. A file with zero importers does not mean it is deleted. Verify before asserting.
+
+7. **When a wrapper and a primary module disagree, document and use the primary module.** `@/lib/admin/guards` is a wrapper. `@/lib/authGuards` is the source. `@/lib/supabase` barrel is unused. The specific sub-modules are the source. Follow the real import graph, not the aspirational one.
+
+8. **When code and this document disagree, inspect the implementation and update this file.** This document is only useful if it reflects reality. If you find a discrepancy, fix the doc as part of your change.
 
 ---
 

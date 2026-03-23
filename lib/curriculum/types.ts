@@ -19,7 +19,7 @@ export interface LessonContract {
   module_order: number;
   module_title: string;
 
-  /** Full lesson body — the primary content field in curriculum_lessons */
+  /** Full lesson body. Maps to the content field in course_lessons on publish. */
   script_text: string;
 
   /** 1–3 sentence summary for learner preview and audit scoring */
@@ -96,7 +96,7 @@ export interface CompetencyAuditResult {
 // ─── Publish input ────────────────────────────────────────────────────────────
 
 /**
- * What the publish route writes into curriculum_lessons.
+ * What the publish route writes into course_lessons.
  * Extends LessonContract with resolved FK IDs.
  */
 export interface PublishableLessonRow extends LessonContract {

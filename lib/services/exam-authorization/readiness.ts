@@ -77,7 +77,7 @@ export async function checkCertificationReadiness(
 
   // ── 3. Quiz passage ─────────────────────────────────────────────────────────
   // quiz_attempts.quiz_id stores the lesson UUID (used as quiz identity)
-  const quizLessons = (lessons ?? []).filter((l) => l.content_type === 'quiz');
+  const quizLessons = (lessons ?? []).filter((l) => l.lesson_type === 'quiz' || l.lesson_type === 'checkpoint');
   const totalQuizzes = quizLessons.length;
 
   const { data: quizResults } = await db
@@ -95,7 +95,7 @@ export async function checkCertificationReadiness(
   }
 
   // ── 4. Practical/lab completion ─────────────────────────────────────────────
-  const labLessons = (lessons ?? []).filter((l) => l.content_type === 'lab');
+  const labLessons = (lessons ?? []).filter((l) => l.lesson_type === 'lab');
   const labsComplete = labLessons.every((l) => completedIds.has(l.id));
   const practicalComplete = labLessons.length === 0 || labsComplete;
 

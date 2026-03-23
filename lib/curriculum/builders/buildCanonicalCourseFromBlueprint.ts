@@ -118,7 +118,10 @@ export async function buildCanonicalCourseFromBlueprint(
     courseId = newCourse.id;
   }
 
-  // ── 2. Replace mode: wipe existing modules + lessons ──────────────────────
+  // ── 2. Preflight — validate before any destructive DB write ──────────────
+  validateLessons(input.blueprint.modules);
+
+  // ── 3. Replace mode: wipe existing modules + lessons ──────────────────────
   if (input.mode === 'replace') {
     // course_lessons has ON DELETE CASCADE from course_modules, but delete
     // lessons first to be explicit and avoid FK constraint races.
@@ -126,7 +129,7 @@ export async function buildCanonicalCourseFromBlueprint(
     await db.from('course_modules').delete().eq('course_id', courseId);
   }
 
-  // ── 3. Load existing lesson slugs for missing-only mode ───────────────────
+  // ── 4. Load existing lesson slugs for missing-only mode ───────────────────
   const existingSlugs = new Set<string>();
   if (input.mode === 'missing-only') {
     const { data: existing } = await db
@@ -138,12 +141,9 @@ export async function buildCanonicalCourseFromBlueprint(
     }
   }
 
-  // ── 4. Upsert modules + lessons in blueprint order ────────────────────────
+  // ── 5. Upsert modules + lessons in blueprint order ────────────────────────
   let totalLessons = 0;
   let skipped      = 0;
-
-  // Preflight — fail before any DB write
-  validateLessons(input.blueprint.modules);
 
   const sortedModules = [...input.blueprint.modules].sort(
     (a, b) => a.orderIndex - b.orderIndex,

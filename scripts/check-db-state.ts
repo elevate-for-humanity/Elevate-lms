@@ -1,10 +1,11 @@
 #!/usr/bin/env tsx
 import { createClient } from '@supabase/supabase-js';
 
-const _url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL ?? '';
-const _key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? '';
-if (!_url || !_key) throw new Error('NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set');
-const db = createClient(_url, _key, { auth: { persistSession: false } });
+const db = createClient(
+  'https://cuxzzpsyufcewtmicszk.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1eHp6cHN5dWZjZXd0bWljc3prIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODE2MTA0NywiZXhwIjoyMDczNzM3MDQ3fQ.5JRYvJPzFzsVaZQkbZDLcohP7dq8LWQEFeFdVByyihE',
+  { auth: { persistSession: false } }
+);
 
 async function main() {
   // course_lessons

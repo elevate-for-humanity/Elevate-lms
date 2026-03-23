@@ -5,9 +5,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const PROJECT_REF = process.env.SUPABASE_PROJECT_REF ?? 'cuxzzpsyufcewtmicszk';
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? '';
-if (!SERVICE_KEY) throw new Error('SUPABASE_SERVICE_ROLE_KEY must be set');
+const PROJECT_REF = 'cuxzzpsyufcewtmicszk';
+const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1eHp6cHN5dWZjZXd0bWljc3prIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODE2MTA0NywiZXhwIjoyMDczNzM3MDQ3fQ.5JRYvJPzFzsVaZQkbZDLcohP7dq8LWQEFeFdVByyihE';
 
 const sql = fs.readFileSync(
   path.join(process.cwd(), 'supabase/migrations/20260504000001_course_lessons_generator_join.sql'),

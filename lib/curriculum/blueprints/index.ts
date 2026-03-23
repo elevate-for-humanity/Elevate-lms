@@ -21,12 +21,14 @@ export type {
 } from './types';
 
 export { prsIndianaBlueprint } from './prs-indiana';
+export { crsIndianaBlueprint } from './crs-indiana';
 export { HVAC_EPA608_BLUEPRINT } from './hvac-epa-608';
 export { bookkeepingQuickbooksBlueprint } from './bookkeeping-quickbooks';
 export { validateBlueprint } from './validateBlueprint';
 
 import type { CredentialBlueprint } from './types';
 import { prsIndianaBlueprint } from './prs-indiana';
+import { crsIndianaBlueprint } from './crs-indiana';
 import { HVAC_EPA608_BLUEPRINT } from './hvac-epa-608';
 import { bookkeepingQuickbooksBlueprint } from './bookkeeping-quickbooks';
 
@@ -35,6 +37,7 @@ import { bookkeepingQuickbooksBlueprint } from './bookkeeping-quickbooks';
 
 const REGISTRY: CredentialBlueprint[] = [
   prsIndianaBlueprint,
+  crsIndianaBlueprint,
   HVAC_EPA608_BLUEPRINT,
   bookkeepingQuickbooksBlueprint,
 ];

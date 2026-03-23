@@ -1,95 +1,265 @@
-import { join } from 'path';
-import { config as dotenvConfig } from 'dotenv';
+/**
+ * scripts/validate-lms-integrity.ts
+ *
+ * Validates the canonical LMS publication chain for all active programs.
+ * Checks the full path: program → courses → course_modules → course_lessons → lms_lessons.
+ *
+ * Usage:
+ *   npx tsx scripts/validate-lms-integrity.ts              # all programs
+ *   npx tsx scripts/validate-lms-integrity.ts --slug prs   # one program slug
+ *   npx tsx scripts/validate-lms-integrity.ts --fail-fast  # exit 1 on first failure
+ *
+ * Exit codes:
+ *   0 — all checks passed
+ *   1 — one or more checks failed
+ *
+ * Designed to run in CI against the live DB (requires SUPABASE env vars).
+ */
+
+import path from 'path';
+import dotenv from 'dotenv';
+dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 import { createClient } from '@supabase/supabase-js';
 
-dotenvConfig({ path: join(process.cwd(), '.env.local') });
+const SLUG_FILTER = (() => {
+  const idx = process.argv.indexOf('--slug');
+  return idx !== -1 ? process.argv[idx + 1] : null;
+})();
+const FAIL_FAST = process.argv.includes('--fail-fast');
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+let supabase: ReturnType<typeof createClient>;
 
-if (!url || !key) {
-  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+// ── Types ─────────────────────────────────────────────────────────────────────
+
+interface CheckResult {
+  program: string;
+  check: string;
+  passed: boolean;
+  detail: string;
 }
 
-const db = createClient(url, key, { auth: { persistSession: false } });
+const results: CheckResult[] = [];
+let failures = 0;
+
+function pass(program: string, check: string, detail: string) {
+  results.push({ program, check, passed: true, detail });
+}
+
+function fail(program: string, check: string, detail: string) {
+  failures++;
+  results.push({ program, check, passed: false, detail });
+  if (FAIL_FAST) {
+    printResults();
+    process.exit(1);
+  }
+}
+
+// ── Checks ────────────────────────────────────────────────────────────────────
+
+async function validateProgram(program: { id: string; slug: string; title: string }) {
+  const slug = program.slug;
+
+  // 1. courses row exists and program_id is correctly linked
+  const { data: course } = await supabase
+    .from('courses')
+    .select('id, program_id, status, is_active')
+    .eq('program_id', program.id)
+    .maybeSingle();
+
+  if (!course) {
+    fail(slug, 'courses_row', 'No courses row linked to this program');
+    return; // remaining checks depend on course existing
+  }
+  if (course.program_id !== program.id) {
+    fail(slug, 'courses_program_id', `course.program_id=${course.program_id} != program.id=${program.id}`);
+  } else {
+    pass(slug, 'courses_program_id', `course_id=${course.id}`);
+  }
+  if (course.status !== 'published') {
+    fail(slug, 'courses_status', `status=${course.status} (expected published)`);
+  } else {
+    pass(slug, 'courses_status', 'published');
+  }
+
+  const courseId = course.id;
+
+  // 2. course_modules exist and all belong to this course
+  const { data: modules, error: modErr } = await supabase
+    .from('course_modules')
+    .select('id, title, course_id, order_index')
+    .eq('course_id', courseId);
+
+  if (modErr || !modules || modules.length === 0) {
+    fail(slug, 'course_modules_exist', 'No course_modules rows for this course');
+    return;
+  }
+  const wrongCourseMods = modules.filter(m => m.course_id !== courseId);
+  if (wrongCourseMods.length > 0) {
+    fail(slug, 'course_modules_course_id', `${wrongCourseMods.length} modules have wrong course_id`);
+  } else {
+    pass(slug, 'course_modules_exist', `${modules.length} modules`);
+  }
+
+  // 3. course_lessons exist and all belong to this course
+  const { data: lessons, error: lessonErr } = await supabase
+    .from('course_lessons')
+    .select('id, slug, course_id, module_id, order_index, lesson_type')
+    .eq('course_id', courseId);
+
+  if (lessonErr || !lessons || lessons.length === 0) {
+    fail(slug, 'course_lessons_exist', 'No course_lessons rows for this course');
+    return;
+  }
+  pass(slug, 'course_lessons_exist', `${lessons.length} lessons`);
+
+  // 4. No orphaned lessons (module_id null or pointing outside this course)
+  const moduleIds = new Set(modules.map(m => m.id));
+  const orphans = lessons.filter(l => !l.module_id || !moduleIds.has(l.module_id));
+  if (orphans.length > 0) {
+    fail(slug, 'no_orphaned_lessons',
+      `${orphans.length} lessons have null/cross-course module_id: ${orphans.slice(0, 3).map(l => l.slug).join(', ')}`
+    );
+  } else {
+    pass(slug, 'no_orphaned_lessons', 'all lessons have valid module_id');
+  }
+
+  // 5. No empty modules (every module must have at least one lesson)
+  const lessonsByModule = new Map<string, number>();
+  for (const l of lessons) {
+    if (l.module_id) lessonsByModule.set(l.module_id, (lessonsByModule.get(l.module_id) ?? 0) + 1);
+  }
+  const emptyMods = modules.filter(m => !lessonsByModule.has(m.id));
+  if (emptyMods.length > 0) {
+    fail(slug, 'no_empty_modules',
+      `${emptyMods.length} modules have 0 lessons: ${emptyMods.map(m => m.title).join(', ')}`
+    );
+  } else {
+    pass(slug, 'no_empty_modules', 'all modules have lessons');
+  }
+
+  // 6. Slug alignment: every course_lesson.slug must exist in curriculum_lessons for this program
+  const { data: clSlugs } = await supabase
+    .from('curriculum_lessons')
+    .select('lesson_slug')
+    .eq('program_id', program.id)
+    .eq('status', 'published');
+
+  const clSlugSet = new Set((clSlugs ?? []).map(r => r.lesson_slug));
+  const driftedLessons = lessons.filter(l => !clSlugSet.has(l.slug));
+  if (driftedLessons.length > 0) {
+    fail(slug, 'slug_alignment',
+      `${driftedLessons.length} course_lessons have slugs not in curriculum_lessons: ` +
+      driftedLessons.slice(0, 3).map(l => l.slug).join(', ')
+    );
+  } else {
+    pass(slug, 'slug_alignment', 'all slugs match curriculum_lessons');
+  }
+
+  // 7. Count parity: course_lessons count must equal published curriculum_lessons count
+  const expectedCount = clSlugSet.size;
+  if (lessons.length !== expectedCount) {
+    fail(slug, 'lesson_count_parity',
+      `course_lessons=${lessons.length} but published curriculum_lessons=${expectedCount}`
+    );
+  } else {
+    pass(slug, 'lesson_count_parity', `${lessons.length} lessons match`);
+  }
+
+  // 8. lms_lessons view resolves lessons for this course (end-to-end view check)
+  const { data: viewRows, error: viewErr } = await supabase
+    .from('lms_lessons')
+    .select('id, order_index, step_type')
+    .eq('course_id', courseId)
+    .order('order_index', { ascending: true });
+
+  if (viewErr || !viewRows || viewRows.length === 0) {
+    fail(slug, 'lms_lessons_view',
+      viewErr ? `view error: ${viewErr.message}` : 'lms_lessons returns 0 rows for this course'
+    );
+  } else {
+    // Check order_index is populated (not null) — the alias fix in Step 0
+    const nullOrder = viewRows.filter(r => r.order_index == null);
+    if (nullOrder.length > 0) {
+      fail(slug, 'lms_lessons_order_index', `${nullOrder.length} rows have null order_index in lms_lessons view`);
+    } else {
+      pass(slug, 'lms_lessons_view', `${viewRows.length} rows visible, order_index populated`);
+    }
+  }
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-  const failures: string[] = [];
+  supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } }
+  );
 
-  // Orphan check — course_modules with no parent course
-  const { data: allModules } = await db.from('course_modules').select('id, course_id');
-  const { data: allCourses } = await db.from('courses').select('id');
-  const courseIds = new Set((allCourses ?? []).map(c => c.id));
-  const orphanModules = (allModules ?? []).filter(m => !courseIds.has(m.course_id));
-  if (orphanModules.length > 0) {
-    failures.push(`Found ${orphanModules.length} orphan course_modules rows`);
-  }
+  console.log('\nLMS Integrity Validation');
+  console.log('========================');
+  if (SLUG_FILTER) console.log(`Filter: --slug ${SLUG_FILTER}\n`);
 
-  // Orphan check — course_lessons with no parent module
-  const { data: allLessons } = await db.from('course_lessons').select('id, module_id');
-  const moduleIds = new Set((allModules ?? []).map(m => m.id));
-  const orphanLessons = (allLessons ?? []).filter(l => !l.module_id || !moduleIds.has(l.module_id));
-  if (orphanLessons.length > 0) {
-    failures.push(`Found ${orphanLessons.length} orphan course_lessons rows`);
-  }
-
-  // Per-program structural check — only programs with has_lms_course=true
-  // are owned by the canonical pipeline. Legacy programs without a course
-  // row are a separate migration concern and are not checked here.
-  const { data: publishedPrograms, error: pubErr } = await db
+  // Load programs
+  let query = supabase
     .from('programs')
-    .select('slug, title')
+    .select('id, slug, title, published, is_active')
     .eq('published', true)
-    .eq('has_lms_course', true);
+    .eq('is_active', true);
 
-  if (pubErr) throw new Error(pubErr.message);
+  if (SLUG_FILTER) query = query.eq('slug', SLUG_FILTER);
 
-  for (const program of publishedPrograms ?? []) {
-    const { data: course } = await db
-      .from('courses')
-      .select('id, slug, status')
-      .eq('slug', program.slug)
-      .maybeSingle();
+  const { data: programs, error } = await query;
 
-    if (!course) {
-      failures.push(`${program.slug}: published program has no matching course`);
-      continue;
-    }
-
-    if (course.status !== 'published') {
-      failures.push(`${program.slug}: program is published but course.status = '${course.status}'`);
-    }
-
-    const { data: modules } = await db
-      .from('course_modules')
-      .select('id, title, order_index')
-      .eq('course_id', course.id)
-      .order('order_index');
-
-    if (!modules?.length) {
-      failures.push(`${program.slug}: published program has zero modules`);
-      continue;
-    }
-
-    for (const mod of modules) {
-      const { data: lessons } = await db
-        .from('course_lessons')
-        .select('id, order_index')
-        .eq('module_id', mod.id);
-
-      if (!lessons?.length) {
-        failures.push(`${program.slug} / ${mod.title}: module has zero lessons`);
-      }
-    }
+  if (error) {
+    console.error('Failed to load programs:', error.message);
+    process.exit(1);
   }
-
-  if (failures.length) {
-    console.error('\nLMS INTEGRITY FAILURES:\n');
-    for (const f of failures) console.error(`  - ${f}`);
+  if (!programs || programs.length === 0) {
+    console.error('No published+active programs found. Check DB or --slug filter.');
     process.exit(1);
   }
 
-  console.log(`LMS integrity check passed. ${publishedPrograms?.length ?? 0} published programs verified.`);
+  console.log(`Checking ${programs.length} program(s)...\n`);
+
+  for (const program of programs) {
+    await validateProgram(program);
+  }
+
+  printResults();
+  process.exit(failures > 0 ? 1 : 0);
 }
 
-main().catch(err => { console.error(err); process.exit(1); });
+function printResults() {
+  // Group by program
+  const byProgram = new Map<string, CheckResult[]>();
+  for (const r of results) {
+    if (!byProgram.has(r.program)) byProgram.set(r.program, []);
+    byProgram.get(r.program)!.push(r);
+  }
+
+  for (const [program, checks] of byProgram) {
+    const programFails = checks.filter(c => !c.passed).length;
+    const status = programFails === 0 ? 'OK' : `FAIL (${programFails})`;
+    console.log(`[${status}] ${program}`);
+    for (const c of checks) {
+      const icon = c.passed ? '  ✅' : '  ❌';
+      console.log(`${icon} ${c.check}: ${c.detail}`);
+    }
+    console.log('');
+  }
+
+  const total = results.length;
+  const passed = total - failures;
+  console.log(`Results: ${passed}/${total} checks passed`);
+  if (failures > 0) {
+    console.log(`\n${failures} check(s) FAILED — LMS is not ready for these programs.`);
+  } else {
+    console.log('\nAll checks passed — canonical chain is intact.');
+  }
+}
+
+main().catch(err => {
+  console.error('Unexpected error:', err);
+  process.exit(1);
+});

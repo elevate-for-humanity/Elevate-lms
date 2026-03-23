@@ -439,7 +439,7 @@ export default async function LearnerDashboardPage() {
                               </Link>
                             ) : (
                               <span className="px-4 py-2 bg-gray-100 text-gray-400 text-sm font-medium rounded-lg cursor-not-allowed">
-                                Coming Soon
+                                Not yet published
                               </span>
                             )}
                           </div>

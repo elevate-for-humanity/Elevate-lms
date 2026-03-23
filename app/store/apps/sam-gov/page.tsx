@@ -36,9 +36,11 @@ const productData = {
   rating: 4.9,
   reviewCount: 127,
   images: [
-    { src: '/images/pages/store-compliance-hero.jpg', alt: 'SAM.gov Assistant — compliance dashboard overview', type: 'image' as const },
-    { src: '/images/pages/store-digital-detail1.jpg', alt: 'SAM.gov Assistant — registration step-by-step wizard', type: 'image' as const },
-    { src: '/images/pages/store-addons-compliance-hero.jpg', alt: 'SAM.gov Assistant — compliance monitoring', type: 'image' as const },
+    { src: '/images/pages/admin-dashboard-hero.jpg', alt: 'SAM.gov Assistant Dashboard', type: 'image' as const },
+    { src: '/images/pages/admin-gov-hero.jpg', alt: 'Registration Progress Tracker', type: 'image' as const },
+    { src: '/images/pages/admin-compliance-hero.jpg', alt: 'Compliance Monitoring Dashboard', type: 'image' as const },
+    { src: '/images/pages/admin-gov-ops-hero.jpg', alt: 'Step-by-Step Registration Wizard', type: 'image' as const },
+    { src: '/images/pages/admin-compliance-audit-hero.jpg', alt: 'Compliance Audit View', type: 'image' as const },
   ],
   features: [
     {

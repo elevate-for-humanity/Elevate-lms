@@ -57,7 +57,7 @@ export default async function InstructorSubmissionsPage({
     .select(`
       id,
       user_id,
-      lesson_id,
+      course_lesson_id,
       course_id,
       step_type,
       submission_text,
@@ -67,7 +67,7 @@ export default async function InstructorSubmissionsPage({
       reviewed_at,
       created_at,
       profiles:user_id ( full_name, email ),
-      curriculum_lessons:lesson_id ( lesson_title, lesson_slug )
+      course_lessons:course_lesson_id ( title, slug )
     `)
     .order('created_at', { ascending: false })
     .limit(100);
@@ -192,7 +192,7 @@ export default async function InstructorSubmissionsPage({
             {submissions.map((sub: any) => {
               const statusMeta = STATUS_META[sub.status as SubmissionStatus] ?? STATUS_META.submitted;
               const learner = sub.profiles;
-              const lesson = sub.curriculum_lessons;
+              const lesson = sub.course_lessons;
               const courseName = courseNameMap.get(sub.course_id) ?? sub.course_id;
 
               return (
@@ -209,7 +209,7 @@ export default async function InstructorSubmissionsPage({
                       </span>
                       <span className="text-slate-400">·</span>
                       <span className="text-sm text-slate-600 truncate">
-                        {lesson?.lesson_title ?? sub.lesson_id}
+                        {lesson?.title ?? sub.course_lesson_id}
                       </span>
                     </div>
 

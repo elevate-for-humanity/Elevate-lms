@@ -20,7 +20,7 @@ type SubmissionStatus = 'submitted' | 'under_review' | 'approved' | 'rejected' |
 interface Submission {
   id: string;
   user_id: string;
-  lesson_id: string;
+  course_lesson_id: string;
   course_id: string;
   step_type: string;
   submission_text: string | null;
@@ -30,7 +30,7 @@ interface Submission {
   reviewed_at: string | null;
   created_at: string;
   profiles: { full_name: string | null; email: string } | null;
-  curriculum_lessons: { lesson_title: string; lesson_slug: string } | null;
+  course_lessons: { title: string; slug: string } | null;
 }
 
 const STATUS_LABELS: Record<SubmissionStatus, string> = {
@@ -59,11 +59,11 @@ export default function SubmissionReviewPage() {
       const { data, error } = await supabase
         .from('step_submissions')
         .select(`
-          id, user_id, lesson_id, course_id, step_type,
+          id, user_id, course_lesson_id, course_id, step_type,
           submission_text, file_urls, status, instructor_note,
           reviewed_at, created_at,
           profiles:user_id ( full_name, email ),
-          curriculum_lessons:lesson_id ( lesson_title, lesson_slug )
+          course_lessons:course_lesson_id ( title, slug )
         `)
         .eq('id', submissionId)
         .single();
@@ -129,7 +129,7 @@ export default function SubmissionReviewPage() {
   }
 
   const learnerName = submission.profiles?.full_name ?? submission.profiles?.email ?? submission.user_id;
-  const lessonTitle = submission.curriculum_lessons?.lesson_title ?? submission.lesson_id;
+  const lessonTitle = submission.course_lessons?.title ?? submission.course_lesson_id;
   const isResolved = submission.status === 'approved' || submission.status === 'rejected';
 
   return (

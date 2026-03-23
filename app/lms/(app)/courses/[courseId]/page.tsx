@@ -35,38 +35,18 @@ async function resolveCourse(courseId: string) {
   if (!tc) return null;
 
   // 3. Find the canonical lesson course_id for this training_course.
-  //    After the 2025-Q2 migration, curriculum_lessons use a new course_id (0ba9a61c)
-  //    while the URL still uses the old training_courses id (f0593164).
-  //    Look up curriculum_lessons rows that reference the old id OR find the new id
-  //    by checking which course_id has the most curriculum_lessons rows.
-  const { data: clByOldId } = await db
-    .from('curriculum_lessons')
-    .select('course_id')
-    .eq('course_id', tc.id)
-    .limit(1);
-
+  //    course_lessons is the canonical table. Look up the courses row
+  //    that matches this training_course by slug, then use its id.
   let lessonCourseId = tc.id;
 
-  if (!clByOldId || clByOldId.length === 0) {
-    // No curriculum_lessons under the old id — find the new canonical id
-    // by looking up the program that matches this training_course title
-    const { data: prog } = await db
-      .from('programs')
-      .select('id')
-      .ilike('title', `%${tc.title?.split(' ')[0]}%`)
-      .limit(1)
-      .maybeSingle();
+  const { data: canonicalCourse } = await db
+    .from('courses')
+    .select('id')
+    .eq('slug', tc.slug)
+    .maybeSingle();
 
-    if (prog?.id) {
-      const { data: clByProg } = await db
-        .from('curriculum_lessons')
-        .select('course_id')
-        .eq('program_id', prog.id)
-        .not('course_id', 'is', null)
-        .limit(1)
-        .maybeSingle();
-      if (clByProg?.course_id) lessonCourseId = clByProg.course_id;
-    }
+  if (canonicalCourse?.id) {
+    lessonCourseId = canonicalCourse.id;
   }
 
   return {

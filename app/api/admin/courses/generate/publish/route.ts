@@ -6,20 +6,13 @@
  *   { course, program_id?, is_published? }  — legacy GeneratedCourse from /generate
  *   { draft, program_id?, is_published? }   — compiled draft from v2 course compiler
  *
- * Insert order: training_courses → training_lessons → curriculum_lessons (parallel, if program_id) → completion_rules → program_courses
- *
- * NOTE: HVAC (program 4226f7f6 / course 0ba9a61c (canonical)) remains legacy-driven.
- * The live learner path is training_lessons (95 rows). The curriculum_lessons
- * skeleton (47 rows) is unpopulated and must NOT be published as the live
- * course until a full content parity migration is completed and verified.
- * Pass threshold: legacy quizzes use 70% (matching real EPA 608 exam).
- * curriculum_lessons checkpoints are set to 80% — resolve before activating.
+ * Insert order: courses → course_modules → course_lessons (parallel, if program_id) → completion_rules → program_courses
  *
  * Schema verified against live DB (cuxzzpsyufcewtmicszk):
  *   completion_rules  — entity_type/entity_id (no direct course_id column)
  *   program_courses   — order_index (not sort_order)
- *   training_courses  — created_by, certificate_enabled, summary present
- *   training_lessons  — narration_script not a column; stored in metadata
+ *   courses           — created_by, certificate_enabled, summary present
+ *   course_lessons    — narration_script stored in metadata
  *
  * Returns { ok: true, courseId, lessonCount }
  */

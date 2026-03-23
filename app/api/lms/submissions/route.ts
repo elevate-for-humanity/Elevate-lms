@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
  * Learner submits a lab or assignment for instructor sign-off.
  * Creates a step_submissions row with status='submitted'.
  *
- * Body: { lesson_id, course_id, step_type, submission_text?, file_urls? }
+ * Body: { course_lesson_id, course_id, step_type, submission_text?, file_urls? }
  */
 export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
   const { user } = auth;
 
   let body: {
-    lesson_id: string;
+    course_lesson_id: string;
     course_id: string;
     step_type: string;
     submission_text?: string;
@@ -36,10 +36,10 @@ export async function POST(request: NextRequest) {
     return safeError('Invalid JSON', 400);
   }
 
-  const { lesson_id, course_id, step_type, submission_text, file_urls } = body;
+  const { course_lesson_id, course_id, step_type, submission_text, file_urls } = body;
 
-  if (!lesson_id || !course_id || !step_type) {
-    return safeError('lesson_id, course_id, and step_type are required', 400);
+  if (!course_lesson_id || !course_id || !step_type) {
+    return safeError('course_lesson_id, course_id, and step_type are required', 400);
   }
 
   const SIGN_OFF_TYPES = ['lab', 'assignment'];
@@ -56,8 +56,8 @@ export async function POST(request: NextRequest) {
   // Verify the lesson exists and belongs to the course
   const { data: lesson, error: lessonErr } = await db
     .from('course_lessons')
-    .select('id, step_type, course_id')
-    .eq('id', lesson_id)
+    .select('id, lesson_type, course_id')
+    .eq('id', course_lesson_id)
     .eq('course_id', course_id)
     .single();
 
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     return safeError('Lesson not found', 404);
   }
 
-  if (!SIGN_OFF_TYPES.includes(lesson.step_type)) {
+  if (!SIGN_OFF_TYPES.includes(lesson.lesson_type)) {
     return safeError('This lesson does not accept submissions', 400);
   }
 
@@ -86,14 +86,14 @@ export async function POST(request: NextRequest) {
   const { data: submission, error: insertErr } = await db
     .from('step_submissions')
     .insert({
-      user_id:         user.id,
-      lesson_id,
+      user_id:          user.id,
+      course_lesson_id,
       course_id,
       step_type,
-      submission_text: submission_text?.trim() || null,
-      file_urls:       file_urls ?? [],
-      status:          'submitted',
-      updated_at:      new Date().toISOString(),
+      submission_text:  submission_text?.trim() || null,
+      file_urls:        file_urls ?? [],
+      status:           'submitted',
+      updated_at:       new Date().toISOString(),
     })
     .select('id, status, created_at')
     .single();
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * GET /api/lms/submissions?course_id=&lesson_id=
+ * GET /api/lms/submissions?course_id=&course_lesson_id=
  *
  * Returns the learner's own submissions for a lesson.
  */
@@ -117,8 +117,8 @@ export async function GET(request: NextRequest) {
   const { user } = auth;
 
   const { searchParams } = new URL(request.url);
-  const course_id = searchParams.get('course_id');
-  const lesson_id = searchParams.get('lesson_id');
+  const course_id        = searchParams.get('course_id');
+  const course_lesson_id = searchParams.get('course_lesson_id');
 
   if (!course_id) return safeError('course_id is required', 400);
 
@@ -126,12 +126,12 @@ export async function GET(request: NextRequest) {
 
   let query = db
     .from('step_submissions')
-    .select('id, lesson_id, step_type, submission_text, file_urls, status, instructor_note, reviewed_at, created_at')
+    .select('id, course_lesson_id, step_type, submission_text, file_urls, status, instructor_note, reviewed_at, created_at')
     .eq('user_id', user.id)
     .eq('course_id', course_id)
     .order('created_at', { ascending: false });
 
-  if (lesson_id) query = query.eq('lesson_id', lesson_id);
+  if (course_lesson_id) query = query.eq('course_lesson_id', course_lesson_id);
 
   const { data, error } = await query;
   if (error) return safeDbError(error, 'Failed to fetch submissions');

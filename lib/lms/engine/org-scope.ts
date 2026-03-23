@@ -167,8 +167,8 @@ export async function getOrgLearners(
 // of cohort or learner count:
 //   1. cohorts (filter)
 //   2. cohort_enrollments (filter)
-//   3. training_courses (course_id lookup)
-//   4. curriculum_lessons (total published count)
+//   3. courses (course_id lookup)
+//   4. course_lessons (total published count)
 //   5. lesson_progress + program_completion_certificates (parallel)
 
 export async function getOrgProgress(

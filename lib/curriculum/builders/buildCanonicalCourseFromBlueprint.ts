@@ -40,6 +40,35 @@ export interface BuildCanonicalCourseResult {
   warnings:     string[];
 }
 
+// ─── Preflight validator ──────────────────────────────────────────────────────
+
+function validateLessons(modules: CredentialBlueprint['modules']): void {
+  const slugs      = new Set<string>();
+  const orderKeys  = new Set<string>(); // `${moduleOrderIndex}:${lessonOrder}`
+
+  for (const mod of modules) {
+    for (const lesson of mod.lessons ?? []) {
+      if (!lesson.slug) throw new Error(`Missing slug in module '${mod.slug}' at order ${lesson.order}`);
+
+      if (slugs.has(lesson.slug)) throw new Error(`Duplicate slug: ${lesson.slug}`);
+      slugs.add(lesson.slug);
+
+      const key = `${mod.orderIndex}:${lesson.order}`;
+      if (orderKeys.has(key)) throw new Error(`Duplicate order ${lesson.order} in module '${mod.slug}'`);
+      orderKeys.add(key);
+
+      const stepType = inferStepType(lesson.slug);
+      if (stepType === 'exam' && !lesson.slug.includes('practice')) {
+        // Certification exams must have a recognisable exam code in the slug
+        // (enforced at DB level via partner_exam_code — validated here as a preflight)
+        const hasCode = lesson.slug.includes('qbocu') || lesson.slug.includes('icbp') ||
+                        lesson.slug.includes('epa') || lesson.slug.includes('certiport');
+        if (!hasCode) throw new Error(`Exam lesson '${lesson.slug}' has no recognisable cert code in slug`);
+      }
+    }
+  }
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export async function buildCanonicalCourseFromBlueprint(
@@ -112,6 +141,9 @@ export async function buildCanonicalCourseFromBlueprint(
   // ── 4. Upsert modules + lessons in blueprint order ────────────────────────
   let totalLessons = 0;
   let skipped      = 0;
+
+  // Preflight — fail before any DB write
+  validateLessons(input.blueprint.modules);
 
   const sortedModules = [...input.blueprint.modules].sort(
     (a, b) => a.orderIndex - b.orderIndex,

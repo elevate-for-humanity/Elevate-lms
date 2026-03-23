@@ -5,8 +5,8 @@
  * generator → validator → publish → lms_lessons view → learner path.
  *
  * These types describe the lesson contract that flows through the pipeline.
- * The canonical DB table is curriculum_lessons. The lms_lessons view
- * presents curriculum_lessons (priority) or training_lessons (fallback).
+ * The canonical DB table is course_lessons. The lms_lessons view reads
+ * course_lessons. curriculum_lessons is legacy — do not write to it.
  */
 
 // ─── Lesson contract (what the generator produces) ────────────────────────────

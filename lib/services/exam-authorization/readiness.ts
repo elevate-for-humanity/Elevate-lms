@@ -51,12 +51,12 @@ export async function checkCertificationReadiness(
   }
 
   // ── 2. Lesson completion ────────────────────────────────────────────────────
-  // curriculum_lessons uses status='published', not is_published
+  // course_lessons is the canonical table — lms_lessons view reads from here.
   const { data: lessons } = await db
-    .from('curriculum_lessons')
-    .select('id, content_type, title')
-    .eq('program_id', programId)
-    .eq('status', 'published');
+    .from('course_lessons')
+    .select('id, lesson_type, title')
+    .eq('course_id', programId)
+    .eq('is_published', true);
 
   const totalLessons = lessons?.length ?? 0;
 

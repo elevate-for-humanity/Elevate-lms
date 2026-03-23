@@ -7,7 +7,7 @@
  * use these functions instead.
  *
  * Read path:
- *   getProgramStructure   — ordered module/lesson tree from curriculum_lessons
+ *   getProgramStructure   — ordered module/lesson tree from course_lessons
  *   getLearnerProgress    — all progress state for a user+course in one pass
  *   canAccessLesson       — access decision with LearnerState (pure, no DB)
  *

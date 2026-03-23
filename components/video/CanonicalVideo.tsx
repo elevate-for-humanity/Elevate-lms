@@ -27,11 +27,16 @@ type Props = {
    */
   poster: `/${string}`;
   className?: string;
-  /** Intersection threshold to trigger play (default 0.5) */
+  /** Intersection threshold to trigger play (default 0.1) */
   threshold?: number;
+  /**
+   * When true (default), video keeps playing after it scrolls out of view.
+   * Set to false only for non-hero ambient videos that should pause when hidden.
+   */
+  playThrough?: boolean;
 };
 
-export default function CanonicalVideo({ src, poster, className, threshold = 0.5 }: Props) {
+export default function CanonicalVideo({ src, poster, className, threshold = 0.1, playThrough = true }: Props) {
   if (process.env.NODE_ENV === 'development') {
     if (!poster) {
       throw new Error('CanonicalVideo requires a local poster. This is not optional.');
@@ -53,18 +58,28 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.5
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  // Visibility-gated playback — never plays on mount, only when in view
+  // Visibility-gated playback — starts when video enters view.
+  // If playThrough=true (default for hero videos), keeps playing after scrolling away.
+  // If playThrough=false, pauses when scrolled out of view.
   useEffect(() => {
     if (reducedMotion || failed) return;
     const video = ref.current;
     if (!video) return;
 
+    let started = false;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && !started) {
+          started = true;
           video.play().catch(() => {});
-        } else {
+          if (playThrough) {
+            // Once started, disconnect — let it play through the page
+            observer.disconnect();
+          }
+        } else if (!entry.isIntersecting && !playThrough) {
           video.pause();
+          started = false;
         }
       },
       { threshold }
@@ -72,7 +87,7 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.5
 
     observer.observe(video);
     return () => observer.disconnect();
-  }, [reducedMotion, failed, threshold]);
+  }, [reducedMotion, failed, threshold, playThrough]);
 
   // Reduced-motion or error: render poster image only
   if (reducedMotion || failed) {

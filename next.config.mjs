@@ -50,41 +50,19 @@ const nextConfig = {
     'core-js',
     'prettier',
     'es-toolkit',
-    // 3D / WebGL
+    // 3D / WebGL (browser-only)
     'three',
     '@react-three/fiber',
     '@react-three/drei',
-    // Charts
+    // Charts (browser-only)
     'recharts',
     'chart.js',
     'react-chartjs-2',
-    // Animation
+    // Animation (browser-only)
     'framer-motion',
-    // Document generation
-    'docx',
-    'mammoth',
-    'xlsx',
-    // Canvas / image
-    'canvas',
+    // Canvas / image (browser-only)
     'html2canvas',
     'html-to-image',
-    // Misc heavy
-    'bcrypt',
-    'bcryptjs',
-    'jszip',
-    'qrcode',
-    'sanitize-html',
-    'cheerio',
-    'express',
-    'multer',
-    'fluent-ffmpeg',
-    '@ffmpeg-installer/ffmpeg',
-    '@ffprobe-installer/ffprobe',
-    'googleapis',
-    'google-auth-library',
-    'monaco-editor',
-    'node-pty',
-    'video.js',
   ],
 
   // Disable dev indicators (static route indicator, build indicator)
@@ -317,7 +295,7 @@ const nextConfig = {
       '**/node_modules/.pnpm/pdf-lib*/**',
       '**/node_modules/@apm-js-collab/**',
       '**/node_modules/.pnpm/@apm-js-collab*/**',
-      // 3D / WebGL (browser-only)
+      // 3D / WebGL (browser-only — never imported from API routes or server components)
       '**/node_modules/three/**',
       '**/node_modules/.pnpm/three*/**',
       '**/node_modules/@react-three/**',
@@ -330,39 +308,11 @@ const nextConfig = {
       // Animation (browser-only)
       '**/node_modules/framer-motion/**',
       '**/node_modules/.pnpm/framer-motion*/**',
-      // Document generation
-      '**/node_modules/docx/**',
-      '**/node_modules/.pnpm/docx*/**',
-      '**/node_modules/mammoth/**',
-      '**/node_modules/.pnpm/mammoth*/**',
-      '**/node_modules/xlsx/**',
-      '**/node_modules/.pnpm/xlsx*/**',
-      // Canvas / image processing
+      // Canvas / image (browser-only)
       '**/node_modules/html2canvas/**',
       '**/node_modules/.pnpm/html2canvas*/**',
       '**/node_modules/html-to-image/**',
       '**/node_modules/.pnpm/html-to-image*/**',
-      // Auth helpers
-      '**/node_modules/@supabase/auth-helpers-nextjs/**',
-      '**/node_modules/.pnpm/@supabase+auth-helpers-nextjs*/**',
-      // Misc heavy
-      '**/node_modules/jszip/**',
-      '**/node_modules/.pnpm/jszip*/**',
-      '**/node_modules/qrcode/**',
-      '**/node_modules/.pnpm/qrcode*/**',
-      '**/node_modules/sanitize-html/**',
-      '**/node_modules/.pnpm/sanitize-html*/**',
-      '**/node_modules/cheerio/**',
-      '**/node_modules/.pnpm/cheerio*/**',
-      '**/node_modules/express/**',
-      '**/node_modules/.pnpm/express*/**',
-      // Source files not needed at runtime
-      'app/**/*.tsx',
-      'app/**/*.ts',
-      'components/**/*.tsx',
-      'components/**/*.ts',
-      'lib/**/*.ts',
-      'lib/**/*.tsx',
     ],
   },
 

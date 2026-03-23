@@ -199,7 +199,7 @@
     # Sockets (not used in serverless)
     "socket.io",
     "socket.io-client",
-    # 3D / WebGL (browser-only)
+    # 3D / WebGL (browser-only — confirmed not imported from any API route)
     "three",
     "@react-three/fiber",
     "@react-three/drei",
@@ -209,27 +209,9 @@
     "react-chartjs-2",
     # Animation (browser-only)
     "framer-motion",
-    # Document generation
-    "docx",
-    "mammoth",
-    "xlsx",
-    # Canvas / image
-    "canvas",
+    # Canvas / image (browser-only)
     "html2canvas",
     "html-to-image",
-    # FFmpeg
-    "fluent-ffmpeg",
-    "@ffmpeg-installer/ffmpeg",
-    "@ffprobe-installer/ffprobe",
-    # Auth helpers (large, not needed in handler)
-    "@supabase/auth-helpers-nextjs",
-    # Misc heavy
-    "bcrypt",
-    "jszip",
-    "qrcode",
-    "sanitize-html",
-    "cheerio",
-    "express",
   ]
 
 # PDF export function - isolated bundle with PDF libraries

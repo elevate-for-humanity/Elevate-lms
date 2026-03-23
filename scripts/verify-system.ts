@@ -50,10 +50,13 @@ const envFile = path.join(ROOT, '.env.local');
 const envContent = fs.existsSync(envFile) ? fs.readFileSync(envFile, 'utf8') : '';
 
 for (const key of REQUIRED_ENV) {
-  if (process.env[key] || envContent.includes(`${key}=`)) {
+  const fromEnv = process.env[key];
+  // Match KEY=value (non-empty) in .env.local — KEY= (blank) does not count
+  const fromFile = envContent.match(new RegExp(`^${key}=(.+)`, 'm'))?.[1]?.trim();
+  if (fromEnv || fromFile) {
     pass(key);
   } else {
-    fail(key, 'not set in process.env or .env.local');
+    fail(key, 'not set in process.env or .env.local (blank values do not count)');
   }
 }
 

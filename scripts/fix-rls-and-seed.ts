@@ -6,11 +6,9 @@ import { createClient } from '@supabase/supabase-js';
 import { buildCourseFromBlueprint } from '../lib/services/curriculum-generator';
 import { prsIndianaBlueprint } from '../lib/curriculum/blueprints/prs-indiana';
 
-const SUPABASE_URL = 'https://cuxzzpsyufcewtmicszk.supabase.co';
-const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1eHp6cHN5dWZjZXd0bWljc3prIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODE2MTA0NywiZXhwIjoyMDczNzM3MDQ3fQ.5JRYvJPzFzsVaZQkbZDLcohP7dq8LWQEFeFdVByyihE';
-
-process.env.NEXT_PUBLIC_SUPABASE_URL = SUPABASE_URL;
-process.env.SUPABASE_SERVICE_ROLE_KEY = SERVICE_KEY;
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL ?? '';
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? '';
+if (!SUPABASE_URL || !SERVICE_KEY) throw new Error('NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set');
 
 const db = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
 

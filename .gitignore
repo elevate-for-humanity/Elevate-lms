@@ -158,7 +158,6 @@ public/generated/videos/
 public/generated-images/
 # lesson MP3s are committed so they deploy to Netlify without an API key at build time
 /reports/
-audit-packet/
 lighthouse-*.json
 deno.lock
 eng.traineddata
@@ -185,7 +184,6 @@ private/
 
 # Removed bloat — do not re-add
 reports/
-audit-packet/
 audit_artifacts/
 playwright-report/
 .github/workflows-disabled-all/

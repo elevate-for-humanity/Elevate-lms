@@ -35,12 +35,16 @@
 
 ## Repository Size
 
-| Metric | Count |
-|--------|-------|
-| `page.tsx` files | 1,486 |
-| `route.ts` files (API) | 1,079 |
-| Supabase migrations | 278 |
-| `console.log` occurrences | ~1,521 across 118 files — use `lib/logger.ts` instead |
+These are point-in-time snapshots. Re-run the commands to get current counts — do not trust the numbers without verifying.
+
+| Metric | Count | Last verified | Command |
+|--------|-------|---------------|---------|
+| `page.tsx` files | 1,498 | 2026-03-22 | `find app -name "page.tsx" \| wc -l` |
+| `route.ts` files (API) | 1,122 | 2026-03-22 | `find app -name "route.ts" \| wc -l` |
+| Supabase migrations | 346 | 2026-03-22 | `ls supabase/migrations/ \| wc -l` |
+| `console.log` occurrences | ~1,585 across 129 files | 2026-03-22 | `grep -r "console\.log" --include="*.ts" --include="*.tsx" \| wc -l` |
+
+Use `import { logger } from '@/lib/logger'` for all new logging. When you update any metric, update the verification date in the same edit.
 
 ---
 
@@ -59,63 +63,19 @@ Never assume a migration is live just because the file exists in `supabase/migra
 
 ## LMS Architecture
 
-### Source of Truth — Canonical Course Tables
+### Course Engine — DB-Driven, Program-Agnostic
 
-**`courses` / `course_modules` / `course_lessons` is the source of truth for all new programs.**
+The course engine routes rendering and completion rules by `step_type`, a column on `curriculum_lessons`. Do not write per-program hardcoded logic — set `step_type` in the DB and the renderer handles it automatically.
 
-`curriculum_lessons` and `modules` are legacy tables retained for HVAC and PRS backward compatibility. Do not write new programs to them. Do not read from them for new features.
-
-### Canonical Data Hierarchy
+### Data Hierarchy
 
 ```
-programs → courses → course_modules → course_lessons → lesson_progress
-                   → module_completion_rules
+programs → modules → curriculum_lessons (step_type) → lesson_progress
+                                                     → checkpoint_scores
+                                                     → step_submissions
 ```
 
-### Adding a New Program — One Entry Point
-
-```ts
-import { createAndPublishProgram } from '@/lib/programs/create-and-publish-program';
-
-const result = await createAndPublishProgram({
-  program: { slug, title, description, category: 'workforce' },
-  modules: [
-    {
-      slug: 'mod-1', title: 'Module 1', orderIndex: 1,
-      lessons: [
-        { slug: 'lesson-1', title: 'Lesson 1', orderIndex: 1, lessonType: 'lesson' },
-        { slug: 'checkpoint-1', title: 'Checkpoint', orderIndex: 2, lessonType: 'checkpoint', passingScore: 80 },
-      ],
-    },
-  ],
-  publish: true,
-});
-// result: { programId, courseId, moduleCount, lessonCount, published }
-```
-
-This is the **only** path for creating new programs. No seed scripts. No hardcoded UUIDs. No manual DB inserts.
-
-- **Input type:** `lib/programs/types.ts` — `ProgramCreateInput`
-- **Pipeline:** `lib/programs/create-and-publish-program.ts`
-- **API route:** `POST /api/admin/programs/create` (admin/super_admin/staff only)
-- **Kill test:** `npx tsx scripts/test-generator-one-shot.ts --cleanup`
-- **Hardening tests:** `SUPABASE_MANAGEMENT_TOKEN=<pat> npx tsx scripts/test-generator-hardening.ts --cleanup`
-
-### Reading a Published Course
-
-```ts
-import { getPublishedCourseBySlug } from '@/lib/lms/course-repository';
-const course = await getPublishedCourseBySlug(db, slug);
-// Returns full module+lesson tree, sorted by order_index
-```
-
-`lib/lms/course-repository.ts` reads `courses → course_modules → course_lessons` only. Never falls back to `curriculum_lessons`.
-
-### lms_lessons View
-
-`lms_lessons` is a read-only projection from `course_lessons` (migration `20260504000001`). It exists for backward compatibility with renderer code that queries it by `course_id`. New code should use `course-repository.ts` directly.
-
-### lesson_type Values
+### step_type Values
 
 | Value | Rendering | Completion Rule |
 |-------|-----------|-----------------|
@@ -131,33 +91,21 @@ const course = await getPublishedCourseBySlug(db, slug);
 
 | Object | Purpose |
 |--------|---------|
-| `courses` | Canonical course store — `slug`, `title`, `status`, `program_id` |
-| `course_modules` | Module definitions — `title`, `order_index`, FK → `courses.id` |
-| `course_lessons` | Lesson store — `lesson_type`, `order_index`, `passing_score`, `quiz_questions` |
-| `module_completion_rules` | Per-module completion gates — one row per module |
-| `lms_lessons` (view) | Projection from `course_lessons` — backward compat only |
-| `curriculum_lessons` | Legacy content store (HVAC, PRS) — read-only, do not write new programs here |
-| `training_lessons` | Legacy HVAC lesson store (94 rows) — archive only |
+| `curriculum_lessons` | Canonical lesson store — `step_type`, `module_order`, `lesson_order`, `passing_score` |
+| `training_lessons` | Legacy HVAC lesson store (94 rows) — do not add new programs here |
+| `lms_lessons` (view) | Unified lesson source: `curriculum_lessons` (priority) UNION `training_lessons` (fallback) |
+| `modules` | Module definitions — `title`, `slug`, `program_id` |
 | `lesson_progress` | Per-user lesson completion |
 | `checkpoint_scores` | Per-user checkpoint pass/fail records — drives module gating |
 | `step_submissions` | Lab/assignment submissions with instructor sign-off |
+| `completion_rules` | Per-course/program completion rule definitions |
 | `program_completion_certificates` | Auto-issued on course completion when all checkpoints pass |
 
-### Schema Integrity
+### Checkpoint Gating
 
-The pipeline depends on these FKs being present in the live DB:
+When a learner completes a checkpoint lesson, a `checkpoint_scores` row is written. The next module is locked until the checkpoint for the previous module has a passing row. This is enforced in the lesson page — do not bypass it.
 
-| Constraint | Table | References |
-|-----------|-------|-----------|
-| `course_modules_course_id_fkey` | `course_modules.course_id` | `courses.id` ON DELETE CASCADE |
-| `course_lessons_course_id_fkey` | `course_lessons.course_id` | `courses.id` ON DELETE CASCADE |
-| `course_lessons_module_id_fkey` | `course_lessons.module_id` | `course_modules.id` ON DELETE SET NULL |
-
-Added live on 2026-05-04 and codified in migration `20260504000002_course_modules_fk.sql`. If PostgREST returns "relationship not found" errors, run:
-
-```sql
-NOTIFY pgrst, 'reload schema';
-```
+**Requires migration `20260327000003_checkpoint_gating.sql` to be applied in Supabase Dashboard.**
 
 ### Certification Chain
 
@@ -168,6 +116,16 @@ All lessons complete + all checkpoints passed
   → learner lands on /lms/courses/[courseId]/certification
   → public verification at /verify/[certificateId]
 ```
+
+### Adding a New Program
+
+1. Create `lib/curriculum/blueprints/[program].ts` following `prs-indiana.ts`
+2. Register it in `lib/curriculum/blueprints/index.ts`
+3. Run the curriculum generator (`lib/services/curriculum-generator.ts`)
+4. Generator seeds `modules` and `curriculum_lessons` rows idempotently
+5. Set `step_type = 'checkpoint'` on module-boundary lessons in the DB
+6. Store `quiz_questions` as JSONB in `curriculum_lessons` rows
+7. LMS renders the course automatically — no new code required
 
 ### HVAC Legacy Path — Do Not Replicate
 
@@ -209,22 +167,33 @@ The lesson page runs both paths in parallel for backward compatibility. New prog
 
 ### Migrations Pending (apply in Supabase Dashboard)
 
-These files exist in `supabase/migrations/` but have **not** been applied to the live DB:
+**Verified:** these files exist in `supabase/migrations/` (confirmed 2026-03-22).  
+**Unverified:** whether they have been applied to the live DB. Do not assume either state without checking.
 
-| File | Effect |
-|------|--------|
-| `20260401000005_curriculum_lessons_quiz_questions.sql` | Adds `quiz_questions` to `curriculum_lessons`, backfills HVAC data |
-| `20260402000003_programs_lms_columns.sql` | Adds `short_description` and `display_order` to `programs` |
+| File | Effect | Live DB status |
+|------|--------|----------------|
+| `20260401000005_curriculum_lessons_quiz_questions.sql` | Adds `quiz_questions` to `curriculum_lessons`, backfills HVAC data, fixes `lms_lessons` view | **UNVERIFIED** — check before use |
+| `20260402000003_programs_lms_columns.sql` | Adds `short_description` and `display_order` to `programs`; backfills `short_description` from `excerpt` | **UNVERIFIED** — check before use |
 
-These files **have been applied** to the live DB (applied 2026-05-04):
+**To verify**, run in Supabase Dashboard SQL Editor:
 
-| File | Effect |
-|------|--------|
-| `20260504000001_lms_lessons_canonical_view.sql` | Rebuilds `lms_lessons` as projection from `course_lessons` |
-| `20260504000002_course_modules_fk.sql` | Adds `course_modules_course_id_fkey` FK; removes orphaned rows |
+```sql
+-- Check curriculum_lessons columns
+SELECT column_name FROM information_schema.columns
+WHERE table_schema = 'public' AND table_name = 'curriculum_lessons'
+ORDER BY column_name;
+
+-- Check programs columns
+SELECT column_name FROM information_schema.columns
+WHERE table_schema = 'public' AND table_name = 'programs'
+  AND column_name IN ('short_description', 'display_order');
+```
+
+When you confirm a migration is applied, update the Live DB status column and add the verification date.
 
 Until `20260401000005` is applied:
 - `curriculum_lessons.quiz_questions` column does not exist
+- `lms_lessons` view returns `NULL` for `quiz_questions` on curriculum rows
 - HVAC checkpoint quiz player falls back to `HVAC_QUIZ_MAP` (still functional, but not DB-driven)
 
 Until `20260402000003` is applied:
@@ -234,9 +203,16 @@ Until `20260402000003` is applied:
 
 **Verify after applying `20260402000003`:**
 ```sql
+-- Confirm columns exist
 SELECT column_name FROM information_schema.columns
 WHERE table_schema = 'public' AND table_name = 'programs'
   AND column_name IN ('short_description', 'display_order');
+
+-- Confirm live programs are published
+SELECT id, slug, title, published, is_active, status
+FROM public.programs
+WHERE published = true AND is_active = true AND status != 'archived'
+ORDER BY title LIMIT 10;
 ```
 
 ### Programs vs Courses — Tracked UX Debt
@@ -253,20 +229,6 @@ The public LMS uses "Programs" (`/lms/programs`) while the authenticated app use
 
 **Do not rename without a migration plan.** Until resolved, use "Program" in all new public-facing UI and "Course" only where it refers to the internal `training_courses` table object.
 
-### Legacy Programs Pending Canonical Migration
-
-Three programs have `has_lms_course=false` because they were seeded via `curriculum_lessons` (old path) and never migrated to the canonical pipeline. They have zero live enrollments and fail safely (program page shows "No courses yet"). They must be rebuilt through `createAndPublishProgram()` before being re-enabled.
-
-| Slug | Title | Blocker |
-|------|-------|---------|
-| `peer-recovery-specialist` | Peer Recovery Specialist | Empty — was always a dead slug. No content anywhere. Needs content authored from scratch. |
-| `bookkeeping` | Bookkeeping | No content in `curriculum_lessons` or `training_lessons`. Needs content authored from scratch. |
-| `cna` | Certified Nursing Assistant | No content in `curriculum_lessons` or `training_lessons`. Needs content authored from scratch. |
-
-**These are not migration candidates — they are content authoring gaps.** There is nothing to migrate. Content must be authored first (via blueprint + `createAndPublishProgram()`), then `has_lms_course` set to `true` after `validate-lms-integrity.ts` passes.
-
-**Proven migration pattern** (for programs that DO have content in `curriculum_lessons`): see `scripts/migrate-prs-jri-to-canonical.ts`. PRS-JRI was migrated this way — 8 modules, 39 lessons, published first pass.
-
 ### Lab / Assignment Instructor Sign-Off UI
 
 `step_submissions` table exists (applied via earlier migration). The lesson page renders lab/assignment UI shells but instructor sign-off UI is not yet built.
@@ -281,11 +243,31 @@ Three programs have `has_lms_course=false` because they were seeded via `curricu
 
 ### Supabase Access
 
-**Canonical** (`lib/supabase/`): `server.ts`, `client.ts`, `admin.ts`, `public.ts`, `server-db.ts`, `static.ts`
+**Canonical modules** (`lib/supabase/`): `server.ts`, `client.ts`, `admin.ts`, `public.ts`, `server-db.ts`, `static.ts`
 
-Import from `@/lib/supabase/*`. The following deprecated shims still have 78 active importers — do not add new imports from them:
+Import from the specific sub-module that matches your execution context. Do not import from the barrel (`@/lib/supabase`) — it is not used in practice.
+
+#### Client selection
+
+| Context | Import | Notes |
+|---------|--------|-------|
+| Server components, API routes | `import { createClient } from '@/lib/supabase/server'` | Respects user session and RLS |
+| Client components (browser) | `import { createBrowserClient } from '@/lib/supabase/client'` | Browser-only |
+| Admin / privileged operations | `import { createAdminClient } from '@/lib/supabase/admin'` | **Bypasses RLS** — see warning below |
+
+#### RLS warning
+
+`createAdminClient` bypasses Row Level Security. Use it only when the operation explicitly requires elevated privileges (provisioning, cron jobs, admin dashboards reading cross-tenant data). Using it in user-driven flows is a security bug. When in doubt, use `createClient`.
+
+If you use `createAdminClient` in a route or service, add an inline comment explaining why RLS bypass is required.
+
+#### Deprecated shims — 79 active importers remain
+
+Do not add new imports from these files:
 
 `lib/supabaseServer.ts`, `lib/supabase-server.ts`, `lib/supabaseAdmin.ts`, `lib/supabase-admin.ts`, `lib/supabaseClient.ts`, `lib/supabaseClients.ts`, `lib/supabase.ts`, `lib/supabase-lazy.ts`, `lib/supabase-api.ts`, `lib/getSupabaseServerClient.ts`
+
+If you edit a file that imports from a deprecated shim, migrate that import to `@/lib/supabase/*` as part of your change.
 
 ### Rate Limiting
 
@@ -307,25 +289,92 @@ if (rateLimited) return rateLimited;
 | `public` | 10 req / 1 min | Public AI tutor, unauthenticated reads |
 
 **Dead — do not import:**
-- `lib/rateLimit.ts` — in-memory, broken in serverless, `@deprecated`. All importers migrated.
+- `lib/rateLimit.ts` — in-memory, broken in serverless, `@deprecated`. Zero active importers. **File still exists on disk** — do not import it; delete it when confirmed safe.
 - `lib/rateLimiter.ts` — **deleted**
 - `lib/api/rate-limiter.ts` — **deleted**
 
-### API Auth Pattern
+### Cron Route Authentication
+
+Cron routes must verify `CRON_SECRET` before performing any work. Do not leave cron endpoints protected only by obscurity or pathname.
 
 ```ts
-// Any authenticated user
-import { apiAuthGuard } from '@/lib/admin/guards';
-const auth = await apiAuthGuard(request);
-if (auth.error) return auth.error;
-
-// Admin or super_admin only
-import { apiRequireAdmin } from '@/lib/admin/guards';
-const auth = await apiRequireAdmin(request);
-if (auth.error) return auth.error;
+const cronSecret = process.env.CRON_SECRET;
+if (request.headers.get('authorization') !== `Bearer ${cronSecret}`) {
+  return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+}
 ```
 
-⚠️ **`apiRequireAdmin` previously only allowed `'admin'`** — this was fixed in PR #50. It now allows `['admin', 'super_admin', 'staff']`. If you see identity-only checks on admin routes, add an explicit role check:
+Any new cron route must implement this check as the first operation in the handler.
+
+---
+
+### API Auth Pattern
+
+There are multiple auth modules. They are not interchangeable. Match the module to the execution context.
+
+#### Guard selection
+
+| Context | Function | Import from | On failure |
+|---------|----------|-------------|------------|
+| Server component / page layout | `requireAdmin()` | `@/lib/auth` | Throws redirect to `/login` |
+| API route / route handler | `apiRequireAdmin()` | `@/lib/authGuards` | Returns `NextResponse` 401/403 |
+
+**Page components:**
+
+```ts
+import { requireAdmin } from '@/lib/auth';
+await requireAdmin(); // throws redirect if not authorized
+```
+
+**API routes:**
+
+```ts
+import { apiRequireAdmin } from '@/lib/authGuards';
+const auth = await apiRequireAdmin(); // no arguments
+if (auth instanceof NextResponse) return auth; // failed — return the error response
+// auth.user, auth.role, auth.profile are available here
+```
+
+```ts
+import { apiAuthGuard } from '@/lib/authGuards';
+const auth = await apiAuthGuard(); // no arguments
+if (!auth.authorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+```
+
+⚠️ `apiRequireAdmin` and `apiAuthGuard` take **no arguments**. Do not pass `request`. Any example showing `apiRequireAdmin(request)` is wrong.
+
+#### `@/lib/admin/guards` is a wrapper, not the source
+
+`lib/admin/guards.ts` re-exports `apiAuthGuard` and `apiRequireAdmin` from `@/lib/authGuards` and adds Netlify context helpers (`isProd`, `isPreview`, `DEV_TOOL_ROUTES`). Import from `@/lib/admin/guards` only when you also need those Netlify helpers. For all other cases import from the real source.
+
+#### Additional guards in `@/lib/authGuards`
+
+```ts
+import { apiRequireInstructor, apiRequireStudent } from '@/lib/authGuards';
+```
+
+#### `lib/auth/` — primary auth subsystem
+
+`lib/auth/` contains 16 files used across ~246 files in the codebase. Before writing any new auth helper, check whether an equivalent already exists here.
+
+| File | Purpose |
+|------|---------|
+| `require-role.ts` | Generic role guard for page components |
+| `require-admin.ts` | Admin page guard |
+| `require-program-holder.ts` | Program holder scope guard |
+| `require-api-role.ts` | API role guard |
+| `require-org-admin.ts` | Org admin scope guard |
+| `org-guard.ts` | Org-level access control |
+| `validate-redirect.ts` | Redirect URL validation — security-critical, do not hand-roll |
+| `role-destinations.ts` | Role → dashboard path mapping |
+| `two-factor.ts` | 2FA helpers |
+| `sso-config.ts` | SSO configuration |
+
+Do not duplicate redirect validation, role checks, program enrollment checks, or page protection helpers. Use the existing implementations.
+
+#### `apiRequireAdmin` role coverage
+
+`apiRequireAdmin` allows `['admin', 'super_admin', 'staff']` (fixed in PR #50). If you encounter identity-only checks on admin routes that predate this fix, add an explicit role check:
 
 ```ts
 const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
@@ -372,13 +421,24 @@ if (error) return safeDbError(error, 'DB query failed');
 
 Never return `error.message` directly in a response body. `lib/safe-error.ts` (root) has been deleted — import only from `@/lib/api/safe-error`.
 
-### Auth Redirect Parameter
+### Auth Redirect Parameters
 
-Use `?redirect=<path>` (not `?next=`):
+Both `?redirect=` and `?next=` are active in the codebase. They serve different flows. Do not collapse them into one rule and do not blindly replace one with the other.
+
+| Param | Used by | Purpose |
+|-------|---------|---------|
+| `?redirect=` | Login page (`/login`) | Returns user to their intended page after password auth |
+| `?next=` | OAuth callback (`/auth/callback`), email-confirm flows, password reset | Supabase-driven post-auth destination |
+
+**Login page redirect** (pre-auth page protection):
 
 ```ts
 redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
 ```
+
+**OAuth / email-confirm flows** — `?next=` is read by `app/auth/callback/route.ts`. Do not remove or rename this param in those flows.
+
+**Security rule:** All redirect targets must be validated through `validateRedirect()` from `@/lib/auth/validate-redirect` before use. Do not implement ad hoc allowlists or string-prefix checks inline.
 
 ---
 
@@ -578,7 +638,7 @@ const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
 - ✅ All blue-* → brand-blue-* across app/ and components/
 - ✅ 27+ public pages rewritten with real content
 - ✅ Auth flow: signin/signup redirect to real forms
-- ✅ Dead rate limit files deleted (`lib/rateLimiter.ts`, `lib/api/rate-limiter.ts`)
+- ✅ Dead rate limit files deleted (`lib/rateLimiter.ts`, `lib/api/rate-limiter.ts`) — `lib/rateLimit.ts` still exists, 0 importers, pending deletion
 - ✅ Dead error helper deleted (`lib/safe-error.ts` root duplicate)
 - ✅ 11 routes migrated from dead `lib/rateLimit` to canonical `applyRateLimit`
 - ✅ Checkpoint gating migration written (`20260327000003_checkpoint_gating.sql`)
@@ -623,9 +683,9 @@ Do not tighten without replacing admin remediation and enrollment-management beh
 
 ## Remaining Technical Debt
 
-- ~1,521 `console.log` calls — use `import { logger } from '@/lib/logger'`
-- 78 files import from deprecated Supabase shims — migrate to `lib/supabase/*` gradually
-- `lib/rateLimit.ts` still exists (`@deprecated`, 0 active importers) — delete when confirmed
+- ~1,585 `console.log` calls across 129 files (2026-03-22) — use `import { logger } from '@/lib/logger'`
+- 79 files import from deprecated Supabase shims — migrate to `lib/supabase/*` gradually
+- `lib/rateLimit.ts` still exists on disk (`@deprecated`, 0 active importers) — safe to delete; do not import
 - `lib/curriculum/blueprints/prs.ts` may be superseded by `prs-indiana.ts` — verify
 - `app/api/auth/login/route.ts` — deprecated duplicate of `/api/auth/signin`
 - 8 certificate-related tables have no migration source — verify in Supabase Dashboard
@@ -681,6 +741,28 @@ Design tokens: `lib/page-design-tokens.ts`
 
 All hero videos use `useHeroVideo` hook. No `muted`/`autoPlay` attributes on `<video>` elements.
 The hook attempts unmuted play and falls back silently. No mute button shown.
+
+---
+
+## Agent Operating Rules
+
+These rules apply to every agent working in this codebase. They exist because the most common failure mode is writing elegant-looking code that follows the wrong abstraction.
+
+1. **Prefer existing helpers over new abstractions.** Before writing a new auth helper, rate limiter, error handler, or redirect validator, check whether one already exists. This codebase has ~5,700 TypeScript files. The helper you need almost certainly exists.
+
+2. **Match auth helper to execution context.** Page components use `@/lib/auth`. API routes use `@/lib/authGuards`. Using the wrong one produces either a broken redirect or a returned response object where a thrown redirect was expected.
+
+3. **Match Supabase client to privilege level.** `createClient` for user-scoped operations. `createAdminClient` only when RLS bypass is explicitly required and documented inline. Never use admin client as a convenience fallback.
+
+4. **Never improvise redirect handling.** Both `?redirect=` and `?next=` are active. Both serve distinct flows. Use `validateRedirect()` from `@/lib/auth/validate-redirect` for any user-supplied destination. Do not implement inline allowlists.
+
+5. **Do not trust stale counts.** Repo metrics in this file have a last-verified date. Re-run the provided commands before making scale-dependent decisions.
+
+6. **Do not describe migrations or cleanup as complete unless the repo state reflects it.** A migration file existing in `supabase/migrations/` does not mean it is applied. A file with zero importers does not mean it is deleted. Verify before asserting.
+
+7. **When a wrapper and a primary module disagree, document and use the primary module.** `@/lib/admin/guards` is a wrapper. `@/lib/authGuards` is the source. `@/lib/supabase` barrel is unused. The specific sub-modules are the source. Follow the real import graph, not the aspirational one.
+
+8. **When code and this document disagree, inspect the implementation and update this file.** This document is only useful if it reflects reality. If you find a discrepancy, fix the doc as part of your change.
 
 ---
 

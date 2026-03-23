@@ -34,18 +34,22 @@ export function DocumentSignatureBlock({
   const [submitting, setSubmitting] = useState(false);
   const [signed, setSigned] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [signerEmail, setSignerEmail] = useState('');
   const [alreadySigned, setAlreadySigned] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Pre-fill name and check if already signed
+  // Pre-fill name + email and check if already signed
   useEffect(() => {
-    import('@/lib/supabase/client').then(({ createClient }) => {
-      const supabase = createClient();
-      supabase?.auth.getUser().then(async ({ data }) => {
+    import('@/lib/supabase/client').then(({ createBrowserClient }) => {
+      const supabase = createBrowserClient();
+      supabase.auth.getUser().then(async ({ data }) => {
         if (!data?.user) { setLoading(false); return; }
+        // Capture auth email as fallback; profile may have a different display email
+        if (data.user.email) setSignerEmail(data.user.email);
         const { data: profile } = await supabase
-          .from('profiles').select('full_name').eq('id', data.user.id).single();
+          .from('profiles').select('full_name, email').eq('id', data.user.id).single();
         if (profile?.full_name) setSignerName(profile.full_name);
+        if (profile?.email) setSignerEmail(profile.email);
 
         const { data: existing } = await supabase
           .from('license_agreement_acceptances')
@@ -103,10 +107,11 @@ export function DocumentSignatureBlock({
         body: JSON.stringify({
           agreements: [agreementType],
           signer_name: signerName.trim(),
+          signer_email: signerEmail.trim(),
           signature_method: method,
           signature_typed: method === 'typed' ? typed.trim() : undefined,
           signature_data: method === 'drawn' ? drawn : undefined,
-          context: 'document',
+          context: 'onboarding',
         }),
       });
       if (!res.ok) {

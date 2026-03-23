@@ -18,8 +18,8 @@ export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  const auth = await apiAuthGuard();
+  if (!auth.authorized || !auth.user) return safeError(auth.error ?? 'Unauthorized', 401);
   const { user } = auth;
 
   let body: {
@@ -112,8 +112,8 @@ export async function GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  const auth = await apiAuthGuard();
+  if (!auth.authorized || !auth.user) return safeError(auth.error ?? 'Unauthorized', 401);
   const { user } = auth;
 
   const { searchParams } = new URL(request.url);

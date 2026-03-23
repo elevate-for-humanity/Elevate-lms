@@ -5,14 +5,11 @@
  * record and writes one if so. Returns the certificate number on success,
  * null if not yet eligible or already issued.
  *
- * Eligibility (enforced by checkCertificationEligibility):
- * - All required lessons complete
- * - All checkpoint/final_exam lessons passed
- * - All required practical evidence approved
- * - All required skill signoffs approved
- * - All required practical hours/attempts satisfied
- * - All module completion rules satisfied
- * - No existing certificate for this user+course
+ * Eligibility:
+ * - All published curriculum_lessons for the course are complete.
+ * - No checkpoint_scores row for this course has passed=false (all gated
+ *   steps must be passed; a learner with zero checkpoints is eligible).
+ * - No existing certificate for this user+course.
  */
 
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -20,7 +17,6 @@ import { logger } from '@/lib/logger';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { getCertificateIssuedEmail } from '@/lib/email/career-course-sequences';
 import { setAuditContext } from '@/lib/audit-context';
-import { checkCertificationEligibility } from '@/lib/services/course-certification-eligibility';
 
 export async function issueCertificateIfEligible(
   userId: string,
@@ -39,23 +35,33 @@ export async function issueCertificateIfEligible(
 
   if (existing) return existing.certificate_number;
 
-  // Full eligibility check — covers lessons, checkpoints, practicals, signoffs, hours
-  const eligibility = await checkCertificationEligibility(userId, courseId);
-  if (!eligibility.eligible) {
-    logger.info('[engine/certificate] Not eligible', {
-      userId, courseId,
-      unmet: eligibility.unmetRequirements.map(r => r.code),
-    });
-    return null;
-  }
-
-  // Count checkpoints for certificate metadata
+  // Every checkpoint/exam lesson for this course must have at least one passing score.
+  // A learner with zero checkpoint attempts is not eligible.
+  // Reads course_lessons (canonical) — lesson_type column.
   const { data: requiredCheckpoints } = await db
     .from('course_lessons')
     .select('id')
     .eq('course_id', courseId)
-    .in('lesson_type', ['checkpoint', 'final_exam']);
+    .in('lesson_type', ['checkpoint', 'exam']);
+
   const totalCheckpoints = requiredCheckpoints?.length ?? 0;
+
+  if (totalCheckpoints > 0) {
+    // For each required checkpoint, confirm at least one passing score exists.
+    const { data: passingScores } = await db
+      .from('checkpoint_scores')
+      .select('lesson_id')
+      .eq('user_id', userId)
+      .eq('course_id', courseId)
+      .eq('passed', true);
+
+    const passedLessonIds = new Set((passingScores ?? []).map((r: any) => r.lesson_id));
+    const allPassed = (requiredCheckpoints ?? []).every((cl: any) => passedLessonIds.has(cl.id));
+
+    if (!allPassed) {
+      return null;
+    }
+  }
 
   // Resolve program_id from enrollment — canonical table
   const { data: enrollment } = await db

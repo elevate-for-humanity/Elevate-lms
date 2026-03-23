@@ -123,7 +123,7 @@ export default async function ScormPage({ params }: Props) {
         <div className="flex-1 flex items-center justify-center">
           <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-8 text-center max-w-md">
             <p className="text-yellow-800 font-medium mb-2">
-              SCORM package not extracted
+              SCORM content not available
             </p>
             <p className="text-yellow-700 text-sm">
               This package has not been extracted yet. An administrator needs to

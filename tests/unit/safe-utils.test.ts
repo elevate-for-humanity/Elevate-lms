@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { date, isRecord, rec, str, num, bool, arr, toDateString, toError, toErrorMessage, toErrorDetail } from '../../lib/safe';
+import { date, isRecord, rec, str, num, bool, arr, toDateString, toError, toErrorMessage } from '../../lib/safe';
 
 describe('isRecord', () => {
   it('should return true for plain objects', () => {
@@ -122,22 +122,13 @@ describe('toError', () => {
 });
 
 describe('toErrorMessage', () => {
-  it('should return a safe generic message in non-development environments', () => {
-    // toErrorMessage hides internals outside of development — use toErrorDetail for actual messages
-    const result = toErrorMessage(new Error('test message'));
-    expect(typeof result).toBe('string');
-    expect(result.length).toBeGreaterThan(0);
-  });
-});
-
-describe('toErrorDetail', () => {
   it('should return message from Error', () => {
-    expect(toErrorDetail(new Error('test message'))).toBe('test message');
+    expect(toErrorMessage(new Error('test message'))).toBe('test message');
   });
 
   it('should stringify non-Error values', () => {
-    expect(toErrorDetail('string')).toBe('string');
-    expect(toErrorDetail(123)).toBe('123');
+    expect(toErrorMessage('string')).toBe('string');
+    expect(toErrorMessage(123)).toBe('123');
   });
 });
 

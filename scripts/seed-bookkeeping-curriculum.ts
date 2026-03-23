@@ -13,9 +13,7 @@
  *   npx tsx scripts/seed-bookkeeping-curriculum.ts --force   # overwrite existing
  */
 
-import path from 'path';
-import dotenv from 'dotenv';
-dotenv.config({ path: path.join(process.cwd(), '.env.local') });
+import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 import { CurriculumGenerator } from '../lib/services/curriculum-generator';
 import { bookkeepingQuickbooksBlueprint } from '../lib/curriculum/blueprints/bookkeeping-quickbooks';
@@ -66,22 +64,18 @@ async function main() {
   }
   console.log(`Program: ${program.title} (${program.id})\n`);
 
-  // 2. Resolve canonical courses row for course_id linkage.
-  // The courses row is created by the canonicalization migration; it may not
-  // exist yet if the migration hasn't been applied. Seed proceeds without it —
-  // the migration backfills course_id after the fact.
+  // 2. Resolve training_courses row for course_id linkage
   const { data: course } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('id, slug, title')
-    .eq('program_id', program.id)
+    .eq('slug', 'bookkeeping-quickbooks')
     .maybeSingle();
 
   const courseId = course?.id ?? null;
   if (courseId) {
     console.log(`Linked course: ${course!.title} (${courseId})`);
   } else {
-    console.log(`No courses row found for program_id ${program.id} — lessons will seed without course_id.`);
-    console.log(`Apply 20260504000000_lms_course_canonicalization.sql to backfill course_id after seeding.`);
+    console.log(`No training_courses row found for slug 'bookkeeping-quickbooks' — lessons will seed without course_id`);
   }
 
   // 3. Run generator

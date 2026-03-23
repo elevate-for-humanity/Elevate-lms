@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 
-// Canonical partner dashboard is at /partner/programs.
-// This route exists as a stable entry point for external links and redirects.
-export default function PartnerDashboardPage() {
-  redirect('/partner/programs');
+// Canonical partner dashboard is /partner-portal.
+// role-destinations.ts sends the 'partner' role here — redirect permanently.
+export default function PartnerDashboardRedirect() {
+  redirect('/partner-portal');
 }

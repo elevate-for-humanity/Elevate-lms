@@ -6,7 +6,6 @@
  */
 
 import Image from 'next/image';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
 import Link from 'next/link';
 
 interface Props {
@@ -45,15 +44,13 @@ export default function SplitMediaBlock({
   const MediaPanel = (
     <div className="relative w-full h-64 sm:h-80 lg:h-full min-h-[320px] overflow-hidden bg-slate-200">
       {videoSrc ? (
-        <CanonicalVideo
+        <video
           src={videoSrc}
-          poster={
-            // CanonicalVideo requires a local path. Use posterSrc if it starts with /,
-            // fall back to imageSrc if local, otherwise use the generic hero poster.
-            ((posterSrc?.startsWith('/') ? posterSrc : null) ??
-             (imageSrc?.startsWith('/') ? imageSrc : null) ??
-             '/images/hero-banner.jpg') as `/${string}`
-          }
+          poster={posterSrc ?? imageSrc}
+          autoPlay
+          muted
+          loop
+          playsInline
           className="absolute inset-0 w-full h-full object-cover"
         />
       ) : imageSrc ? (
@@ -65,9 +62,9 @@ export default function SplitMediaBlock({
           sizes="(max-width: 1024px) 100vw, 50vw"
         />
       ) : (
-        /* Clean placeholder — swap with real asset later */
+        /* No media provided — render neutral placeholder */
         <div className="absolute inset-0 flex items-center justify-center bg-slate-100">
-          <span className="text-slate-400 text-sm font-medium">Media preview unavailable</span>
+          <span className="text-slate-400 text-sm font-medium">Media unavailable</span>
         </div>
       )}
     </div>

@@ -31,17 +31,20 @@ export type LearnerState =
 
 // ─── Step types ───────────────────────────────────────────────────────────────
 
-import type { LessonType } from '@/lib/curriculum/lesson-types';
-import { GATED_LESSON_TYPES, REVIEW_LESSON_TYPES } from '@/lib/curriculum/lesson-types';
+export type StepType =
+  | 'lesson'
+  | 'quiz'
+  | 'checkpoint'
+  | 'lab'
+  | 'assignment'
+  | 'exam'
+  | 'certification';
 
-// StepType is now an alias for the canonical LessonType
-export type StepType = LessonType;
+/** Step types that require a passing score before the learner can advance. */
+export const GATED_STEP_TYPES: StepType[] = ['quiz', 'checkpoint', 'exam'];
 
-/** @deprecated Use GATED_LESSON_TYPES from lib/curriculum/lesson-types */
-export const GATED_STEP_TYPES = GATED_LESSON_TYPES;
-
-/** @deprecated Use REVIEW_LESSON_TYPES from lib/curriculum/lesson-types */
-export const REVIEW_STEP_TYPES = REVIEW_LESSON_TYPES;
+/** Step types that require instructor sign-off (step_submissions). */
+export const REVIEW_STEP_TYPES: StepType[] = ['lab', 'assignment'];
 
 // ─── Program structure ────────────────────────────────────────────────────────
 

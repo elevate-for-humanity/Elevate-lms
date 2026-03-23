@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
+import CanonicalHero from '@/components/hero/CanonicalHero';
+import HeroMediaFrame from '@/components/hero/HeroMediaFrame';
 import {
   GraduationCap,
   Clock,
@@ -18,7 +21,6 @@ import {
   Calendar,
   Building2,
 } from 'lucide-react';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Barber Apprenticeship | Earn While You Learn | DOL Registered',
@@ -29,54 +31,32 @@ export const metadata: Metadata = {
 export default function ApprenticeshipPage() {
   return (
     <main className="min-h-screen bg-white">
-      {/* Hero — video frame only, no text overlay */}
-      <PageVideoHero
-        videoSrc="/videos/barber-hero-final.mp4"
-        posterSrc="/images/pages/barber-apprenticeship-hero.jpg"
-        posterAlt="Barber apprenticeship training at Elevate for Humanity"
-        size="primary"
-      />
-
-      {/* Page identity — below hero */}
-      <section className="bg-white border-b border-slate-100 py-10 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-wrap gap-2 mb-4">
-            <span className="px-3 py-1 bg-brand-orange-600 text-white text-xs font-bold rounded-full">
-              Earn While You Learn
-            </span>
-            <span className="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">
-              DOL Registered
-            </span>
-            <span className="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">
-              $12–15/Hour
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
-            Barber Apprenticeship
-          </h1>
-          <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
-            Get paid to learn. Master your craft. Build your career.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link
-              href="/start"
-              className="inline-flex items-center gap-2 bg-brand-orange-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-brand-orange-700 transition-colors"
-            >
-              Start Your Journey
-              <ArrowRight className="w-4 h-4" />
+      <CanonicalHero
+        media={
+          <HeroMediaFrame heightClass="h-[50vh] sm:h-[56vw] min-h-[280px] max-h-[680px]">
+            <CanonicalVideo
+              src="/videos/barber-hero-final.mp4"
+              poster="/images/pages/barber-apprenticeship.jpg"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </HeroMediaFrame>
+        }
+        title="Barber Apprenticeship"
+        body="Get paid to learn. Master your craft. Build your career."
+        actions={
+          <>
+            <Link href="/start" className="inline-flex items-center gap-2 bg-brand-orange-600 text-white px-8 py-3.5 rounded-lg font-bold hover:bg-brand-orange-700 transition-colors">
+              Start Your Journey <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link
-              href="#how-it-works"
-              className="border-2 border-slate-300 text-slate-700 px-8 py-3 rounded-xl font-bold hover:border-brand-orange-400 hover:text-brand-orange-700 transition-colors"
-            >
+            <Link href="#how-it-works" className="border border-slate-300 text-slate-700 px-8 py-3.5 rounded-lg font-bold hover:bg-slate-50 transition-colors">
               How It Works
             </Link>
-          </div>
-        </div>
-      </section>
+          </>
+        }
+      />
 
       {/* Value Props Strip */}
-      <section className="bg-white py-8 border-b border-slate-100">
+      <section className="py-8 border-t">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div className="flex flex-col items-center">
@@ -99,7 +79,7 @@ export default function ApprenticeshipPage() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-24 bg-white">
+      <section id="how-it-works"className="py-24">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="text-5xl md:text-6xl font-black text-black mb-6">
@@ -175,7 +155,7 @@ export default function ApprenticeshipPage() {
       </section>
 
       {/* Why Apprenticeship */}
-      <section className="py-24 bg-white">
+      <section className="py-24">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -299,7 +279,7 @@ export default function ApprenticeshipPage() {
       </section>
 
       {/* What You'll Master */}
-      <section className="py-24 bg-white">
+      <section className="py-24">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="text-5xl md:text-6xl font-black text-black mb-6">
@@ -396,7 +376,7 @@ export default function ApprenticeshipPage() {
       </section>
 
       {/* Success Stories */}
-      <section className="py-24 bg-white border-t">
+      <section className="py-24 border-t">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="text-5xl md:text-6xl font-black mb-6">

@@ -3,319 +3,416 @@
 /**
  * CurriculumLessonManager
  *
- * Full-course admin builder. Edits course_lessons rows with structured content,
- * objectives, video metadata, assessment questions, evidence requirements,
- * rubric criteria, practical requirements, and competency mappings.
+ * Admin UI for editing curriculum_lessons rows. Exposes step_type, passing_score,
+ * and core lesson fields. Separate from the training_lessons editor at
+ * app/admin/lessons/page.tsx — curriculum_lessons is the DB-driven LMS table.
  *
- * Save path:
- *   - course_lessons columns via PATCH /api/admin/lessons/[lessonId]
- *   - lesson_objectives rows (upserted via API)
- *   - lesson_competency_map rows (upserted via API)
- *   - practical_requirements row (upserted via API)
+ * Usage: embed in any admin page that manages a course's curriculum.
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { ChevronDown, ChevronUp, Save, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import {
-  LESSON_TYPE_META, ASSESSMENT_LESSON_TYPES,
-  EVIDENCE_LESSON_TYPES, VIDEO_LESSON_TYPES, type LessonType,
-} from '@/lib/curriculum/lesson-types';
-import {
-  emptyLessonContent, type LessonContent, type VideoConfig,
-  type EvidenceRequirement, type RubricCriterion, type PracticalConfig,
-} from '@/lib/curriculum/lesson-content-schema';
-import { normalizeLessonContent } from '@/lib/curriculum/normalize-lesson-content';
-
-import LessonBasicsEditor from './lesson-editor/LessonBasicsEditor';
-import LessonObjectivesEditor from './lesson-editor/LessonObjectivesEditor';
-import LessonVideoEditor from './lesson-editor/LessonVideoEditor';
-import LessonAssessmentEditor, { type QuizQuestion } from './lesson-editor/LessonAssessmentEditor';
-import LessonEvidenceEditor from './lesson-editor/LessonEvidenceEditor';
-import LessonRubricEditor from './lesson-editor/LessonRubricEditor';
-import LessonPracticalEditor from './lesson-editor/LessonPracticalEditor';
-import LessonCompetencyEditor from './lesson-editor/LessonCompetencyEditor';
-import { validateLessonSave, isLessonSaveValid } from '@/lib/curriculum/validate-lesson-save';
+  BookOpen, ClipboardList, FlaskConical, FileText, Award, GraduationCap,
+  ChevronDown, ChevronUp, Save, Plus, Trash2, AlertCircle, CheckCircle2,
+} from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-interface LessonRow {
-  id: string; slug: string; title: string; lesson_type: LessonType;
-  status: string; order_index: number; passing_score: number | null;
-  duration_minutes?: number | null; module_id: string | null;
-  quiz_questions: QuizQuestion[] | null; content: unknown;
-  content_structured: unknown; video_file: string | null;
-  video_transcript: string | null; video_runtime_seconds: number;
-  requires_evidence: boolean; requires_signoff: boolean; requires_evaluator: boolean;
+type StepType = 'lesson' | 'quiz' | 'checkpoint' | 'lab' | 'assignment' | 'exam' | 'certification';
+type LessonStatus = 'draft' | 'review' | 'published' | 'archived';
+
+interface CurriculumLesson {
+  id: string;
+  lesson_slug: string;
+  lesson_title: string;
+  step_type: StepType;
+  passing_score: number;
+  module_order: number;
+  lesson_order: number;
+  duration_minutes: number | null;
+  status: LessonStatus;
+  script_text: string | null;
+  video_file: string | null;
+  module_id: string | null;
+  quiz_questions: any[] | null;
 }
 
-interface LessonEditorState {
-  title: string; lessonType: LessonType; status: string; durationMinutes: number;
-  content: LessonContent; quizQuestions: QuizQuestion[]; passingScore: number;
-  videoFile: string; videoTranscript: string; videoRuntime: number;
-  requiresEvidence: boolean; requiresSignoff: boolean; requiresEvaluator: boolean;
-  objectives: string[]; competencyCodes: string[]; practicalInstructions: string;
+interface Props {
+  courseId: string;
+  /** Optional: restrict to a single module_order */
+  moduleOrder?: number;
 }
 
-interface Props { courseId: string; moduleOrder?: number; }
+// ── Constants ──────────────────────────────────────────────────────────────────
 
-type SectionKey = 'basics' | 'content' | 'objectives' | 'video' | 'assessment' | 'evidence' | 'rubric' | 'practical' | 'competency';
-
-const SECTION_LABELS: Record<SectionKey, string> = {
-  basics: 'Basics', content: 'Content', objectives: 'Objectives',
-  video: 'Video', assessment: 'Assessment', evidence: 'Evidence',
-  rubric: 'Rubric', practical: 'Practical', competency: 'Competencies',
+const STEP_TYPE_META: Record<StepType, { label: string; icon: React.ReactNode; color: string }> = {
+  lesson:        { label: 'Lesson',        icon: <BookOpen className="w-4 h-4" />,      color: 'text-slate-600' },
+  quiz:          { label: 'Quiz',          icon: <ClipboardList className="w-4 h-4" />, color: 'text-brand-blue-600' },
+  checkpoint:    { label: 'Checkpoint',    icon: <ClipboardList className="w-4 h-4" />, color: 'text-amber-600' },
+  lab:           { label: 'Lab',           icon: <FlaskConical className="w-4 h-4" />,  color: 'text-teal-600' },
+  assignment:    { label: 'Assignment',    icon: <FileText className="w-4 h-4" />,      color: 'text-purple-600' },
+  exam:          { label: 'Exam',          icon: <Award className="w-4 h-4" />,         color: 'text-red-600' },
+  certification: { label: 'Certification', icon: <GraduationCap className="w-4 h-4" />, color: 'text-brand-green-600' },
 };
 
-function sectionsForType(lt: LessonType): SectionKey[] {
-  const base: SectionKey[] = ['basics', 'objectives', 'competency'];
-  if (lt === 'video')                           return [...base, 'video', 'content'];
-  if (ASSESSMENT_LESSON_TYPES.includes(lt))     return [...base, 'content', 'assessment'];
-  if (EVIDENCE_LESSON_TYPES.includes(lt))       return [...base, 'content', 'evidence', 'rubric', 'practical'];
-  if (lt === 'certification')                   return ['basics'];
-  return [...base, 'content'];
-}
+const STEP_TYPES_WITH_SCORE: StepType[] = ['quiz', 'checkpoint', 'exam'];
 
 // ── Component ──────────────────────────────────────────────────────────────────
 
 export default function CurriculumLessonManager({ courseId, moduleOrder }: Props) {
-  const [lessons, setLessons]       = useState<LessonRow[]>([]);
-  const [loading, setLoading]       = useState(true);
-  const [error, setError]           = useState<string | null>(null);
+  const [lessons, setLessons] = useState<CurriculumLesson[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState<string | null>(null); // lesson id being saved
+  const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [activeSection, setActiveSection] = useState<Record<string, SectionKey>>({});
-  const [edits, setEdits]           = useState<Record<string, LessonEditorState>>({});
-  const [saving, setSaving]         = useState<string | null>(null);
+  const [edits, setEdits] = useState<Record<string, Partial<CurriculumLesson>>>({});
   const [saveStatus, setSaveStatus] = useState<Record<string, 'saved' | 'error'>>({});
 
   const fetchLessons = useCallback(async () => {
-    setLoading(true); setError(null);
+    setLoading(true);
+    setError(null);
     try {
       const supabase = createClient();
       let query = supabase
-        .from('course_lessons')
-        .select('id,slug,title,lesson_type,status,order_index,passing_score,module_id,quiz_questions,content,content_structured,video_file,video_transcript,video_runtime_seconds,requires_evidence,requires_signoff,requires_evaluator')
-        .eq('course_id', courseId).order('order_index');
-      if (moduleOrder !== undefined) query = query.eq('module_id', moduleOrder);
-      const { data, error: e } = await query;
-      if (e) throw e;
-      setLessons((data as LessonRow[]) ?? []);
-    } catch { setError('Failed to load lessons.'); }
-    finally { setLoading(false); }
+        .from('curriculum_lessons')
+        .select('id, lesson_slug, lesson_title, step_type, passing_score, module_order, lesson_order, duration_minutes, status, script_text, video_file, module_id, quiz_questions')
+        .eq('course_id', courseId)
+        .order('module_order')
+        .order('lesson_order');
+
+      if (moduleOrder !== undefined) {
+        query = query.eq('module_order', moduleOrder);
+      }
+
+      const { data, error: fetchError } = await query;
+      if (fetchError) throw fetchError;
+      setLessons((data as CurriculumLesson[]) ?? []);
+    } catch (err: any) {
+      setError('Failed to load curriculum lessons.');
+    } finally {
+      setLoading(false);
+    }
   }, [courseId, moduleOrder]);
 
   useEffect(() => { fetchLessons(); }, [fetchLessons]);
 
-  const initEditorState = useCallback(async (lesson: LessonRow): Promise<LessonEditorState> => {
-    const supabase = createClient();
-    const content = normalizeLessonContent(lesson.content_structured ?? lesson.content);
-    const { data: objRows } = await supabase.from('lesson_objectives').select('objective_text,order_index').eq('lesson_id', lesson.id).order('order_index');
-    const { data: compRows } = await supabase.from('lesson_competency_map').select('competency_code').eq('lesson_id', lesson.id);
-    const { data: prRow } = await supabase.from('practical_requirements').select('*').eq('lesson_id', lesson.id).maybeSingle();
-    if (prRow) {
-      content.practical = { requiredHours: prRow.required_hours ?? 0, requiredAttempts: prRow.required_attempts ?? 0, requiresEvaluatorApproval: prRow.requires_evaluator_approval ?? false, requiresSkillSignoff: prRow.requires_skill_signoff ?? false, safetyGuidance: prRow.safety_guidance ?? '', materialsNeeded: prRow.materials_needed ?? [] };
-      if (Array.isArray(prRow.rubric_json)) content.rubric = prRow.rubric_json;
-    }
-    return {
-      title: lesson.title, lessonType: lesson.lesson_type, status: lesson.status,
-      durationMinutes: (lesson as any).duration_minutes ?? 0, content,
-      quizQuestions: lesson.quiz_questions ?? [], passingScore: lesson.passing_score ?? 70,
-      videoFile: lesson.video_file ?? '', videoTranscript: lesson.video_transcript ?? '',
-      videoRuntime: lesson.video_runtime_seconds ?? 0,
-      requiresEvidence: lesson.requires_evidence ?? false,
-      requiresSignoff: lesson.requires_signoff ?? false,
-      requiresEvaluator: lesson.requires_evaluator ?? false,
-      objectives: (objRows ?? []).map((r: any) => r.objective_text),
-      competencyCodes: (compRows ?? []).map((r: any) => r.competency_code),
-      practicalInstructions: prRow?.instructions ?? '',
-    };
-  }, []);
+  const getEdit = (id: string): Partial<CurriculumLesson> => edits[id] ?? {};
 
-  const handleExpand = async (lesson: LessonRow) => {
-    if (expandedId === lesson.id) { setExpandedId(null); return; }
-    setExpandedId(lesson.id);
-    if (!edits[lesson.id]) {
-      const state = await initEditorState(lesson);
-      setEdits(prev => ({ ...prev, [lesson.id]: state }));
-      setActiveSection(prev => ({ ...prev, [lesson.id]: 'basics' }));
-    }
+  const setField = (id: string, field: keyof CurriculumLesson, value: any) => {
+    setEdits(prev => ({ ...prev, [id]: { ...prev[id], [field]: value } }));
+    setSaveStatus(prev => { const n = { ...prev }; delete n[id]; return n; });
   };
 
-  const patchEdit = (id: string, patch: Partial<LessonEditorState>) =>
-    setEdits(prev => ({ ...prev, [id]: { ...prev[id], ...patch } }));
+  const saveLesson = async (lesson: CurriculumLesson) => {
+    const patch = edits[lesson.id];
+    if (!patch || Object.keys(patch).length === 0) return;
 
-  const patchContent = (id: string, patch: Partial<LessonContent>) => {
-    const cur = edits[id]; if (!cur) return;
-    patchEdit(id, { content: { ...cur.content, ...patch } });
-  };
-
-  const save = async (lessonId: string) => {
-    const state = edits[lessonId]; if (!state) return;
-    setSaving(lessonId);
+    setSaving(lesson.id);
     try {
-      const res = await fetch(`/api/admin/lessons/${lessonId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          courseId, title: state.title, lessonType: state.lessonType,
-          status: state.status, durationMinutes: state.durationMinutes,
-          passingScore: state.passingScore, quizQuestions: state.quizQuestions,
-          videoFile: state.videoFile, videoTranscript: state.videoTranscript,
-          videoRuntimeSeconds: state.videoRuntime,
-          requiresEvidence: state.requiresEvidence, requiresSignoff: state.requiresSignoff,
-          requiresEvaluator: state.requiresEvaluator,
-          contentStructured: { ...state.content, version: 1 },
-          objectives: state.objectives, competencyCodes: state.competencyCodes,
-          practicalInstructions: state.practicalInstructions,
-          practical: state.content.practical, rubric: state.content.rubric,
-        }),
-      });
-      if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error ?? 'Save failed'); }
-      setSaveStatus(prev => ({ ...prev, [lessonId]: 'saved' }));
-      setTimeout(() => setSaveStatus(prev => { const n = { ...prev }; delete n[lessonId]; return n; }), 3000);
-      await fetchLessons();
-    } catch (err: any) {
-      setSaveStatus(prev => ({ ...prev, [lessonId]: 'error' }));
-      setError(err.message ?? 'Save failed');
-    } finally { setSaving(null); }
+      const supabase = createClient();
+      const { error: saveError } = await supabase
+        .from('curriculum_lessons')
+        .update({ ...patch, updated_at: new Date().toISOString() })
+        .eq('id', lesson.id);
+
+      if (saveError) throw saveError;
+
+      setLessons(prev => prev.map(l => l.id === lesson.id ? { ...l, ...patch } : l));
+      setEdits(prev => { const n = { ...prev }; delete n[lesson.id]; return n; });
+      setSaveStatus(prev => ({ ...prev, [lesson.id]: 'saved' }));
+    } catch {
+      setSaveStatus(prev => ({ ...prev, [lesson.id]: 'error' }));
+    } finally {
+      setSaving(null);
+    }
   };
 
-  if (loading) return <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="h-14 bg-slate-100 rounded-lg animate-pulse" />)}</div>;
-  if (error) return <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"><AlertCircle className="w-4 h-4 flex-shrink-0" />{error}</div>;
+  const merged = (lesson: CurriculumLesson): CurriculumLesson => ({
+    ...lesson,
+    ...getEdit(lesson.id),
+  });
+
+  // Group by module_order for display
+  const byModule = lessons.reduce<Record<number, CurriculumLesson[]>>((acc, l) => {
+    const m = l.module_order;
+    if (!acc[m]) acc[m] = [];
+    acc[m].push(l);
+    return acc;
+  }, {});
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12 text-slate-500 text-sm">
+        Loading curriculum lessons…
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+        <AlertCircle className="w-4 h-4 shrink-0" />
+        {error}
+      </div>
+    );
+  }
+
+  if (lessons.length === 0) {
+    return (
+      <div className="text-center py-12 text-slate-500 text-sm">
+        No curriculum lessons found for this course.
+        <p className="mt-2 text-xs text-slate-400">
+          Run the curriculum generator to seed lessons from a blueprint.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-2">
-      {lessons.map(lesson => {
-        const isOpen = expandedId === lesson.id;
-        const state  = edits[lesson.id];
-        const meta   = LESSON_TYPE_META[lesson.lesson_type] ?? LESSON_TYPE_META.reading;
-        const sections = state ? sectionsForType(state.lessonType) : [];
-        const currentSection = (activeSection[lesson.id] ?? 'basics') as SectionKey;
-        const isSaving = saving === lesson.id;
-        const status = saveStatus[lesson.id];
-
-        return (
-          <div key={lesson.id} className="border border-slate-200 rounded-xl overflow-hidden">
-            <div className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition ${isOpen ? 'bg-slate-50 border-b border-slate-200' : 'hover:bg-slate-50'}`} onClick={() => handleExpand(lesson)}>
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${meta.bgColor} ${meta.color}`}>{meta.badge} {meta.shortLabel}</span>
-              <span className="flex-1 font-semibold text-sm text-slate-800 truncate">{lesson.title}</span>
-              <span className="text-xs text-slate-400 font-mono">#{lesson.order_index}</span>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${lesson.status === 'published' ? 'bg-green-100 text-green-700' : lesson.status === 'review' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}>{lesson.status}</span>
-              {status === 'saved' && <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />}
-              {status === 'error' && <AlertCircle  className="w-4 h-4 text-red-500 flex-shrink-0" />}
-              {isOpen ? <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />}
+    <div className="space-y-6">
+      {Object.entries(byModule)
+        .sort(([a], [b]) => Number(a) - Number(b))
+        .map(([modOrder, modLessons]) => (
+          <div key={modOrder} className="border border-slate-200 rounded-xl overflow-hidden">
+            <div className="bg-slate-50 px-4 py-3 border-b border-slate-200">
+              <h3 className="font-semibold text-slate-700 text-sm">
+                Module {modOrder}
+                <span className="ml-2 text-slate-400 font-normal">
+                  ({modLessons.length} lesson{modLessons.length !== 1 ? 's' : ''})
+                </span>
+              </h3>
             </div>
 
-            {isOpen && state && (
-              <div className="flex flex-col md:flex-row">
-                <nav className="md:w-36 border-b md:border-b-0 md:border-r border-slate-100 bg-slate-50 flex md:flex-col overflow-x-auto">
-                  {sections.map(sec => (
-                    <button key={sec} type="button" onClick={() => setActiveSection(prev => ({ ...prev, [lesson.id]: sec }))}
-                      className={`px-3 py-2 text-xs font-semibold text-left whitespace-nowrap transition flex-shrink-0 ${currentSection === sec ? 'bg-white text-brand-blue-700 border-b-2 md:border-b-0 md:border-l-2 border-brand-blue-600' : 'text-slate-500 hover:text-slate-700 hover:bg-white'}`}>
-                      {SECTION_LABELS[sec]}
-                    </button>
-                  ))}
-                </nav>
+            <div className="divide-y divide-slate-100">
+              {modLessons
+                .sort((a, b) => a.lesson_order - b.lesson_order)
+                .map(lesson => {
+                  const m = merged(lesson);
+                  const isDirty = Object.keys(getEdit(lesson.id)).length > 0;
+                  const isExpanded = expandedId === lesson.id;
+                  const meta = STEP_TYPE_META[m.step_type] ?? STEP_TYPE_META.lesson;
+                  const showScore = STEP_TYPES_WITH_SCORE.includes(m.step_type);
 
-                <div className="flex-1 p-4 min-w-0">
-                  {currentSection === 'basics' && (
-                    <LessonBasicsEditor title={state.title} slug={lesson.slug} lessonType={state.lessonType} status={state.status} durationMinutes={state.durationMinutes} orderIndex={lesson.order_index}
-                      onChange={p => patchEdit(lesson.id, { title: p.title ?? state.title, lessonType: p.lessonType ?? state.lessonType, status: p.status ?? state.status, durationMinutes: p.durationMinutes ?? state.durationMinutes })} />
-                  )}
-                  {currentSection === 'content' && (
-                    <div className="space-y-4">
-                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Summary</label>
-                        <textarea value={state.content.summary} onChange={e => patchContent(lesson.id, { summary: e.target.value })} rows={2} placeholder="Brief summary..." className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 resize-none" /></div>
-                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Instructional Content <span className="text-red-500">*</span></label>
-                        <textarea value={state.content.instructionalContent} onChange={e => patchContent(lesson.id, { instructionalContent: e.target.value })} rows={12} placeholder="Full lesson content..." className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 resize-y font-mono" />
-                        <p className="text-xs text-slate-400 mt-1">{state.content.instructionalContent.length} chars (min 50 for publish)</p></div>
-                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Activity Instructions</label>
-                        <textarea value={state.content.activityInstructions} onChange={e => patchContent(lesson.id, { activityInstructions: e.target.value })} rows={3} placeholder="What should the learner do?" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 resize-y" /></div>
-                    </div>
-                  )}
-                  {currentSection === 'objectives' && (
-                    <LessonObjectivesEditor objectives={state.objectives} onChange={objectives => patchEdit(lesson.id, { objectives })} />
-                  )}
-                  {currentSection === 'video' && (
-                    <LessonVideoEditor
-                      video={{ videoFile: state.videoFile || undefined, transcript: state.videoTranscript, runtimeSeconds: state.videoRuntime, completionThresholdPercent: state.content.video?.completionThresholdPercent ?? 90, posterImage: state.content.video?.posterImage, captionsFile: state.content.video?.captionsFile }}
-                      onChange={video => { patchEdit(lesson.id, { videoFile: video.videoFile ?? '', videoTranscript: video.transcript, videoRuntime: video.runtimeSeconds }); patchContent(lesson.id, { video }); }} />
-                  )}
-                  {currentSection === 'assessment' && (
-                    <LessonAssessmentEditor questions={state.quizQuestions} passingScore={state.passingScore}
-                      onChange={quizQuestions => patchEdit(lesson.id, { quizQuestions })}
-                      onScoreChange={passingScore => patchEdit(lesson.id, { passingScore })} />
-                  )}
-                  {currentSection === 'evidence' && (
-                    <LessonEvidenceEditor evidence={state.content.evidence}
-                      onChange={evidence => { patchContent(lesson.id, { evidence }); patchEdit(lesson.id, { requiresEvidence: evidence.enabled, requiresEvaluator: evidence.reviewerRequired }); }} />
-                  )}
-                  {currentSection === 'rubric' && (
-                    <LessonRubricEditor rubric={state.content.rubric} onChange={rubric => patchContent(lesson.id, { rubric })} />
-                  )}
-                  {currentSection === 'practical' && (
-                    <LessonPracticalEditor lessonType={state.lessonType}
-                      practical={state.content.practical ?? { requiredHours: 0, requiredAttempts: 0, requiresEvaluatorApproval: false, requiresSkillSignoff: false, safetyGuidance: '', materialsNeeded: [] }}
-                      onChange={practical => { patchContent(lesson.id, { practical }); patchEdit(lesson.id, { requiresEvaluator: practical.requiresEvaluatorApproval, requiresSignoff: practical.requiresSkillSignoff }); }}
-                      instructions={state.practicalInstructions}
-                      onInstructionsChange={practicalInstructions => patchEdit(lesson.id, { practicalInstructions })} />
-                  )}
-                  {currentSection === 'competency' && (
-                    <LessonCompetencyEditor courseId={courseId} lessonId={lesson.id} mappedCodes={state.competencyCodes} onChange={competencyCodes => patchEdit(lesson.id, { competencyCodes })} />
-                  )}
-
-                  {/* Validation errors */}
-                  {(() => {
-                    const validationErrors = validateLessonSave({
-                      title: state.title,
-                      lessonType: state.lessonType,
-                      videoFile: state.videoFile,
-                      videoTranscript: state.videoTranscript,
-                      videoRuntime: state.videoRuntime,
-                      passingScore: state.passingScore,
-                      quizQuestions: state.quizQuestions,
-                      requiresEvidence: state.requiresEvidence,
-                      practicalInstructions: state.practicalInstructions,
-                      objectives: state.objectives,
-                    });
-                    if (validationErrors.length === 0) return null;
-                    return (
-                      <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg space-y-1">
-                        {validationErrors.map((e, i) => (
-                          <div key={i} className="flex items-start gap-2 text-xs text-red-700">
-                            <AlertCircle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
-                            {e}
-                          </div>
-                        ))}
+                  return (
+                    <div key={lesson.id} className="bg-white">
+                      {/* Row header */}
+                      <div
+                        className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-slate-50 transition"
+                        onClick={() => setExpandedId(isExpanded ? null : lesson.id)}
+                      >
+                        <span className="text-xs text-slate-400 w-8 shrink-0 text-right">
+                          {m.module_order}.{m.lesson_order}
+                        </span>
+                        <span className={`shrink-0 ${meta.color}`}>{meta.icon}</span>
+                        <span className="flex-1 text-sm font-medium text-slate-800 truncate">
+                          {m.lesson_title}
+                        </span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
+                          m.status === 'published' ? 'bg-brand-green-100 text-brand-green-700' :
+                          m.status === 'draft'     ? 'bg-slate-100 text-slate-500' :
+                          m.status === 'review'    ? 'bg-amber-100 text-amber-700' :
+                                                     'bg-red-100 text-red-600'
+                        }`}>
+                          {m.status}
+                        </span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${meta.color} bg-slate-50`}>
+                          {meta.label}
+                        </span>
+                        {isDirty && (
+                          <span className="text-xs text-amber-600 font-medium shrink-0">unsaved</span>
+                        )}
+                        {saveStatus[lesson.id] === 'saved' && (
+                          <CheckCircle2 className="w-4 h-4 text-brand-green-600 shrink-0" />
+                        )}
+                        {saveStatus[lesson.id] === 'error' && (
+                          <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+                        )}
+                        {isExpanded
+                          ? <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" />
+                          : <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+                        }
                       </div>
-                    );
-                  })()}
 
-                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
-                    <div className="text-xs">{status === 'saved' && <span className="text-green-600 font-semibold">✓ Saved</span>}{status === 'error' && <span className="text-red-600 font-semibold">✗ Save failed</span>}</div>
-                    <button
-                      type="button"
-                      onClick={() => save(lesson.id)}
-                      disabled={isSaving || !isLessonSaveValid({
-                        title: state.title, lessonType: state.lessonType,
-                        videoFile: state.videoFile, videoTranscript: state.videoTranscript,
-                        videoRuntime: state.videoRuntime, passingScore: state.passingScore,
-                        quizQuestions: state.quizQuestions, requiresEvidence: state.requiresEvidence,
-                        practicalInstructions: state.practicalInstructions, objectives: state.objectives,
-                      })}
-                      className="flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
-                      title={!isLessonSaveValid({ title: state.title, lessonType: state.lessonType, videoFile: state.videoFile, videoTranscript: state.videoTranscript, videoRuntime: state.videoRuntime, passingScore: state.passingScore, quizQuestions: state.quizQuestions, requiresEvidence: state.requiresEvidence, practicalInstructions: state.practicalInstructions, objectives: state.objectives }) ? 'Fix validation errors before saving' : undefined}
-                    >
-                      <Save className="w-4 h-4" />{isSaving ? 'Saving...' : 'Save Lesson'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+                      {/* Expanded editor */}
+                      {isExpanded && (
+                        <div className="px-4 pb-4 pt-2 bg-slate-50 border-t border-slate-100 space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Lesson title */}
+                            <div className="md:col-span-2">
+                              <label className="block text-xs font-semibold text-slate-600 mb-1">
+                                Lesson Title
+                              </label>
+                              <input
+                                type="text"
+                                value={m.lesson_title}
+                                onChange={e => setField(lesson.id, 'lesson_title', e.target.value)}
+                                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
+                              />
+                            </div>
+
+                            {/* Step type */}
+                            <div>
+                              <label className="block text-xs font-semibold text-slate-600 mb-1">
+                                Step Type
+                              </label>
+                              <select
+                                value={m.step_type}
+                                onChange={e => setField(lesson.id, 'step_type', e.target.value as StepType)}
+                                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 bg-white"
+                              >
+                                {(Object.keys(STEP_TYPE_META) as StepType[]).map(t => (
+                                  <option key={t} value={t}>{STEP_TYPE_META[t].label}</option>
+                                ))}
+                              </select>
+                            </div>
+
+                            {/* Passing score — only for quiz/checkpoint/exam */}
+                            {showScore && (
+                              <div>
+                                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                                  Passing Score (%)
+                                </label>
+                                <input
+                                  type="number"
+                                  min={1}
+                                  max={100}
+                                  value={m.passing_score ?? 70}
+                                  onChange={e => setField(lesson.id, 'passing_score', Number(e.target.value))}
+                                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
+                                />
+                                <p className="text-xs text-slate-400 mt-1">
+                                  {m.step_type === 'checkpoint'
+                                    ? 'Learner must reach this score to unlock the next module.'
+                                    : 'Learner must reach this score to mark the lesson complete.'}
+                                </p>
+                              </div>
+                            )}
+
+                            {/* Status */}
+                            <div>
+                              <label className="block text-xs font-semibold text-slate-600 mb-1">
+                                Status
+                              </label>
+                              <select
+                                value={m.status}
+                                onChange={e => setField(lesson.id, 'status', e.target.value as LessonStatus)}
+                                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 bg-white"
+                              >
+                                <option value="draft">Draft</option>
+                                <option value="review">Review</option>
+                                <option value="published">Published</option>
+                                <option value="archived">Archived</option>
+                              </select>
+                            </div>
+
+                            {/* Duration */}
+                            <div>
+                              <label className="block text-xs font-semibold text-slate-600 mb-1">
+                                Duration (minutes)
+                              </label>
+                              <input
+                                type="number"
+                                min={1}
+                                value={m.duration_minutes ?? ''}
+                                onChange={e => setField(lesson.id, 'duration_minutes', e.target.value ? Number(e.target.value) : null)}
+                                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
+                                placeholder="e.g. 15"
+                              />
+                            </div>
+
+                            {/* Video file */}
+                            <div className="md:col-span-2">
+                              <label className="block text-xs font-semibold text-slate-600 mb-1">
+                                Video File Path
+                              </label>
+                              <input
+                                type="text"
+                                value={m.video_file ?? ''}
+                                onChange={e => setField(lesson.id, 'video_file', e.target.value || null)}
+                                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
+                                placeholder="e.g. hvac/module1-lesson1.mp4"
+                              />
+                            </div>
+
+                            {/* Script text */}
+                            <div className="md:col-span-2">
+                              <label className="block text-xs font-semibold text-slate-600 mb-1">
+                                Script / Content
+                              </label>
+                              <textarea
+                                rows={5}
+                                value={m.script_text ?? ''}
+                                onChange={e => setField(lesson.id, 'script_text', e.target.value || null)}
+                                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 resize-y"
+                                placeholder="Lesson script or rich HTML content…"
+                              />
+                            </div>
+
+                            {/* Quiz questions — only for quiz/checkpoint/exam */}
+                            {showScore && (
+                              <div className="md:col-span-2">
+                                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                                  Quiz Questions (JSON)
+                                </label>
+                                <textarea
+                                  rows={8}
+                                  value={m.quiz_questions ? JSON.stringify(m.quiz_questions, null, 2) : ''}
+                                  onChange={e => {
+                                    try {
+                                      const parsed = e.target.value ? JSON.parse(e.target.value) : null;
+                                      setField(lesson.id, 'quiz_questions', parsed);
+                                    } catch {
+                                      // Don't update on invalid JSON — let user finish typing
+                                    }
+                                  }}
+                                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-blue-500 resize-y"
+                                  placeholder={'[\n  {\n    "id": "q1",\n    "question": "...",\n    "options": ["A", "B", "C", "D"],\n    "correctAnswer": 0,\n    "explanation": "..."\n  }\n]'}
+                                />
+                                <p className="text-xs text-slate-400 mt-1">
+                                  Array of question objects. Each needs: id, question, options[], correctAnswer (0-based index), explanation.
+                                </p>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Slug (read-only) */}
+                          <div className="text-xs text-slate-400">
+                            Slug: <code className="bg-slate-100 px-1 rounded">{lesson.lesson_slug}</code>
+                            &nbsp;·&nbsp;ID: <code className="bg-slate-100 px-1 rounded">{lesson.id}</code>
+                          </div>
+
+                          {/* Save button */}
+                          <div className="flex justify-end gap-2">
+                            {isDirty && (
+                              <button
+                                onClick={() => setEdits(prev => { const n = { ...prev }; delete n[lesson.id]; return n; })}
+                                className="px-3 py-1.5 text-sm text-slate-600 hover:text-slate-800 transition"
+                              >
+                                Discard
+                              </button>
+                            )}
+                            <button
+                              onClick={() => saveLesson(lesson)}
+                              disabled={!isDirty || saving === lesson.id}
+                              className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold transition ${
+                                isDirty && saving !== lesson.id
+                                  ? 'bg-brand-blue-600 hover:bg-brand-blue-700 text-white'
+                                  : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                              }`}
+                            >
+                              <Save className="w-3.5 h-3.5" />
+                              {saving === lesson.id ? 'Saving…' : 'Save'}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
           </div>
-        );
-      })}
-      {lessons.length === 0 && <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-xl"><p className="text-slate-400">No lessons in this course yet.</p></div>}
+        ))}
     </div>
   );
 }

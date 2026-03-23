@@ -37,31 +37,17 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
 
-      # ── HARD GATES (product must exist and be complete) ───────────────────
-      # These run first. A failure here means the product is broken.
-      # Pipeline does not proceed to cosmetic checks if product is incomplete.
+      # Integrity checks - each fails the build if issues found
+      - name: Link integrity check
+        run: pnpm run integrity:links
+
+      - name: Media integrity check
+        run: pnpm run integrity:media
 
       - name: LMS course integrity check
-        # Hard gate: NULL content, missing quizzes, incomplete lessons all fail.
         run: pnpm run integrity:lms
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-
-      - name: LMS canonical chain validation
-        # Validates the full DB chain: program → courses → course_modules →
-        # course_lessons → lms_lessons view for all published programs.
-        # Checks slug alignment, program_id linkage, course_id binding,
-        # orphaned lessons, empty modules, count parity, and view resolution.
-        # Skips gracefully if DB secrets are absent (e.g. fork PRs).
-        run: |
-          if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
-            echo "DB secrets not available — skipping canonical chain validation"
-            exit 0
-          fi
-          pnpm run validate:lms --fail-fast
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
       - name: Store product integrity check
@@ -71,25 +57,11 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
-      # ── SOFT CHECKS (cosmetic / site health) ─────────────────────────────
-      # These run after product gates. Failures are visible but non-blocking.
-      # Broken links and missing media do not block a complete product from merging.
-
-      - name: Link integrity check
-        run: pnpm run integrity:links
-        continue-on-error: true
-
-      - name: Media integrity check
-        run: pnpm run integrity:media
-        continue-on-error: true
-
       - name: Analytics integrity check
         run: pnpm run integrity:analytics
-        continue-on-error: true
 
       - name: Self-service policy check
         run: pnpm run integrity:self-service
-        continue-on-error: true
 
       - name: Upload integrity reports
         if: always()

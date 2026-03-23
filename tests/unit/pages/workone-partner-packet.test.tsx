@@ -20,11 +20,11 @@ describe('WorkOnePartnerPacketPage', () => {
 
   it('displays the hero section with video element', () => {
     render(<WorkOnePartnerPacketPage />);
-    const video = document.querySelector('video') as HTMLVideoElement | null;
+    const video = document.querySelector('video');
     expect(video).toBeTruthy();
-    // CanonicalVideo plays programmatically via IntersectionObserver — no autoplay attribute.
-    // React sets muted as a DOM property (not attribute) and playsInline as an attribute.
-    expect(video!.muted).toBe(true);
+    // Boolean attributes in HTML become empty strings
+    expect(video).toHaveAttribute('autoplay');
+    expect(video).toHaveAttribute('loop');
     expect(video).toHaveAttribute('playsinline');
   });
 

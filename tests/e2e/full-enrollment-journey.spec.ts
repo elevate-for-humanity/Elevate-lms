@@ -39,7 +39,7 @@ test.describe('Full Enrollment Journey: Apply → Auth → Checkout → Enrollme
     await expect(page).toHaveURL(/\/programs/);
     
     // Step 1.3: Verify programs are displayed
-    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('networkidle');
     const programContent = page.locator('main');
     await expect(programContent).toBeVisible();
     
@@ -62,13 +62,16 @@ test.describe('Full Enrollment Journey: Apply → Auth → Checkout → Enrollme
     // Step 2.2: Verify apply landing page content
     await expect(page.locator('h1')).toBeVisible();
     
-    // Step 2.3: Verify page has navigable links (at least one internal link present)
-    const anyLink = page.locator('a[href^="/"]');
-    await expect(anyLink.first()).toBeVisible();
-
-    // Step 2.4: Verify page has substantive content (main element with text)
-    const mainContent = page.locator('main');
-    await expect(mainContent).toBeVisible();
+    // Step 2.3: Verify two enrollment paths are presented
+    const inquiryLink = page.locator('a[href*="/inquiry"]');
+    const programsLink = page.locator('a[href*="/programs"]');
+    
+    await expect(inquiryLink.first()).toBeVisible();
+    await expect(programsLink.first()).toBeVisible();
+    
+    // Step 2.4: Verify eligibility notice is shown
+    const eligibilityNotice = page.locator('text=/eligibility|WorkOne/i');
+    await expect(eligibilityNotice.first()).toBeVisible();
   });
 
   /**
@@ -186,7 +189,7 @@ test.describe('Full Enrollment Journey: Apply → Auth → Checkout → Enrollme
     
     // Step 6.4: Test courses page
     await page.goto('/lms/courses?demo=true');
-    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('networkidle');
     
     // Step 6.5: Verify courses content loads
     const coursesContent = page.locator('main, [role="main"]');
@@ -233,7 +236,7 @@ test.describe('Full Enrollment Journey: Apply → Auth → Checkout → Enrollme
     
     // LMS Access
     await page.goto('/lms/dashboard?demo=true');
-    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('networkidle');
     journeySteps.push('✓ LMS dashboard accessible (demo mode)');
     
     // Log journey completion
@@ -275,7 +278,7 @@ test.describe('Enrollment Journey Error Handling', () => {
     await page.goto('/lms/dashboard');
     
     // Should redirect to login or show auth required message
-    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('networkidle');
     const url = page.url();
     
     const isProtected = 
@@ -326,7 +329,7 @@ test.describe('Enrollment Journey Accessibility', () => {
     await page.goto('/inquiry');
     
     // Wait for page to fully load
-    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('networkidle');
     
     // Get all inputs on the page
     const inputs = page.locator('input:not([type="hidden"]):not([type="submit"])');

@@ -97,7 +97,6 @@ const POLICIES: PolicyItem[] = [
 export default function PolicyAcknowledgmentPage() {
   const [acknowledged, setAcknowledged] = useState<Set<string>>(new Set());
   const [signerName, setSignerName] = useState('');
-  const [signerEmail, setSignerEmail] = useState('');
   const [shopName, setShopName] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -129,7 +128,6 @@ export default function PolicyAcknowledgmentPage() {
         body: JSON.stringify({
           shop_name: shopName,
           signer_name: signerName,
-          signer_email: signerEmail,
           policies_acknowledged: Array.from(acknowledged),
           acknowledged_at: new Date().toISOString(),
         }),
@@ -204,7 +202,7 @@ export default function PolicyAcknowledgmentPage() {
           </span>
           <div className="w-48 bg-gray-200 rounded-full h-2">
             <div
-              className="bg-brand-blue-600 h-2 rounded-full transition-all"
+              className="bg-white h-2 rounded-full transition-all"
               style={{ width: `${(acknowledged.size / POLICIES.length) * 100}%` }}
             />
           </div>
@@ -298,17 +296,6 @@ export default function PolicyAcknowledgmentPage() {
                 onChange={(e) => setSignerName(e.target.value)}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                 placeholder="Full legal name"
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
-              <input
-                type="email"
-                required
-                value={signerEmail}
-                onChange={(e) => setSignerEmail(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
-                placeholder="your@email.com — confirmation will be sent here"
               />
             </div>
           </div>

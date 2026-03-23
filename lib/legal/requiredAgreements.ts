@@ -192,8 +192,7 @@ export async function hasSignedAllRequired(
  * Used by middleware to determine which routes require agreement gating.
  */
 export const PROTECTED_ROUTES: Record<string, UserRole[]> = {
-  // /lms is intentionally excluded — agreement acceptance is collected during
-  // enrollment (EnrollmentForm) not as a gate on every LMS page visit.
+  '/lms': ['student', 'instructor', 'admin', 'staff', 'super_admin'],
   '/student-portal': ['student'],
   '/student': ['student'],
   '/program-holder': ['program_holder'],

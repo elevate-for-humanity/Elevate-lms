@@ -68,36 +68,6 @@ export default function AgreementsPage() {
   const [loading, setLoading] = useState(true);
   // Track which documents the student has acknowledged reading
   const [readAcks, setReadAcks] = useState<Record<string, boolean>>({});
-
-  // Draft key versioned to form shape — stale drafts from old form versions are ignored
-  const DRAFT_KEY = 'onboarding_agreements_readAcks_v1';
-
-  // Rehydrate read acknowledgements from localStorage on mount
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(DRAFT_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && typeof parsed === 'object') {
-          setReadAcks(prev => ({ ...parsed, ...prev }));
-        }
-      }
-    } catch {
-      // Ignore corrupt storage
-    }
-  }, []);
-
-  // Persist readAcks to localStorage (debounced — safe, non-sensitive checkbox state only)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      try {
-        localStorage.setItem(DRAFT_KEY, JSON.stringify(readAcks));
-      } catch {
-        // Storage quota exceeded or unavailable — non-fatal
-      }
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [readAcks]);
   const allRead = REQUIRED_READINGS.every((r) => readAcks[r.id]);
 
   function toggleAck(id: string) {
@@ -251,11 +221,7 @@ export default function AgreementsPage() {
                 documentVersion={AGREEMENT.version}
                 documentUrl={AGREEMENT.documentUrl}
                 acceptanceContext="learner-onboarding"
-                onSuccess={() => {
-                  try { localStorage.removeItem(DRAFT_KEY); } catch { /* non-fatal */ }
-                  setSigned(true);
-                  router.push('/onboarding/learner');
-                }}
+                onSuccess={() => { setSigned(true); router.push('/onboarding/learner'); }}
               />
             </div>
           </div>

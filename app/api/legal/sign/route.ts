@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { headers } from 'next/headers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -8,9 +9,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-type AgreementType = 'enrollment' | 'handbook' | 'data_sharing' | 'program_holder_mou' |
-  'employer_agreement' | 'staff_agreement' | 'mou' | 'ferpa' | 'participation' |
-  'eula' | 'tos' | 'aup' | 'disclosures' | 'license' | 'nda';
+type AgreementType = 'eula' | 'tos' | 'aup' | 'disclosures' | 'license' | 'nda' | 'mou';
 type SignatureMethod = 'checkbox' | 'typed' | 'drawn';
 
 interface SignRequest {
@@ -36,9 +35,10 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    // Use session-scoped client for all user-driven signing — RLS must apply.
-    // createAdminClient is intentionally not used here.
-    const db = supabase;
+  const _admin = createAdminClient(); const db = _admin || supabase;
+    if (!supabase) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {

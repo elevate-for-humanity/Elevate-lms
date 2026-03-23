@@ -18,35 +18,22 @@ type ProgramLike = {
   credential_slug?: string | null;
 };
 
-const SLUG_TO_CREDENTIAL: Record<string, string> = {
-  // PRS
-  'prs':                              'prs',
-  'peer-recovery-specialist':         'prs',
-  'peer-recovery-specialist-jri':     'prs',
-  'peer-recovery-support-specialist': 'prs',
-
-  // CRS
-  'crs':                              'crs',
-  'certified-recovery-specialist':    'crs',
-
-  // Bookkeeping — credentialSlug on the blueprint is 'quickbooks-certified-user'
-  'bookkeeping':                      'quickbooks-certified-user',
-  'bookkeeping-quickbooks':           'quickbooks-certified-user',
-  'bookkeeping-and-quickbooks':       'quickbooks-certified-user',
-};
+const PRS_PROGRAM_SLUGS = new Set([
+  'prs',
+  'peer-recovery-specialist',
+  'peer-recovery-specialist-jri',
+  'peer-recovery-support-specialist',
+]);
 
 export function getBlueprintForProgram(program: ProgramLike): CredentialBlueprint | null {
-  // Prefer explicit credential_slug on the program row
+  // Prefer explicit credential_slug
   if (program.credential_slug) {
     return getBlueprintByCredentialSlug(program.credential_slug);
   }
 
   // Fall back to known program slug aliases
-  if (program.slug) {
-    const credentialSlug = SLUG_TO_CREDENTIAL[program.slug];
-    if (credentialSlug) {
-      return getBlueprintByCredentialSlug(credentialSlug);
-    }
+  if (program.slug && PRS_PROGRAM_SLUGS.has(program.slug)) {
+    return getBlueprintByCredentialSlug('prs');
   }
 
   return null;

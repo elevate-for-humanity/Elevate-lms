@@ -16,35 +16,6 @@
  *     time by the hard-guard pattern in each blueprint file.
  */
 
-// ─── Canonical lesson type (imported from single source of truth) ─────────────
-export type { LessonType } from '@/lib/curriculum/lesson-types';
-import type { LessonType } from '@/lib/curriculum/lesson-types';
-
-// ─── Blueprint lesson requirement ─────────────────────────────────────────────
-
-export type BlueprintLessonRequirement = {
-  lessonType:    LessonType;
-  requiredCount: number;
-};
-
-// ─── Blueprint practical requirement ─────────────────────────────────────────
-
-export type BlueprintPracticalRequirement = {
-  practicalType:              LessonType;
-  minimumHours?:              number;
-  minimumAttempts?:           number;
-  requiresEvaluatorApproval?: boolean;
-  requiresSkillSignoff?:      boolean;
-};
-
-// ─── Blueprint competency ─────────────────────────────────────────────────────
-
-export type BlueprintCourseCompetency = {
-  code:        string;
-  label:       string;
-  description: string;
-};
-
 // ─── Lesson reference (flat list consumed by buildCourseFromBlueprint) ────────
 
 export type BlueprintLessonRef = {
@@ -150,8 +121,6 @@ export type BlueprintGenerationRules = {
 
 // ─── Canonical blueprint ──────────────────────────────────────────────────────
 
-export type CourseBlueprint = CredentialBlueprint; // alias for clarity in new code
-
 export type CredentialBlueprint = {
   /**
    * Stable machine ID — used by getBlueprintById().
@@ -191,32 +160,6 @@ export type CredentialBlueprint = {
   modules: BlueprintModule[];
 
   assessmentRules: BlueprintAssessmentRule[];
-
-  // ── Accreditation / compliance extensions ──────────────────────────────────
-
-  /** Course-level learning objectives (seeded into course_objectives). */
-  courseObjectives?: string[];
-
-  /** Course-level competency definitions (seeded into course_competencies). */
-  competencies?: BlueprintCourseCompetency[];
-
-  /** Required lesson type counts — auditor checks these against actual course. */
-  requiredLessonTypes?: BlueprintLessonRequirement[];
-
-  /** Practical requirements — auditor checks these against practical_requirements rows. */
-  practicalRequirements?: BlueprintPracticalRequirement[];
-
-  /** If true, certificate issuance requires all practical evidence approved. */
-  certificateRequiresPracticalCompletion?: boolean;
-
-  /** If true, course must have a final_exam lesson to publish. */
-  requiresFinalExam?: boolean;
-
-  /** If true, all video lessons must have transcript + runtime for publish. */
-  requiresVideoTranscriptForVideoLessons?: boolean;
-
-  /** Minimum total clock hours required for completion (0 = not enforced). */
-  requiredClockHours?: number;
 };
 
 // ─── Audit result types (consumed by auditor.ts) ──────────────────────────────

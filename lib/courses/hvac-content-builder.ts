@@ -281,44 +281,11 @@ export function getAllLessonContent(): Record<string, string> {
 }
 
 /**
- * Returns true only when content is definitively unusable — not based on length.
- *
- * Invalid states caught:
- *   - null / undefined / false / 0
- *   - non-string (e.g. JSONB {} object leaked from DB default)
- *   - empty string or whitespace-only
- *   - literal strings "null", "{}", "undefined"
- *   - empty HTML: tags with no text content (<p></p>, <p> </p>, <h2></h2>, etc.)
- *   - known generic boilerplate inserted by early seed scripts
- *
- * A short but real lesson (checkpoint intro, lab instruction) is NOT a placeholder.
- * Length is never used as a signal.
+ * Check if a lesson's DB content is just a placeholder (one-line HTML)
  */
-export function isPlaceholderContent(html: string | null | undefined | object): boolean {
-  // Null-ish or wrong type
-  if (html === null || html === undefined) return true;
-  if (typeof html === 'object') return true; // JSONB {} leaked from DB
-  if (typeof html !== 'string') return true;
-
-  const trimmed = html.trim();
-
-  // Literal invalid strings
-  if (trimmed === '' || trimmed === '{}' || trimmed === 'null' || trimmed === 'undefined') return true;
-
-  // Strip all HTML tags and check if any text content remains
-  const textContent = trimmed.replace(/<[^>]*>/g, '').trim();
-  if (textContent === '') return true; // tags only, no text (e.g. <p></p><h2></h2>)
-
-  // Known boilerplate strings inserted by early seed scripts
-  const BOILERPLATE = [
-    'lesson content not found',
-    'content coming soon',
-    'placeholder content',
-    'todo: add content',
-    'lesson content will be added',
-  ];
-  const lower = textContent.toLowerCase();
-  if (BOILERPLATE.some(b => lower.includes(b))) return true;
-
-  return false;
+export function isPlaceholderContent(html: string | null | undefined): boolean {
+  if (!html) return true;
+  // Placeholder content is typically < 200 chars and has generic patterns
+  const stripped = html.replace(/<[^>]*>/g, '').trim();
+  return stripped.length < 150;
 }

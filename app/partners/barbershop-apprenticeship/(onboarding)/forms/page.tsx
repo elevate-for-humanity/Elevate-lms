@@ -3,7 +3,7 @@
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   FileText, CheckCircle2, Circle, AlertCircle, ArrowRight,
   Download, Shield, Clock, BookOpen,
@@ -89,21 +89,12 @@ const REQUIRED_FORMS: FormItem[] = [
   },
   {
     id: 'safety-checklist',
-    name: 'Workplace Safety Self-Assessment',
-    description: 'Complete the workplace safety checklist confirming your shop meets health and safety standards.',
+    name: 'Workplace Safety & Policy Acknowledgment',
+    description: 'Acknowledge workplace safety standards, EEO policy, wage compliance, and reporting obligations. Covers the safety self-assessment.',
     required: true,
     category: 'training',
-    action: 'complete',
-    href: '/programs/barber-apprenticeship/apply?type=partner_shop',
-  },
-  {
-    id: 'compensation-agreement',
-    name: 'Apprentice Compensation Agreement',
-    description: 'Document the agreed compensation model (hourly, commission, or hybrid) and rate for the apprentice.',
-    required: true,
-    category: 'legal',
     action: 'sign',
-    href: '/partners/barbershop-apprenticeship/sign-mou',
+    href: '/partners/barbershop-apprenticeship/policy-acknowledgment',
   },
   {
     id: 'anti-discrimination',
@@ -137,8 +128,28 @@ const actionLabels: Record<string, string> = {
   download: 'Download',
 };
 
+const STORAGE_KEY = 'barber-partner-forms-progress';
+
 export default function RequiredFormsPage() {
   const [completedForms, setCompletedForms] = useState<Set<string>>(new Set());
+
+  // Restore progress from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) setCompletedForms(new Set(JSON.parse(saved)));
+    } catch { /* ignore parse errors */ }
+  }, []);
+
+  // Persist progress to localStorage on every change
+  const toggleForm = (id: string) => {
+    setCompletedForms(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(next))); } catch { /* ignore */ }
+      return next;
+    });
+  };
 
   const totalRequired = REQUIRED_FORMS.filter(f => f.required).length;
   const completedCount = REQUIRED_FORMS.filter(f => completedForms.has(f.id)).length;
@@ -176,7 +187,7 @@ export default function RequiredFormsPage() {
           </div>
           <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
             <div
-              className="bg-white h-3 rounded-full transition-all duration-500"
+              className="bg-brand-blue-600 h-3 rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -260,12 +271,7 @@ export default function RequiredFormsPage() {
                       className={`bg-white rounded-lg border p-4 flex items-start gap-4 ${isComplete ? 'border-brand-green-200 bg-brand-green-50/30' : ''}`}
                     >
                       <button
-                        onClick={() => {
-                          const next = new Set(completedForms);
-                          if (next.has(form.id)) next.delete(form.id);
-                          else next.add(form.id);
-                          setCompletedForms(next);
-                        }}
+                        onClick={() => toggleForm(form.id)}
                         className="mt-0.5 flex-shrink-0"
                         aria-label={isComplete ? `Mark ${form.name} incomplete` : `Mark ${form.name} complete`}
                       >

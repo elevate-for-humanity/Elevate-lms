@@ -107,6 +107,12 @@ export const HVAC_LESSON_UUID: Record<string, string> = {
   'hvac-16-03': '40da8479-1a3a-560c-bfce-16937d1b94db',
   'hvac-16-04': 'b9bceecd-9ea5-5665-90e7-d5e01b3f7c7c',
   'hvac-16-05': 'ec1cbfea-55f5-5083-9a28-8d59248b676a',
+
+  // Lessons 92–95 — Career Readiness (module 10 in DB, weeks 15–16 content)
+  'hvac-lesson-92': '11d9c540-5379-509c-add5-537b362e66c6',
+  'hvac-lesson-93': '4fa12994-8d35-5921-8d32-18875d2e8aa0',
+  'hvac-lesson-94': 'f207e632-8844-58c5-b59a-7053456a4529',
+  'hvac-lesson-95': 'cbb3e909-1221-576e-b6d3-e0b199df3138',
 };
 
 /** Maps module definition ID → first lesson UUID */

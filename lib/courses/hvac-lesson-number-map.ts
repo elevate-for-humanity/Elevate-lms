@@ -115,6 +115,11 @@ export const HVAC_LESSON_NUMBER_TO_DEF_ID: Record<number, string> = {
   89: 'hvac-16-03',
   90: 'hvac-16-04',
   91: 'hvac-16-05',
+  // Lessons 92–95 use slug-based keys (no module/lesson sub-ID)
+  92: 'hvac-lesson-92',
+  93: 'hvac-lesson-93',
+  94: 'hvac-lesson-94',
+  95: 'hvac-lesson-95',
 };
 
 /** Returns the module ID (e.g. 'hvac-05') for a given lesson_number */

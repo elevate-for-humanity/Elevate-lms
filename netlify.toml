@@ -199,19 +199,6 @@
     # Sockets (not used in serverless)
     "socket.io",
     "socket.io-client",
-    # 3D / WebGL (browser-only — confirmed not imported from any API route)
-    "three",
-    "@react-three/fiber",
-    "@react-three/drei",
-    # Charts (browser-only)
-    "recharts",
-    "chart.js",
-    "react-chartjs-2",
-    # Animation (browser-only)
-    "framer-motion",
-    # Canvas / image (browser-only)
-    "html2canvas",
-    "html-to-image",
   ]
 
 # PDF export function - isolated bundle with PDF libraries

@@ -8,7 +8,6 @@
 import Image from 'next/image';
 import CanonicalVideo from '@/components/video/CanonicalVideo';
 import Link from 'next/link';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
 
 interface Props {
   headline: string;

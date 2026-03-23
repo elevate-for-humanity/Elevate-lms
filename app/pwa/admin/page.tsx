@@ -128,6 +128,6 @@ export default async function AdminPWAPage() {
       </div>
     </div>
     <AdminInstallPrompt />
-  </>
+    </>
   );
 }

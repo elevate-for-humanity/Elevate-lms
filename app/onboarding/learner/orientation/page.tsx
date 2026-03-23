@@ -40,6 +40,18 @@ async function completeOrientation() {
     }, { onConflict: 'user_id', ignoreDuplicates: true }),
   ]);
 
+  // Mirror into onboarding_progress after source-of-truth writes succeed
+  try {
+    await db.from('onboarding_progress').upsert({
+      user_id: user.id,
+      profile_completed: true,
+      profile_completed_at: now,
+      updated_at: now,
+    }, { onConflict: 'user_id' });
+  } catch {
+    // Non-fatal — orientation is already recorded above
+  }
+
   // Send "you're ready to start" email — non-blocking
   try {
     const { data: profile } = await db

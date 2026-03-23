@@ -31,6 +31,17 @@ async function _POST(request: NextRequest) {
         logger.error('[Compliance] Handbook acknowledgment failed:', error.message);
         return NextResponse.json({ success: false, error: 'Failed to record acknowledgment' }, { status: 500 });
       }
+      // Mirror into onboarding_progress after source-of-truth write succeeds
+      try {
+        await db.from('onboarding_progress').upsert({
+          user_id: user.id,
+          handbook_acknowledged: true,
+          handbook_acknowledged_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id' });
+      } catch (progressErr) {
+        logger.warn('[Compliance] onboarding_progress handbook write failed (non-fatal)', progressErr);
+      }
       return NextResponse.json({ success: true });
     }
 
@@ -84,6 +95,17 @@ async function _POST(request: NextRequest) {
           return NextResponse.json({ success: true, acceptanceId: race?.id });
         }
         return NextResponse.json({ success: false, error: 'Failed to record agreement. Please try again.' }, { status: 500 });
+      }
+      // Mirror into onboarding_progress after source-of-truth write succeeds
+      try {
+        await db.from('onboarding_progress').upsert({
+          user_id: user.id,
+          agreements_completed: true,
+          agreements_completed_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id' });
+      } catch (progressErr) {
+        logger.warn('[Compliance] onboarding_progress agreements write failed (non-fatal)', progressErr);
       }
       return NextResponse.json({ success: true, acceptanceId: data?.id });
     }

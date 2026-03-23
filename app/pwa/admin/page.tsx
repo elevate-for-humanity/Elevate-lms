@@ -43,7 +43,6 @@ export default async function AdminPWAPage() {
   ];
 
   return (
-    <>
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
       <div className="relative h-48 sm:h-56">
@@ -128,6 +127,5 @@ export default async function AdminPWAPage() {
       </div>
     </div>
     <AdminInstallPrompt />
-    </>
   );
 }

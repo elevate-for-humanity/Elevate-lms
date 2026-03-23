@@ -10,9 +10,10 @@ import {
   GraduationCap,
   TrendingUp,
   Clock,
+  Mail,
+  Phone,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import UserManagementClient from '@/app/admin/users/UserManagementClient';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -173,29 +174,131 @@ export default async function StudentsPage() {
               </div>
             </div>
 
+            {/* Students List */}
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold">Students</h2>
+                <Link
+                  href="/admin/students/export"
+                  className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                >
+                  Export Data
+                </Link>
+              </div>
+              {students && students.length > 0 ? (
+                <div className="space-y-4">
+                  {students.map((student: any) => (
+                    <div
+                      key={student.id}
+                      className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg">
+                            {student.full_name || 'Unnamed Student'}
+                          </h3>
+                          <div className="mt-2 flex flex-wrap gap-4 text-sm text-black">
+                            {student.email && (
+                              <span className="flex items-center gap-1">
+                                <Mail className="h-4 w-4" />
+                                {student.email}
+                              </span>
+                            )}
+                            {student.phone && (
+                              <span className="flex items-center gap-1">
+                                <Phone className="h-4 w-4" />
+                                {student.phone}
+                              </span>
+                            )}
+                            <span>
+                              Joined:{' '}
+                              {new Date(
+                                student.created_at
+                              ).toLocaleDateString()}
+                            </span>
+                          </div>
+                          {student.enrollments &&
+                            student.enrollments.length > 0 && (
+                              <div className="mt-3">
+                                <p className="text-xs text-black mb-1">
+                                  Enrollments:
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  {student.enrollments.map(
+                                    (enrollment: any, idx: number) => (
+                                      <span
+                                        key={idx}
+                                        className={`text-xs px-2 py-2 rounded ${
+                                          enrollment.status === 'active'
+                                            ? 'bg-brand-green-100 text-brand-green-700'
+                                            : enrollment.status === 'completed'
+                                              ? 'bg-brand-blue-100 text-brand-blue-700'
+                                              : 'bg-gray-100 text-black'
+                                        }`}
+                                      >
+                                        {enrollment.program?.name ||
+                                          'Unknown Program'}{' '}
+                                        - {enrollment.status}
+                                        {enrollment.progress &&
+                                          ` (${enrollment.progress}%)`}
+                                      </span>
+                                    )
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                        </div>
+                        <Link
+                          href={`/admin/students/${student.id}`}
+                          className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium ml-4"
+                        >
+                          View Details →
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-black text-lg">No students found</p>
+                  <p className="text-black text-sm mt-2">
+                    Students will appear here once they register
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>
 
-      <UserManagementClient
-        initialUsers={(students ?? []).map((s: any) => ({
-          id: s.id,
-          email: s.email ?? '',
-          full_name: s.full_name ?? '',
-          role: s.role ?? 'student',
-          phone: s.phone ?? '',
-          is_active: s.is_active ?? true,
-          created_at: s.created_at,
-        }))}
-        stats={{
-          total: totalStudents ?? 0,
-          active: activeEnrollments ?? 0,
-          students: totalStudents ?? 0,
-          instructors: 0,
-          admins: 0,
-          employers: 0,
-        }}
-      />
+      {/* CTA Section */}
+      <section className="py-16 bg-brand-blue-700">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              Student Management
+                        </h2>
+            <p className="text-base md:text-lg text-brand-blue-100 mb-8">
+              Search, view, and manage student records and enrollments.
+                        </p>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Link
+                href="/admin/students"
+                className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
+              >
+                View Students
+              </Link>
+              <Link
+                href="/admin/reports"
+                className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg"
+              >
+                View Reports
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

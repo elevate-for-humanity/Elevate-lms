@@ -6,7 +6,6 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { AlertCircle, TrendingDown, FileWarning } from 'lucide-react';
-import { AtRiskActions } from './AtRiskActions';
 
 export const metadata: Metadata = {
   title: 'At-Risk Students | Admin Dashboard',
@@ -297,12 +296,22 @@ export default async function AtRiskStudentsPage() {
                           </div>
                         </div>
                       </div>
-                      <AtRiskActions
-                        studentId={student?.id ?? ''}
-                        enrollmentId={risk.enrollment_id ?? ''}
-                        studentName={student?.full_name ?? ''}
-                        studentEmail={student?.email ?? ''}
-                      />
+                      <div className="flex flex-col gap-2">
+                        <Link
+                          href={`/admin/students/${student?.id}`}
+                          className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 text-center"
+                        >
+                          View Details
+                        </Link>
+                        {student?.phone && (
+                          <a
+                            href={`tel:${student.phone}`}
+                            className="px-4 py-2 bg-brand-green-600 text-white rounded-lg font-semibold hover:bg-brand-green-700 text-center"
+                          >
+                            Call Student
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
@@ -342,12 +351,12 @@ export default async function AtRiskStudentsPage() {
                         {risk.progress_percentage}% complete
                       </div>
                     </div>
-                    <AtRiskActions
-                      studentId={student?.id ?? ''}
-                      enrollmentId={risk.id ?? ''}
-                      studentName={`${student?.first_name ?? ''} ${student?.last_name ?? ''}`.trim()}
-                      studentEmail={student?.email ?? ''}
-                    />
+                    <Link
+                      href={`/admin/students/${student?.id}`}
+                      className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700"
+                    >
+                      Review
+                    </Link>
                   </div>
                 );
               })}

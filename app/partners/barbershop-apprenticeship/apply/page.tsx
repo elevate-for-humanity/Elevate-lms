@@ -172,7 +172,7 @@ export default function BarbershopPartnerApplyPage() {
       const result = await response.json();
 
       if (response.ok) {
-        router.push('/partner/onboarding');
+        router.push('/partners/barbershop-apprenticeship/thank-you');
       } else {
         setError(result.error || 'Something went wrong. Please try again.');
         setLoading(false);

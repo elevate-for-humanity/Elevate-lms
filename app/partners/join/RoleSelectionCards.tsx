@@ -31,6 +31,11 @@ export default function RoleSelectionCards({
         body: JSON.stringify({ role }),
       });
 
+      if (response.status === 401) {
+        router.push('/login?redirect=/partners/join');
+        return;
+      }
+
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || 'Failed to select role');

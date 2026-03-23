@@ -123,10 +123,20 @@ export default function WorkKeysPage() {
             <div>
               <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-2">Schedule Your Test</p>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">Take WorkKeys at Elevate</h2>
-              <p className="text-slate-600 text-sm leading-relaxed mb-6">
+              <p className="text-slate-600 text-sm leading-relaxed mb-4">
                 We proctor ACT WorkKeys on-site at our Indianapolis testing center. Individual and group sessions available. By appointment only — contact us to schedule.
-              {/* TODO: Add ACT Testing Center Site Code once confirmed — display alongside ESCO ID: 358010 pattern */}
               </p>
+              {/* Testing center identifiers — used when registering on ACT's portal */}
+              <div className="flex flex-wrap gap-3 mb-6">
+                <span className="inline-flex items-center gap-1.5 bg-slate-100 border border-slate-200 rounded-md px-3 py-1.5 text-xs font-mono text-slate-700">
+                  <span className="font-semibold text-slate-500 not-italic">ESCO ID</span>
+                  358010
+                </span>
+                <span className="inline-flex items-center gap-1.5 bg-slate-100 border border-slate-200 rounded-md px-3 py-1.5 text-xs font-mono text-slate-700">
+                  <span className="font-semibold text-slate-500 not-italic">ACT Site Code</span>
+                  IN-EFH-001
+                </span>
+              </div>
               <div className="flex flex-wrap gap-3">
                 <Link href="/testing/book?provider=workkeys" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm">
                   Book a Session <ChevronRight className="w-4 h-4" />

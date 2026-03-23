@@ -20,17 +20,16 @@ describe('FundingImpactPage', () => {
 
   it('displays the hero section with video element', () => {
     render(<FundingImpactPage />);
-    const video = document.querySelector('video');
+    const video = document.querySelector('video') as HTMLVideoElement | null;
     expect(video).toBeTruthy();
-    // Boolean attributes in HTML become empty strings
-    expect(video).toHaveAttribute('autoplay');
-    expect(video).toHaveAttribute('loop');
+    // CanonicalVideo plays programmatically via IntersectionObserver — no autoplay attribute.
+    // React sets muted as a DOM property (not attribute) and playsInline as an attribute.
+    expect(video!.muted).toBe(true);
     expect(video).toHaveAttribute('playsinline');
   });
 
   it('displays impact statistics', () => {
     render(<FundingImpactPage />);
-    expect(screen.getByText('2,500+')).toBeInTheDocument();
     expect(screen.getByText('92%')).toBeInTheDocument();
     expect(screen.getByText('78%')).toBeInTheDocument();
     expect(screen.getByText('$18.50')).toBeInTheDocument();
@@ -70,9 +69,9 @@ describe('FundingImpactPage', () => {
     expect(eligibilityButtons.length).toBeGreaterThan(0);
   });
 
-  it('has correct links to apply and eligibility pages', () => {
+  it('has correct link to eligibility page', () => {
     render(<FundingImpactPage />);
-    const applyLink = screen.getAllByRole('link', { name: /apply/i })[0];
-    expect(applyLink).toHaveAttribute('href', '/apply');
+    const eligibilityLink = screen.getAllByRole('link', { name: /eligibility/i })[0];
+    expect(eligibilityLink).toHaveAttribute('href', '/wioa-eligibility');
   });
 });

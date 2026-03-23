@@ -1,389 +1,314 @@
-# AGENTS-IMPROVEMENT-SPEC.md
+# AGENTS.md Improvement Spec
 
-Codebase audit findings. Issues are ranked by severity: **P0** (breaks production), **P1** (security/data risk), **P2** (functional bug), **P3** (structural debt), **P4** (AGENTS.md accuracy).
+Audit date: 2026-05-XX  
+Auditor: Ona (automated codebase diff)
 
----
-
-## AGENTS.md Accuracy Audit — 2026-03-27
-
-This section audits AGENTS.md against the actual codebase state as of commit `fa4ff2dec`.
-
-### What's Accurate
-
-- Tech stack, commands, key directories — correct.
-- API conventions (auth guards, rate limiting, error shape, redirect param) — match actual code.
-- Brand color convention — `brand-blue-*` migration is real and complete.
-- Multi-provider hub patterns (role model, tenant architecture, RLS helpers, safe-error, admin IP guard) — match `lib/api/` and `lib/admin/`.
-- Key new routes table — matches actual `app/api/` directory structure.
-- Document generation pattern (docx + SendGrid) — accurate.
-- Enrollment schema source-of-truth table — accurate.
-- Canonical portals table — accurate (added in a previous session).
-- API auth pattern, rate limiting, error shape sections — accurate.
-
-### Factual Errors in AGENTS.md
-
-**1. Build page count is stale**
-
-Claims `882/882 pages`. Reality: `find app -name "page.tsx"` returns **1,486 files**. The project has grown substantially.
-
-Fix: Remove the specific count. Replace with: `pnpm next build must complete with zero errors. Page count grows as features are added — do not hardcode it.`
-
-**2. "Remaining Lower-Priority Items" section has three resolved items**
-
-| Claim | Reality |
-|-------|---------|
-| "8 files still have Learn/Certify/Work inline SVG card sections" | 0 files match — already eliminated |
-| "~1,233 files use raw Tailwind blue/green instead of brand tokens" | Only 4 files in `app/` still match — migration is essentially complete |
-| "Missing error.tsx in app/store and app/login" | Both files exist |
-
-The console.log count is also wrong: AGENTS.md says 161, reality is **1,521 lines** across 118 files.
-
-Fix: Remove the three resolved items. Update console.log count to 1,521.
-
-**3. "394 routes expose error.message" is wrong**
-
-FUTURE TASKS item 7 claims 394 routes. Reality: ~22 API route files contain the pattern, with 31 actual response lines. The 394 figure was a total line count, not a route count.
-
-Fix: Change to "~22 API route files return `error.message` in responses. Use `safeInternalError()` from `lib/api/safe-error.ts`."
-
-**4. Incomplete work from the last session is not documented**
-
-The previous session began building three features but was cut off mid-execution:
-- `supabase/migrations/20260327000003_checkpoint_gating.sql` — shown in session context, **never written to disk**
-- `CurriculumLessonManager` component — referenced, **never created**
-- Checkpoint progression gating in the lesson page — **not implemented** (the lesson page has step_type rendering but no gate that blocks the next module until a checkpoint passes)
-
-AGENTS.md has no record of this. An agent starting fresh will not know these are pending.
-
-Fix: Add an "In Progress / Incomplete" section.
-
-**5. Rate limiting dead code not flagged**
-
-AGENTS.md correctly identifies `lib/rate-limit.ts` as canonical but does not say the other two files (`lib/rateLimit.ts`, `lib/rateLimiter.ts`) should be deleted. An agent may import from them.
-
-Fix: Add: "`lib/rateLimit.ts` and `lib/rateLimiter.ts` are dead code — do not import from them."
-
-### Missing Sections
-
-**6. LMS Architecture**
-
-The last session added significant LMS infrastructure with no AGENTS.md entry:
-- `step_type_enum` on `curriculum_lessons` (lesson/quiz/checkpoint/lab/assignment/exam/certification)
-- `lms_lessons` view rebuilt to expose `step_type`, `module_title`, `module_order`, `lesson_order`
-- Module-grouped sidebar in the lesson player
-- `app/lms/(app)/courses/[courseId]/certification/page.tsx` — course end-state page
-
-Without this section, the next agent will write new hardcoded per-program logic instead of using the DB-driven approach.
-
-**7. HVAC Legacy vs. New DB-Driven Pattern**
-
-The lesson page currently has both the old HVAC-specific hardcoded path (`HVAC_QUIZ_MAP`, `HVAC_LESSON_UUID`, `buildLessonContent`, `HVAC_QUICK_CHECKS`) and the new DB-driven path coexisting. An agent adding a new program will not know which to follow.
-
-Needed guidance: new programs use `step_type` and `curriculum_lessons` DB rows. Do not add new entries to `HVAC_QUIZ_MAP` or `HVAC_LESSON_UUID`. Those files are HVAC-only legacy.
-
-**8. Migrations are manually applied**
-
-AGENTS.md FUTURE TASKS item 8 says "Run SQL migrations in Supabase Dashboard" — implying they are not auto-applied. This is critical context buried in a to-do item rather than stated as a convention.
-
-Needed section: files go in `supabase/migrations/`, naming is `YYYYMMDD000NNN_description.sql`, applied manually via Supabase Dashboard SQL editor. Never assume a migration is live until confirmed.
-
-### Recommended Changes to AGENTS.md (Priority Order)
-
-| Priority | Change |
-|----------|--------|
-| P0 | Add "In Progress / Incomplete Work" section with the three cut-off items |
-| P0 | Add LMS Architecture section (step_type routing, module grouping, lms_lessons view, certification page, HVAC legacy warning) |
-| P1 | Remove hardcoded page count from Build State |
-| P1 | Remove three resolved items from "Remaining Lower-Priority Items"; update console.log count to 1,521 |
-| P1 | Add Migrations section (naming convention, manual application) |
-| P2 | Fix error.message count from "394 routes" to "~22 API route files" |
-| P2 | Add dead-code warning for `lib/rateLimit.ts` and `lib/rateLimiter.ts` |
+Findings are ranked: **P0** (agent will produce broken code), **P1** (security/data risk), **P2** (functional misdirection), **P3** (stale/incomplete), **P4** (missing coverage).
 
 ---
 
----
+## Summary
 
-## AGENTS.md Assessment
-
-### What's Good
-- Tech stack, commands, and key directories are accurate.
-- Brand color convention is well-documented and enforced.
-- Image replacement mapping is complete and usable.
-- Document generation pattern (docx + SendGrid) is fully specified.
-- Completed task history gives agents useful context.
-
-### What's Wrong / Missing
-1. **La Plaza table contradiction** — table says "12 weeks" but "Key decisions made" section says "Program length set to 10 weeks." One of these is wrong.
-2. **"Access your dashboard" listed twice** — appears in both COMPLETED (line 73) and FUTURE TASKS (line 94). Should be removed from FUTURE TASKS.
-3. **`ROUTES.schedule` bug not documented** — `ROUTES.schedule = '/demo'` in `lib/pricing.ts` but `/schedule` is a real Calendly page. All license pages link to `/demo` when they should link to `/schedule`. This is a live routing bug that should be in Known Fixed Issues (or fixed).
-4. **No middleware.ts documented** — there is no root `middleware.ts`. Auth protection relies entirely on per-page `redirect()` calls. This is a significant architectural gap not mentioned anywhere.
-5. **Deprecated file inventory missing** — 30+ files still import from deprecated Supabase shims (`@/lib/supabaseServer`, `@/lib/supabase-server`, `@/lib/supabaseClients`, `@/lib/supabase-admin`). Not tracked.
-6. **Rate limiter proliferation not documented** — 5 separate rate limit implementations exist. Agents don't know which to use.
-7. **Auth mechanism fragmentation not documented** — 8 different auth patterns in use across API routes (`getUser`, `withAuth`, `apiAuthGuard`, `apiRequireAdmin`, `requireApiAuth`, `env_gate`, `api_key_check`, `webhook_sig`). No guidance on which to use for new routes.
-8. **94 unauthenticated routes that write data** — not tracked in AGENTS.md. AUDIT_ROUTES.csv documents this but AGENTS.md doesn't reference it.
-9. **`/api/checkout/student` deprecated but not removed** — marked `@deprecated` in code, not tracked for removal.
-10. **31 root-level `.md` files** — AGENTS.md doesn't acknowledge these exist. Agents may create duplicate docs.
+| Category | Count |
+|----------|-------|
+| Factual errors (agent will follow wrong instructions) | 5 |
+| Stale counts / metrics | 4 |
+| Missing canonical systems | 3 |
+| Incomplete guard documentation | 2 |
+| Debt items resolved but still marked pending | 1 |
 
 ---
 
-## P0 — Production Bugs
+## P0 — Factual Errors (agent will write wrong code)
 
-### P0-1: `ROUTES.schedule` points to `/demo` instead of `/schedule`
-**File:** `lib/pricing.ts:311`
+### P0-1: Auth guard import path is wrong
+
+**AGENTS.md says:**
+```ts
+import { apiAuthGuard } from '@/lib/admin/guards';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 ```
-schedule: '/demo',   // BUG: should be '/schedule'
-```
-**Impact:** Every "Schedule a Demo" CTA on license pages (`/license`, `/license/features`, `/license/integrations`, `/license/pricing`) sends visitors to the demo landing page, not the Calendly booking page at `/schedule`. Lost conversions.
 
-**Fix:** Change `schedule: '/demo'` → `schedule: '/schedule'` in `lib/pricing.ts`.
+**Reality:** `lib/admin/guards.ts` only re-exports these two functions from `@/lib/authGuards`. The canonical source is `lib/authGuards.ts`. There are **174 files** importing from `@/lib/auth` (the root `lib/auth.ts`) and **38 files** importing directly from `@/lib/authGuards`. Both paths work, but the documented path (`@/lib/admin/guards`) is a thin re-export wrapper used only for admin-specific page guards — not the general API guard pattern.
+
+**Fix:** Document both valid import paths and their intended scope:
+- `@/lib/authGuards` — API routes (server-side, returns `NextResponse` on failure)
+- `@/lib/auth` — Page components (server components, throws redirect on failure)
+- `@/lib/admin/guards` — Admin-specific page guards only (re-exports `apiAuthGuard`/`apiRequireAdmin` plus Netlify context helpers)
+
+Also document the undocumented guards that exist and are widely used:
+- `requireAdmin()` from `@/lib/auth` — 174 importers, used in page layouts
+- `requireInstructor()` / `requireStudent()` from `@/lib/authGuards`
+- `apiRequireInstructor()` / `apiRequireStudent()` from `@/lib/authGuards`
+- `lib/auth/` directory — 16 specialized helpers (`require-role.ts`, `require-program-holder.ts`, `require-api-role.ts`, etc.)
 
 ---
 
-### P0-2: `store/licenses/checkout` and `store/licensing/checkout` are near-duplicate routes
-**Files:** `app/store/licenses/checkout/[slug]/page.tsx` and `app/store/licensing/checkout/[slug]/page.tsx`
+### P0-2: `?next=` param is still in active use — the "use `?redirect=`" rule is not enforced
 
-Both serve checkout for the same products. `store/licensing` has BNPL support and better terms copy; `store/licenses` does not. They return to different success URLs. A user landing on either route gets a different experience.
+**AGENTS.md says:** Use `?redirect=<path>` (not `?next=`).
 
-**Fix:** Redirect `store/licenses/checkout/[slug]` → `store/licensing/checkout/[slug]`. Remove `store/licenses/checkout` after confirming no inbound links.
+**Reality:** `grep` finds **17 files** still using `?next=` including:
+- `app/auth/callback/route.ts` — the OAuth callback itself reads `?next=`
+- `app/auth/forgot-password/actions.ts` — password reset flow uses `?next=`
+- `lib/enrollment/approve.ts` — enrollment approval email uses `?next=`
+- Multiple LMS settings pages
+
+The auth callback at `app/auth/callback/route.ts` explicitly checks `searchParams.has('next')`. This means `?next=` is **not** deprecated — it is the param the OAuth/email-confirm flow uses. `?redirect=` is used for pre-auth page redirects.
+
+**Fix:** Clarify the two-param system:
+- `?redirect=` — used by the login page to return the user after password auth
+- `?next=` — used by Supabase OAuth callback and email-confirm flows
+- Do not conflate them. Do not migrate `?next=` out of the auth callback.
+
+---
+
+### P0-3: Deprecated Supabase shim importer count is wrong
+
+**AGENTS.md says:** "deprecated shims still have 78 active importers"
+
+**Reality:** `grep` finds **79 active importers**. The count is close but the more important gap is that AGENTS.md tells agents not to add new imports but gives no instruction for what to do when editing a file that already uses a deprecated shim.
+
+**Fix:** Add a rule: "If you edit a file that imports from a deprecated shim, migrate that import to `@/lib/supabase/*` as part of your change."
+
+---
+
+### P0-4: `lib/rateLimit.ts` is marked "all importers migrated" but the file still exists on disk
+
+**AGENTS.md says:** "`lib/rateLimit.ts` — in-memory, broken in serverless, `@deprecated`. All importers migrated."
+
+**Reality:** `lib/rateLimit.ts` still exists on disk. Zero active importers is correct, but the file was not deleted. An agent could accidentally import it.
+
+**Fix:** Either delete the file or change the note to "zero importers — safe to delete."
+
+---
+
+### P0-5: `apiRequireAdmin` code example passes `request` as an argument — the function takes no arguments
+
+**AGENTS.md shows:**
+```ts
+const auth = await apiRequireAdmin(request);
+if (auth.error) return auth.error;
+```
+
+**Reality:** `apiRequireAdmin()` in `lib/authGuards.ts` takes **no arguments**. It calls `apiAuthGuard()` internally and returns either a `NextResponse` (on failure) or the auth result object (on success). The `request` argument is silently ignored. The correct usage is:
+
+```ts
+const auth = await apiRequireAdmin();
+// auth is NextResponse on failure, or { authorized, user, profile, role } on success
+if (auth instanceof NextResponse) return auth;
+```
+
+Or check the authorized flag:
+```ts
+const auth = await apiRequireAdmin();
+if (!auth.authorized) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+```
+
+**Fix:** Update the code example to match the actual function signature.
 
 ---
 
 ## P1 — Security / Data Risk
 
-### P1-1: 94 unauthenticated API routes write data
-**Source:** `AUDIT_ROUTES.csv` — `$4=="no" && $8=="yes"`
+### P1-1: `lib/auth/` directory is entirely undocumented
 
-Critical examples:
-- `GET|POST /api/enrollments` — creates enrollments with no auth
-- `GET|POST /api/certificates` — issues certificates with no auth
-- `GET|POST /api/assignments` — writes assignments with no auth
-- `GET|POST /api/achievements` — awards achievements with no auth
-- `GET|POST /api/progress` — writes progress records with no auth
-- `GET /api/affirm/capture` — captures Affirm payments with no auth
-- `GET /api/store/download/:` — serves paid downloads with no auth
-- `GET /api/autopilot-test-users` — creates test users with no auth
+`lib/auth/` contains 16 files used in **246 files** across the codebase:
 
-**Fix:** Each route needs `requireAuth()` or `apiAuthGuard()` before any write. Prioritize payment and certificate routes first.
+| File | Purpose |
+|------|---------|
+| `require-role.ts` | Generic role guard for page components |
+| `require-program-holder.ts` | Program holder scope guard |
+| `require-admin.ts` | Admin page guard |
+| `require-api-role.ts` | API role guard |
+| `require-org-admin.ts` | Org admin scope guard |
+| `org-guard.ts` | Org-level access control |
+| `validate-redirect.ts` | Redirect URL validation (security-critical) |
+| `two-factor.ts` | 2FA helpers |
+| `sso-config.ts` | SSO configuration |
+| `role-destinations.ts` | Role → dashboard path mapping |
 
-### P1-2: 30 app files import from deprecated Supabase shims
-**Pattern:** `from '@/lib/supabaseServer'`, `from '@/lib/supabase-server'`, `from '@/lib/supabaseClients'`, `from '@/lib/supabase-admin'`
+An agent writing a new page or API route has no guidance on which of these to use. This leads to inconsistent auth patterns and potential gaps.
 
-These shims have inconsistent behavior — some throw on missing env vars, some silently return null, some use the wrong key (anon vs service role). Using the wrong one in a write path is a privilege escalation risk.
-
-**Affected files (sample):**
-- `app/api/studio/*` (10 files) — all import `supabaseServer` from `@/lib/supabase-server`
-- `app/api/admin/export/enrollments/route.ts` — imports `supabaseAdmin` from `@/lib/supabaseClients`
-- `app/api/supersonic-fast-cash/jotform-webhook/route.ts` — imports from `@/lib/supabaseServer`
-
-**Fix:** Migrate all 30 to `@/lib/supabase/server` (server components) or `@/lib/supabase/admin` (service role). Then delete the shim files.
-
-### P1-3: No root middleware.ts — auth is per-page only
-There is no `middleware.ts` at the project root. All auth protection is done via `redirect()` inside individual page components. This means:
-- A route with a missing auth check is silently unprotected
-- API routes have no consistent auth layer
-- Auth redirect param is inconsistent: 211 pages use `?redirect=`, 76 use `?next=` — the login page likely only handles one of these
-
-**Fix (short-term):** Document which param the login page reads and standardize all redirects to use it.
-**Fix (long-term):** Add `middleware.ts` with Supabase session refresh and route protection for `/admin/*`, `/lms/*`, `/learner/*`, `/student-portal/*`, `/program-holder/*`.
+**Fix:** Add a `lib/auth/` section to AGENTS.md documenting the directory and its key exports, with usage guidance per context (page vs API, role vs scope).
 
 ---
 
-## P2 — Functional Bugs
+### P1-2: No guidance on `createAdminClient` vs `createClient`
 
-### P2-1: `api/auth/login` and `api/auth/signin` are duplicate endpoints with different implementations
-**Files:** `app/api/auth/login/route.ts`, `app/api/auth/signin/route.ts`
+`createAdminClient` bypasses RLS. Using it where `createClient` is correct is a security bug. The distinction is not documented anywhere in AGENTS.md.
 
-Both authenticate with email/password via Supabase. They use different rate limit libraries (`rateLimit` from `@/lib/rateLimit` vs `withRateLimit` from `@/lib/api/with-rate-limit`), different validation (manual vs `signInSchema` zod), and different error shapes. Client code calling either gets different behavior.
+**Fix:** Add a rule:
 
-**Fix:** Deprecate `api/auth/login`, redirect it to `api/auth/signin`. Remove after confirming no callers.
-
-### P2-2: `api/checkout/student` is deprecated but still receives traffic
-**File:** `app/api/checkout/student/route.ts`
-
-Marked `@deprecated` with a comment saying "Use /api/checkout/learner instead." It proxies to the canonical endpoint via `fetch()` — adding latency and a failure point. The deprecation comment says "Will be removed in a future release" but no tracking exists.
-
-**Fix:** Find all callers of `/api/checkout/student`, update them to `/api/checkout/learner`, then delete the file.
-
-### P2-3: Inconsistent auth redirect parameter (`?redirect=` vs `?next=`)
-211 pages append `?redirect=<path>` on auth redirect. 76 pages use `?next=<path>`. The login page at `app/login/page.tsx` needs to be checked — if it only reads one param, half of all post-login redirects silently fail and users land on the default dashboard instead of their intended destination.
-
-**Fix:** Audit `app/login/LoginForm.tsx` to confirm which param it reads. Standardize all redirect calls to use that param.
-
-### P2-4: `admin-login` page does role check client-side only
-**File:** `app/admin-login/page.tsx`
-
-Role check (`adminRoles.includes(profile.role)`) happens in the browser after Supabase auth succeeds. A valid user with a non-admin role can authenticate, then the client shows an error — but the session is already established. The user is authenticated, just not redirected to `/admin/dashboard`.
-
-**Fix:** Move role verification to a server action or API route. Invalidate the session if the role check fails.
+> Use `createAdminClient` only in server-side operations that intentionally bypass RLS (provisioning, cron jobs, admin dashboards reading cross-tenant data). Use `createClient` for all user-scoped operations — it respects RLS and is the safe default.
 
 ---
 
-## P3 — Structural Debt
+### P1-3: No guidance on `requireAdmin` (page-level) vs `apiRequireAdmin` (API-level)
 
-### P3-1: Five rate limit implementations
-| File | Type | Notes |
-|------|------|-------|
-| `lib/rate-limit.ts` | Upstash Redis | **Canonical — use this** |
-| `lib/rateLimit.ts` | In-memory | Marked `@deprecated`, broken in serverless |
-| `lib/rateLimiter.ts` | `redis` npm package | Different Redis client, separate config |
-| `lib/api/with-rate-limit.ts` | Wrapper around `lib/rate-limit.ts` | OK to use |
-| `lib/api/withRateLimit.ts` | Tier-based wrapper | OK to use |
+The distinction between page-level guards (throw redirect) and API-level guards (return `NextResponse`) is critical. Using a page guard in an API route will throw an unhandled redirect; using an API guard in a page component will return a response object instead of redirecting.
 
-**Fix:** Delete `lib/rateLimit.ts` (deprecated, broken in serverless) and `lib/rateLimiter.ts` (uses different Redis client). Migrate any callers to `lib/rate-limit.ts` or `lib/api/withRateLimit.ts`.
+**Fix:** Add an explicit table:
 
-### P3-2: Three logger implementations
-| File | Notes |
-|------|-------|
-| `lib/logger.ts` | **Canonical — use this** |
-| `lib/audit/logger.ts` | Audit-specific, may be intentional |
-| `lib/logging/logger.ts` | Unknown purpose |
-
-**Fix:** Check if `lib/logging/logger.ts` is used anywhere. If not, delete it. Document in AGENTS.md that `lib/logger.ts` is canonical.
-
-### P3-3: Seventeen Supabase client files (8 deprecated)
-Canonical: `lib/supabase/server.ts`, `lib/supabase/client.ts`, `lib/supabase/admin.ts`
-
-Deprecated (all have `@deprecated` JSDoc):
-- `lib/supabase.ts`
-- `lib/supabaseClient.ts`
-- `lib/supabaseClients.ts`
-- `lib/supabase-server.ts`
-- `lib/supabaseServer.ts`
-- `lib/supabase-admin.ts`
-- `lib/supabaseAdmin.ts`
-- `lib/getSupabaseServerClient.ts`
-- `lib/supabase-lazy.ts`
-- `lib/supabase-api.ts`
-
-**Fix:** After migrating the 30 active importers (P1-2), delete all deprecated shims.
-
-### P3-4: Route namespace fragmentation — employer, partner, student
-The following route groups serve overlapping audiences with no clear canonical path:
-
-**Employer:**
-- `/employer` — authenticated portal (dashboard, analytics, candidates)
-- `/employer-portal` — separate portal with different nav
-- `/employers` — public marketing page
-- `/for-employers` — another public marketing page
-
-**Partner:**
-- `/partner` — authenticated portal
-- `/partner-portal` — separate portal
-- `/partners` — public directory
-- `/partnerships` — single marketing page
-
-**Student/Learner:**
-- `/learner` — redirects to `/learner/dashboard`
-- `/learner/dashboard` — actual dashboard
-- `/student` — separate section (chat, handbook)
-- `/student-portal` — full portal with assignments, grades, schedule
-- `/student-portal/dashboard` — redirects to `/lms/dashboard`
-
-There is no documented canonical portal per role. Agents adding new pages don't know which namespace to use.
-
-**Fix:** Document the canonical portal per role in AGENTS.md. Mark non-canonical paths as legacy/redirect-only.
-
-### P3-5: `store/licenses` and `store/licensing` serve the same purpose
-- `/store/licensing` — has `page.tsx`, full checkout, BNPL support (canonical)
-- `/store/licenses` — no `page.tsx`, checkout only, missing BNPL
-
-**Fix:** Add a redirect from `/store/licenses` → `/store/licensing`. Consolidate checkout to `store/licensing/checkout`.
-
-### P3-6: Eight auth helper files with no documented canonical
-`lib/auth.ts`, `lib/auth-server.ts`, `lib/auth-guard.ts`, `lib/authGuards.ts`, `lib/authAdapter.ts`, `lib/new-ecosystem-services/auth.ts`, `lib/admin/guards.ts`, `lib/auth/lms-routes.ts`
-
-133 API routes import from `@/lib/auth`. No AGENTS.md guidance on which file to use for new routes.
-
-**Fix:** Document in AGENTS.md: use `lib/auth.ts` for server components, `lib/admin/guards.ts` for admin routes, `lib/auth/lms-routes.ts` for LMS role checks.
-
-### P3-7: Inconsistent API error response shape
-Routes return errors as `{ error: "..." }`, `{ message: "..." }`, or both. Client code that checks `response.error` will miss errors returned as `response.message`.
-
-**Fix:** Standardize all API error responses to `{ error: string, code?: string }`. Document this in AGENTS.md.
-
-### P3-8: 31 root-level markdown files with no index
-Files like `AUDIT_REPORT.md`, `AUDIT_REPORT_111_PAGES.md`, `BROKEN_FEATURES_FIX.md`, `AUTOPILOT_STATUS.md`, `ACTIVATION_FORENSIC_REPORT.md`, `DEPLOY_TRIGGER.md` etc. accumulate without cleanup. Agents may create more.
-
-**Fix:** Move historical audit files to `docs/archive/`. Keep only `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `SECURITY.md`, `DEPLOY.md`, `SUPPORT.md` at root.
+| Context | Function | Import | On failure |
+|---------|----------|--------|-----------|
+| Server component / page | `requireAdmin()` | `@/lib/auth` | Throws redirect to `/login` |
+| API route handler | `apiRequireAdmin()` | `@/lib/authGuards` | Returns `NextResponse` 401/403 |
 
 ---
 
-## P4 — AGENTS.md Corrections Needed
+## P2 — Functional Misdirection
 
-| Line | Issue | Fix |
-|------|-------|-----|
-| 175 | La Plaza table says "12 weeks" | Confirm correct duration and update to single value |
-| 185 | "Program length set to 10 weeks" | Contradicts table above — reconcile |
-| 73 | "Access your dashboard" listed as completed | Remove from FUTURE TASKS (line 94) |
-| — | No mention of `ROUTES.schedule` bug | Add to Known Issues or fix in code |
-| — | No canonical portal map per role | Add "Canonical Portals by Role" section |
-| — | No auth pattern guidance for new API routes | Add "API Auth Pattern" section |
-| — | No rate limiter guidance | Add "Rate Limiting" section pointing to canonical files |
-| — | No mention of 31 root `.md` files | Add note: don't create new root-level `.md` files |
-| — | Build state says "882/882 pages" | Verify this is still current after recent changes |
+### P2-1: Repository size metrics are stale
 
----
+**AGENTS.md says:**
+- `page.tsx` files: 1,486
+- `route.ts` files: 1,079
+- Supabase migrations: 278
+- `console.log` occurrences: ~1,521 across 118 files
 
-## Recommended AGENTS.md Additions
+**Reality (current):**
+- `page.tsx` files: **1,498** (+12)
+- `route.ts` files: **1,122** (+43)
+- Supabase migrations: **346** (+68)
+- `console.log` occurrences: **2,305** across **174 files** (+784 occurrences, +56 files — 52% growth)
 
-### Canonical Portals by Role
-```
-/learner/dashboard     — enrolled learners (canonical)
-/student-portal        — legacy, being consolidated into /learner
-/admin/dashboard       — admin/super_admin
-/instructor/dashboard  — instructors
-/employer/dashboard    — employers (canonical)
-/employer-portal       — legacy
-/partner/dashboard     — partners (canonical)
-/program-holder/dashboard — program holders
-/staff-portal/dashboard   — staff
-/mentor/dashboard      — mentors
+The `console.log` count has grown by 52% since the last audit. The migration count has grown by 24%.
+
+**Fix:** Update counts. Add a note that these are point-in-time snapshots — agents should re-run the commands to get current counts rather than trusting the documented numbers:
+
+```bash
+find app -name "page.tsx" | wc -l
+find app -name "route.ts" | wc -l
+ls supabase/migrations/ | wc -l
+grep -r "console\.log" --include="*.ts" --include="*.tsx" | wc -l
 ```
 
-### API Auth Pattern (for new routes)
+---
+
+### P2-2: Supabase canonical import pattern is incomplete
+
+**AGENTS.md says:** "Import from `@/lib/supabase/*`"
+
+**Reality:** The actual usage breakdown:
+- `@/lib/supabase/server` — **1,498 importers**
+- `@/lib/supabase/admin` — **1,614 importers**
+- `@/lib/supabase/client` — **252 importers**
+- `@/lib/supabase` (barrel index) — effectively 0 direct importers
+
+The `lib/supabase/index.ts` barrel export exists but is not used in practice. Agents should import from the specific sub-module.
+
+**Fix:** Replace the vague "Import from `@/lib/supabase/*`" with concrete examples:
+
 ```ts
-// Standard authenticated route
-import { apiAuthGuard } from '@/lib/admin/guards';
-const auth = await apiAuthGuard(request);
-if (auth.error) return auth.error;
-
-// Admin-only route
-import { apiRequireAdmin } from '@/lib/admin/guards';
-const auth = await apiRequireAdmin(request);
-if (auth.error) return auth.error;
-```
-
-### Rate Limiting (for new routes)
-```ts
-// Use applyRateLimit from lib/api/withRateLimit.ts
-import { applyRateLimit } from '@/lib/api/withRateLimit';
-const rateLimited = await applyRateLimit(request, 'api'); // tiers: strict|contact|api|auth|payment|public
-if (rateLimited) return rateLimited;
-```
-
-### API Error Response Shape
-All API routes must return errors as:
-```ts
-NextResponse.json({ error: 'Human-readable message' }, { status: 4xx|5xx })
-// Never: { message: '...' } for errors
-// Never: { error: error.message } — leaks internal details
+import { createClient } from '@/lib/supabase/server';        // Server components, API routes
+import { createAdminClient } from '@/lib/supabase/admin';    // Admin operations (bypasses RLS)
+import { createBrowserClient } from '@/lib/supabase/client'; // Client components only
 ```
 
 ---
 
-## Summary Counts
+### P2-3: Cron route auth pattern is undocumented
 
-| Severity | Count | Description |
-|----------|-------|-------------|
-| P0 | 2 | Production routing bugs |
-| P1 | 3 | Security/data risks |
-| P2 | 4 | Functional bugs |
-| P3 | 8 | Structural debt |
-| P4 | 9 | AGENTS.md inaccuracies |
+`CRON_SECRET` bearer token auth is used in at least 6 cron routes but is not documented as a pattern. Agents writing new cron routes have no canonical example.
 
-**Highest-priority actions:**
-1. Fix `ROUTES.schedule` → `/schedule` (P0-1, 1 line change)
-2. Add auth to the 94 unauthenticated write routes (P1-1, ongoing)
-3. Migrate 30 deprecated Supabase imports (P1-2, then delete shims)
-4. Standardize auth redirect param (P2-3, audit login form first)
-5. Update AGENTS.md with canonical portal map and auth/rate-limit patterns (P4)
+**Fix:** Add a cron route auth pattern to the Canonical Systems section:
+
+```ts
+// Cron routes — called by Netlify scheduled functions or external cron
+const cronSecret = process.env.CRON_SECRET;
+if (request.headers.get('authorization') !== `Bearer ${cronSecret}`) {
+  return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+}
+```
+
+---
+
+## P3 — Stale / Incomplete
+
+### P3-1: Pending migrations section has no last-verified date
+
+**AGENTS.md lists as pending:**
+- `20260401000005_curriculum_lessons_quiz_questions.sql`
+- `20260402000003_programs_lms_columns.sql`
+
+These were documented as pending at the time of writing. Their actual live status is unknown without a Supabase Dashboard query. There is no date stamp on when this was last verified.
+
+**Fix:** Add a "last verified" date to the pending migrations table. Add a reminder that agents must verify migration status in Supabase Dashboard before assuming either state.
+
+---
+
+### P3-2: `lib/auth.ts` (root) is undocumented but has 174 importers
+
+`lib/auth.ts` is a large auth utility file with `requireAdmin`, `requireAdminOrDelegate`, `getCurrentUser`, and other helpers. It is imported by 174 files including `app/admin/layout.tsx`. It is not mentioned anywhere in AGENTS.md.
+
+**Fix:** Add `lib/auth.ts` to the Canonical Systems → API Auth Pattern section as the page-component auth entry point.
+
+---
+
+### P3-3: `lib/authGuards.ts` is the actual canonical API guard file but is not listed
+
+AGENTS.md documents `lib/admin/guards.ts` as the import path, but `lib/admin/guards.ts` is a thin wrapper that re-exports from `lib/authGuards.ts`. The actual implementation and 38 direct importers use `@/lib/authGuards`.
+
+**Fix:** Document `lib/authGuards.ts` as the canonical API guard implementation. Note that `lib/admin/guards.ts` re-exports from it and adds Netlify context helpers — use `lib/admin/guards.ts` only when you also need `isProd`, `isPreview`, `DEV_TOOL_ROUTES`, etc.
+
+---
+
+## P4 — Missing Coverage
+
+### P4-1: No guidance on `lib/auth/validate-redirect.ts`
+
+Redirect validation is a security concern. `lib/auth/validate-redirect.ts` exists but is undocumented. Agents writing login/redirect flows may implement their own (potentially unsafe) redirect validation.
+
+**Fix:** Add a note in the Auth Redirect Parameter section: "Validate redirect targets with `validateRedirect()` from `@/lib/auth/validate-redirect` before using them in `redirect()` calls."
+
+---
+
+### P4-2: No guidance on error handling outside API routes
+
+AGENTS.md documents `safe-error.ts` for API routes only. There is no guidance on error handling in Server Components or Client Components.
+
+**Fix:** Add a brief note: "In Server Components, use `notFound()` or `redirect()` from `next/navigation`. In Client Components, use `try/catch` with local state. `safe-error.ts` is API-route-only."
+
+---
+
+## Concrete Changes to Make in AGENTS.md
+
+Listed in priority order. Each item maps to a finding above.
+
+| # | Priority | Section | Change |
+|---|----------|---------|--------|
+| 1 | P0 | API Auth Pattern | Replace `@/lib/admin/guards` import with correct paths; add page vs API guard table; document `lib/auth/` directory |
+| 2 | P0 | API Auth Pattern | Fix `apiRequireAdmin` code example — remove `request` argument, fix return value check |
+| 3 | P0 | Auth Redirect Parameter | Clarify `?redirect=` vs `?next=` — both are in use for different flows |
+| 4 | P0 | Canonical Systems → Supabase Access | Update import examples to show specific sub-modules (`/server`, `/admin`, `/client`) |
+| 5 | P0 | Canonical Systems → Rate Limiting | Note that `lib/rateLimit.ts` still exists on disk (zero importers, safe to delete) |
+| 6 | P1 | Canonical Systems → Supabase Access | Add `createAdminClient` vs `createClient` guidance |
+| 7 | P1 | Canonical Systems → API Auth Pattern | Add `lib/auth/validate-redirect` note |
+| 8 | P2 | Repository Size | Update all four metrics to current counts; add re-run commands |
+| 9 | P2 | Canonical Systems | Add cron route auth pattern |
+| 10 | P3 | Migrations Pending | Add last-verified date; add Supabase verification query |
+| 11 | P3 | Canonical Systems | Document `lib/auth.ts` and `lib/authGuards.ts` as distinct entry points |
+| 12 | P4 | API Error Response Shape | Add error handling guidance for Server Components and Client Components |
+
+---
+
+## What Is Good in AGENTS.md
+
+These sections are accurate, well-structured, and should not be changed:
+
+- **LMS Architecture** — step_type table, data hierarchy, checkpoint gating, certification chain, and "Adding a New Program" workflow all match the codebase.
+- **HVAC Legacy Path** — accurate. The prohibition on replicating HVAC patterns is correct and well-stated.
+- **Hero Banner Standard** — `HeroVideo.tsx` and `content/heroBanners.ts` both exist and match the documented rules.
+- **CTA System** — correct. `data/programs/<slug>.ts` pattern is real.
+- **Enrollment Schema** — table reference counts and canonical table designations are accurate.
+- **Canonical Portals by Role** — portal paths are correct.
+- **Storage Conventions** — bucket names and access patterns are correct.
+- **Multi-Provider Hub** — role model, tenant architecture, and RLS helpers are accurate.
+- **Audit Scripts** — all three scripts exist and work.
+- **Migration naming convention** — correct.
+- **Brand Color Convention** — correct.
+- **API Error Response Shape** — `lib/api/safe-error.ts` exists and the import path is correct.
+- **Programs vs Courses debt** — well-documented, accurate, and the "do not resolve casually" warning is appropriate.
+- **Admin IP Guard** — `lib/api/admin-ip-guard.ts` exists and the usage pattern is correct.
+- **`apiRequireAdmin` role fix (PR #50)** — the note about `['admin', 'super_admin', 'staff']` is accurate.

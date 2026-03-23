@@ -27,13 +27,21 @@ const EXCLUDE_PATTERNS = [
 
 const FILE_EXTENSIONS = ['.tsx', '.jsx'];
 
-// Only check these high-signal tokens in CI
+// Banned tokens: placeholder language that must never appear in user-facing code.
+// Keep these specific — broad words like "unavailable" hit too many legitimate uses
+// (HTTP error pages, aria labels, className strings). Only ban exact vague phrases
+// that have no legitimate user-facing meaning.
 const CI_BANNED_TOKENS = [
+  // Hard placeholders — zero legitimate user-facing uses
   'coming soon',
   'lorem ipsum',
   'lorem',
   'tbd',
   'fake',
+  // Vague media/content placeholders — must use context-specific labels instead
+  'media unavailable',
+  'content not available',
+  'under construction',
 ];
 
 interface Violation {
@@ -47,15 +55,24 @@ function shouldExclude(filePath: string): boolean {
   return EXCLUDE_PATTERNS.some((pattern) => pattern.test(filePath));
 }
 
-// Patterns that are acceptable uses of banned tokens
+// Patterns that are acceptable uses of banned tokens.
+// These are checked against the full line — if any match, the violation is skipped.
 const ACCEPTABLE_PATTERNS = [
   /fake\s+(student|record|enrollment|data|engagement)/i, // Policy/legal text about fake data
-  /no\s+fake/i, // "no fake data" comments
-  /Schedule\s+TBD/i, // Legitimate fallback for missing schedule
-  /TBD\s*\)/i, // TBD in fallback expressions
-  /\/\*.*\*\//i, // Inline comments
-  /\/\//i, // Line comments
-  /{\/\*.*\*\/}/i, // JSX comments
+  /no\s+fake/i,                    // "no fake data" comments
+  /Schedule\s+TBD/i,               // Legitimate fallback for missing schedule
+  /TBD\s*\)/i,                     // TBD in fallback expressions
+  /\/\*.*\*\//i,                   // Inline block comments
+  /\/\//i,                         // Line comments
+  /{\/\*.*\*\/}/i,                 // JSX comments
+  // "not available" / "unavailable" in TypeScript type names, variable names, or imports
+  /\b(isNot|notAvailable|unavailableReason|checkAvailability)\b/i,
+  // "placeholder" as a legitimate HTML attribute value
+  /placeholder\s*=/i,
+  // "not provided" in error messages that are developer-facing (thrown errors)
+  /throw\s+new\s+Error/i,
+  // aria-label or title attributes may use descriptive "not available" language
+  /aria-label|aria-description/i,
 ];
 
 function isAcceptableUse(line: string, token: string): boolean {
@@ -73,29 +90,57 @@ function isAcceptableUse(line: string, token: string): boolean {
   return ACCEPTABLE_PATTERNS.some((pattern) => pattern.test(line));
 }
 
+// Vague state labels banned only as hardcoded JSX text between tags.
+// NOT banned in: ternaries, template literals, attribute values, error fallbacks,
+// className strings, aria-label, HTTP error pages, or conditional expressions.
+const VAGUE_LABEL_TOKENS = [
+  'media unavailable',
+  'content not available',
+];
+
+// Only matches bare JSX text: >Some text here< with no surrounding JS expression
+// Skips: ternaries (?), template literals (`), attribute values (="), error fallbacks (||)
+function isHardcodedJsxText(line: string, token: string): boolean {
+  const trimmed = line.trim();
+  // Must contain the token between JSX tags: >...token...<
+  const jsxTextPattern = new RegExp(`>\\s*[^<{]*\\b${token.replace(/\s+/g, '\\s+')}\\b[^<{]*\\s*<`, 'i');
+  if (!jsxTextPattern.test(trimmed)) return false;
+  // Skip if line contains ternary, template literal, or logical fallback
+  if (/[?`]|&&|\|\|/.test(trimmed)) return false;
+  // Skip if token is inside a JS expression block {}
+  if (/\{[^}]*\}/.test(trimmed)) return false;
+  return true;
+}
+
 function scanFile(filePath: string): Violation[] {
   const violations: Violation[] = [];
   const content = fs.readFileSync(filePath, 'utf-8');
   const lines = content.split('\n');
-  
+
   const pattern = new RegExp(
     CI_BANNED_TOKENS.map((t) => `\\b${t.replace(/\s+/g, '\\s+')}\\b`).join('|'),
     'gi'
   );
-  
+
+  const vaguePattern = new RegExp(
+    VAGUE_LABEL_TOKENS.map((t) => `\\b${t.replace(/\s+/g, '\\s+')}\\b`).join('|'),
+    'gi'
+  );
+
   lines.forEach((line, lineIndex) => {
     // Skip imports
     if (/^\s*import\s/.test(line)) return;
-    
+    // Skip comments
+    if (/^\s*(\/\/|\/\*|\*)/.test(line)) return;
+    // Skip throw statements (developer-facing errors)
+    if (/throw\s+new\s+Error/.test(line)) return;
+
+    // Check hard-banned tokens (always banned regardless of context)
     pattern.lastIndex = 0;
     let match;
-    
     while ((match = pattern.exec(line)) !== null) {
       const token = match[0].toLowerCase();
-      
-      // Skip acceptable uses
       if (isAcceptableUse(line, token)) continue;
-      
       violations.push({
         file: filePath,
         line: lineIndex + 1,
@@ -103,8 +148,22 @@ function scanFile(filePath: string): Violation[] {
         context: line.trim().substring(0, 100),
       });
     }
+
+    // Check vague labels — only when hardcoded as bare JSX text between tags
+    vaguePattern.lastIndex = 0;
+    while ((match = vaguePattern.exec(line)) !== null) {
+      const token = match[0].toLowerCase();
+      if (!isHardcodedJsxText(line, token)) continue;
+      if (isAcceptableUse(line, token)) continue;
+      violations.push({
+        file: filePath,
+        line: lineIndex + 1,
+        token: `[vague label] ${token}`,
+        context: line.trim().substring(0, 100),
+      });
+    }
   });
-  
+
   return violations;
 }
 
@@ -252,23 +311,40 @@ function main() {
 
   if (hasTokenViolations) {
     console.log(`❌ Found ${allViolations.length} banned token(s):\n`);
-    
+
+    const REPLACEMENT_GUIDE: Record<string, string> = {
+      'coming soon':        'Use a specific date or "Not yet published"',
+      'lorem ipsum':        'Replace with real content',
+      'lorem':              'Replace with real content',
+      'tbd':                'Use a specific value or omit the field',
+      'fake':               'Use real or anonymized data',
+      'media unavailable':  'Use context-specific label: "No video uploaded", "Image not set"',
+      'content not available': 'Use context-specific label: "Module not published", "Lesson not available"',
+      'not available':      'Use context-specific label: "Video not uploaded", "Module not published"',
+      'unavailable':        'Use context-specific label: "No video uploaded", "Module not published"',
+      'not provided':       'Use context-specific label or omit the element entirely',
+      'under construction': 'Remove or replace with a specific state label',
+      'placeholder':        'Replace with real content or remove the element',
+    };
+
     const byFile: Record<string, Violation[]> = {};
     allViolations.forEach((v) => {
       if (!byFile[v.file]) byFile[v.file] = [];
       byFile[v.file].push(v);
     });
-    
+
     Object.entries(byFile).forEach(([file, violations]) => {
       console.log(`📄 ${file}`);
       violations.forEach((v) => {
+        const fix = REPLACEMENT_GUIDE[v.token.toLowerCase()] ?? 'Replace with a specific, context-accurate label';
         console.log(`   Line ${v.line}: "${v.token}"`);
         console.log(`   → ${v.context}`);
+        console.log(`   Fix: ${fix}`);
       });
       console.log('');
     });
-    
-    console.log('Banned tokens:', CI_BANNED_TOKENS.join(', '));
+
+    console.log('Rule: Use context-specific labels. Vague placeholders are not acceptable in user-facing code.');
     console.log('');
   }
 

@@ -2,9 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
-import CanonicalHero from '@/components/hero/CanonicalHero';
-import HeroMediaFrame from '@/components/hero/HeroMediaFrame';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Get Started | Elevate For Humanity',
@@ -21,32 +19,45 @@ export default function Page() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Getstarted" }]} />
       </div>
-      <CanonicalHero
-        media={
-          <HeroMediaFrame>
-            <CanonicalVideo
-              src="/videos/getting-started-hero.mp4"
-              poster="/images/pages/training-cohort.jpg"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          </HeroMediaFrame>
-        }
-        title="Start Your Career Journey Today"
-        body="Funded training. No cost, no debt. Real careers waiting. Get started in 3 simple steps."
-        actions={
-          <>
-            <Link href="/contact" className="bg-brand-orange-600 text-white px-8 py-3.5 rounded-lg font-bold hover:bg-brand-orange-700 transition-colors">
-              Contact Us
-            </Link>
-            <Link href="/programs" className="border border-slate-300 text-slate-700 px-8 py-3.5 rounded-lg font-bold hover:bg-slate-50 transition-colors">
-              View Programs
-            </Link>
-          </>
-        }
+      {/* Hero — video frame only, no text overlay */}
+      <PageVideoHero
+        videoSrc="/videos/getting-started-hero.mp4"
+        posterSrc="/images/pages/getstarted-page-1.jpg"
+        posterAlt="Get started with Elevate for Humanity career training"
+        size="marketing"
       />
 
+      {/* Page identity — below hero */}
+      <section className="bg-white border-b border-slate-100 py-10 px-4">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-brand-orange-600 font-bold text-xs uppercase tracking-widest mb-3">
+            Begin Your Journey
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
+            Start Your Career Journey Today
+          </h1>
+          <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
+            Funded training. No cost, no debt. Real careers waiting. Get started in 3 simple steps.
+          </p>
+          <div className="flex flex-wrap gap-4">
+            <Link
+              href="/contact"
+              className="bg-brand-orange-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-brand-orange-700 transition-colors"
+            >
+              Contact Us
+            </Link>
+            <Link
+              href="/programs"
+              className="border-2 border-slate-300 text-slate-700 px-8 py-3 rounded-xl font-bold hover:border-brand-orange-400 hover:text-brand-orange-700 transition-colors"
+            >
+              View Programs
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Your Journey - 3 Simple Steps */}
-      <section className="py-20">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto text-center mb-16">
             <h2 className="text-2xl md:text-2xl md:text-3xl font-bold mb-4 text-2xl md:text-3xl lg:text-2xl md:text-3xl">
@@ -209,7 +220,7 @@ export default function Page() {
       </section>
 
       {/* Feature Cards */}
-      <section className="py-16">
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">

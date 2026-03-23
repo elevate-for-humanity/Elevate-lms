@@ -324,6 +324,33 @@ export class CurriculumGenerator {
       return null;
     }
 
+    // ── Content completeness gate ────────────────────────────────────────────
+    // Content lessons (step_type = 'lesson') MUST have script_text.
+    // Checkpoint/exam/quiz lessons MUST have quizzes.
+    // Neither can be null, empty, or below the minimum length.
+    // This is the enforcement point that prevents empty shells from entering the DB.
+    const effectiveStepType = def.stepType ?? 'lesson';
+    const isContentLesson = effectiveStepType === 'lesson' || effectiveStepType === 'lab' || effectiveStepType === 'assignment';
+    const isAssessmentLesson = effectiveStepType === 'checkpoint' || effectiveStepType === 'quiz' || effectiveStepType === 'exam';
+
+    if (isContentLesson) {
+      if (!def.scriptText || def.scriptText.trim().length < 300) {
+        const msg = `upsertLesson(${def.lessonSlug}): script_text is required for '${effectiveStepType}' lessons and must be ≥300 characters (got ${def.scriptText?.trim().length ?? 0}) — lesson not written`;
+        this.summary.errors.push(msg);
+        logger.error('curriculum-generator: ' + msg);
+        return null;
+      }
+    }
+
+    if (isAssessmentLesson) {
+      if (!def.quizzes || def.quizzes.length < 3) {
+        const msg = `upsertLesson(${def.lessonSlug}): '${effectiveStepType}' lessons require at least 3 quiz questions (got ${def.quizzes?.length ?? 0}) — lesson not written`;
+        this.summary.errors.push(msg);
+        logger.error('curriculum-generator: ' + msg);
+        return null;
+      }
+    }
+
     // Resolve domain — hard error for credential-bearing programs
     let credentialDomainId: string | null = null;
     if (def.credentialDomainKey) {

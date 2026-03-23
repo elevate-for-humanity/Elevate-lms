@@ -5,8 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  FileText, CheckCircle2, Eraser, Download, Send,
-  Loader2, AlertCircle, ArrowLeft,
+  CheckCircle2, Eraser, Download, Send,
+  Loader2, AlertCircle, ArrowLeft, Pen, Type, CheckSquare,
 } from 'lucide-react';
 import { InstitutionalHeader } from '@/components/documents/InstitutionalHeader';
 
@@ -142,10 +142,14 @@ USDOL/RAPIDS compliance disputes are subject to federal apprenticeship regulatio
   },
 ];
 
+type SignMethod = 'checkbox' | 'typed' | 'drawn';
+
 export default function SignMOUPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasSigned, setHasSigned] = useState(false);
+  const [signMethod, setSignMethod] = useState<SignMethod>('checkbox');
+  const [typedSig, setTypedSig] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
@@ -160,94 +164,25 @@ export default function SignMOUPage() {
   const [compensationRate, setCompensationRate] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-  // Canvas setup
+  // Canvas setup — only when drawn method is active
   useEffect(() => {
+    if (signMethod !== 'drawn') return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas size
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
     const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * 2;
-    canvas.height = rect.height * 2;
-    ctx.scale(2, 2);
-
-    // Style
+    canvas.width = rect.width * ratio;
+    canvas.height = rect.height * ratio;
+    ctx.scale(ratio, ratio);
     ctx.strokeStyle = '#1a1a1a';
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    // Draw signature line
-    ctx.beginPath();
-    ctx.strokeStyle = '#d1d5db';
-    ctx.lineWidth = 1;
-    ctx.moveTo(20, rect.height - 30);
-    ctx.lineTo(rect.width - 20, rect.height - 30);
-    ctx.stroke();
-
-    // Label
-    ctx.fillStyle = '#9ca3af';
-    ctx.font = '12px system-ui';
-    ctx.fillText('Sign above this line', rect.width / 2 - 50, rect.height - 12);
-
-    // Reset stroke style for drawing
-    ctx.strokeStyle = '#1a1a1a';
-    ctx.lineWidth = 2;
-  }, []);
-
-  const getPos = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return { x: 0, y: 0 };
-    const rect = canvas.getBoundingClientRect();
-    if ('touches' in e) {
-      return {
-        x: e.touches[0].clientX - rect.left,
-        y: e.touches[0].clientY - rect.top,
-      };
-    }
-    return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    };
-  }, []);
-
-  const startDrawing = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
-    const ctx = canvasRef.current?.getContext('2d');
-    if (!ctx) return;
-    const pos = getPos(e);
-    ctx.beginPath();
-    ctx.moveTo(pos.x, pos.y);
-    setIsDrawing(true);
-    setHasSigned(true);
-  }, [getPos]);
-
-  const draw = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
-    if (!isDrawing) return;
-    const ctx = canvasRef.current?.getContext('2d');
-    if (!ctx) return;
-    const pos = getPos(e);
-    ctx.lineTo(pos.x, pos.y);
-    ctx.stroke();
-  }, [isDrawing, getPos]);
-
-  const stopDrawing = useCallback(() => {
-    setIsDrawing(false);
-  }, []);
-
-  const clearSignature = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const rect = canvas.getBoundingClientRect();
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Redraw signature line
+    // Baseline guide
     ctx.beginPath();
     ctx.strokeStyle = '#d1d5db';
     ctx.lineWidth = 1;
@@ -261,14 +196,83 @@ export default function SignMOUPage() {
     ctx.lineWidth = 2;
 
     setHasSigned(false);
+  }, [signMethod]);
+
+  // Scale client coords to canvas backing-buffer space
+  const toCanvasCoords = useCallback((
+    canvas: HTMLCanvasElement,
+    clientX: number,
+    clientY: number,
+  ) => {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (clientX - rect.left) * (canvas.width / rect.width),
+      y: (clientY - rect.top) * (canvas.height / rect.height),
+    };
+  }, []);
+
+  const startDrawing = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const { x, y } = toCanvasCoords(canvas, clientX, clientY);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    setIsDrawing(true);
+    setHasSigned(true);
+  }, [toCanvasCoords]);
+
+  const draw = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    if (!isDrawing) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const { x, y } = toCanvasCoords(canvas, clientX, clientY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  }, [isDrawing, toCanvasCoords]);
+
+  const stopDrawing = useCallback(() => setIsDrawing(false), []);
+
+  const clearSignature = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    const rect = canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.beginPath();
+    ctx.strokeStyle = '#d1d5db';
+    ctx.lineWidth = 1;
+    ctx.moveTo(20, rect.height - 30);
+    ctx.lineTo(rect.width - 20, rect.height - 30);
+    ctx.stroke();
+    ctx.fillStyle = '#9ca3af';
+    ctx.font = '12px system-ui';
+    ctx.fillText('Sign above this line', rect.width / 2 - 50, rect.height - 12);
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 2;
+    setHasSigned(false);
+  };
+
+  const isSignatureProvided = () => {
+    if (signMethod === 'drawn') return hasSigned;
+    if (signMethod === 'typed') return typedSig.trim().length > 1;
+    return true; // checkbox
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!hasSigned) {
-      setError('Please provide your signature above.');
+    if (!isSignatureProvided()) {
+      setError(signMethod === 'drawn' ? 'Please draw your signature above.' : 'Please type your signature.');
       return;
     }
     if (!agreedToTerms) {
@@ -279,8 +283,19 @@ export default function SignMOUPage() {
     setSubmitting(true);
 
     try {
-      // Get signature as data URL
-      const signatureData = canvasRef.current?.toDataURL('image/png');
+      // For drawn: capture canvas data URL; verify it's not a blank canvas
+      let signatureData: string | undefined;
+      if (signMethod === 'drawn') {
+        const canvas = canvasRef.current;
+        if (!canvas) throw new Error('Signature canvas not available.');
+        signatureData = canvas.toDataURL('image/png');
+        // A blank white canvas produces a very short data URL — guard against it
+        if (signatureData.length < 5000) {
+          setError('Signature appears empty. Please draw your signature.');
+          setSubmitting(false);
+          return;
+        }
+      }
 
       const payload = {
         shop_name: shopName,
@@ -290,7 +305,9 @@ export default function SignMOUPage() {
         supervisor_license: supervisorLicense,
         compensation_model: compensationModel,
         compensation_rate: compensationRate,
-        signature_data: signatureData,
+        signature_data: signMethod === 'drawn' ? signatureData : undefined,
+        signature_typed: signMethod === 'typed' ? typedSig.trim() : undefined,
+        signature_method: signMethod,
         signed_at: new Date().toISOString(),
         mou_version: '2025-01',
       };
@@ -489,36 +506,86 @@ export default function SignMOUPage() {
 
         {/* Digital Signature */}
         <div className="bg-white rounded-xl shadow-sm border p-6 mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-900">Digital Signature</h2>
-            <button
-              type="button"
-              onClick={clearSignature}
-              className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
-            >
-              <Eraser className="w-4 h-4" /> Clear
-            </button>
+          <h2 className="text-lg font-bold text-gray-900 mb-4">Digital Signature</h2>
+
+          {/* Method selector */}
+          <div className="flex gap-3 flex-wrap mb-5">
+            {([
+              { m: 'checkbox' as SignMethod, Icon: CheckSquare, label: 'Checkbox' },
+              { m: 'typed' as SignMethod, Icon: Type, label: 'Type' },
+              { m: 'drawn' as SignMethod, Icon: Pen, label: 'Draw' },
+            ]).map(({ m, Icon, label }) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setSignMethod(m)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 text-sm font-medium transition-colors ${
+                  signMethod === m
+                    ? 'border-brand-blue-600 bg-brand-blue-50 text-brand-blue-700'
+                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                }`}
+              >
+                <Icon className="w-4 h-4" /> {label}
+              </button>
+            ))}
           </div>
-          <p className="text-sm text-gray-500 mb-3">
-            Draw your signature in the box below using your mouse or finger (on touch devices).
-          </p>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg overflow-hidden bg-white">
-            <canvas
-              ref={canvasRef}
-              className="w-full cursor-crosshair touch-none"
-              style={{ height: '180px' }}
-              onMouseDown={startDrawing}
-              onMouseMove={draw}
-              onMouseUp={stopDrawing}
-              onMouseLeave={stopDrawing}
-              onTouchStart={startDrawing}
-              onTouchMove={draw}
-              onTouchEnd={stopDrawing}
-            />
-          </div>
-          {hasSigned && (
-            <p className="text-sm text-brand-green-600 mt-2 flex items-center gap-1">
-              <CheckCircle2 className="w-4 h-4" /> Signature captured
+
+          {/* Typed */}
+          {signMethod === 'typed' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Type your full name as your signature <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={typedSig}
+                onChange={(e) => setTypedSig(e.target.value)}
+                placeholder="Your full legal name"
+                className="w-full max-w-md px-4 py-3 border border-slate-300 rounded-lg text-2xl focus:ring-2 focus:ring-brand-blue-500"
+                style={{ fontFamily: "'Brush Script MT', cursive" }}
+              />
+            </div>
+          )}
+
+          {/* Drawn */}
+          {signMethod === 'drawn' && (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm text-gray-500">Draw your signature using your mouse or finger.</p>
+                <button
+                  type="button"
+                  onClick={clearSignature}
+                  className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+                >
+                  <Eraser className="w-4 h-4" /> Clear
+                </button>
+              </div>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg overflow-hidden bg-white">
+                <canvas
+                  ref={canvasRef}
+                  className="w-full cursor-crosshair touch-none"
+                  style={{ height: '180px', display: 'block' }}
+                  onMouseDown={startDrawing}
+                  onMouseMove={draw}
+                  onMouseUp={stopDrawing}
+                  onMouseLeave={stopDrawing}
+                  onTouchStart={startDrawing}
+                  onTouchMove={draw}
+                  onTouchEnd={stopDrawing}
+                />
+              </div>
+              {hasSigned && (
+                <p className="text-sm text-brand-green-600 mt-2 flex items-center gap-1">
+                  <CheckCircle2 className="w-4 h-4" /> Signature captured
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Checkbox */}
+          {signMethod === 'checkbox' && (
+            <p className="text-sm text-slate-600 bg-slate-50 rounded-lg p-3 border border-slate-200">
+              By checking the agreement box below and submitting, your name and timestamp will serve as your electronic signature under the E-SIGN Act.
             </p>
           )}
         </div>

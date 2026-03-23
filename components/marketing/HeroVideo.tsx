@@ -12,8 +12,8 @@
  */
 
 import { useEffect, useRef, useState, useId } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import { Volume2, VolumeX, Pause, Play } from 'lucide-react';
+import { validateHeroVideoElement } from '@/lib/hero-video-audit';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                               */
@@ -76,60 +76,86 @@ export default function HeroVideo({
   className = '',
   children,
 }: HeroVideoProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
   const [transcriptOpen, setTranscriptOpen] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
   const transcriptId = useId();
+  const triggeredRef = useRef(false);
 
-  // Track whether we're mounted on the client (avoids SSR/client hydration mismatch)
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-
-  // Preload voiceover audio metadata on mount
+  // Detect reduced-motion preference
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.load();
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
   }, []);
 
-  // Auto-play voiceover when hero scrolls into view (≥50% visible)
-  // Respects prefers-reduced-motion — stays muted if user has motion preference off
+  // Preload audio on mount so it's buffered before scroll fires
   useEffect(() => {
     const audio = audioRef.current;
-    const wrapper = wrapperRef.current;
-    if (!audio || !wrapper) return;
+    if (!audio || prefersReducedMotion) return;
+    audio.load();
+  }, [prefersReducedMotion]);
 
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) return;
+  // Autoplay muted on load — browser allows muted autoplay
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    const video = videoRef.current;
+    if (!video) return;
+    triggeredRef.current = true;
+    video.muted = true;
+    video.play()
+      .then(() => setPlaying(true))
+      .catch(() => {});
 
-    let played = false;
+    const result = validateHeroVideoElement(video);
+    if (!result.ok) {
+      console.error('[HeroVideo] audit failed:', result.errors);
+    }
+  }, [prefersReducedMotion]);
+
+  // Pause video + audio when scrolled out of view; resume when back in view
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    const el = wrapperRef.current;
+    if (!el) return;
+
     const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        if (entry.isIntersecting && !played) {
-          played = true;
-          setMuted(false);
-          audio.currentTime = 0;
-          audio.play().catch(() => setMuted(true));
-        } else if (!entry.isIntersecting && played) {
-          audio.pause();
-          setMuted(true);
-          played = false;
+      ([entry]) => {
+        const video = videoRef.current;
+        const audio = audioRef.current;
+        if (!video || !triggeredRef.current) return;
+        if (entry.isIntersecting) {
+          video.play().catch(() => {});
+          if (audio && !muted) audio.play().catch(() => {});
+          setPlaying(true);
+        } else {
+          video.pause();
+          if (audio) audio.pause();
+          setPlaying(false);
         }
       },
-      { threshold: 0.5 }
+      // threshold: 0 — only pause when the hero is fully off screen
+      { threshold: 0 }
     );
-
-    observer.observe(wrapper);
+    observer.observe(el);
     return () => observer.disconnect();
-  }, [mounted]);
+  }, [prefersReducedMotion, muted]);
 
-  // Voiceover audio toggle — only controls the separate audio track, not the video
   function toggleMute() {
+    const video = videoRef.current;
     const audio = audioRef.current;
     const nextMuted = !muted;
     setMuted(nextMuted);
+
+    if (video) video.muted = nextMuted;
+
     if (audio) {
       if (nextMuted) {
         audio.pause();
@@ -140,32 +166,62 @@ export default function HeroVideo({
     }
   }
 
-  // Always use desktop src on server. Switch to mobile src after mount if viewport is narrow.
-  // This prevents the SSR/client src mismatch hydration error.
-  const videoSrc =
-    mounted && videoSrcMobile && window.innerWidth < 768
-      ? videoSrcMobile
-      : videoSrcDesktop;
+  function togglePlay() {
+    const video = videoRef.current;
+    const audio = audioRef.current;
+    if (!video) return;
+
+    if (video.paused) {
+      video.play().catch(() => {});
+      if (audio && !muted) audio.play().catch(() => {});
+      setPlaying(true);
+    } else {
+      video.pause();
+      if (audio) audio.pause();
+      setPlaying(false);
+    }
+  }
+
+  // Determine video source based on viewport
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const videoSrc = (isMobile && videoSrcMobile) ? videoSrcMobile : videoSrcDesktop;
 
   return (
     <div ref={wrapperRef} className={`w-full ${className}`}>
       {/* ── VIDEO FRAME ── */}
-      {/* Height: 56vw clamped between 400px and 780px */}
+      {/* Height: 56vw clamped between 280px and 680px — no layout shift */}
       <section
         className="relative w-full overflow-hidden bg-slate-900"
-        style={{ height: 'clamp(400px, 56vw, 780px)' }}
+        style={{ height: 'clamp(280px, 56vw, 680px)' }}
         aria-label={analyticsName ? `${analyticsName} hero video` : 'Hero video'}
       >
-        {/* CanonicalVideo handles reduced-motion, error fallback, and visibility gating */}
-        <CanonicalVideo
-          src={videoSrc}
-          poster={posterImage}
-          className="absolute inset-0 w-full h-full object-cover object-center"
-        />
+        {/* Video or poster fallback */}
+        {!prefersReducedMotion && !videoFailed ? (
+          <video
+            ref={videoRef}
+            loop
+            playsInline
+            preload="none"
+            poster={posterImage}
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover object-center"
+            onError={() => setVideoFailed(true)}
+          >
+            <source src={videoSrc} type="video/mp4" />
+          </video>
+        ) : (
+          // Reduced-motion or video-failed: show poster only
+          <img
+            src={posterImage}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover object-center"
+          />
+        )}
 
         {/* Voiceover audio — preload metadata so it's ready when scroll fires */}
         {voiceoverSrc && (
-          <audio ref={audioRef} src={voiceoverSrc} preload="metadata" aria-hidden="true" />
+          <audio ref={audioRef} src={voiceoverSrc} preload="metadata" aria-hidden="true" loop />
         )}
 
         {/* ── ON-VIDEO ELEMENTS (only these three are allowed) ── */}
@@ -190,34 +246,42 @@ export default function HeroVideo({
           </div>
         )}
 
-        {/* Sound toggle — only shown when a voiceover track is present */}
-        {voiceoverSrc && (
-          <div className="absolute bottom-4 right-4 z-10">
-            <button
-              onClick={toggleMute}
-              aria-label={muted ? 'Unmute voiceover' : 'Mute voiceover'}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-black/40 text-white text-xs backdrop-blur-sm hover:bg-black/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white transition-colors"
-            >
-              {muted ? (
-                <>
-                  <VolumeX className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span className="hidden sm:inline">Muted</span>
-                </>
-              ) : (
-                <>
-                  <Volume2 className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span className="hidden sm:inline">Sound on</span>
-                </>
-              )}
-            </button>
-          </div>
-        )}
+        {/* Controls — bottom-right, always */}
+        <div className="absolute bottom-4 right-4 z-10 flex items-center gap-2">
+          {/* Play/Pause */}
+          <button
+            onClick={togglePlay}
+            aria-label={playing ? 'Pause video' : 'Play video'}
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-black/40 text-white backdrop-blur-sm hover:bg-black/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white transition-colors"
+          >
+            {playing ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+          </button>
+
+          {/* Sound toggle */}
+          <button
+            onClick={toggleMute}
+            aria-label={muted ? 'Unmute' : 'Mute'}
+            className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-black/40 text-white text-xs backdrop-blur-sm hover:bg-black/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white transition-colors"
+          >
+            {muted ? (
+              <>
+                <VolumeX className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="hidden sm:inline">Muted</span>
+              </>
+            ) : (
+              <>
+                <Volume2 className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="hidden sm:inline">Sound on</span>
+              </>
+            )}
+          </button>
+        </div>
       </section>
 
       {/* ── BELOW-HERO CONTENT ── */}
       {/* All primary messaging lives here — never on the video */}
       {(belowHeroHeadline || belowHeroSubheadline || ctas || trustIndicators || children) && (
-        <section className="border-b border-slate-100 py-10 sm:py-14">
+        <section className="bg-white border-b border-slate-100 py-10 sm:py-14">
           <div className="max-w-4xl mx-auto px-6">
             {children ? (
               children

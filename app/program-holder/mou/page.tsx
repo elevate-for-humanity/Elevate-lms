@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { InstitutionalHeader } from '@/components/documents/InstitutionalHeader';
@@ -14,12 +13,10 @@ export const metadata: Metadata = {
 
 export default async function ProgramHolderMOUPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: mou } = await db.from('mous').select('*').eq('user_id', user.id).single();
+  const { data: mou } = await supabase.from('mous').select('*').eq('user_id', user.id).single();
 
   return (
     <div className="min-h-screen bg-white">
@@ -44,14 +41,21 @@ export default async function ProgramHolderMOUPage() {
               <div><p className="text-sm text-gray-500">Expiration Date</p><p className="font-medium">{mou.expiry_date ? new Date(mou.expiry_date).toLocaleDateString() : 'N/A'}</p></div>
             </div>
             <div className="flex gap-4">
-              <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Download MOU</button>
-              <button className="border px-4 py-2 rounded-lg hover:bg-white">Request Amendment</button>
+              <Link href="/program-holder/sign-mou" className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">
+                Sign MOU
+              </Link>
+              <Link href="/contact" className="border border-slate-300 px-4 py-2 rounded-lg hover:bg-slate-50 text-slate-700">
+                Request Amendment
+              </Link>
             </div>
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
-            <p className="text-gray-500 mb-4">No MOU on file</p>
-            <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Request MOU</button>
+            <p className="text-slate-500 mb-2">No MOU on file yet.</p>
+            <p className="text-sm text-slate-400 mb-6">Review and sign your partnership agreement to get started.</p>
+            <Link href="/program-holder/sign-mou" className="inline-block bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700">
+              Review &amp; Sign MOU
+            </Link>
           </div>
         )}
       </div>

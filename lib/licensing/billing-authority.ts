@@ -445,16 +445,9 @@ export function getLicenseAccessMode(
     };
   }
 
-  // No license at all — super_admin always gets full access regardless
+  // No license at all — blocked for everyone, including admins.
+  // Admins must purchase a license; there is no bypass for the missing-license case.
   if (!license || accessResult.reason === 'no_license') {
-    if (isAdmin) {
-      return {
-        mode: 'full',
-        canRead: true,
-        canMutate: true,
-        reason: 'no_license_admin_bypass',
-      };
-    }
     return {
       mode: 'blocked',
       canRead: false,

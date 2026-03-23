@@ -183,7 +183,7 @@ export default function HomePage() {
       {/* ── BARBERING — video left, copy right ── */}
       <section className="grid lg:grid-cols-2 border-t border-slate-200">
         <div className="relative h-72 sm:h-96 lg:h-auto min-h-[460px] overflow-hidden bg-slate-900">
-          <CanonicalVideo src="/videos/barber-training.mp4" poster="/images/pages/barber-apprentice-learning.jpg" className="absolute inset-0 w-full h-full object-cover" />
+          <CanonicalVideo src="/videos/barber-training.mp4" poster="/images/barber-hero.jpg" className="absolute inset-0 w-full h-full object-cover" />
         </div>
         <div className="bg-white flex items-center">
           <div className="px-8 py-12 lg:px-14 lg:py-16 max-w-xl w-full">

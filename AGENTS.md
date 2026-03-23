@@ -18,6 +18,213 @@
 - `pnpm next dev --turbopack` — Start dev server
 - `pnpm lint` — Run linter
 
+---
+
+## No-Drift PR Validation SOP
+
+This repository must be operated as a production system, not a patch-and-chase workspace. No pull request is considered reviewable, mergeable, or diagnosable until the working branch is synchronized with `origin/main` and validated from the latest branch head.
+
+### 1. Branch sync is mandatory before any diagnosis
+
+Before reviewing CI, Netlify, lint, test, integrity, accessibility, E2E, or runtime issues, run:
+
+```bash
+git fetch origin
+git checkout <feature-branch>
+git log --oneline HEAD..origin/main
+```
+
+If any commits are listed, the branch is behind main. Stop all debugging and synchronize first:
+
+```bash
+git merge origin/main
+```
+
+Resolve conflicts immediately. Do not continue evaluation on a stale branch.
+
+After merge resolution:
+
+```bash
+git push origin <feature-branch>
+```
+
+Only the CI and deploy results from this updated branch head are valid for review.
+
+### 2. Cherry-pick is not routine branch maintenance
+
+Do not use cherry-pick as the default method to keep a feature branch current. Cherry-pick is allowed only when all three conditions are true:
+
+- the fix already exists and is proven on another branch
+- the change is isolated and low-risk
+- the transfer is intentional and explicitly justified
+
+Otherwise, merge `origin/main` into the feature branch. Repeated cherry-picking is a process failure and creates hidden branch drift.
+
+### 3. Branch health and feature correctness are separate
+
+Do not confuse them.
+
+**Branch health** means: branch is current with `origin/main`, dependencies install, lint passes, build passes, deploy starts successfully, no unresolved conflicts.
+
+**Feature correctness** means: the changed route/page/component behaves correctly, the business logic works, the database state is correct, the UX is complete and coherent.
+
+A green build does not prove feature correctness. A failed build does not always mean the feature is wrong. Stale-branch failures must be eliminated before feature diagnosis begins.
+
+### 4. Every fix claim must include evidence
+
+No one may say "fixed," "resolved," "good," "non-blocking," or "ready to merge" without attaching the evidence category.
+
+Allowed evidence categories:
+- code diff
+- green build on the latest branch commit
+- runtime verification on the affected surface
+- live database validation for DB-affecting work
+- proof that a failing check is pre-existing on `origin/main`
+
+Unsupported claims are not accepted.
+
+### 5. Required validation sequence for every PR
+
+**Step A — Synchronize branch with main**
+
+```bash
+git fetch origin
+git checkout <feature-branch>
+git log --oneline HEAD..origin/main
+git merge origin/main
+git push origin <feature-branch>
+```
+
+If the branch was already current, `git log --oneline HEAD..origin/main` returns no output.
+
+**Step B — Inspect changed surface**
+
+```bash
+git diff --name-only origin/main...HEAD
+```
+
+This defines the actual review surface. Use it to determine whether later failures are likely regressions or unrelated baseline issues.
+
+**Step C — Run branch health checks**
+
+```bash
+pnpm install
+pnpm lint
+pnpm build
+```
+
+If project-specific checks exist, run them too (e.g. `pnpm test`, `pnpm validate:lms`).
+
+**Step D — Review CI and deploys only from latest head**
+
+GitHub checks must be evaluated on the newest commit after sync. Netlify preview must correspond to the newest commit after sync. Old CI results on pre-sync commits are invalid.
+
+**Step E — Runtime verification**
+
+Manually hit the exact changed page, API route, or workflow in preview or dev. Do not infer runtime correctness from compile success.
+
+**Step F — Database validation for DB-affecting changes**
+
+If the PR touches migrations, Supabase queries, data promotion pipelines, view logic, publication flows, course/module/lesson generation, enrollment state, or application/status logic — live database validation is mandatory before merge.
+
+Validate: expected row counts, expected null/non-null state, foreign key integrity, no cross-program contamination, no orphaned records, correct view resolution, no unintended updates to unaffected programs.
+
+### 6. Handling failing checks
+
+**If the build fails:** verify the branch is current with `origin/main` first. If stale, sync first. If current, diagnose the actual code failure.
+
+**If accessibility, integrity, or E2E fails:** compare the failing surface against `git diff --name-only origin/main...HEAD`. If the failing paths are inside the diff, treat as regression until disproven. If outside the diff, test whether failure reproduces on `origin/main`. Only then may it be called pre-existing.
+
+**If runtime fails:** treat as a real blocker on the changed surface unless proven unrelated.
+
+**If database validation fails:** treat as merge-blocking.
+
+### 7. Standard for calling something "pre-existing"
+
+A failure may be called pre-existing only if there is evidence of **both**:
+
+1. the failing surface is outside the PR's changed scope, **and**
+2. the same failure reproduces on `origin/main` or is already documented with current evidence
+
+Without both, do not call it pre-existing. Do not downgrade uncertainty into confidence.
+
+### 8. Netlify and preview rules
+
+A successful deploy means only that the branch built and deployed. It does not prove the application works.
+
+Minimum preview validation: preview corresponds to latest commit, affected route loads, no runtime exception, expected response shape or UI behavior is present, no obvious broken data path.
+
+For API routes, test the exact route. For LMS work, test the actual learner-facing route, not just the landing page.
+
+### 9. Rules specific to this LMS repo
+
+**For curriculum, publication, blueprint, promotion, or course-generation work**, validation must include: correct program-to-course linkage, correct module count, correct lesson count, no wrong-program lesson promotion, no slug-only cross-program contamination, no empty modules, lesson ordering resolves correctly in views, expected lesson content exists in the final learner-facing structure, unaffected programs remain unchanged.
+
+**For application/admin health work**, validation must include: route compiles, route returns valid JSON, date math is correct, deadman/status logic works with real timestamps, no duplicate declarations or shadowing remains.
+
+### 10. Required response format from any coding agent
+
+When reporting status, use this structure exactly:
+
+```
+Branch status:
+- current with origin/main: yes/no
+
+Changed surface:
+- <files or subsystem summary>
+
+Checks:
+- lint: pass/fail
+- build: pass/fail
+- deploy: pass/fail
+- runtime verification: pass/fail
+- DB validation: pass/fail/not applicable
+
+Failures:
+- <each failure with classification: regression / pre-existing / unknown>
+
+Evidence:
+- <diff, command output, runtime path tested, DB query result>
+
+Merge recommendation:
+- merge / do not merge / merge after specific blocker
+```
+
+No vague summaries. No "should be fine." No "looks good." No implied confidence without evidence.
+
+### 11. Hard stop conditions
+
+A PR is not mergeable if any of these are true:
+
+- branch is behind `origin/main`
+- build fails on latest synced head
+- runtime fails on changed surface
+- DB validation fails for DB-affecting work
+- an allegedly pre-existing failure is unproven
+- deploy reviewed is not from latest branch head
+
+### 12. Default commands
+
+```bash
+git fetch origin
+git checkout <feature-branch>
+git log --oneline HEAD..origin/main
+git merge origin/main
+git diff --name-only origin/main...HEAD
+pnpm install
+pnpm lint
+pnpm build
+git push origin <feature-branch>
+```
+
+For LMS validation where applicable: `pnpm validate:lms`
+
+### Paste-this instruction for coding agents
+
+> Before making or evaluating any change, fetch origin and compare the working branch to `origin/main`. If the branch is behind, merge `origin/main` into the feature branch first and resolve conflicts before any further debugging. Do not cherry-pick routine fixes unless explicitly instructed. Do not interpret CI or Netlify failures from a stale branch as feature regressions. For every claimed fix, report evidence from the latest branch head only: changed surface, build result, runtime verification, and live DB validation where applicable. Separate branch health from feature correctness at all times. No PR may be called ready, fixed, or mergeable without evidence.
+
+---
+
 ## Key Directories
 
 - `app/` — Next.js App Router pages
@@ -35,12 +242,16 @@
 
 ## Repository Size
 
-| Metric | Count |
-|--------|-------|
-| `page.tsx` files | 1,486 |
-| `route.ts` files (API) | 1,079 |
-| Supabase migrations | 278 |
-| `console.log` occurrences | ~1,521 across 118 files — use `lib/logger.ts` instead |
+These are point-in-time snapshots. Re-run the commands to get current counts — do not trust the numbers without verifying.
+
+| Metric | Count | Last verified | Command |
+|--------|-------|---------------|---------|
+| `page.tsx` files | 1,498 | 2026-03-22 | `find app -name "page.tsx" \| wc -l` |
+| `route.ts` files (API) | 1,122 | 2026-03-22 | `find app -name "route.ts" \| wc -l` |
+| Supabase migrations | 346 | 2026-03-22 | `ls supabase/migrations/ \| wc -l` |
+| `console.log` occurrences | ~1,585 across 129 files | 2026-03-22 | `grep -r "console\.log" --include="*.ts" --include="*.tsx" \| wc -l` |
+
+Use `import { logger } from '@/lib/logger'` for all new logging. When you update any metric, update the verification date in the same edit.
 
 ---
 
@@ -163,12 +374,29 @@ The lesson page runs both paths in parallel for backward compatibility. New prog
 
 ### Migrations Pending (apply in Supabase Dashboard)
 
-These files exist in `supabase/migrations/` but have **not** been applied to the live DB:
+**Verified:** these files exist in `supabase/migrations/` (confirmed 2026-03-22).  
+**Unverified:** whether they have been applied to the live DB. Do not assume either state without checking.
 
-| File | Effect |
-|------|--------|
-| `20260401000005_curriculum_lessons_quiz_questions.sql` | Adds `quiz_questions` to `curriculum_lessons`, backfills HVAC data, fixes `lms_lessons` view |
-| `20260402000003_programs_lms_columns.sql` | Adds `short_description` and `display_order` to `programs`; backfills `short_description` from `excerpt` |
+| File | Effect | Live DB status |
+|------|--------|----------------|
+| `20260401000005_curriculum_lessons_quiz_questions.sql` | Adds `quiz_questions` to `curriculum_lessons`, backfills HVAC data, fixes `lms_lessons` view | **UNVERIFIED** — check before use |
+| `20260402000003_programs_lms_columns.sql` | Adds `short_description` and `display_order` to `programs`; backfills `short_description` from `excerpt` | **UNVERIFIED** — check before use |
+
+**To verify**, run in Supabase Dashboard SQL Editor:
+
+```sql
+-- Check curriculum_lessons columns
+SELECT column_name FROM information_schema.columns
+WHERE table_schema = 'public' AND table_name = 'curriculum_lessons'
+ORDER BY column_name;
+
+-- Check programs columns
+SELECT column_name FROM information_schema.columns
+WHERE table_schema = 'public' AND table_name = 'programs'
+  AND column_name IN ('short_description', 'display_order');
+```
+
+When you confirm a migration is applied, update the Live DB status column and add the verification date.
 
 Until `20260401000005` is applied:
 - `curriculum_lessons.quiz_questions` column does not exist
@@ -222,11 +450,31 @@ The public LMS uses "Programs" (`/lms/programs`) while the authenticated app use
 
 ### Supabase Access
 
-**Canonical** (`lib/supabase/`): `server.ts`, `client.ts`, `admin.ts`, `public.ts`, `server-db.ts`, `static.ts`
+**Canonical modules** (`lib/supabase/`): `server.ts`, `client.ts`, `admin.ts`, `public.ts`, `server-db.ts`, `static.ts`
 
-Import from `@/lib/supabase/*`. The following deprecated shims still have 78 active importers — do not add new imports from them:
+Import from the specific sub-module that matches your execution context. Do not import from the barrel (`@/lib/supabase`) — it is not used in practice.
+
+#### Client selection
+
+| Context | Import | Notes |
+|---------|--------|-------|
+| Server components, API routes | `import { createClient } from '@/lib/supabase/server'` | Respects user session and RLS |
+| Client components (browser) | `import { createBrowserClient } from '@/lib/supabase/client'` | Browser-only |
+| Admin / privileged operations | `import { createAdminClient } from '@/lib/supabase/admin'` | **Bypasses RLS** — see warning below |
+
+#### RLS warning
+
+`createAdminClient` bypasses Row Level Security. Use it only when the operation explicitly requires elevated privileges (provisioning, cron jobs, admin dashboards reading cross-tenant data). Using it in user-driven flows is a security bug. When in doubt, use `createClient`.
+
+If you use `createAdminClient` in a route or service, add an inline comment explaining why RLS bypass is required.
+
+#### Deprecated shims — 79 active importers remain
+
+Do not add new imports from these files:
 
 `lib/supabaseServer.ts`, `lib/supabase-server.ts`, `lib/supabaseAdmin.ts`, `lib/supabase-admin.ts`, `lib/supabaseClient.ts`, `lib/supabaseClients.ts`, `lib/supabase.ts`, `lib/supabase-lazy.ts`, `lib/supabase-api.ts`, `lib/getSupabaseServerClient.ts`
+
+If you edit a file that imports from a deprecated shim, migrate that import to `@/lib/supabase/*` as part of your change.
 
 ### Rate Limiting
 
@@ -248,25 +496,92 @@ if (rateLimited) return rateLimited;
 | `public` | 10 req / 1 min | Public AI tutor, unauthenticated reads |
 
 **Dead — do not import:**
-- `lib/rateLimit.ts` — in-memory, broken in serverless, `@deprecated`. All importers migrated.
+- `lib/rateLimit.ts` — in-memory, broken in serverless, `@deprecated`. Zero active importers. **File still exists on disk** — do not import it; delete it when confirmed safe.
 - `lib/rateLimiter.ts` — **deleted**
 - `lib/api/rate-limiter.ts` — **deleted**
 
-### API Auth Pattern
+### Cron Route Authentication
+
+Cron routes must verify `CRON_SECRET` before performing any work. Do not leave cron endpoints protected only by obscurity or pathname.
 
 ```ts
-// Any authenticated user
-import { apiAuthGuard } from '@/lib/admin/guards';
-const auth = await apiAuthGuard(request);
-if (auth.error) return auth.error;
-
-// Admin or super_admin only
-import { apiRequireAdmin } from '@/lib/admin/guards';
-const auth = await apiRequireAdmin(request);
-if (auth.error) return auth.error;
+const cronSecret = process.env.CRON_SECRET;
+if (request.headers.get('authorization') !== `Bearer ${cronSecret}`) {
+  return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+}
 ```
 
-⚠️ **`apiRequireAdmin` previously only allowed `'admin'`** — this was fixed in PR #50. It now allows `['admin', 'super_admin', 'staff']`. If you see identity-only checks on admin routes, add an explicit role check:
+Any new cron route must implement this check as the first operation in the handler.
+
+---
+
+### API Auth Pattern
+
+There are multiple auth modules. They are not interchangeable. Match the module to the execution context.
+
+#### Guard selection
+
+| Context | Function | Import from | On failure |
+|---------|----------|-------------|------------|
+| Server component / page layout | `requireAdmin()` | `@/lib/auth` | Throws redirect to `/login` |
+| API route / route handler | `apiRequireAdmin()` | `@/lib/authGuards` | Returns `NextResponse` 401/403 |
+
+**Page components:**
+
+```ts
+import { requireAdmin } from '@/lib/auth';
+await requireAdmin(); // throws redirect if not authorized
+```
+
+**API routes:**
+
+```ts
+import { apiRequireAdmin } from '@/lib/authGuards';
+const auth = await apiRequireAdmin(); // no arguments
+if (auth instanceof NextResponse) return auth; // failed — return the error response
+// auth.user, auth.role, auth.profile are available here
+```
+
+```ts
+import { apiAuthGuard } from '@/lib/authGuards';
+const auth = await apiAuthGuard(); // no arguments
+if (!auth.authorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+```
+
+⚠️ `apiRequireAdmin` and `apiAuthGuard` take **no arguments**. Do not pass `request`. Any example showing `apiRequireAdmin(request)` is wrong.
+
+#### `@/lib/admin/guards` is a wrapper, not the source
+
+`lib/admin/guards.ts` re-exports `apiAuthGuard` and `apiRequireAdmin` from `@/lib/authGuards` and adds Netlify context helpers (`isProd`, `isPreview`, `DEV_TOOL_ROUTES`). Import from `@/lib/admin/guards` only when you also need those Netlify helpers. For all other cases import from the real source.
+
+#### Additional guards in `@/lib/authGuards`
+
+```ts
+import { apiRequireInstructor, apiRequireStudent } from '@/lib/authGuards';
+```
+
+#### `lib/auth/` — primary auth subsystem
+
+`lib/auth/` contains 16 files used across ~246 files in the codebase. Before writing any new auth helper, check whether an equivalent already exists here.
+
+| File | Purpose |
+|------|---------|
+| `require-role.ts` | Generic role guard for page components |
+| `require-admin.ts` | Admin page guard |
+| `require-program-holder.ts` | Program holder scope guard |
+| `require-api-role.ts` | API role guard |
+| `require-org-admin.ts` | Org admin scope guard |
+| `org-guard.ts` | Org-level access control |
+| `validate-redirect.ts` | Redirect URL validation — security-critical, do not hand-roll |
+| `role-destinations.ts` | Role → dashboard path mapping |
+| `two-factor.ts` | 2FA helpers |
+| `sso-config.ts` | SSO configuration |
+
+Do not duplicate redirect validation, role checks, program enrollment checks, or page protection helpers. Use the existing implementations.
+
+#### `apiRequireAdmin` role coverage
+
+`apiRequireAdmin` allows `['admin', 'super_admin', 'staff']` (fixed in PR #50). If you encounter identity-only checks on admin routes that predate this fix, add an explicit role check:
 
 ```ts
 const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
@@ -313,13 +628,24 @@ if (error) return safeDbError(error, 'DB query failed');
 
 Never return `error.message` directly in a response body. `lib/safe-error.ts` (root) has been deleted — import only from `@/lib/api/safe-error`.
 
-### Auth Redirect Parameter
+### Auth Redirect Parameters
 
-Use `?redirect=<path>` (not `?next=`):
+Both `?redirect=` and `?next=` are active in the codebase. They serve different flows. Do not collapse them into one rule and do not blindly replace one with the other.
+
+| Param | Used by | Purpose |
+|-------|---------|---------|
+| `?redirect=` | Login page (`/login`) | Returns user to their intended page after password auth |
+| `?next=` | OAuth callback (`/auth/callback`), email-confirm flows, password reset | Supabase-driven post-auth destination |
+
+**Login page redirect** (pre-auth page protection):
 
 ```ts
 redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
 ```
+
+**OAuth / email-confirm flows** — `?next=` is read by `app/auth/callback/route.ts`. Do not remove or rename this param in those flows.
+
+**Security rule:** All redirect targets must be validated through `validateRedirect()` from `@/lib/auth/validate-redirect` before use. Do not implement ad hoc allowlists or string-prefix checks inline.
 
 ---
 
@@ -519,7 +845,7 @@ const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
 - ✅ All blue-* → brand-blue-* across app/ and components/
 - ✅ 27+ public pages rewritten with real content
 - ✅ Auth flow: signin/signup redirect to real forms
-- ✅ Dead rate limit files deleted (`lib/rateLimiter.ts`, `lib/api/rate-limiter.ts`)
+- ✅ Dead rate limit files deleted (`lib/rateLimiter.ts`, `lib/api/rate-limiter.ts`) — `lib/rateLimit.ts` still exists, 0 importers, pending deletion
 - ✅ Dead error helper deleted (`lib/safe-error.ts` root duplicate)
 - ✅ 11 routes migrated from dead `lib/rateLimit` to canonical `applyRateLimit`
 - ✅ Checkpoint gating migration written (`20260327000003_checkpoint_gating.sql`)
@@ -564,9 +890,9 @@ Do not tighten without replacing admin remediation and enrollment-management beh
 
 ## Remaining Technical Debt
 
-- ~1,521 `console.log` calls — use `import { logger } from '@/lib/logger'`
-- 78 files import from deprecated Supabase shims — migrate to `lib/supabase/*` gradually
-- `lib/rateLimit.ts` still exists (`@deprecated`, 0 active importers) — delete when confirmed
+- ~1,585 `console.log` calls across 129 files (2026-03-22) — use `import { logger } from '@/lib/logger'`
+- 79 files import from deprecated Supabase shims — migrate to `lib/supabase/*` gradually
+- `lib/rateLimit.ts` still exists on disk (`@deprecated`, 0 active importers) — safe to delete; do not import
 - `lib/curriculum/blueprints/prs.ts` may be superseded by `prs-indiana.ts` — verify
 - `app/api/auth/login/route.ts` — deprecated duplicate of `/api/auth/signin`
 - 8 certificate-related tables have no migration source — verify in Supabase Dashboard
@@ -622,6 +948,28 @@ Design tokens: `lib/page-design-tokens.ts`
 
 All hero videos use `useHeroVideo` hook. No `muted`/`autoPlay` attributes on `<video>` elements.
 The hook attempts unmuted play and falls back silently. No mute button shown.
+
+---
+
+## Agent Operating Rules
+
+These rules apply to every agent working in this codebase. They exist because the most common failure mode is writing elegant-looking code that follows the wrong abstraction.
+
+1. **Prefer existing helpers over new abstractions.** Before writing a new auth helper, rate limiter, error handler, or redirect validator, check whether one already exists. This codebase has ~5,700 TypeScript files. The helper you need almost certainly exists.
+
+2. **Match auth helper to execution context.** Page components use `@/lib/auth`. API routes use `@/lib/authGuards`. Using the wrong one produces either a broken redirect or a returned response object where a thrown redirect was expected.
+
+3. **Match Supabase client to privilege level.** `createClient` for user-scoped operations. `createAdminClient` only when RLS bypass is explicitly required and documented inline. Never use admin client as a convenience fallback.
+
+4. **Never improvise redirect handling.** Both `?redirect=` and `?next=` are active. Both serve distinct flows. Use `validateRedirect()` from `@/lib/auth/validate-redirect` for any user-supplied destination. Do not implement inline allowlists.
+
+5. **Do not trust stale counts.** Repo metrics in this file have a last-verified date. Re-run the provided commands before making scale-dependent decisions.
+
+6. **Do not describe migrations or cleanup as complete unless the repo state reflects it.** A migration file existing in `supabase/migrations/` does not mean it is applied. A file with zero importers does not mean it is deleted. Verify before asserting.
+
+7. **When a wrapper and a primary module disagree, document and use the primary module.** `@/lib/admin/guards` is a wrapper. `@/lib/authGuards` is the source. `@/lib/supabase` barrel is unused. The specific sub-modules are the source. Follow the real import graph, not the aspirational one.
+
+8. **When code and this document disagree, inspect the implementation and update this file.** This document is only useful if it reflects reality. If you find a discrepancy, fix the doc as part of your change.
 
 ---
 

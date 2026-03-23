@@ -33,6 +33,7 @@ import { lessonUuidToSimulationKey } from '@/lib/lms/hvac-simulations';
 import { HVAC_QUICK_CHECKS } from '@/lib/courses/hvac-quick-checks';
 import { ExplainSimply } from '@/components/lms/ai/ExplainSimply';
 import { TranslateToggle } from '@/components/lms/ai/TranslateToggle';
+import TrainingLessonFlow from '@/components/lms/TrainingLessonFlow';
 
 const LessonVideoWithSimulation = dynamic(
   () => import('@/components/lms/LessonVideoWithSimulation'),
@@ -61,12 +62,14 @@ export default function LessonPage() {
   // Prevents advancing past a failed checkpoint into the next module.
   const [checkpointBlocked, setCheckpointBlocked] = useState(false);
   const [passedCheckpointIds, setPassedCheckpointIds] = useState<Set<string>>(new Set());
+  // Training flow: whether the learner has passed the lesson quiz in any prior attempt
+  const [quizPassed, setQuizPassed] = useState(false);
   const lessonStartTime = React.useRef(Date.now());
 
   useEffect(() => {
     lessonStartTime.current = Date.now();
     fetchLessonData();
-  }, [lessonId]);
+  }, [lessonId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchLessonData = async () => {
     const { createClient } = await import('@/lib/supabase/client');
@@ -136,18 +139,28 @@ export default function LessonPage() {
           quizPassingScore = quizPassingScore || HVAC_QUIZ_MAP[defId].passingScore;
         }
       }
-      // Enrich placeholder content with generated rich HTML
-      let enrichedContent = lessonData.content;
-      if (isPlaceholderContent(lessonData.content)) {
+      // Normalize content: treat {}, non-string, and placeholder values as null.
+      // For HVAC lessons only, fall back to the static content builder when the
+      // DB row has placeholder content. This fallback is temporary — it will be
+      // removed once all HVAC course_lessons rows have verified HTML content.
+      let enrichedContent: string | null = null;
+      const rawContent = lessonData.content;
+
+      if (typeof rawContent === 'string' && !isPlaceholderContent(rawContent)) {
+        // Valid HTML string from DB — use directly
+        enrichedContent = rawContent;
+      } else {
+        // Placeholder or missing — attempt HVAC static fallback if applicable
         const defId = Object.entries(HVAC_LESSON_UUID).find(([, uuid]) => uuid === lessonData.id)?.[0];
         if (defId) {
           enrichedContent = buildLessonContent(defId);
         }
+        // For non-HVAC programs: enrichedContent stays null → renderer shows unavailable state
       }
 
       setLesson({
         ...lessonData,
-        content: enrichedContent || lessonData.content,
+        content: enrichedContent,
         quiz_questions: quizQuestions || lessonData.quiz_questions,
         passing_score: quizPassingScore || lessonData.passing_score,
         quiz_id: lessonData.quiz_id || (quizQuestions?.length ? lessonData.id : null),
@@ -167,6 +180,22 @@ export default function LessonPage() {
         totalLessons: lessonsData?.length || 0,
         completedLessons: completedCount,
       });
+    }
+
+    // Restore quiz-passed state for training-flow lessons (activity_type != 'standard')
+    // so a learner who already passed doesn't have to re-take the quiz on revisit.
+    if (lessonData?.activity_type && lessonData.activity_type !== 'standard') {
+      try {
+        const attemptRes = await fetch(
+          `/api/lms/lesson-attempt?lessonId=${lessonId}&courseId=${courseId}`
+        );
+        if (attemptRes.ok) {
+          const attemptData = await attemptRes.json();
+          if (attemptData.hasPassed) setQuizPassed(true);
+        }
+      } catch {
+        // Non-fatal — quiz will start fresh
+      }
     }
 
     // 3. Fetch user progress in background
@@ -783,6 +812,27 @@ export default function LessonPage() {
               </div>
             )}
           </div>
+        ) : lesson.activity_type && lesson.activity_type !== 'standard' ? (
+          /* Training flow — video → content → key terms → scenario → quiz → lock/unlock */
+          /* Activates for any lesson with activity_type set (video_demo, scenario, checklist) */
+          <TrainingLessonFlow
+            lessonId={lessonId}
+            courseId={courseId}
+            title={lesson.title}
+            content={lesson.content}
+            videoUrl={lesson.video_url}
+            scenarioPrompt={lesson.scenario_prompt}
+            keyTerms={lesson.key_terms}
+            quizQuestions={lesson.quiz_questions}
+            passingScore={lesson.passing_score || 70}
+            alreadyPassed={quizPassed || isCompleted}
+            onQuizPass={(score, answers) => {
+              // Mark the lesson complete via the existing completion API,
+              // then auto-advance to the next lesson.
+              setQuizPassed(true);
+              markComplete();
+            }}
+          />
         ) : (
           /* Reading / text / video-without-file lesson — show rich content */
           <div className="bg-white py-8">
@@ -801,12 +851,15 @@ export default function LessonPage() {
                     </div>
                   </>
                 ) : (
-                  <div>
-                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-4">
-                      <BookOpen className="w-4 h-4" />
-                      <span>Lesson {currentIndex + 1} of {lessons.length}</span>
+                  <div className="rounded-lg border border-amber-200 bg-amber-50 p-6">
+                    <div className="flex items-center gap-2 text-amber-700 mb-2">
+                      <BookOpen className="w-5 h-5 flex-shrink-0" />
+                      <span className="font-medium">Lesson content not yet published</span>
                     </div>
-                    <p className="text-slate-600">{lesson.description || 'No content available for this lesson.'}</p>
+                    <p className="text-amber-600 text-sm">
+                      This lesson is part of the course structure but its content has not been
+                      published yet. Check back soon or contact your instructor.
+                    </p>
                   </div>
                 )}
               </div>
@@ -982,19 +1035,32 @@ export default function LessonPage() {
               <ChevronLeft className="w-5 h-5" />
               <span className="hidden sm:inline">Previous Lesson</span>
             </button>
-            <button
-              onClick={goToNext}
-              disabled={!hasNext}
-              aria-label="Next Lesson"
-              className={`flex items-center gap-2 px-3 sm:px-6 py-3 rounded-lg text-sm sm:text-base font-semibold transition ${
-                hasNext
-                  ? 'bg-brand-blue-600 hover:bg-brand-blue-700 text-white'
-                  : 'bg-white text-slate-400 cursor-not-allowed'
-              }`}
-            >
-              <span className="hidden sm:inline">Next Lesson</span>
-              <ChevronRight className="w-5 h-5" />
-            </button>
+            {/* Training-flow lessons: Next is locked until quiz is passed */}
+            {lesson?.activity_type && lesson.activity_type !== 'standard' && !quizPassed && !isCompleted ? (
+              <button
+                disabled
+                aria-label="Next Lesson locked — pass the quiz first"
+                title="Pass the quick check to unlock the next lesson"
+                className="flex items-center gap-2 px-3 sm:px-6 py-3 rounded-lg text-sm sm:text-base font-semibold bg-slate-100 text-slate-400 cursor-not-allowed"
+              >
+                <span className="hidden sm:inline">Pass quiz to continue</span>
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            ) : (
+              <button
+                onClick={goToNext}
+                disabled={!hasNext}
+                aria-label="Next Lesson"
+                className={`flex items-center gap-2 px-3 sm:px-6 py-3 rounded-lg text-sm sm:text-base font-semibold transition ${
+                  hasNext
+                    ? 'bg-brand-blue-600 hover:bg-brand-blue-700 text-white'
+                    : 'bg-white text-slate-400 cursor-not-allowed'
+                }`}
+              >
+                <span className="hidden sm:inline">Next Lesson</span>
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            )}
           </div>
 
           {/* Digital Binder */}

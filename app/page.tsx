@@ -7,6 +7,7 @@ import type { Metadata } from 'next';
 import MarqueeBanner from '@/components/MarqueeBanner';
 import TrustStrip from '@/components/TrustStrip';
 import { BlurIn } from '@/components/animations/PremiumAnimations';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 
 
 export const metadata: Metadata = {
@@ -30,8 +31,7 @@ export default function HomePage() {
       {/* ── HERO — BARBER VIDEO ── */}
       <section className="grid lg:grid-cols-2">
         <div className="relative h-72 sm:h-96 lg:h-auto min-h-[520px] overflow-hidden bg-slate-900">
-          <video src="/videos/barber-hero.mp4"
-            autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" />
+          <CanonicalVideo src="/videos/barber-hero.mp4" poster="/images/barber-hero.jpg" className="absolute inset-0 w-full h-full object-cover" />
         </div>
         <div className="bg-slate-900 flex items-center">
           <div className="px-8 py-12 lg:px-14 lg:py-16 max-w-xl w-full">
@@ -96,8 +96,7 @@ export default function HomePage() {
       {/* ── CDL FULL-BLEED VIDEO — second hero ── */}
       <section className="border-t border-slate-200">
         <div className="relative w-full overflow-hidden bg-slate-900" style={{ height: 'clamp(320px, 42vw, 580px)' }}>
-          <video src="/videos/cdl-hero.mp4"
-            autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" />
+          <CanonicalVideo src="/videos/cdl-hero.mp4" poster="/images/hero-banner.jpg" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute bottom-4 left-4">
             <span className="bg-slate-900/80 text-white text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded backdrop-blur-sm">CDL Training</span>
           </div>
@@ -154,8 +153,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="relative h-72 sm:h-96 lg:h-auto min-h-[460px] overflow-hidden bg-slate-900 order-1 lg:order-2">
-          <video src="/videos/electrician-trades.mp4"
-            autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" />
+          <CanonicalVideo src="/videos/electrician-trades.mp4" poster="/images/hero-banner.jpg" className="absolute inset-0 w-full h-full object-cover" />
         </div>
       </section>
 
@@ -185,8 +183,7 @@ export default function HomePage() {
       {/* ── BARBERING — video left, copy right ── */}
       <section className="grid lg:grid-cols-2 border-t border-slate-200">
         <div className="relative h-72 sm:h-96 lg:h-auto min-h-[460px] overflow-hidden bg-slate-900">
-          <video src="/videos/barber-training.mp4"
-            autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" />
+          <CanonicalVideo src="/videos/barber-training.mp4" poster="/images/barber-hero.jpg" className="absolute inset-0 w-full h-full object-cover" />
         </div>
         <div className="bg-white flex items-center">
           <div className="px-8 py-12 lg:px-14 lg:py-16 max-w-xl w-full">

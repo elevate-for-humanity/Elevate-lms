@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
-import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -41,8 +40,9 @@ async function _POST(req: Request) {
       );
     }
 
-    const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+    // This route accepts unauthenticated partner submissions — no user session exists.
+    // createAdminClient is required to write to mou_signatures without RLS.
+    const db = createAdminClient();
 
     // Insert into mou_signatures table
     const { error } = await db.from('mou_signatures').insert({

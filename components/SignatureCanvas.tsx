@@ -37,6 +37,23 @@ export function SignatureCanvas({
     ctx.lineJoin = 'round';
   }, []);
 
+  // Scale a client-space coordinate to canvas backing-buffer space.
+  // Required because the canvas element is stretched via CSS (width:100%) while
+  // the backing buffer retains its fixed pixel dimensions (width/height attrs).
+  const toCanvasCoords = (
+    canvas: HTMLCanvasElement,
+    clientX: number,
+    clientY: number
+  ): { x: number; y: number } => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY,
+    };
+  };
+
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -47,9 +64,9 @@ export function SignatureCanvas({
     setIsDrawing(true);
     setIsEmpty(false);
 
-    const rect = canvas.getBoundingClientRect();
-    const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-    const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const { x, y } = toCanvasCoords(canvas, clientX, clientY);
 
     ctx.beginPath();
     ctx.moveTo(x, y);
@@ -64,9 +81,9 @@ export function SignatureCanvas({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-    const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const { x, y } = toCanvasCoords(canvas, clientX, clientY);
 
     ctx.lineTo(x, y);
     ctx.stroke();

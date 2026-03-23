@@ -47,7 +47,7 @@ export default function StepSubmissionForm({ lessonId, courseId, stepType, lesso
     async function loadPrior() {
       try {
         const res = await fetch(
-          `/api/lms/submissions?course_id=${courseId}&lesson_id=${lessonId}`
+          `/api/lms/submissions?course_id=${courseId}&course_lesson_id=${lessonId}`
         );
         if (res.ok) {
           const { submissions } = await res.json();
@@ -70,10 +70,10 @@ export default function StepSubmissionForm({ lessonId, courseId, stepType, lesso
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        lesson_id:       lessonId,
-        course_id:       courseId,
-        step_type:       stepType,
-        submission_text: text.trim(),
+        course_lesson_id: lessonId,
+        course_id:        courseId,
+        step_type:        stepType,
+        submission_text:  text.trim(),
       }),
     });
 

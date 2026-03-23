@@ -16,18 +16,39 @@ import {
   BookOpen,
   Download,
   ClipboardList,
-CheckCircle, } from 'lucide-react';
+  CheckCircle,
+  Award,
+  GraduationCap,
+} from 'lucide-react';
 import { QuizSystem } from '@/components/lms/QuizSystem';
 import QuizPlayer from '@/components/lms/QuizPlayer';
 import LessonPlayer from '@/components/lms/LessonPlayer';
 import StepSubmissionForm from '@/components/lms/StepSubmissionForm';
 import InteractiveVideoPlayer from '@/components/lms/InteractiveVideoPlayer';
+import HvacLessonVideo from '@/components/lms/HvacLessonVideo';
 import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 import { NoteTaking } from '@/components/NoteTaking';
 import DigitalBinder from '@/components/DigitalBinder';
 import { HVAC_QUIZ_MAP } from '@/lib/courses/hvac-quiz-map';
 import { HVAC_LESSON_UUID } from '@/lib/courses/hvac-uuids';
+
+// Reverse map: UUID → definition key (e.g. '2f172cb2-...' → 'hvac-01-01').
+// Built once at module load to avoid O(n) scan on every lesson render.
+const HVAC_UUID_TO_DEF: Record<string, string> = Object.fromEntries(
+  Object.entries(HVAC_LESSON_UUID).map(([defId, uuid]) => [uuid, defId])
+);
+
+// Slug-based fallback: 'hvac-lesson-1' → 'hvac-01-01' (lesson order within module).
+// curriculum_lessons slugs follow the pattern hvac-lesson-N (1-indexed, sequential).
+function hvacDefIdFromSlug(slug: string): string | undefined {
+  const match = slug.match(/^hvac-lesson-(\d+)$/);
+  if (!match) return undefined;
+  const n = parseInt(match[1], 10); // 1-based absolute lesson index
+  const defKeys = Object.keys(HVAC_LESSON_UUID);
+  return defKeys[n - 1]; // defKeys are ordered hvac-01-01, hvac-01-02, ...
+}
 import { buildLessonContent, isPlaceholderContent } from '@/lib/courses/hvac-content-builder';
+import { HVAC_COURSE_ID } from '@/lib/courses/hvac-uuids';
 import dynamic from 'next/dynamic';
 import { lessonUuidToSimulationKey } from '@/lib/lms/hvac-simulations';
 import { HVAC_QUICK_CHECKS } from '@/lib/courses/hvac-quick-checks';
@@ -44,6 +65,8 @@ export default function LessonPage() {
   const router = useRouter();
   const courseId = params.courseId as string;
   const lessonId = params.lessonId as string;
+
+  const isHvacCourse = courseId === HVAC_COURSE_ID;
 
   const [lesson, setLesson] = useState<any>(null);
   const [lessons, setLessons] = useState<any[]>([]);
@@ -129,8 +152,11 @@ export default function LessonPage() {
       let quizQuestions = lessonData.quiz_questions;
       let quizPassingScore = lessonData.passing_score;
       if (lessonData.content_type === 'quiz' && (!quizQuestions || quizQuestions.length === 0)) {
-        // Reverse-lookup: UUID → definition ID → quiz config
-        const defId = Object.entries(HVAC_LESSON_UUID).find(([, uuid]) => uuid === lessonData.id)?.[0];
+        // Fast O(1) reverse-lookup: UUID → definition ID → quiz config.
+        // Falls back to slug-based lookup for curriculum_lessons rows.
+        const defId =
+          HVAC_UUID_TO_DEF[lessonData.id] ??
+          (lessonData.slug ? hvacDefIdFromSlug(lessonData.slug) : undefined);
         if (defId && HVAC_QUIZ_MAP[defId]) {
           quizQuestions = HVAC_QUIZ_MAP[defId].questions;
           quizPassingScore = quizPassingScore || HVAC_QUIZ_MAP[defId].passingScore;
@@ -139,7 +165,9 @@ export default function LessonPage() {
       // Enrich placeholder content with generated rich HTML
       let enrichedContent = lessonData.content;
       if (isPlaceholderContent(lessonData.content)) {
-        const defId = Object.entries(HVAC_LESSON_UUID).find(([, uuid]) => uuid === lessonData.id)?.[0];
+        const defId =
+          HVAC_UUID_TO_DEF[lessonData.id] ??
+          (lessonData.slug ? hvacDefIdFromSlug(lessonData.slug) : undefined);
         if (defId) {
           enrichedContent = buildLessonContent(defId);
         }
@@ -217,8 +245,8 @@ export default function LessonPage() {
 
     // 5. Determine if the current lesson is blocked by an unpassed checkpoint.
     // A lesson is blocked when it is in module N and the checkpoint for module N-1
-    // has not been passed. Only applies to curriculum_lessons (lesson_source = 'curriculum').
-    if (lessonData && lessonsData && lessonData.lesson_source === 'curriculum' && lessonData.module_order > 1) {
+    // has not been passed. Applies to all DB-driven lessons (lesson_source = 'canonical').
+    if (lessonData && lessonsData && lessonData.lesson_source === 'canonical' && lessonData.module_order > 1) {
       const prevModuleOrder = lessonData.module_order - 1;
       const prevCheckpoint = lessonsData.find(
         (l: any) => l.module_order === prevModuleOrder && l.step_type === 'checkpoint'
@@ -650,6 +678,116 @@ export default function LessonPage() {
               />
             </div>
           </div>
+        ) : lesson.step_type === 'exam' ? (
+          <div className="max-w-4xl mx-auto p-4 md:p-8">
+            {lesson.partner_exam_code ? (
+              /* ── Certiport / external proctored exam ── */
+              <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-8">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                    <Award className="w-6 h-6 text-indigo-600" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-wide text-indigo-600 mb-0.5">
+                      Certiport Proctored Exam — {lesson.partner_exam_code}
+                    </div>
+                    <h2 className="text-xl font-bold text-slate-900">{lesson.title}</h2>
+                  </div>
+                </div>
+                {lesson.content && (
+                  <div className="prose max-w-none mb-6"
+                    dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }} />
+                )}
+                <div className="bg-white rounded-lg border border-indigo-100 p-5 mb-6 space-y-2 text-sm text-slate-700">
+                  <p className="font-semibold text-slate-900">Before you begin:</p>
+                  <ul className="list-disc list-inside space-y-1 text-slate-600">
+                    <li>This exam is delivered through Certiport&apos;s Compass testing software.</li>
+                    <li>You will need your Certiport account credentials.</li>
+                    <li>A voucher will be issued to your registered email before exam day.</li>
+                    <li>Passing score: {lesson.passing_score ?? 70}%</li>
+                  </ul>
+                </div>
+                <Link
+                  href={`/certiport-exam?exam=${encodeURIComponent(lesson.partner_exam_code)}&courseId=${courseId}&lessonId=${lessonId}&returnUrl=${encodeURIComponent(`/lms/courses/${courseId}/lessons/${lessonId}`)}`}
+                  className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors"
+                >
+                  <Award className="w-4 h-4" />
+                  Schedule My Certiport Exam
+                </Link>
+              </div>
+            ) : lesson.quiz_questions?.length > 0 ? (
+              /* ── Internal quiz-based exam ── */
+              <QuizPlayer
+                questions={lesson.quiz_questions}
+                title={lesson.title}
+                onComplete={async (score, answers) => {
+                  const passingScore = lesson.passing_score || 70;
+                  const passed = score >= passingScore;
+                  try {
+                    await fetch(`/api/lessons/${lessonId}/checkpoint`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ courseId, moduleOrder: lesson.module_order ?? 0, score, passed }),
+                    });
+                  } catch { /* non-blocking */ }
+                  if (passed) await markComplete(true);
+                }}
+                passingScore={lesson.passing_score || 70}
+              />
+            ) : (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                    <Award className="w-5 h-5 text-red-600" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-wide text-red-600">Final Exam</div>
+                    <h2 className="text-xl font-bold text-slate-900">{lesson.title}</h2>
+                  </div>
+                </div>
+                {lesson.content && (
+                  <div className="prose max-w-none mb-6"
+                    dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }} />
+                )}
+                <p className="text-slate-500 text-sm">Exam questions are not yet available. Contact your instructor.</p>
+              </div>
+            )}
+          </div>
+        ) : lesson.step_type === 'certification' ? (
+          <div className="max-w-4xl mx-auto p-4 md:p-8">
+            <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-8 text-center">
+              <div className="w-16 h-16 rounded-full bg-brand-green-100 flex items-center justify-center mx-auto mb-4">
+                <GraduationCap className="w-8 h-8 text-brand-green-600" />
+              </div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-brand-green-600 mb-2">Certification</div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-3">{lesson.title}</h2>
+              {lesson.content && (
+                <div className="prose max-w-none text-left mb-6"
+                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }} />
+              )}
+              {courseCompleted && certificate ? (
+                <div className="space-y-4">
+                  <p className="text-brand-green-700 font-semibold">🎉 You have completed this program!</p>
+                  <Link
+                    href={`/lms/courses/${courseId}/certification`}
+                    className="inline-block bg-brand-green-600 hover:bg-brand-green-700 text-white font-bold px-8 py-3 rounded-lg transition-colors"
+                  >
+                    View Your Certificate
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-slate-600 text-sm">Complete all lessons and pass all checkpoints to unlock your certificate.</p>
+                  <button
+                    onClick={() => markComplete(true)}
+                    className="bg-brand-green-600 hover:bg-brand-green-700 text-white font-bold px-8 py-3 rounded-lg transition-colors"
+                  >
+                    Mark Complete &amp; Claim Certificate
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         ) : lesson.content_type === 'scorm' && lesson.scorm_package_id ? (
           <div className="h-[70vh]">
             <iframe
@@ -745,17 +883,37 @@ export default function LessonPage() {
           </div>
         ) : lesson.video_url && !lesson.video_url.includes('/generated/lessons/') ? (
           <div className="max-w-4xl mx-auto p-4 md:p-8">
-            {/* Video/audio lesson with real media file */}
-            <InteractiveVideoPlayer
-              videoUrl={lesson.video_url}
-              title={lesson.title}
-              onComplete={() => {
-                if (!isCompleted) {
-                  setIsCompleted(true);
-                  markComplete();
+            {isHvacCourse ? (
+              /* HVAC: avatar+audio sync player with local MP3/MP4 fallback chain */
+              <HvacLessonVideo
+                lessonDefId={
+                  HVAC_UUID_TO_DEF[lessonId] ??
+                  (lesson.slug ? hvacDefIdFromSlug(lesson.slug) : undefined) ??
+                  lesson.slug
                 }
-              }}
-            />
+                dbVideoUrl={lesson.video_url}
+                brollVideoUrl="/videos/hvac-technician.mp4"
+                lessonTitle={lesson.title}
+                onComplete={() => {
+                  if (!isCompleted) {
+                    setIsCompleted(true);
+                    markComplete();
+                  }
+                }}
+              />
+            ) : (
+              /* Generic video player for all other courses */
+              <InteractiveVideoPlayer
+                videoUrl={lesson.video_url}
+                title={lesson.title}
+                onComplete={() => {
+                  if (!isCompleted) {
+                    setIsCompleted(true);
+                    markComplete();
+                  }
+                }}
+              />
+            )}
             {/* Show lesson content below video */}
             {lesson.content && (
               <div className="mt-6 bg-white rounded-xl p-8 shadow-sm">

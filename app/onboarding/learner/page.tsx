@@ -375,6 +375,29 @@ export default async function LearnerOnboardingPage() {
       </section>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* Resume banner — shown when user has partial progress */}
+        {completedSteps.length > 0 && !allComplete && nextStep && (
+          <div className="mb-8 flex items-start gap-4 rounded-xl border border-brand-blue-200 bg-brand-blue-50 px-5 py-4">
+            <div className="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full bg-brand-blue-100 flex items-center justify-center">
+              <svg className="w-4 h-4 text-brand-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-brand-blue-900">Welcome back, {studentName}</p>
+              <p className="text-sm text-brand-blue-700 mt-0.5">
+                You completed {completedSteps.length} of {ONBOARDING_STEPS.length} steps. Pick up where you left off.
+              </p>
+            </div>
+            <a
+              href={nextStep.href}
+              className="flex-shrink-0 rounded-lg bg-brand-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-700"
+            >
+              Continue →
+            </a>
+          </div>
+        )}
+
         {/* Enrollment approved — student can access courses */}
         {profile?.enrollment_status === 'active' && (
           <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 mb-10 flex flex-col sm:flex-row items-center gap-6">

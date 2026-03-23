@@ -180,6 +180,26 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     // Non-fatal — don't block document upload if activation check fails
   }
 
+  // Mirror documents_uploaded into onboarding_progress after successful upload.
+  // Mark complete only when the user has at least one document on record.
+  try {
+    const { count } = await db
+      .from('user_documents')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id);
+
+    if ((count ?? 0) > 0) {
+      await db.from('onboarding_progress').upsert({
+        user_id: user.id,
+        documents_uploaded: true,
+        documents_uploaded_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id' });
+    }
+  } catch {
+    // Non-fatal — never block document upload
+  }
+
   return NextResponse.json({
     success: true,
     document,

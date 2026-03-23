@@ -67,7 +67,7 @@ export default function SplitMediaBlock({
       ) : (
         /* Clean placeholder — swap with real asset later */
         <div className="absolute inset-0 flex items-center justify-center bg-slate-100">
-          <span className="text-slate-400 text-sm font-medium">Media coming soon</span>
+          <span className="text-slate-400 text-sm font-medium">Media preview unavailable</span>
         </div>
       )}
     </div>

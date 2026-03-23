@@ -242,10 +242,10 @@ export async function getOrgProgress(
     { data: certRows,     error: certErr    },
   ] = await Promise.all([
     db
-      .from('curriculum_lessons')
+      .from('course_lessons')
       .select('id')
       .eq('course_id', courseId)
-      .eq('status', 'published'),
+      .eq('is_published', true),
 
     db
       .from('lesson_progress')

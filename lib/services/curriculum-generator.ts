@@ -1,4 +1,18 @@
 /**
+ * @deprecated LEGACY — do not use for new course generation.
+ *
+ * This generator writes to curriculum_lessons / curriculum_quizzes / curriculum_recaps.
+ * Those tables are NOT read by lms_lessons. Learners cannot see content written here.
+ *
+ * Canonical generation path:
+ *   generateCourseFromBlueprint() → buildCanonicalCourseFromBlueprint()
+ *   → courses / course_modules / course_lessons → lms_lessons → learner
+ *
+ * This file is retained for reference only. Do not import CurriculumGenerator
+ * from active generation routes or admin handlers.
+ */
+
+/**
  * Idempotent curriculum generator.
  *
  * Writes program curriculum into curriculum_lessons, curriculum_quizzes,

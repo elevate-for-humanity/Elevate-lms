@@ -1,29 +1,58 @@
 /**
- * Single integration point for admin-triggered course generation.
+ * generate-course-from-blueprint
  *
- * Bind this wrapper to the repo's real generator that writes to course_lessons
- * (the table lms_lessons view reads from). Do not wire to curriculum_lessons
- * or training_lessons — those are not the learner-facing source.
+ * Canonical bridge between blueprint definitions and the LMS content tables.
  *
- * To bind: replace the throw below with an import of the real generator.
- * Example:
- *   const { CurriculumGenerator } = await import('@/lib/services/curriculum-generator')
- *   const gen = new CurriculumGenerator(args.courseId, null, 'seed_missing')
- *   // ... call gen.upsertModule / gen.upsertLesson per blueprint
- *   return gen.summarize()
+ * Write path: courses → course_modules → course_lessons
+ * Read path:  lms_lessons view → lesson page → learner
+ *
+ * Does NOT write to curriculum_lessons, curriculum_quizzes, curriculum_recaps,
+ * training_lessons, or training_courses.
  */
 
+import { getBlueprintById, getBlueprintByProgramSlug } from './blueprints';
+import {
+  buildCanonicalCourseFromBlueprint,
+  type BuildMode,
+  type BuildCanonicalCourseResult,
+} from './builders/buildCanonicalCourseFromBlueprint';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 export type GenerateCourseArgs = {
-  courseId: string;
+  /** courses.id of an existing course to populate, or omit to create/upsert by slug */
+  courseId?:     string;
+  /** Blueprint ID (e.g. 'bookkeeping-quickbooks-v1') or program slug (e.g. 'bookkeeping') */
   blueprintSlug: string;
-  mode: 'full' | 'missing-only';
+  /** programs.id to link the course to */
+  programId:     string;
+  mode:          'full' | 'missing-only';
 };
 
-export async function generateCourseFromBlueprint(args: GenerateCourseArgs): Promise<unknown> {
-  // Intentional fail-fast — do not remove until bound to the live pipeline.
-  throw new Error(
-    `generateCourseFromBlueprint is not yet wired to the live generator.\n` +
-    `Course: ${args.courseId} | Blueprint: ${args.blueprintSlug} | Mode: ${args.mode}\n` +
-    `Bind this wrapper to the generator that writes to course_lessons.`
-  );
+export type GenerateCourseResult = BuildCanonicalCourseResult;
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
+
+export async function generateCourseFromBlueprint(
+  args: GenerateCourseArgs,
+): Promise<GenerateCourseResult> {
+  // Resolve blueprint — try by ID first, then by program slug
+  const blueprint =
+    getBlueprintById(args.blueprintSlug) ??
+    getBlueprintByProgramSlug(args.blueprintSlug);
+
+  if (!blueprint) {
+    throw new Error(
+      `generateCourseFromBlueprint: no blueprint found for '${args.blueprintSlug}'`,
+    );
+  }
+
+  const buildMode: BuildMode = args.mode === 'full' ? 'replace' : 'missing-only';
+
+  return buildCanonicalCourseFromBlueprint({
+    blueprint,
+    programId:  args.programId,
+    courseSlug: blueprint.programSlug,
+    mode:       buildMode,
+  });
 }

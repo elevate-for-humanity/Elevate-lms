@@ -22,12 +22,12 @@ export const metadata: Metadata = {
 };
 
 const PROGRAMS = [
-  { label: 'Healthcare', title: 'CNA & Medical Assistant', desc: 'Indiana state CNA certification. NHA CCMA. Clinical rotations included. WIOA funded.', img: '/images/pages/card-cna.jpg', href: '/programs/cna', salary: '$30K–$42K', tag: 'Healthcare' },
-  { label: 'Skilled Trades', title: 'HVAC, Welding & Electrical', desc: 'EPA 608, AWS, NCCER credentials. Hands-on lab. Tools provided. Trades pay $45K–$75K.', img: '/images/pages/card-hvac.jpg', href: '/programs?category=trades', salary: '$45K–$75K', tag: 'Trades' },
-  { label: 'Transportation', title: 'CDL Class A', desc: 'Pre-trip, backing, road skills. Indiana freight industry needs drivers now.', img: '/images/pages/card-cdl.jpg', href: '/programs/cdl-training', salary: '$55K–$80K', tag: 'CDL' },
-  { label: 'Barbering', title: 'Barber Apprenticeship', desc: 'DOL Registered Apprenticeship. Earn while you learn. Indiana Barber License on completion.', img: '/images/pages/card-barber.jpg', href: '/programs/barber-apprenticeship', salary: '$35K–$60K', tag: 'Apprenticeship' },
-  { label: 'Business', title: 'Bookkeeping & Business', desc: 'QuickBooks, payroll, financial statements. Launch a business or land a finance role.', img: '/images/pages/card-business.jpg', href: '/programs?category=business', salary: '$38K–$55K', tag: 'Business' },
-  { label: 'Safety', title: 'CPR & First Aid', desc: 'Live instructor. Mannequin shipped to your door. Certified same day. Free with enrollment.', img: '/images/pages/card-cpr.jpg', href: '/programs/cpr-first-aid', salary: 'Required credential', tag: 'Certification' },
+  { label: 'Healthcare', title: 'CNA & Medical Assistant', desc: 'Indiana state CNA certification. NHA CCMA. Clinical rotations included. WIOA funded.', img: '/images/pages/card-cna.jpg', href: '/programs/cna', salary: '$30K–$42K', tag: 'Healthcare', position: 'center top' },
+  { label: 'Skilled Trades', title: 'HVAC, Welding & Electrical', desc: 'EPA 608, AWS, NCCER credentials. Hands-on lab. Tools provided. Trades pay $45K–$75K.', img: '/images/pages/card-hvac.jpg', href: '/programs?category=trades', salary: '$45K–$75K', tag: 'Trades', position: 'center center' },
+  { label: 'Transportation', title: 'CDL Class A', desc: 'Pre-trip, backing, road skills. Indiana freight industry needs drivers now.', img: '/images/pages/card-cdl.jpg', href: '/programs/cdl-training', salary: '$55K–$80K', tag: 'CDL', position: 'center center' },
+  { label: 'Barbering', title: 'Barber Apprenticeship', desc: 'DOL Registered Apprenticeship. Earn while you learn. Indiana Barber License on completion.', img: '/images/pages/card-barber.jpg', href: '/programs/barber-apprenticeship', salary: '$35K–$60K', tag: 'Apprenticeship', position: 'center top' },
+  { label: 'Business', title: 'Bookkeeping & Business', desc: 'QuickBooks, payroll, financial statements. Launch a business or land a finance role.', img: '/images/pages/card-business.jpg', href: '/programs?category=business', salary: '$38K–$55K', tag: 'Business', position: 'center center' },
+  { label: 'Safety', title: 'CPR & First Aid', desc: 'Live instructor. Mannequin shipped to your door. Certified same day. Free with enrollment.', img: '/images/pages/card-cpr.jpg', href: '/programs/cpr-first-aid', salary: 'Required credential', tag: 'Certification', position: 'center center' },
 ];
 
 const FUNDING = [
@@ -139,15 +139,14 @@ export default function HomePage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {PROGRAMS.map((p) => (
               <Link key={p.title} href={p.href} className="group block bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-lg hover:border-brand-red-300 transition-all">
-                {/* Plain img — avoids next/image fill positioning issues in card context */}
-                <div className="relative overflow-hidden" style={{ height: '192px' }}>
+                <div className="relative overflow-hidden" style={{ height: '210px' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={p.img}
                     alt={p.title}
                     loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    style={{ display: 'block' }}
+                    style={{ display: 'block', objectPosition: p.position }}
                   />
                   <div className="absolute top-3 left-3">
                     <span className="bg-slate-900/80 text-white text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded backdrop-blur-sm">{p.tag}</span>

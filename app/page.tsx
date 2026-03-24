@@ -138,25 +138,26 @@ export default function HomePage() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {PROGRAMS.map((p) => (
-              <Link key={p.title} href={p.href} className="group block bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-lg hover:border-brand-red-300 transition-all">
-                <div className="relative overflow-hidden" style={{ aspectRatio: '3/2' }}>
+              <Link key={p.title} href={p.href} className="group flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-lg hover:border-brand-red-300 transition-all">
+                {/* Image — fixed 200px height, never overflows into text */}
+                <div className="relative flex-shrink-0 overflow-hidden" style={{ height: '200px' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={p.img}
                     alt={p.title}
                     loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    style={{ display: 'block' }}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute top-3 left-3">
                     <span className="bg-slate-900/80 text-white text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded backdrop-blur-sm">{p.tag}</span>
                   </div>
                 </div>
-                <div className="p-5">
+                {/* Text — always below image, never clipped */}
+                <div className="flex flex-col flex-1 p-5">
                   <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-1">{p.label}</p>
                   <h3 className="text-slate-900 font-extrabold text-lg mb-2 leading-tight">{p.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed mb-4">{p.desc}</p>
-                  <div className="flex items-center justify-between">
+                  <p className="text-slate-600 text-sm leading-relaxed mb-4 flex-1">{p.desc}</p>
+                  <div className="flex items-center justify-between mt-auto">
                     <span className="text-brand-green-700 font-bold text-xs bg-brand-green-50 px-2.5 py-1 rounded-full">{p.salary}</span>
                     <span className="text-brand-red-600 text-sm font-semibold group-hover:underline">Learn more →</span>
                   </div>

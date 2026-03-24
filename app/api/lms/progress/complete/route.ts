@@ -318,7 +318,7 @@ async function verifyQuizzesPassed(
     const { data: bestAttempt } = await db
       .from('quiz_attempts')
       .select('score, passed')
-      .eq('user_uuid', userId)
+      .eq('user_id', userId)
       .eq('quiz_id', quiz.id)
       .eq('passed', true)
       .order('score', { ascending: false })

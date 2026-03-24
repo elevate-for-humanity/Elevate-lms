@@ -50,9 +50,9 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
   trackVariants: ['type_i', 'type_ii', 'type_iii', 'universal'],
   status: 'active',
 
-  // Generation-rules blueprint — lessons are produced by the generator, not pre-defined.
+  // 11 modules, 60 pre-defined lessons (including 11 checkpoints + 1 final exam).
   expectedModuleCount: 11,
-  expectedLessonCount: 0,
+  expectedLessonCount: 60,
 
   generationRules: {
     allowRemediation: true,
@@ -73,6 +73,7 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
       quizRequired: true,
       practicalRequired: false,
       isCritical: true,
+      domainKey: 'hvac_foundations',
       requiredLessonTypes: [
         { lessonType: 'orientation', requiredCount: 1 },
         { lessonType: 'concept',     requiredCount: 1 },
@@ -91,12 +92,20 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
         'Career Paths and EPA 608 Overview',
         'Module Checkpoint Quiz',
       ],
+      lessons: [
+        { slug: 'hvac-foundations-01', title: 'Introduction to HVAC Systems',          order: 1, domainKey: 'hvac_foundations' },
+        { slug: 'hvac-foundations-02', title: 'Heating, Cooling, and Ventilation Basics', order: 2, domainKey: 'hvac_foundations' },
+        { slug: 'hvac-foundations-03', title: 'Common Components and System Types',    order: 3, domainKey: 'hvac_foundations' },
+        { slug: 'hvac-foundations-04', title: 'Career Paths and EPA 608 Overview',     order: 4, domainKey: 'hvac_foundations' },
+        { slug: 'hvac-foundations-checkpoint', title: 'Module 1 Checkpoint Quiz',      order: 5, domainKey: 'hvac_foundations' },
+      ],
     },
 
     {
       slug: 'hvac-safety-tools',
       title: 'Safety, Tools, and Professional Practice',
       orderIndex: 2,
+      domainKey: 'hvac_safety',
       minLessons: 4,
       maxLessons: 6,
       quizRequired: true,
@@ -122,12 +131,21 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
         'Workplace Professionalism and Documentation',
         'Module Checkpoint Quiz',
       ],
+      lessons: [
+        { slug: 'hvac-safety-01', title: 'HVAC Safety Fundamentals',                    order: 1, domainKey: 'hvac_safety' },
+        { slug: 'hvac-safety-02', title: 'PPE, Lockout/Tagout, and Hazard Awareness',   order: 2, domainKey: 'hvac_safety' },
+        { slug: 'hvac-safety-03', title: 'Hand Tools and Power Tools',                  order: 3, domainKey: 'hvac_safety' },
+        { slug: 'hvac-safety-04', title: 'Meters, Gauges, and Diagnostic Instruments',  order: 4, domainKey: 'hvac_safety' },
+        { slug: 'hvac-safety-05', title: 'Workplace Professionalism and Documentation', order: 5, domainKey: 'hvac_safety' },
+        { slug: 'hvac-safety-checkpoint', title: 'Module 2 Checkpoint Quiz',            order: 6, domainKey: 'hvac_safety' },
+      ],
     },
 
     {
       slug: 'hvac-basic-science',
       title: 'Basic Science for HVAC',
       orderIndex: 3,
+      domainKey: 'hvac_science',
       minLessons: 4,
       maxLessons: 6,
       quizRequired: true,
@@ -152,12 +170,21 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
         'Applied Science Scenarios',
         'Module Checkpoint Quiz',
       ],
+      lessons: [
+        { slug: 'hvac-science-01', title: 'Heat, Temperature, and Transfer',            order: 1, domainKey: 'hvac_science' },
+        { slug: 'hvac-science-02', title: 'Pressure and Vacuum Basics',                 order: 2, domainKey: 'hvac_science' },
+        { slug: 'hvac-science-03', title: 'States of Matter and Refrigerant Behavior',  order: 3, domainKey: 'hvac_science' },
+        { slug: 'hvac-science-04', title: 'Measurement Concepts for HVAC',              order: 4, domainKey: 'hvac_science' },
+        { slug: 'hvac-science-05', title: 'Applied Science Scenarios',                  order: 5, domainKey: 'hvac_science' },
+        { slug: 'hvac-science-checkpoint', title: 'Module 3 Checkpoint Quiz',           order: 6, domainKey: 'hvac_science' },
+      ],
     },
 
     {
       slug: 'refrigeration-cycle',
       title: 'Refrigeration Cycle and System Components',
       orderIndex: 4,
+      domainKey: 'refrigeration_cycle',
       minLessons: 5,
       maxLessons: 7,
       quizRequired: true,
@@ -184,12 +211,22 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
         'Reading the Whole System',
         'Module Checkpoint Quiz',
       ],
+      lessons: [
+        { slug: 'refrig-cycle-01', title: 'The Refrigeration Cycle Explained',   order: 1, domainKey: 'refrigeration_cycle' },
+        { slug: 'refrig-cycle-02', title: 'Compressors and Their Function',       order: 2, domainKey: 'refrigeration_cycle' },
+        { slug: 'refrig-cycle-03', title: 'Condensers and Heat Rejection',        order: 3, domainKey: 'refrigeration_cycle' },
+        { slug: 'refrig-cycle-04', title: 'Metering Devices and Flow Control',    order: 4, domainKey: 'refrigeration_cycle' },
+        { slug: 'refrig-cycle-05', title: 'Evaporators and Heat Absorption',      order: 5, domainKey: 'refrigeration_cycle' },
+        { slug: 'refrig-cycle-06', title: 'Reading the Whole System',             order: 6, domainKey: 'refrigeration_cycle' },
+        { slug: 'refrig-cycle-checkpoint', title: 'Module 4 Checkpoint Quiz',     order: 7, domainKey: 'refrigeration_cycle' },
+      ],
     },
 
     {
       slug: 'refrigerant-handling',
       title: 'Refrigerants, Recovery, Recycling, and Charging',
       orderIndex: 5,
+      domainKey: 'refrigerant_handling',
       minLessons: 5,
       maxLessons: 7,
       quizRequired: true,
@@ -218,12 +255,22 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
         'Common Handling Errors',
         'Module Checkpoint Quiz',
       ],
+      lessons: [
+        { slug: 'refrig-handling-01', title: 'Refrigerant Types and Characteristics',       order: 1, domainKey: 'refrigerant_handling' },
+        { slug: 'refrig-handling-02', title: 'Environmental Impact and Regulatory Context', order: 2, domainKey: 'refrigerant_handling' },
+        { slug: 'refrig-handling-03', title: 'Recovery, Recycling, and Reclamation',        order: 3, domainKey: 'refrigerant_handling' },
+        { slug: 'refrig-handling-04', title: 'Cylinder Safety and Refrigerant Handling',    order: 4, domainKey: 'refrigerant_handling' },
+        { slug: 'refrig-handling-05', title: 'Evacuation and Charging Fundamentals',        order: 5, domainKey: 'refrigerant_handling' },
+        { slug: 'refrig-handling-06', title: 'Common Handling Errors',                      order: 6, domainKey: 'refrigerant_handling' },
+        { slug: 'refrig-handling-checkpoint', title: 'Module 5 Checkpoint Quiz',            order: 7, domainKey: 'refrigerant_handling' },
+      ],
     },
 
     {
       slug: 'epa-608-regulations',
       title: 'EPA 608 Regulatory Core',
       orderIndex: 6,
+      domainKey: 'epa608_regulations',
       minLessons: 4,
       maxLessons: 6,
       quizRequired: true,
@@ -248,12 +295,21 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
         'Regulation Review Drill',
         'Module Checkpoint Quiz',
       ],
+      lessons: [
+        { slug: 'epa-regs-01', title: 'EPA 608 Regulatory Framework',          order: 1, domainKey: 'epa608_regulations' },
+        { slug: 'epa-regs-02', title: 'Technician Certification Rules',         order: 2, domainKey: 'epa608_regulations' },
+        { slug: 'epa-regs-03', title: 'Prohibited Practices and Violations',    order: 3, domainKey: 'epa608_regulations' },
+        { slug: 'epa-regs-04', title: 'Recordkeeping and Compliance Basics',    order: 4, domainKey: 'epa608_regulations' },
+        { slug: 'epa-regs-05', title: 'Regulation Review Drill',                order: 5, domainKey: 'epa608_regulations' },
+        { slug: 'epa-regs-checkpoint', title: 'Module 6 Checkpoint Quiz',       order: 6, domainKey: 'epa608_regulations' },
+      ],
     },
 
     {
       slug: 'epa-608-type-1',
       title: 'Type I — Small Appliances',
       orderIndex: 7,
+      domainKey: 'epa608_type1',
       minLessons: 4,
       maxLessons: 6,
       quizRequired: true,
@@ -278,12 +334,20 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
         'Type I Exam Scenarios',
         'Type I Quiz',
       ],
+      lessons: [
+        { slug: 'type1-01', title: 'What Counts as Type I Equipment',    order: 1, domainKey: 'epa608_type1' },
+        { slug: 'type1-02', title: 'Type I Recovery Requirements',       order: 2, domainKey: 'epa608_type1' },
+        { slug: 'type1-03', title: 'Servicing Small Appliances Safely',  order: 3, domainKey: 'epa608_type1' },
+        { slug: 'type1-04', title: 'Type I Exam Scenarios',              order: 4, domainKey: 'epa608_type1' },
+        { slug: 'type1-checkpoint', title: 'Module 7 Checkpoint Quiz',   order: 5, domainKey: 'epa608_type1' },
+      ],
     },
 
     {
       slug: 'epa-608-type-2',
       title: 'Type II — High-Pressure Appliances',
       orderIndex: 8,
+      domainKey: 'epa608_type2',
       minLessons: 4,
       maxLessons: 6,
       quizRequired: true,
@@ -308,12 +372,20 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
         'Type II Exam Scenarios',
         'Type II Quiz',
       ],
+      lessons: [
+        { slug: 'type2-01', title: 'Understanding Type II Appliances',                  order: 1, domainKey: 'epa608_type2' },
+        { slug: 'type2-02', title: 'Recovery and Leak Repair Requirements',             order: 2, domainKey: 'epa608_type2' },
+        { slug: 'type2-03', title: 'Service Procedures for High-Pressure Systems',      order: 3, domainKey: 'epa608_type2' },
+        { slug: 'type2-04', title: 'Type II Exam Scenarios',                            order: 4, domainKey: 'epa608_type2' },
+        { slug: 'type2-checkpoint', title: 'Module 8 Checkpoint Quiz',                  order: 5, domainKey: 'epa608_type2' },
+      ],
     },
 
     {
       slug: 'epa-608-type-3',
       title: 'Type III — Low-Pressure Appliances',
       orderIndex: 9,
+      domainKey: 'epa608_type3',
       minLessons: 4,
       maxLessons: 6,
       quizRequired: true,
@@ -338,12 +410,20 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
         'Type III Exam Scenarios',
         'Type III Quiz',
       ],
+      lessons: [
+        { slug: 'type3-01', title: 'Understanding Type III Appliances',          order: 1, domainKey: 'epa608_type3' },
+        { slug: 'type3-02', title: 'Low-Pressure System Service Rules',          order: 2, domainKey: 'epa608_type3' },
+        { slug: 'type3-03', title: 'Recovery and Evacuation for Type III',       order: 3, domainKey: 'epa608_type3' },
+        { slug: 'type3-04', title: 'Type III Exam Scenarios',                    order: 4, domainKey: 'epa608_type3' },
+        { slug: 'type3-checkpoint', title: 'Module 9 Checkpoint Quiz',           order: 5, domainKey: 'epa608_type3' },
+      ],
     },
 
     {
       slug: 'epa-608-universal-review',
       title: 'Universal Certification Review',
       orderIndex: 10,
+      domainKey: 'epa608_universal',
       minLessons: 3,
       maxLessons: 5,
       quizRequired: true,
@@ -365,12 +445,19 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
         'Common Mistakes and Trap Questions',
         'Universal Readiness Quiz',
       ],
+      lessons: [
+        { slug: 'universal-01', title: 'Universal Exam Structure and Strategy',  order: 1, domainKey: 'epa608_universal' },
+        { slug: 'universal-02', title: 'Cross-Type Review and Comparison',       order: 2, domainKey: 'epa608_universal' },
+        { slug: 'universal-03', title: 'Common Mistakes and Trap Questions',     order: 3, domainKey: 'epa608_universal' },
+        { slug: 'universal-checkpoint', title: 'Module 10 Checkpoint Quiz',      order: 4, domainKey: 'epa608_universal' },
+      ],
     },
 
     {
       slug: 'final-assessment',
       title: 'Final Assessment and Remediation',
       orderIndex: 11,
+      domainKey: 'epa608_final',
       minLessons: 2,
       maxLessons: 4,
       quizRequired: true,
@@ -389,6 +476,12 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
         'Score Review and Weakness Analysis',
         'Targeted Remediation Lesson',
         'Retake or Mastery Check',
+      ],
+      lessons: [
+        { slug: 'final-practice-exam',    title: 'Final EPA 608 Practice Exam',      order: 1, domainKey: 'epa608_final' },
+        { slug: 'final-score-review',     title: 'Score Review and Weakness Analysis', order: 2, domainKey: 'epa608_final' },
+        { slug: 'final-remediation',      title: 'Targeted Remediation Lesson',       order: 3, domainKey: 'epa608_final' },
+        { slug: 'final-epa608-exam',      title: 'EPA 608 Final Exam',                order: 4, domainKey: 'epa608_final' },
       ],
     },
   ],
@@ -457,5 +550,14 @@ const _actualModuleCount = HVAC_EPA608_BLUEPRINT.modules.length;
 if (_actualModuleCount !== HVAC_EPA608_BLUEPRINT.expectedModuleCount) {
   throw new Error(
     `hvac-epa608 blueprint invalid: expected ${HVAC_EPA608_BLUEPRINT.expectedModuleCount} modules, got ${_actualModuleCount}`
+  );
+}
+
+const _actualLessonCount = HVAC_EPA608_BLUEPRINT.modules.reduce(
+  (sum, m) => sum + (m.lessons?.length ?? 0), 0
+);
+if (_actualLessonCount !== HVAC_EPA608_BLUEPRINT.expectedLessonCount) {
+  throw new Error(
+    `hvac-epa608 blueprint invalid: expected ${HVAC_EPA608_BLUEPRINT.expectedLessonCount} lessons, got ${_actualLessonCount}`
   );
 }

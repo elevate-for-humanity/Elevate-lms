@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import NextImage from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Upload, Image, Video, FileText, Search, Grid, List } from 'lucide-react';
@@ -16,9 +17,11 @@ export default async function MediaLibraryPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect('/login?redirect=/admin/course-builder/media');
-  }
+  if (!user) redirect('/login?redirect=/admin/course-builder/media');
+
+  const db = createAdminClient() || supabase;
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
   return (
     <div className="min-h-screen bg-gray-50">

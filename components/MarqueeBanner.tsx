@@ -1,24 +1,43 @@
 'use client';
 
+/**
+ * MarqueeBanner — continuously scrolling Elevate brand ticker.
+ * Runs indefinitely; does not pause on scroll or hover.
+ */
+
+const ITEMS = [
+  'ELEVATE FOR HUMANITY',
+  'WIOA FUNDED TRAINING',
+  'DOL REGISTERED APPRENTICESHIP',
+  'INDIANA ETPL APPROVED',
+  'CNA CERTIFICATION',
+  'CDL CLASS A',
+  'HVAC · WELDING · ELECTRICAL',
+  'BARBER APPRENTICESHIP',
+  'EARN WHILE YOU LEARN',
+  "APPLY NOW — IT'S FREE",
+  '$0 FOR ELIGIBLE PARTICIPANTS',
+  'INDIANAPOLIS, INDIANA',
+];
+
 export default function MarqueeBanner() {
-  const text = "CAREER TRAINING • WIOA FUNDED • EARN WHILE YOU LEARN • JRI PROGRAMS • APPLY NOW • ";
-  
+  const row = [...ITEMS, ...ITEMS];
+
   return (
-    <div className="bg-slate-900 text-white py-3 overflow-hidden">
-      <div className="animate-marquee whitespace-nowrap flex">
-        {[...Array(4)].map((_, i) => (
-          <span key={i} className="mx-4 text-base sm:text-lg font-black tracking-wider">
-            {text}
+    <div className="bg-slate-900 border-y border-slate-800 py-3.5 overflow-hidden select-none" aria-hidden="true">
+      <div className="flex whitespace-nowrap" style={{ animation: 'elevate-marquee 40s linear infinite' }}>
+        {row.map((item, i) => (
+          <span key={i} className="inline-flex items-center">
+            <span className="text-sm font-black tracking-widest text-white uppercase">{item}</span>
+            <span className="mx-5 text-brand-red-500 font-black">✦</span>
           </span>
         ))}
       </div>
-      <style jsx>{`
-        @keyframes marquee {
-          0% { transform: translateX(0); }
+
+      <style>{`
+        @keyframes elevate-marquee {
+          0%   { transform: translateX(0); }
           100% { transform: translateX(-50%); }
-        }
-        .animate-marquee {
-          animation: marquee 20s linear infinite;
         }
       `}</style>
     </div>

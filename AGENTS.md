@@ -113,15 +113,85 @@ All lessons complete + all checkpoints passed
   → public verification at /verify/[certificateId]
 ```
 
+### Blueprint-Driven Course Engine (canonical path)
+
+Every course is defined by a `CredentialBlueprint` in `lib/curriculum/blueprints/`. The blueprint is the single source of truth for structure, video format, and activity menu. No per-program code is written — the engine reads the blueprint and renders automatically.
+
+**Write path:**
+```
+CredentialBlueprint
+  → buildCanonicalCourseFromBlueprint()
+  → courses + course_modules + course_lessons
+  → lms_lessons view → lesson page → learner
+```
+
+**What gets stored on every `course_lessons` row:**
+- `lesson_type` — inferred from slug suffix (`-checkpoint`, `-lab`, `-exam`, etc.)
+- `activities` JSONB — NHA-style activity menu (video, reading, flashcards, lab, practice, checkpoint)
+- `video_config` JSONB — locked video format from `blueprint.videoConfig`
+
+**Activity menu per step_type (stored in `activities` column):**
+
+| step_type | Activities |
+|-----------|-----------|
+| `lesson` | Video · Reading · Flashcards · Practice |
+| `checkpoint` | Video · Reading · Flashcards · Practice · **Checkpoint Quiz** (gated) |
+| `lab` | Video · Reading · **Hands-On Lab** |
+| `quiz` / `exam` | Video · Flashcards · Practice · **Quiz** |
+
+**Lesson page activity routing:**
+- URL param `?activity=video|reading|flashcards|lab|practice|checkpoint` switches the active tab
+- `CourseModuleAccordion` links each activity directly: `/lms/courses/[id]/lessons/[id]?activity=video`
+- Checkpoint tab is always last and gated until prior required activities are done
+
 ### Adding a New Program
 
-1. Create `lib/curriculum/blueprints/[program].ts` following `prs-indiana.ts`
-2. Register it in `lib/curriculum/blueprints/index.ts`
-3. Run the curriculum generator (`lib/services/curriculum-generator.ts`)
-4. Generator seeds `modules` and `curriculum_lessons` rows idempotently
-5. Set `step_type = 'checkpoint'` on module-boundary lessons in the DB
-6. Store `quiz_questions` as JSONB in `curriculum_lessons` rows
+1. Create `lib/curriculum/blueprints/[program].ts` — copy `hvac-epa-608.ts` as template
+2. Define all modules with `lessons[]` arrays (slugs are the durable identity)
+3. Add `videoConfig` to lock the video format for all lessons in this program
+4. Register in `lib/curriculum/blueprints/index.ts`
+5. Run the seeder: `pnpm tsx scripts/seed-course-from-blueprint.ts --blueprint <id> --program <programId>`
+6. Seeder writes `courses` → `course_modules` → `course_lessons` with activities + video_config
 7. LMS renders the course automatically — no new code required
+
+**Seeder flags:**
+```bash
+# Safe re-run (skips existing lessons)
+pnpm tsx scripts/seed-course-from-blueprint.ts --blueprint hvac-epa608-v1 --program 4226f7f6-fbc1-44b5-83e8-b12ea149e4c7
+
+# Full rebuild (wipes and re-seeds)
+pnpm tsx scripts/seed-course-from-blueprint.ts --blueprint hvac-epa608-v1 --program 4226f7f6-fbc1-44b5-83e8-b12ea149e4c7 --mode replace
+
+# Dry run (prints what would be written)
+pnpm tsx scripts/seed-course-from-blueprint.ts --blueprint hvac-epa608-v1 --program 4226f7f6-fbc1-44b5-83e8-b12ea149e4c7 --dry-run
+
+# List all registered blueprints
+pnpm tsx scripts/seed-course-from-blueprint.ts --list
+```
+
+### Course Landing Page — NHA Style
+
+`app/lms/(app)/courses/[courseId]/page.tsx` renders:
+- Hero image with course title and credential badge
+- Stats strip (lessons, duration, checkpoints, certificate)
+- **Module accordion** (`components/lms/CourseModuleAccordion.tsx`) — each module expands to show lessons
+- Each lesson row expands to show its **activity menu** (NHA-style: Video, Reading, Flashcards, Lab, Practice, Checkpoint)
+- Sidebar: progress card, course details, "Each Lesson Includes" list, credential
+
+### Lesson Page — Activity Tabs
+
+`app/lms/(app)/courses/[courseId]/lessons/[lessonId]/page.tsx` renders:
+- Tab bar driven by `lesson.activities` JSONB (falls back to defaults by step_type)
+- `?activity=` URL param sets the active tab — links from the accordion go directly to the right tab
+- Each tab renders the appropriate component:
+  - `video` → `HvacLessonVideo` (HVAC) or `InteractiveVideoPlayer` (other)
+  - `reading` → sanitized HTML content + AI reading aids
+  - `flashcards` → `SpacedRepetitionReview`
+  - `lab` → `StepSubmissionForm`
+  - `practice` → `QuizPlayer` (HVAC_QUICK_CHECKS or lesson.quiz_questions, passing 60%)
+  - `checkpoint` → `QuizPlayer` (lesson.quiz_questions, passing_score from DB)
+  - `notes` → `NoteTaking`
+  - `resources` → downloadable resource list
 
 ### HVAC Legacy Path — Do Not Replicate
 

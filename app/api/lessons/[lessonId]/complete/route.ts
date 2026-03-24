@@ -177,7 +177,7 @@ async function _POST(
       const { data: passingAttempt } = await db
         .from('quiz_attempts')
         .select('id')
-        .eq('user_uuid', user.id)
+        .eq('user_id', user.id)
         .eq('quiz_id', lessonId)
         .eq('passed', true)
         .limit(1)

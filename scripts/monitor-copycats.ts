@@ -19,7 +19,7 @@ interface SearchResult {
   reason?: string;
 }
 
-interface MonitoringReport {
+export interface MonitoringReport {
   timestamp: string;
   searchTerms: string[];
   results: SearchResult[];
@@ -120,30 +120,126 @@ function generateReport(results: SearchResult[]): MonitoringReport {
 }
 
 /**
- * Send alert if suspicious sites found
+ * Post a Slack alert via incoming webhook.
+ * No-ops if SLACK_WEBHOOK_URL is not set.
  */
-async function sendAlert(report: MonitoringReport): Promise<void> {
+export async function slackAlert(report: MonitoringReport): Promise<void> {
+  const webhookUrl = process.env.SLACK_WEBHOOK_URL;
+  if (!webhookUrl) return;
+
+  const lines = report.results
+    .filter(r => r.suspicious)
+    .map(r => `• <${r.url}|${r.title || r.url}> — ${r.reason ?? 'suspicious match'}`);
+
+  const payload = {
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `🚨 *Copyright Alert* — ${report.suspiciousCount} potential infringement(s) detected`,
+        },
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: lines.join('\n'),
+        },
+      },
+      {
+        type: 'context',
+        elements: [
+          {
+            type: 'mrkdwn',
+            text: `Detected at ${report.timestamp}`,
+          },
+        ],
+      },
+    ],
+  };
+
+  await fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  }).catch(err => console.error('[monitor-copycats] Slack notification failed:', err));
+}
+
+/**
+ * Send an email alert via SendGrid.
+ * No-ops if SENDGRID_API_KEY or ALERT_EMAIL_TO is not set.
+ */
+export async function emailAlert(report: MonitoringReport): Promise<void> {
+  const apiKey = process.env.SENDGRID_API_KEY;
+  const to = process.env.ALERT_EMAIL_TO ?? 'legal@elevateforhumanity.org';
+  if (!apiKey) return;
+
+  const rows = report.results
+    .filter(r => r.suspicious)
+    .map(
+      r =>
+        `<tr><td style="padding:4px 8px"><a href="${r.url}">${r.url}</a></td>` +
+        `<td style="padding:4px 8px">${r.reason ?? ''}</td></tr>`,
+    )
+    .join('');
+
+  const html = `
+    <h2>Copyright Alert — ${report.suspiciousCount} potential infringement(s)</h2>
+    <p>Detected at ${report.timestamp}</p>
+    <table border="1" cellspacing="0" cellpadding="0" style="border-collapse:collapse">
+      <thead>
+        <tr>
+          <th style="padding:4px 8px">URL</th>
+          <th style="padding:4px 8px">Reason</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <p>
+      Next steps:<br>
+      1. Screenshot each site<br>
+      2. Save page source<br>
+      3. File DMCA takedown (see docs/COPYRIGHT-PROTECTION.md)
+    </p>
+  `;
+
+  await fetch('https://api.sendgrid.com/v3/mail/send', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      personalizations: [{ to: [{ email: to }] }],
+      from: { email: 'noreply@elevateforhumanity.org', name: 'Elevate Copyright Monitor' },
+      subject: `Copyright Alert: ${report.suspiciousCount} potential infringement(s)`,
+      content: [{ type: 'text/html', value: html }],
+    }),
+  }).catch(err => console.error('[monitor-copycats] Email notification failed:', err));
+}
+
+/**
+ * Send alert if suspicious sites found.
+ * Notifies via Slack and email when env vars are configured.
+ */
+export async function sendAlert(report: MonitoringReport): Promise<void> {
   if (report.suspiciousCount === 0) {
     console.log('✅ No suspicious sites found');
     return;
   }
-  
+
   console.log(`⚠️  Found ${report.suspiciousCount} suspicious site(s)!`);
   console.log('\nSuspicious URLs:');
-  
+
   report.results
     .filter(r => r.suspicious)
     .forEach(r => {
       console.log(`\n  URL: ${r.url}`);
       console.log(`  Reason: ${r.reason}`);
     });
-  
-  // TODO: Integrate with email/Slack notifications
-  // await sendEmail({
-  //   to: 'legal@www.elevateforhumanity.org',
-  //   subject: `Copyright Alert: ${report.suspiciousCount} potential infringement(s)`,
-  //   body: JSON.stringify(report, null, 2),
-  // });
+
+  await Promise.all([slackAlert(report), emailAlert(report)]);
 }
 
 /**

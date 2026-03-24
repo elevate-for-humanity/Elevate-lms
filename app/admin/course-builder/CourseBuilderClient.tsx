@@ -84,7 +84,7 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
     try {
       if (editingCourse) {
         // Update existing course via API
-        const res = await apiPatch<any>(`/api/admin/courses/${editingCourse.id}`, courseData);
+        const res = await apiPatch<any>(`/api/admin/lms/courses/${editingCourse.id}`, courseData);
         if (res.error) throw new Error(res.error);
         setCourses(courses.map(c => c.id === editingCourse.id ? res.data : c));
       } else {

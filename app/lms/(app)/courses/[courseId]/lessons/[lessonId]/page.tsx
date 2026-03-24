@@ -1121,8 +1121,8 @@ export default function LessonPage() {
                       ) : (
                         <div className="bg-slate-900 rounded-xl aspect-video flex flex-col items-center justify-center text-white gap-3">
                           <Video className="w-12 h-12 text-slate-500" />
-                          <p className="text-slate-400 text-sm">Video coming soon</p>
-                          <p className="text-slate-500 text-xs">Read the lesson content below while we prepare the video.</p>
+                          <p className="text-slate-400 text-sm">Video will be published with the next content update.</p>
+                          <p className="text-slate-500 text-xs">Read the lesson content below in the meantime.</p>
                         </div>
                       )}
                       {lesson.content && (
@@ -1147,7 +1147,7 @@ export default function LessonPage() {
                       ) : (
                         <div className="text-center py-10 text-slate-400">
                           <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-40" />
-                          <p className="text-sm">Reading content coming soon.</p>
+                          <p className="text-sm">Reading content will be published with the next module update.</p>
                         </div>
                       )}
                     </div>
@@ -1198,7 +1198,7 @@ export default function LessonPage() {
                       ) : (
                         <div className="bg-white rounded-xl p-8 shadow-sm text-center">
                           <Zap className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-                          <p className="text-slate-500 font-medium">Practice questions coming soon.</p>
+                          <p className="text-slate-500 font-medium">Practice questions will be released with the assessment module.</p>
                         </div>
                       )}
                     </div>
@@ -1219,7 +1219,7 @@ export default function LessonPage() {
                       ) : (
                         <div className="bg-white rounded-xl p-8 shadow-sm text-center">
                           <Shield className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-                          <p className="text-slate-500 font-medium">Checkpoint questions coming soon.</p>
+                          <p className="text-slate-500 font-medium">Checkpoint questions are scheduled for the next content refresh.</p>
                         </div>
                       )}
                     </div>

@@ -107,15 +107,15 @@ export default function HeroVideo({
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
+        // Start voiceover once when hero first comes into view.
+        // Do NOT pause when scrolled away — let it play through to the end.
         if (entry.isIntersecting && !played) {
           played = true;
           setMuted(false);
           audio.currentTime = 0;
           audio.play().catch(() => setMuted(true));
-        } else if (!entry.isIntersecting && played) {
-          audio.pause();
-          setMuted(true);
-          played = false;
+          // Disconnect after first play — no need to keep observing
+          observer.disconnect();
         }
       },
       { threshold: 0.5 }

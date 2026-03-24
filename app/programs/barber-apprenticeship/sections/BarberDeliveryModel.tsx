@@ -13,7 +13,7 @@ export function BarberDeliveryModel() {
           </p>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
-              <div className="relative h-48">
+              <div className="relative" style={{ aspectRatio: "3/2" }}>
                 <Image src="/images/pages/barber-delivery-1.jpg" alt="Barber classroom instruction" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-6">
@@ -22,7 +22,7 @@ export function BarberDeliveryModel() {
               </div>
             </div>
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
-              <div className="relative h-48">
+              <div className="relative" style={{ aspectRatio: "3/2" }}>
                 <Image src="/images/pages/barber-delivery-2.jpg" alt="Apprentice cutting hair in licensed barbershop" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-6">
@@ -31,7 +31,7 @@ export function BarberDeliveryModel() {
               </div>
             </div>
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
-              <div className="relative h-48">
+              <div className="relative" style={{ aspectRatio: "3/2" }}>
                 <Image src="/images/pages/barber-delivery-3.jpg" alt="Barber apprentice progress tracking" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-6">
@@ -40,7 +40,7 @@ export function BarberDeliveryModel() {
               </div>
             </div>
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
-              <div className="relative h-48">
+              <div className="relative" style={{ aspectRatio: "3/2" }}>
                 <Image src="/images/pages/barber-cutting.jpg" alt="Licensed barbershop training environment" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-6">

@@ -349,7 +349,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
                 Apprentice spots are limited and fill quickly. Join the waiting list to be notified when the next
                 cohort opens. Barbershop owners can also sign up to be considered as a host training site.
               </p>
-              <div className="relative h-56 rounded-xl overflow-hidden shadow-lg">
+              <div className="relative rounded-xl overflow-hidden shadow-lg" style={{ aspectRatio: '3/2' }}>
                 <Image src="/images/pages/barber-styling-hair.jpg" alt="Barber styling a client's hair" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
             </div>

@@ -139,14 +139,14 @@ export default function HomePage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {PROGRAMS.map((p) => (
               <Link key={p.title} href={p.href} className="group block bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-lg hover:border-brand-red-300 transition-all">
-                <div className="relative overflow-hidden" style={{ height: '210px' }}>
+                <div className="relative overflow-hidden" style={{ aspectRatio: '3/2' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={p.img}
                     alt={p.title}
                     loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    style={{ display: 'block', objectPosition: p.position }}
+                    style={{ display: 'block' }}
                   />
                   <div className="absolute top-3 left-3">
                     <span className="bg-slate-900/80 text-white text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded backdrop-blur-sm">{p.tag}</span>

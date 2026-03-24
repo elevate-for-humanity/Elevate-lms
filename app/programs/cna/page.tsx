@@ -187,11 +187,11 @@ export default function CNAPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
               { src: '/images/pages/cna-patient-care.jpg', alt: 'CNA patient care' },
-              { src: '/images/pages/cna-vitals.jpg', alt: 'CNA taking vitals' },
+              { src: '/images/pages/cna-vitals.jpg',       alt: 'CNA taking vitals' },
               { src: '/images/pages/cna-nursing-real.jpg', alt: 'CNA nursing skills' },
-              { src: '/images/pages/cna-nursing.jpg', alt: 'CNA clinical training' },
+              { src: '/images/pages/cna-nursing.jpg',      alt: 'CNA clinical training' },
             ].map((img) => (
-              <div key={img.src} className="relative h-40 sm:h-52 rounded-xl overflow-hidden">
+              <div key={img.src} className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '3/2' }}>
                 <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="25vw" />
               </div>
             ))}

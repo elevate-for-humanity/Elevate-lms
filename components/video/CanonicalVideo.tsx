@@ -34,9 +34,16 @@ type Props = {
    * Set to false only for non-hero ambient videos that should pause when hidden.
    */
   playThrough?: boolean;
+  /**
+   * When true, attempt autoplay immediately on mount without waiting for the
+   * IntersectionObserver. Use for above-the-fold hero videos that are always
+   * visible on page entry. Falls back to observer-gated play if autoplay is
+   * blocked by the browser.
+   */
+  autoPlayOnMount?: boolean;
 };
 
-export default function CanonicalVideo({ src, poster, className, threshold = 0.1, playThrough = true }: Props) {
+export default function CanonicalVideo({ src, poster, className, threshold = 0.1, playThrough = true, autoPlayOnMount = false }: Props) {
   if (process.env.NODE_ENV === 'development') {
     if (!poster) {
       throw new Error('CanonicalVideo requires a local poster. This is not optional.');
@@ -58,11 +65,22 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.1
     return () => mq.removeEventListener('change', handler);
   }, []);
 
+  // Immediate autoplay for above-the-fold hero videos.
+  // Fires on mount so the video starts as soon as the component renders,
+  // without waiting for the IntersectionObserver tick.
+  useEffect(() => {
+    if (!autoPlayOnMount || reducedMotion || failed) return;
+    const video = ref.current;
+    if (!video) return;
+    video.play().catch(() => {});
+  }, [autoPlayOnMount, reducedMotion, failed]);
+
   // Visibility-gated playback — starts when video enters view.
   // If playThrough=true (default for hero videos), keeps playing after scrolling away.
   // If playThrough=false, pauses when scrolled out of view.
+  // Skipped when autoPlayOnMount=true since playback is already started above.
   useEffect(() => {
-    if (reducedMotion || failed) return;
+    if (autoPlayOnMount || reducedMotion || failed) return;
     const video = ref.current;
     if (!video) return;
 
@@ -87,7 +105,7 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.1
 
     observer.observe(video);
     return () => observer.disconnect();
-  }, [reducedMotion, failed, threshold, playThrough]);
+  }, [autoPlayOnMount, reducedMotion, failed, threshold, playThrough]);
 
   // Reduced-motion or error: render poster image only
   if (reducedMotion || failed) {

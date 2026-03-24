@@ -5,9 +5,10 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import React from 'react';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import {
   ChevronLeft,
   ChevronRight,
@@ -19,6 +20,12 @@ import {
   CheckCircle,
   Award,
   GraduationCap,
+  Video,
+  Brain,
+  FlaskConical,
+  Zap,
+  Shield,
+  Lock,
 } from 'lucide-react';
 import { QuizSystem } from '@/components/lms/QuizSystem';
 import QuizPlayer from '@/components/lms/QuizPlayer';
@@ -54,6 +61,7 @@ import { lessonUuidToSimulationKey } from '@/lib/lms/hvac-simulations';
 import { HVAC_QUICK_CHECKS } from '@/lib/courses/hvac-quick-checks';
 import { ExplainSimply } from '@/components/lms/ai/ExplainSimply';
 import { TranslateToggle } from '@/components/lms/ai/TranslateToggle';
+import SpacedRepetitionReview from '@/components/lms/SpacedRepetitionReview';
 
 const LessonVideoWithSimulation = dynamic(
   () => import('@/components/lms/LessonVideoWithSimulation'),
@@ -73,6 +81,19 @@ export default function LessonPage() {
   const [course, setCourse] = useState<any>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  // Activity tab — driven by ?activity= param or defaults to 'video'
+  const [activeActivity, setActiveActivity] = useState<string>('video');
+
+  // ActivityParamSync reads ?activity= and updates state.
+  // Must be inside Suspense because useSearchParams suspends on first render.
+  function ActivityParamSync({ onActivity }: { onActivity: (a: string) => void }) {
+    const sp = useSearchParams();
+    useEffect(() => {
+      const a = sp.get('activity');
+      if (a) onActivity(a);
+    }, [sp, onActivity]);
+    return null;
+  }
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(new Set());
   const [courseCompleted, setCourseCompleted] = useState(false);
@@ -86,12 +107,7 @@ export default function LessonPage() {
   const [passedCheckpointIds, setPassedCheckpointIds] = useState<Set<string>>(new Set());
   const lessonStartTime = React.useRef(Date.now());
 
-  useEffect(() => {
-    lessonStartTime.current = Date.now();
-    fetchLessonData();
-  }, [lessonId]);
-
-  const fetchLessonData = async () => {
+  const fetchLessonData = useCallback(async () => {
     const { createClient } = await import('@/lib/supabase/client');
     const supabase = await createClient();
 
@@ -255,7 +271,12 @@ export default function LessonPage() {
         setCheckpointBlocked(true);
       }
     }
-  };
+  }, [lessonId, courseId, passedCheckpointIds]);
+
+  useEffect(() => {
+    lessonStartTime.current = Date.now();
+    fetchLessonData();
+  }, [lessonId, fetchLessonData]);
 
   const markComplete = async () => {
     const newStatus = !isCompleted;
@@ -451,6 +472,9 @@ export default function LessonPage() {
 
   return (
     <div className="flex flex-col h-[100dvh] bg-white">
+      <Suspense fallback={null}>
+        <ActivityParamSync onActivity={setActiveActivity} />
+      </Suspense>
       <div className="px-4 py-2 border-b border-slate-100 bg-white flex-shrink-0">
         <Breadcrumbs items={[
           { label: "Dashboard", href: "/lms/courses" },
@@ -838,7 +862,7 @@ export default function LessonPage() {
               passingScore={lesson.passing_score || 70}
             />
           </div>
-        ) : lesson.video_url && !lesson.video_url.includes('/generated/lessons/') && lessonUuidToSimulationKey[lessonId] ? (
+        ) : lesson.video_url && lessonUuidToSimulationKey[lessonId] ? (
           <div className="max-w-4xl mx-auto p-4 md:p-8">
             {/* Video + 3D simulation lesson */}
             <LessonVideoWithSimulation
@@ -881,7 +905,7 @@ export default function LessonPage() {
               </div>
             )}
           </div>
-        ) : lesson.video_url && !lesson.video_url.includes('/generated/lessons/') ? (
+        ) : lesson.video_url ? (
           <div className="max-w-4xl mx-auto p-4 md:p-8">
             {isHvacCourse ? (
               /* HVAC: avatar+audio sync player with local MP3/MP4 fallback chain */
@@ -1010,95 +1034,233 @@ export default function LessonPage() {
             </div>
           )}
 
-          {/* Tabs */}
-          <div className="border-b border-slate-200 mb-6">
-            <div className="flex gap-6 overflow-x-auto">
-              <button
-                onClick={() => setActiveTab('overview')}
-                className={`pb-3 px-1 font-semibold whitespace-nowrap ${
-                  activeTab === 'overview'
-                    ? 'border-b-2 border-brand-blue-600 text-brand-blue-600'
-                    : 'text-black hover:text-black'
-                }`}
-              >
-                <BookOpen className="w-4 h-4 inline mr-2" />
-                Overview
-              </button>
-              <button
-                onClick={() => setActiveTab('resources')}
-                className={`pb-3 px-1 font-semibold whitespace-nowrap ${
-                  activeTab === 'resources'
-                    ? 'border-b-2 border-brand-blue-600 text-brand-blue-600'
-                    : 'text-black hover:text-black'
-                }`}
-              >
-                <FileText className="w-4 h-4 inline mr-2" />
-                Resources
-              </button>
-              <button
-                onClick={() => setActiveTab('notes')}
-                className={`pb-3 px-1 font-semibold whitespace-nowrap ${
-                  activeTab === 'notes'
-                    ? 'border-b-2 border-brand-blue-600 text-brand-blue-600'
-                    : 'text-black hover:text-black'
-                }`}
-              >
-                <MessageSquare className="w-4 h-4 inline mr-2" />
-                Notes
-              </button>
-            </div>
-          </div>
+          {/* ── NHA-STYLE ACTIVITY TABS ── */}
+          {(() => {
+            type ActivityDef = { id: string; label: string; icon: React.ElementType; color: string; required: boolean };
+            const stepType = lesson.step_type || lesson.content_type || 'lesson';
+            const isCheckpointLesson = stepType === 'checkpoint' || stepType === 'quiz' || stepType === 'exam';
+            const isLabLesson = stepType === 'lab' || stepType === 'assignment';
 
-          {/* Tab Content */}
-          <div className="mb-8">
-            {activeTab === 'overview' && (
-              <div className="prose max-w-none">
-                <p className="text-slate-700 text-base leading-relaxed">
-                  {lesson.description || 'Complete this lesson to continue your progress.'}
-                </p>
-              </div>
-            )}
+            // Build activity list from lesson.activities (DB) or derive from step_type
+            const storedActivities: any[] = lesson.activities || [];
+            const activityDefs: ActivityDef[] = storedActivities.length > 0
+              ? storedActivities
+                  .sort((a: any, b: any) => a.order - b.order)
+                  .map((a: any) => ({
+                    id: a.type,
+                    label: a.label,
+                    icon: { video: Video, reading: FileText, flashcards: Brain, lab: FlaskConical, practice: Zap, checkpoint: Shield }[a.type as string] ?? BookOpen,
+                    color: { video: 'text-brand-blue-600', reading: 'text-slate-600', flashcards: 'text-purple-600', lab: 'text-green-600', practice: 'text-amber-600', checkpoint: 'text-brand-red-600' }[a.type as string] ?? 'text-slate-600',
+                    required: a.required,
+                  }))
+              : [
+                  { id: 'video',      label: 'Watch Lesson Video',  icon: Video,        color: 'text-brand-blue-600', required: true  },
+                  { id: 'reading',    label: 'Reading',             icon: FileText,     color: 'text-slate-600',      required: true  },
+                  { id: 'flashcards', label: 'Flashcards',          icon: Brain,        color: 'text-purple-600',     required: false },
+                  ...(isLabLesson ? [{ id: 'lab', label: 'Hands-On Lab', icon: FlaskConical, color: 'text-green-600', required: true }] : []),
+                  { id: 'practice',   label: 'Practice Questions',  icon: Zap,          color: 'text-amber-600',      required: false },
+                  ...(isCheckpointLesson ? [{ id: 'checkpoint', label: isCheckpointLesson ? 'Checkpoint Quiz' : 'Quiz', icon: Shield, color: 'text-brand-red-600', required: true }] : []),
+                  { id: 'notes',      label: 'My Notes',            icon: MessageSquare,color: 'text-slate-500',      required: false },
+                  { id: 'resources',  label: 'Resources',           icon: Download,     color: 'text-slate-500',      required: false },
+                ];
 
-            {activeTab === 'resources' && (
-              <div className="space-y-3">
-                {lesson.resources?.length > 0 ? lesson.resources.map((resource: any, idx: number) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between p-4 bg-white rounded-lg hover:bg-slate-50 transition"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
-                        <FileText className="w-5 h-5 text-brand-blue-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold">{resource.name}</div>
-                        <div className="text-sm text-slate-500">
-                          {resource.size}
+            const currentActivity = activityDefs.find(a => a.id === activeActivity) ?? activityDefs[0];
+
+            return (
+              <>
+                {/* Tab bar */}
+                <div className="border-b border-slate-200 mb-6">
+                  <div className="flex gap-1 overflow-x-auto pb-0">
+                    {activityDefs.map((act) => {
+                      const Icon = act.icon;
+                      const isActive = activeActivity === act.id;
+                      const isGated = act.id === 'checkpoint' && !isCompleted && activityDefs.filter(a => a.required && a.id !== 'checkpoint').some(a => true);
+                      return (
+                        <button
+                          key={act.id}
+                          onClick={() => isGated ? undefined : setActiveActivity(act.id)}
+                          disabled={false}
+                          className={`flex items-center gap-1.5 px-3 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition ${
+                            isActive
+                              ? 'border-brand-blue-600 text-brand-blue-600'
+                              : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'
+                          }`}
+                        >
+                          <Icon className={`w-4 h-4 ${isActive ? act.color : 'text-slate-400'}`} />
+                          <span className="hidden sm:inline">{act.label}</span>
+                          {act.required && !isCompleted && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Activity content */}
+                <div className="mb-8">
+
+                  {/* VIDEO */}
+                  {activeActivity === 'video' && (
+                    <div>
+                      {lesson.video_url ? (
+                        isHvacCourse ? (
+                          <HvacLessonVideo
+                            lessonId={lessonId}
+                            videoUrl={lesson.video_url}
+                            title={lesson.title}
+                            onComplete={() => { if (!isCompleted) markComplete(); }}
+                          />
+                        ) : (
+                          <InteractiveVideoPlayer
+                            videoUrl={lesson.video_url}
+                            title={lesson.title}
+                            onComplete={() => { if (!isCompleted) markComplete(); }}
+                          />
+                        )
+                      ) : (
+                        <div className="bg-slate-900 rounded-xl aspect-video flex flex-col items-center justify-center text-white gap-3">
+                          <Video className="w-12 h-12 text-slate-500" />
+                          <p className="text-slate-400 text-sm">Video coming soon</p>
+                          <p className="text-slate-500 text-xs">Read the lesson content below while we prepare the video.</p>
                         </div>
-                      </div>
+                      )}
+                      {lesson.content && (
+                        <div className="mt-6 bg-white rounded-xl p-6 shadow-sm">
+                          <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }} />
+                        </div>
+                      )}
                     </div>
-                    <a
-                      href={resource.url}
-                      download
-                      className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
-                    >
-                      <Download className="w-4 h-4" />
-                      Download
-                    </a>
-                  </div>
-                )) : (
-                  <div className="text-center py-10 text-slate-400">
-                    <FileText className="w-8 h-8 mx-auto mb-2 opacity-40" />
-                    <p className="text-sm">No downloadable resources for this lesson.</p>
-                  </div>
-                )}
-              </div>
-            )}
+                  )}
 
-            {activeTab === 'notes' && (
-              <NoteTaking courseId={courseId} lessonId={lessonId} />
-            )}
-          </div>
+                  {/* READING */}
+                  {activeActivity === 'reading' && (
+                    <div className="bg-white rounded-xl p-8 shadow-sm">
+                      {lesson.content ? (
+                        <>
+                          <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }} />
+                          <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap gap-3">
+                            <ExplainSimply content={lesson.content} />
+                            <TranslateToggle content={lesson.content} />
+                          </div>
+                        </>
+                      ) : (
+                        <div className="text-center py-10 text-slate-400">
+                          <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-40" />
+                          <p className="text-sm">Reading content coming soon.</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* FLASHCARDS */}
+                  {activeActivity === 'flashcards' && (
+                    <div>
+                      <SpacedRepetitionReview />
+                    </div>
+                  )}
+
+                  {/* LAB */}
+                  {activeActivity === 'lab' && (
+                    <div>
+                      {(lesson.step_type === 'lab' || lesson.step_type === 'assignment') ? (
+                        <StepSubmissionForm
+                          lessonId={lessonId}
+                          stepType={lesson.step_type}
+                          onSubmitted={() => { if (!isCompleted) markComplete(); }}
+                        />
+                      ) : (
+                        <div className="bg-white rounded-xl p-8 shadow-sm text-center">
+                          <FlaskConical className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                          <p className="text-slate-500 font-medium">No lab activity for this lesson.</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* PRACTICE QUESTIONS */}
+                  {activeActivity === 'practice' && (
+                    <div>
+                      {HVAC_QUICK_CHECKS[lessonId] ? (
+                        <QuizPlayer
+                          questions={HVAC_QUICK_CHECKS[lessonId]}
+                          title="Practice Questions"
+                          passingScore={60}
+                          onComplete={() => {}}
+                        />
+                      ) : lesson.quiz_questions?.length > 0 ? (
+                        <QuizPlayer
+                          questions={lesson.quiz_questions}
+                          title="Practice Questions"
+                          passingScore={60}
+                          onComplete={() => {}}
+                        />
+                      ) : (
+                        <div className="bg-white rounded-xl p-8 shadow-sm text-center">
+                          <Zap className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                          <p className="text-slate-500 font-medium">Practice questions coming soon.</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* CHECKPOINT / QUIZ */}
+                  {activeActivity === 'checkpoint' && (
+                    <div>
+                      {lesson.quiz_questions?.length > 0 ? (
+                        <QuizPlayer
+                          questions={lesson.quiz_questions}
+                          title={lesson.title}
+                          passingScore={lesson.passing_score || 70}
+                          onComplete={(score) => {
+                            if (score >= (lesson.passing_score || 70) && !isCompleted) markComplete();
+                          }}
+                        />
+                      ) : (
+                        <div className="bg-white rounded-xl p-8 shadow-sm text-center">
+                          <Shield className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                          <p className="text-slate-500 font-medium">Checkpoint questions coming soon.</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* NOTES */}
+                  {activeActivity === 'notes' && (
+                    <NoteTaking courseId={courseId} lessonId={lessonId} />
+                  )}
+
+                  {/* RESOURCES */}
+                  {activeActivity === 'resources' && (
+                    <div className="space-y-3">
+                      {lesson.resources?.length > 0 ? lesson.resources.map((resource: any, idx: number) => (
+                        <div key={idx} className="flex items-center justify-between p-4 bg-white rounded-lg hover:bg-slate-50 transition">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                              <FileText className="w-5 h-5 text-brand-blue-600" />
+                            </div>
+                            <div>
+                              <div className="font-semibold">{resource.name}</div>
+                              <div className="text-sm text-slate-500">{resource.size}</div>
+                            </div>
+                          </div>
+                          <a href={resource.url} download className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700 font-semibold">
+                            <Download className="w-4 h-4" />Download
+                          </a>
+                        </div>
+                      )) : (
+                        <div className="text-center py-10 text-slate-400">
+                          <FileText className="w-8 h-8 mx-auto mb-2 opacity-40" />
+                          <p className="text-sm">No downloadable resources for this lesson.</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                </div>
+              </>
+            );
+          })()}
 
           {/* Course Completion Banner */}
           {courseCompleted && (

@@ -156,11 +156,12 @@ export default function HeroVideo({
         style={{ height: 'clamp(400px, 56vw, 780px)' }}
         aria-label={analyticsName ? `${analyticsName} hero video` : 'Hero video'}
       >
-        {/* CanonicalVideo handles reduced-motion, error fallback, and visibility gating */}
+        {/* autoPlayOnMount — hero is always above the fold on page entry */}
         <CanonicalVideo
           src={videoSrc}
           poster={posterImage}
           className="absolute inset-0 w-full h-full object-cover object-center"
+          autoPlayOnMount
         />
 
         {/* Voiceover audio — preload metadata so it's ready when scroll fires */}

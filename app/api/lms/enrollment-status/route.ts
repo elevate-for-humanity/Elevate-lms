@@ -26,12 +26,33 @@ export async function GET(req: NextRequest) {
   const admin = createAdminClient();
   const db = admin || supabase;
 
-  const { data: enrollment } = await db
+  // Primary lookup: by course_id (most enrollments set this directly)
+  let { data: enrollment } = await db
     .from('program_enrollments')
     .select('id, status, enrollment_state, progress_percent, enrolled_at, revoked_at')
     .eq('user_id', user.id)
     .eq('course_id', courseId)
     .maybeSingle();
+
+  // Fallback: some enrollments are stored against program_id only (no course_id).
+  // Resolve the program_id from the courses table and retry.
+  if (!enrollment) {
+    const { data: course } = await db
+      .from('courses')
+      .select('program_id')
+      .eq('id', courseId)
+      .maybeSingle();
+
+    if (course?.program_id) {
+      const { data: programEnrollment } = await db
+        .from('program_enrollments')
+        .select('id, status, enrollment_state, progress_percent, enrolled_at, revoked_at')
+        .eq('user_id', user.id)
+        .eq('program_id', course.program_id)
+        .maybeSingle();
+      enrollment = programEnrollment;
+    }
+  }
 
   const isRevoked = !!enrollment?.revoked_at;
   const isPendingFunding = enrollment?.enrollment_state === 'pending_funding_verification';

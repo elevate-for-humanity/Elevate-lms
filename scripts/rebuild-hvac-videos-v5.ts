@@ -28,7 +28,7 @@ const supabase = createClient(
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 const HEYGEN_KEY = process.env.HEYGEN_API_KEY!;
 
-const HVAC_COURSE_ID = 'f0593164-55be-5867-98e7-8a86770a8dd0';
+const HVAC_COURSE_ID = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0';
 const TEMP_DIR = path.join(process.cwd(), 'temp', 'hvac-v5');
 const W = 1280;
 const H = 720;
@@ -347,8 +347,8 @@ async function main() {
   console.log('=== HVAC Video V5 — Hybrid: Avatar + Demos + Slides ===\n');
 
   const { data: lessons, error } = await supabase
-    .from('training_lessons')
-    .select('id, title, content, content_type, order_index, lesson_number')
+    .from('course_lessons')
+    .select('id, title, content, lesson_type, order_index')
     .eq('course_id', HVAC_COURSE_ID)
     .order('order_index');
 
@@ -357,8 +357,8 @@ async function main() {
   const total = lessons.length;
   const end = Math.min(startIdx + limit, total);
 
-  // Skip quiz-type lessons
-  const targets = lessons.slice(startIdx, end).filter(l => l.content_type !== 'quiz');
+  // Skip checkpoint lessons — video only for lesson and lab types
+  const targets = lessons.slice(startIdx, end).filter(l => l.lesson_type !== 'checkpoint');
   console.log(`Total lessons: ${total} | Target: ${targets.length} (skipping quizzes)`);
 
   // ── PLAN PHASE (always runs, even dry-run) ──
@@ -497,7 +497,7 @@ async function main() {
       console.log(' done');
 
       // 7. Update DB
-      await supabase.from('training_lessons').update({ video_url: url }).eq('id', lesson.id);
+      await supabase.from('course_lessons').update({ video_url: url }).eq('id', lesson.id);
 
       const mb = fs.statSync(finalPath).size / 1024 / 1024;
       const dur = probeDuration(finalPath);

@@ -119,6 +119,46 @@ export type BlueprintGenerationRules = {
   generatorMode: 'fixed' | 'flexible';
 };
 
+// ─── Video config (locked into blueprint — drives automatic generation) ───────
+
+export type BlueprintVideoConfig = {
+  /**
+   * Layout template to use for all lesson videos in this program.
+   * 'elevate-slide' = dark navy + orange top bar + DALL-E image bottom-left
+   *                   + bullet points + instructor name. Matches HVAC template.
+   */
+  template: 'elevate-slide' | 'talking-head' | 'screencast' | 'custom';
+
+  /** Avatar/instructor identity */
+  instructorName: string;
+  instructorTitle: string;
+  /** Path relative to /public */
+  instructorImagePath: string;
+
+  /** Brand colors */
+  topBarColor: string;       // e.g. '#f97316'
+  accentColor: string;       // e.g. '#3b82f6'
+  backgroundColor: string;   // e.g. '#0f172a'
+
+  /** Voice for TTS narration */
+  ttsVoice: 'onyx' | 'alloy' | 'echo' | 'fable' | 'nova' | 'shimmer';
+  ttsSpeed: number;          // 0.25–4.0, default 0.85
+
+  /** Number of slides per lesson video */
+  slideCount: 5;
+
+  /** Slide segment labels in order */
+  segments: ['intro', 'concept', 'visual', 'application', 'wrapup'];
+
+  /** Generate a DALL-E image per lesson for the bottom-left thumbnail */
+  generateDalleImage: boolean;
+  dalleImageStyle: 'natural' | 'vivid';
+
+  /** Output resolution */
+  width: 1920;
+  height: 1080;
+};
+
 // ─── Canonical blueprint ──────────────────────────────────────────────────────
 
 export type CredentialBlueprint = {
@@ -160,6 +200,14 @@ export type CredentialBlueprint = {
   modules: BlueprintModule[];
 
   assessmentRules: BlueprintAssessmentRule[];
+
+  /**
+   * Locked video format for this program.
+   * The course generator reads this and stores it on course_lessons.
+   * The video generation service reads it to produce consistent videos
+   * without manual configuration per lesson.
+   */
+  videoConfig?: BlueprintVideoConfig;
 };
 
 // ─── Audit result types (consumed by auditor.ts) ──────────────────────────────

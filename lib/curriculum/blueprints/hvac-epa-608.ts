@@ -17,7 +17,27 @@
  * dynamically. expectedLessonCount is 0 for generation-rules blueprints.
  */
 
-import type { CredentialBlueprint } from './types';
+import type { CredentialBlueprint, BlueprintVideoConfig } from './types';
+
+// Locked video format — matches the 6 produced HVAC lesson videos exactly.
+// Do not change without regenerating all lesson videos.
+const HVAC_VIDEO_CONFIG: BlueprintVideoConfig = {
+  template:            'elevate-slide',
+  instructorName:      'Marcus Johnson',
+  instructorTitle:     'Master HVAC Technician',
+  instructorImagePath: '/images/team/instructors/instructor-trades.jpg',
+  topBarColor:         '#f97316',
+  accentColor:         '#3b82f6',
+  backgroundColor:     '#0f172a',
+  ttsVoice:            'onyx',
+  ttsSpeed:            0.85,
+  slideCount:          5,
+  segments:            ['intro', 'concept', 'visual', 'application', 'wrapup'],
+  generateDalleImage:  true,
+  dalleImageStyle:     'natural',
+  width:               1920,
+  height:              1080,
+};
 
 export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
   id: 'hvac-epa608-v1',
@@ -427,6 +447,8 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
       },
     },
   ],
+
+  videoConfig: HVAC_VIDEO_CONFIG,
 };
 
 // ── Hard guard — fail at module load, not at runtime ─────────────────────────

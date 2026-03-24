@@ -17,7 +17,53 @@
  */
 
 import { createAdminClient } from '@/lib/supabase/admin';
-import type { CredentialBlueprint, BlueprintModule, BlueprintLessonRef } from '../blueprints/types';
+import type { CredentialBlueprint, BlueprintModule, BlueprintLessonRef, BlueprintVideoConfig } from '../blueprints/types';
+
+// ─── Default activity menu per step type ─────────────────────────────────────
+// Each lesson gets a default activity set based on its step_type.
+// The lesson page renders these as the NHA-style activity menu.
+// Instructors can override per-lesson via the admin curriculum builder.
+
+type ActivityDescriptor = {
+  type: 'video' | 'reading' | 'flashcards' | 'lab' | 'practice' | 'checkpoint';
+  label: string;
+  order: number;
+  required: boolean;
+};
+
+function defaultActivities(stepType: string): ActivityDescriptor[] {
+  switch (stepType) {
+    case 'checkpoint':
+      return [
+        { type: 'video',      label: 'Watch Lesson Video',    order: 1, required: true  },
+        { type: 'reading',    label: 'Reading',               order: 2, required: true  },
+        { type: 'flashcards', label: 'Flashcards',            order: 3, required: false },
+        { type: 'practice',   label: 'Practice Questions',    order: 4, required: true  },
+        { type: 'checkpoint', label: 'Checkpoint Quiz',       order: 5, required: true  },
+      ];
+    case 'lab':
+      return [
+        { type: 'video',      label: 'Watch Lesson Video',    order: 1, required: true  },
+        { type: 'reading',    label: 'Reading',               order: 2, required: true  },
+        { type: 'lab',        label: 'Hands-On Lab',          order: 3, required: true  },
+      ];
+    case 'quiz':
+    case 'exam':
+      return [
+        { type: 'video',      label: 'Watch Lesson Video',    order: 1, required: false },
+        { type: 'flashcards', label: 'Flashcards',            order: 2, required: false },
+        { type: 'practice',   label: 'Practice Questions',    order: 3, required: false },
+        { type: 'checkpoint', label: 'Quiz',                  order: 4, required: true  },
+      ];
+    default: // 'lesson'
+      return [
+        { type: 'video',      label: 'Watch Lesson Video',    order: 1, required: true  },
+        { type: 'reading',    label: 'Reading',               order: 2, required: true  },
+        { type: 'flashcards', label: 'Flashcards',            order: 3, required: false },
+        { type: 'practice',   label: 'Practice Questions',    order: 4, required: false },
+      ];
+  }
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -165,7 +211,7 @@ export async function buildCanonicalCourseFromBlueprint(
         continue;
       }
 
-      const ok = await upsertLesson(db, courseId, moduleId, mod, lessonRef);
+      const ok = await upsertLesson(db, courseId, moduleId, mod, lessonRef, input.blueprint.videoConfig);
       if (ok) {
         totalLessons++;
       } else {
@@ -226,6 +272,7 @@ async function upsertLesson(
   moduleId: string,
   mod: BlueprintModule,
   lessonRef: BlueprintLessonRef,
+  videoConfig?: BlueprintVideoConfig,
 ): Promise<boolean> {
   // order_index encoding: module * 1000 + lesson (matches course-service.ts convention)
   const orderIndex = mod.orderIndex * 1000 + lessonRef.order;
@@ -241,15 +288,19 @@ async function upsertLesson(
     .eq('slug', lessonRef.slug)
     .maybeSingle();
 
+  const activities = defaultActivities(stepType);
+
   if (existing?.id) {
     const { error } = await db
       .from('course_lessons')
       .update({
-        module_id:   moduleId,
-        title:       lessonRef.title,
-        lesson_type: stepType,
-        order_index: orderIndex,
-        updated_at:  new Date().toISOString(),
+        module_id:    moduleId,
+        title:        lessonRef.title,
+        lesson_type:  stepType,
+        order_index:  orderIndex,
+        activities:   activities,
+        ...(videoConfig ? { video_config: videoConfig } : {}),
+        updated_at:   new Date().toISOString(),
       })
       .eq('id', existing.id);
     return !error;
@@ -258,15 +309,17 @@ async function upsertLesson(
   const { error } = await db
     .from('course_lessons')
     .insert({
-      course_id:   courseId,
-      module_id:   moduleId,
-      slug:        lessonRef.slug,
-      title:       lessonRef.title,
-      lesson_type: stepType,
-      order_index: orderIndex,
-      is_required: true,
+      course_id:    courseId,
+      module_id:    moduleId,
+      slug:         lessonRef.slug,
+      title:        lessonRef.title,
+      lesson_type:  stepType,
+      order_index:  orderIndex,
+      is_required:  true,
       is_published: true,
-      status:      'published',
+      status:       'published',
+      activities:   activities,
+      ...(videoConfig ? { video_config: videoConfig } : {}),
     });
 
   return !error;

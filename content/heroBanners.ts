@@ -28,7 +28,7 @@ export interface HeroBannerCta {
 
 export interface HeroBannerConfig {
   pageKey: string;
-  posterImage: string;
+  posterImage?: string;
   videoSrcDesktop: string;
   videoSrcMobile?: string;
   voiceoverSrc?: string;
@@ -219,7 +219,7 @@ export function buildTranscript({
 const heroBanners: Record<string, HeroBannerConfig> = {
   home: {
     pageKey: 'home',
-    posterImage: '/images/pages/home-hero-video.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/homepage-hero-montage.mp4',
     voiceoverSrc: '/videos/homepage-hero-new.mp3',
     microLabel: 'Indianapolis, Indiana',
@@ -241,7 +241,7 @@ const heroBanners: Record<string, HeroBannerConfig> = {
 
   about: {
     pageKey: 'about',
-    posterImage: '/images/pages/about-hero.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/about-mission.mp4',
     voiceoverSrc: '/audio/heroes/about.mp3',
     microLabel: 'Our Mission',
@@ -262,7 +262,7 @@ const heroBanners: Record<string, HeroBannerConfig> = {
 
   platform: {
     pageKey: 'platform',
-    posterImage: '/images/pages/platform-page-1.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/elevate-overview-with-narration.mp4',
     voiceoverSrc: '/audio/heroes/programs.mp3',
     microLabel: 'Workforce Infrastructure',
@@ -283,7 +283,7 @@ const heroBanners: Record<string, HeroBannerConfig> = {
 
   'funding-how-it-works': {
     pageKey: 'funding-how-it-works',
-    posterImage: '/images/pages/funding-page-3.jpg',
+    posterImage: '',
     // orientation-full.mp4 used until a dedicated funding hero video is produced
     videoSrcDesktop: '/videos/orientation-full.mp4',
     voiceoverSrc: '/audio/heroes/funding.mp3',
@@ -306,7 +306,7 @@ const heroBanners: Record<string, HeroBannerConfig> = {
 
   healthcare: {
     pageKey: 'healthcare',
-    posterImage: '/images/pages/comp-program-template.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
     voiceoverSrc: '/audio/heroes/healthcare.mp3',
     microLabel: 'Healthcare Programs',
@@ -328,7 +328,7 @@ const heroBanners: Record<string, HeroBannerConfig> = {
 
   store: {
     pageKey: 'store',
-    posterImage: '/images/pages/store-licensing-hero.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/store-whitelabel-narrated.mp4',
     videoSrcMobile: '/videos/store-demo-narrated.mp4',
     voiceoverSrc: '/audio/heroes/store.mp3',
@@ -369,7 +369,7 @@ Try the live demo — no signup, no time limit. Every screen is clickable. Searc
 
   programs: {
     pageKey: 'programs',
-    posterImage: '/images/pages/programs-hero.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/programs-overview-video-with-narration.mp4',
     videoSrcMobile: '/videos/program-hero.mp4',
     voiceoverSrc: '/audio/heroes/programs.mp3',
@@ -414,7 +414,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'skilled-trades': {
     pageKey: 'skilled-trades',
-    posterImage: '/images/pages/skilled-trades-sector.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/electrician-trades.mp4',
     voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
     microLabel: 'Skilled Trades',
@@ -437,7 +437,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'hvac-technician': programBanner('hvac-technician', {
     pageKey: 'hvac-technician',
-    posterImage: '/images/pages/hvac-unit.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/hvac-hero-final.mp4',
     voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
     microLabel: 'EPA 608 Universal',
@@ -455,7 +455,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'cdl-training': programBanner('cdl-training', {
     pageKey: 'cdl-training',
-    posterImage: '/images/pages/cdl-truck-highway.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/cdl-hero.mp4',
     voiceoverSrc: '/audio/heroes/cdl.mp3',
     microLabel: 'CDL Class A',
@@ -473,7 +473,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'electrical': programBanner('electrical', {
     pageKey: 'electrical',
-    posterImage: '/images/pages/electrical-wiring.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/electrician-trades.mp4',
     voiceoverSrc: '/audio/heroes/electrical.mp3',
     microLabel: 'NCCER Core Curriculum',
@@ -491,7 +491,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'welding': programBanner('welding', {
     pageKey: 'welding',
-    posterImage: '/images/pages/welding-sparks.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/welding-trades.mp4',
     voiceoverSrc: '/audio/heroes/welding.mp3',
     microLabel: 'AWS D1.1 Certification',
@@ -509,7 +509,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'plumbing': programBanner('plumbing', {
     pageKey: 'plumbing',
-    posterImage: '/images/pages/plumbing-pipes.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/welding-trades.mp4',
     voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
     microLabel: 'NCCER Core Curriculum',
@@ -527,7 +527,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'diesel-mechanic': programBanner('diesel-mechanic', {
     pageKey: 'diesel-mechanic',
-    posterImage: '/images/pages/diesel-mechanic.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/welding-trades.mp4',
     voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
     microLabel: 'ASE Exam Prep',
@@ -545,7 +545,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'construction-trades-certification': programBanner('construction-trades-certification', {
     pageKey: 'construction-trades-certification',
-    posterImage: '/images/pages/construction-trades.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/electrician-trades.mp4',
     voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
     microLabel: 'OSHA 30 + Forklift',
@@ -563,7 +563,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'forklift': programBanner('forklift', {
     pageKey: 'forklift',
-    posterImage: '/images/pages/forklift.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/electrician-trades.mp4',
     voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
     microLabel: 'OSHA Forklift Cert',
@@ -582,7 +582,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'cna': programBanner('cna', {
     pageKey: 'cna',
-    posterImage: '/images/pages/cna-patient-care.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/cna-hero.mp4',
     voiceoverSrc: '/audio/heroes/cna.mp3',
     microLabel: 'Indiana CNA Certification',
@@ -600,7 +600,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'medical-assistant': programBanner('medical-assistant', {
     pageKey: 'medical-assistant',
-    posterImage: '/images/pages/medical-assistant-lab.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
     voiceoverSrc: '/audio/heroes/medical-assistant.mp3',
     microLabel: 'NHA CCMA Certification',
@@ -618,7 +618,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'pharmacy-technician': programBanner('pharmacy-technician', {
     pageKey: 'pharmacy-technician',
-    posterImage: '/images/pages/pharmacy-tech.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
     voiceoverSrc: '/audio/heroes/healthcare.mp3',
     microLabel: 'PTCB CPhT Prep',
@@ -636,7 +636,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'phlebotomy': programBanner('phlebotomy', {
     pageKey: 'phlebotomy',
-    posterImage: '/images/pages/phlebotomy.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
     voiceoverSrc: '/audio/heroes/healthcare.mp3',
     microLabel: 'NHA CPT Certification',
@@ -654,7 +654,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'home-health-aide': programBanner('home-health-aide', {
     pageKey: 'home-health-aide',
-    posterImage: '/images/pages/healthcare-classroom.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/cna-hero.mp4',
     voiceoverSrc: '/audio/heroes/healthcare.mp3',
     microLabel: 'Indiana HHA Certification',
@@ -672,7 +672,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'emergency-health-safety': programBanner('emergency-health-safety', {
     pageKey: 'emergency-health-safety',
-    posterImage: '/images/pages/cpr-aed.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
     voiceoverSrc: '/audio/heroes/healthcare.mp3',
     microLabel: 'NREMT EMR Certification',
@@ -690,7 +690,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'cpr-first-aid': programBanner('cpr-first-aid', {
     pageKey: 'cpr-first-aid',
-    posterImage: '/images/pages/cpr-mannequin.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
     voiceoverSrc: '/audio/heroes/cpr.mp3',
     microLabel: 'HSI Certified',
@@ -709,7 +709,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'sanitation-infection-control': programBanner('sanitation-infection-control', {
     pageKey: 'sanitation-infection-control',
-    posterImage: '/images/pages/sanitation.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
     voiceoverSrc: '/audio/heroes/healthcare.mp3',
     microLabel: 'ServSafe + Bloodborne',
@@ -728,7 +728,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'barber-apprenticeship': programBanner('barber-apprenticeship', {
     pageKey: 'barber-apprenticeship',
-    posterImage: '/images/pages/barber-hero-main.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/barber-hero-final.mp4',
     voiceoverSrc: '/audio/heroes/barber.mp3',
     microLabel: 'DOL Registered Apprenticeship',
@@ -746,7 +746,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'cosmetology-apprenticeship': programBanner('cosmetology-apprenticeship', {
     pageKey: 'cosmetology-apprenticeship',
-    posterImage: '/images/pages/cosmetology.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/beauty-cosmetology.mp4',
     voiceoverSrc: '/audio/heroes/cosmetology.mp3',
     microLabel: 'DOL Registered Apprenticeship',
@@ -764,7 +764,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'nail-technician-apprenticeship': programBanner('nail-technician-apprenticeship', {
     pageKey: 'nail-technician-apprenticeship',
-    posterImage: '/images/pages/nail-technician.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/nail-tech.mp4',
     voiceoverSrc: '/audio/heroes/nail-tech.mp3',
     microLabel: 'DOL Registered Apprenticeship',
@@ -782,7 +782,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'culinary-apprenticeship': programBanner('culinary-apprenticeship', {
     pageKey: 'culinary-apprenticeship',
-    posterImage: '/images/pages/culinary.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/beauty-cosmetology.mp4',
     voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
     microLabel: 'DOL Registered Apprenticeship',
@@ -800,7 +800,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'esthetician': programBanner('esthetician', {
     pageKey: 'esthetician',
-    posterImage: '/images/pages/barber-apprentice-learning.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/beauty-cosmetology.mp4',
     voiceoverSrc: '/audio/heroes/cosmetology.mp3',
     microLabel: 'Esthetician Certificate',
@@ -818,7 +818,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'beauty-career-educator': programBanner('beauty-career-educator', {
     pageKey: 'beauty-career-educator',
-    posterImage: '/images/pages/barber-styling-hair.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/beauty-cosmetology.mp4',
     voiceoverSrc: '/audio/heroes/cosmetology.mp3',
     microLabel: 'Certiport ESB',
@@ -836,7 +836,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'apprenticeships': {
     pageKey: 'apprenticeships',
-    posterImage: '/images/pages/apprenticeships-hero.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/barber-hero-final.mp4',
     voiceoverSrc: '/audio/heroes/barber.mp3',
     microLabel: 'Earn While You Learn',
@@ -853,7 +853,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'it-help-desk': programBanner('it-help-desk', {
     pageKey: 'it-help-desk',
-    posterImage: '/images/pages/it-helpdesk-desk.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/it-technology.mp4',
     voiceoverSrc: '/audio/heroes/technology.mp3',
     microLabel: 'CompTIA A+ Prep',
@@ -871,7 +871,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'cybersecurity-analyst': programBanner('cybersecurity-analyst', {
     pageKey: 'cybersecurity-analyst',
-    posterImage: '/images/pages/cybersecurity-screen.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/it-technology.mp4',
     voiceoverSrc: '/audio/heroes/technology.mp3',
     microLabel: 'CompTIA Security+ Prep',
@@ -889,7 +889,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'network-administration': programBanner('network-administration', {
     pageKey: 'network-administration',
-    posterImage: '/images/pages/network-administration.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/it-technology.mp4',
     voiceoverSrc: '/audio/heroes/technology.mp3',
     microLabel: 'CompTIA Network+ Prep',
@@ -907,7 +907,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'network-support-technician': programBanner('network-support-technician', {
     pageKey: 'network-support-technician',
-    posterImage: '/images/pages/networking-hero.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/it-technology.mp4',
     voiceoverSrc: '/audio/heroes/technology.mp3',
     microLabel: 'IT Specialist Networking',
@@ -925,7 +925,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'software-development': programBanner('software-development', {
     pageKey: 'software-development',
-    posterImage: '/images/pages/software-development.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/it-technology.mp4',
     voiceoverSrc: '/audio/heroes/technology.mp3',
     microLabel: 'IT Specialist Python',
@@ -943,7 +943,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'web-development': programBanner('web-development', {
     pageKey: 'web-development',
-    posterImage: '/images/pages/web-development.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/it-technology.mp4',
     voiceoverSrc: '/audio/heroes/technology.mp3',
     microLabel: 'Meta Front-End Cert',
@@ -961,7 +961,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'graphic-design': programBanner('graphic-design', {
     pageKey: 'graphic-design',
-    posterImage: '/images/pages/graphic-design.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/it-technology.mp4',
     voiceoverSrc: '/audio/heroes/technology.mp3',
     microLabel: 'Adobe Certified Professional',
@@ -979,7 +979,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'cad-drafting': programBanner('cad-drafting', {
     pageKey: 'cad-drafting',
-    posterImage: '/images/pages/cad-drafting.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/it-technology.mp4',
     voiceoverSrc: '/audio/heroes/technology.mp3',
     microLabel: 'Autodesk Certified User',
@@ -999,7 +999,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'tax-preparation': programBanner('tax-preparation', {
     pageKey: 'tax-preparation',
-    posterImage: '/images/pages/tax-prep-desk.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/tax-career-paths.mp4',
     voiceoverSrc: '/audio/heroes/tax.mp3',
     microLabel: 'IRS PTIN + AFSP',
@@ -1017,7 +1017,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'bookkeeping': programBanner('bookkeeping', {
     pageKey: 'bookkeeping',
-    posterImage: '/images/pages/bookkeeping-ledger.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/business-finance.mp4',
     voiceoverSrc: '/audio/heroes/business.mp3',
     microLabel: 'QuickBooks Certified User',
@@ -1035,7 +1035,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'office-administration': programBanner('office-administration', {
     pageKey: 'office-administration',
-    posterImage: '/images/pages/office-admin-desk.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/business-finance.mp4',
     voiceoverSrc: '/audio/heroes/business.mp3',
     microLabel: 'Microsoft Office Specialist',
@@ -1053,7 +1053,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'entrepreneurship': programBanner('entrepreneurship', {
     pageKey: 'entrepreneurship',
-    posterImage: '/images/pages/entrepreneurship.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/business-finance.mp4',
     voiceoverSrc: '/audio/heroes/business.mp3',
     microLabel: 'Certiport ESB Certification',
@@ -1071,7 +1071,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'business-administration': programBanner('business-administration', {
     pageKey: 'business-administration',
-    posterImage: '/images/pages/business-sector.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/business-finance.mp4',
     voiceoverSrc: '/audio/heroes/business.mp3',
     microLabel: 'MOS + Certiport ESB',
@@ -1089,7 +1089,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'project-management': programBanner('project-management', {
     pageKey: 'project-management',
-    posterImage: '/images/pages/project-management.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/business-finance.mp4',
     voiceoverSrc: '/audio/heroes/business.mp3',
     microLabel: 'Certiport PM Certification',
@@ -1107,7 +1107,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'finance-bookkeeping-accounting': programBanner('finance-bookkeeping-accounting', {
     pageKey: 'finance-bookkeeping-accounting',
-    posterImage: '/images/pages/bookkeeping-ledger.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/tax-career-paths.mp4',
     voiceoverSrc: '/audio/heroes/tax.mp3',
     microLabel: 'IRS PTIN + QuickBooks',
@@ -1127,7 +1127,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'peer-recovery-specialist': programBanner('peer-recovery-specialist', {
     pageKey: 'peer-recovery-specialist',
-    posterImage: '/images/pages/peer-recovery.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
     voiceoverSrc: '/audio/heroes/dsp.mp3',
     microLabel: 'Indiana CPRS Credential',
@@ -1145,7 +1145,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'technology': {
     pageKey: 'technology',
-    posterImage: '/images/pages/technology-sector.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/it-technology.mp4',
     voiceoverSrc: '/audio/heroes/technology.mp3',
     microLabel: 'Technology Programs',
@@ -1160,7 +1160,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
 
   'business': {
     pageKey: 'business',
-    posterImage: '/images/pages/business-sector.jpg',
+    posterImage: '',
     videoSrcDesktop: '/videos/business-finance.mp4',
     voiceoverSrc: '/audio/heroes/business.mp3',
     microLabel: 'Business Programs',

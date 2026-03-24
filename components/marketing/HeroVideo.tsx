@@ -31,7 +31,7 @@ export interface HeroVideoProps {
   /** Mobile video source — falls back to desktop if omitted */
   videoSrcMobile?: string;
   /** Poster image shown while video loads and as reduced-motion fallback */
-  posterImage: string;
+  posterImage?: string;
   /** Optional separate voiceover audio track */
   voiceoverSrc?: string;
   /** 2–4 word micro-label rendered in bottom-left corner of video */
@@ -159,7 +159,7 @@ export default function HeroVideo({
         {/* autoPlayOnMount — hero is always above the fold on page entry */}
         <CanonicalVideo
           src={videoSrc}
-          poster={posterImage}
+          poster={posterImage ?? undefined}
           className="absolute inset-0 w-full h-full object-cover object-center"
           autoPlayOnMount
         />

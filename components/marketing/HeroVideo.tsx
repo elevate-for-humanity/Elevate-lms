@@ -152,7 +152,7 @@ export default function HeroVideo({
       {/* ── VIDEO FRAME ── */}
       {/* Height: 56vw clamped between 400px and 780px */}
       <section
-        className="relative w-full overflow-hidden bg-slate-900"
+        className="relative w-full overflow-hidden"
         style={{ height: 'clamp(400px, 56vw, 780px)' }}
         aria-label={analyticsName ? `${analyticsName} hero video` : 'Hero video'}
       >

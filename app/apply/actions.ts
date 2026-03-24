@@ -699,7 +699,9 @@ export async function submitProgramHolderApplication(data: ProgramHolderApplicat
             contact_name: `${data.firstName} ${data.lastName}`,
             contact_email: normalizedEmail,
             contact_phone: data.phone || null,
-            status: 'active',
+            // 'approved' + approved_at required by onboarding status check
+            status: 'approved',
+            approved_at: new Date().toISOString(),
             name: data.organizationName || `${data.firstName} ${data.lastName}`,
           }, { onConflict: 'user_id', ignoreDuplicates: false })
           .select('id')
@@ -715,12 +717,127 @@ export async function submitProgramHolderApplication(data: ProgramHolderApplicat
           .eq('id', profile.id);
 
         logger.info('[Apply] Program holder approved on submit', { userId: profile.id, holderId: holderRow?.id, org: data.organizationName });
+
+        // Send magic link — program holder never set a password, so they
+        // must use the emailed link to access their onboarding portal.
+        await sendProgramHolderWelcomeEmail(adminDb, {
+          email: normalizedEmail,
+          firstName: data.firstName,
+          organizationName: data.organizationName || `${data.firstName} ${data.lastName}`,
+          referenceNumber: result.referenceNumber,
+        });
       }
     }
 
-    return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/program-holder/onboarding` };
+    return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/apply/program-holder/confirmation` };
   }
   return result;
+}
+
+async function sendProgramHolderWelcomeEmail(
+  adminDb: any,
+  opts: { email: string; firstName: string; organizationName: string; referenceNumber: string },
+) {
+  const sgKey = process.env.SENDGRID_API_KEY;
+  if (!sgKey) {
+    logger.warn('[Apply] SENDGRID_API_KEY not set — skipping program holder welcome email');
+    return;
+  }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+
+  // Generate a magic link so the holder can log in without a password.
+  let magicLink = `${siteUrl}/login`;
+  try {
+    const { data: linkData } = await adminDb.auth.admin.generateLink({
+      type: 'magiclink',
+      email: opts.email,
+      options: { redirectTo: `${siteUrl}/program-holder/onboarding` },
+    });
+    if (linkData?.properties?.action_link) {
+      magicLink = linkData.properties.action_link;
+    }
+  } catch (err) {
+    logger.warn('[Apply] Could not generate magic link for program holder welcome email', err);
+  }
+
+  const logoUrl = `${siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
+
+  const html = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;font-family:Arial,sans-serif;background:#f8fafc">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 20px">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+        <tr><td style="padding:28px 32px;text-align:center;border-bottom:1px solid #e2e8f0">
+          <img src="${logoUrl}" alt="Elevate for Humanity" width="140" style="max-width:140px;height:auto" />
+        </td></tr>
+        <tr><td style="padding:32px">
+          <h2 style="color:#1a1a1a;font-size:20px;margin:0 0 16px">Hi ${opts.firstName}, your application was received!</h2>
+          <p style="color:#334155;font-size:15px;line-height:1.7;margin:0 0 16px">
+            Thank you for applying to become a Program Holder with <strong>Elevate for Humanity</strong>.
+            Your account for <strong>${opts.organizationName}</strong> has been created.
+          </p>
+          <p style="color:#334155;font-size:15px;line-height:1.7;margin:0 0 24px">
+            Click the button below to access your onboarding portal and complete the required steps.
+            This link logs you in automatically — no password needed.
+          </p>
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr><td align="center" style="padding:8px 0 28px">
+              <a href="${magicLink}" style="display:inline-block;background:#1d4ed8;color:#fff;text-decoration:none;padding:14px 36px;border-radius:6px;font-weight:bold;font-size:16px">
+                Start Onboarding →
+              </a>
+            </td></tr>
+          </table>
+          <div style="background:#f1f5f9;border-radius:6px;padding:16px 20px;margin:0 0 24px">
+            <p style="color:#475569;font-size:13px;font-weight:bold;margin:0 0 8px">Your onboarding steps:</p>
+            <ol style="color:#475569;font-size:13px;line-height:1.9;margin:0;padding-left:18px">
+              <li>Sign the Memorandum of Understanding (MOU)</li>
+              <li>Acknowledge the Program Holder Handbook</li>
+              <li>Acknowledge Rights &amp; Responsibilities</li>
+              <li>Upload required documents (syllabus, business license, insurance)</li>
+            </ol>
+          </div>
+          <p style="color:#64748b;font-size:13px;line-height:1.7;margin:0 0 8px">
+            <strong>This link expires in 1 hour</strong> — open it before it expires. If it expires, you can request a new one at
+            <a href="${siteUrl}/login" style="color:#1d4ed8">${siteUrl}/login</a> using the
+            "Send magic link" option, or contact us at
+            <a href="mailto:elevate4humanityedu@gmail.com" style="color:#1d4ed8">elevate4humanityedu@gmail.com</a>
+            or call <a href="tel:3173143757" style="color:#1d4ed8">(317) 314-3757</a>.
+          </p>
+          <p style="color:#94a3b8;font-size:12px;margin:20px 0 0">Ref: ${opts.referenceNumber}</p>
+        </td></tr>
+        <tr><td style="background:#f8fafc;padding:20px 32px;text-align:center;border-top:1px solid #e2e8f0">
+          <p style="color:#94a3b8;font-size:12px;margin:0">Elevate for Humanity Career &amp; Technical Institute</p>
+          <p style="color:#94a3b8;font-size:12px;margin:4px 0">8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240</p>
+          <p style="color:#94a3b8;font-size:12px;margin:4px 0">(317) 314-3757</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+
+  try {
+    const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${sgKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: { email: 'noreply@elevateforhumanity.org', name: 'Elevate for Humanity' },
+        reply_to: { email: 'elevate4humanityedu@gmail.com', name: 'Elevate for Humanity' },
+        personalizations: [{ to: [{ email: opts.email, name: opts.firstName }] }],
+        subject: `Welcome — Complete Your Program Holder Onboarding [${opts.referenceNumber}]`,
+        content: [{ type: 'text/html', value: html }],
+      }),
+    });
+    if (!res.ok) {
+      const body = await res.text();
+      logger.error('[Apply] Program holder welcome email failed', new Error(body));
+    } else {
+      logger.info('[Apply] Program holder welcome email sent', { email: opts.email });
+    }
+  } catch (err) {
+    logger.error('[Apply] Program holder welcome email threw', err as Error);
+  }
 }
 
 export async function submitEmployerApplication(data: EmployerApplicationData) {

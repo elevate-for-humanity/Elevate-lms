@@ -4,6 +4,7 @@ import React from 'react';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { CheckCircle, ArrowRight } from 'lucide-react';
 
 export function AcknowledgeRightsForm() {
   const router = useRouter();
@@ -12,6 +13,7 @@ export function AcknowledgeRightsForm() {
   const [title, setTitle] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [done, setDone] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,14 +49,38 @@ export function AcknowledgeRightsForm() {
         throw new Error(data.error || 'Failed to submit acknowledgement');
       }
 
-      // Success! Redirect to dashboard
-      router.push('/program-holder/dashboard?onboarding=complete');
+      // Show success state — user continues to document upload from the banner
+      setDone(true);
     } catch (err: any) {
       setError((err as Error).message || 'Failed to submit acknowledgement');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (done) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-start gap-4 bg-green-50 border border-green-200 rounded-lg p-5">
+          <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="font-semibold text-green-900">Rights &amp; Responsibilities acknowledged</p>
+            <p className="text-green-800 text-sm mt-1 leading-relaxed">
+              Your acknowledgement has been recorded. One last step — upload your required documents below.
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => router.push('/program-holder/documents?required=true')}
+          className="w-full flex items-center justify-center gap-2 min-h-[48px] px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition-colors"
+        >
+          Next: Upload Required Documents
+          <ArrowRight className="w-5 h-5" />
+        </button>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -126,8 +152,7 @@ export function AcknowledgeRightsForm() {
       </button>
 
       <p className="text-sm text-black text-center">
-        After submitting, you will be directed to your dashboard to complete
-        document uploads.
+        After submitting, you will continue to the document upload step.
       </p>
     </form>
   );

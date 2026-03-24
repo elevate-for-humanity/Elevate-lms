@@ -17,7 +17,8 @@ ALTER TABLE public.course_lessons
 -- The view is rebuilt here to add the two new columns.
 -- This replaces the view from migration 20260503000018.
 
-CREATE OR REPLACE VIEW public.lms_lessons AS
+DROP VIEW IF EXISTS public.lms_lessons;
+CREATE VIEW public.lms_lessons AS
   -- Canonical path: course_lessons (priority)
   SELECT
     cl.id,
@@ -37,13 +38,13 @@ CREATE OR REPLACE VIEW public.lms_lessons AS
     cl.video_url                                  AS video_file,
     cl.quiz_questions,
     cl.passing_score,
-    cl.resources,
+    NULL::jsonb                                   AS resources,
     cl.partner_exam_code,
     cl.video_config,
     cl.activities,
     NULL::integer                                 AS lesson_number,
     NULL::integer                                 AS module_order,
-    NULL::text                                    AS lesson_source,
+    'canonical'                                   AS lesson_source,
     cl.created_at,
     cl.updated_at
   FROM public.course_lessons cl
@@ -51,16 +52,16 @@ CREATE OR REPLACE VIEW public.lms_lessons AS
 
   UNION ALL
 
-  -- Legacy fallback: training_lessons (only when no course_lessons row exists)
+  -- Legacy fallback: training_lessons (only when no course_lessons row exists for this course)
   SELECT
     tl.id,
-    tl.course_id,
+    tl.course_id_uuid                             AS course_id,
     NULL::uuid                                    AS module_id,
-    tl.slug,
+    'legacy-' || tl.id::text                      AS slug,
     tl.title,
-    tl.content,
-    tl.content_type,
-    tl.content_type                               AS step_type,
+    to_jsonb(tl.content)                          AS content,
+    tl.content_type::public.lesson_type           AS content_type,
+    tl.content_type::public.lesson_type           AS step_type,
     tl.order_index,
     tl.duration_minutes,
     TRUE                                          AS is_required,
@@ -70,18 +71,17 @@ CREATE OR REPLACE VIEW public.lms_lessons AS
     tl.video_url                                  AS video_file,
     tl.quiz_questions,
     tl.passing_score,
-    tl.resources,
+    NULL::jsonb                                   AS resources,
     NULL::text                                    AS partner_exam_code,
     NULL::jsonb                                   AS video_config,
     NULL::jsonb                                   AS activities,
     tl.lesson_number,
-    tl.module_order,
+    NULL::integer                                 AS module_order,
     'legacy'                                      AS lesson_source,
     tl.created_at,
     tl.updated_at
   FROM public.training_lessons tl
   WHERE NOT EXISTS (
     SELECT 1 FROM public.course_lessons cl2
-    WHERE cl2.course_id = tl.course_id
-      AND cl2.slug      = tl.slug
+    WHERE cl2.course_id = tl.course_id_uuid
   );

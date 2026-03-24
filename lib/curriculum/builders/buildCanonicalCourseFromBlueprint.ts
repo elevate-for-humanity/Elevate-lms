@@ -215,7 +215,7 @@ export async function buildCanonicalCourseFromBlueprint(
       if (ok) {
         totalLessons++;
       } else {
-        warnings.push(`Lesson '${lessonRef.slug}' failed to upsert`);
+        warnings.push(`Lesson '${lessonRef.slug}' failed to upsert — see console for DB error`);
       }
     }
   }
@@ -303,6 +303,7 @@ async function upsertLesson(
         updated_at:   new Date().toISOString(),
       })
       .eq('id', existing.id);
+    if (error) console.error(`  DB update error [${lessonRef.slug}]:`, error.message, error.details);
     return !error;
   }
 
@@ -316,12 +317,13 @@ async function upsertLesson(
       lesson_type:  stepType,
       order_index:  orderIndex,
       is_required:  true,
-      is_published: true,
-      status:       'published',
+      is_published: false,
+      status:       'draft',
       activities:   activities,
       ...(videoConfig ? { video_config: videoConfig } : {}),
     });
 
+  if (error) console.error(`  DB insert error [${lessonRef.slug}]:`, error.message, error.details);
   return !error;
 }
 
@@ -331,7 +333,7 @@ async function upsertLesson(
  */
 function inferStepType(slug: string): string {
   if (slug.endsWith('-checkpoint')) return 'checkpoint';
-  if (slug.endsWith('-exam') || slug.includes('final-') || slug.includes('practice-exam')) return 'exam';
+  if (slug.endsWith('-exam') || slug.endsWith('-practice-exam')) return 'exam';
   if (slug.endsWith('-quiz')) return 'quiz';
   if (slug.endsWith('-lab')) return 'lab';
   if (slug.endsWith('-assignment')) return 'assignment';

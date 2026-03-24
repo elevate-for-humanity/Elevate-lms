@@ -115,6 +115,9 @@ All lessons complete + all checkpoints passed
 
 ### Blueprint-Driven Course Engine (canonical path)
 
+> Full specification: `docs/COURSE_ENGINE.md`
+> Blueprint template: `lib/curriculum/blueprints/_template.ts`
+
 Every course is defined by a `CredentialBlueprint` in `lib/curriculum/blueprints/`. The blueprint is the single source of truth for structure, video format, and activity menu. No per-program code is written — the engine reads the blueprint and renders automatically.
 
 **Write path:**

@@ -1,204 +1,207 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Phone, ArrowRight, Handshake } from 'lucide-react';
+import { Phone, ArrowRight, CheckCircle, Calendar } from 'lucide-react';
+import PartnerMeetingForm from './PartnerMeetingForm';
 
 export const metadata: Metadata = {
-  title: 'Workforce Partners | WorkOne & Community Organizations | Elevate For Humanity',
-  description: 'Partner with Elevate for Humanity to connect job seekers with free career training. WorkOne centers, community organizations, and workforce boards - learn how we work together.',
+  title: 'Workforce & Agency Partners | Elevate for Humanity',
+  description: 'Elevate for Humanity helps workforce boards, state agencies, and community partners deliver credentialed training, testing, and employment pathways — with built-in WIOA and RAPIDS compliance.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/workforce-partners' },
+  openGraph: {
+    title: 'Workforce & Agency Partners | Elevate for Humanity',
+    description: 'End-to-end workforce training delivery with WIOA compliance, RAPIDS reporting, and credential attainment. Partner with us.',
+    type: 'website',
+  },
 };
 
-
-
 export default function WorkforcePartnersPage() {
-
   return (
-    <div className="min-h-screen bg-white">
-      {/* Breadcrumbs */}
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'Workforce Partners' }]} />
-        </div>
-      </div>
+    <main className="min-h-screen bg-white">
 
-      {/* Hero */}
-      <section className="relative h-[50vh] min-h-[400px] overflow-hidden">
-        <Image src="/images/pages/workforce-partners-page-1.jpg" alt="Workforce development partners" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
-          <div className="max-w-5xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
-              <Handshake className="w-4 h-4" /> Partner Network
-            </div>
-            <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
-              Workforce Partners
-            </h1>
-            <p className="text-xl text-white/90 max-w-xl mb-6">
-              We work with WorkOne centers, workforce boards, and community organizations to connect Hoosiers with free career training.
+      {/* ── HERO ── */}
+      <section className="relative overflow-hidden bg-slate-950 min-h-[560px] flex items-center">
+        <video
+          src="/videos/training-providers-hero.mp4"
+          autoPlay muted loop playsInline
+          className="absolute inset-0 w-full h-full object-cover opacity-30"
+        />
+        <div className="relative z-10 max-w-5xl mx-auto px-6 py-20">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-4">For Workforce Boards, Agencies & Community Partners</p>
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-white leading-tight mb-6 max-w-3xl">
+            Expand Training Capacity.<br />Deliver Compliant Outcomes.
+          </h1>
+          <p className="text-slate-300 text-lg leading-relaxed mb-8 max-w-2xl">
+            Elevate for Humanity helps agencies connect residents to industry-recognized credentials and supports compliant delivery for workforce-funded programs — WIOA, RAPIDS, WRG, and JRI.
+          </p>
+          <div className="flex flex-wrap gap-4">
+            <a href="#partner-form" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-lg transition-colors text-base">
+              Request a Partnership Meeting
+            </a>
+            <a href="#refer" className="border-2 border-white/30 text-white font-bold px-8 py-4 rounded-lg hover:bg-white/10 transition-colors text-base">
+              Refer a Program or Cohort
+            </a>
+          </div>
+          <p className="mt-6 text-slate-400 text-sm">
+            Call or text: <a href="tel:3173143757" className="text-white font-semibold hover:text-brand-red-300">(317) 314-3757</a>
+          </p>
+        </div>
+      </section>
+
+      {/* ── POSITIONING STATEMENT ── */}
+      <section className="bg-brand-red-700 py-10 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-white text-lg sm:text-xl font-semibold leading-relaxed">
+            &ldquo;Elevate for Humanity helps workforce and community partners deliver credentialed training, testing, and employment pathways — with the compliance infrastructure to back it up.&rdquo;
+          </p>
+        </div>
+      </section>
+
+      {/* ── WHAT WE DELIVER ── */}
+      <section className="bg-white py-16 sm:py-20 px-6 border-t border-slate-100">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-3 text-center">What we deliver</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3 text-center">End-to-End Workforce Training Infrastructure</h2>
+          <p className="text-slate-500 text-sm text-center mb-12 max-w-xl mx-auto">
+            We don&apos;t just teach courses. We operate the full pipeline — from enrollment to credential attainment to employer placement.
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[
+              {
+                icon: '🎓',
+                title: 'Training Delivery',
+                desc: 'ETPL-approved programs in healthcare, trades, IT, and more. In-person, hybrid, and cohort-based delivery.',
+                color: 'border-brand-blue-500',
+              },
+              {
+                icon: '📋',
+                title: 'Compliance & Reporting',
+                desc: 'WIOA-aligned participant tracking, RAPIDS-compliant apprenticeship reporting, and outcome documentation.',
+                color: 'border-brand-red-500',
+              },
+              {
+                icon: '💻',
+                title: 'Credentialing & Testing',
+                desc: 'Certiport Authorized Testing Center. EPA 608, NHA, WorkKeys, and Microsoft certifications on-site.',
+                color: 'border-violet-500',
+              },
+              {
+                icon: '🤝',
+                title: 'Employer Connections',
+                desc: 'Pre-screened, job-ready graduates. OJT reimbursement structuring and WOTC support for hiring partners.',
+                color: 'border-emerald-500',
+              },
+            ].map((s) => (
+              <div key={s.title} className={`border-t-4 ${s.color} bg-slate-50 rounded-xl p-6`}>
+                <span className="text-3xl block mb-3">{s.icon}</span>
+                <h3 className="font-extrabold text-slate-900 text-base mb-2">{s.title}</h3>
+                <p className="text-slate-600 text-sm leading-relaxed">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── COMPLIANCE CREDENTIALS ── */}
+      <section className="bg-slate-950 py-14 px-6">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3 text-center">Compliance infrastructure</p>
+          <h2 className="text-2xl font-extrabold text-white mb-10 text-center">Built for Audit. Ready for Contracts.</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { label: 'DOL RAPIDS-Compliant', desc: 'Registered apprenticeship programs with RTI hours tied to occupations and DOL reporting.' },
+              { label: 'Indiana ETPL Certified', desc: 'On the Indiana DWD Eligible Training Provider List — eligible for WIOA Individual Training Accounts.' },
+              { label: 'WIOA Title I Aligned', desc: 'Programs structured for Adult, Dislocated Worker, and Youth funding streams.' },
+              { label: 'Workforce Ready Grant', desc: 'Indiana state grant-eligible programs for high-demand certifications.' },
+              { label: 'JRI / Justice Reinvestment', desc: 'Approved to serve justice-involved individuals through Indiana DWD funding.' },
+              { label: 'EmployIndy Partner', desc: 'Integrated with Indianapolis workforce ecosystem for referrals and co-enrollment.' },
+            ].map((c) => (
+              <div key={c.label} className="bg-slate-900 border border-slate-700 rounded-xl p-5 flex items-start gap-3">
+                <CheckCircle className="w-5 h-5 text-brand-red-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-white text-sm mb-1">{c.label}</p>
+                  <p className="text-slate-400 text-xs leading-relaxed">{c.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── HOW WE PARTNER ── */}
+      <section className="bg-white py-16 sm:py-20 px-6 border-t border-slate-100">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-3 text-center">Partnership models</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-12 text-center">How We Work With Agencies</h2>
+          <div className="grid sm:grid-cols-3 gap-6">
+            {[
+              {
+                num: '01',
+                title: 'Training Delivery Partner',
+                desc: 'Your agency refers participants. We deliver the training, manage compliance, and report outcomes back to you. Ideal for WorkOne centers and workforce boards.',
+                cta: 'Refer a Cohort',
+                href: '#refer',
+              },
+              {
+                num: '02',
+                title: 'Co-Enrollment Partner',
+                desc: 'We co-enroll participants in WIOA-funded programs, handle ITA documentation, and coordinate with your case managers throughout training.',
+                cta: 'Request a Meeting',
+                href: '#partner-form',
+              },
+              {
+                num: '03',
+                title: 'Managed Program Operator',
+                desc: 'We operate a full workforce training program on your behalf — curriculum, instruction, compliance, testing, and placement reporting.',
+                cta: 'Discuss a Contract',
+                href: '#partner-form',
+              },
+            ].map((m) => (
+              <div key={m.num} className="bg-slate-50 border border-slate-200 rounded-xl p-7 flex flex-col">
+                <p className="text-4xl font-black text-slate-200 mb-4">{m.num}</p>
+                <h3 className="font-extrabold text-slate-900 text-base mb-3">{m.title}</h3>
+                <p className="text-slate-600 text-sm leading-relaxed flex-1 mb-6">{m.desc}</p>
+                <a href={m.href} className="inline-flex items-center gap-1.5 text-brand-red-600 hover:text-brand-red-700 font-bold text-sm">
+                  {m.cta} <ArrowRight className="w-4 h-4" />
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── REFER SECTION ── */}
+      <section id="refer" className="bg-slate-50 border-t border-slate-200 py-14 px-6">
+        <div className="max-w-4xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8">
+          <div className="max-w-xl">
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-3">Referrals</p>
+            <h2 className="text-2xl font-extrabold text-slate-900 mb-3">Refer a Program or Cohort</h2>
+            <p className="text-slate-600 text-sm leading-relaxed">
+              Have a group of participants ready for training? A specific occupation or funding stream in mind? Send us the details and we&apos;ll structure a program around your cohort — including compliance documentation, scheduling, and outcome reporting.
             </p>
-            <div className="flex flex-wrap gap-4">
-              <Link href="/contact" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-full font-bold transition-all hover:scale-105">
-                Become a Partner <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link href="/workone-partner-packet" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-full font-bold transition-all border border-white/40">
-                Partner Resources
-              </Link>
-            </div>
           </div>
-        </div>
-      </section>
-
-      {/* How We Work Together */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-black text-center mb-4">How We Work Together</h2>
-          <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
-            Elevate for Humanity is an approved training provider on Indiana's Eligible Training Provider List (ETPL). Here's how we partner with workforce organizations.
-          </p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { title: 'Participant Referrals', desc: 'WorkOne career advisors refer WIOA-eligible participants directly to our programs using Individual Training Accounts (ITAs).', image: '/images/pages/workforce-board-page-1.jpg' },
-              { title: 'OJT Contracts', desc: 'We coordinate On-the-Job Training contracts with WorkOne Indianapolis for employer wage reimbursement during training.', image: '/images/pages/workforce-board-page-3.jpg' },
-              { title: 'Progress Reporting', desc: 'We submit attendance, credential attainment, and job placement data back to your office on your schedule.', image: '/images/pages/workforce-board-page-5.jpg' },
-              { title: 'Co-Enrollment', desc: 'Students can be co-enrolled in WIOA and other programs simultaneously. We coordinate with case managers to avoid duplication.', image: '/images/pages/workforce-board-page-7.jpg' },
-            ].map((service) => (
-              <div key={service.title} className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
-                <div className="relative h-36 overflow-hidden">
-                  <Image src={service.image} alt={service.title} fill sizes="25vw" className="object-cover" />
-                </div>
-                <div className="p-5">
-                  <h3 className="font-bold text-slate-900 mb-2">{service.title}</h3>
-                  <p className="text-slate-600 text-sm">{service.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Partner Types */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-black text-center mb-4">Who We Partner With</h2>
-          <p className="text-center text-slate-600 mb-12">Organizations we work with to serve Indiana job seekers</p>
-          <div className="grid md:grid-cols-2 gap-8">
-            {[
-              { type: 'Workforce Board', name: 'WorkOne Indianapolis (Region 5)', desc: 'Our primary workforce board partner. We accept WIOA Adult, Dislocated Worker, and Youth referrals. ITA-funded enrollment processed through INTraining (Location ID: 10004621).', image: '/images/pages/workforce-partners-page-1.jpg' },
-              { type: 'State Agency', name: 'Indiana DWD / ETPL', desc: 'Listed on the Indiana Eligible Training Provider List. Programs approved for WIOA funding statewide. Annual performance data submitted to DWD.', image: '/images/pages/workforce-board-page-2.jpg' },
-              { type: 'Reentry', name: 'JRI & Community Corrections', desc: 'JRI-approved provider. We accept referrals from probation officers, community corrections, and reentry coordinators. Progress reports sent on your schedule.', image: '/images/pages/workforce-board-page-4.jpg' },
-              { type: 'Housing', name: 'Housing Authorities & FSS Programs', desc: 'We accept FSS and Section 3 resident referrals from IHA and other Indiana housing authorities for career training and credential programs.', image: '/images/pages/workforce-board-page-6.jpg' },
-            ].map((partner) => (
-              <div key={partner.name} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-md transition-shadow flex">
-                <div className="relative w-36 flex-shrink-0">
-                  <Image src={partner.image} alt={partner.name} fill sizes="144px" className="object-cover" />
-                  <div className="absolute top-3 left-3">
-                    <span className="bg-brand-blue-600 text-white px-2 py-0.5 rounded text-xs font-bold">{partner.type}</span>
-                  </div>
-                </div>
-                <div className="p-5">
-                  <h3 className="font-bold text-slate-900 mb-1">{partner.name}</h3>
-                  <p className="text-slate-600 text-sm">{partner.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* For WorkOne Staff */}
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-white">
-              <h2 className="text-3xl font-black mb-6">For WorkOne Staff</h2>
-              <p className="text-brand-blue-100 mb-6">
-                Career advisors and case managers: We coordinate directly with WorkOne Indianapolis (Region 5) for participant referrals, OJT contracts, work experience authorizations, and outcome reporting.
-              </p>
-              <ul className="space-y-4 mb-8">
-                {[
-                  'Program fact sheets and eligibility requirements',
-                  'ITA request forms and processing guides',
-                  'Direct contact for student referrals',
-                  'Real-time enrollment and progress updates',
-                  'Weekly progress reports for active participants',
-                  'Credential attainment reported within 5 business days',
-                  'OJT training plans and internship agreements available',
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link href="/workone-partner-packet" className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-6 py-3 rounded-full font-bold hover:bg-white transition-all">
-                Access Partner Packet <ArrowRight className="w-5 h-5" />
-              </Link>
-            </div>
-            <div className="relative h-80 rounded-2xl overflow-hidden shadow-2xl">
-              <Image src="/images/pages/partner-page-15.jpg" alt="WorkOne career advisor" fill sizes="100vw" className="object-cover" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ETPL Information */}
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="bg-white rounded-2xl p-8 md:p-12">
-            <div className="grid lg:grid-cols-2 gap-8 items-center">
-              <div>
-                <h2 className="text-2xl font-black text-slate-900 mb-4">ETPL Approved Provider</h2>
-                <p className="text-slate-600 mb-4">
-                  Elevate for Humanity is listed on Indiana's Eligible Training Provider List (ETPL), which means our programs are approved for WIOA funding.
-                </p>
-                <p className="text-slate-600 mb-6">
-                  Job seekers can use Individual Training Accounts (ITAs) to enroll in our programs at no cost to them.
-                </p>
-                <div className="flex flex-wrap gap-4">
-                  <Link href="/programs" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition-colors">
-                    View Approved Programs
-                  </Link>
-                  <a href="https://www.in.gov/dwd/career-training-adult-ed/intraining/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-semibold hover:bg-white transition-colors">
-                    View ETPL List
-                  </a>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  { label: 'Programs', value: '15+' },
-                  { label: 'Credentials', value: '25+' },
-                  { label: 'Completion Rate', value: '89%' },
-                  { label: 'Job Placement', value: '85%' },
-                ].map((stat, i) => (
-                  <div key={i} className="bg-white rounded-xl p-6 text-center shadow-sm">
-                    <div className="text-3xl font-black text-brand-blue-600 mb-1">{stat.value}</div>
-                    <div className="text-slate-600 text-sm">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-black text-slate-900 mb-4">Partner With Us</h2>
-          <p className="text-xl text-slate-600 mb-8">
-            Let's work together to connect more Hoosiers with career training and employment.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/contact" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-full font-bold transition-all hover:scale-105">
-              Contact Us <ArrowRight className="w-5 h-5" />
-            </Link>
-            <a href="/support" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-full font-bold transition-all border border-white/30">
-              <Phone className="w-5 h-5" /> (317) 314-3757
+          <div className="flex flex-col gap-3 flex-shrink-0">
+            <a href="#partner-form" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-sm text-center">
+              Submit a Referral
+            </a>
+            <a href="tel:3173143757" className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 font-semibold px-8 py-3.5 rounded-lg hover:bg-white transition-colors text-sm">
+              <Phone className="w-4 h-4" /> (317) 314-3757
             </a>
           </div>
         </div>
       </section>
-    </div>
+
+      {/* ── MEETING REQUEST FORM ── */}
+      <section id="partner-form" className="bg-white border-t border-slate-200 py-16 sm:py-20 px-6">
+        <div className="max-w-2xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-3 text-center">Get started</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3 text-center">Request a Partnership Meeting</h2>
+          <p className="text-slate-500 text-sm text-center mb-10">
+            Tell us about your agency and what you&apos;re trying to accomplish. We respond within 24 hours.
+          </p>
+          <PartnerMeetingForm />
+        </div>
+      </section>
+
+    </main>
   );
 }

@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { getRoleDestination } from '@/lib/auth/role-destinations';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
 
 export async function GET(request: Request) {
@@ -79,19 +80,8 @@ export async function GET(request: Request) {
       // Route by role — always, unless an explicit ?next= was provided
       const hasExplicitNext = requestUrl.searchParams.has('next') && next !== '/learner/dashboard';
       if (!hasExplicitNext) {
-        if (resolvedRole === 'admin' || resolvedRole === 'super_admin') {
-          return NextResponse.redirect(new URL('/admin/dashboard', requestUrl.origin));
-        } else if (resolvedRole === 'employer') {
-          return NextResponse.redirect(new URL('/employer-portal', requestUrl.origin));
-        } else if (resolvedRole === 'staff') {
-          return NextResponse.redirect(new URL('/onboarding/staff', requestUrl.origin));
-        } else if (resolvedRole === 'program_holder') {
-          return NextResponse.redirect(new URL('/program-holder/onboarding', requestUrl.origin));
-        } else if (resolvedRole === 'partner') {
-          return NextResponse.redirect(new URL('/partner/onboarding', requestUrl.origin));
-        } else if (resolvedRole === 'instructor') {
-          return NextResponse.redirect(new URL('/instructor/dashboard', requestUrl.origin));
-        }
+        const destination = getRoleDestination(resolvedRole);
+        return NextResponse.redirect(new URL(destination, requestUrl.origin));
       }
 
       return NextResponse.redirect(new URL(next, requestUrl.origin));

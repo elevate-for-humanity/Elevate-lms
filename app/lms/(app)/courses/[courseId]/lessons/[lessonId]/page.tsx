@@ -62,6 +62,9 @@ import { HVAC_QUICK_CHECKS } from '@/lib/courses/hvac-quick-checks';
 import { ExplainSimply } from '@/components/lms/ai/ExplainSimply';
 import { TranslateToggle } from '@/components/lms/ai/TranslateToggle';
 import SpacedRepetitionReview from '@/components/lms/SpacedRepetitionReview';
+import LessonActivityMenu from '@/components/lms/LessonActivityMenu';
+import { getActivitiesForLesson, getDefaultActivity } from '@/lib/lms/activity-map';
+import type { ActivityId } from '@/lib/lms/activity-map';
 
 const LessonVideoWithSimulation = dynamic(
   () => import('@/components/lms/LessonVideoWithSimulation'),
@@ -82,18 +85,39 @@ export default function LessonPage() {
   const [isCompleted, setIsCompleted] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   // Activity tab — driven by ?activity= param or defaults to 'video'
-  const [activeActivity, setActiveActivity] = useState<string>('video');
+  const [activeActivity, setActiveActivity] = useState<ActivityId>('video');
+  // Tracks which activities the learner has interacted with (gates checkpoint tab)
+  const [attempted, setAttempted] = useState<Set<ActivityId>>(new Set());
 
   // ActivityParamSync reads ?activity= and updates state.
   // Must be inside Suspense because useSearchParams suspends on first render.
-  function ActivityParamSync({ onActivity }: { onActivity: (a: string) => void }) {
+  function ActivityParamSync({ onActivity }: { onActivity: (a: ActivityId) => void }) {
     const sp = useSearchParams();
     useEffect(() => {
-      const a = sp.get('activity');
+      const a = sp.get('activity') as ActivityId | null;
       if (a) onActivity(a);
     }, [sp, onActivity]);
     return null;
   }
+
+  // Reset attempted set when lesson changes so gating is fresh per lesson
+  useEffect(() => {
+    setAttempted(new Set());
+    if (lesson) {
+      const stepType = lesson.step_type || lesson.content_type || 'lesson';
+      setActiveActivity(getDefaultActivity(stepType));
+    }
+  }, [lessonId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Mark an activity as attempted (called when learner interacts with it)
+  const markAttempted = useCallback((id: ActivityId) => {
+    setAttempted(prev => {
+      if (prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  }, []);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(new Set());
   const [courseCompleted, setCourseCompleted] = useState(false);
@@ -1036,66 +1060,21 @@ export default function LessonPage() {
 
           {/* ── NHA-STYLE ACTIVITY TABS ── */}
           {(() => {
-            type ActivityDef = { id: string; label: string; icon: React.ElementType; color: string; required: boolean };
             const stepType = lesson.step_type || lesson.content_type || 'lesson';
-            const isCheckpointLesson = stepType === 'checkpoint' || stepType === 'quiz' || stepType === 'exam';
-            const isLabLesson = stepType === 'lab' || stepType === 'assignment';
-
-            // Build activity list from lesson.activities (DB) or derive from step_type
-            const storedActivities: any[] = lesson.activities || [];
-            const activityDefs: ActivityDef[] = storedActivities.length > 0
-              ? storedActivities
-                  .sort((a: any, b: any) => a.order - b.order)
-                  .map((a: any) => ({
-                    id: a.type,
-                    label: a.label,
-                    icon: { video: Video, reading: FileText, flashcards: Brain, lab: FlaskConical, practice: Zap, checkpoint: Shield }[a.type as string] ?? BookOpen,
-                    color: { video: 'text-brand-blue-600', reading: 'text-slate-600', flashcards: 'text-purple-600', lab: 'text-green-600', practice: 'text-amber-600', checkpoint: 'text-brand-red-600' }[a.type as string] ?? 'text-slate-600',
-                    required: a.required,
-                  }))
-              : [
-                  { id: 'video',      label: 'Watch Lesson Video',  icon: Video,        color: 'text-brand-blue-600', required: true  },
-                  { id: 'reading',    label: 'Reading',             icon: FileText,     color: 'text-slate-600',      required: true  },
-                  { id: 'flashcards', label: 'Flashcards',          icon: Brain,        color: 'text-purple-600',     required: false },
-                  ...(isLabLesson ? [{ id: 'lab', label: 'Hands-On Lab', icon: FlaskConical, color: 'text-green-600', required: true }] : []),
-                  { id: 'practice',   label: 'Practice Questions',  icon: Zap,          color: 'text-amber-600',      required: false },
-                  ...(isCheckpointLesson ? [{ id: 'checkpoint', label: isCheckpointLesson ? 'Checkpoint Quiz' : 'Quiz', icon: Shield, color: 'text-brand-red-600', required: true }] : []),
-                  { id: 'notes',      label: 'My Notes',            icon: MessageSquare,color: 'text-slate-500',      required: false },
-                  { id: 'resources',  label: 'Resources',           icon: Download,     color: 'text-slate-500',      required: false },
-                ];
-
-            const currentActivity = activityDefs.find(a => a.id === activeActivity) ?? activityDefs[0];
+            const activityDefs = getActivitiesForLesson(stepType, lesson.activities);
 
             return (
               <>
-                {/* Tab bar */}
-                <div className="border-b border-slate-200 mb-6">
-                  <div className="flex gap-1 overflow-x-auto pb-0">
-                    {activityDefs.map((act) => {
-                      const Icon = act.icon;
-                      const isActive = activeActivity === act.id;
-                      const isGated = act.id === 'checkpoint' && !isCompleted && activityDefs.filter(a => a.required && a.id !== 'checkpoint').some(a => true);
-                      return (
-                        <button
-                          key={act.id}
-                          onClick={() => isGated ? undefined : setActiveActivity(act.id)}
-                          disabled={false}
-                          className={`flex items-center gap-1.5 px-3 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition ${
-                            isActive
-                              ? 'border-brand-blue-600 text-brand-blue-600'
-                              : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'
-                          }`}
-                        >
-                          <Icon className={`w-4 h-4 ${isActive ? act.color : 'text-slate-400'}`} />
-                          <span className="hidden sm:inline">{act.label}</span>
-                          {act.required && !isCompleted && (
-                            <span className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0" />
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+                <LessonActivityMenu
+                  activities={activityDefs}
+                  activeId={activeActivity}
+                  attempted={attempted}
+                  isCompleted={isCompleted}
+                  onChange={(id) => {
+                    setActiveActivity(id);
+                    markAttempted(id);
+                  }}
+                />
 
                 {/* Activity content */}
                 <div className="mb-8">
@@ -1103,19 +1082,21 @@ export default function LessonPage() {
                   {/* VIDEO */}
                   {activeActivity === 'video' && (
                     <div>
+                      {/* Mark video attempted on mount */}
+                      {(() => { markAttempted('video'); return null; })()}
                       {lesson.video_url ? (
                         isHvacCourse ? (
                           <HvacLessonVideo
                             lessonId={lessonId}
                             videoUrl={lesson.video_url}
                             title={lesson.title}
-                            onComplete={() => { if (!isCompleted) markComplete(); }}
+                            onComplete={() => { markAttempted('video'); if (!isCompleted) markComplete(); }}
                           />
                         ) : (
                           <InteractiveVideoPlayer
                             videoUrl={lesson.video_url}
                             title={lesson.title}
-                            onComplete={() => { if (!isCompleted) markComplete(); }}
+                            onComplete={() => { markAttempted('video'); if (!isCompleted) markComplete(); }}
                           />
                         )
                       ) : (
@@ -1135,7 +1116,9 @@ export default function LessonPage() {
 
                   {/* READING */}
                   {activeActivity === 'reading' && (
-                    <div className="bg-white rounded-xl p-8 shadow-sm">
+                    <div className="bg-white rounded-xl p-8 shadow-sm" onScroll={() => markAttempted('reading')}>
+                      {/* Mark reading attempted on mount */}
+                      {(() => { markAttempted('reading'); return null; })()}
                       {lesson.content ? (
                         <>
                           <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }} />
@@ -1156,6 +1139,7 @@ export default function LessonPage() {
                   {/* FLASHCARDS */}
                   {activeActivity === 'flashcards' && (
                     <div>
+                      {(() => { markAttempted('flashcards'); return null; })()}
                       <SpacedRepetitionReview />
                     </div>
                   )}
@@ -1163,11 +1147,12 @@ export default function LessonPage() {
                   {/* LAB */}
                   {activeActivity === 'lab' && (
                     <div>
+                      {(() => { markAttempted('lab'); return null; })()}
                       {(lesson.step_type === 'lab' || lesson.step_type === 'assignment') ? (
                         <StepSubmissionForm
                           lessonId={lessonId}
                           stepType={lesson.step_type}
-                          onSubmitted={() => { if (!isCompleted) markComplete(); }}
+                          onSubmitted={() => { markAttempted('lab'); if (!isCompleted) markComplete(); }}
                         />
                       ) : (
                         <div className="bg-white rounded-xl p-8 shadow-sm text-center">
@@ -1186,14 +1171,14 @@ export default function LessonPage() {
                           questions={HVAC_QUICK_CHECKS[lessonId]}
                           title="Practice Questions"
                           passingScore={60}
-                          onComplete={() => {}}
+                          onComplete={() => markAttempted('practice')}
                         />
                       ) : lesson.quiz_questions?.length > 0 ? (
                         <QuizPlayer
                           questions={lesson.quiz_questions}
                           title="Practice Questions"
                           passingScore={60}
-                          onComplete={() => {}}
+                          onComplete={() => markAttempted('practice')}
                         />
                       ) : (
                         <div className="bg-white rounded-xl p-8 shadow-sm text-center">

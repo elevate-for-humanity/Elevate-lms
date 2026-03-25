@@ -32,6 +32,19 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
   const displayName = data.profile?.full_name?.split(' ')[0] || 'Admin';
   const greeting = mounted ? getGreeting() : 'Welcome';
   const c = data.counts;
+
+  // Recharts ResponsiveContainer requires window — skip charts until client is mounted
+  if (!mounted) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-8 animate-pulse space-y-4">
+        <div className="h-8 bg-slate-100 rounded w-1/3" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => <div key={i} className="h-24 bg-slate-100 rounded-xl" />)}
+        </div>
+        <div className="h-64 bg-slate-100 rounded-xl" />
+      </div>
+    );
+  }
   const certRate = c.enrollments > 0 ? Math.round((c.certificates / c.enrollments) * 100) : 0;
 
   // Chart data

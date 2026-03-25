@@ -51,29 +51,26 @@ export async function POST(req: NextRequest) {
 
   const db = createAdminClient();
 
-  // Store in applications table
+  // Store in leads table
   let applicationId: string | null = null;
   if (db) {
     try {
       const { data, error } = await db
-        .from('applications')
+        .from('leads')
         .insert({
           first_name: firstName,
           last_name: lastName,
           email: normalizedEmail,
           phone: normalizedPhone,
-          city: 'Not provided',
-          zip: '00000',
           program_interest: program || 'Not specified',
-          support_notes: supportNotes,
-          status: 'pending',
           source: source || 'funnel',
+          status: 'new',
         })
         .select('id')
         .single();
 
       if (error) {
-        logger.error('[funnel/lead] DB insert failed', new Error(error.message));
+        logger.error('[funnel/lead] DB insert failed', new Error(`${error.code}: ${error.message}`));
       } else {
         applicationId = data?.id || null;
         logger.info('[funnel/lead] Lead stored', { applicationId, email: normalizedEmail, source });

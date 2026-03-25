@@ -151,7 +151,7 @@ export default function HomePage() {
             {[
               { tag: 'Healthcare', full: 'Certified Nursing Assistant', duration: '4–8 weeks', salary: '$28–$42K/yr', video: '/videos/cna-hero.mp4', href: '/programs/cna' },
               { tag: 'Skilled Trades', full: 'HVAC Technician', duration: '12 weeks', salary: '$40–$80K/yr', video: '/videos/hvac-hero-final.mp4', href: '/programs/hvac-technician' },
-              { tag: 'Transportation', full: 'CDL Class A', duration: 'Weeks, not years', salary: '$50–$80K/yr', video: '/videos/cdl-hero.mp4', href: '/programs/cdl' },
+              { tag: 'Transportation', full: 'CDL Class A', duration: 'Weeks, not years', salary: '$50–$80K/yr', video: '/videos/cdl-hero.mp4', href: '/programs/cdl-training' },
               { tag: 'Apprenticeship', full: 'Barber Apprenticeship', duration: '15–17 months', salary: '$35–$65K+/yr', video: '/videos/barber-training.mp4', href: '/programs/barber-apprenticeship' },
             ].map((prog) => (
               <Link key={prog.full} href={prog.href} className="group relative rounded-2xl overflow-hidden block" style={{ aspectRatio: '9/14' }}>

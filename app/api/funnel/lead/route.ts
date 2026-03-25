@@ -87,7 +87,10 @@ export async function POST(req: NextRequest) {
   const sgKey = process.env.SENDGRID_API_KEY;
   if (sgKey) {
     const logoUrl = `${SITE_URL}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
-    const sourceLabel = source === 'check-eligibility' ? 'Eligibility Check' : 'Direct Application';
+    const sourceLabel =
+      source === 'check-eligibility' ? 'Eligibility Check' :
+      source === 'workforce-partners' ? 'Agency Partner Inquiry' :
+      'Direct Application';
     const html = `
 <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1a1a1a">
   <div style="text-align:center;padding:24px">

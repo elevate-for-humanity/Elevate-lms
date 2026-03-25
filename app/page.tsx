@@ -55,7 +55,7 @@ export default function HomePage() {
               ))}
             </ul>
             <div className="flex flex-wrap gap-3">
-              <Link href="/apply" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-base">
+              <Link href="/apply/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-base">
                 Start My Application
               </Link>
               <Link href="/check-eligibility" className="border-2 border-white/30 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors text-base">
@@ -134,7 +134,7 @@ export default function HomePage() {
             ))}
           </div>
           <div className="text-center mt-12">
-            <Link href="/apply" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-10 py-4 rounded-lg transition-colors text-base inline-block">
+            <Link href="/apply/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-10 py-4 rounded-lg transition-colors text-base inline-block">
               Start My Application
             </Link>
           </div>
@@ -259,12 +259,12 @@ export default function HomePage() {
               Apply in 5 minutes. Training may be fully funded. Graduate with a nationally recognized credential and a job offer.
             </p>
             <div className="flex flex-wrap gap-4 justify-center mb-8">
-              <Link href="/apply" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-lg font-bold text-lg transition-colors">
+              <Link href="/apply/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-lg font-bold text-lg transition-colors">
                 Apply Now
               </Link>
-              <Link href="/schedule-consultation" className="border-2 border-white/30 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition-colors">
+              <a href="tel:3173143757" className="border-2 border-white/30 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition-colors">
                 Talk to an Advisor
-              </Link>
+              </a>
             </div>
             <p className="text-slate-400 text-sm">
               Or call / text us directly:{' '}

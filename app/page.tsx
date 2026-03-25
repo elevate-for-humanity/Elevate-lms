@@ -154,8 +154,8 @@ export default function HomePage() {
               { name: 'IT', full: 'IT Certifications', duration: '8 weeks', salary: '$38–$55K/yr', img: '/images/pages/network-administration.jpg', href: '/programs/it-help-desk', color: 'border-slate-500' },
               { name: 'Barber', full: 'Barber Apprenticeship', duration: '15–17 months', salary: '$35–$65K+/yr', img: '/images/pages/barber-cutting.jpg', href: '/programs/barber-apprenticeship', color: 'border-brand-green-500' },
             ].map((prog) => (
-              <Link key={prog.name} href={prog.href} className={`group border-t-4 ${prog.color} bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col`}>
-                <div className="relative h-40 bg-slate-200">
+              <Link key={prog.name} href={prog.href} className={`group border-t-4 ${prog.color} bg-white text-slate-900 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col`}>
+                <div className="relative h-40 overflow-hidden bg-slate-200">
                   <Image src={prog.img} alt={prog.full} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
                 </div>
                 <div className="p-5 flex flex-col flex-1">

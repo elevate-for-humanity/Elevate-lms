@@ -141,36 +141,45 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── PROGRAMS ── */}
-      <section className="bg-white py-16 sm:py-20 px-6 border-t border-slate-100">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-3 text-center">Programs</p>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3 text-center">Career Programs That Lead to Jobs</h2>
-          <p className="text-slate-500 text-sm text-center mb-12 max-w-xl mx-auto">Every program ends with a nationally recognized credential and a clear path to employment.</p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+      {/* ── PROGRAMS — video hero cards ── */}
+      <section className="bg-slate-950 py-16 sm:py-20 px-6 border-t border-slate-800">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3 text-center">Programs</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3 text-center">Career Programs That Lead to Jobs</h2>
+          <p className="text-slate-400 text-sm text-center mb-12 max-w-xl mx-auto">Every program ends with a nationally recognized credential and a clear path to employment.</p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
             {[
-              { name: 'CNA', full: 'Certified Nursing Assistant', duration: '4–8 weeks', salary: '$28–$42K/yr', img: '/images/pages/cna-nursing-real.jpg', href: '/programs/cna-cert', color: 'border-brand-blue-500' },
-              { name: 'HVAC', full: 'HVAC Technician', duration: '12 weeks', salary: '$40–$80K/yr', img: '/images/pages/hvac-technician.jpg', href: '/programs/hvac-technician', color: 'border-brand-orange-500' },
-              { name: 'IT', full: 'IT Certifications', duration: '8 weeks', salary: '$38–$55K/yr', img: '/images/pages/network-administration.jpg', href: '/programs/it-help-desk', color: 'border-slate-500' },
-              { name: 'Barber', full: 'Barber Apprenticeship', duration: '15–17 months', salary: '$35–$65K+/yr', img: '/images/pages/barber-cutting.jpg', href: '/programs/barber-apprenticeship', color: 'border-brand-green-500' },
+              { tag: 'Healthcare', full: 'Certified Nursing Assistant', duration: '4–8 weeks', salary: '$28–$42K/yr', video: '/videos/cna-hero.mp4', href: '/programs/cna-cert' },
+              { tag: 'Skilled Trades', full: 'HVAC Technician', duration: '12 weeks', salary: '$40–$80K/yr', video: '/videos/hvac-hero-final.mp4', href: '/programs/hvac-technician' },
+              { tag: 'Transportation', full: 'CDL Class A', duration: 'Weeks, not years', salary: '$50–$80K/yr', video: '/videos/cdl-hero.mp4', href: '/programs/cdl-class-a' },
+              { tag: 'Apprenticeship', full: 'Barber Apprenticeship', duration: '15–17 months', salary: '$35–$65K+/yr', video: '/videos/barber-hero.mp4', href: '/programs/barber-apprenticeship' },
             ].map((prog) => (
-              <Link key={prog.name} href={prog.href} className={`group border-t-4 ${prog.color} bg-white text-slate-900 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col`}>
-                <div className="relative h-40 overflow-hidden bg-slate-200">
-                  <Image src={prog.img} alt={prog.full} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
-                </div>
-                <div className="p-5 flex flex-col flex-1">
-                  <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">{prog.name}</p>
-                  <h3 className="font-extrabold text-slate-900 text-sm mb-3 leading-snug">{prog.full}</h3>
-                  <div className="mt-auto space-y-1">
-                    <p className="text-xs text-slate-500">⏱ {prog.duration}</p>
-                    <p className="text-sm font-bold text-brand-green-700">💰 {prog.salary}</p>
+              <Link key={prog.full} href={prog.href} className="group relative rounded-2xl overflow-hidden block" style={{ aspectRatio: '9/14' }}>
+                {/* Video background */}
+                <video
+                  src={prog.video}
+                  autoPlay muted loop playsInline
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent" />
+                {/* Content */}
+                <div className="absolute bottom-0 left-0 right-0 p-5">
+                  <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-1">{prog.tag}</p>
+                  <h3 className="font-extrabold text-white text-base leading-snug mb-3">{prog.full}</h3>
+                  <div className="space-y-1">
+                    <p className="text-xs text-slate-300">⏱ {prog.duration}</p>
+                    <p className="text-sm font-bold text-green-400">💰 {prog.salary}</p>
+                  </div>
+                  <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-white bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full transition-colors">
+                    View Program →
                   </div>
                 </div>
               </Link>
             ))}
           </div>
           <div className="text-center">
-            <Link href="/programs" className="border-2 border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-sm inline-block">
+            <Link href="/programs" className="border-2 border-white/20 text-white hover:bg-white/10 font-bold px-8 py-3.5 rounded-lg transition-colors text-sm inline-block">
               View All Programs
             </Link>
           </div>

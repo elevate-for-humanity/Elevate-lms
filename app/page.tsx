@@ -152,7 +152,7 @@ export default function HomePage() {
               { tag: 'Healthcare', full: 'Certified Nursing Assistant', duration: '4–8 weeks', salary: '$28–$42K/yr', video: '/videos/cna-hero.mp4', href: '/programs/cna-cert' },
               { tag: 'Skilled Trades', full: 'HVAC Technician', duration: '12 weeks', salary: '$40–$80K/yr', video: '/videos/hvac-hero-final.mp4', href: '/programs/hvac-technician' },
               { tag: 'Transportation', full: 'CDL Class A', duration: 'Weeks, not years', salary: '$50–$80K/yr', video: '/videos/cdl-hero.mp4', href: '/programs/cdl-class-a' },
-              { tag: 'Apprenticeship', full: 'Barber Apprenticeship', duration: '15–17 months', salary: '$35–$65K+/yr', video: '/videos/barber-hero.mp4', href: '/programs/barber-apprenticeship' },
+              { tag: 'Apprenticeship', full: 'Barber Apprenticeship', duration: '15–17 months', salary: '$35–$65K+/yr', video: '/videos/barber-training.mp4', href: '/programs/barber-apprenticeship' },
             ].map((prog) => (
               <Link key={prog.full} href={prog.href} className="group relative rounded-2xl overflow-hidden block" style={{ aspectRatio: '9/14' }}>
                 {/* Video background */}
@@ -210,20 +210,20 @@ export default function HomePage() {
 
       {/* ── CREDIBILITY ── */}
       <section className="bg-white border-t border-slate-100 py-12 px-6">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-8 text-center">Approved & recognized by</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-8 text-center">Approved &amp; recognized by</p>
+          <div className="flex flex-wrap justify-center gap-3">
             {[
-              { title: 'DOL Registered Apprenticeship', icon: '🏛️' },
-              { title: 'Indiana ETPL Certified', icon: '📋' },
-              { title: 'Government Contractor', icon: '📜' },
-              { title: 'Certiport Testing Center', icon: '💻' },
-              { title: 'IRS VITA Certified', icon: '💼' },
-              { title: 'EmployIndy Partner', icon: '🤝' },
+              { title: 'DOL Registered Apprenticeship', icon: '🏛️', bg: 'bg-blue-600', text: 'text-white' },
+              { title: 'Indiana ETPL Certified', icon: '📋', bg: 'bg-brand-red-600', text: 'text-white' },
+              { title: 'Government Contractor', icon: '📜', bg: 'bg-slate-800', text: 'text-white' },
+              { title: 'Certiport Testing Center', icon: '💻', bg: 'bg-violet-600', text: 'text-white' },
+              { title: 'IRS VITA Certified', icon: '💼', bg: 'bg-emerald-600', text: 'text-white' },
+              { title: 'EmployIndy Partner', icon: '🤝', bg: 'bg-amber-500', text: 'text-white' },
             ].map((c) => (
-              <div key={c.title} className="flex flex-col items-center text-center p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <span className="text-2xl mb-2">{c.icon}</span>
-                <p className="text-xs font-semibold text-slate-600 leading-tight">{c.title}</p>
+              <div key={c.title} className={`flex items-center gap-2.5 ${c.bg} ${c.text} px-5 py-3 rounded-full font-semibold text-sm whitespace-nowrap shadow-sm`}>
+                <span className="text-lg leading-none">{c.icon}</span>
+                {c.title}
               </div>
             ))}
           </div>

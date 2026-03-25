@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 import MarqueeBanner from '@/components/MarqueeBanner';
-import HomeHero from '@/components/home/HomeHero';
+import { BlurIn } from '@/components/animations/PremiumAnimations';
 
 export const metadata: Metadata = {
   title: 'Elevate for Humanity | Workforce Training — Indianapolis, Indiana',
@@ -21,102 +21,207 @@ export const metadata: Metadata = {
   },
 };
 
-const PROGRAMS = [
-  { label: 'Healthcare', title: 'CNA & Medical Assistant', desc: 'Indiana state CNA certification. NHA CCMA. Clinical rotations included. WIOA funded.', img: '/images/pages/card-cna.jpg', href: '/programs/cna', salary: '$30K–$42K', tag: 'Healthcare', position: 'center top' },
-  { label: 'Skilled Trades', title: 'HVAC, Welding & Electrical', desc: 'EPA 608, AWS, NCCER credentials. Hands-on lab. Tools provided. Trades pay $45K–$75K.', img: '/images/pages/card-hvac.jpg', href: '/programs?category=trades', salary: '$45K–$75K', tag: 'Trades', position: 'center center' },
-  { label: 'Transportation', title: 'CDL Class A', desc: 'Pre-trip, backing, road skills. Indiana freight industry needs drivers now.', img: '/images/pages/card-cdl.jpg', href: '/programs/cdl-training', salary: '$55K–$80K', tag: 'CDL', position: 'center center' },
-  { label: 'Barbering', title: 'Barber Apprenticeship', desc: 'DOL Registered Apprenticeship. Earn while you learn. Indiana Barber License on completion.', img: '/images/pages/card-barber.jpg', href: '/programs/barber-apprenticeship', salary: '$35K–$60K', tag: 'Apprenticeship', position: 'center top' },
-  { label: 'Business', title: 'Bookkeeping & Business', desc: 'QuickBooks, payroll, financial statements. Launch a business or land a finance role.', img: '/images/pages/card-business.jpg', href: '/programs?category=business', salary: '$38K–$55K', tag: 'Business', position: 'center center' },
-  { label: 'Safety', title: 'CPR & First Aid', desc: 'Live instructor. Mannequin shipped to your door. Certified same day. Free with enrollment.', img: '/images/pages/card-cpr.jpg', href: '/programs/cpr-first-aid', salary: 'Required credential', tag: 'Certification', position: 'center center' },
-];
-
-const FUNDING = [
-  { tag: 'Federal', name: 'WIOA', desc: 'Covers tuition, books, tools, and exam fees for eligible adults, dislocated workers, and youth 16–24.' },
-  { tag: 'Indiana State', name: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost for eligible participants.' },
-  { tag: 'Indiana State', name: 'JRI — Job Ready Indy', desc: 'Funded career training for eligible justice-involved individuals through Indiana DWD.' },
-  { tag: 'Federal', name: 'DOL Apprenticeship', desc: 'Earn wages from day one while completing your apprenticeship hours. No tuition cost.' },
-];
-
-const EMPLOYER_PROPS = [
-  { icon: '🎓', title: 'Pre-screened graduates', desc: 'Credentialed, job-ready candidates from our programs — vetted before they reach your door.' },
-  { icon: '💰', title: 'WOTC tax credits', desc: 'Work Opportunity Tax Credits for hiring eligible Elevate graduates. We handle the paperwork.' },
-  { icon: '🔄', title: 'OJT reimbursement', desc: 'On-the-job training wage reimbursement through WIOA — up to 50% of wages during training.' },
-  { icon: '📋', title: 'WIOA compliance', desc: 'Full compliance reporting, documentation, and case management built in.' },
-];
-
-const STATS = [
-  { value: '500+', label: 'Graduates Trained', sub: 'and counting' },
-  { value: '30+', label: 'Employer Partners', sub: 'active hiring' },
-  { value: '15+', label: 'Credentials Offered', sub: 'nationally recognized' },
-  { value: '$0', label: 'Cost to Eligible Participants', sub: 'WIOA & state funded' },
-];
-
-const TESTIMONIALS = [
-  { quote: "WIOA paid for my Medical Assistant training, and I started working right after graduation. Now I'm making $42,000 a year with full benefits.", name: 'Sarah M.', program: 'Medical Assistant', salary: '$42K/yr', photo: '/images/testimonials-hq/person-1.jpg' },
-  { quote: 'They provided an extremely informative and hospitable environment. I really enjoyed my classes. The staff made everything easy to understand.', name: 'Timothy S.', program: 'CDL Training', salary: '$55K/yr', photo: '/images/testimonials-hq/person-4.jpg' },
-  { quote: 'Anyone who wants to grow and make more money should try Elevate. You deserve it. The staff is amazing and easy to communicate with.', name: 'Jasmine R.', program: 'CNA Certification', salary: '$38K/yr', photo: '/images/testimonials-hq/person-3.jpg' },
-];
-
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-white">
 
-      {/* HERO */}
-      <HomeHero />
-
-      {/* ROTATING MARQUEE */}
-      <MarqueeBanner />
-
-      {/* WHO WE ARE */}
-      <section className="bg-white py-20 px-6 border-b-4 border-brand-red-600">
-        <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-3">Who We Are</p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-5">
-              Indianapolis&apos; workforce training platform — built for adults who need real results fast.
-            </h2>
-            <p className="text-slate-600 text-base leading-relaxed mb-5">
-              Elevate for Humanity is a DOL Registered Apprenticeship Sponsor and ETPL-approved training provider serving Indiana adults. We run short-term, credential-bearing programs in healthcare, skilled trades, CDL, barbering, and business — most available at <strong>zero cost</strong> to eligible participants through WIOA and state funding.
+      {/* ── SECTION 1: HERO ── */}
+      <section className="grid lg:grid-cols-2">
+        <div className="relative h-72 sm:h-96 lg:h-auto min-h-[520px] overflow-hidden bg-slate-900">
+          <video src="/videos/barber-hero.mp4"
+            autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" />
+        </div>
+        <div className="bg-slate-900 flex items-center">
+          <div className="px-8 py-12 lg:px-14 lg:py-16 max-w-xl w-full">
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3">Indianapolis, Indiana</p>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-4">
+              Get certified, funded, and hired in 4–12 weeks.
+            </h1>
+            <p className="text-slate-300 text-base leading-relaxed mb-8 max-w-xl">
+              No tuition for eligible applicants. Workforce training aligned with real employers — healthcare, trades, CDL, tech, and more.
             </p>
-            <p className="text-slate-600 text-base leading-relaxed mb-8">
-              We work directly with WorkOne, Indiana DWD, and employer partners to connect graduates with jobs — not just certificates.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/about" className="bg-slate-900 text-white font-bold px-6 py-3 rounded-lg hover:bg-slate-700 transition-colors text-sm">About Elevate</Link>
-              <Link href="/wioa-eligibility" className="border border-slate-300 text-slate-700 font-semibold px-6 py-3 rounded-lg hover:bg-slate-50 transition-colors text-sm">Check My Eligibility</Link>
+            <div className="flex flex-wrap gap-4">
+              <Link href="/check-eligibility" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-base">
+                Check Eligibility
+              </Link>
+              <Link href="/programs" className="border border-white/20 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors text-base">
+                See All Programs
+              </Link>
             </div>
-          </div>
-          <div className="relative h-72 sm:h-96 rounded-2xl overflow-hidden shadow-xl">
-            <Image src="/images/pages/section-success.jpg" alt="Elevate for Humanity graduates" fill priority className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
           </div>
         </div>
       </section>
 
-      {/* WHO WE HELP */}
-      <section className="bg-slate-950 py-20 px-6 border-b-4 border-brand-red-600">
+      {/* ── SECTION 2: AUDIENCE SPLIT ── */}
+      <section className="bg-white border-b border-slate-200 py-14 px-6">
+        <div className="max-w-5xl mx-auto text-center">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-3">Choose your path</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-10">Who are you here for?</h2>
+          <div className="grid sm:grid-cols-3 gap-6">
+            <div className="flex flex-col rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+              <div className="relative h-44 bg-slate-900">
+                <Image src="/images/pages/cna-patient-care.jpg" alt="Get Training" fill className="object-cover" sizes="(max-width: 640px) 100vw, 33vw" />
+                <div className="absolute inset-0 bg-slate-900/40" />
+                <span className="absolute bottom-3 left-4 text-white font-extrabold text-lg">Get Training</span>
+              </div>
+              <div className="flex flex-col flex-1 p-6 bg-white">
+                <p className="text-slate-600 text-sm leading-relaxed mb-6 flex-1">Short-term programs with real credentials. Funding available for eligible Indiana residents.</p>
+                <Link href="/students" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm text-center">
+                  Start Here
+                </Link>
+              </div>
+            </div>
+            <div className="flex flex-col rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+              <div className="relative h-44 bg-slate-900">
+                <Image src="/images/pages/office-administration.jpg" alt="Hire Talent" fill className="object-cover" sizes="(max-width: 640px) 100vw, 33vw" />
+                <div className="absolute inset-0 bg-slate-900/40" />
+                <span className="absolute bottom-3 left-4 text-white font-extrabold text-lg">Hire Talent</span>
+              </div>
+              <div className="flex flex-col flex-1 p-6 bg-white">
+                <p className="text-slate-600 text-sm leading-relaxed mb-6 flex-1">Pre-screened graduates, WOTC credits, OJT reimbursement, and workforce compliance support.</p>
+                <Link href="/employers" className="bg-slate-900 hover:bg-slate-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm text-center">
+                  Hire Graduates
+                </Link>
+              </div>
+            </div>
+            <div className="flex flex-col rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+              <div className="relative h-44 bg-slate-900">
+                <Image src="/images/pages/barber-apprenticeship.jpg" alt="Partner With Us" fill className="object-cover object-top" sizes="(max-width: 640px) 100vw, 33vw" />
+                <div className="absolute inset-0 bg-slate-900/40" />
+                <span className="absolute bottom-3 left-4 text-white font-extrabold text-lg">Partner With Us</span>
+              </div>
+              <div className="flex flex-col flex-1 p-6 bg-white">
+                <p className="text-slate-600 text-sm leading-relaxed mb-6 flex-1">Workforce boards, nonprofits, and employers — align your programs with our ETPL and DOL network.</p>
+                <Link href="/partners" className="bg-brand-blue-700 hover:bg-brand-blue-800 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm text-center">
+                  Become a Partner
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECTION 3: HOW IT WORKS ── */}
+      <section className="bg-slate-950 py-16 sm:py-20 px-6">
         <div className="max-w-5xl mx-auto">
-          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3 text-center">Who We Help</p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-4 text-center">
-            We train adults who are ready to change their lives.
-          </h2>
-          <p className="text-slate-400 text-base text-center mb-12 max-w-2xl mx-auto">
-            Our programs are designed for working adults, career changers, justice-involved individuals, and anyone who needs a faster path to a living wage.
-          </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3 text-center">Simple process</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-12 text-center">How it works</h2>
+          <div className="grid sm:grid-cols-5 gap-4">
             {[
-              { img: '/images/pages/card-adult.jpg', title: 'Working Adults', desc: 'Evening and weekend scheduling. Train without quitting your current job.' },
-              { img: '/images/pages/card-career.jpg', title: 'Career Changers', desc: 'Switch industries in weeks. Credentials that employers recognize immediately.' },
-              { img: '/images/pages/card-wioa.jpg', title: 'WIOA-Eligible Participants', desc: 'Dislocated workers, low-income adults, and youth 16–24 may qualify for fully funded training.' },
-              { img: '/images/pages/card-justice.jpg', title: 'Justice-Involved Individuals', desc: 'JRI and reentry programs. We partner with Indiana DWD to remove barriers to employment.' },
-            ].map((card) => (
-              <div key={card.title} className="bg-slate-900 rounded-xl overflow-hidden border border-slate-800">
-                <div style={{ height: '160px', overflow: 'hidden' }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={card.img} alt={card.title} loading="lazy" className="w-full h-full object-cover" style={{ display: 'block' }} />
+              { step: '1', label: 'Apply', sub: '5 minutes online' },
+              { step: '2', label: 'Get Approved for Funding', sub: 'WIOA, WRG, or self-pay' },
+              { step: '3', label: 'Start Training', sub: 'In-person or hybrid' },
+              { step: '4', label: 'Earn Your Credential', sub: 'Nationally recognized' },
+              { step: '5', label: 'Get Placed', sub: 'Employer network ready' },
+            ].map((s, i) => (
+              <div key={s.step} className="flex flex-col items-center text-center relative">
+                <div className="w-12 h-12 rounded-full bg-brand-red-600 text-white font-black text-lg flex items-center justify-center mb-3 flex-shrink-0">
+                  {s.step}
                 </div>
-                <div className="p-5">
-                  <h3 className="text-white font-bold text-base mb-2">{card.title}</h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">{card.desc}</p>
+                {i < 4 && (
+                  <div className="hidden sm:block absolute top-6 left-[calc(50%+24px)] right-[calc(-50%+24px)] h-px bg-slate-700" />
+                )}
+                <p className="text-white font-bold text-sm mb-1">{s.label}</p>
+                <p className="text-slate-500 text-xs">{s.sub}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-12">
+            <Link href="/check-eligibility" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-10 py-4 rounded-lg transition-colors text-base inline-block">
+              Check My Eligibility — It&apos;s Free
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── MARQUEE ── */}
+      <MarqueeBanner />
+
+      {/* ── SECTION 4: PROGRAM OUTCOMES ── */}
+      <section className="bg-white py-16 sm:py-20 px-6 border-t border-slate-100">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-3 text-center">Real outcomes</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3 text-center">Programs that pay off</h2>
+          <p className="text-slate-500 text-sm text-center mb-12 max-w-xl mx-auto">Every program ends with a nationally recognized credential and a clear path to employment.</p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              { name: 'CNA — Certified Nursing Assistant', duration: '4–8 weeks', credential: 'CNA Certification', salary: '$28–$42K/yr', growth: '+8% job growth', color: 'border-brand-blue-500', tag: 'Healthcare', img: '/images/pages/cna-nursing-real.jpg', href: '/programs/cna-cert' },
+              { name: 'HVAC Technician', duration: '12 weeks', credential: 'EPA 608 Universal, OSHA 30', salary: '$40–$80K/yr', growth: 'High demand statewide', color: 'border-brand-orange-500', tag: 'Skilled Trades', img: '/images/pages/hvac-technician.jpg', href: '/programs/hvac-technician' },
+              { name: 'CDL Class A', duration: 'Weeks, not years', credential: 'CDL Class A License', salary: '$50–$80K/yr', growth: 'Sign-on bonuses available', color: 'border-brand-red-500', tag: 'Transportation', img: '/images/pages/cdl-truck-highway.jpg', href: '/programs/cdl-class-a' },
+              { name: 'Barber Apprenticeship', duration: '15–17 months', credential: 'Indiana Barber License', salary: '$35–$65K+/yr', growth: 'Earn while you train', color: 'border-brand-green-500', tag: 'Apprenticeship', img: '/images/pages/barber-cutting.jpg', href: '/programs/barber-apprenticeship' },
+              { name: 'Phlebotomy Technician', duration: '6 weeks', credential: 'CPT (NHA), CPR', salary: '$32–$42K/yr', growth: 'ETPL approved', color: 'border-brand-blue-500', tag: 'Healthcare', img: '/images/pages/cpr-training-real.jpg', href: '/programs/phlebotomy-technician' },
+              { name: 'IT Help Desk Technician', duration: '8 weeks', credential: 'Certiport IT Specialist', salary: '$38–$55K/yr', growth: 'Remote-friendly roles', color: 'border-slate-500', tag: 'Technology', img: '/images/pages/network-administration.jpg', href: '/programs/it-help-desk' },
+            ].map((prog) => (
+              <div key={prog.name} className={`border-t-4 ${prog.color} bg-white rounded-xl overflow-hidden shadow-sm flex flex-col`}>
+                <div className="relative h-40 bg-slate-200">
+                  <Image src={prog.img} alt={prog.name} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+                </div>
+                <div className="p-5 flex flex-col flex-1">
+                  <span className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">{prog.tag}</span>
+                  <h3 className="font-extrabold text-slate-900 text-base mb-4 leading-snug">{prog.name}</h3>
+                  <div className="space-y-2 flex-1">
+                    <div className="flex items-center gap-2 text-sm text-slate-600"><span className="text-slate-400">⏱</span> {prog.duration}</div>
+                    <div className="flex items-center gap-2 text-sm text-slate-600"><span className="text-slate-400">🎓</span> {prog.credential}</div>
+                    <div className="flex items-center gap-2 text-sm font-bold text-brand-green-700"><span>💰</span> {prog.salary}</div>
+                    <div className="flex items-center gap-2 text-xs text-slate-500"><span>📈</span> {prog.growth}</div>
+                  </div>
+                  <Link href={prog.href} className="mt-5 text-brand-red-600 hover:text-brand-red-700 font-bold text-sm">
+                    View program →
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-10">
+            <Link href="/programs" className="border-2 border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-sm inline-block">
+              See All 20+ Programs
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CDL FULL-BLEED VIDEO ── */}
+      <section className="border-t border-slate-200">
+        <div className="relative w-full overflow-hidden bg-slate-900" style={{ height: 'clamp(320px, 42vw, 580px)' }}>
+          <video src="/videos/cdl-hero.mp4"
+            autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute bottom-4 left-4">
+            <span className="bg-slate-900/80 text-white text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded backdrop-blur-sm">CDL Training</span>
+          </div>
+        </div>
+        <div className="bg-slate-900 px-6 py-12 sm:py-16">
+          <div className="max-w-4xl mx-auto">
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3">Commercial Driver&apos;s License</p>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight mb-4 max-w-2xl">CDL Class A — $55K–$80K Starting. Training in Weeks.</h2>
+            <p className="text-slate-300 text-base leading-relaxed mb-8 max-w-2xl">Indiana&apos;s freight and logistics industry needs drivers now. Elevate&apos;s CDL program covers pre-trip inspection, backing maneuvers, and road skills — everything you need to pass the CDL skills test and start earning.</p>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/programs/cdl-class-a" className="bg-white text-slate-900 hover:bg-slate-100 font-bold px-6 py-3 rounded-lg transition-colors text-sm">See CDL Program</Link>
+              <Link href="/check-eligibility" className="border border-white/20 text-white hover:bg-white/10 font-semibold px-6 py-3 rounded-lg transition-colors text-sm">Check Funding</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECTION 5: CREDIBILITY ── */}
+      <section className="bg-white border-t border-slate-100 py-14 px-6">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-3 text-center">Verified credentials</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3 text-center">Backed by the institutions that matter</h2>
+          <p className="text-slate-500 text-sm text-center mb-12 max-w-xl mx-auto">Our programs are approved, registered, and recognized by federal and state workforce agencies.</p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { title: 'DOL Registered Apprenticeship Sponsor', desc: 'U.S. Department of Labor — official registered apprenticeship programs with earn-while-you-learn structure.', icon: '🏛️' },
+              { title: 'Indiana ETPL Certified Provider', desc: 'Indiana DWD Eligible Training Provider List — programs eligible for WIOA and Workforce Ready Grant funding.', icon: '📋' },
+              { title: 'Government Contractor & State Bidder', desc: 'Approved state bidder and government contractor for workforce and vocational training services.', icon: '📜' },
+              { title: 'Certiport Authorized Testing Center', desc: 'Official testing site for Microsoft, CompTIA, and IT Specialist certifications.', icon: '💻' },
+              { title: 'IRS VITA Certified Site', desc: 'IRS-certified Volunteer Income Tax Assistance site — free tax prep and financial services training.', icon: '💼' },
+              { title: 'EmployIndy Workforce Partner', desc: 'Aligned with Indianapolis workforce development ecosystem for employer connections and job placement.', icon: '🤝' },
+            ].map((c) => (
+              <div key={c.title} className="flex items-start gap-4 bg-slate-50 border border-slate-200 rounded-xl p-5">
+                <span className="text-2xl flex-shrink-0">{c.icon}</span>
+                <div>
+                  <p className="font-bold text-slate-900 text-sm mb-1">{c.title}</p>
+                  <p className="text-slate-500 text-xs leading-relaxed">{c.desc}</p>
                 </div>
               </div>
             ))}
@@ -124,222 +229,69 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* PROGRAMS */}
-      <section className="bg-white py-20 px-6 border-b-4 border-slate-200">
-        <div className="max-w-6xl mx-auto">
-          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-3">Programs</p>
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight max-w-xl">
-              Six career tracks. Weeks to complete. Real credentials.
-            </h2>
-            <Link href="/programs" className="flex-shrink-0 border border-slate-300 text-slate-700 font-semibold px-5 py-2.5 rounded-lg hover:bg-slate-50 transition-colors text-sm">
-              View All Programs →
-            </Link>
+      {/* ── SKILLED TRADES VIDEO ── */}
+      <section className="grid lg:grid-cols-2 border-t border-slate-800">
+        <div className="bg-slate-900 flex items-center order-2 lg:order-1">
+          <div className="px-8 py-12 lg:px-14 lg:py-16 max-w-xl w-full">
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3">Skilled Trades</p>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight mb-4">HVAC, Welding, Electrical — Hands-On Training, Real Credentials</h2>
+            <p className="text-slate-300 text-base leading-relaxed mb-6">Trades jobs pay $45K–$75K starting. Elevate&apos;s programs combine classroom instruction, hands-on lab work, and nationally recognized credentials — EPA 608, AWS, NCCER — in weeks, not years.</p>
+            <ul className="space-y-2 mb-8">
+              {['HVAC Technician — EPA 608 certified', 'Welding — AWS D1.1 structural certification', 'Electrical — NCCER Core + Level 1', 'All tools and safety gear provided'].map((b, i) => (
+                <li key={i} className="flex items-start gap-3 text-sm text-slate-300">
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0" />{b}
+                </li>
+              ))}
+            </ul>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/programs?category=trades" className="bg-white text-slate-900 hover:bg-slate-100 font-bold px-6 py-3 rounded-lg transition-colors text-sm">See Trades Programs</Link>
+              <Link href="/credentials" className="border border-white/20 text-white hover:bg-white/10 font-semibold px-6 py-3 rounded-lg transition-colors text-sm">View Credentials</Link>
+            </div>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {PROGRAMS.map((p) => (
-              <Link key={p.title} href={p.href} className="group flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-lg hover:border-brand-red-300 transition-all">
-                {/* Image — fixed 200px height, never overflows into text */}
-                <div className="relative flex-shrink-0 overflow-hidden" style={{ height: '200px' }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={p.img}
-                    alt={p.title}
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute top-3 left-3">
-                    <span className="bg-slate-900/80 text-white text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded backdrop-blur-sm">{p.tag}</span>
-                  </div>
-                </div>
-                {/* Text — always below image, never clipped */}
-                <div className="flex flex-col flex-1 p-5">
-                  <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-1">{p.label}</p>
-                  <h3 className="text-slate-900 font-extrabold text-lg mb-2 leading-tight">{p.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed mb-4 flex-1">{p.desc}</p>
-                  <div className="flex items-center justify-between mt-auto">
-                    <span className="text-brand-green-700 font-bold text-xs bg-brand-green-50 px-2.5 py-1 rounded-full">{p.salary}</span>
-                    <span className="text-brand-red-600 text-sm font-semibold group-hover:underline">Learn more →</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+        </div>
+        <div className="relative h-72 sm:h-96 lg:h-auto min-h-[460px] overflow-hidden bg-slate-900 order-1 lg:order-2">
+          <video src="/videos/electrician-trades.mp4"
+            autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" />
         </div>
       </section>
 
-      {/* STATS BAND */}
-      <div className="bg-brand-red-700 border-y-4 border-brand-red-800 py-14 px-6">
-        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {STATS.map((m) => (
-            <div key={m.label}>
-              <div className="text-4xl sm:text-5xl font-black text-white mb-1">{m.value}</div>
-              <div className="text-sm font-semibold text-brand-red-100 mb-0.5">{m.label}</div>
-              <div className="text-xs text-brand-red-200">{m.sub}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* FUNDING */}
-      <section className="bg-slate-950 py-20 px-6 border-b-4 border-brand-red-600">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3">Funding</p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-4 max-w-2xl">
-            Most participants pay $0 for training.
-          </h2>
-          <p className="text-slate-400 text-base leading-relaxed mb-10 max-w-2xl">
-            Federal and Indiana state workforce funding covers tuition, books, tools, and certification exam fees for eligible participants. We help you navigate every option.
-          </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
-            {FUNDING.map((f) => (
-              <div key={f.name} className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-                <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>
-                <h3 className="text-white font-bold text-base mb-2">{f.name}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{f.desc}</p>
+      {/* ── FUNDING ── */}
+      <div className="bg-brand-red-700 border-t border-brand-red-800 py-14 sm:py-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-brand-red-200 font-bold text-xs uppercase tracking-widest mb-3">Funding</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">Most participants pay $0 for training</h2>
+          <p className="text-brand-red-100 leading-relaxed mb-10 max-w-2xl">Federal and Indiana state workforce funding covers tuition, books, tools, and certification exam fees for eligible participants.</p>
+          <div className="grid sm:grid-cols-3 gap-4 mb-10">
+            {[
+              { label: 'WIOA', tag: 'Federal', desc: 'Covers tuition, books, tools, and exam fees for eligible adults, dislocated workers, and youth 16–24.' },
+              { label: 'Workforce Ready Grant', tag: 'Indiana State', desc: 'Indiana state grant covering high-demand certification programs at no cost for eligible participants.' },
+              { label: 'JRI — Job Ready Indy', tag: 'Indiana State', desc: 'Funded career training for eligible justice-involved individuals through Indiana DWD.' },
+            ].map((f) => (
+              <div key={f.label} className="bg-white/10 rounded-xl p-6">
+                <p className="text-brand-red-200 text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>
+                <h3 className="text-white font-bold text-base mb-2">{f.label}</h3>
+                <p className="text-brand-red-100 text-sm leading-relaxed">{f.desc}</p>
               </div>
             ))}
           </div>
           <div className="flex flex-wrap gap-4">
-            <Link href="/wioa-eligibility" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors">Check My Eligibility</Link>
-            <Link href="/funding" className="border border-white/30 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors">All Funding Options</Link>
+            <Link href="/check-eligibility" className="bg-white text-brand-red-700 font-bold px-8 py-3.5 rounded-lg hover:bg-brand-red-50 transition-colors">Check My Eligibility</Link>
+            <Link href="/funding" className="border border-white/40 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors">All Funding Options</Link>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* EMPLOYER & PARTNER */}
-      <section className="bg-white py-20 px-6 border-b-4 border-slate-200">
-        <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <div className="relative h-72 sm:h-96 rounded-2xl overflow-hidden shadow-xl order-2 lg:order-1">
-            <Image src="/images/pages/section-employer.jpg" alt="Employer partnership" fill loading="lazy" className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
-          </div>
-          <div className="order-1 lg:order-2">
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-3">For Employers &amp; Partners</p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-5">
-              Hire credentialed graduates. Reduce your cost to hire.
-            </h2>
-            <p className="text-slate-600 text-base leading-relaxed mb-8">
-              Elevate partners with Indiana employers to fill open roles with trained, credentialed graduates — while leveraging WOTC credits, OJT reimbursement, and WIOA compliance support.
-            </p>
-            <div className="grid sm:grid-cols-2 gap-4 mb-8">
-              {EMPLOYER_PROPS.map((ep) => (
-                <div key={ep.title} className="flex gap-3">
-                  <span className="text-2xl flex-shrink-0">{ep.icon}</span>
-                  <div>
-                    <p className="font-bold text-slate-900 text-sm mb-0.5">{ep.title}</p>
-                    <p className="text-slate-500 text-xs leading-relaxed">{ep.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/for-employers" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm">Employer Portal</Link>
-              <Link href="/partner-portal" className="border border-slate-300 text-slate-700 font-semibold px-6 py-3 rounded-lg hover:bg-slate-50 transition-colors text-sm">Become a Partner</Link>
-              <Link href="/workforce-board" className="border border-slate-300 text-slate-700 font-semibold px-6 py-3 rounded-lg hover:bg-slate-50 transition-colors text-sm">Workforce Board</Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CREDENTIALS */}
-      <section className="bg-slate-950 py-20 px-6 border-b-4 border-brand-red-600">
-        <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3">Credentials &amp; Certifications</p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-5">
-              Nationally recognized credentials — not just a certificate of completion.
-            </h2>
-            <p className="text-slate-400 text-base leading-relaxed mb-6">
-              Every Elevate program ends with a credential that employers recognize and regulators accept. EPA 608, AWS, NCCER, NHA CCMA, Indiana State CNA, Indiana Barber License, CDL Class A, CPR/AED — all issued through accredited testing bodies.
-            </p>
-            <div className="grid grid-cols-2 gap-3 mb-8">
-              {['EPA 608 Universal','AWS Welding','NCCER Core','NHA CCMA','Indiana State CNA','Indiana Barber License','CDL Class A','CPR / AED'].map((c) => (
-                <div key={c} className="flex items-center gap-2 text-sm text-slate-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0" />
-                  {c}
-                </div>
-              ))}
-            </div>
-            <Link href="/credentials" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors">
-              View All Credentials
-            </Link>
-          </div>
-          <div className="relative h-72 sm:h-96 rounded-2xl overflow-hidden shadow-xl">
-            <Image src="/images/pages/section-credentials.jpg" alt="Elevate credentials and certifications" fill loading="lazy" className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
-          </div>
-        </div>
-      </section>
-
-      {/* DRUG TESTING */}
-      <section className="bg-white py-20 px-6 border-b-4 border-slate-200">
-        <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <div className="relative h-72 sm:h-96 rounded-2xl overflow-hidden shadow-xl order-2 lg:order-1">
-            <Image src="/images/pages/section-drug-testing.jpg" alt="Drug testing services" fill loading="lazy" className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
-          </div>
-          <div className="order-1 lg:order-2">
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-3">Drug Testing</p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-5">
-              DOT-compliant drug testing for employers and participants.
-            </h2>
-            <p className="text-slate-600 text-base leading-relaxed mb-6">
-              Elevate provides on-site and scheduled drug testing services for employers, program participants, and workforce agencies. DOT-compliant panels, rapid results, and full chain-of-custody documentation.
-            </p>
-            <ul className="space-y-2 mb-8">
-              {['5-panel, 10-panel, and DOT panels','Rapid results — same day','Chain-of-custody documentation','Available for employers and individuals','Pre-employment, random, and post-incident'].map((item) => (
-                <li key={item} className="flex items-center gap-2 text-sm text-slate-700">
-                  <span className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <Link href="/drug-testing" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors">
-              Drug Testing Services
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* PARTNERING */}
-      <section className="bg-slate-950 py-20 px-6 border-b-4 border-brand-red-600">
-        <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3">Partner With Us</p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-5">
-              Workforce agencies, schools, and community organizations — let&apos;s build together.
-            </h2>
-            <p className="text-slate-400 text-base leading-relaxed mb-6">
-              Elevate partners with WorkOne centers, community colleges, reentry programs, housing authorities, and faith-based organizations to deliver training where people need it most. We bring the curriculum, credentials, and compliance — you bring the community.
-            </p>
-            <div className="grid grid-cols-2 gap-3 mb-8">
-              {['WorkOne / DWD','Community Colleges','Reentry Programs','Housing Authorities','Faith-Based Orgs','Employer Consortiums','Workforce Boards','Case Management Agencies'].map((p) => (
-                <div key={p} className="flex items-center gap-2 text-sm text-slate-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0" />
-                  {p}
-                </div>
-              ))}
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/partner-portal" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors">
-                Become a Partner
-              </Link>
-              <Link href="/workforce-board" className="border border-white/20 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors">
-                Workforce Board
-              </Link>
-            </div>
-          </div>
-          <div className="relative h-72 sm:h-96 rounded-2xl overflow-hidden shadow-xl">
-            <Image src="/images/pages/section-partners.jpg" alt="Elevate community partners" fill loading="lazy" className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
-          </div>
-        </div>
-      </section>
-
-      {/* TESTIMONIALS */}
-      <section className="bg-slate-50 py-20 px-6 border-b-4 border-slate-200">
+      {/* ── TESTIMONIALS ── */}
+      <div className="bg-white border-t border-slate-100 py-16 sm:py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Student Outcomes</p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-10">Real students. Real results.</h2>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-10">Real students. Real results.</h2>
           <div className="divide-y divide-slate-200">
-            {TESTIMONIALS.map((t) => (
+            {[
+              { quote: "WIOA paid for my Medical Assistant training, and I started working right after graduation. Now I'm making $42,000 a year with full benefits.", name: 'Sarah M.', program: 'Medical Assistant', salary: '$42K/yr', photo: '/images/testimonials-hq/person-1.jpg' },
+              { quote: "They provided an extremely informative and hospitable environment. I really enjoyed my classes. The staff made everything easy to understand.", name: 'Timothy S.', program: 'CDL Training', salary: '$55K/yr', photo: '/images/testimonials-hq/person-4.jpg' },
+              { quote: "Anyone who wants to grow and make more money should try Elevate. You deserve it. The staff is amazing and easy to communicate with.", name: 'Jasmine R.', program: 'CNA Certification', salary: '$38K/yr', photo: '/images/testimonials-hq/person-3.jpg' },
+            ].map((t) => (
               <div key={t.name} className="flex flex-col sm:flex-row gap-6 py-8">
                 <Image src={t.photo} alt={t.name} width={64} height={64} className="rounded-full object-cover w-16 h-16 flex-shrink-0" />
                 <div>
@@ -349,33 +301,46 @@ export default function HomePage() {
                     <p className="font-bold text-slate-900 text-sm">{t.name}</p>
                     <span className="text-slate-400">·</span>
                     <p className="text-slate-500 text-sm">{t.program}</p>
-                    <span className="text-brand-green-700 font-bold text-xs bg-brand-green-50 px-2.5 py-1 rounded-full">{t.salary}</span>
+                    <span className="text-brand-green-700 font-bold text-xs bg-brand-green-50 px-2 py-0.5 rounded-full">{t.salary}</span>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* FINAL CTA */}
-      <div className="bg-slate-900 py-24 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-4">Get Started</p>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-white mb-5 leading-tight">
-            Your career starts here.<br className="hidden sm:block" /> Apply in minutes.
-          </h2>
-          <p className="text-slate-300 text-lg mb-10 leading-relaxed max-w-xl mx-auto">
-            Training may be fully funded. Graduate with a nationally recognized credential and a job offer.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/wioa-eligibility" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-lg font-bold text-lg transition-colors">
-              Start Here — It&apos;s Free
-            </Link>
-            <Link href="/programs" className="border border-slate-600 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-slate-800 transition-colors">
-              View Programs
-            </Link>
+      {/* ── EMPLOYER STRIP ── */}
+      <div className="bg-slate-50 border-t border-slate-200 py-10 px-6">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">For Employers &amp; Agencies</p>
+            <p className="text-slate-700 text-sm max-w-md">Pre-screened graduates, WOTC credits, OJT reimbursement, and WIOA compliance reporting — all in one place.</p>
           </div>
+          <div className="flex gap-3 flex-shrink-0">
+            <Link href="/employers" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-5 py-2.5 rounded-lg transition-colors text-sm">Hire Graduates</Link>
+            <Link href="/workforce-board" className="border border-slate-300 text-slate-700 font-semibold px-5 py-2.5 rounded-lg hover:bg-white transition-colors text-sm">Workforce Board</Link>
+          </div>
+        </div>
+      </div>
+
+      {/* ── SECTION 6: FINAL CTA ── */}
+      <div className="bg-slate-900 border-t border-slate-800 py-20 sm:py-24 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <BlurIn>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Start your application now.</h2>
+            <p className="text-slate-300 text-lg mb-8 leading-relaxed max-w-xl mx-auto">
+              Apply in 5 minutes. Training may be fully funded. Graduate with a nationally recognized credential and a job offer.
+            </p>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Link href="/check-eligibility" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-lg font-bold text-lg transition-colors">
+                Check Eligibility — It&apos;s Free
+              </Link>
+              <Link href="/programs" className="border border-slate-600 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-slate-800 transition-colors">
+                View Programs
+              </Link>
+            </div>
+          </BlurIn>
         </div>
       </div>
 

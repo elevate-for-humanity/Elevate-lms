@@ -90,10 +90,10 @@ export default function HomePage() {
                   { label: 'Workforce Ready Grant', tag: 'Indiana State', desc: 'Covers high-demand certification programs.' },
                   { label: 'JRI / Employer-Sponsored', tag: 'Indiana State', desc: 'For justice-involved individuals and employer OJT.' },
                 ].map((f) => (
-                  <div key={f.label} className="bg-white/10 rounded-xl p-4">
-                    <p className="text-brand-red-200 text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>
+                  <div key={f.label} className="bg-slate-900 border border-slate-700 rounded-xl p-4">
+                    <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>
                     <h3 className="text-white font-bold text-sm mb-1">{f.label}</h3>
-                    <p className="text-brand-red-100 text-xs leading-relaxed">{f.desc}</p>
+                    <p className="text-slate-300 text-xs leading-relaxed">{f.desc}</p>
                   </div>
                 ))}
               </div>
@@ -101,10 +101,10 @@ export default function HomePage() {
                 Check My Eligibility
               </Link>
             </div>
-            <div className="lg:flex-shrink-0 bg-white/10 rounded-2xl p-8 text-center lg:w-64">
+            <div className="lg:flex-shrink-0 bg-slate-900 border border-slate-700 rounded-2xl p-8 text-center lg:w-64">
               <p className="text-5xl font-black text-white mb-2">$0</p>
-              <p className="text-brand-red-200 text-sm font-semibold mb-4">Cost to eligible participants</p>
-              <p className="text-brand-red-100 text-xs leading-relaxed">Federal and Indiana state funding covers tuition, books, tools, and exam fees.</p>
+              <p className="text-slate-300 text-sm font-semibold mb-4">Cost to eligible participants</p>
+              <p className="text-slate-400 text-xs leading-relaxed">Federal and Indiana state funding covers tuition, books, tools, and exam fees.</p>
             </div>
           </div>
         </div>

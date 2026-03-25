@@ -110,7 +110,6 @@ export default async function PeerRecoverySpecialistPage() {
                 width={1200}
                 height={800}
                 className="h-full w-full object-cover"
-                onError={() => {}}
               />
             </div>
           </div>

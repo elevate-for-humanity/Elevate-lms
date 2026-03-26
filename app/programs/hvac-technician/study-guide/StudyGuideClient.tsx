@@ -8,7 +8,7 @@
 
 import React, { useState } from 'react';
 import { Printer, Download, BookOpen, CheckCircle, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
-import { useI18n } from '@/lib/i18n/context';
+import { useI18n, I18nProvider } from '@/lib/i18n/context';
 
 /* ── Data ─────────────────────────────────────────────────────── */
 
@@ -121,7 +121,7 @@ function CollapsibleQA() {
 
 /* ── Main ─────────────────────────────────────────────────────── */
 
-export default function StudyGuideClient() {
+function StudyGuideContent() {
   const { t } = useI18n();
   const sg = (key: string) => t(`hvac.studyGuide.${key}`);
   const handlePrint = () => window.print();
@@ -362,5 +362,13 @@ export default function StudyGuideClient() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function StudyGuideClient() {
+  return (
+    <I18nProvider>
+      <StudyGuideContent />
+    </I18nProvider>
   );
 }

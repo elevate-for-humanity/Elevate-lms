@@ -19,8 +19,8 @@ const APPLICATION_DATA = {
   organizationType: 'Nonprofit',
 
   // ── Section 2: Organizational Eligibility ─────────────────────────────────
-  samRegistration: 'Yes — CAGE Code: 0Q856',
-  registeredBidder: 'Yes — SAM.gov registered, active federal government contractor',
+  samRegistration: 'Yes — CAGE Code: 0QH19 (2Exclusive LLC-S, DBA: Elevate for Humanity Technical and Career Institute) · UEI: VX2GK5S8SZH8 · Active through June 29, 2026',
+  registeredBidder: 'Yes — SAM.gov registered, active federal government contractor. CAGE: 0QH19.',
   dolSponsor: 'Yes — DOL Registered Apprenticeship Sponsor',
   ein: 'Available upon request',
 
@@ -85,7 +85,7 @@ All costs align with allowable uses as defined in the RFA.`,
 
   // ── Section 7: Capacity & Experience ─────────────────────────────────────
   organizationalCapacity: `2Exclusive LLC (DBA: Elevate for Humanity Technical and Career Institute) is a DOL Registered Apprenticeship Sponsor, ETPL provider, WRG/WIOA/JRI approved organization with active partnerships across Indiana's workforce ecosystem. Key credentials include:
-- SAM.gov registered (CAGE: 0Q856), active federal government contractor
+- SAM.gov registered (CAGE: 0QH19, UEI: VX2GK5S8SZH8), active federal government contractor, active through June 29, 2026
 - ByBlack certified
 - CareerSafe OSHA provider, Milady partner, NRF Rise Up provider, Certiport CATC
 - WorkOne partner, EmployIndy partner, Job Ready Indy partner, HSI affiliate

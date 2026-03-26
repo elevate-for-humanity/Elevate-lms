@@ -160,17 +160,53 @@ def check_brace_balance():
             count += 1
     return count
 
+# ── 7. page.tsx missing default export ───────────────────────────────────────
+def check_missing_default_export():
+    count = 0
+    for path in glob.glob('app/**/page.tsx', recursive=True):
+        try:
+            src = open(path).read()
+        except Exception:
+            continue
+        # re-exports like `export { default } from '...'` are valid
+        has_default = bool(
+            re.search(r'export\s+default\s+', src) or
+            re.search(r'export\s*\{\s*default\s*\}', src)
+        )
+        if not has_default:
+            err(f"[missing-default-export] {path}")
+            count += 1
+    return count
+
+# ── 8. JSX returned from generateMetadata (body in wrong function) ────────────
+def check_jsx_in_generate_metadata():
+    count = 0
+    for path in glob.glob('app/**/page.tsx', recursive=True):
+        try:
+            src = open(path).read()
+        except Exception:
+            continue
+        # Find generateMetadata function body and check if it returns JSX
+        m = re.search(r'export\s+async\s+function\s+generateMetadata\b[^{]*\{(.+?)^\}',
+                      src, re.DOTALL | re.MULTILINE)
+        if m and re.search(r'return\s*\(\s*<', m.group(1)):
+            err(f"[jsx-in-generateMetadata] {path} — JSX returned from generateMetadata instead of page component")
+            count += 1
+    return count
+
 # ── Run all checks ────────────────────────────────────────────────────────────
 print("Running build safety audit...")
 print()
 
 checks = [
-    ("export const injection",   check_export_const_injection),
-    ("duplicate imports",        check_duplicate_imports),
-    ("Image name collision",     check_image_collision),
-    ("hooks in server files",    check_hooks_in_server),
-    ("new Image() server-side",  check_new_image),
-    ("brace imbalance",          check_brace_balance),
+    ("export const injection",        check_export_const_injection),
+    ("duplicate imports",             check_duplicate_imports),
+    ("Image name collision",          check_image_collision),
+    ("hooks in server files",         check_hooks_in_server),
+    ("new Image() server-side",       check_new_image),
+    ("brace imbalance",               check_brace_balance),
+    ("page missing default export",   check_missing_default_export),
+    ("JSX inside generateMetadata",   check_jsx_in_generate_metadata),
 ]
 
 for label, fn in checks:

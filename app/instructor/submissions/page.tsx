@@ -6,10 +6,10 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { requireRole } from '@/lib/auth/require-role';
 import {
 
-export const dynamic = 'force-dynamic';
   ClipboardList, CheckCircle2, XCircle, Clock, RotateCcw,
   ChevronRight, Filter,
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },

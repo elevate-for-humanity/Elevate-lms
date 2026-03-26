@@ -16,7 +16,6 @@ import {
 } from '@/components/dashboards/StateAwareDashboard';
 import {
 
-export const dynamic = 'force-dynamic';
   Briefcase,
   Users,
   FileText,
@@ -25,6 +24,7 @@ export const dynamic = 'force-dynamic';
   TrendingUp,
   BarChart3,
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 /**
  * EMPLOYER PORTAL - PROGRESSION LOGIC

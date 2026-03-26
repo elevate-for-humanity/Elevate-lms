@@ -9,7 +9,6 @@ import { createBrowserClient } from '@supabase/ssr';
 
 import {
 
-export const dynamic = 'force-dynamic';
 
   LayoutDashboard,
   Users,

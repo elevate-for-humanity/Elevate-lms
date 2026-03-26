@@ -5,7 +5,6 @@ import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import {
 
-export const dynamic = 'force-dynamic';
   XCircle,
   Clock,
   FileText,

@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
 
-export const dynamic = 'force-dynamic';
   AlertTriangle,
   FileText,
   Users,

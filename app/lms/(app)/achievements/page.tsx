@@ -8,7 +8,6 @@ import { AchievementsBadges } from '@/components/AchievementsBadges';
 import MicroCredentialsBadges from '@/components/MicroCredentialsBadges';
 import {
 
-export const dynamic = 'force-dynamic';
   Trophy,
   Star,
   Award,

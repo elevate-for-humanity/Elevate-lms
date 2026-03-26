@@ -7,7 +7,6 @@ import { createClient } from '@/lib/supabase/server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
 
-export const dynamic = 'force-dynamic';
   Calendar,
   Clock,
   MapPin,
@@ -22,6 +21,7 @@ export const dynamic = 'force-dynamic';
   Video,
   Building2,
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Schedule | Student Portal',

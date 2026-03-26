@@ -7,10 +7,10 @@ import SponsorDisclosure from '@/components/compliance/SponsorDisclosure';
 import { createClient } from '@/lib/supabase/server';
 import { 
 
-export const dynamic = 'force-dynamic';
   DollarSign, Briefcase, Building2, ArrowRight, 
   Users, Clock, Award, GraduationCap, Zap, Phone 
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Apprenticeships | Earn While You Learn | Elevate For Humanity',

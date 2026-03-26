@@ -6,11 +6,11 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { 
 
-export const dynamic = 'force-dynamic';
   Globe, ArrowRight, Loader2, Code, 
   Plug, Copy, Check, ExternalLink, Zap, Shield,
   BookOpen, CreditCard, Users, BarChart3
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 type Step = 'platform' | 'url' | 'features' | 'generating' | 'setup';
 

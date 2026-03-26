@@ -40,21 +40,6 @@ async function _POST(req: Request) {
     }
 
     const supabase = await createClient();
- ${lastName}`,
-        email,
-        phone,
-        filingStatus,
-        employmentType,
-        estimatedIncome,
-        hasDependents,
-        dependentCount,
-        preferredContact,
-        preferredTime,
-        submittedAt: new Date().toISOString(),
-      });
-
-      return NextResponse.json({ success: true });
-    }
 
     // Try to save to database
     const { error } = await supabase.from('tax_applications').insert({

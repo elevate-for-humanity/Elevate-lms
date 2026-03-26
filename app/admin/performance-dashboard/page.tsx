@@ -6,13 +6,13 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { 
 
-export const dynamic = 'force-dynamic';
   Users, 
   GraduationCap,
   DollarSign,
   Award,
   BookOpen
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Performance Dashboard | Admin | Elevate For Humanity',

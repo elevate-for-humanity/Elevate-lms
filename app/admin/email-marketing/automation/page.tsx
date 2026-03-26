@@ -10,7 +10,6 @@ import { useRouter } from 'next/navigation';
 
 import {
 
-export const dynamic = 'force-dynamic';
 
   Plus,
   Play,
@@ -22,6 +21,7 @@ export const dynamic = 'force-dynamic';
   Clock,
   Zap,
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 interface Workflow {
   id: string;

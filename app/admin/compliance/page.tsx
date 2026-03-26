@@ -7,12 +7,12 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import WIOAComplianceDashboard from '@/components/admin/WIOAComplianceDashboard';
 import {
 
-export const dynamic = 'force-dynamic';
   getAllGuardrails,
   getCriticalGuardrails,
   shouldAutoEnforce,
   type GuardrailPolicy,
 } from '@/lib/compliance/guardrails';
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },

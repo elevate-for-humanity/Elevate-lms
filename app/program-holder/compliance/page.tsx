@@ -6,7 +6,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
 
-export const dynamic = 'force-dynamic';
   Shield,
   AlertTriangle,
   TrendingUp,

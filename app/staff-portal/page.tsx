@@ -5,11 +5,11 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
 
-export const dynamic = 'force-dynamic';
   Users, ClipboardList, BarChart2, Calendar, FileText,
   DollarSign, BookOpen, Star, Settings, ChevronRight,
   CheckCircle, AlertCircle, Video
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Staff Portal | Elevate For Humanity',

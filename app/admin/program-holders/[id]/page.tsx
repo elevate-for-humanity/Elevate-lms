@@ -6,10 +6,10 @@ import Link from 'next/link';
 import { logger } from '@/lib/logger';
 import {
 
-export const dynamic = 'force-dynamic';
   User, Mail, Phone, Calendar,
   FileText, BookOpen, ArrowLeft, ShieldAlert, AlertTriangle,
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Review Program Holder | Admin',

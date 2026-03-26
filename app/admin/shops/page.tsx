@@ -11,7 +11,6 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
 
-export const dynamic = 'force-dynamic';
   Building2,
   Clock,
   XCircle,

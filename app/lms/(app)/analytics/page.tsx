@@ -8,7 +8,6 @@ import LearningAnalyticsDashboard from '@/components/LearningAnalyticsDashboard'
 import StudentEngagementAnalytics from '@/components/StudentEngagementAnalytics';
 import {
 
-export const dynamic = 'force-dynamic';
   BarChart3,
   TrendingUp,
   Clock,

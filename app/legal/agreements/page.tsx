@@ -9,7 +9,6 @@ import { createClient } from '@/lib/supabase/client';
 import SignatureCanvas from 'signature_pad';
 import {
 
-export const dynamic = 'force-dynamic';
   FileText,
   Check,
   ChevronRight,
@@ -27,6 +26,7 @@ export const dynamic = 'force-dynamic';
   UserCheck,
   Handshake,
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 interface Agreement {
   type: string;

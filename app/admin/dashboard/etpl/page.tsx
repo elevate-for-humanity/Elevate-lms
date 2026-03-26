@@ -10,7 +10,6 @@ import {
 import Link from 'next/link';
 import {
 
-export const dynamic = 'force-dynamic';
   Users,
   DollarSign,
   Briefcase,
@@ -20,6 +19,7 @@ export const dynamic = 'force-dynamic';
   Circle,
   Download,
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'ETPL Performance Dashboard | Admin',

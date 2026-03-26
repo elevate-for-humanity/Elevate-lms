@@ -11,7 +11,6 @@ import { useRouter } from 'next/navigation';
 
 import {
 
-export const dynamic = 'force-dynamic';
 
   Mail,
   TrendingUp,
@@ -24,6 +23,7 @@ export const dynamic = 'force-dynamic';
   Calendar,
   Download,
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 interface AnalyticsData {
   overview: {

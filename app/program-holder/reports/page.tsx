@@ -6,7 +6,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
 
-export const dynamic = 'force-dynamic';
   FileText,
   AlertCircle,
   Phone,
@@ -15,6 +14,7 @@ export const dynamic = 'force-dynamic';
   Download,
   Calendar,
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Reports | Program Holder Portal',

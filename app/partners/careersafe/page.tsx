@@ -7,7 +7,6 @@ import Link from 'next/link';
 
 import {
 
-export const dynamic = 'force-dynamic';
   ExternalLink,
   Clock,
   Award,

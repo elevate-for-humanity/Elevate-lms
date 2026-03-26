@@ -17,5 +17,24 @@ export const metadata: Metadata = {
 export default async function DashboardRouterPage() {
   try {
     const supabase = await createClient();
-  
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      const { redirect } = await import('next/navigation');
+      redirect('/login?redirect=/dashboard');
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    const destination = getRoleDestination(profile?.role ?? 'learner');
+    const { redirect } = await import('next/navigation');
+    redirect(destination);
+  } catch (error) {
+    // redirect() throws — rethrow it
+    throw error;
   }
+}

@@ -7,7 +7,6 @@ import Image from 'next/image';
 
 import {
 
-export const dynamic = 'force-dynamic';
   Users,
   Building2,
   GraduationCap,

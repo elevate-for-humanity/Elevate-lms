@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import {
 
-export const dynamic = 'force-dynamic';
   Users,
   Plus,
   Search,
@@ -19,6 +18,7 @@ export const dynamic = 'force-dynamic';
   UserPlus,
   ChevronRight,
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 interface Course {
   id: string;

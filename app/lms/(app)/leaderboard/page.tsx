@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import {
 
-export const dynamic = 'force-dynamic';
   Trophy,
   Medal,
   Award,
@@ -18,6 +17,7 @@ export const dynamic = 'force-dynamic';
   Flame,
   Users,
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/lms/leaderboard' },

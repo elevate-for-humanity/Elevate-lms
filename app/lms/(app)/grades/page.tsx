@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import {
 
-export const dynamic = 'force-dynamic';
   BookOpen,
   TrendingUp,
   Award,
@@ -16,6 +15,7 @@ export const dynamic = 'force-dynamic';
   ChevronRight,
   BarChart3,
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {

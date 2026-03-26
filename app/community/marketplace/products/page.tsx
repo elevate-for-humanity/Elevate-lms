@@ -6,9 +6,9 @@ import { createClient } from '@/lib/supabase/server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
 
-export const dynamic = 'force-dynamic';
   FileText, Download, Star, Tag, Search, Package,
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Digital Products & Resources | Elevate for Humanity',

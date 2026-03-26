@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import {
 
-export const dynamic = 'force-dynamic';
   BookOpen,
   FileText,
   Video,
@@ -20,6 +19,7 @@ export const dynamic = 'force-dynamic';
   Star,
   Bookmark,
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {

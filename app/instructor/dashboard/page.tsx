@@ -9,7 +9,6 @@ import InstructorPerformanceDashboard from '@/components/InstructorPerformanceDa
 
 import {
 
-export const dynamic = 'force-dynamic';
   Users,
   BookOpen,
   Award,

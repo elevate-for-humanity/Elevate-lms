@@ -6,10 +6,10 @@ import Link from 'next/link';
 import { BarChart3, Calendar, FileText, Download, Clock, AlertTriangle } from 'lucide-react';
 import {
 
-export const dynamic = 'force-dynamic';
   getUpcomingDeadlines,
   calculateWIOAPerformance,
 } from '@/lib/compliance/wioa-reporting';
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Workforce Reports | Elevate For Humanity',

@@ -6,10 +6,10 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { 
 
-export const dynamic = 'force-dynamic';
   Clock, DollarSign, Award, ArrowRight, 
   GraduationCap, Users, FileText, Calendar, Heart, Star
 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 

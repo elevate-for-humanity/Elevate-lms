@@ -1,13 +1,9 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import LazyVideo from '@/components/ui/LazyVideo';
-
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
@@ -18,25 +14,8 @@ export const metadata: Metadata = {
     'Comprehensive workforce board portal for program oversight, performance metrics, compliance monitoring, and strategic planning.',
 };
 
-export default async function WorkforceBoardPage() {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Fetch workforce board stats
-  const { count: participantCount } = await db
-    .from('participants')
-    .select('*', { count: 'exact', head: true });
+export default function WorkforceBoardPage() {
+  const participantCount = 0;
 
   const features = [
     {

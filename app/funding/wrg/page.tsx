@@ -1,8 +1,5 @@
 export const revalidate = 600;
-import { createAdminClient } from '@/lib/supabase/admin';
-
 import { Metadata } from 'next';
-import { createPublicClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -16,26 +13,7 @@ export const metadata: Metadata = {
     'Get Funded career training through WRG (Workforce Ready Grant). Indiana residents qualify. No income limits. No age limits.',
 };
 
-export default async function WrgPage() {
-  const supabase = createPublicClient();
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-slate-900 mb-4">Service Unavailable</h1>
-          <p className="text-slate-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Fetch WRG funding info
-  const { data: wrgInfo } = await supabase
-    .from('funding_options')
-    .select('*')
-    .eq('type', 'wrg')
-    .single();
+export default function WrgPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}

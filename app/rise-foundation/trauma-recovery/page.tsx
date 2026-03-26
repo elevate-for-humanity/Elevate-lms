@@ -1,7 +1,5 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { Heart, Shield, Users, Phone, Circle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -13,45 +11,10 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = 'force-dynamic';
-
-export default async function TraumaRecoveryPage() {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Get trauma recovery services
-  const { data: services } = await db
-    .from('foundation_services')
-    .select('*')
-    .eq('category', 'trauma-recovery')
-    .eq('is_active', true)
-    .order('order', { ascending: true });
-
-  // Get support groups
-  const { data: supportGroups } = await db
-    .from('support_groups')
-    .select('*')
-    .eq('category', 'trauma')
-    .eq('is_active', true);
-
-  // Get testimonials
-  const { data: testimonials } = await db
-    .from('testimonials')
-    .select('*')
-    .eq('category', 'trauma-recovery')
-    .eq('is_featured', true)
-    .limit(2);
+export default function TraumaRecoveryPage() {
+  const services: any[] = [];
+  const supportGroups: any[] = [];
+  const testimonials: any[] = [];
 
   const defaultServices = [
     { title: 'Individual Counseling', description: 'One-on-one support with trained trauma specialists' },

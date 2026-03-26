@@ -1,6 +1,4 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Heart, Users, Calendar, Phone, Mail, ArrowRight, HandHeart, Briefcase } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -10,34 +8,9 @@ export const metadata: Metadata = {
   description: 'Join our mission to support healing and recovery. Volunteer, donate, or become a partner.',
 };
 
-export const dynamic = 'force-dynamic';
-
-export default async function GetInvolvedPage() {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-
-  const { count: volunteerCount } = await db
-    .from('volunteers')
-    .select('*', { count: 'exact', head: true })
-    .eq('organization', 'rise-foundation');
-
-  const { data: opportunities } = await db
-    .from('volunteer_opportunities')
-    .select('*')
-    .eq('organization', 'rise-foundation')
-    .eq('is_active', true)
-    .limit(4);
+export default function GetInvolvedPage() {
+  const volunteerCount = 0;
+  const opportunities: any[] = [];
 
   const ways = [
     {

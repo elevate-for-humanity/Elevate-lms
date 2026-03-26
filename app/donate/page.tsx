@@ -1,6 +1,4 @@
 import type { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import DonationForm from '@/components/DonationForm';
@@ -24,57 +22,15 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = 'force-dynamic';
-
-export default async function DonatePage() {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Get impact stats from database
-  const { count: studentsHelped } = await db
-    .from('program_enrollments')
-    .select('*', { count: 'exact', head: true });
-
-  const { count: graduatesPlaced } = await db
-    .from('placements')
-    .select('*', { count: 'exact', head: true });
-
-  const { count: totalDonors } = await db
-    .from('donations')
-    .select('user_id', { count: 'exact', head: true });
-
-  // Get total donations amount
-  const { data: donationTotal } = await db
-    .from('donations')
-    .select('amount')
-    .eq('status', 'completed');
-
-  const totalRaised = donationTotal?.reduce((sum: number, d: any) => sum + (d.amount || 0), 0) || 0;
-
-  // Get recent donors (anonymized)
-  const { data: recentDonations } = await db
-    .from('donations')
-    .select('amount, created_at, is_anonymous')
-    .eq('status', 'completed')
-    .order('created_at', { ascending: false })
-    .limit(5);
+export default function DonatePage() {
+  const recentDonations: any[] = [];
+  const totalRaised = 0;
 
   const impactStats = [
-    { icon: Users, value: studentsHelped || 500, label: 'Students Served' },
+    { icon: Users, value: 500, label: 'Students Served' },
     { icon: GraduationCap, value: '20+', label: 'Training Programs' },
     { icon: Briefcase, value: '50+', label: 'Employer Partners' },
-    { icon: Heart, value: totalDonors || 100, label: 'Donors' },
+    { icon: Heart, value: 100, label: 'Donors' },
   ];
 
   const donationImpact = [

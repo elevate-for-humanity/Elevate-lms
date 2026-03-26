@@ -2,7 +2,6 @@ import Image from 'next/image';
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
@@ -14,13 +13,12 @@ export const metadata: Metadata = {
 
 export default async function FollowUpsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: followUps, count } = await db.from('follow_ups').select('*, profiles!inner(full_name)', { count: 'exact' }).order('due_date').limit(20);
-  const { count: overdueCount } = await db.from('follow_ups').select('*', { count: 'exact', head: true }).lt('due_date', new Date().toISOString()).eq('status', 'pending');
+  const followUps: any[] = [];
+  const count = 0;
+  const overdueCount = 0;
 
   return (
     <div className="min-h-screen bg-white">

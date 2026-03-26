@@ -1,13 +1,10 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Building2, Users, FileText, Shield, Award, Briefcase, Phone, Mail, TrendingUp, Target, Handshake, BarChart3 } from 'lucide-react';
 import LazyVideo from '@/components/ui/LazyVideo';
-
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
@@ -20,21 +17,7 @@ export const metadata: Metadata = {
 
 export default async function GovernmentPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Fetch government partners
-  const { data: partners } = await db
+  const { data: partners } = await supabase
     .from('partners')
     .select('*')
     .eq('type', 'government');

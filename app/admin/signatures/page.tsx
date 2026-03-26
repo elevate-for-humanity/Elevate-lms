@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -19,61 +18,22 @@ export const metadata: Metadata = {
 
 export default async function SignaturesPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Signatures" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
 
-  if (!user) {
-    redirect('/login');
-  }
-
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .single();
 
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
-    redirect('/unauthorized');
-  }
+  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
-  // Fetch signatures data
-  const { data: signatures, count: totalSignatures } = await db
-    .from('signatures')
-    .select(
-      `
-      *,
-      signer:profiles(full_name, email)
-    `,
-      { count: 'exact' }
-    )
-    .order('created_at', { ascending: false })
-    .limit(50);
-
-  const { count: pendingSignatures } = await db
-    .from('signatures')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'pending');
-
-  const { count: completedSignatures } = await db
-    .from('signatures')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'completed');
+  const signatures: any[] = [];
+  const totalSignatures = 0;
+  const pendingSignatures = 0;
+  const completedSignatures = 0;
 
   return (
     <div className="min-h-screen bg-gray-50">

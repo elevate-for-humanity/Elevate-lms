@@ -1,14 +1,10 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
 import Link from 'next/link';
 
 import Image from 'next/image';
 import { BookOpen, Award, Briefcase } from 'lucide-react';
-
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
@@ -20,26 +16,8 @@ export const metadata: Metadata = {
     'View and manage program participants.',
 };
 
-export default async function ParticipantsPage() {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Fetch participants
-  const { data: participants } = await db
-    .from('participants')
-    .select('*')
-    .order('created_at', { ascending: false });
+export default function ParticipantsPage() {
+  const participants: any[] = [];
 
   return (
     <div className="min-h-screen bg-white">

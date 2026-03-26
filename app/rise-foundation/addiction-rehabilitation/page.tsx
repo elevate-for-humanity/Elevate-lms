@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { Heart, Shield, Phone, Calendar } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -13,40 +12,11 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = 'force-dynamic';
-
 export default async function AddictionRehabilitationPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Get addiction services
-  const { data: services } = await db
-    .from('foundation_services')
-    .select('*')
-    .eq('category', 'addiction')
-    .eq('is_active', true)
-    .order('order', { ascending: true });
-
-  // Get support groups
-  const { data: supportGroups } = await db
-    .from('support_groups')
-    .select('*')
-    .eq('category', 'addiction')
-    .eq('is_active', true);
-
-  // Get testimonials
-  const { data: testimonials } = await db
+  const services: any[] = [];
+  const supportGroups: any[] = [];
+  const { data: testimonials } = await supabase
     .from('testimonials')
     .select('*')
     .eq('category', 'addiction-recovery')

@@ -1,10 +1,6 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
@@ -15,28 +11,7 @@ export const metadata: Metadata = {
     'Learn about how Elevate For Humanity uses cookies and similar technologies on our website.',
 };
 
-export default async function CookiesPage() {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Fetch cookie policy content
-  const { data: policy } = await db
-    .from('legal_documents')
-    .select('*')
-    .eq('type', 'cookie_policy')
-    .single();
-
+export default function CookiesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}

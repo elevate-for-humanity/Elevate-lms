@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -17,41 +16,19 @@ export const metadata: Metadata = {
 
 export default async function CompleteFERPATrainingPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/ferpa/training/complete');
 
-  if (!user) {
-    redirect('/login?redirect=/ferpa/training/complete');
-  }
-
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
 
-  if (!profile) {
-    redirect('/unauthorized');
-  }
+  if (!profile) redirect('/unauthorized');
 
-  // Check if user already has current training
-  const { data: existingTraining } = await db
-    .from('ferpa_training_records')
-    .select('*')
-    .eq('user_id', user.id)
-    .gte('completed_at', new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString())
-    .single();
+  const existingTraining = null;
 
   return (
     <>

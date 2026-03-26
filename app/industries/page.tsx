@@ -1,7 +1,5 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import {
   Heart,
@@ -15,8 +13,6 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import ModernLandingHero from '@/components/landing/ModernLandingHero';
-
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Industries We Serve | Elevate for Humanity',
@@ -111,27 +107,7 @@ const industries = [
   },
 ];
 
-export default async function IndustriesPage() {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Fetch industries
-  const { data: dbIndustries } = await db
-    .from('industries')
-    .select('*')
-    .order('name');
-
+export default function IndustriesPage() {
   return (
     <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">

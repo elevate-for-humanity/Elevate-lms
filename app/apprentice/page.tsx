@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { GraduationCap, Clock, FileText, Award, BookOpen, ArrowRight } from 'lucide-react';
+import { GraduationCap, Clock, FileText, Award, BookOpen, ArrowRight, Scissors } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { getNextRequiredAction } from '@/lib/enrollment/gate';
 
@@ -83,7 +83,8 @@ export default async function ApprenticePortalPage() {
   const requiredHours = 1500; // Barber requirement
 
   const quickLinks = [
-    { name: 'Log Hours', href: '/apprentice/hours', icon: Clock, description: 'Record your work hours' },
+    { name: 'Log Hours', href: '/apprentice/hours', icon: Clock, description: 'Record your OJL & RTI hours' },
+    { name: 'Competency Progress', href: '/apprentice/competencies', icon: Scissors, description: 'Track cuts, shaves & WPS skills' },
     { name: 'Documents', href: '/apprentice/documents', icon: FileText, description: 'View required documents' },
     { name: 'Skills Checklist', href: '/apprentice/skills', icon: Award, description: 'Track skill competencies' },
     { name: 'Handbook', href: '/apprentice/handbook', icon: BookOpen, description: 'Apprenticeship guidelines' },

@@ -113,10 +113,10 @@ async function _POST(request: NextRequest) {
       });
     }
 
-    // Load site geofence
+    // Load site geofence from apprentice_sites
     const { data: site, error: siteError } = await supabase
-      .from('partner_sites')
-      .select('id, center_lat, center_lng, radius_m')
+      .from('apprentice_sites')
+      .select('id, latitude, longitude, radius_meters')
       .eq('id', entry.site_id)
       .single();
 
@@ -128,8 +128,8 @@ async function _POST(request: NextRequest) {
     }
 
     // Compute within_geofence using haversine
-    const distance = haversineDistance(lat, lng, site.center_lat, site.center_lng);
-    const withinGeofence = distance <= site.radius_m;
+    const distance = haversineDistance(lat, lng, site.latitude, site.longitude);
+    const withinGeofence = distance <= site.radius_meters;
 
     // Call update_geofence_state DB function
     const { error: geofenceError } = await supabase.rpc('update_geofence_state', {

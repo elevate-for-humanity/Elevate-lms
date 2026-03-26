@@ -53,9 +53,20 @@ async function _GET(request: NextRequest) {
       logger.error('[Documents API] Docs error:', docsError);
     }
 
+    // Generate signed URLs for each document (60-minute expiry)
+    const docsWithUrls = await Promise.all(
+      (uploadedDocuments || []).map(async (doc: any) => {
+        if (!doc.file_path) return { ...doc, signed_url: null };
+        const { data: signed } = await supabase.storage
+          .from('documents')
+          .createSignedUrl(doc.file_path, 3600);
+        return { ...doc, signed_url: signed?.signedUrl ?? null };
+      })
+    );
+
     return NextResponse.json({
       documentTypes: documentTypes || [],
-      uploadedDocuments: uploadedDocuments || [],
+      uploadedDocuments: docsWithUrls,
     });
   } catch (error) {
     logger.error('[Documents API] Error:', error);
@@ -133,24 +144,26 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
     }
 
-    // Bucket is private — store file_path only, generate signed URLs on-demand
+    // Bucket is private — store file_path, generate signed URLs on-demand
 
-    // Delete any existing document of this type (replace)
+    // Replace any existing document of this type for this student
     await db
       .from('apprentice_documents')
       .delete()
       .eq('student_id', user.id)
       .eq('document_type_id', documentTypeId);
 
-    // Create document record
+    // Create document record — file_path is the canonical storage reference
     const { data: docRecord, error: recordError } = await db
       .from('apprentice_documents')
       .insert({
         student_id: user.id,
         document_type_id: documentTypeId,
         program_slug: programSlug,
+        document_type: docType.document_type,
         file_name: file.name,
-        file_url: null,
+        file_path: storagePath,          // ← storage path saved here
+        file_url: null,                  // deprecated column, left null
         file_size_bytes: file.size,
         mime_type: file.type,
         status: 'pending',
@@ -254,10 +267,11 @@ async function _DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Cannot delete approved documents' }, { status: 400 });
     }
 
-    // Delete from storage (extract path from URL)
-    const urlParts = doc.file_url.split('/documents/');
-    if (urlParts.length > 1) {
-      await supabase.storage.from('documents').remove([urlParts[1]]);
+    // Delete from storage using file_path (canonical) or fall back to parsing file_url
+    const storagePath = doc.file_path
+      || (doc.file_url?.includes('/documents/') ? doc.file_url.split('/documents/')[1] : null);
+    if (storagePath) {
+      await supabase.storage.from('documents').remove([storagePath]);
     }
 
     // Delete record

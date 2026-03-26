@@ -82,10 +82,10 @@ async function _POST(request: NextRequest) {
       accuracy_m,
     } = body;
 
-    // Validate required fields
-    if (!action || !apprentice_id || !partner_id || !program_id || !site_id) {
+    // Validate required fields (partner_id is optional — some apprentices have no shop yet)
+    if (!action || !apprentice_id || !program_id || !site_id) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required fields: action, apprentice_id, program_id, site_id' },
         { status: 400 }
       );
     }
@@ -113,10 +113,10 @@ async function _POST(request: NextRequest) {
       );
     }
 
-    // Load site geofence
+    // Load site geofence from apprentice_sites
     const { data: site, error: siteError } = await supabase
-      .from('partner_sites')
-      .select('id, center_lat, center_lng, radius_m, name')
+      .from('apprentice_sites')
+      .select('id, latitude, longitude, radius_meters, name')
       .eq('id', site_id)
       .single();
 
@@ -128,8 +128,8 @@ async function _POST(request: NextRequest) {
     }
 
     // Validate inside geofence
-    const distance = haversineDistance(lat, lng, site.center_lat, site.center_lng);
-    const withinGeofence = distance <= site.radius_m;
+    const distance = haversineDistance(lat, lng, site.latitude, site.longitude);
+    const withinGeofence = distance <= site.radius_meters;
 
     if (!withinGeofence) {
       // Raise admin alert for attempted action outside geofence

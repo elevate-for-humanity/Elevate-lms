@@ -6,7 +6,99 @@ import Link from 'next/link';
 import {
   Loader2, AlertCircle, Download,
   BookOpen, FileText, ClipboardCheck, ShieldCheck, ArrowRight,
+  Upload, CheckCircle2, PenLine, Calendar,
 } from 'lucide-react';
+
+// ─── Reusable signature pad ───────────────────────────────────────────────────
+function SignaturePad({
+  label,
+  signerLabel,
+  signerName,
+  onSignerNameChange,
+  canvasRef,
+  hasSigned,
+  onClear,
+  onStartDrawing,
+  onDraw,
+  onStopDrawing,
+  signedAt,
+}: {
+  label: string;
+  signerLabel: string;
+  signerName: string;
+  onSignerNameChange: (v: string) => void;
+  canvasRef: React.RefObject<HTMLCanvasElement>;
+  hasSigned: boolean;
+  onClear: () => void;
+  onStartDrawing: (e: React.MouseEvent | React.TouchEvent) => void;
+  onDraw: (e: React.MouseEvent | React.TouchEvent) => void;
+  onStopDrawing: () => void;
+  signedAt: string | null;
+}) {
+  return (
+    <div className="border border-slate-200 rounded-xl p-5 bg-slate-50 space-y-4">
+      <div className="flex items-center gap-2">
+        <PenLine className="w-4 h-4 text-brand-blue-600" />
+        <h3 className="font-semibold text-slate-900 text-sm">{label}</h3>
+      </div>
+
+      {/* Signer name */}
+      <div>
+        <label className="block text-xs font-medium text-slate-600 mb-1">{signerLabel} *</label>
+        <input
+          type="text"
+          required
+          value={signerName}
+          onChange={e => onSignerNameChange(e.target.value)}
+          placeholder="Full legal name"
+          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-blue-500 bg-white"
+        />
+      </div>
+
+      {/* Canvas */}
+      <div>
+        <label className="block text-xs font-medium text-slate-600 mb-1">Draw Signature *</label>
+        <div className="border-2 border-dashed border-slate-300 rounded-lg overflow-hidden bg-white">
+          <canvas
+            ref={canvasRef}
+            className="w-full h-28 cursor-crosshair touch-none"
+            onMouseDown={onStartDrawing}
+            onMouseMove={onDraw}
+            onMouseUp={onStopDrawing}
+            onMouseLeave={onStopDrawing}
+            onTouchStart={onStartDrawing}
+            onTouchMove={onDraw}
+            onTouchEnd={onStopDrawing}
+          />
+        </div>
+        <div className="flex items-center justify-between mt-1.5">
+          {hasSigned ? (
+            <span className="text-xs text-green-700 font-medium flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Signature captured
+            </span>
+          ) : (
+            <span className="text-xs text-slate-400">Draw your signature above</span>
+          )}
+          <button type="button" onClick={onClear} className="text-xs text-slate-400 hover:text-slate-700 underline">
+            Clear
+          </button>
+        </div>
+      </div>
+
+      {/* Date */}
+      {signedAt && (
+        <div className="flex items-center gap-1.5 text-xs text-slate-500">
+          <Calendar className="w-3.5 h-3.5" />
+          Signed: {new Date(signedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+        </div>
+      )}
+
+      <p className="text-xs text-slate-400 leading-relaxed">
+        This electronic signature is legally binding under the Indiana Uniform Electronic Transactions Act (IC 26-2-8) and the federal ESIGN Act.
+      </p>
+    </div>
+  );
+}
 
 const compensationModels = [
   { value: 'hourly', label: 'Hourly Wage' },
@@ -46,39 +138,8 @@ const partnerSteps = [
   },
 ];
 
-export default function PartnerShopForm() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [formData, setFormData] = useState({
-    shopLegalName: '',
-    shopDbaName: '',
-    ownerName: '',
-    contactName: '',
-    contactEmail: '',
-    contactPhone: '',
-    shopAddressLine1: '',
-    shopAddressLine2: '',
-    shopCity: '',
-    shopState: 'IN',
-    shopZip: '',
-    indianaShopLicenseNumber: '',
-    supervisorName: '',
-    supervisorLicenseNumber: '',
-    supervisorYearsLicensed: '',
-    apprenticesOnPayroll: 'yes',
-    compensationModel: '',
-    numberOfEmployees: '',
-    workersCompStatus: '',
-    hasGeneralLiability: '',
-    canSuperviseAndVerify: '',
-    mouAcknowledged: false,
-    consentAcknowledged: false,
-    notes: '',
-    honeypot: '',
-  });
-
-  // Signature canvas
+// ─── Canvas hook factory ──────────────────────────────────────────────────────
+function useSignaturePad() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasSigned, setHasSigned] = useState(false);
@@ -128,7 +189,7 @@ export default function PartnerShopForm() {
 
   const stopDrawing = useCallback(() => setIsDrawing(false), []);
 
-  const clearSignature = useCallback(() => {
+  const clear = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -137,21 +198,126 @@ export default function PartnerShopForm() {
     setHasSigned(false);
   }, []);
 
+  const toDataURL = () => canvasRef.current?.toDataURL('image/png') || '';
+
+  return { canvasRef, hasSigned, startDrawing, draw, stopDrawing, clear, toDataURL };
+}
+
+export default function PartnerShopForm() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const [formData, setFormData] = useState({
+    // Shop identity
+    shopLegalName: '',
+    shopDbaName: '',
+    ownerName: '',
+    ein: '',
+    einQaNotes: '',
+    // Shop physical address (worksite)
+    shopPhysicalAddress: '',
+    // Contact
+    contactName: '',
+    contactEmail: '',
+    contactPhone: '',
+    // Mailing address
+    shopAddressLine1: '',
+    shopAddressLine2: '',
+    shopCity: '',
+    shopState: 'IN',
+    shopZip: '',
+    // License
+    indianaShopLicenseNumber: '',
+    // Supervisor
+    supervisorName: '',
+    supervisorLicenseNumber: '',
+    supervisorYearsLicensed: '',
+    // Employment & compliance
+    apprenticesOnPayroll: 'yes',
+    compensationModel: '',
+    numberOfEmployees: '',
+    workersCompStatus: '',
+    hasGeneralLiability: '',
+    canSuperviseAndVerify: '',
+    // Agreements
+    mouAcknowledged: false,
+    mouSignerName: '',
+    employerAcceptanceAcknowledged: false,
+    employerAcceptanceSignerName: '',
+    consentAcknowledged: false,
+    consentSignerName: '',
+    // Misc
+    notes: '',
+    honeypot: '',
+  });
+
+  // EIN file upload state
+  const [einFile, setEinFile] = useState<File | null>(null);
+  const [einFileName, setEinFileName] = useState('');
+
+  // Three separate signature pads
+  const mouSig = useSignaturePad();
+  const employerSig = useSignaturePad();
+  const consentSig = useSignaturePad();
+
+  // Timestamps set when user first draws each signature
+  const [mouSignedAt, setMouSignedAt] = useState<string | null>(null);
+  const [employerSignedAt, setEmployerSignedAt] = useState<string | null>(null);
+  const [consentSignedAt, setConsentSignedAt] = useState<string | null>(null);
+
+  // Wrap draw handlers to capture timestamp on first stroke
+  const handleMouDraw = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    mouSig.draw(e);
+    if (!mouSignedAt) setMouSignedAt(new Date().toISOString());
+  }, [mouSig, mouSignedAt]);
+
+  const handleEmployerDraw = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    employerSig.draw(e);
+    if (!employerSignedAt) setEmployerSignedAt(new Date().toISOString());
+  }, [employerSig, employerSignedAt]);
+
+  const handleConsentDraw = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    consentSig.draw(e);
+    if (!consentSignedAt) setConsentSignedAt(new Date().toISOString());
+  }, [consentSig, consentSignedAt]);
+
   const updateField = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleEinFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    setEinFile(file);
+    setEinFileName(file?.name ?? '');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.honeypot) return;
 
-    if (!formData.mouAcknowledged || !formData.consentAcknowledged) {
-      setError('Please acknowledge both the MOU and consent checkboxes.');
+    if (!formData.mouAcknowledged || !formData.mouSignerName.trim()) {
+      setError('Please acknowledge the MOU and enter the signer name.');
       return;
     }
-
-    if (!hasSigned) {
-      setError('Please provide your signature before submitting.');
+    if (!mouSig.hasSigned) {
+      setError('Please draw your signature on the MOU.');
+      return;
+    }
+    if (!formData.employerAcceptanceAcknowledged || !formData.employerAcceptanceSignerName.trim()) {
+      setError('Please acknowledge the Employer Acceptance Agreement and enter the signer name.');
+      return;
+    }
+    if (!employerSig.hasSigned) {
+      setError('Please draw your signature on the Employer Acceptance Agreement.');
+      return;
+    }
+    if (!formData.consentAcknowledged || !formData.consentSignerName.trim()) {
+      setError('Please acknowledge the consent and enter the signer name.');
+      return;
+    }
+    if (!consentSig.hasSigned) {
+      setError('Please draw your signature on the consent section.');
       return;
     }
 
@@ -159,11 +325,35 @@ export default function PartnerShopForm() {
     setError('');
 
     try {
-      const signatureData = canvasRef.current?.toDataURL('image/png') || '';
+      // If EIN file selected, convert to base64 for transmission
+      let einFileData: string | null = null;
+      if (einFile) {
+        einFileData = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(einFile);
+        });
+      }
+
       const response = await fetch('/api/partners/barbershop-apprenticeship/apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, signatureData }),
+        body: JSON.stringify({
+          ...formData,
+          // Legacy field — kept for API backward compat
+          signatureData: consentSig.toDataURL(),
+          // New signature fields
+          mouSignatureData: mouSig.toDataURL(),
+          mouSignedAt: mouSignedAt ?? new Date().toISOString(),
+          employerAcceptanceSignatureData: employerSig.toDataURL(),
+          employerAcceptanceSignedAt: employerSignedAt ?? new Date().toISOString(),
+          consentSignatureData: consentSig.toDataURL(),
+          consentSignedAt: consentSignedAt ?? new Date().toISOString(),
+          // EIN
+          einFileData,
+          einFileName,
+        }),
       });
 
       const result = await response.json();
@@ -232,9 +422,89 @@ export default function PartnerShopForm() {
                   <label className="block text-sm font-medium text-slate-700 mb-1">Owner Name *</label>
                   <input type="text" required value={formData.ownerName} onChange={e => updateField('ownerName', e.target.value)} className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500" />
                 </div>
+
+                {/* Indiana Shop License — full copy required */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Indiana Shop License # *</label>
                   <input type="text" required value={formData.indianaShopLicenseNumber} onChange={e => updateField('indianaShopLicenseNumber', e.target.value)} className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500" />
+                  <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2 mt-2 leading-relaxed">
+                    ⚠️ <strong>Full copy required.</strong> You must upload a complete copy of your Indiana barbershop license showing the license number, expiration date, licensee name, and shop address. Partial copies or photos that cut off any portion of the license will not be accepted.
+                  </p>
+                </div>
+
+                {/* EIN */}
+                <div className="md:col-span-2 border-t border-slate-100 pt-4 mt-2">
+                  <h3 className="text-sm font-semibold text-slate-800 mb-3">Employer Identification Number (EIN)</h3>
+                  <p className="text-xs text-slate-500 mb-4">
+                    Required for DOL RAPIDS worksite registration. Enter your EIN and upload your IRS confirmation letter (CP-575 or 147C). The name on the EIN must match your shop legal name above.
+                  </p>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">EIN (XX-XXXXXXX) *</label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.ein}
+                        onChange={e => updateField('ein', e.target.value)}
+                        placeholder="12-3456789"
+                        pattern="\d{2}-\d{7}"
+                        title="Enter EIN in format XX-XXXXXXX"
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Upload EIN Paperwork *
+                      </label>
+                      <label className="flex items-center gap-3 w-full px-4 py-2 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition">
+                        <Upload className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                        <span className="text-sm text-slate-600 truncate">
+                          {einFileName || 'Choose file (PDF or image)'}
+                        </span>
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={handleEinFileChange}
+                          className="sr-only"
+                        />
+                      </label>
+                      {einFile && (
+                        <p className="text-xs text-green-700 mt-1 flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> {einFileName}
+                        </p>
+                      )}
+                      <p className="text-xs text-slate-400 mt-1">IRS CP-575 or 147C letter — full document, no crops</p>
+                    </div>
+                  </div>
+                  {/* EIN QA notes */}
+                  <div className="mt-3">
+                    <label className="block text-sm font-medium text-slate-700 mb-1">EIN Notes (optional)</label>
+                    <textarea
+                      rows={2}
+                      value={formData.einQaNotes}
+                      onChange={e => updateField('einQaNotes', e.target.value)}
+                      placeholder="e.g. EIN is under the LLC name, not the DBA — or — sole proprietor using SSN (attach W-9)"
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 text-sm resize-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Shop physical address (worksite) */}
+                <div className="md:col-span-2 border-t border-slate-100 pt-4 mt-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Shop Physical / Worksite Address *
+                  </label>
+                  <p className="text-xs text-slate-500 mb-2">
+                    The street address where apprentices will perform on-the-job training. This is registered as the worksite in the federal RAPIDS system.
+                  </p>
+                  <input
+                    type="text"
+                    required
+                    value={formData.shopPhysicalAddress}
+                    onChange={e => updateField('shopPhysicalAddress', e.target.value)}
+                    placeholder="e.g. 1234 Main St, Indianapolis, IN 46204"
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
+                  />
                 </div>
               </div>
             </div>
@@ -423,59 +693,126 @@ export default function PartnerShopForm() {
               <textarea rows={4} value={formData.notes} onChange={e => updateField('notes', e.target.value)} placeholder="Any additional information you'd like to share..." className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500" />
             </div>
 
-            {/* Acknowledgments */}
+            {/* ── MOU ─────────────────────────────────────────────────────── */}
             <div className="bg-white p-6 rounded-xl shadow-sm">
-              <h2 className="text-xl font-bold text-slate-900 mb-6">Acknowledgments</h2>
-              <div className="space-y-4">
-                <div className="p-4 bg-brand-blue-50 border border-brand-blue-200 rounded-lg">
-                  <label className="flex items-start gap-3 cursor-pointer">
-                    <input type="checkbox" checked={formData.mouAcknowledged} onChange={e => updateField('mouAcknowledged', e.target.checked)} className="mt-1" />
-                    <span className="text-sm text-slate-700">
-                      I acknowledge that I have reviewed the <Link href="/docs/Indiana-Barbershop-Apprenticeship-MOU" className="text-brand-blue-600 underline" target="_blank">Memorandum of Understanding (MOU)</Link> and understand that signing it is required to participate as a partner. *
-                    </span>
-                  </label>
-                </div>
-                <div className="p-4 bg-white border border-slate-200 rounded-lg">
-                  <label className="flex items-start gap-3 cursor-pointer">
-                    <input type="checkbox" checked={formData.consentAcknowledged} onChange={e => updateField('consentAcknowledged', e.target.checked)} className="mt-1" />
-                    <span className="text-sm text-slate-700">
-                      I consent to be contacted regarding this application and acknowledge that my information will be handled according to the <Link href="/privacy-policy" className="text-brand-blue-600 underline">Privacy Policy</Link>. *
-                    </span>
-                  </label>
-                </div>
+              <h2 className="text-xl font-bold text-slate-900 mb-2">Memorandum of Understanding (MOU)</h2>
+              <p className="text-sm text-slate-500 mb-4">
+                Review the MOU before signing. This document governs your responsibilities as a DOL Registered Apprenticeship partner shop.
+              </p>
+              <div className="p-4 bg-brand-blue-50 border border-brand-blue-200 rounded-lg mb-4">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    required
+                    checked={formData.mouAcknowledged}
+                    onChange={e => updateField('mouAcknowledged', e.target.checked)}
+                    className="mt-1"
+                  />
+                  <span className="text-sm text-slate-700">
+                    I have read and agree to the{' '}
+                    <Link href="/docs/Indiana-Barbershop-Apprenticeship-MOU" className="text-brand-blue-600 underline font-medium" target="_blank">
+                      Memorandum of Understanding (MOU)
+                    </Link>{' '}
+                    and understand it is a binding agreement required to participate as a partner shop. *
+                  </span>
+                </label>
               </div>
+              <SignaturePad
+                label="MOU Signature"
+                signerLabel="MOU Signer Full Name"
+                signerName={formData.mouSignerName}
+                onSignerNameChange={v => updateField('mouSignerName', v)}
+                canvasRef={mouSig.canvasRef}
+                hasSigned={mouSig.hasSigned}
+                onClear={() => { mouSig.clear(); setMouSignedAt(null); }}
+                onStartDrawing={mouSig.startDrawing}
+                onDraw={handleMouDraw}
+                onStopDrawing={mouSig.stopDrawing}
+                signedAt={mouSignedAt}
+              />
             </div>
 
-            {/* Signature */}
+            {/* ── Employer Acceptance Agreement ────────────────────────────── */}
             <div className="bg-white p-6 rounded-xl shadow-sm">
-              <h2 className="text-xl font-bold text-slate-900 mb-2">Applicant Signature *</h2>
-              <p className="text-sm text-slate-500 mb-4">Sign below to confirm that the information provided is accurate and complete.</p>
-              <div className="border-2 border-dashed border-slate-300 rounded-lg overflow-hidden bg-white">
-                <canvas
-                  ref={canvasRef}
-                  className="w-full h-32 cursor-crosshair touch-none"
-                  onMouseDown={startDrawing}
-                  onMouseMove={draw}
-                  onMouseUp={stopDrawing}
-                  onMouseLeave={stopDrawing}
-                  onTouchStart={startDrawing}
-                  onTouchMove={draw}
-                  onTouchEnd={stopDrawing}
-                />
-              </div>
-              <div className="flex items-center justify-between mt-2">
-                {hasSigned ? (
-                  <p className="text-sm text-green-600 font-medium">Signature captured</p>
-                ) : (
-                  <p className="text-sm text-slate-500">Draw your signature above</p>
-                )}
-                <button type="button" onClick={clearSignature} className="text-sm text-slate-500 hover:text-slate-700 underline">
-                  Clear
-                </button>
-              </div>
-              <p className="text-xs text-slate-500 mt-2">
-                By signing, you agree that this electronic signature is legally binding under the Indiana Uniform Electronic Transactions Act (IC 26-2-8) and the federal ESIGN Act.
+              <h2 className="text-xl font-bold text-slate-900 mb-2">Employer Acceptance Agreement</h2>
+              <p className="text-sm text-slate-500 mb-4">
+                As the employing shop, you accept responsibility for the apprentice as an employee, agree to pay at least minimum wage, maintain required insurance, and comply with all DOL Registered Apprenticeship standards for the duration of the apprenticeship.
               </p>
+              <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-4 space-y-2 text-sm text-slate-700">
+                <p className="font-semibold text-slate-900">By signing, the employer agrees to:</p>
+                <ul className="list-disc list-inside space-y-1 text-sm text-slate-700 ml-1">
+                  <li>Add the apprentice to payroll as a W-2 employee</li>
+                  <li>Pay at least Indiana minimum wage ($7.25/hr) throughout the apprenticeship</li>
+                  <li>Maintain active Workers&apos; Compensation and General Liability insurance</li>
+                  <li>Designate a licensed supervising barber for all OJL hours</li>
+                  <li>Verify and sign off on apprentice competency log entries</li>
+                  <li>Cooperate with DOL RAPIDS reporting and any compliance audits</li>
+                  <li>Notify Elevate for Humanity within 5 business days of any change in employment status</li>
+                </ul>
+              </div>
+              <div className="p-4 bg-white border border-slate-200 rounded-lg mb-4">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    required
+                    checked={formData.employerAcceptanceAcknowledged}
+                    onChange={e => updateField('employerAcceptanceAcknowledged', e.target.checked)}
+                    className="mt-1"
+                  />
+                  <span className="text-sm text-slate-700">
+                    I accept the Employer Acceptance Agreement and confirm that I have the authority to bind this business to these obligations. *
+                  </span>
+                </label>
+              </div>
+              <SignaturePad
+                label="Employer Acceptance Signature"
+                signerLabel="Authorized Signer Full Name"
+                signerName={formData.employerAcceptanceSignerName}
+                onSignerNameChange={v => updateField('employerAcceptanceSignerName', v)}
+                canvasRef={employerSig.canvasRef}
+                hasSigned={employerSig.hasSigned}
+                onClear={() => { employerSig.clear(); setEmployerSignedAt(null); }}
+                onStartDrawing={employerSig.startDrawing}
+                onDraw={handleEmployerDraw}
+                onStopDrawing={employerSig.stopDrawing}
+                signedAt={employerSignedAt}
+              />
+            </div>
+
+            {/* ── Application Consent ──────────────────────────────────────── */}
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <h2 className="text-xl font-bold text-slate-900 mb-2">Application Consent & Certification</h2>
+              <p className="text-sm text-slate-500 mb-4">
+                Certify that all information in this application is accurate and consent to contact.
+              </p>
+              <div className="p-4 bg-white border border-slate-200 rounded-lg mb-4">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    required
+                    checked={formData.consentAcknowledged}
+                    onChange={e => updateField('consentAcknowledged', e.target.checked)}
+                    className="mt-1"
+                  />
+                  <span className="text-sm text-slate-700">
+                    I certify that all information provided in this application is true and accurate. I consent to be contacted regarding this application and acknowledge that my information will be handled per the{' '}
+                    <Link href="/privacy-policy" className="text-brand-blue-600 underline">Privacy Policy</Link>. *
+                  </span>
+                </label>
+              </div>
+              <SignaturePad
+                label="Application Signature"
+                signerLabel="Applicant Full Name"
+                signerName={formData.consentSignerName}
+                onSignerNameChange={v => updateField('consentSignerName', v)}
+                canvasRef={consentSig.canvasRef}
+                hasSigned={consentSig.hasSigned}
+                onClear={() => { consentSig.clear(); setConsentSignedAt(null); }}
+                onStartDrawing={consentSig.startDrawing}
+                onDraw={handleConsentDraw}
+                onStopDrawing={consentSig.stopDrawing}
+                signedAt={consentSignedAt}
+              />
             </div>
 
             {/* Honeypot */}

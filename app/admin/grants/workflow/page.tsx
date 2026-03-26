@@ -1,7 +1,5 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { requireAdmin } from '@/lib/auth';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -15,22 +13,20 @@ export const metadata: Metadata = {
 };
 
 async function getWorkflowData() {
-  const { data: grants } = await supabaseAdmin
-    .from('grants')
+  const db = createAdminClient();
+
+  const { data: grants } = await db
+    .from('grant_opportunities')
     .select('*')
-    .order('due_date', { ascending: true });
+    .order('deadline', { ascending: true });
 
-  const { data: entities } = await supabaseAdmin
-    .from('grant_entities')
-    .select('*');
-
-  const { data: applications } = await supabaseAdmin
+  const { data: applications } = await db
     .from('grant_applications')
     .select('*');
 
   return {
     grants: grants || [],
-    entities: entities || [],
+    entities: [] as any[],
     applications: applications || [],
   };
 }
@@ -60,8 +56,6 @@ export default async function GrantWorkflowPage() {
     .select('*')
     .eq('id', user.id)
     .single();
-
-  await requireAdmin();
 
   const { grants, entities, applications } = await getWorkflowData();
 
@@ -183,7 +177,7 @@ export default async function GrantWorkflowPage() {
                     </p>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-slate-500">
-                        Due: {new Date(grant.due_date).toLocaleDateString()}
+                        Due: {grant.deadline ? new Date(grant.deadline).toLocaleDateString() : 'TBD'}
                       </span>
                       <Link
                         href={`/admin/grants/intake/${grant.id}`}

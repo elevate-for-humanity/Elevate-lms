@@ -7,6 +7,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
   Building2, CheckCircle, Clock, XCircle,
   Phone, Mail, MapPin, User, ShieldCheck, AlertTriangle,
+  FileText, PenLine, Hash,
 } from 'lucide-react';
 import ApproveButton from './ApproveButton';
 
@@ -28,6 +29,7 @@ type Application = {
   shop_city: string;
   shop_state: string;
   shop_zip: string;
+  shop_physical_address: string | null;
   indiana_shop_license_number: string;
   supervisor_name: string;
   supervisor_license_number: string;
@@ -37,7 +39,17 @@ type Application = {
   apprentices_on_payroll: boolean;
   can_supervise_and_verify: boolean;
   mou_acknowledged: boolean;
+  mou_signed_at: string | null;
+  mou_signer_name: string | null;
   consent_acknowledged: boolean;
+  consent_signed_at: string | null;
+  consent_signer_name: string | null;
+  employer_acceptance_acknowledged: boolean;
+  employer_acceptance_signed_at: string | null;
+  employer_acceptance_signer_name: string | null;
+  ein: string | null;
+  ein_document_path: string | null;
+  ein_qa_notes: string | null;
   number_of_employees: number | null;
   notes: string | null;
   status: string | null;
@@ -91,19 +103,23 @@ export default async function BarberShopApplicationsPage() {
     .eq('id', user.id)
     .single();
 
-  if (profile?.role !== 'admin') redirect('/');
+  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/');
 
   const { data: applications, error } = await db
     .from('barbershop_partner_applications')
     .select(`
       id, created_at, shop_legal_name, shop_dba_name,
       owner_name, contact_name, contact_email, contact_phone,
-      shop_city, shop_state, shop_zip,
+      shop_city, shop_state, shop_zip, shop_physical_address,
       indiana_shop_license_number,
       supervisor_name, supervisor_license_number,
       compensation_model, workers_comp_status,
       has_general_liability, apprentices_on_payroll,
-      can_supervise_and_verify, mou_acknowledged, consent_acknowledged,
+      can_supervise_and_verify,
+      mou_acknowledged, mou_signed_at, mou_signer_name,
+      consent_acknowledged, consent_signed_at, consent_signer_name,
+      employer_acceptance_acknowledged, employer_acceptance_signed_at, employer_acceptance_signer_name,
+      ein, ein_document_path, ein_qa_notes,
       number_of_employees, notes, status
     `)
     .order('created_at', { ascending: false });
@@ -214,6 +230,12 @@ export default async function BarberShopApplicationsPage() {
                     <MapPin className="w-3.5 h-3.5 text-gray-400" />
                     {app.shop_city}, {app.shop_state} {app.shop_zip}
                   </p>
+                  {app.shop_physical_address && (
+                    <p className="flex items-center gap-1.5 text-gray-500 text-xs">
+                      <MapPin className="w-3 h-3 text-gray-300" />
+                      Physical: {app.shop_physical_address}
+                    </p>
+                  )}
                   <p className="flex items-center gap-1.5 text-gray-700">
                     <ShieldCheck className="w-3.5 h-3.5 text-gray-400" />
                     IN Shop License: <span className="font-mono ml-1">{app.indiana_shop_license_number}</span>
@@ -223,12 +245,26 @@ export default async function BarberShopApplicationsPage() {
                   </p>
                 </div>
 
-                {/* Employment */}
+                {/* Employment & EIN */}
                 <div className="space-y-1">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Employment</p>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Employment & EIN</p>
                   <p className="text-gray-700">Compensation: {app.compensation_model || '—'}</p>
                   <p className="text-gray-700">Employees: {app.number_of_employees ?? '—'}</p>
                   <p className="text-gray-700">Workers Comp: {app.workers_comp_status}</p>
+                  <p className="flex items-center gap-1.5 text-gray-700">
+                    <Hash className="w-3.5 h-3.5 text-gray-400" />
+                    EIN: {app.ein ? <span className="font-mono">{app.ein}</span> : <span className="text-gray-400">Not provided</span>}
+                    {app.ein_document_path && (
+                      <span className="ml-1 inline-flex items-center gap-0.5 text-xs text-green-700 bg-green-50 px-1.5 py-0.5 rounded">
+                        <FileText className="w-3 h-3" /> Doc uploaded
+                      </span>
+                    )}
+                  </p>
+                  {app.ein_qa_notes && (
+                    <p className="text-xs text-amber-700 bg-amber-50 rounded px-2 py-1">
+                      EIN note: {app.ein_qa_notes}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -238,9 +274,34 @@ export default async function BarberShopApplicationsPage() {
                 <ComplianceFlag ok={app.has_general_liability} label="General liability" />
                 <ComplianceFlag ok={app.workers_comp_status === 'verified'} label="Workers comp" />
                 <ComplianceFlag ok={app.can_supervise_and_verify} label="Can supervise" />
+                <ComplianceFlag ok={!!app.employer_acceptance_acknowledged} label="Employer acceptance" />
                 <ComplianceFlag ok={app.mou_acknowledged} label="MOU acknowledged" />
                 <ComplianceFlag ok={app.consent_acknowledged} label="Consent" />
               </div>
+
+              {/* Signature timestamps */}
+              {(app.mou_signed_at || app.consent_signed_at || app.employer_acceptance_signed_at) && (
+                <div className="mt-3 flex flex-wrap gap-4 text-xs text-gray-500">
+                  {app.employer_acceptance_signed_at && (
+                    <span className="flex items-center gap-1">
+                      <PenLine className="w-3 h-3" />
+                      Employer acceptance: {app.employer_acceptance_signer_name || app.contact_name} at {new Date(app.employer_acceptance_signed_at).toLocaleString()}
+                    </span>
+                  )}
+                  {app.mou_signed_at && (
+                    <span className="flex items-center gap-1">
+                      <PenLine className="w-3 h-3" />
+                      MOU: {app.mou_signer_name || app.contact_name} at {new Date(app.mou_signed_at).toLocaleString()}
+                    </span>
+                  )}
+                  {app.consent_signed_at && (
+                    <span className="flex items-center gap-1">
+                      <PenLine className="w-3 h-3" />
+                      Consent: {app.consent_signer_name || app.contact_name} at {new Date(app.consent_signed_at).toLocaleString()}
+                    </span>
+                  )}
+                </div>
+              )}
 
               {app.notes && (
                 <p className="mt-3 text-sm text-gray-600 bg-gray-50 rounded p-3">

@@ -61,6 +61,7 @@ async function _GET(request: NextRequest) {
         id,
         referral_id,
         employer_id,
+        program_id,
         rapids_id,
         start_date,
         status
@@ -79,6 +80,7 @@ async function _GET(request: NextRequest) {
           id,
           referral_id,
           employer_id,
+          program_id,
           rapids_id,
           start_date,
           status,
@@ -98,6 +100,14 @@ async function _GET(request: NextRequest) {
       }
     }
 
+    // Non-admin users with no apprentice record cannot use the timeclock
+    if (!isAdmin && !apprentice) {
+      return NextResponse.json(
+        { error: 'No active apprenticeship found. Contact your program coordinator.', code: 'NO_APPRENTICESHIP' },
+        { status: 403 }
+      );
+    }
+
     // Get employer/shop info
     let shopId: string | null = null;
     let shopName: string | null = null;
@@ -113,7 +123,41 @@ async function _GET(request: NextRequest) {
       }
     }
 
+    // Get program info for display
+    let programId: string | null = apprentice?.program_id ?? null;
+    let programName = 'Barber Apprenticeship';
+    if (programId) {
+      const { data: prog } = await db
+        .from('programs')
+        .select('id, name')
+        .eq('id', programId)
+        .maybeSingle();
+      if (prog) programName = prog.name;
+    } else {
+      // Fallback: resolve barber program id
+      const { data: prog } = await db
+        .from('programs')
+        .select('id, name')
+        .eq('slug', 'barber-apprenticeship')
+        .maybeSingle();
+      if (prog) { programId = prog.id; programName = prog.name; }
+    }
+
+    // Hours progress from hour_entries
+    let hoursCompleted = 0;
+    const hoursRequired = 2000; // Indiana barber OJL requirement
+    if (apprentice) {
+      const { data: hourRows } = await db
+        .from('hour_entries')
+        .select('hours_claimed, accepted_hours, status, source_type')
+        .eq('user_id', user.id);
+      hoursCompleted = (hourRows ?? [])
+        .filter((h: any) => h.status === 'approved' && (h.source_type === 'ojl' || h.source_type === 'timeclock' || h.source_type === 'host_shop' || h.source_type === 'manual'))
+        .reduce((sum: number, h: any) => sum + (Number(h.accepted_hours) || Number(h.hours_claimed) || 0), 0);
+    }
+
     // Build site query based on role
+    // Filter by is_active (new column) OR status = 'active' (legacy column)
     let sitesQuery = db
       .from('apprentice_sites')
       .select(`
@@ -122,13 +166,9 @@ async function _GET(request: NextRequest) {
         latitude,
         longitude,
         radius_meters,
-        shop_id,
-        shops:shop_id (
-          id,
-          name
-        )
+        shop_id
       `)
-      .eq('is_active', true);
+      .or('is_active.eq.true,status.eq.active');
 
     // Restrict sites for non-admin users
     if (!isAdmin && apprentice?.employer_id) {
@@ -141,9 +181,9 @@ async function _GET(request: NextRequest) {
 
     const { data: sites } = await sitesQuery;
 
-    const allowedSites = (sites || []).map(site => ({
+    const allowedSites = (sites || []).map((site: any) => ({
       id: site.id,
-      name: site.name || (site.shops as { name: string } | null)?.name || 'Unknown Site',
+      name: site.name || 'Unknown Site',
       lat: site.latitude,
       lng: site.longitude,
       radius_m: site.radius_meters || 100,
@@ -182,8 +222,15 @@ async function _GET(request: NextRequest) {
       userId: user.id,
       userName: profile?.full_name || user.email,
       role,
+      // Program info — required by timeclock page
+      programId,
+      programName,
+      hoursCompleted,
+      hoursRequired,
+      // Shop / site info
       shopId,
       shopName,
+      partnerId: apprentice?.employer_id || null,
       defaultSiteId: allowedSites[0]?.id || null,
       allowedSites,
       activeShift,

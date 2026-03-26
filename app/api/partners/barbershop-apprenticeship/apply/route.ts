@@ -22,6 +22,7 @@ interface ApplicationData {
   shopCity: string;
   shopState: string;
   shopZip: string;
+  shopPhysicalAddress?: string;
   indianaShopLicenseNumber: string;
   supervisorName: string;
   supervisorLicenseNumber: string;
@@ -29,6 +30,28 @@ interface ApplicationData {
   compensationModel: string;
   workersCompStatus: string;
   canSuperviseAndVerify: string;
+  apprenticesOnPayroll?: string;
+  hasGeneralLiability?: string;
+  numberOfEmployees?: string;
+  // EIN
+  ein?: string;
+  einFileData?: string;   // base64 data URL
+  einFileName?: string;
+  einQaNotes?: string;
+  // Employer acceptance agreement
+  employerAcceptanceAcknowledged?: boolean;
+  employerAcceptanceSignatureData?: string;
+  employerAcceptanceSignedAt?: string;
+  employerAcceptanceSignerName?: string;
+  // MOU signature
+  mouSignatureData?: string;
+  mouSignedAt?: string;
+  mouSignerName?: string;
+  // Consent signature
+  consentSignatureData?: string;
+  consentSignedAt?: string;
+  consentSignerName?: string;
+  // Legacy
   mouAcknowledged: boolean;
   consentAcknowledged: boolean;
   notes?: string;
@@ -170,6 +193,29 @@ async function _POST(req: Request) {
       );
     }
 
+    // Upload EIN document to storage if provided
+    let einDocumentPath: string | null = null;
+    if (body.einFileData && body.einFileName) {
+      try {
+        const base64Data = body.einFileData.split(',')[1];
+        const mimeType = body.einFileData.split(';')[0].replace('data:', '');
+        const buffer = Buffer.from(base64Data, 'base64');
+        const ext = body.einFileName.split('.').pop() || 'pdf';
+        const storagePath = `ein-documents/${Date.now()}-${body.contactEmail.replace(/[^a-z0-9]/gi, '_')}.${ext}`;
+        const { error: uploadError } = await supabase.storage
+          .from('documents')
+          .upload(storagePath, buffer, { contentType: mimeType, upsert: false });
+        if (!uploadError) einDocumentPath = storagePath;
+        else logger.error('EIN document upload failed', uploadError);
+      } catch (uploadErr) {
+        logger.error('EIN document upload error', uploadErr as Error);
+      }
+    }
+
+    const ipRaw = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+      || req.headers.get('x-real-ip')
+      || 'unknown';
+
     // Insert application
     const { data, error } = await supabase
       .from('barbershop_partner_applications')
@@ -185,6 +231,7 @@ async function _POST(req: Request) {
         shop_city: body.shopCity.trim(),
         shop_state: body.shopState || 'IN',
         shop_zip: body.shopZip.trim(),
+        shop_physical_address: body.shopPhysicalAddress?.trim() || null,
         indiana_shop_license_number: body.indianaShopLicenseNumber.trim(),
         supervisor_name: body.supervisorName.trim(),
         supervisor_license_number: body.supervisorLicenseNumber.trim(),
@@ -194,7 +241,7 @@ async function _POST(req: Request) {
         number_of_employees: body.numberOfEmployees ? parseInt(body.numberOfEmployees) : null,
         has_general_liability: body.hasGeneralLiability === 'yes',
         workers_comp_status: body.workersCompStatus || 'none',
-        // Legacy field preserved for backward compatibility
+        // Legacy fields preserved for backward compatibility
         employment_model: body.compensationModel,
         has_workers_comp: body.workersCompStatus === 'verified',
         can_supervise_and_verify: body.canSuperviseAndVerify === 'yes',
@@ -202,9 +249,26 @@ async function _POST(req: Request) {
         consent_acknowledged: body.consentAcknowledged,
         notes: body.notes?.trim() || null,
         signature_data: body.signatureData || null,
+        // EIN
+        ein: body.ein?.trim() || null,
+        ein_document_path: einDocumentPath,
+        ein_qa_notes: body.einQaNotes?.trim() || null,
+        // Employer acceptance agreement
+        employer_acceptance_acknowledged: body.employerAcceptanceAcknowledged ?? false,
+        employer_acceptance_signature_data: body.employerAcceptanceSignatureData || null,
+        employer_acceptance_signed_at: body.employerAcceptanceSignedAt || null,
+        employer_acceptance_signer_name: body.employerAcceptanceSignerName?.trim() || null,
+        // MOU signature
+        mou_signature_data: body.mouSignatureData || null,
+        mou_signed_at: body.mouSignedAt || null,
+        mou_signer_name: body.mouSignerName?.trim() || body.contactName.trim(),
+        // Consent signature
+        consent_signature_data: body.consentSignatureData || null,
+        consent_signed_at: body.consentSignedAt || null,
+        consent_signer_name: body.consentSignerName?.trim() || body.contactName.trim(),
         source_url: req.headers.get('referer') || null,
         user_agent: req.headers.get('user-agent') || null,
-        ip_hash: hashIP(identifier),
+        ip_hash: hashIP(ipRaw),
       })
       .select()
       .single();
@@ -225,12 +289,18 @@ async function _POST(req: Request) {
       <p><strong>Contact:</strong> ${body.contactName}</p>
       <p><strong>Email:</strong> ${body.contactEmail}</p>
       <p><strong>Phone:</strong> ${body.contactPhone}</p>
-      <p><strong>Address:</strong> ${body.shopAddressLine1}${body.shopAddressLine2 ? ', ' + body.shopAddressLine2 : ''}, ${body.shopCity}, ${body.shopState} ${body.shopZip}</p>
+      <p><strong>Mailing Address:</strong> ${body.shopAddressLine1}${body.shopAddressLine2 ? ', ' + body.shopAddressLine2 : ''}, ${body.shopCity}, ${body.shopState} ${body.shopZip}</p>
+      ${body.shopPhysicalAddress ? `<p><strong>Physical/Shop Address:</strong> ${body.shopPhysicalAddress}</p>` : ''}
       <p><strong>Shop License #:</strong> ${body.indianaShopLicenseNumber}</p>
+      <p><strong>EIN:</strong> ${body.ein || 'Not provided'}${einDocumentPath ? ' <em>(EIN document uploaded)</em>' : ''}</p>
+      ${body.einQaNotes ? `<p><strong>EIN Notes:</strong> ${body.einQaNotes}</p>` : ''}
       <p><strong>Supervisor:</strong> ${body.supervisorName} (License: ${body.supervisorLicenseNumber}, ${body.supervisorYearsLicensed || 'N/A'} years)</p>
       <p><strong>Compensation Model:</strong> ${body.compensationModel}</p>
       <p><strong>Workers' Comp:</strong> ${body.workersCompStatus}</p>
       <p><strong>Can Supervise:</strong> ${body.canSuperviseAndVerify}</p>
+      <p><strong>Employer Acceptance Signed:</strong> ${body.employerAcceptanceAcknowledged ? `Yes — ${body.employerAcceptanceSignerName || 'name not captured'} at ${body.employerAcceptanceSignedAt || 'time not captured'}` : 'No'}</p>
+      <p><strong>MOU Signed:</strong> ${body.mouSignedAt ? `Yes at ${body.mouSignedAt}` : 'No'}</p>
+      <p><strong>Consent Signed:</strong> ${body.consentSignedAt ? `Yes at ${body.consentSignedAt}` : 'No'}</p>
       ${body.notes ? `<p><strong>Notes:</strong> ${body.notes}</p>` : ''}
       <hr>
       <p><small>Application ID: ${data.id}</small></p>

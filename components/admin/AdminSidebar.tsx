@@ -21,6 +21,7 @@ import {
   ChevronRight,
   X,
   Menu,
+  DollarSign,
 } from 'lucide-react';
 
 interface NavItem {
@@ -116,6 +117,30 @@ const PRIMARY_NAV: NavSection[] = [
       { name: 'Users', href: '/admin/reports/users' },
       { name: 'Leads', href: '/admin/reports/leads' },
       { name: 'Charts', href: '/admin/reports/charts' },
+    ],
+  },
+  {
+    name: 'Grants & Submissions',
+    icon: DollarSign,
+    items: [
+      { name: 'Overview',          href: '/admin/grants' },
+      { name: 'Opportunity Inbox', href: '/admin/grants/intake' },
+      { name: 'New Opportunity',   href: '/admin/grants/new' },
+      { name: 'Workflow',          href: '/admin/grants/workflow' },
+      { name: 'Submissions Log',   href: '/admin/grants/submissions' },
+      { name: 'Revenue Tracking',  href: '/admin/grants/revenue' },
+      { name: '— Submissions OS —', href: '/admin/submissions' },
+      { name: 'Opportunities',     href: '/admin/submissions/opportunities' },
+      { name: 'Org Profile',       href: '/admin/submissions/org' },
+      { name: 'Facts Vault',       href: '/admin/submissions/facts' },
+      { name: 'Attachments',       href: '/admin/submissions/attachments' },
+      { name: 'Content Library',   href: '/admin/submissions/content' },
+      { name: 'Templates',         href: '/admin/submissions/templates' },
+      { name: 'Past Performance',  href: '/admin/submissions/past-performance' },
+      { name: 'Compliance',        href: '/admin/submissions/compliance' },
+      { name: 'Partners',          href: '/admin/submissions/partners' },
+      { name: 'Exception Queue',   href: '/admin/submissions/exceptions' },
+      { name: 'Audit Log',         href: '/admin/submissions/audit' },
     ],
   },
   {

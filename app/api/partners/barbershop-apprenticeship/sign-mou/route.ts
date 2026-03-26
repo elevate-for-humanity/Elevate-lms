@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { generateMOUPdf } from '@/lib/documents/generate-mou-pdf';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -146,6 +147,135 @@ async function _POST(req: NextRequest) {
         .eq('id', application.id);
 
       logger.info(`[sign-mou] Application ${application.id} updated to mou_signed`);
+    }
+
+    // Generate signed PDF and email to partner + Elevate
+    try {
+      const pdfBytes = await generateMOUPdf({
+        shop_name,
+        signer_name,
+        signer_title,
+        supervisor_name,
+        supervisor_license,
+        compensation_model,
+        compensation_rate,
+        signed_at: signed_at || now,
+        signature_data,
+        ip_address: ipAddress,
+        mou_version: mou_version || '2.0',
+      });
+
+      // Upload PDF to Supabase storage
+      const pdfFileName = `barber-mou/signed-mou-${Date.now()}-${signer_name.trim().replace(/\s+/g, '-').toLowerCase()}.pdf`;
+      const { data: pdfUpload } = await supabase.storage
+        .from('mous')
+        .upload(pdfFileName, pdfBytes, { contentType: 'application/pdf', upsert: false });
+
+      // Get public URL
+      const { data: pdfUrl } = supabase.storage.from('mous').getPublicUrl(pdfFileName);
+
+      // Update mou_signatures with PDF path
+      if (mouRecord?.id && pdfUpload) {
+        await supabase.from('mou_signatures').update({ mou_final_pdf_url: pdfUrl.publicUrl }).eq('id', mouRecord.id);
+      }
+
+      // Update partners table
+      await supabase.from('partners').update({
+        mou_signed: true,
+        mou_signed_at: signed_at || now,
+        mou_final_pdf_url: pdfUrl.publicUrl,
+        onboarding_step: 'mou_signed',
+        updated_at: now,
+      }).ilike('contact_email', '%' + (body.contact_email || shop_name) + '%');
+
+      const pdfBase64 = Buffer.from(pdfBytes).toString('base64');
+      const sgKey = process.env.SENDGRID_API_KEY;
+
+      if (sgKey) {
+        // Email PDF to partner
+        const partnerEmail = body.contact_email;
+        if (partnerEmail) {
+          await fetch('https://api.sendgrid.com/v3/mail/send', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${sgKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              personalizations: [{ to: [{ email: partnerEmail }] }],
+              from: { email: 'noreply@elevateforhumanity.org', name: 'Elevate for Humanity' },
+              reply_to: { email: 'info@elevateforhumanity.org' },
+              subject: `Your Signed MOU — ${shop_name} | Elevate for Humanity Barber Apprenticeship`,
+              content: [{
+                type: 'text/html',
+                value: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+                  <div style="background:#1a1a2e;padding:20px;border-radius:8px 8px 0 0;text-align:center">
+                    <h1 style="color:#fff;margin:0;font-size:18px">Elevate for Humanity</h1>
+                    <p style="color:#aaa;margin:4px 0 0;font-size:12px">Technical and Career Institute · RAPIDS: 2025-IN-132301</p>
+                  </div>
+                  <div style="padding:28px;border:1px solid #e5e5e5;border-top:none">
+                    <h2 style="color:#1a1a2e">MOU Signed — Your Copy is Attached</h2>
+                    <p>Hi ${signer_name},</p>
+                    <p>Thank you for signing the Employer Training Site MOU for <strong>${shop_name}</strong>. Your fully executed copy is attached to this email as a PDF.</p>
+                    <p><strong>Both parties have signed:</strong></p>
+                    <ul>
+                      <li>✓ Elevate for Humanity — Elizabeth Greene, Founder & CEO</li>
+                      <li>✓ ${shop_name} — ${signer_name}, ${signer_title}</li>
+                    </ul>
+                    <p><strong>Next step:</strong> Complete your Employer Agreement to finalize RAPIDS registration.</p>
+                    <p style="text-align:center;margin:24px 0">
+                      <a href="https://www.elevateforhumanity.org/partners/barbershop-apprenticeship/forms"
+                        style="background:#1a1a2e;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold">
+                        Complete Employer Agreement
+                      </a>
+                    </p>
+                    <p>Questions? Call <strong>(317) 314-3757</strong></p>
+                    <p>Thank you,<br/><strong>Elizabeth Greene</strong><br/>Founder & CEO, Elevate for Humanity</p>
+                  </div>
+                </div>`,
+              }],
+              attachments: [{
+                content: pdfBase64,
+                filename: `Signed-MOU-${shop_name.replace(/\s+/g, '-')}.pdf`,
+                type: 'application/pdf',
+                disposition: 'attachment',
+              }],
+            }),
+          });
+        }
+
+        // Email PDF copy to Elevate
+        const adminEmail = process.env.ALERT_EMAIL_TO || 'elevate4humanityedu@gmail.com';
+        await fetch('https://api.sendgrid.com/v3/mail/send', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${sgKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            personalizations: [{ to: [{ email: adminEmail }] }],
+            from: { email: 'noreply@elevateforhumanity.org', name: 'Elevate for Humanity' },
+            subject: `[SIGNED MOU + PDF] ${shop_name} — ${signer_name}`,
+            content: [{
+              type: 'text/html',
+              value: `<div style="font-family:Arial,sans-serif;max-width:600px">
+                <h2>[MOU SIGNED] ${shop_name}</h2>
+                <table style="width:100%;border-collapse:collapse;font-size:13px">
+                  <tr><td style="padding:6px;font-weight:bold;background:#f8f8f8">Shop</td><td style="padding:6px">${shop_name}</td></tr>
+                  <tr><td style="padding:6px;font-weight:bold">Signer</td><td style="padding:6px">${signer_name} — ${signer_title}</td></tr>
+                  <tr><td style="padding:6px;font-weight:bold;background:#f8f8f8">Supervisor</td><td style="padding:6px">${supervisor_name || 'N/A'} — License: ${supervisor_license || 'N/A'}</td></tr>
+                  <tr><td style="padding:6px;font-weight:bold">Compensation</td><td style="padding:6px">${compensation_model || 'N/A'} — ${compensation_rate || 'N/A'}</td></tr>
+                  <tr><td style="padding:6px;font-weight:bold;background:#f8f8f8">Signed At</td><td style="padding:6px">${now}</td></tr>
+                  <tr><td style="padding:6px;font-weight:bold">IP</td><td style="padding:6px">${ipAddress}</td></tr>
+                </table>
+                <p>Signed PDF attached. Also stored in Supabase mous bucket.</p>
+              </div>`,
+            }],
+            attachments: [{
+              content: pdfBase64,
+              filename: `Signed-MOU-${shop_name.replace(/\s+/g, '-')}.pdf`,
+              type: 'application/pdf',
+              disposition: 'attachment',
+            }],
+          }),
+        });
+      }
+    } catch (pdfErr) {
+      logger.warn('[sign-mou] PDF generation failed (non-blocking):', pdfErr);
     }
 
     // Send admin notification email

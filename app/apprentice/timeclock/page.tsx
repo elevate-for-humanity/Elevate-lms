@@ -7,13 +7,17 @@ import {
   Clock, 
   MapPin, 
   AlertTriangle, 
-  
   Coffee, 
   LogOut,
   Loader2,
   ArrowLeft,
-  RefreshCw
+  RefreshCw,
+  History,
+  CheckCircle2,
+  XCircle,
+  ChevronRight,
 } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 const HEARTBEAT_INTERVAL_MS = 2 * 60 * 1000; // 2 minutes
 const LOCATION_TIMEOUT_MS = 10000;
@@ -97,6 +101,18 @@ export default function TimeclockPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Recent shift history
+  const [recentShifts, setRecentShifts] = useState<{
+    id: string;
+    work_date: string;
+    clock_in_at: string | null;
+    clock_out_at: string | null;
+    hours_worked: number | null;
+    status: string | null;
+    auto_clocked_out: boolean | null;
+  }[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+
   // Fetch timeclock context on mount
   useEffect(() => {
     async function fetchContext() {
@@ -138,6 +154,24 @@ export default function TimeclockPage() {
     
     fetchContext();
   }, [router]);
+
+  // Fetch recent shift history once context is loaded
+  useEffect(() => {
+    if (!context) return;
+    setHistoryLoading(true);
+    const supabase = createClient();
+    supabase
+      .from('progress_entries')
+      .select('id,work_date,clock_in_at,clock_out_at,hours_worked,status,auto_clocked_out')
+      .eq('apprentice_id', context.apprenticeId)
+      .not('clock_in_at', 'is', null)
+      .order('work_date', { ascending: false })
+      .limit(7)
+      .then(({ data }) => {
+        setRecentShifts(data ?? []);
+        setHistoryLoading(false);
+      });
+  }, [context]);
 
   // Get current location
   const getLocation = useCallback((): Promise<GeolocationPosition> => {
@@ -377,13 +411,24 @@ export default function TimeclockPage() {
   return (
     <div className="min-h-screen bg-white py-8">
       <div className="max-w-md mx-auto px-4">
-        <Link 
-          href="/apprentice" 
-          className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Dashboard
-        </Link>
+        {/* Nav strip */}
+        <div className="flex items-center justify-between mb-6">
+          <Link href="/apprentice" className="inline-flex items-center text-gray-600 hover:text-gray-900">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Dashboard
+          </Link>
+          <div className="flex items-center gap-2 text-xs">
+            <Link href="/apprentice/timeclock/history" className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition">
+              Shift Log
+            </Link>
+            <Link href="/apprentice/hours" className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition">
+              Hours
+            </Link>
+            <Link href="/apprentice/competencies/log" className="px-3 py-1.5 bg-brand-blue-50 hover:bg-brand-blue-100 text-brand-blue-700 rounded-lg font-medium transition">
+              + Competency
+            </Link>
+          </div>
+        </div>
 
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
@@ -582,6 +627,69 @@ export default function TimeclockPage() {
           </div>
 
           {/* Shift Complete */}
+          {/* ── RECENT SHIFT LOG ── */}
+          <div className="mt-8">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+                <History className="w-4 h-4 text-brand-blue-500" />
+                Recent Shifts
+              </h2>
+              <Link
+                href="/apprentice/timeclock/history"
+                className="text-xs text-brand-blue-600 hover:underline flex items-center gap-0.5"
+              >
+                View all <ChevronRight className="w-3 h-3" />
+              </Link>
+            </div>
+
+            {historyLoading ? (
+              <div className="flex items-center justify-center py-6 text-gray-400">
+                <Loader2 className="w-4 h-4 animate-spin mr-2" /> Loading…
+              </div>
+            ) : recentShifts.length === 0 ? (
+              <p className="text-sm text-gray-400 text-center py-6">No shifts recorded yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {recentShifts.map((s) => {
+                  const hrs = s.hours_worked ?? 0;
+                  const isToday = s.work_date === new Date().toISOString().slice(0, 10);
+                  return (
+                    <div key={s.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm">
+                      <div className="flex items-center gap-2">
+                        {s.auto_clocked_out ? (
+                          <XCircle className="w-4 h-4 text-amber-500 flex-shrink-0" />
+                        ) : s.clock_out_at ? (
+                          <CheckCircle2 className="w-4 h-4 text-brand-green-500 flex-shrink-0" />
+                        ) : (
+                          <Clock className="w-4 h-4 text-brand-blue-500 flex-shrink-0 animate-pulse" />
+                        )}
+                        <div>
+                          <p className="font-medium text-gray-800">
+                            {isToday ? 'Today' : new Date(s.work_date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {s.clock_in_at ? new Date(s.clock_in_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}
+                            {' → '}
+                            {s.clock_out_at ? new Date(s.clock_out_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : s.clock_in_at ? 'Active' : '—'}
+                            {s.auto_clocked_out && ' (auto)'}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-gray-800">{hrs.toFixed(1)}h</p>
+                        <p className={`text-xs capitalize ${
+                          s.status === 'approved' ? 'text-brand-green-600' :
+                          s.status === 'rejected' ? 'text-brand-red-600' :
+                          'text-gray-400'
+                        }`}>{s.status ?? 'pending'}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
           {shift.clockOutAt && (
             <div className="mt-6 p-4 bg-brand-green-50 rounded-lg">
               <div className="flex items-center">

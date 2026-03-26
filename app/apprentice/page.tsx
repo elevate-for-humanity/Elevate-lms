@@ -77,7 +77,11 @@ export default async function ApprenticePortalPage() {
   const requiredHours = 1500; // Barber requirement
 
   const quickLinks = [
-    { name: 'Log Hours', href: '/apprentice/hours', icon: Clock, description: 'Record your OJL & RTI hours' },
+    { name: 'Timeclock', href: '/apprentice/timeclock', icon: Clock, description: 'Clock in / out at your work site' },
+    { name: 'Shift History', href: '/apprentice/timeclock/history', icon: Clock, description: 'View all recorded shifts' },
+    { name: 'Log Hours', href: '/apprentice/hours/log', icon: Clock, description: 'Manually record OJL & RTI hours' },
+    { name: 'Hours History', href: '/apprentice/hours', icon: Clock, description: 'Review submitted hour entries' },
+    { name: 'Competency Log', href: '/apprentice/competencies/log', icon: Scissors, description: 'Log a service for WPS credit' },
     { name: 'Competency Progress', href: '/apprentice/competencies', icon: Scissors, description: 'Track cuts, shaves & WPS skills' },
     { name: 'Documents', href: '/apprentice/documents', icon: FileText, description: 'View required documents' },
     { name: 'Skills Checklist', href: '/apprentice/skills', icon: Award, description: 'Track skill competencies' },

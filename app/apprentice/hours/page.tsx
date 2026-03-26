@@ -66,13 +66,34 @@ export default async function ApprenticeHoursPage() {
             <h1 className="text-3xl font-bold text-gray-900">Apprentice Hours</h1>
             <p className="text-gray-600 mt-1">Track your apprenticeship progress</p>
           </div>
-          <Link
-            href="/apprentice/hours/log"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
-          >
-            <Plus className="w-4 h-4" />
-            Log Hours
-          </Link>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Link
+              href="/apprentice/timeclock"
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm"
+            >
+              <Clock className="w-4 h-4" />
+              Timeclock
+            </Link>
+            <Link
+              href="/apprentice/timeclock/history"
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm"
+            >
+              Shift Log
+            </Link>
+            <Link
+              href="/apprentice/competencies/log"
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm"
+            >
+              Competency Log
+            </Link>
+            <Link
+              href="/apprentice/hours/log"
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Log Hours
+            </Link>
+          </div>
         </div>
 
         {/* Progress Card */}

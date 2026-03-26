@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Save, AlertCircle, CheckCircle2, Scissors } from 'lucide-react';
+import { ArrowLeft, Save, AlertCircle, CheckCircle2, Scissors, Clock, History } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Suspense } from 'react';
@@ -172,12 +172,22 @@ function LogCompetencyForm() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <Link
-          href="/apprentice/competencies"
-          className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 mb-6 transition"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back to Competencies
-        </Link>
+        <div className="flex items-center justify-between mb-6">
+          <Link
+            href="/apprentice/competencies"
+            className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to Competencies
+          </Link>
+          <div className="flex items-center gap-2 text-xs">
+            <Link href="/apprentice/timeclock" className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition">
+              <Clock className="w-3.5 h-3.5" /> Timeclock
+            </Link>
+            <Link href="/apprentice/hours" className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition">
+              <History className="w-3.5 h-3.5" /> Hours
+            </Link>
+          </div>
+        </div>
 
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
           <div className="flex items-center gap-3 mb-6">

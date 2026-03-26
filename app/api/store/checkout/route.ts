@@ -18,7 +18,7 @@ async function _POST(req: Request) {
     const { productId, email, adminSessionId, approvedLinkId } = await req.json();
 
     // SECTION 1: Licensing mode check
-    const authCheck = validateCheckoutAuthorization(adminSessionId, approvedLinkId);
+    const authCheck = await validateCheckoutAuthorization(adminSessionId, approvedLinkId);
     if (!authCheck.authorized) {
       logger.warn('Unauthorized checkout attempt', { productId, email, reason: authCheck.reason });
       return Response.json({ error: authCheck.reason }, { status: 403 });

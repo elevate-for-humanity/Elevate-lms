@@ -18,11 +18,11 @@ function getSupabaseAdmin() {
 
 export function getLicensingMode(): LicensingMode {
   const mode = process.env.LICENSING_MODE;
-  if (mode === 'controlled' || mode === 'open') {
-    return mode;
-  }
-  // Default to controlled in production
-  return process.env.NODE_ENV === 'production' ? 'controlled' : 'open';
+  if (mode === 'controlled') return 'controlled';
+  // 'open', 'production', or any other value → open (public checkout allowed)
+  if (mode) return 'open';
+  // No env var set: open in all environments
+  return 'open';
 }
 
 export function isLicensingControlled(): boolean {

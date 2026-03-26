@@ -132,7 +132,7 @@ async function main() {
       job_application: content.jobApplication || '',
       watch_for: content.watchFor || [],
       diagram_ref: content.diagramRef || null,
-      video_file: uuid ? `/generated/videos/${uuid}.mp4` : null,
+      video_file: uuid ? `/videos/lessons/${uuid}.mp4` : null,
       audio_file: uuid ? `/generated/lessons/${uuid}.mp3` : null,
       status: 'published',
     };

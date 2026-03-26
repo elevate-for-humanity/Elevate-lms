@@ -1,7 +1,7 @@
 /**
  * Generate 30-second intro MP3s for each catalog course preview video.
  * Uses OpenAI TTS (tts-1-hd, alloy voice).
- * Output: public/generated/previews/audio-{id}.mp3
+ * Output: public/videos/previews/audio-{id}.mp3
  *
  * Run: npx tsx scripts/generate-course-preview-audio.ts
  */
@@ -14,7 +14,7 @@ import * as path from 'path';
 import OpenAI from 'openai';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const OUT_DIR = path.join(process.cwd(), 'public', 'generated', 'previews');
+const OUT_DIR = path.join(process.cwd(), 'public', 'videos', 'previews');
 
 // Each script is ~30 seconds of natural speech at a calm pace
 const COURSE_SCRIPTS: Record<string, string> = {

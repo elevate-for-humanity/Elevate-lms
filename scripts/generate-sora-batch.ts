@@ -17,7 +17,7 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 const CONCURRENCY = 5;
-const VIDEO_DIR = path.join(process.cwd(), 'public', 'generated', 'videos');
+const VIDEO_DIR = path.join(process.cwd(), 'public', 'videos', 'lessons');
 
 // ── Scene prompts by course category ────────────────────────────────────
 
@@ -95,7 +95,7 @@ async function generateOne(lessonId: string, courseName: string, lessonTitle: st
         const filename = `lesson-${lessonId}.mp4`;
         writeFileSync(path.join(VIDEO_DIR, filename), buffer);
 
-        const videoUrl = `/generated/videos/${filename}`;
+        const videoUrl = `/videos/lessons/${filename}`;
         await supabase.from('training_lessons')
           .update({ video_url: videoUrl, updated_at: new Date().toISOString() })
           .eq('id', lessonId);

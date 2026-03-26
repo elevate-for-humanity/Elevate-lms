@@ -45,14 +45,21 @@ const HVAC_UUID_TO_DEF: Record<string, string> = Object.fromEntries(
   Object.entries(HVAC_LESSON_UUID).map(([defId, uuid]) => [uuid, defId])
 );
 
-// Slug-based fallback: 'hvac-lesson-1' → 'hvac-01-01' (lesson order within module).
-// curriculum_lessons slugs follow the pattern hvac-lesson-N (1-indexed, sequential).
+// Slug-based fallback: maps DB lesson slug → HVAC_LESSON_UUID defId.
+// Supports:
+//   hvac-MM-NN        → direct key lookup (e.g. hvac-01-01)
+//   hvac-MM-checkpoint → no dedicated video; caller falls back to b-roll
+//   hvac-lesson-N     → legacy absolute-index format
 function hvacDefIdFromSlug(slug: string): string | undefined {
+  // New canonical format: hvac-MM-PP (e.g. hvac-01-01) — direct match
+  if (/^hvac-\d{2}-\d{2}$/.test(slug)) return slug;
+
+  // Legacy format: hvac-lesson-N (1-based absolute index)
   const match = slug.match(/^hvac-lesson-(\d+)$/);
   if (!match) return undefined;
-  const n = parseInt(match[1], 10); // 1-based absolute lesson index
+  const n = parseInt(match[1], 10);
   const defKeys = Object.keys(HVAC_LESSON_UUID);
-  return defKeys[n - 1]; // defKeys are ordered hvac-01-01, hvac-01-02, ...
+  return defKeys[n - 1];
 }
 import { buildLessonContent, isPlaceholderContent } from '@/lib/courses/hvac-content-builder';
 import { HVAC_COURSE_ID } from '@/lib/courses/hvac-uuids';
@@ -71,6 +78,23 @@ const LessonVideoWithSimulation = dynamic(
   { ssr: false }
 );
 
+// Reads ?activity= once on mount inside its own Suspense boundary.
+// Defined outside LessonPage so it has a stable identity across renders.
+// onActivity MUST be useCallback-stable — do not pass an inline function.
+function ActivityParamSync({ onActivity }: { onActivity: (a: ActivityId) => void }) {
+  const sp = useSearchParams();
+  const initialised = React.useRef(false);
+  useEffect(() => {
+    if (initialised.current) return;
+    const a = sp.get('activity') as ActivityId | null;
+    if (a) {
+      initialised.current = true;
+      onActivity(a);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  return null;
+}
+
 export default function LessonPage() {
   const params = useParams();
   const router = useRouter();
@@ -79,15 +103,13 @@ export default function LessonPage() {
 
   const isHvacCourse = courseId === HVAC_COURSE_ID;
 
-  // ── State ────────────────────────────────────────────────────────────────────
+  // ── All state declarations first — no hooks may reference these before this block ──
   const [lesson, setLesson] = useState<any>(null);
   const [lessons, setLessons] = useState<any[]>([]);
   const [course, setCourse] = useState<any>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
-  // Activity tab — driven by ?activity= param or defaults to 'video'
   const [activeActivity, setActiveActivity] = useState<ActivityId>('video');
-  // Tracks which activities the learner has interacted with (gates checkpoint tab)
   const [attempted, setAttempted] = useState<Set<ActivityId>>(new Set());
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(new Set());
@@ -96,19 +118,26 @@ export default function LessonPage() {
   const [enrollmentBlocked, setEnrollmentBlocked] = useState(false);
   const [enrollmentBlockReason, setEnrollmentBlockReason] = useState<'pending_approval' | 'pending_funding_verification' | 'not_enrolled'>('not_enrolled');
   const [completionError, setCompletionError] = useState<string | null>(null);
-  // checkpointBlocked: true when the previous module's checkpoint has not been passed.
-  // Prevents advancing past a failed checkpoint into the next module.
   const [checkpointBlocked, setCheckpointBlocked] = useState(false);
   const [passedCheckpointIds, setPassedCheckpointIds] = useState<Set<string>>(new Set());
   const [loadTimeout, setLoadTimeout] = useState(false);
 
-  // ── Refs ─────────────────────────────────────────────────────────────────────
+  // ── Refs — stable across renders, safe to use in any hook below ──
+  // Mirrors passedCheckpointIds so fetchLessonData can read it without
+  // listing it as a useCallback dependency (which would cause an infinite loop).
+  const passedCheckpointIdsRef = React.useRef<Set<string>>(new Set());
   const lessonStartTime = React.useRef(Date.now());
 
-  // ── Callbacks (must precede any effects that reference them) ─────────────────
+  // ── Effects — all state and refs are declared above ──
+
+  // ── Stable callbacks — declared before any effect that references them ──
+
+  // Stable setter for ActivityParamSync — must not change identity across renders.
+  const handleActivityParam = useCallback((a: ActivityId) => {
+    setActiveActivity(a);
+  }, []);
 
   // Mark an activity as attempted (called when learner interacts with it).
-  // Uses functional update to avoid stale closure and prevent duplicate entries.
   const markAttempted = useCallback((id: ActivityId) => {
     setAttempted(prev => {
       if (prev.has(id)) return prev;
@@ -118,9 +147,20 @@ export default function LessonPage() {
     });
   }, []);
 
-  // ── Effects ──────────────────────────────────────────────────────────────────
+  // ── Effects — all callbacks and state declared above ──
 
-  // Reset attempted set when lesson changes so gating is fresh per lesson
+  // Keep ref in sync with passedCheckpointIds state.
+  useEffect(() => {
+    passedCheckpointIdsRef.current = passedCheckpointIds;
+  }, [passedCheckpointIds]);
+
+  // Mark the active activity as attempted when it changes.
+  // Replaces IIFE markAttempted() calls inside JSX which cause infinite loops.
+  useEffect(() => {
+    markAttempted(activeActivity);
+  }, [activeActivity, markAttempted]);
+
+  // Reset activity/attempt state when navigating to a new lesson.
   useEffect(() => {
     setAttempted(new Set());
     if (lesson) {
@@ -128,17 +168,6 @@ export default function LessonPage() {
       setActiveActivity(getDefaultActivity(stepType));
     }
   }, [lessonId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // ActivityParamSync reads ?activity= and updates state.
-  // Must be inside Suspense because useSearchParams suspends on first render.
-  function ActivityParamSync({ onActivity }: { onActivity: (a: ActivityId) => void }) {
-    const sp = useSearchParams();
-    useEffect(() => {
-      const a = sp.get('activity') as ActivityId | null;
-      if (a) onActivity(a);
-    }, [sp, onActivity]);
-    return null;
-  }
 
   const fetchLessonData = useCallback(async () => {
     const { createClient } = await import('@/lib/supabase/client');
@@ -328,16 +357,18 @@ export default function LessonPage() {
     // 5. Determine if the current lesson is blocked by an unpassed checkpoint.
     // A lesson is blocked when it is in module N and the checkpoint for module N-1
     // has not been passed. Applies to all DB-driven lessons (lesson_source = 'canonical').
+    // NOTE: passedCheckpointIds is read via a ref to avoid adding it as a dependency
+    // (which would cause fetchLessonData to re-run every time a checkpoint is passed).
     if (lessonData && lessonsData && lessonData.lesson_source === 'canonical' && lessonData.module_order > 1) {
       const prevModuleOrder = lessonData.module_order - 1;
       const prevCheckpoint = lessonsData.find(
         (l: any) => l.module_order === prevModuleOrder && l.step_type === 'checkpoint'
       );
-      if (prevCheckpoint && !passedCheckpointIds.has(prevCheckpoint.id)) {
+      if (prevCheckpoint && !passedCheckpointIdsRef.current.has(prevCheckpoint.id)) {
         setCheckpointBlocked(true);
       }
     }
-  }, [lessonId, courseId, passedCheckpointIds]);
+  }, [lessonId, courseId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     lessonStartTime.current = Date.now();
@@ -538,7 +569,7 @@ export default function LessonPage() {
   return (
     <div className="flex flex-col h-[100dvh] bg-white">
       <Suspense fallback={null}>
-        <ActivityParamSync onActivity={setActiveActivity} />
+        <ActivityParamSync onActivity={handleActivityParam} />
       </Suspense>
       <div className="px-4 py-2 border-b border-slate-100 bg-white flex-shrink-0">
         <Breadcrumbs items={[
@@ -927,6 +958,35 @@ export default function LessonPage() {
               passingScore={lesson.passing_score || 70}
             />
           </div>
+        ) : isHvacCourse ? (
+          /* HVAC: always render the avatar+audio player — video_url is NULL in DB,
+             HvacLessonVideo resolves the file from defId → UUID → /hvac/videos/ */
+          <div className="max-w-4xl mx-auto p-4 md:p-8">
+            <HvacLessonVideo
+              lessonDefId={
+                HVAC_UUID_TO_DEF[lessonId] ??
+                (lesson.slug ? hvacDefIdFromSlug(lesson.slug) : undefined) ??
+                lesson.slug
+              }
+              dbVideoUrl={lesson.video_url ?? undefined}
+              brollVideoUrl="/videos/hvac-technician.mp4"
+              lessonTitle={lesson.title}
+              onComplete={() => {
+                if (!isCompleted) {
+                  setIsCompleted(true);
+                  markComplete();
+                }
+              }}
+            />
+            {lesson.content && (
+              <div className="mt-6 bg-white rounded-xl p-8 shadow-sm">
+                <div
+                  className="prose max-w-none"
+                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }}
+                />
+              </div>
+            )}
+          </div>
         ) : lesson.video_url && lessonUuidToSimulationKey[lessonId] ? (
           <div className="max-w-4xl mx-auto p-4 md:p-8">
             {/* Video + 3D simulation lesson */}
@@ -1123,8 +1183,6 @@ export default function LessonPage() {
                   {/* VIDEO */}
                   {activeActivity === 'video' && (
                     <div>
-                      {/* Mark video attempted on mount */}
-                      {(() => { markAttempted('video'); return null; })()}
                       {lesson.video_url ? (
                         isHvacCourse ? (
                           <HvacLessonVideo
@@ -1157,9 +1215,7 @@ export default function LessonPage() {
 
                   {/* READING */}
                   {activeActivity === 'reading' && (
-                    <div className="bg-white rounded-xl p-8 shadow-sm" onScroll={() => markAttempted('reading')}>
-                      {/* Mark reading attempted on mount */}
-                      {(() => { markAttempted('reading'); return null; })()}
+                    <div className="bg-white rounded-xl p-8 shadow-sm">
                       {lesson.content ? (
                         <>
                           <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }} />
@@ -1180,7 +1236,6 @@ export default function LessonPage() {
                   {/* FLASHCARDS */}
                   {activeActivity === 'flashcards' && (
                     <div>
-                      {(() => { markAttempted('flashcards'); return null; })()}
                       <SpacedRepetitionReview />
                     </div>
                   )}
@@ -1188,7 +1243,6 @@ export default function LessonPage() {
                   {/* LAB */}
                   {activeActivity === 'lab' && (
                     <div>
-                      {(() => { markAttempted('lab'); return null; })()}
                       {(lesson.step_type === 'lab' || lesson.step_type === 'assignment') ? (
                         <StepSubmissionForm
                           lessonId={lessonId}

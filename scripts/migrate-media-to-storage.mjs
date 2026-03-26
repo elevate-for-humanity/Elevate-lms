@@ -38,7 +38,7 @@ const MIGRATION_MAP = [
   { local: 'public/hvac/videos',     bucket: 'course-videos', prefix: 'hvac/videos' },
   { local: 'public/hvac/diagrams',   bucket: 'course-videos', prefix: 'hvac/diagrams' },
   { local: 'public/videos',          bucket: 'course-videos', prefix: 'videos' },
-  { local: 'public/generated/videos',bucket: 'course-videos', prefix: 'generated/videos' },
+  { local: 'public/videos/lessons',bucket: 'course-videos', prefix: 'videos/lessons' },
   { local: 'public/generated/lessons',bucket: 'media',        prefix: 'generated/lessons' },
 ];
 
@@ -127,7 +127,7 @@ async function main() {
     console.log('1. Verify files are accessible in Supabase Storage dashboard');
     console.log('2. Run: node scripts/update-media-urls.mjs');
     console.log('3. Test the site locally');
-    console.log('4. Then remove files from git: git rm -r public/hvac public/videos public/generated/videos public/generated/lessons');
+    console.log('4. Then remove files from git: git rm -r public/hvac public/videos');
   }
 }
 

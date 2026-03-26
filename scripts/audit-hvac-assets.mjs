@@ -7,7 +7,7 @@ const HEYGEN_KEY = process.env.HEYGEN_API_KEY;
 
 const SCAN_DIRS = [
   'public/generated/lessons',
-  'public/generated/videos',
+  'public/videos/lessons',
   'public/videos/avatars',
   'public/images/hvac-diagrams',
   'public/images/programs-hq',

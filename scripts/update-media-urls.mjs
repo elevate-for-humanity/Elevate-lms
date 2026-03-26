@@ -28,7 +28,7 @@ const URL_MAP = [
   { from: /(['"`])\/hvac\/videos\//g,           to: `$1${STORAGE_BASE}/course-videos/hvac/videos/` },
   { from: /(['"`])\/hvac\/diagrams\//g,         to: `$1${STORAGE_BASE}/course-videos/hvac/diagrams/` },
   { from: /(['"`])\/videos\//g,                 to: `$1${STORAGE_BASE}/course-videos/videos/` },
-  { from: /(['"`])\/generated\/videos\//g,      to: `$1${STORAGE_BASE}/course-videos/generated/videos/` },
+  { from: /(['"`])\/videos\/lessons\//g,         to: `$1${STORAGE_BASE}/course-videos/videos/lessons/` },
   { from: /(['"`])\/generated\/lessons\//g,     to: `$1${STORAGE_BASE}/media/generated/lessons/` },
 ];
 

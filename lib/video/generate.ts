@@ -158,13 +158,13 @@ export async function generateSoraVideo(
       const videoBuffer = Buffer.from(await downloadResponse.arrayBuffer());
 
       // Save locally
-      const outputDir = path.join(process.cwd(), 'public', 'generated', 'videos');
+      const outputDir = path.join(process.cwd(), 'public', 'videos', 'lessons');
       await fs.mkdir(outputDir, { recursive: true });
       const filename = `sora-${video.id}.mp4`;
       const outputPath = path.join(outputDir, filename);
       await fs.writeFile(outputPath, videoBuffer);
 
-      return { videoUrl: `/generated/videos/${filename}`, videoId: video.id };
+      return { videoUrl: `/videos/lessons/${filename}`, videoId: video.id };
     }
 
     if (status.status === 'failed') {

@@ -40,7 +40,7 @@ SELECT
   cm.title                                AS module_title,
   COALESCE(cm.order_index, 0)             AS module_order,
   NULL::INTEGER                           AS lesson_order,
-  NULL::INTEGER                           AS duration_minutes,
+  cl.duration_minutes,
   cl.is_published,
   cl.status,
   'canonical'                             AS lesson_source,

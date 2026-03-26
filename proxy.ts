@@ -150,6 +150,15 @@ export async function proxy(request: NextRequest) {
   const host = request.headers.get('host') || '';
   const { pathname } = request.nextUrl;
 
+  // Inject x-pathname so server components (e.g. PublicLayout) can read the
+  // current route without relying on unreliable x-url / x-invoke-path headers.
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-pathname', pathname);
+
+  // Helper: NextResponse.next() that always forwards x-pathname to the page.
+  const nextWithPathname = () =>
+    NextResponse.next({ request: { headers: requestHeaders } });
+
   // ── BYPASS POLICY ────────────────────────────────────────────────────────────
   // Single definition. No other branch in this file references SKIP_ADMIN_AUTH.
   // allowDevAdminBypass is false in all production builds: NODE_ENV is set to
@@ -175,7 +184,7 @@ export async function proxy(request: NextRequest) {
   // Stripe webhooks use signature verification, not auth
   // ============================================
   if (WEBHOOK_PATHS.some(path => pathname.startsWith(path))) {
-    return NextResponse.next();
+    return nextWithPathname();
   }
 
   // ============================================
@@ -297,11 +306,11 @@ export async function proxy(request: NextRequest) {
 
     // Non-protected API routes pass through
     if (pathname.startsWith('/api/') && !isProtectedApi) {
-      return NextResponse.next();
+      return nextWithPathname();
     }
     // Protected API routes that passed auth check also pass through
     if (isProtectedApi) {
-      return NextResponse.next();
+      return nextWithPathname();
     }
   }
 
@@ -323,7 +332,7 @@ export async function proxy(request: NextRequest) {
     if (!pathname.startsWith('/lms')) {
       return NextResponse.rewrite(new URL(`/lms${pathname}`, request.url));
     }
-    return NextResponse.next();
+    return nextWithPathname();
   }
 
   // Education domain routing (elevateforhumanityeducation.com)
@@ -332,7 +341,7 @@ export async function proxy(request: NextRequest) {
     if (pathname === '/' || pathname === '') {
       return NextResponse.rewrite(new URL('/admin', request.url));
     }
-    return NextResponse.next();
+    return nextWithPathname();
   }
 
   // Connects domain routing (elevateconnects.org)
@@ -341,7 +350,7 @@ export async function proxy(request: NextRequest) {
     if (pathname === '/' || pathname === '') {
       return NextResponse.rewrite(new URL('/connects', request.url));
     }
-    return NextResponse.next();
+    return nextWithPathname();
   }
 
   // Supersonic Fast Cash domain routing (supersonicfastermoney.com -> /supersonic-fast-cash)
@@ -352,7 +361,7 @@ export async function proxy(request: NextRequest) {
       pathname.startsWith('/api') ||
       pathname.includes('.')
     ) {
-      return NextResponse.next();
+      return nextWithPathname();
     }
 
     // Root of Supersonic domain -> supersonic-fast-cash homepage
@@ -362,12 +371,12 @@ export async function proxy(request: NextRequest) {
 
     // Already on /supersonic-fast-cash path, allow through
     if (pathname.startsWith('/supersonic-fast-cash')) {
-      return NextResponse.next();
+      return nextWithPathname();
     }
 
     // Login/auth pages - allow through
     if (pathname === '/login' || pathname === '/signup' || pathname === '/unauthorized') {
-      return NextResponse.next();
+      return nextWithPathname();
     }
 
     // Rewrite all other paths to /supersonic-fast-cash/*
@@ -382,7 +391,7 @@ export async function proxy(request: NextRequest) {
       pathname.startsWith('/api') ||
       pathname.includes('.')
     ) {
-      return NextResponse.next();
+      return nextWithPathname();
     }
 
     // Root of platform subdomain -> licensing page
@@ -392,7 +401,7 @@ export async function proxy(request: NextRequest) {
 
     // Already on /platform path, allow through
     if (pathname.startsWith('/platform')) {
-      return NextResponse.next();
+      return nextWithPathname();
     }
 
     // Rewrite all other paths to /platform/licensing/*
@@ -421,7 +430,7 @@ export async function proxy(request: NextRequest) {
     pathname === '/signup' ||
     pathname === '/unauthorized'
   ) {
-    return NextResponse.next();
+    return nextWithPathname();
   }
 
   // Dashboard landing pages are PUBLIC (exact match only)
@@ -431,7 +440,7 @@ export async function proxy(request: NextRequest) {
   );
 
   if (isPublicDashboardLanding) {
-    return NextResponse.next();
+    return nextWithPathname();
   }
 
   // ── ADMIN NAMESPACE PROTECTION ──────────────────────────────────────────────
@@ -447,7 +456,7 @@ export async function proxy(request: NextRequest) {
 
   if (isAdminNamespace) {
     if (allowDevAdminBypass) {
-      return NextResponse.next();
+      return nextWithPathname();
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -550,17 +559,17 @@ export async function proxy(request: NextRequest) {
   );
 
   if (!protectedRoute && !authRequired) {
-    return NextResponse.next();
+    return nextWithPathname();
   }
 
   // Create Supabase client for auth check
-  let response = NextResponse.next({ request: { headers: request.headers } });
+  let response = NextResponse.next({ request: { headers: requestHeaders } });
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    return NextResponse.next();
+    return nextWithPathname();
   }
 
   const supabase = createServerClient(supabaseUrl, supabaseKey, {
@@ -690,26 +699,11 @@ export async function proxy(request: NextRequest) {
       return response;
     }
 
-    // Check if user has completed onboarding status
-    const { data: onboardingStatus } = await supabase
-      .from('user_onboarding_status')
-      .select('status, agreements_signed')
-      .eq('user_id', user.id)
-      .single();
-
-    // If no onboarding record or incomplete, redirect to legal agreements
-    if (!onboardingStatus || onboardingStatus.status !== 'complete') {
-      return NextResponse.redirect(new URL('/onboarding/legal', request.url), { status: 307 });
-    }
-
-    // If agreements not signed, redirect to legal agreements
-    if (!onboardingStatus.agreements_signed) {
-      return NextResponse.redirect(new URL('/onboarding/legal', request.url), { status: 307 });
-    }
-
-    // Legacy check - if onboarding not completed in profile, redirect
+    // Primary gate: profiles.onboarding_completed is readable by the user (no RLS block).
+    // user_onboarding_status has RLS that blocks user reads — do not query it from the
+    // middleware session client. profiles.onboarding_completed is the canonical flag.
     if (!profile?.onboarding_completed) {
-      return NextResponse.redirect(new URL('/onboarding', request.url), { status: 307 });
+      return NextResponse.redirect(new URL('/onboarding/legal', request.url), { status: 307 });
     }
   }
 

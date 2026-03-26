@@ -75,10 +75,10 @@ export default async function CoursePage({ params }: { params: Params }) {
 
   const { data: enrollment } = await supabase
     .from('program_enrollments')
-    .select('status, enrollment_state, enrolled_at, revoked_at')
+    .select('status, enrollment_state, enrolled_at')
     .eq('user_id', user.id).eq('course_id', courseId).maybeSingle();
 
-  if (enrollment?.revoked_at) redirect('/lms/programs');
+  if (enrollment?.status === 'revoked') redirect('/lms/programs');
   if (enrollment?.enrollment_state === 'pending_funding_verification')
     redirect(`/lms/enrollment-pending?courseId=${courseId}`);
 
@@ -121,6 +121,17 @@ export default async function CoursePage({ params }: { params: Params }) {
     l.step_type === 'checkpoint' || l.content_type === 'quiz').length;
   const isEnrolled = !!enrollment && !isPendingApproval;
 
+  // Derive activity types actually present across all lessons from DB records.
+  // Only show what exists — no static marketing claims.
+  const activityTypeSet = new Set<string>();
+  for (const l of allLessons) {
+    if (Array.isArray(l.activities)) {
+      for (const a of l.activities) {
+        if (a?.type) activityTypeSet.add(a.type);
+      }
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-50">
 
@@ -131,7 +142,7 @@ export default async function CoursePage({ params }: { params: Params }) {
           <nav className="flex items-center gap-1.5 text-xs text-white/60 mb-3">
             <Link href="/lms/courses" className="hover:text-white">My Courses</Link>
             <ChevronRight className="w-3 h-3" />
-            <span className="text-white font-medium">{course.title}</span>
+            <span className="text-white/80">Course Overview</span>
           </nav>
           <h1 className="text-2xl sm:text-4xl font-extrabold text-white leading-tight drop-shadow">{course.title}</h1>
           {credentialName && (
@@ -309,24 +320,26 @@ export default async function CoursePage({ params }: { params: Params }) {
               </dl>
             </div>
 
-            <div className="bg-white rounded-xl border border-slate-200 p-5">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Each Lesson Includes</h3>
-              <ul className="space-y-2.5">
-                {([
-                  { icon: Video,        label: 'Instructor Video',   color: 'text-brand-blue-600' },
-                  { icon: FileText,     label: 'Reading & Notes',    color: 'text-slate-500' },
-                  { icon: Brain,        label: 'Flashcards',         color: 'text-purple-600' },
-                  { icon: FlaskConical, label: 'Hands-On Lab',       color: 'text-green-600' },
-                  { icon: Zap,          label: 'Practice Questions', color: 'text-amber-600' },
-                  { icon: Shield,       label: 'Checkpoint Quiz',    color: 'text-brand-red-600' },
-                ] as const).map(({ icon: Icon, label, color }) => (
-                  <li key={label} className="flex items-center gap-2.5 text-sm text-slate-700">
-                    <Icon className={`w-4 h-4 flex-shrink-0 ${color}`} />
-                    {label}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {activityTypeSet.size > 0 && (
+              <div className="bg-white rounded-xl border border-slate-200 p-5">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Each Lesson Includes</h3>
+                <ul className="space-y-2.5">
+                  {([
+                    { type: 'video',       icon: Video,        label: 'Instructor Video',   color: 'text-brand-blue-600' },
+                    { type: 'reading',     icon: FileText,     label: 'Reading & Notes',    color: 'text-slate-500' },
+                    { type: 'flashcards',  icon: Brain,        label: 'Flashcards',         color: 'text-purple-600' },
+                    { type: 'lab',         icon: FlaskConical, label: 'Hands-On Lab',       color: 'text-green-600' },
+                    { type: 'practice',    icon: Zap,          label: 'Practice Questions', color: 'text-amber-600' },
+                    { type: 'checkpoint',  icon: Shield,       label: 'Checkpoint Quiz',    color: 'text-brand-red-600' },
+                  ] as const).filter(({ type }) => activityTypeSet.has(type)).map(({ icon: Icon, label, color }) => (
+                    <li key={label} className="flex items-center gap-2.5 text-sm text-slate-700">
+                      <Icon className={`w-4 h-4 flex-shrink-0 ${color}`} />
+                      {label}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {credentialName && (
               <div className="bg-white rounded-xl border border-slate-200 p-5">

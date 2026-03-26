@@ -4,7 +4,7 @@
  * Each video = course photo background + branded overlay + first 30s of lesson MP3.
  * Uses @ffmpeg-installer (bundled binary) + fluent-ffmpeg + sharp.
  *
- * Output: public/generated/previews/course-{id}.mp4
+ * Output: public/videos/previews/course-{id}.mp4
  * Upload: npx tsx scripts/upload-course-previews-to-storage.ts
  *
  * Run: npx tsx scripts/generate-course-preview-videos.ts
@@ -24,7 +24,7 @@ import { HVAC_LESSON_UUID } from '../lib/courses/hvac-uuids';
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
-const OUT_DIR   = path.join(process.cwd(), 'public', 'generated', 'previews');
+const OUT_DIR   = path.join(process.cwd(), 'public', 'videos', 'previews');
 const AUDIO_DIR = path.join(process.cwd(), 'public', 'generated', 'lessons');
 const IMG_DIR   = path.join(process.cwd(), 'public', 'images');
 

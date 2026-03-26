@@ -86,43 +86,26 @@ export default function HeroVideo({
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
-  // Preload voiceover audio metadata on mount
+  // Attempt to autoplay voiceover immediately on mount.
+  // Browsers may block autoplay with audio — if blocked, stay muted so the
+  // user can manually unmute via the on-screen button.
+  // Respects prefers-reduced-motion.
   useEffect(() => {
+    if (!mounted) return;
     const audio = audioRef.current;
     if (!audio) return;
-    audio.load();
-  }, []);
-
-  // Auto-play voiceover when hero scrolls into view (≥50% visible)
-  // Respects prefers-reduced-motion — stays muted if user has motion preference off
-  useEffect(() => {
-    const audio = audioRef.current;
-    const wrapper = wrapperRef.current;
-    if (!audio || !wrapper) return;
 
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) return;
 
-    let played = false;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        // Start voiceover once when hero first comes into view.
-        // Do NOT pause when scrolled away — let it play through to the end.
-        if (entry.isIntersecting && !played) {
-          played = true;
-          setMuted(false);
-          audio.currentTime = 0;
-          audio.play().catch(() => setMuted(true));
-          // Disconnect after first play — no need to keep observing
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(wrapper);
-    return () => observer.disconnect();
+    audio.load();
+    audio.currentTime = 0;
+    audio.play()
+      .then(() => setMuted(false))
+      .catch(() => {
+        // Browser blocked autoplay — stay muted; user can click unmute button
+        setMuted(true);
+      });
   }, [mounted]);
 
   // Voiceover audio toggle — only controls the separate audio track, not the video

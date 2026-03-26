@@ -30,6 +30,7 @@ export default function HomePage() {
       <section className="grid lg:grid-cols-2">
         <div className="relative h-72 sm:h-96 lg:h-auto min-h-[560px] overflow-hidden bg-slate-900">
           <video src="/videos/barber-hero.mp4"
+            poster="/hero-images/barber-hero.jpg"
             autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-slate-900/30" />
         </div>

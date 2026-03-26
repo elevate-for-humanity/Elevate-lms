@@ -52,12 +52,6 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
       issuer: 'Elevate for Humanity',
       description: 'Business fundamentals for barbers: client management, booking systems, pricing strategy, and shop operations.',
     },
-    {
-      name: 'CPR / First Aid / AED',
-      issuer: 'American Heart Association',
-      description: 'Emergency response certification.',
-      validity: '2 years',
-    },
   ],
 
   outcomes: [
@@ -256,7 +250,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     '900 hours of training (52 weeks)',
     'Starter barber tool kit',
     'Indiana Barber License exam fee',
-    'CPR/First Aid/AED certification',
+
     'LMS access for full program duration',
     'Career placement and shop matching',
   ],
@@ -288,15 +282,6 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
       duration: '10 hours',
       required: true,
       enrollmentUrl: 'https://www.careersafeonline.com/osha-10-hour-general-industry',
-    },
-    {
-      courseId: 'hsi-cpr-aed',
-      label: 'CPR/AED Certification',
-      partnerName: 'Health & Safety Institute',
-      credentialIssued: 'CPR/AED Certification',
-      duration: '4 hours',
-      required: true,
-      enrollmentUrl: 'https://www.hsi.com/courses/cpr-aed',
     },
   ],
 

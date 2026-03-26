@@ -79,6 +79,7 @@ export default function LessonPage() {
 
   const isHvacCourse = courseId === HVAC_COURSE_ID;
 
+  // ── State ────────────────────────────────────────────────────────────────────
   const [lesson, setLesson] = useState<any>(null);
   const [lessons, setLessons] = useState<any[]>([]);
   const [course, setCourse] = useState<any>(null);
@@ -88,36 +89,6 @@ export default function LessonPage() {
   const [activeActivity, setActiveActivity] = useState<ActivityId>('video');
   // Tracks which activities the learner has interacted with (gates checkpoint tab)
   const [attempted, setAttempted] = useState<Set<ActivityId>>(new Set());
-
-  // ActivityParamSync reads ?activity= and updates state.
-  // Must be inside Suspense because useSearchParams suspends on first render.
-  function ActivityParamSync({ onActivity }: { onActivity: (a: ActivityId) => void }) {
-    const sp = useSearchParams();
-    useEffect(() => {
-      const a = sp.get('activity') as ActivityId | null;
-      if (a) onActivity(a);
-    }, [sp, onActivity]);
-    return null;
-  }
-
-  // Reset attempted set when lesson changes so gating is fresh per lesson
-  useEffect(() => {
-    setAttempted(new Set());
-    if (lesson) {
-      const stepType = lesson.step_type || lesson.content_type || 'lesson';
-      setActiveActivity(getDefaultActivity(stepType));
-    }
-  }, [lessonId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Mark an activity as attempted (called when learner interacts with it)
-  const markAttempted = useCallback((id: ActivityId) => {
-    setAttempted(prev => {
-      if (prev.has(id)) return prev;
-      const next = new Set(prev);
-      next.add(id);
-      return next;
-    });
-  }, []);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(new Set());
   const [courseCompleted, setCourseCompleted] = useState(false);
@@ -129,7 +100,44 @@ export default function LessonPage() {
   // Prevents advancing past a failed checkpoint into the next module.
   const [checkpointBlocked, setCheckpointBlocked] = useState(false);
   const [passedCheckpointIds, setPassedCheckpointIds] = useState<Set<string>>(new Set());
+
+  // ── Refs ─────────────────────────────────────────────────────────────────────
   const lessonStartTime = React.useRef(Date.now());
+
+  // ── Callbacks (must precede any effects that reference them) ─────────────────
+
+  // Mark an activity as attempted (called when learner interacts with it).
+  // Uses functional update to avoid stale closure and prevent duplicate entries.
+  const markAttempted = useCallback((id: ActivityId) => {
+    setAttempted(prev => {
+      if (prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  }, []);
+
+  // ── Effects ──────────────────────────────────────────────────────────────────
+
+  // Reset attempted set when lesson changes so gating is fresh per lesson
+  useEffect(() => {
+    setAttempted(new Set());
+    if (lesson) {
+      const stepType = lesson.step_type || lesson.content_type || 'lesson';
+      setActiveActivity(getDefaultActivity(stepType));
+    }
+  }, [lessonId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ActivityParamSync reads ?activity= and updates state.
+  // Must be inside Suspense because useSearchParams suspends on first render.
+  function ActivityParamSync({ onActivity }: { onActivity: (a: ActivityId) => void }) {
+    const sp = useSearchParams();
+    useEffect(() => {
+      const a = sp.get('activity') as ActivityId | null;
+      if (a) onActivity(a);
+    }, [sp, onActivity]);
+    return null;
+  }
 
   const fetchLessonData = useCallback(async () => {
     const { createClient } = await import('@/lib/supabase/client');

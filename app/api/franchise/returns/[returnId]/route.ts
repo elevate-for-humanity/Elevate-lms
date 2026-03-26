@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -14,7 +13,6 @@ async function _GET(
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -24,7 +22,7 @@ async function _GET(
     const { returnId } = await params;
 
     // Get the return with related data
-    const { data: submission, error } = await db
+    const { data: submission, error } = await supabase
       .from('franchise_return_submissions')
       .select(`
         *,
@@ -40,7 +38,7 @@ async function _GET(
     }
 
     // Check access
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -79,7 +77,6 @@ async function _PATCH(
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -90,7 +87,7 @@ async function _PATCH(
     const body = await request.json();
 
     // Get the return
-    const { data: submission, error: fetchError } = await db
+    const { data: submission, error: fetchError } = await supabase
       .from('franchise_return_submissions')
       .select('*, office:franchise_offices(owner_id)')
       .eq('id', returnId)
@@ -101,7 +98,7 @@ async function _PATCH(
     }
 
     // Check access - only admins and office owners can reassign
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -117,7 +114,7 @@ async function _PATCH(
     // Handle preparer reassignment
     if (body.preparer_id && body.preparer_id !== submission.preparer_id) {
       // Verify new preparer belongs to same office
-      const { data: newPreparer, error: preparerError } = await db
+      const { data: newPreparer, error: preparerError } = await supabase
         .from('franchise_preparers')
         .select('*')
         .eq('id', body.preparer_id)
@@ -142,7 +139,7 @@ async function _PATCH(
       }
 
       // Log the reassignment
-      await db.from('franchise_audit_log').insert({
+      await supabase.from('franchise_audit_log').insert({
         action: 'preparer_reassigned',
         entity_type: 'return',
         entity_id: returnId,
@@ -169,7 +166,7 @@ async function _PATCH(
       }
     }
 
-    const { data: updated, error: updateError } = await db
+    const { data: updated, error: updateError } = await supabase
       .from('franchise_return_submissions')
       .update(updates)
       .eq('id', returnId)

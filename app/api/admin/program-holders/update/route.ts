@@ -1,7 +1,4 @@
 import { requireAdmin } from '@/lib/auth';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
@@ -11,6 +8,10 @@ import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { writeApiAuditEvent } from '@/lib/audit/api-audit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 export const POST = withAuth(
   async (req, context) => {

@@ -1,11 +1,12 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 const VALID_TRANSITIONS: Record<string, string[]> = {
   submitted:       ['in_review'],

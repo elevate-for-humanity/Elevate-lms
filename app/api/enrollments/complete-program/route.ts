@@ -1,7 +1,4 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 /**
  * PROGRAM COMPLETION ENDPOINT
@@ -15,11 +12,14 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { issueCertificate } from '@/lib/certificates/issue-certificate';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 interface CompleteProgramRequest {
   enrollment_id: string;
@@ -31,7 +31,6 @@ async function _POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Verify authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -52,7 +51,7 @@ async function _POST(req: NextRequest) {
     logger.info('Starting program completion', { enrollment_id, user_id: user.id });
 
     // Get enrollment with program and student details
-    const { data: enrollment, error: enrollmentError } = await db
+    const { data: enrollment, error: enrollmentError } = await supabase
       .from('program_enrollments')
       .select(`
         id,
@@ -77,7 +76,7 @@ async function _POST(req: NextRequest) {
     }
 
     // Verify user owns this enrollment or is admin
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -89,7 +88,7 @@ async function _POST(req: NextRequest) {
     }
 
     // Get student profile
-    const { data: studentProfile } = await db
+    const { data: studentProfile } = await supabase
       .from('profiles')
       .select('full_name, first_name, last_name, email')
       .eq('id', enrollment.user_id)

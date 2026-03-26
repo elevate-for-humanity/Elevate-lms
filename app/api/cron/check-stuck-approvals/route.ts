@@ -1,11 +1,12 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 30;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 30;
+
+export const dynamic = 'force-dynamic';
 
 const STUCK_THRESHOLD_HOURS = 24;
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'elevate4humanityedu@gmail.com';

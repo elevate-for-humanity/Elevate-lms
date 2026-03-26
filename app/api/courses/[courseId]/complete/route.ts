@@ -1,14 +1,14 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(
   request: NextRequest,
@@ -25,10 +25,9 @@ async function _POST(
 
     const { courseId } = await params;
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get course info
-    const { data: course, error: courseError } = await db
+    const { data: course, error: courseError } = await supabase
       .from('courses')
       .select('id, title')
       .eq('id', courseId)
@@ -39,7 +38,7 @@ async function _POST(
     }
 
     // Check enrollment
-    const { data: enrollment, error: enrollmentError } = await db
+    const { data: enrollment, error: enrollmentError } = await supabase
       .from('training_enrollments')
       .select('id, status, progress')
       .eq('user_id', user.id)
@@ -54,12 +53,12 @@ async function _POST(
     }
 
     // Check if all lessons are completed
-    const { data: lessons } = await db
+    const { data: lessons } = await supabase
       .from('course_lessons')
       .select('id')
       .eq('course_id', courseId);
 
-    const { data: completedLessons } = await db
+    const { data: completedLessons } = await supabase
       .from('lesson_progress')
       .select('id')
       .eq('user_id', user.id)
@@ -104,7 +103,7 @@ async function _POST(
     }
 
     // Proctored exam gate (course-specific)
-    const { data: courseDetail } = await db
+    const { data: courseDetail } = await supabase
       .from('courses')
       .select('slug')
       .eq('id', courseId)
@@ -114,7 +113,7 @@ async function _POST(
     let examSession: any = null;
 
     if (requirements.examRequirement) {
-      const { data: session } = await db
+      const { data: session } = await supabase
         .from('exam_sessions')
         .select('id, provider, result, score, proctor_id, completed_at')
         .eq('student_id', user.id)
@@ -133,7 +132,7 @@ async function _POST(
     }
 
     // Mark enrollment as completed
-    const { error: updateError } = await db
+    const { error: updateError } = await supabase
       .from('training_enrollments')
       .update({
         status: 'completed',
@@ -152,7 +151,7 @@ async function _POST(
     }
 
     // Gather seat time
-    const { data: seatTimeData } = await db
+    const { data: seatTimeData } = await supabase
       .from('lesson_progress')
       .select('time_spent_seconds')
       .eq('user_id', user.id)
@@ -205,7 +204,7 @@ async function _POST(
     }
 
     // Get user profile for response
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('first_name, last_name, email')
       .eq('id', user.id)
@@ -256,29 +255,28 @@ async function _GET(
 
     const { courseId } = await params;
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get completion status
-    const { data: enrollment } = await db
+    const { data: enrollment } = await supabase
       .from('training_enrollments')
       .select('status, progress, completed_at')
       .eq('user_id', user.id)
       .eq('course_id', courseId)
       .single();
 
-    const { data: lessons } = await db
+    const { data: lessons } = await supabase
       .from('course_lessons')
       .select('id')
       .eq('course_id', courseId);
 
-    const { data: completedLessons } = await db
+    const { data: completedLessons } = await supabase
       .from('lesson_progress')
       .select('id')
       .eq('user_id', user.id)
       .eq('course_id', courseId)
       .eq('completed', true);
 
-    const { data: certificate } = await db
+    const { data: certificate } = await supabase
       .from('certificates')
       .select('id, certificate_number, issued_at, verification_url')
       .eq('user_id', user.id)

@@ -11,8 +11,6 @@
  *
  * Auth: authenticated user (own application_id) OR admin
  */
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -21,6 +19,9 @@ import { logger } from '@/lib/logger';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import * as Sentry from '@sentry/nextjs';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 const SYSTEM_ACTOR = '00000000-0000-0000-0000-000000000001';
 

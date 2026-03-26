@@ -1,5 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -7,6 +5,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { validateEnrollmentIntegrity } from '@/lib/enrollment-integrity-audit';
 import { trySendEmail } from '@/lib/email/resend';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 // SLA thresholds in hours
 const SLA_HOURS: Record<string, number> = {

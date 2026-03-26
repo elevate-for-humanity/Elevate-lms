@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { stripe } from '@/lib/stripe/client';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -23,7 +22,6 @@ async function _POST(req: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -38,7 +36,7 @@ async function _POST(req: Request) {
     const customerEmail = formData.get('customerEmail') as string || user.email;
 
     // Get cart items with product details + LMS access flags from store_products
-    const { data: cartItems, error: cartError } = await db
+    const { data: cartItems, error: cartError } = await supabase
       .from('cart_items')
       .select(`
         id,
@@ -54,7 +52,7 @@ async function _POST(req: Request) {
 
     // Check store_products for LMS access metadata (grants_course_access, course_id)
     const productIds = cartItems.map((item: any) => item.product_id).filter(Boolean);
-    const { data: storeProducts } = await db
+    const { data: storeProducts } = await supabase
       .from('store_products')
       .select('product_id, grants_course_access, course_id')
       .in('product_id', productIds);
@@ -79,7 +77,7 @@ async function _POST(req: Request) {
     // Resolve course slugs for webhook fulfillment
     let courseSlugs: string[] = [];
     if (lmsCourseIds.length > 0) {
-      const { data: courses } = await db
+      const { data: courses } = await supabase
         .from('training_courses')
         .select('id, slug')
         .in('id', lmsCourseIds);

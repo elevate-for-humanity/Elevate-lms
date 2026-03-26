@@ -1,5 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -7,6 +5,9 @@ import { createClient } from '@/lib/supabase/server';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { logger } from '@/lib/logger';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 const FROM = 'Elevate Testing Center <testing@elevateforhumanity.org>';

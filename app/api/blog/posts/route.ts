@@ -27,7 +27,7 @@ async function _GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const offset = parseInt(searchParams.get('offset') || '0');
     
-    let query = db
+    let query = supabase
       .from('blog_posts')
       .select('*', { count: 'exact' })
       .eq('published', true)
@@ -63,14 +63,13 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role, full_name')
       .eq('id', user.id)

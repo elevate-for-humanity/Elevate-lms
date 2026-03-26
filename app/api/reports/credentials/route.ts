@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getOrgContext } from '@/lib/org/getOrgContext';
 import { requireReportAccess, toCsv, getCsvHeaders } from '@/lib/reports';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(req: NextRequest) {
   try {
@@ -16,7 +16,6 @@ async function _GET(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
       error: authError,
@@ -33,7 +32,7 @@ async function _GET(req: NextRequest) {
     const format = searchParams.get('format');
     const programId = searchParams.get('program_id');
 
-    let query = db
+    let query = supabase
       .from('reporting_credentials')
       .select('*')
       .eq('organization_id', ctx.organization_id);

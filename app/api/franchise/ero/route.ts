@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { eroService } from '@/lib/franchise/ero-service';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -12,7 +11,6 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -27,7 +25,7 @@ async function _GET(request: NextRequest) {
     }
 
     // Check access
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -36,7 +34,7 @@ async function _GET(request: NextRequest) {
     const isAdmin = profile?.role === 'super_admin' || profile?.role === 'franchise_admin';
 
     if (!isAdmin) {
-      const { data: office } = await db
+      const { data: office } = await supabase
         .from('franchise_offices')
         .select('owner_id')
         .eq('id', officeId)
@@ -69,7 +67,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -87,7 +84,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Check access - only admins and office owners can set ERO config
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -96,7 +93,7 @@ async function _POST(request: NextRequest) {
     const isAdmin = profile?.role === 'super_admin' || profile?.role === 'franchise_admin';
 
     if (!isAdmin) {
-      const { data: office } = await db
+      const { data: office } = await supabase
         .from('franchise_offices')
         .select('owner_id')
         .eq('id', body.office_id)

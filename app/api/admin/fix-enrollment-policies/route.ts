@@ -1,6 +1,4 @@
 import { requireAdmin } from '@/lib/auth';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -8,6 +6,9 @@ import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 import { writeApiAuditEvent } from '@/lib/audit/api-audit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 export const POST = withAuth(
   async (req: NextRequest, ctx) => {

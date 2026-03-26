@@ -1,15 +1,15 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { auditedMutation } from '@/lib/audit/transactional';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
   try {
@@ -26,7 +26,6 @@ async function _POST(req: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -36,7 +35,7 @@ async function _POST(req: Request) {
     }
 
     // Check if user is employer/admin/sponsor
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('user_profiles')
       .select('role, employer_id')
       .eq('user_id', user.id)
@@ -50,7 +49,7 @@ async function _POST(req: Request) {
     }
 
     // Load the hour entry to validate source_type and ownership
-    const { data: hourRecord } = await db
+    const { data: hourRecord } = await supabase
       .from('hour_entries')
       .select('user_id, source_type, status')
       .eq('id', hour_id)
@@ -71,7 +70,7 @@ async function _POST(req: Request) {
 
     // Employer must supervise this student
     if (profile.role === 'employer' && profile.employer_id && hourRecord.user_id) {
-      const { data: studentProfile } = await db
+      const { data: studentProfile } = await supabase
         .from('user_profiles')
         .select('employer_id')
         .eq('user_id', hourRecord.user_id)

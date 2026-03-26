@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -11,7 +10,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
@@ -23,7 +21,7 @@ async function _POST(request: NextRequest) {
     const { format, dateRange, customStartDate, customEndDate, groupByCategory, includeSignatures, includePhotos } = body;
 
     // Get apprentice record
-    const { data: apprentice, error: apprenticeError } = await db
+    const { data: apprentice, error: apprenticeError } = await supabase
       .from('apprentices')
       .select('id, user_id, shop_id, shops(name)')
       .eq('user_id', user.id)
@@ -61,7 +59,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Fetch approved hour entries
-    const { data: entries, error: entriesError } = await db
+    const { data: entries, error: entriesError } = await supabase
       .from('hour_entries')
       .select('*')
       .eq('apprentice_id', apprentice.id)
@@ -76,7 +74,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Get user profile
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('full_name, email')
       .eq('id', user.id)

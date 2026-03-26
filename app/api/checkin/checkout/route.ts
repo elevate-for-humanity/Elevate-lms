@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -11,7 +10,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
@@ -20,7 +18,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Get apprentice record
-    const { data: apprentice, error: apprenticeError } = await db
+    const { data: apprentice, error: apprenticeError } = await supabase
       .from('apprentices')
       .select('id')
       .eq('user_id', user.id)
@@ -31,7 +29,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Find active session
-    const { data: session, error: sessionError } = await db
+    const { data: session, error: sessionError } = await supabase
       .from('checkin_sessions')
       .select('id, checkin_time, shop_id')
       .eq('apprentice_id', apprentice.id)
@@ -49,7 +47,7 @@ async function _POST(request: NextRequest) {
     const hoursLogged = (durationMinutes / 60).toFixed(2);
 
     // Update session with checkout time
-    const { error: updateError } = await db
+    const { error: updateError } = await supabase
       .from('checkin_sessions')
       .update({
         checkout_time: checkoutTime.toISOString(),
@@ -65,7 +63,7 @@ async function _POST(request: NextRequest) {
     // Create hour entry from session
     const totalHours = Math.round((durationMinutes / 60) * 100) / 100;
 
-    const { error: entryError } = await db
+    const { error: entryError } = await supabase
       .from('hour_entries')
       .insert({
         user_id: user.id,

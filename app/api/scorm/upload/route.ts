@@ -1,7 +1,4 @@
-export const runtime = 'nodejs';
 import { createAdminClient } from '@/lib/supabase/admin';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 120;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/auth';
@@ -10,6 +7,10 @@ import JSZip from 'jszip';
 import { XMLParser } from 'fast-xml-parser';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 120;
+
+export const dynamic = 'force-dynamic';
 
 /**
  * Find the launch href from a parsed imsmanifest.xml.

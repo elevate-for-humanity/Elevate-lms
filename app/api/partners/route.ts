@@ -1,12 +1,12 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: NextRequest) {
   try {
@@ -14,11 +14,6 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    
-    if (!supabase) {
-      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
-    }
 
     const { searchParams } = new URL(request.url);
     const program = searchParams.get('program');
@@ -26,7 +21,7 @@ async function _GET(request: NextRequest) {
     const city = searchParams.get('city');
     const state = searchParams.get('state');
 
-    let query = db
+    let query = supabase
       .from('partners')
       .select('id, name, city, state, address, status, programs')
       .eq('status', status);

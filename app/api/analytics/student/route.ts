@@ -1,14 +1,14 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/analytics/student/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: NextRequest) {
   try {
@@ -16,7 +16,6 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -29,7 +28,7 @@ async function _GET(request: NextRequest) {
     }
 
     // Get user's enrollments
-    const { data: enrollments } = await db
+    const { data: enrollments } = await supabase
       .from("program_enrollments")
       .select("course_id")
       .eq("user_id", user.id);
@@ -41,21 +40,21 @@ async function _GET(request: NextRequest) {
     let completedLessons = 0;
 
     for (const courseId of courseIds) {
-      const { data: modules } = await db
+      const { data: modules } = await supabase
         .from("modules")
         .select("id")
         .eq("course_id", courseId);
 
       const moduleIds = modules?.map((m) => m.id) || [];
 
-      const { data: lessons } = await db
+      const { data: lessons } = await supabase
         .from("training_lessons")
         .select("id")
         .in("module_id", moduleIds);
 
       totalLessons += lessons?.length || 0;
 
-      const { data: progress } = await db
+      const { data: progress } = await supabase
         .from("lesson_progress")
         .select("lesson_id")
         .eq("user_id", user.id)
@@ -71,7 +70,7 @@ async function _GET(request: NextRequest) {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const { data: activityData } = await db
+    const { data: activityData } = await supabase
       .from("learning_activity")
       .select("activity_date, minutes_spent")
       .eq("user_id", user.id)
@@ -97,7 +96,7 @@ async function _GET(request: NextRequest) {
     const averageTimePerWeekHours = totalMinutes / 60;
 
     // Get streak
-    const { data: streakData } = await db
+    const { data: streakData } = await supabase
       .from("learning_activity")
       .select("current_streak")
       .eq("user_id", user.id)
@@ -108,21 +107,21 @@ async function _GET(request: NextRequest) {
     let coursesCompleted = 0;
 
     for (const courseId of courseIds) {
-      const { data: modules } = await db
+      const { data: modules } = await supabase
         .from("modules")
         .select("id")
         .eq("course_id", courseId);
 
       const moduleIds = modules?.map((m) => m.id) || [];
 
-      const { data: lessons } = await db
+      const { data: lessons } = await supabase
         .from("training_lessons")
         .select("id")
         .in("module_id", moduleIds);
 
       const totalCourseLessons = lessons?.length || 0;
 
-      const { data: progress } = await db
+      const { data: progress } = await supabase
         .from("lesson_progress")
         .select("lesson_id")
         .eq("user_id", user.id)

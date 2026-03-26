@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 
 
-export const maxDuration = 60;
 import { parseBody } from '@/lib/api-helpers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
 
 async function _GET(request: Request) {
   

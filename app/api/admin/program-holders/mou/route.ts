@@ -2,9 +2,6 @@ import { requireAdmin } from '@/lib/auth';
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { generateMOUText } from '@/lib/mou-template';
@@ -12,6 +9,10 @@ import { withAuth } from '@/lib/with-auth';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const _GET = withAuth(
   async (req, context) => {

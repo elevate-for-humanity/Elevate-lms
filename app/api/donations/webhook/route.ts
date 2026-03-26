@@ -1,13 +1,13 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -37,11 +37,10 @@ async function _POST(request: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Idempotency check
     if (supabase) {
-      const { data: existing } = await db
+      const { data: existing } = await supabase
         .from('stripe_webhook_events')
         .select('id')
         .eq('stripe_event_id', event.id)
@@ -51,7 +50,7 @@ async function _POST(request: Request) {
         return NextResponse.json({ received: true, duplicate: true });
       }
 
-      await db
+      await supabase
         .from('stripe_webhook_events')
         .insert({ stripe_event_id: event.id, event_type: event.type, status: 'processing' })
         .catch(() => {});
@@ -65,7 +64,7 @@ async function _POST(request: Request) {
 
         if (donationId) {
           // Update donation status
-          await db
+          await supabase
             .from('donations')
             .update({
               payment_status: 'succeeded',
@@ -76,7 +75,7 @@ async function _POST(request: Request) {
             .eq('id', donationId);
 
           // Get donation details for receipt
-          const { data: donation } = await db
+          const { data: donation } = await supabase
             .from('donations')
             .select('*')
             .eq('id', donationId)
@@ -84,7 +83,7 @@ async function _POST(request: Request) {
 
           if (donation && !donation.receipt_sent) {
             // Send receipt email
-            await db.from('email_queue').insert({
+            await supabase.from('email_queue').insert({
               to_email: donation.donor_email,
               from_email: 'noreply@elevateforhumanity.org',
               subject: 'Thank you for your donation - Receipt',
@@ -100,7 +99,7 @@ async function _POST(request: Request) {
             });
 
             // Mark receipt as sent
-            await db
+            await supabase
               .from('donations')
               .update({
                 receipt_sent: true,
@@ -111,7 +110,7 @@ async function _POST(request: Request) {
 
           // Track conversion
           if (donation?.user_id) {
-            await db.from('conversions').insert({
+            await supabase.from('conversions').insert({
               user_id: donation.user_id,
               conversion_type: 'donation_made',
               value: donation.amount,
@@ -125,14 +124,14 @@ async function _POST(request: Request) {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
         // Find donation by payment intent
-        const { data: donation } = await db
+        const { data: donation } = await supabase
           .from('donations')
           .select('id')
           .eq('stripe_payment_intent_id', paymentIntent.id)
           .single();
 
         if (donation) {
-          await db
+          await supabase
             .from('donations')
             .update({
               payment_status: 'failed',
@@ -147,14 +146,14 @@ async function _POST(request: Request) {
         const charge = event.data.object as Stripe.Charge;
 
         // Find donation by payment intent
-        const { data: donation } = await db
+        const { data: donation } = await supabase
           .from('donations')
           .select('id')
           .eq('stripe_payment_intent_id', charge.payment_intent as string)
           .single();
 
         if (donation) {
-          await db
+          await supabase
             .from('donations')
             .update({
               payment_status: 'refunded',
@@ -169,14 +168,14 @@ async function _POST(request: Request) {
         const subscription = event.data.object as Stripe.Subscription;
 
         // Find donation by subscription ID
-        const { data: donation } = await db
+        const { data: donation } = await supabase
           .from('donations')
           .select('id')
           .eq('stripe_subscription_id', subscription.id)
           .single();
 
         if (donation) {
-          await db
+          await supabase
             .from('donations')
             .update({
               payment_status: 'cancelled',

@@ -1,9 +1,6 @@
 import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 /**
  * AI Chat Response API
@@ -15,6 +12,10 @@ import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const openai = process.env.OPENAI_API_KEY
   ? new OpenAI({

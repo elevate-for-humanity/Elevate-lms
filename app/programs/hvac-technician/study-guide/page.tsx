@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
 import StudyGuideClient from './StudyGuideClient';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static'
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'EPA 608 Study Guide — HVAC Technician | Elevate for Humanity',

@@ -1,6 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -8,6 +5,10 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { approveApplication } from '@/lib/enrollment/approve';
 import { logger } from '@/lib/logger';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 // Intent → expected current status + target status
 // Mirrors the DB trigger's enforced state machine:

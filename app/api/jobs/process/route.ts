@@ -14,14 +14,15 @@
  *   - After 5 attempts: status = 'failed' (visible in admin/jobs)
  */
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import type { CertificateIssuedPayload } from '@/lib/jobs/enqueue';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const MAX_ATTEMPTS = 5;
 const RETRY_DELAY_MINUTES = 5;

@@ -1,6 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 /**
  * Grant Notifications API
@@ -19,6 +16,10 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: NextRequest) {
   try {

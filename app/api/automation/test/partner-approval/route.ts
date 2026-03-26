@@ -1,7 +1,6 @@
 import { logger } from "@/lib/logger";
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
@@ -20,7 +19,6 @@ async function _POST() {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Check auth and admin role
   const { data: { user } } = await supabase.auth.getUser();
@@ -28,7 +26,7 @@ async function _POST() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)

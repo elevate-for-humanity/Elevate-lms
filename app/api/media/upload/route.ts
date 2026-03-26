@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 // Allowed MIME types for media uploads
 const ALLOWED_TYPES = [

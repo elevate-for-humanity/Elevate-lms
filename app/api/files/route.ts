@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 // Use Node.js runtime for file uploads
 
@@ -17,7 +17,6 @@ async function _GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -28,7 +27,7 @@ const supabase = await createClient();
 
   const folderId = request.nextUrl.searchParams.get('folderId') || null;
 
-  const { data: files, error } = await db
+  const { data: files, error } = await supabase
     .from('files')
     .select('*')
     .eq('user_id', user.id)
@@ -47,7 +46,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -80,7 +78,7 @@ async function _POST(request: NextRequest) {
   } = supabase.storage.from('files').getPublicUrl(fileName);
 
   // Save file metadata
-  const { data, error }: any = await db
+  const { data, error }: any = await supabase
     .from('files')
     .insert({
       user_id: user.id,
@@ -106,7 +104,6 @@ async function _DELETE(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -122,7 +119,7 @@ const supabase = await createClient();
   }
 
   // Get file info
-  const { data: file } = await db
+  const { data: file } = await supabase
     .from('files')
     .select('storage_path')
     .eq('id', id)
@@ -135,7 +132,7 @@ const supabase = await createClient();
   }
 
   // Delete from database
-  const { error } = await db
+  const { error } = await supabase
     .from('files')
     .delete()
     .eq('id', id)

@@ -1,15 +1,15 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/videos/[videoId]/meta/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 type Params = { params: Promise<{ videoId: string }> };
 
@@ -20,10 +20,9 @@ async function _GET(req: NextRequest, { params }: Params) {
 
     const { videoId } = await params;
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get video chapters
-    const { data: chapters, error: chaptersError } = await db
+    const { data: chapters, error: chaptersError } = await supabase
       .from("video_chapters")
       .select("*")
       .eq("video_id", videoId)
@@ -34,7 +33,7 @@ async function _GET(req: NextRequest, { params }: Params) {
     }
 
     // Get video transcript (lesson_id stores the video reference)
-    const { data: transcript, error: transcriptError } = await db
+    const { data: transcript, error: transcriptError } = await supabase
       .from("video_transcripts")
       .select("*")
       .eq("lesson_id", videoId)
@@ -64,7 +63,6 @@ async function _POST(req: NextRequest, { params }: Params) {
 
     const { videoId } = await params;
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -75,7 +73,7 @@ async function _POST(req: NextRequest, { params }: Params) {
     }
 
     // Check if user is admin
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", user.id)
@@ -91,11 +89,11 @@ async function _POST(req: NextRequest, { params }: Params) {
     // Update chapters if provided
     if (chapters && Array.isArray(chapters)) {
       // Delete existing chapters
-      await db.from("video_chapters").delete().eq("video_id", videoId);
+      await supabase.from("video_chapters").delete().eq("video_id", videoId);
 
       // Insert new chapters
       if (chapters.length > 0) {
-        const { error: chaptersError } = await db
+        const { error: chaptersError } = await supabase
           .from("video_chapters")
           .insert(
             chapters.map((item: any) => ({
@@ -119,7 +117,7 @@ async function _POST(req: NextRequest, { params }: Params) {
     // Update transcript if provided
     if (transcript) {
       // Check if transcript exists
-      const { data: existing } = await db
+      const { data: existing } = await supabase
         .from("video_transcripts")
         .select("id")
         .eq("lesson_id", videoId)
@@ -127,7 +125,7 @@ async function _POST(req: NextRequest, { params }: Params) {
 
       if (existing) {
         // Update existing
-        const { error: transcriptError } = await db
+        const { error: transcriptError } = await supabase
           .from("video_transcripts")
           .update({
             transcript_text: transcript.content,
@@ -144,7 +142,7 @@ async function _POST(req: NextRequest, { params }: Params) {
         }
       } else {
         // Insert new
-        const { error: transcriptError } = await db
+        const { error: transcriptError } = await supabase
           .from("video_transcripts")
           .insert({
             lesson_id: videoId,

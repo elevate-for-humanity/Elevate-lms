@@ -1,7 +1,6 @@
 import { requireAdmin } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getTenantContext, logAdminAccess } from '@/lib/tenant';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -27,10 +26,9 @@ async function _POST(
     const { id: jobId } = await params;
     const tenantContext = await getTenantContext();
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Verify super_admin role
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', tenantContext.userId)
@@ -41,7 +39,7 @@ async function _POST(
     }
 
     // Get job details for audit
-    const { data: job } = await db
+    const { data: job } = await supabase
       .from('provisioning_jobs')
       .select('*')
       .eq('id', jobId)

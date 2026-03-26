@@ -1,23 +1,22 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logStaffRecordAccess } from '@/lib/audit/ferpa';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -27,7 +26,7 @@ async function _POST(req: Request) {
   }
 
   // Check if user is instructor
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -53,7 +52,7 @@ async function _POST(req: Request) {
   }
 
   // Verify this grade item belongs to a course taught by instructor
-  const { data: gradeItem } = await db
+  const { data: gradeItem } = await supabase
     .from('grade_items')
     .select(
       `
@@ -71,7 +70,7 @@ async function _POST(req: Request) {
   }
 
   // Upsert the grade
-  const { error } = await db.from('grades').upsert(
+  const { error } = await supabase.from('grades').upsert(
     {
       grade_item_id: gradeItemId,
       enrollment_id: enrollmentId,

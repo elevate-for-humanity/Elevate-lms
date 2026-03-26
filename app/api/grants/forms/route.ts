@@ -1,5 +1,4 @@
 
-export const maxDuration = 60;
 
 /**
  * Federal Forms API
@@ -16,6 +15,7 @@ import {
 } from '@/lib/grants/federal-forms';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
 
 async function _POST(req: NextRequest) {
   try {

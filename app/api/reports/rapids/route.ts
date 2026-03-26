@@ -1,14 +1,14 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(req: Request) {
   try {
@@ -16,7 +16,6 @@ async function _GET(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check if user is admin
     const {
@@ -27,7 +26,7 @@ async function _GET(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('user_profiles')
       .select('role')
       .eq('user_id', user.id)
@@ -41,7 +40,7 @@ async function _GET(req: Request) {
     }
 
     // Get all approved hours from consolidated hour_entries
-    const { data: rawRows, error } = await db
+    const { data: rawRows, error } = await supabase
       .from('hour_entries')
       .select(
         `
@@ -63,7 +62,7 @@ async function _GET(req: Request) {
     const userIds = [...new Set((rawRows || []).map((h: any) => h.user_id).filter(Boolean))];
     const profileMap: Record<string, any> = {};
     if (userIds.length > 0) {
-      const { data: profiles } = await db
+      const { data: profiles } = await supabase
         .from('user_profiles')
         .select('user_id, first_name, last_name, email')
         .in('user_id', userIds);

@@ -1,21 +1,20 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const _POST = withAuth(
   async (req: NextRequest, user) => {
     try {
       const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
       // Step 1: Create the table
       // logger.info("Creating marketing_contacts table...");
@@ -225,7 +224,7 @@ const _POST = withAuth(
       let skipped = 0;
 
       for (const contact of contacts) {
-        const { error } = await db
+        const { error } = await supabase
           .from('marketing_contacts')
           .insert(contact);
 
@@ -244,7 +243,7 @@ const _POST = withAuth(
       }
 
       // Get final count
-      const { count } = await db
+      const { count } = await supabase
         .from('marketing_contacts')
         .select('*', { count: 'exact', head: true });
 

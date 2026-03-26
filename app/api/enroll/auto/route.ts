@@ -2,13 +2,9 @@
  * @deprecated Disabled. Use /api/enrollments/create-enforced.
  */
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { stripe } from '@/lib/stripe/client';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
@@ -16,6 +12,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 interface AutoEnrollRequest {
   firstName: string;
@@ -53,13 +53,12 @@ async function _POST(req: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const emailLower = email.toLowerCase();
 
     logger.info('Starting auto-enrollment', { email: emailLower, programSlug });
 
     // STEP 1: Get program details
-    const { data: program, error: programError } = await db
+    const { data: program, error: programError } = await supabase
       .from('programs')
       .select('id, name, slug, total_cost')
       .eq('slug', programSlug)
@@ -73,7 +72,7 @@ async function _POST(req: Request) {
     let userId: string;
     let isNewUser = false;
 
-    const { data: existingUser } = await db
+    const { data: existingUser } = await supabase
       .from('profiles')
       .select('id')
       .eq('email', emailLower)
@@ -109,7 +108,7 @@ async function _POST(req: Request) {
       isNewUser = true;
 
       // STEP 4: Create profile
-      const { error: profileError } = await db.from('profiles').insert({
+      const { error: profileError } = await supabase.from('profiles').insert({
         id: userId,
         email: emailLower,
         full_name: `${firstName} ${lastName}`,
@@ -132,7 +131,7 @@ async function _POST(req: Request) {
     }
 
     // STEP 5: Create enrollment (FREE - no payment required)
-    const { data: existingEnrollment } = await db
+    const { data: existingEnrollment } = await supabase
       .from('program_enrollments')
       .select('id')
       .eq('user_id', userId)
@@ -146,7 +145,7 @@ async function _POST(req: Request) {
       logger.info('Enrollment already exists', { enrollmentId });
     } else {
       // Idempotent upsert — safe against race conditions
-      const { data: enrollment, error: enrollError } = await db
+      const { data: enrollment, error: enrollError } = await supabase
         .from('program_enrollments')
         .upsert({
           user_id: userId,
@@ -172,7 +171,7 @@ async function _POST(req: Request) {
       logger.info('Created FREE enrollment', { enrollmentId });
 
       // Notify admins of pending enrollment
-      const { data: admins } = await db
+      const { data: admins } = await supabase
         .from('profiles')
         .select('id')
         .in('role', ['admin', 'super_admin']);
@@ -185,21 +184,21 @@ async function _POST(req: Request) {
           message: `${firstName} ${lastName} (${emailLower}) has enrolled in ${program.name}. Enrollment ID: ${enrollmentId}`,
         }));
 
-        await db.from('notifications').insert(notifications);
+        await supabase.from('notifications').insert(notifications);
         logger.info('Admin notifications created', { count: admins.length });
       }
     }
 
     // STEP 5b: Create training_enrollments so student can access course content
     try {
-      const { data: linkedCourses } = await db
+      const { data: linkedCourses } = await supabase
         .from('training_courses')
         .select('id')
         .eq('program_id', program.id);
 
       if (linkedCourses && linkedCourses.length > 0) {
         for (const course of linkedCourses) {
-          await db
+          await supabase
             .from('training_enrollments')
             .upsert({
               user_id: userId,
@@ -216,7 +215,7 @@ async function _POST(req: Request) {
     }
 
     // STEP 6: Create application record
-    const { data: application } = await db
+    const { data: application } = await supabase
       .from('applications')
       .insert({
         first_name: firstName,

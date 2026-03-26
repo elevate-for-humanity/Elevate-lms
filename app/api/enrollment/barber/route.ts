@@ -1,14 +1,14 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   try {
@@ -16,11 +16,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    
-    if (!supabase) {
-      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     
@@ -35,7 +30,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Check if user is already enrolled
-    const { data: existingEnrollment } = await db
+    const { data: existingEnrollment } = await supabase
       .from('partner_users')
       .select('id')
       .eq('user_id', user.id)
@@ -49,7 +44,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Verify partner exists and is active
-    const { data: partner } = await db
+    const { data: partner } = await supabase
       .from('partners')
       .select('id, name, status')
       .eq('id', partnerId)
@@ -66,7 +61,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Create enrollment record
-    const { error: enrollError } = await db
+    const { error: enrollError } = await supabase
       .from('partner_users')
       .insert({
         user_id: user.id,
@@ -81,7 +76,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Update user profile with apprentice role if needed
-    await db
+    await supabase
       .from('profiles')
       .update({ 
         role: 'apprentice',
@@ -91,7 +86,7 @@ async function _POST(request: NextRequest) {
 
     // Create initial progress record
     // Note: apprentice_progress has no partner_id or program_id column
-    await db
+    await supabase
       .from('apprentice_progress')
       .insert({
         user_id: user.id,

@@ -1,8 +1,5 @@
 import { logger } from '@/lib/logger';
 import { checkEligibilityAndAuthorize } from '@/lib/services/exam-eligibility';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -17,6 +14,10 @@ import {
 } from '@/lib/lms/engine';
 import type { CheckpointGateError } from '@/lib/lms/engine';
 import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(
   request: NextRequest,

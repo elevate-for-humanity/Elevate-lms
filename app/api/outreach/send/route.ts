@@ -1,8 +1,9 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 const SENDGRID_KEY = process.env.SENDGRID_KEY || process.env.SENDGRID_API_KEY;
 const SENDGRID_FROM = process.env.SENDGRID_FROM || 'info@elevateforhumanity.org';

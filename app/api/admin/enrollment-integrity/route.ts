@@ -2,7 +2,6 @@ import { requireAdmin } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/authGuards';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -22,27 +21,23 @@ const guard = await apiRequireAdmin();
   if (guard) return guard;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) {
-    return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
-  }
 
   // Check program_enrollments for duplicate (student_id, program_slug)
-  const { data: dupProgramEnrollments } = await db
+  const { data: dupProgramEnrollments } = await supabase
     .from('program_enrollments')
     .select('student_id, program_slug')
     .then(() => supabase.rpc('check_enrollment_duplicates').catch(() => null)) as any;
 
   // Fallback: run raw counts via individual queries
-  const { count: totalProgramEnrollments } = await db
+  const { count: totalProgramEnrollments } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true });
 
-  const { count: totalStudentEnrollments } = await db
+  const { count: totalStudentEnrollments } = await supabase
     .from('student_enrollments')
     .select('*', { count: 'exact', head: true });
 
-  const { count: totalLegacyEnrollments } = await db
+  const { count: totalLegacyEnrollments } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true });
 

@@ -1,6 +1,4 @@
 
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireApiAuth, APIAuthError } from '@/lib/auth';
@@ -16,6 +14,8 @@ import {
 } from '@/lib/onboarding';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 interface User {
   id: string;

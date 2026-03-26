@@ -1,16 +1,16 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   try {
@@ -19,10 +19,9 @@ async function _POST(request: NextRequest) {
 
     const data = await parseBody<Record<string, any>>(request);
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Store in database
-    const { error: dbError } = await db.from('partner_inquiries').insert({
+    const { error: dbError } = await supabase.from('partner_inquiries').insert({
       full_name: data.fullName,
       organization: data.organization,
       email: data.email,

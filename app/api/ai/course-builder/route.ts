@@ -1,8 +1,5 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 120;
 
 import { createClient } from '@/lib/supabase/server';
 import { isOpenAIConfigured } from '@/lib/openai-client';
@@ -12,6 +9,10 @@ import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { requireAdminRole } from '@/lib/api/requireAdminRole';
+export const runtime = 'nodejs';
+export const maxDuration = 120;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
   const rateLimited = await applyRateLimit(req, 'api');

@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { AI_INSTRUCTORS } from '@/lib/ai-instructors';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -14,10 +13,9 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get real instructors from profiles
-    const { data: instructors, error } = await db
+    const { data: instructors, error } = await supabase
       .from('profiles')
       .select('id, full_name, email, avatar_url, bio')
       .eq('role', 'instructor')
@@ -30,7 +28,7 @@ async function _GET(request: Request) {
     const nextWeek = new Date(today);
     nextWeek.setDate(nextWeek.getDate() + 7);
 
-    const { data: bookedAppointments } = await db
+    const { data: bookedAppointments } = await supabase
       .from('appointments')
       .select('appointment_date, appointment_time')
       .gte('appointment_date', today.toISOString().split('T')[0])

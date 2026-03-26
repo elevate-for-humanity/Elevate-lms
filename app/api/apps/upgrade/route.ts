@@ -2,7 +2,6 @@ import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -32,10 +31,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (!supabase) {
-      return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -58,7 +53,7 @@ async function _POST(request: NextRequest) {
     // Get or create Stripe customer
     let customerId: string;
     
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('stripe_customer_id')
       .eq('id', user.id)
@@ -75,7 +70,7 @@ async function _POST(request: NextRequest) {
       });
       customerId = customer.id;
 
-      await db
+      await supabase
         .from('profiles')
         .update({ stripe_customer_id: customerId })
         .eq('id', user.id);

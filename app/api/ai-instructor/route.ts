@@ -1,6 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
@@ -11,6 +8,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { aiChat, isAIAvailable } from '@/lib/ai';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const SYSTEM_PROMPT = `You are an AI instructor assistant for Elevate for Humanity, a workforce training institution. Your role is to guide students through their programs and courses with consistent, helpful support.
 

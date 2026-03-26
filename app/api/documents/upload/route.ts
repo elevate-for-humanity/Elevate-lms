@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { withErrorHandling, APIErrors } from '@/lib/api';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { NextRequest, NextResponse } from 'next/server';
@@ -15,7 +14,6 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Check authentication
   const {
@@ -123,7 +121,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   }
 
   // Save document record to database
-  const { data: document, error: dbError } = await db
+  const { data: document, error: dbError } = await supabase
     .from('documents')
     .insert({
       user_id: user.id,
@@ -166,7 +164,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
 
   // Check if this upload completes employer onboarding
   try {
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -191,7 +189,6 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Check authentication
   const {
@@ -208,7 +205,7 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
   const status = searchParams.get('status');
 
   // Build query
-  let query = db
+  let query = supabase
     .from('documents')
     .select('*')
     .eq('user_id', user.id)

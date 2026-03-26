@@ -1,6 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 30;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -10,6 +7,10 @@ import { hrEmailTemplates, HrEmailStep, HrEmailParams } from '@/lib/email/templa
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { logger } from '@/lib/logger';
+export const runtime = 'nodejs';
+export const maxDuration = 30;
+
+export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/hr/emails

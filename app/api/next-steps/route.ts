@@ -1,7 +1,4 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -10,6 +7,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { sendEmail } from '@/lib/email/sendgrid';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 function computeProgress(row: any) {
   const checks = [

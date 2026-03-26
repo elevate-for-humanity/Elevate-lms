@@ -1,15 +1,15 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 // GET /api/hr/time-entries?employee_id=&start=&end=&status=
 async function _GET(request: NextRequest) {
@@ -18,7 +18,6 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const params = request.nextUrl.searchParams;
 
     const employeeId = params.get('employee_id');
@@ -26,7 +25,7 @@ async function _GET(request: NextRequest) {
     const end = params.get('end');
     const status = params.get('status');
 
-    let query = db
+    let query = supabase
       .from('time_entries')
       .select(
         `
@@ -69,7 +68,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = await parseBody<Record<string, any>>(request);
 
     const {
@@ -102,7 +100,7 @@ async function _POST(request: NextRequest) {
       );
     }
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('time_entries')
       .insert({
         employee_id,

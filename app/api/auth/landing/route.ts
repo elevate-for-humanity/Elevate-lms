@@ -1,7 +1,4 @@
-export const runtime = 'nodejs';
 import { createAdminClient } from '@/lib/supabase/admin';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/auth/landing/route.ts
 import { NextResponse } from 'next/server';
@@ -11,6 +8,10 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { getRoleDestination } from '@/lib/auth/role-destinations';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
   

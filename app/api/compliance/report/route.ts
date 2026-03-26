@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -15,14 +14,13 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -38,16 +36,16 @@ async function _GET(request: NextRequest) {
     const endDate = searchParams.get('endDate');
 
     // Get compliance data
-    const { data: complianceItems } = await db
+    const { data: complianceItems } = await supabase
       .from('compliance_items')
       .select('*')
       .order('created_at', { ascending: false });
 
-    const { data: enrollments } = await db
+    const { data: enrollments } = await supabase
       .from('program_enrollments')
       .select('id, status, program_id, enrolled_at, completed_at');
 
-    const { data: applications } = await db
+    const { data: applications } = await supabase
       .from('applications')
       .select('id, status, submitted_at');
 
@@ -105,14 +103,13 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -126,7 +123,7 @@ async function _POST(request: NextRequest) {
     const { reportType, filters, schedule } = body;
 
     // Save report configuration or schedule
-    const { data: savedReport, error } = await db
+    const { data: savedReport, error } = await supabase
       .from('wioa_compliance_reports')
       .insert({
         report_type: reportType,

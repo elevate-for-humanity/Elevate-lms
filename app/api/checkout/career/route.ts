@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { toError, toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PRICES } from '@/lib/stripe/prices';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'contact');

@@ -1,5 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
@@ -7,6 +5,9 @@ import { importScormPackage, getScormRegistration } from '@/lib/scormCloud';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/admin/scorm — Import a SCORM package via SCORM Cloud

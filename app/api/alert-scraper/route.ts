@@ -1,15 +1,15 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 10;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 10;
+
+export const dynamic = 'force-dynamic';
 
 /**
  * Scraper Alert Endpoint
@@ -48,8 +48,7 @@ async function _POST(request: NextRequest) {
       try {
         // Log to database
         const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-        await db.from('scraping_attempts').insert({
+        await supabase.from('scraping_attempts').insert({
           detection_type: type,
           url,
           ip_address: ip,

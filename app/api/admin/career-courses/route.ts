@@ -1,6 +1,5 @@
 import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
@@ -10,11 +9,10 @@ export const dynamic = 'force-dynamic';
 
 async function guardAdmin() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
@@ -38,7 +36,7 @@ const denied = await guardAdmin();
       );
     }
 
-    const { data: courses, error } = await db
+    const { data: courses, error } = await supabase
       .from('career_courses')
       .select(`
         *,
@@ -79,7 +77,7 @@ async function _POST(req: Request) {
     }
 
       // Get all courses without Stripe IDs
-      const { data: courses, error } = await db
+      const { data: courses, error } = await supabase
         .from('career_courses')
         .select('*')
         .is('stripe_product_id', null);
@@ -118,7 +116,7 @@ async function _POST(req: Request) {
           });
 
           // Update course with Stripe IDs
-          await db
+          await supabase
             .from('career_courses')
             .update({
               stripe_product_id: product.id,

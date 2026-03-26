@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { getCatalogProduct } from '@/lib/store/db';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -22,10 +21,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (!supabase) {
-      return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -76,7 +71,7 @@ async function _POST(request: NextRequest) {
     // Get or create Stripe customer
     let stripeCustomerId: string;
     
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('stripe_customer_id, email, full_name')
       .eq('id', user.id)
@@ -96,7 +91,7 @@ async function _POST(request: NextRequest) {
       });
       stripeCustomerId = customer.id;
 
-      await db
+      await supabase
         .from('profiles')
         .update({ stripe_customer_id: stripeCustomerId })
         .eq('id', user.id);
@@ -105,7 +100,7 @@ async function _POST(request: NextRequest) {
     // Get or create organization
     let organizationId: string;
     
-    const { data: existingOrg } = await db
+    const { data: existingOrg } = await supabase
       .from('organizations')
       .select('id')
       .eq('contact_email', billing_email || user.email)
@@ -114,7 +109,7 @@ async function _POST(request: NextRequest) {
     if (existingOrg) {
       organizationId = existingOrg.id;
     } else {
-      const { data: newOrg } = await db
+      const { data: newOrg } = await supabase
         .from('organizations')
         .insert({
           name: organization_name || `${profile?.full_name}'s Organization`,
@@ -128,7 +123,7 @@ async function _POST(request: NextRequest) {
       organizationId = newOrg?.id;
 
       // Link user to organization
-      await db
+      await supabase
         .from('profiles')
         .update({ organization_id: organizationId })
         .eq('id', user.id);

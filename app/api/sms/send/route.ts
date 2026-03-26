@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -11,7 +10,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -26,7 +24,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Log the SMS message (actual sending requires Twilio/SMS provider integration)
-    const { data, error } = await db
+    const { data, error } = await supabase
       .from('sms_messages')
       .insert({
         phone_number,

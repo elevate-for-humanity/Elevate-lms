@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { QuestionUpdateSchema } from '@/lib/validators/course';
 import { getQuestion, updateQuestion, deleteQuestion } from '@/lib/db/courses';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -11,11 +10,9 @@ export const dynamic = 'force-dynamic';
 
 async function requireAdmin() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) return { error: 'Database unavailable', status: 500 };
-  const { data: { user } } = await supabase.auth.getUser();
+const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Unauthorized', status: 401 };
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin', 'super_admin', 'instructor'].includes(profile.role)) {
     return { error: 'Forbidden', status: 403 };
   }

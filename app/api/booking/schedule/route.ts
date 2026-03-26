@@ -1,11 +1,12 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 const ScheduleSchema = z.object({
   name: z.string().min(2).max(120),

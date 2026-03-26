@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { auditedMutation } from '@/lib/audit/transactional';
@@ -15,7 +14,6 @@ async function _GET(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   const {
     data: { user },
@@ -26,7 +24,7 @@ const supabase = await createClient();
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { data: requests, error } = await db
+  const { data: requests, error } = await supabase
     .from('transfer_hour_requests')
     .select(`
       *,
@@ -51,7 +49,6 @@ async function _POST(req: Request) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   const {
     data: { user },
@@ -94,7 +91,7 @@ async function _POST(req: Request) {
   }
 
   // Verify enrollment belongs to user
-  const { data: enrollment, error: enrollmentError } = await db
+  const { data: enrollment, error: enrollmentError } = await supabase
     .from('student_enrollments')
     .select('id, student_id, transfer_hours')
     .eq('id', enrollment_id)
@@ -106,7 +103,7 @@ async function _POST(req: Request) {
   }
 
   // Check for existing pending request
-  const { data: existingRequest } = await db
+  const { data: existingRequest } = await supabase
     .from('transfer_hour_requests')
     .select('id')
     .eq('enrollment_id', enrollment_id)

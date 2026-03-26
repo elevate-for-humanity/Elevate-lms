@@ -1,6 +1,5 @@
 import { createCheckoutSession } from '@/lib/store/stripe';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { validateCheckoutAuthorization } from '@/lib/store/licensing-mode';
@@ -30,10 +29,9 @@ async function _POST(req: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get product details
-    const { data: product, error } = await db
+    const { data: product, error } = await supabase
       .from('products')
       .select('*')
       .eq('id', productId)

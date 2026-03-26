@@ -1,15 +1,15 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/mobile/courses/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: NextRequest) {
   try {
@@ -26,7 +26,6 @@ async function _GET(request: NextRequest) {
 
     const token = authHeader.substring(7);
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Verify token and get user
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
@@ -39,7 +38,7 @@ async function _GET(request: NextRequest) {
     }
 
     // Get user's enrolled courses
-    const { data: enrollments, error: enrollError } = await db
+    const { data: enrollments, error: enrollError } = await supabase
       .from("program_enrollments")
       .select(`
         id,
@@ -72,14 +71,14 @@ async function _GET(request: NextRequest) {
         if (!course) return null;
 
         // Get total lessons in course
-        const { data: modules } = await db
+        const { data: modules } = await supabase
           .from("modules")
           .select("id")
           .eq("course_id", courseId);
 
         const moduleIds = modules?.map((m) => m.id) || [];
 
-        const { data: lessons } = await db
+        const { data: lessons } = await supabase
           .from("training_lessons")
           .select("id")
           .in("module_id", moduleIds);
@@ -87,7 +86,7 @@ async function _GET(request: NextRequest) {
         const totalLessons = lessons?.length || 0;
 
         // Get completed lessons
-        const { data: progress } = await db
+        const { data: progress } = await supabase
           .from("lesson_progress")
           .select("lesson_id, completed")
           .eq("user_id", user.id)
@@ -103,7 +102,7 @@ async function _GET(request: NextRequest) {
         let nextLessonTitle = undefined;
 
         if (nextLesson) {
-          const { data: lessonData } = await db
+          const { data: lessonData } = await supabase
             .from("training_lessons")
             .select("title")
             .eq("id", nextLesson.id)

@@ -1,21 +1,20 @@
 import { NextResponse } from "next/server";
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { uploadComplianceEvidenceFile } from "@/lib/storage/complianceEvidence";
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -25,7 +24,7 @@ async function _POST(request: Request) {
   }
 
   // Check if user is admin
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
@@ -47,7 +46,7 @@ async function _POST(request: Request) {
   }
 
   // Validate item exists
-  const { data: item } = await db
+  const { data: item } = await supabase
     .from("compliance_items")
     .select("id")
     .eq("id", itemId)
@@ -61,7 +60,7 @@ async function _POST(request: Request) {
   const { fileUrl, fileName } = await uploadComplianceEvidenceFile(file, itemId);
 
   // Create evidence record
-  const { data: evidence, error } = await db
+  const { data: evidence, error } = await supabase
     .from("compliance_evidence")
     .insert({
       item_id: itemId,
@@ -77,7 +76,7 @@ async function _POST(request: Request) {
   }
 
   // Log the upload
-  await db.from("audit_logs").insert({
+  await supabase.from("audit_logs").insert({
     actor_id: user.id,
     actor_email: user.email,
     action: "compliance_evidence_uploaded",

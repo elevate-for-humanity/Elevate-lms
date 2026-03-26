@@ -1,11 +1,12 @@
-export const runtime = 'nodejs';
 import { createAdminClient } from '@/lib/supabase/admin';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(req: NextRequest) {
   

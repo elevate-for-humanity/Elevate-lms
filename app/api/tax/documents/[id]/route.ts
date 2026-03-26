@@ -1,12 +1,12 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _DELETE(
   request: Request,
@@ -18,7 +18,6 @@ async function _DELETE(
 const { id } = await params;
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -29,7 +28,7 @@ const { id } = await params;
     }
 
     // Get document to verify ownership and get file path
-    const { data: document, error: fetchError } = await db
+    const { data: document, error: fetchError } = await supabase
       .from('tax_documents')
       .select('*')
       .eq('id', id)
@@ -53,7 +52,7 @@ const { id } = await params;
     }
 
     // Delete from database
-    const { error: deleteError } = await db
+    const { error: deleteError } = await supabase
       .from('tax_documents')
       .delete()
       .eq('id', id)

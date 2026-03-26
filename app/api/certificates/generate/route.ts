@@ -1,16 +1,16 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { checkApprenticeshipEligibility } from '@/lib/hours/get-approved-hours';
 import { checkCertificateIssuanceEligibility } from '@/lib/services/credential-pipeline';
 import { createHash } from 'crypto';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const BUILD_SHA = process.env.COMMIT_REF?.slice(0, 12) || 'dev';
 
@@ -20,7 +20,6 @@ async function _POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get authenticated user
     const {
@@ -61,7 +60,7 @@ async function _POST(request: Request) {
 
     if (programSlug) {
       // Workforce path: load program directly by slug (no course required)
-      const { data: prog } = await db
+      const { data: prog } = await supabase
         .from('programs')
         .select('id, title, slug, issuance_policy, min_rti_hours, min_ojl_hours, credential_type, credential_name, requires_instructor_attestation, min_engagement_hours')
         .eq('slug', programSlug)
@@ -73,7 +72,7 @@ async function _POST(request: Request) {
       program = prog;
 
       // Check for an enrollment or application for this user + program
-      const { data: enroll } = await db
+      const { data: enroll } = await supabase
         .from('program_enrollments')
         .select('id, user_id, course_id, completed_at, status, funding_source, funding_status, amount_paid_cents, stripe_payment_intent_id')
         .eq('user_id', user.id)
@@ -90,7 +89,7 @@ async function _POST(request: Request) {
       course_id = enroll?.course_id || null;
     } else {
       // Course path: load via enrollment → course → program
-      const { data: enroll, error: enrollmentError } = await db
+      const { data: enroll, error: enrollmentError } = await supabase
         .from('program_enrollments')
         .select(
           `
@@ -170,7 +169,7 @@ async function _POST(request: Request) {
       }
     } else {
       // Course-based programs (HVAC, OSHA, etc.): gate on lesson completion.
-      const { data: completionRow, error: completionError } = await db
+      const { data: completionRow, error: completionError } = await supabase
         .from('course_completion_status')
         .select(
           `
@@ -206,7 +205,7 @@ async function _POST(request: Request) {
       // verify accumulated seat time meets the threshold.
       // This proves "instructional engagement, not just logins."
       if (program?.min_engagement_hours && program.min_engagement_hours > 0 && course_id) {
-        const { data: progressRows } = await db
+        const { data: progressRows } = await supabase
           .from('lesson_progress')
           .select('time_spent_seconds')
           .eq('user_id', enrollment.user_id)
@@ -235,7 +234,7 @@ async function _POST(request: Request) {
     // Programs with requires_instructor_attestation=true must have
     // documented instructional oversight before credential issuance.
     if (program?.requires_instructor_attestation) {
-      const { data: attestations, error: attestErr } = await db
+      const { data: attestations, error: attestErr } = await supabase
         .from('instructor_attestations')
         .select('id, attestation_type, hours_attested, attested_at')
         .eq('student_id', enrollment.user_id)
@@ -300,7 +299,7 @@ async function _POST(request: Request) {
     }
 
     // 3) Check if certificate already exists
-    const { data: existingCert } = await db
+    const { data: existingCert } = await supabase
       .from('certificates')
       .select('id, certificate_number, verification_code')
       .eq('student_id', enrollment.user_id)
@@ -316,7 +315,7 @@ async function _POST(request: Request) {
     }
 
     // 4) Load student profile
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('user_profiles')
       .select('full_name, email')
       .eq('user_id', enrollment.user_id)
@@ -327,7 +326,7 @@ async function _POST(request: Request) {
     const verificationCode = generateVerificationCode();
 
     // 6) Insert certificate
-    const { data: cert, error: certError } = await db
+    const { data: cert, error: certError } = await supabase
       .from('certificates')
       .insert({
         student_id: enrollment.user_id,
@@ -407,7 +406,7 @@ async function _POST(request: Request) {
 
     // 7) Update enrollment status to completed and record certificate issuance timestamp
     const now = new Date().toISOString();
-    await db
+    await supabase
       .from('program_enrollments')
       .update({
         status: 'completed',

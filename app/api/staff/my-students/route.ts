@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getTenantContext, TenantContextError } from '@/lib/tenant';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
   try {
@@ -18,10 +18,9 @@ async function _GET(request: Request) {
     const tenantContext = await getTenantContext();
     
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get staff profile
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', tenantContext.userId)
@@ -32,7 +31,7 @@ async function _GET(request: Request) {
     }
 
     // Get students in this tenant (RLS enforces tenant_id filtering)
-    const { data: students, error } = await db
+    const { data: students, error } = await supabase
       .from('profiles')
       .select('id, email, full_name, last_sign_in_at')
       .eq('role', 'student')

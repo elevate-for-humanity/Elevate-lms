@@ -1,11 +1,12 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createZoomMeeting } from '@/lib/integrations/zoom';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 

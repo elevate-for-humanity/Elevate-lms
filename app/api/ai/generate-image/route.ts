@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
@@ -12,6 +10,8 @@ import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { requireAdminRole } from '@/lib/api/requireAdminRole';
 import { createClient } from '@/lib/supabase/server';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 /**
  * Image Generation API

@@ -1,13 +1,13 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getCaseTimeline, getCaseTasks, transitionCaseStatus, checkSignatureCompleteness } from '@/lib/workflow/case-management';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(req: Request, { params }: { params: Promise<{ caseId: string }> }) {
   try {
@@ -15,7 +15,6 @@ async function _GET(req: Request, { params }: { params: Promise<{ caseId: string
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user }, error: authErr } = await supabase.auth.getUser();
     
     if (authErr || !user) {
@@ -24,7 +23,7 @@ async function _GET(req: Request, { params }: { params: Promise<{ caseId: string
 
     const { caseId } = await params;
 
-    const { data: enrollmentCase, error } = await db
+    const { data: enrollmentCase, error } = await supabase
       .from('enrollment_cases')
       .select('*')
       .eq('id', caseId)
@@ -37,7 +36,7 @@ async function _GET(req: Request, { params }: { params: Promise<{ caseId: string
     if (enrollmentCase.student_id !== user.id && 
         enrollmentCase.program_holder_id !== user.id && 
         enrollmentCase.employer_id !== user.id) {
-      const { data: profile } = await db
+      const { data: profile } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
@@ -72,7 +71,6 @@ async function _PATCH(req: Request, { params }: { params: Promise<{ caseId: stri
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user }, error: authErr } = await supabase.auth.getUser();
     
     if (authErr || !user) {
@@ -87,7 +85,7 @@ async function _PATCH(req: Request, { params }: { params: Promise<{ caseId: stri
       return NextResponse.json({ error: 'status is required' }, { status: 400 });
     }
 
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)

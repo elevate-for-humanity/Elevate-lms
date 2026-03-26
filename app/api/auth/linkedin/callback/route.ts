@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 /**
  * LinkedIn OAuth Callback Handler
@@ -89,7 +89,6 @@ const searchParams = request.nextUrl.searchParams;
 
     // Store in database
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -101,7 +100,7 @@ const searchParams = request.nextUrl.searchParams;
     }
 
     // Save to settings table
-    const { error: saveError } = await db
+    const { error: saveError } = await supabase
       .from('social_media_settings')
       .upsert({
         platform: 'linkedin',

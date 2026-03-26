@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { checkPartnerApproval, processPartnerDocument } from '@/lib/automation/partner-approval';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -18,10 +17,6 @@ async function _POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (!supabase) {
-      return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
-    }
 
     // Check auth
     const { data: { user } } = await supabase.auth.getUser();
@@ -30,7 +25,7 @@ async function _POST(req: Request) {
     }
 
     // Check admin role
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)

@@ -1,7 +1,4 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 30;
 
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
@@ -13,6 +10,10 @@ import { sendApplicationWelcomeEmail } from '@/lib/email/application-welcome';
 import { sendOnboardingEmail } from '@/lib/email/send-onboarding';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { getRoutingRecommendations } from '@/lib/automation/shop-routing';
+export const runtime = 'nodejs';
+export const maxDuration = 30;
+
+export const dynamic = 'force-dynamic';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 const ADMIN_SMS = process.env.ADMIN_SMS_GATEWAY || '';

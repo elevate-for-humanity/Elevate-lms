@@ -1,15 +1,15 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/mobile/login/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   try {
@@ -26,7 +26,6 @@ async function _POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Authenticate with Supabase
     const { data, error }: any = await supabase.auth.signInWithPassword({
@@ -49,7 +48,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Get user profile
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from("profiles")
       .select("full_name, role")
       .eq("id", data.user.id)

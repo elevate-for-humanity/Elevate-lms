@@ -1,8 +1,5 @@
 import { requireAdmin } from '@/lib/auth';
-export const runtime = 'nodejs';
 import { createAdminClient } from '@/lib/supabase/admin';
-export const maxDuration = 60;
-export const dynamic = 'force-dynamic';
 
 // app/api/admin/applications-secure/[id]/route.ts
 // SECURE VERSION with authentication
@@ -11,6 +8,10 @@ import { withAuth } from '@/lib/with-auth';
 import { getServerSupabase } from '@/lib/supabaseClients';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const _GET = withAuth(
   async (req: NextRequest, { params, user }) => {

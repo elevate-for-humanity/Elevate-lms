@@ -16,9 +16,6 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    if (!supabase) {
-      return NextResponse.json({ success: false }, { status: 503 });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     

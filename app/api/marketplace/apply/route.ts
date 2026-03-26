@@ -1,13 +1,13 @@
-export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 
 // Using Node.js runtime for email compatibility
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'strict');
@@ -16,7 +16,6 @@ async function _POST(req: Request) {
 
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -39,7 +38,7 @@ async function _POST(req: Request) {
     }
 
     // Check if user already has a creator profile
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('marketplace_creators')
       .select('id, status')
       .eq('user_id', user.id)
@@ -58,7 +57,7 @@ async function _POST(req: Request) {
     }
 
     // Create creator application
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('marketplace_creators')
       .insert({
         user_id: user.id,

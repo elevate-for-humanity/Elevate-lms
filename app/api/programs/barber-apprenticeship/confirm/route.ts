@@ -1,11 +1,12 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { barberConfirmationAdminEmail } from '@/lib/email/templates/barber-full-onboarding';
 import { logger } from '@/lib/logger';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 

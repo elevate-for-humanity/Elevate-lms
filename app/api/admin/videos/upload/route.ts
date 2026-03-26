@@ -3,13 +3,14 @@ import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createServerSupabaseClient } from '@/lib/auth';
 import { withAuth } from '@/lib/with-auth';
 import { toErrorMessage } from '@/lib/safe';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const _POST = withAuth(
   async (request: Request, user) => {

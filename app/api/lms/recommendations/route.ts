@@ -1,13 +1,13 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { recommendationEngine } from '@/lib/recommendations/engine';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/lms/recommendations — Get personalized course recommendations
@@ -18,10 +18,6 @@ async function _GET(request: NextRequest) {
 
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (!supabase) {
-      return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -29,21 +25,21 @@ async function _GET(request: NextRequest) {
     }
 
     // Fetch user profile data for recommendations
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('interests, skill_level, learning_style')
       .eq('id', user.id)
       .single();
 
     // Fetch completed courses
-    const { data: completedEnrollments } = await db
+    const { data: completedEnrollments } = await supabase
       .from('program_enrollments')
       .select('course_id')
       .eq('user_id', user.id)
       .eq('status', 'completed');
 
     // Fetch available courses
-    const { data: courses } = await db
+    const { data: courses } = await supabase
       .from('courses')
       .select('id, title, description, category, difficulty, duration_hours, rating')
       .eq('published', true)

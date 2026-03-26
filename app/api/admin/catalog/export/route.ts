@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -12,13 +11,12 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    const _admin = createAdminClient(); const db = _admin || supabase;
-
+  
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
     if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -26,7 +24,7 @@ async function _GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const format = searchParams.get('format') || 'json';
 
-    const { data: programs } = await db
+    const { data: programs } = await supabase
       .from('programs')
       .select('id, title, slug, description, category, status, tuition, duration_weeks, total_hours')
       .eq('status', 'active')

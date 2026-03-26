@@ -11,12 +11,13 @@ import { logger } from '@/lib/logger';
  * Then set up SendGrid/Resend inbound parse to POST to this endpoint.
  */
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;

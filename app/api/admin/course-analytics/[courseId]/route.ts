@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import {
   getCourseAnalytics,
   getStudentEngagement,
@@ -12,6 +8,10 @@ import {
 } from '@/lib/analytics/course-analytics';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(
   req: Request,
@@ -23,7 +23,6 @@ async function _GET(
 
     const { courseId } = await params;
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -33,7 +32,7 @@ async function _GET(
     }
 
     // Check if user is admin
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)

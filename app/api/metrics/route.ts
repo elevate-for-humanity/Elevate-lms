@@ -1,11 +1,11 @@
 
-export const maxDuration = 60;
 // AUTH: Intentionally public — no authentication required
 
 // app/api/metrics/route.ts
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
 
 let requestCount = 0;
 

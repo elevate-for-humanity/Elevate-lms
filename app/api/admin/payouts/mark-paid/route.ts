@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@supabase/supabase-js';
 import { requireAdmin } from '@/lib/auth';
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 function getSupabaseAdmin() {
   if (

@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 /**
  * Admin API for Enrollment Jobs
@@ -21,7 +21,6 @@ async function _GET(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Verify staff role
   const {
@@ -31,7 +30,7 @@ const supabase = await createClient();
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -42,7 +41,7 @@ const supabase = await createClient();
   }
 
   // Get failed and retrying jobs
-  const { data: jobs, error } = await db
+  const { data: jobs, error } = await supabase
     .from('enrollment_jobs')
     .select(
       `
@@ -76,7 +75,6 @@ async function _POST(req: Request) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Verify staff role
   const {
@@ -86,7 +84,7 @@ async function _POST(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -101,7 +99,7 @@ async function _POST(req: Request) {
 
   if (action === 'retry' && job_id) {
     // Reset failed job to retry
-    const { error } = await db
+    const { error } = await supabase
       .from('enrollment_jobs')
       .update({
         status: 'pending',

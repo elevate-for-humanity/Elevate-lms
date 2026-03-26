@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { sanitizeSearchInput } from '@/lib/utils';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -29,10 +28,6 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (!supabase) {
-      return NextResponse.json({ error: 'Database not available' }, { status: 500 });
-    }
 
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
@@ -44,7 +39,7 @@ async function _GET(request: NextRequest) {
     const offset = (page - 1) * limit;
 
     // Build query for courses
-    let query = db
+    let query = supabase
       .from('training_courses')
       .select(`
         id,
@@ -93,7 +88,7 @@ async function _GET(request: NextRequest) {
     }
 
     // Also fetch available programs for context
-    const { data: programs } = await db
+    const { data: programs } = await supabase
       .from('programs')
       .select('id, slug, name, category, is_active')
       .eq('is_active', true)
@@ -143,10 +138,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (!supabase) {
-      return NextResponse.json({ error: 'Database not available' }, { status: 500 });
-    }
 
     // Verify authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -182,7 +173,7 @@ async function _POST(request: NextRequest) {
       .substring(0, 20) + '_' + Date.now().toString(36).toUpperCase();
 
     // Insert course
-    const { data: course, error: insertError } = await db
+    const { data: course, error: insertError } = await supabase
       .from('training_courses')
       .insert({
         course_name,
@@ -205,7 +196,7 @@ async function _POST(request: NextRequest) {
 
     // If program_id provided, link course to program
     if (program_id && course) {
-      await db
+      await supabase
         .from('program_courses')
         .insert({
           program_id,

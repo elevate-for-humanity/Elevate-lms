@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { getTenantContext, TenantContextError } from '@/lib/tenant';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
   try {
@@ -18,10 +18,9 @@ async function _GET(request: Request) {
     // STEP 4D: Get tenant context - enforces tenant isolation
     const tenantContext = await getTenantContext();
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check if user is partner
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", tenantContext.userId)
@@ -32,7 +31,7 @@ async function _GET(request: Request) {
     }
 
     // Get enrollments for this tenant (RLS also enforces this)
-    const { data: enrollments, error } = await db
+    const { data: enrollments, error } = await supabase
       .from("program_enrollments")
       .select(`
         id,

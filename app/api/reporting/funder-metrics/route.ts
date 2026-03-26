@@ -1,5 +1,4 @@
 
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { calculateFunderMetrics } from '@/lib/reporting/enterprise-dashboard';
@@ -7,6 +6,7 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
 
 async function _GET(request: Request) {
   try {

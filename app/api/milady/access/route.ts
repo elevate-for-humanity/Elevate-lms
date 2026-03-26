@@ -2,7 +2,6 @@ import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -19,7 +18,6 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -35,7 +33,7 @@ async function _GET(request: NextRequest) {
     }
 
     // Security: Only allow users to view their own access (unless admin)
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -47,7 +45,7 @@ async function _GET(request: NextRequest) {
     }
 
     // Get Milady access record
-    const { data: access, error } = await db
+    const { data: access, error } = await supabase
       .from('milady_access')
       .select('*')
       .eq('student_id', studentId)
@@ -56,7 +54,7 @@ async function _GET(request: NextRequest) {
 
     if (error || !access) {
       // Check if student has active enrollment (payment completed, docs verified)
-      const { data: enrollment } = await db
+      const { data: enrollment } = await supabase
         .from('program_enrollments')
         .select('id, status, docs_verified')
         .eq('user_id', studentId)
@@ -74,7 +72,7 @@ async function _GET(request: NextRequest) {
       }
 
       // Check for pending enrollment (paid but not yet approved)
-      const { data: pendingEnrollment } = await db
+      const { data: pendingEnrollment } = await supabase
         .from('program_enrollments')
         .select('id, status, docs_verified')
         .eq('user_id', studentId)
@@ -123,7 +121,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -140,7 +137,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Get student profile
-    const { data: studentProfile } = await db
+    const { data: studentProfile } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', studentId)

@@ -1,14 +1,14 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   try {
@@ -16,7 +16,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Verify authentication
     const { data: { user } } = await supabase.auth.getUser();
@@ -63,7 +62,7 @@ async function _POST(request: NextRequest) {
     const certificate_id = `FERPA-${Date.now()}-${user_id.substring(0, 8)}`;
 
     // Insert training record
-    const { data: trainingRecord, error: trainingError } = await db
+    const { data: trainingRecord, error: trainingError } = await supabase
       .from('ferpa_training_records')
       .insert({
         id: certificate_id,
@@ -92,7 +91,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Log the completion
-    await db.from('audit_logs').insert({
+    await supabase.from('audit_logs').insert({
       user_id,
       action: 'ferpa_training_completed',
       resource_type: 'ferpa_training',

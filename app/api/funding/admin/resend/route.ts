@@ -1,7 +1,4 @@
-export const runtime = 'nodejs';
 import { createAdminClient } from '@/lib/supabase/admin';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
@@ -12,6 +9,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { sendEmail as realSendEmail } from '@/lib/email';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function sendEmail(to: string, subject: string, text: string) {
   await realSendEmail({ to, subject, html: text.replace(/\n/g, '<br>') });

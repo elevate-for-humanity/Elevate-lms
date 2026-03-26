@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   try {
@@ -14,7 +14,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const {
@@ -27,7 +26,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Verify user is a program holder
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -41,7 +40,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Get program holder record
-    const { data: programHolder, error: phError } = await db
+    const { data: programHolder, error: phError } = await supabase
       .from('program_holders')
       .select('id')
       .eq('user_id', user.id)
@@ -71,7 +70,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Insert report
-    const { data: report, error: insertError } = await db
+    const { data: report, error: insertError } = await supabase
       .from('apprentice_weekly_reports')
       .insert({
         program_holder_id: programHolder.id,
@@ -94,7 +93,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Log the action
-    await db.from('audit_logs').insert({
+    await supabase.from('audit_logs').insert({
       user_id: user.id,
       action: 'report_submitted',
       resource_type: 'apprentice_weekly_report',

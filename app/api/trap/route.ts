@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 // AUTH: Intentionally public — no authentication required
 
 
-export const maxDuration = 60;
 import { logSecurityEvent, blacklistIP } from '@/lib/security-monitor';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
 
 /**
  * Honeypot endpoint - should never be accessed by legitimate users

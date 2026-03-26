@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 type Action = 'APPROVE' | 'REJECT' | 'LOCK';
 
@@ -20,7 +20,6 @@ export async function GET(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
     error: authErr,
@@ -37,7 +36,7 @@ const supabase = await createClient();
   const userEmail = user.email;
 
   // Find program holders where this user is the mentor
-  const { data: programHolders } = await db
+  const { data: programHolders } = await supabase
     .from('program_holders')
     .select('id')
     .eq('email', userEmail);
@@ -49,7 +48,7 @@ const supabase = await createClient();
   const holderIds = programHolders.map((ph) => ph.id);
 
   // Query consolidated hour_entries
-  let q = db
+  let q = supabase
     .from('hour_entries')
     .select(
       `
@@ -90,7 +89,6 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   const {
     data: { user },
@@ -108,7 +106,7 @@ export async function POST(req: Request) {
     return jsonError('Invalid action');
 
   // Fetch entry + status first
-  const { data: entry, error: readErr } = await db
+  const { data: entry, error: readErr } = await supabase
     .from('hour_entries')
     .select('id,status')
     .eq('id', entry_id)
@@ -148,7 +146,7 @@ export async function POST(req: Request) {
     patch.rejection_reason = note;
   }
 
-  const { data: updated, error: updErr } = await db
+  const { data: updated, error: updErr } = await supabase
     .from('hour_entries')
     .update(patch)
     .eq('id', entry_id)

@@ -3,7 +3,6 @@ import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -74,9 +73,8 @@ async function grantLmsAccess(
  */
 async function unlockDownload(userId: string, productId: string, stripePaymentId?: string) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  const { error } = await db.from('user_entitlements').upsert({
+  const { error } = await supabase.from('user_entitlements').upsert({
     user_id: userId,
     entitlement_type: 'digital_download',
     product_id: productId,
@@ -106,9 +104,8 @@ async function recordPurchase(
   metadata: Record<string, string>
 ) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  const { error } = await db.from('purchases').insert({
+  const { error } = await supabase.from('purchases').insert({
     user_id: userId,
     stripe_session_id: sessionId,
     product_id: productId,
@@ -257,10 +254,9 @@ async function _POST(req: NextRequest) {
 
     if (paymentIntentId) {
       const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
       // Revoke user_entitlements
-      const { error: entitlementError } = await db
+      const { error: entitlementError } = await supabase
         .from('user_entitlements')
         .update({
           status: 'revoked',
@@ -274,7 +270,7 @@ async function _POST(req: NextRequest) {
       }
 
       // Update purchase record
-      const { error: purchaseError } = await db
+      const { error: purchaseError } = await supabase
         .from('purchases')
         .update({
           status: 'refunded',
@@ -288,7 +284,7 @@ async function _POST(req: NextRequest) {
 
       // POLICY: Refund reverses funding, not training.
       // Training status is untouched; admin must explicitly terminate if needed.
-      const { error: enrollmentError } = await db
+      const { error: enrollmentError } = await supabase
         .from('program_enrollments')
         .update({
           funding_status: 'refunded',
@@ -308,7 +304,7 @@ async function _POST(req: NextRequest) {
         if (userId) {
           const programId = paymentIntent.metadata?.program_id;
           const SYSTEM_WEBHOOK_ACTOR = '00000000-0000-0000-0000-000000000001';
-          let certQuery = db
+          let certQuery = supabase
             .from('certificates')
             .update({
               funding_status: 'refunded',
@@ -325,7 +321,7 @@ async function _POST(req: NextRequest) {
           const { error: certErr } = await certQuery;
           if (certErr) {
             // Fallback: some certs use user_id column
-            const fallback = db
+            const fallback = supabase
               .from('certificates')
               .update({
                 funding_status: 'refunded',

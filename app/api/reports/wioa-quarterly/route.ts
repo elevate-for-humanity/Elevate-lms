@@ -1,14 +1,14 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 /**
  * WIOA Quarterly Performance Report API
@@ -21,7 +21,6 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const {
@@ -106,7 +105,7 @@ async function generateQuarterlyReport(
   const endISO = endDate.toISOString();
 
   // 1. Enrollment Metrics
-  let enrollmentQuery = db
+  let enrollmentQuery = supabase
     .from('program_enrollments')
     .select('id, status, created_at, completed_at, user_id, course_id')
     .gte('created_at', startISO)
@@ -133,7 +132,7 @@ async function generateQuarterlyReport(
       : '0.00';
 
   // 2. Employment Outcomes
-  const { data: employmentOutcomes } = await db
+  const { data: employmentOutcomes } = await supabase
     .from('employment_outcomes')
     .select('*')
     .gte('employment_date', startISO)
@@ -168,7 +167,7 @@ async function generateQuarterlyReport(
       : '0.00';
 
   // 3. Credentials Earned
-  const { data: credentials } = await db
+  const { data: credentials } = await supabase
     .from('credentials_attained')
     .select('*')
     .gte('issue_date', startISO)
@@ -182,7 +181,7 @@ async function generateQuarterlyReport(
 
   // 4. Demographics
   const userIds = enrollments?.map((e) => e.user_id) || [];
-  const { data: demographics } = await db
+  const { data: demographics } = await supabase
     .from('participant_demographics')
     .select('*')
     .in('user_id', userIds);
@@ -201,13 +200,13 @@ async function generateQuarterlyReport(
   // 5. Program Breakdown (if no specific program)
   let programBreakdown = null;
   if (!programId) {
-    const { data: programs } = await db
+    const { data: programs } = await supabase
       .from('programs')
       .select('id, title');
 
     programBreakdown = await Promise.all(
       (programs || []).map(async (program: Record<string, any>) => {
-        const { data: programEnrollments } = await db
+        const { data: programEnrollments } = await supabase
           .from('program_enrollments')
           .select('id, status')
           .eq('program_id', program.id)
@@ -296,7 +295,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -310,7 +308,7 @@ async function _POST(request: NextRequest) {
     const { quarter, year, programId, reportData } = body;
 
     // Save to quarterly_performance table
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('quarterly_performance')
       .upsert({
         quarter,

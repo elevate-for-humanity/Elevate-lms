@@ -1,15 +1,15 @@
-export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 // Using Node.js runtime for email compatibility
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
   try {
@@ -19,10 +19,9 @@ async function _POST(req: Request) {
     await requireAdmin();
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { productId, reason } = await req.json();
 
-    const { error } = await db
+    const { error } = await supabase
       .from('marketplace_products')
       .update({
         status: 'rejected',

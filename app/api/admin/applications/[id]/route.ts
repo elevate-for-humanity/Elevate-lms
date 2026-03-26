@@ -12,11 +12,10 @@ export const dynamic = 'force-dynamic';
 
 async function requireAdmin() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) return { error: 'Database unavailable', status: 500 };
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Unauthorized', status: 401 };
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
     return { error: 'Forbidden', status: 403 };
   }
@@ -44,7 +43,7 @@ async function resolveCourseId(supabase: any, programInterest: string): Promise<
 
   const normalized = programInterest.toLowerCase().replace(/-/g, ' ').trim();
 
-  const { data: courses } = await db
+  const { data: courses } = await supabase
     .from('courses')
     .select('id, title');
 
@@ -221,7 +220,7 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
         if (userId && courseId) {
           // Resolve the actual program_id from programs table
           const programSlug = (before.program_interest || '').toLowerCase().replace(/\s+/g, '-').trim();
-          const { data: programRow } = await auth.db
+          const { data: programRow } = await auth.supabase
             .from('programs')
             .select('id, name')
             .eq('slug', programSlug)
@@ -229,7 +228,7 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
           const programId = programRow?.id || courseId;
 
           // Check for existing course-level enrollment
-          const { data: existingEnrollment } = await auth.db
+          const { data: existingEnrollment } = await auth.supabase
             .from('enrollments')
             .select('id')
             .eq('user_id', userId)
@@ -250,7 +249,7 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
           }
 
           // Upsert program_enrollments — links student to their program
-          await auth.db
+          await auth.supabase
             .from('program_enrollments')
             .upsert({
               user_id: userId,
@@ -270,7 +269,7 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
             });
 
           // Update application with resolved IDs and enrolled status
-          await auth.db
+          await auth.supabase
             .from('applications')
             .update({
               status: 'enrolled',
@@ -280,7 +279,7 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
             .eq('id', id);
 
           // Audit log
-          await auth.db.from('audit_logs').insert({
+          await auth.supabase.from('audit_logs').insert({
             actor_id: auth.user.id,
             actor_role: auth.profile.role,
             action: 'create',
@@ -309,7 +308,7 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
                    updateData.status === 'rejected' ? 'reject' :
                    'status_change';
 
-    await auth.db.from('audit_logs').insert({
+    await auth.supabase.from('audit_logs').insert({
       actor_id: auth.user.id,
       actor_role: auth.profile.role,
       action,
@@ -341,7 +340,7 @@ async function _DELETE(request: Request, { params }: { params: Promise<{ id: str
 
     const data = await deleteApplication(id);
 
-    await auth.db.from('audit_logs').insert({
+    await auth.supabase.from('audit_logs').insert({
       actor_id: auth.user.id,
       actor_role: auth.profile.role,
       action: 'delete',

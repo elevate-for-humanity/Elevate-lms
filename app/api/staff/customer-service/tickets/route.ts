@@ -1,13 +1,13 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: Request) {
   try {
@@ -15,7 +15,6 @@ async function _POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -26,7 +25,7 @@ async function _POST(request: Request) {
     }
 
     // Verify user is staff/admin
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -55,7 +54,7 @@ async function _POST(request: Request) {
     }
 
     // Create ticket
-    const { data: ticket, error: ticketError } = await db
+    const { data: ticket, error: ticketError } = await supabase
       .from('service_tickets')
       .insert({
         student_id,

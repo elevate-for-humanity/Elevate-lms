@@ -1,20 +1,19 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const _GET = withAuth(
   async (req, context) => {
     const user = context.user;
     try {
       const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
       // Note: Add authentication check here
       // const { data: { user } } = await supabase.auth.getUser();
@@ -22,7 +21,7 @@ const _GET = withAuth(
       //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       // }
 
-      const { data, error }: any = await db
+      const { data, error }: any = await supabase
         .from('program_holder_acknowledgements')
         .select('*')
         .order('created_at', { ascending: false });

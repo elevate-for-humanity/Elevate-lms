@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getSignedDownload } from "@/lib/storage/getSignedDownload";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -11,7 +10,6 @@ async function _GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   // Get authenticated user
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -24,7 +22,7 @@ const supabase = await createClient();
   }
 
   // Check entitlement
-  const { data: entitlement, error: entitlementError } = await db
+  const { data: entitlement, error: entitlementError } = await supabase
     .from("store_entitlements")
     .select("id, revoked_at")
     .eq("user_id", user.id)

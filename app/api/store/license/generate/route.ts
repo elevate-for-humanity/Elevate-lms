@@ -1,10 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { generateLicenseKey, hashLicenseKey } from '@/lib/store/license';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { checkRateLimit } from '@/lib/rate-limit';
@@ -12,6 +8,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 // Verify admin API key for internal/webhook calls
 function verifyAdminApiKey(request: Request): boolean {
@@ -121,7 +121,6 @@ async function _POST(req: Request) {
     if (!isAdmin && !isWebhook) {
       // Check for authenticated admin user
       const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       
       if (authError || !user) {
@@ -133,7 +132,7 @@ async function _POST(req: Request) {
       }
 
       // Verify admin role
-      const { data: profile } = await db
+      const { data: profile } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
@@ -182,7 +181,7 @@ async function _POST(req: Request) {
     expiresAt.setDate(expiresAt.getDate() + config.duration);
 
     // Store license with hashed key (never store raw key)
-    const { data: license, error: licenseError } = await db
+    const { data: license, error: licenseError } = await supabase
       .from('licenses')
       .insert({
         license_key: licenseKeyHash,

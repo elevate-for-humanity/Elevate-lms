@@ -1,20 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { cloneRepository } from '@/lib/store/stripe-products';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const { productId } = await req.json();
 
@@ -23,9 +27,7 @@ async function _POST(req: NextRequest) {
     }
 
     // Get product details
-    const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    const { data: product, error } = await db
+    const { data: product, error } = await supabase
       .from('products')
       .select('*')
       .eq('id', productId)
@@ -43,7 +45,7 @@ async function _POST(req: NextRequest) {
     const clonedRepo = await cloneRepository(product.repo, newRepoName);
 
     // Log the clone (optional - could save to database)
-    await db.from('product_clones').insert({
+    await supabase.from('product_clones').insert({
       product_id: productId,
       cloned_repo: clonedRepo,
       cloned_at: new Date().toISOString(),

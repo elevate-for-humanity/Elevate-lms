@@ -1,9 +1,10 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * Cohort outcomes report for partners and funders.

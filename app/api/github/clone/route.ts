@@ -1,12 +1,12 @@
 import { gh, parseRepo } from "@/lib/github";
 
 
-export const maxDuration = 60;
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
 
 async function _POST(req: Request) {
   try {

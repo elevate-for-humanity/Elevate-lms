@@ -1,22 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from "@/lib/auth";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(
   _req: NextRequest,
   { params }: { params: Promise<{ lessonId: string }> }
 ) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const user = await getCurrentUser();
 
   if (!user) {
@@ -32,7 +31,7 @@ async function _GET(
     return NextResponse.json(body, { status });
   }
 
-  const { data, error }: any = await db
+  const { data, error }: any = await supabase
     .from("lesson_notes")
     .select("id, position_seconds, body, created_at")
     .eq("lesson_id", lessonId)
@@ -55,7 +54,6 @@ async function _POST(
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const user = await getCurrentUser();
 
   if (!user) {
@@ -80,7 +78,7 @@ async function _POST(
     return NextResponse.json({ error: "text required" }, { status: 400 });
   }
 
-  const { error } = await db.from("lesson_notes").insert({
+  const { error } = await supabase.from("lesson_notes").insert({
     user_id: user.id,
     lesson_id: lessonId,
     body: noteText,

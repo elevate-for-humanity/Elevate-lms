@@ -1,13 +1,13 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { generateCertificatePDF } from '@/lib/certificates/generator';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(
   request: Request,
@@ -18,7 +18,6 @@ async function _GET(
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { certificateId } = await params;
     const {
       data: { user },
@@ -29,7 +28,7 @@ async function _GET(
     }
 
     // profiles join works via user_id FK; courses join does not exist on this table
-    const { data: certificate } = await db
+    const { data: certificate } = await supabase
       .from('certificates')
       .select('*, profiles(full_name)')
       .eq('id', certificateId)

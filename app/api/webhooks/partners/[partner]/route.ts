@@ -1,8 +1,6 @@
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 
 // app/api/webhooks/partners/[partner]/route.ts
 // Webhook endpoint for partner progress updates
@@ -13,6 +11,8 @@ import { getPartnerClient, PartnerType, WebhookPayload } from '@/lib/partners';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 

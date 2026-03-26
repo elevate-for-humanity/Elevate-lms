@@ -1,5 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 // POST /api/provider/applications/[id]/review
 // Body: { action: 'approve' | 'deny' | 'under_review', reviewNotes?: string }
@@ -20,6 +18,9 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 const VALID_ACTIONS = ['approve', 'deny', 'under_review'] as const;
 type ReviewAction = typeof VALID_ACTIONS[number];

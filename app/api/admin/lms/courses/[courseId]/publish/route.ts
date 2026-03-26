@@ -1,5 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/admin/lms/courses/[courseId]/publish
@@ -15,6 +13,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { publishCourse } from '@/lib/lms/course-service';
 import { safeInternalError } from '@/lib/api/safe-error';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 async function runHealthCheck(
   supabase: Awaited<ReturnType<typeof createClient>>,

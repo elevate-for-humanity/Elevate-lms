@@ -1,12 +1,13 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/resend';
 import { logger } from '@/lib/logger';
 import { getProgramConfig } from '@/lib/partners/program-config';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const ADMIN_EMAIL = process.env.PARTNER_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com';
 const CALENDLY_URL = process.env.NEXT_PUBLIC_CALENDLY_30MIN || 'https://calendly.com/elevate4humanityedu/30min';

@@ -1,12 +1,12 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
   try {
@@ -14,7 +14,6 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -25,7 +24,7 @@ async function _GET(request: Request) {
     }
 
     // Verify user is admin
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -42,7 +41,7 @@ async function _GET(request: Request) {
     ).toISOString();
 
     // Get page views
-    const { data: pageViews, error: pageViewsError } = await db
+    const { data: pageViews, error: pageViewsError } = await supabase
       .from('page_views')
       .select('path, created_at')
       .gte('created_at', startDate)
@@ -56,7 +55,7 @@ async function _GET(request: Request) {
     }
 
     // Get conversions
-    const { data: conversions, error: conversionsError } = await db
+    const { data: conversions, error: conversionsError } = await supabase
       .from('conversions')
       .select('*')
       .gte('created_at', startDate)
@@ -118,7 +117,7 @@ async function _GET(request: Request) {
     });
 
     // Get top referrers
-    const { data: referrers } = await db
+    const { data: referrers } = await supabase
       .from('page_views')
       .select('referrer')
       .gte('created_at', startDate)

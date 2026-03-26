@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { z } from 'zod';
 import { createStoreProduct } from '@/lib/store/stripe-products';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/authGuards';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
@@ -21,6 +17,10 @@ import { requireActiveLicense, LicenseError, licenseErrorResponse } from '@/lib/
 import { TenantContextError } from '@/lib/tenant';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: NextRequest) {
   try {
@@ -53,8 +53,7 @@ async function _POST(req: NextRequest) {
 
     // Store in Supabase
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('products')
       .insert({
         title,

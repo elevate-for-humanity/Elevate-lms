@@ -1,15 +1,15 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 // GET /api/hr/employees/[id] - Get single employee
 async function _GET(
@@ -21,10 +21,9 @@ async function _GET(
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { id } = await params;
 
-    const { data: employee, error } = await db
+    const { data: employee, error } = await supabase
       .from('employees')
       .select(
         `
@@ -88,7 +87,6 @@ async function _PATCH(
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { id } = await params;
     const body = await parseBody<Record<string, any>>(request);
 
@@ -101,7 +99,7 @@ async function _PATCH(
       ...updateFields
     } = body;
 
-    const { data: employee, error } = await db
+    const { data: employee, error } = await supabase
       .from('employees')
       .update(updateFields)
       .eq('id', id)
@@ -140,14 +138,13 @@ async function _DELETE(
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { id } = await params;
     const searchParams = request.nextUrl.searchParams;
     const terminationDate =
       searchParams.get('termination_date') ||
       new Date().toISOString().split('T')[0];
 
-    const { data: employee, error } = await db
+    const { data: employee, error } = await supabase
       .from('employees')
       .update({
         employment_status: 'terminated',
@@ -161,7 +158,7 @@ async function _DELETE(
     if (error) throw error;
 
     // Terminate active benefits
-    await db
+    await supabase
       .from('benefits_enrollments')
       .update({
         status: 'terminated',

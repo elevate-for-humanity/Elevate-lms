@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   try {
@@ -15,7 +15,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get current user
     const {
@@ -38,7 +37,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Save upload record
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('uploads')
       .insert({
         user_id: user.id,
@@ -73,7 +72,6 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get current user
     const {
@@ -87,7 +85,7 @@ async function _GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const dashboardType = searchParams.get('dashboard_type');
 
-    let query = db
+    let query = supabase
       .from('uploads')
       .select('*')
       .eq('user_id', user.id)
@@ -121,7 +119,6 @@ async function _DELETE(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get current user
     const {
@@ -143,7 +140,7 @@ async function _DELETE(request: NextRequest) {
     }
 
     // Delete upload record (only if owned by user)
-    const { error } = await db
+    const { error } = await supabase
       .from('uploads')
       .delete()
       .eq('id', uploadId)

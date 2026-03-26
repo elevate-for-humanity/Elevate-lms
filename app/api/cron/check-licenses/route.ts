@@ -9,7 +9,6 @@ import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Stripe from 'stripe';
 
 import { auditMutation } from '@/lib/api/withAudit';
@@ -28,7 +27,6 @@ async function _GET(request: NextRequest) {
   }
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const results = {
     checked: 0,
     suspended: 0,
@@ -38,7 +36,7 @@ async function _GET(request: NextRequest) {
 
   try {
     // 1. Check for expired licenses (one-time purchases)
-    const { data: expiredLicenses } = await db
+    const { data: expiredLicenses } = await supabase
       .from('licenses')
       .select('id, tenant_id, admin_email, company_name')
       .eq('status', 'active')
@@ -47,12 +45,12 @@ async function _GET(request: NextRequest) {
 
     for (const license of expiredLicenses || []) {
       try {
-        await db
+        await supabase
           .from('licenses')
           .update({ status: 'expired', updated_at: new Date().toISOString() })
           .eq('id', license.id);
 
-        await db
+        await supabase
           .from('tenants')
           .update({ active: false })
           .eq('id', license.tenant_id);
@@ -68,7 +66,7 @@ async function _GET(request: NextRequest) {
     }
 
     // 2. Check subscription status for active licenses
-    const { data: subscriptionLicenses } = await db
+    const { data: subscriptionLicenses } = await supabase
       .from('licenses')
       .select('id, tenant_id, stripe_subscription_id, status')
       .not('stripe_subscription_id', 'is', null);
@@ -83,18 +81,18 @@ async function _GET(request: NextRequest) {
 
         if (shouldBeActive && !isActive) {
           // Reactivate
-          await db
+          await supabase
             .from('licenses')
             .update({ status: 'active', suspended_at: null, suspended_reason: null })
             .eq('id', license.id);
-          await db
+          await supabase
             .from('tenants')
             .update({ active: true })
             .eq('id', license.tenant_id);
           results.reactivated++;
         } else if (!shouldBeActive && isActive) {
           // Suspend
-          await db
+          await supabase
             .from('licenses')
             .update({ 
               status: 'suspended', 
@@ -102,7 +100,7 @@ async function _GET(request: NextRequest) {
               suspended_reason: `Subscription ${subscription.status}`,
             })
             .eq('id', license.id);
-          await db
+          await supabase
             .from('tenants')
             .update({ active: false })
             .eq('id', license.tenant_id);
@@ -117,7 +115,7 @@ async function _GET(request: NextRequest) {
 
     // 3. Send warning emails for licenses expiring soon (7 days)
     const sevenDaysFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-    const { data: expiringLicenses } = await db
+    const { data: expiringLicenses } = await supabase
       .from('licenses')
       .select('id, admin_email, company_name, expires_at')
       .eq('status', 'active')
@@ -128,7 +126,7 @@ async function _GET(request: NextRequest) {
     for (const license of expiringLicenses || []) {
       try {
         await sendExpiryWarningEmail(license.admin_email, license.company_name, license.expires_at);
-        await db
+        await supabase
           .from('licenses')
           .update({ expiry_warning_sent: true })
           .eq('id', license.id);

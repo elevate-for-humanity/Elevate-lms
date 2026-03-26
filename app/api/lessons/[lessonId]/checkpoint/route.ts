@@ -8,14 +8,15 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { getCurrentUser } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { recordCheckpointAttempt } from '@/lib/lms/engine';
 import { logger } from '@/lib/logger';
 import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(
   request: NextRequest,

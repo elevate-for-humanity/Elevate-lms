@@ -1,10 +1,11 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';

@@ -10,7 +10,6 @@
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { z } from 'zod';
 
@@ -19,12 +18,9 @@ export const dynamic = 'force-dynamic';
 
 async function requireAdmin() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
-  if (!supabase) return { error: 'Database unavailable', status: 500 };
-  const { data: { user } } = await supabase.auth.getUser();
+const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Unauthorized', status: 401 };
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin', 'super_admin', 'org_admin', 'instructor'].includes(profile.role)) {
     return { error: 'Forbidden', status: 403 };
@@ -54,7 +50,7 @@ export async function GET(
   const auth = await requireAdmin();
   if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
-  const { data: course, error } = await auth.db
+  const { data: course, error } = await auth.supabase
     .from('courses')
     .select('metadata')
     .eq('id', id)
@@ -112,7 +108,7 @@ export async function PUT(
   );
 
   // Load existing metadata to merge (preserve non-quiz keys)
-  const { data: existing } = await auth.db
+  const { data: existing } = await auth.supabase
     .from('courses')
     .select('metadata')
     .eq('id', id)
@@ -126,7 +122,7 @@ export async function PUT(
     quiz_questions: parsed.data.quiz_questions,
   };
 
-  const { error: updateError } = await auth.db
+  const { error: updateError } = await auth.supabase
     .from('courses')
     .update({ metadata: updatedMeta, updated_at: new Date().toISOString() })
     .eq('id', id);

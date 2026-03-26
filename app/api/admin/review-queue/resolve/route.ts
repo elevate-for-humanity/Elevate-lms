@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,10 +12,6 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (!supabase) {
-      return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
-    }
 
     // Check auth
     const { data: { user } } = await supabase.auth.getUser();
@@ -25,7 +20,7 @@ export async function POST(req: Request) {
     }
 
     // Check admin role
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -49,7 +44,7 @@ export async function POST(req: Request) {
     }
 
     // Get queue item
-    const { data: item, error: itemError } = await db
+    const { data: item, error: itemError } = await supabase
       .from('review_queue')
       .select('*')
       .eq('id', queue_item_id)
@@ -76,7 +71,7 @@ export async function POST(req: Request) {
       if (item.queue_type === 'transcript_review' && approved_hours !== undefined) {
         inputSnapshot.approved_hours = approved_hours;
         
-        await db
+        await supabase
           .from('transfer_hours')
           .update({
             approved_hours: approved_hours,
@@ -94,14 +89,14 @@ export async function POST(req: Request) {
         inputSnapshot.selected_shop_id = selected_shop_id;
 
         // Update routing score status
-        await db
+        await supabase
           .from('shop_routing_scores')
           .update({ status: 'assigned', assigned_at: new Date().toISOString() })
           .eq('application_id', item.subject_id)
           .eq('shop_id', selected_shop_id);
 
         // Mark others as expired
-        await db
+        await supabase
           .from('shop_routing_scores')
           .update({ status: 'expired' })
           .eq('application_id', item.subject_id)
@@ -109,7 +104,7 @@ export async function POST(req: Request) {
           .eq('status', 'recommended');
 
         // Update application
-        await db
+        await supabase
           .from('applications')
           .update({
             assigned_shop_id: selected_shop_id,
@@ -122,7 +117,7 @@ export async function POST(req: Request) {
 
       // Handle partner docs review
       if (item.queue_type === 'partner_docs_review') {
-        await db
+        await supabase
           .from('partners')
           .update({
             status: 'active',
@@ -135,7 +130,7 @@ export async function POST(req: Request) {
 
       // Handle document review
       if (item.queue_type === 'document_review') {
-        await db
+        await supabase
           .from('documents')
           .update({
             status: 'approved',
@@ -156,7 +151,7 @@ export async function POST(req: Request) {
 
       // Update underlying record status
       if (item.queue_type === 'transcript_review') {
-        await db
+        await supabase
           .from('transfer_hours')
           .update({
             status: 'rejected',
@@ -166,7 +161,7 @@ export async function POST(req: Request) {
           })
           .eq('id', item.subject_id);
       } else if (item.queue_type === 'document_review') {
-        await db
+        await supabase
           .from('documents')
           .update({
             status: 'rejected',
@@ -180,7 +175,7 @@ export async function POST(req: Request) {
 
       // Mark document as needs reupload
       if (item.subject_type === 'document') {
-        await db
+        await supabase
           .from('documents')
           .update({ status: 'needs_reupload' })
           .eq('id', item.subject_id);
@@ -188,7 +183,7 @@ export async function POST(req: Request) {
     }
 
     // Write automated_decision
-    await db.from('automated_decisions').insert({
+    await supabase.from('automated_decisions').insert({
       subject_type: item.subject_type,
       subject_id: item.subject_id,
       decision: action === 'approve' ? 'approved' : action === 'reject' ? 'rejected' : 'needs_review',
@@ -199,7 +194,7 @@ export async function POST(req: Request) {
     });
 
     // Update queue item
-    await db
+    await supabase
       .from('review_queue')
       .update({
         status: 'resolved',

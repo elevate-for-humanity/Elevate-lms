@@ -1,13 +1,13 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
   try {
@@ -15,7 +15,6 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -26,7 +25,7 @@ async function _GET(request: Request) {
     }
 
     // Get all training modules
-    const { data: modules, error: modulesError } = await db
+    const { data: modules, error: modulesError } = await supabase
       .from('training_modules')
       .select('*')
       .order('order_index', { ascending: true });
@@ -39,7 +38,7 @@ async function _GET(request: Request) {
     }
 
     // Get user's progress
-    const { data: progress, error: progressError } = await db
+    const { data: progress, error: progressError } = await supabase
       .from('staff_training_progress')
       .select('*')
       .eq('user_id', user.id);
@@ -79,7 +78,6 @@ async function _POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -100,7 +98,7 @@ async function _POST(request: Request) {
     }
 
     // Check if module exists
-    const { data: module, error: moduleError } = await db
+    const { data: module, error: moduleError } = await supabase
       .from('training_modules')
       .select('*')
       .eq('id', module_id)
@@ -111,7 +109,7 @@ async function _POST(request: Request) {
     }
 
     // Upsert progress
-    const { data: progress, error: progressError } = await db
+    const { data: progress, error: progressError } = await supabase
       .from('staff_training_progress')
       .upsert(
         {

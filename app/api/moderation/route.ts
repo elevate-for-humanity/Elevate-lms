@@ -1,5 +1,4 @@
 
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
@@ -19,6 +18,7 @@ import {
 } from '@/lib/contentModeration';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
 
 async function _GET(request: NextRequest) {
   try {

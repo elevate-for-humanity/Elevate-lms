@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -22,14 +21,6 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    
-    if (!supabase) {
-      return NextResponse.json(
-        { error: 'Database not configured' },
-        { status: 503 }
-      );
-    }
 
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -42,7 +33,7 @@ async function _GET(request: NextRequest) {
     }
 
     // Get user profile
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('id, role, full_name')
       .eq('id', user.id)
@@ -55,13 +46,12 @@ async function _GET(request: NextRequest) {
     let apprentice = null;
     
     // First try direct user_id match
-    const { data: apprenticeByUserId } = await db
+    const { data: apprenticeByUserId } = await supabase
       .from('apprentices')
       .select(`
         id,
         referral_id,
         employer_id,
-        program_id,
         rapids_id,
         start_date,
         status
@@ -74,13 +64,12 @@ async function _GET(request: NextRequest) {
       apprentice = apprenticeByUserId;
     } else if (user.email) {
       // Fallback: match by email if user_id not set
-      const { data: apprenticeByEmail } = await db
+      const { data: apprenticeByEmail } = await supabase
         .from('apprentices')
         .select(`
           id,
           referral_id,
           employer_id,
-          program_id,
           rapids_id,
           start_date,
           status,
@@ -93,26 +82,18 @@ async function _GET(request: NextRequest) {
       if (apprenticeByEmail) {
         apprentice = apprenticeByEmail;
         // Update the apprentice record with user_id for future lookups
-        await db
+        await supabase
           .from('apprentices')
           .update({ user_id: user.id })
           .eq('id', apprenticeByEmail.id);
       }
     }
 
-    // Non-admin users with no apprentice record cannot use the timeclock
-    if (!isAdmin && !apprentice) {
-      return NextResponse.json(
-        { error: 'No active apprenticeship found. Contact your program coordinator.', code: 'NO_APPRENTICESHIP' },
-        { status: 403 }
-      );
-    }
-
     // Get employer/shop info
     let shopId: string | null = null;
     let shopName: string | null = null;
     if (apprentice?.employer_id) {
-      const { data: shop } = await db
+      const { data: shop } = await supabase
         .from('shops')
         .select('id, name')
         .eq('id', apprentice.employer_id)
@@ -123,42 +104,8 @@ async function _GET(request: NextRequest) {
       }
     }
 
-    // Get program info for display
-    let programId: string | null = apprentice?.program_id ?? null;
-    let programName = 'Barber Apprenticeship';
-    if (programId) {
-      const { data: prog } = await db
-        .from('programs')
-        .select('id, name')
-        .eq('id', programId)
-        .maybeSingle();
-      if (prog) programName = prog.name;
-    } else {
-      // Fallback: resolve barber program id
-      const { data: prog } = await db
-        .from('programs')
-        .select('id, name')
-        .eq('slug', 'barber-apprenticeship')
-        .maybeSingle();
-      if (prog) { programId = prog.id; programName = prog.name; }
-    }
-
-    // Hours progress from hour_entries
-    let hoursCompleted = 0;
-    const hoursRequired = 2000; // Indiana barber OJL requirement
-    if (apprentice) {
-      const { data: hourRows } = await db
-        .from('hour_entries')
-        .select('hours_claimed, accepted_hours, status, source_type')
-        .eq('user_id', user.id);
-      hoursCompleted = (hourRows ?? [])
-        .filter((h: any) => h.status === 'approved' && (h.source_type === 'ojl' || h.source_type === 'timeclock' || h.source_type === 'host_shop' || h.source_type === 'manual'))
-        .reduce((sum: number, h: any) => sum + (Number(h.accepted_hours) || Number(h.hours_claimed) || 0), 0);
-    }
-
     // Build site query based on role
-    // Filter by is_active (new column) OR status = 'active' (legacy column)
-    let sitesQuery = db
+    let sitesQuery = supabase
       .from('apprentice_sites')
       .select(`
         id,
@@ -166,9 +113,13 @@ async function _GET(request: NextRequest) {
         latitude,
         longitude,
         radius_meters,
-        shop_id
+        shop_id,
+        shops:shop_id (
+          id,
+          name
+        )
       `)
-      .or('is_active.eq.true,status.eq.active');
+      .eq('is_active', true);
 
     // Restrict sites for non-admin users
     if (!isAdmin && apprentice?.employer_id) {
@@ -181,9 +132,9 @@ async function _GET(request: NextRequest) {
 
     const { data: sites } = await sitesQuery;
 
-    const allowedSites = (sites || []).map((site: any) => ({
+    const allowedSites = (sites || []).map(site => ({
       id: site.id,
-      name: site.name || 'Unknown Site',
+      name: site.name || (site.shops as { name: string } | null)?.name || 'Unknown Site',
       lat: site.latitude,
       lng: site.longitude,
       radius_m: site.radius_meters || 100,
@@ -194,7 +145,7 @@ async function _GET(request: NextRequest) {
     let activeShift = null;
     if (apprentice) {
       try {
-        const { data: shift } = await db
+        const { data: shift } = await supabase
           .from('progress_entries')
           .select('id, clock_in_at, lunch_start_at, lunch_end_at, site_id')
           .eq('apprentice_id', apprentice.id)
@@ -222,15 +173,8 @@ async function _GET(request: NextRequest) {
       userId: user.id,
       userName: profile?.full_name || user.email,
       role,
-      // Program info — required by timeclock page
-      programId,
-      programName,
-      hoursCompleted,
-      hoursRequired,
-      // Shop / site info
       shopId,
       shopName,
-      partnerId: apprentice?.employer_id || null,
       defaultSiteId: allowedSites[0]?.id || null,
       allowedSites,
       activeShift,

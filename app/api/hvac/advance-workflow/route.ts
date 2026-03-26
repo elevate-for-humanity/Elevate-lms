@@ -1,5 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
@@ -7,6 +5,9 @@ import { advanceHvacWorkflow } from '@/lib/courses/hvac-completion-workflow';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { logger } from '@/lib/logger';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/hvac/advance-workflow

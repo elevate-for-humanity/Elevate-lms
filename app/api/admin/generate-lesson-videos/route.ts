@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
@@ -79,7 +78,7 @@ async function generateForLesson(
       logger.info(`[VideoGen] Synthesia: "${lesson.title}" (${avatarId})`);
       const result = await generateSynthesiaVideo(script, avatarId);
 
-      await db.from('training_lessons')
+      await supabase.from('training_lessons')
         .update({ video_url: result.videoUrl, updated_at: new Date().toISOString() })
         .eq('id', lesson.id);
 
@@ -104,7 +103,7 @@ async function generateForLesson(
       const audioDataUrl = `data:audio/mp3;base64,${audioBase64}`;
       const result = await generateDIDVideo(script, instructor.avatar, audioDataUrl);
 
-      await db.from('training_lessons')
+      await supabase.from('training_lessons')
         .update({ video_url: result.videoUrl, updated_at: new Date().toISOString() })
         .eq('id', lesson.id);
 
@@ -127,7 +126,7 @@ async function generateForLesson(
       logger.info(`[VideoGen] Sora: "${lesson.title}"`);
       const result = await generateSoraVideo(prompt, '8', '1280x720');
 
-      await db.from('training_lessons')
+      await supabase.from('training_lessons')
         .update({ video_url: result.videoUrl, updated_at: new Date().toISOString() })
         .eq('id', lesson.id);
 
@@ -155,7 +154,7 @@ async function generateForLesson(
     await generateNaturalVoiceover(script, voice, instructor.id, outputPath);
     const audioUrl = `/hvac/audio/${filename}`;
 
-    await db.from('training_lessons')
+    await supabase.from('training_lessons')
       .update({ video_url: audioUrl, updated_at: new Date().toISOString() })
       .eq('id', lesson.id);
 
@@ -176,7 +175,7 @@ async function generateForLesson(
     await generateVoiceover(script, voice as any, outputPath);
     const audioUrl = `/hvac/audio/${filename}`;
 
-    await db.from('training_lessons')
+    await supabase.from('training_lessons')
       .update({ video_url: audioUrl, updated_at: new Date().toISOString() })
       .eq('id', lesson.id);
 
@@ -196,7 +195,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -209,14 +207,14 @@ async function _POST(request: NextRequest) {
     let lessons: any[] = [];
 
     if (lessonId) {
-      const { data } = await db
+      const { data } = await supabase
         .from('training_lessons')
         .select('*, training_courses(course_name)')
         .eq('id', lessonId)
         .single();
       if (data) lessons = [data];
     } else if (courseId) {
-      const { data } = await db
+      const { data } = await supabase
         .from('training_lessons')
         .select('*, training_courses(course_name)')
         .eq('course_id', courseId)
@@ -224,7 +222,7 @@ async function _POST(request: NextRequest) {
         .order('lesson_number');
       lessons = data || [];
     } else {
-      const { data } = await db
+      const { data } = await supabase
         .from('training_lessons')
         .select('*, training_courses(course_name)')
         .or('video_url.is.null,video_url.like.%.mp3')
@@ -279,24 +277,23 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-    const { count: total } = await db
+    const { count: total } = await supabase
       .from('training_lessons')
       .select('*', { count: 'exact', head: true });
 
-    const { count: withRealVideo } = await db
+    const { count: withRealVideo } = await supabase
       .from('training_lessons')
       .select('*', { count: 'exact', head: true })
       .not('video_url', 'is', null)
       .not('video_url', 'like', '%.mp3');
 
-    const { count: withMp3 } = await db
+    const { count: withMp3 } = await supabase
       .from('training_lessons')
       .select('*', { count: 'exact', head: true })
       .like('video_url', '%.mp3');
 
-    const { count: noMedia } = await db
+    const { count: noMedia } = await supabase
       .from('training_lessons')
       .select('*', { count: 'exact', head: true })
       .is('video_url', null);

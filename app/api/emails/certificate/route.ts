@@ -1,7 +1,4 @@
-export const runtime = 'nodejs';
 import { createAdminClient } from '@/lib/supabase/admin';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
@@ -11,6 +8,10 @@ import { sendEmail, emailTemplates } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: Request) {
   try {

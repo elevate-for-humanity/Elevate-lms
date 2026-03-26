@@ -1,7 +1,6 @@
 import { requireAdmin } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getTenantContext, logAdminAccess } from '@/lib/tenant';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -34,10 +33,9 @@ async function _PATCH(
     const { id: licenseId } = await params;
     const tenantContext = await getTenantContext();
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Verify super_admin role
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', tenantContext.userId)
@@ -51,7 +49,7 @@ async function _PATCH(
     const { action, reason, features, limits } = body;
 
     // Get license to find tenant_id for audit
-    const { data: license } = await db
+    const { data: license } = await supabase
       .from('licenses')
       .select('tenant_id, status')
       .eq('id', licenseId)
@@ -83,7 +81,7 @@ async function _PATCH(
         break;
 
       case 'update_features':
-        result = await db
+        result = await supabase
           .from('licenses')
           .update({ features, updated_at: new Date().toISOString() })
           .eq('id', licenseId);
@@ -98,7 +96,7 @@ async function _PATCH(
         break;
 
       case 'update_limits':
-        result = await db
+        result = await supabase
           .from('licenses')
           .update({ 
             max_users: limits.max_users,
@@ -162,10 +160,9 @@ async function _DELETE(
     const { id: licenseId } = await params;
     const tenantContext = await getTenantContext();
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Verify super_admin role
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', tenantContext.userId)

@@ -1,12 +1,12 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * Admin: Assign Certiport Voucher
@@ -23,7 +23,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -31,7 +30,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Check admin role
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -52,7 +51,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Update the exam request
-    const { data: updated, error } = await db
+    const { data: updated, error } = await supabase
       .from('certiport_exam_requests')
       .update({
         voucher_code: voucherCode,

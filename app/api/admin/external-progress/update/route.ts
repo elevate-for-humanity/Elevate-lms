@@ -1,7 +1,4 @@
 import { requireAdmin } from '@/lib/auth';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/admin/external-progress/update/route.ts
 import { NextRequest, NextResponse } from 'next/server';
@@ -10,6 +7,10 @@ import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { writeApiAuditEvent } from '@/lib/audit/api-audit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 export const POST = withAuth(
   async (req: NextRequest, ctx) => {

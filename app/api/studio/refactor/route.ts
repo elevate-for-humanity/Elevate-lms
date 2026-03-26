@@ -1,11 +1,11 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
 
 const getOpenAI = () => new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,

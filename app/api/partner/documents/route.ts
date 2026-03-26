@@ -1,12 +1,12 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 // GET - List partner's documents and requirements
 async function _GET(request: NextRequest) {
@@ -15,7 +15,6 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -23,7 +22,7 @@ async function _GET(request: NextRequest) {
     }
 
     // Get partner
-    const { data: partnerUser } = await db
+    const { data: partnerUser } = await supabase
       .from('partner_users')
       .select('partner_id, partners(state)')
       .eq('user_id', user.id)
@@ -37,7 +36,7 @@ async function _GET(request: NextRequest) {
     const partnerState = (partnerUser.partners as { state: string })?.state || 'Indiana';
 
     // Get partner's programs
-    const { data: programAccess } = await db
+    const { data: programAccess } = await supabase
       .from('partner_program_access')
       .select('program_id')
       .eq('partner_id', partnerId)
@@ -46,14 +45,14 @@ async function _GET(request: NextRequest) {
     const programs = (programAccess || []).map(p => p.program_id);
 
     // Get document requirements for this partner's state and programs
-    const { data: requirements } = await db
+    const { data: requirements } = await supabase
       .from('partner_document_requirements')
       .select('*')
       .or(`state.eq.${partnerState},state.eq.ALL`)
       .or(`program_id.in.(${programs.join(',')}),program_id.eq.ALL`);
 
     // Get partner's uploaded documents
-    const { data: documents } = await db
+    const { data: documents } = await supabase
       .from('partner_documents')
       .select('*')
       .eq('partner_id', partnerId)
@@ -93,7 +92,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const supabaseAdmin = createAdminClient();
 
     if (!supabaseAdmin) {
@@ -109,7 +107,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Get partner
-    const { data: partnerUser } = await db
+    const { data: partnerUser } = await supabase
       .from('partner_users')
       .select('partner_id')
       .eq('user_id', user.id)

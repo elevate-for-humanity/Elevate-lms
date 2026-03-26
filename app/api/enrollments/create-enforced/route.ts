@@ -5,13 +5,9 @@
  * This endpoint replaces the legacy enrollment flow.
  */
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { 
@@ -21,6 +17,10 @@ import {
 import { FundingPathway, BRIDGE_PLAN_CONSTRAINTS } from '@/types/enrollment';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   try {
@@ -46,7 +46,6 @@ async function _POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // ENFORCEMENT: Validate intake completion and funding pathway
     const eligibility = await validateEnrollmentEligibility(user.id, programId);
@@ -61,7 +60,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Get intake record for linking
-    const { data: intake } = await db
+    const { data: intake } = await supabase
       .from('intake_records')
       .select('id, funding_pathway, employer_name')
       .eq('user_id', user.id)
@@ -77,7 +76,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Check for existing enrollment
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('training_enrollments')
       .select('id, status')
       .eq('user_id', user.id)
@@ -93,7 +92,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Get program details for tuition amount
-    const { data: program } = await db
+    const { data: program } = await supabase
       .from('programs')
       .select('price, name')
       .eq('id', programId)
@@ -112,7 +111,7 @@ async function _POST(request: NextRequest) {
       enrolled_at: new Date().toISOString(),
     };
 
-    const { data: enrollment, error: enrollError } = await db
+    const { data: enrollment, error: enrollError } = await supabase
       .from('training_enrollments')
       .insert(enrollmentData)
       .select('id')
@@ -132,7 +131,7 @@ async function _POST(request: NextRequest) {
     switch (intake.funding_pathway as FundingPathway) {
       case 'workforce_funded':
         // No payment setup needed - funded by agency
-        await db
+        await supabase
           .from('training_enrollments')
           .update({ status: 'active', payment_status: 'paid' })
           .eq('id', enrollment.id);
@@ -140,7 +139,7 @@ async function _POST(request: NextRequest) {
 
       case 'employer_sponsored':
         // Create employer sponsorship record
-        const { data: sponsorship } = await db
+        const { data: sponsorship } = await supabase
           .from('employer_sponsorships')
           .insert({
             enrollment_id: enrollment.id,
@@ -171,7 +170,7 @@ async function _POST(request: NextRequest) {
 
         if (!planResult.success) {
           // Rollback enrollment
-          await db
+          await supabase
             .from('training_enrollments')
             .delete()
             .eq('id', enrollment.id);

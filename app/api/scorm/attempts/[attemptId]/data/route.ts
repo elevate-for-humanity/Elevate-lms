@@ -1,8 +1,5 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/scorm/attempts/[attemptId]/data/route.ts
 import { NextResponse } from 'next/server';
@@ -10,6 +7,10 @@ import { requireApiAuth } from '@/lib/auth';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(
   request: Request,

@@ -1,12 +1,12 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
   try {
@@ -14,7 +14,6 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -25,7 +24,7 @@ async function _GET(request: Request) {
     }
 
     // Verify user is staff/admin
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -39,7 +38,7 @@ async function _GET(request: Request) {
     }
 
     // Get all protocols
-    const { data: protocols, error: protocolsError } = await db
+    const { data: protocols, error: protocolsError } = await supabase
       .from('customer_service_protocols')
       .select('*')
       .order('category');
@@ -52,7 +51,7 @@ async function _GET(request: Request) {
     }
 
     // Get active tickets (assigned to user or unassigned)
-    const { data: tickets, error: ticketsError } = await db
+    const { data: tickets, error: ticketsError } = await supabase
       .from('service_tickets')
       .select(
         `

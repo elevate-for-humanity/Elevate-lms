@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs'; // Changed from edge to support S3 SDK
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { getDigitalProduct } from '@/lib/store/digital-products';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { generateSignedDownloadUrl, isStorageConfigured, getProductFileInfo, getPublicFallbackUrl } from '@/lib/storage/file-storage';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs'; // Changed from edge to support S3 SDK
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 /**
  * Download digital product
@@ -24,10 +24,9 @@ async function verifyDownloadToken(
 ): Promise<{ valid: boolean; userId?: string }> {
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check if purchase exists with this token
-    const { data: purchase } = await db
+    const { data: purchase } = await supabase
       .from('purchases')
       .select('*, user_id')
       .eq('download_token', token)
@@ -55,9 +54,8 @@ async function verifyUserEntitlement(
 ): Promise<boolean> {
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-    const { data: entitlement } = await db
+    const { data: entitlement } = await supabase
       .from('user_entitlements')
       .select('id')
       .eq('user_id', userId)
@@ -78,9 +76,8 @@ async function logDownload(
 ): Promise<void> {
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-    await db.from('downloads').insert({
+    await supabase.from('downloads').insert({
       product_id: productId,
       download_token: token,
       ip_address:

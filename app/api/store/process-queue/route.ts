@@ -1,12 +1,12 @@
-export const runtime = 'nodejs';
-import { createAdminClient } from '@/lib/supabase/admin';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { processFulfillmentQueue, getQueueStats } from '@/lib/store/fulfillment-queue';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 /**
  * Process fulfillment queue
@@ -28,14 +28,13 @@ async function _POST(req: Request) {
       // Check if it's an admin request
       const { createClient } = await import('@/lib/supabase/server');
       const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 });
       }
       
-      const { data: profile } = await db
+      const { data: profile } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)

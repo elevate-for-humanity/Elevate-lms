@@ -1,12 +1,12 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: Request) {
   try {
@@ -14,7 +14,6 @@ async function _POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -80,7 +79,7 @@ async function _POST(request: Request) {
     }
 
     // Create database record
-    const { data: document, error: dbError } = await db
+    const { data: document, error: dbError } = await supabase
       .from('tax_documents')
       .insert({
         email: user.email!,

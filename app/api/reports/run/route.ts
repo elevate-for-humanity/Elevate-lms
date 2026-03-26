@@ -1,21 +1,20 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/reports/run/route.ts
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   const {
     data: { user },
@@ -26,7 +25,7 @@ async function _POST(request: Request) {
   }
 
   // Check if user is admin
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
@@ -39,7 +38,7 @@ async function _POST(request: Request) {
   const { type, tenantId } = await request.json();
 
   if (type === "enrollments_by_program") {
-    const query = db
+    const query = supabase
       .from("program_enrollments")
       .select("program_id, count")
       .order("count", { ascending: false });
@@ -70,7 +69,7 @@ async function _POST(request: Request) {
   }
 
   if (type === "user_activity") {
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from("profiles")
       .select(
         `

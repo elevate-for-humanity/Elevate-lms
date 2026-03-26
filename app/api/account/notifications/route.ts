@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function _POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -22,7 +20,7 @@ async function _POST(request: NextRequest) {
       }
     }
 
-    await db
+    await supabase
       .from('notification_preferences')
       .upsert({
         user_id: user.id,

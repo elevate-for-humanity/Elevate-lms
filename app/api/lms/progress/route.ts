@@ -1,11 +1,12 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { getLearnerProgress } from '@/lib/lms/engine';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 // GET /api/lms/progress?courseId=<uuid>
 //

@@ -1,19 +1,18 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -23,7 +22,7 @@ const supabase = await createClient();
   }
 
   // Check if user is admin
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -34,18 +33,18 @@ const supabase = await createClient();
   }
 
   // Get total students
-  const { count: totalStudents } = await db
+  const { count: totalStudents } = await supabase
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('role', 'student');
 
   // Get total enrollments
-  const { count: totalEnrollments } = await db
+  const { count: totalEnrollments } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true });
 
   // Get completed enrollments
-  const { count: completedEnrollments } = await db
+  const { count: completedEnrollments } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed');
@@ -63,7 +62,7 @@ const supabase = await createClient();
 
   // Get enrollments by sector (if you have this field)
   // Note: This is a Content - adjust based on your schema
-  const { data: bySectorData } = await db
+  const { data: bySectorData } = await supabase
     .from('program_enrollments')
     .select('sector')
     .not('sector', 'is', null);
@@ -81,7 +80,7 @@ const supabase = await createClient();
   }));
 
   // Get enrollments by ZIP code (if you have this field)
-  const { data: byZipData } = await db
+  const { data: byZipData } = await supabase
     .from('program_enrollments')
     .select('zip_code')
     .not('zip_code', 'is', null);

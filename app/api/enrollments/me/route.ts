@@ -11,10 +11,6 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    
-    if (!supabase) {
-      return NextResponse.json({ enrollments: [] });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     

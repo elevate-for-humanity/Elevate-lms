@@ -5,15 +5,15 @@ import { logger } from '@/lib/logger';
  * Manages workforce agency referrals with automated status reporting.
  */
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { WorkforceAgencyType, WorkforceReferralStatus } from '@/types/enrollment';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 // GET: List referrals or get specific referral
 async function _GET(request: NextRequest) {
@@ -21,7 +21,6 @@ async function _GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -29,7 +28,7 @@ const supabase = await createClient();
   }
 
   // Check staff role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -44,7 +43,7 @@ const supabase = await createClient();
   const agencyName = searchParams.get('agency');
   const status = searchParams.get('status');
 
-  let query = db
+  let query = supabase
     .from('workforce_referrals')
     .select(`
       *,
@@ -81,7 +80,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -124,7 +122,7 @@ async function _POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid agency type' }, { status: 400 });
   }
 
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('workforce_referrals')
     .insert({
       user_id: userId,
@@ -159,7 +157,6 @@ async function _PATCH(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -167,7 +164,7 @@ const supabase = await createClient();
   }
 
   // Check staff role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -228,7 +225,7 @@ const supabase = await createClient();
 
     case 'send_status_update':
       // Get referral with case manager info
-      const { data: referral } = await db
+      const { data: referral } = await supabase
         .from('workforce_referrals')
         .select('*, enrollments(status, programs(name))')
         .eq('id', referralId)
@@ -269,7 +266,7 @@ const supabase = await createClient();
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   }
 
-  const { error } = await db
+  const { error } = await supabase
     .from('workforce_referrals')
     .update(updateData)
     .eq('id', referralId);
@@ -287,7 +284,6 @@ async function _PUT(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   // This endpoint is for automated status updates
   // Should be called by a cron job
@@ -301,7 +297,7 @@ const supabase = await createClient();
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-  const { data: referrals } = await db
+  const { data: referrals } = await supabase
     .from('workforce_referrals')
     .select(`
       *,
@@ -337,7 +333,7 @@ const supabase = await createClient();
       logger.error('Failed to send email to:', referral.case_manager_email, emailError);
     }
     
-    await db
+    await supabase
       .from('workforce_referrals')
       .update({ last_status_update_sent_at: new Date().toISOString() })
       .eq('id', referral.id);

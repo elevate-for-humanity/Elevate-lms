@@ -1,16 +1,16 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { resend } from '@/lib/resend';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
   try {
@@ -25,7 +25,6 @@ async function _POST(req: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = await req.json();
 
     // Get recipient list
@@ -74,7 +73,7 @@ async function _POST(req: Request) {
         results.push({ email: recipient.email, success: true, data });
 
         // Log send
-        await db.from('email_logs').insert({
+        await supabase.from('email_logs').insert({
           campaign_id: body.campaignId,
           recipient_email: recipient.email,
           recipient_id: recipient.id,
@@ -94,7 +93,7 @@ async function _POST(req: Request) {
         });
 
         // Log failure
-        await db.from('email_logs').insert({
+        await supabase.from('email_logs').insert({
           campaign_id: body.campaignId,
           recipient_email: recipient.email,
           recipient_id: recipient.id,
@@ -107,7 +106,7 @@ async function _POST(req: Request) {
 
     // Update campaign status
     if (body.campaignId) {
-      await db
+      await supabase
         .from('email_campaigns')
         .update({
           status: 'sent',
@@ -143,14 +142,14 @@ async function getRecipients(supabase: any, listType: string) {
 
   switch (listType) {
     case 'all-students':
-      query = db
+      query = supabase
         .from('students')
         .select('id, email, first_name, last_name, program_name')
         .not('email', 'is', null);
       break;
 
     case 'active-students':
-      query = db
+      query = supabase
         .from('students')
         .select('id, email, first_name, last_name, program_name')
         .eq('status', 'active')
@@ -158,7 +157,7 @@ async function getRecipients(supabase: any, listType: string) {
       break;
 
     case 'new-applicants':
-      query = db
+      query = supabase
         .from('students')
         .select('id, email, first_name, last_name, program_name')
         .eq('status', 'applicant')
@@ -166,7 +165,7 @@ async function getRecipients(supabase: any, listType: string) {
       break;
 
     case 'program-completers':
-      query = db
+      query = supabase
         .from('students')
         .select('id, email, first_name, last_name, program_name')
         .eq('status', 'completed')
@@ -174,7 +173,7 @@ async function getRecipients(supabase: any, listType: string) {
       break;
 
     case 'employers':
-      query = db
+      query = supabase
         .from('employers')
         .select(
           'id, email, contact_name as first_name, company_name as last_name'
@@ -183,7 +182,7 @@ async function getRecipients(supabase: any, listType: string) {
       break;
 
     case 'workone':
-      query = db
+      query = supabase
         .from('partners')
         .select(
           'id, email, contact_name as first_name, organization as last_name'

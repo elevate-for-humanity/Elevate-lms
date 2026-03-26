@@ -2,11 +2,11 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 
 
-export const maxDuration = 60;
 import { stripe } from '@/lib/stripe/client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
 
 async function _POST(request: NextRequest) {
   try {

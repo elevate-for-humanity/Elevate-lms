@@ -1,5 +1,3 @@
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 
 import Stripe from 'stripe';
 import { NextRequest, NextResponse } from 'next/server';
@@ -7,7 +5,6 @@ import { parseBody } from '@/lib/api-helpers';
 import { apiAuthGuard } from '@/lib/authGuards';
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import {
   createCoursePaymentIntent,
   createSubscriptionPaymentIntent,
@@ -25,6 +22,8 @@ import {
 } from '@/lib/payments';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 /**
  * Verify that the Stripe customer ID belongs to the authenticated user.
@@ -32,8 +31,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
  */
 async function verifyCustomerOwnership(userId: string, customerId: string): Promise<boolean> {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('stripe_customer_id')
     .eq('id', userId)
@@ -48,8 +46,7 @@ async function verifyCustomerOwnership(userId: string, customerId: string): Prom
  */
 async function verifyPaymentOwnership(userId: string, paymentId: string): Promise<boolean> {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: payment } = await db
+  const { data: payment } = await supabase
     .from('payments')
     .select('user_id')
     .eq('id', paymentId)
@@ -64,8 +61,7 @@ async function verifyPaymentOwnership(userId: string, paymentId: string): Promis
  */
 async function verifySubscriptionOwnership(userId: string, subscriptionId: string): Promise<boolean> {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: subscription } = await db
+  const { data: subscription } = await supabase
     .from('subscriptions')
     .select('user_id')
     .eq('stripe_subscription_id', subscriptionId)
@@ -80,8 +76,7 @@ async function verifySubscriptionOwnership(userId: string, subscriptionId: strin
  */
 async function getUserStripeCustomerId(userId: string): Promise<string | null> {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('stripe_customer_id')
     .eq('id', userId)

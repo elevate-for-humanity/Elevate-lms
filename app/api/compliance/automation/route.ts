@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const maxDuration = 120;
 
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
@@ -15,6 +13,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { requireAdminRole } from '@/lib/api/requireAdminRole';
+export const runtime = 'nodejs';
+export const maxDuration = 120;
 
 /**
  * Compliance Automation API

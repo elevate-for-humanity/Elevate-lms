@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(
   request: NextRequest,
@@ -20,7 +20,6 @@ async function _GET(
 
     const { courseId } = await params;
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check if courseId is a UUID or slug
     const isUUID =
@@ -29,7 +28,7 @@ async function _GET(
       );
 
     // Get course with lessons
-    const query = db.from('courses').select(`
+    const query = supabase.from('courses').select(`
         *,
         lessons (
           id,
@@ -83,7 +82,6 @@ async function _PATCH(
 
     const { courseId } = await params;
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const {
@@ -94,7 +92,7 @@ async function _PATCH(
     }
 
     // Check if user is admin or instructor
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', session.user.id)
@@ -112,7 +110,7 @@ async function _PATCH(
 
     const updates = await request.json();
 
-    const { data: course, error } = await db
+    const { data: course, error } = await supabase
       .from('courses')
       .update(updates)
       .eq('id', courseId)
@@ -149,7 +147,6 @@ async function _DELETE(
 
     const { courseId } = await params;
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const {
@@ -160,7 +157,7 @@ async function _DELETE(
     }
 
     // Check if user is admin
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', session.user.id)
@@ -179,7 +176,7 @@ async function _DELETE(
       { status: 410 }
     );
 
-    const { error } = await db
+    const { error } = await supabase
       .from('courses')
       .delete()
       .eq('id', courseId);

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { IntakeCreateSchema } from '@/lib/validators/course';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -18,10 +17,6 @@ async function _POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (!supabase) {
-      return NextResponse.json({ error: 'Database unavailable' }, { status: 500 });
-    }
 
     const body = await request.json().catch(() => null);
     const parsed = IntakeCreateSchema.safeParse(body);
@@ -36,7 +31,7 @@ async function _POST(request: Request) {
     // Get source page from referer header
     const referer = request.headers.get('referer') || '';
     
-    const { data, error } = await db
+    const { data, error } = await supabase
       .from('intakes')
       .insert({
         source: parsed.data.source || 'website',
@@ -71,10 +66,6 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (!supabase) {
-      return NextResponse.json({ error: 'Database unavailable' }, { status: 500 });
-    }
 
     // Auth check - admin only
     const { data: { user } } = await supabase.auth.getUser();
@@ -82,7 +73,7 @@ async function _GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -95,7 +86,7 @@ async function _GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
 
-    let query = db
+    let query = supabase
       .from('intakes')
       .select('*')
       .order('created_at', { ascending: false });

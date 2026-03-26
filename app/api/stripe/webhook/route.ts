@@ -6,8 +6,6 @@
  * but logs a deprecation warning on every invocation.
  * 
  */
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe/client';
@@ -17,6 +15,8 @@ import { auditMutation } from '@/lib/api/withAudit';
 import { setAuditContext } from '@/lib/audit-context';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PRICES } from '@/lib/stripe/prices';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 function tierFromPrice(priceId?: string | null): 'free' | 'student' | 'career' {
   if (!priceId) return 'free';

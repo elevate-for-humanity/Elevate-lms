@@ -1,7 +1,4 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 /**
  * Finalize Enrollment Payment
@@ -19,10 +16,13 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 interface FinalizePaymentRequest {
   enrollmentId: string;
@@ -43,7 +43,6 @@ async function _POST(req: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const {
@@ -66,7 +65,7 @@ async function _POST(req: Request) {
     }
 
     // Get enrollment details
-    const { data: enrollment, error: enrollmentError } = await db
+    const { data: enrollment, error: enrollmentError } = await supabase
       .from('program_enrollments')
       .select(
         `
@@ -143,7 +142,7 @@ async function _POST(req: Request) {
       description = `Enrollment: ${enrollment.course.course_name}`;
     } else if (paymentMode === 'scholarship') {
       // No charge - mark as paid immediately
-      const { error: updateError } = await db
+      const { error: updateError } = await supabase
         .from('program_enrollments')
         .update({
           status: 'active',
@@ -170,7 +169,7 @@ async function _POST(req: Request) {
       });
     } else {
       // employer mode - create invoice for employer
-      const { data: enrollment } = await db
+      const { data: enrollment } = await supabase
         .from('program_enrollments')
         .select('*, programs(*), users(*)')
         .eq('id', enrollmentId)
@@ -209,7 +208,7 @@ async function _POST(req: Request) {
       await stripe.invoices.finalizeInvoice(invoice.id);
 
       // Update enrollment with invoice ID
-      await db
+      await supabase
         .from('program_enrollments')
         .update({
           stripe_invoice_id: invoice.id,
@@ -287,7 +286,7 @@ async function _POST(req: Request) {
 
     if (!session.url) {
       // Unlock enrollment if session creation failed
-      await db
+      await supabase
         .from('program_enrollments')
         .update({
           billing_lock: false,
@@ -302,7 +301,7 @@ async function _POST(req: Request) {
     }
 
     // Update enrollment with stripe session ID
-    await db
+    await supabase
       .from('program_enrollments')
       .update({
         stripe_checkout_session_id: session.id,

@@ -1,10 +1,11 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { sendSlackMessage } from '@/lib/notifications/slack';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/cron/funding-escalation

@@ -1,8 +1,5 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/exams/start/route.ts
 import { NextResponse } from 'next/server';
@@ -12,6 +9,10 @@ import { selectQuestionsForExamAttempt } from '@/lib/assessments/selectQuestions
 import { getProctoringLaunchUrl } from '@/lib/integrations/proctoring';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');

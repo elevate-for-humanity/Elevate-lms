@@ -6,18 +6,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling, APIErrors } from '@/lib/api';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const _GET = withErrorHandling(async (request: NextRequest) => {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Optional: Check authentication
   const { data: { user } } = await supabase.auth.getUser();
   
   // Query programs table
-  const { data: programs, error } = await db
+  const { data: programs, error } = await supabase
     .from('programs')
     .select('*')
     .order('id', { ascending: true });

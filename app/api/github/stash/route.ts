@@ -1,5 +1,4 @@
 
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { gh, parseRepo, getUserOctokit } from '@/lib/github';
@@ -8,6 +7,7 @@ import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
 
 // Git stash operations via GitHub API
 // Note: GitHub API doesn't have native stash support, so we simulate it

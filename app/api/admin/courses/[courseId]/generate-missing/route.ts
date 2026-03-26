@@ -1,5 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/admin/courses/[courseId]/generate-missing
@@ -17,6 +15,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { getAllBlueprints } from '@/lib/curriculum/blueprints';
 import { generateCourseFromBlueprint } from '@/lib/curriculum/generate-course-from-blueprint';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(
   request: NextRequest,

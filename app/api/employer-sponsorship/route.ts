@@ -4,12 +4,9 @@
  * Manages employer sponsorship records with post-hire reimbursement tracking.
  */
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { 
   validateEmployerSponsorshipTerms,
   handleEmployerSeparation 
@@ -17,6 +14,9 @@ import {
 import { EMPLOYER_SPONSORSHIP_CONSTRAINTS } from '@/types/enrollment';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 // GET: List sponsorships (admin) or get specific sponsorship
 async function _GET(request: NextRequest) {
@@ -24,7 +24,6 @@ async function _GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -32,7 +31,7 @@ const supabase = await createClient();
   }
 
   // Check admin role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -47,7 +46,7 @@ const supabase = await createClient();
   const status = searchParams.get('status');
   const employerName = searchParams.get('employer');
 
-  let query = db
+  let query = supabase
     .from('employer_sponsorships')
     .select(`
       *,
@@ -84,7 +83,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -92,7 +90,7 @@ async function _POST(request: NextRequest) {
   }
 
   // Check admin role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -133,7 +131,7 @@ async function _POST(request: NextRequest) {
     }, { status: 400 });
   }
 
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('employer_sponsorships')
     .insert({
       enrollment_id: enrollmentId,
@@ -167,7 +165,6 @@ async function _PATCH(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -175,7 +172,7 @@ const supabase = await createClient();
   }
 
   // Check admin role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -228,14 +225,14 @@ const supabase = await createClient();
       };
 
       // Activate the enrollment
-      const { data: sponsorship } = await db
+      const { data: sponsorship } = await supabase
         .from('employer_sponsorships')
         .select('enrollment_id')
         .eq('id', sponsorshipId)
         .single();
 
       if (sponsorship) {
-        await db
+        await supabase
           .from('program_enrollments')
           .update({ status: 'active', payment_status: 'paid' })
           .eq('id', sponsorship.enrollment_id);
@@ -248,7 +245,7 @@ const supabase = await createClient();
       }
 
       // Get current sponsorship data
-      const { data: current } = await db
+      const { data: current } = await supabase
         .from('employer_sponsorships')
         .select('reimbursements_received, total_reimbursed, term_months, total_tuition')
         .eq('id', sponsorshipId)
@@ -299,7 +296,7 @@ const supabase = await createClient();
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   }
 
-  const { error } = await db
+  const { error } = await supabase
     .from('employer_sponsorships')
     .update(updateData)
     .eq('id', sponsorshipId);

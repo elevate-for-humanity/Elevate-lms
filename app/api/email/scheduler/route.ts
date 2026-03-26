@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 /**
  * Email Scheduler - Processes scheduled campaigns
@@ -21,11 +21,10 @@ async function _GET(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get scheduled campaigns that are due
     const now = new Date().toISOString();
-    const { data: campaigns, error } = await db
+    const { data: campaigns, error } = await supabase
       .from('email_campaigns')
       .select('*')
       .eq('status', 'scheduled')
@@ -46,7 +45,7 @@ async function _GET(req: Request) {
     for (const campaign of campaigns) {
       try {
         // Mark as sending
-        await db
+        await supabase
           .from('email_campaigns')
           .update({ status: 'sending' })
           .eq('id', campaign.id);
@@ -82,7 +81,7 @@ async function _GET(req: Request) {
           });
         } else {
           // Mark as failed
-          await db
+          await supabase
             .from('email_campaigns')
             .update({
               status: 'failed',
@@ -104,7 +103,7 @@ async function _GET(req: Request) {
         );
 
         // Mark as failed
-        await db
+        await supabase
           .from('email_campaigns')
           .update({
             status: 'failed',

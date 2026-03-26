@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -12,33 +11,32 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    const _admin = createAdminClient(); const db = _admin || supabase;
-
+  
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
     if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { count: programCount } = await db
+    const { count: programCount } = await supabase
       .from('programs')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'active');
 
-    const { count: courseCount } = await db
+    const { count: courseCount } = await supabase
       .from('courses')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'published');
 
-    const { count: enrollmentCount } = await db
+    const { count: enrollmentCount } = await supabase
       .from('program_enrollments')
       .select('*', { count: 'exact', head: true })
       .in('status', ['active', 'completed']);
 
-    const { data: categories } = await db
+    const { data: categories } = await supabase
       .from('programs')
       .select('category')
       .eq('status', 'active');

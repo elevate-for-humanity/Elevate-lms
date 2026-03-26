@@ -1,14 +1,14 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   try {
@@ -16,7 +16,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -28,7 +27,7 @@ async function _POST(request: NextRequest) {
     const quiz = await request.json();
 
     // Save quiz
-    const { data: quizData, error: quizError } = await db
+    const { data: quizData, error: quizError } = await supabase
       .from('quizzes')
       .upsert({
         id: quiz.id,
@@ -50,7 +49,7 @@ async function _POST(request: NextRequest) {
 
     // Delete existing questions
     if (quiz.id) {
-      await db.from('quiz_questions').delete().eq('quiz_id', quizData.id);
+      await supabase.from('quiz_questions').delete().eq('quiz_id', quizData.id);
     }
 
     // Save questions
@@ -71,7 +70,7 @@ async function _POST(request: NextRequest) {
         })
       );
 
-      const { error: questionsError } = await db
+      const { error: questionsError } = await supabase
         .from('quiz_questions')
         .insert(questions);
 

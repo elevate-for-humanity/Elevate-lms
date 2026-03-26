@@ -21,9 +21,6 @@
  * Payment Links are supported via fallback handler but should NOT be
  * used for enrollments - they lack guaranteed metadata.
  */
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { z } from 'zod';
 import { NextResponse } from 'next/server';
@@ -33,6 +30,10 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const enrollCheckoutSchema = z.object({
   firstName: z.string().min(1).max(100).trim(),

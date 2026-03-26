@@ -1,13 +1,14 @@
-export const runtime = 'nodejs';
 import { createAdminClient } from '@/lib/supabase/admin';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { sendEmail, emailTemplates } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 // This endpoint should be called by a cron job (e.g., scheduled cron, GitHub Actions, or external service)
 // Recommended: Run daily at 9 AM

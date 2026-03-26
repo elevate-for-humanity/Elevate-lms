@@ -1,16 +1,16 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { auditPiiAccess } from '@/lib/auditLog';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 // Utility: simple tax calc (you can later replace with real tax engine)
 function calculateTaxes(grossPay: number) {
@@ -40,7 +40,6 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // FERPA audit: log payroll PII access
     const { data: { user: payrollUser } } = await supabase.auth.getUser();
@@ -57,7 +56,7 @@ export async function GET(request: NextRequest) {
     const year = searchParams.get('year');
     const status = searchParams.get('status');
 
-    let query = db
+    let query = supabase
       .from('payroll_runs')
       .select(
         `
@@ -103,7 +102,6 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = await parseBody<Record<string, any>>(request);
 
     const { pay_period_start, pay_period_end, pay_date } = body;
@@ -131,7 +129,7 @@ export async function POST(request: NextRequest) {
     ).slice(-6)}`;
 
     // Create payroll run (draft)
-    const { data: payrollRun, error: runError } = await db
+    const { data: payrollRun, error: runError } = await supabase
       .from('payroll_runs')
       .insert({
         run_number: runNumber,
@@ -147,7 +145,7 @@ export async function POST(request: NextRequest) {
     if (runError) throw runError;
 
     // 1) Fetch all active employees
-    const { data: employees, error: empError } = await db
+    const { data: employees, error: empError } = await supabase
       .from('employees')
       .select(
         `
@@ -163,7 +161,7 @@ export async function POST(request: NextRequest) {
     if (empError) throw empError;
 
     // 2) Fetch approved time entries in that period
-    const { data: timeEntries, error: timeError } = await db
+    const { data: timeEntries, error: timeError } = await supabase
       .from('time_entries')
       .select('*')
       .gte('entry_date', pay_period_start)
@@ -278,7 +276,7 @@ export async function POST(request: NextRequest) {
 
     // 4) Insert pay stubs
     if (payStubsToInsert.length > 0) {
-      const { error: stubError } = await db
+      const { error: stubError } = await supabase
         .from('pay_stubs')
         .insert(payStubsToInsert);
 
@@ -286,7 +284,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 5) Update payroll run totals
-    const { data: updatedRun, error: updateError } = await db
+    const { data: updatedRun, error: updateError } = await supabase
       .from('payroll_runs')
       .update({
         total_gross: totalGross,

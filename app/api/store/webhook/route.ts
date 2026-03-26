@@ -8,20 +8,20 @@
  * Digital product fulfillment is handled by /api/webhooks/store.
  */
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { verifyWebhookSignature } from '@/lib/store/stripe';
 import { generateLicenseKey, hashLicenseKey } from '@/lib/store/license';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { isEventProcessed, markEventProcessed } from '@/lib/store/idempotency';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 interface ProductRecord {
   id: string;
@@ -51,7 +51,6 @@ async function _POST(req: Request) {
     const event = verifyWebhookSignature(body, signature, webhookSecret);
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // SECTION 2: Idempotency check
     const alreadyProcessed = await isEventProcessed(supabase, event.id);
@@ -75,7 +74,7 @@ async function _POST(req: Request) {
       }
 
       // Get product details
-      const { data: product } = await db
+      const { data: product } = await supabase
         .from('products')
         .select('*')
         .eq('id', productId)
@@ -91,7 +90,7 @@ async function _POST(req: Request) {
       const licenseHash = hashLicenseKey(licenseKey);
 
       // Store purchase
-      const { error: purchaseError } = await db.from('purchases').insert({
+      const { error: purchaseError } = await supabase.from('purchases').insert({
         email,
         product_id: productId,
         repo: product.repo,
@@ -102,7 +101,7 @@ async function _POST(req: Request) {
       }
 
       // Store license
-      const { error: licenseError } = await db.from('licenses').insert({
+      const { error: licenseError } = await supabase.from('licenses').insert({
         email,
         product_id: productId,
         license_key: licenseHash,

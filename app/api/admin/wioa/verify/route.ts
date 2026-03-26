@@ -1,13 +1,13 @@
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
@@ -28,10 +28,9 @@ async function _POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
-    const { error } = await db
+    const { error } = await supabase
       .from('wioa_participants')
       .update({
         eligibility_status: action === 'approve' ? 'approved' : 'denied',

@@ -1,6 +1,4 @@
 
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 // AUTH: Intentionally public — no authentication required
 
 import { NextResponse } from 'next/server';
@@ -8,6 +6,8 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 async function _POST(req: Request) {
   try {

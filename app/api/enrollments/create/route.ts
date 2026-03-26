@@ -1,6 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 /**
  * POST /api/enrollments/create
@@ -20,11 +17,14 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
@@ -70,12 +70,11 @@ async function _POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Idempotency check (graceful if table doesn't exist)
     if (idempotencyKey) {
       try {
-        const { data: existingByKey } = await db
+        const { data: existingByKey } = await supabase
           .from('enrollment_idempotency')
           .select('enrollment_id, created_at')
           .eq('idempotency_key', idempotencyKey)
@@ -96,7 +95,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Validate course exists and is available — canonical courses table only
-    const { data: course, error: courseError } = await db
+    const { data: course, error: courseError } = await supabase
       .from('courses')
       .select('id, title, status, is_active')
       .eq('id', courseId)
@@ -130,7 +129,7 @@ async function _POST(request: NextRequest) {
     const courseVersionId: string | null = courseVersion?.id ?? null;
 
     // Check existing enrollment
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('program_enrollments')
       .select('user_id, course_id, status')
       .eq('user_id', user.id)
@@ -147,7 +146,7 @@ async function _POST(request: NextRequest) {
       }
       
       // Reactivate expired/withdrawn enrollment
-      const { data: reactivated, error: reactivateError } = await db
+      const { data: reactivated, error: reactivateError } = await supabase
         .from('program_enrollments')
         .update({ 
           status: 'active', 
@@ -174,7 +173,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Create new enrollment — locked to current published version
-    const { data: enrollment, error } = await db
+    const { data: enrollment, error } = await supabase
       .from('program_enrollments')
       .insert({
         user_id:           user.id,
@@ -200,7 +199,7 @@ async function _POST(request: NextRequest) {
     // Record idempotency key if provided (graceful if table doesn't exist)
     if (idempotencyKey) {
       void Promise.resolve(
-        db.from('enrollment_idempotency').insert({
+        supabase.from('enrollment_idempotency').insert({
           idempotency_key: idempotencyKey,
           enrollment_id: `${user.id}_${courseId}`,
           user_id: user.id,

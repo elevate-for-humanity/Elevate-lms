@@ -1,15 +1,15 @@
-export const dynamic = 'force-dynamic';
 // Using Node.js runtime for email compatibility
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
 import { sendCreatorApprovalEmail } from '@/lib/email/sendgrid';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
@@ -17,7 +17,6 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -26,7 +25,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: adminProfile } = await db
+    const { data: adminProfile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -40,13 +39,13 @@ export async function POST(req: Request) {
     const { ipAddress } = getRequestMetadata(req);
 
     // Get creator details
-    const { data: creator } = await db
+    const { data: creator } = await supabase
       .from('marketplace_creators')
       .select('user_id, profiles(email, full_name)')
       .eq('id', creatorId)
       .single();
 
-    const { error } = await db
+    const { error } = await supabase
       .from('marketplace_creators')
       .update({ status: 'approved' })
       .eq('id', creatorId);

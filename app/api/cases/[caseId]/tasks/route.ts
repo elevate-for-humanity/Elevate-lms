@@ -1,13 +1,13 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getCaseTasks, completeTask, initializeCaseTasks } from '@/lib/workflow/case-management';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(req: Request, { params }: { params: Promise<{ caseId: string }> }) {
   try {
@@ -15,7 +15,6 @@ async function _GET(req: Request, { params }: { params: Promise<{ caseId: string
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user }, error: authErr } = await supabase.auth.getUser();
     
     if (authErr || !user) {
@@ -38,7 +37,6 @@ async function _POST(req: Request, { params }: { params: Promise<{ caseId: strin
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user }, error: authErr } = await supabase.auth.getUser();
     
     if (authErr || !user) {
@@ -67,7 +65,6 @@ async function _PATCH(req: Request, { params }: { params: Promise<{ caseId: stri
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user }, error: authErr } = await supabase.auth.getUser();
     
     if (authErr || !user) {
@@ -89,7 +86,7 @@ async function _PATCH(req: Request, { params }: { params: Promise<{ caseId: stri
       return NextResponse.json({ success: true });
     }
 
-    const { error } = await db
+    const { error } = await supabase
       .from('case_tasks')
       .update({ status, updated_at: new Date().toISOString() })
       .eq('id', taskId);

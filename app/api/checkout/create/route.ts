@@ -1,18 +1,18 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/checkout/create/route.ts - Create Stripe checkout for course
 import { stripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 
 
@@ -44,10 +44,9 @@ async function _POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get course details
-    const { data: course, error: courseError } = await db
+    const { data: course, error: courseError } = await supabase
       .from('training_courses')
       .select('*')
       .eq('id', courseId)
@@ -70,7 +69,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Check if already enrolled
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('program_enrollments')
       .select('id, payment_status')
       .eq('user_id', user.id)
@@ -118,7 +117,7 @@ async function _POST(request: NextRequest) {
 
     // Create or update enrollment with pending payment
     if (existing) {
-      await db
+      await supabase
         .from('program_enrollments')
         .update({
           payment_status: 'pending',
@@ -126,7 +125,7 @@ async function _POST(request: NextRequest) {
         })
         .eq('id', existing.id);
     } else {
-      await db.from('program_enrollments').insert({
+      await supabase.from('program_enrollments').insert({
         user_id: user.id,
         course_id: courseId,
         status: 'pending',

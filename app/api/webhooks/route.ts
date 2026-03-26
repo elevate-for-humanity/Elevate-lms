@@ -1,5 +1,3 @@
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
@@ -19,6 +17,8 @@ import {
   type WebhookEvent,
 } from '@/lib/webhooks';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 async function _GET(request: NextRequest) {
   try {

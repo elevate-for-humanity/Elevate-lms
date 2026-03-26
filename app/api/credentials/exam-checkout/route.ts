@@ -10,7 +10,6 @@
  * Returns: { url: string } — Stripe hosted checkout URL
  */
 
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
@@ -18,6 +17,8 @@ import { apiAuthGuard } from '@/lib/authGuards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { resolvePaymentResponsibility } from '@/lib/services/credential-pipeline';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   const stripeKey = process.env.STRIPE_SECRET_KEY;

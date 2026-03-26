@@ -6,7 +6,6 @@ import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -19,7 +18,6 @@ async function _POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -68,7 +66,7 @@ async function _POST(req: NextRequest) {
     const result = await response.json();
 
     // Log extraction for audit
-    await db.from('ocr_extractions').insert({
+    await supabase.from('ocr_extractions').insert({
       user_id: user.id,
       document_type: documentType,
       program_context: programContext,

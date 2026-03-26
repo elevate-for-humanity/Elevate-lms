@@ -1,13 +1,14 @@
 import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import crypto from 'crypto';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 // Simple encryption for tokens - in production use a proper KMS
 const ENCRYPTION_KEY = process.env.DEPLOY_TOKEN_KEY || 'default-key-change-in-production-32';

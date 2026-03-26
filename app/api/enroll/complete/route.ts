@@ -1,17 +1,17 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 interface CompleteEnrollmentRequest {
   sessionId: string;
@@ -42,7 +42,6 @@ async function _POST(req: Request) {
     } = body;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const emailLower = email.toLowerCase();
 
     logger.info('Starting enrollment completion', {
@@ -52,7 +51,7 @@ async function _POST(req: Request) {
     });
 
     // Step 1: Get program details
-    const { data: program, error: programError } = await db
+    const { data: program, error: programError } = await supabase
       .from('programs')
       .select('id, name, slug')
       .eq('slug', programSlug)
@@ -64,7 +63,7 @@ async function _POST(req: Request) {
 
     // Step 2: Check if user already exists
     let userId: string;
-    const { data: existingUser } = await db
+    const { data: existingUser } = await supabase
       .from('profiles')
       .select('id')
       .eq('email', emailLower)
@@ -96,7 +95,7 @@ async function _POST(req: Request) {
       userId = authData.user.id;
 
       // Step 4: Create profile
-      const { error: profileError } = await db.from('profiles').insert({
+      const { error: profileError } = await supabase.from('profiles').insert({
         id: userId,
         email: emailLower,
         full_name: `${firstName} ${lastName}`,
@@ -136,7 +135,7 @@ async function _POST(req: Request) {
     }
 
     // Step 6: Check if already enrolled
-    const { data: existingEnrollment } = await db
+    const { data: existingEnrollment } = await supabase
       .from('program_enrollments')
       .select('id')
       .eq('user_id', userId)
@@ -150,7 +149,7 @@ async function _POST(req: Request) {
       logger.info('Student already enrolled', { enrollmentId });
 
       // Update status to pending (keep pending until approval)
-      await db
+      await supabase
         .from('program_enrollments')
         .update({
           status: 'pending',
@@ -160,7 +159,7 @@ async function _POST(req: Request) {
         .eq('id', enrollmentId);
     } else {
       // Step 7: Create enrollment (pending until approval)
-      const { data: enrollment, error: enrollError } = await db
+      const { data: enrollment, error: enrollError } = await supabase
         .from('program_enrollments')
         .insert({
           user_id: userId,
@@ -185,7 +184,7 @@ async function _POST(req: Request) {
       });
 
       // Notify admins of pending enrollment
-      const { data: admins } = await db
+      const { data: admins } = await supabase
         .from('profiles')
         .select('id')
         .in('role', ['admin', 'super_admin']);
@@ -198,13 +197,13 @@ async function _POST(req: Request) {
           message: `${firstName} ${lastName} (${email}) has completed payment for ${program.name}. Enrollment ID: ${enrollmentId}`,
         }));
 
-        await db.from('notifications').insert(notifications);
+        await supabase.from('notifications').insert(notifications);
         logger.info('Admin notifications created', { count: admins.length });
       }
     }
 
     // Step 8: Update application status
-    await db
+    await supabase
       .from('applications')
       .update({
         status: 'approved',
@@ -214,7 +213,7 @@ async function _POST(req: Request) {
     // Step 9: Mark Milady access granted (link-based, no API)
     // Student will receive Milady signup link in welcome email
     if (programSlug === 'barber-apprenticeship') {
-      await db
+      await supabase
         .from('program_enrollments')
         .update({ milady_enrolled: true })
         .eq('id', enrollmentId);

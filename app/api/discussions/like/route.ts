@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function _POST(req: Request) {
   try {
     const supabase = await createClient();
-    const _admin = createAdminClient(); const db = _admin || supabase;
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
@@ -16,7 +14,7 @@ async function _POST(req: Request) {
     const { threadId } = await req.json();
 
     // Toggle like via RPC or direct update
-    const { data: thread } = await db
+    const { data: thread } = await supabase
       .from('discussion_threads')
       .select('likes')
       .eq('id', threadId)
@@ -24,7 +22,7 @@ async function _POST(req: Request) {
 
     const currentLikes = thread?.likes || 0;
 
-    await db
+    await supabase
       .from('discussion_threads')
       .update({ likes: currentLikes + 1 })
       .eq('id', threadId);

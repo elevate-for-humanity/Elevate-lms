@@ -1,14 +1,15 @@
 import { NextRequest } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/server';
 import { randomBytes } from 'node:crypto';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 function newSerial() {
   return `EFH-${randomBytes(4).toString('hex').toUpperCase()}`;

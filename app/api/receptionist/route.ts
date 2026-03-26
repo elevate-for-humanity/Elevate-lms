@@ -1,5 +1,4 @@
 
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { getOpenAIClient } from '@/lib/openai-client';
@@ -7,6 +6,7 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
 
 // System prompt for the AI receptionist
 const RECEPTIONIST_PROMPT = `You are the AI receptionist for Elevate for Humanity, a workforce development organization in Indiana.

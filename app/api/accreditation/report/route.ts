@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -15,14 +14,13 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -33,15 +31,15 @@ async function _GET(request: NextRequest) {
     }
 
     // Get accreditation data
-    const { data: programs } = await db
+    const { data: programs } = await supabase
       .from('programs')
       .select('id, name, credential, accreditation_status, accreditation_body, accreditation_expires');
 
-    const { data: enrollments } = await db
+    const { data: enrollments } = await supabase
       .from('program_enrollments')
       .select('id, status, program_id, enrolled_at, completed_at');
 
-    const { data: certificates } = await db
+    const { data: certificates } = await supabase
       .from('certificates')
       .select('id, program_id, issued_at');
 
@@ -106,14 +104,13 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -127,7 +124,7 @@ async function _POST(request: NextRequest) {
     const { programId, accreditationBody, status, expiresAt, documents } = body;
 
     // Update program accreditation
-    const { error } = await db
+    const { error } = await supabase
       .from('programs')
       .update({
         accreditation_status: status,

@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -13,10 +12,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (!supabase) {
-      return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -30,7 +25,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Check if user already has a subscription for this app
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('user_app_subscriptions')
       .select('*')
       .eq('user_id', user.id)
@@ -60,7 +55,7 @@ async function _POST(request: NextRequest) {
     const trialEndsAt = new Date();
     trialEndsAt.setDate(trialEndsAt.getDate() + TRIAL_DURATION_DAYS);
 
-    const { data: subscription, error } = await db
+    const { data: subscription, error } = await supabase
       .from('user_app_subscriptions')
       .insert({
         user_id: user.id,

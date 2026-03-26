@@ -1,11 +1,10 @@
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
@@ -20,10 +19,9 @@ async function _GET(request: NextRequest) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get all active apprenticeships with notification settings
-    const { data: notifications, error } = await db
+    const { data: notifications, error } = await supabase
       .from('apprentice_notifications')
       .select(
         `
@@ -87,7 +85,7 @@ async function _GET(request: NextRequest) {
       });
 
       // Update last_sent_at
-      await db
+      await supabase
         .from('apprentice_notifications')
         .update({ last_sent_at: new Date().toISOString() })
         .eq('id', notification.id);

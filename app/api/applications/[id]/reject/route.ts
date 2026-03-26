@@ -1,15 +1,15 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 30;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 30;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(
   request: NextRequest,
@@ -26,10 +26,9 @@ async function _POST(
 
     const { id } = await params;
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check if user is admin
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -40,7 +39,7 @@ async function _POST(
     }
 
     // Get application
-    const { data: application, error: appError } = await db
+    const { data: application, error: appError } = await supabase
       .from('applications')
       .select('*')
       .eq('id', id)
@@ -54,7 +53,7 @@ async function _POST(
     const { reason } = body;
 
     // Update application status
-    const { error: updateError } = await db
+    const { error: updateError } = await supabase
       .from('applications')
       .update({
         status: 'rejected',

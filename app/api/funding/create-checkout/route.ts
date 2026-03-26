@@ -1,16 +1,16 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
   try {
@@ -36,10 +36,9 @@ async function _POST(req: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get student profile
-    const { data: profile, error: profileError } = await db
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('id, email, full_name, first_name, last_name')
       .eq('id', studentId)
@@ -57,7 +56,7 @@ async function _POST(req: Request) {
     }
 
     // Get program details
-    const { data: program } = await db
+    const { data: program } = await supabase
       .from('programs')
       .select('id, name, slug, total_cost')
       .eq('id', programId)
@@ -113,7 +112,7 @@ async function _POST(req: Request) {
     });
 
     // Store funding payment record for audit
-    const { error: paymentError } = await db
+    const { error: paymentError } = await supabase
       .from('funding_payments')
       .insert({
         student_id: studentId,

@@ -8,7 +8,6 @@
  * https://www.elevateforhumanity.org/api/affirm/webhook
  */
 
-export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -19,6 +18,7 @@ import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tr
 import { flagCertificatesOnRefund } from '@/lib/certificates/flag-on-refund';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
 
 interface AffirmWebhookEvent {
   type: string;

@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
@@ -41,12 +40,7 @@ async function _POST(req: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-    if (!supabase) {
-      // If no database, just log and return success
-      logger.info('Tax refund application received:', {
-        name: `${firstName} ${lastName}`,
+ ${lastName}`,
         email,
         phone,
         filingStatus,
@@ -63,7 +57,7 @@ async function _POST(req: Request) {
     }
 
     // Try to save to database
-    const { error } = await db.from('tax_applications').insert({
+    const { error } = await supabase.from('tax_applications').insert({
       first_name: firstName,
       last_name: lastName,
       email,

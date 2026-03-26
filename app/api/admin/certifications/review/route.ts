@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -12,7 +11,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   // Get current user and verify admin role
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -22,7 +20,7 @@ async function _POST(request: NextRequest) {
   }
 
   // Check if user is admin
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -102,7 +100,6 @@ async function _GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   // Get current user and verify admin role
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -112,7 +109,7 @@ const supabase = await createClient();
   }
 
   // Check if user is admin
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -125,7 +122,7 @@ const supabase = await createClient();
   const { searchParams } = new URL(request.url);
   const status = searchParams.get('status');
 
-  let query = db
+  let query = supabase
     .from('certification_submissions')
     .select(`
       *,

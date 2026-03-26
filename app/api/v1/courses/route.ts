@@ -1,6 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // Public REST API - Courses Endpoint
 import { NextRequest, NextResponse } from 'next/server';
@@ -12,11 +9,14 @@ import {
   logAPIRequest,
 } from '@/lib/api/rest-api';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { sanitizeSearchInput } from '@/lib/utils';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 // GET /api/v1/courses - List all courses
 async function _GET(request: NextRequest) {
@@ -49,7 +49,6 @@ const startTime = Date.now();
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const searchParams = request.nextUrl.searchParams;
 
     // Pagination
@@ -62,7 +61,7 @@ const startTime = Date.now();
     const status = searchParams.get('status') || 'published';
     const search = searchParams.get('search');
 
-    let query = db
+    let query = supabase
       .from('training_courses')
       .select(
         `
@@ -162,9 +161,8 @@ async function _POST(request: NextRequest) {
 
     const body = await parseBody<Record<string, any>>(request);
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-    const { data: course, error: createError } = await db
+    const { data: course, error: createError } = await supabase
       .from('training_courses')
       .insert({
         title: body.title,

@@ -1,15 +1,15 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { canMatchApprentice, hasVerifiedDocuments } from '@/lib/documents';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 /**
  * MANDATORY VERIFICATION ENFORCEMENT:
@@ -33,7 +33,6 @@ async function _POST(req: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Verify admin access
     const {
@@ -44,7 +43,7 @@ async function _POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -60,7 +59,7 @@ async function _POST(req: Request) {
     // =========================================================================
     
     // Get apprentice ID from student
-    const { data: apprentice } = await db
+    const { data: apprentice } = await supabase
       .from('apprentices')
       .select('id')
       .eq('user_id', studentId)
@@ -98,7 +97,7 @@ async function _POST(req: Request) {
     }
 
     // Create or update shop placement record
-    const { error: placementError } = await db
+    const { error: placementError } = await supabase
       .from('shop_placements')
       .upsert(
         {
@@ -122,7 +121,7 @@ async function _POST(req: Request) {
     }
 
     // Mark onboarding step complete
-    const { error: onboardingError } = await db
+    const { error: onboardingError } = await supabase
       .from('student_onboarding')
       .update({ shop_placed: true })
       .eq('student_id', studentId);

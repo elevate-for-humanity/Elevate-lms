@@ -1,17 +1,17 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
@@ -43,10 +43,9 @@ async function _POST(req: Request) {
   }
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Insert into database
-  const { error: dbError } = await db
+  const { error: dbError } = await supabase
     .from('license_requests')
     .insert(payload);
 

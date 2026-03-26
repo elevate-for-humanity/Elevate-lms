@@ -1,13 +1,14 @@
 import { requireAdmin } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createRouteHandlerClient } from '@/lib/auth';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const _GET = withAuth(
   async (req, context) => {

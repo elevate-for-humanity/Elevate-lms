@@ -1,8 +1,9 @@
-export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/workspace/[id] — get a single workspace

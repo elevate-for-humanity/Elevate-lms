@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: NextRequest) {
   try {
@@ -14,7 +14,6 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -23,7 +22,7 @@ async function _GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role, program_holder_id')
       .eq('id', user.id)
@@ -38,7 +37,7 @@ async function _GET(request: NextRequest) {
     }
 
     // Get programs via program_holder_programs association table
-    const { data: associations } = await db
+    const { data: associations } = await supabase
       .from('program_holder_programs')
       .select('program_id')
       .eq('program_holder_id', profile.program_holder_id)
@@ -51,7 +50,7 @@ async function _GET(request: NextRequest) {
     const programIds = associations.map((a: any) => a.program_id);
 
     // Get enrollments for owned programs
-    const { data: enrollments } = await db
+    const { data: enrollments } = await supabase
       .from('program_enrollments')
       .select('student_id, program_id')
       .in('program_id', programIds);
@@ -63,7 +62,7 @@ async function _GET(request: NextRequest) {
     const studentIds = [...new Set(enrollments.map((e) => e.student_id))];
 
     // Get student details
-    const { data: students, error } = await db
+    const { data: students, error } = await supabase
       .from('profiles')
       .select('id, email, full_name, created_at')
       .in('id', studentIds)

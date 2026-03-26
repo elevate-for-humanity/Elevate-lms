@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function _POST(request: NextRequest) {
@@ -15,8 +14,7 @@ async function _POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    await db.from('community_members').insert({
+    await supabase.from('community_members').insert({
       full_name: name,
       email,
       status: status || 'prospective',

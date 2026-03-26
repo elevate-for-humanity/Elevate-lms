@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
   try {
@@ -24,7 +24,6 @@ async function _POST(req: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -34,7 +33,7 @@ async function _POST(req: Request) {
     }
 
     // Check if user is admin/sponsor/employer
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('user_profiles')
       .select('role, employer_id')
       .eq('user_id', user.id)
@@ -48,7 +47,7 @@ async function _POST(req: Request) {
     }
 
     // Load the hour entry to validate
-    const { data: hourEntry } = await db
+    const { data: hourEntry } = await supabase
       .from('hour_entries')
       .select('user_id, source_type, status')
       .eq('id', hour_id)
@@ -73,7 +72,7 @@ async function _POST(req: Request) {
 
     // OJL hours: employer must supervise this specific student
     if (profile.role === 'employer' && profile.employer_id) {
-      const { data: studentProfile } = await db
+      const { data: studentProfile } = await supabase
         .from('user_profiles')
         .select('employer_id')
         .eq('user_id', hourEntry.user_id)
@@ -88,7 +87,7 @@ async function _POST(req: Request) {
     }
 
     // Approve the hours — trigger enforces attestation fields
-    const { error } = await db
+    const { error } = await supabase
       .from('hour_entries')
       .update({
         status: 'approved',
@@ -133,7 +132,6 @@ async function _PUT(req: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -143,7 +141,7 @@ async function _PUT(req: Request) {
     }
 
     // Check if user is admin/sponsor/employer
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('user_profiles')
       .select('role, employer_id')
       .eq('user_id', user.id)
@@ -158,14 +156,14 @@ async function _PUT(req: Request) {
 
     // If employer, verify all hours belong to their apprentices
     if (profile.role === 'employer' && profile.employer_id) {
-      const { data: entries } = await db
+      const { data: entries } = await supabase
         .from('hour_entries')
         .select('user_id')
         .in('id', hour_ids);
 
       if (entries) {
         const studentIds = [...new Set(entries.map(e => e.user_id))];
-        const { data: studentProfiles } = await db
+        const { data: studentProfiles } = await supabase
           .from('user_profiles')
           .select('user_id, employer_id')
           .in('user_id', studentIds);
@@ -183,7 +181,7 @@ async function _PUT(req: Request) {
     }
 
     // Bulk approve — only pending entries, trigger enforces attestation
-    const { error } = await db
+    const { error } = await supabase
       .from('hour_entries')
       .update({
         status: 'approved',

@@ -1,11 +1,7 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import {
   OnboardingData,
   generateCompleteOnboardingPackage,
@@ -21,6 +17,10 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   try {
@@ -29,7 +29,6 @@ async function _POST(request: NextRequest) {
 
     const data: OnboardingData = await request.json();
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get authenticated user
     const {
@@ -59,7 +58,7 @@ async function _POST(request: NextRequest) {
     const onboardingPackage = generateCompleteOnboardingPackage(data);
 
     // Store onboarding data in database
-    const { data: onboardingRecord, error: onboardingError } = await db
+    const { data: onboardingRecord, error: onboardingError } = await supabase
       .from('onboarding_submissions')
       .insert({
         user_id: user.id,
@@ -248,7 +247,6 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -258,7 +256,7 @@ async function _GET(request: NextRequest) {
     }
 
     // Get user's onboarding status
-    const { data: onboarding, error } = await db
+    const { data: onboarding, error } = await supabase
       .from('onboarding_submissions')
       .select('*')
       .eq('user_id', user.id)

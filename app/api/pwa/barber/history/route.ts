@@ -1,12 +1,12 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
   try {
@@ -14,11 +14,6 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    
-    if (!supabase) {
-      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     
@@ -27,7 +22,7 @@ async function _GET(request: Request) {
     }
 
     // Get all progress entries for this user
-    const { data: progressEntries, error } = await db
+    const { data: progressEntries, error } = await supabase
       .from('progress_entries')
       .select('*')
       .eq('apprentice_id', user.id)

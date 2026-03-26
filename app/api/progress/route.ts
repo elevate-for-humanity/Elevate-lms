@@ -1,14 +1,14 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
   try {
@@ -24,24 +24,23 @@ async function _GET(request: Request) {
     const courseId = searchParams.get('courseId');
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     if (courseId) {
       // Get progress for specific course
-      const { data: enrollment } = await db
+      const { data: enrollment } = await supabase
         .from('program_enrollments')
         .select('*')
         .eq('user_id', user.id)
         .eq('course_id', courseId)
         .single();
 
-      const { data: lessons } = await db
+      const { data: lessons } = await supabase
         .from('training_lessons')
         .select('id, title, order_index, duration_minutes')
         .eq('course_id', courseId)
         .order('order_index');
 
-      const { data: lessonProgress } = await db
+      const { data: lessonProgress } = await supabase
         .from('lesson_progress')
         .select('lesson_id, completed, completed_at, time_spent_seconds')
         .eq('user_id', user.id)
@@ -74,7 +73,7 @@ async function _GET(request: Request) {
     }
 
     // Get all enrollments with progress
-    const { data: enrollments } = await db
+    const { data: enrollments } = await supabase
       .from('program_enrollments')
       .select(`
         id,
@@ -92,7 +91,7 @@ async function _GET(request: Request) {
       .eq('user_id', user.id)
       .order('started_at', { ascending: false });
 
-    const { data: allProgress } = await db
+    const { data: allProgress } = await supabase
       .from('lesson_progress')
       .select('course_id, completed')
       .eq('user_id', user.id);
@@ -144,10 +143,9 @@ async function _POST(request: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Upsert lesson progress
-    const { data, error } = await db
+    const { data, error } = await supabase
       .from('lesson_progress')
       .upsert(
         {

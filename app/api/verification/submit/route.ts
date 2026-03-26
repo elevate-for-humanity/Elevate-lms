@@ -1,13 +1,13 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditPiiAccess } from '@/lib/auditLog';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +17,6 @@ export async function POST(request: NextRequest) {
     await auditPiiAccess({ action: 'PII_ACCESS', entity: 'pii', req: request, metadata: { route: '/api/verification/submit' } });
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const {
@@ -29,7 +28,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if verification documents already uploaded for this user
-    const { data: existingDocs } = await db
+    const { data: existingDocs } = await supabase
       .from('documents')
       .select('id')
       .eq('user_id', user.id)
@@ -152,7 +151,7 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get('user-agent') || 'unknown';
 
     // Create verification record (schema: id, first_name, last_name, id_type, status, rejection_reason, verified_at)
-    const { data: verification, error: dbError } = await db
+    const { data: verification, error: dbError } = await supabase
       .from('id_verifications')
       .insert({
         first_name: firstName,
@@ -172,7 +171,7 @@ export async function POST(request: NextRequest) {
         docRows.push({ user_id: user.id, document_type: 'photo_id' as const, file_name: 'id-back.jpg', file_url: null, file_path: idBackPath, mime_type: 'image/jpeg', status: 'pending_review' });
       }
       docRows.push({ user_id: user.id, document_type: 'other' as const, file_name: 'selfie.jpg', file_url: null, file_path: selfiePath, mime_type: 'image/jpeg', status: 'pending_review' });
-      await db.from('documents').insert(docRows);
+      await supabase.from('documents').insert(docRows);
     }
 
     if (dbError) {
@@ -207,7 +206,6 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const {
@@ -219,7 +217,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if user has uploaded ID documents
-    const { data: docs } = await db
+    const { data: docs } = await supabase
       .from('documents')
       .select('id, document_type, status, file_url, created_at')
       .eq('user_id', user.id)

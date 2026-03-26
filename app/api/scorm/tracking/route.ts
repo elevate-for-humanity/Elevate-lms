@@ -1,14 +1,14 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: Request) {
   try {
@@ -16,7 +16,6 @@ async function _POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -36,7 +35,7 @@ async function _POST(request: Request) {
     } = body;
 
     // Update SCORM enrollment
-    const { data: enrollment, error: enrollmentError } = await db
+    const { data: enrollment, error: enrollmentError } = await supabase
       .from('scorm_enrollments')
       .upsert({
         scorm_package_id: scormPackageId,
@@ -63,7 +62,7 @@ async function _POST(request: Request) {
     // Track individual SCORM elements
     if (cmiData) {
       const trackingPromises = Object.entries(cmiData).map(([element, value]: any) =>
-        db.from('scorm_tracking').insert({
+        supabase.from('scorm_tracking').insert({
           scorm_enrollment_id: enrollment.id,
           element,
           value: String(value),
@@ -76,7 +75,7 @@ async function _POST(request: Request) {
     // If completed, update main enrollment if linked
     if (status === 'completed' || status === 'passed') {
       if (enrollmentId) {
-        await db
+        await supabase
           .from('program_enrollments')
           .update({
             progress: 100,
@@ -100,7 +99,6 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -115,7 +113,7 @@ async function _GET(request: Request) {
       return NextResponse.json({ error: 'Missing scormPackageId' }, { status: 400 });
     }
 
-    const { data: enrollment, error } = await db
+    const { data: enrollment, error } = await supabase
       .from('scorm_enrollments')
       .select('*')
       .eq('scorm_package_id', scormPackageId)

@@ -1,5 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/admin/lms/courses — create a canonical draft course
@@ -12,6 +10,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createDraftCourse } from '@/lib/lms/course-service';
 import { safeInternalError } from '@/lib/api/safe-error';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {

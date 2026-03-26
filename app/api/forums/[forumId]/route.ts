@@ -1,15 +1,15 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/forums/[forumId]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getUserIdFromRequest } from "@/lib/getUserIdFromRequest";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 type Params = { params: Promise<{ forumId: string }> };
 
@@ -21,10 +21,9 @@ async function _GET(_req: NextRequest, { params }: Params) {
 
     const { forumId } = await params;
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get threads with creator info
-    const { data: threads, error: threadsError } = await db
+    const { data: threads, error: threadsError } = await supabase
       .from("discussion_threads")
       .select(`
         id,
@@ -50,7 +49,7 @@ async function _GET(_req: NextRequest, { params }: Params) {
 
     // Get user profiles for thread creators
     const userIds = [...new Set(threads?.map((t) => t.user_id) || [])];
-    const { data: profiles } = await db
+    const { data: profiles } = await supabase
       .from("profiles")
       .select("id, full_name, avatar_url")
       .in("id", userIds);
@@ -59,7 +58,7 @@ async function _GET(_req: NextRequest, { params }: Params) {
 
     // Get reply counts for each thread
     const threadIds = threads?.map((t) => t.id) || [];
-    const { data: posts } = await db
+    const { data: posts } = await supabase
       .from("discussion_posts")
       .select("thread_id")
       .in("thread_id", threadIds);
@@ -107,7 +106,6 @@ async function _POST(req: NextRequest, { params }: Params) {
 
     const { forumId } = await params;
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = (await req.json()) as { title?: string; content?: string };
 
     if (!body.title || !body.content) {
@@ -120,7 +118,7 @@ async function _POST(req: NextRequest, { params }: Params) {
     const now = new Date().toISOString();
 
     // 1) Create thread
-    const { data: thread, error: threadError } = await db
+    const { data: thread, error: threadError } = await supabase
       .from("discussion_threads")
       .insert({
         forum_id: forumId,
@@ -141,7 +139,7 @@ async function _POST(req: NextRequest, { params }: Params) {
     }
 
     // 2) Create first post
-    const { error: postError } = await db
+    const { error: postError } = await supabase
       .from("discussion_posts")
       .insert({
         thread_id: thread.id,

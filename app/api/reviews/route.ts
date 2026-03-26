@@ -1,13 +1,13 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
   try {
@@ -15,12 +15,11 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const featured = searchParams.get('featured');
 
-    let query = db
+    let query = supabase
       .from('reviews')
       .select('*')
       .order('created_at', { ascending: false });
@@ -44,7 +43,7 @@ async function _GET(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const { data: profile } = await db
+      const { data: profile } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
@@ -89,7 +88,6 @@ async function _POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = await parseBody<Record<string, any>>(request);
 
     const { reviewer_name, reviewer_email, rating, content } = body;
@@ -116,7 +114,7 @@ async function _POST(request: Request) {
     } = await supabase.auth.getUser();
 
     // Create review
-    const { data: review, error: reviewError } = await db
+    const { data: review, error: reviewError } = await supabase
       .from('reviews')
       .insert({
         user_id: user?.id || null,
@@ -134,7 +132,7 @@ async function _POST(request: Request) {
     }
 
     // Notify admin of new review
-    await db.from('email_queue').insert({
+    await supabase.from('email_queue').insert({
       to_email: 'info@elevateforhumanity.org',
       from_email: 'noreply@elevateforhumanity.org',
       subject: 'New Review Submitted - Pending Moderation',

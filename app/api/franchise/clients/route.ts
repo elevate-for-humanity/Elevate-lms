@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { clientService } from '@/lib/franchise/client-service';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditPiiAccess } from '@/lib/auditLog';
@@ -14,7 +13,6 @@ export async function GET(request: NextRequest) {
     await auditPiiAccess({ action: 'PII_ACCESS', entity: 'pii', req: request, metadata: { route: '/api/franchise/clients' } });
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -33,7 +31,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check access
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -43,7 +41,7 @@ export async function GET(request: NextRequest) {
 
     if (!isAdmin) {
       // Check if user owns the office or is a preparer there
-      const { data: office } = await db
+      const { data: office } = await supabase
         .from('franchise_offices')
         .select('owner_id')
         .eq('id', officeId)
@@ -52,7 +50,7 @@ export async function GET(request: NextRequest) {
       const isOwner = office?.owner_id === user.id;
 
       if (!isOwner) {
-        const { data: preparer } = await db
+        const { data: preparer } = await supabase
           .from('franchise_preparers')
           .select('id')
           .eq('office_id', officeId)
@@ -92,7 +90,6 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -110,7 +107,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check access
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -119,7 +116,7 @@ export async function POST(request: NextRequest) {
     const isAdmin = profile?.role === 'super_admin' || profile?.role === 'franchise_admin';
 
     if (!isAdmin) {
-      const { data: office } = await db
+      const { data: office } = await supabase
         .from('franchise_offices')
         .select('owner_id')
         .eq('id', body.office_id)
@@ -128,7 +125,7 @@ export async function POST(request: NextRequest) {
       const isOwner = office?.owner_id === user.id;
 
       if (!isOwner) {
-        const { data: preparer } = await db
+        const { data: preparer } = await supabase
           .from('franchise_preparers')
           .select('id')
           .eq('office_id', body.office_id)

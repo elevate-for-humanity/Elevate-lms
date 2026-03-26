@@ -1,7 +1,4 @@
 import { requireAdmin } from '@/lib/auth';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/admin/export/enrollments/route.ts
 import { NextRequest, NextResponse } from 'next/server';
@@ -10,6 +7,10 @@ import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { logBulkExport } from '@/lib/audit/ferpa';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const _GET = withAuth(
   async (req: NextRequest, user) => {

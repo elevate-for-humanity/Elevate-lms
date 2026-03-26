@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(
   request: Request,
@@ -18,7 +18,6 @@ async function _POST(
 
   const { id } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { signerName, signerEmail, role } = await request.json();
 
   if (!signerName || !signerEmail) {
@@ -29,7 +28,7 @@ async function _POST(
   }
 
   // Verify document exists
-  const { data: doc } = await db
+  const { data: doc } = await supabase
     .from("signature_documents")
     .select("id, title, type")
     .eq("id", id)
@@ -46,7 +45,7 @@ async function _POST(
     null;
 
   // Create signature
-  const { data: signature, error } = await db
+  const { data: signature, error } = await supabase
     .from("signatures")
     .insert({
       document_id: doc.id,
@@ -63,7 +62,7 @@ async function _POST(
   }
 
   // Log the signature
-  await db.from("audit_logs").insert({
+  await supabase.from("audit_logs").insert({
     actor_id: null,
     actor_email: signerEmail,
     action: "document_signed",

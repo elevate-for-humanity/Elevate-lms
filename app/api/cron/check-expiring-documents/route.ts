@@ -1,12 +1,12 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: NextRequest) {
   try {
@@ -16,12 +16,11 @@ async function _GET(request: NextRequest) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const today = new Date();
     const thirtyDaysFromNow = new Date(today);
     thirtyDaysFromNow.setDate(today.getDate() + 30);
 
-    const { data: expiringDocs } = await db
+    const { data: expiringDocs } = await supabase
       .from('documents')
       .select(
         `
@@ -65,7 +64,7 @@ async function _GET(request: NextRequest) {
       }
 
       if (daysUntilExpiration <= 0) {
-        await db
+        await supabase
           .from('documents')
           .update({ status: 'expired' })
           .eq('id', doc.id);

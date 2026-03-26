@@ -1,15 +1,15 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _PATCH(
   request: NextRequest,
@@ -21,7 +21,6 @@ async function _PATCH(
 const { id } = await params;
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = await parseBody<Record<string, any>>(request);
     const { status, rejection_reason } = body;
 
@@ -35,7 +34,7 @@ const { id } = await params;
     } = await supabase.auth.getUser();
 
     // Get existing leave request
-    const { data: existing, error: existingError } = await db
+    const { data: existing, error: existingError } = await supabase
       .from('leave_requests')
       .select('*')
       .eq('id', id)
@@ -50,7 +49,7 @@ const { id } = await params;
     }
 
     // Update leave request
-    const { data: updated, error: updateError } = await db
+    const { data: updated, error: updateError } = await supabase
       .from('leave_requests')
       .update({
         status,

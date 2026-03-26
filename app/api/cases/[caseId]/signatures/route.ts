@@ -1,13 +1,13 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { addSignature, checkSignatureCompleteness } from '@/lib/workflow/case-management';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request, { params }: { params: Promise<{ caseId: string }> }) {
   try {
@@ -15,7 +15,6 @@ async function _POST(req: Request, { params }: { params: Promise<{ caseId: strin
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user }, error: authErr } = await supabase.auth.getUser();
     
     if (authErr || !user) {
@@ -30,7 +29,7 @@ async function _POST(req: Request, { params }: { params: Promise<{ caseId: strin
       return NextResponse.json({ error: 'signerRole and agreementType are required' }, { status: 400 });
     }
 
-    const { data: enrollmentCase } = await db
+    const { data: enrollmentCase } = await supabase
       .from('enrollment_cases')
       .select('student_id, program_holder_id, employer_id')
       .eq('id', caseId)
@@ -46,7 +45,7 @@ async function _POST(req: Request, { params }: { params: Promise<{ caseId: strin
       user.id === enrollmentCase.employer_id;
 
     if (!isAuthorized) {
-      const { data: profile } = await db
+      const { data: profile } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
@@ -91,7 +90,6 @@ async function _GET(req: Request, { params }: { params: Promise<{ caseId: string
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user }, error: authErr } = await supabase.auth.getUser();
     
     if (authErr || !user) {
@@ -101,7 +99,7 @@ async function _GET(req: Request, { params }: { params: Promise<{ caseId: string
     const { caseId } = await params;
 
     // agreement_acceptances: subject_type, subject_id, agreement_key, agreement_version, accepted_name, accepted_email, accepted_at
-    const { data: signatures, error } = await db
+    const { data: signatures, error } = await supabase
       .from('agreement_acceptances')
       .select('id, subject_type, subject_id, agreement_key, agreement_version, accepted_name, accepted_email, accepted_at')
       .eq('subject_id', caseId)

@@ -1,12 +1,12 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: NextRequest) {
   try {
@@ -14,7 +14,6 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -25,7 +24,7 @@ async function _GET(request: NextRequest) {
     const programId = searchParams.get('program');
 
     // Get partner user
-    const { data: partnerUser } = await db
+    const { data: partnerUser } = await supabase
       .from('partner_users')
       .select('partner_id')
       .eq('user_id', user.id)
@@ -38,7 +37,7 @@ async function _GET(request: NextRequest) {
 
     // Check program access
     if (programId) {
-      const { data: access } = await db
+      const { data: access } = await supabase
         .from('partner_program_access')
         .select('id')
         .eq('partner_id', partnerUser.partner_id)
@@ -52,7 +51,7 @@ async function _GET(request: NextRequest) {
     }
 
     // Get apprentices assigned to this partner
-    let query = db
+    let query = supabase
       .from('apprenticeships')
       .select(`
         id,
@@ -79,7 +78,7 @@ async function _GET(request: NextRequest) {
     // Get total hours for each apprentice
     const apprentices = await Promise.all(
       (apprenticeships || []).map(async (a) => {
-        const { data: progressSum } = await db
+        const { data: progressSum } = await supabase
           .from('progress_entries')
           .select('hours_worked')
           .eq('apprentice_id', a.apprentice_id)

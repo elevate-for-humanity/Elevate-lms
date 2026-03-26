@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -13,7 +12,6 @@ async function _POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const data = await req.json();
 
     // Validate required fields
@@ -39,7 +37,7 @@ async function _POST(req: NextRequest) {
       );
     }
 
-    const { data: enrollment, error } = await db
+    const { data: enrollment, error } = await supabase
       .from('program_enrollments')
       .insert({
         first_name: data.firstName.trim(),

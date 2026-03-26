@@ -1,10 +1,10 @@
 import { createClient } from '@/lib/supabase/server';
 
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 

@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 // GET /api/events
 async function _GET(req: NextRequest) {
@@ -16,13 +16,12 @@ async function _GET(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const searchParams = req.nextUrl.searchParams;
     const status = searchParams.get('status') || 'published';
     const upcomingOnly = searchParams.get('upcoming') === 'true';
     const eventType = searchParams.get('event_type');
 
-    let query = db
+    let query = supabase
       .from('community_events')
       .select('*')
       .order('created_at', { ascending: false });
@@ -58,7 +57,6 @@ async function _POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = await req.json();
 
     const {
@@ -85,7 +83,7 @@ async function _POST(req: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser();
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('events')
       .insert({
         title,

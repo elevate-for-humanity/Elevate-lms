@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -14,7 +13,6 @@ async function _POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -30,7 +28,7 @@ async function _POST(req: Request) {
     }
 
     // Check if item already in cart
-    const { data: existingItem } = await db
+    const { data: existingItem } = await supabase
       .from('cart_items')
       .select('id, quantity')
       .eq('user_id', user.id)
@@ -39,13 +37,13 @@ async function _POST(req: Request) {
 
     if (existingItem) {
       // Update quantity
-      await db
+      await supabase
         .from('cart_items')
         .update({ quantity: existingItem.quantity + quantity })
         .eq('id', existingItem.id);
     } else {
       // Add new item
-      await db
+      await supabase
         .from('cart_items')
         .insert({
           user_id: user.id,

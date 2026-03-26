@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { supabaseServer } from '@/lib/supabaseServer';
 import {
   sendProgramHolderApplicationConfirmation,
@@ -12,6 +9,10 @@ import {
 import { checkRateLimit, verifyTurnstileToken } from '@/lib/turnstile';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: NextRequest) {
   try {

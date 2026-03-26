@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { bindUserToOrg } from '@/lib/org/bindUserToOrg';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: NextRequest) {
   try {
@@ -15,7 +15,6 @@ async function _POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
       error: authError,
@@ -44,7 +43,7 @@ async function _POST(req: NextRequest) {
     }
 
     // Create organization
-    const { data: org, error: orgError } = await db
+    const { data: org, error: orgError } = await supabase
       .from('organizations')
       .insert({
         name,
@@ -66,7 +65,7 @@ async function _POST(req: NextRequest) {
     }
 
     // Seed default settings
-    const { error: settingsError } = await db
+    const { error: settingsError } = await supabase
       .from('organization_settings')
       .insert({
         organization_id: org.id,
@@ -77,7 +76,7 @@ async function _POST(req: NextRequest) {
     }
 
     // Assign creator as org_admin
-    const { error: memberError } = await db
+    const { error: memberError } = await supabase
       .from('organization_users')
       .insert({
         organization_id: org.id,

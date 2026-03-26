@@ -1,16 +1,16 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireApiAuth } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { approveApplication } from '@/lib/enrollment/approve';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(
   req: NextRequest,
@@ -24,16 +24,14 @@ async function _POST(
   try {
     await requireApiAuth();
     const supabase = await createClient();
-    const _admin = createAdminClient();
-    const db = _admin || supabase;
-    const {
+      const {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     adminUserId = user.id;
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -86,7 +84,7 @@ async function _POST(
 
     // Send approval email (non-blocking)
     try {
-      const { data: app } = await db
+      const { data: app } = await supabase
         .from('applications')
         .select('email, first_name')
         .eq('id', id)

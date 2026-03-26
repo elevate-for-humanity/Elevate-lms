@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@supabase/supabase-js';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 // This route is called by scheduled cron daily at 6 AM
 // Cron expression: 0 11 * * * (11:00 UTC = 6:00 AM EST)

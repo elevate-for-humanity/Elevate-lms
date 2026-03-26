@@ -1,13 +1,13 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(req: NextRequest) {
   try {
@@ -15,7 +15,6 @@ async function _GET(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const { data: { user } } = await supabase.auth.getUser();
@@ -24,7 +23,7 @@ async function _GET(req: NextRequest) {
     }
 
     // Check admin role
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -35,7 +34,7 @@ async function _GET(req: NextRequest) {
     }
 
     // Fetch employer incentives
-    const { data: incentives, error } = await db
+    const { data: incentives, error } = await supabase
       .from('employer_incentives')
       .select(`
         *,
@@ -84,7 +83,6 @@ async function _POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const { data: { user } } = await supabase.auth.getUser();
@@ -93,7 +91,7 @@ async function _POST(req: NextRequest) {
     }
 
     // Check admin role
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -123,7 +121,7 @@ async function _POST(req: NextRequest) {
     }
 
     // Create incentive record
-    const { data: incentive, error } = await db
+    const { data: incentive, error } = await supabase
       .from('employer_incentives')
       .insert({
         employer_id,

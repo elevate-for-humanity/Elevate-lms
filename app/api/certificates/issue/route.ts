@@ -1,8 +1,5 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
@@ -10,6 +7,10 @@ import { createClient } from "@supabase/supabase-js";
 import { generateCertificateNumber, generateCertificatePDF } from "@/lib/certificates/generator";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function parseBody<T>(request: NextRequest): Promise<T> {
   return request.json() as Promise<T>;

@@ -1,13 +1,13 @@
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
@@ -21,10 +21,9 @@ async function _POST(request: NextRequest) {
   try {
     const body = await request.json();
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
-    const { data, error } = await db
+    const { data, error } = await supabase
       .from('crm_follow_ups')
       .insert({
         contact_id: body.contact_id || null,
@@ -64,11 +63,10 @@ async function _PATCH(request: NextRequest) {
     if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const updates: any = { status, updated_at: new Date().toISOString() };
     if (status === 'completed') updates.completed_at = new Date().toISOString();
 
-    const { error } = await db.from('crm_follow_ups').update(updates).eq('id', id);
+    const { error } = await supabase.from('crm_follow_ups').update(updates).eq('id', id);
     if (error) throw error;
 
     const { data: { user } } = await supabase.auth.getUser();

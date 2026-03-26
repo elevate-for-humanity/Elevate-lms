@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import programCurriculum from '@/lms-content/curricula/program-curriculum-map.json';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -20,7 +19,6 @@ const { searchParams } = new URL(request.url);
   }
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Get program curriculum from JSON
   const programData = programCurriculum.programs.find(p => p.id === programId);
@@ -30,7 +28,7 @@ const { searchParams } = new URL(request.url);
   }
 
   // Get user's certification submissions
-  const { data: submissions } = await db
+  const { data: submissions } = await supabase
     .from('certification_submissions')
     .select('*')
     .eq('user_id', userId)

@@ -1,5 +1,4 @@
 
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { gh, parseRepo, getUserOctokit } from '@/lib/github';
@@ -7,6 +6,7 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
 
 // Pull latest changes (fetch remote and get diff)
 async function _POST(req: NextRequest) {

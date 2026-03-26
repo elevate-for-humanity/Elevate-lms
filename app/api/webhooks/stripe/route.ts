@@ -29,9 +29,6 @@ import { createAdminClient } from '@/lib/supabase/admin';
  *   audit_logs, tenants, applications
  * 
  */
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import Stripe from 'stripe';
 import { stripe } from '@/lib/stripe/client';
@@ -52,6 +49,10 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tracker';
 import { flagCertificatesOnRefund } from '@/lib/certificates/flag-on-refund';
 import * as Sentry from '@sentry/nextjs';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 
 

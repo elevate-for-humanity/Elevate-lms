@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
   try {
@@ -24,7 +24,6 @@ async function _POST(req: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -34,13 +33,13 @@ async function _POST(req: Request) {
     }
 
     // Check if user has permission to reject hours
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single();
 
-    const { data: partnerUser } = await db
+    const { data: partnerUser } = await supabase
       .from('partner_users')
       .select('partner_id, role')
       .eq('user_id', user.id)
@@ -57,7 +56,7 @@ async function _POST(req: Request) {
     }
 
     // Reject the hours
-    const { error } = await db
+    const { error } = await supabase
       .from('hour_entries')
       .update({
         status: 'rejected',
@@ -73,7 +72,7 @@ async function _POST(req: Request) {
     }
 
     // Log the rejection
-    await db.from('audit_logs').insert({
+    await supabase.from('audit_logs').insert({
       actor_id: user.id,
       action: 'hours_rejected',
       entity_type: 'hour_entries',

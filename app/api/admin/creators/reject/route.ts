@@ -1,8 +1,6 @@
 import { logger } from '@/lib/logger';
-export const dynamic = 'force-dynamic';
 
 // Using Node.js runtime for email compatibility
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
@@ -10,6 +8,9 @@ import { sendCreatorRejectionEmail } from '@/lib/email/sendgrid';
 import { z } from 'zod';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 // Input validation schema
 const rejectCreatorSchema = z.object({
@@ -26,7 +27,6 @@ async function _POST(req: Request) {
 
     // 1. Authentication
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -36,7 +36,7 @@ async function _POST(req: Request) {
     }
 
     // 2. Authorization - check for admin or super_admin
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)

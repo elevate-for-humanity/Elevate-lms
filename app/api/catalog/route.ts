@@ -1,5 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 // GET /api/catalog
 // Public, rate-limited. Returns paginated, filtered results from program_catalog_index.
@@ -16,6 +14,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeInternalError } from '@/lib/api/safe-error';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'public');

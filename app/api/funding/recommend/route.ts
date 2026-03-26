@@ -1,6 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from "next/server";
 import { matchFundingPrograms } from "@/lib/funding/match";
@@ -9,6 +6,10 @@ import { getOpenAIClient, isOpenAIConfigured } from "@/lib/openai-client";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');

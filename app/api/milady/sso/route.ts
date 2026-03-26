@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { MiladyAPI } from '@/lib/partners/milady';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   try {
@@ -15,7 +15,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -34,7 +33,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Get enrollment details
-    const { data: enrollment, error: enrollmentError } = await db
+    const { data: enrollment, error: enrollmentError } = await supabase
       .from('partner_lms_enrollments')
       .select(
         `
@@ -60,7 +59,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Get student profile
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', user.id)
@@ -82,7 +81,7 @@ async function _POST(request: NextRequest) {
     });
 
     // Update last accessed timestamp
-    await db
+    await supabase
       .from('partner_lms_enrollments')
       .update({ last_accessed_at: new Date().toISOString() })
       .eq('id', enrollmentId);

@@ -1,5 +1,3 @@
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
@@ -7,6 +5,8 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 async function _POST(request: Request) {
   try {

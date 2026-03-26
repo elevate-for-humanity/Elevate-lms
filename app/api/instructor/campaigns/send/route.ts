@@ -1,15 +1,15 @@
-export const dynamic = 'force-dynamic';
 // Using Node.js runtime for email compatibility
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { resend } from '@/lib/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   try {
@@ -17,7 +17,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -26,7 +25,7 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role, full_name')
       .eq('id', user.id)
@@ -47,7 +46,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Verify instructor has access to these students through their courses
-    const { data: courses } = await db
+    const { data: courses } = await supabase
       .from('training_courses')
       .select('id')
       .eq('instructor_id', user.id);
@@ -59,7 +58,7 @@ async function _POST(request: NextRequest) {
     const courseIds = courses.map((c) => c.id);
 
     // Get enrollments for instructor's courses
-    const { data: enrollments } = await db
+    const { data: enrollments } = await supabase
       .from('course_enrollments')
       .select('student_id')
       .in('course_id', courseIds)
@@ -75,7 +74,7 @@ async function _POST(request: NextRequest) {
     const validStudentIds = enrollments.map((e) => e.student_id);
 
     // Get student details
-    const { data: students } = await db
+    const { data: students } = await supabase
       .from('profiles')
       .select('id, email, full_name')
       .in('id', validStudentIds);

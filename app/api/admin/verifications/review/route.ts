@@ -1,9 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -12,6 +8,10 @@ import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { auditedMutation } from '@/lib/audit/transactional';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   try {
@@ -19,7 +19,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -29,7 +28,7 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -81,7 +80,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Fetch joined profile data for email notifications
-    const { data: verification } = await db
+    const { data: verification } = await supabase
       .from('id_verifications')
       .select(`*, profiles:user_id (id, full_name, email)`)
       .eq('id', verificationId)

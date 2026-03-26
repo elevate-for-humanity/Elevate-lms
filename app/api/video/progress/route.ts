@@ -1,21 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from "@/lib/auth";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const user = await getCurrentUser();
 
   if (!user) {
@@ -29,7 +28,7 @@ const supabase = await createClient();
     return NextResponse.json({ error: "lessonId required" }, { status: 400 });
   }
 
-  const { data, error }: any = await db
+  const { data, error }: any = await supabase
     .from("video_progress")
     .select("*")
     .eq("user_id", user.id)
@@ -49,7 +48,6 @@ async function _POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const user = await getCurrentUser();
 
   if (!user) {
@@ -68,7 +66,7 @@ async function _POST(req: NextRequest) {
       ? lastPositionSeconds >= durationSeconds - 5
       : false;
 
-  const { data, error }: any = await db
+  const { data, error }: any = await supabase
     .from("video_progress")
     .upsert(
       {

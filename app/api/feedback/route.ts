@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -13,14 +12,13 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     const body = await request.json();
     const { action, type, title, description, category, pageUrl, browserInfo } = body;
 
     if (action === 'submit') {
-      const { data, error } = await db
+      const { data, error } = await supabase
         .from('user_feedback')
         .insert({
           user_id: user?.id || null,
@@ -56,7 +54,6 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -66,7 +63,7 @@ async function _GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
 
-    let query = db
+    let query = supabase
       .from('user_feedback')
       .select('*')
       .order('created_at', { ascending: false });

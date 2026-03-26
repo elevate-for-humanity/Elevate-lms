@@ -1,5 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 // POST /api/provider/programs/create
 // Creates a new program record in draft/pending_review state for a provider tenant.
@@ -11,6 +9,9 @@ import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { providerApiGuard } from '@/lib/api/provider-guard';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');

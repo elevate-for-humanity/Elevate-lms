@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -11,7 +10,6 @@ async function _POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
@@ -25,7 +23,7 @@ async function _POST(req: Request) {
     }
 
     // Verify ownership and current state
-    const { data: enrollment, error: fetchError } = await db
+    const { data: enrollment, error: fetchError } = await supabase
       .from('program_enrollments')
       .select('id, user_id, enrollment_state, program_id, email, full_name')
       .eq('id', enrollment_id)
@@ -65,7 +63,7 @@ async function _POST(req: Request) {
     const now = new Date().toISOString();
 
     // Advance state to active in program_enrollments
-    const { error: updateError } = await db
+    const { error: updateError } = await supabase
       .from('program_enrollments')
       .update({
         enrollment_state: 'active',
@@ -77,7 +75,7 @@ async function _POST(req: Request) {
       .eq('id', enrollment_id);
 
     // Mirror documents_submitted_at to training_enrollments — apprentice portal gate reads this
-    await db
+    await supabase
       .from('training_enrollments')
       .update({ documents_submitted_at: now, updated_at: now })
       .eq('user_id', user.id)
@@ -91,14 +89,14 @@ async function _POST(req: Request) {
     // Bridge: create training_enrollments so the student can access course content.
     if (enrollment.program_id) {
       try {
-        const { data: linkedCourses } = await db
+        const { data: linkedCourses } = await supabase
           .from('training_courses')
           .select('id')
           .eq('program_id', enrollment.program_id);
 
         if (linkedCourses && linkedCourses.length > 0) {
           for (const course of linkedCourses) {
-            await db
+            await supabase
               .from('training_enrollments')
               .upsert({
                 user_id: user.id,

@@ -1,20 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from "@/lib/auth";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(_req: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const user = await getCurrentUser();
 
   if (!user) {
@@ -25,18 +24,18 @@ const supabase = await createClient();
 
   const [{ data: activityToday }, { data: goalRow }, { data: streakRow }] =
     await Promise.all([
-      db
+      supabase
         .from("learning_activity")
         .select("seconds_watched")
         .eq("user_id", user.id)
         .eq("activity_date", today)
         .maybeSingle(),
-      db
+      supabase
         .from("learning_goals")
         .select("daily_minutes")
         .eq("user_id", user.id)
         .maybeSingle(),
-      db
+      supabase
         .from("daily_streaks")
         .select("current_streak, longest_streak, last_active_date")
         .eq("user_id", user.id)

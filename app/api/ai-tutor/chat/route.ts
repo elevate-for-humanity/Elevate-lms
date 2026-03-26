@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const SYSTEM_PROMPTS: Record<string, string> = {
   chat: `You are an AI tutor for Elevate for Humanity, a workforce development platform in Indianapolis, Indiana. You help students studying for career certifications in healthcare, skilled trades, technology, business, and other fields. Provide clear, accurate, educational responses. Reference Indiana-specific licensing requirements, employers, and resources when relevant. Keep responses focused and practical.`,
@@ -85,7 +85,6 @@ async function _POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -117,7 +116,7 @@ async function _POST(request: NextRequest) {
     // Get conversation history if exists
     let messages: Array<{ role: string; content: string }> = [];
     if (conversationId) {
-      const { data: history } = await db
+      const { data: history } = await supabase
         .from('conversations')
         .select('messages')
         .eq('id', conversationId)
@@ -183,7 +182,7 @@ async function _POST(request: NextRequest) {
     // Save or update conversation
     let newConversationId = conversationId;
     if (!conversationId) {
-      const { data: newConv } = await db
+      const { data: newConv } = await supabase
         .from('conversations')
         .insert({
           user_id: user.id,
@@ -196,7 +195,7 @@ async function _POST(request: NextRequest) {
 
       newConversationId = newConv?.id;
     } else {
-      await db
+      await supabase
         .from('conversations')
         .update({ messages })
         .eq('id', conversationId)

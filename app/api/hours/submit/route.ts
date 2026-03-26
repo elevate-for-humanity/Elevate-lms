@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -11,7 +10,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
@@ -27,7 +25,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Get apprentice record
-    const { data: apprentice, error: apprenticeError } = await db
+    const { data: apprentice, error: apprenticeError } = await supabase
       .from('apprentices')
       .select('id, shop_id')
       .eq('user_id', user.id)
@@ -63,7 +61,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Create hour entry
-    const { data: entry, error: entryError } = await db
+    const { data: entry, error: entryError } = await supabase
       .from('hour_entries')
       .insert({
         apprentice_id: apprentice.id,

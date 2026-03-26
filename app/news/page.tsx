@@ -5,7 +5,8 @@ import { Calendar, Tag, ArrowRight, Newspaper } from 'lucide-react';
 import { getPublishedPosts, getFeaturedPost, getCategories, formatPostDate } from '@/lib/data/news';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static'
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'News & Updates | Elevate for Humanity',

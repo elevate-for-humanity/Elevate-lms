@@ -16,7 +16,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sezzle } from '@/lib/sezzle/client';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -121,7 +120,6 @@ async function _POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Log the virtual card checkout completion
     logger.info('Sezzle virtual card checkout completed', {
@@ -157,7 +155,7 @@ async function _POST(request: NextRequest) {
     if (supabase) {
       // Update application if provided
       if (applicationId) {
-        await db
+        await supabase
           .from('applications')
           .update({
             sezzle_session_uuid: sessionId,
@@ -173,7 +171,7 @@ async function _POST(request: NextRequest) {
       }
 
       // Create payment record
-      const { error: paymentError } = await db
+      const { error: paymentError } = await supabase
         .from('payments')
         .insert({
           provider: 'sezzle_virtual_card',
@@ -205,7 +203,7 @@ async function _POST(request: NextRequest) {
 
       // Create enrollment if we have the necessary info
       if (programSlug && holder?.email) {
-        const { error: enrollmentError } = await db
+        const { error: enrollmentError } = await supabase
           .from('program_enrollments')
           .insert({
             program_slug: programSlug,

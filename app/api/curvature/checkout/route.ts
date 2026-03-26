@@ -1,13 +1,12 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 
 import { stripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 
 interface CartItem {
@@ -35,7 +34,6 @@ async function _POST(request: NextRequest) {
 
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -43,7 +41,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Get cart items with product details
-    const { data: cartItems, error: cartError } = await db
+    const { data: cartItems, error: cartError } = await supabase
       .from('cart_items')
       .select(`
         product_id,
@@ -119,7 +117,7 @@ async function _POST(request: NextRequest) {
     });
 
     // Create order record
-    const { data: order, error: orderError } = await db
+    const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
         user_id: user.id,
@@ -140,7 +138,7 @@ async function _POST(request: NextRequest) {
         quantity: item.quantity,
       }));
 
-      await db.from('order_items').insert(orderItems);
+      await supabase.from('order_items').insert(orderItems);
     }
 
     return NextResponse.json({ url: session.url, sessionId: session.id });

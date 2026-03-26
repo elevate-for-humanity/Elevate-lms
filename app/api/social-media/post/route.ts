@@ -1,14 +1,14 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/social-media/post
@@ -20,7 +20,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const {
@@ -66,7 +65,7 @@ async function _POST(request: NextRequest) {
     // Post immediately or schedule
     if (scheduled_for) {
       // Schedule post
-      const { data: scheduledPost, error: scheduleError } = await db
+      const { data: scheduledPost, error: scheduleError } = await supabase
         .from('social_media_posts')
         .insert({
           platform,
@@ -122,7 +121,7 @@ async function _POST(request: NextRequest) {
       }
 
       // Save to database
-      const { data: savedPost } = await db
+      const { data: savedPost } = await supabase
         .from('social_media_posts')
         .insert({
           platform,
@@ -162,9 +161,8 @@ async function postToLinkedIn(data: any) {
     // Get LinkedIn credentials from database
     const { createClient } = await import('@/lib/supabase/server');
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-    const { data: settings, error: settingsError } = await db
+    const { data: settings, error: settingsError } = await supabase
       .from('social_media_settings')
       .select('*')
       .eq('platform', 'linkedin')
@@ -516,7 +514,6 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -530,7 +527,7 @@ async function _GET(request: NextRequest) {
     const platform = searchParams.get('platform');
     const status = searchParams.get('status');
 
-    let query = db
+    let query = supabase
       .from('social_media_posts')
       .select('*')
       .order('created_at', { ascending: false });

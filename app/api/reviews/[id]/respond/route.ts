@@ -1,13 +1,13 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(
   request: Request,
@@ -19,7 +19,6 @@ async function _POST(
   const { id } = await params;
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -30,7 +29,7 @@ async function _POST(
     }
 
     // Verify user is admin
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -51,7 +50,7 @@ async function _POST(
     }
 
     // Update review with response
-    const { data: review, error: updateError } = await db
+    const { data: review, error: updateError } = await supabase
       .from('reviews')
       .update({
         response,
@@ -73,7 +72,7 @@ async function _POST(
 
     // Send notification to reviewer if email provided
     if (review.reviewer_email) {
-      await db.from('email_queue').insert({
+      await supabase.from('email_queue').insert({
         to_email: review.reviewer_email,
         from_email: 'noreply@elevateforhumanity.org',
         subject: 'Response to Your Review',

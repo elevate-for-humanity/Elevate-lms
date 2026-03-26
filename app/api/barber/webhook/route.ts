@@ -2,7 +2,6 @@ import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Stripe from 'stripe';
 import { BARBER_PRICING, calculateWeeklyPayment } from '@/lib/programs/pricing';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -106,7 +105,6 @@ async function _POST(request: NextRequest) {
   }
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const adminClient = createAdminClient();
   if (!supabase) {
     return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
@@ -182,7 +180,7 @@ async function _POST(request: NextRequest) {
           }
 
           // Create enrollment record
-          await db.from('barber_subscriptions').insert({
+          await supabase.from('barber_subscriptions').insert({
             stripe_customer_id: customerId,
             customer_email: customerEmail,
             customer_name: customerName,
@@ -294,7 +292,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
             });
           }
 
-          const { data: subRecord } = await db.from('barber_subscriptions').insert({
+          const { data: subRecord } = await supabase.from('barber_subscriptions').insert({
             stripe_customer_id: customerId,
             customer_email: customerEmail,
             customer_name: customerName,
@@ -322,7 +320,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
 
           // Create program_enrollments row. user_id is null — public checkout has no
           // Supabase account yet. enrollment-success links it by email on first login.
-          await db.from('program_enrollments').insert({
+          await supabase.from('program_enrollments').insert({
             user_id: null,
             email: normalizedEmail,
             full_name: customerName,
@@ -392,7 +390,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
         // Store subscription in database with email tracking fields
-        const { data: subscriptionRecord } = await db.from('barber_subscriptions').upsert({
+        const { data: subscriptionRecord } = await supabase.from('barber_subscriptions').upsert({
           user_id: userId,
           enrollment_id: enrollmentId || null,
           stripe_subscription_id: subscriptionId,
@@ -416,7 +414,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
 
         // Update enrollment status if enrollment_id provided
         if (enrollmentId) {
-          await db
+          await supabase
             .from('program_enrollments')
             .update({ 
               payment_status: 'active',
@@ -426,7 +424,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
         }
 
         // === NEW: Create/upsert apprentice record ===
-        const { data: existingApprentice } = await db
+        const { data: existingApprentice } = await supabase
           .from('apprentices')
           .select('id, start_date')
           .eq('user_id', userId)
@@ -436,7 +434,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
         if (existingApprentice) {
           // Update existing - only set start_date if null
           apprenticeId = existingApprentice.id;
-          await db
+          await supabase
             .from('apprentices')
             .update({
               status: 'active',
@@ -446,7 +444,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
             .eq('id', apprenticeId);
         } else {
           // Create new apprentice record
-          const { data: newApprentice } = await db
+          const { data: newApprentice } = await supabase
             .from('apprentices')
             .insert({
               user_id: userId,
@@ -461,14 +459,14 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
 
         // Link apprentice to subscription
         if (apprenticeId && subscriptionRecord?.id) {
-          await db
+          await supabase
             .from('barber_subscriptions')
             .update({ apprentice_id: apprenticeId })
             .eq('id', subscriptionRecord.id);
         }
 
         // === NEW: Send emails (idempotent - check if already sent) ===
-        const { data: subRecord } = await db
+        const { data: subRecord } = await supabase
           .from('barber_subscriptions')
           .select('welcome_email_sent_at, milady_email_sent_at')
           .eq('stripe_subscription_id', subscriptionId)
@@ -554,7 +552,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
             }
             
             // Mark welcome email as sent
-            await db
+            await supabase
               .from('barber_subscriptions')
               .update({ 
                 welcome_email_sent_at: new Date().toISOString(),
@@ -602,14 +600,14 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
             });
             
             // Mark Milady email as sent
-            await db
+            await supabase
               .from('barber_subscriptions')
               .update({ milady_email_sent_at: new Date().toISOString() })
               .eq('stripe_subscription_id', subscriptionId);
 
             // Queue Milady provisioning so admins have an in-app record.
             // Email alone is fragile — if missed, student waits with no visibility.
-            await db
+            await supabase
               .from('milady_provisioning_queue')
               .insert({
                 student_id: userId || null,
@@ -650,7 +648,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
           break;
         }
 
-        await db
+        await supabase
           .from('barber_subscriptions')
           .update({
             status: subscription.status,
@@ -673,7 +671,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
           break;
         }
 
-        await db
+        await supabase
           .from('barber_subscriptions')
           .update({
             status: 'canceled',
@@ -698,7 +696,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
         }
 
         // Record payment
-        await db.from('barber_payments').insert({
+        await supabase.from('barber_payments').insert({
           user_id: subscription.metadata?.user_id,
           stripe_subscription_id: subscriptionId,
           stripe_invoice_id: invoice.id,
@@ -714,7 +712,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
         if (currentWeeks > 0) {
           const newWeeksRemaining = currentWeeks - 1;
           
-          await db
+          await supabase
             .from('barber_subscriptions')
             .update({
               weeks_remaining: newWeeksRemaining,
@@ -780,7 +778,6 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
 async function _PUT(request: NextRequest) {
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
     }
@@ -791,7 +788,7 @@ async function _PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -844,7 +841,7 @@ async function _PUT(request: NextRequest) {
     });
 
     // Update database
-    await db
+    await supabase
       .from('barber_subscriptions')
       .update({
         transferred_hours_verified,

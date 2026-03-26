@@ -1,14 +1,14 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: NextRequest) {
   try {
@@ -17,12 +17,11 @@ async function _POST(req: NextRequest) {
 
     // Auth: require admin or instructor
     const supabase = await createClient();
-    const _admin = createAdminClient(); const db = _admin || supabase;
-    const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const { data: profile } = await db.from('profiles').select('role').eq('id', session.user.id).single();
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
     if (!profile || !['admin', 'super_admin', 'instructor'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -45,7 +44,7 @@ async function _POST(req: NextRequest) {
     if (slug) updateData.slug = slug;
     if (title) updateData.title = title;
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('training_courses')
       .update(updateData)
       .eq('id', id)

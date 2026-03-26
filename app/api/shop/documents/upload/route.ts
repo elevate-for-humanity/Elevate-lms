@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
   try {
@@ -15,7 +15,6 @@ async function _POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -37,7 +36,7 @@ async function _POST(req: Request) {
     }
 
     // Verify user is staff at this shop
-    const { data: staff } = await db
+    const { data: staff } = await supabase
       .from('shop_staff')
       .select('id')
       .eq('shop_id', shopId)
@@ -64,7 +63,7 @@ async function _POST(req: Request) {
     }
 
     // Save document record
-    const { error: dbError } = await db.from('shop_documents').insert({
+    const { error: dbError } = await supabase.from('shop_documents').insert({
       shop_id: shopId,
       document_type: documentType,
       file_url: uploadData.path,

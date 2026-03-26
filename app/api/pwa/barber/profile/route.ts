@@ -1,13 +1,13 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getAchievedMilestones, BARBER_MILESTONES } from '@/lib/pwa/milestones';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
   try {
@@ -15,11 +15,6 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    
-    if (!supabase) {
-      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     
@@ -28,7 +23,7 @@ async function _GET(request: Request) {
     }
 
     // Get user profile
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('id, full_name, first_name, email, phone')
       .eq('id', user.id)
@@ -39,7 +34,7 @@ async function _GET(request: Request) {
     }
 
     // Get partner assignment
-    const { data: partnerUser } = await db
+    const { data: partnerUser } = await supabase
       .from('partner_users')
       .select(`
         created_at,
@@ -54,7 +49,7 @@ async function _GET(request: Request) {
       .single();
 
     // Get total hours
-    const { data: progressEntries } = await db
+    const { data: progressEntries } = await supabase
       .from('progress_entries')
       .select('hours_worked')
       .eq('apprentice_id', user.id)

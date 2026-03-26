@@ -1,11 +1,11 @@
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 // AUTH: Intentionally public — no authentication required
 
 // app/api/lti/config/route.ts
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 async function _GET(request: Request) {
   

@@ -1,7 +1,4 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
@@ -10,6 +7,10 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { randomBytes } from 'node:crypto';
 import { logAuditEvent, AuditActions } from '@/lib/audit';
 import { toErrorMessage } from '@/lib/safe';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   const supabase = createAdminClient();

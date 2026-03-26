@@ -13,7 +13,6 @@
  * 6. Capture route loads metadata from DB by order_id
  */
 
-export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAffirmCheckoutConfig, affirm } from '@/lib/affirm/client';
@@ -22,6 +21,7 @@ import { logger } from '@/lib/logger';
 import { resolvePaymentAmount } from '@/lib/payments/resolve-amount';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
 
 async function _POST(request: NextRequest) {
   try {

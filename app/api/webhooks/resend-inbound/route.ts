@@ -1,12 +1,13 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 30;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { resend } from '@/lib/resend';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tracker';
+export const runtime = 'nodejs';
+export const maxDuration = 30;
+
+export const dynamic = 'force-dynamic';
 
 // Where to forward inbound emails. Map recipient prefixes to Gmail.
 const FORWARD_MAP: Record<string, string> = {

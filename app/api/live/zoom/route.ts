@@ -1,8 +1,5 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/live/zoom/route.ts
 // API endpoint for instructors to schedule Zoom live sessions
@@ -12,6 +9,10 @@ import { createZoomMeeting } from '@/lib/integrations/zoom';
 import { logAuditEvent, getRequestMetadata } from '@/lib/audit';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');

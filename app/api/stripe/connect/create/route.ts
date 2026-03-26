@@ -1,7 +1,4 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { z } from 'zod';
 import { getStripe } from '@/lib/stripe/client';
@@ -10,6 +7,10 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/authGuards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const connectCreateSchema = z.object({
   employer_id: z.string().uuid(),

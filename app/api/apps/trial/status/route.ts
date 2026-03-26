@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -11,10 +10,6 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (!supabase) {
-      return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -28,7 +23,7 @@ async function _GET(request: NextRequest) {
       return NextResponse.json({ error: 'App slug required' }, { status: 400 });
     }
 
-    const { data: subscription } = await db
+    const { data: subscription } = await supabase
       .from('user_app_subscriptions')
       .select('*')
       .eq('user_id', user.id)
@@ -51,7 +46,7 @@ async function _GET(request: NextRequest) {
 
       if (daysRemaining <= 0) {
         // Trial expired - update status
-        await db
+        await supabase
           .from('user_app_subscriptions')
           .update({ status: 'expired' })
           .eq('id', subscription.id);

@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 type HourType = 'RTI' | 'OJT';
 type FundingPhase = 'PRE_WIOA' | 'WIOA' | 'POST_CERT';
@@ -28,7 +28,6 @@ async function _POST(req: Request) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   const {
     data: { user },
@@ -49,7 +48,7 @@ async function _POST(req: Request) {
   }
 
   // Verify user owns this enrollment
-  const { data: enrollment, error: enrollErr } = await db
+  const { data: enrollment, error: enrollErr } = await supabase
     .from('student_enrollments')
     .select('id, student_id, program_id')
     .eq('id', enrollment_id)
@@ -113,7 +112,7 @@ async function _POST(req: Request) {
   }
 
   // Fetch apprentice funding profile (WIOA start + post-cert date)
-  const { data: profile, error: profErr } = await db
+  const { data: profile, error: profErr } = await supabase
     .from('apprentice_funding_profile')
     .select('wioa_start_date, post_cert_date')
     .eq('enrollment_id', enrollment_id)
@@ -167,7 +166,7 @@ async function _POST(req: Request) {
   week_end.setUTCDate(week_end.getUTCDate() + 7);
   const week_end_iso = week_end.toISOString().slice(0, 10);
 
-  const { data: totals, error: totErr } = await db
+  const { data: totals, error: totErr } = await supabase
     .from('hour_entries')
     .select('hours_claimed, source_type, category')
     .eq('user_id', user.id)
@@ -211,7 +210,7 @@ async function _POST(req: Request) {
 
   const newHours = newMinutes / 60;
 
-  const { data: created, error: insErr } = await db
+  const { data: created, error: insErr } = await supabase
     .from('hour_entries')
     .insert({
       user_id: user.id,
@@ -238,7 +237,6 @@ async function _GET(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   const {
     data: { user },
@@ -252,7 +250,7 @@ const supabase = await createClient();
   const status = searchParams.get('status');
   const funding_phase = searchParams.get('funding_phase');
 
-  let query = db
+  let query = supabase
     .from('hour_entries')
     .select('*')
     .eq('user_id', user.id)

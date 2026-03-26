@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 import { runAutomationTasks } from '@/lib/automation/enrollment-automation';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 

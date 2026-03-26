@@ -1,20 +1,19 @@
 import { NextResponse } from "next/server";
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -24,7 +23,7 @@ const supabase = await createClient();
   }
 
   // Check if user is admin
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
@@ -34,7 +33,7 @@ const supabase = await createClient();
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { data: items, error } = await db
+  const { data: items, error } = await supabase
     .from("compliance_items")
     .select(`
       *,
@@ -55,7 +54,6 @@ async function _PATCH(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -65,7 +63,7 @@ const supabase = await createClient();
   }
 
   // Check if user is admin
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
@@ -84,7 +82,7 @@ const supabase = await createClient();
     );
   }
 
-  const { error } = await db
+  const { error } = await supabase
     .from("compliance_items")
     .update({
       status,
@@ -98,7 +96,7 @@ const supabase = await createClient();
   }
 
   // Log the compliance update
-  await db.from("audit_logs").insert({
+  await supabase.from("audit_logs").insert({
     actor_id: user.id,
     actor_email: user.email,
     action: "compliance_item_updated",

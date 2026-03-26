@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { requireApiRole } from '@/lib/auth/require-api-role';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
@@ -12,6 +9,10 @@ import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { getCourseRequirements } from '@/lib/courses/completion-requirements';
 import { startCredentialAttempt } from '@/lib/services/credential-pipeline';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 /**
  * Mark course as completed

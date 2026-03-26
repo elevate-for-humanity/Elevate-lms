@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
 import { auditLog } from '@/lib/auditLog';
 import { updateTenantLicense } from '@/lib/licenseGuard';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {

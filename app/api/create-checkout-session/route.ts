@@ -1,5 +1,3 @@
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 
 import { stripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
@@ -8,6 +6,8 @@ import { getRAPIDSMetadata, isRAPIDSProgram } from '@/lib/compliance/rapids-conf
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 
 

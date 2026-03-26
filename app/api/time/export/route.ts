@@ -1,14 +1,14 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 function csvEscape(v: any) {
   const s = String(v ?? '');
@@ -21,7 +21,6 @@ async function _GET(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
     error: authErr,
@@ -39,7 +38,7 @@ const supabase = await createClient();
   const userEmail = user.email;
 
   // Find program holders where this user is the mentor
-  const { data: programHolders } = await db
+  const { data: programHolders } = await supabase
     .from('program_holders')
     .select('id')
     .eq('email', userEmail);
@@ -51,7 +50,7 @@ const supabase = await createClient();
   const holderIds = programHolders.map((ph) => ph.id);
 
   // Query consolidated hour_entries
-  let q = db
+  let q = supabase
     .from('hour_entries')
     .select(
       `
@@ -90,7 +89,7 @@ const supabase = await createClient();
   const userIds = [...new Set(rows.map((r: any) => r.user_id).filter(Boolean))];
   const profileMap: Record<string, string> = {};
   if (userIds.length > 0) {
-    const { data: profiles } = await db
+    const { data: profiles } = await supabase
       .from('profiles')
       .select('id, full_name')
       .in('id', userIds);

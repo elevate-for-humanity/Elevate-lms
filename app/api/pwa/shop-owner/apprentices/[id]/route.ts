@@ -1,12 +1,12 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 const MILESTONES = [
   { hours: 500, title: 'Beginner', achieved: false },
@@ -25,11 +25,6 @@ async function _GET(
 
     const { id: apprenticeId } = await params;
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    
-    if (!supabase) {
-      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     
@@ -38,7 +33,7 @@ async function _GET(
     }
 
     // Get user's partner association
-    const { data: partnerUser } = await db
+    const { data: partnerUser } = await supabase
       .from('partner_users')
       .select('partner_id, role')
       .eq('user_id', user.id)
@@ -51,7 +46,7 @@ async function _GET(
     }
 
     // Verify apprentice is assigned to this partner
-    const { data: apprenticeAssignment } = await db
+    const { data: apprenticeAssignment } = await supabase
       .from('partner_users')
       .select('created_at')
       .eq('user_id', apprenticeId)
@@ -66,7 +61,7 @@ async function _GET(
     }
 
     // Get apprentice profile
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('id, full_name, first_name, email, phone, created_at')
       .eq('id', apprenticeId)
@@ -77,7 +72,7 @@ async function _GET(
     }
 
     // Get all progress entries
-    const { data: progressEntries } = await db
+    const { data: progressEntries } = await supabase
       .from('progress_entries')
       .select('*')
       .eq('apprentice_id', apprenticeId)

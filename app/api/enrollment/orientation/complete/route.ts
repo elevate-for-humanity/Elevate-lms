@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -11,7 +10,6 @@ async function _POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
@@ -25,7 +23,7 @@ async function _POST(req: Request) {
     }
 
     // Verify ownership and current state
-    const { data: enrollment, error: fetchError } = await db
+    const { data: enrollment, error: fetchError } = await supabase
       .from('program_enrollments')
       .select('id, user_id, enrollment_state')
       .eq('id', enrollment_id)
@@ -57,7 +55,7 @@ async function _POST(req: Request) {
     }
 
     // Advance state
-    const { error: updateError } = await db
+    const { error: updateError } = await supabase
       .from('program_enrollments')
       .update({
         enrollment_state: 'orientation_complete',

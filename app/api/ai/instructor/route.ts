@@ -1,10 +1,7 @@
 
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import {
   getInstructorByProgramId,
   getInstructorById,
@@ -13,6 +10,8 @@ import { allPrograms } from '@/lms-data/programs';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 const apiKey = process.env.OPENAI_API_KEY;
 
@@ -108,9 +107,8 @@ Keep responses concise (2-4 paragraphs max), practical, and encouraging. Focus o
       // Log interaction to database
       try {
         const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
         const { data: { user } } = await supabase.auth.getUser();
-        await db.from('ai_instructor_interactions').insert({
+        await supabase.from('ai_instructor_interactions').insert({
           user_id: user?.id || null,
           program_id: programId,
           instructor_id: instructorId,

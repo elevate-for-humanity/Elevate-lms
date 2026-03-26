@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -19,7 +18,6 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhuma
 async function _POST() {
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -27,7 +25,7 @@ async function _POST() {
     }
 
     // Verify the application is actually approved (DB trigger must have run)
-    const { data: application } = await db
+    const { data: application } = await supabase
       .from('applications')
       .select('id, first_name, last_name, email, program_interest, status, reference_number')
       .eq('user_id', user.id)
@@ -41,7 +39,7 @@ async function _POST() {
     }
 
     // Check if approval email was already sent (idempotent)
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('onboarding_progress')
       .select('status')
       .eq('user_id', user.id)

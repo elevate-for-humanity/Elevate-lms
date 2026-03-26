@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { withErrorHandling, APIErrors } from '@/lib/api';
 import { NextRequest, NextResponse } from 'next/server';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
@@ -23,7 +22,6 @@ const SOURCE_TYPE_MAP: Record<string, TransferSourceType> = {
 
 export const POST = withErrorHandling(async (request: NextRequest) => {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Check authentication
   const {
@@ -60,7 +58,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   }
 
   // Verify apprentice belongs to user
-  const { data: apprentice, error: apprenticeError } = await db
+  const { data: apprentice, error: apprenticeError } = await supabase
     .from('apprentices')
     .select('id, user_id, program_id, programs(total_hours)')
     .eq('id', apprenticeId)
@@ -107,7 +105,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     : 'requires_manual_review';
 
   // Create transfer request
-  const { data: transferRequest, error: insertError } = await db
+  const { data: transferRequest, error: insertError } = await supabase
     .from('hour_transfer_requests')
     .insert({
       apprentice_id: apprenticeId,

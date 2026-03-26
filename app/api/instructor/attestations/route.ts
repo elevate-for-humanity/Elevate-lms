@@ -1,12 +1,12 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * Instructor Attestation API
@@ -39,7 +39,7 @@ const ATTESTATION_METHODS = new Set([
 
 async function getInstructorProfile(db: any, userId: string) {
   // Check profiles table for role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('id, role, full_name, email')
     .eq('id', userId)
@@ -54,7 +54,7 @@ async function getInstructorProfile(db: any, userId: string) {
   }
 
   // Also check if they're an instructor in partner_users
-  const { data: partnerUser } = await db
+  const { data: partnerUser } = await supabase
     .from('partner_users')
     .select('role')
     .eq('user_id', userId)
@@ -78,8 +78,6 @@ async function _POST(req: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -135,7 +133,7 @@ async function _POST(req: NextRequest) {
   }
 
   // Verify student exists
-  const { data: student } = await db
+  const { data: student } = await supabase
     .from('profiles')
     .select('id')
     .eq('id', student_id)
@@ -147,7 +145,7 @@ async function _POST(req: NextRequest) {
 
   // For session_delivery: verify the cohort session exists and isn't already attested by this instructor
   if (attestation_type === 'session_delivery' && cohort_session_id) {
-    const { data: existingAttestation } = await db
+    const { data: existingAttestation } = await supabase
       .from('instructor_attestations')
       .select('id')
       .eq('instructor_id', user.id)
@@ -166,7 +164,7 @@ async function _POST(req: NextRequest) {
 
   // For module_completion: verify the lesson exists and check for duplicate
   if (attestation_type === 'module_completion' && lesson_id) {
-    const { data: existingAttestation } = await db
+    const { data: existingAttestation } = await supabase
       .from('instructor_attestations')
       .select('id')
       .eq('instructor_id', user.id)
@@ -184,7 +182,7 @@ async function _POST(req: NextRequest) {
   }
 
   // Insert attestation
-  const { data: attestation, error: insertErr } = await db
+  const { data: attestation, error: insertErr } = await supabase
     .from('instructor_attestations')
     .insert({
       instructor_id: user.id,
@@ -213,7 +211,7 @@ async function _POST(req: NextRequest) {
 
   // If attesting an hour_entry, update its engagement_verified status
   if (hour_entry_id) {
-    await db
+    await supabase
       .from('lesson_progress')
       .update({
         engagement_verified: true,
@@ -238,8 +236,6 @@ async function _GET(req: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -252,14 +248,14 @@ async function _GET(req: NextRequest) {
   const limit = Math.min(Number(url.searchParams.get('limit')) || 50, 200);
   const offset = Number(url.searchParams.get('offset')) || 0;
 
-  let query = db
+  let query = supabase
     .from('instructor_attestations')
     .select('*')
     .order('attested_at', { ascending: false })
     .range(offset, offset + limit - 1);
 
   // Instructors see attestations they created; admins see all; students see their own
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)

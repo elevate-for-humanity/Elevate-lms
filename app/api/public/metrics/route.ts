@@ -1,13 +1,13 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 /**
  * Public Metrics API
@@ -20,7 +20,6 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get real metrics from database
     const [
@@ -34,10 +33,10 @@ async function _GET(request: Request) {
       totalCertificates,
     ] = await Promise.all([
       // Total registered users
-      db.from('profiles').select('id', { count: 'exact', head: true }),
+      supabase.from('profiles').select('id', { count: 'exact', head: true }),
 
       // Active students (enrolled in last 30 days)
-      db
+      supabase
         .from('program_enrollments')
         .select('user_id', { count: 'exact', head: true })
         .gte(
@@ -47,21 +46,21 @@ async function _GET(request: Request) {
         .eq('status', 'active'),
 
       // Total enrollments
-      db.from('program_enrollments').select('id', { count: 'exact', head: true }),
+      supabase.from('program_enrollments').select('id', { count: 'exact', head: true }),
 
       // Completed courses
-      db
+      supabase
         .from('program_enrollments')
         .select('id', { count: 'exact', head: true })
         .eq('status', 'completed'),
 
       // Total applications
-      db
+      supabase
         .from('applications')
         .select('id', { count: 'exact', head: true }),
 
       // Recent logins (last 24 hours)
-      db
+      supabase
         .from('profiles')
         .select('last_sign_in_at', { count: 'exact', head: true })
         .gte(
@@ -70,13 +69,13 @@ async function _GET(request: Request) {
         ),
 
       // Active courses
-      db
+      supabase
         .from('training_courses')
         .select('id', { count: 'exact', head: true })
         .eq('is_published', true),
 
       // Total certificates issued
-      db
+      supabase
         .from('certificates')
         .select('id', { count: 'exact', head: true }),
     ]);
@@ -90,7 +89,7 @@ async function _GET(request: Request) {
         : 0;
 
     // Get recent activity (last 10 enrollments - public data only)
-    const { data: recentActivity } = await db
+    const { data: recentActivity } = await supabase
       .from('program_enrollments')
       .select('created_at, courses(title)')
       .order('created_at', { ascending: false })

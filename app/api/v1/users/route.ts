@@ -1,6 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // Public REST API - Users Endpoint
 import { NextRequest, NextResponse } from 'next/server';
@@ -12,12 +9,15 @@ import {
   logAPIRequest,
 } from '@/lib/api/rest-api';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 // GET /api/v1/users - List users
 async function _GET(request: NextRequest) {
@@ -47,7 +47,6 @@ const startTime = Date.now();
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const searchParams = request.nextUrl.searchParams;
 
     const page = parseInt(searchParams.get('page') || '1', 10);
@@ -58,7 +57,7 @@ const startTime = Date.now();
       data: users,
       error: queryError,
       count,
-    } = await db
+    } = await supabase
       .from('profiles')
       .select('id, full_name, email, role, created_at', { count: 'exact' })
       .order('created_at', { ascending: false })
@@ -134,7 +133,6 @@ async function _POST(request: NextRequest) {
 
     const body = await parseBody<Record<string, any>>(request);
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Create auth user
     const { data: authData, error: authError } =
@@ -150,7 +148,7 @@ async function _POST(request: NextRequest) {
     if (authError) throw authError;
 
     // Create profile
-    const { data: profile, error: profileError } = await db
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .insert({
         id: authData.user.id,

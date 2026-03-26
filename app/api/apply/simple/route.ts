@@ -1,10 +1,11 @@
-export const dynamic = 'force-dynamic';
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { sendApplicationWelcomeEmail } from '@/lib/email/application-welcome';
 import { sendOnboardingEmail } from '@/lib/email/send-onboarding';
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
   try {

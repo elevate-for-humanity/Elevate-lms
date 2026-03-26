@@ -1,15 +1,15 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   try {
@@ -17,7 +17,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -32,7 +31,7 @@ async function _POST(request: NextRequest) {
     // Save or update course structure
     for (const module of modules) {
       // Upsert module
-      const { data: moduleData, error: moduleError } = await db
+      const { data: moduleData, error: moduleError } = await supabase
         .from('modules')
         .upsert({
           id: module.id.startsWith('module-') ? undefined : module.id,
@@ -54,7 +53,7 @@ async function _POST(request: NextRequest) {
           { status: 410 }
         );
 
-        const { data: lessonData, error: lessonError } = await db
+        const { data: lessonData, error: lessonError } = await supabase
           .from('training_lessons')
           .upsert({
             id: lesson.id.startsWith('lesson-') ? undefined : lesson.id,
@@ -69,7 +68,7 @@ async function _POST(request: NextRequest) {
         if (lessonError) throw lessonError;
 
         // Delete existing blocks for this lesson
-        await db
+        await supabase
           .from('lesson_content_blocks')
           .delete()
           .eq('lesson_id', lessonData.id);
@@ -86,7 +85,7 @@ async function _POST(request: NextRequest) {
             })
           );
 
-          const { error: blocksError } = await db
+          const { error: blocksError } = await supabase
             .from('lesson_content_blocks')
             .insert(blocks);
 

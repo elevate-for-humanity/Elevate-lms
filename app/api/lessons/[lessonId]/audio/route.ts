@@ -1,6 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 300;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { existsSync } from 'fs';
@@ -13,6 +10,10 @@ import type { CourseLesson, CourseModule } from '@/lib/courses/definitions';
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import { aiChat, isAIAvailable } from '@/lib/ai/ai-service';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 300;
+
+export const dynamic = 'force-dynamic';
 
 /* ── Paths ──────────────────────────────────────────────────── */
 

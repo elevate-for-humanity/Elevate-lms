@@ -1,14 +1,14 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(
   request: Request,
@@ -19,8 +19,7 @@ async function _POST(
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    const _admin = createAdminClient(); const db = _admin || supabase;
-    const { lessonId } = await params;
+      const { lessonId } = await params;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -38,7 +37,7 @@ async function _POST(
 
     const { progress } = await request.json();
 
-    const { error } = await db.from('video_progress').upsert(
+    const { error } = await supabase.from('video_progress').upsert(
       {
         user_id: user.id,
         lesson_id: lessonId,

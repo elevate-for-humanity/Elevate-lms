@@ -1,13 +1,9 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import Stripe from 'stripe';
 import { stripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
@@ -16,6 +12,10 @@ import { logger } from '@/lib/logger';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 interface CheckoutRequest {
   programId: string;
@@ -42,7 +42,6 @@ async function _POST(request: NextRequest) {
 
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get authenticated user
     const {
@@ -82,7 +81,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Get program details from database
-    const { data: program, error: programError } = await db
+    const { data: program, error: programError } = await supabase
       .from('programs')
       .select('*')
       .eq('id', programId)
@@ -114,7 +113,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Get or create Stripe customer
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('stripe_customer_id, email, full_name')
       .eq('id', user.id)
@@ -136,7 +135,7 @@ async function _POST(request: NextRequest) {
         customerId = customer.id;
 
         // Save customer ID to database
-        await db
+        await supabase
           .from('profiles')
           .update({ stripe_customer_id: customer.id })
           .eq('id', user.id);
@@ -167,7 +166,7 @@ async function _POST(request: NextRequest) {
 
     // Look up the most recent application for this user+program so we can
     // embed application_id in metadata — required for reconciliation.
-    const { data: application } = await db
+    const { data: application } = await supabase
       .from('applications')
       .select('id')
       .eq('user_id', user.id)
@@ -303,7 +302,7 @@ async function _POST(request: NextRequest) {
 
     // Log payment attempt in database
     try {
-      await db.from('payment_logs').insert({
+      await supabase.from('payment_logs').insert({
         user_id: user.id,
         program_id: programId,
         session_id: session.id,

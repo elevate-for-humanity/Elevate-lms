@@ -1,12 +1,12 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 /**
  * EMPLOYER APPLICATION API
@@ -21,7 +21,6 @@ async function _POST(request: NextRequest) {
 
     const formData = await request.formData();
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Extract form data
     const data = {
@@ -49,7 +48,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Get default tenant (for now - will be replaced with tenant resolution)
-    const { data: defaultTenant } = await db
+    const { data: defaultTenant } = await supabase
       .from('tenants')
       .select('id')
       .eq('slug', 'efh-core')
@@ -63,7 +62,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Create employer application in canonical applications table
-    const { data: application, error: appError } = await db
+    const { data: application, error: appError } = await supabase
       .from('applications')
       .insert({
         first_name: data.first_name,

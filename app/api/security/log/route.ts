@@ -1,14 +1,14 @@
 import { logger } from '@/lib/logger';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 10;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 10;
+
+export const dynamic = 'force-dynamic';
 
 // Simple in-memory rate limiting (per IP)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -55,8 +55,7 @@ async function _POST(request: NextRequest) {
     Promise.resolve().then(async () => {
       try {
         const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-        await db.from('audit_logs').insert({
+        await supabase.from('audit_logs').insert({
           action: body.type,
           event_type: 'security',
           ip_address: ip,

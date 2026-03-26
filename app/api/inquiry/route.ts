@@ -1,14 +1,14 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 30;
 
 import { NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 30;
+
+export const dynamic = 'force-dynamic';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 const ADMIN_SMS = process.env.ADMIN_SMS_GATEWAY || '';
@@ -47,8 +47,7 @@ async function _POST(req: Request) {
     // Save inquiry to database
     try {
       const supabase = await createClient();
-      const _admin = createAdminClient(); const db = _admin || supabase;
-      await db.from('inquiries').insert({
+          await supabase.from('inquiries').insert({
         name,
         email,
         phone,

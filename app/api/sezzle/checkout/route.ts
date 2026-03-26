@@ -15,7 +15,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sezzle, SezzleSessionRequest } from '@/lib/sezzle/client';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { resolvePaymentAmount } from '@/lib/payments/resolve-amount';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -116,7 +115,6 @@ async function _POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
     // Generate a unique reference ID
@@ -231,7 +229,7 @@ async function _POST(request: NextRequest) {
 
     // Store the Sezzle order reference in database
     if (supabase && applicationId) {
-      await db
+      await supabase
         .from('applications')
         .update({
           sezzle_session_uuid: session.uuid,

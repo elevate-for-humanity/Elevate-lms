@@ -1,14 +1,14 @@
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { toErrorMessage } from '@/lib/safe';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 // Allowed bucket names (whitelist)
 const ALLOWED_BUCKETS = ['media', 'documents', 'avatars', 'course-content'];
@@ -22,7 +22,6 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Authentication check
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -35,7 +34,7 @@ export async function POST(req: Request) {
     }
 
     // Check admin role for delete operations
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)

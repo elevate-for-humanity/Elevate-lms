@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -16,9 +15,8 @@ async function _GET(
 
     const { courseId } = await params;
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-    const { data, error } = await db
+    const { data, error } = await supabase
       .from('course_modules')
       .select('*')
       .eq('course_id', courseId)
@@ -44,7 +42,6 @@ async function _POST(
 
     const { courseId } = await params;
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -54,7 +51,7 @@ async function _POST(
     const body = await request.json();
     const { title, description, content, order_index } = body;
 
-    const { data, error } = await db
+    const { data, error } = await supabase
       .from('course_modules')
       .insert({
         course_id: courseId,
@@ -87,7 +84,6 @@ async function _PUT(
 
     const { courseId } = await params;
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -99,7 +95,7 @@ async function _PUT(
 
     // Update module order
     for (const mod of modules) {
-      await db
+      await supabase
         .from('course_modules')
         .update({ order_index: mod.order_index })
         .eq('id', mod.id)

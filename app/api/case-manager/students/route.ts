@@ -1,13 +1,13 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
   try {
@@ -15,7 +15,6 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -24,7 +23,7 @@ async function _GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('user_profiles')
       .select('role')
       .eq('user_id', user.id)
@@ -38,7 +37,7 @@ async function _GET(request: Request) {
     }
 
     // Get students assigned to this case manager
-    const { data: students, error } = await db
+    const { data: students, error } = await supabase
       .from('user_profiles')
       .select(
         `
@@ -65,7 +64,7 @@ async function _GET(request: Request) {
     const studentsWithData = await Promise.all(
       (students || []).map(async (student) => {
         // Get enrollments
-        const { data: enrollments } = await db
+        const { data: enrollments } = await supabase
           .from('program_enrollments')
           .select(
             `
@@ -78,7 +77,7 @@ async function _GET(request: Request) {
           .eq('student_id', student.user_id);
 
         // Get hours summary from consolidated hour_entries
-        const { data: hours } = await db
+        const { data: hours } = await supabase
           .from('hour_entries')
           .select('hours_claimed, accepted_hours, status')
           .eq('user_id', student.user_id);
@@ -91,7 +90,7 @@ async function _GET(request: Request) {
             .reduce((sum, h) => sum + (Number(h.accepted_hours) || Number(h.hours_claimed) || 0), 0) || 0;
 
         // Get exam readiness
-        const { data: readiness } = await db
+        const { data: readiness } = await supabase
           .from('exam_readiness')
           .select('*')
           .eq('student_id', student.user_id)

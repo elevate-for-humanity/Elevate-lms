@@ -1,15 +1,15 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { stripe } from '@/lib/stripe/client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: Request) {
   try {
@@ -17,7 +17,6 @@ async function _POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = await parseBody<Record<string, any>>(request);
 
     const {
@@ -55,7 +54,7 @@ async function _POST(request: Request) {
     } = await supabase.auth.getUser();
 
     // Create donation record
-    const { data: donation, error: donationError } = await db
+    const { data: donation, error: donationError } = await supabase
       .from('donations')
       .insert({
         donor_name,
@@ -120,7 +119,7 @@ async function _POST(request: Request) {
     const session = await stripe.checkout.sessions.create(sessionParams);
 
     // Update donation with Stripe session ID
-    await db
+    await supabase
       .from('donations')
       .update({
         stripe_checkout_session_id: session.id,

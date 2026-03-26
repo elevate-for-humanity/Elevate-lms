@@ -1,14 +1,14 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/study-groups/[id]/join/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(
   request: NextRequest,
@@ -20,7 +20,6 @@ async function _POST(
 
     const { id } = await params;
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -35,7 +34,7 @@ async function _POST(
     const groupId = id;
 
     // Check if group exists
-    const { data: group, error: groupError } = await db
+    const { data: group, error: groupError } = await supabase
       .from("study_groups")
       .select("id, max_members")
       .eq("id", groupId)
@@ -49,7 +48,7 @@ async function _POST(
     }
 
     // Check if already a member
-    const { data: existingMembership } = await db
+    const { data: existingMembership } = await supabase
       .from("study_group_members")
       .select("id")
       .eq("group_id", groupId)
@@ -65,7 +64,7 @@ async function _POST(
 
     // Check if group is full
     if (group.max_members) {
-      const { count } = await db
+      const { count } = await supabase
         .from("study_group_members")
         .select("*", { count: "exact", head: true })
         .eq("group_id", groupId);
@@ -79,7 +78,7 @@ async function _POST(
     }
 
     // Add user to group
-    const { error: insertError } = await db
+    const { error: insertError } = await supabase
       .from("study_group_members")
       .insert({
         group_id: groupId,

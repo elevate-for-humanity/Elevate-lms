@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 // AUTH: Intentionally public — no authentication required
 
 
-export const maxDuration = 60;
 import { searchEntities } from '@/lib/integrations/sam-gov';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
 
 async function _GET(req: NextRequest) {
   try {

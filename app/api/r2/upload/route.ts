@@ -2,7 +2,6 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { uploadToR2, getContentType, isR2Configured } from '@/lib/cloudflare-r2';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -27,7 +26,6 @@ async function _POST(req: NextRequest) {
 
     // Check authentication (admin only)
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -35,7 +33,7 @@ async function _POST(req: NextRequest) {
     }
 
     // Check if user is admin
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)

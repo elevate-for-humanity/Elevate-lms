@@ -1,7 +1,4 @@
-export const runtime = 'nodejs';
 import { createAdminClient } from '@/lib/supabase/admin';
-export const maxDuration = 60;
-export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
@@ -9,6 +6,10 @@ import { logger } from '@/lib/logger';
 import { sanitizeSearchInput } from '@/lib/utils';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 // Create Supabase client for edge runtime
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;

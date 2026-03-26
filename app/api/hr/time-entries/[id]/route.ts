@@ -1,15 +1,15 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _PATCH(
   request: NextRequest,
@@ -21,7 +21,6 @@ async function _PATCH(
 const { id } = await params;
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = await parseBody<Record<string, any>>(request);
 
     const { clock_in, clock_out, break_minutes, lunch_minutes, status, notes } =
@@ -50,7 +49,7 @@ const { id } = await params;
       update.total_hours = regHours;
     }
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('time_entries')
       .update(update)
       .eq('id', id)
@@ -82,8 +81,7 @@ async function _DELETE(
 const { id } = await params;
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    const { error } = await db.from('time_entries').delete().eq('id', id);
+    const { error } = await supabase.from('time_entries').delete().eq('id', id);
 
     if (error) throw error;
 

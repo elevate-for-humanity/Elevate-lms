@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditPiiAccess } from '@/lib/auditLog';
@@ -33,10 +32,9 @@ export async function POST(request: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Store document upload request in database
-    const { error: dbError } = await db
+    const { error: dbError } = await supabase
       .from('tax_document_uploads')
       .insert({
         first_name: firstName,

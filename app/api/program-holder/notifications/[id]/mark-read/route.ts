@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(
   req: Request,
@@ -17,7 +17,6 @@ async function _POST(
 
   const { id } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   const {
     data: { user },
@@ -27,7 +26,7 @@ async function _POST(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { error } = await db
+  const { error } = await supabase
     .from('notifications')
     .update({ read: true, read_at: new Date().toISOString() })
     .eq('id', id)

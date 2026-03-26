@@ -1,14 +1,14 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/mobile/profile/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: NextRequest) {
   try {
@@ -25,7 +25,6 @@ async function _GET(request: NextRequest) {
 
     const token = authHeader.substring(7);
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Verify token and get user
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
@@ -38,20 +37,20 @@ async function _GET(request: NextRequest) {
     }
 
     // 1) Get user profile
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from("profiles")
       .select("full_name, avatar_url")
       .eq("id", user.id)
       .single();
 
     // 2) Get course counts
-    const { count: totalCourses } = await db
+    const { count: totalCourses } = await supabase
       .from("program_enrollments")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id);
 
     // Get completed courses (progress >= 100%)
-    const { data: enrollments } = await db
+    const { data: enrollments } = await supabase
       .from("program_enrollments")
       .select("course_id")
       .eq("user_id", user.id);
@@ -60,14 +59,14 @@ async function _GET(request: NextRequest) {
     if (enrollments) {
       for (const enrollment of enrollments) {
         // Get total lessons
-        const { data: modules } = await db
+        const { data: modules } = await supabase
           .from("modules")
           .select("id")
           .eq("course_id", enrollment.course_id);
 
         const moduleIds = modules?.map((m) => m.id) || [];
 
-        const { data: lessons } = await db
+        const { data: lessons } = await supabase
           .from("training_lessons")
           .select("id")
           .in("module_id", moduleIds);
@@ -75,7 +74,7 @@ async function _GET(request: NextRequest) {
         const totalLessons = lessons?.length || 0;
 
         // Get completed lessons
-        const { data: progress } = await db
+        const { data: progress } = await supabase
           .from("lesson_progress")
           .select("lesson_id")
           .eq("user_id", user.id)
@@ -91,13 +90,13 @@ async function _GET(request: NextRequest) {
     }
 
     // 3) Get certificates count
-    const { count: certificatesCount } = await db
+    const { count: certificatesCount } = await supabase
       .from("certificates")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id);
 
     // 4) Get streak (from learning_activity table or calculate)
-    const { data: streakData } = await db
+    const { data: streakData } = await supabase
       .from("learning_activity")
       .select("current_streak")
       .eq("user_id", user.id)

@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(
   request: Request,
@@ -17,9 +17,8 @@ async function _GET(
     if (rateLimited) return rateLimited;
 const { id } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  const { data: doc, error } = await db
+  const { data: doc, error } = await supabase
     .from("signature_documents")
     .select(`
       *,

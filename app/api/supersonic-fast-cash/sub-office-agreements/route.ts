@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   try {
@@ -14,7 +14,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const data = await request.json();
 
     // Get IP address
@@ -24,7 +23,7 @@ async function _POST(request: NextRequest) {
       'unknown';
 
     // Insert into database
-    const { data: agreement, error } = await db
+    const { data: agreement, error } = await supabase
       .from('sub_office_agreements')
       .insert({
         sub_office_name: data.subOfficeName,
@@ -67,9 +66,8 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-    const { data: agreements, error } = await db
+    const { data: agreements, error } = await supabase
       .from('sub_office_agreements')
       .select('*')
       .order('created_at', { ascending: false });

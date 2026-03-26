@@ -1,6 +1,5 @@
 
 
-export const maxDuration = 60;
 
 import { NextRequest } from 'next/server';
 import { gh, parseRepo } from '@/lib/github';
@@ -10,6 +9,7 @@ import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
 
 // Simple HTML escape for security
 function escapeHtml(text: string): string {

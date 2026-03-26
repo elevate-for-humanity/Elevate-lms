@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -13,25 +12,24 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get client counts
-    const { count: totalClients } = await db
+    const { count: totalClients } = await supabase
       .from('tax_clients')
       .select('*', { count: 'exact', head: true });
 
-    const { count: pendingReturns } = await db
+    const { count: pendingReturns } = await supabase
       .from('tax_clients')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'pending');
 
-    const { count: completedReturns } = await db
+    const { count: completedReturns } = await supabase
       .from('tax_clients')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'completed');
 
     // Get total refunds
-    const { data: refundData } = await db
+    const { data: refundData } = await supabase
       .from('tax_clients')
       .select('refund_amount')
       .eq('status', 'completed');
@@ -43,7 +41,7 @@ async function _GET(request: Request) {
 
     // Get today's appointments
     const today = new Date().toISOString().split('T')[0];
-    const { count: todayAppointments } = await db
+    const { count: todayAppointments } = await supabase
       .from('appointments')
       .select('*', { count: 'exact', head: true })
       .eq('appointment_date', today)
@@ -52,7 +50,7 @@ async function _GET(request: Request) {
     // Get weekly revenue (last 7 days)
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
-    const { data: revenueData } = await db
+    const { data: revenueData } = await supabase
       .from('tax_clients')
       .select('preparation_fee')
       .eq('status', 'completed')

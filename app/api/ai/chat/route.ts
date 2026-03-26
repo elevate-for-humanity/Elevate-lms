@@ -1,16 +1,16 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import OpenAI from 'openai';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 function getOpenAIClient() {
   return new OpenAI({
@@ -33,7 +33,6 @@ async function _POST(req: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -43,7 +42,7 @@ async function _POST(req: Request) {
     }
 
     // Get AI assignment
-    const { data: assignment, error: assignmentError } = await db
+    const { data: assignment, error: assignmentError } = await supabase
       .from('student_ai_assignments')
       .select(
         `
@@ -63,7 +62,7 @@ async function _POST(req: Request) {
     }
 
     // Get or create chat session
-    let { data: session } = await db
+    let { data: session } = await supabase
       .from('ai_chat_sessions')
       .select('*')
       .eq('student_id', user.id)
@@ -71,7 +70,7 @@ async function _POST(req: Request) {
       .maybeSingle();
 
     if (!session) {
-      const { data: newSession, error: sessionError } = await db
+      const { data: newSession, error: sessionError } = await supabase
         .from('ai_chat_sessions')
         .insert({
           student_id: user.id,
@@ -93,7 +92,7 @@ async function _POST(req: Request) {
     }
 
     // Save user message
-    await db.from('chat_messages').insert({
+    await supabase.from('chat_messages').insert({
       session_id: session.id,
       role: 'user',
       content: message,
@@ -101,7 +100,7 @@ async function _POST(req: Request) {
 
     // Mark AI instructor met on first message
     try {
-      await db
+      await supabase
         .from('student_onboarding')
         .update({ ai_instructor_met: true })
         .eq('student_id', user.id)
@@ -111,7 +110,7 @@ async function _POST(req: Request) {
     }
 
     // Pull recent history
-    const { data: history } = await db
+    const { data: history } = await supabase
       .from('chat_messages')
       .select('role, content')
       .eq('session_id', session.id)
@@ -141,7 +140,7 @@ async function _POST(req: Request) {
     const reply = completion.choices[0].message.content || "I'm here to help!";
 
     // Save assistant message
-    await db.from('chat_messages').insert({
+    await supabase.from('chat_messages').insert({
       session_id: session.id,
       role: 'assistant',
       content: reply,
@@ -164,7 +163,6 @@ async function _GET(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -174,7 +172,7 @@ async function _GET(req: Request) {
     }
 
     // Get session
-    const { data: session } = await db
+    const { data: session } = await supabase
       .from('ai_chat_sessions')
       .select('id')
       .eq('student_id', user.id)
@@ -185,7 +183,7 @@ async function _GET(req: Request) {
     }
 
     // Get messages
-    const { data: messages } = await db
+    const { data: messages } = await supabase
       .from('chat_messages')
       .select('role, content, created_at')
       .eq('session_id', session.id)

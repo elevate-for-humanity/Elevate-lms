@@ -8,13 +8,14 @@
  *   { fundingSource, fundingStatus, requiresCheckout, amountCents, authorizationId, reason }
  */
 
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/authGuards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { resolvePaymentResponsibility } from '@/lib/services/credential-pipeline';
 import { createAdminClient } from '@/lib/supabase/admin';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');

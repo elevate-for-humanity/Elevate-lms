@@ -1,14 +1,14 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/verify/certificate/[certificateId]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 type Params = { params: Promise<{ certificateId: string }> };
 
@@ -19,10 +19,9 @@ async function _GET(_req: NextRequest, { params }: Params) {
 
     const { certificateId } = await params;
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get certificate details
-    const { data: certificate, error: certError } = await db
+    const { data: certificate, error: certError } = await supabase
       .from("certificates")
       .select(`
         id,
@@ -51,14 +50,14 @@ async function _GET(_req: NextRequest, { params }: Params) {
     }
 
     // Get user profile
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from("profiles")
       .select("full_name, email")
       .eq("id", certificate.user_id)
       .single();
 
     // Get course details
-    const { data: course } = await db
+    const { data: course } = await supabase
       .from("training_courses")
       .select("title, description")
       .eq("id", certificate.course_id)

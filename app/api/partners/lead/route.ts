@@ -1,5 +1,4 @@
 
-export const maxDuration = 60;
 // AUTH: Intentionally public — no authentication required
 
 // app/api/partners/lead/route.ts
@@ -7,6 +6,7 @@ import { NextResponse } from 'next/server';
 import { createOrUpdateContact, createOpportunity, createOrUpdateAccount, createLead } from '@/lib/integrations/salesforce';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
 
 async function _POST(request: Request) {
   

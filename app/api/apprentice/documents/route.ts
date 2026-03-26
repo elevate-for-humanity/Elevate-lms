@@ -3,7 +3,6 @@ import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -20,7 +19,6 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -31,7 +29,7 @@ async function _GET(request: NextRequest) {
     const programSlug = searchParams.get('program') || 'barber-apprenticeship';
 
     // Get document types for this program
-    const { data: documentTypes, error: typesError } = await db
+    const { data: documentTypes, error: typesError } = await supabase
       .from('apprentice_document_types')
       .select('*')
       .eq('program_slug', programSlug)
@@ -42,7 +40,7 @@ async function _GET(request: NextRequest) {
     }
 
     // Get student's uploaded documents
-    const { data: uploadedDocuments, error: docsError } = await db
+    const { data: uploadedDocuments, error: docsError } = await supabase
       .from('apprentice_documents')
       .select('*')
       .eq('student_id', user.id)
@@ -53,20 +51,9 @@ async function _GET(request: NextRequest) {
       logger.error('[Documents API] Docs error:', docsError);
     }
 
-    // Generate signed URLs for each document (60-minute expiry)
-    const docsWithUrls = await Promise.all(
-      (uploadedDocuments || []).map(async (doc: any) => {
-        if (!doc.file_path) return { ...doc, signed_url: null };
-        const { data: signed } = await supabase.storage
-          .from('documents')
-          .createSignedUrl(doc.file_path, 3600);
-        return { ...doc, signed_url: signed?.signedUrl ?? null };
-      })
-    );
-
     return NextResponse.json({
       documentTypes: documentTypes || [],
-      uploadedDocuments: docsWithUrls,
+      uploadedDocuments: uploadedDocuments || [],
     });
   } catch (error) {
     logger.error('[Documents API] Error:', error);
@@ -84,7 +71,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -101,7 +87,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Get document type to validate
-    const { data: docType } = await db
+    const { data: docType } = await supabase
       .from('apprentice_document_types')
       .select('*')
       .eq('id', documentTypeId)
@@ -144,26 +130,24 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
     }
 
-    // Bucket is private — store file_path, generate signed URLs on-demand
+    // Bucket is private — store file_path only, generate signed URLs on-demand
 
-    // Replace any existing document of this type for this student
-    await db
+    // Delete any existing document of this type (replace)
+    await supabase
       .from('apprentice_documents')
       .delete()
       .eq('student_id', user.id)
       .eq('document_type_id', documentTypeId);
 
-    // Create document record — file_path is the canonical storage reference
-    const { data: docRecord, error: recordError } = await db
+    // Create document record
+    const { data: docRecord, error: recordError } = await supabase
       .from('apprentice_documents')
       .insert({
         student_id: user.id,
         document_type_id: documentTypeId,
         program_slug: programSlug,
-        document_type: docType.document_type,
         file_name: file.name,
-        file_path: storagePath,          // ← storage path saved here
-        file_url: null,                  // deprecated column, left null
+        file_url: null,
         file_size_bytes: file.size,
         mime_type: file.type,
         status: 'pending',
@@ -180,14 +164,14 @@ async function _POST(request: NextRequest) {
     // PHASE 2: Notify staff of document upload
     try {
       // Get student profile for name
-      const { data: studentProfile } = await db
+      const { data: studentProfile } = await supabase
         .from('profiles')
         .select('full_name, email')
         .eq('id', user.id)
         .single();
 
       // Get admin emails
-      const { data: admins } = await db
+      const { data: admins } = await supabase
         .from('profiles')
         .select('email')
         .in('role', ['admin', 'super_admin']);
@@ -236,7 +220,6 @@ async function _DELETE(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -251,7 +234,7 @@ async function _DELETE(request: NextRequest) {
     }
 
     // Get document to verify ownership and get file path
-    const { data: doc } = await db
+    const { data: doc } = await supabase
       .from('apprentice_documents')
       .select('*')
       .eq('id', docId)
@@ -267,15 +250,14 @@ async function _DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Cannot delete approved documents' }, { status: 400 });
     }
 
-    // Delete from storage using file_path (canonical) or fall back to parsing file_url
-    const storagePath = doc.file_path
-      || (doc.file_url?.includes('/documents/') ? doc.file_url.split('/documents/')[1] : null);
-    if (storagePath) {
-      await supabase.storage.from('documents').remove([storagePath]);
+    // Delete from storage (extract path from URL)
+    const urlParts = doc.file_url.split('/documents/');
+    if (urlParts.length > 1) {
+      await supabase.storage.from('documents').remove([urlParts[1]]);
     }
 
     // Delete record
-    const { error } = await db
+    const { error } = await supabase
       .from('apprentice_documents')
       .delete()
       .eq('id', docId);

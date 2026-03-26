@@ -1,12 +1,12 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   try {
@@ -14,11 +14,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    
-    if (!supabase) {
-      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     
@@ -37,7 +32,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Get user's partner association
-    const { data: partnerUser } = await db
+    const { data: partnerUser } = await supabase
       .from('partner_users')
       .select('partner_id, role')
       .eq('user_id', user.id)
@@ -51,7 +46,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Verify entry belongs to this partner
-    const { data: entry } = await db
+    const { data: entry } = await supabase
       .from('progress_entries')
       .select('id, partner_id, apprentice_id, hours_worked')
       .eq('id', entryId)
@@ -68,7 +63,7 @@ async function _POST(request: NextRequest) {
     // Update entry status
     const newStatus = action === 'approve' ? 'approved' : 'rejected';
     
-    const { error: updateError } = await db
+    const { error: updateError } = await supabase
       .from('progress_entries')
       .update({
         status: newStatus,
@@ -86,7 +81,7 @@ async function _POST(request: NextRequest) {
     // If approved, update apprentice's total hours
     if (action === 'approve') {
       // Get current total
-      const { data: currentProgress } = await db
+      const { data: currentProgress } = await supabase
         .from('apprentice_progress')
         .select('total_hours')
         .eq('user_id', entry.apprentice_id)
@@ -95,7 +90,7 @@ async function _POST(request: NextRequest) {
       const currentHours = currentProgress?.total_hours || 0;
       const newTotal = currentHours + parseFloat(entry.hours_worked || 0);
 
-      await db
+      await supabase
         .from('apprentice_progress')
         .upsert({
           user_id: entry.apprentice_id,

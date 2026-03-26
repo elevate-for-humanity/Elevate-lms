@@ -1,13 +1,13 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 300;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { createTalk, pollTalkResult } from '@/lib/d-id/generate-talk';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 300;
+
+export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/admin/generate-avatar-video
@@ -45,15 +45,13 @@ async function _POST(req: NextRequest) {
 
   try {
     const supabase = await createClient();
-    const _admin = createAdminClient();
-    const db = _admin || supabase;
-
+  
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -100,7 +98,7 @@ async function _POST(req: NextRequest) {
       const talk = await createTalk({ photoUrl, audioUrl });
       const result = await pollTalkResult(talk.id, 60, 5000);
 
-      await db.from('audit_logs').insert({
+      await supabase.from('audit_logs').insert({
         actor_id: user.id,
         actor_role: profile.role,
         action: 'generate_avatar_video',
@@ -141,7 +139,7 @@ async function _POST(req: NextRequest) {
       }
     }
 
-    await db.from('audit_logs').insert({
+    await supabase.from('audit_logs').insert({
       actor_id: user.id,
       actor_role: profile.role,
       action: 'generate_avatar_video_batch',

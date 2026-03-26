@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
   try {
@@ -24,7 +24,6 @@ async function _POST(req: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -34,7 +33,7 @@ async function _POST(req: Request) {
     }
 
     // Update credential status
-    const { error } = await db
+    const { error } = await supabase
       .from('external_credentials')
       .update({
         status: 'completed',
@@ -53,7 +52,7 @@ async function _POST(req: Request) {
 
     // Update exam readiness if Milady RISE
     if (provider === 'Milady RISE') {
-      await db.from('exam_readiness').upsert({
+      await supabase.from('exam_readiness').upsert({
         student_id: user.id,
         theory_complete: true,
       });

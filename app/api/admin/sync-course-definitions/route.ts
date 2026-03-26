@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { COURSE_DEFINITIONS } from '@/lib/courses/definitions';
 import { HVAC_QUIZ_MAP, getUniversalExam } from '@/lib/courses/hvac-quizzes';
 import { logger } from '@/lib/logger';
@@ -21,11 +20,9 @@ function deterministicUUID(key: string): string {
 
 async function requireAdmin() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) return { error: 'Database unavailable', status: 500 };
-  const { data: { user } } = await supabase.auth.getUser();
+const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Unauthorized', status: 401 };
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -107,7 +104,7 @@ async function _POST(request: NextRequest) {
       const courseId = deterministicUUID(`${course.slug}-course`);
 
       // Upsert course
-      const { error: courseError } = await db
+      const { error: courseError } = await supabase
         .from('training_courses')
         .upsert(
           {
@@ -174,7 +171,7 @@ async function _POST(request: NextRequest) {
       }
 
       // Delete existing lessons for this course, then insert fresh
-      const { error: deleteError } = await db
+      const { error: deleteError } = await supabase
         .from('training_lessons')
         .delete()
         .eq('course_id_uuid', courseId);
@@ -189,7 +186,7 @@ async function _POST(request: NextRequest) {
       let inserted = 0;
       for (let batch = 0; batch < lessonRows.length; batch += 50) {
         const chunk = lessonRows.slice(batch, batch + 50);
-        const { error: insertError } = await db
+        const { error: insertError } = await supabase
           .from('training_lessons')
           .insert(chunk);
 

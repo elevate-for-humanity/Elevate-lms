@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { stripe } from '@/lib/stripe/client';
 import { getCatalogProduct } from '@/lib/store/db';
 import { STRIPE_PRICE_IDS, isPriceConfigured } from '@/lib/stripe/price-map';
 import { toErrorMessage } from '@/lib/safe';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { paymentRateLimit } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function handler(req: Request) {
   try {
@@ -44,14 +44,13 @@ async function handler(req: Request) {
 
     // Get authenticated user and tenant
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
     let tenantId: string | null = null;
     if (user) {
-      const { data: membership } = await db
+      const { data: membership } = await supabase
         .from('tenant_memberships')
         .select('tenant_id')
         .eq('user_id', user.id)

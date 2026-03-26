@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -11,11 +10,6 @@ async function _POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    
-    if (!supabase) {
-      return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     
@@ -26,7 +20,7 @@ async function _POST(req: Request) {
     const { program } = await req.json();
 
     // Update enrollment to mark documents submitted
-    const { error } = await db
+    const { error } = await supabase
       .from('program_enrollments')
       .update({ 
         documents_submitted_at: new Date().toISOString(),
@@ -38,7 +32,7 @@ async function _POST(req: Request) {
 
     // Advance state machine: orientation_complete → active
     // (documents_complete is not a distinct state in this flow)
-    await db
+    await supabase
       .from('program_enrollments')
       .update({ enrollment_state: 'active', updated_at: new Date().toISOString() })
       .eq('user_id', user.id)

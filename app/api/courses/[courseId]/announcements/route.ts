@@ -1,15 +1,15 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(
   _req: NextRequest,
@@ -19,10 +19,9 @@ async function _GET(
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { courseId } = await params;
 
-  const { data, error }: any = await db
+  const { data, error }: any = await supabase
     .from('course_announcements')
     .select('id, title, body, created_at')
     .eq('course_id', courseId)
@@ -44,7 +43,6 @@ async function _POST(
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const user = await getCurrentUser();
 
   if (!user) {
@@ -63,7 +61,7 @@ async function _POST(
   }
 
   // Optional: verify user is instructor for this course
-  const { data: course, error: courseError } = await db
+  const { data: course, error: courseError } = await supabase
     .from('courses')
     .select('instructor_id')
     .eq('id', courseId)
@@ -82,7 +80,7 @@ async function _POST(
   }
 
   // Insert announcement
-  const { error: insertError } = await db
+  const { error: insertError } = await supabase
     .from('course_announcements')
     .insert({
       course_id: courseId,
@@ -97,7 +95,7 @@ async function _POST(
   }
 
   // Notify enrolled students — training_enrollments is the canonical course enrollment table
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('training_enrollments')
     .select('user_id')
     .eq('course_id', courseId);
@@ -111,7 +109,7 @@ async function _POST(
       url: `/lms/courses/${courseId}`,
     }));
 
-    const { error: notifError } = await db
+    const { error: notifError } = await supabase
       .from('notifications')
       .insert(notifications);
 

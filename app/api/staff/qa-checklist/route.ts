@@ -1,13 +1,13 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
   try {
@@ -15,7 +15,6 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -26,7 +25,7 @@ async function _GET(request: Request) {
     }
 
     // Get user role
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -37,7 +36,7 @@ async function _GET(request: Request) {
     }
 
     // Get checklists for user's role
-    const { data: checklists, error: checklistsError } = await db
+    const { data: checklists, error: checklistsError } = await supabase
       .from('qa_checklists')
       .select('*')
       .eq('is_active', true)
@@ -53,7 +52,7 @@ async function _GET(request: Request) {
 
     // Get user's completions for today
     const today = new Date().toISOString().split('T')[0];
-    const { data: completions, error: completionsError } = await db
+    const { data: completions, error: completionsError } = await supabase
       .from('qa_checklist_completions')
       .select('*')
       .eq('user_id', user.id)
@@ -98,7 +97,6 @@ async function _POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -119,7 +117,7 @@ async function _POST(request: Request) {
     }
 
     // Verify checklist exists
-    const { data: checklist, error: checklistError } = await db
+    const { data: checklist, error: checklistError } = await supabase
       .from('qa_checklists')
       .select('*')
       .eq('id', checklist_id)
@@ -133,7 +131,7 @@ async function _POST(request: Request) {
     }
 
     // Create completion
-    const { data: completion, error: completionError } = await db
+    const { data: completion, error: completionError } = await supabase
       .from('qa_checklist_completions')
       .insert({
         checklist_id,

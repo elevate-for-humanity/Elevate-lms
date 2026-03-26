@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -11,7 +10,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -22,7 +20,7 @@ async function _POST(request: NextRequest) {
     const body = await request.json();
 
     // Update sync status
-    const { error } = await db
+    const { error } = await supabase
       .from('google_classroom_sync')
       .upsert({
         user_id: user.id,
@@ -46,14 +44,13 @@ async function _GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('google_classroom_sync')
     .select('last_sync_at, settings, status')
     .eq('user_id', user.id)

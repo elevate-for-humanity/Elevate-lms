@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
   try {
@@ -16,7 +16,6 @@ async function _POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -26,7 +25,7 @@ async function _POST(req: Request) {
     }
 
     // Check if user is admin
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -46,7 +45,7 @@ async function _POST(req: Request) {
     }
 
     // Update document approval status
-    const { error } = await db
+    const { error } = await supabase
       .from('shop_documents')
       .update({
         approved: !!approved,
@@ -72,14 +71,14 @@ async function _POST(req: Request) {
     });
 
     // Check if all required docs are now approved
-    const { data: doc } = await db
+    const { data: doc } = await supabase
       .from('shop_documents')
       .select('shop_id')
       .eq('id', shop_document_id)
       .single();
 
     if (doc) {
-      const { data: allDocs } = await db
+      const { data: allDocs } = await supabase
         .from('shop_required_docs_status')
         .select('required, approved')
         .eq('shop_id', doc.shop_id);
@@ -89,7 +88,7 @@ async function _POST(req: Request) {
 
       if (allApproved) {
         // Mark shop onboarding as complete
-        await db
+        await supabase
           .from('shop_onboarding')
           .update({
             handbook_ack: true,
@@ -102,14 +101,14 @@ async function _POST(req: Request) {
 
         // Notify shop owner that all docs are approved and onboarding is complete
         try {
-          const { data: shop } = await db
+          const { data: shop } = await supabase
             .from('shops')
             .select('owner_id, name')
             .eq('id', doc.shop_id)
             .single();
 
           if (shop?.owner_id) {
-            const { data: ownerProfile } = await db
+            const { data: ownerProfile } = await supabase
               .from('profiles')
               .select('email, full_name')
               .eq('id', shop.owner_id)

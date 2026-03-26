@@ -2,9 +2,6 @@ import { requireAdmin } from '@/lib/auth';
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { createClient } from '@supabase/supabase-js';
@@ -14,6 +11,10 @@ import { toErrorMessage } from '@/lib/safe';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const _POST = withAuth(
   async (req, context) => {

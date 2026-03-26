@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/openai-client';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
@@ -31,7 +31,6 @@ async function _POST(req: Request) {
   }
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -43,7 +42,7 @@ async function _POST(req: Request) {
   const { courseId, question } = await req.json();
 
   // Fetch course content for context
-  const { data: course } = await db
+  const { data: course } = await supabase
     .from('training_courses')
     .select(
       `

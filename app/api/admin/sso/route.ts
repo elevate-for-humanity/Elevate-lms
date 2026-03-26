@@ -1,14 +1,14 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { requireRole, handleRBACError } from '@/lib/rbac';
 import { withAuth } from '@/lib/with-auth';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 // GET /api/admin/sso - List SSO connections
 const _GET = withAuth(
@@ -17,9 +17,8 @@ const _GET = withAuth(
     try {
       await requireRole(['admin']);
       const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-      const { data, error }: any = await db
+      const { data, error }: any = await supabase
         .from('sso_connections')
         .select('*')
         .order('provider');
@@ -41,7 +40,6 @@ const _POST = withAuth(
     try {
       await requireRole(['admin']);
       const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
       const body = await req.json();
 
       const {
@@ -71,7 +69,7 @@ const _POST = withAuth(
         );
       }
 
-      const { data, error }: any = await db
+      const { data, error }: any = await supabase
         .from('sso_connections')
         .insert({
           provider,

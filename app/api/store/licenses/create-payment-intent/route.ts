@@ -1,16 +1,16 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { parseBody } from '@/lib/api-helpers';
 import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { apiAuthGuard } from '@/lib/authGuards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const licensePaymentSchema = z.object({
   productId: z.string().min(1),
@@ -114,8 +114,7 @@ async function _POST(request: NextRequest) {
 
     // Store pending license in database
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    await db.from('license_purchases').insert({
+    await supabase.from('license_purchases').insert({
       stripe_payment_intent_id: paymentIntent.id,
       stripe_customer_id: customer.id,
       product_id: product.id,

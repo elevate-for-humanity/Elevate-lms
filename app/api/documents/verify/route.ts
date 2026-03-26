@@ -1,6 +1,5 @@
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { withErrorHandling, APIErrors } from '@/lib/api';
 import { NextRequest, NextResponse } from 'next/server';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
@@ -15,7 +14,6 @@ export const dynamic = 'force-dynamic';
 
 export const POST = withErrorHandling(async (request: NextRequest) => {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Check authentication
   const {
@@ -27,7 +25,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   }
 
   // Check if user is admin
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -53,7 +51,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   }
 
   // Get document with user profile
-  const { data: document, error: fetchError } = await db
+  const { data: document, error: fetchError } = await supabase
     .from('documents')
     .select(`
       *,
@@ -103,7 +101,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   let enrollmentReady = false;
   if (action === 'approve' && document.document_type === 'photo_id') {
     // Check if this user has a pending enrollment that can now be approved
-    const { data: pendingEnrollment } = await db
+    const { data: pendingEnrollment } = await supabase
       .from('program_enrollments')
       .select('id, status')
       .eq('user_id', document.user_id)
@@ -112,7 +110,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
 
     if (pendingEnrollment) {
       // Mark enrollment as ready for approval (docs verified)
-      await db
+      await supabase
         .from('program_enrollments')
         .update({
           docs_verified: true,
@@ -169,7 +167,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   let employerActivated = false;
   if (action === 'approve' && document.user_id) {
     try {
-      const { data: profile } = await db
+      const { data: profile } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', document.user_id)

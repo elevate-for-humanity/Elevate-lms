@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(
   req: NextRequest,
@@ -19,7 +19,6 @@ async function _POST(
 
     const { id } = await params;
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = await req.json();
     const { full_name, email, phone, answers } = body;
 
@@ -31,7 +30,7 @@ async function _POST(
     }
 
     // Load event
-    const { data: event, error: eErr } = await db
+    const { data: event, error: eErr } = await supabase
       .from('events')
       .select('*')
       .eq('id', id)
@@ -47,7 +46,7 @@ async function _POST(
     }
 
     // Count registrations
-    const { count } = await db
+    const { count } = await supabase
       .from('event_registrations')
       .select('*', { count: 'exact', head: true })
       .eq('event_id', id)
@@ -69,7 +68,7 @@ async function _POST(
       data: { user },
     } = await supabase.auth.getUser();
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('event_registrations')
       .insert({
         event_id: id,

@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { headers } from 'next/headers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -35,10 +34,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (!supabase) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -92,7 +87,7 @@ async function _POST(request: NextRequest) {
     const user_agent = headersList.get('user-agent') || 'unknown';
 
     // Get current versions for each agreement type
-    const { data: versions, error: versionsError } = await db
+    const { data: versions, error: versionsError } = await supabase
       .from('agreement_versions')
       .select('agreement_type, current_version, document_url')
       .in('agreement_type', agreements);
@@ -105,7 +100,7 @@ async function _POST(request: NextRequest) {
     const timestamp = new Date().toISOString();
 
     // Get user profile for role
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -137,7 +132,7 @@ async function _POST(request: NextRequest) {
     });
 
     // Insert acceptances (upsert to handle re-signing)
-    const { data: inserted, error: insertError } = await db
+    const { data: inserted, error: insertError } = await supabase
       .from('license_agreement_acceptances')
       .upsert(acceptances, {
         onConflict: 'user_id,agreement_type,document_version',
@@ -151,7 +146,7 @@ async function _POST(request: NextRequest) {
 
     // Log the signing event for audit trail
     try {
-      await db.from('audit_logs').insert({
+      await supabase.from('audit_logs').insert({
         user_id: user.id,
         action: 'agreement_signed',
         resource_type: 'license_agreement_acceptances',

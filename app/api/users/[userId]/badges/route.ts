@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -15,10 +14,9 @@ async function _GET(
     if (rateLimited) return rateLimited;
 const { userId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch user badges/achievements
-  const { data: badges, error } = await db
+  const { data: badges, error } = await supabase
     .from('achievements')
     .select('*')
     .eq('user_id', userId)
@@ -26,7 +24,7 @@ const { userId } = await params;
 
   if (error) {
     // Fall back to user_badges if achievements doesn't have user_id
-    const { data: userBadges, error: badgeError } = await db
+    const { data: userBadges, error: badgeError } = await supabase
       .from('user_badges')
       .select('*, badge_definitions(*)')
       .eq('user_id', userId);

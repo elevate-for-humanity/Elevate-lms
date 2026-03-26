@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { geocodeAddress, buildAddressString, isGeocodingResult } from '@/lib/geo/geocode';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
@@ -15,17 +14,13 @@ async function _POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (!supabase) {
-      return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -42,7 +37,7 @@ async function _POST(req: Request) {
     }
 
     // Get shop
-    const { data: shop, error: shopError } = await db
+    const { data: shop, error: shopError } = await supabase
       .from('shops')
       .select('id, name, address1, address2, city, state, zip')
       .eq('id', shop_id)
@@ -54,7 +49,7 @@ async function _POST(req: Request) {
 
     // Clear failed status if retrying
     if (retry) {
-      await db
+      await supabase
         .from('shops')
         .update({ geocode_failed_at: null, geocode_error: null })
         .eq('id', shop_id);
@@ -70,7 +65,7 @@ async function _POST(req: Request) {
     });
 
     if (!address || address.length < 5) {
-      await db
+      await supabase
         .from('shops')
         .update({
           geocode_failed_at: new Date().toISOString(),
@@ -85,7 +80,7 @@ async function _POST(req: Request) {
     const result = await geocodeAddress(address);
 
     if (isGeocodingResult(result)) {
-      await db
+      await supabase
         .from('shops')
         .update({
           latitude: result.latitude,
@@ -106,7 +101,7 @@ async function _POST(req: Request) {
         source: result.source,
       });
     } else {
-      await db
+      await supabase
         .from('shops')
         .update({
           geocode_failed_at: new Date().toISOString(),

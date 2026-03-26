@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const maxDuration = 300; // 5 minutes for video generation
 
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
@@ -10,6 +8,8 @@ import { generateCourseVideo, getAvailableServices } from '@/lib/video/generate'
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 300; // 5 minutes for video generation
 
 interface Scene {
   id: string;

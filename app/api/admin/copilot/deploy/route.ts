@@ -1,6 +1,5 @@
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
@@ -24,14 +23,13 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: deployments, error } = await db
+    const { data: deployments, error } = await supabase
       .from('copilot_deployments')
       .select('*')
       .order('deployed_at', { ascending: false });
@@ -61,7 +59,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
@@ -79,7 +76,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Check if this copilot type is already deployed
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('copilot_deployments')
       .select('id, status')
       .eq('copilot_type', copilot_type)
@@ -101,7 +98,7 @@ async function _POST(request: NextRequest) {
       deployed_by: user.id,
     };
 
-    const { data: newDeployment, error } = await db
+    const { data: newDeployment, error } = await supabase
       .from('copilot_deployments')
       .insert(deployment)
       .select()
@@ -124,7 +121,7 @@ async function _POST(request: NextRequest) {
 
     // Simulate deployment process - in production this would trigger actual deployment
     setTimeout(async () => {
-      await db
+      await supabase
         .from('copilot_deployments')
         .update({ status: 'active' })
         .eq('id', newDeployment.id);
@@ -150,7 +147,6 @@ async function _PATCH(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
@@ -169,7 +165,7 @@ async function _PATCH(request: NextRequest) {
 
     const newStatus = action === 'start' ? 'active' : 'stopped';
 
-    const { data: updated, error } = await db
+    const { data: updated, error } = await supabase
       .from('copilot_deployments')
       .update({ 
         status: newStatus,
@@ -205,7 +201,6 @@ async function _DELETE(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
@@ -222,7 +217,7 @@ async function _DELETE(request: NextRequest) {
       );
     }
 
-    const { error } = await db
+    const { error } = await supabase
       .from('copilot_deployments')
       .delete()
       .eq('id', deploymentId);

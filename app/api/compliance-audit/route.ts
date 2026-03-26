@@ -4,15 +4,15 @@
  * Generates and manages monthly compliance audits with auto-flagging.
  */
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { COMPLIANCE_THRESHOLDS } from '@/types/enrollment';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 // GET: Get audit for specific month/year or list all
 async function _GET(request: NextRequest) {
@@ -20,7 +20,6 @@ async function _GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -28,7 +27,7 @@ const supabase = await createClient();
   }
 
   // Check admin role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -43,7 +42,7 @@ const supabase = await createClient();
   const year = searchParams.get('year');
   const auditId = searchParams.get('id');
 
-  let query = db.from('compliance_audits').select('*');
+  let query = supabase.from('compliance_audits').select('*');
 
   if (auditId) {
     query = query.eq('id', auditId);
@@ -67,7 +66,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -75,7 +73,7 @@ async function _POST(request: NextRequest) {
   }
 
   // Check admin role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -93,7 +91,7 @@ async function _POST(request: NextRequest) {
   }
 
   // Check if audit already exists
-  const { data: existing } = await db
+  const { data: existing } = await supabase
     .from('compliance_audits')
     .select('id')
     .eq('audit_month', month)
@@ -112,7 +110,7 @@ async function _POST(request: NextRequest) {
   const endDate = new Date(year, month, 0);
 
   // Gather enrollment data
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('program_enrollments')
     .select('id, funding_pathway, intake_completed, status, created_at')
     .gte('created_at', startDate.toISOString())
@@ -132,7 +130,7 @@ async function _POST(request: NextRequest) {
     : 0;
 
   // Check payment plans
-  const { data: paymentPlans } = await db
+  const { data: paymentPlans } = await supabase
     .from('bridge_payment_plans')
     .select('id, status, balance_remaining, plan_start_date, academic_access_paused')
     .gte('created_at', startDate.toISOString())
@@ -178,7 +176,7 @@ async function _POST(request: NextRequest) {
   }
 
   // Create audit record
-  const { data: audit, error } = await db
+  const { data: audit, error } = await supabase
     .from('compliance_audits')
     .insert({
       audit_month: month,
@@ -224,7 +222,6 @@ async function _PATCH(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -232,7 +229,7 @@ const supabase = await createClient();
   }
 
   // Check admin role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -289,7 +286,7 @@ const supabase = await createClient();
       };
 
       // Check if all signatures are complete
-      const { data: audit } = await db
+      const { data: audit } = await supabase
         .from('compliance_audits')
         .select('admissions_lead_signed, program_director_signed')
         .eq('id', auditId)
@@ -313,7 +310,7 @@ const supabase = await createClient();
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   }
 
-  const { error } = await db
+  const { error } = await supabase
     .from('compliance_audits')
     .update(updateData)
     .eq('id', auditId);

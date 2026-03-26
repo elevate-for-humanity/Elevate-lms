@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/openai-client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 /**
  * AI Blog Post Generator
@@ -20,7 +20,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check if user is admin
     const {
@@ -31,7 +30,7 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -49,7 +48,7 @@ async function _POST(request: NextRequest) {
 
     if (programSlug) {
       // Get program details
-      const { data: program } = await db
+      const { data: program } = await supabase
         .from('programs')
         .select('*')
         .eq('slug', programSlug)
@@ -121,7 +120,7 @@ async function _POST(request: NextRequest) {
     const readingTime = Math.ceil(wordCount / 200);
 
     // Save to database
-    const { data: blogPost, error } = await db
+    const { data: blogPost, error } = await supabase
       .from('blog_posts')
       .insert({
         title: meta.title,

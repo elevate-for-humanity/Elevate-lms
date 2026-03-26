@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -13,32 +12,31 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get enrollment counts
-    const { count: totalEnrollments } = await db
+    const { count: totalEnrollments } = await supabase
       .from('program_enrollments')
       .select('*', { count: 'exact', head: true });
 
     // Get completion counts
-    const { count: completedEnrollments } = await db
+    const { count: completedEnrollments } = await supabase
       .from('program_enrollments')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'completed');
 
     // Get active students
-    const { count: activeStudents } = await db
+    const { count: activeStudents } = await supabase
       .from('program_enrollments')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'active');
 
     // Get certificates issued
-    const { count: certificatesIssued } = await db
+    const { count: certificatesIssued } = await supabase
       .from('certificates')
       .select('*', { count: 'exact', head: true });
 
     // Get program count
-    const { count: programsOffered } = await db
+    const { count: programsOffered } = await supabase
       .from('programs')
       .select('*', { count: 'exact', head: true })
       .eq('is_active', true);

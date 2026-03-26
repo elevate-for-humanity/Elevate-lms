@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 import {
   getStats,
   getRecentAuthFailures,
@@ -11,6 +9,8 @@ import {
 import { requireOrgAdmin } from '@/lib/auth/require-org-admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 /**
  * GET /api/monitoring/stats

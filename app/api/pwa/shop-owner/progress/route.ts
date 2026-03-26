@@ -1,12 +1,12 @@
 import { logger } from '@/lib/logger';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 const MILESTONES = [
   { hours: 250, label: 'Foundation', color: 'blue' },
@@ -23,11 +23,6 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    
-    if (!supabase) {
-      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     
@@ -36,7 +31,7 @@ async function _GET(request: Request) {
     }
 
     // Get user's partner association
-    const { data: partnerUser } = await db
+    const { data: partnerUser } = await supabase
       .from('partner_users')
       .select('partner_id, role')
       .eq('user_id', user.id)
@@ -50,7 +45,7 @@ async function _GET(request: Request) {
     }
 
     // Get apprentices assigned to this partner
-    const { data: apprenticeUsers } = await db
+    const { data: apprenticeUsers } = await supabase
       .from('partner_users')
       .select('user_id')
       .eq('partner_id', partnerUser.partner_id)
@@ -73,13 +68,13 @@ async function _GET(request: Request) {
     }
 
     // Get apprentice profiles
-    const { data: profiles } = await db
+    const { data: profiles } = await supabase
       .from('profiles')
       .select('id, full_name, first_name, created_at')
       .in('id', apprenticeIds);
 
     // Get all progress entries for apprentices
-    const { data: allProgress } = await db
+    const { data: allProgress } = await supabase
       .from('progress_entries')
       .select('*')
       .eq('partner_id', partnerUser.partner_id)

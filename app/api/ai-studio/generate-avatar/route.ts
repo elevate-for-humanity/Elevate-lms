@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { generateTextToSpeech } from '@/server/tts-service';
@@ -13,6 +11,8 @@ import { promisify } from 'util';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 

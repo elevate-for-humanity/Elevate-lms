@@ -1,10 +1,11 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/resend';
 import { logger } from '@/lib/logger';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 const ADMIN_EMAIL = process.env.PARTNER_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com';
 

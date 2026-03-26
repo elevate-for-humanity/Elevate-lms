@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -11,11 +10,6 @@ async function _POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    
-    if (!supabase) {
-      return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     
@@ -27,7 +21,7 @@ async function _POST(req: Request) {
     const now = new Date().toISOString();
 
     // Update program_enrollments (state machine)
-    await db
+    await supabase
       .from('program_enrollments')
       .update({
         orientation_completed_at: now,
@@ -39,7 +33,7 @@ async function _POST(req: Request) {
       .is('orientation_completed_at', null);
 
     // Update training_enrollments — this is what the apprentice portal gate reads
-    const { error: teError } = await db
+    const { error: teError } = await supabase
       .from('training_enrollments')
       .update({
         orientation_completed_at: now,

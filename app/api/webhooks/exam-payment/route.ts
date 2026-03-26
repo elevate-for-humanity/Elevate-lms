@@ -8,14 +8,15 @@
  * Idempotent — safe to replay. Uses stripe_webhook_events for deduplication.
  */
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 import Stripe from 'stripe';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { markPaymentSucceeded } from '@/lib/services/credential-pipeline';
 import { logger } from '@/lib/logger';
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   const stripeKey = process.env.STRIPE_SECRET_KEY;

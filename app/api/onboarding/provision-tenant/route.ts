@@ -1,16 +1,16 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { resend } from '@/lib/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 
 /**
@@ -49,11 +49,10 @@ async function _POST(request: NextRequest) {
     } = body;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // 1. Create tenant
     const slug = generateSlug(organizationName);
-    const { data: tenant, error: tenantError } = await db
+    const { data: tenant, error: tenantError } = await supabase
       .from('tenants')
       .insert({
         name: organizationName,
@@ -72,7 +71,7 @@ async function _POST(request: NextRequest) {
     const validUntil = new Date();
     validUntil.setFullYear(validUntil.getFullYear() + 1);
 
-    await db.from('licenses').insert({
+    await supabase.from('licenses').insert({
       tenant_id: tenant.id,
       tier: licenseConfig.tier,
       status: 'active',
@@ -104,7 +103,7 @@ async function _POST(request: NextRequest) {
     }
 
     // 4. Create profile
-    await db.from('profiles').insert({
+    await supabase.from('profiles').insert({
       id: authUser.user.id,
       email: contactEmail,
       full_name: contactName,
@@ -113,7 +112,7 @@ async function _POST(request: NextRequest) {
     });
 
     // 5. Create tenant branding (default)
-    await db.from('tenant_branding').insert({
+    await supabase.from('tenant_branding').insert({
       tenant_id: tenant.id,
       logo_url: '/default-logo.png',
       primary_color: '#16a34a',

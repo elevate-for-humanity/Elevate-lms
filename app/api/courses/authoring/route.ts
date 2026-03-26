@@ -1,14 +1,14 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/courses/authoring/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(req: NextRequest) {
   try {
@@ -16,7 +16,6 @@ async function _GET(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -27,7 +26,7 @@ async function _GET(req: NextRequest) {
     }
 
     // Check if user is admin or instructor
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from("user_profiles")
       .select("role")
       .eq("user_id", user.id)
@@ -38,7 +37,7 @@ async function _GET(req: NextRequest) {
     }
 
     // Get courses created by this user or all if admin
-    let query = db
+    let query = supabase
       .from("courses")
       .select("*")
       .order("created_at", { ascending: false });
@@ -73,7 +72,6 @@ async function _POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -84,7 +82,7 @@ async function _POST(req: NextRequest) {
     }
 
     // Check if user is admin or instructor
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from("user_profiles")
       .select("role")
       .eq("user_id", user.id)
@@ -112,7 +110,7 @@ async function _POST(req: NextRequest) {
     );
 
     // Create course
-    const { data: course, error: courseError } = await db
+    const { data: course, error: courseError } = await supabase
       .from("courses")
       .insert({
         title,
@@ -144,7 +142,7 @@ async function _POST(req: NextRequest) {
         order: index + 1,
       }));
 
-      const { error: modulesError } = await db
+      const { error: modulesError } = await supabase
         .from("course_modules")
         .insert(moduleInserts);
 

@@ -1,6 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
@@ -11,6 +8,10 @@ import { getUserById } from '@/lib/supabase-admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 function makeSerial() {
   return `EFH-${randomBytes(4).toString('hex').toUpperCase()}`;

@@ -1,5 +1,4 @@
 
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createBackup, exportBackupToJSON, listBackups } from '@/lib/backup';
@@ -7,6 +6,7 @@ import { requireAdmin } from '@/lib/authGuards';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
 
 const _POST = withAuth(
   async (request: NextRequest, user) => {

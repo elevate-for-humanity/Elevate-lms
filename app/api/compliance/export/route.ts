@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
@@ -21,7 +20,6 @@ export async function GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Verify authentication
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -30,7 +28,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Verify admin role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -69,7 +67,7 @@ export async function GET(request: NextRequest) {
 
     // Export agreement acceptances
     if (exportType === 'all' || exportType === 'agreements') {
-      let query = db
+      let query = supabase
         .from('license_agreement_acceptances')
         .select(`
           id,
@@ -103,7 +101,7 @@ export async function GET(request: NextRequest) {
 
     // Export handbook acknowledgments
     if (exportType === 'all' || exportType === 'handbook') {
-      let query = db
+      let query = supabase
         .from('handbook_acknowledgments')
         .select(`
           id,
@@ -136,7 +134,7 @@ export async function GET(request: NextRequest) {
 
     // Export onboarding progress
     if (exportType === 'all' || exportType === 'onboarding') {
-      let query = db
+      let query = supabase
         .from('onboarding_progress')
         .select(`
           id,
@@ -170,7 +168,7 @@ export async function GET(request: NextRequest) {
 
     // Export audit logs
     if (exportType === 'all' || exportType === 'audit') {
-      let query = db
+      let query = supabase
         .from('compliance_audit_log')
         .select(`
           id,
@@ -211,10 +209,10 @@ export async function GET(request: NextRequest) {
         { count: completedOnboarding },
         { count: pendingOnboarding },
       ] = await Promise.all([
-        db.from('license_agreement_acceptances').select('*', { count: 'exact', head: true }),
-        db.from('handbook_acknowledgments').select('*', { count: 'exact', head: true }),
-        db.from('onboarding_progress').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
-        db.from('onboarding_progress').select('*', { count: 'exact', head: true }).neq('status', 'completed'),
+        supabase.from('license_agreement_acceptances').select('*', { count: 'exact', head: true }),
+        supabase.from('handbook_acknowledgments').select('*', { count: 'exact', head: true }),
+        supabase.from('onboarding_progress').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
+        supabase.from('onboarding_progress').select('*', { count: 'exact', head: true }).neq('status', 'completed'),
       ]);
 
       exportData.summary = {
@@ -319,7 +317,6 @@ function escapeCSV(value: any): string {
  */
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Verify authentication
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -328,7 +325,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Verify admin role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -353,16 +350,16 @@ export async function POST(request: NextRequest) {
           { data: handbook },
           { data: onboarding },
         ] = await Promise.all([
-          db
+          supabase
             .from('license_agreement_acceptances')
             .select('agreement_type, accepted_at')
             .eq('user_id', userId),
-          db
+          supabase
             .from('handbook_acknowledgments')
             .select('acknowledged_at')
             .eq('user_id', userId)
             .single(),
-          db
+          supabase
             .from('onboarding_progress')
             .select('*')
             .eq('user_id', userId)

@@ -1,6 +1,3 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/applications/route.ts
 import { NextResponse } from 'next/server';
@@ -12,6 +9,10 @@ import { sendEmail } from '@/lib/email/sendgrid';
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { approveApplication } from '@/lib/enrollment/approve';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 // CORS preflight for cross-origin form submissions
 export async function OPTIONS() {

@@ -1,13 +1,10 @@
-export const dynamic = 'force-dynamic';
 
 // Using Node.js runtime for SendGrid
-export const maxDuration = 60;
 
 import { z } from 'zod';
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { orchestrateEnrollment } from '@/lib/enrollment/orchestrate-enrollment';
 import {
   sendApplicationConfirmation,
@@ -16,6 +13,9 @@ import {
 import { checkRateLimit, verifyTurnstileToken } from '@/lib/turnstile';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const enrollApplySchema = z.object({
   firstName: z.string().min(1).max(100).trim(),
@@ -72,7 +72,6 @@ async function _POST(req: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get or create user profile
     const {
@@ -122,7 +121,7 @@ async function _POST(req: Request) {
       });
     } else {
       // Authenticated user - check enrollment approval status
-      const { data: profile } = await db
+      const { data: profile } = await supabase
         .from('profiles')
         .select('enrollment_status, program_holder_id')
         .eq('id', studentId)

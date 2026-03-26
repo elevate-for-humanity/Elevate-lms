@@ -1,16 +1,16 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 interface ProductInput {
   title: string;
@@ -26,7 +26,6 @@ async function _POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check auth
     const {
@@ -45,7 +44,7 @@ async function _POST(req: NextRequest) {
     const stripeProduct = await createStripeProduct(product);
 
     // Save to database
-    const { data, error } = await db
+    const { data, error } = await supabase
       .from('store_products')
       .upsert({
         title: product.title,

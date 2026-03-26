@@ -1,13 +1,13 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
   try {
@@ -15,7 +15,6 @@ async function _POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -31,7 +30,7 @@ async function _POST(req: Request) {
       );
     }
 
-    const { data: thread, error } = await db
+    const { data: thread, error } = await supabase
       .from('discussion_threads')
       .insert({
         course_id: courseId,
@@ -48,14 +47,14 @@ async function _POST(req: Request) {
     }
 
     // Simple gamification: award "first post" badge
-    const { data: badge } = await db
+    const { data: badge } = await supabase
       .from('badges')
       .select('*')
       .eq('slug', 'first-post')
       .single();
 
     if (badge) {
-      await db.from('user_badges').upsert(
+      await supabase.from('user_badges').upsert(
         {
           user_id: user.id,
           badge_id: badge.id,

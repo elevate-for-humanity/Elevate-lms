@@ -1,8 +1,5 @@
 import { requireAdmin } from '@/lib/auth';
-export const runtime = 'nodejs';
 import { createAdminClient } from '@/lib/supabase/admin';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // app/api/admin/analytics/overview/route.ts
 // Real-time analytics overview
@@ -10,6 +7,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseClient } from "@/lib/supabase-api";
 import { withAuth } from '@/lib/with-auth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const _GET = withAuth(
   async (req: NextRequest, user) => {

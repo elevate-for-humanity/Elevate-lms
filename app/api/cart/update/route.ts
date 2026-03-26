@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -14,7 +13,6 @@ async function _POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -31,14 +29,14 @@ async function _POST(req: Request) {
 
     if (quantity <= 0) {
       // Remove item if quantity is 0 or less
-      await db
+      await supabase
         .from('cart_items')
         .delete()
         .eq('id', itemId)
         .eq('user_id', user.id);
     } else {
       // Update quantity
-      await db
+      await supabase
         .from('cart_items')
         .update({ quantity })
         .eq('id', itemId)

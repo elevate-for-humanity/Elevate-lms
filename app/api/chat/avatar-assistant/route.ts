@@ -2,7 +2,6 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/openai-client';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { 
   MASTER_AVATAR_PROMPT, 
   getPageScript,
@@ -150,9 +149,8 @@ async function _POST(request: NextRequest) {
     // Log interaction to database
     try {
       const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
       const { data: { user } } = await supabase.auth.getUser();
-      await db.from('avatar_chat_interactions').insert({
+      await supabase.from('avatar_chat_interactions').insert({
         user_id: user?.id || null,
         route: body.route || null,
         user_message: message,

@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -21,16 +20,12 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (!supabase) {
-      return NextResponse.json({ testimonials: [] });
-    }
 
     const { searchParams } = new URL(request.url);
     const featured = searchParams.get('featured') === 'true';
     const limit = parseInt(searchParams.get('limit') || '10', 10);
 
-    let query = db
+    let query = supabase
       .from('testimonials')
       .select('id, quote, name, role, program')
       .eq('published', true)

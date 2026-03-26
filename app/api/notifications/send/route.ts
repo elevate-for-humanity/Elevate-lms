@@ -1,13 +1,12 @@
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import webpush from 'web-push';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 // Configure web-push with VAPID keys
 // In production, these should be in environment variables
@@ -40,9 +39,8 @@ async function _POST(request: NextRequest) {
     // Log notification to database
     try {
       const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
       const { data: { user } } = await supabase.auth.getUser();
-      await db.from('push_notification_send_log').insert({
+      await supabase.from('push_notification_send_log').insert({
         sender_id: user?.id,
         title: notification.title,
         body: notification.body,

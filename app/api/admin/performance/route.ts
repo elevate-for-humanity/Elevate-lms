@@ -1,12 +1,12 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
   try {
@@ -14,7 +14,6 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -25,7 +24,7 @@ async function _GET(request: Request) {
     }
 
     // Verify user is admin
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -45,19 +44,19 @@ async function _GET(request: Request) {
       ticketsResult,
     ] = await Promise.all([
       // Total students
-      db
+      supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true })
         .eq('role', 'student'),
 
       // Active enrollments
-      db
+      supabase
         .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'active'),
 
       // Applications this month
-      db
+      supabase
         .from('applications')
         .select('*', { count: 'exact', head: true })
         .gte(
@@ -70,7 +69,7 @@ async function _GET(request: Request) {
         ),
 
       // Course completions this month
-      db
+      supabase
         .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'completed')
@@ -84,7 +83,7 @@ async function _GET(request: Request) {
         ),
 
       // Revenue this month (from donations)
-      db
+      supabase
         .from('donations')
         .select('amount')
         .eq('payment_status', 'succeeded')
@@ -98,7 +97,7 @@ async function _GET(request: Request) {
         ),
 
       // Open tickets
-      db
+      supabase
         .from('service_tickets')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'open'),
@@ -112,7 +111,7 @@ async function _GET(request: Request) {
       ) || 0;
 
     // Get recent performance metrics
-    const { data: recentMetrics } = await db
+    const { data: recentMetrics } = await supabase
       .from('performance_metrics')
       .select('*')
       .gte(
@@ -144,7 +143,7 @@ async function _GET(request: Request) {
 
     // Update performance_metrics table
     const today = new Date().toISOString().split('T')[0];
-    await db.from('performance_metrics').upsert([
+    await supabase.from('performance_metrics').upsert([
       {
         metric_name: 'total_students',
         value: metrics.totalStudents,

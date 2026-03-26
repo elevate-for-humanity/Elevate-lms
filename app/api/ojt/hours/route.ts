@@ -1,6 +1,5 @@
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -13,10 +12,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (!supabase) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -103,10 +98,6 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (!supabase) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -118,7 +109,7 @@ async function _GET(request: NextRequest) {
     const endDate = searchParams.get('end_date');
     const enrollmentId = searchParams.get('enrollment_id');
 
-    let query = db
+    let query = supabase
       .from('ojt_hours_log')
       .select('*')
       .eq('student_id', user.id)

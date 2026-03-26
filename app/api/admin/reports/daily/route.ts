@@ -1,15 +1,15 @@
 import { requireAdmin } from '@/lib/auth';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { notifySendgrid } from '@/lib/notify';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const _POST = withAuth(
   async (req: Request, user) => {
@@ -22,7 +22,6 @@ const _POST = withAuth(
 
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
     const [
@@ -30,16 +29,16 @@ const _POST = withAuth(
       { count: completions },
       { count: newUsers },
     ] = await Promise.all([
-      db
+      supabase
         .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .gte('enrolled_at', yesterday.toISOString()),
-      db
+      supabase
         .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .not('completed_at', 'is', null)
         .gte('completed_at', yesterday.toISOString()),
-      db
+      supabase
         .from('users')
         .select('*', { count: 'exact', head: true })
         .gte('created_at', yesterday.toISOString()),

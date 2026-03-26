@@ -1,22 +1,21 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { type, apprenticeshipId, data } = await request.json();
 
-  const { data: apprenticeship } = await db
+  const { data: apprenticeship } = await supabase
     .from('apprenticeship_enrollments')
     .select(`
       *,
@@ -102,7 +101,7 @@ async function _POST(request: Request) {
 
   // Insert notifications into the canonical notification_logs table
   for (const notif of notifications) {
-    await db.from('notification_logs').insert(notif);
+    await supabase.from('notification_logs').insert(notif);
   }
 
   return NextResponse.json({ success: true, sent: notifications.length });
@@ -114,7 +113,6 @@ async function _GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const today = new Date().toISOString().split('T')[0];
   const currentHour = new Date().getHours();
 
@@ -124,7 +122,7 @@ const supabase = await createClient();
   }
 
   // Find apprentices who haven't checked in today
-  const { data: apprenticeships } = await db
+  const { data: apprenticeships } = await supabase
     .from('apprenticeship_enrollments')
     .select(`
       *,
@@ -135,7 +133,7 @@ const supabase = await createClient();
   let alertsSent = 0;
 
   for (const apprenticeship of apprenticeships || []) {
-    const { data: todayLog } = await db
+    const { data: todayLog } = await supabase
       .from('ojt_hours_log')
       .select('id')
       .eq('apprenticeship_id', apprenticeship.id)

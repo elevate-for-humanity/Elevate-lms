@@ -1,6 +1,5 @@
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { enqueueNotification, buildTokenUrl } from '@/lib/notifications';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -24,7 +23,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Verify staff/admin
     const {
@@ -35,7 +33,7 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: staffProfile } = await db
+    const { data: staffProfile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -75,7 +73,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Check if user already exists
-    const { data: existingProfile } = await db
+    const { data: existingProfile } = await supabase
       .from('profiles')
       .select('id')
       .eq('email', email)
@@ -86,7 +84,7 @@ async function _POST(request: NextRequest) {
     if (existingProfile) {
       profileId = existingProfile.id;
       // Update existing profile
-      await db
+      await supabase
         .from('profiles')
         .update({
           first_name: firstName,
@@ -99,7 +97,7 @@ async function _POST(request: NextRequest) {
         .eq('id', profileId);
     } else {
       // Create new profile
-      const { data: newProfile, error: profileError } = await db
+      const { data: newProfile, error: profileError } = await supabase
         .from('profiles')
         .insert({
           email,
@@ -125,7 +123,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Create or update student record
-    await db
+    await supabase
       .from('students')
       .upsert({
         id: profileId,
@@ -147,7 +145,7 @@ async function _POST(request: NextRequest) {
     let totalHours = 2000;
     
     if (programId) {
-      const { data: program } = await db
+      const { data: program } = await supabase
         .from('programs')
         .select('name, total_hours')
         .eq('id', programId)
@@ -160,7 +158,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Create enrollment - ACTIVE immediately (Elevate paid)
-    const { data: enrollment, error: enrollmentError } = await db
+    const { data: enrollment, error: enrollmentError } = await supabase
       .from('program_enrollments')
       .insert({
         user_id: profileId,
@@ -184,7 +182,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Create apprentice record for hour logging
-    await db
+    await supabase
       .from('apprentices')
       .upsert({
         user_id: profileId,
@@ -199,7 +197,7 @@ async function _POST(request: NextRequest) {
 
     // Link uploaded documents to user
     if (documentIds && documentIds.length > 0) {
-      await db
+      await supabase
         .from('documents')
         .update({
           user_id: profileId,

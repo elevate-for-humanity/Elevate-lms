@@ -1,14 +1,14 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
   try {
@@ -16,7 +16,6 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -26,7 +25,7 @@ async function _GET(request: Request) {
     }
 
     // Get user profile and check role
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('user_profiles')
       .select('role, employer_id')
       .eq('user_id', user.id)
@@ -40,7 +39,7 @@ async function _GET(request: Request) {
     }
 
     // Get pending hours from hour_entries
-    const query = db
+    const query = supabase
       .from('hour_entries')
       .select(
         `
@@ -64,7 +63,7 @@ async function _GET(request: Request) {
     const userIds = [...new Set((pendingHours || []).map((h: any) => h.user_id).filter(Boolean))];
     const profileMap: Record<string, any> = {};
     if (userIds.length > 0) {
-      const { data: profiles } = await db
+      const { data: profiles } = await supabase
         .from('user_profiles')
         .select('user_id, first_name, last_name, email, employer_id')
         .in('user_id', userIds);

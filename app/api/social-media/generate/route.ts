@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import OpenAI from 'openai';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const openai = process.env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -50,9 +50,8 @@ async function _POST(req: Request) {
       try {
         const { createClient } = await import('@/lib/supabase/server');
         const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-        const { data: blogPosts } = await db
+        const { data: blogPosts } = await supabase
           .from('blog_posts')
           .select('title, excerpt, slug')
           .eq('published', true)

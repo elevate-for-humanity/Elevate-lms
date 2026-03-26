@@ -1,14 +1,14 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { sendStudentDeclineNotification } from '@/lib/email/service';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   try {
@@ -16,7 +16,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const {
@@ -29,7 +28,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Verify user is a program holder
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -43,7 +42,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Get program holder record
-    const { data: programHolder, error: phError } = await db
+    const { data: programHolder, error: phError } = await supabase
       .from('program_holders')
       .select('id')
       .eq('user_id', user.id)
@@ -68,7 +67,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Verify the enrollment belongs to this program holder
-    const { data: enrollment, error: enrollmentError } = await db
+    const { data: enrollment, error: enrollmentError } = await supabase
       .from('program_holder_students')
       .select('*')
       .eq('id', enrollment_id)
@@ -83,7 +82,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Update enrollment status to declined
-    const { data: updated, error: updateError } = await db
+    const { data: updated, error: updateError } = await supabase
       .from('program_holder_students')
       .update({
         status: 'declined',
@@ -103,7 +102,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Log the action
-    await db.from('audit_logs').insert({
+    await supabase.from('audit_logs').insert({
       user_id: user.id,
       action: 'student_declined',
       resource_type: 'program_holder_student',
@@ -116,13 +115,13 @@ async function _POST(request: NextRequest) {
     });
 
     // Get student and program holder details for email
-    const { data: studentProfile } = await db
+    const { data: studentProfile } = await supabase
       .from('profiles')
       .select('email, full_name')
       .eq('id', enrollment.student_id)
       .single();
 
-    const { data: phProfile } = await db
+    const { data: phProfile } = await supabase
       .from('profiles')
       .select('full_name')
       .eq('id', user.id)

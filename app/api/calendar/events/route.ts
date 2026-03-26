@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -11,7 +10,6 @@ async function _GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -21,7 +19,7 @@ const supabase = await createClient();
   const month = request.nextUrl.searchParams.get('month');
   const year = request.nextUrl.searchParams.get('year');
 
-  let query = db
+  let query = supabase
     .from('calendar_events')
     .select('*')
     .eq('user_id', user.id)

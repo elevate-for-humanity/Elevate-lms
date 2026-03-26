@@ -1,13 +1,13 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
   try {
@@ -15,7 +15,6 @@ async function _POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -35,7 +34,7 @@ async function _POST(req: Request) {
     } = body;
 
     // Verify user owns this program holder
-    const { data: programHolder } = await db
+    const { data: programHolder } = await supabase
       .from('program_holders')
       .select('id')
       .eq('id', program_holder_id)
@@ -47,7 +46,7 @@ async function _POST(req: Request) {
     }
 
     // Update or insert preferences
-    const { data: preferences, error } = await db
+    const { data: preferences, error } = await supabase
       .from('notification_preferences')
       .upsert(
         {

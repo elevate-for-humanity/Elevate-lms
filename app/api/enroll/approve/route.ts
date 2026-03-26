@@ -1,16 +1,16 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { canApproveApprentice } from '@/lib/documents';
 import { notifyApprenticeDecision } from '@/lib/notifications';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 interface ApproveEnrollmentRequest {
   enrollment_id: string;
@@ -39,7 +39,6 @@ async function _POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const {
@@ -53,7 +52,7 @@ async function _POST(req: NextRequest) {
 
     // CRITICAL: Only admin or super_admin may approve enrollments
     // Program holders are explicitly forbidden from approval authority
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -90,7 +89,7 @@ async function _POST(req: NextRequest) {
     });
 
     // Get enrollment details (using enrollments table)
-    const { data: enrollment, error: enrollmentError } = await db
+    const { data: enrollment, error: enrollmentError } = await supabase
       .from('program_enrollments')
       .select('id, user_id, program_id, status, program_holder_id')
       .eq('id', enrollment_id)
@@ -120,7 +119,7 @@ async function _POST(req: NextRequest) {
     // =========================================================================
     
     // Check if this is an apprentice enrollment (check for apprentice record)
-    const { data: apprentice } = await db
+    const { data: apprentice } = await supabase
       .from('apprentices')
       .select('id')
       .eq('user_id', enrollment.user_id)
@@ -155,7 +154,7 @@ async function _POST(req: NextRequest) {
     }
 
     // STEP 1: Activate enrollment (admin-only, no program holder checks needed)
-    const { error: updateEnrollmentError } = await db
+    const { error: updateEnrollmentError } = await supabase
       .from('program_enrollments')
       .update({
         status: 'active',
@@ -175,7 +174,7 @@ async function _POST(req: NextRequest) {
     logger.info('Enrollment activated', { enrollment_id });
 
     // STEP 2: Activate profile enrollment_status
-    const { error: updateProfileError } = await db
+    const { error: updateProfileError } = await supabase
       .from('profiles')
       .update({
         enrollment_status: 'active',
@@ -198,14 +197,14 @@ async function _POST(req: NextRequest) {
     // STEP 2.5a: Create training_enrollments so student can access course content
     if (enrollment.program_id) {
       try {
-        const { data: linkedCourses } = await db
+        const { data: linkedCourses } = await supabase
           .from('training_courses')
           .select('id')
           .eq('program_id', enrollment.program_id);
 
         if (linkedCourses && linkedCourses.length > 0) {
           for (const course of linkedCourses) {
-            await db
+            await supabase
               .from('training_enrollments')
               .upsert({
                 user_id: enrollment.user_id,
@@ -227,7 +226,7 @@ async function _POST(req: NextRequest) {
 
     // STEP 2.5b: Create apprentice record (for hour logging and tracking)
     // Check if apprentice record already exists
-    const { data: existingApprentice } = await db
+    const { data: existingApprentice } = await supabase
       .from('apprentices')
       .select('id')
       .eq('user_id', enrollment.user_id)
@@ -235,13 +234,13 @@ async function _POST(req: NextRequest) {
 
     if (!existingApprentice) {
       // Get program info
-      const { data: program } = await db
+      const { data: program } = await supabase
         .from('programs')
         .select('id, name, total_hours')
         .eq('id', enrollment.program_id)
         .single();
 
-      const { error: apprenticeError } = await db
+      const { error: apprenticeError } = await supabase
         .from('apprentices')
         .insert({
           user_id: enrollment.user_id,
@@ -287,7 +286,7 @@ async function _POST(req: NextRequest) {
 
     // STEP 4: Log approval action (safe - do not fail if audit log fails)
     try {
-      await db.from('audit_logs').insert({
+      await supabase.from('audit_logs').insert({
         actor_id: user.id,
         actor_role: profile?.role || 'unknown',
         action: 'enrollment_approved',
@@ -306,7 +305,7 @@ async function _POST(req: NextRequest) {
     // STEP 5: Notify student of approval
     try {
       // In-app notification
-      await db.from('notifications').insert({
+      await supabase.from('notifications').insert({
         user_id: enrollment.user_id,
         type: 'system',
         title: 'Enrollment Approved',
@@ -315,7 +314,7 @@ async function _POST(req: NextRequest) {
       });
 
       // Email notification via outbox (with token link)
-      const { data: studentProfile } = await db
+      const { data: studentProfile } = await supabase
         .from('profiles')
         .select('email, full_name')
         .eq('id', enrollment.user_id)
@@ -340,7 +339,7 @@ async function _POST(req: NextRequest) {
           const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
           // Get program name for the email
-          const { data: program } = await db
+          const { data: program } = await supabase
             .from('programs')
             .select('name')
             .eq('id', enrollment.program_id)
@@ -368,21 +367,21 @@ async function _POST(req: NextRequest) {
     try {
       if (enrollment.program_holder_id) {
         // Get program holder user directly from program_holders table
-        const { data: programHolder } = await db
+        const { data: programHolder } = await supabase
           .from('program_holders')
           .select('user_id, organization_name')
           .eq('id', enrollment.program_holder_id)
           .single();
 
         if (programHolder?.user_id) {
-          const { data: phProfile } = await db
+          const { data: phProfile } = await supabase
             .from('profiles')
             .select('id, email, full_name')
             .eq('id', programHolder.user_id)
             .single();
 
           if (phProfile) {
-            await db.from('notifications').insert({
+            await supabase.from('notifications').insert({
               user_id: phProfile.id,
               type: 'system',
               title: 'Student Enrollment Approved',

@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireApiRole } from '@/lib/auth/require-api-role';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { parseBody } from '@/lib/api-helpers';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 // GET /api/wioa/iep - Get Individual Employment Plans
 async function _GET(request: NextRequest) {

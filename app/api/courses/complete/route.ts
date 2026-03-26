@@ -1,15 +1,15 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { generateShortId } from '@/lib/utils/id-generator';
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _POST(req: NextRequest) {
   try {
@@ -18,8 +18,7 @@ async function _POST(req: NextRequest) {
 
     // Auth: require authenticated user
     const supabase = await createClient();
-    const _admin = createAdminClient(); const db = _admin || supabase;
-    const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -27,14 +26,14 @@ async function _POST(req: NextRequest) {
     const { courseId, userId, enrollmentId, completionData } = await req.json();
 
     // Verify the authenticated user matches the userId or is admin
-    const { data: profile } = await db.from('profiles').select('role').eq('id', session.user.id).single();
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
     const isAdmin = profile && ['admin', 'super_admin'].includes(profile.role);
     if (session.user.id !== userId && !isAdmin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Update enrollment status
-    const { error: updateError } = await db
+    const { error: updateError } = await supabase
       .from('partner_enrollments')
       .update({
         status: 'completed',
@@ -48,7 +47,7 @@ async function _POST(req: NextRequest) {
     // Create certificate record
     const certificateNumber = `EFH-${generateShortId()}-${courseId.substring(0, 8)}`;
 
-    const { error: certError } = await db
+    const { error: certError } = await supabase
       .from('module_certificates')
       .insert({
         user_id: userId,

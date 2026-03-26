@@ -1,15 +1,15 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { resend } from '@/lib/resend';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 /**
  * Workflow Processor - Processes triggered workflows and sends drip emails
@@ -28,11 +28,10 @@ async function _GET(req: Request) {
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     const now = new Date();
 
     // Get active workflows
-    const { data: workflows, error: workflowsError } = await db
+    const { data: workflows, error: workflowsError } = await supabase
       .from('email_workflows')
       .select('*')
       .eq('status', 'active');
@@ -107,7 +106,7 @@ async function processNewTriggers(supabase: any, workflow: any, now: Date) {
   switch (trigger) {
     case 'enrollment':
       // Find students enrolled in last 5 minutes
-      const { data: enrolled } = await db
+      const { data: enrolled } = await supabase
         .from('students')
         .select('id, email, first_name, last_name, program_name')
         .eq('status', 'active')
@@ -118,7 +117,7 @@ async function processNewTriggers(supabase: any, workflow: any, now: Date) {
 
     case 'application':
       // Find new applications in last 5 minutes
-      const { data: applications } = await db
+      const { data: applications } = await supabase
         .from('students')
         .select('id, email, first_name, last_name, program_name')
         .eq('status', 'applicant')
@@ -129,7 +128,7 @@ async function processNewTriggers(supabase: any, workflow: any, now: Date) {
 
     case 'completion':
       // Find completed programs in last 5 minutes
-      const { data: completed } = await db
+      const { data: completed } = await supabase
         .from('students')
         .select('id, email, first_name, last_name, program_name')
         .eq('status', 'completed')
@@ -143,7 +142,7 @@ async function processNewTriggers(supabase: any, workflow: any, now: Date) {
       const abandonedTime = new Date(
         now.getTime() - 24 * 60 * 60 * 1000
       ).toISOString();
-      const { data: abandoned } = await db
+      const { data: abandoned } = await supabase
         .from('students')
         .select('id, email, first_name, last_name, program_name')
         .eq('status', 'applicant')
@@ -158,7 +157,7 @@ async function processNewTriggers(supabase: any, workflow: any, now: Date) {
   // Enroll new users in workflow
   for (const user of newUsers) {
     // Check if already enrolled
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('workflow_enrollments')
       .select('id')
       .eq('workflow_id', workflow.id)
@@ -168,7 +167,7 @@ async function processNewTriggers(supabase: any, workflow: any, now: Date) {
     if (existing) continue; // Already enrolled
 
     // Enroll user
-    await db.from('workflow_enrollments').insert({
+    await supabase.from('workflow_enrollments').insert({
       workflow_id: workflow.id,
       user_id: user.id,
       user_email: user.email,
@@ -184,7 +183,7 @@ async function processNewTriggers(supabase: any, workflow: any, now: Date) {
  */
 async function processPendingEmails(supabase: any, workflow: any, now: Date) {
   // Get enrollments with pending emails
-  const { data: enrollments, error } = await db
+  const { data: enrollments, error } = await supabase
     .from('workflow_enrollments')
     .select('*')
     .eq('workflow_id', workflow.id)
@@ -204,7 +203,7 @@ async function processPendingEmails(supabase: any, workflow: any, now: Date) {
 
       if (currentStep >= steps.length) {
         // Workflow completed
-        await db
+        await supabase
           .from('workflow_enrollments')
           .update({
             completed: true,
@@ -217,7 +216,7 @@ async function processPendingEmails(supabase: any, workflow: any, now: Date) {
       const step = steps[currentStep];
 
       // Get user details
-      const { data: user } = await db
+      const { data: user } = await supabase
         .from('students')
         .select('*')
         .eq('id', enrollment.user_id)
@@ -271,7 +270,7 @@ async function processPendingEmails(supabase: any, workflow: any, now: Date) {
       }
 
       // Update enrollment
-      await db
+      await supabase
         .from('workflow_enrollments')
         .update({
           current_step: nextStep,
@@ -281,7 +280,7 @@ async function processPendingEmails(supabase: any, workflow: any, now: Date) {
         .eq('id', enrollment.id);
 
       // Log email
-      await db.from('email_logs').insert({
+      await supabase.from('email_logs').insert({
         workflow_id: workflow.id,
         recipient_email: enrollment.user_email,
         recipient_id: enrollment.user_id,
@@ -298,7 +297,7 @@ async function processPendingEmails(supabase: any, workflow: any, now: Date) {
       );
 
       // Log failure
-      await db.from('email_logs').insert({
+      await supabase.from('email_logs').insert({
         workflow_id: workflow.id,
         recipient_email: enrollment.user_email,
         recipient_id: enrollment.user_id,

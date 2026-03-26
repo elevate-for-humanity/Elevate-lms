@@ -1,20 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -26,7 +25,7 @@ const supabase = await createClient();
   const month = request.nextUrl.searchParams.get('month');
   const year = request.nextUrl.searchParams.get('year');
 
-  let query = db
+  let query = supabase
     .from('calendar_events')
     .select('*')
     .eq('user_id', user.id)
@@ -52,7 +51,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -71,7 +69,7 @@ async function _POST(request: NextRequest) {
     color?: string;
   };
 
-  const { data, error }: any = await db
+  const { data, error }: any = await supabase
     .from('calendar_events')
     .insert({
       user_id: user.id,
@@ -97,7 +95,6 @@ async function _PUT(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -109,7 +106,7 @@ const supabase = await createClient();
   const body = await request.json();
   const { id, ...updates } = body;
 
-  const { data, error }: any = await db
+  const { data, error }: any = await supabase
     .from('calendar_events')
     .update(updates)
     .eq('id', id)
@@ -129,7 +126,6 @@ async function _DELETE(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -144,7 +140,7 @@ const supabase = await createClient();
     return NextResponse.json({ error: 'Event ID required' }, { status: 400 });
   }
 
-  const { error } = await db
+  const { error } = await supabase
     .from('calendar_events')
     .delete()
     .eq('id', id)

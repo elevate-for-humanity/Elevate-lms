@@ -1,13 +1,13 @@
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(
   request: Request,
@@ -19,7 +19,6 @@ async function _GET(
 const { id } = await params;
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -30,7 +29,7 @@ const { id } = await params;
     }
 
     // Verify user is staff/admin
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -43,7 +42,7 @@ const { id } = await params;
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { data: process, error } = await db
+    const { data: process, error } = await supabase
       .from('processes')
       .select('*, process_steps(*)')
       .eq('id', id)

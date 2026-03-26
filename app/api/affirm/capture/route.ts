@@ -8,7 +8,6 @@
  * URL params (except checkout_token and order_id) are ignored to prevent tampering.
  */
 
-export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { affirm } from '@/lib/affirm/client';
@@ -16,6 +15,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
 
 async function _GET(request: NextRequest) {
   

@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { withErrorHandling, APIErrors } from '@/lib/api';
 import { NextRequest, NextResponse } from 'next/server';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
@@ -22,7 +21,6 @@ interface BulkVerifyRequest {
  */
 export const POST = withErrorHandling(async (request: NextRequest) => {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Check authentication
   const {
@@ -34,7 +32,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   }
 
   // Check if user is admin
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -70,7 +68,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   for (const documentId of documentIds) {
     try {
       // Get document details
-      const { data: document, error: fetchError } = await db
+      const { data: document, error: fetchError } = await supabase
         .from('documents')
         .select('*')
         .eq('id', documentId)
@@ -119,7 +117,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
         
         if (transferDocTypes.includes(document.document_type)) {
           // Check if there are pending transfer requests for this user
-          const { data: pendingTransfers } = await db
+          const { data: pendingTransfers } = await supabase
             .from('hour_transfer_requests')
             .select('id, source_type, status')
             .eq('submitted_by', document.user_id)
@@ -133,7 +131,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
               
               if (canEvaluate.allowed) {
                 // Update transfer status to pending (ready for evaluation)
-                await db
+                await supabase
                   .from('hour_transfer_requests')
                   .update({
                     status: 'pending',

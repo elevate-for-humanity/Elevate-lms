@@ -5,9 +5,6 @@ import { createAdminClient } from '@/lib/supabase/admin';
  *   - /api/enrollment/submit (comprehensive wizard)
  *   - /api/enrollments/create-enforced (admin/partner)
  */
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
@@ -18,6 +15,10 @@ import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 function getSupabase() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

@@ -1,5 +1,4 @@
 
-export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { gh, parseRepo, getUserOctokit } from '@/lib/github';
@@ -8,6 +7,7 @@ import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
 
 // Get diff between two refs or for a specific file
 async function _GET(req: NextRequest) {

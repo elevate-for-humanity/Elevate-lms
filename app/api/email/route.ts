@@ -1,21 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -26,7 +25,7 @@ const supabase = await createClient();
 
   const folder = request.nextUrl.searchParams.get('folder') || 'inbox';
 
-  const { data: emails, error } = await db
+  const { data: emails, error } = await supabase
     .from('emails')
     .select('*')
     .eq('user_id', user.id)
@@ -45,7 +44,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -59,7 +57,7 @@ async function _POST(request: NextRequest) {
 
   if (action === 'send') {
     // Send email
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('emails')
       .insert({
         user_id: user.id,
@@ -82,7 +80,7 @@ async function _POST(request: NextRequest) {
 
   if (action === 'star' || action === 'unstar') {
     const { id } = body;
-    const { error } = await db
+    const { error } = await supabase
       .from('emails')
       .update({ starred: action === 'star' })
       .eq('id', id)
@@ -97,7 +95,7 @@ async function _POST(request: NextRequest) {
 
   if (action === 'mark-read' || action === 'mark-unread') {
     const { id } = body;
-    const { error } = await db
+    const { error } = await supabase
       .from('emails')
       .update({ read: action === 'mark-read' })
       .eq('id', id)
@@ -112,7 +110,7 @@ async function _POST(request: NextRequest) {
 
   if (action === 'delete') {
     const { id } = body;
-    const { error } = await db
+    const { error } = await supabase
       .from('emails')
       .update({ folder: 'trash' })
       .eq('id', id)

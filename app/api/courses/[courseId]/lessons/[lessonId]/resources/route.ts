@@ -1,15 +1,15 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { getCurrentUser } from '@/lib/auth';
 import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 async function _GET(
   request: Request,
@@ -23,8 +23,7 @@ async function _GET(
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const supabase = await createClient();
-    const _admin = createAdminClient(); const db = _admin || supabase;
-    const { lessonId } = await params;
+      const { lessonId } = await params;
 
     try {
       await assertLessonAccess(user.id, lessonId);
@@ -33,7 +32,7 @@ async function _GET(
       return NextResponse.json(body, { status });
     }
 
-    const { data: resources, error } = await db
+    const { data: resources, error } = await supabase
       .from('course_materials')
       .select('*')
       .eq('lesson_id', lessonId)

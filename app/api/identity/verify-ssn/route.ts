@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditPiiAccess } from '@/lib/auditLog';
 
@@ -21,7 +20,6 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -70,7 +68,7 @@ export async function POST(request: NextRequest) {
     const result = await response.json();
 
     // Save verification result to database
-    const { data: verification, error } = await db
+    const { data: verification, error } = await supabase
       .from('ssn_verifications')
       .insert({
         user_id: user.id,
@@ -95,7 +93,7 @@ export async function POST(request: NextRequest) {
 
     // Update program holder verification status if SSN verified
     if (result.verified) {
-      await db.from('program_holder_verification').upsert({
+      await supabase.from('program_holder_verification').upsert({
         program_holder_id: user.id,
         ssn_verified: true,
         ssn_verified_at: new Date().toISOString(),

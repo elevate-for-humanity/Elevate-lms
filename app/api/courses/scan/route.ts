@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 
-export const maxDuration = 60;
 import { gh, parseRepo } from '@/lib/github';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const maxDuration = 60;
 
 async function _GET(req: NextRequest) {
   try {

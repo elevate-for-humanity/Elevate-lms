@@ -1,8 +1,5 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 // =====================================================
 // INTAKE STAGE 2: ELIGIBILITY
@@ -15,6 +12,10 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
 
 const EligibilitySchema = z.object({
   leadId: z.string().uuid(),

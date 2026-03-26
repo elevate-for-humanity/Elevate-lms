@@ -3,8 +3,6 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Shield, ClipboardList, Plus, ArrowLeft } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
-
 export const metadata: Metadata = {
   title: 'Proctor Portal | Elevate for Humanity',
   description: 'Manage proctored certification exams — EPA 608, Certiport, OSHA, and more.',

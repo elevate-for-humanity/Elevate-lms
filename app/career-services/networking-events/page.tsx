@@ -8,7 +8,7 @@ import EventCard from '@/components/events/EventCard';
 import EventsEmptyState from '@/components/events/EventsEmptyState';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Networking Events | Career Services | Elevate for Humanity',

@@ -29,16 +29,19 @@ async function _GET(request: Request) {
       supabase.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('status', 'active'),
     ]);
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        total: totalRes.count ?? 0,
-        thisMonth: monthRes.count ?? 0,
-        today: todayRes.count ?? 0,
-        activeStudents: activeRes.count ?? 0,
-        lastUpdated: now.toISOString(),
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          total: totalRes.count ?? 0,
+          thisMonth: monthRes.count ?? 0,
+          today: todayRes.count ?? 0,
+          activeStudents: activeRes.count ?? 0,
+          lastUpdated: now.toISOString(),
+        },
       },
-    });
+      { headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' } }
+    );
   } catch (error) {
     return NextResponse.json(
       { success: false, error: 'Failed to fetch enrollment data' },

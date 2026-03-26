@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 
 // Legacy HVAC course home — consolidated into /lms/courses/[courseId]

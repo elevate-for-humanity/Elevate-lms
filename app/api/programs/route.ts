@@ -55,11 +55,14 @@ async function _GET(request: Request) {
       );
     }
 
-    return NextResponse.json({
-      status: 'success',
-      count: programs?.length || 0,
-      programs: programs || [],
-    });
+    return NextResponse.json(
+      {
+        status: 'success',
+        count: programs?.length || 0,
+        programs: programs || [],
+      },
+      { headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' } }
+    );
   } catch (error) {
     logger.error('Error in programs API:', error);
     return NextResponse.json(

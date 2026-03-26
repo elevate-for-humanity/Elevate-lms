@@ -6,7 +6,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import RequestInfoForm from './RequestInfoForm';
 import { getProgramBySlug } from '@/lib/programs/get-program';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 interface Props {
   params: { slug: string };

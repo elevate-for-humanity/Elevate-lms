@@ -23,7 +23,10 @@ const supabase = createSupabaseClient();
   // Try cache first
   const cached = await cacheGet(cacheKey);
   if (cached) {
-    return NextResponse.json({ programs: cached, cached: true });
+    return NextResponse.json(
+      { programs: cached, cached: true },
+      { headers: { 'Cache-Control': 's-maxage=300, stale-while-revalidate=600' } }
+    );
   }
 
   // Fetch from database
@@ -41,6 +44,9 @@ const supabase = createSupabaseClient();
   // Cache for 5 minutes
   await cacheSet(cacheKey, data, 300);
 
-  return NextResponse.json({ programs: data, cached: false });
+  return NextResponse.json(
+    { programs: data, cached: false },
+    { headers: { 'Cache-Control': 's-maxage=300, stale-while-revalidate=600' } }
+  );
 }
 export const GET = withApiAudit('/api/programs/featured', _GET);

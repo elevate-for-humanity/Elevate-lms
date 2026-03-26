@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Calendar, Clock, Users, Play } from 'lucide-react';
 import { createPublicClient } from '@/lib/supabase/server';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Webinars | Elevate For Humanity',

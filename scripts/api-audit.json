@@ -1,0 +1,358 @@
+{
+  "truly_public": [
+    "app/api/ai/generate-script/route.ts",
+    "app/api/ai-instructor/hvac/route.ts",
+    "app/api/ai-tutor/public/route.ts",
+    "app/api/analytics/events/route.ts",
+    "app/api/analytics/reports/wioa/route.ts",
+    "app/api/applications/route.ts",
+    "app/api/applications/track/route.ts",
+    "app/api/apply/route.ts",
+    "app/api/apply/simple/route.ts",
+    "app/api/audit/export/route.ts",
+    "app/api/autopilot/route.ts",
+    "app/api/autopilot/sitemap/route.ts",
+    "app/api/autopilots/deploy/route.ts",
+    "app/api/billing/report-usage/route.ts",
+    "app/api/board/compliance-report/route.ts",
+    "app/api/booking/schedule/route.ts",
+    "app/api/build/route.ts",
+    "app/api/cash-advances/applications/[id]/approve/route.ts",
+    "app/api/cash-advances/applications/[id]/route.ts",
+    "app/api/cash-advances/applications/route.ts",
+    "app/api/chat/ai-response/route.ts",
+    "app/api/chatbot/calendly-webhook/route.ts",
+    "app/api/chatbot/lead/route.ts",
+    "app/api/cm/learners/[id]/notes/route.ts",
+    "app/api/cm/learners/[id]/route.ts",
+    "app/api/contact/route.ts",
+    "app/api/courses/[courseId]/lessons/[lessonId]/complete/route.ts",
+    "app/api/courses/sitemap/route.ts",
+    "app/api/cron/career-course-emails/route.ts",
+    "app/api/cron/check-stuck-approvals/route.ts",
+    "app/api/cron/compliance-expiration/route.ts",
+    "app/api/cron/daily-attendance-alerts/route.ts",
+    "app/api/cron/enrollment-automation/route.ts",
+    "app/api/cron/escalate-funding-sla/route.ts",
+    "app/api/cron/expire-credentials/route.ts",
+    "app/api/cron/expire-exam-authorizations/route.ts",
+    "app/api/cron/expire-licenses/route.ts",
+    "app/api/cron/inactivity-reminders/route.ts",
+    "app/api/cron/onboarding-reminder/route.ts",
+    "app/api/cron/payment-monitoring/route.ts",
+    "app/api/cron/poll-mef-acks/route.ts",
+    "app/api/cron/process-notifications/route.ts",
+    "app/api/cron/process-provisioning-jobs/route.ts",
+    "app/api/cron/trial-lifecycle/route.ts",
+    "app/api/cron/webhook-health-check/route.ts",
+    "app/api/cron/weekly-reminders/route.ts",
+    "app/api/cron/weekly-verdicts/route.ts",
+    "app/api/demo/reset/route.ts",
+    "app/api/employer/hiring-trends/route.ts",
+    "app/api/employer/retention-stats/route.ts",
+    "app/api/employers/onboard/[id]/route.ts",
+    "app/api/employers/onboard/route.ts",
+    "app/api/enrollment-count/route.ts",
+    "app/api/exams/start/route.ts",
+    "app/api/exams/submit/route.ts",
+    "app/api/funding/update/route.ts",
+    "app/api/grants/draft/route.ts",
+    "app/api/grants/match/route.ts",
+    "app/api/grants/sync/route.ts",
+    "app/api/help/search/route.ts",
+    "app/api/hsi/create-checkout/route.ts",
+    "app/api/hvac/advance-workflow/route.ts",
+    "app/api/inquiries/route.ts",
+    "app/api/intake/apply/route.ts",
+    "app/api/intake/leads/route.ts",
+    "app/api/intake/status/route.ts",
+    "app/api/internal/program-proof/[slug]/route.ts",
+    "app/api/lessons/[lessonId]/audio/route.ts",
+    "app/api/lessons/[lessonId]/checkpoint/route.ts",
+    "app/api/live/zoom/route.ts",
+    "app/api/lms/progress/complete/route.ts",
+    "app/api/lms/progress/start/route.ts",
+    "app/api/lti/launch/route.ts",
+    "app/api/marketplace/health/route.ts",
+    "app/api/marketplace/purchase-details/route.ts",
+    "app/api/marketplace/report/route.ts",
+    "app/api/media-proxy/route.ts",
+    "app/api/mef/readiness/route.ts",
+    "app/api/orientation/schedule/route.ts",
+    "app/api/partner/applications/[id]/deny/route.ts",
+    "app/api/partner-courses/create-checkout/route.ts",
+    "app/api/partners/[program]/apply/route.ts",
+    "app/api/partners/barbershop-apprenticeship/apply/route.ts",
+    "app/api/partners/barbershop-apprenticeship/policy-acknowledgment/route.ts",
+    "app/api/programs/barber-apprenticeship/apply/route.ts",
+    "app/api/programs/barber-apprenticeship/confirm/route.ts",
+    "app/api/programs/cdl/waitlist/route.ts",
+    "app/api/programs/featured/route.ts",
+    "app/api/programs/route.ts",
+    "app/api/provider/staff/invite/route.ts",
+    "app/api/push/send/route.ts",
+    "app/api/rapids/safe-update/route.ts",
+    "app/api/rapids/update/route.ts",
+    "app/api/reports/wioa/route.ts",
+    "app/api/schedule-consultation/route.ts",
+    "app/api/scorm/attempts/[attemptId]/data/route.ts",
+    "app/api/scorm/content/[packageId]/[...path]/route.ts",
+    "app/api/soc/mark/route.ts",
+    "app/api/store/clone/route.ts",
+    "app/api/store/customer-portal/route.ts",
+    "app/api/store/license/validate/route.ts",
+    "app/api/store/licenses/webhook/route.ts",
+    "app/api/store/products/[slug]/route.ts",
+    "app/api/store/subscribe/route.ts",
+    "app/api/stripe/invoice/create/route.ts",
+    "app/api/studio/chat/route.ts",
+    "app/api/studio/comments/route.ts",
+    "app/api/studio/complete/route.ts",
+    "app/api/studio/deploy-tokens/route.ts",
+    "app/api/studio/favorites/route.ts",
+    "app/api/studio/fix/route.ts",
+    "app/api/studio/generate-tests/route.ts",
+    "app/api/studio/pr-tracking/route.ts",
+    "app/api/studio/recent/route.ts",
+    "app/api/studio/repos/route.ts",
+    "app/api/studio/session/route.ts",
+    "app/api/studio/share/route.ts",
+    "app/api/studio/terminal/route.ts",
+    "app/api/studio/workflow-tracking/route.ts",
+    "app/api/studio/ws/route.ts",
+    "app/api/supersonic-fast-cash/apply/route.ts",
+    "app/api/supersonic-fast-cash/clients/route.ts",
+    "app/api/supersonic-fast-cash/file-return/route.ts",
+    "app/api/supersonic-fast-cash/generate-access-key/route.ts",
+    "app/api/supersonic-fast-cash/jotform-webhook/route.ts",
+    "app/api/supersonic-fast-cash/ocr-extract/route.ts",
+    "app/api/supersonic-fast-cash/refund-tracking/route.ts",
+    "app/api/supersonic-fast-cash/save-tax-return/route.ts",
+    "app/api/supersonic-fast-cash/stripe-webhook/route.ts",
+    "app/api/supersonic-fast-cash/validate-access-key/route.ts",
+    "app/api/support/ticket/route.ts",
+    "app/api/tax/book-appointment/route.ts",
+    "app/api/tax/file-return/route.ts",
+    "app/api/tax/upload-url/route.ts",
+    "app/api/tax-filing/applications/route.ts",
+    "app/api/tax-intake/route.ts",
+    "app/api/tenants/create/route.ts",
+    "app/api/tenants/provision/route.ts",
+    "app/api/testing/book/route.ts",
+    "app/api/token/validate/route.ts",
+    "app/api/track-usage/route.ts",
+    "app/api/v1/health/route.ts",
+    "app/api/verify/route.ts",
+    "app/api/waitlist/cna/route.ts",
+    "app/api/webhooks/exam-payment/route.ts",
+    "app/api/webhooks/marketplace/route.ts",
+    "app/api/webhooks/milady-email/route.ts",
+    "app/api/webhooks/partners/[partner]/route.ts",
+    "app/api/webhooks/resend-inbound/route.ts",
+    "app/api/webhooks/stripe/route.ts",
+    "app/api/webhooks/stripe-identity/route.ts",
+    "app/api/wioa/case-management/[id]/route.ts",
+    "app/api/wioa/case-management/route.ts",
+    "app/api/wioa/eligibility/route.ts",
+    "app/api/wioa/employment/route.ts",
+    "app/api/wioa/iep/[id]/route.ts",
+    "app/api/wioa/iep/route.ts",
+    "app/api/wioa/reporting/route.ts",
+    "app/api/wioa/support-services/[id]/approve/route.ts",
+    "app/api/wioa/support-services/route.ts",
+    "app/api/workforce-board/performance-trends/route.ts",
+    "app/api/workspace/[id]/route.ts",
+    "app/api/workspace/route.ts",
+    "app/api/wotc/update/route.ts",
+    "app/api/xapi/route.ts"
+  ],
+  "has_auth": [
+    {
+      "file": "app/api/certificates/issue/route.ts",
+      "signals": [
+        "getSession()",
+        "auth.getSession"
+      ]
+    },
+    {
+      "file": "app/api/ojt/submit/route.ts",
+      "signals": [
+        "getSession()",
+        "auth.getSession"
+      ]
+    },
+    {
+      "file": "app/api/privacy/delete/route.ts",
+      "signals": [
+        "getSession()",
+        "auth.getSession"
+      ]
+    },
+    {
+      "file": "app/api/privacy/export/route.ts",
+      "signals": [
+        "getSession()",
+        "auth.getSession"
+      ]
+    },
+    {
+      "file": "app/api/quizzes/[quizId]/route.ts",
+      "signals": [
+        "getSession()",
+        "auth.getSession"
+      ]
+    }
+  ],
+  "ambiguous": [
+    {
+      "file": "app/api/achievements/route.ts",
+      "signals": [
+        "createServerSupabaseClient"
+      ]
+    },
+    {
+      "file": "app/api/ai-studio/generate-avatar/route.ts",
+      "signals": [
+        "Authorization"
+      ]
+    },
+    {
+      "file": "app/api/analytics/metrics/dol-dwd/route.ts",
+      "signals": [
+        "createServerSupabaseClient"
+      ]
+    },
+    {
+      "file": "app/api/applications/wioa/route.ts",
+      "signals": [
+        "Authorization"
+      ]
+    },
+    {
+      "file": "app/api/assignments/[id]/submit/route.ts",
+      "signals": [
+        "createServerSupabaseClient"
+      ]
+    },
+    {
+      "file": "app/api/assignments/route.ts",
+      "signals": [
+        "createServerSupabaseClient"
+      ]
+    },
+    {
+      "file": "app/api/certificates/route.ts",
+      "signals": [
+        "createServerSupabaseClient"
+      ]
+    },
+    {
+      "file": "app/api/credentials/issue/route.ts",
+      "signals": [
+        "createServerSupabaseClient"
+      ]
+    },
+    {
+      "file": "app/api/cron/funding-escalation/route.ts",
+      "signals": [
+        "Authorization"
+      ]
+    },
+    {
+      "file": "app/api/enrollments/route.ts",
+      "signals": [
+        "createServerSupabaseClient"
+      ]
+    },
+    {
+      "file": "app/api/funnel/lead/route.ts",
+      "signals": [
+        "Authorization"
+      ]
+    },
+    {
+      "file": "app/api/gamification/leaderboard/route.ts",
+      "signals": [
+        "createServerSupabaseClient"
+      ]
+    },
+    {
+      "file": "app/api/health/route.ts",
+      "signals": [
+        "Authorization"
+      ]
+    },
+    {
+      "file": "app/api/intake/application/route.ts",
+      "signals": [
+        "createServerSupabaseClient"
+      ]
+    },
+    {
+      "file": "app/api/intake/eligibility/route.ts",
+      "signals": [
+        "createServerSupabaseClient"
+      ]
+    },
+    {
+      "file": "app/api/intake/interest/route.ts",
+      "signals": [
+        "createServerSupabaseClient"
+      ]
+    },
+    {
+      "file": "app/api/jobs/process/route.ts",
+      "signals": [
+        "Authorization"
+      ]
+    },
+    {
+      "file": "app/api/leaderboard/route.ts",
+      "signals": [
+        "createServerSupabaseClient"
+      ]
+    },
+    {
+      "file": "app/api/milady-rise/enroll/route.ts",
+      "signals": [
+        "createServerSupabaseClient"
+      ]
+    },
+    {
+      "file": "app/api/partners/barbershop-apprenticeship/sign-mou/route.ts",
+      "signals": [
+        "Authorization"
+      ]
+    },
+    {
+      "file": "app/api/programs/[slug]/courses/route.ts",
+      "signals": [
+        "createServerSupabaseClient"
+      ]
+    },
+    {
+      "file": "app/api/reporting/dol-dwd/route.ts",
+      "signals": [
+        "createServerSupabaseClient"
+      ]
+    },
+    {
+      "file": "app/api/social/feeds/route.ts",
+      "signals": [
+        "Authorization"
+      ]
+    },
+    {
+      "file": "app/api/supersonic-fast-cash/sync-jotform/route.ts",
+      "signals": [
+        "Authorization"
+      ]
+    },
+    {
+      "file": "app/api/waitlist/route.ts",
+      "signals": [
+        "Authorization"
+      ]
+    }
+  ]
+}

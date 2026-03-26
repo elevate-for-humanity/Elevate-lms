@@ -5,7 +5,7 @@ import { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
-  ArrowLeft, Clock, Camera, Image, X, 
+  ArrowLeft, Clock, Camera, Image as ImageIcon, X, 
   Loader2, AlertCircle, Calendar,
   MapPin, FileText
 } from 'lucide-react';
@@ -307,7 +307,7 @@ export default function SubmitHoursPage() {
               className="w-full h-32 border-2 border-dashed border-slate-600 rounded-xl flex flex-col items-center justify-center gap-2 text-slate-400 hover:border-brand-blue-500 hover:text-brand-blue-400 transition-colors"
             >
               <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-                <Image className="w-6 h-6" />
+                <ImageIcon className="w-6 h-6" />
               </div>
               <span className="text-sm">Tap to add photo</span>
             </button>

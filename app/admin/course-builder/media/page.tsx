@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Upload, Image, Video, FileText, Search, Grid, List } from 'lucide-react';
+import { ArrowLeft, Upload, Image as ImageIcon, Video, FileText, Search, Grid, List } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,7 +64,7 @@ export default async function MediaLibraryPage() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-brand-green-100 rounded-lg">
-                <Image className="w-5 h-5 text-brand-green-600" />
+                <ImageIcon className="w-5 h-5 text-brand-green-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">0</p>

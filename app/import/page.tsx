@@ -6,7 +6,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { 
   Globe, ArrowRight, Loader2, Circle, 
-  Palette, FileText, Image, Navigation, Sparkles,
+  Palette, FileText, Image as ImageIcon, Navigation, Sparkles,
   AlertCircle, ExternalLink
 } from 'lucide-react';
 
@@ -276,7 +276,7 @@ export default function ImportSitePage() {
                   <p className="text-slate-500 text-sm">Pages</p>
                 </div>
                 <div className="bg-white/5 rounded-lg p-4 text-center">
-                  <Image className="w-6 h-6 text-brand-blue-400 mx-auto mb-2" />
+                  <ImageIcon className="w-6 h-6 text-brand-blue-400 mx-auto mb-2" />
                   <p className="text-2xl font-bold text-slate-900">{extracted.imagesFound}</p>
                   <p className="text-slate-500 text-sm">Images</p>
                 </div>

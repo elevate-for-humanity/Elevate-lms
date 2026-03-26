@@ -10,7 +10,7 @@ import {
   DollarSign,
   Tag,
   FileText,
-  Image,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -203,7 +203,7 @@ export default async function AddProductPage() {
           {/* Images */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Image className="w-5 h-5" />
+              <ImageIcon className="w-5 h-5" />
               Product Images
             </h2>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">

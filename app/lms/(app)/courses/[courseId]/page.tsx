@@ -88,10 +88,27 @@ export default async function CoursePage({ params }: { params: Params }) {
     .from('course_modules').select('id, title, order_index')
     .eq('course_id', lessonCourseId).order('order_index', { ascending: true });
 
-  const { data: lessonsRaw } = await db
+  let { data: lessonsRaw } = await db
     .from('lms_lessons')
     .select('id, title, description, duration_minutes, order_index, content_type, step_type, module_id, activities, slug')
     .eq('course_id', lessonCourseId).order('order_index', { ascending: true });
+
+  // Fallback: if lms_lessons returns nothing (view filters unpublished),
+  // read directly from course_lessons so the page still renders.
+  if (!lessonsRaw || lessonsRaw.length === 0) {
+    const { data: clFallback } = await db
+      .from('course_lessons')
+      .select('id, title, order_index, lesson_type, module_id, activities, slug')
+      .eq('course_id', lessonCourseId)
+      .order('order_index', { ascending: true });
+    lessonsRaw = (clFallback || []).map((r: any) => ({
+      ...r,
+      step_type: r.lesson_type,
+      content_type: r.lesson_type,
+      description: null,
+      duration_minutes: null,
+    }));
+  }
 
   const allLessons = (lessonsRaw || []) as any[];
 

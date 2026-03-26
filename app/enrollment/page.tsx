@@ -19,24 +19,30 @@ export default async function EnrollmentPage() {
   const supabase = await createClient();
   const _admin = createAdminClient();
   const db = _admin || supabase;
-  let programs: any[] = [];
-  if (supabase) {
-    const { data } = await db.from('programs').select('id, name, status, description').eq('status', 'active').order('name').limit(20);
-    programs = data ?? [];
-  }
+  const { data: programsData } = await db
+    .from('programs')
+    .select('id, title, slug, description, excerpt, image_url, duration_weeks, credential_name, status, is_active')
+    .eq('is_active', true)
+    .neq('status', 'archived')
+    .order('title')
+    .limit(20);
+  const programs = programsData ?? [];
+
+  // Featured = first 4 active programs from DB
+  const featured = programs.slice(0, 4).map((p: any) => ({
+    name: p.title,
+    hours: p.duration_weeks ? `${p.duration_weeks * 40}+` : '—',
+    weeks: p.duration_weeks ? String(p.duration_weeks) : '—',
+    credentials: '—',
+    href: `/apply/student?program=${p.slug}`,
+    image: p.image_url || '/images/pages/apply-page-1.jpg',
+  }));
 
   const steps = [
     { step: '1', title: 'Apply', desc: 'Complete the student application form with your information and program interest.', href: '/apply/student' },
     { step: '2', title: 'Review', desc: 'Our team reviews your application and contacts you within 1-2 business days.' },
     { step: '3', title: 'Enroll', desc: 'Sign the enrollment agreement, submit required documents, and confirm funding.' },
     { step: '4', title: 'Onboard', desc: 'Complete orientation, access the LMS, and begin your training program.' },
-  ];
-
-  const featured = [
-    { name: 'Building Technician with HVAC Fundamentals', hours: '400+', weeks: '12', credentials: '6', href: '/apply/student?program=hvac-technician', image: '/images/pages/hvac-technician.jpg' },
-    { name: 'Electrical Apprenticeship', hours: '400+', weeks: '20', credentials: '4', href: '/apply/student?program=electrical', image: '/images/pages/hvac-technician.jpg' },
-    { name: 'Plumbing Apprenticeship', hours: '400+', weeks: '20', credentials: '4', href: '/apply/student?program=plumbing', image: '/images/pages/hvac-technician.jpg' },
-    { name: 'Forklift Operator', hours: '40', weeks: '1', credentials: '2', href: '/apply/student?program=forklift', image: '/images/pages/apply-page-1.jpg' },
   ];
 
   return (

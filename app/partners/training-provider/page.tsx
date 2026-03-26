@@ -33,7 +33,7 @@ const BENEFITS = [
   {
     title: 'LMS & Student Tracking',
     desc: 'Access our platform for enrollment management, attendance tracking, credential issuance, and compliance reporting.',
-    image: '/images/pages/training-classroom.jpg',
+    image: '/images/pages/training-providers-page-1.jpg',
   },
   {
     title: 'Automated Outcome Reports',

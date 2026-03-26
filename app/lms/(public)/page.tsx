@@ -12,14 +12,7 @@ export const metadata: Metadata = {
   description: 'Start your career training. Browse programs, enroll, and earn industry credentials.',
 };
 
-const PROGRAMS = [
-  { title: 'HVAC Technician', desc: 'EPA 608 certification. Hands-on refrigeration and electrical training.', duration: '16 weeks', credential: 'EPA 608', image: '/images/pages/hvac-unit.jpg', slug: 'hvac-technician', funded: true },
-  { title: 'CNA / Nursing Assistant', desc: 'State-certified nursing assistant training for healthcare careers.', duration: '6 weeks', credential: 'State CNA', image: '/images/pages/cna-hero.jpg', slug: 'cna', funded: true },
-  { title: 'CDL Training', desc: 'Commercial driver license training. Class A and B available.', duration: '8 weeks', credential: 'CDL Class A', image: '/images/pages/cdl-hero.jpg', slug: 'cdl-training', funded: true },
-  { title: 'Barber Apprenticeship', desc: 'Indiana DOL registered apprenticeship. Earn while you learn.', duration: '52 weeks', credential: 'Indiana Barber License', image: '/images/pages/barber-hero-main.jpg', slug: 'barber-apprenticeship', funded: true },
-  { title: 'Medical Assistant', desc: 'Clinical and administrative skills for medical office careers.', duration: '12 weeks', credential: 'CCMA', image: '/images/pages/medical-assistant-hero.jpg', slug: 'medical-assistant', funded: true },
-  { title: 'Cybersecurity Analyst', desc: 'CompTIA Security+ and network defense fundamentals.', duration: '12 weeks', credential: 'CompTIA Security+', image: '/images/pages/cybersecurity-hero.jpg', slug: 'cybersecurity-analyst', funded: false },
-];
+// Programs are loaded from the DB inside the page component
 
 const STEPS = [
   { num: '1', title: 'Apply', desc: 'Free application. Takes 5 minutes. No prior experience required.' },
@@ -34,6 +27,27 @@ export default async function LmsPublicPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (user) redirect('/learner/dashboard');
+
+  // Load programs from DB — active, published, ordered
+  const { createAdminClient } = await import('@/lib/supabase/admin');
+  const db = createAdminClient();
+  const { data: dbPrograms } = await db
+    .from('programs')
+    .select('id, title, slug, description, excerpt, image_url, duration_weeks, credential, credential_name, is_active, status')
+    .eq('is_active', true)
+    .neq('status', 'archived')
+    .order('title')
+    .limit(12);
+
+  const programs = (dbPrograms ?? []).map((p: any) => ({
+    title: p.title,
+    desc: p.excerpt || p.description?.slice(0, 120) || '',
+    duration: p.duration_weeks ? `${p.duration_weeks} weeks` : '—',
+    credential: p.credential_name || p.credential || '—',
+    image: p.image_url || '/images/pages/hvac-unit.jpg',
+    slug: p.slug,
+    funded: false,
+  }));
   return (
     <div className="min-h-screen bg-white">
 
@@ -81,7 +95,7 @@ export default async function LmsPublicPage() {
             <p className="text-slate-500 text-base">Most programs are fully funded for Indiana residents.</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {PROGRAMS.map(p => (
+            {programs.map(p => (
               <div key={p.slug} className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-md transition group">
                 <div className="relative aspect-[16/9] overflow-hidden">
                   <Image src={p.image} alt={p.title} fill className="object-cover group-hover:scale-105 transition duration-500" sizes="(max-width: 640px) 100vw, 33vw" />

@@ -52,7 +52,7 @@ export default function BillingSettingsPage() {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      router.push('/login?next=/lms/settings/billing');
+      router.push('/login?redirect=/lms/settings/billing');
       return;
     }
 

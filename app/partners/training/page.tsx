@@ -14,7 +14,7 @@ export default function TrainingPartnerPage() {
     <PublicLandingPage config={{
       breadcrumbs: [{ label: 'Partners', href: '/partners' }, { label: 'Training' }],
       hero: {
-        image: '/images/pages/training-cohort.jpg',
+        image: '/images/pages/partner-page-1.jpg',
         tag: 'Training Partners',
         title: 'Training Provider Partnership',
         subtitle: 'Co-deliver workforce training programs and expand your reach through our enrollment pipeline and funding network.',

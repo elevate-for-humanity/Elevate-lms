@@ -63,7 +63,7 @@ const PROGRAMS = [
 
 const LOCATIONS = [
   { state: 'Indiana', href: '/career-training-indiana', cities: ['Indianapolis', 'Fort Wayne', 'Evansville'], image: '/images/pages/about-career-training.jpg', desc: 'Main campus. WIOA-eligible programs, apprenticeships, and job placement.' },
-  { state: 'Illinois', href: '/career-training-illinois', cities: ['Chicago', 'Aurora', 'Naperville'], image: '/images/pages/training-classroom.jpg', desc: 'Workforce programs across the Chicago metro and statewide.' },
+  { state: 'Illinois', href: '/career-training-illinois', cities: ['Chicago', 'Aurora', 'Naperville'], image: '/images/pages/workforce-training.jpg', desc: 'Workforce programs across the Chicago metro and statewide.' },
   { state: 'Ohio', href: '/career-training-ohio', cities: ['Columbus', 'Cleveland', 'Cincinnati'], image: '/images/pages/welding-sparks.jpg', desc: 'Career training aligned with Ohio industry demand.' },
   { state: 'Tennessee', href: '/career-training-tennessee', cities: ['Nashville', 'Memphis', 'Knoxville'], image: '/images/pages/electrical.jpg', desc: 'Expanding workforce development across Tennessee.' },
   { state: 'Texas', href: '/career-training-texas', cities: ['Houston', 'Dallas', 'San Antonio'], image: '/images/pages/business-sector.jpg', desc: 'Trade, healthcare, and technology programs for Texas.' },
@@ -114,7 +114,7 @@ export default function EducationLandingPage() {
       <section className="pt-16">
         <HeroVideo
           videoSrcDesktop="/videos/lms-learning.mp4"
-          posterImage="/images/pages/training-cohort.jpg"
+          posterImage="/images/pages/higher-ed-hero.jpg"
           voiceoverSrc="/audio/heroes/programs.mp3"
           microLabel="Career Training"
           analyticsName="education"

@@ -26,7 +26,7 @@ export default function Page() {
           <HeroMediaFrame>
             <CanonicalVideo
               src="/videos/getting-started-hero.mp4"
-              poster="/images/pages/training-cohort.jpg"
+              poster="/images/pages/getstarted-page-1.jpg"
               className="absolute inset-0 w-full h-full object-cover"
             />
           </HeroMediaFrame>

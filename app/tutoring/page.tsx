@@ -28,7 +28,7 @@ export default function TutoringPage() {
     {
       title: "Healthcare & CNA",
       description: "Anatomy review, medical terminology, patient care procedures, clinical skills practice, and state exam preparation for CNA certification.",
-      image: "/images/pages/training-classroom.jpg"
+      image: "/images/pages/cna-clinical.jpg"
     },
     {
       title: "Skilled Trades",
@@ -38,22 +38,22 @@ export default function TutoringPage() {
     {
       title: "Technology & IT",
       description: "CompTIA A+ and Network+ exam prep, cybersecurity concepts, help desk scenarios, coding fundamentals, and web development projects.",
-      image: "/images/pages/training-classroom.jpg"
+      image: "/images/pages/cybersecurity.jpg"
     },
     {
       title: "Business & Finance",
       description: "QuickBooks operations, bookkeeping fundamentals, tax preparation concepts, business plan development, and Microsoft Office proficiency.",
-      image: "/images/pages/training-classroom.jpg"
+      image: "/images/pages/bookkeeping.jpg"
     },
     {
       title: "General Academic Support",
       description: "Math fundamentals, reading comprehension, study skills, test-taking strategies, and GED preparation for students who need foundational support.",
-      image: "/images/pages/training-classroom.jpg"
+      image: "/images/pages/adult-learner.jpg"
     },
     {
       title: "Certification Exam Prep",
       description: "Focused review sessions for any certification exam — OSHA, AWS, QuickBooks, CompTIA, AFSP, or state licensing boards. Practice tests and targeted review.",
-      image: "/images/pages/training-classroom.jpg"
+      image: "/images/pages/certifications.jpg"
     }
   ];
 
@@ -117,10 +117,10 @@ export default function TutoringPage() {
           <h2 className="text-3xl font-bold text-center mb-12">How Tutoring Works</h2>
           <div className="grid md:grid-cols-4 gap-6">
             {[
-              { step: "1", title: "Log In to LMS", desc: "Access the tutoring portal through your student dashboard. Navigate to Help > Tutoring.", image: "/images/pages/training-classroom.jpg" },
-              { step: "2", title: "Choose Your Subject", desc: "Select from healthcare, trades, technology, business, academic support, or exam prep.", image: "/images/pages/training-classroom.jpg" },
-              { step: "3", title: "Book a Session", desc: "Pick an available tutor and time slot. Choose 30 or 60 minutes, virtual or in-person.", image: "/images/pages/training-classroom.jpg" },
-              { step: "4", title: "Meet & Learn", desc: "Join your session via Zoom or at the training center. Get focused help on exactly what you need.", image: "/images/pages/training-classroom.jpg" },
+              { step: "1", title: "Log In to LMS", desc: "Access the tutoring portal through your student dashboard. Navigate to Help > Tutoring.", image: "/images/pages/lms-page-1.jpg" },
+              { step: "2", title: "Choose Your Subject", desc: "Select from healthcare, trades, technology, business, academic support, or exam prep.", image: "/images/pages/courses-page-1.jpg" },
+              { step: "3", title: "Book a Session", desc: "Pick an available tutor and time slot. Choose 30 or 60 minutes, virtual or in-person.", image: "/images/pages/calendar-page-1.jpg" },
+              { step: "4", title: "Meet & Learn", desc: "Join your session via Zoom or at the training center. Get focused help on exactly what you need.", image: "/images/pages/career-counseling.jpg" },
             ].map((item, index) => (
               <motion.div
                 key={index}

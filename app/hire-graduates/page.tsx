@@ -100,7 +100,7 @@ export default async function HireGraduatesPage() {
             {/* Feature Cards */}
             <div className="grid md:grid-cols-3 gap-8">
               {[
-                { image: '/images/pages/training-classroom.jpg', alt: 'Students in workforce training programs', title: 'Learn', desc: 'Short-term, industry-aligned training programs with hands-on instruction.' },
+                { image: '/images/pages/hire-graduates-page-1.jpg', alt: 'Students in workforce training programs', title: 'Learn', desc: 'Short-term, industry-aligned training programs with hands-on instruction.' },
                 { image: '/images/pages/credentials-page-1.jpg', alt: 'Industry certifications earned by graduates', title: 'Certify', desc: 'Graduates earn nationally recognized credentials before day one on the job.' },
                 { image: '/images/pages/about-employer-partners.jpg', alt: 'Graduates placed with employer partners', title: 'Work', desc: 'We connect certified graduates directly with employers hiring in their field.' },
               ].map((card) => (

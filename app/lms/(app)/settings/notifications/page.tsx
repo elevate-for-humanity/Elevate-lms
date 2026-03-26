@@ -81,7 +81,7 @@ export default function NotificationSettingsPage() {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      router.push('/login?next=/lms/settings/notifications');
+      router.push('/login?redirect=/lms/settings/notifications');
       return;
     }
     

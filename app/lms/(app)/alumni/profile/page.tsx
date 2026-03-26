@@ -63,7 +63,7 @@ export default function AlumniProfilePage() {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      router.push('/login?next=/lms/alumni/profile');
+      router.push('/login?redirect=/lms/alumni/profile');
       return;
     }
 

@@ -10,6 +10,10 @@
  *
  * This file is retained for reference only. Do not import CurriculumGenerator
  * from active generation routes or admin handlers.
+ *
+ * ⚠️  HARD GUARD: CurriculumGenerator constructor throws at runtime.
+ * Any attempt to instantiate it will fail loudly rather than silently
+ * overwriting canonical course_lessons data.
  */
 
 /**

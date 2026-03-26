@@ -39,6 +39,10 @@ export default async function AlumniPage() {
     );
   }
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    const { redirect } = await import('next/navigation');
+    redirect('/login?redirect=/lms/alumni');
+  }
 
   // Get alumni members
   const { data: alumni } = await db

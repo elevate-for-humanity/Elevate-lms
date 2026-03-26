@@ -22,7 +22,7 @@ const addOns = [
     icon: Users,
     price: '$1,997',
     video: '/videos/store/store-community-hub.mp4',
-    poster: '/images/pages/training-cohort.jpg',
+    poster: '/images/pages/store-hero.jpg',
     features: [
       'Discussion Forums with Categories',
       'Member Groups & Cohorts',

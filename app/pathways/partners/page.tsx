@@ -215,7 +215,7 @@ export default function PartnersPage() {
               {
                 type: 'Educational Institutions',
                 examples: 'Community colleges, career centers, high schools, adult education programs',
-                image: '/images/pages/training-classroom.jpg',
+                image: '/images/pages/pathways-page-1.jpg',
                 what: [
                   'Articulation and credit transfer discussions for students moving between programs',
                   'Dual enrollment or bridge program partnerships',

@@ -30,7 +30,7 @@ export default async function MyCoursesPage() {
   // Canonical: published courses only
   const { data: courses } = await db
     .from('courses')
-    .select('id, title, description, short_description, status, is_active, thumbnail_url, program_id')
+    .select('id, title, description, short_description, status, is_active, program_id')
     .eq('status', 'published')
     .eq('is_active', true)
     .order('created_at', { ascending: false });
@@ -100,18 +100,9 @@ export default async function MyCoursesPage() {
                     className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col"
                   >
                     <div className="relative h-44 bg-slate-100 flex-shrink-0">
-                      {course.thumbnail_url ? (
-                        <Image
-                          src={course.thumbnail_url}
-                          alt={course.title}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <BookOpen className="w-12 h-12 text-slate-300" />
-                        </div>
-                      )}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <BookOpen className="w-12 h-12 text-slate-300" />
+                      </div>
                       {isEnrolled && (
                         <span className="absolute top-3 right-3 bg-brand-green-600 text-white px-2 py-0.5 rounded text-xs font-semibold">
                           Enrolled

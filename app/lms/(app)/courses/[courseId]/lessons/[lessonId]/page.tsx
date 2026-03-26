@@ -164,18 +164,51 @@ export default function LessonPage() {
       }
     }
 
-    // 1. Fetch lesson data
-    const { data: lessonData } = await supabase
+    // 1. Fetch lesson data — try lms_lessons view first, fall back to course_lessons
+    let { data: lessonData } = await supabase
       .from('lms_lessons')
       .select('*')
       .eq('id', lessonId)
-      .single();
+      .maybeSingle();
 
-    const { data: lessonsData } = await supabase
+    // Fallback: lms_lessons view may filter out unpublished lessons
+    if (!lessonData) {
+      const { data: clLesson } = await supabase
+        .from('course_lessons')
+        .select('*')
+        .eq('id', lessonId)
+        .maybeSingle();
+      if (clLesson) {
+        lessonData = {
+          ...clLesson,
+          step_type: clLesson.lesson_type,
+          content_type: clLesson.lesson_type,
+          lesson_source: 'canonical',
+          order_index: clLesson.order_index,
+        };
+      }
+    }
+
+    let { data: lessonsData } = await supabase
       .from('lms_lessons')
       .select('*')
       .eq('course_id', courseId)
       .order('order_index');
+
+    // Fallback for course list
+    if (!lessonsData || lessonsData.length === 0) {
+      const { data: clLessons } = await supabase
+        .from('course_lessons')
+        .select('*')
+        .eq('course_id', courseId)
+        .order('order_index');
+      lessonsData = (clLessons || []).map((r: any) => ({
+        ...r,
+        step_type: r.lesson_type,
+        content_type: r.lesson_type,
+        lesson_source: 'canonical',
+      }));
+    }
 
     const { data: courseData } = await supabase
       .from('courses')

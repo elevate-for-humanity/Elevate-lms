@@ -139,7 +139,7 @@ export default async function OrientationPage() {
       <div className="relative w-full overflow-hidden" style={{ height: '55vh', minHeight: 280, maxHeight: 480 }}>
         <CanonicalVideo
           src="/videos/getting-started-hero.mp4"
-          poster="/images/pages/training-cohort.jpg"
+          poster="/images/pages/orientation-page-1.jpg"
           className="absolute inset-0 w-full h-full object-cover"
         />
       </div>

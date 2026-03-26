@@ -336,7 +336,7 @@ export default async function LearnerOnboardingPage() {
       <div className="relative w-full overflow-hidden" style={{ height: '55vh', minHeight: 280, maxHeight: 500 }}>
         <CanonicalVideo
           src="/videos/getting-started-hero.mp4"
-          poster="/images/pages/training-cohort.jpg"
+          poster="/images/pages/onboarding-page-2.jpg"
           className="absolute inset-0 w-full h-full object-cover"
         />
       </div>

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 const impactAreas = [
-  { image: '/images/pages/training-classroom.jpg', alt: 'Students in funded training and certification programs', title: 'Training & Certifications', desc: 'Fund tuition, exam fees, and certification costs for students who don\'t qualify for government funding.' },
+  { image: '/images/pages/philanthropy-hero.jpg', alt: 'Students in funded training and certification programs', title: 'Training & Certifications', desc: 'Fund tuition, exam fees, and certification costs for students who don\'t qualify for government funding.' },
   { image: '/images/pages/welding-sparks.jpg', alt: 'Welding and trades tools and supplies for training', title: 'Tools & Supplies', desc: 'Provide welding equipment, HVAC tools, barber kits, medical supplies, and uniforms for hands-on training.' },
   { image: '/images/pages/comp-home-pathways-support.jpg', alt: 'Support services helping students stay in programs', title: 'Support Services', desc: 'Cover transportation, childcare, and emergency assistance that keeps students in their programs.' },
   { image: '/images/pages/about-career-training.jpg', alt: 'Career services and job placement support', title: 'Career Services', desc: 'Fund resume workshops, interview coaching, job placement support, and employer networking events.' },

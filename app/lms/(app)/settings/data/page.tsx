@@ -33,7 +33,7 @@ export default function DataSettingsPage() {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      router.push('/login?next=/lms/settings/data');
+      router.push('/login?redirect=/lms/settings/data');
       return;
     }
     setLoading(false);

@@ -131,7 +131,7 @@ export default function HandbookAcknowledgePage() {
 
     supabase?.auth.getUser().then(async ({ data, error }) => {
       if (error || !data?.user) {
-        router.push('/login?next=/student-portal/handbook/acknowledge');
+        router.push('/login?redirect=/student-portal/handbook/acknowledge');
         return;
       }
 

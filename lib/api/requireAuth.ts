@@ -16,6 +16,14 @@ export async function requireAuth(request: Request): Promise<{
   userId: string | null;
   error: NextResponse | null;
 }> {
+  // Internal service-to-service calls (e.g. test scripts, cron jobs)
+  // Accept X-Internal-Service-Key matching SUPABASE_SERVICE_ROLE_KEY.
+  // Only valid in non-browser contexts — never exposed to client JS.
+  const internalKey = request.headers.get('x-internal-service-key');
+  if (internalKey && internalKey === process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return { userId: 'service-role', error: null };
+  }
+
   // Try Authorization header first (API clients, edge runtime)
   const authHeader = request.headers.get('authorization');
   const cookieHeader = request.headers.get('cookie');

@@ -105,7 +105,7 @@ export default function AgreementsPage() {
       <div className="relative w-full overflow-hidden" style={{ height: '60vh', minHeight: 320, maxHeight: 560 }}>
         <CanonicalVideo
           src="/videos/elevate-overview-with-narration.mp4"
-          poster="/images/pages/training-cohort.jpg"
+          poster="/images/pages/enrollment-agreement-page-1.jpg"
           className="absolute inset-0 w-full h-full object-cover"
         />
       </div>

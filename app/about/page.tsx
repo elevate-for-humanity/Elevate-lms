@@ -124,7 +124,7 @@ export default function AboutPage() {
           <div className="space-y-8">
             <div className="flex flex-col sm:flex-row gap-5">
               <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
-                <Image src="/images/pages/training-cohort.jpg" alt="Career training programs" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" />
+                <Image src="/images/pages/about-career-training.jpg" alt="Career training programs" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Career Training Programs</h3>

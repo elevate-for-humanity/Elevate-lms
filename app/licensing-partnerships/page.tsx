@@ -40,7 +40,7 @@ export const metadata: Metadata = {
 
 const PARTNERSHIP_TYPES = [
   {
-    image: '/images/pages/training-cohort.jpg',
+    image: '/images/pages/licensing-partnerships-page-1.jpg',
     alt: 'Training provider delivering workforce programs through the Elevate platform',
     title: 'Training Provider',
     description:

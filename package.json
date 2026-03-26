@@ -211,6 +211,8 @@
     "ci:install": "pnpm install --frozen-lockfile",
     "ci:build": "pnpm build",
     "ci:check": "pnpm archetype:check && pnpm typecheck && pnpm lint && pnpm seo:check",
+    "check:safety": "python3 scripts/audit-build-safety.py",
+    "check:all": "pnpm check:safety && pnpm lint && pnpm typecheck",
     "seo:check": "node scripts/ci/seo-check.mjs",
     "seo:validate": "node scripts/ci/seo-validation.ts",
     "audit:programs": "tsx scripts/audit-program-pages.ts",

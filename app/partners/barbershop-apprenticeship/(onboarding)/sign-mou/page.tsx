@@ -487,10 +487,41 @@ export default function SignMOUPage() {
           </div>
         </div>
 
-        {/* Digital Signature */}
+        {/* Signature Blocks */}
+        <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">Signatures</h2>
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            {/* Elevate — pre-signed */}
+            <div className="border border-gray-200 rounded-lg p-4">
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Sponsor — Already Signed</p>
+              <div className="border-b border-gray-400 pb-2 mb-3">
+                <span style={{fontFamily:'Georgia,serif',fontSize:'24px',color:'#1a1a2e',fontStyle:'italic'}}>Elizabeth Greene</span>
+              </div>
+              <p className="text-xs text-gray-600"><strong>Name:</strong> Elizabeth Greene</p>
+              <p className="text-xs text-gray-600"><strong>Title:</strong> Founder &amp; CEO</p>
+              <p className="text-xs text-gray-600"><strong>Organization:</strong> 2Exclusive LLC-S DBA Elevate for Humanity Technical and Career Institute</p>
+              <p className="text-xs text-gray-600"><strong>Date:</strong> {new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</p>
+              <div className="mt-3 bg-green-50 border border-green-200 rounded px-3 py-1.5 text-xs text-green-700 font-semibold text-center">✓ Signed by Elevate for Humanity</div>
+            </div>
+            {/* Adam — needs to sign */}
+            <div className="border-2 border-dashed border-red-300 rounded-lg p-4 bg-red-50">
+              <p className="text-xs font-bold text-red-600 uppercase tracking-wide mb-3">Employer Training Site — Your Signature Required</p>
+              <div className="border-b border-dashed border-red-400 pb-2 mb-3 min-h-[32px]">
+                <span className="text-sm text-red-400 italic">Draw your signature below</span>
+              </div>
+              <p className="text-xs text-gray-600"><strong>Name:</strong> Adam Kriech</p>
+              <p className="text-xs text-gray-600"><strong>Title:</strong> Owner</p>
+              <p className="text-xs text-gray-600"><strong>Organization:</strong> Kountry Kutz Barbershop</p>
+              <p className="text-xs text-gray-600"><strong>Date:</strong> {new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</p>
+              <div className="mt-3 bg-yellow-50 border border-yellow-300 rounded px-3 py-1.5 text-xs text-yellow-700 font-semibold text-center">⚠ Awaiting your signature</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Digital Signature Canvas */}
         <div className="bg-white rounded-xl shadow-sm border p-6 mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-900">Digital Signature</h2>
+            <h2 className="text-lg font-bold text-gray-900">Draw Your Signature</h2>
             <button
               type="button"
               onClick={clearSignature}

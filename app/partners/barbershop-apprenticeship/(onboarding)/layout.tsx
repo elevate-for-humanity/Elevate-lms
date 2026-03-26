@@ -23,7 +23,7 @@ export default async function OnboardingLayout({
     .eq('id', user.id)
     .single();
 
-  const allowed = ['program_holder', 'admin', 'super_admin', 'staff'];
+  const allowed = ['program_holder', 'admin', 'super_admin', 'staff', 'employer', 'partner'];
   if (!profile || !allowed.includes(profile.role)) {
     // Authenticated but wrong role — send to the public partner page
     redirect('/partners/barbershop-apprenticeship');

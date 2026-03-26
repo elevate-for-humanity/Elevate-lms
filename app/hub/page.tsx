@@ -36,8 +36,6 @@ const navItems = [
 export default async function HubPage() {
   const supabase = await createClient();
   
-  if (!supabase) redirect('/hub/welcome');
-
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/hub/welcome');
 

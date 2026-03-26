@@ -14,7 +14,6 @@ export const metadata: Metadata = {
 export default async function LearnerPage() {
   try {
     const supabase = await createClient();
-    if (!supabase) { redirect('/login?redirect=/learner/dashboard'); }
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {

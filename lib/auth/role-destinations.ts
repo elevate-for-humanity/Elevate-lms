@@ -60,8 +60,8 @@ export const ROLE_DESTINATIONS: Record<string, string> = {
   provider_admin: '/provider/dashboard',
 
   // External partners
-  partner:        '/partner/dashboard',
-  sponsor:        '/partner/dashboard',
+  partner:        '/partner-portal',
+  sponsor:        '/partner-portal',
   employer:       '/employer/dashboard',
   workforce_board:'/workforce-board/dashboard',
 

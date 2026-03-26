@@ -106,7 +106,7 @@ const AUTH_REQUIRED_ROUTES = [
   '/student', '/learner', '/my-courses', '/my-progress', '/settings',
   '/onboarding/learner', '/onboarding/employer', '/onboarding/partner',
   '/onboarding/staff', '/onboarding/school',
-  '/employer-portal', '/franchise', '/program-holder',
+  '/franchise', '/program-holder',
   '/tax-self-prep', '/supersonic-fast-cash/portal',
   '/supersonic-fast-cash/diy-taxes',
 ];

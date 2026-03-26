@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { SamGovApp } from './SamGovApp';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -67,7 +68,7 @@ export default async function SamGovPage() {
     .order('updated_at', { ascending: false });
 
   if (entitiesError) {
-    console.error('Error fetching entities:', entitiesError);
+    logger.error('Error fetching entities:', entitiesError);
   }
 
   // Fetch documents for all entities

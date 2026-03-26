@@ -19,7 +19,7 @@ async function sendEmailDirect(to: string, subject: string, html: string) {
     const result = await sendEmail({ to, subject, html });
     return result.success;
   } catch (err) {
-    console.error('[Email] Send failed:', err instanceof Error ? err.message : err);
+    logger.error('[Email] Send failed:', err instanceof Error ? err.message : err);
     return false;
   }
 }

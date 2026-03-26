@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { FileText, Search, ChevronRight, Eye } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { logger } from '@/lib/logger';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -55,7 +56,7 @@ export default async function HelpArticlesPage() {
       popularArticles = artData || [];
     }
   } catch (err) {
-    console.error('Failed to fetch help data:', err);
+    logger.error('Failed to fetch help data:', err);
   }
 
   return (

@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import {
+import { logger } from '@/lib/logger';
   ChevronRight,
   Plus,
   Clock,
@@ -92,7 +93,7 @@ export default async function FerpaRequestsPage() {
     .limit(50);
 
   if (error) {
-    console.error('Error fetching FERPA requests:', error);
+    logger.error('Error fetching FERPA requests:', error);
   }
 
   // Get counts by status

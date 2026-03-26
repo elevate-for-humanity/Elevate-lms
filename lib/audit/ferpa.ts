@@ -10,6 +10,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { headers } from 'next/headers';
+import { logger } from '@/lib/logger';
 
 export type FerpaRecordType =
   | 'student_record'
@@ -87,10 +88,10 @@ export async function logFerpaAccess(entry: FerpaLogEntry): Promise<void> {
     });
 
     if (error) {
-      console.error('[FERPA Audit] Insert failed:', error.message);
+      logger.error('[FERPA Audit] Insert failed:', error.message);
     }
   } catch (err) {
-    console.error('[FERPA Audit] Exception:', err);
+    logger.error('[FERPA Audit] Exception:', err);
   }
 }
 

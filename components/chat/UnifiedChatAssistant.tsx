@@ -63,12 +63,6 @@ export default function UnifiedChatAssistant({
     setScriptError(null);
 
     // Log script version for session tracking
-    console.info(`[Chat] Loaded script: ${loadedScript.id} v${loadedScript.version}`, {
-      sessionId,
-      assistantId: loadedScript.id,
-      scriptVersion: loadedScript.version,
-      environment: loadedScript.environment,
-    });
 
     // Set initial greeting
     if (loadedScript.greeting) {

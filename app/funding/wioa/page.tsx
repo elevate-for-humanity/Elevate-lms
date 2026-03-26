@@ -4,6 +4,7 @@ import { createPublicClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { logger } from '@/lib/logger';
 
 export const revalidate = 600;
 
@@ -30,7 +31,7 @@ export default async function WioaPage() {
       wioaInfo = data;
     }
   } catch (error) {
-    console.error('Error fetching WIOA info:', error);
+    logger.error('Error fetching WIOA info:', error);
   }
   return (
     <div className="min-h-screen bg-white">

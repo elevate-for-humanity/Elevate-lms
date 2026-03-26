@@ -18,6 +18,7 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { CredentialBlueprint, BlueprintModule, BlueprintLessonRef, BlueprintVideoConfig } from '../blueprints/types';
+import { logger } from '@/lib/logger';
 
 // ─── Default activity menu per step type ─────────────────────────────────────
 // Each lesson gets a default activity set based on its step_type.
@@ -303,7 +304,7 @@ async function upsertLesson(
         updated_at:   new Date().toISOString(),
       })
       .eq('id', existing.id);
-    if (error) console.error(`  DB update error [${lessonRef.slug}]:`, error.message, error.details);
+    if (error) logger.error(`  DB update error [${lessonRef.slug}]:`, error.message, error.details);
     return !error;
   }
 
@@ -323,7 +324,7 @@ async function upsertLesson(
       ...(videoConfig ? { video_config: videoConfig } : {}),
     });
 
-  if (error) console.error(`  DB insert error [${lessonRef.slug}]:`, error.message, error.details);
+  if (error) logger.error(`  DB insert error [${lessonRef.slug}]:`, error.message, error.details);
   return !error;
 }
 

@@ -13,6 +13,7 @@ import {
   ShoppingBag,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { logger } from '@/lib/logger';
 
 export const metadata: Metadata = {
   title: 'Order History | Elevate Shop',
@@ -67,7 +68,7 @@ export default async function OrderHistoryPage() {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching orders:', error.message);
+    logger.error('Error fetching orders:', error.message);
   }
 
   // Transform data to match expected format

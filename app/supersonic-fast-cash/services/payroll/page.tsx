@@ -3,6 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
+import { logger } from '@/lib/logger';
   Users,
   DollarSign,
   FileText,
@@ -40,7 +41,7 @@ export default async function PayrollPage() {
       dbServices = data;
     }
   } catch (error) {
-    console.error('Error fetching payroll services:', error);
+    logger.error('Error fetching payroll services:', error);
   }
 
   const services = [

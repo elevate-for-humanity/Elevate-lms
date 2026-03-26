@@ -10,6 +10,7 @@ import {
   Package,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { logger } from '@/lib/logger';
 
 export const metadata: Metadata = {
   title: 'Products | Elevate Shop',
@@ -43,7 +44,7 @@ export default async function ProductsPage() {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching products:', error.message);
+    logger.error('Error fetching products:', error.message);
   }
 
   const products: Product[] = (productsData || []).map((p: any) => ({

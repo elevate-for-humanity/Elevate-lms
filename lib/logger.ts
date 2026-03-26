@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 // Centralized logging utility
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
@@ -68,13 +69,13 @@ class Logger {
         }
         break;
       case 'info':
-        console.info(formatted);
+        logger.info(formatted);
         break;
       case 'warn':
-        console.warn(formatted);
+        logger.warn(formatted);
         break;
       case 'error':
-        console.error(formatted);
+        logger.error(formatted);
         break;
     }
 

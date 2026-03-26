@@ -11,6 +11,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { logger } from '@/lib/logger';
 
 export const metadata: Metadata = {
   title: 'Community Groups | Elevate for Humanity',
@@ -35,7 +36,7 @@ export default async function GroupsPage() {
     .limit(20);
 
   if (error) {
-    console.error('Error fetching groups:', error.message);
+    logger.error('Error fetching groups:', error.message);
   }
 
   // Get current user and their group memberships

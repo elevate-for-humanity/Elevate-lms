@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { ShopClient } from './ShopClient';
 import { PageTracker } from '@/components/analytics/PageTracker';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { logger } from '@/lib/logger';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -54,7 +55,7 @@ export default async function ShopPage() {
       products = data || [];
     }
   } catch (err) {
-    console.error('Failed to fetch shop products:', err);
+    logger.error('Failed to fetch shop products:', err);
   }
 
   return (

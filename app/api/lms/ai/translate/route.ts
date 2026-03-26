@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { apiAuthGuard } from '@/lib/admin/guards';
+import { logger } from '@/lib/logger';
 
 let _client: OpenAI | null = null;
 function getClient() {
@@ -85,7 +86,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ translated, lang: targetLang });
   } catch (err) {
-    console.error('[ai/translate]', err);
+    logger.error('[ai/translate]', err);
     return NextResponse.json({ error: 'AI request failed' }, { status: 502 });
   }
 }

@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { User, Save, ArrowLeft } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,7 +34,7 @@ async function updateProfile(formData: FormData) {
   }).eq('id', user.id);
 
   if (error) {
-    console.error('Profile update failed:', error.message);
+    logger.error('Profile update failed:', error.message);
     throw new Error('Failed to save profile');
   }
 

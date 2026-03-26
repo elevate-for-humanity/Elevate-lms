@@ -14,7 +14,7 @@
  *
  * Usage:
  *   const audit = await runAlignmentAudit();
- *   console.log(formatAuditReport(audit));
+ *   logger.info(formatAuditReport(audit));
  *
  *   // Generate only missing content:
  *   const gaps = audit.programs.filter(p => !p.isAligned);

@@ -10,6 +10,7 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 
 export interface ElevateEvent {
   id: string;
@@ -64,7 +65,7 @@ export async function getUpcomingEvents(filter: EventFilter = {}): Promise<Eleva
 
   const { data, error } = await q;
   if (error) {
-    console.error('[events] getUpcomingEvents error:', error.message);
+    logger.error('[events] getUpcomingEvents error:', error.message);
     return [];
   }
   return (data ?? []) as ElevateEvent[];
@@ -88,7 +89,7 @@ export async function getPastEvents(filter: EventFilter = {}): Promise<ElevateEv
 
   const { data, error } = await q;
   if (error) {
-    console.error('[events] getPastEvents error:', error.message);
+    logger.error('[events] getPastEvents error:', error.message);
     return [];
   }
   return (data ?? []) as ElevateEvent[];
@@ -105,7 +106,7 @@ export async function getEvent(idOrSlug: string): Promise<ElevateEvent | null> {
     .maybeSingle();
 
   if (error) {
-    console.error('[events] getEvent error:', error.message);
+    logger.error('[events] getEvent error:', error.message);
     return null;
   }
   return data as ElevateEvent | null;

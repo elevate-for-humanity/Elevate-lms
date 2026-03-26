@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { Clock, Plus, Calendar, TrendingUp, Target } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { logger } from '@/lib/logger';
 
 export const metadata: Metadata = {
   title: 'Apprentice Hours | Elevate For Humanity',
@@ -37,7 +38,7 @@ export default async function ApprenticeHoursPage() {
     .limit(20);
 
   if (error) {
-    console.error('Error fetching hours:', error.message);
+    logger.error('Error fetching hours:', error.message);
   }
 
   const logs = hoursData || [];

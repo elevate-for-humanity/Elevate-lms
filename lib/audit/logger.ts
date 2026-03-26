@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 
 export type AuditAction = 
   | 'user.login'
@@ -66,7 +67,7 @@ export async function logAuditEvent(entry: AuditLogEntry): Promise<void> {
     });
   } catch (error) {
     // Log to console but don't throw - audit logging should not break the app
-    console.error('[Audit] Failed to log event:', error);
+    logger.error('[Audit] Failed to log event:', error);
   }
 }
 

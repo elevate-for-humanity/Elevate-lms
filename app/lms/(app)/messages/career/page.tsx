@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { MessageSquare, Send, Briefcase, ChevronLeft } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export const metadata: Metadata = {
   title: 'Career Services Messages | LMS',
@@ -34,7 +35,7 @@ export default async function CareerMessagesPage() {
     .limit(50);
 
   if (error) {
-    console.error('Error fetching messages:', error.message);
+    logger.error('Error fetching messages:', error.message);
   }
 
   const messageList = messages || [];

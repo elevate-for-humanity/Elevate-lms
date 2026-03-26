@@ -12,6 +12,7 @@
 
 import type { ProgramSchema } from './program-schema';
 import { getPublishedProgramBySlug } from './getProgramBySlug';
+import { logger } from '@/lib/logger';
 
 // Slugs fully migrated to DB — no static data/programs/<slug>.ts file exists.
 // For these, a minimal ProgramSchema is synthesized from the DB record.
@@ -97,7 +98,7 @@ export async function getProgramBySlug(slug: string): Promise<ProgramSchema | nu
     ) as ProgramSchema | undefined;
     return named ?? null;
   } catch (err) {
-    console.error(`[getProgramBySlug] Failed to load static program file for slug '${slug}':`, err);
+    logger.error(`[getProgramBySlug] Failed to load static program file for slug '${slug}':`, err);
     return null;
   }
 }

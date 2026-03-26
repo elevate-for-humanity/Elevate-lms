@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Studio API Client
  * 
@@ -339,7 +340,7 @@ class StudioAPI {
             break;
         }
       } catch (e) {
-        console.error('Failed to parse workspace message:', e);
+        logger.error('Failed to parse workspace message:', e);
       }
     };
 

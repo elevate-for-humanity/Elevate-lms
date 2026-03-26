@@ -4,6 +4,7 @@ import { Metadata } from 'next';
 import { MessageSquare, Clock, ChevronRight, Plus } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import DiscussionForums from '@/components/forums/DiscussionForums';
+import { logger } from '@/lib/logger';
 
 export const metadata: Metadata = {
   title: 'Community Discussions | Elevate For Humanity',
@@ -32,7 +33,7 @@ export default async function DiscussionsPage() {
     .limit(20);
 
   if (error) {
-    console.error('Error fetching discussions:', error.message);
+    logger.error('Error fetching discussions:', error.message);
   }
 
   const discussionList = discussions || [];

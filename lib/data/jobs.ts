@@ -7,6 +7,7 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 
 export interface JobPosting {
   id: string;
@@ -61,7 +62,7 @@ export async function getActiveJobs(opts: {
 
   const { data, error } = await q;
   if (error) {
-    console.error('[jobs] getActiveJobs error:', error.message);
+    logger.error('[jobs] getActiveJobs error:', error.message);
     return [];
   }
   return (data ?? []) as JobPosting[];
@@ -77,7 +78,7 @@ export async function getJobById(id: string): Promise<JobPosting | null> {
     .maybeSingle();
 
   if (error) {
-    console.error('[jobs] getJobById error:', error.message);
+    logger.error('[jobs] getJobById error:', error.message);
     return null;
   }
   return data as JobPosting | null;

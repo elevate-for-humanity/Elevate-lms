@@ -8,6 +8,7 @@ import {
   GraduationCap, HelpCircle, Circle
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { logger } from '@/lib/logger';
 
 export const metadata: Metadata = {
   title: 'Community | Elevate For Humanity',
@@ -32,7 +33,7 @@ export default async function CommunityPage() {
         .select('*', { count: 'exact', head: true });
       if (count) memberCount = count;
     } catch (error) {
-      console.error('[Community] Error:', error);
+      logger.error('[Community] Error:', error);
     }
   }
 

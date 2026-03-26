@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
+import { logger } from '@/lib/logger';
 
 export async function createGrantOpportunity(formData: FormData) {
   const supabase = await createClient();
@@ -44,7 +45,7 @@ export async function createGrantOpportunity(formData: FormData) {
     .single();
 
   if (error) {
-    console.error('Grant insert error:', error);
+    logger.error('Grant insert error:', error);
     return { error: 'Operation failed' };
   }
 
@@ -151,7 +152,7 @@ export async function createGrantApplication(formData: FormData) {
     .single();
 
   if (error) {
-    console.error('Grant application insert error:', error);
+    logger.error('Grant application insert error:', error);
     return { error: 'Operation failed' };
   }
 

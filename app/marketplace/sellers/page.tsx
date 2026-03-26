@@ -3,6 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { User, Star, Package, Users } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export const metadata: Metadata = {
   title: 'Sellers | Marketplace',
@@ -31,7 +32,7 @@ export default async function MarketplaceSellersPage() {
     .order('total_sales', { ascending: false });
 
   if (error) {
-    console.error('Error fetching sellers:', error.message);
+    logger.error('Error fetching sellers:', error.message);
   }
 
   const sellerList = sellers || [];

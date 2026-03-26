@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { Star, ShoppingCart } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export const metadata: Metadata = {
   title: 'Browse Marketplace | Elevate For Humanity',
@@ -34,7 +35,7 @@ export default async function MarketplaceBrowsePage() {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching marketplace items:', error.message);
+    logger.error('Error fetching marketplace items:', error.message);
   }
 
   const itemList = items || [];

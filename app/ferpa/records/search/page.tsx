@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import {
+import { logger } from '@/lib/logger';
   ChevronRight,
   Search,
   User,
@@ -92,7 +93,7 @@ export default async function FerpaRecordsSearchPage({
     const { data, error } = await dbQuery.limit(25);
 
     if (error) {
-      console.error('Search error:', error);
+      logger.error('Search error:', error);
     } else {
       results = (data as StudentResult[]) || [];
     }

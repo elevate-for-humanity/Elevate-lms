@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import type { EmailOtpType } from '@supabase/supabase-js';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /auth/confirm
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
               .is('user_id', null);
 
             if (fetchError) {
-              console.error('[auth/confirm] enrollment lookup failed', {
+              logger.error('[auth/confirm] enrollment lookup failed', {
                 userId: user.id,
                 error: fetchError.message,
               });
@@ -70,7 +71,7 @@ export async function GET(request: NextRequest) {
                   .eq('id', row.id);
 
                 if (linkError) {
-                  console.error('[auth/confirm] enrollment link failed', {
+                  logger.error('[auth/confirm] enrollment link failed', {
                     enrollmentId: row.id,
                     userId: user.id,
                     error: linkError.message,
@@ -87,7 +88,7 @@ export async function GET(request: NextRequest) {
                     .eq('id', row.barber_sub_id);
 
                   if (subError) {
-                    console.error('[auth/confirm] barber_subscriptions link failed', {
+                    logger.error('[auth/confirm] barber_subscriptions link failed', {
                       barberSubId: row.barber_sub_id,
                       userId: user.id,
                       error: subError.message,
@@ -98,7 +99,7 @@ export async function GET(request: NextRequest) {
                 }
               }
 
-              console.info('[auth/confirm] enrollment linking complete', {
+              logger.info('[auth/confirm] enrollment linking complete', {
                 userId: user.id,
                 pendingCount,
                 linkedCount,
@@ -115,12 +116,12 @@ export async function GET(request: NextRequest) {
                 }
               }
             } else {
-              console.info('[auth/confirm] no pending enrollments to link', { userId: user.id });
+              logger.info('[auth/confirm] no pending enrollments to link', { userId: user.id });
             }
           }
         } catch (err: any) {
           // Non-fatal — enrollment-success page has its own email-linking fallback
-          console.error('[auth/confirm] enrollment linking threw', { error: err?.message });
+          logger.error('[auth/confirm] enrollment linking threw', { error: err?.message });
         }
       } else if (type === 'recovery') {
         // Use the next param set by sendRecoveryEmail's redirectTo option.
@@ -139,7 +140,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Log error for debugging
-    console.error('Email verification error:', error);
+    logger.error('Email verification error:', error);
   }
 
   // Redirect to error page if verification fails

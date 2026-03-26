@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
+import { logger } from '@/lib/logger';
 
 export async function createWOTCApplication(formData: FormData) {
   const supabase = await createClient();
@@ -52,7 +53,7 @@ export async function createWOTCApplication(formData: FormData) {
 
   if (error) {
     // Log without exposing sensitive data
-    console.error('WOTC insert error:', error?.message || 'unknown');
+    logger.error('WOTC insert error:', error?.message || 'unknown');
     return { error: 'Operation failed' };
   }
 

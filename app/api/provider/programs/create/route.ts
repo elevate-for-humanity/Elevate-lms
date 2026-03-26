@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { providerApiGuard } from '@/lib/api/provider-guard';
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
 
   // Non-fatal: program is created even if approval record fails
   if (approvalError) {
-    console.warn('provider/programs/create: failed to create approval record', approvalError.message);
+    logger.warn('provider/programs/create: failed to create approval record', approvalError.message);
   }
 
   // Mark first_program_submitted onboarding step

@@ -22,7 +22,7 @@ function onAuditFailure(context: string, error: unknown, event: Record<string, u
   const errorMessage = error instanceof Error ? error.message : String(error);
 
   // Channel 1: Structured log — visible in container/edge logs
-  console.error(JSON.stringify({
+  logger.error(JSON.stringify({
     level: 'AUDIT_WRITE_FAILURE',
     timestamp: new Date().toISOString(),
     context,

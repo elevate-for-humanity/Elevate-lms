@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { BookOpen, Play, Clock, Users, Star, Lock, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { logger } from '@/lib/logger';
 
 export const metadata: Metadata = {
   title: 'Classroom | Community | Elevate For Humanity',
@@ -24,7 +25,7 @@ export default async function ClassroomPage() {
     .limit(12);
 
   if (error) {
-    console.error('Error fetching courses:', error.message);
+    logger.error('Error fetching courses:', error.message);
   }
 
   // Get enrollment counts

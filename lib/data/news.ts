@@ -7,6 +7,7 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 
 export interface BlogPost {
   id: string;
@@ -47,7 +48,7 @@ export async function getPublishedPosts(opts: { limit?: number; category?: strin
 
   const { data, error } = await q;
   if (error) {
-    console.error('[news] getPublishedPosts error:', error.message);
+    logger.error('[news] getPublishedPosts error:', error.message);
     return [];
   }
   return (data ?? []) as BlogPost[];
@@ -64,7 +65,7 @@ export async function getFeaturedPost(): Promise<BlogPost | null> {
     .maybeSingle();
 
   if (error) {
-    console.error('[news] getFeaturedPost error:', error.message);
+    logger.error('[news] getFeaturedPost error:', error.message);
     return null;
   }
   return data as BlogPost | null;
@@ -80,7 +81,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPostFull | null> 
     .maybeSingle();
 
   if (error) {
-    console.error('[news] getPostBySlug error:', error.message);
+    logger.error('[news] getPostBySlug error:', error.message);
     return null;
   }
   return data as BlogPostFull | null;

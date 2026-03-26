@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
+import { logger } from '@/lib/logger';
   ArrowLeft,
   FileText,
   Download,
@@ -70,7 +71,7 @@ export default async function DocumentCategoryPage({ params }: Props) {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching documents:', error);
+    logger.error('Error fetching documents:', error);
   }
 
   const categoryLabel = categoryLabels[category] || category;

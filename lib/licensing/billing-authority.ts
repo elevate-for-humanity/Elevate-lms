@@ -371,7 +371,7 @@ export function getStripeUpdatableFields(
     if (stripeData.stripe_subscription_id) updates.stripe_subscription_id = stripeData.stripe_subscription_id;
   } else {
     // DB-authoritative: Stripe should NOT update status or expiration
-    console.info('[billing-authority] Skipping Stripe lifecycle fields for DB tier', { tier });
+    logger.info('[billing-authority] Skipping Stripe lifecycle fields for DB tier', { tier });
   }
 
   return updates;

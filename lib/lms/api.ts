@@ -12,6 +12,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import type { Program, CourseProgress } from './types';
+import { logger } from '@/lib/logger';
 
 async function getDb() {
   const admin = createAdminClient();
@@ -35,7 +36,7 @@ export async function getPrograms(): Promise<Program[]> {
     .order('title', { ascending: true });
 
   if (error) {
-    console.error('getPrograms error:', error.message);
+    logger.error('getPrograms error:', error.message);
     return [];
   }
 
@@ -58,7 +59,7 @@ export async function getProgramBySlug(slug: string): Promise<Program | null> {
     .maybeSingle();
 
   if (error) {
-    console.error('getProgramBySlug error:', error.message);
+    logger.error('getProgramBySlug error:', error.message);
     return null;
   }
   if (!data) return null;
@@ -89,7 +90,7 @@ export async function getUserCourses(userId: string): Promise<CourseProgress[]> 
     .in('status', ['active', 'enrolled', 'in_progress']);
 
   if (error) {
-    console.error('getUserCourses error:', error.message);
+    logger.error('getUserCourses error:', error.message);
     return [];
   }
 

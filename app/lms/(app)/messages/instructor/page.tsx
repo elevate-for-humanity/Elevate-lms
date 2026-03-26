@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { MessageSquare, Send, User, ChevronLeft } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export const metadata: Metadata = {
   title: 'Instructor Messages | LMS',
@@ -36,7 +37,7 @@ export default async function InstructorMessagesPage() {
     .limit(50);
 
   if (error) {
-    console.error('Error fetching messages:', error.message);
+    logger.error('Error fetching messages:', error.message);
   }
 
   const messageList = messages || [];

@@ -8,6 +8,7 @@
 
 import { SupabaseClient } from '@supabase/supabase-js';
 import { initializeModuleProgress } from './module-gating';
+import { logger } from '@/lib/logger';
 
 export type LessonType =
   | 'lesson' | 'quiz' | 'checkpoint' | 'lab'
@@ -199,7 +200,7 @@ export async function publishCourse(
       .single();
 
     if (versionErr) {
-      console.error('[publishCourse] course_versions insert failed:', versionErr.message);
+      logger.error('[publishCourse] course_versions insert failed:', versionErr.message);
     } else if (newVersion) {
       version = newVersion;
       const { data: mods } = await db.from('course_modules').select('id').eq('course_id', courseId).order('order_index');
@@ -213,7 +214,7 @@ export async function publishCourse(
       }
     }
   } catch (snapErr) {
-    console.error('[publishCourse] snapshot failed (non-fatal):', snapErr);
+    logger.error('[publishCourse] snapshot failed (non-fatal):', snapErr);
   }
 
   await db.rpc('log_audit_event', {

@@ -19,7 +19,6 @@ function resolveCourseId(data: unknown): string {
     if (c.value) {
       const result = CourseIdSchema.safeParse(c.value);
       if (result.success) {
-        console.info('[course:create] resolved id', { id: result.data, source: c.path });
         return result.data;
       }
     }

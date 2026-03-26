@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { Calendar, MessageSquare } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export const metadata: Metadata = {
   title: 'Mentorship Program | Alumni',
@@ -33,7 +34,7 @@ export default async function MentorshipPage() {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching mentors:', error.message);
+    logger.error('Error fetching mentors:', error.message);
   }
 
   const mentorList = mentors || [];

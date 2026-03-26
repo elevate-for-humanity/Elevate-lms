@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import {
+import { logger } from '@/lib/logger';
   ChevronRight,
   Search,
   FileText,
@@ -78,7 +79,7 @@ export default async function FerpaRecordsPage() {
     .limit(50);
 
   if (error) {
-    console.error('Error fetching student records:', error);
+    logger.error('Error fetching student records:', error);
   }
 
   // Get counts

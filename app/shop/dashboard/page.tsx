@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ShoppingBag, DollarSign, Package, Users, BarChart3 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,7 +66,7 @@ export default async function ShopDashboardPage() {
         { label: 'Customers', value: '1,234', change: '+12% this month', icon: Users },
       ];
     } catch (error) {
-      console.error('[Shop Dashboard] Error:', error);
+      logger.error('[Shop Dashboard] Error:', error);
     }
   }
 

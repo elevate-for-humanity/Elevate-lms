@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { FileText, Clock, AlertCircle, Calendar, CheckCircle, } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export const metadata: Metadata = {
   title: 'Assignments | Student Portal',
@@ -36,7 +37,7 @@ export default async function AssignmentsPage() {
     .order('due_date', { ascending: true });
 
   if (error) {
-    console.error('Error fetching assignments:', error.message);
+    logger.error('Error fetching assignments:', error.message);
   }
 
   const assignmentList = (assignments || []).map((a: any) => ({

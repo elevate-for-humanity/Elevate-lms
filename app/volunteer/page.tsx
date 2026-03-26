@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Metadata } from 'next';
 import { Heart, Users, Clock, MapPin, Calendar, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { logger } from '@/lib/logger';
 
 export const metadata: Metadata = {
   title: 'Volunteer Opportunities | Elevate For Humanity',
@@ -26,7 +27,7 @@ export default async function VolunteerPage() {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching opportunities:', error.message);
+    logger.error('Error fetching opportunities:', error.message);
   }
 
   const opportunityList = opportunities || [];

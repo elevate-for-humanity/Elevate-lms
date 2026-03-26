@@ -14,6 +14,7 @@
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import {
+import { logger } from '@/lib/logger';
   HSI_COURSES,
   NRF_COURSES,
   JRI_COURSES,
@@ -102,10 +103,10 @@ export async function seedPartnerCourses(
 
   for (const provider of PROVIDERS) {
     if (!apply) {
-      console.log(`[DRY RUN] Provider: ${provider.name} (${provider.courses.length} courses)`);
+      logger.info(`[DRY RUN] Provider: ${provider.name} (${provider.courses.length} courses)`);
       for (const c of provider.courses) {
         const courseType = MICRO_COURSE_IDS.has(c.id) ? 'micro' : 'partner';
-        console.log(`  [${courseType}] ${c.title}`);
+        logger.info(`  [${courseType}] ${c.title}`);
       }
       continue;
     }

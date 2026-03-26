@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Heart, Users, Calendar, Phone, Mail, ArrowRight, HandHeart, Briefcase } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: 'Get Involved | Rise Foundation',

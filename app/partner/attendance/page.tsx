@@ -3,7 +3,6 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Calendar, Users, Plus, AlertTriangle, QrCode } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
@@ -22,11 +21,9 @@ export const metadata: Metadata = {
 
 export default async function PartnerAttendancePage() {
   const supabase = await createClient();
-  if (!supabase) redirect('/login');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/partner/login');
 
-  const db = createAdminClient() || supabase;
 
   let sessions: any[] = [];
   let summary: any = null;

@@ -28,9 +28,6 @@ export default async function ApprenticeCourseDetailPage({
   const { id } = await params;
   const supabase = await createClient();
 
-  if (!supabase) {
-    redirect('/login?redirect=/apprentice');
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
 

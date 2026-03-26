@@ -21,9 +21,6 @@ const statusColors: Record<string, string> = {
 
 export default async function AdminWaitlistPage() {
   const supabase = await createClient();
-  if (!supabase) {
-    return <div className="p-8 text-center">Service unavailable</div>;
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');

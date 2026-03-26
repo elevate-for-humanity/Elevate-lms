@@ -58,7 +58,6 @@ async function confirmSchedule(formData: FormData) {
   const supabase = await createServerClient();
   const admin = createAdmin();
   const db = admin || supabase;
-  if (!supabase) throw new Error('Database unavailable');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
@@ -91,7 +90,6 @@ async function confirmSchedule(formData: FormData) {
 
 export default async function SelectSchedulePage() {
   const supabase = await createClient();
-  if (!supabase) redirect('/login');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 

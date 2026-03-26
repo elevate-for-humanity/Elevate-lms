@@ -28,7 +28,6 @@ interface OnboardingStep {
 
 export default async function EmployerOnboardingPage() {
   const supabase = await createClient();
-  if (!supabase) redirect('/login');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/onboarding/employer');
 

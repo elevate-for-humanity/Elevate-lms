@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import PayrollClient from './PayrollClient';
 
@@ -14,7 +13,6 @@ export const metadata: Metadata = {
 
 export default async function PayrollPage() {
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');

@@ -11,9 +11,6 @@ export const metadata: Metadata = {
 
 export default async function AiTutorLogsPage() {
   const supabase = await createClient();
-  if (!supabase) {
-    return <div className="p-8 text-center text-gray-500">Service unavailable</div>;
-  }
 
   const now = new Date();
   const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();

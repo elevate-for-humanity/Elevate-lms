@@ -37,7 +37,6 @@ export default function VerifyEmailPage() {
     setResent(false);
 
     try {
-      if (!supabase) throw new Error('Service unavailable');
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email,

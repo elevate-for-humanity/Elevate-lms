@@ -19,9 +19,6 @@ export const dynamic = 'force-dynamic';
 export default async function ContactsPage() {
   const supabase = await createClient();
 
-  if (!supabase) {
-    redirect('/login?redirect=/admin/crm/contacts');
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
 

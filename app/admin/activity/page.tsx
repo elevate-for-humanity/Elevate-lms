@@ -20,9 +20,6 @@ export const dynamic = 'force-dynamic';
 export default async function ActivityLogPage() {
   const supabase = await createClient();
 
-  if (!supabase) {
-    redirect('/login?redirect=/admin/activity');
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
 

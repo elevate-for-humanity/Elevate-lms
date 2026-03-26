@@ -5,7 +5,6 @@ import { AdminInstallPrompt } from '@/components/pwa/AdminInstallPrompt';
 
 async function getAdminDashboardData() {
   const supabase = createAdminClient();
-  if (!supabase) return { profiles: 0, applications: 0, enrollments: 0, courses: 0, programs: 0, products: 0, recentApps: [], recentEnrollments: [] };
 
   const [profileRes, appRes, enrollRes, courseRes, programRes, productRes, recentAppsRes, recentEnrollRes] = await Promise.all([
     supabase.from('profiles').select('id', { count: 'exact', head: true }),

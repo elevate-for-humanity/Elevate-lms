@@ -12,6 +12,7 @@
  */
 
 import { createAdminClient, createAuditedAdminClient } from '@/lib/supabase/admin';
+import { logger } from '@/lib/logger';
 
 export type EntityType = 'course' | 'program';
 

@@ -14,9 +14,6 @@ export const metadata: Metadata = {
 
 export default async function SampleReportsPage() {
   const supabase = await createClient();
-  if (!supabase) {
-    return <div className="p-8 text-center text-gray-600">Database unavailable.</div>;
-  }
 
   const [students, enrollments, certificates, completions, programs, courses] = await Promise.all([
     supabase.from('profiles').select('id, full_name, email, role, enrollment_status, created_at').eq('role', 'student').order('created_at', { ascending: false }).limit(20),

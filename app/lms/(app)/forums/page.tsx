@@ -6,7 +6,6 @@ import {
   Clock, ChevronRight, Plus,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';
@@ -32,7 +31,6 @@ export default async function ForumsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/lms/forums');
 
-  const db = createAdminClient() || supabase;
 
   // Fetch categories with topic counts
   const { data: categories } = await supabase

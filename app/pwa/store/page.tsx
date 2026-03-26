@@ -4,7 +4,6 @@ import { createAdminClient } from '@/lib/supabase/admin';
 
 async function getStoreData() {
   const supabase = createAdminClient();
-  if (!supabase) return { products: [], categories: [] };
 
   const { data: products } = await supabase
     .from('products')

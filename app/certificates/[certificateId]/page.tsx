@@ -23,7 +23,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { certificateId } = await params;
   const supabase = await createClient();
   
-  if (!supabase) return { title: 'Certificate | Elevate for Humanity' };
   
   const { data: certificate } = await supabase
     .from('certificates')

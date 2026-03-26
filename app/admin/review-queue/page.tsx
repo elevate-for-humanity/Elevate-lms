@@ -40,7 +40,6 @@ export default async function ReviewQueuePage({
 }) {
   const { queue_type, status: statusParam } = await searchParams;
   const supabase = await createClient();
-  if (!supabase) redirect('/login');
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');

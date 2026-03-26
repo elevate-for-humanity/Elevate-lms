@@ -14,9 +14,6 @@ export const metadata: Metadata = {
 export default async function EnrollmentSuccessPage() {
   const supabase = await createClient();
 
-  if (!supabase) {
-    redirect('/error?message=service-unavailable');
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
 

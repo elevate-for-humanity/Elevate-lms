@@ -4,7 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import PartnerSettingsForm from './PartnerSettingsForm';
 
 export const dynamic = 'force-dynamic';
@@ -20,7 +19,6 @@ export default async function PartnerSettingsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/partner/settings');
 
-  const db = createAdminClient() || supabase;
 
   const { data: partnerUser } = await supabase
     .from('partner_users')

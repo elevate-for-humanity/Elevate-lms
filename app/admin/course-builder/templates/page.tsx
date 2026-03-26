@@ -1,7 +1,6 @@
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, FileText, Plus, Copy } from 'lucide-react';
@@ -50,7 +49,6 @@ export default async function CourseTemplatesPage() {
 
   if (!user) redirect('/login?redirect=/admin/course-builder/templates');
 
-  const db = createAdminClient() || supabase;
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 

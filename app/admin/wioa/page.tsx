@@ -16,9 +16,6 @@ export const metadata: Metadata = {
 
 async function getWIOAData() {
   const supabase = createAdminClient();
-  if (!supabase) {
-    return { enrollments: [], count: 0, verified: 0, pending: 0, issues: 0 };
-  }
   
   // Get enrollments with WIOA funding
   const { data: enrollments, count } = await supabase

@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, Download, Users, TrendingUp, Calendar, BarChart3 } from 'lucide-react';
@@ -17,7 +16,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function PartnerReportsPage() {
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) redirect('/login?redirect=/partner/reports');

@@ -72,7 +72,6 @@ export default function DocumentsPage() {
 
   useEffect(() => {
     const supabase = createClient();
-    if (!supabase) { router.push('/login'); return; }
 
     supabase.auth.getUser().then(({ data, error: authErr }) => {
       if (authErr || !data?.user) { router.push('/login'); return; }

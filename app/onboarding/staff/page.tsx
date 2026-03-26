@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -19,8 +18,6 @@ export const metadata: Metadata = {
 
 export default async function StaffOnboardingPage() {
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
-  if (!supabase) redirect('/login');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/onboarding/staff');
 

@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import FundingVerificationTable from './FundingVerificationTable';
@@ -13,7 +12,6 @@ export const metadata: Metadata = {
 
 export default async function FundingVerificationPage() {
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
 
   const {
     data: { user },

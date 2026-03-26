@@ -1,12 +1,10 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AcknowledgeHandbookPage() {
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/employee/handbook/acknowledge');

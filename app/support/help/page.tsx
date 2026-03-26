@@ -25,7 +25,6 @@ const categories = [
 
 async function getArticles(category?: string, search?: string) {
   const supabase = createAdminClient();
-  if (!supabase) return [];
   
   let query = supabase
     .from('support_articles')

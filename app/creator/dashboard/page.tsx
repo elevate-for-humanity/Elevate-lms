@@ -15,9 +15,6 @@ export const dynamic = 'force-dynamic';
 export default async function CreatorDashboardPage() {
   const supabase = await createClient();
 
-  if (!supabase) {
-    redirect('/login?redirect=/creator/dashboard');
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/creator/dashboard');

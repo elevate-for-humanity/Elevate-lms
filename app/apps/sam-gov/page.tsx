@@ -17,9 +17,6 @@ export default async function SamGovPage() {
   const supabase = await createClient();
   
   // Must have database connection
-  if (!supabase) {
-    redirect('/error?message=service-unavailable');
-  }
 
   // Must be logged in
   const { data: { user } } = await supabase.auth.getUser();

@@ -218,9 +218,6 @@ async function checkDatabaseConnection(): Promise<{ connected: boolean; tables: 
   try {
     const supabase = await createClient();
 
-    if (!supabase) {
-      return { connected: false, tables: [], error: 'Supabase client not available' };
-    }
     
     // Check core tables
     const tables = ['profiles', 'programs', 'student_enrollments', 'partner_lms_enrollments', 'achievements'];

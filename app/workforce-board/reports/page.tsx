@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { BarChart3, Calendar, FileText, Download, Clock, AlertTriangle } from 'lucide-react';
@@ -20,11 +19,9 @@ export const metadata: Metadata = {
 
 export default async function ReportsPage() {
   const supabase = await createClient();
-  if (!supabase) redirect('/login');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const db = createAdminClient() || supabase;
 
   // WIOA deadlines from lib
   const deadlines = getUpcomingDeadlines();

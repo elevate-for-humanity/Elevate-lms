@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
 import WorkOneChecklistSection from '@/components/workone/WorkOneChecklist';
 import {
+import { logger } from '@/lib/logger';
   Clock,
   Play,
   MessageSquare,

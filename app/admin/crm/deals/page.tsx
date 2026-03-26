@@ -18,9 +18,6 @@ export const dynamic = 'force-dynamic';
 export default async function DealsPage() {
   const supabase = await createClient();
 
-  if (!supabase) {
-    redirect('/login?redirect=/admin/crm/deals');
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
 

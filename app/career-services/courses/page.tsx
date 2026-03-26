@@ -22,7 +22,6 @@ export const dynamic = 'force-dynamic';
 export default async function CareerCoursesPage() {
   const supabase = await createClient();
 
-  if (!supabase) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <p>Unable to load courses. Please try again later.</p>

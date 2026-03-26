@@ -21,10 +21,6 @@ export default function InstructorsPage() {
   }, [filter]);
 
   async function loadData() {
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
     
     // Load instructors with their course assignments and performance
     let query = supabase

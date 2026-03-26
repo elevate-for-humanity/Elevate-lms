@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -44,7 +43,6 @@ export default async function InstructorSubmissionsPage({
   const { user, profile } = await requireRole(['instructor', 'admin', 'super_admin']);
 
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
 
   const params = await searchParams;
   const filterStatus = params.status as SubmissionStatus | undefined;

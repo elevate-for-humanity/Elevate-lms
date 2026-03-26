@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, Circle, Star, BookOpen, Award, ChevronRight, TrendingUp } from 'lucide-react';
@@ -72,7 +71,6 @@ const SKILL_CATEGORIES = [
 
 export default async function StaffSkillsPage() {
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/staff-portal/skills');

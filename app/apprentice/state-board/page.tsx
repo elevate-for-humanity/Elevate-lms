@@ -28,7 +28,6 @@ export const metadata: Metadata = {
 
 export default async function StateBoardExamPage() {
   const supabase = await createClient();
-  if (!supabase) { redirect("/login"); }
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {

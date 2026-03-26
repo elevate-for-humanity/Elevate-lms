@@ -28,7 +28,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { programId } = await params;
   const supabase = await createClient();
   
-  if (!supabase) return { title: 'Program | Program Holder' };
   
   const { data: program } = await supabase
     .from('programs')

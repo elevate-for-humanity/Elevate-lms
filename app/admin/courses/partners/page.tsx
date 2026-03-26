@@ -14,9 +14,6 @@ export const metadata: Metadata = {
 
 export default async function CoursePartnersPage() {
   const supabase = await createClient();
-  if (!supabase) {
-    return <div className="p-8 text-center text-gray-600">Database unavailable.</div>;
-  }
 
   const { data: partners, count } = await supabase
     .from('profiles')

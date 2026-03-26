@@ -12,7 +12,6 @@ type Params = Promise<{ slug: string }>;
 
 async function getArticle(slug: string) {
   const supabase = createAdminClient();
-  if (!supabase) return null;
   
   const { data: article, error } = await supabase
     .from('support_articles')
@@ -34,7 +33,6 @@ async function getArticle(slug: string) {
 
 async function getRelatedArticles(category: string, currentSlug: string) {
   const supabase = createAdminClient();
-  if (!supabase) return [];
   
   const { data: articles } = await supabase
     .from('support_articles')

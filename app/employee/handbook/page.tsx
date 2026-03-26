@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { BookOpen, CheckCircle, ChevronRight, FileText, Shield, Users, Clock, AlertTriangle, Heart, Briefcase } from 'lucide-react';
@@ -127,7 +126,6 @@ const HANDBOOK_SECTIONS = [
 
 export default async function EmployeeHandbookPage() {
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/employee/handbook');

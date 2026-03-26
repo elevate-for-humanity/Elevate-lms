@@ -4,7 +4,6 @@ import { createAdminClient } from '@/lib/supabase/admin';
 
 async function getEmployerData() {
   const supabase = createAdminClient();
-  if (!supabase) return { programs: [], enrollments: 0, completedEnrollments: 0 };
 
   const [programRes, enrollRes, completedRes] = await Promise.all([
     supabase.from('programs').select('id, name, slug, category, placement_rate, completion_rate').eq('is_active', true).order('name').limit(20),

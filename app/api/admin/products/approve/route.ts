@@ -7,6 +7,7 @@ import { requireAdmin } from '@/lib/auth';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { logger } from '@/lib/logger';
 export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';

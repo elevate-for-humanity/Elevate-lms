@@ -16,9 +16,6 @@ export const dynamic = 'force-dynamic';
 export default async function ShoppingCartPage() {
   const supabase = await createClient();
 
-  if (!supabase) {
-    redirect('/login?redirect=/shop/cart');
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
 

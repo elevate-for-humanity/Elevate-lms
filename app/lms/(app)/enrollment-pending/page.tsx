@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -21,7 +20,6 @@ export default async function EnrollmentPendingPage({
   const { courseId } = await searchParams;
 
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
 
   const {
     data: { user },

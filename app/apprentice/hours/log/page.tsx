@@ -26,7 +26,6 @@ export default function LogApprenticeHoursPage() {
 
   useEffect(() => {
     const getUser = async () => {
-      if (!supabase) return;
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
     };

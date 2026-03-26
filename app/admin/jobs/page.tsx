@@ -16,9 +16,6 @@ export const metadata: Metadata = {
 
 async function getJobsData() {
   const supabase = createAdminClient();
-  if (!supabase) {
-    return { jobs: [], stats: { totalJobs: 0, activeJobs: 0, employers: 0 } };
-  }
   
   const { data: jobPostings, count: jobCount } = await supabase
     .from('job_postings')

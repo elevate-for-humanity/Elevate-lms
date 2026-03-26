@@ -4,7 +4,6 @@ import { createAdminClient } from '@/lib/supabase/admin';
 
 async function getInstructorData() {
   const supabase = createAdminClient();
-  if (!supabase) return { courses: [], totalEnrollments: 0, activeEnrollments: 0 };
 
   const [courseRes, totalRes, activeRes] = await Promise.all([
     supabase.from('courses').select('id, title, course_code, description, duration_hours, is_active, instructor_id').eq('is_active', true).order('title').limit(30),

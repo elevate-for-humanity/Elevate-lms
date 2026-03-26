@@ -9,7 +9,6 @@ export const dynamic = 'force-dynamic';
 
 async function getStudentData(userId: string, email: string) {
   const supabase = createAdminClient();
-  if (!supabase) return { profile: null, programEnrollments: [], courseEnrollments: [], applications: [], appointments: [] };
 
   const [profileRes, progEnrollRes, courseEnrollRes, appRes, apptRes] = await Promise.all([
     // Profile — onboarding state

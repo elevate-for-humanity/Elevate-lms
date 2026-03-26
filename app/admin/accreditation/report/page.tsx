@@ -41,9 +41,6 @@ async function getAccreditationData(supabase: any) {
 
 export default async function AccreditationReportPage() {
   const supabase = await createClient();
-  if (!supabase) {
-    return <div className="p-8 text-center text-gray-600">Database unavailable.</div>;
-  }
 
   const data = await getAccreditationData(supabase);
   const now = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });

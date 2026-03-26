@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Award, Plus, Users, Search, Shield, Download } from 'lucide-react';
@@ -21,8 +20,6 @@ export default async function CertificatesPage({
 }) {
   const params = await searchParams;
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
-  if (!supabase) redirect('/login');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();

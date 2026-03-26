@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import PartnerProgramClient from './PartnerProgramClient';
 
 export const dynamic = 'force-dynamic';
@@ -22,7 +21,6 @@ export default async function PartnerProgramPage({ params }: { params: Promise<{
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?redirect=/partner/programs/${slug}`);
 
-  const db = createAdminClient() || supabase;
 
   // Partner role guard
   const { data: profile } = await supabase

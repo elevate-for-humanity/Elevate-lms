@@ -34,7 +34,6 @@ const STATE_STYLES: Record<CredentialLifecycleState, { label: string; color: str
 
 export default async function CertificationPage() {
   const supabase = await createClient();
-  if (!supabase) redirect('/login?redirect=/lms/certification');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/lms/certification');
 

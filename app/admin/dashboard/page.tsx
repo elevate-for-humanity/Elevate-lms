@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import DashboardClient from './DashboardClient';
 import { BuiltCoursesPanel } from './BuiltCoursesPanel';
 
@@ -135,7 +134,6 @@ async function getDashboardData(supabase: any, db: any) {
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
 
   const data = await getDashboardData(supabase, db);
 

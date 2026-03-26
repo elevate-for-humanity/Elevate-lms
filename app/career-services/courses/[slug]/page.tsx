@@ -29,7 +29,6 @@ export async function generateMetadata({
   const { slug } = await params;
   const supabase = await createClient();
   
-  if (!supabase) return { title: 'Course Not Found' };
 
   const { data: course } = await supabase
     .from('career_courses')
@@ -53,9 +52,6 @@ export default async function CourseDetailPage({
   const { slug } = await params;
   const supabase = await createClient();
 
-  if (!supabase) {
-    notFound();
-  }
 
   const { data: course } = await supabase
     .from('career_courses')

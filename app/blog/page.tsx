@@ -20,7 +20,6 @@ async function getDbPosts(): Promise<BlogPost[]> {
   try {
     const { createAdminClient } = await import('@/lib/supabase/admin');
     const supabase = createAdminClient();
-    if (!supabase) return [];
     const { data } = await supabase
       .from('blog_posts')
       .select('*')

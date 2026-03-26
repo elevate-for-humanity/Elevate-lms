@@ -28,9 +28,6 @@ export default async function PartnerLearningPage({ params }: Props) {
   
   const supabase = await createClient();
   
-  if (!supabase) {
-    redirect('/login?redirect=/partner-learning/' + enrollmentId);
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
   

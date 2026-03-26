@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -15,7 +14,6 @@ export const metadata: Metadata = {
 
 export default async function TestingAdminPage() {
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');

@@ -6,6 +6,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import CanonicalVideo from '@/components/video/CanonicalVideo';
 import { BookOpen, CheckCircle2, ArrowLeft, Shield, Clock, Users, AlertTriangle } from 'lucide-react';
 import OrientationAvatar from './OrientationAvatar';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +20,6 @@ async function completeOrientation() {
   const { createClient } = await import('@/lib/supabase/server');
   const { logger } = await import('@/lib/logger');
   const supabase = await createClient();
-  if (!supabase) throw new Error('Database unavailable');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
@@ -93,7 +93,6 @@ async function completeOrientation() {
 
 export default async function OrientationPage() {
   const supabase = await createClient();
-  if (!supabase) redirect('/login');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 

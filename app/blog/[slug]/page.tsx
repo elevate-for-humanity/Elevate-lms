@@ -26,7 +26,6 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
   // Fall back to DB
   try {
     const supabase = createAdminClient();
-    if (!supabase) return null;
 
     const { data: post, error } = await supabase
       .from('blog_posts')
@@ -61,7 +60,6 @@ async function getRelatedPosts(category: string, currentSlug: string): Promise<P
   // Top up from DB if needed
   try {
     const supabase = createAdminClient();
-    if (!supabase) return staticRelated;
 
     const staticSlugs = staticRelated.map((p) => p.slug);
     const { data: posts } = await supabase

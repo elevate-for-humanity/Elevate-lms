@@ -12,7 +12,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lessonId } = await params;
   const supabase = await createClient();
   
-  if (!supabase) return { title: 'Lesson | Elevate LMS' };
   
   const { data: lesson } = await supabase
     .from('course_lessons')

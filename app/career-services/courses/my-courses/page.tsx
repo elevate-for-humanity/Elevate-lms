@@ -16,9 +16,6 @@ export const dynamic = 'force-dynamic';
 export default async function MyCoursesPage() {
   const supabase = await createClient();
 
-  if (!supabase) {
-    redirect('/login?redirect=/career-services/courses/my-courses');
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
 

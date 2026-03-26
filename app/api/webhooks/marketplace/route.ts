@@ -7,6 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { randomBytes } from 'node:crypto';
 import { logAuditEvent, AuditActions } from '@/lib/audit';
 import { toErrorMessage } from '@/lib/safe';
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 

@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -67,7 +66,6 @@ async function createZoomMeeting(topic: string, startTime: string): Promise<stri
 export default async function InterviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?redirect=/careers/interview/${id}`);

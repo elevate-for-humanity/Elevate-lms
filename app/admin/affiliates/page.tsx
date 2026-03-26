@@ -16,9 +16,6 @@ export const metadata: Metadata = {
 
 async function getAffiliateData() {
   const supabase = createAdminClient();
-  if (!supabase) {
-    return { affiliates: [], stats: { total: 0, active: 0, totalPaid: 0 } };
-  }
   
   // Get affiliates from database
   const { data: affiliates, count } = await supabase

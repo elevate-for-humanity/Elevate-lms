@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 
 // /onboarding/legal was a duplicate of /onboarding/learner/agreements.

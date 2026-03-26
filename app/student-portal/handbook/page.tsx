@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 
 // Merged into /student-handbook (canonical, DB-driven, with acknowledgment tracking).

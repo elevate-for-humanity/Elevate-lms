@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -39,10 +40,7 @@ export default async function AlumniPage() {
     );
   }
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    const { redirect } = await import('next/navigation');
-    redirect('/login?redirect=/lms/alumni');
-  }
+  if (!user) redirect('/login?redirect=/lms/alumni');
 
   // Get alumni members
   const { data: alumni } = await db

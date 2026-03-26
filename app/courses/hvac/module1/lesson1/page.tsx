@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 
 // Legacy standalone HVAC lesson — consolidated into /lms/courses/[courseId]

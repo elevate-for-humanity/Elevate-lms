@@ -100,6 +100,7 @@ export default function LessonPage() {
   // Prevents advancing past a failed checkpoint into the next module.
   const [checkpointBlocked, setCheckpointBlocked] = useState(false);
   const [passedCheckpointIds, setPassedCheckpointIds] = useState<Set<string>>(new Set());
+  const [loadTimeout, setLoadTimeout] = useState(false);
 
   // ── Refs ─────────────────────────────────────────────────────────────────────
   const lessonStartTime = React.useRef(Date.now());
@@ -444,7 +445,6 @@ export default function LessonPage() {
   };
 
   // Timeout: if lesson hasn't loaded after 30s, show error
-  const [loadTimeout, setLoadTimeout] = useState(false);
   useEffect(() => {
     if (lesson) { setLoadTimeout(false); return; }
     const timer = setTimeout(() => {

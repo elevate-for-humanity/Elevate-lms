@@ -126,34 +126,6 @@ export function createPublicClient(): SupabaseClient<any> {
   }
 }
 
-// Returns null if admin client cannot be created - NEVER throws
-export function createAdminClient(): SupabaseClient<any> | null {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    if (process.env.NODE_ENV === 'development') {
-      logger.warn(
-        '[Supabase Admin] Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY. ' +
-        'Admin features disabled.'
-      );
-    }
-    return null;
-  }
-
-  try {
-    return createSupabaseClient(
-      supabaseUrl,
-      serviceRoleKey,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-        },
-      }
-    );
-  } catch (error) {
-    logger.error('[Supabase Admin] Failed to create client:', error);
-    return null;
-  }
-}
+// createAdminClient is the canonical export from '@/lib/supabase/admin'.
+// Re-exported here for callers that import from '@/lib/supabase/server' directly.
+export { createAdminClient } from '@/lib/supabase/admin';

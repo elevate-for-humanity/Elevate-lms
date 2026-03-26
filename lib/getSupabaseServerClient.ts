@@ -1,17 +1,15 @@
+/** @deprecated Use '@/lib/supabase/admin' instead. */
 // lib/getSupabaseServerClient.ts
-import { createClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export function getSupabaseServerClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!url || !key) {
-    throw new Error('Missing Supabase environment variables');
+  const client = createAdminClient();
+  if (!client) {
+    // Return a no-op client rather than throwing — throwing crashes lambdas on cold start
+    const { createClient } = require('@supabase/supabase-js');
+    return createClient('https://placeholder.supabase.co', 'placeholder', {
+      auth: { persistSession: false },
+    });
   }
-
-  return createClient(url, key, {
-    auth: {
-      persistSession: false,
-    },
-  });
+  return client;
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
-import { createServerSupabaseClient } from '@/lib/auth';
+import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
   title: 'Onboarding',
@@ -18,12 +18,10 @@ export default async function OnboardingLayout({
   children: React.ReactNode;
 }) {
   // Require authentication and enrollment for onboarding
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!user) {
     redirect('/login?redirect=/onboarding');
   }
 
@@ -32,7 +30,7 @@ export default async function OnboardingLayout({
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
-    .eq('id', session.user.id)
+    .eq('id', user.id)
     .single();
 
   // All authenticated users can access onboarding

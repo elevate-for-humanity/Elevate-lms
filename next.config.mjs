@@ -504,6 +504,8 @@ const nextConfig = {
       // Exact match first: /portal → portal chooser. Wildcard below catches /portal/anything → /lms/anything.
       { source: '/portal', destination: '/portals', permanent: true },
       { source: '/portal/:path*', destination: '/lms/:path*', permanent: true },
+      // Specific student routes before wildcard
+      { source: '/student/handbook', destination: '/student-handbook', permanent: true },
       { source: '/student/:path*', destination: '/lms/:path*', permanent: true },
       { source: '/students/:path*', destination: '/lms/:path*', permanent: true },
       { source: '/learners/:path*', destination: '/lms/:path*', permanent: true },
@@ -753,7 +755,6 @@ const nextConfig = {
       // Redirect-only page.tsx files moved here to free build slots.
       // ============================================
       // Handbook canonicalization — /student-handbook is the single source
-      { source: '/student/handbook',          destination: '/student-handbook', permanent: true },
       { source: '/student-portal/handbook',   destination: '/student-handbook', permanent: true },
 
       // /cert/verify kept as page.tsx — passes query params to /verify

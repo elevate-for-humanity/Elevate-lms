@@ -11,7 +11,7 @@ const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScqiIUAO2CCKOkG_h3cqv
 
 const APPLICATION_DATA = {
   // ── Section 1: Organization Info ──────────────────────────────────────────
-  organizationName: 'Elevate for Humanity, Inc.',
+  organizationName: '2Exclusive LLC (DBA: Elevate for Humanity Technical and Career Institute)',
   address: '8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240',
   primaryContact: 'Elizabeth Greene, Founder & Chief Executive Officer',
   phone: '(317) 314-3757',
@@ -33,7 +33,7 @@ const APPLICATION_DATA = {
   totalRequested: '$170,000 (within $400,000 cap)',
 
   // ── Section 4: Employer Partner ───────────────────────────────────────────
-  employerPartner: 'Selfish Inc. (DBA: The Rise Foundation), a 501(c)(3) nonprofit based in Indianapolis, Indiana. Partner employer actively participating in apprenticeship programs sponsored by Elevate for Humanity, a DOL Registered Apprenticeship Sponsor. Currently employing apprentices in workforce development and community services roles in Indiana.',
+  employerPartner: 'Selfish Inc. (DBA: The Rise Foundation), a 501(c)(3) nonprofit based in Indianapolis, Indiana. Partner employer actively participating in apprenticeship programs sponsored by 2Exclusive LLC (DBA: Elevate for Humanity Technical and Career Institute), a DOL Registered Apprenticeship Sponsor. Currently employing apprentices in workforce development and community services roles in Indiana.',
   employerState: 'Indiana',
   employerStatus: 'In good standing with the State of Indiana',
 
@@ -84,9 +84,9 @@ No wage subsidies or supplanting of other committed funds included.
 All costs align with allowable uses as defined in the RFA.`,
 
   // ── Section 7: Capacity & Experience ─────────────────────────────────────
-  organizationalCapacity: `Elevate for Humanity is a DOL Registered Apprenticeship Sponsor, ETPL provider, WRG/WIOA/JRI approved organization with active partnerships across Indiana's workforce ecosystem. Key credentials include:
+  organizationalCapacity: `2Exclusive LLC (DBA: Elevate for Humanity Technical and Career Institute) is a DOL Registered Apprenticeship Sponsor, ETPL provider, WRG/WIOA/JRI approved organization with active partnerships across Indiana's workforce ecosystem. Key credentials include:
 - SAM.gov registered (CAGE: 0Q856), active federal government contractor
-- ByBlack certified nonprofit
+- ByBlack certified
 - CareerSafe OSHA provider, Milady partner, NRF Rise Up provider, Certiport CATC
 - WorkOne partner, EmployIndy partner, Job Ready Indy partner, HSI affiliate
 - Led by Elizabeth Greene: U.S. Army veteran, IRS Enrolled Agent, licensed barber, Indiana substitute teacher, EPA 608 Certified Proctor

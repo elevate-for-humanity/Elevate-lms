@@ -33,7 +33,7 @@ const APPLICATION_DATA = {
   totalRequested: '$170,000 (within $400,000 cap)',
 
   // ── Section 4: Employer Partner ───────────────────────────────────────────
-  employerPartner: 'Selfish Inc. (DBA: The Rise Foundation), a 501(c)(3) nonprofit based in Indianapolis, Indiana. Partner employer actively participating in apprenticeship programs sponsored by 2Exclusive LLC (DBA: Elevate for Humanity Technical and Career Institute), a DOL Registered Apprenticeship Sponsor. Currently employing apprentices in workforce development and community services roles in Indiana.',
+  employerPartner: 'Selfish Inc., a 501(c)(3) nonprofit based in Indianapolis, Indiana. Registered employer partner actively participating in apprenticeship programs sponsored by 2Exclusive LLC (DBA: Elevate for Humanity Technical and Career Institute), a DOL Registered Apprenticeship Sponsor. Currently employing apprentices in workforce development and community services roles in Indiana.',
   employerState: 'Indiana',
   employerStatus: 'In good standing with the State of Indiana',
 

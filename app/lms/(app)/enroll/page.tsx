@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -27,21 +26,7 @@ interface Props {
 export default async function EnrollPage({ searchParams }: Props) {
   const params = await searchParams;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Enroll" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -58,7 +43,7 @@ export default async function EnrollPage({ searchParams }: Props) {
   }
 
   // Get user's existing enrollments — training_enrollments is the canonical LMS table
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('training_enrollments')
     .select('course_id')
     .eq('user_id', user.id);
@@ -66,7 +51,7 @@ export default async function EnrollPage({ searchParams }: Props) {
   const enrolledCourseIds = new Set(enrollments?.map(e => e.course_id) || []);
 
   // Fetch available courses (not enrolled)
-  const { data: courses } = await db
+  const { data: courses } = await supabase
     .from('training_courses')
     .select('*')
     .eq('is_published', true)
@@ -75,7 +60,7 @@ export default async function EnrollPage({ searchParams }: Props) {
   const availableCourses = courses?.filter(c => !enrolledCourseIds.has(c.id)) || [];
 
   // Fetch partner courses
-  const { data: partnerCourses } = await db
+  const { data: partnerCourses } = await supabase
     .from('partner_lms_courses')
     .select(`
       *,
@@ -88,7 +73,7 @@ export default async function EnrollPage({ searchParams }: Props) {
     .order('course_name');
 
   // Get partner enrollments
-  const { data: partnerEnrollments } = await db
+  const { data: partnerEnrollments } = await supabase
     .from('partner_lms_enrollments')
     .select('course_id')
     .eq('student_id', user.id);

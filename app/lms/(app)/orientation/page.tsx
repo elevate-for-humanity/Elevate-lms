@@ -1,11 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-export const dynamic = 'force-dynamic';
 import { requireRole } from '@/lib/auth/require-role';
 import ProgramOrientationVideo from '@/components/student/ProgramOrientationVideo';
 import { Book, Users, Award, Briefcase } from 'lucide-react';
 import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Program Orientation | Student Dashboard',
@@ -73,23 +73,8 @@ export default async function OrientationPage() {
               onComplete={async () => {
                 'use server';
                 const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Orientation" }]} />
-      </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-                await db
+                await supabase
                   .from('profiles')
                   .update({ orientation_completed: true })
                   .eq('id', user.id);

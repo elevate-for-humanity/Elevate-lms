@@ -1,11 +1,12 @@
-export const dynamic = 'force-static';
-export const revalidate = 3600;
 
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 import MarqueeBanner from '@/components/MarqueeBanner';
 import { BlurIn } from '@/components/animations/PremiumAnimations';
+
+export const dynamic = 'force-static';
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Elevate for Humanity | Workforce Training — Indianapolis, Indiana',

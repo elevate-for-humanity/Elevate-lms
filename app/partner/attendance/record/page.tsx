@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Users } from 'lucide-react';
@@ -16,7 +15,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function RecordAttendancePage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) redirect('/login');
 
@@ -24,7 +22,7 @@ export default async function RecordAttendancePage() {
   if (!user) redirect('/login?redirect=/partner/attendance/record');
 
   // Get partner info
-  const { data: partner } = await db
+  const { data: partner } = await supabase
     .from('partners')
     .select('id')
     .eq('user_id', user.id)
@@ -35,7 +33,7 @@ export default async function RecordAttendancePage() {
 
   if (partner) {
     // Get students enrolled with this partner
-    const { data: enrollmentData } = await db
+    const { data: enrollmentData } = await supabase
       .from('program_enrollments')
       .select(`
         id,
@@ -54,7 +52,7 @@ export default async function RecordAttendancePage() {
     }
 
     // Get courses for this partner
-    const { data: courseData } = await db
+    const { data: courseData } = await supabase
       .from('training_courses')
       .select('id, title')
       .eq('partner_id', partner.id)

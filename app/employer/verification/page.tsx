@@ -1,9 +1,10 @@
-export const dynamic = 'force-dynamic';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Employer Verification | Elevate for Humanity',
@@ -16,16 +17,6 @@ export default async function EmployerVerificationPage() {
   try {
     const supabase = await createClient();
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
     const { data: authData } = await supabase.auth.getUser();
     user = authData.user;
   } catch (error) { /* Error handled silently */ }

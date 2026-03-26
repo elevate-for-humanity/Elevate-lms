@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
@@ -21,18 +21,7 @@ export default async function EnrollmentSuccessPage({
   params: { courseId: string };
 }) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   // Get current user
   const {
@@ -43,7 +32,7 @@ export default async function EnrollmentSuccessPage({
   }
 
   // Fetch enrollment details
-  const { data: enrollment } = await db
+  const { data: enrollment } = await supabase
     .from('partner_enrollments')
     .select(
       '*, partner_courses(course_name, partner_lms_providers(provider_name))'

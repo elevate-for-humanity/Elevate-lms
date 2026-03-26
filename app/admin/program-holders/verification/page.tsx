@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import {
+
+export const dynamic = 'force-dynamic';
   XCircle,
   Clock,
   FileText,
@@ -21,21 +21,10 @@ export const metadata: Metadata = {
 export default async function ProgramHolderVerificationPage() {
   const { user, profile } = await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   // Get pending verifications
-  const { data: pendingHolders } = await db
+  const { data: pendingHolders } = await supabase
     .from('program_holders')
     .select(
       `
@@ -54,13 +43,13 @@ export default async function ProgramHolderVerificationPage() {
   // Get documents for each holder
   const holdersWithDocs = await Promise.all(
     (pendingHolders || []).map(async (holder) => {
-      const { data: documents } = await db
+      const { data: documents } = await supabase
         .from('program_holder_documents')
         .select('*')
         .eq('program_holder_id', holder.user_id)
         .order('uploaded_at', { ascending: false });
 
-      const { data: banking } = await db
+      const { data: banking } = await supabase
         .from('program_holder_banking')
         .select('*')
         .eq('program_holder_id', holder.user_id)
@@ -75,7 +64,7 @@ export default async function ProgramHolderVerificationPage() {
   );
 
   // Get recently verified
-  const { data: recentlyVerified } = await db
+  const { data: recentlyVerified } = await supabase
     .from('program_holders')
     .select(
       `

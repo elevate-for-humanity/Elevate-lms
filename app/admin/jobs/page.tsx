@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -7,6 +6,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Job Postings | Admin | Elevate for Humanity',

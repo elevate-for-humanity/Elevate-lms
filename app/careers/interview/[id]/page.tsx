@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Video, Calendar, Clock, CheckCircle, ExternalLink, AlertCircle, User } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Interview | Elevate For Humanity',
@@ -72,7 +73,7 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
   if (!user) redirect(`/login?redirect=/careers/interview/${id}`);
 
   // Load application
-  const { data: app } = await db
+  const { data: app } = await supabase
     .from('job_applications')
     .select('*, job_postings(title, department)')
     .eq('id', id)
@@ -92,7 +93,7 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
   }
 
   // Check if interview already scheduled in DB
-  const { data: existingInterview } = await db
+  const { data: existingInterview } = await supabase
     .from('interviews')
     .select('*')
     .eq('candidate', id)
@@ -119,7 +120,7 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
     if (zoomLink) {
       interviewDate = scheduledAt.toISOString();
       // Save to interviews table
-      await db.from('interviews').insert({
+      await supabase.from('interviews').insert({
         candidate: id,
         position,
         status: 'scheduled',
@@ -128,7 +129,7 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
         profiles: { zoom_link: zoomLink },
       });
       // Update application status
-      await db.from('job_applications').update({
+      await supabase.from('job_applications').update({
         status: 'interview_scheduled',
         updated_at: new Date().toISOString(),
       }).eq('id', id);

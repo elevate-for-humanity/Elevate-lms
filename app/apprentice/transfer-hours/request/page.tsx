@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import TransferRequestForm from './TransferRequestForm';
 
@@ -13,7 +12,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function TransferRequestPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) {
     redirect('/login');
   }
@@ -27,7 +25,7 @@ export default async function TransferRequestPage() {
   }
 
   // Get apprentice profile
-  const { data: apprentice } = await db
+  const { data: apprentice } = await supabase
     .from('apprentices')
     .select('*, program:program_id(name, total_hours, allows_transfer)')
     .eq('user_id', user.id)
@@ -38,7 +36,7 @@ export default async function TransferRequestPage() {
   }
 
   // Get existing documents for this apprentice
-  const { data: existingDocs } = await db
+  const { data: existingDocs } = await supabase
     .from('documents')
     .select('id, document_type, file_name, status')
     .eq('user_id', user.id)

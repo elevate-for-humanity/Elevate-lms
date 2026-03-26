@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
@@ -42,24 +41,13 @@ interface Order {
 
 export default async function OrderHistoryPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Database connection failed.</p>
-        </div>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/shop/orders');
 
   // Fetch orders from database
-  const { data: ordersData, error } = await db
+  const { data: ordersData, error } = await supabase
     .from('orders')
     .select(`
       id,

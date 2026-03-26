@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { BarChart3, Download, Calendar, TrendingUp, Users, DollarSign, ArrowLeft, FileText } from 'lucide-react';
 
@@ -23,12 +22,11 @@ const reportTypes = [
 
 export default async function WIOAReportsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Query real participant counts from enrollments
-  const { count: totalParticipants } = await db.from('program_enrollments').select('*', { count: 'exact', head: true });
-  const { count: completedEnrollments } = await db.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed');
-  const { count: totalCerts } = await db.from('certificates').select('*', { count: 'exact', head: true });
+  const { count: totalParticipants } = await supabase.from('program_enrollments').select('*', { count: 'exact', head: true });
+  const { count: completedEnrollments } = await supabase.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed');
+  const { count: totalCerts } = await supabase.from('certificates').select('*', { count: 'exact', head: true });
 
   const credentialRate = (totalParticipants && totalParticipants > 0) ? Math.round(((totalCerts || 0) / totalParticipants) * 100) : 0;
 

@@ -1,14 +1,14 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Plus, Users, Calendar, Send, Eye, MousePointer } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { EmailCampaignManager } from '@/components/EmailCampaignManager';
 import { SMSNotificationSystem } from '@/components/SMSNotificationSystem';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Campaigns | Admin | Elevate For Humanity',
@@ -32,7 +32,6 @@ const typeIcons: Record<string, typeof Mail> = {
 
 export default async function AdminCampaignsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -46,7 +45,7 @@ export default async function AdminCampaignsPage() {
   let activeCampaigns = 0;
 
   try {
-    const result = await db
+    const result = await supabase
       .from('marketing_campaigns')
       .select('*')
       .order('created_at', { ascending: false })
@@ -55,12 +54,12 @@ export default async function AdminCampaignsPage() {
     error = result.error;
 
     if (!error) {
-      const { count: total } = await db
+      const { count: total } = await supabase
         .from('marketing_campaigns')
         .select('*', { count: 'exact', head: true });
       totalCampaigns = total || 0;
 
-      const { count: active } = await db
+      const { count: active } = await supabase
         .from('marketing_campaigns')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'active');

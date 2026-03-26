@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { generateInternalMetadata } from '@/lib/seo/metadata';
 
 export const metadata: Metadata = generateInternalMetadata({
@@ -10,7 +9,6 @@ export const metadata: Metadata = generateInternalMetadata({
 });
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { safeFormatDate } from '@/lib/format-utils';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
@@ -54,6 +52,8 @@ import { EmptyEnrollmentState } from '@/components/lms/dashboard/EmptyEnrollment
 import { StudentToolsStrip } from '@/components/lms/dashboard/StudentToolsStrip';
 import { PendingApprovalNotice } from '@/components/lms/dashboard/PendingApprovalNotice';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * STUDENT PORTAL - ORCHESTRATED
  *
@@ -75,25 +75,23 @@ export default async function StudentDashboardOrchestrated() {
   ]);
 
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
   // Get program-level enrollments (multi-program architecture)
-  const { data: programEnrollments } = await db
+  const { data: programEnrollments } = await supabase
     .from('program_enrollments')
     .select('id, status, enrolled_at, progress_percent, program_id, programs(id, title, slug, code)')
     .eq('user_id', user.id)
     .order('enrolled_at', { ascending: false });
 
   // Get partner enrollments (external providers like HSI)
-  const { data: partnerEnrollments } = await db
+  const { data: partnerEnrollments } = await supabase
     .from('partner_lms_enrollments')
     .select('*, partner_lms_courses(*), partner_lms_providers(*)')
     .eq('student_id', user.id)
     .order('created_at', { ascending: false });
 
   // Get canonical course enrollments (program_enrollments with course_id set)
-  const { data: courseEnrollments } = await db
+  const { data: courseEnrollments } = await supabase
     .from('program_enrollments')
     .select('id, status, enrolled_at, progress_percent, course_id, courses(id, title, description)')
     .eq('user_id', user.id)
@@ -131,7 +129,7 @@ export default async function StudentDashboardOrchestrated() {
   }
 
   // Get certifications from certificates table
-  const { data: certifications } = await db
+  const { data: certifications } = await supabase
     .from('certificates')
     .select('*')
     .eq('user_id', user.id)
@@ -139,7 +137,7 @@ export default async function StudentDashboardOrchestrated() {
     .catch(() => ({ data: null, error: null }));
 
   // Get job placements (gracefully handle if table doesn't exist)
-  const { data: placements } = await db
+  const { data: placements } = await supabase
     .from('job_placements')
     .select('*')
     .eq('user_id', user.id)
@@ -147,7 +145,7 @@ export default async function StudentDashboardOrchestrated() {
     .catch(() => ({ data: null, error: null }));
 
   // Check whether the learner has a pending_workone application — gates WorkOne checklist
-  const { data: workoneApp } = await db
+  const { data: workoneApp } = await supabase
     .from('applications')
     .select('id, status, requested_funding_source')
     .eq('user_id', user.id)

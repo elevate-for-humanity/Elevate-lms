@@ -46,7 +46,7 @@ export default async function RiseFoundationPage() {
 
   try {
     const db = createAdminClient();
-    const { data: eventsData } = await db
+    const { data: eventsData } = await supabase
       .from('events')
       .select('id, title, description, start_date')
       .eq('organization', 'rise-foundation')
@@ -55,7 +55,7 @@ export default async function RiseFoundationPage() {
       .limit(3);
     events = eventsData;
 
-    const { data: testimonialsData } = await db
+    const { data: testimonialsData } = await supabase
       .from('testimonials')
       .select('id, content, name')
       .eq('is_featured', true)

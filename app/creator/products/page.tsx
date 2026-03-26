@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -8,37 +7,27 @@ export const metadata: Metadata = {
 };
 
 import { requireCreator } from '@/lib/creator';
-export const dynamic = 'force-dynamic';
 import Image from 'next/image';
 import { createClient } from '@/utils/supabase/server';
 import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 
 export default async function CreatorProductsPage() {
   const { creator } = await requireCreator();
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   // Fetch creator's products
-  const { data: products } = await db
+  const { data: products } = await supabase
     .from('marketplace_products')
     .select('*')
     .eq('creator_id', creator.id)
     .order('created_at', { ascending: false });
 
   // Fetch sales count for each product
-  const { data: salesData } = await db
+  const { data: salesData } = await supabase
     .from('marketplace_sales')
     .select('product_id')
     .eq('creator_id', creator.id);

@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import StaffApplicationForm from './StaffApplicationForm';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -18,21 +17,10 @@ export const metadata: Metadata = {
 
 export default async function StaffApplicationPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-slate-900 mb-4">Service Unavailable</h1>
-          <p className="text-slate-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   
   // Fetch application settings
-  const { data: settings } = await db
+  const { data: settings } = await supabase
     .from('site_settings')
     .select('*')
     .eq('key', 'staff_applications')

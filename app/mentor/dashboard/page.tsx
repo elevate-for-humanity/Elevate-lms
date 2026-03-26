@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { Users, Calendar, MessageSquare, Award, ChevronRight } from 'lucide-react';
@@ -17,7 +16,6 @@ export default async function MentorDashboardPage() {
   const { user } = await requireRole(['mentor', 'admin', 'super_admin']);
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   let menteeCount = 0;
   let sessionCount = 0;
@@ -25,7 +23,7 @@ export default async function MentorDashboardPage() {
   let recentMentees: any[] = [];
 
   // Get mentor's mentees
-  const { data: mentorships, count } = await db
+  const { data: mentorships, count } = await supabase
     .from('mentorships')
     .select(`
       id,
@@ -49,7 +47,7 @@ export default async function MentorDashboardPage() {
   }
 
   // Get upcoming sessions
-  const { data: sessions } = await db
+  const { data: sessions } = await supabase
     .from('mentor_sessions')
     .select(`
       id,
@@ -83,7 +81,7 @@ export default async function MentorDashboardPage() {
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
   
-  const { count: monthSessions } = await db
+  const { count: monthSessions } = await supabase
     .from('mentor_sessions')
     .select('*', { count: 'exact', head: true })
     .eq('mentor_id', user.id)

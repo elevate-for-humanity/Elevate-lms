@@ -1,4 +1,3 @@
-export const revalidate = 600;
 import { createAdminClient } from '@/lib/supabase/admin';
 
 import Image from 'next/image';
@@ -7,6 +6,8 @@ import { Metadata } from 'next';
 import { Building2, Briefcase, GraduationCap, Handshake, Award } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createPublicClient } from '@/lib/supabase/server';
+
+export const revalidate = 600;
 
 export const metadata: Metadata = {
   title: 'Our Partners | Elevate for Humanity',

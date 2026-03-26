@@ -18,7 +18,7 @@ export default async function ProgramHolderDashboardPage() {
 
   // Fetch programs this holder can access via program_holder_programs
   const { data: programsData } = programIds.length > 0
-    ? await db
+    ? await supabase
         .from('programs')
         .select('id, name, title, is_active, enrolled_count, completion_rate, created_at')
         .in('id', programIds)

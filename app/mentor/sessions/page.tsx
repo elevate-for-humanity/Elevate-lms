@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Calendar, Clock, Video, MapPin, Plus } from 'lucide-react';
@@ -14,7 +13,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function MentorSessionsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) redirect('/login');
 
@@ -25,7 +23,7 @@ export default async function MentorSessionsPage() {
   let pastSessions: any[] = [];
 
   // Get upcoming sessions
-  const { data: upcoming } = await db
+  const { data: upcoming } = await supabase
     .from('mentor_sessions')
     .select(`
       id,
@@ -55,7 +53,7 @@ export default async function MentorSessionsPage() {
   }
 
   // Get past sessions
-  const { data: past } = await db
+  const { data: past } = await supabase
     .from('mentor_sessions')
     .select(`
       id,

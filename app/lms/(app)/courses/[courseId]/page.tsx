@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -13,18 +12,20 @@ import {
 } from 'lucide-react';
 import { CourseModuleAccordion } from '@/components/lms/CourseModuleAccordion';
 
+export const dynamic = 'force-dynamic';
+
 type Params = Promise<{ courseId: string }>;
 
 async function resolveCourse(courseId: string) {
   const db = createAdminClient();
-  const { data: course } = await db
+  const { data: course } = await supabase
     .from('courses')
     .select('id, title, description, short_description, status, is_active, program_id, slug')
     .eq('id', courseId)
     .maybeSingle();
   if (course) return { ...course, _lessonCourseId: course.id };
 
-  const { data: tc } = await db
+  const { data: tc } = await supabase
     .from('training_courses')
     .select('id, title, description, is_active, slug')
     .eq('id', courseId)
@@ -32,7 +33,7 @@ async function resolveCourse(courseId: string) {
   if (!tc) return null;
 
   let lessonCourseId = tc.id;
-  const { data: canonicalCourse } = await db
+  const { data: canonicalCourse } = await supabase
     .from('courses').select('id').eq('slug', tc.slug).maybeSingle();
   if (canonicalCourse?.id) lessonCourseId = canonicalCourse.id;
 
@@ -64,7 +65,7 @@ export default async function CoursePage({ params }: { params: Params }) {
   if (!course) notFound();
 
   const { data: program } = course.program_id
-    ? await db.from('programs')
+    ? await supabase.from('programs')
         .select('image_url, hero_image_url, credential_name, credential_type, credential')
         .eq('id', course.program_id).single()
     : { data: null };
@@ -72,7 +73,7 @@ export default async function CoursePage({ params }: { params: Params }) {
   const heroImage = program?.hero_image_url || program?.image_url || '/images/pages/hvac-unit.jpg';
   const credentialName = program?.credential_name || program?.credential || null;
 
-  const { data: enrollment } = await db
+  const { data: enrollment } = await supabase
     .from('program_enrollments')
     .select('status, enrollment_state, enrolled_at, revoked_at')
     .eq('user_id', user.id).eq('course_id', courseId).maybeSingle();
@@ -84,35 +85,18 @@ export default async function CoursePage({ params }: { params: Params }) {
   const isPendingApproval = enrollment?.status === 'pending_approval';
   const lessonCourseId = (course as any)._lessonCourseId || courseId;
 
-  const { data: modulesRaw } = await db
+  const { data: modulesRaw } = await supabase
     .from('course_modules').select('id, title, order_index')
     .eq('course_id', lessonCourseId).order('order_index', { ascending: true });
 
-  let { data: lessonsRaw } = await db
+  const { data: lessonsRaw } = await supabase
     .from('lms_lessons')
     .select('id, title, description, duration_minutes, order_index, content_type, step_type, module_id, activities, slug')
     .eq('course_id', lessonCourseId).order('order_index', { ascending: true });
 
-  // Fallback: if lms_lessons returns nothing (view filters unpublished),
-  // read directly from course_lessons so the page still renders.
-  if (!lessonsRaw || lessonsRaw.length === 0) {
-    const { data: clFallback } = await db
-      .from('course_lessons')
-      .select('id, title, order_index, lesson_type, module_id, activities, slug')
-      .eq('course_id', lessonCourseId)
-      .order('order_index', { ascending: true });
-    lessonsRaw = (clFallback || []).map((r: any) => ({
-      ...r,
-      step_type: r.lesson_type,
-      content_type: r.lesson_type,
-      description: null,
-      duration_minutes: null,
-    }));
-  }
-
   const allLessons = (lessonsRaw || []) as any[];
 
-  const { data: lessonProgress } = await db
+  const { data: lessonProgress } = await supabase
     .from('lesson_progress').select('lesson_id, completed, completed_at')
     .eq('user_id', user.id)
     .in('lesson_id', allLessons.map((l) => l.id));

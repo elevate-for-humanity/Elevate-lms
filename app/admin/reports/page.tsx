@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { BarChart3, Users, GraduationCap, DollarSign, TrendingUp, FileText, Eye } from 'lucide-react';
 
@@ -14,7 +13,6 @@ export const metadata: Metadata = {
 
 export default async function ReportsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch data for reports
   const [
@@ -23,19 +21,19 @@ export default async function ReportsPage() {
     { count: totalLeads },
     { count: totalEnrollments },
   ] = await Promise.all([
-    db.from('profiles').select('*', { count: 'exact', head: true }),
-    db.from('courses').select('*', { count: 'exact', head: true }),
-    db.from('leads').select('*', { count: 'exact', head: true }),
-    db.from('program_enrollments').select('*', { count: 'exact', head: true }),
+    supabase.from('profiles').select('*', { count: 'exact', head: true }),
+    supabase.from('courses').select('*', { count: 'exact', head: true }),
+    supabase.from('leads').select('*', { count: 'exact', head: true }),
+    supabase.from('program_enrollments').select('*', { count: 'exact', head: true }),
   ]);
 
   // Get recent activity
-  const { data: recentLeads } = await db
+  const { data: recentLeads } = await supabase
     .from('leads')
     .select('created_at')
     .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
 
-  const { data: recentEnrollments } = await db
+  const { data: recentEnrollments } = await supabase
     .from('program_enrollments')
     .select('created_at')
     .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());

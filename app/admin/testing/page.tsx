@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import TestingAdminClient from './TestingAdminClient';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Testing Center Admin | Elevate For Humanity',
@@ -19,10 +20,10 @@ export default async function TestingAdminPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!['admin', 'super_admin'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
-  const { data: bookings } = await db
+  const { data: bookings } = await supabase
     .from('exam_bookings')
     .select('*')
     .order('preferred_date', { ascending: true });

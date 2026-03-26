@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Users, AlertTriangle, TrendingDown, CheckCircle, User, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -15,19 +15,11 @@ export const metadata: Metadata = {
 
 export default async function RetentionPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
-
-  if (!supabase) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div>
-    </div>
-  );
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/admin/retention');
 
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   const now = new Date();
@@ -41,15 +33,15 @@ export default async function RetentionPage() {
     { data: lessonActivity },
     { data: statusBreakdown },
   ] = await Promise.all([
-    db.from('program_enrollments').select('id, status, enrolled_at, progress, user_id').limit(2000),
-    db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student').eq('enrollment_status', 'at_risk'),
-    db.from('program_enrollments')
+    supabase.from('program_enrollments').select('id, status, enrolled_at, progress, user_id').limit(2000),
+    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student').eq('enrollment_status', 'at_risk'),
+    supabase.from('program_enrollments')
       .select('id, status, enrolled_at, profiles(full_name, email)')
       .eq('status', 'dropped')
       .order('enrolled_at', { ascending: false })
       .limit(10),
-    db.from('lesson_progress').select('user_id, completed_at').gte('completed_at', thirtyDaysAgo).limit(1000),
-    db.from('profiles').select('enrollment_status').eq('role', 'student').limit(2000),
+    supabase.from('lesson_progress').select('user_id, completed_at').gte('completed_at', thirtyDaysAgo).limit(1000),
+    supabase.from('profiles').select('enrollment_status').eq('role', 'student').limit(2000),
   ]);
 
   // 30-day retention: enrolled in last 30 days still active

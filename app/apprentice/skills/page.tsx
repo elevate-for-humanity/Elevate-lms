@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Circle, Target, TrendingUp } from 'lucide-react';
@@ -15,7 +14,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function ApprenticeSkillsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) { redirect("/login"); }
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -24,21 +22,21 @@ export default async function ApprenticeSkillsPage() {
   }
 
   // Get apprentice profile
-  const { data: apprentice } = await db
+  const { data: apprentice } = await supabase
     .from('apprentices')
     .select('*, program:program_id(name)')
     .eq('user_id', user.id)
     .single();
 
   // Get skill categories (flat — apprentice_skills join omitted until migration runs)
-  const { data: rawCategories } = await db
+  const { data: rawCategories } = await supabase
     .from('skill_categories')
     .select('*')
     .eq('program_id', apprentice?.program_id)
     .order('order', { ascending: true });
 
   // Get skills separately (table may not exist yet; errors are non-fatal)
-  const { data: rawSkills } = await db
+  const { data: rawSkills } = await supabase
     .from('apprentice_skills')
     .select('*, progress:apprentice_skill_progress(*)')
     .eq('program_id', apprentice?.program_id);
@@ -50,7 +48,7 @@ export default async function ApprenticeSkillsPage() {
   }));
 
   // Get overall progress
-  const { data: progressSummary } = await db
+  const { data: progressSummary } = await supabase
     .from('apprentice_skill_progress')
     .select('*')
     .eq('apprentice_id', apprentice?.id);

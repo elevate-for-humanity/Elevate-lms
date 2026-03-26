@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -40,18 +39,7 @@ export const dynamic = 'force-dynamic';
  */
 export default async function WorkforceBoardDashboard() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   // Require authentication
   const { data: { user } } = await supabase.auth.getUser();
@@ -60,7 +48,7 @@ export default async function WorkforceBoardDashboard() {
   }
 
   // Get profile and verify role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('id, role, full_name, email')
     .eq('id', user.id)
@@ -80,11 +68,11 @@ export default async function WorkforceBoardDashboard() {
     programsResult,
     providersResult,
   ] = await Promise.all([
-    db.from('program_enrollments').select('*', { count: 'exact', head: true }),
-    db.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
-    db.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-    db.from('programs').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-    db.from('partner_lms_providers').select('*', { count: 'exact', head: true }),
+    supabase.from('program_enrollments').select('*', { count: 'exact', head: true }),
+    supabase.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
+    supabase.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+    supabase.from('programs').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+    supabase.from('partner_lms_providers').select('*', { count: 'exact', head: true }),
   ]);
 
   const totalEnrollments = enrollmentsResult.count || 0;
@@ -95,14 +83,14 @@ export default async function WorkforceBoardDashboard() {
   const completionRate = totalEnrollments > 0 ? Math.round((completedEnrollments / totalEnrollments) * 100) : 0;
 
   // Get recent enrollments
-  const { data: recentEnrollments } = await db
+  const { data: recentEnrollments } = await supabase
     .from('program_enrollments')
     .select('id, status, created_at, profiles (full_name), programs (name, title)')
     .order('created_at', { ascending: false })
     .limit(5);
 
   // Get at-risk participants
-  const { data: atRiskParticipants, count: atRiskCount } = await db
+  const { data: atRiskParticipants, count: atRiskCount } = await supabase
     .from('program_enrollments')
     .select('*, profiles (full_name, email)', { count: 'exact' })
     .eq('at_risk', true)
@@ -110,7 +98,7 @@ export default async function WorkforceBoardDashboard() {
     .limit(5);
 
   // Derive WIOA indicators from real data
-  const { data: certificatesIssued } = await db
+  const { data: certificatesIssued } = await supabase
     .from('certificates')
     .select('id', { count: 'exact', head: true });
   const credentialCount = certificatesIssued?.length ?? 0;
@@ -119,7 +107,7 @@ export default async function WorkforceBoardDashboard() {
     ? Math.min(100, Math.round((credentialCount / completedEnrollments) * 100))
     : 0;
   // Measurable skill gains: active enrollments with progress > 0
-  const { count: skillGainCount } = await db
+  const { count: skillGainCount } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active')

@@ -20,7 +20,7 @@ export default async function CaseManagerParticipantsPage() {
   const db       = admin || supabase;
 
   // Resolve assigned application IDs for this case manager
-  const { data: assignments } = await db
+  const { data: assignments } = await supabase
     .from('case_manager_assignments')
     .select('application_id')
     .eq('case_manager_id', user.id);
@@ -30,7 +30,7 @@ export default async function CaseManagerParticipantsPage() {
   // Fetch applications (which carry contact info)
   let applications: any[] = [];
   if (applicationIds.length > 0) {
-    const { data } = await db
+    const { data } = await supabase
       .from('applications')
       .select('id, first_name, last_name, email, phone, program_interest, status, created_at')
       .in('id', applicationIds)
@@ -45,7 +45,7 @@ export default async function CaseManagerParticipantsPage() {
   const enrollmentCountByEmail: Record<string, number> = {};
 
   if (emails.length > 0) {
-    const { data: profiles } = await db
+    const { data: profiles } = await supabase
       .from('profiles')
       .select('id, email, full_name, city, state')
       .in('email', emails);
@@ -57,7 +57,7 @@ export default async function CaseManagerParticipantsPage() {
     // Enrollment counts per user
     const userIds = Object.values(profilesByEmail).map((p: any) => p.id);
     if (userIds.length > 0) {
-      const { data: enrollments } = await db
+      const { data: enrollments } = await supabase
         .from('program_enrollments')
         .select('user_id, status')
         .in('user_id', userIds);

@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { BookOpen, Users, ArrowRight } from 'lucide-react';
@@ -14,24 +13,14 @@ export const metadata: Metadata = {
 
 export default async function AdminGradebookIndexPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-
-      
-        <h1 className="text-2xl font-bold text-gray-900">Service Unavailable</h1>
-      </div>
-    );
-  }
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -41,7 +30,7 @@ export default async function AdminGradebookIndexPage() {
     redirect('/unauthorized');
   }
 
-  const { data: courses } = await db
+  const { data: courses } = await supabase
     .from('training_courses')
     .select('id, title, enrollment_count, status')
     .order('title');

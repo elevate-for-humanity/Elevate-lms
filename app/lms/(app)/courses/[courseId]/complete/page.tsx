@@ -4,7 +4,6 @@
  * Kept for backward compatibility with any existing links.
  */
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { generateInternalMetadata } from '@/lib/seo/metadata';
 
 export const metadata: Metadata = generateInternalMetadata({
@@ -15,8 +14,9 @@ export const metadata: Metadata = generateInternalMetadata({
 
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
 
 
 interface Params {
@@ -26,25 +26,14 @@ interface Params {
 export default async function CompleteCourse({ params }: { params: Params }) {
   const { courseId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: course } = await db
+  const { data: course } = await supabase
     .from('courses')
     .select('id, title, description')
     .eq('id', courseId)
@@ -53,7 +42,7 @@ export default async function CompleteCourse({ params }: { params: Params }) {
   if (!course) redirect('/lms/courses');
 
   // Check current progress
-  const { data: progress } = await db
+  const { data: progress } = await supabase
     .from('lms_progress')
     .select('status, completed_at')
     .eq('user_id', user.id)

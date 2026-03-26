@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Award, Plus, Users, Search, Shield, Download } from 'lucide-react';
 import { revokeCertificate } from './actions';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -24,20 +25,20 @@ export default async function CertificatesPage({
   if (!supabase) redirect('/login');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   // Fetch certificates from both tables
   let certificates: any[] = [];
   const searchTerm = params.search || '';
 
-  const { data: issuedCerts } = await db
+  const { data: issuedCerts } = await supabase
     .from('issued_certificates')
     .select('id, certificate_number, recipient_name, recipient_email, issue_date, status, signed_by, created_at')
     .order('created_at', { ascending: false })
     .limit(50);
 
-  const { data: legacyCerts } = await db
+  const { data: legacyCerts } = await supabase
     .from('certificates')
     .select('id, certificate_number, student_name, student_email, issued_date, status, signed_by, created_at')
     .order('created_at', { ascending: false })

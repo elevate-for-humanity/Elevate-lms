@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import { redirect } from 'next/navigation';
 import VerificationReviewForm from './VerificationReviewForm';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Review Program Holder | Admin',
@@ -18,21 +18,10 @@ export default async function ReviewVerificationPage({
 }) {
   const { user, profile } = await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   // Get program holder
-  const { data: holder } = await db
+  const { data: holder } = await supabase
     .from('program_holders')
     .select(
       `
@@ -54,21 +43,21 @@ export default async function ReviewVerificationPage({
   }
 
   // Get documents
-  const { data: documents } = await db
+  const { data: documents } = await supabase
     .from('program_holder_documents')
     .select('*')
     .eq('program_holder_id', holder.user_id)
     .order('uploaded_at', { ascending: false });
 
   // Get banking
-  const { data: banking } = await db
+  const { data: banking } = await supabase
     .from('program_holder_banking')
     .select('*')
     .eq('program_holder_id', holder.user_id)
     .single();
 
   // Get verification history
-  const { data: verificationHistory } = await db
+  const { data: verificationHistory } = await supabase
     .from('program_holder_verification')
     .select(
       `

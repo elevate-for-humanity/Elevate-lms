@@ -15,21 +15,10 @@ export const metadata: Metadata = {
 
 export default async function RefundPolicyPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   
   // Fetch refund policy
-  const { data: policy } = await db
+  const { data: policy } = await supabase
     .from('legal_documents')
     .select('*')
     .eq('type', 'refund_policy')

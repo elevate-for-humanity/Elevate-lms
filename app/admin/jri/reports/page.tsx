@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, Download, ArrowLeft, CheckCircle, Briefcase, Users } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -14,13 +14,11 @@ export const metadata: Metadata = {
 
 export default async function JRIReportsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/admin/jri/reports');
 
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   const [
@@ -30,11 +28,11 @@ export default async function JRIReportsPage() {
     { count: employed },
     { data: participants },
   ] = await Promise.all([
-    db.from('jri_participants').select('id', { count: 'exact', head: true }),
-    db.from('jri_participants').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-    db.from('jri_participants').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
-    db.from('jri_participants').select('id', { count: 'exact', head: true }).eq('employment_status', 'employed'),
-    db.from('jri_participants').select('id, status, program, enrolled_at, employment_status, profiles(full_name, email)').limit(500),
+    supabase.from('jri_participants').select('id', { count: 'exact', head: true }),
+    supabase.from('jri_participants').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    supabase.from('jri_participants').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
+    supabase.from('jri_participants').select('id', { count: 'exact', head: true }).eq('employment_status', 'employed'),
+    supabase.from('jri_participants').select('id, status, program, enrolled_at, employment_status, profiles(full_name, email)').limit(500),
   ]);
 
   const placementRate = (total || 0) > 0 ? Math.round(((employed || 0) / (total || 1)) * 100) : 0;

@@ -3,7 +3,6 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Clock, XCircle, AlertCircle, TrendingUp, Briefcase, CheckCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { getUnverifiedHours, type OJTHoursLog } from '@/lib/blended-learning/ojt-tracking';
@@ -17,7 +16,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function PartnerHoursPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -25,7 +23,7 @@ export default async function PartnerHoursPage() {
   }
 
   // Get partner info
-  const { data: partnerUser } = await db
+  const { data: partnerUser } = await supabase
     .from('partner_users')
     .select('partner_id, role')
     .eq('user_id', user.id)
@@ -36,18 +34,18 @@ export default async function PartnerHoursPage() {
   }
 
   // Get hours statistics from consolidated hour_entries
-  const { data: pendingHours, count: pendingCount } = await db
+  const { data: pendingHours, count: pendingCount } = await supabase
     .from('hour_entries')
     .select('*', { count: 'exact' })
     .eq('status', 'pending')
     .order('created_at', { ascending: false });
 
-  const { count: approvedCount } = await db
+  const { count: approvedCount } = await supabase
     .from('hour_entries')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'approved');
 
-  const { count: rejectedCount } = await db
+  const { count: rejectedCount } = await supabase
     .from('hour_entries')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'rejected');
@@ -57,7 +55,7 @@ export default async function PartnerHoursPage() {
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
 
-  const { data: monthlyHours } = await db
+  const { data: monthlyHours } = await supabase
     .from('hour_entries')
     .select('hours_claimed')
     .eq('status', 'approved')
@@ -69,7 +67,7 @@ export default async function PartnerHoursPage() {
   let ojtPlacements: any[] = [];
   let unverifiedOJT: OJTHoursLog[] = [];
   try {
-    const { data: placements } = await db
+    const { data: placements } = await supabase
       .from('ojt_placements')
       .select('id, student_id, employer_name, position_title, status, total_hours_required, total_hours_completed')
       .eq('status', 'active')

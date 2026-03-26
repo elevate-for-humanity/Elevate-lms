@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight, Users, GraduationCap, Clock, Download, TrendingUp, Calendar } from 'lucide-react';
@@ -16,14 +15,13 @@ export const dynamic = 'force-dynamic';
 
 export default async function StaffReportsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login?redirect=/staff-portal/reports');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role, full_name')
     .eq('id', user.id)
@@ -39,37 +37,37 @@ export default async function StaffReportsPage() {
   const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
   // Student counts
-  const { count: totalStudents } = await db
+  const { count: totalStudents } = await supabase
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('role', 'student');
 
-  const { count: newStudentsThisWeek } = await db
+  const { count: newStudentsThisWeek } = await supabase
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('role', 'student')
     .gte('created_at', weekAgo);
 
   // Enrollment stats
-  const { count: activeEnrollments } = await db
+  const { count: activeEnrollments } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
 
-  const { count: completedThisMonth } = await db
+  const { count: completedThisMonth } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed')
     .gte('completed_at', monthAgo);
 
   // Attendance today
-  const { count: attendanceToday } = await db
+  const { count: attendanceToday } = await supabase
     .from('attendance')
     .select('*', { count: 'exact', head: true })
     .eq('date', today);
 
   // Recent enrollments for the table
-  const { data: recentEnrollments } = await db
+  const { data: recentEnrollments } = await supabase
     .from('program_enrollments')
     .select(`
       id,

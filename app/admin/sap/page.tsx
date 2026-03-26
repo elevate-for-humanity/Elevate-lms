@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
+
+export const dynamic = 'force-dynamic';
   TrendingUp,
   TrendingDown,
   AlertTriangle,
@@ -24,20 +24,7 @@ export const metadata: Metadata = {
 
 export default async function SAPMonitoringPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-
-      
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -47,7 +34,7 @@ export default async function SAPMonitoringPage() {
   }
 
   // Check admin role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -58,7 +45,7 @@ export default async function SAPMonitoringPage() {
   }
 
   // Get all active enrollments with student and program data
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('program_enrollments')
     .select(
       `
@@ -74,7 +61,7 @@ export default async function SAPMonitoringPage() {
   const studentsWithSAP = await Promise.all(
     (enrollments || []).map(async (enrollment) => {
       // Get grades
-      const { data: grades } = await db
+      const { data: grades } = await supabase
         .from('grades')
         .select('percentage')
         .eq('enrollment_id', enrollment.id);
@@ -98,7 +85,7 @@ export default async function SAPMonitoringPage() {
                 : 0.0;
 
       // Get attendance
-      const { data: attendance } = await db
+      const { data: attendance } = await supabase
         .from('attendance_records')
         .select('status')
         .eq('enrollment_id', enrollment.id);

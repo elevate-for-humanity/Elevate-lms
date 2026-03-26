@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Building2, Mail, ExternalLink, ArrowLeft, Users } from 'lucide-react';
@@ -15,12 +14,11 @@ export const metadata: Metadata = {
 
 export default async function CoursePartnersPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) {
     return <div className="p-8 text-center text-gray-600">Database unavailable.</div>;
   }
 
-  const { data: partners, count } = await db
+  const { data: partners, count } = await supabase
     .from('profiles')
     .select('id, full_name, email, organization_id, created_at, is_active', { count: 'exact' })
     .eq('role', 'partner')

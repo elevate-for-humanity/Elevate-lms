@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -19,7 +18,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function ExportAttendancePage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) {
     redirect('/login');
@@ -32,7 +30,7 @@ export default async function ExportAttendancePage() {
   }
 
   // Fetch cohorts for filter
-  const { data: cohorts } = await db
+  const { data: cohorts } = await supabase
     .from('cohorts')
     .select('id, name')
     .order('name');
@@ -40,7 +38,7 @@ export default async function ExportAttendancePage() {
   const cohortList = cohorts || [];
 
   // Get summary stats
-  const { count: totalRecords } = await db
+  const { count: totalRecords } = await supabase
     .from('attendance_hours')
     .select('*', { count: 'exact', head: true });
 

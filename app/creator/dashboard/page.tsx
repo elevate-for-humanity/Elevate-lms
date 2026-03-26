@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Palette, BookOpen, Users, TrendingUp, Plus, Eye, Edit, BarChart3 } from 'lucide-react';
@@ -15,7 +14,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function CreatorDashboardPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     redirect('/login?redirect=/creator/dashboard');
@@ -25,7 +23,7 @@ export default async function CreatorDashboardPage() {
   if (!user) redirect('/login?redirect=/creator/dashboard');
 
   // Role guard — creator, admin, super_admin only
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -36,7 +34,7 @@ export default async function CreatorDashboardPage() {
   }
 
   // Fetch courses created by this user
-  const { data: coursesData } = await db
+  const { data: coursesData } = await supabase
     .from('training_courses')
     .select('id, course_name, is_active, enrolled_count, created_at')
     .eq('created_by', user.id)

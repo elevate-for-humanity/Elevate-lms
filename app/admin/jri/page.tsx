@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Users, CheckCircle, Briefcase, FileText, User, ArrowRight, Shield } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -15,19 +15,11 @@ export const metadata: Metadata = {
 
 export default async function JRIPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
-
-  if (!supabase) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div>
-    </div>
-  );
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/admin/jri');
 
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   const [
@@ -38,12 +30,12 @@ export default async function JRIPage() {
     { data: recentParticipants },
     { data: programBreakdown },
   ] = await Promise.all([
-    db.from('jri_participants').select('id', { count: 'exact', head: true }),
-    db.from('jri_participants').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-    db.from('jri_participants').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
-    db.from('jri_participants').select('id', { count: 'exact', head: true }).eq('employment_status', 'employed'),
-    db.from('jri_participants').select('id, status, program, enrolled_at, employment_status, profiles(full_name, email)').order('enrolled_at', { ascending: false }).limit(12),
-    db.from('jri_participants').select('program, status').limit(500),
+    supabase.from('jri_participants').select('id', { count: 'exact', head: true }),
+    supabase.from('jri_participants').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    supabase.from('jri_participants').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
+    supabase.from('jri_participants').select('id', { count: 'exact', head: true }).eq('employment_status', 'employed'),
+    supabase.from('jri_participants').select('id, status, program, enrolled_at, employment_status, profiles(full_name, email)').order('enrolled_at', { ascending: false }).limit(12),
+    supabase.from('jri_participants').select('program, status').limit(500),
   ]);
 
   const byProgram: Record<string, number> = {};

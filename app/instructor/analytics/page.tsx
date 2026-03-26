@@ -1,11 +1,11 @@
 import Image from 'next/image';
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { StudentEngagementChart, CoursePerformanceChart } from './InstructorCharts';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/instructor/analytics' },
@@ -15,22 +15,20 @@ export const metadata: Metadata = {
 
 export default async function InstructorAnalyticsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
   // Get courses assigned to this instructor
-  const { data: myCourses } = await db.from('training_courses').select('id').eq('instructor_id', user.id);
+  const { data: myCourses } = await supabase.from('training_courses').select('id').eq('instructor_id', user.id);
   const courseIds = (myCourses || []).map((c: any) => c.id);
   const totalCourses = courseIds.length;
 
   // Get enrollment counts for those courses
   const { count: totalStudents } = courseIds.length > 0
-    ? await db.from('training_enrollments').select('*', { count: 'exact', head: true }).in('course_id', courseIds)
+    ? await supabase.from('training_enrollments').select('*', { count: 'exact', head: true }).in('course_id', courseIds)
     : { count: 0 };
   const { count: completedEnrollments } = courseIds.length > 0
-    ? await db.from('training_enrollments').select('*', { count: 'exact', head: true }).in('course_id', courseIds).eq('status', 'completed')
+    ? await supabase.from('training_enrollments').select('*', { count: 'exact', head: true }).in('course_id', courseIds).eq('status', 'completed')
     : { count: 0 };
   const completionRate = (totalStudents && totalStudents > 0) ? Math.round(((completedEnrollments || 0) / totalStudents) * 100) : 0;
 

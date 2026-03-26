@@ -87,7 +87,7 @@ export default async function DrugTestingLandingPage() {
   let program: any = null;
   try {
     const db = createAdminClient();
-    const { data } = await db
+    const { data } = await supabase
       .from('programs')
       .select('id, name, description, full_description, training_hours, tuition, credential_name, career_outcomes, what_you_learn, salary_min, salary_max, industry_demand, wioa_approved')
       .eq('slug', 'drug-alcohol-specimen-collector')

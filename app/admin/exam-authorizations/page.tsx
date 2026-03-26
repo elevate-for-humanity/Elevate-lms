@@ -19,7 +19,7 @@ export default async function ExamAuthorizationsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/admin/exam-authorizations');
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -30,7 +30,7 @@ export default async function ExamAuthorizationsPage() {
   }
 
   // Work queue — active + recently terminal authorizations
-  const { data: queue } = await db
+  const { data: queue } = await supabase
     .from('exam_authorization_queue')
     .select('*');
 

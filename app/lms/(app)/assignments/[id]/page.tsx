@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -24,11 +23,10 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) return { title: 'Assignment | Elevate LMS' };
   
-  const { data: assignment } = await db
+  const { data: assignment } = await supabase
     .from('assignments')
     .select('title')
     .eq('id', id)
@@ -42,23 +40,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function AssignmentDetailPage({ params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-        </div>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/lms/assignments/' + id);
 
   // Fetch assignment
-  const { data: assignment, error } = await db
+  const { data: assignment, error } = await supabase
     .from('assignments')
     .select(`
       *,
@@ -70,7 +58,7 @@ export default async function AssignmentDetailPage({ params }: Props) {
   if (error || !assignment) notFound();
 
   // Fetch user's submission
-  const { data: submission } = await db
+  const { data: submission } = await supabase
     .from('assignment_submissions')
     .select('*')
     .eq('assignment_id', id)

@@ -1,13 +1,13 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import CanonicalVideo from '@/components/video/CanonicalVideo';
 import { BookOpen, CheckCircle2, ArrowLeft, Shield, Clock, Users, AlertTriangle } from 'lucide-react';
 import OrientationAvatar from './OrientationAvatar';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Orientation | Elevate for Humanity',
@@ -19,7 +19,6 @@ async function completeOrientation() {
   const { createClient } = await import('@/lib/supabase/server');
   const { logger } = await import('@/lib/logger');
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) throw new Error('Database unavailable');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
@@ -28,12 +27,12 @@ async function completeOrientation() {
 
   await Promise.all([
     // Mark profile flag (read by onboarding page completion check)
-    db.from('profiles').update({
+    supabase.from('profiles').update({
       orientation_completed: true,
       orientation_completed_at: now,
     }).eq('id', user.id),
     // Write to orientation_completions table (also read by onboarding page)
-    db.from('orientation_completions').upsert({
+    supabase.from('orientation_completions').upsert({
       user_id: user.id,
       completed_at: now,
       orientation_type: 'learner',
@@ -42,7 +41,7 @@ async function completeOrientation() {
 
   // Send "you're ready to start" email — non-blocking
   try {
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('email, first_name, full_name')
       .eq('id', user.id)
@@ -94,7 +93,6 @@ async function completeOrientation() {
 
 export default async function OrientationPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) redirect('/login');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');

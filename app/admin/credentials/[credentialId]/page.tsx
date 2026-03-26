@@ -12,7 +12,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { credentialId } = await params;
   const db = createAdminClient();
-  const { data } = await db.from('credential_registry').select('name').eq('id', credentialId).single();
+  const { data } = await supabase.from('credential_registry').select('name').eq('id', credentialId).single();
   return { title: data ? `${data.name} | Credential Registry` : 'Edit Credential | Admin' };
 }
 
@@ -27,10 +27,10 @@ export default async function EditCredentialPage({
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin','super_admin','org_admin','staff'].includes(profile.role)) redirect('/unauthorized');
 
-  const { data: credential } = await db
+  const { data: credential } = await supabase
     .from('credential_registry')
     .select('*')
     .eq('id', credentialId)
@@ -39,14 +39,14 @@ export default async function EditCredentialPage({
   if (!credential) notFound();
 
   // Load linked training courses
-  const { data: linkedCourses } = await db
+  const { data: linkedCourses } = await supabase
     .from('training_courses')
     .select('id, title, course_name, status')
     .eq('credential_id', credentialId)
     .order('title');
 
   // Load programs using this credential
-  const { data: programLinks } = await db
+  const { data: programLinks } = await supabase
     .from('program_credentials')
     .select('id, is_required, program_id')
     .eq('credential_id', credentialId);

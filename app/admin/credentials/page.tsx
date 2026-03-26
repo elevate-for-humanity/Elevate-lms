@@ -31,12 +31,12 @@ export default async function CredentialRegistryPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin','super_admin','org_admin','staff'].includes(profile.role)) {
     redirect('/unauthorized');
   }
 
-  const { data: rawCredentials } = await db
+  const { data: rawCredentials } = await supabase
     .from('credential_registry')
     .select('*')
     .order('credential_stack')

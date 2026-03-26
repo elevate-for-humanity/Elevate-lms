@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import {
   Building2, BookOpen, Users, BarChart3, FileText, Settings,
   ShieldCheck, ClipboardCheck, Eye, Scale, GraduationCap,
@@ -32,14 +31,12 @@ const features = [
 
 export default async function ProgramHolderLanding() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
   const { data: { user } } = await supabase.auth.getUser();
 
   let isProgramHolder = false;
   if (user) {
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)

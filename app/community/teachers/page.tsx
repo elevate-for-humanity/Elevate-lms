@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { GraduationCap, Users, FileText, Video, Download } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -17,21 +16,10 @@ export const dynamic = 'force-dynamic';
 
 export default async function TeachersPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   // Get teacher resources
-  const { data: resources } = await db
+  const { data: resources } = await supabase
     .from('resources')
     .select('*')
     .eq('category', 'teachers')
@@ -39,7 +27,7 @@ export default async function TeachersPage() {
     .order('order', { ascending: true });
 
   // Get training videos
-  const { data: videos } = await db
+  const { data: videos } = await supabase
     .from('training_videos')
     .select('*')
     .eq('audience', 'teachers')
@@ -47,7 +35,7 @@ export default async function TeachersPage() {
     .limit(4);
 
   // Get teacher community discussions
-  const { data: discussions } = await db
+  const { data: discussions } = await supabase
     .from('discussions')
     .select('id, title, created_at, reply_count')
     .eq('category', 'teachers')

@@ -20,7 +20,7 @@ export default async function WIOAReportPage() {
   const db       = admin || supabase;
 
   // Get assigned application IDs
-  const { data: assignments } = await db
+  const { data: assignments } = await supabase
     .from('case_manager_assignments')
     .select('application_id')
     .eq('case_manager_id', user.id);
@@ -30,7 +30,7 @@ export default async function WIOAReportPage() {
   // Get emails from applications
   let participantEmails: string[] = [];
   if (applicationIds.length > 0) {
-    const { data: apps } = await db
+    const { data: apps } = await supabase
       .from('applications')
       .select('email')
       .in('id', applicationIds);
@@ -40,7 +40,7 @@ export default async function WIOAReportPage() {
   // Get user IDs from profiles
   let participantUserIds: string[] = [];
   if (participantEmails.length > 0) {
-    const { data: profiles } = await db
+    const { data: profiles } = await supabase
       .from('profiles')
       .select('id')
       .in('email', participantEmails);
@@ -50,7 +50,7 @@ export default async function WIOAReportPage() {
   // Fetch WIOA participants for these users
   let wioaRows: any[] = [];
   if (participantUserIds.length > 0) {
-    const { data } = await db
+    const { data } = await supabase
       .from('wioa_participants')
       .select(`
         id, user_id, first_name, last_name, email,
@@ -70,7 +70,7 @@ export default async function WIOAReportPage() {
   const outcomesByParticipant: Record<string, any> = {};
 
   if (wioaIds.length > 0) {
-    const { data: outcomes } = await db
+    const { data: outcomes } = await supabase
       .from('wioa_participant_records')
       .select(`
         participant_id,
@@ -93,7 +93,7 @@ export default async function WIOAReportPage() {
   // Fetch verified placements for these users
   const placementsByUser: Record<string, any> = {};
   if (participantUserIds.length > 0) {
-    const { data: placements } = await db
+    const { data: placements } = await supabase
       .from('placement_records')
       .select('learner_id, employer_name, job_title, hourly_wage, start_date, status')
       .in('learner_id', participantUserIds)

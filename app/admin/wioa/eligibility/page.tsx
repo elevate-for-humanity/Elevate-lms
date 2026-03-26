@@ -3,7 +3,6 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { XCircle, Clock, Search, ArrowLeft, User, FileCheck, Plus } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,10 +14,9 @@ export const metadata: Metadata = {
 
 export default async function WIOAEligibilityPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch WIOA applications
-  const { data: applications } = await db
+  const { data: applications } = await supabase
     .from('wioa_applications')
     .select('*, profiles(first_name, last_name, email)')
     .order('created_at', { ascending: false })

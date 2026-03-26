@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
@@ -16,15 +15,13 @@ export const dynamic = 'force-dynamic';
 
 export default async function VerifyIdentityPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
   if (!supabase) redirect('/login');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/onboarding/learner/verify-identity');
 
   // Check identity via documents table (id_verifications has no user_id column)
-  const { data: idDoc } = await db
+  const { data: idDoc } = await supabase
     .from('documents')
     .select('id, status, created_at')
     .eq('user_id', user.id)

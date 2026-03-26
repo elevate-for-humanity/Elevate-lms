@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { LmsHeroBanner } from '@/components/lms/LmsHeroBanner';
@@ -16,21 +15,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function QuizzesPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Quizzes" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -42,7 +27,7 @@ export default async function QuizzesPage() {
   const stats = { available: 0, completed: 0, passed: 0, avgScore: 0 };
 
   try {
-    const { data: enrollments } = await db
+    const { data: enrollments } = await supabase
       .from('program_enrollments')
       .select('course_id')
       .eq('user_id', user.id)
@@ -51,7 +36,7 @@ export default async function QuizzesPage() {
     const courseIds = enrollments?.map(e => e.course_id) || [];
 
     if (courseIds.length > 0) {
-      const { data: quizData } = await db
+      const { data: quizData } = await supabase
         .from('quizzes')
         .select('*, courses (id, title)')
         .in('course_id', courseIds)
@@ -62,7 +47,7 @@ export default async function QuizzesPage() {
         quizzes = quizData;
       }
 
-      const { data: attemptData } = await db
+      const { data: attemptData } = await supabase
         .from('quiz_attempts')
         .select('*')
         .eq('user_id', user.id)

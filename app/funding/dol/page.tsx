@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -7,7 +6,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'DOL Registered Apprenticeship Programs | Elevate for Humanity',
   description:
@@ -27,8 +27,7 @@ const benefits = [
 
 export default async function DOLFundingPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: dbRows } = await db.from('funding_sources').select('*').limit(50);
+  const { data: dbRows } = await supabase.from('funding_sources').select('*').limit(50);
 const programs = (dbRows as any[]) || [];
 
   return (

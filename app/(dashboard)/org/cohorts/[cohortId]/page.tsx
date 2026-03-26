@@ -29,7 +29,7 @@ export default async function OrgCohortDetailPage({ params }: Props) {
   if (!db) return <p className="p-8 text-sm text-gray-500">Service unavailable.</p>;
 
   // Verify cohort belongs to this org
-  const { data: cohort } = await db
+  const { data: cohort } = await supabase
     .from('cohorts')
     .select('id, name, status, start_date, end_date, delivery_mode')
     .eq('id', cohortId)

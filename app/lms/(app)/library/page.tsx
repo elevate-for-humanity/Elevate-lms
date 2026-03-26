@@ -1,12 +1,12 @@
-export const dynamic = 'force-dynamic';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import {
+
+export const dynamic = 'force-dynamic';
   BookOpen,
   FileText,
   Video,
@@ -31,21 +31,7 @@ export const metadata: Metadata = {
 
 export default async function LibraryPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Library" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -55,7 +41,7 @@ export default async function LibraryPage() {
   }
 
   // Fetch user's enrolled courses
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('program_enrollments')
     .select(`
       *,
@@ -70,7 +56,7 @@ export default async function LibraryPage() {
     .order('created_at', { ascending: false });
 
   // Fetch library resources
-  const { data: resources } = await db
+  const { data: resources } = await supabase
     .from('library_resources')
     .select('*')
     .eq('is_public', true)
@@ -79,14 +65,14 @@ export default async function LibraryPage() {
 
   // Fetch course materials for enrolled courses
   const courseIds = enrollments?.map(e => e.course_id) || [];
-  const { data: courseMaterials } = await db
+  const { data: courseMaterials } = await supabase
     .from('course_materials')
     .select('*, courses (title)')
     .in('course_id', courseIds.length > 0 ? courseIds : ['00000000-0000-0000-0000-000000000000'])
     .order('created_at', { ascending: false });
 
   // Fetch user's bookmarked resources
-  const { data: bookmarks } = await db
+  const { data: bookmarks } = await supabase
     .from('resource_bookmarks')
     .select('resource_id')
     .eq('user_id', user.id);

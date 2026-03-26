@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { BookOpen, FileText, NotebookPen, Compass, BookMarked, GraduationCap, ArrowRight,
   Phone
@@ -18,21 +17,10 @@ export const metadata = {
 
 export default async function LearningHubPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   
   // Fetch learning resources
-  const { data: resources } = await db
+  const { data: resources } = await supabase
     .from('learning_resources')
     .select('*')
     .eq('published', true)

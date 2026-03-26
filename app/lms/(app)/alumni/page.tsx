@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -24,26 +23,12 @@ export const dynamic = 'force-dynamic';
 
 export default async function AlumniPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Alumni" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/lms/alumni');
 
   // Get alumni members
-  const { data: alumni } = await db
+  const { data: alumni } = await supabase
     .from('profiles')
     .select('id, full_name, avatar_url, graduation_year, program, company, job_title, location')
     .eq('role', 'alumni')
@@ -51,13 +36,13 @@ export default async function AlumniPage() {
     .limit(20);
 
   // Get alumni count
-  const { count: alumniCount } = await db
+  const { count: alumniCount } = await supabase
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('role', 'alumni');
 
   // Get upcoming alumni events
-  const { data: events } = await db
+  const { data: events } = await supabase
     .from('events')
     .select('*')
     .eq('event_type', 'alumni')
@@ -66,7 +51,7 @@ export default async function AlumniPage() {
     .limit(3);
 
   // Get success stories
-  const { data: stories } = await db
+  const { data: stories } = await supabase
     .from('success_stories')
     .select('*')
     .eq('is_published', true)
@@ -76,7 +61,7 @@ export default async function AlumniPage() {
   // Check if current user is alumni
   let isAlumni = false;
   if (user) {
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)

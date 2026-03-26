@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { 
   Trophy, 
@@ -44,18 +43,6 @@ const achievementIcons: Record<string, any> = {
 
 export default async function AchievementsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   
   // Get current user
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -91,7 +78,7 @@ export default async function AchievementsPage() {
   }
 
   // Fetch user's earned achievements
-  const { data: earnedAchievements } = await db
+  const { data: earnedAchievements } = await supabase
     .from('user_achievements')
     .select(`
       id,
@@ -109,14 +96,14 @@ export default async function AchievementsPage() {
     .order('earned_at', { ascending: false });
 
   // Fetch all available achievements
-  const { data: allAchievements } = await db
+  const { data: allAchievements } = await supabase
     .from('achievements')
     .select('*')
     .eq('active', true)
     .order('points', { ascending: true });
 
   // Get user profile for stats
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('full_name')
     .eq('id', user.id)

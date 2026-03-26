@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -20,15 +19,13 @@ export const dynamic = 'force-dynamic';
 
 export default async function MyCoursesPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/lms/courses');
 
   // Canonical: published courses only
-  const { data: courses } = await db
+  const { data: courses } = await supabase
     .from('courses')
     .select('id, title, description, short_description, status, is_active, program_id')
     .eq('status', 'published')
@@ -36,7 +33,7 @@ export default async function MyCoursesPage() {
     .order('created_at', { ascending: false });
 
   // Canonical: student enrollments
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('program_enrollments')
     .select('course_id, status, progress_percent')
     .eq('user_id', user.id);

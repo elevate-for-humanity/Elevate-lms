@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { PlayCircle, Clock, Award, BookOpen } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
@@ -35,27 +35,16 @@ export default async function StaffTrainingPage() {
   ]);
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   // Get all training modules
-  const { data: modules, error: modulesError } = await db
+  const { data: modules, error: modulesError } = await supabase
     .from('training_modules')
     .select('*')
     .order('order_index', { ascending: true });
 
   // Get user's progress
-  const { data: progress, error: progressError } = await db
+  const { data: progress, error: progressError } = await supabase
     .from('staff_training_progress')
     .select('*')
     .eq('user_id', user.id);

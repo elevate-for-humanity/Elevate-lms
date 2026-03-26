@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Trophy, Medal, Crown, ArrowRight } from 'lucide-react';
@@ -15,14 +14,12 @@ export const dynamic = 'force-dynamic';
 
 export default async function LeaderboardPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
-  if (!supabase) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1><p className="text-gray-600">Please try again later.</p></div></div>;
 
   const { data: { user } } = await supabase.auth.getUser();
 
   // Fetch top learners from real data
-  const { data: topLearners } = await db
+  const { data: topLearners } = await supabase
     .from('profiles')
     .select('id, full_name, avatar_url, points, role')
     .order('points', { ascending: false })

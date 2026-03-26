@@ -1,10 +1,8 @@
 
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { 
   Award, 
@@ -21,6 +19,8 @@ import {
 import { IPLA_EXAM_INFO, IPLA_EXAM_FEES } from '@/lib/payment-config';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'State Board Exam | Indiana IPLA',
   description: 'Schedule your Indiana Professional Licensing Agency state board exam.',
@@ -28,7 +28,6 @@ export const metadata: Metadata = {
 
 export default async function StateBoardExamPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) { redirect("/login"); }
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -37,14 +36,14 @@ export default async function StateBoardExamPage() {
   }
 
   // Get student enrollment
-  const { data: enrollment } = await db
+  const { data: enrollment } = await supabase
     .from('student_enrollments')
     .select('*')
     .eq('student_id', user.id)
     .single();
 
   // Get time entries to calculate hours
-  const { data: timeEntries } = await db
+  const { data: timeEntries } = await supabase
     .from('time_entries')
     .select('minutes, status')
     .eq('student_id', user.id)

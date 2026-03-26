@@ -1,7 +1,5 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -28,8 +26,6 @@ export async function generateMetadata({
   }
 
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
   if (!db) {
     return {
@@ -38,7 +34,7 @@ export async function generateMetadata({
     };
   }
 
-  const { data: course } = await db
+  const { data: course } = await supabase
     .from('training_courses')
     .select('course_name, description')
     .eq('id', courseId)
@@ -63,6 +59,8 @@ import { Clock, Users, Award, BookOpen, Play, ChevronDown, Shield, Wrench } from
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { LESSON_MODULE_MAP, getModuleForLesson } from '@/lib/courses/lesson-module-map';
 
+export const dynamic = 'force-dynamic';
+
 export default async function CourseDetailPage({
   params,
 }: {
@@ -79,14 +77,12 @@ export default async function CourseDetailPage({
   }
 
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
   if (!db) {
     notFound();
   }
 
-  const { data: course, error } = await db
+  const { data: course, error } = await supabase
     .from('training_courses')
     .select('*')
     .eq('id', courseId)
@@ -97,7 +93,7 @@ export default async function CourseDetailPage({
   }
 
   // Fetch published lessons
-  const { data: lessons } = await db
+  const { data: lessons } = await supabase
     .from('training_lessons')
     .select('*')
     .eq('course_id', courseId)
@@ -105,7 +101,7 @@ export default async function CourseDetailPage({
     .order('lesson_number');
 
   // Fetch modules
-  const { data: modules } = await db
+  const { data: modules } = await supabase
     .from('course_modules')
     .select('*')
     .eq('course_id', courseId)
@@ -121,7 +117,7 @@ export default async function CourseDetailPage({
   let progressPercent = 0;
 
   if (user) {
-    const { data }: any = await db
+    const { data }: any = await supabase
       .from('training_enrollments')
       .select('*')
       .eq('user_id', user.id)
@@ -130,7 +126,7 @@ export default async function CourseDetailPage({
     enrollment = data;
 
     if (enrollment) {
-      const { data: progressData } = await db
+      const { data: progressData } = await supabase
         .from('lesson_progress')
         .select('lesson_id, completed')
         .eq('user_id', user.id)

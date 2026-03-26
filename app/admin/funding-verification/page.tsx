@@ -35,13 +35,13 @@ export default async function FundingVerificationPage() {
   //          enrollment_state, funding_source, enrolled_at, due_at, notes,
   //          days_since_enrollment, days_until_due, sla_status,
   //          has_open_escalation, flag_type, flagged_at
-  const { data: queue, error } = await db
+  const { data: queue, error } = await supabase
     .from('v_funding_verification_queue')
     .select('*');
   // View is already ordered by SLA priority — no .order() needed
 
   // Summary stats
-  const { data: flags } = await db
+  const { data: flags } = await supabase
     .from('payment_integrity_flags')
     .select('resolved_at')
     .eq('flag_type', 'pending_admin_verification');

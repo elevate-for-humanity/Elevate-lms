@@ -1,12 +1,12 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { logger } from '@/lib/logger';
 import {
+
+export const dynamic = 'force-dynamic';
   User, Mail, Phone, Calendar,
   FileText, BookOpen, ArrowLeft, ShieldAlert, AlertTriangle,
 } from 'lucide-react';
@@ -59,13 +59,11 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
   const { id } = await params;
   const { error: pageError, success: pageSuccess } = await searchParams;
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: adminProfile } = await db
+  const { data: adminProfile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -80,7 +78,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
   const hasApprovalAuthority = canApprove(adminRole);
 
   // Fetch program holder
-  const { data: holder, error } = await db
+  const { data: holder, error } = await supabase
     .from('program_holders')
     .select('*')
     .eq('id', id)
@@ -89,7 +87,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
   if (error || !holder) notFound();
 
   // Fetch assigned programs
-  const { data: assignments } = await db
+  const { data: assignments } = await supabase
     .from('program_holder_programs')
     .select('id, program_id, role_in_program, is_primary, status, created_at')
     .eq('program_holder_id', id);
@@ -98,14 +96,14 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
 
   // Fetch program details for assigned programs
   const { data: assignedPrograms } = assignedProgramIds.length > 0
-    ? await db.from('programs').select('id, name, title, slug').in('id', assignedProgramIds)
+    ? await supabase.from('programs').select('id, name, title, slug').in('id', assignedProgramIds)
     : { data: [] };
 
   const programMap: Record<string, any> = {};
   (assignedPrograms || []).forEach((p: any) => { programMap[p.id] = p; });
 
   // Fetch all active programs for dropdowns
-  const { data: allPrograms } = await db
+  const { data: allPrograms } = await supabase
     .from('programs')
     .select('id, name, title, slug, is_active')
     .eq('is_active', true)
@@ -117,11 +115,11 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
 
   // Fetch linked user profile
   const { data: holderProfile } = holder.user_id
-    ? await db.from('profiles').select('id, email, full_name, role').eq('id', holder.user_id).single()
+    ? await supabase.from('profiles').select('id, email, full_name, role').eq('id', holder.user_id).single()
     : { data: null };
 
   // Fetch audit events for this holder
-  const { data: auditEvents } = await db
+  const { data: auditEvents } = await supabase
     .from('admin_audit_events')
     .select('action, actor_user_id, metadata, created_at')
     .eq('target_type', 'program_holder')

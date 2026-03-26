@@ -1,11 +1,11 @@
-export const dynamic = 'force-dynamic';
 
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'My Courses | Elevate for Humanity',
@@ -19,20 +19,7 @@ export default async function InstructorCoursesPage() {
   
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-
-      
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
     
     try {
       const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -43,7 +30,7 @@ export default async function InstructorCoursesPage() {
         user = authData.user;
         
         if (user) {
-          const { data, error: queryError } = await db
+          const { data, error: queryError } = await supabase
             .from('training_courses')
             .select('*, training_enrollments(count)')
             .eq('instructor_id', user.id)

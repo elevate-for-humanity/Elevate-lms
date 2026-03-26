@@ -1,11 +1,11 @@
-export const dynamic = 'force-dynamic';
 
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import SpeedGraderWrapper from './SpeedGraderWrapper';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'SpeedGrader | Elevate For Humanity',
@@ -17,21 +17,13 @@ type Params = Promise<{ courseId: string; assignmentId: string }>;
 export default async function SpeedGraderPage({ params }: { params: Params }) {
   const { courseId, assignmentId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <p className="text-gray-600">Service Unavailable</p>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
   // Verify instructor role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -42,7 +34,7 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
   }
 
   // Fetch assignment
-  const { data: assignment, error: assignmentError } = await db
+  const { data: assignment, error: assignmentError } = await supabase
     .from('assignments')
     .select('id, title, description, max_points, course_id, due_date')
     .eq('id', assignmentId)
@@ -54,14 +46,14 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
   }
 
   // Fetch rubric if linked
-  const { data: rubricLink } = await db
+  const { data: rubricLink } = await supabase
     .from('assignment_rubrics')
     .select('rubric_id, rubrics(*)')
     .eq('assignment_id', assignmentId)
     .single();
 
   // Fetch submissions with student info
-  const { data: submissions } = await db
+  const { data: submissions } = await supabase
     .from('assignment_submissions')
     .select(`
       id,
@@ -78,7 +70,7 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
   // Fetch existing grades for these submissions
   const submissionIds = (submissions || []).map((s: any) => s.id);
   const { data: existingGrades } = submissionIds.length > 0
-    ? await db
+    ? await supabase
         .from('grades')
         .select('*')
         .in('submission_id', submissionIds)

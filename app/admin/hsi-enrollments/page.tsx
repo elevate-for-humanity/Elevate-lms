@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -14,27 +14,14 @@ export const metadata: Metadata = {
 
 export default async function HSIEnrollmentsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-
-      
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) redirect('/login');
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -45,7 +32,7 @@ export default async function HSIEnrollmentsPage() {
   }
 
   // Get HSI enrollments from partner courses
-  const { data: hsiEnrollments, count } = await db
+  const { data: hsiEnrollments, count } = await supabase
     .from('partner_course_enrollments')
     .select(
       `

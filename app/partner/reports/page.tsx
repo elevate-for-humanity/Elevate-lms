@@ -23,7 +23,7 @@ export default async function PartnerReportsPage() {
   if (!user) redirect('/login?redirect=/partner/reports');
 
   // Partner role guard — only partner, admin, super_admin, staff
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role, full_name')
     .eq('id', user.id)
@@ -34,7 +34,7 @@ export default async function PartnerReportsPage() {
   }
 
   // Resolve partner org from partner_users
-  const { data: partnerUser } = await db
+  const { data: partnerUser } = await supabase
     .from('partner_users')
     .select('partner_id')
     .eq('user_id', user.id)
@@ -53,18 +53,18 @@ export default async function PartnerReportsPage() {
 
   if (orgId) {
     const [total, quarter, completed, recent] = await Promise.all([
-      db.from('partner_enrollments')
+      supabase.from('partner_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('partner_id', orgId),
-      db.from('partner_enrollments')
+      supabase.from('partner_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('partner_id', orgId)
         .gte('created_at', thisQuarterStart.toISOString()),
-      db.from('partner_enrollments')
+      supabase.from('partner_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('partner_id', orgId)
         .eq('status', 'completed'),
-      db.from('partner_enrollments')
+      supabase.from('partner_enrollments')
         .select('id, completed_at, student_id, program_slug')
         .eq('partner_id', orgId)
         .eq('status', 'completed')
@@ -81,7 +81,7 @@ export default async function PartnerReportsPage() {
     if (recentCompletions.length > 0) {
       const studentIds = recentCompletions.map((r: any) => r.student_id).filter(Boolean);
       if (studentIds.length > 0) {
-        const { data: profiles } = await db
+        const { data: profiles } = await supabase
           .from('profiles')
           .select('id, full_name')
           .in('id', studentIds);

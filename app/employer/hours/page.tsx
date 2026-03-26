@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import Image from 'next/image';
@@ -16,13 +15,12 @@ export const dynamic = 'force-dynamic';
 
 export default async function EmployerHoursPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) redirect('/login?redirect=/employer/hours');
 
   // Verify employer role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('user_profiles')
     .select('role, employer_id')
     .eq('user_id', user.id)
@@ -33,23 +31,23 @@ export default async function EmployerHoursPage() {
   }
 
   // Get stats from hour_entries
-  const { count: pendingCount } = await db
+  const { count: pendingCount } = await supabase
     .from('hour_entries')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'pending');
 
-  const { count: approvedCount } = await db
+  const { count: approvedCount } = await supabase
     .from('hour_entries')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'approved');
 
-  const { count: rejectedCount } = await db
+  const { count: rejectedCount } = await supabase
     .from('hour_entries')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'rejected');
 
   // Total approved hours
-  const { data: approvedHoursData } = await db
+  const { data: approvedHoursData } = await supabase
     .from('hour_entries')
     .select('hours_claimed, accepted_hours')
     .eq('status', 'approved');

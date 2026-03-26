@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
+
+export const dynamic = 'force-dynamic';
   AlertTriangle,
   FileText,
   Users,
@@ -26,54 +26,29 @@ export const metadata: Metadata = {
 
 export default async function AccreditationPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/admin/accreditation');
 
-      
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login?redirect=/admin/accreditation');
-  }
-
-  // Check admin role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .single();
 
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
-    redirect('/dashboard');
-  }
+  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/dashboard');
 
-  // Get compliance metrics
-  const { data: programs } = await db
+  const { data: programs } = await supabase
     .from('programs')
     .select('*')
     .eq('status', 'active');
 
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('program_enrollments')
     .select('*, program:programs(name)')
-    .gte(
-      'created_at',
-      new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString()
-    );
+    .gte('created_at', new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString());
 
-  const { data: completions } = await db
+  const { data: completions } = await supabase
     .from('program_enrollments')
     .select('*')
     .eq('status', 'completed')
@@ -82,7 +57,7 @@ export default async function AccreditationPage() {
       new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString()
     );
 
-  const { data: placements } = await db
+  const { data: placements } = await supabase
     .from('job_placements')
     .select('*')
     .gte(

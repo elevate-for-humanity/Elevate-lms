@@ -20,7 +20,7 @@ export default async function CaseManagerPlacementsPage() {
   const db       = admin || supabase;
 
   // Fetch all placements this case manager owns, pending first
-  const { data: placements } = await db
+  const { data: placements } = await supabase
     .from('placement_records')
     .select(`
       id, employer_name, job_title, employment_type,

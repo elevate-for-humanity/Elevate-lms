@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -23,7 +22,6 @@ export default async function VerifyCertificatePage({
 }) {
   const { certificateId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Start to find certificate in multiple tables
   let certificate = null;
@@ -33,7 +31,7 @@ export default async function VerifyCertificatePage({
   let certificateType = '';
 
   // Check program_completion_certificates
-  const { data: programCert } = await db
+  const { data: programCert } = await supabase
     .from('program_completion_certificates')
     .select('*, users(full_name, email)')
     .eq('certificate_number', certificateId)
@@ -50,7 +48,7 @@ export default async function VerifyCertificatePage({
 
   // Check partner_certificates
   if (!certificate) {
-    const { data: partnerCert } = await db
+    const { data: partnerCert } = await supabase
       .from('partner_certificates')
       .select('*, users(full_name, email), partner_courses(course_name)')
       .eq('certificate_number', certificateId)
@@ -68,7 +66,7 @@ export default async function VerifyCertificatePage({
 
   // Check module_certificates
   if (!certificate) {
-    const { data: moduleCert } = await db
+    const { data: moduleCert } = await supabase
       .from('module_certificates')
       .select('*, users(full_name, email)')
       .eq('certificate_number', certificateId)
@@ -86,7 +84,7 @@ export default async function VerifyCertificatePage({
 
   // Check main certificates table (by certificate_number or verification_token)
   if (!certificate) {
-    const { data: mainCert } = await db
+    const { data: mainCert } = await supabase
       .from('certificates')
       .select('*, profiles:student_id(full_name, email)')
       .or(`certificate_number.eq.${certificateId},verification_token.eq.${certificateId},id.eq.${certificateId}`)

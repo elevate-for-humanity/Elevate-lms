@@ -7,11 +7,11 @@ export const metadata: Metadata = {
 };
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
-export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
+
+export const dynamic = 'force-dynamic';
   Building2,
   Clock,
   XCircle,
@@ -21,23 +21,7 @@ CheckCircle, } from 'lucide-react';
 
 export default async function AdminShopsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-
-      
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Shops" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -47,7 +31,7 @@ export default async function AdminShopsPage() {
   }
 
   // Check if user is admin
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -58,7 +42,7 @@ export default async function AdminShopsPage() {
   }
 
   // Get all shops with their onboarding status
-  const { data: shops } = await db
+  const { data: shops } = await supabase
     .from('shops')
     .select(
       `
@@ -71,7 +55,7 @@ export default async function AdminShopsPage() {
     .order('created_at', { ascending: false });
 
   // Get shop applications
-  const { data: applications } = await db
+  const { data: applications } = await supabase
     .from('shop_applications')
     .select('*')
     .eq('status', 'submitted')
@@ -80,7 +64,7 @@ export default async function AdminShopsPage() {
   // Get document status for each shop
   const shopsWithDocs = await Promise.all(
     (shops || []).map(async (shop) => {
-      const { data: docs } = await db
+      const { data: docs } = await supabase
         .from('shop_required_docs_status')
         .select('required, approved')
         .eq('shop_id', shop.id);

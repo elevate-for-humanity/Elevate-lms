@@ -1,5 +1,3 @@
-export const dynamic = 'force-static';
-export const revalidate = 86400;
 import { Metadata } from 'next';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
@@ -7,6 +5,9 @@ import CprHero from '@/components/programs/CprHero';
 import CprPageBlocks from '@/components/programs/CprPageBlocks';
 import { CPR_FIRST_AID } from '@/data/programs/cpr-first-aid';
 import { validateProgram } from '@/lib/programs/program-schema';
+
+export const dynamic = 'force-static';
+export const revalidate = 86400;
 
 const p = CPR_FIRST_AID;
 

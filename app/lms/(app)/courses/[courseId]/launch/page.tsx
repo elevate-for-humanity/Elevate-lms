@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { generateInternalMetadata } from '@/lib/seo/metadata';
 
 export const metadata: Metadata = generateInternalMetadata({
@@ -10,7 +9,8 @@ export const metadata: Metadata = generateInternalMetadata({
 
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+
+export const dynamic = 'force-dynamic';
 
 
 interface Params {
@@ -20,26 +20,14 @@ interface Params {
 export default async function LaunchCourse({ params }: { params: Params }) {
   const { courseId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: course, error } = await db
+  const { data: course, error } = await supabase
     .from('courses')
     .select(
       'id, slug, title, delivery_mode, partner_url, launch_mode, allow_iframe'
@@ -50,7 +38,7 @@ export default async function LaunchCourse({ params }: { params: Params }) {
   if (error || !course) redirect('/lms/courses');
 
   // Track "started"
-  await db.from('lms_progress').upsert(
+  await supabase.from('lms_progress').upsert(
     {
       user_id: user.id,
       course_id: course.id,

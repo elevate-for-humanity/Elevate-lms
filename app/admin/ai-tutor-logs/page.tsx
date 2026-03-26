@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Shield, AlertTriangle, MessageCircle, Clock } from 'lucide-react';
 
@@ -12,7 +11,6 @@ export const metadata: Metadata = {
 
 export default async function AiTutorLogsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) {
     return <div className="p-8 text-center text-gray-500">Service unavailable</div>;
   }
@@ -22,33 +20,33 @@ export default async function AiTutorLogsPage() {
   const last7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
   // Total hits last 24h
-  const { count: total24h } = await db
+  const { count: total24h } = await supabase
     .from('public_ai_tutor_logs')
     .select('*', { count: 'exact', head: true })
     .gte('created_at', last24h);
 
   // Blocked last 24h
-  const { count: blocked24h } = await db
+  const { count: blocked24h } = await supabase
     .from('public_ai_tutor_logs')
     .select('*', { count: 'exact', head: true })
     .gte('created_at', last24h)
     .not('blocked_reason', 'is', null);
 
   // Total hits last 7d
-  const { count: total7d } = await db
+  const { count: total7d } = await supabase
     .from('public_ai_tutor_logs')
     .select('*', { count: 'exact', head: true })
     .gte('created_at', last7d);
 
   // Recent logs (last 50)
-  const { data: recentLogs } = await db
+  const { data: recentLogs } = await supabase
     .from('public_ai_tutor_logs')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(50);
 
   // Top IPs by volume (last 24h) — for abuse detection
-  const { data: topIps } = await db
+  const { data: topIps } = await supabase
     .from('public_ai_tutor_logs')
     .select('ip_hash')
     .gte('created_at', last24h)

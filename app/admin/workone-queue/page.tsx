@@ -20,7 +20,7 @@ export default async function WorkOneQueuePage() {
   if (!user) redirect('/login?redirect=/admin/workone-queue');
 
   const db = createAdminClient();
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -31,7 +31,7 @@ export default async function WorkOneQueuePage() {
   }
 
   // Load pending_workone and funding_review applications
-  const { data: apps } = await db
+  const { data: apps } = await supabase
     .from('applications')
     .select(`
       id, first_name, last_name, email, phone,

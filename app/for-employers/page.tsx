@@ -39,12 +39,12 @@ export default async function ForEmployersPage() {
 
   try {
     const db = createAdminClient();
-    const { count: ec } = await db
+    const { count: ec } = await supabase
       .from('employer_profiles')
       .select('*', { count: 'exact', head: true });
     employerCount = ec;
 
-    const { count: pc } = await db
+    const { count: pc } = await supabase
       .from('programs')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'active');

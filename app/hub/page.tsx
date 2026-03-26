@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -36,7 +35,6 @@ const navItems = [
 
 export default async function HubPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) redirect('/hub/welcome');
 
@@ -44,7 +42,7 @@ export default async function HubPage() {
   if (!user) redirect('/hub/welcome');
 
   // Get user profile
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('full_name, role, points, onboarding_completed')
     .eq('id', user.id)

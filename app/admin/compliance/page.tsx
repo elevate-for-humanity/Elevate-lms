@@ -1,13 +1,13 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import WIOAComplianceDashboard from '@/components/admin/WIOAComplianceDashboard';
 import {
+
+export const dynamic = 'force-dynamic';
   getAllGuardrails,
   getCriticalGuardrails,
   shouldAutoEnforce,
@@ -26,18 +26,7 @@ export const metadata: Metadata = {
 
 export default async function CompliancePage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -46,7 +35,7 @@ export default async function CompliancePage() {
     redirect('/login');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -56,13 +45,13 @@ export default async function CompliancePage() {
     redirect('/unauthorized');
   }
 
-  const { data: items, count: totalItems } = await db
+  const { data: items, count: totalItems } = await supabase
     .from('profiles')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })
     .limit(50);
 
-  const { count: activeItems } = await db
+  const { count: activeItems } = await supabase
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');

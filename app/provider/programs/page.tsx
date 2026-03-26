@@ -20,10 +20,10 @@ export default async function ProviderProgramsPage() {
   if (!user) redirect('/login?redirect=/provider/programs');
 
   const db = createAdminClient()!;
-  const { data: profile } = await db.from('profiles').select('tenant_id').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('tenant_id').eq('id', user.id).single();
   if (!profile?.tenant_id) redirect('/unauthorized');
 
-  const { data: programs } = await db
+  const { data: programs } = await supabase
     .from('programs')
     .select('id, title, status, published, is_active, created_at, next_start_date, seats_available, credential_name')
     .eq('tenant_id', profile.tenant_id)

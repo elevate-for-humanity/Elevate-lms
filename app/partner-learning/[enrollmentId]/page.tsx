@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { 
   ArrowLeft, 
   ExternalLink, 
@@ -28,7 +27,6 @@ export default async function PartnerLearningPage({ params }: Props) {
   const { enrollmentId } = await params;
   
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) {
     redirect('/login?redirect=/partner-learning/' + enrollmentId);
@@ -41,7 +39,7 @@ export default async function PartnerLearningPage({ params }: Props) {
   }
 
   // Fetch the partner enrollment
-  const { data: enrollment, error } = await db
+  const { data: enrollment, error } = await supabase
     .from('partner_lms_enrollments')
     .select(`
       *,

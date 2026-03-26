@@ -1,11 +1,12 @@
-export const dynamic = 'force-static';
-export const revalidate = 3600;
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronRight, Phone } from 'lucide-react';
 import HeroVideo from '@/components/marketing/HeroVideo';
+
+export const dynamic = 'force-static';
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Hire Trained Graduates | Employer Partnership | Elevate for Humanity',

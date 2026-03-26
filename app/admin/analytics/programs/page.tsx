@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
@@ -15,18 +15,7 @@ export const metadata: Metadata = {
 
 export default async function ProgramAnalyticsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -35,7 +24,7 @@ export default async function ProgramAnalyticsPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -46,25 +35,25 @@ export default async function ProgramAnalyticsPage() {
   }
 
   // Fetch program analytics
-  const { count: totalPrograms } = await db
+  const { count: totalPrograms } = await supabase
     .from('programs')
     .select('*', { count: 'exact', head: true });
 
-  const { count: activePrograms } = await db
+  const { count: activePrograms } = await supabase
     .from('programs')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
 
-  const { count: totalParticipants } = await db
+  const { count: totalParticipants } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true });
 
-  const { count: completedParticipants } = await db
+  const { count: completedParticipants } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed');
 
-  const { data: programs } = await db
+  const { data: programs } = await supabase
     .from('programs')
     .select('id, title, status, created_at')
     .order('created_at', { ascending: false })

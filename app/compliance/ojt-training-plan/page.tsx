@@ -1,7 +1,8 @@
-export const dynamic = 'force-static';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
   title: 'OJT Training Plan Template | Elevate for Humanity',

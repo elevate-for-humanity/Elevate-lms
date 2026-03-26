@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { BookOpen, Download, ChevronRight, FileText, Shield, Users, Clock, Award, ShieldAlert } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -17,15 +16,11 @@ export const dynamic = 'force-dynamic';
 
 export default async function StudentHandbookPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) {
-    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1><p className="text-gray-600">Please try again later.</p></div></div>;
-  }
   const { data: { user } } = await supabase.auth.getUser();
 
   // Handbook content is rendered from hardcoded sections below.
   // This query is for optional metadata (last updated date, PDF download link).
-  const { data: handbook } = await db
+  const { data: handbook } = await supabase
     .from('documents')
     .select('*')
     .eq('document_type', 'student-handbook')
@@ -33,7 +28,7 @@ export default async function StudentHandbookPage() {
     .limit(1)
     .maybeSingle();
 
-  const { data: acknowledgment } = user ? await db
+  const { data: acknowledgment } = user ? await supabase
     .from('handbook_acknowledgments')
     .select('*')
     .eq('user_id', user.id)

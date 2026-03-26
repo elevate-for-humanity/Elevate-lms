@@ -22,10 +22,10 @@ export default async function ProviderCompliancePage() {
   if (!user) redirect('/login?redirect=/provider/compliance');
 
   const db = createAdminClient()!;
-  const { data: profile } = await db.from('profiles').select('tenant_id').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('tenant_id').eq('id', user.id).single();
   if (!profile?.tenant_id) redirect('/unauthorized');
 
-  const { data: artifacts } = await db
+  const { data: artifacts } = await supabase
     .from('provider_compliance_artifacts')
     .select('*')
     .eq('tenant_id', profile.tenant_id)

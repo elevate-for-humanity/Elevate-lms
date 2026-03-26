@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { FileText, Download, Printer, Eye, Calendar, Building2, Clock, GraduationCap } from 'lucide-react';
 import { programs } from '@/app/data/programs';
@@ -15,13 +14,12 @@ export const dynamic = 'force-dynamic';
 
 export default async function ProgramCatalogPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   // Get programs from database or use static data
   let allPrograms = programs;
   
   if (supabase) {
-    const { data: dbPrograms } = await db
+    const { data: dbPrograms } = await supabase
       .from('programs')
       .select('*')
       .order('name', { ascending: true });

@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import LessonManagerClient from './LessonManagerClient';
 import QuizManagerClient from './QuizManagerClient';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Course Content | Elevate For Humanity',
@@ -15,18 +15,16 @@ export const metadata: Metadata = {
 export default async function CourseContentPage({ params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
-  const { data: rawCourse } = await db.from('training_courses').select('*').eq('id', courseId).single();
+  const { data: rawCourse } = await supabase.from('training_courses').select('*').eq('id', courseId).single();
   const course = rawCourse ? { ...rawCourse, title: rawCourse.course_name || rawCourse.title } : null;
-  const { data: lessons } = await db.from('training_lessons').select('*').eq('course_id', courseId).order('lesson_number');
+  const { data: lessons } = await supabase.from('training_lessons').select('*').eq('course_id', courseId).order('lesson_number');
 
   // Extract quiz data from metadata JSONB (set by AI ingestion pipeline)
   const quizMeta = rawCourse?.metadata as {

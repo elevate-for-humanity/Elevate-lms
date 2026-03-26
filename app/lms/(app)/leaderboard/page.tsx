@@ -1,12 +1,12 @@
-export const dynamic = 'force-dynamic';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import {
+
+export const dynamic = 'force-dynamic';
   Trophy,
   Medal,
   Award,
@@ -38,51 +38,36 @@ interface LeaderboardEntry {
 
 export default async function LeaderboardPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Leaderboard" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/lms/leaderboard');
 
   // Fetch all profiles
-  const { data: profiles } = await db
+  const { data: profiles } = await supabase
     .from('profiles')
     .select('id, first_name, last_name, avatar_url')
     .limit(100);
 
   // Fetch enrollment data for completed courses
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('program_enrollments')
     .select('user_id, status, completed_lessons')
     .eq('status', 'completed');
 
   // Fetch quiz attempts
-  const { data: quizAttempts } = await db
+  const { data: quizAttempts } = await supabase
     .from('quiz_attempts')
     .select('user_id, score, status')
     .eq('status', 'completed');
 
   // Fetch student progress for lesson completions
-  const { data: progressData } = await db
+  const { data: progressData } = await supabase
     .from('student_progress')
     .select('student_id, completed')
     .eq('completed', true);
 
   // Fetch badges earned
-  const { data: userBadges } = await db
+  const { data: userBadges } = await supabase
     .from('user_badges')
     .select('user_id, badge_id');
 

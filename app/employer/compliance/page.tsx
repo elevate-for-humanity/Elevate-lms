@@ -1,10 +1,11 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
+
+export const dynamic = 'force-dynamic';
   Shield, FileText, DollarSign, Users, Download,
   AlertCircle, Clock, ArrowRight, BarChart,
 } from 'lucide-react';

@@ -11,17 +11,17 @@ export default async function ProviderSettingsPage() {
   if (!user) redirect('/login?redirect=/provider/settings');
 
   const db = createAdminClient()!;
-  const { data: profile } = await db.from('profiles').select('tenant_id, full_name, email').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('tenant_id, full_name, email').eq('id', user.id).single();
   if (!profile?.tenant_id) redirect('/unauthorized');
 
-  const { data: tenant } = await db
+  const { data: tenant } = await supabase
     .from('tenants')
     .select('id, name, slug')
     .eq('id', profile.tenant_id)
     .single();
 
   // Fetch organization record linked to this tenant
-  const { data: org } = await db
+  const { data: org } = await supabase
     .from('organizations')
     .select('id, name, slug, logo_url, tagline, support_email, website, phone, address_line1, city, state, zip')
     .eq('tenant_id', profile.tenant_id)

@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/employer/placements' },
@@ -13,12 +13,10 @@ export const metadata: Metadata = {
 
 export default async function PlacementsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: placements, count } = await db.from('job_placements').select('*, profiles!inner(full_name)', { count: 'exact' }).eq('employer_id', user.id).order('placement_date', { ascending: false }).limit(20);
+  const { data: placements, count } = await supabase.from('job_placements').select('*, profiles!inner(full_name)', { count: 'exact' }).eq('employer_id', user.id).order('placement_date', { ascending: false }).limit(20);
 
   return (
     <div className="min-h-screen bg-white">

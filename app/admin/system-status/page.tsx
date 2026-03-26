@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { 
   
   XCircle, 
@@ -68,7 +67,7 @@ async function checkCreatorPlatformCapabilities(supabase: any): Promise<CreatorC
   // Helper to check if table exists and is accessible
   async function tableCheck(tableName: string): Promise<'active' | 'partial' | 'missing'> {
     try {
-      const { error } = await db.from(tableName).select('id').limit(1);
+      const { error } = await supabase.from(tableName).select('id').limit(1);
       if (error) {
         if (error.code === '42501') return 'active'; // RLS blocking = table exists
         if (error.code === 'PGRST205') return 'missing'; // Table doesn't exist
@@ -157,7 +156,7 @@ async function checkCreatorPlatformCapabilities(supabase: any): Promise<CreatorC
   });
   
   // 6. Creator Courses
-  const { count: creatorCourseCount } = await db
+  const { count: creatorCourseCount } = await supabase
     .from('creator_courses')
     .select('*', { count: 'exact', head: true });
   capabilities.push({
@@ -180,7 +179,7 @@ async function checkCreatorPlatformCapabilities(supabase: any): Promise<CreatorC
   });
   
   // 8. Enrollment-based Access Control
-  const { count: enrollmentCount } = await db
+  const { count: enrollmentCount } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true });
   capabilities.push({
@@ -218,7 +217,6 @@ async function checkCreatorPlatformCapabilities(supabase: any): Promise<CreatorC
 async function checkDatabaseConnection(): Promise<{ connected: boolean; tables: string[]; error?: string }> {
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     if (!supabase) {
       return { connected: false, tables: [], error: 'Supabase client not available' };
@@ -229,7 +227,7 @@ async function checkDatabaseConnection(): Promise<{ connected: boolean; tables: 
     const results: string[] = [];
     
     for (const table of tables) {
-      const { error } = await db.from(table).select('id').limit(1);
+      const { error } = await supabase.from(table).select('id').limit(1);
       if (!error) results.push(table);
     }
     
@@ -307,7 +305,6 @@ export default async function SystemStatusPage() {
   
   // Check creator platform capabilities
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const creatorCapabilities = await checkCreatorPlatformCapabilities(supabase);
   
   // Count statuses

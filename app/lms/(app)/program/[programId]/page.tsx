@@ -1,7 +1,5 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -17,15 +15,15 @@ import {
 } from 'lucide-react';
 import { evaluateCompletion } from '@/lib/lms/completion-rules';
 
+export const dynamic = 'force-dynamic';
+
 type Params = Promise<{ programId: string }>;
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { programId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
-  const { data: program } = await db
+  const { data: program } = await supabase
     .from('programs')
     .select('title')
     .or(`id.eq.${programId},slug.eq.${programId},code.eq.${programId}`)
@@ -40,14 +38,12 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function ProgramDashboardPage({ params }: { params: Params }) {
   const { programId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/lms/program/' + programId);
 
   // Look up program by id, slug, or code
-  const { data: program } = await db
+  const { data: program } = await supabase
     .from('programs')
     .select('id, title, slug, code, description, duration_weeks, completion_criteria')
     .or(`id.eq.${programId},slug.eq.${programId},code.eq.${programId}`)
@@ -56,7 +52,7 @@ export default async function ProgramDashboardPage({ params }: { params: Params 
   if (!program) notFound();
 
   // Verify enrollment
-  const { data: enrollment } = await db
+  const { data: enrollment } = await supabase
     .from('program_enrollments')
     .select('id, status, enrolled_at, progress_percent')
     .eq('user_id', user.id)
@@ -71,7 +67,7 @@ export default async function ProgramDashboardPage({ params }: { params: Params 
   }
 
   // Get courses for this program
-  const { data: courses } = await db
+  const { data: courses } = await supabase
     .from('courses')
     .select('id, title, description, is_active')
     .eq('program_id', program.id)
@@ -81,14 +77,14 @@ export default async function ProgramDashboardPage({ params }: { params: Params 
   const courseIds = (courses || []).map((c: any) => c.id);
 
   const { data: allLessons } = courseIds.length > 0
-    ? await db
+    ? await supabase
         .from('lms_lessons')
         .select('id, course_id')
         .in('course_id', courseIds)
     : { data: [] };
 
   const { data: lessonProgress } = courseIds.length > 0
-    ? await db
+    ? await supabase
         .from('lesson_progress')
         .select('lesson_id, completed')
         .eq('user_id', user.id)
@@ -114,7 +110,7 @@ export default async function ProgramDashboardPage({ params }: { params: Params 
   const overallPercent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
   // Get certificates for this program
-  const { data: certificates } = await db
+  const { data: certificates } = await supabase
     .from('certificates')
     .select('id, title, issued_at')
     .eq('user_id', user.id)

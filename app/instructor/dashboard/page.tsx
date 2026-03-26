@@ -1,15 +1,15 @@
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { safeFormatDate } from '@/lib/format-utils';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import InstructorPerformanceDashboard from '@/components/InstructorPerformanceDashboard';
-export const dynamic = 'force-dynamic';
 
 import {
+
+export const dynamic = 'force-dynamic';
   Users,
   BookOpen,
   Award,
@@ -35,23 +35,10 @@ export default async function ProgramHolderDashboard() {
   ]);
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-
-      
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   // Fetch courses assigned to this instructor, then get their enrollments
-  const { data: myCourses } = await db
+  const { data: myCourses } = await supabase
     .from('training_courses')
     .select('id')
     .eq('instructor_id', user.id);
@@ -59,7 +46,7 @@ export default async function ProgramHolderDashboard() {
   const courseIds = (myCourses || []).map((c: any) => c.id);
 
   const { data: students } = courseIds.length > 0
-    ? await db
+    ? await supabase
         .from('training_enrollments')
         .select(`*, profiles (id, full_name, email), programs (id, title, name, training_hours)`)
         .in('course_id', courseIds)

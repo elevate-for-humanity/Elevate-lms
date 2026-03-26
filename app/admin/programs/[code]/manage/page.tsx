@@ -30,7 +30,7 @@ export default async function ManageProgramPage({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -42,7 +42,7 @@ export default async function ManageProgramPage({
 
   // Load program — try code first, then slug
   let program: any = null;
-  const { data: byCode } = await db
+  const { data: byCode } = await supabase
     .from('programs')
     .select('id, title, code, slug')
     .eq('code', code)
@@ -50,7 +50,7 @@ export default async function ManageProgramPage({
   if (byCode) {
     program = byCode;
   } else {
-    const { data: bySlug } = await db
+    const { data: bySlug } = await supabase
       .from('programs')
       .select('id, title, code, slug')
       .eq('slug', code)
@@ -73,7 +73,7 @@ export default async function ManageProgramPage({
   const programCode = program.code || program.slug || code;
 
   // Load attached internal courses
-  const { data: internalLinks } = await db
+  const { data: internalLinks } = await supabase
     .from('program_courses')
     .select(`
       id, order_index, is_required,
@@ -83,7 +83,7 @@ export default async function ManageProgramPage({
     .order('order_index');
 
   // Load external partner training items
-  const { data: externalItems } = await db
+  const { data: externalItems } = await supabase
     .from('program_external_courses')
     .select('*')
     .eq('program_id', program.id)
@@ -91,14 +91,14 @@ export default async function ManageProgramPage({
     .order('order_index');
 
   // Load all published + draft courses for the attach picker
-  const { data: availableCourses } = await db
+  const { data: availableCourses } = await supabase
     .from('training_courses')
     .select('id, title, course_name, status, category')
     .in('status', ['published', 'draft'])
     .order('title');
 
   // Load credentials already linked to this program
-  const { data: linkedCredentials } = await db
+  const { data: linkedCredentials } = await supabase
     .from('program_credentials')
     .select(`
       id, is_required, sort_order, notes,
@@ -111,7 +111,7 @@ export default async function ManageProgramPage({
     .order('sort_order');
 
   // Load all active credentials for the picker
-  const { data: allCredentials } = await db
+  const { data: allCredentials } = await supabase
     .from('credential_registry')
     .select('id, name, abbreviation, issuer_type, credential_stack, competency_area, stack_level')
     .eq('is_active', true)

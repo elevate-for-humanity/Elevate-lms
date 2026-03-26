@@ -1,8 +1,9 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { requireAdmin } from '@/lib/auth';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import SettingsForm from './SettingsForm';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Settings | Admin',

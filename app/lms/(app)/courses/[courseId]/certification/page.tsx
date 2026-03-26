@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -7,6 +6,8 @@ import { CheckCircle, Award, ArrowRight, BookOpen, ExternalLink } from 'lucide-r
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import ExamReadinessWidget from '@/components/lms/ExamReadinessWidget';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Certification | Elevate LMS',
@@ -27,7 +28,7 @@ export default async function CertificationPage({ params }: Props) {
   if (!user) redirect(`/login?redirect=/lms/courses/${courseId}/certification`);
 
   // Course info
-  const { data: course } = await db
+  const { data: course } = await supabase
     .from('courses')
     .select('id, title, program_id')
     .eq('id', courseId)
@@ -36,12 +37,12 @@ export default async function CertificationPage({ params }: Props) {
   if (!course) redirect('/lms/courses');
 
   // Lesson completion stats
-  const { data: allLessons } = await db
+  const { data: allLessons } = await supabase
     .from('lms_lessons')
     .select('id')
     .eq('course_id', courseId);
 
-  const { data: completedLessons } = await db
+  const { data: completedLessons } = await supabase
     .from('lesson_progress')
     .select('id')
     .eq('user_id', user.id)
@@ -55,7 +56,7 @@ export default async function CertificationPage({ params }: Props) {
 
   // Primary credential for this program
   const { data: primaryCred } = course.program_id
-    ? await db
+    ? await supabase
         .from('program_credentials')
         .select('credential_id, credential_registry(id, name, abbreviation, issuing_body, exam_url)')
         .eq('program_id', course.program_id)
@@ -66,7 +67,7 @@ export default async function CertificationPage({ params }: Props) {
   const cred = (primaryCred as any)?.credential_registry ?? null;
 
   // Existing certification request
-  const { data: certRequest } = await db
+  const { data: certRequest } = await supabase
     .from('certification_requests')
     .select('id, status, created_at')
     .eq('user_id', user.id)
@@ -76,7 +77,7 @@ export default async function CertificationPage({ params }: Props) {
     .maybeSingle();
 
   // Existing certificate
-  const { data: certificate } = await db
+  const { data: certificate } = await supabase
     .from('certificates')
     .select('id, issued_at, certificate_url')
     .eq('user_id', user.id)

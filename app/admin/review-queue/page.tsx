@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -41,14 +40,13 @@ export default async function ReviewQueuePage({
 }) {
   const { queue_type, status: statusParam } = await searchParams;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) redirect('/login');
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
   // Check admin role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -59,7 +57,7 @@ export default async function ReviewQueuePage({
   }
 
   // Build query
-  let query = db
+  let query = supabase
     .from('review_queue')
     .select('*')
     .order('priority', { ascending: true })
@@ -78,7 +76,7 @@ export default async function ReviewQueuePage({
   const { data: items, error } = await query.limit(100);
 
   // Get counts by queue type
-  const { data: counts } = await db
+  const { data: counts } = await supabase
     .from('review_queue')
     .select('queue_type')
     .in('status', ['open', 'in_progress']);

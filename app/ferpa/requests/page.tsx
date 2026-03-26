@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
@@ -66,20 +65,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof
 
 export default async function FerpaRequestsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-
-      
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Database connection failed. Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -87,7 +73,7 @@ export default async function FerpaRequestsPage() {
     redirect('/login?redirect=/ferpa/requests');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role, full_name')
     .eq('id', user.id)
@@ -99,7 +85,7 @@ export default async function FerpaRequestsPage() {
   }
 
   // Fetch requests
-  const { data: requests, error } = await db
+  const { data: requests, error } = await supabase
     .from('ferpa_access_requests')
     .select('*')
     .order('created_at', { ascending: false })

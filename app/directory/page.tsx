@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -7,7 +6,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Building2, MapPin, Globe, ArrowRight } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Partner Directory | Elevate for Humanity',
   description: 'Workforce development partners, employer partners, and community resources in Indianapolis. WorkOne, Indiana DWD, EmployIndy, and more.',
@@ -24,8 +24,7 @@ const resources = [
 
 export default async function DirectoryPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: dbRows } = await db.from('partners').select('*').limit(50);
+  const { data: dbRows } = await supabase.from('partners').select('*').limit(50);
 const partners = (dbRows as any[]) || [];
 
   return (

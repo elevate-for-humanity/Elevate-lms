@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { TransferHoursTable } from './transfer-hours-table';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -15,23 +15,7 @@ export const metadata: Metadata = {
 
 export default async function TransferHoursPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-
-      
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Transfer Hours" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -40,7 +24,7 @@ export default async function TransferHoursPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -50,7 +34,7 @@ export default async function TransferHoursPage() {
     redirect('/unauthorized');
   }
 
-  const { data: transferHours, count: totalRequests } = await db
+  const { data: transferHours, count: totalRequests } = await supabase
     .from('transfer_hours')
     .select(
       `
@@ -64,17 +48,17 @@ export default async function TransferHoursPage() {
     )
     .order('created_at', { ascending: false });
 
-  const { count: pendingRequests } = await db
+  const { count: pendingRequests } = await supabase
     .from('transfer_hours')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'pending');
 
-  const { count: approvedRequests } = await db
+  const { count: approvedRequests } = await supabase
     .from('transfer_hours')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'approved');
 
-  const { count: deniedRequests } = await db
+  const { count: deniedRequests } = await supabase
     .from('transfer_hours')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'denied');

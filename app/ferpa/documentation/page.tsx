@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
@@ -45,25 +44,12 @@ const DOCUMENT_TYPE_LABELS: Record<string, string> = {
 
 export default async function FerpaDocumentationPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-
-      
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Database connection failed.</p>
-        </div>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/ferpa/documentation');
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -73,7 +59,7 @@ export default async function FerpaDocumentationPage() {
   if (!profile || !allowedRoles.includes(profile.role)) redirect('/unauthorized');
 
   // Fetch documents based on role
-  let query = db
+  let query = supabase
     .from('ferpa_documents')
     .select('*')
     .eq('is_current', true)

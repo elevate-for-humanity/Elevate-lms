@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Clock, Calendar, TrendingUp, Plus } from 'lucide-react';
@@ -16,7 +15,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function HoursHistoryPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -24,7 +22,7 @@ export default async function HoursHistoryPage() {
   }
 
   // Fetch apprenticeship enrollment
-  const { data: enrollment } = await db
+  const { data: enrollment } = await supabase
     .from('apprenticeship_enrollments')
     .select(`
       id,
@@ -38,7 +36,7 @@ export default async function HoursHistoryPage() {
     .single();
 
   // Fetch hours log from consolidated hour_entries
-  const { data: hoursLog } = await db
+  const { data: hoursLog } = await supabase
     .from('hour_entries')
     .select('*')
     .eq('user_id', user.id)

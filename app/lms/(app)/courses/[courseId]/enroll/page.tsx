@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -23,39 +22,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { courseId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return { title: 'Enroll | Elevate LMS' };
-  }
-
-  const { data: course } = await db
-    .from('courses')
-    .select('title')
-    .eq('id', courseId)
-    .single();
-
-  return {
-    title: course ? `Enroll in ${course.title} | Elevate LMS` : 'Enroll | Elevate LMS',
-    description: 'Enroll in this course to start learning.',
-  };
-}
-
-export default async function CourseEnrollPage({ params }: Props) {
-  const { courseId } = await params;
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -64,7 +31,7 @@ export default async function CourseEnrollPage({ params }: Props) {
   }
 
   // Fetch course details — canonical courses table
-  const { data: course, error } = await db
+  const { data: course, error } = await supabase
     .from('courses')
     .select('id, title, description, short_description, status, is_active, program_id')
     .eq('id', courseId)
@@ -75,7 +42,7 @@ export default async function CourseEnrollPage({ params }: Props) {
   }
 
   // Check if already enrolled — match on course_id OR program_id
-  const { data: existingByCourse } = await db
+  const { data: existingByCourse } = await supabase
     .from('program_enrollments')
     .select('id, status')
     .eq('user_id', user.id)
@@ -83,7 +50,7 @@ export default async function CourseEnrollPage({ params }: Props) {
     .maybeSingle();
 
   const existingByProgram = course.program_id
-    ? await db
+    ? await supabase
         .from('program_enrollments')
         .select('id, status')
         .eq('user_id', user.id)
@@ -97,20 +64,20 @@ export default async function CourseEnrollPage({ params }: Props) {
   }
 
   // Get user profile
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('first_name, last_name, email')
     .eq('id', user.id)
     .single();
 
   // Get lesson count from canonical table
-  const { count: lessonCount } = await db
+  const { count: lessonCount } = await supabase
     .from('course_lessons')
     .select('id', { count: 'exact', head: true })
     .eq('course_id', courseId);
 
   // Get enrolled student count
-  const { count: studentCount } = await db
+  const { count: studentCount } = await supabase
     .from('program_enrollments')
     .select('id', { count: 'exact', head: true })
     .eq('course_id', courseId);

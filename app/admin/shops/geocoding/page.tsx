@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import GeocodingManager from './GeocodingManager';
 
@@ -7,13 +6,12 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminGeocodingPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) redirect('/login');
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -24,7 +22,7 @@ export default async function AdminGeocodingPage() {
   }
 
   // Get shops with geocoding status
-  const { data: shops } = await db
+  const { data: shops } = await supabase
     .from('shops')
     .select('id, name, address1, address2, city, state, zip, latitude, longitude, geocoded_at, geocode_source, geocode_failed_at, geocode_error, active')
     .order('name');

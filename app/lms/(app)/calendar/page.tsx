@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { CalendarWidget } from '@/components/CalendarWidget';
@@ -36,7 +35,6 @@ function getFirstDayOfMonth(year: number, month: number) {
 
 export default async function CalendarPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) { redirect("/login"); }
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -57,7 +55,7 @@ export default async function CalendarPage() {
   let enrolledCourses: any[] = [];
 
   try {
-    const { data: enrollments } = await db
+    const { data: enrollments } = await supabase
       .from('program_enrollments')
       .select('*, courses (id, title, description, start_date, end_date)')
       .eq('user_id', user.id)
@@ -67,7 +65,7 @@ export default async function CalendarPage() {
       enrolledCourses = enrollments.map(e => e.courses).filter(Boolean);
     }
 
-    const { data: calendarEvents } = await db
+    const { data: calendarEvents } = await supabase
       .from('calendar_events')
       .select('*')
       .or(`user_id.eq.${user.id},is_public.eq.true`)
@@ -79,7 +77,7 @@ export default async function CalendarPage() {
       events = calendarEvents;
     }
 
-    const { data: assignments } = await db
+    const { data: assignments } = await supabase
       .from('assignments')
       .select('*, courses (title)')
       .in('course_id', enrolledCourses.map(c => c.id))

@@ -34,7 +34,7 @@ export default async function PartnerAttendancePage() {
 
   try {
     // Get partner org
-    const { data: partnerUser } = await db
+    const { data: partnerUser } = await supabase
       .from('partner_users')
       .select('partner_id')
       .eq('user_id', user.id)
@@ -43,7 +43,7 @@ export default async function PartnerAttendancePage() {
     const orgId = partnerUser?.partner_id;
 
     // Fetch attendance sessions
-    const { data: sessionData } = await db
+    const { data: sessionData } = await supabase
       .from('attendance_sessions')
       .select('*')
       .order('date', { ascending: false })
@@ -57,7 +57,7 @@ export default async function PartnerAttendancePage() {
     }
 
     // Also pull from partner_attendance for weekly records
-    const { data: weeklyRecords } = await db
+    const { data: weeklyRecords } = await supabase
       .from('partner_attendance')
       .select('*')
       .order('created_at', { ascending: false })

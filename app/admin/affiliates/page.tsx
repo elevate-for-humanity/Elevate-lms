@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { Metadata } from 'next';
@@ -7,6 +6,8 @@ import { Users, DollarSign, TrendingUp, UserPlus, Search, Filter, MoreVertical }
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Affiliate Management | Admin | Elevate for Humanity',

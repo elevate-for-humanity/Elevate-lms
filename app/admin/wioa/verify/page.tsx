@@ -1,12 +1,12 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import { getAdminDocumentUrl } from '@/lib/admin/document-access';
 import Link from 'next/link';
 import { ArrowLeft, FileText, XCircle, AlertTriangle, Download, Upload, CheckCircle, Users, Loader2 } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Verify Eligibility | WIOA Admin',
@@ -25,13 +25,12 @@ export default async function WIOAVerifyPage({
   }
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const params = await searchParams;
   const participantId = params.id;
 
   // If no participant ID, show list of pending verifications
   if (!participantId) {
-    const { data: pending } = await db
+    const { data: pending } = await supabase
       .from('wioa_participants')
       .select('id, first_name, last_name, email, eligibility_status, created_at')
       .in('eligibility_status', ['pending', 'in_review'])
@@ -85,7 +84,7 @@ export default async function WIOAVerifyPage({
   }
 
   // Load specific participant
-  const { data: participant } = await db
+  const { data: participant } = await supabase
     .from('wioa_participants')
     .select('*')
     .eq('id', participantId)
@@ -105,7 +104,7 @@ export default async function WIOAVerifyPage({
   }
 
   // Load documents for this participant
-  const { data: documents } = await db
+  const { data: documents } = await supabase
     .from('documents')
     .select('id, title, file_url, file_path, document_type, status, created_at')
     .eq('user_id', participant.user_id)

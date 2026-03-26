@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Search, MessageSquare, Calendar, Users } from 'lucide-react';
@@ -14,7 +13,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function MenteesPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) redirect('/login');
 
@@ -24,7 +22,7 @@ export default async function MenteesPage() {
   const mentees: any[] = [];
 
   // Get mentor's mentees
-  const { data: mentorships } = await db
+  const { data: mentorships } = await supabase
     .from('mentorships')
     .select(`
       id,
@@ -39,7 +37,7 @@ export default async function MenteesPage() {
   if (mentorships) {
     // Get session counts for each mentee
     for (const m of mentorships) {
-      const { count } = await db
+      const { count } = await supabase
         .from('mentor_sessions')
         .select('*', { count: 'exact', head: true })
         .eq('mentor_id', user.id)

@@ -1,16 +1,16 @@
-export const dynamic = 'force-dynamic';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { Metadata } from 'next';
 
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { BookOpen, Award, Briefcase } from 'lucide-react';
 import GoogleClassroomSync from '@/components/GoogleClassroomSync';
 import { VideoConferencingIntegration } from '@/components/VideoConferencingIntegration';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
@@ -23,21 +23,7 @@ export const metadata: Metadata = {
 
 export default async function IntegrationsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Integrations" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -46,14 +32,14 @@ export default async function IntegrationsPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
 
   // Fetch student's courses
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('program_enrollments')
     .select(
       `
@@ -69,19 +55,19 @@ export default async function IntegrationsPage() {
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
-  const { count: activeCourses } = await db
+  const { count: activeCourses } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
     .eq('status', 'active');
 
-  const { count: completedCourses } = await db
+  const { count: completedCourses } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
     .eq('status', 'completed');
 
-  const { data: recentProgress } = await db
+  const { data: recentProgress } = await supabase
     .from('student_progress')
     .select(
       `

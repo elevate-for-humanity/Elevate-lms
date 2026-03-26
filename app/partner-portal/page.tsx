@@ -42,7 +42,7 @@ export default async function PartnerPortalPage() {
 
       if (orgId) {
         // Active apprentices
-        const { count: apprenticeCount } = await db
+        const { count: apprenticeCount } = await supabase
           .from('partner_enrollments')
           .select('*', { count: 'exact', head: true })
           .eq('partner_id', orgId)
@@ -50,13 +50,13 @@ export default async function PartnerPortalPage() {
         stats.activeApprentices = apprenticeCount || 0;
 
         // Pending hours (by user_id of students in this org's enrollments)
-        const { data: enrolledStudents } = await db
+        const { data: enrolledStudents } = await supabase
           .from('partner_enrollments')
           .select('student_id')
           .eq('partner_id', orgId);
         const studentIds = (enrolledStudents || []).map((e: any) => e.student_id);
         if (studentIds.length > 0) {
-          const { count: pendingHoursCount } = await db
+          const { count: pendingHoursCount } = await supabase
             .from('hour_entries')
             .select('*', { count: 'exact', head: true })
             .in('user_id', studentIds)
@@ -65,7 +65,7 @@ export default async function PartnerPortalPage() {
         }
 
         // Pending documents
-        const { count: pendingDocsCount } = await db
+        const { count: pendingDocsCount } = await supabase
           .from('partner_documents')
           .select('*', { count: 'exact', head: true })
           .eq('organization_id', orgId)
@@ -73,7 +73,7 @@ export default async function PartnerPortalPage() {
         stats.pendingDocuments = pendingDocsCount || 0;
 
         // Completions
-        const { count: completionCount } = await db
+        const { count: completionCount } = await supabase
           .from('partner_completions')
           .select('*', { count: 'exact', head: true })
           .eq('partner_id', user.id);
@@ -83,7 +83,7 @@ export default async function PartnerPortalPage() {
         const weekAgo = new Date();
         weekAgo.setDate(weekAgo.getDate() - 7);
         if (studentIds.length > 0) {
-          const { count: attendanceCount } = await db
+          const { count: attendanceCount } = await supabase
             .from('partner_attendance')
             .select('*', { count: 'exact', head: true })
             .in('student_id', studentIds);
@@ -91,7 +91,7 @@ export default async function PartnerPortalPage() {
         }
 
         // Recent audit log
-        const { data: auditData } = await db
+        const { data: auditData } = await supabase
           .from('partner_audit_log')
           .select('id, action, entity_type, created_at')
           .eq('partner_id', orgId)
@@ -100,7 +100,7 @@ export default async function PartnerPortalPage() {
         recentActivity = auditData || [];
 
         // MOU status
-        const { data: mou } = await db
+        const { data: mou } = await supabase
           .from('partner_mous')
           .select('status')
           .eq('partner_id', orgId)
@@ -111,7 +111,7 @@ export default async function PartnerPortalPage() {
         }
 
         // Programs this partner is enrolled in
-        const { data: programLinks } = await db
+        const { data: programLinks } = await supabase
           .from('partner_programs')
           .select('program_slug, programs(title, name)')
           .eq('partner_id', orgId)

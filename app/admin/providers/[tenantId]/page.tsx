@@ -32,7 +32,7 @@ export default async function ProviderDetailPage({
   const db = createAdminClient();
   if (!db) return <div className="p-8 text-red-600">Database unavailable</div>;
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -43,7 +43,7 @@ export default async function ProviderDetailPage({
   }
 
   // Fetch tenant
-  const { data: tenant } = await db
+  const { data: tenant } = await supabase
     .from('tenants')
     .select('*')
     .eq('id', tenantId)
@@ -60,29 +60,29 @@ export default async function ProviderDetailPage({
     { data: auditEvents },
     { count: enrollmentCount },
   ] = await Promise.all([
-    db.from('profiles')
+    supabase.from('profiles')
       .select('id, email, full_name, role, created_at')
       .eq('tenant_id', tenantId)
       .order('created_at'),
-    db.from('programs')
+    supabase.from('programs')
       .select('id, title, status, published, is_active, created_at', { count: 'exact' })
       .eq('tenant_id', tenantId)
       .order('created_at', { ascending: false })
       .limit(10),
-    db.from('provider_compliance_artifacts')
+    supabase.from('provider_compliance_artifacts')
       .select('*')
       .eq('tenant_id', tenantId)
       .order('expires_at', { ascending: true }),
-    db.from('provider_onboarding_steps')
+    supabase.from('provider_onboarding_steps')
       .select('*')
       .eq('tenant_id', tenantId)
       .order('created_at'),
-    db.from('admin_audit_events')
+    supabase.from('admin_audit_events')
       .select('action, metadata, created_at, actor_user_id')
       .eq('target_id', tenantId)
       .order('created_at', { ascending: false })
       .limit(20),
-    db.from('program_enrollments')
+    supabase.from('program_enrollments')
       .select('*', { count: 'exact', head: true })
       .eq('tenant_id', tenantId),
   ]);

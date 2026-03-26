@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Phone, ArrowLeft, ExternalLink, GraduationCap, Award, Clock, Users, Star, Sparkles } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
 export const metadata: Metadata = {
   title: 'Drug Testing Training Courses | Elevate for Humanity',
@@ -15,10 +14,9 @@ export const dynamic = 'force-dynamic';
 
 export default async function DrugTestingTrainingPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   // Fetch NDS courses from database
-  const { data: dbCourses } = await db
+  const { data: dbCourses } = await supabase
     .from('nds_training_courses')
     .select('*')
     .eq('is_active', true)

@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -15,38 +14,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { scormId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return { title: 'SCORM Content | Elevate LMS' };
-  }
-
-  const { data: scorm } = await db
-    .from('scorm_packages')
-    .select('title')
-    .eq('id', scormId)
-    .single();
-
-  return {
-    title: scorm ? `${scorm.title} | Elevate LMS` : 'SCORM Content | Elevate LMS',
-  };
-}
-
-export default async function ScormPage({ params }: Props) {
-  const { scormId } = await params;
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   const {
     data: { user },
@@ -57,7 +25,7 @@ export default async function ScormPage({ params }: Props) {
   }
 
   // Fetch SCORM package
-  const { data: scorm, error } = await db
+  const { data: scorm, error } = await supabase
     .from('scorm_packages')
     .select('*, courses (id, title)')
     .eq('id', scormId)
@@ -68,7 +36,7 @@ export default async function ScormPage({ params }: Props) {
   }
 
   // Fetch user's progress from scorm_enrollments
-  const { data: enrollment } = await db
+  const { data: enrollment } = await supabase
     .from('scorm_enrollments')
     .select('*')
     .eq('scorm_package_id', scormId)

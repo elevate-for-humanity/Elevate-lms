@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
@@ -15,18 +15,7 @@ export const metadata: Metadata = {
 
 export default async function EngagementPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -35,7 +24,7 @@ export default async function EngagementPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -46,20 +35,20 @@ export default async function EngagementPage() {
   }
 
   // Fetch engagement data
-  const { count: totalUsers } = await db
+  const { count: totalUsers } = await supabase
     .from('profiles')
     .select('*', { count: 'exact', head: true });
 
-  const { count: activeUsers } = await db
+  const { count: activeUsers } = await supabase
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .gte('last_sign_in_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
 
-  const { count: totalEnrollments } = await db
+  const { count: totalEnrollments } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true });
 
-  const { data: recentActivity } = await db
+  const { data: recentActivity } = await supabase
     .from('profiles')
     .select('id, full_name, email, last_sign_in_at')
     .order('last_sign_in_at', { ascending: false })

@@ -3,7 +3,6 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { BookOpen, Award, Briefcase } from 'lucide-react';
@@ -25,12 +24,12 @@ const getCachedUserData = unstable_cache(
   async (userId: string, supabase: any) => {
     // Run queries in parallel instead of sequentially
     const [profileResult, enrollmentsResult, activeResult, completedResult, progressResult] = await Promise.all([
-      db
+      supabase
         .from('profiles')
         .select('id, full_name, role, avatar_url')
         .eq('id', userId)
         .single(),
-      db
+      supabase
         .from('program_enrollments')
         .select(`
           id, status, progress, created_at,
@@ -39,17 +38,17 @@ const getCachedUserData = unstable_cache(
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(10),
-      db
+      supabase
         .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId)
         .eq('status', 'active'),
-      db
+      supabase
         .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId)
         .eq('status', 'completed'),
-      db
+      supabase
         .from('student_progress')
         .select(`id, updated_at, courses (title)`)
         .eq('student_id', userId)
@@ -71,22 +70,7 @@ const getCachedUserData = unstable_cache(
 
 export default async function LearningPathsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Learning Paths" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();

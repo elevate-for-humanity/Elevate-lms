@@ -1,5 +1,3 @@
-export const dynamic = 'force-static';
-export const revalidate = 3600;
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -7,6 +5,9 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import HeroVideo from '@/components/marketing/HeroVideo';
+
+export const dynamic = 'force-static';
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Impact & Outcomes | Elevate for Humanity',

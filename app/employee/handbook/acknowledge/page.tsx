@@ -1,7 +1,8 @@
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
 
 export default async function AcknowledgeHandbookPage() {
   const supabase = await createClient();
@@ -11,7 +12,7 @@ export default async function AcknowledgeHandbookPage() {
   if (!user) redirect('/login?redirect=/employee/handbook/acknowledge');
 
   // Upsert acknowledgment
-  await db.from('handbook_acknowledgments').upsert({
+  await supabase.from('handbook_acknowledgments').upsert({
     user_id: user.id,
     handbook_version: new Date().getFullYear().toString(),
     acknowledged_at: new Date().toISOString(),

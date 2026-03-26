@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { AcknowledgeHandbookForm } from './AcknowledgeHandbookForm';
 import { AlertTriangle, BookOpen, Info, ShieldAlert } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Program Holder Handbook | Elevate For Humanity',
@@ -17,23 +17,12 @@ export const metadata: Metadata = {
 
 export default async function ProgramHolderHandbookPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: acknowledgement } = await db
+  const { data: acknowledgement } = await supabase
     .from('program_holder_acknowledgements')
     .select('*')
     .eq('user_id', user.id)

@@ -6,7 +6,6 @@ import { Store, Search, Filter, Star, Users, Clock, ChevronRight,
   Phone
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -48,9 +47,8 @@ export default async function MarketplacePage() {
   
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
     if (supabase) {
-      const { data } = await db
+      const { data } = await supabase
         .from('marketplace_courses')
         .select('id, title, slug, creator_name, price, rating, student_count, duration_hours, image_url, category')
         .eq('is_published', true)

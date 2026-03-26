@@ -1,12 +1,12 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { Calendar, Plus, XCircle, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Time Off | Employee Portal',
@@ -16,14 +16,13 @@ export const metadata: Metadata = {
 
 export default async function TimeOffPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login?redirect=/employee/time-off');
   }
 
-  const { data: requests } = await db
+  const { data: requests } = await supabase
     .from('time_off_requests')
     .select('*')
     .eq('user_id', user.id)

@@ -1,12 +1,12 @@
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import {
+
+export const dynamic = 'force-dynamic';
   Users,
   FileText,
   Clock,
@@ -31,20 +31,7 @@ export const metadata: Metadata = {
 
 export default async function FERPAPortal() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-
-      
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -53,7 +40,7 @@ export default async function FERPAPortal() {
     redirect('/login?redirect=/ferpa');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role, full_name')
     .eq('id', user.id)
@@ -72,17 +59,17 @@ export default async function FERPAPortal() {
   }
 
   // Fetch FERPA metrics
-  const { count: totalStudents } = await db
+  const { count: totalStudents } = await supabase
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('role', 'student');
 
-  const { count: activeEnrollments } = await db
+  const { count: activeEnrollments } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
 
-  const { count: pendingRequests } = await db
+  const { count: pendingRequests } = await supabase
     .from('applications')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'pending');

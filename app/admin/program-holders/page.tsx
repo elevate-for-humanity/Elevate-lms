@@ -1,12 +1,12 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Building2, Clock, CheckCircle, XCircle, Eye, Send } from 'lucide-react';
 import ResendOnboardingButton from './ResendOnboardingButton';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Program Holders | Admin | Elevate For Humanity',
@@ -23,13 +23,11 @@ const STATUS_STYLES: Record<string, string> = {
 
 export default async function AdminProgramHoldersPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -40,7 +38,7 @@ export default async function AdminProgramHoldersPage() {
   }
 
   // Fetch all program holders
-  const { data: holders } = await db
+  const { data: holders } = await supabase
     .from('program_holders')
     .select('id, organization_name, name, contact_name, contact_email, contact_phone, status, mou_signed, created_at, user_id')
     .order('created_at', { ascending: false });
@@ -48,7 +46,7 @@ export default async function AdminProgramHoldersPage() {
   // Fetch program counts per holder
   const holderIds = (holders || []).map((h: any) => h.id);
   const { data: programCounts } = holderIds.length > 0
-    ? await db
+    ? await supabase
         .from('program_holder_programs')
         .select('program_holder_id')
         .in('program_holder_id', holderIds)

@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
@@ -6,6 +5,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Plus, FileQuestion, CheckSquare, Clock, Search } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Assessment Bank | Admin | Elevate For Humanity',
@@ -19,7 +20,7 @@ export default async function AssessmentBankPage() {
   if (!user) redirect('/login?redirect=/admin/course-builder/assessments');
 
   const db = createAdminClient() || supabase;
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
   return (

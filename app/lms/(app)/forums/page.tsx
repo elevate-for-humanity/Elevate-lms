@@ -35,21 +35,21 @@ export default async function ForumsPage() {
   const db = createAdminClient() || supabase;
 
   // Fetch categories with topic counts
-  const { data: categories } = await db
+  const { data: categories } = await supabase
     .from('forum_categories')
     .select('id, name, slug, description, icon, color, sort_order')
     .eq('is_active', true)
     .order('sort_order', { ascending: true });
 
   // Fetch recent topics across all categories
-  const { data: recentTopics } = await db
+  const { data: recentTopics } = await supabase
     .from('forum_topics')
     .select('id, title, category_id, is_pinned, reply_count, view_count, created_at, author_id')
     .order('created_at', { ascending: false })
     .limit(8);
 
   // Fetch topic counts per category
-  const { data: topicCounts } = await db
+  const { data: topicCounts } = await supabase
     .from('forum_topics')
     .select('category_id');
 

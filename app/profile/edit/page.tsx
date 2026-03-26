@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { User, Save, ArrowLeft } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Edit Profile | Elevate for Humanity',
@@ -23,7 +23,7 @@ async function updateProfile(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { error } = await db.from('profiles').update({
+  const { error } = await supabase.from('profiles').update({
     full_name: formData.get('full_name') as string,
     phone: formData.get('phone') as string || null,
     address: formData.get('address') as string || null,
@@ -42,12 +42,11 @@ async function updateProfile(formData: FormData) {
 
 export default async function EditProfilePage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) redirect('/login');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
 
   return (
     <div className="min-h-screen bg-white p-6">

@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { generateInternalMetadata } from '@/lib/seo/metadata';
 
 export const metadata: Metadata = generateInternalMetadata({
@@ -11,6 +10,8 @@ export const metadata: Metadata = generateInternalMetadata({
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import PayrollSetupForm from './PayrollSetupForm';
+
+export const dynamic = 'force-dynamic';
 
 
 export default async function PayrollSetupPage() {

@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, Download, Calendar, Users, Clock } from 'lucide-react';
@@ -15,7 +14,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function ShopReportsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     redirect('/login?redirect=/shop/reports');
@@ -28,7 +26,7 @@ export default async function ShopReportsPage() {
   }
 
   // Get shops this user is staff at
-  const { data: staffRecords } = await db
+  const { data: staffRecords } = await supabase
     .from('shop_staff')
     .select('shop_id')
     .eq('user_id', user.id);
@@ -47,7 +45,7 @@ export default async function ShopReportsPage() {
 
   if (shopIds.length > 0) {
     // progress_entries is the live timeclock table; partner_id maps to shop
-    const { data: entries } = await db
+    const { data: entries } = await supabase
       .from('progress_entries')
       .select(`
         id,

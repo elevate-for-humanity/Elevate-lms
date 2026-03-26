@@ -1,8 +1,9 @@
-export const revalidate = 600;
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const revalidate = 600;
 
 export const metadata: Metadata = {
   alternates: {

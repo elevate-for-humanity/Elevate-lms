@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -23,46 +22,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { threadId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return { title: 'Thread | Elevate LMS' };
-  }
-
-  const { data: thread } = await db
-    .from('forum_threads')
-    .select('title')
-    .eq('id', threadId)
-    .single();
-
-  return {
-    title: thread ? `${thread.title} | Forums | Elevate LMS` : 'Thread | Elevate LMS',
-  };
-}
-
-interface ThreadReply {
-  id: string;
-  content: string;
-  created_at: string;
-  user_id: string;
-  profiles: { full_name: string | null; avatar_url: string | null } | null;
-}
-
-export default async function ThreadPage({ params }: Props) {
-  const { forumId, threadId } = await params;
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -71,7 +31,7 @@ export default async function ThreadPage({ params }: Props) {
   }
 
   // Fetch thread with author
-  const { data: thread, error } = await db
+  const { data: thread, error } = await supabase
     .from('forum_threads')
     .select(`
       *,
@@ -86,7 +46,7 @@ export default async function ThreadPage({ params }: Props) {
   }
 
   // Fetch replies
-  const { data: replies } = await db
+  const { data: replies } = await supabase
     .from('forum_replies')
     .select(`
       *,

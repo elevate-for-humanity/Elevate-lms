@@ -1,14 +1,14 @@
-export const dynamic = 'force-dynamic';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import LearningAnalyticsDashboard from '@/components/LearningAnalyticsDashboard';
 import StudentEngagementAnalytics from '@/components/StudentEngagementAnalytics';
 import {
+
+export const dynamic = 'force-dynamic';
   BarChart3,
   TrendingUp,
   Clock,
@@ -30,21 +30,7 @@ export const metadata: Metadata = {
 
 export default async function AnalyticsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Analytics" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -54,7 +40,7 @@ export default async function AnalyticsPage() {
   }
 
   // Fetch enrollments
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('program_enrollments')
     .select(`
       *,
@@ -68,14 +54,14 @@ export default async function AnalyticsPage() {
     .eq('user_id', user.id);
 
   // Fetch lesson progress
-  const { data: lessonProgress } = await db
+  const { data: lessonProgress } = await supabase
     .from('student_progress')
     .select('*')
     .eq('student_id', user.id)
     .order('updated_at', { ascending: false });
 
   // Fetch quiz attempts
-  const { data: quizAttempts } = await db
+  const { data: quizAttempts } = await supabase
     .from('quiz_attempts')
     .select('*')
     .eq('user_id', user.id)
@@ -83,7 +69,7 @@ export default async function AnalyticsPage() {
     .order('completed_at', { ascending: false });
 
   // Fetch assignment submissions
-  const { data: assignments } = await db
+  const { data: assignments } = await supabase
     .from('assignment_submissions')
     .select('*')
     .eq('student_id', user.id)

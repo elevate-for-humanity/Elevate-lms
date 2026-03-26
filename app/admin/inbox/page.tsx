@@ -7,7 +7,6 @@ export const metadata: Metadata = {
 };
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
@@ -17,7 +16,7 @@ async function requireAdmin(supabase: any) {
   const { data }: any = await supabase.auth.getUser();
   if (!data?.user) return false;
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('user_profiles')
     .select('role')
     .eq('user_id', data.user.id)
@@ -28,23 +27,7 @@ async function requireAdmin(supabase: any) {
 
 export default async function AdminInboxPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-
-      
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Inbox" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const isAdmin = await requireAdmin(supabase);
 
   if (!isAdmin) {
@@ -57,12 +40,12 @@ export default async function AdminInboxPage() {
   }
 
   const [{ data: partners }, { data: licenses }] = await Promise.all([
-    db
+    supabase
       .from('partner_inquiries')
       .select('*')
       .order('submitted_at', { ascending: false })
       .limit(50),
-    db
+    supabase
       .from('license_requests')
       .select('*')
       .order('created_at', { ascending: false })

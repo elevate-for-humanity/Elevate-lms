@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -103,7 +102,6 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
 
 export default async function LearnerOnboardingPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) { redirect("/login"); }
   const { data: { user } } = await supabase.auth.getUser();
@@ -121,34 +119,34 @@ export default async function LearnerOnboardingPage() {
     idDocResult,
     orientationResult,
   ] = await Promise.all([
-    db.from('profiles')
+    supabase.from('profiles')
       .select('*, onboarding_completed, funding_confirmed, funding_source, orientation_completed, schedule_selected, enrollment_status, full_name, first_name, last_name, phone, address')
       .eq('id', user.id)
       .single(),
-    db.from('program_enrollments')
+    supabase.from('program_enrollments')
       .select('id, program_id, program_slug, status, enrollment_state')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle(),
-    db.from('documents')
+    supabase.from('documents')
       .select('document_type', { count: 'exact' })
       .eq('user_id', user.id),
-    db.from('license_agreement_acceptances')
+    supabase.from('license_agreement_acceptances')
       .select('agreement_key:agreement_type')
       .eq('user_id', user.id),
-    db.from('handbook_acknowledgments')
+    supabase.from('handbook_acknowledgments')
       .select('id')
       .eq('user_id', user.id)
       .limit(1),
     // Check identity via documents table (id_verifications has no user_id column)
-    db.from('documents')
+    supabase.from('documents')
       .select('id, status')
       .eq('user_id', user.id)
       .eq('document_type', 'photo_id')
       .limit(1)
       .maybeSingle(),
-    db.from('orientation_completions')
+    supabase.from('orientation_completions')
       .select('id')
       .eq('user_id', user.id)
       .limit(1),
@@ -168,7 +166,7 @@ export default async function LearnerOnboardingPage() {
   // Look up program name from apprenticeship_programs (FK target for program_enrollments)
   let enrollmentProgramName: string | null = null;
   if (enrollment?.program_id) {
-    const { data: prog } = await db
+    const { data: prog } = await supabase
       .from('apprenticeship_programs')
       .select('name')
       .eq('id', enrollment.program_id)
@@ -225,13 +223,13 @@ export default async function LearnerOnboardingPage() {
       const { sendEmail } = await import('@/lib/email');
 
       // Mark onboarding complete
-      await db.from('profiles').update({
+      await supabase.from('profiles').update({
         onboarding_completed: true,
         onboarding_completed_at: new Date().toISOString(),
       }).eq('id', user.id);
 
       // Find pending application
-      const { data: pendingApp } = await db
+      const { data: pendingApp } = await supabase
         .from('applications')
         .select('id, status, program_id, program_interest')
         .eq('user_id', user.id)
@@ -249,7 +247,7 @@ export default async function LearnerOnboardingPage() {
           role: 'student',
         });
       } else if (enrollment && enrollment.enrollment_state !== 'active') {
-        await db.from('program_enrollments')
+        await supabase.from('program_enrollments')
           .update({ enrollment_state: 'active', status: 'active' })
           .eq('id', enrollment.id);
       }

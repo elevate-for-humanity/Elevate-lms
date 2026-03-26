@@ -17,7 +17,7 @@ export default async function CourseGeneratorPage() {
   if (!user) redirect('/admin/login');
 
   const db = createAdminClient();
-  const { data: programs } = await db
+  const { data: programs } = await supabase
     .from('training_programs')
     .select('id, name, category')
     .eq('is_active', true)

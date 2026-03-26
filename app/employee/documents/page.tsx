@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, Download, Upload, Folder, Search } from 'lucide-react';
@@ -15,7 +14,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function EmployeeDocumentsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) { redirect("/login"); }
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -24,14 +22,14 @@ export default async function EmployeeDocumentsPage() {
   }
 
   // Get employee documents
-  const { data: documents } = await db
+  const { data: documents } = await supabase
     .from('employee_documents')
     .select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
   // Get document categories
-  const { data: categories } = await db
+  const { data: categories } = await supabase
     .from('document_categories')
     .select('*')
     .eq('type', 'employee')

@@ -1,9 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { generateMetadata } from '@/lib/seo/metadata';
 
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = generateMetadata({
   title: 'Application-Success',
@@ -15,23 +13,14 @@ import Link from 'next/link';
 import { PartyPopper } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ApplicationSuccessPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   
   // Log success page visit
-  await db.from('page_views').insert({ page: 'application_success' }).select();
+  await supabase.from('page_views').insert({ page: 'application_success' }).select();
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}

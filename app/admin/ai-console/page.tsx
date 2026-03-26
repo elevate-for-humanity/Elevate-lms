@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'AI Console | Admin',
@@ -11,29 +11,11 @@ export const metadata: Metadata = {
 
 export default async function AIConsolePage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-
-      
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Ai Console" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -42,51 +24,51 @@ export default async function AIConsolePage() {
     redirect('/unauthorized');
 
   // Get AI usage stats
-  const { count: totalConversations } = await db
+  const { count: totalConversations } = await supabase
     .from('conversations')
     .select('*', { count: 'exact', head: true });
 
   // Get AI task metrics
-  const { count: totalTasks } = await db
+  const { count: totalTasks } = await supabase
     .from('ai_generation_tasks')
     .select('*', { count: 'exact', head: true });
 
-  const { count: completedTasks } = await db
+  const { count: completedTasks } = await supabase
     .from('ai_generation_tasks')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed');
 
-  const { count: failedTasks } = await db
+  const { count: failedTasks } = await supabase
     .from('ai_generation_tasks')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'failed');
 
-  const { count: runningTasks } = await db
+  const { count: runningTasks } = await supabase
     .from('ai_generation_tasks')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'running');
 
   // Get recent activity feed
-  const { data: recentTasks } = await db
+  const { data: recentTasks } = await supabase
     .from('ai_generation_tasks')
     .select('id, task_type, status, input_config, created_at, completed_at, error_message')
     .order('created_at', { ascending: false })
     .limit(20);
 
   // Get generated asset counts
-  const { count: totalImages } = await db
+  const { count: totalImages } = await supabase
     .from('generated_images')
     .select('*', { count: 'exact', head: true });
 
-  const { count: totalTTS } = await db
+  const { count: totalTTS } = await supabase
     .from('tts_audio_files')
     .select('*', { count: 'exact', head: true });
 
-  const { count: totalVideos } = await db
+  const { count: totalVideos } = await supabase
     .from('video_generation_jobs')
     .select('*', { count: 'exact', head: true });
 
-  const { count: totalCourses } = await db
+  const { count: totalCourses } = await supabase
     .from('course_generation_logs')
     .select('*', { count: 'exact', head: true });
 

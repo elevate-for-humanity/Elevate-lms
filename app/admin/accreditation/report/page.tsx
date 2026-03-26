@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Download, Calendar, AlertTriangle, Clock, ArrowLeft, CheckCircle2, Shield, FileText } from 'lucide-react';
@@ -15,11 +14,11 @@ export const metadata: Metadata = {
 
 async function getAccreditationData(supabase: any) {
   const [programs, courses, certificates, enrollments, completions] = await Promise.all([
-    db.from('programs').select('id, name, status, created_at').eq('status', 'active'),
-    db.from('training_courses').select('id, course_name, is_active').eq('is_active', true),
-    db.from('certificates').select('id, created_at, status'),
-    db.from('program_enrollments').select('id, status, created_at'),
-    db.from('completions').select('id, created_at'),
+    supabase.from('programs').select('id, name, status, created_at').eq('status', 'active'),
+    supabase.from('training_courses').select('id, course_name, is_active').eq('is_active', true),
+    supabase.from('certificates').select('id, created_at, status'),
+    supabase.from('program_enrollments').select('id, status, created_at'),
+    supabase.from('completions').select('id, created_at'),
   ]);
 
   const totalPrograms = programs.data?.length ?? 0;
@@ -42,7 +41,6 @@ async function getAccreditationData(supabase: any) {
 
 export default async function AccreditationReportPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) {
     return <div className="p-8 text-center text-gray-600">Database unavailable.</div>;
   }

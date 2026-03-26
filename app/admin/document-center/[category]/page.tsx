@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -45,21 +44,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function DocumentCategoryPage({ params }: Props) {
   const { category } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="p-8 text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-        <p className="text-gray-600">Please try again later.</p>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: adminProfile } = await db
+  const { data: adminProfile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -70,7 +60,7 @@ export default async function DocumentCategoryPage({ params }: Props) {
   }
 
   // Fetch documents in this category
-  const { data: documents, error } = await db
+  const { data: documents, error } = await supabase
     .from('documents')
     .select(`
       *,

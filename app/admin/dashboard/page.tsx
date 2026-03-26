@@ -1,9 +1,10 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import DashboardClient from './DashboardClient';
 import { BuiltCoursesPanel } from './BuiltCoursesPanel';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -27,21 +28,21 @@ async function getDashboardData(supabase: any, db: any) {
     recentStudentsRes,
     topCoursesRes,
   ] = await Promise.all([
-    db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student'),
-    db.from('programs').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-    db.from('courses').select('id', { count: 'exact', head: true }).eq('is_active', true),
-    db.from('program_enrollments').select('id', { count: 'exact', head: true }),
-    db.from('certificates').select('id', { count: 'exact', head: true }),
-    db.from('course_lessons').select('id', { count: 'exact', head: true }),
-    db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'partner'),
-    db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student').eq('enrollment_status', 'at_risk'),
+    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student'),
+    supabase.from('programs').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    supabase.from('courses').select('id', { count: 'exact', head: true }).eq('is_active', true),
+    supabase.from('program_enrollments').select('id', { count: 'exact', head: true }),
+    supabase.from('certificates').select('id', { count: 'exact', head: true }),
+    supabase.from('course_lessons').select('id', { count: 'exact', head: true }),
+    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'partner'),
+    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student').eq('enrollment_status', 'at_risk'),
     // Full data for charts
-    db.from('profiles').select('enrollment_status').eq('role', 'student'),
-    db.from('program_enrollments').select('status, enrolled_at, progress, course_id'),
-    db.from('programs').select('id, name, status'),
-    db.from('courses').select('id, title, is_active'),
-    db.from('profiles').select('id, full_name, email, enrollment_status, created_at').eq('role', 'student').order('created_at', { ascending: false }).limit(10),
-    db.from('program_enrollments').select('course_id, status').limit(500),
+    supabase.from('profiles').select('enrollment_status').eq('role', 'student'),
+    supabase.from('program_enrollments').select('status, enrolled_at, progress, course_id'),
+    supabase.from('programs').select('id, name, status'),
+    supabase.from('courses').select('id, title, is_active'),
+    supabase.from('profiles').select('id, full_name, email, enrollment_status, created_at').eq('role', 'student').order('created_at', { ascending: false }).limit(10),
+    supabase.from('program_enrollments').select('course_id, status').limit(500),
   ]);
 
   // Build enrollment trend by month
@@ -104,7 +105,7 @@ async function getDashboardData(supabase: any, db: any) {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      const { data } = await db.from('profiles').select('full_name, role').eq('id', user.id).single();
+      const { data } = await supabase.from('profiles').select('full_name, role').eq('id', user.id).single();
       profile = data;
     }
   } catch { /* non-fatal */ }
@@ -134,14 +135,7 @@ async function getDashboardData(supabase: any, db: any) {
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) {
-    return (
-      <div className="p-8 text-center">
-        <p className="text-gray-600">Database unavailable. Check Supabase configuration.</p>
-      </div>
-    );
-  }
+  const db = createAdminClient() || supabase;
 
   const data = await getDashboardData(supabase, db);
 

@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
@@ -9,6 +8,8 @@ import {
   BookOpen, CheckCircle, Clock, Lock, ChevronRight, Star
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Staff Onboarding | Elevate For Humanity',
@@ -27,10 +28,10 @@ export default async function StaffOnboardingPage() {
   // If user signed up as staff, fix it here before rendering
   const metaRole = user.user_metadata?.role;
   if (metaRole === 'staff') {
-    await db.from('profiles').upsert({ id: user.id, role: 'staff' }, { onConflict: 'id' });
+    await supabase.from('profiles').upsert({ id: user.id, role: 'staff' }, { onConflict: 'id' });
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('full_name, role')
     .eq('id', user.id)
@@ -42,9 +43,9 @@ export default async function StaffOnboardingPage() {
     { data: handbookAck },
     { data: userSkills },
   ] = await Promise.all([
-    db.from('payroll_profiles').select('id, status').eq('user_id', user.id).maybeSingle(),
-    db.from('handbook_acknowledgments').select('id').eq('user_id', user.id).maybeSingle(),
-    db.from('user_skills').select('skill_name').eq('user_id', user.id),
+    supabase.from('payroll_profiles').select('id, status').eq('user_id', user.id).maybeSingle(),
+    supabase.from('handbook_acknowledgments').select('id').eq('user_id', user.id).maybeSingle(),
+    supabase.from('user_skills').select('skill_name').eq('user_id', user.id),
   ]);
 
   const skillsCompleted = (userSkills ?? []).length;

@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import { requireAdmin } from '@/lib/auth';
 import { getAdminCoursesOverview } from '@/lib/admin/course-admin-overview';
 import { AdminCoursesTable } from './AdminCoursesTable';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
   title: 'Course Management | Admin | Elevate For Humanity',

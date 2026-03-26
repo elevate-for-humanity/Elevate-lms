@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { WebsiteBuilderApp } from './WebsiteBuilderApp';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -14,7 +13,6 @@ export const metadata: Metadata = {
 
 export default async function WebsiteBuilderPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) {
     redirect('/error?message=service-unavailable');
@@ -25,7 +23,7 @@ export default async function WebsiteBuilderPage() {
     redirect('/login?redirect=/apps/website-builder&message=login-required');
   }
 
-  const { data: subscription } = await db
+  const { data: subscription } = await supabase
     .from('user_app_subscriptions')
     .select('*')
     .eq('user_id', user.id)
@@ -54,7 +52,7 @@ export default async function WebsiteBuilderPage() {
   }
 
   // Fetch user's websites
-  const { data: websites } = await db
+  const { data: websites } = await supabase
     .from('user_websites')
     .select('*, pages:website_pages(count)')
     .eq('user_id', user.id)

@@ -6,7 +6,6 @@ import {
   GraduationCap, Briefcase, Award, BookOpen, Sparkles 
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { CourseCatalog } from '@/components/CourseCatalog';
 import { CourseCompletionTracking } from '@/components/CourseCompletionTracking';
@@ -45,12 +44,11 @@ const microClasses = [
 
 export default async function CoursesPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   let featuredCourses: any[] = [];
 
   if (supabase) {
     try {
-      const { data } = await db
+      const { data } = await supabase
         .from('programs')
         .select('id, title, slug, category, image_url, description, duration, price')
         .eq('is_active', true)

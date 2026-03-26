@@ -1,14 +1,14 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import CertificateDownload from '@/components/CertificateDownload';
 import CertificateGenerator from '@/components/CertificateGenerator';
 import { CertificateTemplate } from '@/components/lms/CertificateTemplate';
 import { GenerateCertificateButton } from '@/components/lms/GenerateCertificateButton';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
@@ -21,22 +21,7 @@ export const metadata: Metadata = {
 
 export default async function CertificatesPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Certificates" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -45,21 +30,21 @@ export default async function CertificatesPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
 
   // Fetch certificates (no FK to courses table, use stored course_title/program_name)
-  const { data: certificates } = await db
+  const { data: certificates } = await supabase
     .from('certificates')
     .select('*')
     .eq('user_id', user.id)
     .order('issued_at', { ascending: false });
 
   // Fetch transcripts (program completions)
-  const { data: transcripts } = await db
+  const { data: transcripts } = await supabase
     .from('transcripts')
     .select('*')
     .eq('user_id', user.id)

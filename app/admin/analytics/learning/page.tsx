@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
@@ -15,18 +15,7 @@ export const metadata: Metadata = {
 
 export default async function LearningAnalyticsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -35,7 +24,7 @@ export default async function LearningAnalyticsPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -46,24 +35,24 @@ export default async function LearningAnalyticsPage() {
   }
 
   // Fetch learning analytics data
-  const { count: totalCourses } = await db
+  const { count: totalCourses } = await supabase
     .from('courses')
     .select('*', { count: 'exact', head: true });
 
-  const { count: totalEnrollments } = await db
+  const { count: totalEnrollments } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true });
 
-  const { count: completedEnrollments } = await db
+  const { count: completedEnrollments } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed');
 
-  const { count: totalCertificates } = await db
+  const { count: totalCertificates } = await supabase
     .from('certificates')
     .select('*', { count: 'exact', head: true });
 
-  const { data: topCourses } = await db
+  const { data: topCourses } = await supabase
     .from('courses')
     .select('id, title, enrollment_count')
     .order('enrollment_count', { ascending: false })

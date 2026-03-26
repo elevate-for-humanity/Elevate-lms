@@ -1,12 +1,13 @@
 import Image from 'next/image';
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { BarChart3, Calendar, FileText, Download, Clock, AlertTriangle } from 'lucide-react';
 import {
+
+export const dynamic = 'force-dynamic';
   getUpcomingDeadlines,
   calculateWIOAPerformance,
 } from '@/lib/compliance/wioa-reporting';
@@ -38,9 +39,9 @@ export default async function ReportsPage() {
 
   // Enrollment counts
   const [totalEnrollments, activeEnrollments, completions] = await Promise.all([
-    db.from('enrollments').select('id', { count: 'exact', head: true }),
-    db.from('enrollments').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-    db.from('partner_completions').select('id', { count: 'exact', head: true }),
+    supabase.from('enrollments').select('id', { count: 'exact', head: true }),
+    supabase.from('enrollments').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    supabase.from('partner_completions').select('id', { count: 'exact', head: true }),
   ]);
 
   const reports = [

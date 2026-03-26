@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -14,25 +14,12 @@ export const metadata: Metadata = {
 
 export default async function LessonsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-
-      
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -42,7 +29,7 @@ export default async function LessonsPage() {
     redirect('/unauthorized');
   }
 
-  const { data: lessons, count: totalLessons } = await db
+  const { data: lessons, count: totalLessons } = await supabase
     .from('course_lessons')
     .select('id, title, course_id, order_index, duration, video_url, created_at, updated_at', { count: 'exact' })
     .order('updated_at', { ascending: false })
@@ -51,12 +38,12 @@ export default async function LessonsPage() {
   // Get courses for display names
   const courseIds = [...new Set((lessons || []).map(l => l.course_id).filter(Boolean))];
   const { data: courses } = courseIds.length > 0
-    ? await db.from('courses').select('id, title').in('id', courseIds)
+    ? await supabase.from('courses').select('id, title').in('id', courseIds)
     : { data: [] };
 
   const courseMap = new Map((courses || []).map(c => [c.id, c.title]));
 
-  const { count: withVideo } = await db
+  const { count: withVideo } = await supabase
     .from('course_lessons')
     .select('*', { count: 'exact', head: true })
     .not('video_url', 'is', null);

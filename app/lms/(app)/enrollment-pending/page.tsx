@@ -31,7 +31,7 @@ export default async function EnrollmentPendingPage({
   // Confirm the enrollment is actually in pending_funding_verification.
   // If it has since been verified, redirect to the course.
   if (courseId) {
-    const { data: enrollment } = await db
+    const { data: enrollment } = await supabase
       .from('program_enrollments')
       .select('enrollment_state, status')
       .eq('user_id', user.id)
@@ -48,7 +48,7 @@ export default async function EnrollmentPendingPage({
     }
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('full_name, email')
     .eq('id', user.id)

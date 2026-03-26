@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -30,18 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function QuizResultsPage({ params }: Props) {
   const { quizId, attemptId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -50,7 +38,7 @@ export default async function QuizResultsPage({ params }: Props) {
   }
 
   // Fetch attempt with quiz details
-  const { data: attempt, error: attemptError } = await db
+  const { data: attempt, error: attemptError } = await supabase
     .from('quiz_attempts')
     .select(`
       *,
@@ -77,7 +65,7 @@ export default async function QuizResultsPage({ params }: Props) {
   }
 
   // Fetch attempt answers with question details
-  const { data: attemptAnswers } = await db
+  const { data: attemptAnswers } = await supabase
     .from('quiz_attempt_answers')
     .select(`
       *,
@@ -96,7 +84,7 @@ export default async function QuizResultsPage({ params }: Props) {
     .order('created_at', { ascending: true });
 
   // Get total attempts for this quiz
-  const { count: totalAttempts } = await db
+  const { count: totalAttempts } = await supabase
     .from('quiz_attempts')
     .select('*', { count: 'exact', head: true })
     .eq('quiz_id', quizId)

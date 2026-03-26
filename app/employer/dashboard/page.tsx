@@ -6,8 +6,6 @@ export const metadata: Metadata = {
 };
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
-export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { safeFormatDate } from '@/lib/format-utils';
@@ -17,6 +15,8 @@ import {
   SectionCard,
 } from '@/components/dashboards/StateAwareDashboard';
 import {
+
+export const dynamic = 'force-dynamic';
   Briefcase,
   Users,
   FileText,
@@ -40,18 +40,7 @@ import {
 
 export default async function EmployerDashboardOrchestrated() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   // Require authentication
   const {
@@ -60,7 +49,7 @@ export default async function EmployerDashboardOrchestrated() {
   if (!user) redirect('/login?redirect=/employer/dashboard');
 
   // Get employer profile
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -95,21 +84,21 @@ export default async function EmployerDashboardOrchestrated() {
   }
 
   // Get job postings
-  const { data: postings } = await db
+  const { data: postings } = await supabase
     .from('job_postings')
     .select('*')
     .eq('employer_id', user.id)
     .eq('status', 'active');
 
   // Get pending applications
-  const { data: applications } = await db
+  const { data: applications } = await supabase
     .from('job_applications')
     .select('*')
     .eq('employer_id', user.id)
     .eq('status', 'pending');
 
   // Check apprenticeship program
-  const { data: apprenticeshipProgram } = await db
+  const { data: apprenticeshipProgram } = await supabase
     .from('apprenticeships')
     .select('*')
     .eq('employer_id', user.id)

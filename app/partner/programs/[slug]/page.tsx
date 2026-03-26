@@ -25,7 +25,7 @@ export default async function PartnerProgramPage({ params }: { params: Promise<{
   const db = createAdminClient() || supabase;
 
   // Partner role guard
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -36,7 +36,7 @@ export default async function PartnerProgramPage({ params }: { params: Promise<{
   }
 
   // Verify this partner has access to this program
-  const { data: partnerUser } = await db
+  const { data: partnerUser } = await supabase
     .from('partner_users')
     .select('partner_id')
     .eq('user_id', user.id)
@@ -45,7 +45,7 @@ export default async function PartnerProgramPage({ params }: { params: Promise<{
   const orgId = partnerUser?.partner_id ?? null;
 
   // Resolve program display name from DB, fall back to slug
-  const { data: program } = await db
+  const { data: program } = await supabase
     .from('programs')
     .select('title, name')
     .eq('slug', slug)

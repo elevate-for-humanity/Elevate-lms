@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { requireAdmin } from '@/lib/auth';
 import { Plus, BookOpen, ChevronRight } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = { title: 'Program Courses | Elevate Admin' };
 
@@ -13,12 +13,11 @@ export default async function ProgramCoursesPage({ params }: { params: Promise<{
   const { code } = await params;
   await requireAdmin();
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  const { data: program } = await db.from('programs').select('id, title, code, slug').or(`code.eq.${code},slug.eq.${code}`).single();
+  const { data: program } = await supabase.from('programs').select('id, title, code, slug').or(`code.eq.${code},slug.eq.${code}`).single();
   if (!program) return <div className="p-8"><h1 className="text-2xl font-bold">Program not found</h1></div>;
 
-  const { data: courses } = await db
+  const { data: courses } = await supabase
     .from('training_courses')
     .select('id, course_name, title, slug, is_active, duration_hours, enrolled_count, status')
     .eq('program_id', program.id)
@@ -28,7 +27,7 @@ export default async function ProgramCoursesPage({ params }: { params: Promise<{
   const courseIds = (courses || []).map((c: any) => c.id);
   const lessonCounts: Record<string, number> = {};
   if (courseIds.length > 0) {
-    const { data: lessons } = await db
+    const { data: lessons } = await supabase
       .from('training_lessons')
       .select('course_id')
       .in('course_id', courseIds);

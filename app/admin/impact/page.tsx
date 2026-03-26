@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Users, Briefcase, Award, TrendingUp, Heart, BookOpen, Star, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -15,19 +15,11 @@ export const metadata: Metadata = {
 
 export default async function ImpactPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
-
-  if (!supabase) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div>
-    </div>
-  );
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/admin/impact');
 
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   const [
@@ -40,14 +32,14 @@ export default async function ImpactPage() {
     { data: programBreakdown },
     { data: donationsData },
   ] = await Promise.all([
-    db.from('program_enrollments').select('id', { count: 'exact', head: true }),
-    db.from('certificates').select('id', { count: 'exact', head: true }),
-    db.from('programs').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-    db.from('courses').select('id', { count: 'exact', head: true }).eq('is_active', true),
-    db.from('employment_outcomes').select('employment_status, wage_at_placement, wage_at_followup').limit(500),
-    db.from('certificates').select('id, user_id, issued_at, profiles(full_name)').order('issued_at', { ascending: false }).limit(10),
-    db.from('programs').select('id, name, status').eq('status', 'active').limit(20),
-    db.from('donations').select('amount, created_at').limit(500),
+    supabase.from('program_enrollments').select('id', { count: 'exact', head: true }),
+    supabase.from('certificates').select('id', { count: 'exact', head: true }),
+    supabase.from('programs').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    supabase.from('courses').select('id', { count: 'exact', head: true }).eq('is_active', true),
+    supabase.from('employment_outcomes').select('employment_status, wage_at_placement, wage_at_followup').limit(500),
+    supabase.from('certificates').select('id, user_id, issued_at, profiles(full_name)').order('issued_at', { ascending: false }).limit(10),
+    supabase.from('programs').select('id, name, status').eq('status', 'active').limit(20),
+    supabase.from('donations').select('amount, created_at').limit(500),
   ]);
 
   const employed = (employmentData || []).filter((e: any) => e.employment_status === 'employed').length;

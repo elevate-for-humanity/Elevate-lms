@@ -1,13 +1,13 @@
 
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { Users, BookOpen, AlertCircle, Clock } from 'lucide-react';
 import { safeFormatDate } from '@/lib/format-utils';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
@@ -36,45 +36,34 @@ export default async function StaffDashboard() {
   ]);
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   // Get student counts
-  const { count: totalStudents } = await db
+  const { count: totalStudents } = await supabase
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('role', 'student');
 
   // Get active enrollments
-  const { count: activeEnrollments } = await db
+  const { count: activeEnrollments } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
 
   // Get at-risk students
-  const { count: atRiskCount } = await db
+  const { count: atRiskCount } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('at_risk', true);
 
   // Get pending enrollments
-  const { count: pendingEnrollments } = await db
+  const { count: pendingEnrollments } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'pending');
 
   // Get recent enrollments for activity feed
-  const { data: recentEnrollments } = await db
+  const { data: recentEnrollments } = await supabase
     .from('program_enrollments')
     .select(
       `

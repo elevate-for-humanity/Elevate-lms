@@ -24,8 +24,8 @@ export default async function NetworkingEventsPage() {
   const [upcoming, past, employerCount, eventCount] = await Promise.all([
     getUpcomingEvents({ types: NETWORKING_TYPES, limit: 9 }),
     getPastEvents({ types: NETWORKING_TYPES, limit: 3 }),
-    db ? db.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'employer').then(r => r.count ?? 0) : Promise.resolve(0),
-    db ? db.from('events').select('*', { count: 'exact', head: true }).in('event_type', NETWORKING_TYPES).eq('is_active', true).then(r => r.count ?? 0) : Promise.resolve(0),
+    db ? supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'employer').then(r => r.count ?? 0) : Promise.resolve(0),
+    db ? supabase.from('events').select('*', { count: 'exact', head: true }).in('event_type', NETWORKING_TYPES).eq('is_active', true).then(r => r.count ?? 0) : Promise.resolve(0),
   ]);
 
   return (

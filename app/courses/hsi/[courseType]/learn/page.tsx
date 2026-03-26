@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { HSICoursePlayer } from './HSICoursePlayer';
 
@@ -30,18 +29,7 @@ export default async function HSILearnPage({
   params: { courseType: string } 
 }) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   // Get current user
   const { data: { user } } = await supabase.auth.getUser();
@@ -51,7 +39,7 @@ export default async function HSILearnPage({
   }
 
   // Get the HSI course product
-  const { data: course } = await db
+  const { data: course } = await supabase
     .from('hsi_course_products')
     .select('*')
     .eq('course_type', params.courseType)
@@ -72,7 +60,7 @@ export default async function HSILearnPage({
   }
 
   // Check if user has an active enrollment
-  const { data: enrollment } = await db
+  const { data: enrollment } = await supabase
     .from('hsi_enrollment_queue')
     .select('*')
     .eq('student_id', user.id)
@@ -82,7 +70,7 @@ export default async function HSILearnPage({
 
   if (!enrollment) {
     // Check for pending enrollment
-    const { data: pendingEnrollment } = await db
+    const { data: pendingEnrollment } = await supabase
       .from('hsi_enrollment_queue')
       .select('*')
       .eq('student_id', user.id)

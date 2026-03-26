@@ -20,7 +20,7 @@ export default async function AdminProvidersPage() {
   const db = createAdminClient();
   if (!db) return <div className="p-8 text-red-600">Database unavailable</div>;
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -30,14 +30,14 @@ export default async function AdminProvidersPage() {
     redirect('/unauthorized');
   }
 
-  const { data: tenants } = await db
+  const { data: tenants } = await supabase
     .from('tenants')
     .select('id, name, slug, status, active, created_at')
     .eq('type', 'partner_provider')
     .order('created_at', { ascending: false });
 
   // Pending applications count for the badge
-  const { count: pendingCount } = await db
+  const { count: pendingCount } = await supabase
     .from('provider_applications')
     .select('*', { count: 'exact', head: true })
     .in('status', ['pending', 'under_review']);
@@ -46,7 +46,7 @@ export default async function AdminProvidersPage() {
   const tenantIds = (tenants ?? []).map(t => t.id);
   let ghostTenantIds = new Set<string>();
   if (tenantIds.length > 0) {
-    const { data: adminProfiles } = await db
+    const { data: adminProfiles } = await supabase
       .from('profiles')
       .select('tenant_id')
       .in('tenant_id', tenantIds)

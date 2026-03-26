@@ -23,7 +23,7 @@ export default async function ProviderApplicationsPage({
   const db = createAdminClient();
   if (!db) return <div className="p-8 text-red-600">Database unavailable</div>;
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -37,7 +37,7 @@ export default async function ProviderApplicationsPage({
   const activeFilter = filterStatus ?? 'pending';
 
   // Counts per status for tab badges
-  const { data: counts } = await db
+  const { data: counts } = await supabase
     .from('provider_applications')
     .select('status');
 
@@ -47,7 +47,7 @@ export default async function ProviderApplicationsPage({
   }, {});
 
   // Applications for active tab
-  const query = db
+  const query = supabase
     .from('provider_applications')
     .select('*')
     .order('created_at', { ascending: false });

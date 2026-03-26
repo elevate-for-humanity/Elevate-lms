@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -19,7 +18,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function AnalyticsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     redirect('/login?redirect=/employer-portal/analytics');
@@ -32,7 +30,7 @@ export default async function AnalyticsPage() {
   }
 
   // Fetch employer's job postings
-  const { data: jobPostings } = await db
+  const { data: jobPostings } = await supabase
     .from('job_postings')
     .select('id, job_title, status, positions_available, positions_filled, created_at')
     .eq('employer_id', user.id)
@@ -42,12 +40,12 @@ export default async function AnalyticsPage() {
   const safeJobIds = jobIds.length > 0 ? jobIds : ['00000000-0000-0000-0000-000000000000'];
 
   // Fetch application counts
-  const { count: totalApplications } = await db
+  const { count: totalApplications } = await supabase
     .from('job_applications')
     .select('id', { count: 'exact', head: true })
     .in('job_id', safeJobIds);
 
-  const { count: hiredCount } = await db
+  const { count: hiredCount } = await supabase
     .from('job_applications')
     .select('id', { count: 'exact', head: true })
     .in('job_id', safeJobIds)

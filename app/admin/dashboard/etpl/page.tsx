@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
@@ -10,6 +9,8 @@ import {
 } from '@/lib/metrics';
 import Link from 'next/link';
 import {
+
+export const dynamic = 'force-dynamic';
   Users,
   DollarSign,
   Briefcase,

@@ -26,7 +26,7 @@ export default async function ParticipantDetailPage({ params }: Props) {
   const db       = admin || supabase;
 
   // Verify this application is assigned to this case manager (or user is admin)
-  const { data: assignment } = await db
+  const { data: assignment } = await supabase
     .from('case_manager_assignments')
     .select('application_id')
     .eq('application_id', id)
@@ -34,7 +34,7 @@ export default async function ParticipantDetailPage({ params }: Props) {
     .maybeSingle();
 
   // Admins can view any participant
-  const { data: profileData } = await db
+  const { data: profileData } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -45,7 +45,7 @@ export default async function ParticipantDetailPage({ params }: Props) {
   if (!assignment && !isAdmin) notFound();
 
   // Fetch application
-  const { data: app } = await db
+  const { data: app } = await supabase
     .from('applications')
     .select('id, first_name, last_name, email, phone, program_interest, status, created_at, notes')
     .eq('id', id)
@@ -54,7 +54,7 @@ export default async function ParticipantDetailPage({ params }: Props) {
   if (!app) notFound();
 
   // Look up profile by email
-  const { data: learnerProfile } = await db
+  const { data: learnerProfile } = await supabase
     .from('profiles')
     .select('id, full_name, email, phone, city, state, date_of_birth')
     .eq('email', app.email)
@@ -63,28 +63,28 @@ export default async function ParticipantDetailPage({ params }: Props) {
   const learnerId = learnerProfile?.id ?? null;
 
   // Enrollments
-  const { data: enrollments } = learnerId ? await db
+  const { data: enrollments } = learnerId ? await supabase
     .from('program_enrollments')
     .select('id, status, progress_percent, funding_source, enrolled_at, programs:program_id(name)')
     .eq('user_id', learnerId)
     .order('enrolled_at', { ascending: false }) : { data: [] };
 
   // Credentials
-  const { data: credentials } = learnerId ? await db
+  const { data: credentials } = learnerId ? await supabase
     .from('credentials')
     .select('id, credential_name, credential_type, issued_date, expiry_date, status')
     .eq('user_id', learnerId)
     .order('issued_date', { ascending: false }) : { data: [] };
 
   // Placements
-  const { data: placements } = learnerId ? await db
+  const { data: placements } = learnerId ? await supabase
     .from('placement_records')
     .select('id, employer_name, job_title, employment_type, hourly_wage, start_date, status, verified_at')
     .eq('learner_id', learnerId)
     .order('created_at', { ascending: false }) : { data: [] };
 
   // WIOA record
-  const { data: wioa } = learnerId ? await db
+  const { data: wioa } = learnerId ? await supabase
     .from('wioa_participants')
     .select('id, wioa_program, eligibility_status, enrollment_date, exit_date, exit_reason')
     .eq('user_id', learnerId)

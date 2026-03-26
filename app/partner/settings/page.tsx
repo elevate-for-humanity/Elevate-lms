@@ -22,7 +22,7 @@ export default async function PartnerSettingsPage() {
 
   const db = createAdminClient() || supabase;
 
-  const { data: partnerUser } = await db
+  const { data: partnerUser } = await supabase
     .from('partner_users')
     .select('partner_id')
     .eq('user_id', user.id)
@@ -31,14 +31,14 @@ export default async function PartnerSettingsPage() {
   const orgId = partnerUser?.partner_id ?? null;
 
   const { data: org } = orgId
-    ? await db
+    ? await supabase
         .from('partners')
         .select('name, city, state, address, contact_name, contact_email, contact_phone, notification_preferences')
         .eq('id', orgId)
         .single()
     : { data: null };
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('full_name, email')
     .eq('id', user.id)

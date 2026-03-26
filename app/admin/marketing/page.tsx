@@ -1,8 +1,6 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -17,6 +15,8 @@ import {
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Marketing | Admin | Elevate For Humanity',
   description: 'Marketing dashboard and campaign management.',
@@ -24,7 +24,6 @@ export const metadata: Metadata = {
 
 export default async function AdminMarketingPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -32,17 +31,17 @@ export default async function AdminMarketingPage() {
   }
 
   // Fetch leads stats
-  const { count: totalLeads } = await db
+  const { count: totalLeads } = await supabase
     .from('leads')
     .select('*', { count: 'exact', head: true });
 
-  const { count: newLeadsThisMonth } = await db
+  const { count: newLeadsThisMonth } = await supabase
     .from('leads')
     .select('*', { count: 'exact', head: true })
     .gte('created_at', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString());
 
   // Fetch campaigns
-  const { data: campaigns } = await db
+  const { data: campaigns } = await supabase
     .from('marketing_campaigns')
     .select('*')
     .order('created_at', { ascending: false })
@@ -53,7 +52,7 @@ export default async function AdminMarketingPage() {
   const activeCampaigns = campaigns?.filter(c => c.status === 'active').length || 0;
 
   // Get lead sources breakdown
-  const { data: leadsBySource } = await db
+  const { data: leadsBySource } = await supabase
     .from('leads')
     .select('source');
 

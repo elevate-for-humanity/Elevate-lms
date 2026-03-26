@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -6,7 +5,8 @@ import Image from 'next/image';
 import { Users, MessageSquare, BookOpen, Award, ArrowRight, Star } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Join Our Community | Elevate for Humanity',
@@ -18,10 +18,9 @@ export const metadata: Metadata = {
 
 export default async function JoinCommunityPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch testimonials from database
-  const { data: testimonials } = await db
+  const { data: testimonials } = await supabase
     .from('testimonials')
     .select('name, role, quote, image_url')
     .eq('approved', true)

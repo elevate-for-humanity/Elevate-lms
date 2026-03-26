@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -15,10 +14,9 @@ export const dynamic = 'force-dynamic';
 
 export default async function MarketplaceBrowsePage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch marketplace items from database
-  const { data: items, error } = await db
+  const { data: items, error } = await supabase
     .from('marketplace_items')
     .select(`
       id,

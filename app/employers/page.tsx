@@ -1,5 +1,3 @@
-export const dynamic = 'force-static';
-export const revalidate = 3600;
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -20,6 +18,9 @@ import OJTSection from '@/components/employers/OJTSection';
 import WOTCSection from '@/components/employers/WOTCSection';
 import GrantsSection from '@/components/employers/GrantsSection';
 import HeroVideo from '@/components/marketing/HeroVideo';
+
+export const dynamic = 'force-static';
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'For Employers — OJT Funding, Tax Credits & Trained Talent | Elevate for Humanity',

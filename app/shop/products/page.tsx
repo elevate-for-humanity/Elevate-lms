@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import {
@@ -34,21 +33,10 @@ interface Product {
 
 export default async function ProductsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Database connection failed.</p>
-        </div>
-      </div>
-    );
-  }
 
   // Fetch products from database
-  const { data: productsData, error } = await db
+  const { data: productsData, error } = await supabase
     .from('products')
     .select('*')
     .eq('is_active', true)

@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import { getAdminDocumentUrl } from '@/lib/admin/document-access';
 import Link from 'next/link';
@@ -32,14 +31,13 @@ export default async function ReviewDetailPage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) redirect('/login');
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
   // Check admin role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -50,7 +48,7 @@ export default async function ReviewDetailPage({
   }
 
   // Fetch review queue item
-  const { data: item, error } = await db
+  const { data: item, error } = await supabase
     .from('review_queue')
     .select('*')
     .eq('id', id)
@@ -69,7 +67,7 @@ export default async function ReviewDetailPage({
   let routingScores: any[] = [];
 
   if (item.subject_type === 'document') {
-    const { data: doc } = await db
+    const { data: doc } = await supabase
       .from('documents')
       .select('*')
       .eq('id', item.subject_id)
@@ -89,7 +87,7 @@ export default async function ReviewDetailPage({
     subject = doc;
 
     // Get extraction
-    const { data: ext } = await db
+    const { data: ext } = await supabase
       .from('documents_extractions')
       .select('*')
       .eq('document_id', item.subject_id)
@@ -98,7 +96,7 @@ export default async function ReviewDetailPage({
       .single();
     extraction = ext;
   } else if (item.subject_type === 'transfer_hours') {
-    const { data: th } = await db
+    const { data: th } = await supabase
       .from('transfer_hours')
       .select('*, documents(*)')
       .eq('id', item.subject_id)
@@ -108,7 +106,7 @@ export default async function ReviewDetailPage({
     document = th?.documents;
 
     if (th?.extraction_id) {
-      const { data: ext } = await db
+      const { data: ext } = await supabase
         .from('documents_extractions')
         .select('*')
         .eq('id', th.extraction_id)
@@ -116,7 +114,7 @@ export default async function ReviewDetailPage({
       extraction = ext;
     }
   } else if (item.subject_type === 'application') {
-    const { data: app } = await db
+    const { data: app } = await supabase
       .from('applications')
       .select('*, profiles!applications_user_id_fkey(full_name, email)')
       .eq('id', item.subject_id)
@@ -124,14 +122,14 @@ export default async function ReviewDetailPage({
     subject = app;
 
     // Get routing scores
-    const { data: scores } = await db
+    const { data: scores } = await supabase
       .from('shop_routing_scores')
       .select('*, shops(name, address, city)')
       .eq('application_id', item.subject_id)
       .order('rank', { ascending: true });
     routingScores = scores || [];
   } else if (item.subject_type === 'partner') {
-    const { data: partner } = await db
+    const { data: partner } = await supabase
       .from('partners')
       .select('*')
       .eq('id', item.subject_id)
@@ -140,7 +138,7 @@ export default async function ReviewDetailPage({
   }
 
   // Get decision history
-  const { data: decisionHistory } = await db
+  const { data: decisionHistory } = await supabase
     .from('automated_decisions')
     .select('*')
     .eq('subject_type', item.subject_type)

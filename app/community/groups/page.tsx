@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -26,10 +25,9 @@ export const dynamic = 'force-dynamic';
 
 export default async function GroupsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch groups from database
-  const { data: groups, error } = await db
+  const { data: groups, error } = await supabase
     .from('community_groups')
     .select('id, name, description, category, image_url, is_public, member_count, created_at')
     .eq('is_active', true)
@@ -45,7 +43,7 @@ export default async function GroupsPage() {
   let userGroups: string[] = [];
 
   if (user) {
-    const { data: memberships } = await db
+    const { data: memberships } = await supabase
       .from('community_group_members')
       .select('group_id')
       .eq('user_id', user.id)
@@ -55,7 +53,7 @@ export default async function GroupsPage() {
   }
 
   // Get category counts
-  const { data: categoryCounts } = await db
+  const { data: categoryCounts } = await supabase
     .from('community_groups')
     .select('category')
     .eq('is_active', true);

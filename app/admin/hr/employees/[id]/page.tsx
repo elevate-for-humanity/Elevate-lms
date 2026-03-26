@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -35,21 +34,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function EmployeeDetailPage({ params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="p-8 text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-        <p className="text-gray-600">Please try again later.</p>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: adminProfile } = await db
+  const { data: adminProfile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -60,7 +50,7 @@ export default async function EmployeeDetailPage({ params }: Props) {
   }
 
   // Fetch employee
-  const { data: employee, error } = await db
+  const { data: employee, error } = await supabase
     .from('employees')
     .select(`
       *,
@@ -78,7 +68,7 @@ export default async function EmployeeDetailPage({ params }: Props) {
   }
 
   // Fetch time off requests (time_off_requests uses user_id, not employee PK)
-  const { data: timeOffRequests } = await db
+  const { data: timeOffRequests } = await supabase
     .from('time_off_requests')
     .select('*')
     .eq('user_id', employee.user_id)
@@ -86,7 +76,7 @@ export default async function EmployeeDetailPage({ params }: Props) {
     .limit(5);
 
   // Fetch performance reviews
-  const { data: reviews } = await db
+  const { data: reviews } = await supabase
     .from('performance_reviews')
     .select('*')
     .eq('employee_id', id)

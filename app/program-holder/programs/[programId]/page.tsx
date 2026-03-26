@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -28,11 +27,10 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { programId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) return { title: 'Program | Program Holder' };
   
-  const { data: program } = await db
+  const { data: program } = await supabase
     .from('programs')
     .select('name')
     .eq('id', programId)
@@ -48,10 +46,9 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
   const { programId } = await params;
   // Layout already validates access via requireProgramAccess
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch program (access validated by layout)
-  const { data: program, error } = await db
+  const { data: program, error } = await supabase
     .from('programs')
     .select('*')
     .eq('id', programId)
@@ -60,7 +57,7 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
   if (error || !program) notFound();
 
   // Fetch enrollments
-  const { data: enrollments, count: enrollmentCount } = await db
+  const { data: enrollments, count: enrollmentCount } = await supabase
     .from('program_enrollments')
     .select('*, profiles(first_name, last_name, email)', { count: 'exact' })
     .eq('program_id', programId)
@@ -68,7 +65,7 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
     .limit(10);
 
   // Fetch courses in program
-  const { data: courses, count: courseCount } = await db
+  const { data: courses, count: courseCount } = await supabase
     .from('courses')
     .select('*', { count: 'exact' })
     .eq('program_id', programId);

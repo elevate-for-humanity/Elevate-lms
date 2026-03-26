@@ -3,7 +3,6 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { DollarSign, Clock, Search, FileText, TrendingUp, Plus, Circle, } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,10 +14,9 @@ export const metadata: Metadata = {
 
 export default async function WOTCAdminPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch WOTC applications
-  const { data: applications } = await db
+  const { data: applications } = await supabase
     .from('wotc_applications')
     .select('*')
     .order('created_at', { ascending: false })

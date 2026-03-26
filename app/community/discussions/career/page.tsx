@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Briefcase, MessageSquare, ThumbsUp, Clock, User, Plus, Pin } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -15,11 +14,10 @@ export const dynamic = 'force-dynamic';
 
 export default async function CareerDiscussionsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   // Fetch career-related discussions
-  const { data: discussions } = await db
+  const { data: discussions } = await supabase
     .from('discussions')
     .select(`
       id,

@@ -13,7 +13,7 @@ export default async function ProgramGradesPage({
   const { programId } = await params;
   const { db } = await requireProgramAccess(programId);
 
-  const { data: program } = await db
+  const { data: program } = await supabase
     .from('programs')
     .select('id, name, title')
     .eq('id', programId)
@@ -21,7 +21,7 @@ export default async function ProgramGradesPage({
 
   if (!program) return <div className="p-8 text-center text-gray-500">Program not found.</div>;
 
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('student_enrollments')
     .select('id, student_id, progress, status, grade, created_at, profiles!student_enrollments_student_id_fkey(full_name, email)')
     .eq('program_id', programId)

@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
@@ -14,13 +13,12 @@ export const dynamic = 'force-dynamic';
 
 export default async function InstructorMessagesPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) redirect('/login?redirect=/lms/messages/instructor');
 
   // Fetch messages from database
-  const { data: messages, error } = await db
+  const { data: messages, error } = await supabase
     .from('messages')
     .select(`
       id,

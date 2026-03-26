@@ -1,12 +1,12 @@
-export const dynamic = 'force-dynamic';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import {
+
+export const dynamic = 'force-dynamic';
   Users,
   Plus,
   Search,
@@ -27,26 +27,12 @@ export const metadata: Metadata = {
 
 export default async function GroupsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Groups" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/lms/groups');
 
   // Fetch user's group memberships
-  const { data: memberships } = await db
+  const { data: memberships } = await supabase
     .from('study_group_members')
     .select(`
       *,
@@ -67,7 +53,7 @@ export default async function GroupsPage() {
   // Fetch member counts for each group
   const groups = await Promise.all(
     (memberships || []).map(async (membership) => {
-      const { count } = await db
+      const { count } = await supabase
         .from('study_group_members')
         .select('*', { count: 'exact', head: true })
         .eq('study_group_id', membership.study_group_id);
@@ -83,7 +69,7 @@ export default async function GroupsPage() {
 
   // Fetch recent group messages
   const groupIds = groups.map(g => g.id);
-  const { data: recentMessages } = await db
+  const { data: recentMessages } = await supabase
     .from('group_messages')
     .select('*, profiles (first_name, last_name)')
     .in('group_id', groupIds.length > 0 ? groupIds : ['00000000-0000-0000-0000-000000000000'])

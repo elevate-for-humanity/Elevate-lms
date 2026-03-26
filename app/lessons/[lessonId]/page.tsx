@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import { Metadata } from 'next';
 
@@ -12,11 +11,10 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lessonId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) return { title: 'Lesson | Elevate LMS' };
   
-  const { data: lesson } = await db
+  const { data: lesson } = await supabase
     .from('course_lessons')
     .select('title, course_id')
     .eq('id', lessonId)
@@ -31,20 +29,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function LessonRedirectPage({ params }: Props) {
   const { lessonId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-        </div>
-      </div>
-    );
-  }
 
   // Get the lesson to find its course
-  const { data: lesson, error } = await db
+  const { data: lesson, error } = await supabase
     .from('course_lessons')
     .select('course_id')
     .eq('id', lessonId)

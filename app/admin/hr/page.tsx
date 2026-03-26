@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Users, Clock, Calendar, DollarSign, Star, AlertCircle, User, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -15,19 +15,11 @@ export const metadata: Metadata = {
 
 export default async function HRPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
-
-  if (!supabase) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div>
-    </div>
-  );
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/admin/hr');
 
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   const [
@@ -37,11 +29,11 @@ export default async function HRPage() {
     { data: recentPayroll },
     { data: recentReviews },
   ] = await Promise.all([
-    db.from('employees').select('id, first_name, last_name, department, role, status, created_at', { count: 'exact' }).order('created_at', { ascending: false }).limit(8),
-    db.from('leave_requests').select('id, employee_id, leave_type, start_date, end_date, status', { count: 'exact' }).eq('status', 'pending').limit(5),
-    db.from('time_off_requests').select('id, employee_id, start_date, end_date, status', { count: 'exact' }).eq('status', 'pending').limit(5),
-    db.from('payroll_runs').select('id, period_start, period_end, total_amount, status').order('period_start', { ascending: false }).limit(5),
-    db.from('performance_reviews').select('id, employee_id, review_date, rating, status').order('review_date', { ascending: false }).limit(5),
+    supabase.from('employees').select('id, first_name, last_name, department, role, status, created_at', { count: 'exact' }).order('created_at', { ascending: false }).limit(8),
+    supabase.from('leave_requests').select('id, employee_id, leave_type, start_date, end_date, status', { count: 'exact' }).eq('status', 'pending').limit(5),
+    supabase.from('time_off_requests').select('id, employee_id, start_date, end_date, status', { count: 'exact' }).eq('status', 'pending').limit(5),
+    supabase.from('payroll_runs').select('id, period_start, period_end, total_amount, status').order('period_start', { ascending: false }).limit(5),
+    supabase.from('performance_reviews').select('id, employee_id, review_date, rating, status').order('review_date', { ascending: false }).limit(5),
   ]);
 
   const activeEmployees = (employees || []).filter((e: any) => e.status === 'active').length;

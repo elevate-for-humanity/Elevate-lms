@@ -13,7 +13,7 @@ export default async function ProviderDashboardPage() {
 
   const db = createAdminClient()!;
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('tenant_id, full_name, role')
     .eq('id', user.id)
@@ -34,11 +34,11 @@ export default async function ProviderDashboardPage() {
     { data: complianceArtifacts },
     { data: recentPrograms },
   ] = await Promise.all([
-    db.from('provider_onboarding_steps').select('*').eq('tenant_id', tenantId).order('created_at'),
-    db.from('programs').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId),
-    db.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId),
-    db.from('provider_compliance_artifacts').select('id, label, expires_at, verified').eq('tenant_id', tenantId),
-    db.from('programs')
+    supabase.from('provider_onboarding_steps').select('*').eq('tenant_id', tenantId).order('created_at'),
+    supabase.from('programs').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId),
+    supabase.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId),
+    supabase.from('provider_compliance_artifacts').select('id, label, expires_at, verified').eq('tenant_id', tenantId),
+    supabase.from('programs')
       .select('id, title, status, published, is_active, created_at')
       .eq('tenant_id', tenantId)
       .order('created_at', { ascending: false })

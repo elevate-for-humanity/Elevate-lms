@@ -1,6 +1,5 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
 
 import { useEffect, useState, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -9,6 +8,8 @@ import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import SignatureCanvas from 'signature_pad';
 import {
+
+export const dynamic = 'force-dynamic';
   FileText,
   Check,
   ChevronRight,

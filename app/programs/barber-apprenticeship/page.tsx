@@ -1,10 +1,11 @@
-export const dynamic = 'force-static';
-export const revalidate = 86400;
 import { Metadata } from 'next';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 import { BARBER_APPRENTICESHIP } from '@/data/programs/barber-apprenticeship';
 import { validateProgram } from '@/lib/programs/program-schema';
 import BarberApprenticeshipClient from './BarberApprenticeshipClient';
+
+export const dynamic = 'force-static';
+export const revalidate = 86400;
 
 const p = BARBER_APPRENTICESHIP;
 

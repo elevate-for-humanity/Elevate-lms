@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { AlertCircle, CheckCircle, Clock } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import JobRetryButton from './JobRetryButton';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -42,7 +43,7 @@ export default async function SystemJobsPage() {
   if (!user) redirect('/login');
 
   const db = createAdminClient();
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -52,21 +53,21 @@ export default async function SystemJobsPage() {
     redirect('/unauthorized');
   }
 
-  const { data: pendingJobs } = await db
+  const { data: pendingJobs } = await supabase
     .from('job_queue')
     .select('*')
     .in('status', ['pending', 'processing'])
     .order('created_at', { ascending: false })
     .limit(50);
 
-  const { data: failedJobs } = await db
+  const { data: failedJobs } = await supabase
     .from('job_queue')
     .select('*')
     .eq('status', 'failed')
     .order('created_at', { ascending: false })
     .limit(50);
 
-  const { data: recentCompleted } = await db
+  const { data: recentCompleted } = await supabase
     .from('job_queue')
     .select('*')
     .eq('status', 'completed')

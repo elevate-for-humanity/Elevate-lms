@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -30,8 +29,6 @@ interface OnboardingStep {
 export default async function EmployerOnboardingPage() {
   const supabase = await createClient();
   if (!supabase) redirect('/login');
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/onboarding/employer');
 
@@ -47,7 +44,7 @@ export default async function EmployerOnboardingPage() {
   }
 
   // Get or create onboarding record
-  let { data: onboarding } = await db
+  let { data: onboarding } = await supabase
     .from('employer_onboarding')
     .select('*')
     .eq('employer_id', user.id)
@@ -57,13 +54,13 @@ export default async function EmployerOnboardingPage() {
 
   if (!onboarding) {
     // First visit after application — seed the row so subsequent updates work
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('first_name, last_name, email')
       .eq('id', user.id)
       .maybeSingle();
 
-    const { data: newRow } = await db
+    const { data: newRow } = await supabase
       .from('employer_onboarding')
       .insert({
         employer_id: user.id,
@@ -78,7 +75,7 @@ export default async function EmployerOnboardingPage() {
   }
 
   // Get uploaded documents
-  const { data: documents } = await db
+  const { data: documents } = await supabase
     .from('documents')
     .select('document_type, status')
     .eq('user_id', user.id);
@@ -89,7 +86,7 @@ export default async function EmployerOnboardingPage() {
   );
 
   // Get agreement status
-  const { data: agreements } = await db
+  const { data: agreements } = await supabase
     .from('license_agreement_acceptances')
     .select('agreement_type')
     .eq('user_id', user.id);

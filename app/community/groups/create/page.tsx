@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
@@ -16,21 +15,20 @@ export const dynamic = 'force-dynamic';
 
 export default async function CreateGroupPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login?redirect=/community/groups/create');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('full_name')
     .eq('id', user.id)
     .single();
 
   // Fetch available programs for group topics
-  const { data: programs } = await db
+  const { data: programs } = await supabase
     .from('programs')
     .select('id, name, slug')
     .eq('is_active', true)

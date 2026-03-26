@@ -19,7 +19,7 @@ export default async function ExternalCourseApprovalsPage() {
   if (!user) redirect('/login?redirect=/admin/external-course-completions');
 
   const db = createAdminClient();
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -30,7 +30,7 @@ export default async function ExternalCourseApprovalsPage() {
   }
 
   // Pending: certificate uploaded but not yet approved
-  const { data: pending } = await db
+  const { data: pending } = await supabase
     .from('external_course_completions')
     .select(`
       id, user_id, completed_at, certificate_url,
@@ -45,7 +45,7 @@ export default async function ExternalCourseApprovalsPage() {
     .order('completed_at', { ascending: true });
 
   // Sponsored but no login sent yet
-  const { data: needsLogin } = await db
+  const { data: needsLogin } = await supabase
     .from('external_course_completions')
     .select(`
       id, user_id, elevate_sponsored, login_sent_at,

@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { BookOpen, Users, Award, FileText, Layers, ClipboardCheck, Upload } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Program Dashboard | Elevate Admin',
@@ -13,26 +13,25 @@ export const metadata: Metadata = {
 export default async function ProgramDashboardPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 
   // Load program
-  const { data: program } = await db.from('programs').select('*').eq('code', code).single();
+  const { data: program } = await supabase.from('programs').select('*').eq('code', code).single();
   if (!program) {
     // Try by slug
-    const { data: bySlug } = await db.from('programs').select('*').eq('slug', code).single();
+    const { data: bySlug } = await supabase.from('programs').select('*').eq('slug', code).single();
     if (!bySlug) return <div className="p-8"><h1 className="text-2xl font-bold">Program not found</h1><p className="text-gray-600 mt-2">No program with code &quot;{code}&quot;</p></div>;
     redirect(`/admin/programs/${bySlug.code || bySlug.slug}/dashboard`);
   }
 
   // Counts
-  const { count: courseCount } = await db.from('training_courses').select('id', { count: 'exact', head: true }).eq('program_id', program.id);
-  const { count: enrollmentCount } = await db.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('program_id', program.id);
-  const { count: lessonCount } = await db.from('training_lessons').select('id', { count: 'exact', head: true });
-  const { count: certCount } = await db.from('certificates').select('id', { count: 'exact', head: true }).eq('program_id', program.id);
+  const { count: courseCount } = await supabase.from('training_courses').select('id', { count: 'exact', head: true }).eq('program_id', program.id);
+  const { count: enrollmentCount } = await supabase.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('program_id', program.id);
+  const { count: lessonCount } = await supabase.from('training_lessons').select('id', { count: 'exact', head: true });
+  const { count: certCount } = await supabase.from('certificates').select('id', { count: 'exact', head: true }).eq('program_id', program.id);
 
   const sections = [
     { name: 'Courses', href: `/admin/programs/${code}/courses`, icon: BookOpen, count: courseCount || 0, desc: 'Manage courses in this program' },

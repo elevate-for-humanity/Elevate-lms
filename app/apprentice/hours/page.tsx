@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
@@ -15,13 +14,12 @@ export const dynamic = 'force-dynamic';
 
 export default async function ApprenticeHoursPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) redirect('/login?redirect=/apprentice/hours');
 
   // Fetch hours from consolidated hour_entries table
-  const { data: hoursData, error } = await db
+  const { data: hoursData, error } = await supabase
     .from('hour_entries')
     .select(`
       id,

@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
@@ -42,20 +41,7 @@ export default async function FerpaRecordsSearchPage({
 }) {
   const params = await searchParams;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-
-      
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Database connection failed. Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -63,7 +49,7 @@ export default async function FerpaRecordsSearchPage({
     redirect('/login?redirect=/ferpa/records/search');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role, full_name')
     .eq('id', user.id)
@@ -82,7 +68,7 @@ export default async function FerpaRecordsSearchPage({
   if (query.length >= 2) {
     searchPerformed = true;
     
-    let dbQuery = db
+    let dbQuery = supabase
       .from('profiles')
       .select(`
         id,
@@ -112,7 +98,7 @@ export default async function FerpaRecordsSearchPage({
     }
 
     // Log the search for audit purposes
-    await db.from('audit_logs').insert({
+    await supabase.from('audit_logs').insert({
       user_id: user.id,
       action: 'ferpa_record_search',
       details: { query, searchType, results_count: results.length },

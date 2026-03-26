@@ -1,14 +1,14 @@
-export const dynamic = 'force-dynamic';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { AchievementsBadges } from '@/components/AchievementsBadges';
 import MicroCredentialsBadges from '@/components/MicroCredentialsBadges';
 import {
+
+export const dynamic = 'force-dynamic';
   Trophy,
   Star,
   Award,
@@ -32,22 +32,7 @@ export const metadata: Metadata = {
 
 export default async function AchievementsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Achievements" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -56,14 +41,14 @@ export default async function AchievementsPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
 
   // Fetch enrollments
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('program_enrollments')
     .select(`
       *,
@@ -78,34 +63,34 @@ export default async function AchievementsPage() {
     .order('created_at', { ascending: false });
 
   // Fetch completed courses
-  const { count: completedCourses } = await db
+  const { count: completedCourses } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
     .eq('status', 'completed');
 
   // Fetch lesson progress
-  const { count: completedLessons } = await db
+  const { count: completedLessons } = await supabase
     .from('student_progress')
     .select('*', { count: 'exact', head: true })
     .eq('student_id', user.id)
     .eq('completed', true);
 
   // Fetch quiz attempts
-  const { data: quizAttempts } = await db
+  const { data: quizAttempts } = await supabase
     .from('quiz_attempts')
     .select('score, status')
     .eq('user_id', user.id)
     .eq('status', 'completed');
 
   // Fetch certificates
-  const { count: certificatesEarned } = await db
+  const { count: certificatesEarned } = await supabase
     .from('certificates')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id);
 
   // Fetch badges
-  const { data: userBadges } = await db
+  const { data: userBadges } = await supabase
     .from('user_badges')
     .select('*, badges (*)')
     .eq('user_id', user.id);

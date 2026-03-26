@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -6,8 +5,9 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import SponsorDisclosure from '@/components/compliance/SponsorDisclosure';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { 
+
+export const dynamic = 'force-dynamic';
   DollarSign, Briefcase, Building2, ArrowRight, 
   Users, Clock, Award, GraduationCap, Zap, Phone 
 } from 'lucide-react';
@@ -35,8 +35,7 @@ const steps = [
 
 export default async function ApprenticeshipsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: dbRows } = await db.from('apprenticeships').select('*').limit(50);
+  const { data: dbRows } = await supabase.from('apprenticeships').select('*').limit(50);
 const apprenticeships = (dbRows as any[]) || [];
 
   return (

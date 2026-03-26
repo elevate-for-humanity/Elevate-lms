@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Code, BookOpen, Github, FileCode, Terminal, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -13,25 +12,13 @@ export const metadata: Metadata = {
   description: 'API documentation, SDKs, and developer tools for integrating with Elevate.',
 };
 
-export const dynamic = 'force-dynamic';
 
 export default async function DevelopersPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   // Get API documentation
-  const { data: docs } = await db
+  const { data: docs } = await supabase
     .from('documentation')
     .select('*')
     .eq('category', 'api')
@@ -39,7 +26,7 @@ export default async function DevelopersPage() {
     .order('order', { ascending: true });
 
   // Get code examples
-  const { data: examples } = await db
+  const { data: examples } = await supabase
     .from('code_examples')
     .select('*')
     .eq('is_active', true)
@@ -120,6 +107,8 @@ npm install @elevate/sdk
 
 # Initialize the client
 import { ElevateClient } from '@elevate/sdk';
+
+export const dynamic = 'force-dynamic';
 
 const client = new ElevateClient({
   apiKey: process.env.ELEVATE_API_KEY

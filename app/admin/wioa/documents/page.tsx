@@ -3,7 +3,6 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { Upload, Download, Search, Filter, Folder, File, Eye, Trash2, ArrowLeft, Plus } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,10 +14,9 @@ export const metadata: Metadata = {
 
 export default async function WIOADocumentsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch WIOA documents
-  const { data: documents } = await db
+  const { data: documents } = await supabase
     .from('wioa_documents')
     .select('*, profiles(first_name, last_name)')
     .order('created_at', { ascending: false })

@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Briefcase, Award, TrendingUp, Clock, CheckCircle, XCircle, User } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -15,19 +15,11 @@ export const metadata: Metadata = {
 
 export default async function OutcomesPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
-
-  if (!supabase) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div>
-    </div>
-  );
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/admin/outcomes');
 
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   const [
@@ -36,10 +28,10 @@ export default async function OutcomesPage() {
     { count: totalCerts },
     { data: recentOutcomes },
   ] = await Promise.all([
-    db.from('employment_outcomes').select('employment_status, wage_at_placement, wage_at_followup, employer_name, start_date, user_id').limit(1000),
-    db.from('program_enrollments').select('id', { count: 'exact', head: true }),
-    db.from('certificates').select('id', { count: 'exact', head: true }),
-    db.from('employment_outcomes')
+    supabase.from('employment_outcomes').select('employment_status, wage_at_placement, wage_at_followup, employer_name, start_date, user_id').limit(1000),
+    supabase.from('program_enrollments').select('id', { count: 'exact', head: true }),
+    supabase.from('certificates').select('id', { count: 'exact', head: true }),
+    supabase.from('employment_outcomes')
       .select('id, employment_status, employer_name, wage_at_placement, wage_at_followup, start_date, profiles(full_name)')
       .order('start_date', { ascending: false })
       .limit(15),

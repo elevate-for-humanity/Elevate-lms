@@ -1,8 +1,9 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/program-holder/how-to-use' },
@@ -12,7 +13,6 @@ export const metadata: Metadata = {
 
 export default async function HowToUsePage() {
   const supabase = await createClient();
-  if (!supabase) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 

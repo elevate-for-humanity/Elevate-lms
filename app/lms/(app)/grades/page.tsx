@@ -1,12 +1,12 @@
-export const dynamic = 'force-dynamic';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import {
+
+export const dynamic = 'force-dynamic';
   BookOpen,
   TrendingUp,
   Award,
@@ -27,22 +27,7 @@ export const metadata: Metadata = {
 
 export default async function GradesPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Grades" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -51,14 +36,14 @@ export default async function GradesPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
 
   // Fetch enrollments with course details
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('program_enrollments')
     .select(`
       *,
@@ -73,7 +58,7 @@ export default async function GradesPage() {
     .order('created_at', { ascending: false });
 
   // Fetch assignment submissions with grades
-  const { data: assignmentSubmissions } = await db
+  const { data: assignmentSubmissions } = await supabase
     .from('assignment_submissions')
     .select(`
       *,
@@ -90,7 +75,7 @@ export default async function GradesPage() {
     .order('graded_at', { ascending: false });
 
   // Fetch quiz attempts with scores
-  const { data: quizAttempts } = await db
+  const { data: quizAttempts } = await supabase
     .from('quiz_attempts')
     .select(`
       *,

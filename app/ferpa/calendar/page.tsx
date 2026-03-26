@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
@@ -42,25 +41,12 @@ const EVENT_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
 
 export default async function FerpaCalendarPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-
-      
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Database connection failed.</p>
-        </div>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/ferpa/calendar');
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -70,7 +56,7 @@ export default async function FerpaCalendarPage() {
   if (!profile || !allowedRoles.includes(profile.role)) redirect('/unauthorized');
 
   // Fetch upcoming events
-  const { data: events } = await db
+  const { data: events } = await supabase
     .from('ferpa_calendar_events')
     .select('*')
     .gte('start_date', new Date().toISOString())
@@ -78,7 +64,7 @@ export default async function FerpaCalendarPage() {
     .limit(20);
 
   // Fetch overdue/past events that aren't completed
-  const { data: overdueEvents } = await db
+  const { data: overdueEvents } = await supabase
     .from('ferpa_calendar_events')
     .select('*')
     .lt('start_date', new Date().toISOString())

@@ -1,13 +1,13 @@
-export const dynamic = 'force-dynamic';
 
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
+
+export const dynamic = 'force-dynamic';
   Calendar,
   Clock,
   MapPin,
@@ -31,15 +31,13 @@ export const metadata: Metadata = {
 
 export default async function StudentPortalSchedulePage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login?redirect=/student-portal/schedule');
   }
 
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('training_enrollments')
     .select(`
       id,
@@ -51,7 +49,7 @@ export default async function StudentPortalSchedulePage() {
     .eq('user_id', user.id)
     .in('status', ['active', 'enrolled', 'in_progress']);
 
-  const { data: appointments } = await db
+  const { data: appointments } = await supabase
     .from('crm_appointments')
     .select('*')
     .eq('contact_id', user.id)

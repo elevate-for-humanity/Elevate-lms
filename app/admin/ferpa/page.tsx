@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -18,12 +17,11 @@ export const metadata: Metadata = {
 
 export default async function AdminFerpaPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Query real counts from documents table (consent forms are documents)
-  const { count: consentCount } = await db.from('documents').select('*', { count: 'exact', head: true }).eq('document_type', 'consent');
-  const { count: pendingDocs } = await db.from('documents').select('*', { count: 'exact', head: true }).eq('status', 'pending');
-  const { count: totalStudents } = await db.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student');
+  const { count: consentCount } = await supabase.from('documents').select('*', { count: 'exact', head: true }).eq('document_type', 'consent');
+  const { count: pendingDocs } = await supabase.from('documents').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+  const { count: totalStudents } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student');
 
   const complianceStats = [
     { label: 'Active Consent Forms', value: String(consentCount || 0), icon: FileText, color: 'green' },
@@ -33,7 +31,7 @@ export default async function AdminFerpaPage() {
   ];
 
   // Query recent audit activity
-  const { data: auditLogs } = await db
+  const { data: auditLogs } = await supabase
     .from('audit_logs')
     .select('action, target_type, created_at, actor_id')
     .order('created_at', { ascending: false })
@@ -46,18 +44,6 @@ export default async function AdminFerpaPage() {
     status: 'complete',
   }));
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-
-      
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -66,7 +52,7 @@ export default async function AdminFerpaPage() {
   }
 
   // Check admin role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)

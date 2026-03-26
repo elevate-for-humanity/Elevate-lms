@@ -11,7 +11,7 @@ export default async function ProviderProgramNewPage() {
   if (!user) redirect('/login?redirect=/provider/programs/new');
 
   const db = createAdminClient()!;
-  const { data: profile } = await db.from('profiles').select('tenant_id').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('tenant_id').eq('id', user.id).single();
   if (!profile?.tenant_id) redirect('/unauthorized');
 
   return (

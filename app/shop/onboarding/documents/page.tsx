@@ -1,6 +1,5 @@
 
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { generateInternalMetadata } from '@/lib/seo/metadata';
 
 export const metadata: Metadata = generateInternalMetadata({
@@ -12,6 +11,8 @@ export const metadata: Metadata = generateInternalMetadata({
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { ShopDocumentUpload } from '@/components/shop/ShopDocumentUpload';
+
+export const dynamic = 'force-dynamic';
 
 
 export default async function ShopDocumentsPage() {

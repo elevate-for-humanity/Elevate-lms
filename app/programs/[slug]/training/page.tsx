@@ -28,7 +28,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { slug } = await params;
   const db = createAdminClient();
-  const { data: program } = await db
+  const { data: program } = await supabase
     .from('programs')
     .select('title, description')
     .or(`slug.eq.${slug},code.eq.${slug}`)
@@ -142,7 +142,7 @@ export default async function ProgramTrainingPage({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?next=/programs/${slug}/training`);
 
-  const { data: program } = await db
+  const { data: program } = await supabase
     .from('programs')
     .select('id, title, slug, code, description, category, estimated_weeks, estimated_hours')
     .or(`slug.eq.${slug},code.eq.${slug}`)
@@ -161,7 +161,7 @@ export default async function ProgramTrainingPage({
     );
   }
 
-  const { data: internalLinks } = await db
+  const { data: internalLinks } = await supabase
     .from('program_courses')
     .select(`
       id, sort_order, is_required,
@@ -170,7 +170,7 @@ export default async function ProgramTrainingPage({
     .eq('program_id', program.id)
     .order('sort_order');
 
-  const { data: externalRows } = await db
+  const { data: externalRows } = await supabase
     .from('program_external_courses')
     .select('*')
     .eq('program_id', program.id)
@@ -179,7 +179,7 @@ export default async function ProgramTrainingPage({
 
   const internalCourseIds = (internalLinks ?? []).map((l: any) => l.course?.id).filter(Boolean);
   const { data: enrollments } = internalCourseIds.length > 0
-    ? await db
+    ? await supabase
         .from('training_enrollments')
         .select('course_id')
         .eq('user_id', user.id)
@@ -189,7 +189,7 @@ export default async function ProgramTrainingPage({
 
   const externalIds = (externalRows ?? []).map((e: any) => e.id);
   const { data: extCompletions } = externalIds.length > 0
-    ? await db
+    ? await supabase
         .from('program_external_completions')
         .select('external_course_id')
         .eq('user_id', user.id)

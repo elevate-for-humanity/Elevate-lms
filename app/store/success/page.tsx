@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -26,20 +25,7 @@ export default async function StoreSuccessPage({
 }) {
   const { order_id } = await searchParams;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-
-      
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -53,7 +39,7 @@ export default async function StoreSuccessPage({
   let orderItems = null;
 
   if (orderId) {
-    const { data: orderData } = await db
+    const { data: orderData } = await supabase
       .from('orders')
       .select('*')
       .eq('id', orderId)
@@ -62,7 +48,7 @@ export default async function StoreSuccessPage({
     order = orderData;
 
     if (order) {
-      const { data: items } = await db
+      const { data: items } = await supabase
         .from('order_items')
         .select(`
           id,
@@ -76,7 +62,7 @@ export default async function StoreSuccessPage({
   }
 
   // Get user's recent purchases for downloads
-  const { data: purchases } = await db
+  const { data: purchases } = await supabase
     .from('purchases')
     .select(`
       id,

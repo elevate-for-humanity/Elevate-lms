@@ -1,13 +1,13 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-export const dynamic = 'force-dynamic';
 import { requireAdmin } from '@/lib/auth';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { BarChart, DollarSign, Gift } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Cash Advances Admin | Elevate For Humanity',
@@ -16,21 +16,7 @@ export const metadata: Metadata = {
 
 export default async function CashAdvancesAdminPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Cash Advances" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -39,7 +25,7 @@ export default async function CashAdvancesAdminPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -49,13 +35,13 @@ export default async function CashAdvancesAdminPage() {
     redirect('/unauthorized');
   }
 
-  const { data: items, count: totalItems } = await db
+  const { data: items, count: totalItems } = await supabase
     .from('profiles')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })
     .limit(50);
 
-  const { count: activeItems } = await db
+  const { count: activeItems } = await supabase
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
@@ -63,7 +49,7 @@ export default async function CashAdvancesAdminPage() {
   await requireAdmin();
 
   // Fetch applications
-  const { data: applications, error } = await db
+  const { data: applications, error } = await supabase
     .from('cash_advance_applications')
     .select('*')
     .order('created_at', { ascending: false })

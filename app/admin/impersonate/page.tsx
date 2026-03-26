@@ -18,7 +18,7 @@ export default async function ImpersonatePage() {
   if (!user) redirect('/login');
 
   const db = createAdminClient();
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -29,7 +29,7 @@ export default async function ImpersonatePage() {
   }
 
   // Recent impersonation audit entries for visibility
-  const { data: recentSessions } = await db
+  const { data: recentSessions } = await supabase
     .from('admin_audit_events')
     .select('id, actor_user_id, entity_id, after_state, created_at')
     .eq('entity', 'impersonation_session')

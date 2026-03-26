@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FileText, Users, Award, DollarSign, ArrowLeft, Download, BarChart3, GraduationCap } from 'lucide-react';
@@ -15,18 +14,17 @@ export const metadata: Metadata = {
 
 export default async function SampleReportsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) {
     return <div className="p-8 text-center text-gray-600">Database unavailable.</div>;
   }
 
   const [students, enrollments, certificates, completions, programs, courses] = await Promise.all([
-    db.from('profiles').select('id, full_name, email, role, enrollment_status, created_at').eq('role', 'student').order('created_at', { ascending: false }).limit(20),
-    db.from('program_enrollments').select('id, status, created_at, program_id').order('created_at', { ascending: false }).limit(20),
-    db.from('certificates').select('id, status, created_at').order('created_at', { ascending: false }).limit(20),
-    db.from('completions').select('id, created_at').order('created_at', { ascending: false }).limit(20),
-    db.from('programs').select('id, name, status', { count: 'exact' }),
-    db.from('courses').select('id, title, is_active', { count: 'exact' }),
+    supabase.from('profiles').select('id, full_name, email, role, enrollment_status, created_at').eq('role', 'student').order('created_at', { ascending: false }).limit(20),
+    supabase.from('program_enrollments').select('id, status, created_at, program_id').order('created_at', { ascending: false }).limit(20),
+    supabase.from('certificates').select('id, status, created_at').order('created_at', { ascending: false }).limit(20),
+    supabase.from('completions').select('id, created_at').order('created_at', { ascending: false }).limit(20),
+    supabase.from('programs').select('id, name, status', { count: 'exact' }),
+    supabase.from('courses').select('id, title, is_active', { count: 'exact' }),
   ]);
 
   const reportSections = [

@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
@@ -7,6 +6,8 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { requireRole } from '@/lib/auth/require-role';
 import {
+
+export const dynamic = 'force-dynamic';
   ClipboardList, CheckCircle2, XCircle, Clock, RotateCcw,
   ChevronRight, Filter,
 } from 'lucide-react';
@@ -52,7 +53,7 @@ export default async function InstructorSubmissionsPage({
   // Fetch submissions assigned to this instructor (or all, for admin)
   const isAdmin = profile.role === 'admin' || profile.role === 'super_admin';
 
-  let query = db
+  let query = supabase
     .from('step_submissions')
     .select(`
       id,
@@ -100,7 +101,7 @@ export default async function InstructorSubmissionsPage({
   // Resolve course names
   const courseIds = [...new Set((submissions ?? []).map(s => s.course_id))];
   const { data: courses } = courseIds.length
-    ? await db.from('training_courses').select('id, course_name').in('id', courseIds)
+    ? await supabase.from('training_courses').select('id, course_name').in('id', courseIds)
     : { data: [] };
   const courseNameMap = new Map((courses ?? []).map((c: any) => [c.id, c.course_name]));
 

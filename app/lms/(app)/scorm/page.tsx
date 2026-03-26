@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/lms/scorm' },
@@ -13,12 +13,10 @@ export const metadata: Metadata = {
 
 export default async function ScormPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: packages } = await db
+  const { data: packages } = await supabase
     .from('scorm_packages')
     .select('id, title, description, scorm_version, duration_minutes, courses(id, title)')
     .order('title')
@@ -27,7 +25,7 @@ export default async function ScormPage() {
   // Get user's progress for each package
   const packageIds = (packages || []).map((p: any) => p.id);
   const { data: progressData } = packageIds.length > 0
-    ? await db
+    ? await supabase
         .from('scorm_progress')
         .select('scorm_id, status, progress_percentage')
         .eq('user_id', user.id)

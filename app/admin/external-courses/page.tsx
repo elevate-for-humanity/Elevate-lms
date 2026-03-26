@@ -10,7 +10,7 @@ async function requireAdmin() {
   const user = await getCurrentUser();
   if (!user) redirect('/login?redirect=/admin/external-courses');
   const db = createAdminClient();
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
     redirect('/admin/dashboard');
   }
@@ -22,7 +22,7 @@ export default async function ExternalCoursesAdminPage() {
 
   const db = createAdminClient();
 
-  const { data: items } = await db
+  const { data: items } = await supabase
     .from('program_external_courses')
     .select(`
       id,

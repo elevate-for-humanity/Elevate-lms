@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -23,50 +22,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { forumId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return { title: 'Forum | Elevate LMS' };
-  }
-
-  const { data: forum } = await db
-    .from('forums')
-    .select('name')
-    .eq('id', forumId)
-    .single();
-
-  return {
-    title: forum ? `${forum.name} | Forums | Elevate LMS` : 'Forum | Elevate LMS',
-  };
-}
-
-interface Thread {
-  id: string;
-  title: string;
-  content: string | null;
-  is_pinned: boolean;
-  is_locked: boolean;
-  created_at: string;
-  user_id: string;
-  profiles: { full_name: string | null; avatar_url: string | null } | null;
-  reply_count?: number;
-}
-
-export default async function ForumPage({ params }: Props) {
-  const { forumId } = await params;
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -75,7 +31,7 @@ export default async function ForumPage({ params }: Props) {
   }
 
   // Fetch forum details
-  const { data: forum, error } = await db
+  const { data: forum, error } = await supabase
     .from('forums')
     .select('*')
     .eq('id', forumId)
@@ -86,7 +42,7 @@ export default async function ForumPage({ params }: Props) {
   }
 
   // Fetch threads
-  const { data: threads } = await db
+  const { data: threads } = await supabase
     .from('forum_threads')
     .select(`
       *,
@@ -99,7 +55,7 @@ export default async function ForumPage({ params }: Props) {
   const typedThreads = (threads || []) as Thread[];
 
   // Get thread stats
-  const { count: memberCount } = await db
+  const { count: memberCount } = await supabase
     .from('forum_members')
     .select('*', { count: 'exact', head: true })
     .eq('forum_id', forumId);

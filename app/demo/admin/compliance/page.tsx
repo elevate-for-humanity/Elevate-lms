@@ -1,16 +1,15 @@
-export const dynamic = 'force-dynamic';
 
 import Image from 'next/image';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { AlertTriangle, XCircle } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+
+export const dynamic = 'force-dynamic';
 
 export default async function DemoCompliancePage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: dbRows } = await db.from('compliance_audits').select('*').limit(50);
+  const { data: dbRows } = await supabase.from('compliance_audits').select('*').limit(50);
 const checks = (dbRows as any[]) || [];
 
   return (

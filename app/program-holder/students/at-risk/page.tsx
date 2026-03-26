@@ -1,12 +1,12 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { AlertTriangle, Mail, Phone, TrendingDown, Clock } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'At-Risk Students | Program Holder Portal',
@@ -18,28 +18,14 @@ export const metadata: Metadata = {
 
 export default async function AtRiskStudentsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Students" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) redirect('/login');
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -48,7 +34,7 @@ export default async function AtRiskStudentsPage() {
   if (!profile || profile.role !== 'program_holder') redirect('/');
 
   // Get program holder record
-  const { data: programHolder } = await db
+  const { data: programHolder } = await supabase
     .from('program_holders')
     .select('id')
     .eq('user_id', user.id)
@@ -59,7 +45,7 @@ export default async function AtRiskStudentsPage() {
   }
 
   // Fetch all active students
-  const { data: atRiskStudents, count } = await db
+  const { data: atRiskStudents, count } = await supabase
     .from('program_holder_students')
     .select(
       `

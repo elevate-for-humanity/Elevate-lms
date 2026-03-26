@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -19,18 +18,7 @@ export const metadata: Metadata = {
 
 export default async function MeetingsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -38,7 +26,7 @@ export default async function MeetingsPage() {
     redirect('/login?redirect=/lms/collaborate/meetings');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('full_name, avatar_url')
     .eq('id', user.id)
@@ -47,7 +35,7 @@ export default async function MeetingsPage() {
   // Fetch user's scheduled meetings from study_sessions if table exists
   let upcomingMeetings: any[] = [];
   try {
-    const { data: meetings } = await db
+    const { data: meetings } = await supabase
       .from('study_sessions')
       .select('id, title, description, scheduled_at, duration_minutes, meeting_url, host_id')
       .or(`host_id.eq.${user.id}`)

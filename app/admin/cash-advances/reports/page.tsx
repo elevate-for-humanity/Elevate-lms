@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Cash Advance Reports | Admin | Elevate For Humanity',
@@ -12,25 +12,14 @@ export const metadata: Metadata = {
 
 export default async function CashAdvanceReportsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) redirect('/login');
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -41,16 +30,16 @@ export default async function CashAdvanceReportsPage() {
   }
 
   // Fetch cash advance statistics
-  const { data: allAdvances } = await db
+  const { data: allAdvances } = await supabase
     .from('cash_advances')
     .select('*');
 
-  const { data: approvedAdvances } = await db
+  const { data: approvedAdvances } = await supabase
     .from('cash_advances')
     .select('*')
     .eq('status', 'approved');
 
-  const { data: pendingAdvances } = await db
+  const { data: pendingAdvances } = await supabase
     .from('cash_advances')
     .select('*')
     .eq('status', 'pending');

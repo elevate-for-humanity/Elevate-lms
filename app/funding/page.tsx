@@ -1,5 +1,3 @@
-export const dynamic = 'force-static';
-export const revalidate = 86400;
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -7,6 +5,9 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { BNPL_DESCRIPTION } from '@/lib/bnpl-config';
 import { ArrowRight } from 'lucide-react';
+
+export const dynamic = 'force-static';
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding' },

@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { requireAdmin } from '@/lib/auth';
 import { ClipboardCheck, CheckCircle } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = { title: 'Completion Rules | Elevate Admin' };
 
@@ -12,9 +12,8 @@ export default async function ProgramCompletionPage({ params }: { params: Promis
   const { code } = await params;
   await requireAdmin();
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  const { data: program } = await db.from('programs').select('id, title, completion_criteria').or(`code.eq.${code},slug.eq.${code}`).single();
+  const { data: program } = await supabase.from('programs').select('id, title, completion_criteria').or(`code.eq.${code},slug.eq.${code}`).single();
   if (!program) return <div className="p-8"><h1 className="text-2xl font-bold">Program not found</h1></div>;
 
   const criteria = program.completion_criteria as any;

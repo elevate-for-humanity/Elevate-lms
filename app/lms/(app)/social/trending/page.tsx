@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -20,18 +19,7 @@ export const metadata: Metadata = {
 
 export default async function TrendingPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -42,7 +30,7 @@ export default async function TrendingPage() {
   // Fetch recent social posts ordered by engagement
   let trendingPosts: any[] = [];
   try {
-    const { data } = await db
+    const { data } = await supabase
       .from('social_posts')
       .select('id, title, content, like_count, comment_count, share_count, created_at, profiles!social_posts_author_id_fkey(full_name)')
       .order('like_count', { ascending: false })
@@ -55,7 +43,7 @@ export default async function TrendingPage() {
   // Fetch popular forum threads as trending topics
   let trendingThreads: any[] = [];
   try {
-    const { data } = await db
+    const { data } = await supabase
       .from('forum_threads')
       .select('id, title, forum_id, reply_count, view_count, created_at, profiles!forum_threads_author_id_fkey(full_name)')
       .order('view_count', { ascending: false })

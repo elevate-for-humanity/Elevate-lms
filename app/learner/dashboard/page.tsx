@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Image from 'next/image';
 import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
@@ -37,10 +36,9 @@ export default async function LearnerDashboardPage() {
   const { user, profile } = await requireRole(['student', 'admin', 'super_admin']);
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch enrollments from both tables (legacy enrollments + training_enrollments)
-  const { data: legacyEnrollments } = await db
+  const { data: legacyEnrollments } = await supabase
     .from('program_enrollments')
     .select(`
       id,
@@ -58,7 +56,7 @@ export default async function LearnerDashboardPage() {
     .eq('user_id', user.id)
     .order('enrolled_at', { ascending: false });
 
-  const { data: trainingEnrollments } = await db
+  const { data: trainingEnrollments } = await supabase
     .from('training_enrollments')
     .select(`
       id,
@@ -94,7 +92,7 @@ export default async function LearnerDashboardPage() {
   });
 
   // Fetch external (non-LMS) enrollments — rendered as admin-managed program cards
-  const { data: externalEnrollments } = await db
+  const { data: externalEnrollments } = await supabase
     .from('external_program_enrollments')
     .select('id, program_slug, enrollment_state, start_date, notes, created_at')
     .eq('user_id', user.id)
@@ -102,7 +100,7 @@ export default async function LearnerDashboardPage() {
     .order('created_at', { ascending: false });
 
   // Fetch achievements
-  const { data: achievements } = await db
+  const { data: achievements } = await supabase
     .from('user_achievements')
     .select(`
       id,
@@ -119,7 +117,7 @@ export default async function LearnerDashboardPage() {
     .limit(5);
 
   // Fetch notifications
-  const { data: notifications } = await db
+  const { data: notifications } = await supabase
     .from('notifications')
     .select('*')
     .eq('user_id', user.id)
@@ -128,7 +126,7 @@ export default async function LearnerDashboardPage() {
     .limit(5);
 
   // Fetch certificates
-  const { data: certificates } = await db
+  const { data: certificates } = await supabase
     .from('certificates')
     .select('id, certificate_number, course_title, issued_at, verification_code')
     .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
@@ -136,7 +134,7 @@ export default async function LearnerDashboardPage() {
     .limit(5);
 
   // Fetch active certification requests for the pipeline section
-  const { data: certRequests } = await db
+  const { data: certRequests } = await supabase
     .from('certification_requests')
     .select(`
       id, status, authorization_code, authorization_expires_at,
@@ -156,7 +154,7 @@ export default async function LearnerDashboardPage() {
     .limit(5);
 
   // Fetch attendance hours
-  const { data: attendanceData } = await db
+  const { data: attendanceData } = await supabase
     .from('attendance_hours')
     .select('hours_logged, date, type')
     .eq('enrollment_id', enrollments?.[0]?.id || '00000000-0000-0000-0000-000000000000')
@@ -164,7 +162,7 @@ export default async function LearnerDashboardPage() {
     .limit(30);
 
   // Fetch training hours from consolidated hour_entries
-  const { data: hoursData } = await db
+  const { data: hoursData } = await supabase
     .from('hour_entries')
     .select('hours_claimed')
     .eq('user_id', user.id);
@@ -176,7 +174,7 @@ export default async function LearnerDashboardPage() {
   // Fetch lesson progress for all enrolled courses
   const courseIds = enrollments?.map(e => e.course_id).filter(Boolean) || [];
   const { data: lessonProgress } = courseIds.length > 0
-    ? await db
+    ? await supabase
         .from('lesson_progress')
         .select('course_id, lesson_id, completed')
         .eq('user_id', user.id)
@@ -184,7 +182,7 @@ export default async function LearnerDashboardPage() {
     : { data: null };
 
   // Check for pending onboarding (program_enrollments in pre-active state)
-  const { data: pendingOnboarding } = await db
+  const { data: pendingOnboarding } = await supabase
     .from('program_enrollments')
     .select('id, enrollment_state, next_required_action, full_name, program_id')
     .eq('user_id', user.id)
@@ -197,7 +195,7 @@ export default async function LearnerDashboardPage() {
   // trigger reconciliation server-side. Fire-and-forget — never blocks render.
   const hasActiveEnrollment = (legacyEnrollments ?? []).some((e: any) => e.status === 'active');
   if (!hasActiveEnrollment) {
-    const { data: paidApp } = await db
+    const { data: paidApp } = await supabase
       .from('applications')
       .select('id')
       .eq('user_id', user.id)
@@ -207,7 +205,7 @@ export default async function LearnerDashboardPage() {
       .maybeSingle();
 
     if (paidApp) {
-      const { data: stripeSession } = await db
+      const { data: stripeSession } = await supabase
         .from('stripe_sessions_staging')
         .select('session_id')
         .eq('application_id', paidApp.id)
@@ -230,7 +228,7 @@ export default async function LearnerDashboardPage() {
   }
 
   // Check whether the learner has a pending_workone application — gates WorkOne checklist
-  const { data: workoneApp } = await db
+  const { data: workoneApp } = await supabase
     .from('applications')
     .select('id, status, requested_funding_source')
     .eq('user_id', user.id)

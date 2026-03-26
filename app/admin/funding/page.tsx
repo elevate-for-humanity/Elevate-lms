@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { DollarSign, FileText, Users, TrendingUp, CheckCircle, Clock, AlertCircle, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -15,19 +15,11 @@ export const metadata: Metadata = {
 
 export default async function FundingPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
-
-  if (!supabase) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div>
-    </div>
-  );
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/admin/funding');
 
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   const [
@@ -37,11 +29,11 @@ export default async function FundingPage() {
     { data: fundingPrograms },
     { data: recentTracking },
   ] = await Promise.all([
-    db.from('funding_tracking').select('funding_source, amount, status').limit(1000),
-    db.from('grant_applications').select('id, status, amount_requested, created_at', { count: 'exact' }).order('created_at', { ascending: false }).limit(500),
-    db.from('grant_opportunities').select('id, title, amount, deadline, status', { count: 'exact' }).limit(10),
-    db.from('funding_programs').select('id, name, funding_source, max_amount, status').limit(20),
-    db.from('funding_tracking').select('id, funding_source, amount, status, created_at, profiles(full_name)').order('created_at', { ascending: false }).limit(12),
+    supabase.from('funding_tracking').select('funding_source, amount, status').limit(1000),
+    supabase.from('grant_applications').select('id, status, amount_requested, created_at', { count: 'exact' }).order('created_at', { ascending: false }).limit(500),
+    supabase.from('grant_opportunities').select('id, title, amount, deadline, status', { count: 'exact' }).limit(10),
+    supabase.from('funding_programs').select('id, name, funding_source, max_amount, status').limit(20),
+    supabase.from('funding_tracking').select('id, funding_source, amount, status, created_at, profiles(full_name)').order('created_at', { ascending: false }).limit(12),
   ]);
 
   // Aggregate by source

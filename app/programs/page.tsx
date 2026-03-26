@@ -1,11 +1,12 @@
-export const dynamic = 'force-static';
-export const revalidate = 86400;
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Clock, DollarSign } from 'lucide-react';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import heroBanners from '@/content/heroBanners';
+
+export const dynamic = 'force-static';
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: 'Career Training Programs | Elevate for Humanity',

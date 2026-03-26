@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Building2, Users, CheckCircle, TrendingUp } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/admin/reports/partners' },
@@ -16,11 +16,9 @@ export const metadata: Metadata = {
 
 export default async function PartnerReportsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 
   // Fetch real stats from DB
@@ -31,11 +29,11 @@ export default async function PartnerReportsPage() {
     { data: partnerList },
     { data: recentInquiries },
   ] = await Promise.all([
-    db.from('partners').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-    db.from('partner_enrollments').select('*', { count: 'exact', head: true }),
-    db.from('partner_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
-    db.from('partners').select('id, name, city, state, status, created_at').order('created_at', { ascending: false }).limit(20),
-    db.from('partner_inquiries').select('id, name, organization, status, created_at').order('created_at', { ascending: false }).limit(10),
+    supabase.from('partners').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+    supabase.from('partner_enrollments').select('*', { count: 'exact', head: true }),
+    supabase.from('partner_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
+    supabase.from('partners').select('id, name, city, state, status, created_at').order('created_at', { ascending: false }).limit(20),
+    supabase.from('partner_inquiries').select('id, name, organization, status, created_at').order('created_at', { ascending: false }).limit(10),
   ]);
 
   const total = totalEnrollments || 0;

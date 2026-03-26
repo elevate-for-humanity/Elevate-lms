@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import AttendanceRecordForm from './AttendanceRecordForm';
@@ -16,14 +15,13 @@ export const dynamic = 'force-dynamic';
 
 export default async function RecordAttendancePage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login?redirect=/staff-portal/attendance/record');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role, full_name')
     .eq('id', user.id)
@@ -34,7 +32,7 @@ export default async function RecordAttendancePage() {
   }
 
   // Fetch active students with their enrollments
-  const { data: activeEnrollments } = await db
+  const { data: activeEnrollments } = await supabase
     .from('program_enrollments')
     .select(`
       id,
@@ -48,7 +46,7 @@ export default async function RecordAttendancePage() {
 
   // Fetch today's attendance records
   const today = new Date().toISOString().split('T')[0];
-  const { data: todayAttendance } = await db
+  const { data: todayAttendance } = await supabase
     .from('attendance')
     .select('student_id, status, check_in_time')
     .eq('date', today);

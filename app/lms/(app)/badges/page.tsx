@@ -1,12 +1,12 @@
-export const dynamic = 'force-dynamic';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
+
+export const dynamic = 'force-dynamic';
   Award,
   Star,
   Trophy,
@@ -128,21 +128,7 @@ const colorMap: Record<string, { bg: string; text: string; border: string }> = {
 
 export default async function BadgesPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Badges" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -152,31 +138,31 @@ export default async function BadgesPage() {
   }
 
   // Fetch badges from database
-  const { data: dbBadges } = await db
+  const { data: dbBadges } = await supabase
     .from('badges')
     .select('*')
     .order('created_at');
 
   // Fetch user's earned badges
-  const { data: userBadges } = await db
+  const { data: userBadges } = await supabase
     .from('user_badges')
     .select('*, badges (*)')
     .eq('user_id', user.id);
 
   // Fetch user stats for progress calculation
-  const { count: completedCourses } = await db
+  const { count: completedCourses } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
     .eq('status', 'completed');
 
-  const { data: quizAttempts } = await db
+  const { data: quizAttempts } = await supabase
     .from('quiz_attempts')
     .select('score')
     .eq('user_id', user.id)
     .eq('status', 'completed');
 
-  const { count: forumPosts } = await db
+  const { count: forumPosts } = await supabase
     .from('forum_posts')
     .select('*', { count: 'exact', head: true })
     .eq('author_id', user.id);

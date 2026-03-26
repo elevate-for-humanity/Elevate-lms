@@ -1,6 +1,5 @@
 
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { generateInternalMetadata } from '@/lib/seo/metadata';
 
 export const metadata: Metadata = generateInternalMetadata({
@@ -10,25 +9,15 @@ export const metadata: Metadata = generateInternalMetadata({
 });
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { ShopReportForm } from '@/components/shop/ShopReportForm';
+
+export const dynamic = 'force-dynamic';
 
 
 export default async function NewWeeklyReport() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -38,7 +27,7 @@ export default async function NewWeeklyReport() {
   }
 
   // Get shop for this user
-  const { data: staff } = await db
+  const { data: staff } = await supabase
     .from('shop_staff')
     .select('shop_id')
     .eq('user_id', user.id);
@@ -50,7 +39,7 @@ export default async function NewWeeklyReport() {
   }
 
   // Get active placements for this shop
-  const { data: placements } = await db
+  const { data: placements } = await supabase
     .from('apprentice_placements')
     .select('id, profiles(id, full_name)')
     .eq('shop_id', shopId)

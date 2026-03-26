@@ -1,9 +1,10 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { loadCaseFileSummaries } from '@/lib/case-file/loader';
 import { Search, Filter, ChevronRight, User } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Participant Case Files | Staff Portal',

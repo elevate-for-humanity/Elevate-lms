@@ -1,15 +1,14 @@
-export const dynamic = 'force-dynamic';
 
 import Image from 'next/image';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+
+export const dynamic = 'force-dynamic';
 
 export default async function DemoHoursPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: dbRows } = await db.from('hour_entries').select('*').limit(50);
+  const { data: dbRows } = await supabase.from('hour_entries').select('*').limit(50);
 const hours = (dbRows as any[]) || [];
 
   const totalHours = 680;

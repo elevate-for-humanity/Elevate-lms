@@ -1,5 +1,3 @@
-export const dynamic = 'force-static';
-export const revalidate = 86400;
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -9,6 +7,9 @@ import ProgramPageLayout from '@/components/programs/ProgramPageLayout';
 import type { ProgramPageConfig } from '@/components/programs/ProgramPageLayout';
 import { InView } from '@/components/ui/InView';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
+
+export const dynamic = 'force-static';
+export const revalidate = 86400;
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 

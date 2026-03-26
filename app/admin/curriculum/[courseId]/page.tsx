@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
@@ -7,6 +6,8 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { BookOpen, ArrowLeft, Layers } from 'lucide-react';
 import CurriculumLessonManager from '@/components/admin/CurriculumLessonManager';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -25,7 +26,7 @@ export default async function CurriculumCourseEditorPage({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/admin/curriculum/' + courseId);
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -36,21 +37,21 @@ export default async function CurriculumCourseEditorPage({
   }
 
   // Resolve course name — try training_courses first, then programs table
-  const { data: trainingCourse } = await db
+  const { data: trainingCourse } = await supabase
     .from('courses')
     .select('id, title')
     .eq('id', courseId)
     .maybeSingle();
 
   const { data: program } = !trainingCourse
-    ? await db.from('programs').select('id, name').eq('id', courseId).maybeSingle()
+    ? await supabase.from('programs').select('id, name').eq('id', courseId).maybeSingle()
     : { data: null };
 
   const courseName =
     trainingCourse?.title ?? program?.name ?? null;
 
   // Verify at least one curriculum_lessons row exists for this courseId
-  const { count: lessonCount } = await db
+  const { count: lessonCount } = await supabase
     .from('course_lessons')
     .select('id', { count: 'exact', head: true })
     .eq('course_id', courseId);
@@ -73,7 +74,7 @@ export default async function CurriculumCourseEditorPage({
   const legacyWarning = LEGACY_DRIVEN_COURSES[courseId] ?? null;
 
   // Module summary for the sidebar
-  const { data: moduleSummary } = await db
+  const { data: moduleSummary } = await supabase
     .from('course_lessons')
     .select('module_order, module_title, step_type, status')
     .eq('course_id', courseId)

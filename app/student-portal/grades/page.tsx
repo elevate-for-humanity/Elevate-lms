@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { GraduationCap, BookOpen, Award } from 'lucide-react';
@@ -16,8 +15,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function StudentPortalGradesPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -25,7 +22,7 @@ export default async function StudentPortalGradesPage() {
   }
 
   // Fetch grades from database
-  const { data: grades } = await db
+  const { data: grades } = await supabase
     .from('grades')
     .select(`
       id,
@@ -41,7 +38,7 @@ export default async function StudentPortalGradesPage() {
     .order('graded_at', { ascending: false });
 
   // Fetch course progress/completion
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('training_enrollments')
     .select(`
       id,
@@ -55,7 +52,7 @@ export default async function StudentPortalGradesPage() {
     .order('enrolled_at', { ascending: false });
 
   // Also check course_enrollments table
-  const { data: courseEnrollments } = await db
+  const { data: courseEnrollments } = await supabase
     .from('course_enrollments')
     .select(`
       id,

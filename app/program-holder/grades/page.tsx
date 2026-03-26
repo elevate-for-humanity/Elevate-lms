@@ -1,9 +1,10 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import Image from 'next/image';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
@@ -18,7 +19,7 @@ export default async function GradesPage() {
 
   // Fetch student enrollments scoped to owned programs
   const { data: items, count } = programIds.length > 0
-    ? await db
+    ? await supabase
         .from('student_enrollments')
         .select('id, student_id, program_id, progress, status, grade, created_at, profiles!student_enrollments_student_id_fkey(full_name, email)', { count: 'exact' })
         .in('program_id', programIds)
@@ -28,7 +29,7 @@ export default async function GradesPage() {
 
   const programNames: Record<string, string> = {};
   if (ownedPrograms) {
-    const { data: progDetails } = await db
+    const { data: progDetails } = await supabase
       .from('programs')
       .select('id, name, title')
       .in('id', programIds);

@@ -1,10 +1,11 @@
-export const dynamic = 'force-static';
-export const revalidate = 86400;
 import { Metadata } from 'next';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import { OFFICE_ADMINISTRATION } from '@/data/programs/office-administration';
 import { validateProgram } from '@/lib/programs/program-schema';
+
+export const dynamic = 'force-static';
+export const revalidate = 86400;
 
 const p = OFFICE_ADMINISTRATION;
 

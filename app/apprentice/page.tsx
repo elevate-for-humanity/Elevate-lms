@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { GraduationCap, Clock, FileText, Award, BookOpen, ArrowRight, Scissors } from 'lucide-react';
@@ -19,8 +18,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function ApprenticePortalPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
   
   if (!supabase) {
     redirect('/login?redirect=/apprentice');
@@ -32,14 +29,14 @@ export default async function ApprenticePortalPage() {
     redirect('/login?redirect=/apprentice');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('full_name')
     .eq('id', user.id)
     .single();
 
   // Get active enrollment with program info
-  const { data: enrollment } = await db
+  const { data: enrollment } = await supabase
     .from('training_enrollments')
     .select('*, programs(slug, name)')
     .eq('user_id', user.id)
@@ -67,14 +64,14 @@ export default async function ApprenticePortalPage() {
     program_slug: enrollment.programs?.slug,
   }) : { label: 'Apply to a Program', href: '/programs', description: 'Start your journey' };
 
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('training_enrollments')
     .select('id, status, progress, course_id')
     .eq('user_id', user.id)
     .limit(5);
 
   // Get real hours from attendance_hours table
-  const { data: hoursData } = await db
+  const { data: hoursData } = await supabase
     .from('attendance_hours')
     .select('hours_logged')
     .eq('enrollment_id', enrollment?.id);

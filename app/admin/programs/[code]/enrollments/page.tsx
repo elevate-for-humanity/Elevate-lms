@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { requireAdmin } from '@/lib/auth';
 import { Users } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = { title: 'Program Enrollments | Elevate Admin' };
 
@@ -12,12 +12,11 @@ export default async function ProgramEnrollmentsPage({ params }: { params: Promi
   const { code } = await params;
   await requireAdmin();
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  const { data: program } = await db.from('programs').select('id, title').or(`code.eq.${code},slug.eq.${code}`).single();
+  const { data: program } = await supabase.from('programs').select('id, title').or(`code.eq.${code},slug.eq.${code}`).single();
   if (!program) return <div className="p-8"><h1 className="text-2xl font-bold">Program not found</h1></div>;
 
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('program_enrollments')
     .select('id, user_id, status, progress_percent, enrolled_at, completed_at, created_at')
     .eq('program_id', program.id)
@@ -28,7 +27,7 @@ export default async function ProgramEnrollmentsPage({ params }: { params: Promi
   const userIds = [...new Set((enrollments || []).map((e: any) => e.user_id).filter(Boolean))];
   const profiles: Record<string, any> = {};
   if (userIds.length > 0) {
-    const { data: profs } = await db.from('profiles').select('id, first_name, last_name, email').in('id', userIds);
+    const { data: profs } = await supabase.from('profiles').select('id, first_name, last_name, email').in('id', userIds);
     for (const p of profs || []) profiles[p.id] = p;
   }
 

@@ -15,7 +15,7 @@ export default async function ProgramHolderProgramsPage() {
   const { db, programIds } = await requireProgramHolder();
 
   const { data: programsData } = programIds.length > 0
-    ? await db
+    ? await supabase
         .from('programs')
         .select('id, name, title, is_active, enrolled_count, completion_rate, created_at')
         .in('id', programIds)

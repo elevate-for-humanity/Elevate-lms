@@ -1,12 +1,12 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { Clock, Phone, Mail, Calendar, Plus, CheckCircle } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Follow-ups | CRM Admin',
@@ -21,10 +21,9 @@ export default async function CRMFollowUpsPage() {
   }
 
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch follow-ups with contact info
-  const { data: followUps } = await db
+  const { data: followUps } = await supabase
     .from('crm_follow_ups')
     .select(`
       *,

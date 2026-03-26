@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -18,21 +18,7 @@ export const metadata: Metadata = {
 
 export default async function ApplicantsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Applicants" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -41,7 +27,7 @@ export default async function ApplicantsPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -51,7 +37,7 @@ export default async function ApplicantsPage() {
     redirect('/unauthorized');
   }
 
-  const { data: applications, count: totalApplications } = await db
+  const { data: applications, count: totalApplications } = await supabase
     .from('applications')
     .select(
       `
@@ -63,24 +49,24 @@ export default async function ApplicantsPage() {
     .order('created_at', { ascending: false })
     .limit(50);
 
-  const { count: activeItems } = await db
+  const { count: activeItems } = await supabase
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
 
-  const { count: pendingApplications } = await db
+  const { count: pendingApplications } = await supabase
     .from('applications')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'pending');
 
-  const { count: approvedApplications } = await db
+  const { count: approvedApplications } = await supabase
     .from('applications')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'approved');
 
   const weekAgo = new Date();
   weekAgo.setDate(weekAgo.getDate() - 7);
-  const { count: recentApplications } = await db
+  const { count: recentApplications } = await supabase
     .from('applications')
     .select('*', { count: 'exact', head: true })
     .gte('created_at', weekAgo.toISOString());
@@ -90,7 +76,7 @@ export default async function ApplicantsPage() {
   }
 
   // Fetch relevant data
-  const { data: items, count: totalItems } = await db
+  const { data: items, count: totalItems } = await supabase
     .from('profiles')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })

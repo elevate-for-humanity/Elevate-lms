@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, Upload, Clock, XCircle } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -17,25 +17,14 @@ export const metadata: Metadata = {
 
 export default async function EmployerDocumentsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) redirect('/login');
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -43,13 +32,13 @@ export default async function EmployerDocumentsPage() {
 
   if (!profile || profile.role !== 'employer') redirect('/');
 
-  const { data: documents } = await db
+  const { data: documents } = await supabase
     .from('documents')
     .select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
-  const { data: requirements } = await db
+  const { data: requirements } = await supabase
     .from('document_requirements')
     .select('*')
     .eq('role', 'employer')

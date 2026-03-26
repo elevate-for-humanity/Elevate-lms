@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
@@ -8,6 +7,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Image from 'next/image';
 import CanonicalVideo from '@/components/video/CanonicalVideo';
 import { CheckCircle2, ArrowLeft, Clock, MapPin } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Select Schedule | Elevate for Humanity',
@@ -63,13 +64,13 @@ async function confirmSchedule(formData: FormData) {
 
   const scheduleType = formData.get('schedule_type') as string;
 
-  await db.from('profiles').update({
+  await supabase.from('profiles').update({
     schedule_selected: true,
     selected_cohort: scheduleType,
   }).eq('id', user.id);
 
   // Ensure training_enrollments row exists
-  const { data: existing } = await db
+  const { data: existing } = await supabase
     .from('training_enrollments')
     .select('id')
     .eq('user_id', user.id)
@@ -77,7 +78,7 @@ async function confirmSchedule(formData: FormData) {
     .maybeSingle();
 
   if (!existing) {
-    await db.from('training_enrollments').insert({
+    await supabase.from('training_enrollments').insert({
       user_id: user.id,
       course_id: '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0',
       status: 'pending_approval',

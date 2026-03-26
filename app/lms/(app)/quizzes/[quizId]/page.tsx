@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -25,39 +24,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { quizId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   
-  if (!supabase) {
-    return { title: 'Quiz | Elevate LMS' };
-  }
-
-  const { data: quiz } = await db
-    .from('quizzes')
-    .select('title, description')
-    .eq('id', quizId)
-    .single();
-
-  return {
-    title: quiz?.title ? `${quiz.title} | Elevate LMS` : 'Quiz | Elevate LMS',
-    description: quiz?.description || 'Take this quiz to test your knowledge.',
-  };
-}
-
-export default async function QuizPage({ params }: Props) {
-  const { quizId } = await params;
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -66,7 +33,7 @@ export default async function QuizPage({ params }: Props) {
   }
 
   // Fetch quiz with questions
-  const { data: quiz, error: quizError } = await db
+  const { data: quiz, error: quizError } = await supabase
     .from('quizzes')
     .select(`
       id,
@@ -93,7 +60,7 @@ export default async function QuizPage({ params }: Props) {
   }
 
   // Fetch questions for this quiz
-  const { data: questions } = await db
+  const { data: questions } = await supabase
     .from('quiz_questions')
     .select(`
       id,
@@ -112,7 +79,7 @@ export default async function QuizPage({ params }: Props) {
     .order('order_index', { ascending: true });
 
   // Fetch user's previous attempts
-  const { data: attempts } = await db
+  const { data: attempts } = await supabase
     .from('quiz_attempts')
     .select('*')
     .eq('quiz_id', quizId)
@@ -138,7 +105,7 @@ export default async function QuizPage({ params }: Props) {
     // Look up the exam session for proctored quizzes
     let examSessionId: string | undefined;
     if (quiz.requires_proctoring) {
-      const { data: examSession } = await db
+      const { data: examSession } = await supabase
         .from('exam_sessions')
         .select('id')
         .eq('quiz_attempt_id', inProgressAttempt.id)

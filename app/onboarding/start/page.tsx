@@ -1,6 +1,4 @@
 import { Metadata } from 'next';
-import { createAdminClient } from '@/lib/supabase/admin';
-export const dynamic = 'force-dynamic';
 import { generateInternalMetadata } from '@/lib/seo/metadata';
 
 export const metadata: Metadata = generateInternalMetadata({
@@ -13,21 +11,12 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import OnboardingFlow from './OnboardingFlow';
 
+export const dynamic = 'force-dynamic';
+
 
 export default async function OnboardingStartPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   const {
     data: { user },
@@ -38,7 +27,7 @@ export default async function OnboardingStartPage() {
   }
 
   // Get user's profile to determine role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('id, full_name, email, role')
     .eq('id', user.id)
@@ -67,7 +56,7 @@ export default async function OnboardingStartPage() {
   }
 
   // Check if onboarding is already complete
-  const { data: progress } = await db
+  const { data: progress } = await supabase
     .from('onboarding_progress')
     .select('is_complete, role')
     .eq('user_id', user.id)
@@ -86,7 +75,7 @@ export default async function OnboardingStartPage() {
   }
 
   // Get active onboarding packet for role
-  const { data: packet } = await db
+  const { data: packet } = await supabase
     .from('onboarding_packets')
     .select('id, title, description')
     .eq('role', profile.role)
@@ -115,14 +104,14 @@ export default async function OnboardingStartPage() {
   }
 
   // Get onboarding documents
-  const { data: documents } = await db
+  const { data: documents } = await supabase
     .from('onboarding_documents')
     .select('*')
     .eq('packet_id', packet.id)
     .order('sort_order', { ascending: true });
 
   // Get existing signatures
-  const { data: signatures } = await db
+  const { data: signatures } = await supabase
     .from('onboarding_signatures')
     .select('document_id')
     .eq('user_id', user.id);
@@ -132,7 +121,7 @@ export default async function OnboardingStartPage() {
   );
 
   // Get payroll profile status
-  const { data: payrollProfile } = await db
+  const { data: payrollProfile } = await supabase
     .from('payroll_profiles')
     .select('status')
     .eq('user_id', user.id)

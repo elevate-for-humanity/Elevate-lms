@@ -1,8 +1,9 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import FERPATrainingDashboard from '@/components/compliance/FERPATrainingDashboard';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'FERPA Training Management | Elevate For Humanity',

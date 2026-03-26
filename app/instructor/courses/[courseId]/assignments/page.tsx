@@ -1,12 +1,12 @@
-export const dynamic = 'force-dynamic';
 
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, Users, Clock, ChevronRight } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Assignments | Instructor',
@@ -18,29 +18,19 @@ type Params = Promise<{ courseId: string }>;
 export default async function InstructorAssignmentsPage({ params }: { params: Params }) {
   const { courseId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-
-      
-        <p className="text-gray-600">Service Unavailable</p>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: course } = await db
+  const { data: course } = await supabase
     .from('training_courses')
     .select('id, title')
     .eq('id', courseId)
     .single();
 
   // Fetch assignments for this course
-  const { data: assignments } = await db
+  const { data: assignments } = await supabase
     .from('assignments')
     .select('id, title, description, max_points, due_date, created_at')
     .eq('course_id', courseId)
@@ -49,7 +39,7 @@ export default async function InstructorAssignmentsPage({ params }: { params: Pa
   // Get submission counts per assignment
   const assignmentIds = (assignments || []).map((a: any) => a.id);
   const { data: submissionCounts } = assignmentIds.length > 0
-    ? await db
+    ? await supabase
         .from('assignment_submissions')
         .select('assignment_id')
         .in('assignment_id', assignmentIds)
@@ -62,7 +52,7 @@ export default async function InstructorAssignmentsPage({ params }: { params: Pa
 
   // Get graded counts
   const { data: gradedCounts } = assignmentIds.length > 0
-    ? await db
+    ? await supabase
         .from('grades')
         .select('assignment_id')
         .in('assignment_id', assignmentIds)

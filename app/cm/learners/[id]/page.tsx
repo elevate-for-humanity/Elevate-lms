@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -37,21 +36,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CMLearnerDetailPage({ params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="p-8 text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
   // Verify case manager access
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -62,7 +53,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
   }
 
   // Fetch learner
-  const { data: learner, error } = await db
+  const { data: learner, error } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', id)
@@ -71,7 +62,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
   if (error || !learner) notFound();
 
   // Fetch enrollments
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('program_enrollments')
     .select(`
       *,
@@ -82,7 +73,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
     .order('enrolled_at', { ascending: false });
 
   // Fetch case notes
-  const { data: caseNotes } = await db
+  const { data: caseNotes } = await supabase
     .from('case_notes')
     .select(`
       *,
@@ -93,14 +84,14 @@ export default async function CMLearnerDetailPage({ params }: Props) {
     .limit(5);
 
   // Fetch goals
-  const { data: goals } = await db
+  const { data: goals } = await supabase
     .from('learner_goals')
     .select('*')
     .eq('learner_id', id)
     .order('created_at', { ascending: false });
 
   // Fetch documents
-  const { data: documents } = await db
+  const { data: documents } = await supabase
     .from('learner_documents')
     .select('*')
     .eq('learner_id', id)

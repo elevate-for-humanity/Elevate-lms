@@ -31,7 +31,7 @@ export default async function PlacementPage() {
 
   // Employer count for stats
   const employerCount = db
-    ? await db.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'employer').then(r => r.count ?? 0)
+    ? await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'employer').then(r => r.count ?? 0)
     : 0;
 
   return (

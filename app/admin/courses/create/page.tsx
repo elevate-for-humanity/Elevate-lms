@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import CourseIngestionWizard from './CourseIngestionWizard';
@@ -14,21 +13,12 @@ export const metadata: Metadata = {
 
 export default async function CreateCoursePage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <h1 className="text-2xl font-bold text-gray-900">Service Unavailable</h1>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -38,7 +28,7 @@ export default async function CreateCoursePage() {
     redirect('/unauthorized');
   }
 
-  const { data: programs } = await db
+  const { data: programs } = await supabase
     .from('programs')
     .select('id, title')
     .eq('status', 'active')

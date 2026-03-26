@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Settings, Users, FileText, Shield, BarChart, Download } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -17,21 +16,10 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   // Get admin resources
-  const { data: resources } = await db
+  const { data: resources } = await supabase
     .from('resources')
     .select('*')
     .eq('category', 'admins')
@@ -39,7 +27,7 @@ export default async function AdminsPage() {
     .order('order', { ascending: true });
 
   // Get admin guides
-  const { data: guides } = await db
+  const { data: guides } = await supabase
     .from('documentation')
     .select('*')
     .eq('category', 'admin-guides')
@@ -47,7 +35,7 @@ export default async function AdminsPage() {
     .limit(6);
 
   // Get admin discussions
-  const { data: discussions } = await db
+  const { data: discussions } = await supabase
     .from('discussions')
     .select('id, title, created_at, reply_count')
     .eq('category', 'admins')

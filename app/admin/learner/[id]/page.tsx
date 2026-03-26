@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -36,21 +35,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function LearnerDetailPage({ params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="p-8 text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-        <p className="text-gray-600">Please try again later.</p>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: adminProfile } = await db
+  const { data: adminProfile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -61,7 +51,7 @@ export default async function LearnerDetailPage({ params }: Props) {
   }
 
   // Fetch learner profile
-  const { data: learner, error } = await db
+  const { data: learner, error } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', id)
@@ -72,7 +62,7 @@ export default async function LearnerDetailPage({ params }: Props) {
   }
 
   // Fetch enrollments
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('program_enrollments')
     .select(`
       *,
@@ -82,14 +72,14 @@ export default async function LearnerDetailPage({ params }: Props) {
     .order('enrolled_at', { ascending: false });
 
   // Fetch certificates
-  const { data: certificates } = await db
+  const { data: certificates } = await supabase
     .from('certificates')
     .select('*')
     .eq('user_id', id)
     .order('issued_at', { ascending: false });
 
   // Fetch recent activity
-  const { data: recentActivity } = await db
+  const { data: recentActivity } = await supabase
     .from('lesson_progress')
     .select(`
       *,

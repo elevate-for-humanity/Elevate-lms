@@ -23,7 +23,7 @@ export default async function CaseManagerDashboardPage() {
   const db = admin || supabase;
 
   // ─── Assigned participants ────────────────────────────────────────────────
-  const { data: assignments } = await db
+  const { data: assignments } = await supabase
     .from('case_manager_assignments')
     .select('learner_id, assigned_at, expires_at')
     .eq('case_manager_id', user.id);
@@ -34,7 +34,7 @@ export default async function CaseManagerDashboardPage() {
   // ─── Participant profiles ─────────────────────────────────────────────────
   let participants: any[] = [];
   if (learnerIds.length > 0) {
-    const { data } = await db
+    const { data } = await supabase
       .from('profiles')
       .select('id, full_name, email, city, state, created_at')
       .in('id', learnerIds)
@@ -47,12 +47,12 @@ export default async function CaseManagerDashboardPage() {
   let activeEnrollments = 0;
   let completedEnrollments = 0;
   if (learnerIds.length > 0) {
-    const { count: active } = await db
+    const { count: active } = await supabase
       .from('program_enrollments')
       .select('id', { count: 'exact', head: true })
       .in('user_id', learnerIds)
       .eq('status', 'active');
-    const { count: completed } = await db
+    const { count: completed } = await supabase
       .from('program_enrollments')
       .select('id', { count: 'exact', head: true })
       .in('user_id', learnerIds)
@@ -64,7 +64,7 @@ export default async function CaseManagerDashboardPage() {
   // ─── Credential summary ───────────────────────────────────────────────────
   let credentialsEarned = 0;
   if (learnerIds.length > 0) {
-    const { count } = await db
+    const { count } = await supabase
       .from('learner_credentials')
       .select('id', { count: 'exact', head: true })
       .in('learner_id', learnerIds)
@@ -76,12 +76,12 @@ export default async function CaseManagerDashboardPage() {
   let placementsVerified = 0;
   let placementsPending = 0;
   if (learnerIds.length > 0) {
-    const { count: verified } = await db
+    const { count: verified } = await supabase
       .from('placement_records')
       .select('id', { count: 'exact', head: true })
       .in('learner_id', learnerIds)
       .eq('status', 'verified');
-    const { count: pending } = await db
+    const { count: pending } = await supabase
       .from('placement_records')
       .select('id', { count: 'exact', head: true })
       .in('learner_id', learnerIds)
@@ -93,7 +93,7 @@ export default async function CaseManagerDashboardPage() {
   // ─── Recent enrollments needing attention ─────────────────────────────────
   let recentEnrollments: any[] = [];
   if (learnerIds.length > 0) {
-    const { data } = await db
+    const { data } = await supabase
       .from('program_enrollments')
       .select(`
         id, status, enrolled_at, funding_source,

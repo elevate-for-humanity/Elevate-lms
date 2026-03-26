@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/lms/profile' },
@@ -13,15 +13,12 @@ export const metadata: Metadata = {
 
 export default async function ProfilePage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
-  if (!supabase) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single();
-  const { count: completedCourses } = await db.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'completed');
-  const { count: certificates } = await db.from('certificates').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
+  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+  const { count: completedCourses } = await supabase.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'completed');
+  const { count: certificates } = await supabase.from('certificates').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
 
   return (
     <div className="min-h-screen bg-white">

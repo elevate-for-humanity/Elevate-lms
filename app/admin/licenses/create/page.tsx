@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowLeft, Award, Calendar, Building, Save } from 'lucide-react';
@@ -16,9 +15,8 @@ export const metadata: Metadata = {
 
 export default async function CreateLicensePage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const tenants = db
-    ? (await db.from('tenants').select('id, name').order('name')).data ?? []
+    ? (await supabase.from('tenants').select('id, name').order('name')).data ?? []
     : [];
 
   return (

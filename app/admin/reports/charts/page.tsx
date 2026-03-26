@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { BarChart3, TrendingUp, PieChart, Target } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -14,18 +14,16 @@ export const metadata: Metadata = {
 
 export default async function ChartsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
-  const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   const [enrollments, completions, programs, applications] = await Promise.all([
-    db.from('enrollments').select('id', { count: 'exact', head: true }),
-    db.from('partner_completions').select('id', { count: 'exact', head: true }),
-    db.from('programs').select('id', { count: 'exact', head: true }),
-    db.from('applications').select('id', { count: 'exact', head: true }),
+    supabase.from('enrollments').select('id', { count: 'exact', head: true }),
+    supabase.from('partner_completions').select('id', { count: 'exact', head: true }),
+    supabase.from('programs').select('id', { count: 'exact', head: true }),
+    supabase.from('applications').select('id', { count: 'exact', head: true }),
   ]);
 
   const stats = [
@@ -35,7 +33,7 @@ export default async function ChartsPage() {
     { label: 'Applications', value: applications.count ?? 0, icon: Target },
   ];
 
-  const { data: enrollmentsByStatus } = await db
+  const { data: enrollmentsByStatus } = await supabase
     .from('enrollments')
     .select('status')
     .limit(500);
@@ -45,7 +43,7 @@ export default async function ChartsPage() {
     statusCounts[e.status] = (statusCounts[e.status] || 0) + 1;
   });
 
-  const { data: programEnrollments } = await db
+  const { data: programEnrollments } = await supabase
     .from('enrollments')
     .select('program_id, programs(name)')
     .limit(500);

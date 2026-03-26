@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, Circle, Star, BookOpen, Award, ChevronRight, TrendingUp } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Staff Skills | Elevate For Humanity',
@@ -77,7 +78,7 @@ export default async function StaffSkillsPage() {
   if (!user) redirect('/login?redirect=/staff-portal/skills');
 
   // Fetch completed skills for this user
-  const { data: userSkills } = await db
+  const { data: userSkills } = await supabase
     .from('user_skills')
     .select('skill_name, verified, verified_at')
     .eq('user_id', user.id);

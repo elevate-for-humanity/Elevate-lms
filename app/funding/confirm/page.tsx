@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { DollarSign, CheckCircle2, ArrowLeft, FileText, ExternalLink } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Confirm Funding | Elevate for Humanity',
@@ -25,7 +25,7 @@ async function confirmFunding(formData: FormData) {
 
   const fundingSource = formData.get('funding_source') as string;
 
-  const { error } = await db.from('profiles').update({
+  const { error } = await supabase.from('profiles').update({
     funding_source: fundingSource || 'pending',
     funding_confirmed: true,
   }).eq('id', user.id);
@@ -40,7 +40,6 @@ async function confirmFunding(formData: FormData) {
 
 export default async function ConfirmFundingPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) redirect('/login');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');

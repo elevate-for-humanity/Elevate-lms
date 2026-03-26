@@ -1,10 +1,10 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Attendance | Staff Portal',
@@ -14,10 +14,9 @@ export const metadata: Metadata = {
 
 export default async function StaffPortalAttendancePage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch attendance records from database
-  const { data: attendanceRecords } = await db
+  const { data: attendanceRecords } = await supabase
     .from('attendance_hours')
     .select(`
       id,
@@ -35,7 +34,7 @@ export default async function StaffPortalAttendancePage() {
     .limit(20);
 
   // Fetch today's sessions/cohorts
-  const { data: cohorts } = await db
+  const { data: cohorts } = await supabase
     .from('cohorts')
     .select('id, name, start_date, end_date')
     .eq('status', 'active')

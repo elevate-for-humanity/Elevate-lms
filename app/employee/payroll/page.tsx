@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
@@ -9,6 +8,8 @@ import {
   CreditCard, Building2, Banknote, Settings, CheckCircle, AlertCircle
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'My Payroll | Elevate For Humanity',
@@ -51,7 +52,7 @@ export default async function EmployeePayrollPage() {
   if (!user) redirect('/login?redirect=/employee/payroll');
 
   // Fetch pay stubs for this employee
-  const { data: stubs } = await db
+  const { data: stubs } = await supabase
     .from('pay_stubs')
     .select(`
       id, gross_pay, net_pay, federal_tax, state_tax,
@@ -64,14 +65,14 @@ export default async function EmployeePayrollPage() {
     .limit(24);
 
   // Fetch payroll profile (pay method)
-  const { data: payrollProfile } = await db
+  const { data: payrollProfile } = await supabase
     .from('payroll_profiles')
     .select('bank_name, account_type, direct_deposit_enabled, status')
     .eq('user_id', user.id)
     .maybeSingle();
 
   // Fetch payout rate config
-  const { data: rateConfig } = await db
+  const { data: rateConfig } = await supabase
     .from('payout_rate_configs')
     .select('rate_amount, rate_type, effective_date')
     .order('effective_date', { ascending: false })

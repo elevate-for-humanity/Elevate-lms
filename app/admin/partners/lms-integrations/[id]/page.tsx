@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -36,21 +35,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function LMSIntegrationDetailPage({ params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="p-8 text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-        <p className="text-gray-600">Please try again later.</p>
-      </div>
-    );
-  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: adminProfile } = await db
+  const { data: adminProfile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -61,7 +51,7 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
   }
 
   // Fetch LMS provider
-  const { data: provider, error } = await db
+  const { data: provider, error } = await supabase
     .from('partner_lms_providers')
     .select('*')
     .eq('id', id)
@@ -72,20 +62,20 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
   }
 
   // Fetch courses from this provider
-  const { data: courses, count: courseCount } = await db
+  const { data: courses, count: courseCount } = await supabase
     .from('partner_lms_courses')
     .select('*', { count: 'exact' })
     .eq('provider_id', id)
     .order('course_name');
 
   // Fetch enrollments count
-  const { count: enrollmentCount } = await db
+  const { count: enrollmentCount } = await supabase
     .from('partner_lms_enrollments')
     .select('*', { count: 'exact', head: true })
     .in('course_id', courses?.map(c => c.id) || []);
 
   // Fetch recent sync logs
-  const { data: syncLogs } = await db
+  const { data: syncLogs } = await supabase
     .from('partner_lms_sync_logs')
     .select('*')
     .eq('provider_id', id)

@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { BookOpen, Layers, ChevronRight, PlusCircle } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -23,7 +24,7 @@ export default async function CurriculumPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/admin/curriculum');
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -34,7 +35,7 @@ export default async function CurriculumPage() {
   }
 
   // Aggregate lesson counts per course_id from curriculum_lessons
-  const { data: lessonRows } = await db
+  const { data: lessonRows } = await supabase
     .from('course_lessons')
     .select('course_id, status, step_type');
 
@@ -57,7 +58,7 @@ export default async function CurriculumPage() {
 
   // Resolve course names from training_courses
   const { data: trainingCourses } = courseIds.length
-    ? await db
+    ? await supabase
         .from('courses')
         .select('id, title')
         .in('id', courseIds)
@@ -68,7 +69,7 @@ export default async function CurriculumPage() {
   const unresolvedIds = courseIds.filter(id => !resolvedIds.has(id));
 
   const { data: programs } = unresolvedIds.length
-    ? await db
+    ? await supabase
         .from('programs')
         .select('id, name')
         .in('id', unresolvedIds)

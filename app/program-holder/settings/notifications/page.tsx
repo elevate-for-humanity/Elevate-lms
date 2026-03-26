@@ -1,9 +1,9 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import NotificationPreferencesForm from './NotificationPreferencesForm';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Notification Settings | Program Holder',
@@ -15,21 +15,7 @@ export const metadata = {
 
 export default async function ProgramHolderNotificationSettingsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Settings" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   const {
     data: { user },
@@ -40,7 +26,7 @@ export default async function ProgramHolderNotificationSettingsPage() {
   }
 
   // Get program holder record
-  const { data: programHolder } = await db
+  const { data: programHolder } = await supabase
     .from('program_holders')
     .select('id, organization_name')
     .eq('user_id', user.id)
@@ -51,7 +37,7 @@ export default async function ProgramHolderNotificationSettingsPage() {
   }
 
   // Get or create notification preferences
-  let { data: preferences } = await db
+  let { data: preferences } = await supabase
     .from('notification_preferences')
     .select('*')
     .eq('program_holder_id', programHolder.id)
@@ -59,7 +45,7 @@ export default async function ProgramHolderNotificationSettingsPage() {
 
   // Create default preferences if they don't exist
   if (!preferences) {
-    const { data: newPreferences } = await db
+    const { data: newPreferences } = await supabase
       .from('notification_preferences')
       .insert({
         program_holder_id: programHolder.id,

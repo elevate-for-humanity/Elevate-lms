@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { BookOpen, CheckCircle, ChevronRight, FileText, Shield, Users, Clock, AlertTriangle, Heart, Briefcase } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Employee Handbook | Elevate For Humanity',
@@ -132,7 +133,7 @@ export default async function EmployeeHandbookPage() {
   if (!user) redirect('/login?redirect=/employee/handbook');
 
   // Check if user has already acknowledged
-  const { data: ack } = await db
+  const { data: ack } = await supabase
     .from('handbook_acknowledgments')
     .select('id, acknowledged_at')
     .eq('user_id', user.id)

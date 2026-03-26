@@ -1,5 +1,3 @@
-export const dynamic = 'force-static';
-export const revalidate = 3600;
 
 import { Metadata } from 'next';
 import Image from 'next/image';
@@ -7,6 +5,9 @@ import HeroVideo from '@/components/marketing/HeroVideo';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Phone, Building2, Users, DollarSign, TrendingUp, ArrowRight } from 'lucide-react';
+
+export const dynamic = 'force-static';
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'For Agencies | Government-Aligned Workforce Infrastructure',

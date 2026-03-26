@@ -1,10 +1,12 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { requireAdmin } from '@/lib/auth';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -13,49 +15,42 @@ export const metadata: Metadata = {
 };
 
 async function getWorkflowData() {
-  const db = createAdminClient();
-
-  const { data: grants } = await db
-    .from('grant_opportunities')
+  const { data: grants } = await supabaseAdmin
+    .from('grants')
     .select('*')
-    .order('deadline', { ascending: true });
+    .order('due_date', { ascending: true });
 
-  const { data: applications } = await db
+  const { data: entities } = await supabaseAdmin
+    .from('grant_entities')
+    .select('*');
+
+  const { data: applications } = await supabaseAdmin
     .from('grant_applications')
     .select('*');
 
   return {
     grants: grants || [],
-    entities: [] as any[],
+    entities: entities || [],
     applications: applications || [],
   };
 }
 
 export default async function GrantWorkflowPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) redirect('/login');
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
+
+  await requireAdmin();
 
   const { grants, entities, applications } = await getWorkflowData();
 
@@ -177,7 +172,7 @@ export default async function GrantWorkflowPage() {
                     </p>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-slate-500">
-                        Due: {grant.deadline ? new Date(grant.deadline).toLocaleDateString() : 'TBD'}
+                        Due: {new Date(grant.due_date).toLocaleDateString()}
                       </span>
                       <Link
                         href={`/admin/grants/intake/${grant.id}`}

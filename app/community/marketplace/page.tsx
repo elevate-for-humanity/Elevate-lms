@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
@@ -82,18 +81,7 @@ const FEATURED_CATEGORIES = [
 
 export default async function CommunityMarketplacePage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   
   let courses: any[] = [];
   let products: any[] = [];
@@ -102,7 +90,7 @@ export default async function CommunityMarketplacePage() {
   
   try {
     // Get creator courses
-    const { data: courseData, count: courseCount } = await db
+    const { data: courseData, count: courseCount } = await supabase
       .from('creator_courses')
       .select(`
         *,
@@ -117,7 +105,7 @@ export default async function CommunityMarketplacePage() {
     }
 
     // Get shop products
-    const { data: productData, count: productCount } = await db
+    const { data: productData, count: productCount } = await supabase
       .from('shop_products')
       .select(`
         *,
@@ -134,7 +122,7 @@ export default async function CommunityMarketplacePage() {
     totalListings = (courseCount || 0) + (productCount || 0);
 
     // Count unique sellers
-    const { count: sellerCount } = await db
+    const { count: sellerCount } = await supabase
       .from('shop_profiles')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'active');

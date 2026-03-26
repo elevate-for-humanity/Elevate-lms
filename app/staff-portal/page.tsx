@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
+
+export const dynamic = 'force-dynamic';
   Users, ClipboardList, BarChart2, Calendar, FileText,
   DollarSign, BookOpen, Star, Settings, ChevronRight,
   CheckCircle, AlertCircle, Video
@@ -30,10 +31,10 @@ export default async function StaffPortalLanding() {
 
   if (user) {
     const [{ data: pp }, { data: ha }, { data: us }, { data: pr }] = await Promise.all([
-      db.from('payroll_profiles').select('id').eq('user_id', user.id).maybeSingle(),
-      db.from('handbook_acknowledgments').select('id').eq('user_id', user.id).maybeSingle(),
-      db.from('user_skills').select('skill_name').eq('user_id', user.id),
-      db.from('profiles').select('full_name, role').eq('id', user.id).maybeSingle(),
+      supabase.from('payroll_profiles').select('id').eq('user_id', user.id).maybeSingle(),
+      supabase.from('handbook_acknowledgments').select('id').eq('user_id', user.id).maybeSingle(),
+      supabase.from('user_skills').select('skill_name').eq('user_id', user.id),
+      supabase.from('profiles').select('full_name, role').eq('id', user.id).maybeSingle(),
     ]);
     payrollDone = !!pp;
     handbookDone = !!ha;

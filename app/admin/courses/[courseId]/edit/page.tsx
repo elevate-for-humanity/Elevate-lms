@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { EditCourseForm } from './EditCourseForm';
@@ -18,22 +17,14 @@ export default async function EditCoursePage({
 }) {
   const { courseId } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <h1 className="text-2xl font-bold text-gray-900">Service Unavailable</h1>
-      </div>
-    );
-  }
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -43,7 +34,7 @@ export default async function EditCoursePage({
     redirect('/unauthorized');
   }
 
-  const { data: course } = await db
+  const { data: course } = await supabase
     .from('training_courses')
     .select('*')
     .eq('id', courseId)
@@ -51,7 +42,7 @@ export default async function EditCoursePage({
 
   if (!course) notFound();
 
-  const { data: programs } = await db
+  const { data: programs } = await supabase
     .from('programs')
     .select('id, title')
     .order('title');

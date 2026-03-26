@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -10,7 +9,8 @@ import {
 import { QuickSummary } from '@/app/admin/governance/_content/QuickSummary';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Authoritative Documents | Governance | Supersonic Fast Cash',
   description: 'The seven governing documents that define platform operations for Supersonic Fast Cash tax preparation and refund advance services.',
@@ -33,8 +33,7 @@ const summaryBullets = [
 
 export default async function SupersonicAuthoritativeDocsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: dbRows } = await db.from('tax_returns').select('*').limit(50);
+  const { data: dbRows } = await supabase.from('tax_returns').select('*').limit(50);
 const documents = (dbRows as any[]) || [];
 
   const currentDate = new Date().toLocaleDateString('en-US', {

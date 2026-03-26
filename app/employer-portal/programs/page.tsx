@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -7,7 +6,8 @@ import Link from 'next/link';
 import { Award, DollarSign, Users, Clock, ArrowRight } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Employer Programs | Employer Portal',
   description: 'Explore tax credit programs, apprenticeships, and workforce development opportunities.',
@@ -17,8 +17,7 @@ export const metadata: Metadata = {
 
 export default async function EmployerProgramsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: dbRows } = await db.from('employers').select('*').limit(50);
+  const { data: dbRows } = await supabase.from('employers').select('*').limit(50);
 const programs = (dbRows as any[]) || [];
 
   return (

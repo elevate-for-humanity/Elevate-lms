@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, PlayCircle, Clock, BookOpen } from 'lucide-react';
@@ -28,8 +27,6 @@ export default async function ApprenticeCourseDetailPage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
   if (!supabase) {
     redirect('/login?redirect=/apprentice');
@@ -42,7 +39,7 @@ export default async function ApprenticeCourseDetailPage({
   }
 
   // Get enrollment with program
-  const { data: enrollment } = await db
+  const { data: enrollment } = await supabase
     .from('training_enrollments')
     .select('*, programs(id, name, slug)')
     .eq('user_id', user.id)
@@ -66,21 +63,21 @@ export default async function ApprenticeCourseDetailPage({
   }
 
   // Get course from database
-  const { data: course } = await db
+  const { data: course } = await supabase
     .from('training_courses')
     .select('*')
     .eq('id', id)
     .single();
 
   // Get course modules
-  const { data: modules } = await db
+  const { data: modules } = await supabase
     .from('course_modules')
     .select('*')
     .eq('course_id', id)
     .order('order_index', { ascending: true });
 
   // Get user's progress on modules
-  const { data: progress } = await db
+  const { data: progress } = await supabase
     .from('module_progress')
     .select('module_id, completed_at')
     .eq('user_id', user.id)

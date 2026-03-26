@@ -1,11 +1,12 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState } from 'react';
 import Link from 'next/link';
 import { 
+
+export const dynamic = 'force-dynamic';
   Globe, ArrowRight, Loader2, Code, 
   Plug, Copy, Check, ExternalLink, Zap, Shield,
   BookOpen, CreditCard, Users, BarChart3

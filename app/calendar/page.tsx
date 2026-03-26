@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -19,23 +18,13 @@ export const dynamic = 'force-dynamic';
 
 export default async function CalendarPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const { data: { user } } = await supabase.auth.getUser();
 
   let enrollments = null;
   let assignments = null;
 
   if (user) {
-    const { data: enrollmentData } = await db
+    const { data: enrollmentData } = await supabase
       .from('program_enrollments')
       .select(`
         id,
@@ -47,7 +36,7 @@ export default async function CalendarPage() {
 
     const courseIds = enrollments?.map((e: any) => e.course?.id).filter(Boolean) || [];
     if (courseIds.length > 0) {
-      const { data: assignmentData } = await db
+      const { data: assignmentData } = await supabase
         .from('assignments')
         .select('*')
         .in('course_id', courseIds)
@@ -58,7 +47,7 @@ export default async function CalendarPage() {
     }
   }
 
-  const { data: programs } = await db
+  const { data: programs } = await supabase
     .from('programs')
     .select('id, name, start_date, schedule')
     .eq('is_active', true)

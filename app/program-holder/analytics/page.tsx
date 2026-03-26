@@ -16,7 +16,7 @@ export default async function ProgramHolderAnalyticsPage() {
   const { db, holderId } = await requireProgramHolder();
 
   // Get program holder record using the real linkage
-  const { data: programHolder } = await db
+  const { data: programHolder } = await supabase
     .from('program_holders')
     .select('id, name, payout_share')
     .eq('id', holderId)
@@ -33,13 +33,13 @@ export default async function ProgramHolderAnalyticsPage() {
   const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
 
   // Current period stats
-  const { count: currentEnrollments } = await db
+  const { count: currentEnrollments } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id)
     .gte('enrolled_at', thirtyDaysAgo.toISOString());
 
-  const { count: previousEnrollments } = await db
+  const { count: previousEnrollments } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id)
@@ -47,37 +47,37 @@ export default async function ProgramHolderAnalyticsPage() {
     .lt('enrolled_at', thirtyDaysAgo.toISOString());
 
   // Total stats
-  const { count: totalEnrollments } = await db
+  const { count: totalEnrollments } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id);
 
-  const { count: activeEnrollments } = await db
+  const { count: activeEnrollments } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id)
     .eq('status', 'active');
 
-  const { count: completedEnrollments } = await db
+  const { count: completedEnrollments } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id)
     .eq('status', 'completed');
 
   // Program performance
-  const { data: programs } = await db
+  const { data: programs } = await supabase
     .from('programs')
     .select('id, name, slug')
     .eq('program_holder_id', programHolder.id);
 
   const programStats = await Promise.all(
     (programs || []).map(async (program: any) => {
-      const { count: enrollments } = await db
+      const { count: enrollments } = await supabase
         .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('program_id', program.id);
 
-      const { count: completed } = await db
+      const { count: completed } = await supabase
         .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('program_id', program.id)

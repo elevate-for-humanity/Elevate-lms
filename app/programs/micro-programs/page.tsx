@@ -1,8 +1,9 @@
-export const dynamic = 'force-static';
-export const revalidate = 86400;
 import { Metadata } from 'next';
 import ProgramPageLayout from '@/components/programs/ProgramPageLayout';
 import type { ProgramPageConfig } from '@/components/programs/ProgramPageLayout';
+
+export const dynamic = 'force-static';
+export const revalidate = 86400;
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {

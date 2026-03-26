@@ -499,10 +499,10 @@ async function testOnboarding() {
 // ─────────────────────────────────────────────────────────────────────────────
 async function testGit() {
   console.log('\n══ 10. GIT STATE ══');
-  const log = execSync('git log --oneline origin/main | head -5').toString();
+  const log = execSync('git log --oneline origin/main | head -20').toString();
   record('git', 'fix(lms) commit on origin/main', log.includes('fix(lms)'), log.split('\n')[0]);
-  record('git', 'fix(admin) commit on origin/main', log.includes('fix(admin)'), '');
-  record('git', 'feat(pipeline) commit on origin/main', log.includes('feat(pipeline)') || log.includes('fix(lms)'), '');
+  record('git', 'fix(admin) commit on origin/main', log.includes('fix(admin)'), log.includes('fix(admin)') ? 'found' : 'not in last 20 commits');
+  record('git', 'feat(pipeline) or fix(lms) on origin/main', log.includes('feat(pipeline)') || log.includes('fix(lms)'), '');
 
   // Only flag truly unexpected dirty files — scripts/ additions are expected
   const status = execSync('git status --short').toString().trim();

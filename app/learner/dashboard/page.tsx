@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
 import WorkOneChecklistSection from '@/components/workone/WorkOneChecklist';
 import {
-import { logger } from '@/lib/logger';
   Clock,
   Play,
   MessageSquare,
@@ -24,6 +23,7 @@ import { logger } from '@/lib/logger';
   AlertCircle,
   FileCheck,
 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export const metadata: Metadata = {
   title: 'Learner Dashboard | Elevate LMS',

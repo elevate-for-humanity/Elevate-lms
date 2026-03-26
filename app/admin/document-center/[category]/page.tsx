@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
+import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
-import { logger } from '@/lib/logger';
   ArrowLeft,
   FileText,
   Download,

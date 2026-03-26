@@ -1,9 +1,9 @@
 import { createClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-import { logger } from '@/lib/logger';
   Users,
   DollarSign,
   FileText,

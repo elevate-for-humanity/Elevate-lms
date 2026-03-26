@@ -13,8 +13,8 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import {
 import { logger } from '@/lib/logger';
+import {
   HSI_COURSES,
   NRF_COURSES,
   JRI_COURSES,

@@ -183,15 +183,9 @@ export default function HeroVideo({
               className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-black/40 text-white text-xs backdrop-blur-sm hover:bg-black/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white transition-colors"
             >
               {muted ? (
-                <>
-                  <VolumeX className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span className="hidden sm:inline">Muted</span>
-                </>
+                <VolumeX className="w-3.5 h-3.5 flex-shrink-0" />
               ) : (
-                <>
-                  <Volume2 className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span className="hidden sm:inline">Sound on</span>
-                </>
+                <Volume2 className="w-3.5 h-3.5 flex-shrink-0" />
               )}
             </button>
           </div>

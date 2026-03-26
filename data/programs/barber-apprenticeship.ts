@@ -250,7 +250,6 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     '900 hours of training (52 weeks)',
     'Starter barber tool kit',
     'Indiana Barber License exam fee',
-
     'LMS access for full program duration',
     'Career placement and shop matching',
   ],

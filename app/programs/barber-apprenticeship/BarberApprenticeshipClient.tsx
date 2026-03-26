@@ -143,7 +143,6 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
             { img: '/images/pages/barber-tools-closeup.jpg', alt: 'Barber tools and clippers', cred: p.credentials[0] },
             { img: '/images/pages/barber-client-consult.jpg', alt: 'Barber consulting with client', cred: p.credentials[1] },
             { img: '/images/pages/barber-shop-wide.jpg', alt: 'Professional barbershop interior', cred: p.credentials[2] },
-            { img: '/images/pages/barber-checking-work.jpg', alt: 'Barber checking finished haircut', cred: p.credentials[3] },
           ].filter(item => item.cred).map((item, i) => (
             <div key={i} className="border border-slate-200 rounded-xl overflow-hidden hover:border-brand-blue-300 transition-colors">
               <div className="relative h-44">

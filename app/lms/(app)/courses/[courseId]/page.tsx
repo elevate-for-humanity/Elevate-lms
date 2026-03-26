@@ -18,14 +18,14 @@ type Params = Promise<{ courseId: string }>;
 
 async function resolveCourse(courseId: string) {
   const db = createAdminClient();
-  const { data: course } = await supabase
+  const { data: course } = await db
     .from('courses')
     .select('id, title, description, short_description, status, is_active, program_id, slug')
     .eq('id', courseId)
     .maybeSingle();
   if (course) return { ...course, _lessonCourseId: course.id };
 
-  const { data: tc } = await supabase
+  const { data: tc } = await db
     .from('training_courses')
     .select('id, title, description, is_active, slug')
     .eq('id', courseId)
@@ -33,7 +33,7 @@ async function resolveCourse(courseId: string) {
   if (!tc) return null;
 
   let lessonCourseId = tc.id;
-  const { data: canonicalCourse } = await supabase
+  const { data: canonicalCourse } = await db
     .from('courses').select('id').eq('slug', tc.slug).maybeSingle();
   if (canonicalCourse?.id) lessonCourseId = canonicalCourse.id;
 

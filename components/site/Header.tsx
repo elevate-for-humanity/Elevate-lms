@@ -145,8 +145,8 @@ export default function Header() {
             src="/logo.png"
             alt="Elevate"
             width={40}
-            height={40}
-            className="w-10 h-10"
+            height={60}
+            className="w-auto h-10"
             priority
           />
           <span className="font-bold text-lg text-slate-900 hidden sm:block">

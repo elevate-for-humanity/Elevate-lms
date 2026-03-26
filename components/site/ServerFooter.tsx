@@ -89,7 +89,7 @@ export default function ServerFooter() {
         {/* Institutional Identity */}
         <div className="mb-10 pb-8 border-b border-slate-800">
           <div className="flex items-center gap-3 mb-3">
-            <Image src="/logo.png" alt="Elevate for Humanity" width={32} height={32} className="w-8 h-8" />
+            <Image src="/logo.png" alt="Elevate for Humanity" width={32} height={48} className="w-auto h-8" />
             <span className="text-lg font-bold text-white">Elevate for Humanity</span>
           </div>
           <p className="text-sm text-slate-500 max-w-2xl leading-relaxed">
@@ -208,8 +208,8 @@ export default function ServerFooter() {
                 src="/logo.png"
                 alt="Elevate"
                 width={28}
-                height={28}
-                className="w-7 h-7"
+                height={42}
+                className="w-auto h-7"
               />
               <p className="text-slate-500 text-sm">
                 © {new Date().getFullYear()} 2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Training Institute.

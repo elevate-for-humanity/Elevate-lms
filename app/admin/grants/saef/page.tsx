@@ -15,7 +15,7 @@ const APPLICATION_DATA = {
   address: '8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240',
   primaryContact: 'Elizabeth Greene, Founder & Chief Executive Officer',
   phone: '(317) 314-3757',
-  email: 'elizabethpowell6262@gmail.com',
+  email: 'elevate4humanityedu@gmail.com',
   organizationType: 'Nonprofit',
 
   // ── Section 2: Organizational Eligibility ─────────────────────────────────

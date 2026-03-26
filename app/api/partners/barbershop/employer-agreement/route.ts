@@ -147,7 +147,7 @@ async function _POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        personalizations: [{ to: [{ email: 'elizabethpowell6262@gmail.com' }] }],
+        personalizations: [{ to: [{ email: process.env.ALERT_EMAIL_TO || 'elevate4humanityedu@gmail.com' }] }],
         from: { email: 'noreply@elevateforhumanity.org', name: 'Elevate for Humanity' },
         subject: `[EMPLOYER AGREEMENT] ${shop_name} — Onboarding Complete`,
         content: [{

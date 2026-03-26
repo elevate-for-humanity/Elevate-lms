@@ -21,7 +21,7 @@ export const ORG_PROFILE = {
   state: 'Indiana',
   zip: '46240',
   phone: '(317) 314-3757',
-  email: 'elizabethpowell6262@gmail.com',
+  email: 'elevate4humanityedu@gmail.com',
   website: 'https://www.elevateforhumanity.org',
 
   // ── Leadership ──────────────────────────────────────────────────────────────

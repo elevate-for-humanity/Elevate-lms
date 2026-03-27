@@ -10,10 +10,9 @@ const PROGRAMS = [
     full: 'Certified Nursing Assistant',
     duration: '4–8 weeks',
     salary: '$28–$42K/yr',
-    // CNA is NOT on Indiana ETPL — not WIOA/WorkOne funded.
-    // Funded via employer sponsorship, private pay, or Medicaid waiver.
-    funding: 'Employer-Sponsored',
-    fundingColor: 'text-sky-400',
+    // CNA is not on Indiana ETPL — not WIOA/WorkOne funded.
+    funding: 'Fee-Based',
+    fundingColor: 'text-slate-300',
     video: '/videos/cna-hero.mp4',
     href: '/programs/cna',
   },

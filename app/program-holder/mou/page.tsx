@@ -42,14 +42,17 @@ export default async function ProgramHolderMOUPage() {
               <div><p className="text-sm text-gray-500">Expiration Date</p><p className="font-medium">{mou.expiry_date ? new Date(mou.expiry_date).toLocaleDateString() : 'N/A'}</p></div>
             </div>
             <div className="flex gap-4">
-              <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Download MOU</button>
-              <button className="border px-4 py-2 rounded-lg hover:bg-white">Request Amendment</button>
+              {mou.file_url
+                ? <a href={mou.file_url} target="_blank" rel="noopener noreferrer" className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Download MOU</a>
+                : <span className="bg-slate-100 text-slate-400 px-4 py-2 rounded-lg cursor-not-allowed text-sm">Download not available</span>
+              }
+              <a href="mailto:partnerships@elevateforhumanity.org?subject=MOU Amendment Request" className="border px-4 py-2 rounded-lg hover:bg-slate-50">Request Amendment</a>
             </div>
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
             <p className="text-gray-500 mb-4">No MOU on file</p>
-            <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Request MOU</button>
+            <a href="mailto:partnerships@elevateforhumanity.org?subject=MOU Request" className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 inline-block">Request MOU</a>
           </div>
         )}
       </div>

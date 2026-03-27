@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
-import { Users, Calendar, MessageSquare, Award, ChevronRight } from 'lucide-react';
+import { Users, Calendar, MessageSquare, ChevronRight } from 'lucide-react';
 
 export const metadata: Metadata = { 
   title: 'Mentor Dashboard | Elevate for Humanity',
@@ -89,11 +89,17 @@ export default async function MentorDashboardPage() {
 
   sessionCount = monthSessions || 0;
 
+  // Unread messages addressed to this mentor
+  const { count: unreadMessages } = await supabase
+    .from('messages')
+    .select('*', { count: 'exact', head: true })
+    .eq('recipient_id', user.id)
+    .eq('read', false);
+
   const stats = [
     { label: 'Active Mentees', value: String(menteeCount), icon: Users },
     { label: 'Sessions This Month', value: String(sessionCount), icon: Calendar },
-    { label: 'Messages', value: '0', icon: MessageSquare },
-    { label: 'Avg Rating', value: '--', icon: Award },
+    { label: 'Unread Messages', value: String(unreadMessages ?? 0), icon: MessageSquare },
   ];
 
   return (

@@ -97,10 +97,13 @@ export default async function AnalyticsPage() {
               <p className="text-gray-600">Track your hiring performance and metrics</p>
             </div>
             <div className="flex gap-3">
-              <button className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-white">
+              <a
+                href="/employer-portal/analytics/export"
+                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-slate-50"
+              >
                 <Download className="w-4 h-4" />
                 Export
-              </button>
+              </a>
             </div>
           </div>
         </div>

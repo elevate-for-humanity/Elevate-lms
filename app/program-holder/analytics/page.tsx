@@ -186,14 +186,25 @@ export default async function ProgramHolderAnalyticsPage() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          {/* Chart Placeholder */}
+          {/* Enrollment summary — chart visualization not yet implemented */}
           <div className="md:col-span-2 bg-white rounded-xl border p-6">
-            <h2 className="font-semibold mb-4">Enrollment Trends</h2>
-            <div className="h-64 bg-white rounded-lg flex items-center justify-center">
-              <div className="text-center">
-                <TrendingUp className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                <p className="text-gray-500">Enrollment data visualization</p>
-                <p className="text-sm text-gray-400">{currentEnrollments || 0} enrollments this month</p>
+            <h2 className="font-semibold mb-4">Enrollment Summary</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-slate-50 rounded-lg p-4">
+                <p className="text-sm text-slate-500 mb-1">Total Enrollments</p>
+                <p className="text-3xl font-bold text-slate-900">{totalEnrollments || 0}</p>
+              </div>
+              <div className="bg-slate-50 rounded-lg p-4">
+                <p className="text-sm text-slate-500 mb-1">This Month</p>
+                <p className="text-3xl font-bold text-brand-blue-600">{currentEnrollments || 0}</p>
+              </div>
+              <div className="bg-slate-50 rounded-lg p-4">
+                <p className="text-sm text-slate-500 mb-1">Completion Rate</p>
+                <p className="text-3xl font-bold text-brand-green-600">{completionRate}%</p>
+              </div>
+              <div className="bg-slate-50 rounded-lg p-4">
+                <p className="text-sm text-slate-500 mb-1">Active Programs</p>
+                <p className="text-3xl font-bold text-slate-900">{programs?.length || 0}</p>
               </div>
             </div>
           </div>

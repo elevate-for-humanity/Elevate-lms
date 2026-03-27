@@ -18,7 +18,13 @@ export const metadata: Metadata = {
 export default async function EmployerProgramsPage() {
   const supabase = await createClient();
   const { data: dbRows } = await supabase.from('employers').select('*').limit(50);
-const programs = (dbRows as any[]) || [];
+  const programs = (dbRows as any[]) || [];
+
+  const { count: programCount } = await supabase
+    .from('programs')
+    .select('*', { count: 'exact', head: true })
+    .eq('is_active', true)
+    .neq('status', 'archived');
 
   return (
     <div className="min-h-screen bg-white">
@@ -38,7 +44,7 @@ const programs = (dbRows as any[]) || [];
           {[
             { icon: DollarSign, label: 'WOTC Credit per Hire', value: 'Up to $9,600', color: 'brand-green' },
             { icon: Users, label: 'OJT Wage Reimbursement', value: '50–75%', color: 'brand-blue' },
-            { icon: Award, label: 'Available Programs', value: '4', color: 'brand-blue' },
+            { icon: Award, label: 'Available Programs', value: String(programCount ?? 0), color: 'brand-blue' },
             { icon: Clock, label: 'Avg. Processing Time', value: '2–4 weeks', color: 'brand-orange' },
           ].map((stat, index) => (
             <div key={index} className="bg-white rounded-xl p-6 shadow-sm">

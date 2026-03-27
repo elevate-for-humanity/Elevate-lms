@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import MarqueeBanner from '@/components/MarqueeBanner';
 import { BlurIn } from '@/components/animations/PremiumAnimations';
 import { ProgramVideoCards } from '@/components/marketing/ProgramVideoCards';
+import { HeroVideoBg } from '@/components/marketing/HeroVideoBg';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600;
@@ -30,9 +31,8 @@ export default function HomePage() {
       {/* ── HERO ── */}
       <section className="grid lg:grid-cols-2">
         <div className="relative h-72 sm:h-96 lg:h-auto min-h-[560px] overflow-hidden bg-slate-900">
-          <video src="/videos/barber-hero.mp4"
-            autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-slate-900/30" />
+          <HeroVideoBg src="/videos/barber-hero.mp4" />
+          <div className="absolute inset-0 bg-slate-900/30 pointer-events-none" />
         </div>
         <div className="bg-slate-900 flex items-center">
           <div className="px-8 py-12 lg:px-14 lg:py-16 max-w-xl w-full">

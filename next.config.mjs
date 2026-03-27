@@ -1,4 +1,10 @@
-import { withSentryConfig } from '@sentry/nextjs';
+// @sentry/nextjs is optional — stub when not installed
+let withSentryConfig;
+try {
+  ({ withSentryConfig } = await import('@sentry/nextjs'));
+} catch {
+  withSentryConfig = (config) => config;
+}
 import { adminRedirects } from './lib/admin-redirects.mjs';
 
 /** @type {import('next').NextConfig} */
@@ -105,6 +111,9 @@ const nextConfig = {
     '**.gitpod.dev',
   ],
 
+  turbopack: {
+    root: '/workspaces/Elevate-lms',
+  },
   // Experimental features for better performance
   experimental: {
     serverActions: {

@@ -12,8 +12,8 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Elevate for Humanity | Workforce Training — Indianapolis, Indiana',
-  description: 'Career training in Indiana. WIOA, Workforce Ready Grant, and JRI funded programs available. HVAC, CDL, Barber, CNA, IT. Apply today.',
-  keywords: 'workforce training Indianapolis, WIOA training Indiana, CNA certification Indianapolis, CDL training Indiana, barber apprenticeship Indianapolis, HVAC training Indiana, free job training Indianapolis, Elevate for Humanity',
+  description: 'Career training in Indiana. WIOA and Workforce Ready Grant funded programs available. HVAC, CDL, IT, CNA, Barber Apprenticeship. Apply today.',
+  keywords: 'workforce training Indianapolis, WIOA training Indiana, CNA certification Indianapolis, CDL training Indiana, barber apprenticeship Indianapolis, HVAC training Indiana, career training Indianapolis, Elevate for Humanity',
   openGraph: {
     title: 'Elevate for Humanity | Workforce Training — Indianapolis, Indiana',
     description: 'Free and low-cost career training in Indiana. Earn industry-recognized certifications and start working fast.',
@@ -46,7 +46,7 @@ export default function HomePage() {
             {/* Proof bullets */}
             <ul className="space-y-2 mb-8">
               {[
-                'WIOA, WRG & JRI funded programs available',
+                'WIOA & Workforce Ready Grant funded programs available',
                 'Certifications included',
                 'Job placement support',
                 'Indiana-approved training provider',

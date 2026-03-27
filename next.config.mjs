@@ -111,9 +111,7 @@ const nextConfig = {
     '**.gitpod.dev',
   ],
 
-  turbopack: {
-    root: '/workspaces/Elevate-lms',
-  },
+  turbopack: {},
   // Experimental features for better performance
   experimental: {
     serverActions: {

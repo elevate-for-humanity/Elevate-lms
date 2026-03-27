@@ -8,6 +8,8 @@ export interface DashboardData {
     lessons: number;
     partners: number;
     atRisk: number;
+    pendingEnrollments: number;
+    pendingDocs: number;
   };
   enrollmentsByMonth: Record<string, number>;
   studentStatuses: Record<string, number>;

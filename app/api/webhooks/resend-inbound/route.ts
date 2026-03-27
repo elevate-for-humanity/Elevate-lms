@@ -1,22 +1,14 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import { resend } from '@/lib/resend';
+import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tracker';
+import { fetchReceivedEmail, resolveForwardTarget } from '@/lib/email/resend-inbound';
 export const runtime = 'nodejs';
 export const maxDuration = 30;
 
 export const dynamic = 'force-dynamic';
-
-// Where to forward inbound emails. Map recipient prefixes to Gmail.
-const FORWARD_MAP: Record<string, string> = {
-  'info': 'elevate4humanityedu@gmail.com',
-  'support': 'elevate4humanityedu@gmail.com',
-  'admissions': 'elevate4humanityedu@gmail.com',
-  'enrollment': 'elevate4humanityedu@gmail.com',
-};
-const DEFAULT_FORWARD = 'elevate4humanityedu@gmail.com';
 
 /**
  * Resend inbound webhook — receives email.received events and forwards
@@ -111,35 +103,35 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Temporary processing error' }, { status: 503 });
     }
 
-    // Determine forwarding destination based on the recipient address
-    let forwardTo = DEFAULT_FORWARD;
-    for (const addr of toAddresses) {
-      const prefix = addr.split('@')[0]?.toLowerCase();
-      if (prefix && FORWARD_MAP[prefix]) {
-        forwardTo = FORWARD_MAP[prefix];
-        break;
-      }
-    }
+    const forwardTo = resolveForwardTarget(toAddresses);
 
     logger.info('[Resend Inbound] Forwarding email', { emailId, from, to: toAddresses, subject, forwardTo });
 
-    // Use Resend SDK forward helper — handles content + attachments automatically
-    // TODO: receiving.forward is Resend-specific; needs dedicated client if re-enabled
-    const { data, error } = await (resend as any).emails.receiving.forward({
-      emailId,
+    // Fetch full email content from Resend, then forward via SendGrid.
+    const received = await fetchReceivedEmail(emailId);
+
+    const html = received?.html ?? `<p><strong>From:</strong> ${from}</p><p><em>(Email body unavailable — RESEND_API_KEY not configured)</em></p>`;
+    const text = received?.text ?? `From: ${from}\n\n(Email body unavailable — RESEND_API_KEY not configured)`;
+    const replyTo = received?.reply_to?.[0] ?? from;
+
+    const result = await sendEmail({
       to: forwardTo,
       from: 'Elevate Forwarding <noreply@elevateforhumanity.org>',
+      replyTo,
+      subject: `Fwd: ${subject}`,
+      html,
+      text,
     });
 
-    if (error) {
-      logger.error('[Resend Inbound] Forward failed:', error);
-      await finalizeWebhookEvent('resend', eventId, 'errored', String(error));
+    if (!result.success) {
+      logger.error('[Resend Inbound] Forward failed:', result.error);
+      await finalizeWebhookEvent('resend', eventId, 'errored', String(result.error));
       return NextResponse.json({ ok: false, error: 'Forward failed' }, { status: 500 });
     }
 
     await finalizeWebhookEvent('resend', eventId, 'processed');
-    logger.info('[Resend Inbound] Forwarded successfully', { emailId, forwardedId: data?.id });
-    return NextResponse.json({ ok: true, forwardedId: data?.id });
+    logger.info('[Resend Inbound] Forwarded successfully', { emailId, forwardTo });
+    return NextResponse.json({ ok: true });
   } catch (err) {
     logger.error('[Resend Inbound] Webhook error:', err);
     return NextResponse.json({ ok: false, error: 'Internal error' }, { status: 500 });

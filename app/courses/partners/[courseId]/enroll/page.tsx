@@ -51,7 +51,7 @@ export default function EnrollPage({
         data: { user: currentUser },
       } = await supabase.auth.getUser();
       if (!currentUser) {
-        router.push(`/login?next=/courses/partners/${params.courseId}/enroll`);
+        router.push(`/login?redirect=/courses/partners/${params.courseId}/enroll`);
         return;
       }
       setUser(currentUser);

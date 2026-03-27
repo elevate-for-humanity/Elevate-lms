@@ -128,6 +128,49 @@ export default async function StudentDashboardOrchestrated() {
     courseProgress = activeEnrollment.progress_percent ?? activeEnrollment.progress_percentage ?? 0;
   }
 
+  // Build a deterministic resume href:
+  // 1. Last incomplete lesson (lesson_progress row where completed = false, ordered by updated_at desc)
+  // 2. Fallback: first lesson in the course ordered by lesson_order
+  const activeCourseId = (activeEnrollment as any)?.course_id ?? null;
+  let resumeLessonId: string | null = null;
+  let resumeCourseId: string | null = activeCourseId;
+
+  if (activeCourseId) {
+    // Try last incomplete lesson first
+    const { data: incompleteLesson } = await supabase
+      .from('lesson_progress')
+      .select('lesson_id, course_id')
+      .eq('user_id', user.id)
+      .eq('course_id', activeCourseId)
+      .eq('completed', false)
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (incompleteLesson?.lesson_id) {
+      resumeLessonId = incompleteLesson.lesson_id;
+      resumeCourseId = incompleteLesson.course_id ?? activeCourseId;
+    } else {
+      // Fallback: first lesson in the course (no progress yet, or all complete)
+      const { data: firstLesson } = await supabase
+        .from('course_lessons')
+        .select('id')
+        .eq('course_id', activeCourseId)
+        .order('order_index', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      if (firstLesson?.id) {
+        resumeLessonId = firstLesson.id;
+      }
+    }
+  }
+
+  // Build the href — only set if we have both course and lesson IDs
+  const resumeHref = resumeCourseId && resumeLessonId
+    ? `/lms/courses/${resumeCourseId}/lessons/${resumeLessonId}`
+    : null;
+
   // Get certifications from certificates table
   const { data: certifications } = await supabase
     .from('certificates')
@@ -235,6 +278,7 @@ export default async function StudentDashboardOrchestrated() {
         firstName={profile?.full_name?.split(' ')[0] || user.email?.split('@')[0] || 'Student'}
         courseProgress={courseProgress}
         hasActiveEnrollment={!!activeEnrollment}
+        resumeHref={resumeHref}
       />
 
       {/* Pending Enrollment Notice */}

@@ -120,7 +120,7 @@ export default async function SellOnMarketplacePage() {
             </Link>
           ) : (
             <Link
-              href="/login?next=/marketplace/sell"
+              href="/login?redirect=/marketplace/sell"
               className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-blue-600 rounded-lg hover:bg-brand-blue-50 font-semibold text-lg"
             >
               Sign In to Apply
@@ -228,7 +228,7 @@ export default async function SellOnMarketplacePage() {
             </Link>
           ) : (
             <Link
-              href="/login?next=/marketplace/sell"
+              href="/login?redirect=/marketplace/sell"
               className="inline-flex items-center gap-2 px-8 py-4 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 font-semibold text-lg"
             >
               Sign In to Apply

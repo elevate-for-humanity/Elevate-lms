@@ -124,7 +124,7 @@ export default function TimeclockPage() {
           if (data.code === 'NO_APPRENTICESHIP') {
             setContextError('You do not have an active apprenticeship. Please contact your program coordinator.');
           } else if (response.status === 401) {
-            router.push('/login?next=/apprentice/timeclock');
+            router.push('/login?redirect=/apprentice/timeclock');
             return;
           } else {
             setContextError(data.error || 'Failed to load timeclock');

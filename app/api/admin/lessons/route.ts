@@ -4,6 +4,7 @@ import { createLesson, listLessons } from '@/lib/db/courses';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -49,6 +50,14 @@ async function _POST(request: Request) {
       return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
     }
     const data = await createLesson(parsed.data);
+    await logAdminAudit({
+      action:     AdminAction.LESSON_CREATED,
+      actorId:    auth.user.id,
+      entityType: 'course_lessons',
+      entityId:   (data as any)?.id ?? 'unknown',
+      metadata:   { course_id: parsed.data.course_id, title: parsed.data.title },
+      req:        request,
+    });
     return NextResponse.json({ data }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

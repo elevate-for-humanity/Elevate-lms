@@ -13,6 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { publishCourse } from '@/lib/lms/course-service';
 import { safeInternalError } from '@/lib/api/safe-error';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -92,6 +93,15 @@ export async function POST(
     }
 
     const result = await publishCourse(supabase, courseId, user.id, label);
+
+    await logAdminAudit({
+      action:     AdminAction.COURSE_PUBLISHED,
+      actorId:    user.id,
+      entityType: 'courses',
+      entityId:   courseId,
+      metadata:   { label, lesson_count: (result as any)?.lessonCount },
+      req:        request,
+    });
 
     return NextResponse.json({ success: true, ...result });
   } catch (error) {

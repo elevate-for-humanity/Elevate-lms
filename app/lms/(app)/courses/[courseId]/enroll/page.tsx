@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, BookOpen, Award, Users, Shield, CheckCircle } from 'lucide-react';
@@ -32,14 +33,16 @@ export default async function EnrollPage({ params }: Props) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/lms/courses/' + courseId + '/enroll');
 
-  const { data: course, error } = await supabase
+  const db = createAdminClient();
+
+  const { data: course, error } = await db
     .from('courses')
     .select('id, title, description, program_id')
     .eq('id', courseId)
     .single();
   if (error || !course) notFound();
 
-  const { data: existingByCourse } = await supabase
+  const { data: existingByCourse } = await db
     .from('program_enrollments')
     .select('id')
     .eq('user_id', user.id)
@@ -47,7 +50,7 @@ export default async function EnrollPage({ params }: Props) {
     .maybeSingle();
 
   const existingByProgram = course.program_id
-    ? await supabase
+    ? await db
         .from('program_enrollments')
         .select('id')
         .eq('user_id', user.id)
@@ -64,7 +67,7 @@ export default async function EnrollPage({ params }: Props) {
     .eq('id', user.id)
     .single();
 
-  const { count: lessonCount } = await supabase
+  const { count: lessonCount } = await db
     .from('course_lessons')
     .select('id', { count: 'exact', head: true })
     .eq('course_id', courseId);

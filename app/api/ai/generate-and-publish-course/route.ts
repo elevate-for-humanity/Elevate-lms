@@ -26,6 +26,7 @@ import { requireAuth } from '@/lib/api/requireAuth';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { generateCourseOutlineFn } from '@/lib/ai/generate-course-outline-fn';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export const maxDuration = 300;
 
@@ -214,6 +215,23 @@ export async function POST(request: NextRequest) {
     curriculum_lessons_inserted: number;
     curriculum_lessons_skipped: number;
   };
+
+  await logAdminAudit({
+    action:     AdminAction.BULK_CONTENT_GENERATED,
+    actorId:    auth.user?.id ?? '00000000-0000-0000-0000-000000000000',
+    entityType: 'courses',
+    entityId:   courseId,
+    metadata:   {
+      title:                       outline.course.title,
+      modules_inserted:            moduleRows.length,
+      lessons_published:           pub.lessons_published,
+      curriculum_lessons_inserted: pub.curriculum_lessons_inserted,
+      generation_attempt:          attempt,
+      normalization_applied:       normalization,
+      program_id:                  body.programId ?? null,
+    },
+    req: request,
+  });
 
   return NextResponse.json({
     ok: true,

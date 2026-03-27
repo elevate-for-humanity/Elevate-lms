@@ -109,6 +109,58 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
       </div>
 
       <div className="max-w-[1400px] mx-auto px-4 md:px-6 -mt-6 relative z-20">
+
+        {/* ── Action Center ── surfaces items that need a decision right now */}
+        {(c.pendingEnrollments > 0 || c.atRisk > 0 || c.pendingDocs > 0) && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+            {c.pendingEnrollments > 0 && (
+              <Link href="/admin/enrollments?status=pending"
+                className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 hover:bg-red-100 transition-colors group">
+                <div className="w-9 h-9 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-4 h-4 text-red-600" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-red-700 leading-tight">
+                    {c.pendingEnrollments} Pending Enrollment{c.pendingEnrollments !== 1 ? 's' : ''}
+                  </p>
+                  <p className="text-xs text-red-500">Awaiting approval</p>
+                </div>
+                <ArrowUpRight className="w-4 h-4 text-red-400 ml-auto flex-shrink-0 group-hover:text-red-600 transition-colors" />
+              </Link>
+            )}
+            {c.atRisk > 0 && (
+              <Link href="/admin/at-risk"
+                className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 hover:bg-amber-100 transition-colors group">
+                <div className="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="w-4 h-4 text-amber-600" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-amber-700 leading-tight">
+                    {c.atRisk} At-Risk Student{c.atRisk !== 1 ? 's' : ''}
+                  </p>
+                  <p className="text-xs text-amber-500">Need intervention</p>
+                </div>
+                <ArrowUpRight className="w-4 h-4 text-amber-400 ml-auto flex-shrink-0 group-hover:text-amber-600 transition-colors" />
+              </Link>
+            )}
+            {c.pendingDocs > 0 && (
+              <Link href="/admin/documents/review"
+                className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 hover:bg-blue-100 transition-colors group">
+                <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                  <FileText className="w-4 h-4 text-blue-600" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-blue-700 leading-tight">
+                    {c.pendingDocs} Document{c.pendingDocs !== 1 ? 's' : ''} to Review
+                  </p>
+                  <p className="text-xs text-blue-500">In review queue</p>
+                </div>
+                <ArrowUpRight className="w-4 h-4 text-blue-400 ml-auto flex-shrink-0 group-hover:text-blue-600 transition-colors" />
+              </Link>
+            )}
+          </div>
+        )}
+
         {/* Stat Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 mb-6">
           {stats.map(s => (

@@ -467,13 +467,14 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(new URL('/login', request.url), { status: 307 });
     }
 
-    let adminResponse = NextResponse.next({ request: { headers: request.headers } });
+    let adminResponse = NextResponse.next({ request: { headers: requestHeaders } });
     const adminSupabase = createServerClient(supabaseUrl, supabaseKey, {
       cookies: {
         getAll: () => request.cookies.getAll(),
         setAll: (cookiesToSet) => {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          adminResponse = NextResponse.next({ request });
+          // Preserve requestHeaders (x-pathname) when refreshing cookies
+          adminResponse = NextResponse.next({ request: { headers: requestHeaders } });
           cookiesToSet.forEach(({ name, value, options }) =>
             adminResponse.cookies.set(name, value, options)
           );
@@ -579,7 +580,8 @@ export async function proxy(request: NextRequest) {
       },
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({ request });
+        // Preserve requestHeaders (which carries x-pathname) when refreshing cookies
+        response = NextResponse.next({ request: { headers: requestHeaders } });
         cookiesToSet.forEach(({ name, value, options }) =>
           response.cookies.set(name, value, options)
         );

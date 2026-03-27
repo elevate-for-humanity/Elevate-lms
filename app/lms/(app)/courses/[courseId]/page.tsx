@@ -73,7 +73,7 @@ export default async function CoursePage({ params }: { params: Params }) {
   const heroImage = program?.hero_image_url || program?.image_url || '/images/pages/hvac-unit.jpg';
   const credentialName = program?.credential_name || program?.credential || null;
 
-  const { data: enrollment } = await supabase
+  const { data: enrollment } = await db
     .from('program_enrollments')
     .select('status, enrollment_state, enrolled_at')
     .eq('user_id', user.id).eq('course_id', courseId).maybeSingle();
@@ -85,11 +85,11 @@ export default async function CoursePage({ params }: { params: Params }) {
   const isPendingApproval = enrollment?.status === 'pending_approval';
   const lessonCourseId = (course as any)._lessonCourseId || courseId;
 
-  const { data: modulesRaw } = await supabase
+  const { data: modulesRaw } = await db
     .from('course_modules').select('id, title, order_index')
     .eq('course_id', lessonCourseId).order('order_index', { ascending: true });
 
-  const { data: lessonsRaw } = await supabase
+  const { data: lessonsRaw } = await db
     .from('lms_lessons')
     .select('id, title, description, duration_minutes, order_index, content_type, step_type, module_id, activities, slug')
     .eq('course_id', lessonCourseId).order('order_index', { ascending: true });

@@ -35,7 +35,7 @@ interface LMSSidebarProps {
 }
 
 const navItems = [
-  { href: '/learner/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/lms/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/lms/courses', label: 'My Courses', icon: BookOpen },
   { href: '/lms/progress', label: 'Progress', icon: TrendingUp },
   { href: '/lms/quizzes', label: 'Quizzes', icon: ClipboardCheck },

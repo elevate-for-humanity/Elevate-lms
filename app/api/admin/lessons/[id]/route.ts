@@ -4,6 +4,7 @@ import { getLesson, updateLesson, deleteLesson } from '@/lib/db/courses';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -53,13 +54,31 @@ const { id } = await params;
     }
     const data = await updateLesson(id, parsed.data);
     if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
+    // Detect publish/unpublish transitions for targeted audit entries
+    const isPublish   = parsed.data.is_published === true  || (parsed.data as any).status === 'published';
+    const isUnpublish = parsed.data.is_published === false || (parsed.data as any).status === 'draft';
+    const action = isPublish
+      ? AdminAction.LESSON_PUBLISHED
+      : isUnpublish
+        ? AdminAction.LESSON_UNPUBLISHED
+        : AdminAction.LESSON_UPDATED;
+
+    await logAdminAudit({
+      action,
+      actorId:    auth.user.id,
+      entityType: 'course_lessons',
+      entityId:   id,
+      metadata:   { fields_changed: Object.keys(parsed.data) },
+      req:        request,
+    });
     return NextResponse.json({ data }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-async function _DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
+async function _DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -67,7 +86,17 @@ const { id } = await params;
   const auth = await requireAdmin();
   if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
   try {
+    // Fetch title before deletion so the audit record is meaningful
+    const existing = await getLesson(id);
     const data = await deleteLesson(id);
+    await logAdminAudit({
+      action:     AdminAction.LESSON_DELETED,
+      actorId:    auth.user.id,
+      entityType: 'course_lessons',
+      entityId:   id,
+      metadata:   { title: (existing as any)?.title ?? 'unknown' },
+      req:        request,
+    });
     return NextResponse.json({ data }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

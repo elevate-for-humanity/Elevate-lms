@@ -94,7 +94,7 @@ export default async function ApplicationSuccessPage() {
 
         <div className="space-y-3">
           <a
-            href="https://calendly.com/elevate-for-humanity/advisor-call"
+            href="https://calendly.com/elevate4humanityedu"
             target="_blank"
             rel="noopener noreferrer"
             className="block w-full rounded-xl bg-brand-blue-600 px-6 py-3 text-center font-semibold text-white hover:bg-brand-blue-700 transition-colors"

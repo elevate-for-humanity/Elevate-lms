@@ -37,86 +37,91 @@ interface NavSection {
   items?: NavItem[];
 }
 
-// Primary nav: daily operational surfaces only.
-// Every item here loads real data and supports a staff task that completes without workarounds.
+// Primary nav — 5 cockpit zones. Every item maps to a real operational task.
 const PRIMARY_NAV: NavSection[] = [
   {
     name: 'Dashboard',
     icon: LayoutDashboard,
     href: '/admin',
   },
+
+  // ── Zone 1: Intake & Enrollment ──────────────────────────────────────────
   {
-    name: 'Students',
-    icon: Users,
-    href: '/admin/students',
+    name: 'Intake & Enrollment',
+    icon: Inbox,
+    items: [
+      { name: 'Applications',     href: '/admin/applicants' },
+      { name: 'Eligibility',      href: '/admin/wioa/eligibility' },
+      { name: 'Approvals',        href: '/admin/review-queue' },
+      { name: 'Enrollments',      href: '/admin/enrollments' },
+      { name: 'Waitlist',         href: '/admin/waitlist' },
+      { name: 'Leads',            href: '/admin/leads' },
+      { name: 'Cohorts',          href: '/admin/cohorts' },
+    ],
   },
+
+  // ── Zone 2: Training (LMS) ───────────────────────────────────────────────
   {
-    name: 'Enrollments',
+    name: 'Training',
     icon: GraduationCap,
     items: [
-      { name: 'Enrollments', href: '/admin/enrollments' },
-      { name: 'Cohorts', href: '/admin/cohorts' },
-    ],
-  },
-  {
-    name: 'Programs',
-    icon: BookOpen,
-    items: [
-      { name: 'Programs', href: '/admin/programs' },
-      { name: 'Completions', href: '/admin/completions' },
-    ],
-  },
-  {
-    name: 'Courses',
-    icon: BookOpen,
-    items: [
-      { name: 'Courses', href: '/admin/courses' },
+      { name: 'Students',         href: '/admin/students' },
+      { name: 'Programs',         href: '/admin/programs' },
+      { name: 'Courses',          href: '/admin/courses' },
+      { name: 'Curriculum',       href: '/admin/curriculum' },
+      { name: 'Lessons',          href: '/admin/lessons' },
+      { name: 'Attendance',       href: '/admin/attendance' },
+      { name: 'Progress',         href: '/admin/at-risk' },
+      { name: 'Gradebook',        href: '/admin/gradebook' },
+      { name: 'Certificates',     href: '/admin/certificates' },
+      { name: 'Completions',      href: '/admin/completions' },
       { name: 'AI Course Builder', href: '/admin/courses/generate' },
-      { name: 'Course Builder', href: '/admin/course-builder' },
-      { name: 'Curriculum', href: '/admin/curriculum' },
-      { name: 'Modules', href: '/admin/modules' },
-      { name: 'Lessons', href: '/admin/lessons' },
-      { name: 'Quiz Builder', href: '/admin/quiz-builder' },
-      { name: 'Gradebook', href: '/admin/gradebook' },
     ],
   },
-  {
-    name: 'Partners',
-    icon: Building2,
-    items: [
-      { name: 'Partners', href: '/admin/partners' },
-      { name: 'Applications', href: '/admin/applications' },
-      { name: 'Partner Inquiries', href: '/admin/partner-inquiries' },
 
-    ],
-  },
+  // ── Zone 3: Compliance & Funding ─────────────────────────────────────────
   {
-    name: 'Documents',
-    icon: FileText,
+    name: 'Compliance & Funding',
+    icon: Shield,
     items: [
-      { name: 'Documents', href: '/admin/documents' },
-      { name: 'Review Queue', href: '/admin/documents/review' },
+      { name: 'Compliance',       href: '/admin/compliance' },
+      { name: 'WIOA',             href: '/admin/wioa' },
+      { name: 'WIOA Documents',   href: '/admin/wioa/documents' },
+      { name: 'WIOA Reports',     href: '/admin/wioa/reports' },
+      { name: 'Funding',          href: '/admin/funding' },
+      { name: 'JRI',              href: '/admin/jri' },
+      { name: 'WOTC',             href: '/admin/wotc' },
+      { name: 'Audit Logs',       href: '/admin/audit-logs' },
+      { name: 'Documents',        href: '/admin/documents' },
+      { name: 'Verifications',    href: '/admin/verifications/review' },
     ],
   },
+
+  // ── Zone 4: Employment & Outcomes ────────────────────────────────────────
   {
-    name: 'Certificates',
-    icon: Award,
+    name: 'Employment & Outcomes',
+    icon: Briefcase,
     items: [
-      { name: 'Certificates', href: '/admin/certificates' },
-      { name: 'Issue Certificate', href: '/admin/certificates/issue' },
+      { name: 'Employers',        href: '/admin/employers' },
+      { name: 'Job Placements',   href: '/admin/enrollment-jobs' },
+      { name: 'Apprenticeships',  href: '/admin/apprenticeships' },
+      { name: 'OJT / MOU',        href: '/admin/mou' },
+      { name: 'Partners',         href: '/admin/partners' },
+      { name: 'Program Holders',  href: '/admin/program-holders' },
     ],
   },
+
+  // ── Zone 5: Reporting & Analytics ────────────────────────────────────────
   {
-    name: 'Reports',
+    name: 'Reporting',
     icon: BarChart3,
     items: [
-      { name: 'Overview', href: '/admin/reports' },
-      { name: 'Enrollment', href: '/admin/reports/enrollment' },
-      { name: 'Financial', href: '/admin/reports/financial' },
-      { name: 'Partners', href: '/admin/reports/partners' },
-      { name: 'Users', href: '/admin/reports/users' },
-      { name: 'Leads', href: '/admin/reports/leads' },
-      { name: 'Charts', href: '/admin/reports/charts' },
+      { name: 'Overview',         href: '/admin/reports' },
+      { name: 'Enrollment',       href: '/admin/reports/enrollment' },
+      { name: 'Financial',        href: '/admin/reports/financial' },
+      { name: 'Partners',         href: '/admin/reports/partners' },
+      { name: 'Charts',           href: '/admin/reports/charts' },
+      { name: 'Hours Export',     href: '/admin/hours-export' },
     ],
   },
   {

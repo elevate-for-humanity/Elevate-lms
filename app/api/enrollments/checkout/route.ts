@@ -28,8 +28,16 @@ function getSupabase() {
 }
 
 async function _POST(request: NextRequest) {
-    const rateLimited = await applyRateLimit(request, 'contact');
-    if (rateLimited) return rateLimited;
+  const rateLimited = await applyRateLimit(request, 'payment');
+  if (rateLimited) return rateLimited;
+
+  // Auth: require authenticated user — payments must be tied to a real session
+  const { createClient: createAuthClient } = await import('@/lib/supabase/server');
+  const authSupabase = await createAuthClient();
+  const { data: { session: authSession } } = await authSupabase.auth.getSession();
+  if (!authSession) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
   const stripe = getStripe();
   const supabase = getSupabase();

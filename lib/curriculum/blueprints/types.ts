@@ -17,6 +17,27 @@
  */
 
 // ─── Lesson reference (flat list consumed by buildCourseFromBlueprint) ────────
+//
+// Production contract: a lesson ref MUST carry the full instructional payload
+// required for its step_type before the seeder will insert a DB row.
+//
+// Required by step_type:
+//   lesson      — content (HTML) + objective
+//   checkpoint  — content (HTML) + objective + quizQuestions (≥5) + passingScore
+//   quiz/exam   — quizQuestions (≥5) + passingScore
+//   lab         — content (HTML) + objective
+//   assignment  — content (HTML) + objective
+//
+// If any required field is absent, the seeder logs the exact missing fields
+// and skips the lesson entirely. No draft shell is created.
+
+export type BlueprintQuizQuestion = {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation?: string;
+};
 
 export type BlueprintLessonRef = {
   /** Stable slug — identity key, never change after seeding */
@@ -27,6 +48,42 @@ export type BlueprintLessonRef = {
   /** credential_exam_domains.domain_key this lesson covers */
   domainKey: string;
   competencyKeys?: string[];
+
+  // ── Production content payload ──────────────────────────────────────
+  // Required fields vary by step_type (inferred from slug suffix).
+  // The seeder validates these before inserting. Missing = no row created.
+
+  /** What the learner will be able to do after this lesson */
+  objective?: string;
+
+  /**
+   * Full lesson body as sanitized HTML.
+   * Required for: lesson, checkpoint, lab, assignment.
+   * Must be > 200 characters of visible text after stripping tags.
+   */
+  content?: string;
+
+  /**
+   * Quiz/checkpoint questions.
+   * Required for: checkpoint, quiz, exam.
+   * Minimum 5 questions per lesson.
+   */
+  quizQuestions?: BlueprintQuizQuestion[];
+
+  /**
+   * Minimum passing score (0–100).
+   * Required for: checkpoint, quiz, exam.
+   */
+  passingScore?: number;
+
+  /** Duration hint in minutes — used for display only, not validated */
+  durationMinutes?: number;
+
+  /**
+   * Certiport or external exam code.
+   * Required for exam lessons that use an external proctoring system.
+   */
+  partnerExamCode?: string;
 };
 
 // ─── Competency requirement (consumed by auditor) ─────────────────────────────

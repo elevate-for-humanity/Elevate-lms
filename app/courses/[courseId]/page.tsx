@@ -230,7 +230,7 @@ export default async function CourseDetailPage({
                 </Link>
                 {!user && (
                   <Link
-                    href={`/login?next=/courses/${courseId}`}
+                    href={`/login?redirect=/courses/${courseId}`}
                     className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-4 rounded-xl font-semibold transition-all backdrop-blur-sm"
                   >
                     Sign In to Track Progress

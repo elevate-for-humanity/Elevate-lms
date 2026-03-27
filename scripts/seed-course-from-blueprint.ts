@@ -110,16 +110,35 @@ async function main() {
     mode: modeArg as 'replace' | 'missing-only',
   });
 
-  console.log('✅ Done');
+  const totalAttempted = result.lessonCount + result.contentFailures.length;
+
+  console.log('\n── Seed result ──────────────────────────────────────────');
   console.log(`   Course ID    : ${result.courseId}`);
   console.log(`   Modules      : ${result.moduleCount}`);
-  console.log(`   Lessons      : ${result.lessonCount}`);
-  console.log(`   Skipped      : ${result.skipped}`);
+  console.log(`   Inserted     : ${result.lessonCount} / ${totalAttempted} lessons`);
+  console.log(`   Skipped      : ${result.skipped} (already exist)`);
+  console.log(`   Content fail : ${result.contentFailures.length} (no row created)`);
+
+  if (result.contentFailures.length > 0) {
+    console.log(`\n❌ Content failures — these lessons were NOT inserted:\n`);
+    result.contentFailures.forEach(f => {
+      console.log(`   ${f.slug} [${f.stepType}] "${f.title}"`);
+      f.violations.forEach(v => console.log(`     • ${v.field}: ${v.reason}`));
+    });
+    console.log('');
+  }
+
   if (result.warnings.length > 0) {
     console.log(`\n⚠️  Warnings (${result.warnings.length}):`);
     result.warnings.forEach(w => console.log(`   - ${w}`));
   }
-  console.log('');
+
+  if (result.contentFailures.length > 0) {
+    console.log('❌ Seed completed with content failures. Fix the blueprint lesson refs above and re-run.\n');
+    process.exit(1);
+  }
+
+  console.log('✅ All lessons inserted with production content.\n');
 }
 
 main().catch(err => {

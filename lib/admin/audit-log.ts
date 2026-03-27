@@ -108,6 +108,19 @@ export const AdminAction = {
   LESSON_VIDEO_GENERATED: 'lesson.video_generated',
   VIDEO_UPLOADED: 'video.uploaded',
 
+  // LMS — high-risk lesson and course lifecycle actions
+  // These are the actions that can corrupt learner-facing content if done wrong.
+  LESSON_CREATED:          'lesson.created',
+  LESSON_UPDATED:          'lesson.updated',
+  LESSON_DELETED:          'lesson.deleted',
+  LESSON_PUBLISHED:        'lesson.published',
+  LESSON_UNPUBLISHED:      'lesson.unpublished',
+  COURSE_PUBLISHED:        'course.published',
+  COURSE_UNPUBLISHED:      'course.unpublished',
+  COURSE_SEED_RUN:         'course.seed_run',
+  BULK_CONTENT_GENERATED:  'course.bulk_content_generated',
+  BULK_LESSON_CLEANUP:     'course.bulk_lesson_cleanup',
+
   // Operations
   INTAKE_CREATED: 'intake.created',
   NEXT_STEPS_UPDATED: 'next_steps.updated',

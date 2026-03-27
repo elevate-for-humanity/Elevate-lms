@@ -131,7 +131,7 @@ function LegalAgreementsContent() {
     const supabase = createClient();
     supabase?.auth.getUser().then(async ({ data, error }) => {
       if (error || !data?.user) {
-        router.push('/login?next=/legal/agreements');
+        router.push('/login?redirect=/legal/agreements');
         return;
       }
       setUser(data.user);

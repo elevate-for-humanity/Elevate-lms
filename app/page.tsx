@@ -30,7 +30,6 @@ export default function HomePage() {
       <section className="grid lg:grid-cols-2">
         <div className="relative h-72 sm:h-96 lg:h-auto min-h-[560px] overflow-hidden bg-slate-900">
           <video src="/videos/barber-hero.mp4"
-            poster="/hero-images/barber-hero.jpg"
             autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-slate-900/30" />
         </div>
@@ -170,8 +169,8 @@ export default function HomePage() {
                   <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-1">{prog.tag}</p>
                   <h3 className="font-extrabold text-white text-base leading-snug mb-3">{prog.full}</h3>
                   <div className="space-y-1">
-                    <p className="text-xs text-slate-300">⏱ {prog.duration}</p>
-                    <p className="text-sm font-bold text-green-400">💰 {prog.salary}</p>
+                    <p className="text-xs text-slate-300">{prog.duration}</p>
+                    <p className="text-sm font-bold text-green-400">{prog.salary}</p>
                   </div>
                   <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-white bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full transition-colors">
                     View Program →
@@ -195,15 +194,19 @@ export default function HomePage() {
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-12 text-center">Why Students Choose Elevate</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: '⚡', title: 'Fast-Track Programs', desc: '4–16 weeks to a new career. No years of school required.' },
-              { icon: '🏆', title: 'Real Certifications', desc: 'Industry-recognized credentials employers actually hire for.' },
-              { icon: '🔧', title: 'Hands-On Training', desc: 'Job-ready skills from day one — not just classroom theory.' },
-              { icon: '🤝', title: 'Enrollment to Employment', desc: 'We support you from application through job placement.' },
+              { img: '/images/pages/about-career-training.jpg', title: 'Fast-Track Programs', desc: '4–16 weeks to a new career. No years of school required.' },
+              { img: '/images/pages/admin-certifications-hero.jpg', title: 'Real Certifications', desc: 'Industry-recognized credentials employers actually hire for.' },
+              { img: '/images/pages/barber-apprentice-learning.jpg', title: 'Hands-On Training', desc: 'Job-ready skills from day one — not just classroom theory.' },
+              { img: '/images/pages/about-employer-partners.jpg', title: 'Enrollment to Employment', desc: 'We support you from application through job placement.' },
             ].map((w) => (
-              <div key={w.title} className="bg-white border border-slate-200 rounded-xl p-6 text-center">
-                <span className="text-3xl block mb-3">{w.icon}</span>
-                <h3 className="font-extrabold text-slate-900 text-base mb-2">{w.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{w.desc}</p>
+              <div key={w.title} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+                <div className="relative h-36 w-full">
+                  <Image src={w.img} alt={w.title} fill className="object-cover" sizes="(max-width: 640px) 100vw, 25vw" />
+                </div>
+                <div className="p-5">
+                  <h3 className="font-extrabold text-slate-900 text-base mb-2">{w.title}</h3>
+                  <p className="text-slate-500 text-sm leading-relaxed">{w.desc}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -216,15 +219,14 @@ export default function HomePage() {
           <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-8 text-center">Approved &amp; recognized by</p>
           <div className="flex flex-wrap justify-center gap-3">
             {[
-              { title: 'DOL Registered Apprenticeship', icon: '🏛️', bg: 'bg-blue-600', text: 'text-white' },
-              { title: 'Indiana ETPL Certified', icon: '📋', bg: 'bg-brand-red-600', text: 'text-white' },
-              { title: 'Government Contractor', icon: '📜', bg: 'bg-slate-800', text: 'text-white' },
-              { title: 'Certiport Testing Center', icon: '💻', bg: 'bg-violet-600', text: 'text-white' },
-              { title: 'IRS VITA Certified', icon: '💼', bg: 'bg-emerald-600', text: 'text-white' },
-              { title: 'EmployIndy Partner', icon: '🤝', bg: 'bg-amber-500', text: 'text-white' },
+              { title: 'DOL Registered Apprenticeship', bg: 'bg-blue-600' },
+              { title: 'Indiana ETPL Certified', bg: 'bg-brand-red-600' },
+              { title: 'Government Contractor', bg: 'bg-slate-800' },
+              { title: 'Certiport Testing Center', bg: 'bg-violet-600' },
+              { title: 'IRS VITA Certified', bg: 'bg-emerald-600' },
+              { title: 'EmployIndy Partner', bg: 'bg-amber-500' },
             ].map((c) => (
-              <div key={c.title} className={`flex items-center gap-2.5 ${c.bg} ${c.text} px-5 py-3 rounded-full font-semibold text-sm whitespace-nowrap shadow-sm`}>
-                <span className="text-lg leading-none">{c.icon}</span>
+              <div key={c.title} className={`${c.bg} text-white px-5 py-3 rounded-full font-semibold text-sm whitespace-nowrap shadow-sm`}>
                 {c.title}
               </div>
             ))}

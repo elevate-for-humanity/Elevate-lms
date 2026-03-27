@@ -140,7 +140,7 @@ export default async function ProgramTrainingPage({
   const db = createAdminClient();
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(`/login?next=/programs/${slug}/training`);
+  if (!user) redirect(`/login?redirect=/programs/${slug}/training`);
 
   const { data: program } = await supabase
     .from('programs')

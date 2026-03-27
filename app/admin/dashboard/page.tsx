@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import DashboardClient from './DashboardClient';
 import { BuiltCoursesPanel } from './BuiltCoursesPanel';
 
@@ -20,6 +21,8 @@ async function getDashboardData(supabase: any, db: any) {
     lessonsRes,
     partnersRes,
     atRiskRes,
+    pendingEnrollmentsRes,
+    pendingDocsRes,
     allStudentsRes,
     allEnrollmentsRes,
     allProgramsRes,
@@ -35,6 +38,9 @@ async function getDashboardData(supabase: any, db: any) {
     supabase.from('course_lessons').select('id', { count: 'exact', head: true }),
     supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'partner'),
     supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student').eq('enrollment_status', 'at_risk'),
+    // Action Center counts
+    supabase.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('documents').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     // Full data for charts
     supabase.from('profiles').select('enrollment_status').eq('role', 'student'),
     supabase.from('program_enrollments').select('status, enrolled_at, progress, course_id'),
@@ -119,6 +125,8 @@ async function getDashboardData(supabase: any, db: any) {
       lessons: lessonsRes.count ?? 0,
       partners: partnersRes.count ?? 0,
       atRisk: atRiskRes.count ?? 0,
+      pendingEnrollments: pendingEnrollmentsRes.count ?? 0,
+      pendingDocs: pendingDocsRes.count ?? 0,
     },
     enrollmentsByMonth,
     studentStatuses,
@@ -134,6 +142,7 @@ async function getDashboardData(supabase: any, db: any) {
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient();
+  const db = createAdminClient();
 
   const data = await getDashboardData(supabase, db);
 

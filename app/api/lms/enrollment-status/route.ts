@@ -27,48 +27,66 @@ export async function GET(req: NextRequest) {
   const admin = createAdminClient();
   const db = admin || supabase;
 
-  // Primary lookup: by course_id (most enrollments set this directly)
-  let { data: enrollment } = await db
-    .from('program_enrollments')
-    .select('id, status, enrollment_state, progress_percent, enrolled_at, revoked_at')
-    .eq('user_id', user.id)
-    .eq('course_id', courseId)
+  // Resolve canonical courses UUID.
+  // The URL param may be a training_courses ID (legacy HVAC routes). In that
+  // case program_enrollments.course_id stores the canonical courses UUID, so
+  // a direct lookup with the raw param returns nothing.
+  // Resolution: if the param matches a courses row directly, use it. Otherwise
+  // look it up in training_courses and follow the slug to courses.
+  let resolvedCourseId = courseId;
+  const { data: directCourse } = await db
+    .from('courses')
+    .select('id, program_id')
+    .eq('id', courseId)
     .maybeSingle();
 
-  // Fallback: some enrollments are stored against program_id only (no course_id).
-  // Resolve the program_id from the courses table and retry.
-  if (!enrollment) {
-    const { data: course } = await db
-      .from('courses')
-      .select('program_id')
+  if (!directCourse) {
+    // Not a canonical courses UUID — try training_courses
+    const { data: tc } = await db
+      .from('training_courses')
+      .select('id, slug')
       .eq('id', courseId)
       .maybeSingle();
-
-    if (course?.program_id) {
-      const { data: programEnrollment } = await db
-        .from('program_enrollments')
-        .select('id, status, enrollment_state, progress_percent, enrolled_at, revoked_at')
-        .eq('user_id', user.id)
-        .eq('program_id', course.program_id)
+    if (tc?.slug) {
+      const { data: canonical } = await db
+        .from('courses')
+        .select('id')
+        .eq('slug', tc.slug)
         .maybeSingle();
-      enrollment = programEnrollment;
+      if (canonical?.id) resolvedCourseId = canonical.id;
     }
   }
 
-  const isRevoked = !!enrollment?.revoked_at;
+  const resolvedProgramId = directCourse?.program_id ?? null;
+
+  // Primary lookup: by resolved canonical course_id
+  let { data: enrollment } = await db
+    .from('program_enrollments')
+    .select('id, status, enrollment_state, progress_percent, enrolled_at')
+    .eq('user_id', user.id)
+    .eq('course_id', resolvedCourseId)
+    .maybeSingle();
+
+  // Fallback: some enrollments are stored against program_id only (no course_id).
+  if (!enrollment && resolvedProgramId) {
+    const { data: programEnrollment } = await db
+      .from('program_enrollments')
+      .select('id, status, enrollment_state, progress_percent, enrolled_at')
+      .eq('user_id', user.id)
+      .eq('program_id', resolvedProgramId)
+      .maybeSingle();
+    enrollment = programEnrollment;
+  }
+
   const isPendingFunding = enrollment?.enrollment_state === 'pending_funding_verification';
-  const effectiveStatus = isRevoked ? 'revoked'
-    : isPendingFunding ? 'pending_funding_verification'
+  const effectiveStatus = isPendingFunding ? 'pending_funding_verification'
     : (enrollment?.status ?? null);
 
-  // approved=false blocks lesson page from loading content.
-  // pending_funding_verification is explicitly not approved — student has no
-  // confirmed funding source and must not access lesson content.
-  const approved = !!enrollment && !isRevoked && !isPendingFunding
-    && !['pending_approval', 'pending'].includes(enrollment.status ?? '');
+  const approved = !!enrollment && !isPendingFunding
+    && !['pending_approval', 'pending'].includes(enrollment?.status ?? '');
 
   return NextResponse.json({
-    enrolled:         !!enrollment && !isRevoked,
+    enrolled:         !!enrollment,
     status:           effectiveStatus,
     enrollment_state: enrollment?.enrollment_state ?? null,
     progress:         enrollment?.progress_percent ?? 0,

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -29,7 +30,8 @@ export default async function EnrollmentPendingPage({
   // Confirm the enrollment is actually in pending_funding_verification.
   // If it has since been verified, redirect to the course.
   if (courseId) {
-    const { data: enrollment } = await supabase
+    const db = createAdminClient();
+    const { data: enrollment } = await db
       .from('program_enrollments')
       .select('enrollment_state, status')
       .eq('user_id', user.id)
@@ -37,11 +39,11 @@ export default async function EnrollmentPendingPage({
       .maybeSingle();
 
     if (
-      enrollment &&
-      enrollment.enrollment_state !== 'pending_funding_verification' &&
-      enrollment.status !== 'pending_funding_verification'
+      !enrollment ||
+      (enrollment.enrollment_state !== 'pending_funding_verification' &&
+        enrollment.status !== 'pending_funding_verification')
     ) {
-      // Funding has been verified — send them to the course
+      // Enrollment is active or not found — send them to the course
       redirect(`/lms/courses/${courseId}`);
     }
   }

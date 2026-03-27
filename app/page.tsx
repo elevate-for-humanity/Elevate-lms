@@ -4,13 +4,14 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 import MarqueeBanner from '@/components/MarqueeBanner';
 import { BlurIn } from '@/components/animations/PremiumAnimations';
+import { ProgramVideoCards } from '@/components/marketing/ProgramVideoCards';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Elevate for Humanity | Workforce Training — Indianapolis, Indiana',
-  description: 'Free and low-cost career training in Indiana. WIOA, Workforce Ready Grant, and JRI funded programs. CNA, HVAC, CDL, IT, Barber. Apply today.',
+  description: 'Career training in Indiana. WIOA, Workforce Ready Grant, and JRI funded programs available. HVAC, CDL, Barber, CNA, IT. Apply today.',
   keywords: 'workforce training Indianapolis, WIOA training Indiana, CNA certification Indianapolis, CDL training Indiana, barber apprenticeship Indianapolis, HVAC training Indiana, free job training Indianapolis, Elevate for Humanity',
   openGraph: {
     title: 'Elevate for Humanity | Workforce Training — Indianapolis, Indiana',
@@ -45,7 +46,7 @@ export default function HomePage() {
             {/* Proof bullets */}
             <ul className="space-y-2 mb-8">
               {[
-                '100% funded programs available (WIOA, WRG, JRI)',
+                'WIOA, WRG & JRI funded programs available',
                 'Certifications included',
                 'Job placement support',
                 'Indiana-approved training provider',
@@ -148,37 +149,7 @@ export default function HomePage() {
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3 text-center">Programs</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3 text-center">Career Programs That Lead to Jobs</h2>
           <p className="text-slate-400 text-sm text-center mb-12 max-w-xl mx-auto">Every program ends with a nationally recognized credential and a clear path to employment.</p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-            {[
-              { tag: 'Healthcare', full: 'Certified Nursing Assistant', duration: '4–8 weeks', salary: '$28–$42K/yr', video: '/videos/cna-hero.mp4', href: '/programs/cna' },
-              { tag: 'Skilled Trades', full: 'HVAC Technician', duration: '12 weeks', salary: '$40–$80K/yr', video: '/videos/hvac-hero-final.mp4', href: '/programs/hvac-technician' },
-              { tag: 'Transportation', full: 'CDL Class A', duration: 'Weeks, not years', salary: '$50–$80K/yr', video: '/videos/cdl-hero.mp4', href: '/programs/cdl-training' },
-              { tag: 'Apprenticeship', full: 'Barber Apprenticeship', duration: '15–17 months', salary: '$35–$65K+/yr', video: '/videos/barber-training.mp4', href: '/programs/barber-apprenticeship' },
-            ].map((prog) => (
-              <Link key={prog.full} href={prog.href} className="group relative rounded-2xl overflow-hidden block" style={{ aspectRatio: '9/14' }}>
-                {/* Video background */}
-                <video
-                  src={prog.video}
-                  autoPlay muted loop playsInline
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent" />
-                {/* Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-5">
-                  <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-1">{prog.tag}</p>
-                  <h3 className="font-extrabold text-white text-base leading-snug mb-3">{prog.full}</h3>
-                  <div className="space-y-1">
-                    <p className="text-xs text-slate-300">{prog.duration}</p>
-                    <p className="text-sm font-bold text-green-400">{prog.salary}</p>
-                  </div>
-                  <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-white bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full transition-colors">
-                    View Program →
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <ProgramVideoCards />
           <div className="text-center">
             <Link href="/programs" className="border-2 border-white/20 text-white hover:bg-white/10 font-bold px-8 py-3.5 rounded-lg transition-colors text-sm inline-block">
               View All Programs

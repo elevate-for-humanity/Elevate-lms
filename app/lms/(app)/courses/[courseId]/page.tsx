@@ -61,8 +61,22 @@ export default async function CoursePage({ params }: { params: Params }) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/lms/courses/' + courseId);
 
+  if (!db) {
+    // Admin client unavailable — service role key not configured.
+    return (
+      <div className="min-h-screen flex items-center justify-center text-slate-500">
+        Course data unavailable. Please contact support.
+      </div>
+    );
+  }
+
   const course = await resolveCourse(courseId);
   if (!course) notFound();
+
+  // lessonCourseId is the canonical courses UUID — may differ from the URL
+  // param when the URL uses a training_courses ID (e.g. legacy HVAC routes).
+  // All downstream queries — including enrollment — must use this value.
+  const lessonCourseId = (course as any)._lessonCourseId || courseId;
 
   const { data: program } = course.program_id
     ? await supabase.from('programs')
@@ -76,14 +90,13 @@ export default async function CoursePage({ params }: { params: Params }) {
   const { data: enrollment } = await db
     .from('program_enrollments')
     .select('status, enrollment_state, enrolled_at')
-    .eq('user_id', user.id).eq('course_id', courseId).maybeSingle();
+    .eq('user_id', user.id).eq('course_id', lessonCourseId).maybeSingle();
 
   if (enrollment?.status === 'revoked') redirect('/lms/programs');
   if (enrollment?.enrollment_state === 'pending_funding_verification')
-    redirect(`/lms/enrollment-pending?courseId=${courseId}`);
+    redirect(`/lms/enrollment-pending?courseId=${lessonCourseId}`);
 
   const isPendingApproval = enrollment?.status === 'pending_approval';
-  const lessonCourseId = (course as any)._lessonCourseId || courseId;
 
   const { data: modulesRaw } = await db
     .from('course_modules').select('id, title, order_index')
@@ -91,7 +104,7 @@ export default async function CoursePage({ params }: { params: Params }) {
 
   const { data: lessonsRaw } = await db
     .from('lms_lessons')
-    .select('id, title, description, duration_minutes, order_index, content_type, step_type, module_id, activities, slug')
+    .select('id, title, duration_minutes, order_index, content_type, step_type, module_id, activities, lesson_slug, passing_score')
     .eq('course_id', lessonCourseId).order('order_index', { ascending: true });
 
   const allLessons = (lessonsRaw || []) as any[];

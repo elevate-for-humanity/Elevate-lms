@@ -26,8 +26,8 @@ export function ProgramsTable({ programs }: { programs: Program[] }) {
 
   const filteredPrograms = programs.filter((program) => {
     const matchesSearch =
-      program.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      program.slug.toLowerCase().includes(searchTerm.toLowerCase());
+      (program.name ?? '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (program.slug ?? '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter =
       filterStatus === 'all' ||
       (filterStatus === 'active' && program.is_active) ||
@@ -153,7 +153,7 @@ export function ProgramsTable({ programs }: { programs: Program[] }) {
                   <td className="px-6 py-4 text-right text-sm font-medium">
                     <div className="flex items-center justify-end gap-2">
                       <Link
-                        href={`/admin/programs/${program.slug}`}
+                        href={`/admin/programs/${program.slug}/manage`}
                         className="text-brand-blue-600 hover:text-brand-blue-900"
                       >
                         Edit

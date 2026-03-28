@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import ApplicationActions from './ApplicationActions';
@@ -58,7 +59,10 @@ export default async function ReviewApplicationPage({
     redirect('/unauthorized');
   }
 
-  const { data: app, error } = await supabase
+  // Use admin client — applications table RLS restricts session-based reads.
+  // Auth check above already confirmed the caller is admin/super_admin.
+  const db = createAdminClient();
+  const { data: app, error } = await db
     .from('applications')
     .select('*')
     .eq('id', id)
@@ -81,7 +85,7 @@ export default async function ReviewApplicationPage({
   if (programSlug) {
     // Try exact match on slug-like patterns in title
     const searchTerm = programSlug.replace(/-/g, ' ');
-    const { data: matchedCourse } = await supabase
+    const { data: matchedCourse } = await db
       .from('courses')
       .select('id, title')
       .ilike('title', `%${searchTerm}%`)

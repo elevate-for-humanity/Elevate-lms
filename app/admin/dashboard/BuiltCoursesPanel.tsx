@@ -1,8 +1,14 @@
 import Link from 'next/link';
-import { getAdminCoursesOverview } from '@/lib/admin/course-admin-overview';
+import { getAdminCoursesOverview, type AdminCourseOverview } from '@/lib/admin/course-admin-overview';
 
 export async function BuiltCoursesPanel() {
-  const courses = await getAdminCoursesOverview();
+  let courses: Awaited<ReturnType<typeof getAdminCoursesOverview>> = [];
+  try {
+    courses = await getAdminCoursesOverview();
+  } catch {
+    // Non-fatal: panel is informational only
+    courses = [];
+  }
   const built = courses.filter(c => c.actualLessons > 0).slice(0, 5);
 
   return (

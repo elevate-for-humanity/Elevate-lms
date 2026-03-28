@@ -31,6 +31,11 @@ function deriveStatus(expected: number, actual: number): AdminCourseStatus {
 export async function getAdminCoursesOverview(): Promise<AdminCourseOverview[]> {
   const supabase = createAdminClient();
 
+  if (!supabase) {
+    // Service role key not available — return empty list rather than crashing the dashboard
+    return [];
+  }
+
   // Build blueprint index keyed by programSlug for O(1) lookup
   const blueprints = getAllBlueprints();
   const bpByProgramSlug = new Map(
@@ -53,7 +58,11 @@ export async function getAdminCoursesOverview(): Promise<AdminCourseOverview[]> 
     `)
     .order('course_name', { ascending: true });
 
-  if (error) throw new Error(`getAdminCoursesOverview: ${error.message}`);
+  if (error) {
+    // Log but don't throw — a broken courses panel must not crash the dashboard
+    console.error(`[getAdminCoursesOverview] query failed: ${error.message} (code: ${error.code})`);
+    return [];
+  }
 
   // Load lesson counts from course_lessons (the table lms_lessons view reads from)
   const { data: lessonRows } = await supabase

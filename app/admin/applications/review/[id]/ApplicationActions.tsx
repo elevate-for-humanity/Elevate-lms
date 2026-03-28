@@ -46,6 +46,7 @@ export default function ApplicationActions({
       // Use the full approve endpoint that creates user + enrollment
       const res = await fetch(`/api/admin/applications/${applicationId}/approve`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           program_id: programId,
@@ -79,6 +80,7 @@ export default function ApplicationActions({
     try {
       const res = await fetch(`/api/admin/applications/${applicationId}`, {
         method: 'PATCH',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });

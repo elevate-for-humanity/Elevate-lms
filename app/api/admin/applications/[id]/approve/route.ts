@@ -4,6 +4,7 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireApiAuth } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { approveApplication } from '@/lib/enrollment/approve';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -31,7 +32,8 @@ async function _POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     adminUserId = user.id;
-    const { data: profile } = await supabase
+    const adminDb = createAdminClient();
+    const { data: profile } = await adminDb!
       .from('profiles')
       .select('role')
       .eq('id', user.id)

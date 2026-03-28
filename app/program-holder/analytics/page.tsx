@@ -3,6 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { ChevronRight, TrendingUp, Users, DollarSign, GraduationCap, Download, ArrowUp, ArrowDown } from 'lucide-react';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import { EnrollmentTrendChart } from '@/components/program-holder/EnrollmentTrendChart';
 
 export const metadata: Metadata = {
   title: 'Analytics | Program Holder Portal | Elevate For Humanity',
@@ -16,7 +17,7 @@ export default async function ProgramHolderAnalyticsPage() {
   const { db, holderId } = await requireProgramHolder();
 
   // Get program holder record using the real linkage
-  const { data: programHolder } = await supabase
+  const { data: programHolder } = await db
     .from('program_holders')
     .select('id, name, payout_share')
     .eq('id', holderId)
@@ -33,13 +34,13 @@ export default async function ProgramHolderAnalyticsPage() {
   const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
 
   // Current period stats
-  const { count: currentEnrollments } = await supabase
+  const { count: currentEnrollments } = await db
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id)
     .gte('enrolled_at', thirtyDaysAgo.toISOString());
 
-  const { count: previousEnrollments } = await supabase
+  const { count: previousEnrollments } = await db
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id)
@@ -47,37 +48,63 @@ export default async function ProgramHolderAnalyticsPage() {
     .lt('enrolled_at', thirtyDaysAgo.toISOString());
 
   // Total stats
-  const { count: totalEnrollments } = await supabase
+  const { count: totalEnrollments } = await db
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id);
 
-  const { count: activeEnrollments } = await supabase
+  const { count: activeEnrollments } = await db
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id)
     .eq('status', 'active');
 
-  const { count: completedEnrollments } = await supabase
+  const { count: completedEnrollments } = await db
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id)
     .eq('status', 'completed');
 
+  // Monthly enrollment trend — last 12 months
+  const twelveMonthsAgo = new Date(now.getFullYear() - 1, now.getMonth(), 1);
+  const { data: enrollmentRows } = await db
+    .from('program_enrollments')
+    .select('enrolled_at')
+    .eq('program_holder_id', programHolder.id)
+    .gte('enrolled_at', twelveMonthsAgo.toISOString())
+    .order('enrolled_at', { ascending: true });
+
+  // Bucket into YYYY-MM, fill gaps so the chart has a continuous x-axis
+  const buckets: Record<string, number> = {};
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    buckets[key] = 0;
+  }
+  for (const row of enrollmentRows ?? []) {
+    if (row.enrolled_at) {
+      const key = (row.enrolled_at as string).slice(0, 7);
+      if (key in buckets) buckets[key]++;
+    }
+  }
+  const enrollmentTrend = Object.entries(buckets)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([month, count]) => ({ month, count }));
+
   // Program performance
-  const { data: programs } = await supabase
+  const { data: programs } = await db
     .from('programs')
     .select('id, name, slug')
     .eq('program_holder_id', programHolder.id);
 
   const programStats = await Promise.all(
     (programs || []).map(async (program: any) => {
-      const { count: enrollments } = await supabase
+      const { count: enrollments } = await db
         .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('program_id', program.id);
 
-      const { count: completed } = await supabase
+      const { count: completed } = await db
         .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('program_id', program.id)
@@ -186,25 +213,21 @@ export default async function ProgramHolderAnalyticsPage() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          {/* Enrollment summary — chart visualization not yet implemented */}
+          {/* Enrollment trend chart */}
           <div className="md:col-span-2 bg-white rounded-xl border p-6">
-            <h2 className="font-semibold mb-4">Enrollment Summary</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-slate-50 rounded-lg p-4">
-                <p className="text-sm text-slate-500 mb-1">Total Enrollments</p>
-                <p className="text-3xl font-bold text-slate-900">{totalEnrollments || 0}</p>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-semibold">Enrollment Trend</h2>
+              <span className="text-xs text-slate-400">Last 12 months</span>
+            </div>
+            <EnrollmentTrendChart data={enrollmentTrend} />
+            <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t">
+              <div>
+                <p className="text-xs text-slate-500 mb-0.5">Total Enrollments</p>
+                <p className="text-xl font-bold text-slate-900">{totalEnrollments || 0}</p>
               </div>
-              <div className="bg-slate-50 rounded-lg p-4">
-                <p className="text-sm text-slate-500 mb-1">This Month</p>
-                <p className="text-3xl font-bold text-brand-blue-600">{currentEnrollments || 0}</p>
-              </div>
-              <div className="bg-slate-50 rounded-lg p-4">
-                <p className="text-sm text-slate-500 mb-1">Completion Rate</p>
-                <p className="text-3xl font-bold text-brand-green-600">{completionRate}%</p>
-              </div>
-              <div className="bg-slate-50 rounded-lg p-4">
-                <p className="text-sm text-slate-500 mb-1">Active Programs</p>
-                <p className="text-3xl font-bold text-slate-900">{programs?.length || 0}</p>
+              <div>
+                <p className="text-xs text-slate-500 mb-0.5">This Month</p>
+                <p className="text-xl font-bold text-brand-blue-600">{currentEnrollments || 0}</p>
               </div>
             </div>
           </div>
@@ -222,8 +245,16 @@ export default async function ProgramHolderAnalyticsPage() {
                 <span className="font-semibold">{programHolder.payout_share}%</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Avg Completion</span>
+                <span className="text-gray-600">Completion Rate</span>
                 <span className="font-semibold">{completionRate}%</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Active Students</span>
+                <span className="font-semibold">{activeEnrollments || 0}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Completed</span>
+                <span className="font-semibold">{completedEnrollments || 0}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">This Month</span>
@@ -255,7 +286,7 @@ export default async function ProgramHolderAnalyticsPage() {
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-2">
                         <div className="w-24 bg-gray-200 rounded-full h-2">
-                          <div className="bg-white h-2 rounded-full" 
+                          <div className="bg-brand-orange-500 h-2 rounded-full"
                             style={{ width: `${program.completionRate}%` }} />
                         </div>
                         <span className="text-sm">{program.completionRate}%</span>

@@ -37,26 +37,17 @@ export default async function ProgramsPage() {
     redirect('/unauthorized');
   }
 
-  const { data: programs, count: totalPrograms } = await supabase
-    .from('programs')
-    .select(
-      `
-      *,
-      modules:modules(count)
-    `,
-      { count: 'exact' }
-    )
-    .order('created_at', { ascending: false });
-
-  const { count: activePrograms } = await supabase
-    .from('programs')
-    .select('*', { count: 'exact', head: true })
-    .eq('is_active', true);
-
-  const { count: featuredPrograms } = await supabase
-    .from('programs')
-    .select('*', { count: 'exact', head: true })
-    .eq('featured', true);
+  const [
+    { data: programs },
+    { count: totalPrograms },
+    { count: activePrograms },
+    { count: featuredPrograms },
+  ] = await Promise.all([
+    supabase.from('programs').select('*').order('created_at', { ascending: false }),
+    supabase.from('programs').select('*', { count: 'exact', head: true }),
+    supabase.from('programs').select('*', { count: 'exact', head: true }).eq('is_active', true),
+    supabase.from('programs').select('*', { count: 'exact', head: true }).eq('featured', true),
+  ]);
 
   return (
     <div className="min-h-screen bg-gray-50">

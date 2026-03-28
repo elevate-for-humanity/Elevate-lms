@@ -15,8 +15,12 @@ async function requireAdmin() {
   if (!supabase) return { error: 'Database unavailable', status: 500 };
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Unauthorized', status: 401 };
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+  // Use admin client for the profile lookup — session-based reads on profiles
+  // can return null when RLS policies restrict the session JWT in Route Handlers.
+  const db = createAdminClient();
+  if (!db) return { error: 'Database unavailable', status: 500 };
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
     return { error: 'Forbidden', status: 403 };
   }
   return { user, profile, supabase };

@@ -3,6 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { FollowUpBlastButton } from '@/components/admin/FollowUpBlastButton';
 
 export const dynamic = 'force-dynamic';
 

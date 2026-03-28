@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import DashboardClient from './DashboardClient';
 import { BuiltCoursesPanel } from './BuiltCoursesPanel';
+import { DashboardClientWrapper } from './DashboardClientWrapper';
 
 export const dynamic = 'force-dynamic';
 
@@ -148,7 +148,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <>
-      <DashboardClient data={data} />
+      <DashboardClientWrapper data={data} />
       <div className="max-w-7xl mx-auto px-4 pb-8">
         <BuiltCoursesPanel />
       </div>

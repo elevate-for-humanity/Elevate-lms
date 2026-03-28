@@ -470,8 +470,13 @@ export async function listApplications(filters?: { status?: string; programId?: 
 }
 
 export async function getApplication(id: string) {
-  const supabase = await getSupabase();
-  const { data, error } = await supabase
+  // Use admin client — applications table RLS blocks session-based reads.
+  // Callers are admin API routes that have already verified the caller's role.
+  const { createAdminClient } = await import('@/lib/supabase/admin');
+  const { setAuditContext } = await import('@/lib/audit-context');
+  const db = createAdminClient();
+  await setAuditContext(db, { systemActor: 'admin_applications_api' });
+  const { data, error } = await db
     .from('applications')
     .select('*, program:programs(id, title, code)')
     .eq('id', id)
@@ -482,13 +487,17 @@ export async function getApplication(id: string) {
 }
 
 export async function updateApplication(id: string, patch: ApplicationUpdate) {
-  const supabase = await getSupabase();
+  // Use admin client — applications table RLS blocks session-based updates.
+  const { createAdminClient } = await import('@/lib/supabase/admin');
+  const { setAuditContext } = await import('@/lib/audit-context');
+  const db = createAdminClient();
+  await setAuditContext(db, { systemActor: 'admin_applications_api' });
   const updateData: any = { ...patch, updated_at: new Date().toISOString() };
   if (patch.status === 'approved' || patch.status === 'rejected') {
     updateData.reviewed_at = new Date().toISOString();
   }
   
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('applications')
     .update(updateData)
     .eq('id', id)
@@ -500,8 +509,11 @@ export async function updateApplication(id: string, patch: ApplicationUpdate) {
 }
 
 export async function deleteApplication(id: string) {
-  const supabase = await getSupabase();
-  const { error } = await supabase.from('applications').delete().eq('id', id);
+  const { createAdminClient } = await import('@/lib/supabase/admin');
+  const { setAuditContext } = await import('@/lib/audit-context');
+  const db = createAdminClient();
+  await setAuditContext(db, { systemActor: 'admin_applications_api' });
+  const { error } = await db.from('applications').delete().eq('id', id);
   if (error) throw new Error('Database operation failed');
   return { ok: true };
 }

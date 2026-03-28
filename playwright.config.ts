@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
+  globalSetup: './tests/e2e/global-setup.ts',
   testDir: './tests',
   testMatch: ['**/*.spec.ts', '**/e2e/**/*.test.ts'],
   testIgnore: ['**/unit/**'],
@@ -11,7 +12,7 @@ export default defineConfig({
   reporter: 'html',
   timeout: 60000,
   use: {
-    baseURL: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     navigationTimeout: 45000,
@@ -26,9 +27,9 @@ export default defineConfig({
       },
     },
   ],
-  // Only start a local dev server when testing against localhost.
-  // When NEXT_PUBLIC_SITE_URL points to a deployed environment, skip webServer.
-  ...((!process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL.includes('localhost'))
+  // Use PLAYWRIGHT_BASE_URL to target a remote environment.
+  // Default: always test against localhost:3000.
+  ...(!process.env.PLAYWRIGHT_BASE_URL || process.env.PLAYWRIGHT_BASE_URL.includes('localhost')
     ? {
         webServer: {
           command: 'pnpm dev',

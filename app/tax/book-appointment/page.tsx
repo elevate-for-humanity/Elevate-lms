@@ -43,27 +43,32 @@ export default function BookAppointmentPage() {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        setStatus('success');
-        // Reset form after 3 seconds
-        setTimeout(() => {
-          setFormData({
-            name: '',
-            email: '',
-            phone: '',
-            service: '',
-            appointmentType: 'in-person',
-            preferredDate: '',
-            preferredTime: '',
-            message: '',
-          });
-          setStatus('idle');
-        }, 3000);
-      } else {
-        setStatus('error');
-        setTimeout(() => setStatus('idle'), 3000);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Booking failed. Please call (317) 314-3757.');
       }
-    } catch (error) { /* Error handled silently */ 
+
+      if (!data.appointment?.id) {
+        throw new Error('Appointment could not be confirmed. Please call (317) 314-3757.');
+      }
+
+      setStatus('success');
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          service: '',
+          appointmentType: 'in-person',
+          preferredDate: '',
+          preferredTime: '',
+          message: '',
+        });
+        setStatus('idle');
+      }, 3000);
+    } catch (err) {
       setStatus('error');
       setTimeout(() => setStatus('idle'), 3000);
     }

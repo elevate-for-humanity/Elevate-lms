@@ -17,6 +17,7 @@ export default function CosmetologyDocumentsPage() {
   const [governmentId, setGovernmentId] = useState<UploadedFile | null>(null);
   const [additionalDocs, setAdditionalDocs] = useState<UploadedFile[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const [enrollmentId, setEnrollmentId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -111,8 +112,7 @@ export default function CosmetologyDocumentsPage() {
       } else {
         throw new Error(result.error || 'Upload failed');
       }
-    } catch (error) {
-      console.error('Upload error:', error);
+    } catch {
       if (docType === 'government-id') {
         setGovernmentId({ ...uploadedFile, status: 'error' });
       } else {
@@ -129,6 +129,7 @@ export default function CosmetologyDocumentsPage() {
     if (!governmentId || governmentId.status !== 'complete') return;
 
     setSubmitting(true);
+    setSubmitError('');
 
     try {
       const response = await fetch('/api/enrollment/submit-documents', {
@@ -137,13 +138,18 @@ export default function CosmetologyDocumentsPage() {
         body: JSON.stringify({ program: 'cosmetology-apprenticeship' }),
       });
 
-      if (response.ok) {
-        router.push('/apprentice');
-      } else {
-        router.push('/apprentice');
+      const data = await response.json();
+
+      if (!response.ok) {
+        setSubmitError(data.error || 'Submission failed. Please try again or call (317) 314-3757.');
+        setSubmitting(false);
+        return;
       }
-    } catch {
+
       router.push('/apprentice');
+    } catch {
+      setSubmitError('Unable to submit. Please try again or call (317) 314-3757.');
+      setSubmitting(false);
     }
   };
 
@@ -186,6 +192,9 @@ export default function CosmetologyDocumentsPage() {
                     </span>
                     {governmentId.status === 'uploading' && (
                       <span className="text-sm text-purple-600">Uploading...</span>
+                    )}
+                    {governmentId.status === 'error' && (
+                      <span className="text-sm text-red-600">Upload failed. Please try again or call (317) 314-3757.</span>
                     )}
                     {governmentId.status === 'complete' && (
                       <button
@@ -241,6 +250,11 @@ export default function CosmetologyDocumentsPage() {
           </div>
         </div>
 
+        {submitError && (
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 mb-3">
+            {submitError}
+          </div>
+        )}
         <button
           onClick={handleSubmit}
           disabled={!canSubmit || submitting}

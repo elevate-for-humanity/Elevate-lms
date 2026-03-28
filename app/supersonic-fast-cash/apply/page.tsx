@@ -23,10 +23,12 @@ export default function RefundApplyPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitError('');
 
     try {
       const response = await fetch('/api/supersonic/apply', {
@@ -35,11 +37,16 @@ export default function RefundApplyPage() {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        setIsSubmitted(true);
+      const data = await response.json();
+
+      if (!response.ok) {
+        setSubmitError(data.error || 'Submission failed. Please call (317) 314-3757.');
+        return;
       }
-    } catch (error) {
-      console.error('Error submitting application:', error);
+
+      setIsSubmitted(true);
+    } catch {
+      setSubmitError('Unable to submit. Please try again or call (317) 314-3757.');
     } finally {
       setIsSubmitting(false);
     }
@@ -337,6 +344,11 @@ export default function RefundApplyPage() {
             </div>
 
             {/* Submit */}
+            {submitError && (
+              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                {submitError}
+              </div>
+            )}
             <button
               type="submit"
               disabled={isSubmitting}

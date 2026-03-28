@@ -81,3 +81,35 @@
 ## Related Issues
 
 <!-- Link related issues: Fixes #123, Relates to #456 -->
+
+---
+
+## Reliability Gate
+
+Every box must be checked before merge when this PR touches enrollment, booking, payment, application, or auth flows.
+
+### API routes
+
+- [ ] No API route returns `success: true` after a DB write failure
+- [ ] No `catch` block logs and continues — persistence failures return non-2xx
+- [ ] Native form POST routes redirect on both success and error — no raw JSON responses
+- [ ] Email / notification sends only run **after** a confirmed DB write
+
+### Client submit handlers
+
+- [ ] Handlers validate payload `success` and a required identifier — not just `response.ok`
+- [ ] Error states are visible to the user inline — not console-only
+- [ ] Double-submit is prevented while a request is in flight
+
+### Revenue / enrollment / booking / payment flows
+
+- [ ] Payment or next-step redirect only happens after a real persisted record ID is confirmed
+- [ ] Failure paths keep the user on-page with a recoverable error message
+- [ ] These flows were manually broken and re-tested
+
+### Guard scripts
+
+- [ ] `pnpm lint:reliability` passes
+- [ ] `pnpm lint:critical-routes` passes
+
+> **Rule: No DB record = no success state.**

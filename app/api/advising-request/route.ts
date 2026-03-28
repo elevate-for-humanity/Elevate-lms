@@ -6,6 +6,7 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { sendEmail } from '@/lib/email/sendgrid';
+import { requireDbWrite, success, failure } from '@/lib/api/safe-handler';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -29,10 +30,9 @@ async function _POST(request: Request) {
 
     const supabase = await createClient();
 
-    // Store in database (you may need to create this table)
-    const { error: dbError } = await supabase
-      .from('advising_requests')
-      .insert({
+    // DB write is required — no fallthrough on failure
+    const record = await requireDbWrite(
+      supabase.from('advising_requests').insert({
         name,
         phone,
         email,
@@ -40,13 +40,11 @@ async function _POST(request: Request) {
         contact_methods: contactMethod,
         questions,
         created_at: new Date().toISOString(),
-      });
+      }).select().single(),
+      'Failed to save advising request'
+    );
 
-    if (dbError) {
-      logger.error('Database error:', dbError);
-      // Continue even if database insert fails - we'll still send the email
-    }
-
+    // Email is secondary — only runs after DB success
     try {
       await sendEmail({
         to: 'elevate4humanityedu@gmail.com',
@@ -72,17 +70,14 @@ async function _POST(request: Request) {
         }).catch((err) => logger.warn('[advising-request] SMS alert failed:', err));
       }
     } catch (emailError) {
-      logger.error('[advising-request] Email failed:', emailError);
-      // Don't fail the request if email fails
+      logger.warn('[advising-request] Email failed (record saved):', emailError);
     }
 
-    return NextResponse.json({ success: true });
-  } catch (error) { 
-    logger.error('Error processing advising request:', error);
-    return NextResponse.json(
-      { error: 'Failed to process request' },
-      { status: 500 }
-    );
+    return success({ id: record.id });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Failed to process request';
+    logger.error('Advising request error:', err);
+    return failure(message);
   }
 }
 export const POST = withApiAudit('/api/advising-request', _POST);

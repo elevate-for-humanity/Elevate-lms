@@ -7,6 +7,7 @@ import { resend } from '@/lib/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { requireDbWrite, success, failure } from '@/lib/api/safe-handler';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -43,48 +44,29 @@ async function _POST(req: Request) {
     // Create Supabase client with service role key
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Insert appointment into database
-    const { data, error }: any = await supabase
-      .from('appointments')
-      .insert([
-        {
-          service_type: appointmentData.serviceType,
-          appointment_type: appointmentData.appointmentType,
-          appointment_date: appointmentData.date,
-          appointment_time: appointmentData.time,
-          first_name: appointmentData.firstName,
-          last_name: appointmentData.lastName,
-          email: appointmentData.email,
-          phone: appointmentData.phone,
-          tax_situation: appointmentData.taxSituation || null,
-          has_w2: appointmentData.hasW2 || false,
-          has_1099: appointmentData.has1099 || false,
-          has_business_income: appointmentData.hasBusinessIncome || false,
-          has_rental_income: appointmentData.hasRentalIncome || false,
-          needs_refund_advance: appointmentData.needsRefundAdvance || false,
-          refund_advance_amount: appointmentData.refundAdvanceAmount || null,
-          location: appointmentData.location || null,
-          status: 'pending',
-        },
-      ])
-      .select()
-      .single();
-
-    if (error) {
-
-      // If table doesn't exist, still return success (we'll handle via email)
-      if (error.code === '42P01') {
-        return NextResponse.json({
-          success: true,
-          message: 'Appointment request received. We will contact you shortly.',
-        });
-      }
-
-      return NextResponse.json(
-        { error: 'Failed to create appointment', details: 'Internal server error' },
-        { status: 500 }
-      );
-    }
+    // DB write is required — no fallthrough on failure
+    const appointment = await requireDbWrite(
+      supabase.from('appointments').insert([{
+        service_type: appointmentData.serviceType,
+        appointment_type: appointmentData.appointmentType,
+        appointment_date: appointmentData.date,
+        appointment_time: appointmentData.time,
+        first_name: appointmentData.firstName,
+        last_name: appointmentData.lastName,
+        email: appointmentData.email,
+        phone: appointmentData.phone,
+        tax_situation: appointmentData.taxSituation || null,
+        has_w2: appointmentData.hasW2 || false,
+        has_1099: appointmentData.has1099 || false,
+        has_business_income: appointmentData.hasBusinessIncome || false,
+        has_rental_income: appointmentData.hasRentalIncome || false,
+        needs_refund_advance: appointmentData.needsRefundAdvance || false,
+        refund_advance_amount: appointmentData.refundAdvanceAmount || null,
+        location: appointmentData.location || null,
+        status: 'pending',
+      }]).select().single(),
+      'Failed to create appointment. Please call (317) 314-3757.'
+    );
 
     // Send confirmation email to customer
     try {
@@ -133,16 +115,11 @@ async function _POST(req: Request) {
       });
     } catch { /* non-fatal */ }
 
-    return NextResponse.json({
-      success: true,
-      appointment: data,
-      message: 'Appointment booked successfully! Check your email for confirmation.',
-    });
-  } catch (error) { 
-    return NextResponse.json(
-      { error: 'Internal server error', details: 'Internal server error' },
-      { status: 500 }
-    );
+    return success({ appointment });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Internal server error';
+    logger.error('Tax book-appointment error:', err);
+    return failure(message);
   }
 }
 export const POST = withApiAudit('/api/tax/book-appointment', _POST);

@@ -333,7 +333,9 @@
     "check-env": "node -e \"if (!require(\\\"fs\\\").existsSync(\\\".env.local\\\")) { console.error(\\\"❌ .env.local not found! Run: ./setup-env.sh\\\"); process.exit(1); } else { console.log(\\\"✅ .env.local exists\\\"); }\"",
     "dev:fast": "bash scripts/dev-fast.sh",
     "dev:kill-port": "bash scripts/kill-port.sh 3000",
-    "audit:hero-banners": "tsx scripts/audit-hero-banners.ts"
+    "lint:reliability": "node scripts/guard-no-fake-success.mjs",
+    "lint:critical-routes": "node scripts/guard-critical-routes.mjs",
+    "verify:survival": "pnpm lint && pnpm lint:reliability && pnpm lint:critical-routes"
   },
   "overrides": {
     "inflight": "npm:lru-cache@^10.0.0"

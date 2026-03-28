@@ -52,6 +52,7 @@ export function ApplicationForm() {
   };
   const [submitting, setSubmitting] = useState(false);
   const [applicationId, setApplicationId] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState('');
 
   const handleSubmit = async () => {
     setSubmitting(true);
@@ -77,12 +78,15 @@ export function ApplicationForm() {
         throw new Error(result.error || 'Submission failed');
       }
 
-      setApplicationId(result.referenceNumber || `APP-${Date.now()}`);
+      if (!result.referenceNumber) {
+        throw new Error('Application could not be confirmed. Please call (317) 314-3757.');
+      }
+
+      setApplicationId(result.referenceNumber);
       setStep(6);
-    } catch (err) {
-      console.error('Application submission error:', err);
-      setApplicationId(`APP-${Date.now()}`);
-      setStep(6);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Submission failed. Please try again.';
+      setSubmitError(message);
     } finally {
       setSubmitting(false);
     }
@@ -371,9 +375,16 @@ export function ApplicationForm() {
               Continue
             </Button>
           ) : (
-            <Button variant="primary" onClick={handleSubmit} disabled={submitting}>
-              {submitting ? 'Submitting...' : 'Submit Application'}
-            </Button>
+            <div className="flex flex-col gap-3 w-full">
+              {submitError && (
+                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                  {submitError}
+                </div>
+              )}
+              <Button variant="primary" onClick={handleSubmit} disabled={submitting}>
+                {submitting ? 'Submitting...' : 'Submit Application'}
+              </Button>
+            </div>
           )}
         </div>
       </CardContent>

@@ -61,15 +61,11 @@ async function _POST(req: Request) {
     });
 
     if (error) {
-      logger.error('Database error:', error);
-      // Still return success - we don't want to block the user
-      // Log the application for manual follow-up
-      logger.info('Tax refund application (DB failed):', {
-        name: `${firstName} ${lastName}`,
-        email,
-        phone,
-        submittedAt: new Date().toISOString(),
-      });
+      logger.error('Database error:', { code: error.code, message: error.message, route: '/api/supersonic/apply', table: 'tax_applications' });
+      return NextResponse.json(
+        { error: 'Failed to submit application. Please call (317) 314-3757.' },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ success: true });

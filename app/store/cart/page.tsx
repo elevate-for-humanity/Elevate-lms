@@ -22,7 +22,19 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default async function CartPage() {
+const CART_ERROR_MESSAGES: Record<string, string> = {
+  'payment-unavailable': 'Checkout is temporarily unavailable. Please try again later or call (317) 314-3757.',
+  'checkout-failed': 'We could not start your checkout session. Please try again.',
+};
+
+export default async function CartPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error: errorSlug } = await searchParams;
+  const checkoutError = errorSlug ? (CART_ERROR_MESSAGES[errorSlug] ?? 'Something went wrong. Please try again.') : null;
+
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -96,6 +108,11 @@ export default async function CartPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Cart" }]} />
       </div>
 <div className="max-w-4xl mx-auto px-4 py-8">
+        {checkoutError && (
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+            {checkoutError}
+          </div>
+        )}
         <div className="flex items-center gap-4 mb-8">
           <Link href="/store" className="text-gray-500 hover:text-gray-700">
             <ArrowLeft className="w-5 h-5" />

@@ -77,15 +77,24 @@ export default function CNAEnrollPage() {
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Enrollment submission failed');
+        throw new Error(data.error || 'Enrollment submission failed');
+      }
+
+      // Require a real persisted UUID before proceeding to payment.
+      // A timestamp-format ID (CNA-XXXXXXX) means the DB write did not happen.
+      const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!data.enrollmentId || !uuidPattern.test(data.enrollmentId)) {
+        throw new Error('Enrollment could not be confirmed. Please call (317) 314-3757.');
       }
 
       // Redirect to payment
       if (formData.paymentOption === 'payment-plan') {
-        window.location.href = `/lms/payments/checkout?program=cna&amount=${PROGRAM_DETAILS.downPayment}&type=down-payment`;
+        window.location.href = `/lms/payments/checkout?program=cna&amount=${PROGRAM_DETAILS.downPayment}&type=down-payment&enrollment=${data.enrollmentId}`;
       } else {
-        window.location.href = `/lms/payments/checkout?program=cna&amount=${PROGRAM_DETAILS.price}&type=full-payment`;
+        window.location.href = `/lms/payments/checkout?program=cna&amount=${PROGRAM_DETAILS.price}&type=full-payment&enrollment=${data.enrollmentId}`;
       }
     } catch (err) {
       setError('There was an error processing your enrollment. Please try again or contact us at our contact form');

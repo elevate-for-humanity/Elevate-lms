@@ -10,6 +10,9 @@ export interface EnvConfig {
   // Required - Core functionality
   NEXT_PUBLIC_SUPABASE_URL: string;
   NEXT_PUBLIC_SUPABASE_ANON_KEY: string;
+  // Required in production: used for redirect targets in checkout and auth flows.
+  // Missing value causes checkout failure redirects to point at localhost.
+  NEXT_PUBLIC_SITE_URL: string;
 
   // Optional - Services degrade gracefully if missing
   SUPABASE_SERVICE_ROLE_KEY?: string;
@@ -38,6 +41,12 @@ export function validateRequiredEnv(): void {
     'NEXT_PUBLIC_SUPABASE_URL',
     'NEXT_PUBLIC_SUPABASE_ANON_KEY',
   ];
+
+  // NEXT_PUBLIC_SITE_URL is required in production — missing value causes
+  // checkout and auth redirects to point at localhost instead of the real domain.
+  if (process.env.NODE_ENV === 'production') {
+    required.push('NEXT_PUBLIC_SITE_URL');
+  }
 
   const missing = required.filter((key) => !process.env[key]);
 

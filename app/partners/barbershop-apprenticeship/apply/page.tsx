@@ -171,12 +171,19 @@ export default function BarbershopPartnerApplyPage() {
 
       const result = await response.json();
 
-      if (response.ok) {
-        router.push('/partners/barbershop-apprenticeship/thank-you');
-      } else {
+      if (!response.ok) {
         setError(result.error || 'Something went wrong. Please try again.');
         setLoading(false);
+        return;
       }
+
+      if (!result.applicationId) {
+        setError('Application could not be confirmed. Please call (317) 314-3757.');
+        setLoading(false);
+        return;
+      }
+
+      router.push('/partners/barbershop-apprenticeship/thank-you');
     } catch {
       setError('Unable to submit. Please try again or call (317) 314-3757.');
       setLoading(false);

@@ -121,7 +121,7 @@ async function _POST(req: NextRequest) {
       );
     }
 
-    // Store in partner_mous (optional — don't block flow if schema mismatch)
+    // Store in partner_mous (optional audit record — primary MOU signature already saved above)
     try {
       await supabase.from('partner_mous').insert({
         partner_id: application?.id || '00000000-0000-0000-0000-000000000000',

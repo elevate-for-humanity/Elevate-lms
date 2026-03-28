@@ -23,7 +23,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function ProductDetailPage({ params }: Props) {
+const CHECKOUT_ERROR_MESSAGES: Record<string, string> = {
+  'payment-unavailable': 'Checkout is temporarily unavailable. Please try again later or call (317) 314-3757.',
+  'checkout-failed': 'We could not start your checkout session. Please try again.',
+  'invalid-product': 'This product is not available for purchase. Please contact support.',
+  'rate-limited': 'Too many requests. Please wait a moment and try again.',
+};
+
+export default async function ProductDetailPage({
+  params,
+  searchParams,
+}: Props & { searchParams: Promise<{ error?: string }> }) {
+  const { error: errorSlug } = await searchParams;
+  const checkoutError = errorSlug
+    ? (CHECKOUT_ERROR_MESSAGES[errorSlug] ?? 'Something went wrong. Please try again.')
+    : null;
+
   const supabase = await createClient();
 
   
@@ -59,6 +74,15 @@ export default async function ProductDetailPage({ params }: Props) {
           sizes="100vw"
         />
       </section>
+
+      {/* Checkout error banner */}
+      {checkoutError && (
+        <div className="max-w-7xl mx-auto px-4 pt-6">
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+            {checkoutError}
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <section className="py-16">

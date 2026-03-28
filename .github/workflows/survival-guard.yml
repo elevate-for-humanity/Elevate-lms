@@ -1,0 +1,34 @@
+name: Survival Guard
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  reliability:
+    name: Reliability & Critical Route Guard
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Reliability guard (fake-success / silent-failure patterns)
+        run: pnpm lint:reliability
+
+      - name: Critical route guard (enrollment / booking / payment / signout)
+        run: pnpm lint:critical-routes

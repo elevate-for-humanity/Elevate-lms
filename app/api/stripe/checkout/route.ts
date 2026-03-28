@@ -3,11 +3,11 @@ import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
 import { getCatalogProduct } from '@/lib/store/db';
 import { STRIPE_PRICE_IDS, isPriceConfigured } from '@/lib/stripe/price-map';
-import { toErrorMessage } from '@/lib/safe';
 import { createClient } from '@/lib/supabase/server';
 import { paymentRateLimit } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { injectFailureRedirect } from '@/lib/api/failure-injection';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -18,28 +18,26 @@ async function handler(req: Request) {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
 
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const storeUrl = `${siteUrl}/store`;
+
+    const injected = injectFailureRedirect(req, `${storeUrl}?error=checkout-failed`);
+    if (injected) return injected;
+
     // Rate limiting
     if (paymentRateLimit) {
       const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
       const limiter = paymentRateLimit.get();
-      const { success } = limiter ? await limiter.limit(ip) : { success: true };
-      
-      if (!success) {
-        return NextResponse.json(
-          { error: 'Too many payment requests. Please try again later.' },
-          { status: 429 }
-        );
+      const { success: rateLimitOk } = limiter ? await limiter.limit(ip) : { success: true };
+
+      if (!rateLimitOk) {
+        return NextResponse.redirect(new URL(`${storeUrl}?error=rate-limited`, req.url), 303);
       }
     }
 
     // Check if Stripe is configured
     if (!process.env.STRIPE_SECRET_KEY) {
-      return NextResponse.json(
-        {
-          error: 'Payment system not configured. Please contact support.',
-        },
-        { status: 503 }
-      );
+      return NextResponse.redirect(new URL(`${storeUrl}?error=payment-unavailable`, req.url), 303);
     }
 
     // Get authenticated user and tenant
@@ -79,7 +77,7 @@ async function handler(req: Request) {
     }
 
     if (!productId) {
-      return NextResponse.json({ error: 'Missing productId' }, { status: 400 });
+      return NextResponse.redirect(new URL(`${storeUrl}?error=invalid-product`, req.url), 303);
     }
 
     // DB-backed product lookup with hardcoded fallback
@@ -106,22 +104,18 @@ async function handler(req: Request) {
       }
     }
     if (!product) {
-      return NextResponse.json({ error: 'Invalid productId' }, { status: 400 });
+      return NextResponse.redirect(new URL(`${storeUrl}?error=invalid-product`, req.url), 303);
     }
+
+    // From here we have a product slug — use it for error redirects
+    const productUrl = `${siteUrl}/platform/${product.slug}`;
 
     // Check if Stripe Price ID is configured
     if (!isPriceConfigured(productId)) {
-      // Error logged
-      return NextResponse.json(
-        {
-          error: 'Product not available for purchase. Please contact support.',
-        },
-        { status: 500 }
-      );
+      return NextResponse.redirect(new URL(`${productUrl}?error=payment-unavailable`, req.url), 303);
     }
 
     const priceId = STRIPE_PRICE_IDS[productId];
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
     // Map product slug to plan name for license activation
     const planNameMap: Record<string, string> = {
@@ -163,20 +157,13 @@ async function handler(req: Request) {
     });
 
     if (!session.url) {
-      return NextResponse.json(
-        { error: 'Failed to create checkout session' },
-        { status: 500 }
-      );
+      return NextResponse.redirect(new URL(`${productUrl}?error=checkout-failed`, req.url), 303);
     }
 
     // Redirect to Stripe Checkout
     return NextResponse.redirect(session.url, 303);
-  } catch (err: any) {
-    // Error: $1
-    return NextResponse.json(
-      { err: toErrorMessage(err) || 'Internal server err' },
-      { status: 500 }
-    );
+  } catch (err: unknown) {
+    return NextResponse.redirect(new URL(`${storeUrl}?error=checkout-failed`, req.url), 303);
   }
 }
 export const POST = withApiAudit('/api/stripe/checkout', handler);

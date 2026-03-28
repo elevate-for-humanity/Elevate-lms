@@ -4,6 +4,7 @@ import { stripe } from '@/lib/stripe/client';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { injectFailureRedirect } from '@/lib/api/failure-injection';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -13,22 +14,25 @@ async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
+    // Use the public-facing host for redirects so they work behind proxies/Gitpod tunnels
+    const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || 'localhost:3000';
+    const proto = req.headers.get('x-forwarded-proto') || 'https';
+    const baseUrl = `${proto}://${host}`;
+
+    const injected = injectFailureRedirect(req, `${baseUrl}/store/cart?error=checkout-failed`);
+    if (injected) return injected;
+
     // Check if Stripe is configured
     if (!process.env.STRIPE_SECRET_KEY) {
-      return NextResponse.json(
-        { error: 'Payment system not configured' },
-        { status: 503 }
-      );
+      logger.error('Cart checkout: Stripe not configured');
+      return NextResponse.redirect(`${baseUrl}/store/cart?error=payment-unavailable`);
     }
 
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.redirect(`${baseUrl}/login?redirect=/store/cart`);
     }
 
     // Get form data
@@ -47,7 +51,7 @@ async function _POST(req: Request) {
       .eq('user_id', user.id);
 
     if (cartError || !cartItems || cartItems.length === 0) {
-      return NextResponse.redirect(new URL('/store/cart', req.url));
+      return NextResponse.redirect(`${baseUrl}/store/cart`);
     }
 
     // Check store_products for LMS access metadata (grants_course_access, course_id)
@@ -131,20 +135,15 @@ async function _POST(req: Request) {
     });
 
     if (!session.url) {
-      return NextResponse.json(
-        { error: 'Failed to create checkout session' },
-        { status: 500 }
-      );
+      logger.error('Cart checkout: Stripe session created but no URL returned', { userId: user.id });
+      return NextResponse.redirect(`${baseUrl}/store/cart?error=checkout-failed`);
     }
 
     // Redirect to Stripe Checkout
     return NextResponse.redirect(session.url, 303);
   } catch (error) {
     logger.error('Cart checkout error:', error instanceof Error ? error : new Error(String(error)));
-    return NextResponse.json(
-      { error: 'Checkout failed. Please try again.' },
-      { status: 500 }
-    );
+    return NextResponse.redirect(`${baseUrl}/store/cart?error=checkout-failed`);
   }
 }
 export const POST = withApiAudit('/api/store/cart-checkout', _POST);

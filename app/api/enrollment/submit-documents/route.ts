@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { success, failure } from '@/lib/api/safe-handler';
 
 async function _POST(req: Request) {
   try {
@@ -39,14 +40,14 @@ async function _POST(req: Request) {
       .in('enrollment_state', ['orientation_complete', 'documents_complete']);
 
     if (error) {
-      logger.error('Error updating enrollment:', error);
-      // Don't fail - let the flow continue
+      logger.error('Error updating enrollment:', { code: error.code, message: error.message, userId: user.id, route: '/api/enrollment/submit-documents' });
+      return failure('Failed to record document submission. Please try again or call (317) 314-3757.');
     }
 
-    return NextResponse.json({ success: true, program });
-  } catch (error) {
-    logger.error('Document submission error:', error);
-    return NextResponse.json({ success: true }); // Don't block flow
+    return success({ program });
+  } catch (err: unknown) {
+    logger.error('Document submission error:', err);
+    return failure('Failed to process document submission.');
   }
 }
 export const POST = withApiAudit('/api/enrollment/submit-documents', _POST);

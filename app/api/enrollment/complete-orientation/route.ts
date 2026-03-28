@@ -49,7 +49,7 @@ async function _POST(req: Request) {
     return NextResponse.json({ success: true, program });
   } catch (error) {
     logger.error('Orientation completion error:', error);
-    return NextResponse.json({ success: true }); // Don't block flow
+    return NextResponse.json({ error: 'Failed to complete orientation' }, { status: 500 });
   }
 }
 export const POST = withApiAudit('/api/enrollment/complete-orientation', _POST);

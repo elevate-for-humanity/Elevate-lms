@@ -18,6 +18,7 @@ export default function BarberDocumentsPage() {
   const [governmentId, setGovernmentId] = useState<UploadedFile | null>(null);
   const [additionalDocs, setAdditionalDocs] = useState<UploadedFile[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const [enrollmentId, setEnrollmentId] = useState<string | null>(null);
 
   // Get enrollment ID on mount
@@ -115,7 +116,6 @@ export default function BarberDocumentsPage() {
         throw new Error(result.error || 'Upload failed');
       }
     } catch (error) {
-      console.error('Upload error:', error);
       if (docType === 'government-id') {
         setGovernmentId({ ...uploadedFile, status: 'error' });
       } else {
@@ -132,22 +132,27 @@ export default function BarberDocumentsPage() {
     if (!governmentId || governmentId.status !== 'complete') return;
 
     setSubmitting(true);
+    setSubmitError('');
 
     try {
-      // Mark documents as submitted
       const response = await fetch('/api/enrollment/submit-documents', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ program: 'barber-apprenticeship' }),
       });
 
-      if (response.ok) {
-        router.push('/apprentice');
-      } else {
-        router.push('/apprentice');
+      const data = await response.json();
+
+      if (!response.ok) {
+        setSubmitError(data.error || 'Submission failed. Please try again or call (317) 314-3757.');
+        setSubmitting(false);
+        return;
       }
-    } catch {
+
       router.push('/apprentice');
+    } catch {
+      setSubmitError('Unable to submit. Please try again or call (317) 314-3757.');
+      setSubmitting(false);
     }
   };
 
@@ -193,6 +198,9 @@ export default function BarberDocumentsPage() {
                     </span>
                     {governmentId.status === 'uploading' && (
                       <span className="text-sm text-brand-blue-600">Uploading...</span>
+                    )}
+                    {governmentId.status === 'error' && (
+                      <span className="text-sm text-red-600">Upload failed. Please try again or call (317) 314-3757.</span>
                     )}
                     {governmentId.status === 'complete' && (
                       <button
@@ -250,6 +258,11 @@ export default function BarberDocumentsPage() {
         </div>
 
         {/* Submit Button */}
+        {submitError && (
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 mb-3">
+            {submitError}
+          </div>
+        )}
         <button
           onClick={handleSubmit}
           disabled={!canSubmit || submitting}

@@ -10,18 +10,14 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const _POST = withErrorHandling(async (request: NextRequest) => {
   const supabase = await createClient();
-  
-  // Sign out
+
   const { error } = await supabase.auth.signOut();
 
   if (error) {
-    throw APIErrors.external('Supabase Auth');
+    return NextResponse.redirect(new URL('/login?error=signout-failed', request.url), 303);
   }
 
-  return NextResponse.json({
-    success: true,
-    message: 'Signed out successfully',
-  });
+  return NextResponse.redirect(new URL('/', request.url), 303);
 });
 
 export const runtime = 'nodejs';

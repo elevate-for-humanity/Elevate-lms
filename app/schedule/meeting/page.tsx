@@ -69,6 +69,7 @@ function formatDateFull(date: Date): string {
 
 export default function ScheduleMeetingPage() {
   const [step, setStep] = useState(1);
+  const [submitError, setSubmitError] = useState('');
   const [meetingType, setMeetingType] = useState<MeetingType | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -79,13 +80,15 @@ export default function ScheduleMeetingPage() {
     notes: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState<boolean | 'soft'>(false);
 
   const availableDates = getNextTwoWeeks();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+
+    setSubmitError('');
 
     try {
       const response = await fetch('/api/booking/schedule', {
@@ -96,31 +99,49 @@ export default function ScheduleMeetingPage() {
           meetingType,
           date: selectedDate?.toISOString(),
           time: selectedTime,
-          duration: 60, // 1 hour
+          duration: 60,
         }),
       });
 
-      if (response.ok) {
+      const data = await response.json();
+
+      if (!response.ok) {
+        setSubmitError(data.error || 'Booking failed. Please call (317) 314-3757.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // dbSaved=false means the record was not persisted — show a softer confirmation
+      // so the user knows to expect a follow-up rather than a guaranteed slot
+      if (!data.dbSaved) {
+        setSubmitted('soft');
+      } else {
         setSubmitted(true);
       }
-    } catch (error) {
-      console.error('Booking error:', error);
+    } catch {
+      setSubmitError('Unable to submit. Please try again or call (317) 314-3757.');
     }
 
     setIsSubmitting(false);
   };
 
   if (submitted) {
+    const isConfirmed = submitted === true;
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
           <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-500 flex-shrink-0">•</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Meeting Scheduled!</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            {isConfirmed ? 'Meeting Scheduled!' : 'Request Received'}
+          </h1>
           <p className="text-gray-600 mb-6">
-            Your {meetingType === 'virtual' ? 'virtual meeting' : 'phone call'} has been scheduled for:
+            {isConfirmed
+              ? `Your ${meetingType === 'virtual' ? 'virtual meeting' : 'phone call'} has been scheduled for:`
+              : 'We received your request and will confirm your meeting within 1 business day. If the requested time is unavailable, we will suggest alternatives.'}
           </p>
+          {isConfirmed && (
           <div className="bg-white rounded-xl p-4 mb-6">
             <p className="font-semibold text-gray-900">{selectedDate && formatDateFull(selectedDate)}</p>
             <p className="text-gray-600">
@@ -130,8 +151,11 @@ export default function ScheduleMeetingPage() {
               {meetingType === 'virtual' ? 'Via Google Meet' : 'We will call you'}
             </p>
           </div>
+          )}
           <p className="text-sm text-gray-600 mb-6">
-            A confirmation email has been sent to <strong>{formData.email}</strong>
+            {isConfirmed
+              ? <>A confirmation email has been sent to <strong>{formData.email}</strong></>
+              : <>Questions? Call us at <strong>(317) 314-3757</strong></>}
           </p>
           <div className="flex flex-col gap-3">
             <Link
@@ -435,6 +459,11 @@ export default function ScheduleMeetingPage() {
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back
                 </button>
+                {submitError && (
+                  <div className="w-full rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                    {submitError}
+                  </div>
+                )}
                 <button
                   type="submit"
                   disabled={isSubmitting}

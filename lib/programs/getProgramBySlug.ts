@@ -6,7 +6,7 @@
  * No fallbacks. No static file imports.
  */
 
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -84,7 +84,7 @@ export type ProgramRecord = {
 // ─── Repository ───────────────────────────────────────────────────────────────
 
 export async function getPublishedProgramBySlug(slug: string): Promise<ProgramRecord> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   const { data, error } = await supabase
     .from('programs')

@@ -260,7 +260,12 @@ export default async function CoursePage({ params }: { params: Params }) {
                 </ul>
               </div>
             </div>
-            <h2 className="text-lg font-extrabold text-slate-900 mb-4">Course Content</h2>
+            <div className="mb-4">
+              <h2 className="text-lg font-extrabold text-slate-900">Course Curriculum</h2>
+              <p className="text-sm text-slate-500 mt-1">
+                {modules.length} modules · {allLessons.length} lessons · {totalHours > 0 ? `${totalHours}+ hours` : `${remainingMinutes}m`} of training
+              </p>
+            </div>
             {modules.length > 0 ? (
               <CourseModuleAccordion
                 modules={modules}

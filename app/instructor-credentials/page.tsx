@@ -71,7 +71,7 @@ const PROGRAM_CREDENTIALS = [
     regulatoryBody: 'FMCSA (Federal Motor Carrier Safety Administration) / Indiana BMV',
   },
   {
-    program: 'Building Technician with HVAC Fundamentals',
+    program: 'HVAC Technician',
     occupation: 'HVAC Installer / Maintenance Technician',
     credentialPartner: 'Authorized Testing Partner',
     instructorRequirements: [

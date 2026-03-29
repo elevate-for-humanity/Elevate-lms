@@ -203,18 +203,18 @@ export const barberVisuals: PageVisualConfig = {
 // HVAC / BUILDING TECH VISUALS
 // ----------------------
 export const hvacVisuals: PageVisualConfig = {
-  slug: "hvac-building-technician",
+  slug: "hvac-technician",
   heroes: [
     {
       id: "hvac-hero-main",
       imageSrc: "/images/pages/training-classroom.jpg",
       imageAlt: "HVAC learner working on an outdoor unit.",
       eyebrow: "Skilled Trades",
-      title: "HVAC & Building Technician Pathway",
+      title: "HVAC Technician Training",
       subtitle:
-        "Heating, ventilation, and air conditioning basics aligned with employer needs.",
-      ctaLabel: "Explore HVAC Pathway",
-      ctaHref: "/programs/hvac-building-technician",
+        "Heating, ventilation, and air conditioning training aligned with employer needs.",
+      ctaLabel: "Explore HVAC Program",
+      ctaHref: "/programs/hvac-technician",
     },
     {
       id: "hvac-hero-earn",

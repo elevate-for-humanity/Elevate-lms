@@ -45,7 +45,7 @@ export const NAV_REGISTRY: NavCategory[] = [
     // Featured programs for mega menu
     featured: [
       { label: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
-      { label: 'Building Technician with HVAC Fundamentals', href: '/programs/hvac-technician' },
+      { label: 'HVAC Technician', href: '/programs/hvac-technician' },
       { label: 'Direct Support Professional', href: '/programs/direct-support-professional' },
     ],
   },

@@ -80,7 +80,7 @@ interface Testimonial {
 export const programs: Program[] = [
   {
     slug: 'hvac-technician',
-    name: 'Building Technician with HVAC Fundamentals',
+    name: 'HVAC Technician',
     heroTitle: 'HVAC Technician Career Training',
     heroSubtitle:
       'Install, maintain, and repair heating and cooling systems. Earn EPA 608 Universal certification — proctored on-site at our approved testing facility. 6–8 weeks classroom plus 2–4 weeks hands-on training.',

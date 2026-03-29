@@ -32,7 +32,7 @@ export const mainNavigation: NavItem[] = [
           { label: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
           { label: 'HVAC Technician', href: '/programs/hvac-technician' },
           { label: 'Building Maintenance', href: '/programs/building-maintenance' },
-          { label: 'Building Technician', href: '/programs/building-technician' },
+          { label: 'HVAC Technician', href: '/programs/hvac-technician' },
         ]
       },
       {

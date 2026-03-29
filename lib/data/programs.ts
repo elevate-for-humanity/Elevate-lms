@@ -106,7 +106,7 @@ function getDefaultHeroImage(slug: string): string {
     cna: '/images/pages/cna-clinical.jpg',
     cdl: '/images/pages/cdl-truck-highway.jpg',
     'building-maintenance': '/images/pages/hvac-tools.jpg',
-    'building-technician': '/images/pages/electrical.jpg',
+    'hvac-technician': '/images/pages/programs-hvac-course-hero.jpg',
     'workforce-readiness': '/images/pages/workforce-training.jpg',
   };
 

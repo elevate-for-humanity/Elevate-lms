@@ -71,7 +71,7 @@ const PROGRAMS = [
     nextStep: 'After licensure, many barbers open their own shops. Others pursue cosmetology cross-licensing, instructor certification, or build a client base at an established shop.',
   },
   {
-    name: 'Building Technician with HVAC Fundamentals',
+    name: 'HVAC Technician',
     image: '/images/pages/hvac-technician.jpg',
     href: '/programs/hvac-technician',
     credential: 'EPA Section 608 Certification + OSHA 30-Hour Safety Certification',

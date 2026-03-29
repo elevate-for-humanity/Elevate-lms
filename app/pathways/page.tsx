@@ -112,7 +112,7 @@ const PROGRAMS = [
     desc: 'DOL Registered Apprenticeship. You train at a real barbershop under a licensed instructor. You learn fades, tapers, lineups, shaving, beard grooming, sanitation, client consultation, and business management. Elevate coordinates apprenticeship registration and compliance paperwork.',
   },
   {
-    name: 'Building Technician with HVAC Fundamentals',
+    name: 'HVAC Technician',
     image: '/images/pages/hvac-technician.jpg',
     href: '/programs/hvac-technician',
     duration: '12–16 weeks',

@@ -31,7 +31,7 @@ export default async function EnrollmentPage() {
   ];
 
   const featured = [
-    { name: 'Building Technician with HVAC Fundamentals', hours: '400+', weeks: '12', credentials: '6', href: '/apply/student?program=hvac-technician', image: '/images/pages/hvac-technician.jpg' },
+    { name: 'HVAC Technician', hours: '400+', weeks: '12', credentials: '6', href: '/apply/student?program=hvac-technician', image: '/images/pages/hvac-technician.jpg' },
     { name: 'Electrical Apprenticeship', hours: '400+', weeks: '20', credentials: '4', href: '/apply/student?program=electrical', image: '/images/pages/hvac-technician.jpg' },
     { name: 'Plumbing Apprenticeship', hours: '400+', weeks: '20', credentials: '4', href: '/apply/student?program=plumbing', image: '/images/pages/hvac-technician.jpg' },
     { name: 'Forklift Operator', hours: '40', weeks: '1', credentials: '2', href: '/apply/student?program=forklift', image: '/images/pages/apply-page-1.jpg' },

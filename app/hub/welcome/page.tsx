@@ -84,7 +84,7 @@ export default async function HubWelcomePage() {
     },
     {
       name: 'Trades Apprentice',
-      program: 'Building Technician with HVAC Fundamentals',
+      program: 'HVAC Technician',
       quote: 'I could see my progress every day. The system kept me accountable and on schedule.',
       image: '/images/pages/comp-universal-hero.jpg',
     },

@@ -34,7 +34,7 @@ export default async function TuitionFeesPage() {
     { name: 'Nail Technician Apprenticeship', duration: '24 weeks', tuition: 0, examFees: 75, examFeesNote: 'Indiana PSI nail tech exam', materials: 0, fundingType: 'DOL Registered Apprenticeship' },
     { name: 'CNA Certification', duration: '6 weeks', tuition: 0, examFees: 115, examFeesNote: 'Pearson VUE CNA exam', materials: 0, fundingType: 'WIOA / WRG Eligible' },
     { name: 'CDL Training (Class A)', duration: '4 weeks', tuition: 0, examFees: 50, examFeesNote: 'Indiana BMV CDL skills test', materials: 0, fundingType: 'WIOA / WRG Eligible' },
-    { name: 'Building Technician with HVAC Fundamentals', duration: '12 weeks', tuition: 0, examFees: 0, examFeesNote: 'EPA 608 exam — contact admissions for current fee schedule', materials: 0, fundingType: 'WIOA / WRG Eligible' },
+    { name: 'HVAC Technician', duration: '12 weeks', tuition: 0, examFees: 0, examFeesNote: 'EPA 608 exam — contact admissions for current fee schedule', materials: 0, fundingType: 'WIOA / WRG Eligible' },
     { name: 'Electrical Technician', duration: '12 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA / WRG Eligible' },
     { name: 'Plumbing Technician', duration: '12 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA / WRG Eligible' },
     { name: 'Welding', duration: '10 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA / WRG Eligible' },

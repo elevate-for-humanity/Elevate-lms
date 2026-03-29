@@ -192,8 +192,11 @@ export default async function CoursePage({ params }: { params: Params }) {
           <h1 className="text-3xl sm:text-5xl font-extrabold text-white leading-tight drop-shadow-lg mb-3">
             {course.title}
           </h1>
-          <p className="text-base sm:text-lg text-white/80 font-medium max-w-2xl leading-relaxed mb-5">
-            Complete this program and you'll be EPA 608 certified — the federal credential required to purchase and handle regulated refrigerants, and a baseline requirement for employment at any HVAC company.
+          <p className="text-base sm:text-lg text-white/80 font-medium max-w-2xl leading-relaxed mb-4">
+            Complete this program and you'll be EPA 608 certified — required to handle regulated refrigerants and a baseline credential for HVAC employment.
+          </p>
+          <p className="text-sm text-white/60 max-w-2xl mb-5">
+            Prepares you for entry-level HVAC technician positions. Aligned with residential and light commercial roles.
           </p>
           <div className="flex flex-wrap items-center gap-3">
             {isEnrolled && nextLesson ? (
@@ -222,8 +225,8 @@ export default async function CoursePage({ params }: { params: Params }) {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
               { icon: Thermometer, color: 'text-brand-orange-400', title: 'Install & Service Systems', body: 'Residential and commercial HVAC — heating, cooling, ventilation, and refrigeration systems.' },
-              { icon: BadgeCheck,  color: 'text-amber-400',        title: 'EPA 608 Certified',         body: 'Required by federal law to handle refrigerants. A baseline requirement at every HVAC employer.' },
-              { icon: DollarSign,  color: 'text-green-400',        title: '$45K–$75K in Indiana',      body: 'BLS median for HVAC technicians in Indiana. Experienced techs and union roles go higher.' },
+              { icon: BadgeCheck,  color: 'text-amber-400',        title: 'EPA 608 Certified',         body: 'Required by federal law to handle refrigerants. A standard requirement for HVAC technicians and widely expected by employers.' },
+              { icon: DollarSign,  color: 'text-green-400',        title: '$45K–$75K+ in Indiana',     body: 'Typical HVAC wages in Indiana range from ~$45K to $75K+, depending on experience and certification (BLS).' },
             ].map(({ icon: Icon, color, title, body }) => (
               <div key={title} className="flex items-start gap-3">
                 <div className={`w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5`}>
@@ -274,9 +277,9 @@ export default async function CoursePage({ params }: { params: Params }) {
               <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Credentials You'll Earn</p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[
-                  { icon: BadgeCheck, color: 'bg-amber-500',        label: 'EPA 608 Universal',    sub: 'Federal credential — required to purchase and handle regulated refrigerants' },
+                  { icon: BadgeCheck, color: 'bg-amber-500',        label: 'EPA 608 Universal',    sub: 'Federal credential — required to handle regulated refrigerants' },
                   { icon: Shield,     color: 'bg-orange-600',        label: 'OSHA 10',              sub: 'DOL-issued Construction Safety card' },
-                  { icon: Award,      color: 'bg-brand-blue-600',    label: 'CPR / First Aid',      sub: 'Industry-standard certification included' },
+                  { icon: Award,      color: 'bg-brand-blue-600',    label: 'CPR / First Aid',      sub: 'Certification included (industry-recognized provider)' },
                 ].map(({ icon: Icon, color, label, sub }) => (
                   <div key={label} className="flex items-start gap-3 bg-white/5 rounded-lg p-3 border border-white/10">
                     <div className={`w-8 h-8 rounded-lg ${color} flex items-center justify-center flex-shrink-0`}>
@@ -295,7 +298,7 @@ export default async function CoursePage({ params }: { params: Params }) {
             <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
               <h2 className="text-base font-extrabold text-slate-900 mb-2">About This Program</h2>
               <p className="text-slate-700 text-sm leading-relaxed">
-                This is a workforce training program — not a survey course. You'll learn to diagnose, install, and service real HVAC systems, then sit for the EPA 608 Universal exam. WIOA funding is available for eligible students; no out-of-pocket cost for those who qualify.
+                This is a workforce training program — not a survey course. You'll learn to diagnose, install, and service real HVAC systems, then sit for the EPA 608 Universal exam. WIOA funding is available for eligible participants — no out-of-pocket cost for those who qualify.
               </p>
               {(course.description || course.short_description) && (
                 <p className="text-slate-500 text-sm leading-relaxed mt-2">
@@ -422,7 +425,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                 </div>
               ) : (
                 <div className="p-5">
-                  <p className="text-xs text-slate-500 mb-3 text-center">Funding available through WIOA &amp; DOL</p>
+                  <p className="text-xs text-slate-500 mb-3 text-center">WIOA funding available for eligible participants</p>
                   <Link href={`/lms/courses/${courseId}/enroll`}
                     className="w-full flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white py-3.5 rounded-xl font-bold transition text-sm">
                     Apply Now — Free
@@ -457,9 +460,9 @@ export default async function CoursePage({ params }: { params: Params }) {
               <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">After Completion</p>
               <div className="space-y-3">
                 {[
-                  { icon: TrendingUp, color: 'text-green-400',  text: 'Qualified for entry-level HVAC roles upon certification' },
+                  { icon: TrendingUp, color: 'text-green-400',  text: 'Prepares for entry-level HVAC technician positions in residential and light commercial settings' },
                   { icon: MapPin,     color: 'text-blue-400',   text: 'Strong demand across Indiana — residential, commercial, and industrial' },
-                  { icon: DollarSign, color: 'text-amber-400',  text: '$45K–$75K median range in Indiana (BLS)' },
+                  { icon: DollarSign, color: 'text-amber-400',  text: '~$45K–$75K+ typical range in Indiana, depending on experience (BLS)' },
                 ].map(({ icon: Icon, color, text }) => (
                   <div key={text} className="flex items-start gap-2.5">
                     <Icon className={`w-4 h-4 flex-shrink-0 mt-0.5 ${color}`} />

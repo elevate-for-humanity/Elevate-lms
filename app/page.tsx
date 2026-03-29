@@ -33,8 +33,9 @@ export default function HomePage() {
         <div className="relative h-72 sm:h-96 lg:h-auto min-h-[560px] overflow-hidden bg-slate-900">
           <HeroVideoBg
             src="/videos/homepage-hero-new.mp4"
+            audioSrc="/videos/homepage-hero-new.mp3"
             poster="/images/pages/about-career-training.jpg"
-            caption="At Elevate for Humanity, education changes your life — without debt. Our programs connect you to JRI, WRG, WIOA, and registered apprenticeships for free training and paid opportunities. Train online, practice hands-on, earn while you learn. From healthcare to trades to technology — we offer stacked credentials and real career pathways. You don't need perfect circumstances — just the courage to begin. Apply today at ElevateForHumanity.org"
+            caption="Welcome to Elevate For Humanity — where opportunity, training, and community come together to change lives. Approved for WIOA, Workforce Ready Grant, Registered Apprenticeship, and industry-recognized credentials. Whether you're starting fresh, leveling up, or reinventing your path — Elevate For Humanity is where your journey begins. Enroll today at ElevateForHumanity.org"
           />
           <div className="absolute inset-0 bg-slate-900/30 pointer-events-none" />
         </div>

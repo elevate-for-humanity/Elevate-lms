@@ -6,20 +6,24 @@ import { Volume2, VolumeX } from 'lucide-react';
 interface HeroVideoBgProps {
   src: string;
   poster?: string;
-  /** Voiceover caption shown when unmuted. Pass the short 30-sec script. */
+  /** Separate MP3 voiceover — played in sync with the video when unmuted */
+  audioSrc?: string;
+  /** Caption text shown when unmuted */
   caption?: string;
 }
 
 /**
  * Full-bleed background video for hero sections.
  *
- * - Starts muted (browser autoplay requirement)
- * - Mute/unmute button always visible — bottom-right
- * - When unmuted, shows a caption strip with the voiceover script
+ * - Video autoplays muted (browser requirement)
+ * - Separate MP3 voiceover synced via audioSrc prop
+ * - Unmute button starts the audio track from the beginning
+ * - Caption strip shown when unmuted
  * - Respects prefers-reduced-motion (shows poster only)
  */
-export function HeroVideoBg({ src, poster, caption }: HeroVideoBgProps) {
+export function HeroVideoBg({ src, poster, audioSrc, caption }: HeroVideoBgProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const [muted, setMuted] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -32,7 +36,7 @@ export function HeroVideoBg({ src, poster, caption }: HeroVideoBgProps) {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  // Autoplay on mount — hero is always above the fold
+  // Autoplay video on mount
   useEffect(() => {
     if (reducedMotion || failed) return;
     videoRef.current?.play().catch(() => {});
@@ -40,10 +44,24 @@ export function HeroVideoBg({ src, poster, caption }: HeroVideoBgProps) {
 
   function toggleMute() {
     const v = videoRef.current;
+    const a = audioRef.current;
     if (!v) return;
-    v.muted = !v.muted;
-    if (!v.muted && v.paused) v.play().catch(() => {});
-    setMuted(v.muted);
+
+    if (muted) {
+      // Start audio from beginning, synced to video position
+      if (a) {
+        a.currentTime = v.currentTime;
+        a.play().catch(() => {});
+      }
+      if (v.paused) v.play().catch(() => {});
+      setMuted(false);
+    } else {
+      if (a) {
+        a.pause();
+        a.currentTime = 0;
+      }
+      setMuted(true);
+    }
   }
 
   if (reducedMotion || failed) {
@@ -67,10 +85,20 @@ export function HeroVideoBg({ src, poster, caption }: HeroVideoBgProps) {
         onError={() => setFailed(true)}
       />
 
-      {/* Mute toggle — always visible, prominent */}
+      {/* Separate voiceover audio track — not looped, plays once per unmute */}
+      {audioSrc && (
+        <audio
+          ref={audioRef}
+          src={audioSrc}
+          preload="metadata"
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Mute toggle */}
       <button
         onClick={toggleMute}
-        aria-label={muted ? 'Unmute video' : 'Mute video'}
+        aria-label={muted ? 'Unmute voiceover' : 'Mute voiceover'}
         title={muted ? 'Click to hear the voiceover' : 'Mute'}
         className="absolute bottom-4 right-4 z-20 flex items-center gap-2 bg-black/60 hover:bg-black/80 text-white text-xs font-semibold px-3 py-2 rounded-full transition-colors backdrop-blur-sm border border-white/20"
       >
@@ -87,7 +115,7 @@ export function HeroVideoBg({ src, poster, caption }: HeroVideoBgProps) {
         )}
       </button>
 
-      {/* Caption strip — shown when unmuted and a script is provided */}
+      {/* Caption strip — shown when unmuted */}
       {caption && !muted && (
         <div className="absolute bottom-16 left-4 right-20 z-20 pointer-events-none">
           <p className="bg-black/75 text-white text-xs sm:text-sm leading-relaxed px-4 py-3 rounded-lg backdrop-blur-sm max-w-xl">

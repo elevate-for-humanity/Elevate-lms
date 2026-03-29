@@ -9,11 +9,11 @@ export function ProgramComingSoon({ title, slug }: { title: string; slug: string
     <main className="min-h-screen bg-white flex items-center justify-center px-6">
       <div className="max-w-lg text-center">
         <p className="text-sm font-semibold uppercase tracking-widest text-slate-400 mb-3">
-          Coming Soon
+          Enrollment Opening Soon
         </p>
         <h1 className="text-3xl font-bold text-slate-900">{title}</h1>
         <p className="mt-4 text-slate-600 leading-relaxed">
-          We&apos;re finishing the details for this program. Check back soon or contact us to learn more.
+          We&apos;re finalizing enrollment details for this program. Contact us to get on the list or learn more about start dates.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link

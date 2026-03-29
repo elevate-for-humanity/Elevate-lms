@@ -135,12 +135,20 @@ export default async function CoursePage({ params }: { params: Params }) {
   const isEnrolled = !!enrollment && !isPendingApproval;
 
   // Derive activity types actually present across all lessons from DB records.
-  // Only show what exists — no static marketing claims.
+  // activities is stored as JSONB — either {video:true, reading:true, ...}
+  // or [{type:'video'}, ...]. Handle both shapes.
   const activityTypeSet = new Set<string>();
   for (const l of allLessons) {
+    if (!l.activities) continue;
     if (Array.isArray(l.activities)) {
+      // Array shape: [{type:'video'}, ...]
       for (const a of l.activities) {
         if (a?.type) activityTypeSet.add(a.type);
+      }
+    } else if (typeof l.activities === 'object') {
+      // Object shape: {video: true, reading: true, ...}
+      for (const [key, val] of Object.entries(l.activities)) {
+        if (val) activityTypeSet.add(key);
       }
     }
   }
@@ -223,6 +231,14 @@ export default async function CoursePage({ params }: { params: Params }) {
 
           {/* MODULE ACCORDION */}
           <div className="lg:col-span-2">
+            {(course.description || course.short_description) && (
+              <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
+                <h2 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-2">About This Course</h2>
+                <p className="text-slate-700 text-sm leading-relaxed">
+                  {course.short_description || course.description}
+                </p>
+              </div>
+            )}
             <h2 className="text-lg font-extrabold text-slate-900 mb-4">Course Content</h2>
             {modules.length > 0 ? (
               <CourseModuleAccordion

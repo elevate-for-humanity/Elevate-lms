@@ -1,4 +1,5 @@
 "use client";
+import { useRef } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Download, Share2, Award } from 'lucide-react';
@@ -14,17 +15,65 @@ export default function CertificateGenerator({
   completionDate = new Date().toLocaleDateString(),
   certificateId = 'CERT-' + Date.now(),
 }: CertificateGeneratorProps = {}) {
+  const certRef = useRef<HTMLDivElement>(null);
+
   const handleDownload = () => {
-    // Generate PDF certificate
-    //
+    // Open a print dialog scoped to just the certificate element.
+    // The browser's "Save as PDF" option produces a clean PDF without
+    // needing a server-side renderer or third-party library.
+    const printWindow = window.open('', '_blank', 'width=900,height=650');
+    if (!printWindow || !certRef.current) return;
+
+    const styles = Array.from(document.styleSheets)
+      .flatMap((sheet) => {
+        try {
+          return Array.from(sheet.cssRules).map((r) => r.cssText);
+        } catch {
+          return [];
+        }
+      })
+      .join('\n');
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Certificate — ${courseName}</title>
+          <style>${styles}</style>
+          <style>
+            @media print { body { margin: 0; } }
+            body { font-family: Arial, sans-serif; }
+          </style>
+        </head>
+        <body>${certRef.current.outerHTML}</body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    // Small delay lets styles load before the dialog opens
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 300);
   };
+
   const handleShare = () => {
-    // Share to LinkedIn, etc.
-    //
+    // Deep-link to LinkedIn's share dialog pre-filled with certificate details.
+    // LinkedIn's certification add flow requires their API; this opens the
+    // profile share as the closest publicly available option.
+    const text = encodeURIComponent(
+      `I just completed "${courseName}" through Elevate for Humanity! Certificate ID: ${certificateId}`,
+    );
+    const url = encodeURIComponent('https://www.elevateforhumanity.org');
+    window.open(
+      `https://www.linkedin.com/sharing/share-offsite/?url=${url}&summary=${text}`,
+      '_blank',
+      'noopener,noreferrer,width=600,height=500',
+    );
   };
   return (
     <div className="space-y-6">
-      <Card className="border-4 border-brand-red-600">
+      <Card ref={certRef} className="border-4 border-brand-red-600">
         <CardContent className="p-12 text-center">
           <div className="mb-8">
             <Award className="mx-auto text-brand-orange-600" size={64} />

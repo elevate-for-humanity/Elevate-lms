@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Turnstile from '@/components/Turnstile';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
+import { validatePassword } from '@/lib/auth/password-validation';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,6 +28,35 @@ function SignupFormContent() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string>('');
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSent, setResendSent] = useState(false);
+
+  const handlePasswordChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, password: value }));
+    if (value.length === 0) {
+      setPasswordErrors([]);
+      return;
+    }
+    const result = validatePassword(value);
+    setPasswordErrors(result.valid ? [] : result.errors);
+  };
+
+  const handleResendVerification = async () => {
+    setResendLoading(true);
+    try {
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      );
+      await supabase.auth.resend({ type: 'signup', email: formData.email });
+      setResendSent(true);
+    } catch {
+      // best-effort — don't surface errors to avoid email enumeration
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +71,6 @@ function SignupFormContent() {
     }
 
     // Validate password strength (NIST 800-63B)
-    const { validatePassword } = await import('@/lib/auth/password-validation');
     const passwordCheck = validatePassword(formData.password);
     if (!passwordCheck.valid) {
       setError(passwordCheck.errors[0]);
@@ -138,12 +167,21 @@ function SignupFormContent() {
           <p className="text-sm text-gray-600 mb-6">
             Once verified, you will be taken directly to your onboarding portal based on your selected role.
           </p>
-          <Link
-            href="/login"
-            className="inline-block px-6 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700"
-          >
-            Already verified? Go to Login
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              href="/login"
+              className="inline-block px-6 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700"
+            >
+              Already verified? Go to Login
+            </Link>
+            <button
+              onClick={handleResendVerification}
+              disabled={resendLoading || resendSent}
+              className="px-6 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {resendSent ? 'Email resent ✓' : resendLoading ? 'Sending…' : 'Resend verification email'}
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -239,19 +277,36 @@ function SignupFormContent() {
             type="password"
             id="password"
             value={formData.password}
-            onChange={(
-              e: React.ChangeEvent<
-                HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-              >
-            ) => setFormData({ ...formData, password: e.target.value })}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handlePasswordChange(e.target.value)
+            }
             required
             minLength={8}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+            aria-describedby="password-requirements"
+            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent ${
+              passwordErrors.length > 0
+                ? 'border-brand-red-400 bg-brand-red-50'
+                : formData.password.length >= 8
+                ? 'border-brand-green-400'
+                : 'border-gray-300'
+            }`}
             placeholder="••••••••"
           />
-          <p className="mt-1 text-xs text-black">
-            Must be at least 8 characters
-          </p>
+          <div id="password-requirements" className="mt-1 space-y-0.5">
+            {passwordErrors.length > 0 ? (
+              passwordErrors.map((err) => (
+                <p key={err} className="text-xs text-brand-red-600 flex items-center gap-1">
+                  <span aria-hidden="true">✕</span> {err}
+                </p>
+              ))
+            ) : formData.password.length >= 8 ? (
+              <p className="text-xs text-brand-green-600 flex items-center gap-1">
+                <span aria-hidden="true">✓</span> Password looks good
+              </p>
+            ) : (
+              <p className="text-xs text-gray-500">Must be at least 8 characters</p>
+            )}
+          </div>
         </div>
 
         <div>

@@ -66,8 +66,12 @@ export default function ReportsDashboard({
 }: ReportsDashboardProps) {
   const [dateRange, setDateRange] = useState('30');
 
-  // Process enrollment trend data
+  // Process enrollment trend data filtered by selected date range
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - parseInt(dateRange, 10));
+
   const enrollmentTrendData = recentEnrollments
+    .filter((e) => new Date(e.created_at) >= cutoff)
     .reduce((acc: Array<{ date: string; enrollments: number }>, enrollment) => {
       const date = new Date(enrollment.created_at).toLocaleDateString();
       const existing = acc.find((item) => item.date === date);
@@ -78,7 +82,7 @@ export default function ReportsDashboard({
       }
       return acc;
     }, [])
-    .slice(-7); // Last 7 days
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   // Process status distribution
   const statusData = [
@@ -214,11 +218,30 @@ export default function ReportsDashboard({
       </div>
 
       {/* Charts Row 1 */}
+      {/* Date range selector */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-gray-900">Trends</h2>
+        <div className="flex items-center gap-2">
+          <label htmlFor="date-range" className="text-sm text-gray-600">Period:</label>
+          <select
+            id="date-range"
+            value={dateRange}
+            onChange={(e) => setDateRange(e.target.value)}
+            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-blue-500"
+          >
+            <option value="7">Last 7 days</option>
+            <option value="30">Last 30 days</option>
+            <option value="90">Last 90 days</option>
+            <option value="365">Last year</option>
+          </select>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Enrollment Trend */}
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <h3 className="text-lg font-semibold mb-4">
-            Enrollment Trend (Last 7 Days)
+            Enrollment Trend (Last {dateRange} days)
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={enrollmentTrendData}>

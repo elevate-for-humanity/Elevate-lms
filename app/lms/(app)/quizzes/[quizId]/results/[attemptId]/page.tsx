@@ -128,9 +128,9 @@ export default async function QuizResultsPage({ params }: Props) {
 
         {/* Results Header */}
         <div className={`rounded-2xl p-8 mb-8 ${
-          passed 
-            ? 'bg-slate-700' 
-            : 'bg-slate-700'
+          passed
+            ? 'bg-emerald-700'
+            : 'bg-brand-red-700'
         } text-white`}>
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -140,7 +140,7 @@ export default async function QuizResultsPage({ params }: Props) {
               )}
             </div>
             <div className={`w-20 h-20 rounded-full flex items-center justify-center ${
-              passed ? 'bg-white/20' : 'bg-white/20'
+              passed ? 'bg-emerald-600' : 'bg-brand-red-600'
             }`}>
               {passed ? (
                 <Trophy className="w-10 h-10" />
@@ -153,8 +153,8 @@ export default async function QuizResultsPage({ params }: Props) {
           <div className="text-center py-6">
             <p className="text-white/80 text-lg mb-2">Your Score</p>
             <p className="text-7xl font-bold mb-2">{score}%</p>
-            <p className="text-xl">
-              {passed ? 'Congratulations! You passed!' : `You need ${passingScore}% to pass`}
+            <p className="text-xl font-semibold">
+              {passed ? '✓ You passed!' : `✕ You need ${passingScore}% to pass`}
             </p>
           </div>
 

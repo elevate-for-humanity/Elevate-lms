@@ -308,7 +308,7 @@ export default function HvacCourseHome({
               HVAC Technician<br />Certification Pathway
             </h1>
             <p className="text-white/60 text-base md:text-lg mt-4 max-w-lg leading-relaxed">
-              12-week structured workforce pathway. EPA 608 Universal, OSHA 30, CPR/AED, and employer placement.
+              12-week structured workforce pathway. EPA 608 Universal, OSHA 10, CPR/AED, and employer placement.
             </p>
             <div className="flex flex-wrap items-center gap-3 mt-8">
               <Link href={continueUrl}
@@ -366,7 +366,7 @@ export default function HvacCourseHome({
                 bg: 'bg-brand-blue-50', border: 'border-brand-blue-200', accent: 'text-brand-blue-700', check: 'text-brand-blue-500',
               },
               {
-                name: 'OSHA 30-Hour Construction',
+                name: 'OSHA 10-Hour Construction',
                 issuer: 'Occupational Safety & Health Administration',
                 desc: 'Industry-standard safety certification covering fall protection, electrical safety, HazCom, and PPE.',
                 bg: 'bg-brand-red-50', border: 'border-brand-red-200', accent: 'text-brand-red-700', check: 'text-brand-red-500',
@@ -595,9 +595,9 @@ export default function HvacCourseHome({
                 <ul className="space-y-3">
                   {[
                     'EPA Section 608 Universal — all equipment types',
-                    'OSHA 30-Hour Construction Safety (DOL card)',
+                    'OSHA 10-Hour Construction Safety (DOL card)',
                     'Nationally accredited CPR/First Aid/AED',
-                    'NRF Rise Up Retail Industry Fundamentals',
+
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-2.5 text-sm text-slate-300">
                       <CheckCircle className="w-4 h-4 text-brand-green-400 mt-0.5 flex-shrink-0" />

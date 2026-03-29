@@ -6,7 +6,7 @@ import { getCourseBySlug } from '@/lib/courses/definitions';
 
 export const metadata: Metadata = {
   title: 'HVAC Technician Curriculum | Elevate for Humanity',
-  description: 'Full HVAC Technician course curriculum — 16 modules, 88 lessons. EPA 608 Universal, OSHA 30, Residential HVAC Certifications, CPR, Rise Up.',
+  description: 'Full HVAC Technician course curriculum — 10 modules. EPA 608 Universal, OSHA 10, Residential HVAC Certifications, CPR/First Aid.',
 };
 
 export default function HVACCurriculumPage() {
@@ -72,7 +72,7 @@ export default function HVACCurriculumPage() {
         <div className="mt-6 bg-white rounded-lg p-4">
           <h2 className="text-sm font-bold text-slate-500 uppercase mb-2">Credentials Earned Upon Completion</h2>
           <div className="flex flex-wrap gap-2">
-            {['EPA 608 Universal', 'Residential HVAC Cert 1', 'Residential HVAC Cert 2', 'OSHA 30', 'CPR', 'Rise Up'].map((c) => (
+            {['EPA 608 Universal', 'OSHA 10', 'CPR / First Aid'].map((c) => (
               <span key={c} className="bg-white border border-slate-200 text-slate-700 text-sm px-3 py-1 rounded">{c}</span>
             ))}
           </div>

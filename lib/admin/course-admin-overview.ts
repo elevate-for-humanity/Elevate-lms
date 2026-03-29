@@ -44,19 +44,20 @@ export async function getAdminCoursesOverview(): Promise<AdminCourseOverview[]> 
       .map(bp => [bp.programSlug, bp])
   );
 
-  // Load all training_courses with their linked program slug
+  // Load all courses from the canonical table with their linked program slug
   const { data: courses, error } = await supabase
-    .from('training_courses')
+    .from('courses')
     .select(`
       id,
       slug,
-      course_name,
+      title,
       program_id,
       is_active,
+      status,
       updated_at,
       programs ( slug )
     `)
-    .order('course_name', { ascending: true });
+    .order('title', { ascending: true });
 
   if (error) {
     // Log but don't throw — a broken courses panel must not crash the dashboard
@@ -81,17 +82,16 @@ export async function getAdminCoursesOverview(): Promise<AdminCourseOverview[]> 
     const programSlug = (c.programs as { slug: string } | null)?.slug ?? null;
     const bp = programSlug ? bpByProgramSlug.get(programSlug) : undefined;
     const actualLessons = lessonCountByCourseId.get(c.id) ?? 0;
-    // HVAC uses generation-rules (expectedLessonCount=0) — treat 95 as expected
     const expectedLessons = bp
       ? bp.expectedLessonCount > 0
         ? bp.expectedLessonCount
-        : bp.expectedModuleCount * 8 // HVAC: 11 modules × ~8 lessons
+        : bp.expectedModuleCount * 8
       : 0;
 
     return {
       id: c.id,
       slug: c.slug ?? null,
-      title: c.course_name,
+      title: c.title,
       programId: c.program_id ?? null,
       programSlug,
       blueprintSlug: bp?.credentialSlug ?? null,

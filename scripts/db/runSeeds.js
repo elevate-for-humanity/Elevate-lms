@@ -12,7 +12,7 @@ async function runSeeds() {
     process.exit(1);
   }
 
-  const client = new Client({ connectionString });
+  const client = new Client({ connectionString, ssl: { rejectUnauthorized: false } });
 
   try {
     await client.connect();

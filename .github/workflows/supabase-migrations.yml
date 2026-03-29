@@ -1,6 +1,7 @@
 name: Supabase Migrations Autopilot
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - "supabase/migrations/**"

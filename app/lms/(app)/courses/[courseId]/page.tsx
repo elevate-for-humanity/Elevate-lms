@@ -8,7 +8,8 @@ import Image from 'next/image';
 import {
   Play, Clock, BookOpen, Award, Lock, ChevronRight,
   CheckCircle, Shield, FileText, Zap, FlaskConical,
-  Brain, ClipboardList, Video,
+  Brain, ClipboardList, Video, Wrench, Thermometer, BadgeCheck,
+  TrendingUp, MapPin, DollarSign,
 } from 'lucide-react';
 import { CourseModuleAccordion } from '@/components/lms/CourseModuleAccordion';
 
@@ -167,98 +168,140 @@ export default async function CoursePage({ params }: { params: Params }) {
     <div className="min-h-screen bg-slate-50">
 
       {/* HERO */}
-      <div className="relative h-[220px] sm:h-[300px] w-full overflow-hidden bg-slate-900">
-        <Image src={heroImage} alt={course.title} fill className="object-cover object-center opacity-60" priority />
-        <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-10">
-          <nav className="flex items-center gap-1.5 text-xs text-white/60 mb-3">
-            <Link href="/lms/courses" className="hover:text-white">My Courses</Link>
+      <div className="relative h-[340px] sm:h-[440px] w-full overflow-hidden bg-slate-900">
+        <Image src={heroImage} alt={course.title} fill className="object-cover object-center opacity-50" priority />
+        {/* gradient: dark at bottom for text legibility, slight tint at top */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-slate-900/20" />
+        <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-12 max-w-5xl mx-auto w-full">
+          <nav className="flex items-center gap-1.5 text-xs text-white/50 mb-4">
+            <Link href="/lms/courses" className="hover:text-white transition">My Courses</Link>
             <ChevronRight className="w-3 h-3" />
-            <span className="text-white/80">Course Overview</span>
+            <span className="text-white/70">Program Overview</span>
           </nav>
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-white leading-tight drop-shadow">{course.title}</h1>
-          {credentialName && (
-            <div className="flex items-center gap-2 mt-2">
-              <Award className="w-4 h-4 text-amber-400" />
-              <span className="text-sm text-amber-300 font-semibold">Prepares for {credentialName}</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* STATS STRIP */}
-      <div className="bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="flex flex-wrap items-center gap-5 py-4">
-            {([
-              { icon: Clock,         label: totalHours > 0 ? `${totalHours}+ Hours of Training` : `${remainingMinutes}m` },
-              { icon: BookOpen,      label: `${allLessons.length} Lessons` },
-              { icon: ClipboardList, label: `${checkpointCount} Checkpoints` },
-              { icon: Award,         label: 'EPA 608 Certification Prep' },
-            ] as const).map(({ icon: Icon, label }) => (
-              <span key={label} className="flex items-center gap-1.5 text-sm text-slate-600 font-medium">
-                <Icon className="w-4 h-4 text-slate-400" />{label}
+          {/* Program type badge */}
+          <div className="flex items-center gap-2 mb-3">
+            <span className="inline-flex items-center gap-1.5 bg-brand-orange-500/90 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+              <Wrench className="w-3 h-3" /> Skilled Trades
+            </span>
+            {credentialName && (
+              <span className="inline-flex items-center gap-1.5 bg-amber-500/90 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                <BadgeCheck className="w-3 h-3" /> Federal Certification
               </span>
-            ))}
-            <div className="ml-auto flex items-center gap-3">
-              {isEnrolled && (
-                <div className="flex items-center gap-2">
-                  <div className="w-28 h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-brand-blue-600 rounded-full" style={{ width: `${progressPct}%` }} />
-                  </div>
-                  <span className="text-xs font-bold text-slate-700">{progressPct}%</span>
-                </div>
-              )}
-              {isEnrolled && nextLesson && (
-                <Link href={`/lms/courses/${courseId}/lessons/${nextLesson.id}`}
-                  className="flex items-center gap-1.5 bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-bold px-4 py-2 rounded-lg transition">
-                  <Play className="w-3.5 h-3.5" />{completedCount > 0 ? 'Continue' : 'Start Course'}
-                </Link>
-              )}
-              {isEnrolled && !nextLesson && (
-                <span className="flex items-center gap-1.5 text-green-700 font-bold text-sm bg-green-50 border border-green-200 px-3 py-2 rounded-lg">
-                  <CheckCircle className="w-4 h-4" /> Complete
-                </span>
-              )}
-              {!isEnrolled && !isPendingApproval && (
-                <Link href={`/lms/courses/${courseId}/enroll`}
-                  className="flex items-center gap-1.5 bg-brand-red-600 hover:bg-brand-red-700 text-white text-sm font-bold px-4 py-2 rounded-lg transition">
-                  Enroll Now
-                </Link>
-              )}
-              {enrollment && isPendingApproval && (
-                <span className="flex items-center gap-1.5 text-amber-700 font-bold text-sm bg-amber-50 border border-amber-200 px-3 py-2 rounded-lg">
-                  <Clock className="w-4 h-4" /> Pending Approval
-                </span>
-              )}
+            )}
+          </div>
+          <h1 className="text-3xl sm:text-5xl font-extrabold text-white leading-tight drop-shadow-lg mb-3">
+            {course.title}
+          </h1>
+          <p className="text-base sm:text-lg text-white/80 font-medium max-w-2xl leading-relaxed mb-5">
+            Complete this program and you'll be qualified to work on residential and commercial HVAC systems — legally certified to handle refrigerants under federal law.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            {isEnrolled && nextLesson ? (
+              <Link href={`/lms/courses/${courseId}/lessons/${nextLesson.id}`}
+                className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-500 text-white font-bold px-6 py-3 rounded-xl transition shadow-lg text-sm">
+                <Play className="w-4 h-4" />{completedCount > 0 ? 'Continue Training' : 'Start Training'}
+              </Link>
+            ) : !isEnrolled && !isPendingApproval ? (
+              <Link href={`/lms/courses/${courseId}/enroll`}
+                className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-500 text-white font-bold px-6 py-3 rounded-xl transition shadow-lg text-sm">
+                Apply Now — Free
+              </Link>
+            ) : null}
+            <div className="flex items-center gap-4 text-white/70 text-sm">
+              <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" />{totalHours > 0 ? `${totalHours}+ hrs` : `${remainingMinutes}m`}</span>
+              <span className="flex items-center gap-1.5"><BookOpen className="w-4 h-4" />{allLessons.length} lessons</span>
+              <span className="flex items-center gap-1.5"><Shield className="w-4 h-4" />{checkpointCount} checkpoints</span>
             </div>
           </div>
         </div>
       </div>
 
+      {/* OUTCOME STRIP — what you'll be able to do after this program */}
+      <div className="bg-slate-900 border-b border-slate-800">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {[
+              { icon: Thermometer, color: 'text-brand-orange-400', title: 'Install & Service Systems', body: 'Residential and commercial HVAC — heating, cooling, ventilation, and refrigeration.' },
+              { icon: BadgeCheck,  color: 'text-amber-400',        title: 'EPA 608 Certified',         body: 'Federally required to handle refrigerants. Opens doors to every HVAC employer.' },
+              { icon: DollarSign,  color: 'text-green-400',        title: '$50K–$80K Starting Range',  body: 'Median HVAC technician wage in Indiana. Demand is high and growing.' },
+            ].map(({ icon: Icon, color, title, body }) => (
+              <div key={title} className="flex items-start gap-3">
+                <div className={`w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                  <Icon className={`w-5 h-5 ${color}`} />
+                </div>
+                <div>
+                  <p className="text-white font-bold text-sm">{title}</p>
+                  <p className="text-slate-400 text-xs mt-0.5 leading-relaxed">{body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* PROGRESS BAR — enrolled users only, sits between hero and main content */}
+      {isEnrolled && (
+        <div className="bg-white border-b border-slate-200">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-4">
+            <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-full bg-brand-blue-600 rounded-full transition-all" style={{ width: `${progressPct}%` }} />
+            </div>
+            <span className="text-xs font-bold text-slate-700 whitespace-nowrap">{progressPct}% complete</span>
+            <span className="text-xs text-slate-500 whitespace-nowrap hidden sm:block">{completedCount} of {allLessons.length} lessons</span>
+            {!nextLesson && (
+              <span className="flex items-center gap-1 text-green-700 font-bold text-xs bg-green-50 border border-green-200 px-2.5 py-1 rounded-lg">
+                <CheckCircle className="w-3.5 h-3.5" /> Complete
+              </span>
+            )}
+            {enrollment && isPendingApproval && (
+              <span className="flex items-center gap-1 text-amber-700 font-bold text-xs bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-lg">
+                <Clock className="w-3.5 h-3.5" /> Pending Approval
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* MAIN */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
         <div className="grid lg:grid-cols-3 gap-8">
 
-          {/* MODULE ACCORDION */}
+          {/* MAIN CONTENT COLUMN */}
           <div className="lg:col-span-2">
+
+            {/* CREDENTIAL TRUST BLOCK — high visual weight, above the fold */}
+            <div className="bg-slate-900 rounded-xl p-5 mb-6">
+              <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Credentials You'll Earn</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {[
+                  { icon: BadgeCheck, color: 'bg-amber-500',        label: 'EPA 608 Universal',    sub: 'Federal — required by law to handle refrigerants' },
+                  { icon: Shield,     color: 'bg-orange-600',        label: 'OSHA 10',              sub: 'DOL Construction Safety card' },
+                  { icon: Award,      color: 'bg-brand-blue-600',    label: 'CPR / First Aid',      sub: 'American Heart Association' },
+                ].map(({ icon: Icon, color, label, sub }) => (
+                  <div key={label} className="flex items-start gap-3 bg-white/5 rounded-lg p-3 border border-white/10">
+                    <div className={`w-8 h-8 rounded-lg ${color} flex items-center justify-center flex-shrink-0`}>
+                      <Icon className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-white font-bold text-sm leading-tight">{label}</p>
+                      <p className="text-slate-400 text-xs mt-0.5 leading-snug">{sub}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ABOUT */}
             <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
-              <h2 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-2">About This Course</h2>
-              <p className="text-slate-900 font-semibold text-sm leading-relaxed mb-2">
-                This program trains entry-level HVAC technicians and prepares them for EPA 608 Universal certification and employment.
+              <h2 className="text-base font-extrabold text-slate-900 mb-2">About This Program</h2>
+              <p className="text-slate-700 text-sm leading-relaxed">
+                This is a workforce training program — not a survey course. You'll learn to diagnose, install, and service real HVAC systems, then sit for the EPA 608 Universal exam. Funding is available through WIOA and DOL for eligible students.
               </p>
               {(course.description || course.short_description) && (
-                <p className="text-slate-600 text-sm leading-relaxed">
+                <p className="text-slate-500 text-sm leading-relaxed mt-2">
                   {course.short_description || course.description}
                 </p>
               )}
-              <div className="mt-4 pt-4 border-t border-slate-100">
-                <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-2">Credentials Earned</p>
-                <ul className="space-y-1.5 text-sm text-slate-700">
-                  <li className="flex items-start gap-2"><span className="text-green-600 font-bold mt-0.5">✓</span><span><strong>EPA 608 Universal</strong> — required by federal law to handle refrigerants</span></li>
-                  <li className="flex items-start gap-2"><span className="text-green-600 font-bold mt-0.5">✓</span><span><strong>OSHA 10</strong> Construction Safety (DOL card)</span></li>
-                  <li className="flex items-start gap-2"><span className="text-green-600 font-bold mt-0.5">✓</span><span><strong>CPR / First Aid</strong> Certification</span></li>
-                </ul>
-              </div>
             </div>
             <div className="mb-4">
               <h2 className="text-lg font-extrabold text-slate-900">Course Curriculum</h2>
@@ -266,6 +309,33 @@ export default async function CoursePage({ params }: { params: Params }) {
                 {modules.length} modules · {allLessons.length} lessons · {totalHours > 0 ? `${totalHours}+ hours` : `${remainingMinutes}m`} of training
               </p>
             </div>
+
+            {/* Phase overview — groups modules into industry training phases */}
+            {modules.length >= 10 && (() => {
+              const phases = [
+                { label: 'Phase 1', name: 'Foundations',         range: [1, 3],  color: 'bg-blue-50 border-blue-200 text-blue-800' },
+                { label: 'Phase 2', name: 'Refrigeration',       range: [4, 5],  color: 'bg-cyan-50 border-cyan-200 text-cyan-800' },
+                { label: 'Phase 3', name: 'EPA Regulations',     range: [6, 6],  color: 'bg-orange-50 border-orange-200 text-orange-800' },
+                { label: 'Phase 4', name: 'Certification Tracks',range: [7, 9],  color: 'bg-purple-50 border-purple-200 text-purple-800' },
+                { label: 'Phase 5', name: 'Exam Prep',           range: [10, 11],color: 'bg-green-50 border-green-200 text-green-800' },
+              ];
+              return (
+                <div className="mb-6 grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  {phases.map(({ label, name, range, color }) => {
+                    const count = modules.filter((_: any, i: number) => i + 1 >= range[0] && i + 1 <= range[1]).length;
+                    if (count === 0) return null;
+                    return (
+                      <div key={label} className={`rounded-lg border px-3 py-2.5 ${color}`}>
+                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">{label}</p>
+                        <p className="text-xs font-semibold mt-0.5 leading-tight">{name}</p>
+                        <p className="text-[10px] mt-1 opacity-60">{count} module{count !== 1 ? 's' : ''}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+
             {modules.length > 0 ? (
               <CourseModuleAccordion
                 modules={modules}
@@ -318,54 +388,61 @@ export default async function CoursePage({ params }: { params: Params }) {
 
           {/* SIDEBAR */}
           <div className="space-y-4">
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+
+            {/* PRIMARY ACTION CARD */}
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
               {isEnrolled ? (
-                <>
+                <div className="p-5">
                   <div className="mb-4">
                     <div className="flex justify-between text-sm mb-1.5">
                       <span className="text-slate-600 font-medium">Your Progress</span>
-                      <span className="font-bold text-slate-900">{progressPct}%</span>
+                      <span className="font-extrabold text-slate-900">{progressPct}%</span>
                     </div>
-                    <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-brand-blue-600 rounded-full" style={{ width: `${progressPct}%` }} />
+                    <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-brand-blue-600 rounded-full transition-all" style={{ width: `${progressPct}%` }} />
                     </div>
                     <p className="text-xs text-slate-500 mt-1.5">{completedCount} of {allLessons.length} lessons complete</p>
                   </div>
                   {nextLesson ? (
                     <Link href={`/lms/courses/${courseId}/lessons/${nextLesson.id}`}
-                      className="w-full flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white py-3 rounded-xl font-bold transition text-sm">
-                      <Play className="w-4 h-4" />{completedCount > 0 ? 'Continue Learning' : 'Start Course'}
+                      className="w-full flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white py-3.5 rounded-xl font-bold transition text-sm">
+                      <Play className="w-4 h-4" />{completedCount > 0 ? 'Continue Training' : 'Start Training'}
                     </Link>
                   ) : (
-                    <div className="flex items-center justify-center gap-2 py-3 bg-green-50 text-green-800 rounded-xl font-bold text-sm border border-green-200">
-                      <CheckCircle className="w-4 h-4" /> Course Complete
+                    <div className="flex items-center justify-center gap-2 py-3.5 bg-green-50 text-green-800 rounded-xl font-bold text-sm border border-green-200">
+                      <CheckCircle className="w-4 h-4" /> Training Complete
                     </div>
                   )}
-                </>
+                </div>
               ) : enrollment && isPendingApproval ? (
-                <div className="text-center py-2">
+                <div className="p-5 text-center">
                   <Clock className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                   <p className="font-bold text-slate-900 text-sm mb-1">Enrollment Under Review</p>
-                  <p className="text-xs text-slate-500">We will email you when confirmed.</p>
+                  <p className="text-xs text-slate-500">We'll email you when confirmed.</p>
                 </div>
               ) : (
-                <Link href={`/lms/courses/${courseId}/enroll`}
-                  className="w-full flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white py-3 rounded-xl font-bold transition text-sm">
-                  Enroll Now — Free to Apply
-                </Link>
+                <div className="p-5">
+                  <p className="text-xs text-slate-500 mb-3 text-center">Funding available through WIOA &amp; DOL</p>
+                  <Link href={`/lms/courses/${courseId}/enroll`}
+                    className="w-full flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white py-3.5 rounded-xl font-bold transition text-sm">
+                    Apply Now — Free
+                  </Link>
+                </div>
               )}
             </div>
 
+            {/* PROGRAM DETAILS */}
             <div className="bg-white rounded-xl border border-slate-200 p-5">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Course Details</h3>
+              <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Program Details</h3>
               <dl className="space-y-3">
                 {[
-                  { label: 'Modules',     value: modules.length || '—' },
-                  { label: 'Lessons',     value: allLessons.length },
-                  { label: 'Duration',    value: totalHours > 0 ? `${totalHours}h ${remainingMinutes}m` : `${remainingMinutes}m` },
-                  { label: 'Checkpoints', value: checkpointCount },
-                  { label: 'Certificate', value: 'Included' },
-                  { label: 'Level',       value: 'Beginner–Intermediate' },
+                  { label: 'Training Hours', value: totalHours > 0 ? `${totalHours}h ${remainingMinutes}m` : `${remainingMinutes}m` },
+                  { label: 'Modules',        value: modules.length || '—' },
+                  { label: 'Lessons',        value: allLessons.length },
+                  { label: 'Checkpoints',    value: checkpointCount },
+                  { label: 'Certificate',    value: 'Included' },
+                  { label: 'Level',          value: 'Entry–Intermediate' },
+                  { label: 'Funding',        value: 'WIOA / DOL eligible' },
                 ].map(({ label, value }) => (
                   <div key={label} className="flex items-center justify-between">
                     <dt className="text-xs text-slate-500">{label}</dt>
@@ -373,6 +450,23 @@ export default async function CoursePage({ params }: { params: Params }) {
                   </div>
                 ))}
               </dl>
+            </div>
+
+            {/* CAREER OUTCOME */}
+            <div className="bg-slate-900 rounded-xl p-5">
+              <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">After Completion</p>
+              <div className="space-y-3">
+                {[
+                  { icon: TrendingUp, color: 'text-green-400',  text: 'Qualified for entry-level HVAC roles immediately' },
+                  { icon: MapPin,     color: 'text-blue-400',   text: 'High demand across Indiana and nationally' },
+                  { icon: DollarSign, color: 'text-amber-400',  text: '$50K–$80K median starting wage' },
+                ].map(({ icon: Icon, color, text }) => (
+                  <div key={text} className="flex items-start gap-2.5">
+                    <Icon className={`w-4 h-4 flex-shrink-0 mt-0.5 ${color}`} />
+                    <p className="text-slate-300 text-xs leading-relaxed">{text}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {activityTypeSet.size > 0 && (

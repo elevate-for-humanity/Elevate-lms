@@ -193,7 +193,7 @@ export default async function CoursePage({ params }: { params: Params }) {
             {course.title}
           </h1>
           <p className="text-base sm:text-lg text-white/80 font-medium max-w-2xl leading-relaxed mb-5">
-            Complete this program and you'll be qualified to work on residential and commercial HVAC systems — legally certified to handle refrigerants under federal law.
+            Complete this program and you'll be EPA 608 certified — the federal credential required to purchase and handle regulated refrigerants, and a baseline requirement for employment at any HVAC company.
           </p>
           <div className="flex flex-wrap items-center gap-3">
             {isEnrolled && nextLesson ? (
@@ -221,9 +221,9 @@ export default async function CoursePage({ params }: { params: Params }) {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-5">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { icon: Thermometer, color: 'text-brand-orange-400', title: 'Install & Service Systems', body: 'Residential and commercial HVAC — heating, cooling, ventilation, and refrigeration.' },
-              { icon: BadgeCheck,  color: 'text-amber-400',        title: 'EPA 608 Certified',         body: 'Federally required to handle refrigerants. Opens doors to every HVAC employer.' },
-              { icon: DollarSign,  color: 'text-green-400',        title: '$50K–$80K Starting Range',  body: 'Median HVAC technician wage in Indiana. Demand is high and growing.' },
+              { icon: Thermometer, color: 'text-brand-orange-400', title: 'Install & Service Systems', body: 'Residential and commercial HVAC — heating, cooling, ventilation, and refrigeration systems.' },
+              { icon: BadgeCheck,  color: 'text-amber-400',        title: 'EPA 608 Certified',         body: 'Required by federal law to handle refrigerants. A baseline requirement at every HVAC employer.' },
+              { icon: DollarSign,  color: 'text-green-400',        title: '$45K–$75K in Indiana',      body: 'BLS median for HVAC technicians in Indiana. Experienced techs and union roles go higher.' },
             ].map(({ icon: Icon, color, title, body }) => (
               <div key={title} className="flex items-start gap-3">
                 <div className={`w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5`}>
@@ -274,9 +274,9 @@ export default async function CoursePage({ params }: { params: Params }) {
               <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Credentials You'll Earn</p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[
-                  { icon: BadgeCheck, color: 'bg-amber-500',        label: 'EPA 608 Universal',    sub: 'Federal — required by law to handle refrigerants' },
-                  { icon: Shield,     color: 'bg-orange-600',        label: 'OSHA 10',              sub: 'DOL Construction Safety card' },
-                  { icon: Award,      color: 'bg-brand-blue-600',    label: 'CPR / First Aid',      sub: 'American Heart Association' },
+                  { icon: BadgeCheck, color: 'bg-amber-500',        label: 'EPA 608 Universal',    sub: 'Federal credential — required to purchase and handle regulated refrigerants' },
+                  { icon: Shield,     color: 'bg-orange-600',        label: 'OSHA 10',              sub: 'DOL-issued Construction Safety card' },
+                  { icon: Award,      color: 'bg-brand-blue-600',    label: 'CPR / First Aid',      sub: 'Industry-standard certification included' },
                 ].map(({ icon: Icon, color, label, sub }) => (
                   <div key={label} className="flex items-start gap-3 bg-white/5 rounded-lg p-3 border border-white/10">
                     <div className={`w-8 h-8 rounded-lg ${color} flex items-center justify-center flex-shrink-0`}>
@@ -295,7 +295,7 @@ export default async function CoursePage({ params }: { params: Params }) {
             <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
               <h2 className="text-base font-extrabold text-slate-900 mb-2">About This Program</h2>
               <p className="text-slate-700 text-sm leading-relaxed">
-                This is a workforce training program — not a survey course. You'll learn to diagnose, install, and service real HVAC systems, then sit for the EPA 608 Universal exam. Funding is available through WIOA and DOL for eligible students.
+                This is a workforce training program — not a survey course. You'll learn to diagnose, install, and service real HVAC systems, then sit for the EPA 608 Universal exam. WIOA funding is available for eligible students; no out-of-pocket cost for those who qualify.
               </p>
               {(course.description || course.short_description) && (
                 <p className="text-slate-500 text-sm leading-relaxed mt-2">
@@ -457,9 +457,9 @@ export default async function CoursePage({ params }: { params: Params }) {
               <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">After Completion</p>
               <div className="space-y-3">
                 {[
-                  { icon: TrendingUp, color: 'text-green-400',  text: 'Qualified for entry-level HVAC roles immediately' },
-                  { icon: MapPin,     color: 'text-blue-400',   text: 'High demand across Indiana and nationally' },
-                  { icon: DollarSign, color: 'text-amber-400',  text: '$50K–$80K median starting wage' },
+                  { icon: TrendingUp, color: 'text-green-400',  text: 'Qualified for entry-level HVAC roles upon certification' },
+                  { icon: MapPin,     color: 'text-blue-400',   text: 'Strong demand across Indiana — residential, commercial, and industrial' },
+                  { icon: DollarSign, color: 'text-amber-400',  text: '$45K–$75K median range in Indiana (BLS)' },
                 ].map(({ icon: Icon, color, text }) => (
                   <div key={text} className="flex items-start gap-2.5">
                     <Icon className={`w-4 h-4 flex-shrink-0 mt-0.5 ${color}`} />

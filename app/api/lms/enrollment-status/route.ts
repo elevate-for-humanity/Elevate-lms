@@ -27,6 +27,18 @@ export async function GET(req: NextRequest) {
   const admin = createAdminClient();
   const db = admin || supabase;
 
+  // Admins and super_admins are always treated as enrolled — bypass enrollment check.
+  if (admin) {
+    const { data: profile } = await admin
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
+    if (['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) {
+      return NextResponse.json({ enrolled: true, status: 'active', enrollment_state: 'active', progress: 0, approved: true });
+    }
+  }
+
   // Resolve canonical courses UUID.
   // The URL param may be a training_courses ID (legacy HVAC routes). In that
   // case program_enrollments.course_id stores the canonical courses UUID, so

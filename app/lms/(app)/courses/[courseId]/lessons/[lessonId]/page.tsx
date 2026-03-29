@@ -179,24 +179,30 @@ export default function LessonPage() {
     if (user) {
       try {
         const enrollRes = await fetch(`/api/lms/enrollment-status?courseId=${courseId}`);
-        const enrollData = enrollRes.ok ? await enrollRes.json() : null;
+        // Fail open on non-ok responses (401 during session hydration, 500, etc.)
+        // Only block on an explicit, successful response that says not enrolled.
+        if (!enrollRes.ok) {
+          // Don't block — let the lesson load. The server-side page already
+          // enforces auth via redirect('/login'). A 401 here means the session
+          // cookie hasn't hydrated yet on the client, not that the user is unauthed.
+        } else {
+          const enrollData = await enrollRes.json();
 
-        // Block if not enrolled, pending approval, or pending funding verification.
-        // pending_funding_verification = provisionally admitted with no confirmed
-        // funding source — must not access lesson content until admin verifies.
-        const isPendingFunding =
-          enrollData?.status === 'pending_funding_verification' ||
-          enrollData?.enrollment_state === 'pending_funding_verification';
-        const isPendingApproval = enrollData?.status === 'pending_approval';
+          // Block if not enrolled, pending approval, or pending funding verification.
+          const isPendingFunding =
+            enrollData?.status === 'pending_funding_verification' ||
+            enrollData?.enrollment_state === 'pending_funding_verification';
+          const isPendingApproval = enrollData?.status === 'pending_approval';
 
-        if (!enrollData?.enrolled || isPendingApproval || isPendingFunding) {
-          setEnrollmentBlockReason(
-            isPendingFunding ? 'pending_funding_verification'
-            : isPendingApproval ? 'pending_approval'
-            : 'not_enrolled'
-          );
-          setEnrollmentBlocked(true);
-          return;
+          if (!enrollData?.enrolled || isPendingApproval || isPendingFunding) {
+            setEnrollmentBlockReason(
+              isPendingFunding ? 'pending_funding_verification'
+              : isPendingApproval ? 'pending_approval'
+              : 'not_enrolled'
+            );
+            setEnrollmentBlocked(true);
+            return;
+          }
         }
       } catch {
         // Network error — don't block, let lesson load attempt continue

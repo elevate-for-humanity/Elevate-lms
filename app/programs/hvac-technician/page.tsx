@@ -53,7 +53,6 @@ const AUTHORITY = [
   'OSHA 10 — nationally recognized safety cert',
   'State-recognized workforce training provider',
   'WIOA & Workforce Ready Grant approved',
-  'NRF Rise Up credential included',
   'CPR / First Aid certification',
 ];
 

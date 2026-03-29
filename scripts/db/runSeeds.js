@@ -1,62 +1,55 @@
 // scripts/db/runSeeds.js
-// Run ALL SQL files in supabase/seeds in alphabetical order
+// Run all SQL files in supabase/seeds in alphabetical order.
 
-const fs = require('fs');
-const path = require('path');
-const { Client } = require('pg');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import pg from 'pg';
+
+const { Client } = pg;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 async function runSeeds() {
   const connectionString = process.env.SUPABASE_DB_URL;
-
   if (!connectionString) {
-    process.exit(1);
+    console.log('SUPABASE_DB_URL not set, skipping seeds');
+    return;
+  }
+
+  const seedsDir = path.join(__dirname, '../../supabase/seeds');
+  if (!fs.existsSync(seedsDir)) {
+    console.log('No supabase/seeds directory, skipping');
+    return;
+  }
+
+  const files = fs.readdirSync(seedsDir)
+    .filter(f => f.endsWith('.sql'))
+    .sort();
+
+  if (files.length === 0) {
+    console.log('No seed files found');
+    return;
   }
 
   const client = new Client({ connectionString, ssl: { rejectUnauthorized: false } });
 
   try {
     await client.connect();
-
-    const seedsDir = path.join(process.cwd(), 'supabase', 'seeds');
-
-    if (!fs.existsSync(seedsDir)) {
-      process.exit(1);
-    }
-
-    const files = fs
-      .readdirSync(seedsDir)
-      .filter((f) => f.endsWith('.sql'))
-      .sort();
-
-    if (files.length === 0) {
-      return;
-    }
-
+    console.log('Connected for seeds');
 
     for (const file of files) {
-      const filePath = path.join(seedsDir, file);
-
-      const sql = fs.readFileSync(filePath, 'utf8');
-
+      const sql = fs.readFileSync(path.join(seedsDir, file), 'utf8');
+      console.log('Running seed ' + file + '...');
       try {
-        await client.query('BEGIN');
         await client.query(sql);
-        await client.query('COMMIT');
+        console.log('Seeded ' + file);
       } catch (err) {
-        await client.query('ROLLBACK');
-        process.exit(1);
+        console.error('Seed failed ' + file + ': ' + err.message);
       }
     }
-
-  } catch (err) {
-    process.exit(1);
   } finally {
     await client.end();
   }
 }
 
-if (require.main === module) {
-  runSeeds();
-}
-
-module.exports = { runSeeds };
+runSeeds();

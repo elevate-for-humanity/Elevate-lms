@@ -111,9 +111,9 @@ export default async function AdminLayout({
     <>
       <IdleTimeoutGuard />
       <AdminSidebar />
-      <div className="lg:pl-60">
+      <div className="lg:pl-64">
         <AdminHeader />
-        <main id="main-content" className="pt-16 min-h-screen bg-gray-50">{children}</main>
+        <main id="main-content" className="pt-24 min-h-screen bg-slate-50">{children}</main>
       </div>
     </>
   );

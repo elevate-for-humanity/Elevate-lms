@@ -50,7 +50,7 @@ const OUTCOMES = [
 
 const AUTHORITY = [
   'EPA 608 Universal — proctored on-site',
-  'OSHA 30 — nationally recognized safety cert',
+  'OSHA 10 — nationally recognized safety cert',
   'State-recognized workforce training provider',
   'WIOA & Workforce Ready Grant approved',
   'NRF Rise Up credential included',

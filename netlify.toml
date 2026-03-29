@@ -612,3 +612,42 @@
   for = "/onboarding/*"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
+
+# ── Course consolidation redirects ────────────────────────────────────────────
+# Static hardcoded course pages removed — all traffic goes to DB-driven LMS
+
+[[redirects]]
+  from = "/courses"
+  to = "/lms/programs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/courses/epa-608"
+  to = "/lms/courses/0ba9a61c-1f1b-4019-be6f-90e92eba2bc0"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/courses/catalog"
+  to = "/lms/programs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/courses/capital-readiness"
+  to = "/lms/programs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/courses/hvac"
+  to = "/lms/courses/0ba9a61c-1f1b-4019-be6f-90e92eba2bc0"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/courses/hvac/*"
+  to = "/lms/courses/0ba9a61c-1f1b-4019-be6f-90e92eba2bc0"
+  status = 301
+  force = true

@@ -1,9 +1,10 @@
--- Update lms_lessons view to prioritize curriculum_lessons over course_lessons.
--- curriculum_lessons rows take priority for any course_id that has rows there.
--- course_lessons remains as fallback for courses not yet in curriculum_lessons.
+-- Rebuild lms_lessons view to prioritize curriculum_lessons over course_lessons.
 --
--- Key fix: cast step_type to TEXT in both branches (curriculum_lessons.step_type
--- is an enum; course_lessons.lesson_type is text — UNION requires matching types).
+-- Key fixes vs previous version:
+-- 1. Cast step_type to TEXT (curriculum_lessons uses an enum, course_lessons uses text)
+-- 2. Resolve module_id from course_modules via module_order join — curriculum_lessons
+--    has a FK to the 'modules' table, not 'course_modules', so we can't store
+--    course_modules.id directly. The view resolves it at query time.
 
 DROP VIEW IF EXISTS public.lms_lessons CASCADE;
 
@@ -26,8 +27,8 @@ SELECT
   cl.quiz_questions,
   NULL::JSONB                                  AS activities,
   NULL::JSONB                                  AS video_config,
-  cl.module_id,
-  NULL::TEXT                                   AS module_title,
+  cm.id                                        AS module_id,
+  cm.title                                     AS module_title,
   cl.module_order,
   cl.lesson_order,
   cl.duration_minutes,
@@ -44,6 +45,9 @@ SELECT
   NULL::TEXT                                   AS scorm_package_id,
   NULL::TEXT                                   AS scorm_launch_path
 FROM public.curriculum_lessons cl
+LEFT JOIN public.course_modules cm
+  ON cm.course_id = cl.course_id
+  AND cm.order_index = cl.module_order
 
 UNION ALL
 

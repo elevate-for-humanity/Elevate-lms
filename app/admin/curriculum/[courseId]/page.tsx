@@ -71,25 +71,21 @@ export default async function CurriculumCourseEditorPage({
   };
   const legacyWarning = LEGACY_DRIVEN_COURSES[courseId] ?? null;
 
-  // Module summary for the sidebar
+  // Module summary for the sidebar — join course_modules for title + order
   const { data: moduleSummary } = await supabase
     .from('course_lessons')
-    .select('module_order, module_title, step_type, status')
+    .select('lesson_type, module_id, course_modules ( title, order_index )')
     .eq('course_id', courseId)
-    .order('module_order')
-    .order('lesson_order');
+    .order('order_index', { ascending: true });
 
-  // Group by module_order
-  const moduleMap = new Map<number, { title: string; count: number; published: number }>();
-  for (const row of moduleSummary ?? []) {
-    const existing = moduleMap.get(row.module_order) ?? {
-      title: (row as any).module_title ?? `Module ${row.module_order + 1}`,
-      count: 0,
-      published: 0,
-    };
+  // Group by module_id, keyed by module order_index for display
+  const moduleMap = new Map<number, { title: string; count: number }>();
+  for (const row of (moduleSummary ?? []) as any[]) {
+    const modOrder: number = row.course_modules?.order_index ?? 0;
+    const modTitle: string = row.course_modules?.title ?? `Module ${modOrder + 1}`;
+    const existing = moduleMap.get(modOrder) ?? { title: modTitle, count: 0 };
     existing.count++;
-    if (row.status === 'published') existing.published++;
-    moduleMap.set(row.module_order, existing);
+    moduleMap.set(modOrder, existing);
   }
   const modules = Array.from(moduleMap.entries()).sort(([a], [b]) => a - b);
 
@@ -162,7 +158,7 @@ export default async function CurriculumCourseEditorPage({
                       >
                         <span className="truncate">{mod.title}</span>
                         <span className="text-xs text-slate-400 ml-2 shrink-0">
-                          {mod.published}/{mod.count}
+                          {mod.count}
                         </span>
                       </a>
                     </li>

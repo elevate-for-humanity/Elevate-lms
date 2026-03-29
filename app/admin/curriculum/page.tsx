@@ -32,23 +32,21 @@ export default async function CurriculumPage() {
     redirect('/unauthorized');
   }
 
-  // Aggregate lesson counts per course_id from curriculum_lessons
+  // Aggregate lesson counts per course_id from course_lessons (canonical table)
   const { data: lessonRows } = await supabase
     .from('course_lessons')
-    .select('course_id, status, step_type');
+    .select('course_id, lesson_type');
 
   // Build per-course stats
   const courseStats = new Map<string, {
     total: number;
-    published: number;
     checkpoints: number;
   }>();
 
   for (const row of lessonRows ?? []) {
-    const s = courseStats.get(row.course_id) ?? { total: 0, published: 0, checkpoints: 0 };
+    const s = courseStats.get(row.course_id) ?? { total: 0, checkpoints: 0 };
     s.total++;
-    if (row.status === 'published') s.published++;
-    if (row.step_type === 'checkpoint' || row.step_type === 'quiz' || row.step_type === 'exam') s.checkpoints++;
+    if (row.lesson_type === 'checkpoint' || row.lesson_type === 'quiz' || row.lesson_type === 'exam') s.checkpoints++;
     courseStats.set(row.course_id, s);
   }
 
@@ -87,7 +85,6 @@ export default async function CurriculumPage() {
     .sort((a, b) => b.total - a.total);
 
   const totalLessons = courses.reduce((sum, c) => sum + c.total, 0);
-  const totalPublished = courses.reduce((sum, c) => sum + c.published, 0);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -130,8 +127,8 @@ export default async function CurriculumPage() {
             <p className="text-3xl font-bold text-slate-800">{totalLessons}</p>
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-5">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Published</p>
-            <p className="text-3xl font-bold text-brand-green-600">{totalPublished}</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Checkpoints</p>
+            <p className="text-3xl font-bold text-amber-600">{courses.reduce((sum, c) => sum + c.checkpoints, 0)}</p>
           </div>
         </div>
 
@@ -139,9 +136,9 @@ export default async function CurriculumPage() {
         {courses.length === 0 ? (
           <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
             <Layers className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-            <p className="text-slate-500 font-medium">No curriculum_lessons rows found.</p>
+            <p className="text-slate-500 font-medium">No course lessons found.</p>
             <p className="text-sm text-slate-400 mt-1">
-              Publish a course via the AI builder to populate this table.
+              Run the blueprint seeder or use the AI builder to populate course_lessons.
             </p>
             <Link
               href="/admin/courses/ai-builder"
@@ -152,11 +149,7 @@ export default async function CurriculumPage() {
           </div>
         ) : (
           <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100">
-            {courses.map(course => {
-              const pct = course.total > 0
-                ? Math.round((course.published / course.total) * 100)
-                : 0;
-              return (
+            {courses.map(course => (
                 <Link
                   key={course.id}
                   href={`/admin/curriculum/${course.id}`}
@@ -170,16 +163,6 @@ export default async function CurriculumPage() {
                   </div>
 
                   <div className="flex items-center gap-6 ml-4 shrink-0">
-                    {/* Progress bar */}
-                    <div className="hidden sm:flex items-center gap-2">
-                      <div className="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-brand-green-500 rounded-full"
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-slate-500 w-8 text-right">{pct}%</span>
-                    </div>
 
                     <div className="text-right">
                       <p className="text-sm font-semibold text-slate-700">{course.total}</p>
@@ -196,8 +179,7 @@ export default async function CurriculumPage() {
                     <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-brand-blue-400 transition" />
                   </div>
                 </Link>
-              );
-            })}
+            ))}
           </div>
         )}
       </div>

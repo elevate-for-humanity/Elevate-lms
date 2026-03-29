@@ -193,10 +193,10 @@ export default async function CoursePage({ params }: { params: Params }) {
             {course.title}
           </h1>
           <p className="text-base sm:text-lg text-white/80 font-medium max-w-2xl leading-relaxed mb-4">
-            Complete this program and you'll be EPA 608 certified — required to handle regulated refrigerants and a baseline credential for HVAC employment.
+            A workforce training program that prepares you for entry-level HVAC technician roles — including EPA 608 certification, the federal credential required to handle regulated refrigerants.
           </p>
           <p className="text-sm text-white/60 max-w-2xl mb-5">
-            Prepares you for entry-level HVAC technician positions. Aligned with residential and light commercial roles.
+            Participants who complete the program are prepared to sit for EPA 608 certification and pursue roles such as HVAC Helper, Installer Assistant, or Entry-Level HVAC Technician.
           </p>
           <div className="flex flex-wrap items-center gap-3">
             {isEnrolled && nextLesson ? (
@@ -224,9 +224,9 @@ export default async function CoursePage({ params }: { params: Params }) {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-5">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { icon: Thermometer, color: 'text-brand-orange-400', title: 'Install & Service Systems', body: 'Residential and commercial HVAC — heating, cooling, ventilation, and refrigeration systems.' },
-              { icon: BadgeCheck,  color: 'text-amber-400',        title: 'EPA 608 Certified',         body: 'Required by federal law to handle refrigerants. A standard requirement for HVAC technicians and widely expected by employers.' },
-              { icon: DollarSign,  color: 'text-green-400',        title: '$45K–$75K+ in Indiana',     body: 'Typical HVAC wages in Indiana range from ~$45K to $75K+, depending on experience and certification (BLS).' },
+              { icon: Thermometer, color: 'text-brand-orange-400', title: 'HVAC Helper → Technician',  body: 'Targets entry-level roles: HVAC Helper, Installer Assistant, and Entry-Level HVAC Technician in residential and light commercial settings.' },
+              { icon: BadgeCheck,  color: 'text-amber-400',        title: 'EPA 608 Certification Prep', body: 'Required by federal law to handle refrigerants. A standard requirement for HVAC technicians and widely expected by employers.' },
+              { icon: DollarSign,  color: 'text-green-400',        title: 'Wage Progression',          body: 'Entry-level roles typically start lower, with progression into the ~$45K–$75K+ range as experience and certifications grow (BLS).' },
             ].map(({ icon: Icon, color, title, body }) => (
               <div key={title} className="flex items-start gap-3">
                 <div className={`w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5`}>
@@ -279,7 +279,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                 {[
                   { icon: BadgeCheck, color: 'bg-amber-500',        label: 'EPA 608 Universal',    sub: 'Federal credential — required to handle regulated refrigerants' },
                   { icon: Shield,     color: 'bg-orange-600',        label: 'OSHA 10',              sub: 'DOL-issued Construction Safety card' },
-                  { icon: Award,      color: 'bg-brand-blue-600',    label: 'CPR / First Aid',      sub: 'Certification included (industry-recognized provider)' },
+                  { icon: Award,      color: 'bg-brand-blue-600',    label: 'CPR / First Aid',      sub: 'Certification issued through an industry-recognized training provider' },
                 ].map(({ icon: Icon, color, label, sub }) => (
                   <div key={label} className="flex items-start gap-3 bg-white/5 rounded-lg p-3 border border-white/10">
                     <div className={`w-8 h-8 rounded-lg ${color} flex items-center justify-center flex-shrink-0`}>
@@ -298,7 +298,7 @@ export default async function CoursePage({ params }: { params: Params }) {
             <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
               <h2 className="text-base font-extrabold text-slate-900 mb-2">About This Program</h2>
               <p className="text-slate-700 text-sm leading-relaxed">
-                This is a workforce training program — not a survey course. You'll learn to diagnose, install, and service real HVAC systems, then sit for the EPA 608 Universal exam. WIOA funding is available for eligible participants — no out-of-pocket cost for those who qualify.
+                A workforce training program — not a survey course. You'll learn to diagnose, install, and service real HVAC systems, then sit for the EPA 608 Universal exam. Participants who complete the program are prepared to pursue entry-level HVAC technician roles. WIOA funding is available for eligible participants — no out-of-pocket cost for those who qualify.
               </p>
               {(course.description || course.short_description) && (
                 <p className="text-slate-500 text-sm leading-relaxed mt-2">
@@ -460,9 +460,9 @@ export default async function CoursePage({ params }: { params: Params }) {
               <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">After Completion</p>
               <div className="space-y-3">
                 {[
-                  { icon: TrendingUp, color: 'text-green-400',  text: 'Prepares for entry-level HVAC technician positions in residential and light commercial settings' },
+                  { icon: TrendingUp, color: 'text-green-400',  text: 'Targets roles: HVAC Helper, Installer Assistant, Entry-Level HVAC Technician' },
                   { icon: MapPin,     color: 'text-blue-400',   text: 'Strong demand across Indiana — residential, commercial, and industrial' },
-                  { icon: DollarSign, color: 'text-amber-400',  text: '~$45K–$75K+ typical range in Indiana, depending on experience (BLS)' },
+                  { icon: DollarSign, color: 'text-amber-400',  text: 'Entry-level roles start lower; progression into ~$45K–$75K+ range (BLS Indiana)' },
                 ].map(({ icon: Icon, color, text }) => (
                   <div key={text} className="flex items-start gap-2.5">
                     <Icon className={`w-4 h-4 flex-shrink-0 mt-0.5 ${color}`} />

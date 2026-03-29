@@ -1,4 +1,4 @@
-name: Supabase Migrations Autopilot
+name: Supabase Migrations
 
 on:
   workflow_dispatch:
@@ -28,29 +28,33 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run Supabase Autopilot
+      - name: Apply migrations
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          SUPABASE_SEED_FILE: WORKING_SEED.sql
-        run: |
-          chmod +x scripts/supabase-auto-setup.sh
-          scripts/supabase-auto-setup.sh
+        run: node scripts/db/runMigrations.js
 
-      - name: Test connection
+      - name: Verify lms_lessons
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-        run: pnpm run supabase:test
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          node -e "
+          const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+          const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+          fetch(url + '/rest/v1/lms_lessons?course_id=eq.0ba9a61c-1f1b-4019-be6f-90e92eba2bc0&select=count', {
+            headers: { apikey: key, Authorization: 'Bearer ' + key, Prefer: 'count=exact' }
+          }).then(r => r.json()).then(d => {
+            const count = d[0]?.count;
+            console.log('HVAC lms_lessons:', count);
+            if (parseInt(count) !== 95) process.exit(1);
+          });
+          "
 
       - name: Notify success
         if: success()
-        run: echo "✅ Database migrations and seeds completed successfully"
+        run: echo "Migrations complete"
 
       - name: Notify failure
         if: failure()
-        run: echo "❌ Database migrations failed"
+        run: echo "Migrations failed"

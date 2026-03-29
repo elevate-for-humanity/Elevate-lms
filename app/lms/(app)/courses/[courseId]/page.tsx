@@ -190,10 +190,10 @@ export default async function CoursePage({ params }: { params: Params }) {
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="flex flex-wrap items-center gap-5 py-4">
             {([
+              { icon: Clock,         label: totalHours > 0 ? `${totalHours}+ Hours of Training` : `${remainingMinutes}m` },
               { icon: BookOpen,      label: `${allLessons.length} Lessons` },
-              { icon: Clock,         label: totalHours > 0 ? `${totalHours}h ${remainingMinutes}m` : `${remainingMinutes}m` },
               { icon: ClipboardList, label: `${checkpointCount} Checkpoints` },
-              { icon: Award,         label: 'Certificate' },
+              { icon: Award,         label: 'EPA 608 Certification Prep' },
             ] as const).map(({ icon: Icon, label }) => (
               <span key={label} className="flex items-center gap-1.5 text-sm text-slate-600 font-medium">
                 <Icon className="w-4 h-4 text-slate-400" />{label}
@@ -241,14 +241,25 @@ export default async function CoursePage({ params }: { params: Params }) {
 
           {/* MODULE ACCORDION */}
           <div className="lg:col-span-2">
-            {(course.description || course.short_description) && (
-              <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-2">About This Course</h2>
-                <p className="text-slate-700 text-sm leading-relaxed">
+            <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-2">About This Course</h2>
+              <p className="text-slate-900 font-semibold text-sm leading-relaxed mb-2">
+                This program trains entry-level HVAC technicians and prepares them for EPA 608 Universal certification and employment.
+              </p>
+              {(course.description || course.short_description) && (
+                <p className="text-slate-600 text-sm leading-relaxed">
                   {course.short_description || course.description}
                 </p>
+              )}
+              <div className="mt-4 pt-4 border-t border-slate-100">
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-2">Credentials Earned</p>
+                <ul className="space-y-1.5 text-sm text-slate-700">
+                  <li className="flex items-start gap-2"><span className="text-green-600 font-bold mt-0.5">✓</span><span><strong>EPA 608 Universal</strong> — required by federal law to handle refrigerants</span></li>
+                  <li className="flex items-start gap-2"><span className="text-green-600 font-bold mt-0.5">✓</span><span><strong>OSHA 10</strong> Construction Safety (DOL card)</span></li>
+                  <li className="flex items-start gap-2"><span className="text-green-600 font-bold mt-0.5">✓</span><span><strong>CPR / First Aid</strong> Certification</span></li>
+                </ul>
               </div>
-            )}
+            </div>
             <h2 className="text-lg font-extrabold text-slate-900 mb-4">Course Content</h2>
             {modules.length > 0 ? (
               <CourseModuleAccordion

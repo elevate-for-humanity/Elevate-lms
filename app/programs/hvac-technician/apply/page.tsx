@@ -293,9 +293,8 @@ export default function HvacApplyPage() {
                   <li>• Residential HVAC Certification 1</li>
                   <li>• Residential HVAC Certification 2</li>
                   <li>• EPA 608 Universal Certification</li>
-                  <li>• OSHA 30</li>
-                  <li>• CPR Certification</li>
-                  <li>• Rise Up Certificate</li>
+                  <li>• OSHA 10 Construction Safety</li>
+                  <li>• CPR / First Aid Certification</li>
                 </ul>
               </div>
 

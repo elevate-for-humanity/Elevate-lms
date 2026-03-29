@@ -145,6 +145,34 @@ export default async function CoursePage({ params }: { params: Params }) {
     l.step_type === 'checkpoint' || l.content_type === 'quiz').length;
   const isEnrolled = isAdminUser || (!!enrollment && !isPendingApproval);
 
+  // ── Phase/module context for the resume card ──────────────────────────
+  // Maps module order_index ranges to phase labels (HVAC-specific, 11 modules).
+  // Falls back gracefully for other courses.
+  const PHASE_MAP = [
+    { label: 'Phase 1', name: 'Foundations',          range: [1, 3]  },
+    { label: 'Phase 2', name: 'Refrigeration',        range: [4, 5]  },
+    { label: 'Phase 3', name: 'EPA Regulations',      range: [6, 6]  },
+    { label: 'Phase 4', name: 'Certification Tracks', range: [7, 9]  },
+    { label: 'Phase 5', name: 'Exam Prep',            range: [10, 11]},
+  ];
+
+  // Active module = first module with any incomplete lesson
+  const activeModuleIdx = modules.findIndex((mod: any) =>
+    mod.lessons.some((l: any) => !progressMap.get(l.id)?.completed)
+  );
+  const activeModule = modules[activeModuleIdx >= 0 ? activeModuleIdx : 0] as any;
+  const activeModuleOrder = activeModule?.order_index ?? 1;
+  const activePhase = PHASE_MAP.find(p => activeModuleOrder >= p.range[0] && activeModuleOrder <= p.range[1]);
+
+  // Lesson position within active module
+  const activeLessonsInModule = activeModule?.lessons ?? [];
+  const completedInActiveModule = activeLessonsInModule.filter((l: any) => progressMap.get(l.id)?.completed).length;
+
+  // Completed modules count
+  const completedModules = modules.filter((mod: any) =>
+    mod.lessons.length > 0 && mod.lessons.every((l: any) => progressMap.get(l.id)?.completed)
+  ).length;
+
   // Derive activity types actually present across all lessons from DB records.
   // activities is stored as JSONB — either {video:true, reading:true, ...}
   // or [{type:'video'}, ...]. Handle both shapes.
@@ -164,6 +192,228 @@ export default async function CoursePage({ params }: { params: Params }) {
     }
   }
 
+  // ── Enrolled learner view — completely different hierarchy ───────────
+  if (isEnrolled) {
+    return (
+      <div className="min-h-screen bg-slate-50">
+
+        {/* ENROLLED HERO — compact, action-first */}
+        <div className="relative h-[180px] sm:h-[220px] w-full overflow-hidden bg-slate-900">
+          <Image src={heroImage} alt={course.title} fill className="object-cover object-center opacity-30" priority />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/60 to-slate-900/30" />
+          <div className="absolute inset-0 flex flex-col justify-end p-5 sm:p-8 max-w-5xl mx-auto w-full">
+            <nav className="flex items-center gap-1.5 text-xs text-white/40 mb-2">
+              <Link href="/lms/courses" className="hover:text-white transition">My Courses</Link>
+              <ChevronRight className="w-3 h-3" />
+              <span className="text-white/60">{course.title}</span>
+            </nav>
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-brand-orange-400 mb-1">
+                  {activePhase ? `${activePhase.label} · ${activePhase.name}` : 'In Progress'}
+                </p>
+                <h1 className="text-xl sm:text-2xl font-extrabold text-white leading-tight">{course.title}</h1>
+              </div>
+              <div className="flex-shrink-0 text-right hidden sm:block">
+                <p className="text-xs text-white/50">{completedModules} of {modules.length} modules complete</p>
+                <p className="text-lg font-extrabold text-white">{progressPct}%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* RESUME CARD — the dominant action */}
+        <div className="bg-white border-b border-slate-200 shadow-sm">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+
+              {/* Progress bar + human label */}
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-semibold text-slate-700">
+                    {completedCount === 0
+                      ? 'Not started yet — Lesson 1 is ready'
+                      : activeModule
+                        ? `${activeModule.title} · Lesson ${completedInActiveModule + 1} of ${activeLessonsInModule.length}`
+                        : `${completedCount} of ${allLessons.length} lessons complete`
+                    }
+                  </span>
+                  <span className="text-xs font-bold text-slate-900">{progressPct}%</span>
+                </div>
+                <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-brand-blue-600 rounded-full transition-all"
+                    style={{ width: progressPct === 0 ? '2px' : `${progressPct}%` }}
+                  />
+                </div>
+                {completedCount > 0 && (
+                  <p className="text-xs text-slate-400 mt-1">
+                    {completedModules > 0 ? `${completedModules} module${completedModules !== 1 ? 's' : ''} complete · ` : ''}
+                    {allLessons.length - completedCount} lessons remaining
+                  </p>
+                )}
+              </div>
+
+              {/* Primary CTA */}
+              <div className="flex-shrink-0">
+                {nextLesson ? (
+                  <Link
+                    href={`/lms/courses/${courseId}/lessons/${nextLesson.id}`}
+                    className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-3 rounded-xl transition text-sm shadow-sm whitespace-nowrap"
+                  >
+                    <Play className="w-4 h-4" />
+                    {completedCount === 0 ? 'Start Training' : 'Continue Training'}
+                  </Link>
+                ) : (
+                  <div className="inline-flex items-center gap-2 bg-green-50 text-green-800 font-bold px-6 py-3 rounded-xl text-sm border border-green-200">
+                    <CheckCircle className="w-4 h-4" /> Training Complete
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* MAIN — curriculum first, no marketing */}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+          <div className="grid lg:grid-cols-3 gap-8">
+
+            {/* CURRICULUM COLUMN */}
+            <div className="lg:col-span-2">
+              <div className="flex items-baseline justify-between mb-4">
+                <div>
+                  <h2 className="text-base font-extrabold text-slate-900">Your Training Path</h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {modules.length} modules · {allLessons.length} lessons · {totalHours > 0 ? `${totalHours}+ hours` : `${totalMinutes}m`}
+                  </p>
+                </div>
+                {nextLesson && (
+                  <Link
+                    href={`/lms/courses/${courseId}/lessons/${nextLesson.id}`}
+                    className="text-xs font-bold text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1"
+                  >
+                    Jump to next <ChevronRight className="w-3 h-3" />
+                  </Link>
+                )}
+              </div>
+
+              {modules.length > 0 ? (
+                <>
+                  {/* Phase grouping — renders phase label before each phase's first module */}
+                  {PHASE_MAP.map((phase) => {
+                    const phaseModules = modules.filter((_: any, i: number) =>
+                      i + 1 >= phase.range[0] && i + 1 <= phase.range[1]
+                    );
+                    if (phaseModules.length === 0) return null;
+                    const phaseComplete = phaseModules.every((mod: any) =>
+                      mod.lessons.length > 0 && mod.lessons.every((l: any) => progressMap.get(l.id)?.completed)
+                    );
+                    const isActivePhase = activePhase?.label === phase.label;
+                    return (
+                      <div key={phase.label} className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className={`text-xs font-bold uppercase tracking-widest ${isActivePhase ? 'text-brand-blue-600' : phaseComplete ? 'text-green-600' : 'text-slate-400'}`}>
+                            {phase.label}
+                          </span>
+                          <span className="text-xs text-slate-500 font-medium">— {phase.name}</span>
+                          {phaseComplete && <CheckCircle className="w-3.5 h-3.5 text-green-500 ml-auto" />}
+                          {isActivePhase && !phaseComplete && <span className="ml-auto text-[10px] font-bold text-brand-blue-600 bg-brand-blue-50 border border-brand-blue-200 px-2 py-0.5 rounded-full">Current</span>}
+                        </div>
+                        <CourseModuleAccordion
+                          modules={phaseModules}
+                          courseId={courseId}
+                          progressMap={Object.fromEntries(progressMap)}
+                          isEnrolled={isEnrolled}
+                          isPendingApproval={!!isPendingApproval}
+                        />
+                      </div>
+                    );
+                  })}
+                  {/* Ungrouped modules (courses with < 10 modules, no phase map) */}
+                  {modules.length < 10 && (
+                    <CourseModuleAccordion
+                      modules={modules}
+                      courseId={courseId}
+                      progressMap={Object.fromEntries(progressMap)}
+                      isEnrolled={isEnrolled}
+                      isPendingApproval={!!isPendingApproval}
+                    />
+                  )}
+                </>
+              ) : (
+                <div className="rounded-xl border border-slate-200 bg-white p-10 text-center">
+                  <BookOpen className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                  <p className="text-slate-500 font-medium">No lessons available yet.</p>
+                </div>
+              )}
+            </div>
+
+            {/* SIDEBAR */}
+            <div className="space-y-4">
+
+              {/* Next lesson card */}
+              {nextLesson && (
+                <div className="bg-white rounded-xl border border-slate-200 p-5">
+                  <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Up Next</p>
+                  <p className="text-sm font-semibold text-slate-900 mb-1 leading-snug">{nextLesson.title}</p>
+                  {nextLesson.duration_minutes && (
+                    <p className="text-xs text-slate-400 mb-3 flex items-center gap-1">
+                      <Clock className="w-3 h-3" />{nextLesson.duration_minutes} min
+                    </p>
+                  )}
+                  <Link
+                    href={`/lms/courses/${courseId}/lessons/${nextLesson.id}`}
+                    className="w-full flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white py-2.5 rounded-lg font-bold transition text-sm"
+                  >
+                    <Play className="w-3.5 h-3.5" />
+                    {completedCount === 0 ? 'Start Lesson' : 'Continue'}
+                  </Link>
+                </div>
+              )}
+
+              {/* Progress breakdown */}
+              <div className="bg-white rounded-xl border border-slate-200 p-5">
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Your Progress</p>
+                <div className="space-y-3">
+                  {[
+                    { label: 'Modules complete',  value: `${completedModules} / ${modules.length}` },
+                    { label: 'Lessons complete',  value: `${completedCount} / ${allLessons.length}` },
+                    { label: 'Current phase',     value: activePhase ? `${activePhase.label}: ${activePhase.name}` : '—' },
+                    { label: 'Hours remaining',   value: totalHours > 0 ? `~${Math.round((totalMinutes * (1 - progressPct / 100)) / 60)}h` : '—' },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="flex items-center justify-between">
+                      <dt className="text-xs text-slate-500">{label}</dt>
+                      <dd className="text-xs font-semibold text-slate-900">{value}</dd>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Credentials reminder */}
+              <div className="bg-slate-900 rounded-xl p-5">
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">You're Earning</p>
+                <div className="space-y-2.5">
+                  {[
+                    { icon: BadgeCheck, color: 'text-amber-400',       label: 'EPA 608 Universal' },
+                    { icon: Shield,     color: 'text-orange-400',      label: 'OSHA 10' },
+                    { icon: Award,      color: 'text-brand-blue-400',  label: 'CPR / First Aid' },
+                  ].map(({ icon: Icon, color, label }) => (
+                    <div key={label} className="flex items-center gap-2.5">
+                      <Icon className={`w-4 h-4 flex-shrink-0 ${color}`} />
+                      <span className="text-sm font-medium text-white">{label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Unenrolled / marketing view ───────────────────────────────────────
   return (
     <div className="min-h-screen bg-slate-50">
 

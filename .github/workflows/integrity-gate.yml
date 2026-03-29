@@ -63,6 +63,12 @@ jobs:
       - name: Self-service policy check
         run: pnpm run integrity:self-service
 
+      - name: Program catalog integrity check
+        run: pnpm run integrity:programs
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
       - name: Upload integrity reports
         if: always()
         uses: actions/upload-artifact@v4

@@ -206,7 +206,7 @@
     "integrity:test-endpoints": "node scripts/check-no-test-endpoints.mjs",
     "integrity:stripe": "node scripts/check-stripe-integrity.mjs",
     "integrity:dead-links": "bash scripts/no-dead-links.sh",
-    "integrity:all": "npm run integrity:links && npm run integrity:media && npm run integrity:lms && npm run integrity:store && npm run integrity:analytics && npm run integrity:self-service && npm run integrity:test-endpoints && npm run integrity:dead-links",
+    "integrity:all": "npm run integrity:links && npm run integrity:media && npm run integrity:lms && npm run integrity:store && npm run integrity:analytics && npm run integrity:self-service && npm run integrity:test-endpoints && npm run integrity:dead-links && pnpm integrity:programs",
     "approve-builds": "bash scripts/pnpm-approve-builds.sh",
     "archetype:check": "node scripts/archetype-mapper.mjs",
     "spot-check": "node scripts/spot-check.mjs",
@@ -337,7 +337,8 @@
     "dev:kill-port": "bash scripts/kill-port.sh 3000",
     "lint:reliability": "node scripts/guard-no-fake-success.mjs",
     "lint:critical-routes": "node scripts/guard-critical-routes.mjs",
-    "verify:survival": "pnpm lint && pnpm lint:reliability && pnpm lint:critical-routes"
+    "verify:survival": "pnpm lint && pnpm lint:reliability && pnpm lint:critical-routes",
+    "integrity:programs": "tsx scripts/check-program-integrity.ts"
   },
   "overrides": {
     "inflight": "npm:lru-cache@^10.0.0"

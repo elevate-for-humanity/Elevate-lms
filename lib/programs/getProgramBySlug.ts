@@ -79,6 +79,8 @@ export type ProgramRecord = {
   program_ctas: ProgramCTA[];
   program_tracks: ProgramTrack[];
   program_modules: ProgramModule[];
+  /** True only when all required relations (media, CTAs, tracks, modules) are present. */
+  isComplete: boolean;
 };
 
 // ─── Repository ───────────────────────────────────────────────────────────────
@@ -156,12 +158,18 @@ export async function getPublishedProgramBySlug(slug: string): Promise<ProgramRe
     throw new Error(`Published program not found for slug: ${slug}`);
   }
 
-  // Normalise missing relations to empty arrays so the page renders partial
-  // content rather than 404ing when child tables are not yet seeded.
+  // Normalise missing relations to empty arrays — page renders a controlled
+  // "coming soon" state rather than 404ing or showing empty sections.
   data.program_media   = data.program_media   ?? [];
   data.program_ctas    = data.program_ctas    ?? [];
   data.program_tracks  = data.program_tracks  ?? [];
   data.program_modules = data.program_modules ?? [];
+
+  (data as ProgramRecord).isComplete =
+    data.program_media.length > 0 &&
+    data.program_ctas.length > 0 &&
+    data.program_tracks.length > 0 &&
+    data.program_modules.length > 0;
 
   // Sort all relations by sort_order
   data.program_media.sort((a, b) => a.sort_order - b.sort_order);

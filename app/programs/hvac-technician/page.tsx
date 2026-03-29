@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getPublishedProgramBySlug, formatTrackCost } from '@/lib/programs/getProgramBySlug';
+import { ProgramComingSoon } from '@/components/programs/ProgramComingSoon';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import heroBanners from '@/content/heroBanners';
 
@@ -62,6 +63,10 @@ export default async function HVACTechnicianPage() {
     program = await getPublishedProgramBySlug('hvac-technician');
   } catch {
     notFound();
+  }
+
+  if (!program.isComplete) {
+    return <ProgramComingSoon title={program.title} slug={program.slug} />;
   }
 
   const hero =

@@ -133,9 +133,11 @@ export async function GET(request: NextRequest) {
         redirectTo = '/learner/dashboard?invited=true';
       }
 
-      // Always redirect to canonical domain — request.url may be a Netlify
-      // deploy-preview URL which breaks email links clicked from outside.
-      const CANONICAL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+      // Use NEXT_PUBLIC_SITE_URL if set, otherwise fall back to the origin
+      // of the incoming request so deploy-preview links work correctly.
+      const CANONICAL = process.env.NEXT_PUBLIC_SITE_URL
+        ? process.env.NEXT_PUBLIC_SITE_URL
+        : new URL(request.url).origin;
       return NextResponse.redirect(new URL(redirectTo, CANONICAL));
     }
 
@@ -144,7 +146,9 @@ export async function GET(request: NextRequest) {
   }
 
   // Redirect to error page if verification fails
-  const CANONICAL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+  const CANONICAL = process.env.NEXT_PUBLIC_SITE_URL
+    ? process.env.NEXT_PUBLIC_SITE_URL
+    : new URL(request.url).origin;
   return NextResponse.redirect(
     new URL('/login?error=verification_failed', CANONICAL)
   );

@@ -4,7 +4,12 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+// Use NETLIFY_URL (set automatically on Netlify) so deploy-preview reset links
+// land on the correct domain. Fall back to NEXT_PUBLIC_SITE_URL then production.
+const SITE_URL =
+  process.env.NETLIFY_URL
+    ? `https://${process.env.NETLIFY_URL}`
+    : process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
 /**
  * Generate a password recovery link via Supabase Admin API and send it

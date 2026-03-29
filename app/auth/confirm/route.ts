@@ -141,15 +141,29 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL(redirectTo, CANONICAL));
     }
 
-    // Log error for debugging
+    // verifyOtp failed — token expired or already used
     logger.error('Email verification error:', error);
+    const CANONICAL = process.env.NEXT_PUBLIC_SITE_URL
+      ? process.env.NEXT_PUBLIC_SITE_URL
+      : new URL(request.url).origin;
+
+    if (type === 'recovery') {
+      // Send back to forgot-password with a clear message instead of silent login redirect
+      return NextResponse.redirect(
+        new URL('/auth/forgot-password?error=link_expired', CANONICAL)
+      );
+    }
+
+    return NextResponse.redirect(
+      new URL('/login?error=verification_failed', CANONICAL)
+    );
   }
 
-  // Redirect to error page if verification fails
+  // No token_hash or type — redirect to login
   const CANONICAL = process.env.NEXT_PUBLIC_SITE_URL
     ? process.env.NEXT_PUBLIC_SITE_URL
     : new URL(request.url).origin;
   return NextResponse.redirect(
-    new URL('/login?error=verification_failed', CANONICAL)
+    new URL('/login?error=no_token', CANONICAL)
   );
 }

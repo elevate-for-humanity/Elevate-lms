@@ -85,7 +85,7 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
             <div className="max-w-2xl">
-              <p className="text-brand-red-200 font-bold text-xs uppercase tracking-widest mb-3">Funding</p>
+              <p className="text-white font-bold text-xs uppercase tracking-widest mb-3">Funding</p>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">You May Qualify for Free Training</h2>
               <p className="text-brand-red-100 text-base leading-relaxed mb-6">
                 Many students pay $0 through state and workforce funding programs. We help you find and apply for the funding you qualify for.
@@ -191,15 +191,15 @@ export default function HomePage() {
       {/* ── CREDIBILITY ── */}
       <section className="bg-white border-t border-slate-100 py-12 px-6">
         <div className="max-w-6xl mx-auto">
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-8 text-center">Approved &amp; recognized by</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-600 mb-8 text-center">Approved &amp; recognized by</p>
           <div className="flex flex-wrap justify-center gap-3">
             {[
               { title: 'DOL Registered Apprenticeship', bg: 'bg-blue-600' },
               { title: 'Indiana ETPL Certified', bg: 'bg-brand-red-600' },
               { title: 'Government Contractor', bg: 'bg-slate-800' },
               { title: 'Certiport Testing Center', bg: 'bg-violet-600' },
-              { title: 'IRS VITA Certified', bg: 'bg-emerald-600' },
-              { title: 'EmployIndy Partner', bg: 'bg-amber-500' },
+              { title: 'IRS VITA Certified', bg: 'bg-emerald-700' },
+              { title: 'EmployIndy Partner', bg: 'bg-amber-700' },
             ].map((c) => (
               <div key={c.title} className={`${c.bg} text-white px-5 py-3 rounded-full font-semibold text-sm whitespace-nowrap shadow-sm`}>
                 {c.title}

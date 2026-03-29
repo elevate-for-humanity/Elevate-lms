@@ -39,7 +39,7 @@ test.describe('Full Enrollment Journey: Apply → Auth → Checkout → Enrollme
     await expect(page).toHaveURL(/\/programs/);
     
     // Step 1.3: Verify programs are displayed
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded', { timeout: 30000 });
     const programContent = page.locator('main');
     await expect(programContent).toBeVisible();
     
@@ -189,7 +189,7 @@ test.describe('Full Enrollment Journey: Apply → Auth → Checkout → Enrollme
     
     // Step 6.4: Test courses page
     await page.goto('/lms/courses?demo=true');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded', { timeout: 30000 });
     
     // Step 6.5: Verify courses content loads
     const coursesContent = page.locator('main, [role="main"]');
@@ -236,7 +236,7 @@ test.describe('Full Enrollment Journey: Apply → Auth → Checkout → Enrollme
     
     // LMS Access
     await page.goto('/lms/dashboard?demo=true');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded', { timeout: 30000 });
     journeySteps.push('✓ LMS dashboard accessible (demo mode)');
     
     // Log journey completion
@@ -278,7 +278,7 @@ test.describe('Enrollment Journey Error Handling', () => {
     await page.goto('/lms/dashboard');
     
     // Should redirect to login or show auth required message
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded', { timeout: 30000 });
     const url = page.url();
     
     const isProtected = 
@@ -329,7 +329,7 @@ test.describe('Enrollment Journey Accessibility', () => {
     await page.goto('/inquiry');
     
     // Wait for page to fully load
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded', { timeout: 30000 });
     
     // Get all inputs on the page
     const inputs = page.locator('input:not([type="hidden"]):not([type="submit"])');

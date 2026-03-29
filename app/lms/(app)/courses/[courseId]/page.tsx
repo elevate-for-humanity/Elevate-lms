@@ -219,7 +219,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                   <CheckCircle className="w-4 h-4" /> Complete
                 </span>
               )}
-              {!enrollment && (
+              {!isEnrolled && !isPendingApproval && (
                 <Link href={`/lms/courses/${courseId}/enroll`}
                   className="flex items-center gap-1.5 bg-brand-red-600 hover:bg-brand-red-700 text-white text-sm font-bold px-4 py-2 rounded-lg transition">
                   Enroll Now

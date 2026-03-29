@@ -297,6 +297,17 @@ export default function LessonPage() {
         }
       }
 
+      // Seatbelt: if curriculum-source lesson still has no content after DB read,
+      // fall back to the codebase content library so the reading tab is never blank.
+      if (!enrichedContent && lessonData.lesson_source === 'curriculum') {
+        const defId =
+          HVAC_UUID_TO_DEF[lessonData.id] ??
+          (lessonData.slug ? hvacDefIdFromSlug(lessonData.slug) : undefined);
+        if (defId) {
+          enrichedContent = buildLessonContent(defId);
+        }
+      }
+
       setLesson({
         ...lessonData,
         content: enrichedContent || lessonData.rendered_html || lessonData.content,

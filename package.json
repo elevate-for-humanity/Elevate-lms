@@ -338,7 +338,8 @@
     "lint:reliability": "node scripts/guard-no-fake-success.mjs",
     "lint:critical-routes": "node scripts/guard-critical-routes.mjs",
     "verify:survival": "pnpm lint && pnpm lint:reliability && pnpm lint:critical-routes",
-    "integrity:programs": "tsx scripts/check-program-integrity.ts"
+    "integrity:programs": "tsx scripts/check-program-integrity.ts",
+    "integrity:hvac-content": "tsx scripts/check-hvac-content.ts"
   },
   "overrides": {
     "inflight": "npm:lru-cache@^10.0.0"

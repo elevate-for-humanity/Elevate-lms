@@ -48,9 +48,9 @@ export default async function CurriculumCourseEditorPage({
   const courseName =
     trainingCourse?.title ?? program?.name ?? null;
 
-  // Verify at least one curriculum_lessons row exists for this courseId
+  // Count curriculum_lessons rows for this courseId
   const { count: lessonCount } = await supabase
-    .from('course_lessons')
+    .from('curriculum_lessons')
     .select('id', { count: 'exact', head: true })
     .eq('course_id', courseId);
 
@@ -58,34 +58,21 @@ export default async function CurriculumCourseEditorPage({
     notFound();
   }
 
-  // HVAC remains legacy-driven pending content migration.
-  // training_lessons (95 rows, course f0593164) is the live learner path.
-  // curriculum_lessons (47 rows, program 4226f7f6) is an unpopulated skeleton
-  // and must NOT be published or marketed as the live course until a full
-  // content parity migration is completed and verified.
-  const LEGACY_DRIVEN_COURSES: Record<string, string> = {
-    '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0':
-      'HVAC Technician — live learner path is training_lessons (95 lessons). ' +
-      'These curriculum_lessons rows are an unpopulated migration skeleton. ' +
-      'Do not publish or route learners here until content parity is verified.',
-  };
-  const legacyWarning = LEGACY_DRIVEN_COURSES[courseId] ?? null;
-
-  // Module summary for the sidebar — join course_modules for title + order
+  // Module summary for the sidebar — group by module_order
   const { data: moduleSummary } = await supabase
-    .from('course_lessons')
-    .select('lesson_type, module_id, course_modules ( title, order_index )')
+    .from('curriculum_lessons')
+    .select('module_order, lesson_order')
     .eq('course_id', courseId)
-    .order('order_index', { ascending: true });
+    .order('module_order', { ascending: true });
 
-  // Group by module_id, keyed by module order_index for display
   const moduleMap = new Map<number, { title: string; count: number }>();
-  for (const row of (moduleSummary ?? []) as any[]) {
-    const modOrder: number = row.course_modules?.order_index ?? 0;
-    const modTitle: string = row.course_modules?.title ?? `Module ${modOrder + 1}`;
-    const existing = moduleMap.get(modOrder) ?? { title: modTitle, count: 0 };
+  for (const row of moduleSummary ?? []) {
+    const existing = moduleMap.get(row.module_order) ?? {
+      title: `Module ${row.module_order}`,
+      count: 0,
+    };
     existing.count++;
-    moduleMap.set(modOrder, existing);
+    moduleMap.set(row.module_order, existing);
   }
   const modules = Array.from(moduleMap.entries()).sort(([a], [b]) => a - b);
 

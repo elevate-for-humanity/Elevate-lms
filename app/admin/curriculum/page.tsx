@@ -32,10 +32,10 @@ export default async function CurriculumPage() {
     redirect('/unauthorized');
   }
 
-  // Aggregate lesson counts per course_id from course_lessons (canonical table)
+  // Aggregate lesson counts per course_id from curriculum_lessons (live table)
   const { data: lessonRows } = await supabase
-    .from('course_lessons')
-    .select('course_id, lesson_type');
+    .from('curriculum_lessons')
+    .select('course_id, step_type');
 
   // Build per-course stats
   const courseStats = new Map<string, {
@@ -46,7 +46,7 @@ export default async function CurriculumPage() {
   for (const row of lessonRows ?? []) {
     const s = courseStats.get(row.course_id) ?? { total: 0, checkpoints: 0 };
     s.total++;
-    if (row.lesson_type === 'checkpoint' || row.lesson_type === 'quiz' || row.lesson_type === 'exam') s.checkpoints++;
+    if (row.step_type === 'checkpoint' || row.step_type === 'quiz' || row.step_type === 'exam') s.checkpoints++;
     courseStats.set(row.course_id, s);
   }
 
@@ -138,7 +138,7 @@ export default async function CurriculumPage() {
             <Layers className="w-10 h-10 text-slate-300 mx-auto mb-3" />
             <p className="text-slate-500 font-medium">No course lessons found.</p>
             <p className="text-sm text-slate-400 mt-1">
-              Run the blueprint seeder or use the AI builder to populate course_lessons.
+              Run the curriculum generator or AI builder to seed lessons.
             </p>
             <Link
               href="/admin/courses/ai-builder"

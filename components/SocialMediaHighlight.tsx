@@ -68,7 +68,7 @@ export default function SocialMediaHighlight() {
           >
             <div className="relative h-48 overflow-hidden">
               <Image
-                src="/images/pages/heroes-hq/team-hero.jpg"
+                src="/images/pages/team-hero.jpg"
                 alt="Connect on LinkedIn"
                 fill
                 className="object-cover group-hover:scale-110 transition-transform duration-300"

@@ -11,6 +11,7 @@ import {
   Building2, FileText, Users, Scissors, ClipboardList,
 } from 'lucide-react';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
+import { BarberEnrollment } from './sections/BarberEnrollment';
 
 interface Props { program: ProgramSchema; }
 
@@ -59,8 +60,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
           <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-600">
             <span><strong>Schedule:</strong> {p.schedule}</span>
             <span><strong>Cohort:</strong> {p.cohortSize}</span>
-            <span><strong>Funding:</strong> {p.fundingStatement}</span>
-            <span><strong>Self-pay:</strong> {p.selfPayCost}</span>
+            <span><strong>Tuition:</strong> $4,980. Payment plans available.</span>
           </div>
         </div>
       </section>
@@ -214,65 +214,12 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
             </a>
           </div>
 
-          {/* BNPL + Calculator links */}
-          <div className="flex flex-wrap items-center justify-center gap-4 mt-6 text-sm">
-            <Link href="/programs/barber-apprenticeship/apply#payment" className="text-brand-blue-600 hover:text-brand-blue-700 underline flex items-center gap-1">
-              <DollarSign className="w-4 h-4" /> Buy Now, Pay Later (BNPL) Options
-            </Link>
-            <Link href="/programs/barber-apprenticeship/apply#calculator" className="text-brand-blue-600 hover:text-brand-blue-700 underline flex items-center gap-1">
-              <DollarSign className="w-4 h-4" /> Payment Calculator
-            </Link>
-          </div>
         </div>
       </section>
 
-      {/* ═══ PARTNER BARBERSHOP SECTION ═══ */}
-      <section className="py-10">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div className="relative h-80 rounded-xl overflow-hidden shadow-lg">
-              <Image src="/images/pages/barber-station-mirror.jpg" alt="Barbershop station with mirror and tools" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
-            </div>
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center">
-                  <Building2 className="w-5 h-5 text-brand-orange-700" />
-                </div>
-                <h2 className="text-xl font-bold text-slate-900">Partner Barbershop Program</h2>
-              </div>
-              <p className="text-slate-700 leading-relaxed mb-4">
-                Our apprenticeship depends on licensed barbershops willing to host and train apprentices on the job.
-                As a <strong>Partner Barbershop</strong>, you provide the supervised on-the-job training environment where
-                apprentices complete their 1,500 OJT hours. We handle all the paperwork — hour tracking, state compliance,
-                curriculum delivery, and completion documentation.
-              </p>
-              <p className="text-slate-700 leading-relaxed mb-4">
-                In return, you get pre-screened, motivated help during busy hours, a pipeline of potential future employees
-                trained to your standards, and recognition as an approved DOL training site. Many host shops hire their
-                best apprentices after completion.
-              </p>
-              <p className="text-slate-700 leading-relaxed mb-6">
-                To qualify, your shop must hold an active Indiana barbershop license, employ at least one licensed barber
-                capable of supervising, and maintain a safe, professional training environment.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  href="/programs/barber-apprenticeship/apply?type=partner_shop"
-                  className="bg-brand-orange-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-brand-orange-700 transition-colors"
-                >
-                  Learn More & Apply as Host Shop
-                </Link>
-                <Link
-                  href="/forms/host-shop-inquiry"
-                  className="border border-slate-300 text-slate-700 px-6 py-2.5 rounded-lg font-semibold text-sm hover:border-slate-400 transition-colors"
-                >
-                  Host Shop Inquiry
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <BarberEnrollment />
+
+
 
       {/* ═══ CAREER OUTCOMES / LABOR MARKET ═══ */}
       <section className="py-10">
@@ -428,7 +375,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
             <p>Modality: {p.modality}</p>
             <p>Facility: {p.facilityInfo}</p>
             <p>Equipment: {p.equipmentIncluded}</p>
-            <p>Payment: {p.paymentTerms}</p>
+            <p>Tuition: $4,980. Payment plans available.</p>
           </div>
         </div>
       </section>

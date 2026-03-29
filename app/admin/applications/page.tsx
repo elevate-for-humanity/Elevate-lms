@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { FollowUpBlastButton } from '@/components/admin/FollowUpBlastButton';
+import ApplicationsTableClient from './ApplicationsTableClient';
+import type { ApplicationRow } from './ApplicationsTableClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,42 +18,7 @@ export const metadata: Metadata = {
   description: 'Manage all applications',
 };
 
-const statusLabels: Record<string, string> = {
-  pending: 'Pending',
-  submitted: 'Submitted',
-  approved: 'Approved',
-  rejected: 'Rejected',
-  in_review: 'In Review',
-  enrolled: 'Enrolled',
-  waitlisted: 'Waitlisted',
-};
 
-const statusColors: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  submitted: 'bg-brand-blue-100 text-brand-blue-800',
-  approved: 'bg-brand-green-100 text-brand-green-800',
-  rejected: 'bg-brand-red-100 text-brand-red-800',
-  in_review: 'bg-brand-blue-100 text-brand-blue-800',
-  enrolled: 'bg-emerald-100 text-emerald-800',
-  waitlisted: 'bg-purple-100 text-purple-800',
-};
-
-interface ApplicationRow {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  full_name: string | null;
-  email: string | null;
-  phone: string | null;
-  city: string | null;
-  zip: string | null;
-  program_interest: string | null;
-  support_notes: string | null;
-  status: string;
-  source: string | null;
-  created_at: string;
-  updated_at: string | null;
-}
 
 export default async function ApplicationsPage({
   searchParams,
@@ -220,86 +187,7 @@ export default async function ApplicationsPage({
             </div>
           ) : applications && applications.length > 0 ? (
             <>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Applicant
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Contact
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Program
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Submitted
-                      </th>
-                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {(applications as ApplicationRow[]).map((app) => {
-                      const displayName =
-                        [app.first_name, app.last_name].filter(Boolean).join(' ') ||
-                        app.full_name ||
-                        'Unknown';
-
-                      return (
-                        <tr key={app.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <div className="font-medium text-gray-900">{displayName}</div>
-                            {app.city && (
-                              <div className="text-sm text-gray-500">
-                                {app.city}
-                                {app.zip ? `, ${app.zip}` : ''}
-                              </div>
-                            )}
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">{app.email || 'N/A'}</div>
-                            {app.phone && <div className="text-sm text-gray-500">{app.phone}</div>}
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <span className="text-sm text-gray-900">
-                              {app.program_interest || 'Not specified'}
-                            </span>
-                            {app.source && (
-                              <div className="text-xs text-gray-400">
-                                {app.source.replace(/-/g, ' ')}
-                              </div>
-                            )}
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <span
-                              className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${statusColors[app.status] || 'bg-gray-100 text-gray-800'}`}
-                            >
-                              {statusLabels[app.status] || app.status}
-                            </span>
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {new Date(app.created_at).toLocaleDateString('en-US')}
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-right">
-                            <Link
-                              href={`/admin/applications/review/${app.id}`}
-                              className="text-brand-blue-600 hover:text-brand-blue-800 text-sm font-medium"
-                            >
-                              Review
-                            </Link>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              <ApplicationsTableClient applications={applications as ApplicationRow[]} />
 
               {totalPages > 1 && (
                 <div className="px-4 py-3 border-t bg-gray-50 flex items-center justify-between">

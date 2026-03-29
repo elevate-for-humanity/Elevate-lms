@@ -22,11 +22,12 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { requireAuth } from '@/lib/api/requireAuth';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { generateCourseOutlineFn } from '@/lib/ai/generate-course-outline-fn';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
+import { transformLessonContent } from '@/lib/lms/transformLessonContent';
 
 export const maxDuration = 300;
 
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await requireAuth(request);
+  const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
   let body: GenerateAndPublishRequest;
@@ -163,22 +164,32 @@ export async function POST(request: NextRequest) {
       activities,
       status:       'draft',
       is_published: false,
-      // All AI-generated content goes in the content JSON blob
-      content: JSON.stringify({
-        compliance_status:      'draft_for_human_review',
-        compliance_notice:      outline.course.compliance_notice,
-        learning_points:        l.learning_points,
-        scenario:               l.scenario,
-        assessment_question:    l.assessment_question,
-        exam_eligibility:       l.step_type === 'exam'
-          ? outline.course.exam_eligibility_criteria
-          : undefined,
-        pass_threshold:         l.step_type === 'checkpoint'
-          ? outline.course.pass_threshold_checkpoints
-          : l.step_type === 'exam'
-            ? outline.course.pass_threshold_final_exam
+      // Transform at write time — lesson page receives HTML + quiz, not raw JSON.
+      // The raw blob is preserved in content for audit/re-generation; the rendered
+      // fields (rendered_html, quiz_questions) are what the LMS actually reads.
+      ...(() => {
+        const blob = {
+          compliance_status:   'draft_for_human_review',
+          compliance_notice:   (outline.course as any).compliance_notice,
+          learning_points:     l.learning_points,
+          scenario:            l.scenario,
+          assessment_question: l.assessment_question,
+          exam_eligibility:    l.step_type === 'exam'
+            ? outline.course.exam_eligibility_criteria
             : undefined,
-      }),
+          pass_threshold:      l.step_type === 'checkpoint'
+            ? outline.course.pass_threshold_checkpoints
+            : l.step_type === 'exam'
+              ? outline.course.pass_threshold_final_exam
+              : undefined,
+        };
+        const { html, quizQuestions } = transformLessonContent(blob, l.slug);
+        return {
+          content:        JSON.stringify(blob),   // raw blob preserved for audit
+          rendered_html:  html,                   // production-ready HTML
+          quiz_questions: quizQuestions.length > 0 ? quizQuestions : null,
+        };
+      })(),
     };
   });
 
@@ -218,7 +229,7 @@ export async function POST(request: NextRequest) {
 
   await logAdminAudit({
     action:     AdminAction.BULK_CONTENT_GENERATED,
-    actorId:    auth.user?.id ?? '00000000-0000-0000-0000-000000000000',
+    actorId:    auth.userId ?? '00000000-0000-0000-0000-000000000000',
     entityType: 'courses',
     entityId:   courseId,
     metadata:   {

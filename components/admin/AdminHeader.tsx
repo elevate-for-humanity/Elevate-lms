@@ -3,304 +3,89 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import EnvironmentBadge from './EnvironmentBadge';
-import {
-  LayoutDashboard,
-  Users,
-  GraduationCap,
-  Building2,
-  FileText,
-  Settings,
-  BarChart3,
-  Shield,
-  Rocket,
-  Menu,
-  X,
-  ChevronDown,
-  GitBranch,
-  RefreshCw,
-} from 'lucide-react';
-
-const NAV_SECTIONS = [
-  {
-    name: 'Dashboard',
-    href: '/admin/dashboard',
-    icon: LayoutDashboard,
-  },
-  {
-    name: 'Users',
-    icon: Users,
-    items: [
-      { name: 'All Users', href: '/admin/users' },
-      { name: 'Students', href: '/admin/students' },
-      { name: 'Instructors', href: '/admin/instructors' },
-      { name: 'Applicants', href: '/admin/applicants' },
-      { name: 'Leads', href: '/admin/leads' },
-    ],
-  },
-  {
-    name: 'Programs',
-    icon: GraduationCap,
-    items: [
-      { name: 'All Programs', href: '/admin/programs' },
-      { name: 'Courses', href: '/admin/courses' },
-      { name: 'Enrollments', href: '/admin/enrollments' },
-      { name: 'Certificates', href: '/admin/certificates' },
-      { name: 'Apprenticeships', href: '/admin/apprenticeships' },
-    ],
-  },
-  {
-    name: 'Partners',
-    icon: Building2,
-    items: [
-      { name: 'All Partners', href: '/admin/partners' },
-      { name: 'Employers', href: '/admin/employers' },
-      { name: 'Program Holders', href: '/admin/program-holders' },
-      { name: 'Shops', href: '/admin/shops' },
-      { name: 'Barber Shop Applications', href: '/admin/barber-shop-applications' },
-    ],
-  },
-  {
-    name: 'Reports',
-    icon: BarChart3,
-    items: [
-      { name: 'Analytics', href: '/admin/analytics' },
-      { name: 'Enrollment Reports', href: '/admin/reports/enrollment' },
-      { name: 'Financial Reports', href: '/admin/reports/financial' },
-      { name: 'Compliance', href: '/admin/compliance' },
-    ],
-  },
-  {
-    name: 'Content',
-    icon: FileText,
-    items: [
-      { name: 'Course Builder', href: '/admin/course-builder' },
-      { name: 'Documents', href: '/admin/documents' },
-      { name: 'Blog', href: '/admin/blog' },
-      { name: 'Media', href: '/admin/videos' },
-    ],
-  },
-  {
-    name: 'System',
-    icon: Settings,
-    items: [
-      { name: 'Settings', href: '/admin/settings' },
-      { name: 'Integrations', href: '/admin/integrations' },
-      { name: 'API Keys', href: '/admin/api-keys' },
-      { name: 'Audit Logs', href: '/admin/audit-logs' },
-      { name: 'System Health', href: '/admin/system-health' },
-      { name: 'Advanced Tools', href: '/admin/advanced-tools' },
-    ],
-  },
-];
-
-// Environment detection for badge
-const isNetlify = process.env.NEXT_PUBLIC_NETLIFY === 'true';
-const netlifyContext = process.env.NEXT_PUBLIC_CONTEXT;
-const isProd = isNetlify 
-  ? netlifyContext === 'production' 
-  : process.env.NODE_ENV === 'production';
-const isPreview = isNetlify 
-  ? netlifyContext === 'deploy-preview' || netlifyContext === 'branch-deploy'
-  : false;
-
-function getEnvBadge(): { label: string; color: string } {
-  if (isProd) {
-    return { label: 'PRODUCTION', color: 'bg-brand-red-100 text-brand-red-800 border-brand-red-200' };
-  }
-  if (isPreview) {
-    return { label: 'PREVIEW', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' };
-  }
-  return { label: 'DEVELOPMENT', color: 'bg-brand-blue-100 text-brand-blue-800 border-brand-blue-200' };
-}
+import { Search, Bell, ChevronDown, Settings, ExternalLink, LogOut } from 'lucide-react';
 
 export default function AdminHeader() {
   const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [deploying, setDeploying] = useState(false);
-  const envBadge = getEnvBadge();
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [search, setSearch] = useState('');
 
-  const handleDeploy = async () => {
-    setDeploying(true);
-    try {
-      // Trigger Netlify build hook or GitHub Actions
-      const response = await fetch('/api/admin/deploy', {
-        method: 'POST',
-      });
-      if (response.ok) {
-        alert('Deployment triggered successfully!');
-      } else {
-        alert('Failed to trigger deployment');
-      }
-    } catch (error) {
-      alert('Error triggering deployment');
-    } finally {
-      setDeploying(false);
-    }
+  const segment = pathname.split('/').filter(Boolean)[1] || 'dashboard';
+  const pageTitle = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
+
+  const subtitles: Record<string, string> = {
+    dashboard:    'Manage applications, enrollments, students, and operations',
+    applications: 'Review and action incoming applications',
+    students:     'Track student progress and status',
+    enrollments:  'Manage active and pending enrollments',
+    programs:     'Configure programs and curriculum',
+    instructors:  'Instructor assignments and performance',
+    payments:     'Billing, fees, and financial records',
+    reports:      'Analytics, compliance, and exports',
+    settings:     'System configuration and preferences',
   };
+  const subtitle = subtitles[segment] ?? 'Admin console';
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    if (search.trim()) {
+      window.location.href = `/admin/students?search=${encodeURIComponent(search.trim())}`;
+    }
+  }
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-slate-900 text-white z-[9999] shadow-lg">
-      <div className="h-full flex items-center justify-between px-4">
-        {/* Logo */}
-        <Link href="/admin/dashboard" className="flex items-center gap-2">
-          <Shield className="w-8 h-8 text-brand-blue-400" />
-          <span className="font-bold text-lg hidden sm:block">Admin Panel</span>
-        </Link>
-        
-        {/* Environment Badge */}
-        <EnvironmentBadge label={envBadge.label} color={envBadge.color} />
-
-        {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-1" aria-label="Admin navigation">
-          {NAV_SECTIONS.map((section) => (
-            <div key={section.name} className="relative">
-              {section.href ? (
-                <Link
-                  href={section.href}
-                  className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    pathname === section.href
-                      ? 'bg-slate-700 text-white'
-                      : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                  }`}
-                >
-                  <section.icon className="w-4 h-4" />
-                  {section.name}
-                </Link>
-              ) : (
-                <button
-                  onClick={() => setOpenDropdown(openDropdown === section.name ? null : section.name)}
-                  className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    section.items?.some((item) => pathname.startsWith(item.href))
-                      ? 'bg-slate-700 text-white'
-                      : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                  }`}
-                >
-                  <section.icon className="w-4 h-4" />
-                  {section.name}
-                  <ChevronDown className="w-3 h-3" />
-                </button>
-              )}
-
-              {/* Dropdown */}
-              {section.items && openDropdown === section.name && (
-                <div className="absolute top-full left-0 mt-1 w-48 bg-slate-800 rounded-md shadow-lg py-1 z-50">
-                  {section.items.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setOpenDropdown(null)}
-                      className={`block px-4 py-2 text-sm ${
-                        pathname === item.href
-                          ? 'bg-slate-700 text-white'
-                          : 'text-slate-300 hover:bg-slate-700 hover:text-white'
-                      }`}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </nav>
-
-        {/* Right side actions */}
-        <div className="flex items-center gap-3">
-          {/* Deploy Button */}
-          <button
-            onClick={handleDeploy}
-            disabled={deploying}
-            className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-brand-green-600 hover:bg-brand-green-700 disabled:bg-brand-green-800 rounded-md text-sm font-medium transition-colors"
-          >
-            {deploying ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
-            ) : (
-              <Rocket className="w-4 h-4" />
-            )}
-            {deploying ? 'Deploying...' : 'Deploy'}
-          </button>
-
-          {/* GitHub Link */}
-          <a
-            href="https://github.com/elevateforhumanity/Elevate-lms"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden md:flex items-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-md text-sm font-medium transition-colors"
-          >
-            <GitBranch className="w-4 h-4" />
-            GitHub
-          </a>
-
-          {/* Back to Site */}
-          <Link
-            href="/"
-            className="hidden sm:block px-3 py-1.5 text-slate-300 hover:text-white text-sm"
-          >
-            View Site
-          </Link>
-
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-md hover:bg-slate-800"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
+    <header className="fixed top-0 left-0 right-0 lg:left-60 h-14 bg-white border-b border-gray-200 z-30 flex items-center px-4 gap-4">
+      <div className="min-w-0 flex-1">
+        <h1 className="text-sm font-semibold text-gray-900 leading-tight truncate">{pageTitle}</h1>
+        <p className="text-[11px] text-gray-400 leading-tight hidden sm:block truncate">{subtitle}</p>
       </div>
 
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden absolute top-16 left-0 right-0 bg-slate-900 border-t border-slate-700 max-h-[calc(100vh-4rem)] overflow-y-auto">
-          <div className="px-4 py-4 space-y-2">
-            {NAV_SECTIONS.map((section) => (
-              <div key={section.name}>
-                {section.href ? (
-                  <Link
-                    href={section.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-md text-slate-300 hover:bg-slate-800"
-                  >
-                    <section.icon className="w-5 h-5" />
-                    {section.name}
-                  </Link>
-                ) : (
-                  <>
-                    <div className="flex items-center gap-2 px-3 py-2 text-slate-400 font-medium">
-                      <section.icon className="w-5 h-5" />
-                      {section.name}
-                    </div>
-                    <div className="ml-7 space-y-1">
-                      {section.items?.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="block px-3 py-1.5 text-sm text-slate-300 hover:text-white"
-                        >
-                          {item.name}
-                        </Link>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
-
-            {/* Mobile Deploy */}
-            <button
-              onClick={handleDeploy}
-              disabled={deploying}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-brand-green-600 hover:bg-brand-green-700 rounded-md text-sm font-medium mt-4"
-            >
-              {deploying ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Rocket className="w-4 h-4" />}
-              {deploying ? 'Deploying...' : 'Deploy to Production'}
-            </button>
-          </div>
+      <form onSubmit={handleSearch} className="hidden md:flex items-center">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search students, applications…"
+            className="pl-8 pr-3 py-1.5 text-xs border border-gray-200 rounded-lg w-56 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+          />
         </div>
-      )}
+      </form>
+
+      <Link href="/admin/notifications"
+        className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+        title="Notifications">
+        <Bell className="w-4 h-4" />
+      </Link>
+
+      <div className="relative">
+        <button onClick={() => setProfileOpen(v => !v)}
+          className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+          <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">A</div>
+          <span className="hidden sm:block font-medium">Admin</span>
+          <ChevronDown className="w-3 h-3 text-gray-400" />
+        </button>
+        {profileOpen && (
+          <>
+            <div className="fixed inset-0 z-10" onClick={() => setProfileOpen(false)} />
+            <div className="absolute right-0 top-full mt-1 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-20 py-1">
+              <Link href="/admin/settings" onClick={() => setProfileOpen(false)}
+                className="flex items-center gap-2 px-3 py-2 text-xs text-gray-700 hover:bg-gray-50">
+                <Settings className="w-3.5 h-3.5" /> Settings
+              </Link>
+              <Link href="/" onClick={() => setProfileOpen(false)}
+                className="flex items-center gap-2 px-3 py-2 text-xs text-gray-700 hover:bg-gray-50">
+                <ExternalLink className="w-3.5 h-3.5" /> View site
+              </Link>
+              <div className="border-t border-gray-100 my-1" />
+              <Link href="/api/auth/signout" onClick={() => setProfileOpen(false)}
+                className="flex items-center gap-2 px-3 py-2 text-xs text-red-600 hover:bg-red-50">
+                <LogOut className="w-3.5 h-3.5" /> Sign out
+              </Link>
+            </div>
+          </>
+        )}
+      </div>
     </header>
   );
 }

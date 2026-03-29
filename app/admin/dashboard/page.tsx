@@ -23,12 +23,16 @@ async function getDashboardData(supabase: any, db: any) {
     atRiskRes,
     pendingEnrollmentsRes,
     pendingDocsRes,
+    pendingAppsRes,
     allStudentsRes,
     allEnrollmentsRes,
     allProgramsRes,
     allCoursesRes,
     recentStudentsRes,
     topCoursesRes,
+    recentApplicationsRes,
+    activityLogRes,
+    paymentsRes,
   ] = await Promise.all([
     supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student'),
     supabase.from('programs').select('id', { count: 'exact', head: true }).eq('status', 'active'),
@@ -41,13 +45,33 @@ async function getDashboardData(supabase: any, db: any) {
     // Action Center counts
     supabase.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     supabase.from('documents').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('applications').select('id', { count: 'exact', head: true }).in('status', ['submitted', 'pending', 'in_review']),
     // Full data for charts
     supabase.from('profiles').select('enrollment_status').eq('role', 'student'),
     supabase.from('program_enrollments').select('status, enrolled_at, progress, course_id'),
     supabase.from('programs').select('id, name, status'),
     supabase.from('courses').select('id, title, is_active'),
-    supabase.from('profiles').select('id, full_name, email, enrollment_status, created_at').eq('role', 'student').order('created_at', { ascending: false }).limit(10),
+    // Recent students with their latest enrolled program name
+    supabase.from('profiles')
+      .select('id, full_name, email, enrollment_status, created_at, program_enrollments(program_id, programs(name))')
+      .eq('role', 'student')
+      .order('created_at', { ascending: false })
+      .limit(10),
     supabase.from('program_enrollments').select('course_id, status').limit(500),
+    // Recent applications — newest 8
+    supabase.from('applications')
+      .select('id, first_name, last_name, full_name, email, program_interest, status, created_at')
+      .order('created_at', { ascending: false })
+      .limit(8),
+    // Admin activity log — newest 10 events
+    supabase.from('admin_activity_log')
+      .select('id, action, details, timestamp')
+      .order('timestamp', { ascending: false })
+      .limit(10),
+    // Payments — sum paid amount_cents
+    supabase.from('payments')
+      .select('amount_cents')
+      .eq('status', 'paid'),
   ]);
 
   // Build enrollment trend by month
@@ -115,6 +139,61 @@ async function getDashboardData(supabase: any, db: any) {
     }
   } catch { /* non-fatal */ }
 
+  // Flatten program name onto each recent student row
+  const recentStudents = (recentStudentsRes.data ?? []).map((s: any) => {
+    const enrollment = Array.isArray(s.program_enrollments) ? s.program_enrollments[0] : null;
+    const program = enrollment?.programs;
+    return {
+      id: s.id,
+      full_name: s.full_name ?? null,
+      email: s.email ?? null,
+      enrollment_status: s.enrollment_status ?? null,
+      created_at: s.created_at ?? null,
+      program_name: (program as any)?.name ?? null,
+    };
+  });
+
+  // Build real activity feed from admin_activity_log + recent applications + recent enrollments
+  const activityItems: { id: string; label: string; created_at: string }[] = [];
+
+  for (const row of activityLogRes.data ?? []) {
+    const details = row.details as Record<string, string> | null;
+    const who = details?.student_name || details?.name || details?.email || '';
+    const what = details?.program || details?.program_name || '';
+    const label = [row.action, who, what].filter(Boolean).join(' — ');
+    activityItems.push({ id: `log-${row.id}`, label, created_at: row.timestamp });
+  }
+
+  // Supplement with recent applications if activity log is sparse
+  if (activityItems.length < 5) {
+    for (const app of recentApplicationsRes.data ?? []) {
+      const name = [app.first_name, app.last_name].filter(Boolean).join(' ') || app.full_name || 'Applicant';
+      activityItems.push({
+        id: `app-${app.id}`,
+        label: `${name} applied for ${app.program_interest || 'a program'}`,
+        created_at: app.created_at,
+      });
+    }
+  }
+
+  // Supplement with recent enrollments
+  if (activityItems.length < 8) {
+    for (const s of recentStudents.slice(0, 5)) {
+      activityItems.push({
+        id: `enroll-${s.id}`,
+        label: `${s.full_name || 'Student'} registered${(s as any).program_name ? ` — ${(s as any).program_name}` : ''}`,
+        created_at: s.created_at ?? new Date().toISOString(),
+      });
+    }
+  }
+
+  const recentActivity = activityItems
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 10);
+
+  const totalRevenueCents = (paymentsRes.data ?? [])
+    .reduce((sum, row) => sum + Number(row.amount_cents ?? 0), 0);
+
   return {
     counts: {
       students: studentsRes.count ?? 0,
@@ -127,6 +206,7 @@ async function getDashboardData(supabase: any, db: any) {
       atRisk: atRiskRes.count ?? 0,
       pendingEnrollments: pendingEnrollmentsRes.count ?? 0,
       pendingDocs: pendingDocsRes.count ?? 0,
+      pendingApplications: pendingAppsRes.count ?? 0,
     },
     enrollmentsByMonth,
     studentStatuses,
@@ -134,7 +214,10 @@ async function getDashboardData(supabase: any, db: any) {
     progressBuckets,
     programStatuses,
     topCourses,
-    recentStudents: recentStudentsRes.data ?? [],
+    recentStudents,
+    recentApplications: recentApplicationsRes.data ?? [],
+    recentActivity,
+    totalRevenueCents,
     profile,
     generatedAt: new Date().toISOString(),
   };

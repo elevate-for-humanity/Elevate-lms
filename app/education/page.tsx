@@ -46,7 +46,7 @@ const PROGRAMS = [
     tags: ['CDL Class A', 'CDL Class B', 'Diesel Mechanic'],
   },
   {
-    title: 'Beauty & Barbering',
+    title: 'Barber Apprenticeship',
     href: '/programs/barber-apprenticeship',
     image: '/images/pages/barber-apprenticeship.jpg',
     desc: 'Barber apprenticeships and cosmetology training. Learn from licensed professionals in real shop settings.',

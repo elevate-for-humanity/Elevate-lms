@@ -63,6 +63,13 @@ BEGIN
     RAISE EXCEPTION 'No course_lessons found for course %', p_course_id;
   END IF;
 
+  -- ── 2b. Flip course status to published ───────────────────────────────────
+  UPDATE public.courses
+     SET status     = 'published',
+         is_active  = true,
+         updated_at = now()
+   WHERE id = p_course_id;
+
   -- ── 3. Collect existing curriculum_lessons orders (idempotency) ───────────
   SELECT ARRAY_AGG(lesson_order)
     INTO v_existing_orders

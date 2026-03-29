@@ -23,7 +23,7 @@ export const NAV_ITEMS = [
       { name: 'Skilled Trades', href: '/programs/skilled-trades' },
       { name: 'CDL Driving', href: '/programs/cdl-training' },
       { name: 'Technology', href: '/programs/technology' },
-      { name: 'Barbering & Beauty', href: '/programs/barber-apprenticeship' },
+      { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
       { name: 'Business & Finance', href: '/programs/finance-bookkeeping-accounting' },
       { name: 'Peer Recovery', href: '/programs/peer-recovery-specialist' },
       { name: 'All Programs →', href: '/programs' },

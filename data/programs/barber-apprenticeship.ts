@@ -29,8 +29,8 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   },
   schedule: 'Flexible — 15–20 hrs/week (OJT at host shop + RTI online)',
   cohortSize: '8–12 apprentices per cohort',
-  fundingStatement: 'Employer-sponsored through DOL Registered Apprenticeship. Apprentices earn wages during training. Self-pay option: $3,500 with payment plans.',
-  selfPayCost: '$3,500 (if not employer-sponsored)',
+  fundingStatement: '$4,980. Payment plans available.',
+  selfPayCost: '$4,980',
   badge: 'DOL Registered',
   badgeColor: 'blue',
 
@@ -69,7 +69,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
       title: 'Barber Apprentice',
       timeframe: '0–12 months (during program)',
       requirements: 'Enrolled in DOL Registered Apprenticeship',
-      salaryRange: '$24,000–$30,000 (earn while you learn)',
+      salaryRange: '$24,000–$30,000 (after licensing)',
     },
     {
       title: 'Licensed Barber',
@@ -253,7 +253,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     'LMS access for full program duration',
     'Career placement and shop matching',
   ],
-  paymentTerms: 'Employer-sponsored through DOL Registered Apprenticeship. Apprentices earn wages during training. Self-pay option: $3,500 with payment plans.',
+  paymentTerms: '$4,980. Payment plans available.',
 
   // ─── Content model ──────────────────────────────────────────────
   deliveryModel: 'partner',
@@ -285,7 +285,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   ],
 
   faqs: [
-    { question: 'Do I get paid during the apprenticeship?', answer: 'Yes. As a DOL Registered Apprentice, you earn wages while training at your host barbershop. Starting pay is typically $12–$15/hour, increasing as you gain skills.' },
+    { question: 'How much does the program cost?', answer: 'Tuition is $4,980. Payment plans are available — contact us to discuss options.' },
     { question: 'How long is the program?', answer: '12 months (52 weeks). Indiana requires 2,000 total hours: 1,500 hours of on-the-job training at a licensed shop and 500 hours of Related Technical Instruction delivered online.' },
     { question: 'Do I need my own barbershop?', answer: 'No. We match you with a licensed host barbershop in the Indianapolis area. The host shop provides your on-the-job training environment.' },
     { question: 'What license do I earn?', answer: 'The Indiana Barber License, issued by the Indiana State Board of Cosmetology and Barber Examiners. You also earn a DOL Registered Apprenticeship certificate, which is recognized in all 50 states.' },
@@ -298,5 +298,5 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   ],
 
   metaTitle: 'Barber Apprenticeship | DOL Registered | Indianapolis',
-  metaDescription: '52-week DOL Registered Barber Apprenticeship. Earn your Indiana Barber License. 2,000 hours. Earn while you learn. Indianapolis.',
+  metaDescription: '52-week DOL Registered Barber Apprenticeship. Earn your Indiana Barber License. 2,000 hours. $4,980 tuition. Payment plans available. Indianapolis.',
 };

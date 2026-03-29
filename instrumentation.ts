@@ -5,10 +5,16 @@ export async function register() {
     const { hydrateProcessEnv } = await import('./lib/secrets');
     await hydrateProcessEnv();
 
-    await import('./sentry.server.config');
+    // Only load Sentry when a DSN is configured — avoids crashing dev servers
+    // that don't have @sentry/node-core resolved in the pnpm isolated store.
+    if (process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN) {
+      await import('./sentry.server.config');
+    }
   }
 
   if (process.env.NEXT_RUNTIME === 'edge') {
-    await import('./sentry.edge.config');
+    if (process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN) {
+      await import('./sentry.edge.config');
+    }
   }
 }

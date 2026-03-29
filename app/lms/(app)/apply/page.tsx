@@ -236,7 +236,7 @@ export default function StudentApplicationPage() {
               <option value="electrical">Electrical</option>
               <option value="plumbing">Plumbing</option>
             </optgroup>
-            <optgroup label="Barber & Beauty">
+            <optgroup label="Barber Apprenticeship">
               <option value="barber">Barber Apprenticeship</option>
               <option value="cosmetology">Cosmetology</option>
             </optgroup>

@@ -16,7 +16,7 @@ export default function Programs() {
       image: '/hero-images/skilled-trades-category.jpg',
     },
     {
-      title: 'Barber & Beauty',
+      title: 'Barber Apprenticeship',
       description: 'Complete state-approved training in barbering, cosmetology, or esthetics. Programs meet licensing requirements and include practical experience in working salons.',
       href: '/programs/barber-apprenticeship',
       image: '/hero-images/barber-hero.jpg',

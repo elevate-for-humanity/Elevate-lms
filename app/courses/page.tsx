@@ -30,7 +30,7 @@ const featuredCategories = [
   { slug: 'skilled-trades', name: 'Skilled Trades', image: '/images/pages/welding-sparks.jpg', courses: 6, description: 'HVAC, Electrical, Welding, Plumbing, and Construction certifications.' },
   { slug: 'technology', name: 'Technology', image: '/images/pages/it-helpdesk-desk.jpg', courses: 4, description: 'Cybersecurity, IT Help Desk, Software Development, and Networking.' },
   { slug: 'cdl', name: 'CDL & Transportation', image: '/images/pages/cdl-truck-highway.jpg', courses: 3, description: 'Class A and Class B CDL training with job placement assistance.' },
-  { slug: 'barber-apprenticeship', name: 'Beauty & Barbering', image: '/images/pages/barber-fade.jpg', courses: 3, description: 'Barber apprenticeships, cosmetology, and nail technician programs.' },
+  { slug: 'barber-apprenticeship', name: 'Barber Apprenticeship', image: '/images/pages/barber-fade.jpg', courses: 3, description: 'DOL Registered Apprenticeship in barbering. Earn your Indiana Barber License.' },
   { slug: 'business', name: 'Business & Finance', image: '/images/pages/bookkeeping-ledger.jpg', courses: 4, description: 'Bookkeeping, Office Administration, Tax Preparation, and Entrepreneurship.' },
 ];
 

@@ -170,6 +170,31 @@ export async function POST(request: NextRequest) {
 
     if (timeError) throw timeError;
 
+    // Fetch YTD totals from prior stubs in the same calendar year, keyed by employee_id.
+    // We join through payroll_runs to filter by pay_date year without a DB function.
+    const payYear = new Date(pay_date).getFullYear();
+    const ytdStart = `${payYear}-01-01`;
+    const ytdEnd = pay_date; // up to (but not including) this run's pay_date
+
+    const { data: priorStubs } = await supabase
+      .from('pay_stubs')
+      .select('employee_id, gross_pay, total_taxes, total_deductions, net_pay, payroll_runs!inner(pay_date)')
+      .gte('payroll_runs.pay_date', ytdStart)
+      .lt('payroll_runs.pay_date', ytdEnd);
+
+    // Aggregate prior YTD totals per employee
+    type YtdTotals = { gross: number; taxes: number; deductions: number; net: number };
+    const ytdByEmployee = new Map<string, YtdTotals>();
+    for (const stub of priorStubs ?? []) {
+      const prev = ytdByEmployee.get(stub.employee_id) ?? { gross: 0, taxes: 0, deductions: 0, net: 0 };
+      ytdByEmployee.set(stub.employee_id, {
+        gross:      prev.gross      + Number(stub.gross_pay       ?? 0),
+        taxes:      prev.taxes      + Number(stub.total_taxes     ?? 0),
+        deductions: prev.deductions + Number(stub.total_deductions ?? 0),
+        net:        prev.net        + Number(stub.net_pay         ?? 0),
+      });
+    }
+
     const payStubsToInsert: any[] = [];
     let totalGross = 0;
     let totalNet = 0;
@@ -265,10 +290,10 @@ export async function POST(request: NextRequest) {
         other_deductions: otherDeductions,
         total_deductions: totalStubDeductions,
         net_pay: netPay,
-        ytd_gross: 0, // Note: compute YTD from prior stubs
-        ytd_taxes: 0,
-        ytd_deductions: 0,
-        ytd_net: 0,
+        ytd_gross:      (ytdByEmployee.get(employee.id)?.gross      ?? 0) + grossPay,
+        ytd_taxes:      (ytdByEmployee.get(employee.id)?.taxes      ?? 0) + taxes.totalTaxes,
+        ytd_deductions: (ytdByEmployee.get(employee.id)?.deductions ?? 0) + totalStubDeductions,
+        ytd_net:        (ytdByEmployee.get(employee.id)?.net        ?? 0) + netPay,
         payment_method: 'direct_deposit',
         status: 'pending',
       });

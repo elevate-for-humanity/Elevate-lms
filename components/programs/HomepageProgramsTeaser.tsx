@@ -10,7 +10,7 @@ export function HomepageProgramsTeaser() {
       href: "/programs/cna",
     },
     {
-      title: "Barber & Beauty",
+      title: "Barber Apprenticeship",
       description: "DOL Registered Apprenticeships",
       image: "/images/pages/adult-learner.jpg",
       href: "/programs/barber-apprenticeship",

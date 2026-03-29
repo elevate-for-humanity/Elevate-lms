@@ -7,55 +7,53 @@ import { ACTIVE_BNPL_PROVIDERS, BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
 export function BarberEnrollment() {
   return (
     <>
-      {/* Section 10 — Tuition, Funding & Payment */}
+      {/* Section 10 — Tuition & Payment */}
       <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 text-center">Tuition, Funding &amp; Payment Options</h2>
-          <p className="text-slate-600 text-center mb-8 max-w-2xl mx-auto">
-            This program is a workforce training and apprenticeship-aligned program. Funding eligibility may vary based on individual workforce programs, partner sponsorships, or external approvals.
+          <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 text-center">Tuition &amp; Payment Options</h2>
+          <p className="text-slate-600 text-center mb-2 max-w-2xl mx-auto">
+            Total tuition: <strong>$4,980</strong>. Small down payment, small weekly payments — you pick.
           </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          <p className="text-slate-500 text-center text-sm mb-8 max-w-2xl mx-auto">
+            WIOA, JRI, and workforce funding may cover tuition at no cost — check eligibility before paying.
+          </p>
+          <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
             <div className="bg-white rounded-xl p-5 border border-slate-200 text-center">
               <DollarSign className="w-8 h-8 text-brand-green-600 mx-auto mb-2" />
               <h3 className="font-bold text-slate-900 mb-1">Pay in Full</h3>
-              <p className="text-slate-600 text-sm mb-3">Visa, Mastercard, Amex, Discover via Stripe</p>
-              <Link href="/programs/barber-apprenticeship/apply?type=apprentice" className="inline-block text-sm font-semibold text-brand-red-600 hover:text-brand-red-700">
-                Apply Now &rarr;
+              <p className="text-2xl font-black text-slate-900 mb-1">$4,980</p>
+              <p className="text-slate-500 text-xs mb-3">5% discount applied at checkout</p>
+              <Link href="/programs/barber-apprenticeship/apply?type=apprentice&payment=pay_in_full" className="inline-block text-sm font-semibold text-brand-red-600 hover:text-brand-red-700">
+                Enroll Now &rarr;
+              </Link>
+            </div>
+            <div className="bg-white rounded-xl p-5 border-2 border-brand-orange-400 text-center relative">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-orange-600 text-white text-xs font-bold px-3 py-1 rounded-full">POPULAR</span>
+              <CreditCard className="w-8 h-8 text-brand-orange-600 mx-auto mb-2" />
+              <h3 className="font-bold text-slate-900 mb-1">Payment Plan</h3>
+              <p className="text-2xl font-black text-slate-900 mb-1">from $600 <span className="text-base font-normal text-slate-500">down</span></p>
+              <p className="text-slate-500 text-xs mb-1">You choose your down payment</p>
+              <p className="text-slate-500 text-xs mb-3">Remainder split over 29 weekly payments</p>
+              <Link href="/programs/barber-apprenticeship/apply?type=apprentice&payment=payment_plan" className="inline-block bg-brand-orange-600 hover:bg-brand-orange-700 text-white text-sm font-bold px-4 py-2 rounded-lg transition-colors">
+                Choose My Plan &rarr;
               </Link>
             </div>
             <div className="bg-white rounded-xl p-5 border border-slate-200 text-center">
               <CreditCard className="w-8 h-8 text-brand-blue-600 mx-auto mb-2" />
-              <h3 className="font-bold text-slate-900 mb-1">Payment Plans</h3>
-              <p className="text-slate-600 text-sm mb-3">Weekly or monthly installments with down payment</p>
-              <Link href="/pay" className="inline-block text-sm font-semibold text-brand-red-600 hover:text-brand-red-700">
-                View Plans &rarr;
-              </Link>
-            </div>
-            <div className="bg-white rounded-xl p-5 border-2 border-brand-blue-400 text-center relative">
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">POPULAR</span>
-              <CreditCard className="w-8 h-8 text-brand-blue-600 mx-auto mb-2" />
               <h3 className="font-bold text-slate-900 mb-1">Buy Now, Pay Later</h3>
-              <p className="text-slate-600 text-sm mb-2">Split into interest-free payments</p>
+              <p className="text-slate-500 text-xs mb-2">Finance your down payment with Affirm or Sezzle</p>
               <div className="flex flex-wrap justify-center gap-1 mb-3">
                 {ACTIVE_BNPL_PROVIDERS.slice(0, 3).map((p) => (
                   <span key={p.id} className={`px-2 py-0.5 ${p.badgeBg} ${p.badgeText} rounded-full text-xs font-medium`}>{p.name}</span>
                 ))}
               </div>
-              <Link href="/pay" className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-bold px-4 py-2 rounded-lg transition-colors">
-                Apply for BNPL
-              </Link>
-            </div>
-            <div className="bg-white rounded-xl p-5 border border-slate-200 text-center">
-              <Building2 className="w-8 h-8 text-brand-orange-600 mx-auto mb-2" />
-              <h3 className="font-bold text-slate-900 mb-1">Employer Sponsorship</h3>
-              <p className="text-slate-600 text-sm mb-3">Invoice or sponsorship agreement available</p>
-              <Link href="/programs/barber-apprenticeship/apply?type=partner_shop" className="inline-block text-sm font-semibold text-brand-red-600 hover:text-brand-red-700">
-                Partner Info &rarr;
+              <Link href="/programs/barber-apprenticeship/apply?type=apprentice&payment=bnpl" className="inline-block text-sm font-semibold text-brand-blue-600 hover:text-brand-blue-700">
+                Apply for BNPL &rarr;
               </Link>
             </div>
           </div>
           <p className="mt-4 text-xs text-slate-500 text-center max-w-2xl mx-auto">
-            Payment plans and financing availability are subject to provider approval and individual eligibility. Workforce partner referrals accepted when applicable.
+            Weekly invoices sent every Friday. BNPL finances your down payment — remaining balance paid weekly. Subject to provider approval.
           </p>
         </div>
       </section>

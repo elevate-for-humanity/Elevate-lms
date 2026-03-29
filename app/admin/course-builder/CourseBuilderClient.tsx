@@ -13,8 +13,9 @@ interface Course {
   description: string | null;
   program_id: string | null;
   duration_hours: number | null;
-  is_published: boolean;
-  order_index: number;
+  /** canonical courses table uses status, not is_published */
+  status: 'draft' | 'published' | 'archived';
+  is_active: boolean;
   created_at: string;
   programs?: { id: string; title: string } | null;
 }
@@ -42,11 +43,11 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
     description: '',
     program_id: '',
     duration_hours: '',
-    is_published: false,
+    publish_immediately: false,
   });
 
   const resetForm = () => {
-    setFormData({ title: '', description: '', program_id: '', duration_hours: '', is_published: false });
+    setFormData({ title: '', description: '', program_id: '', duration_hours: '', publish_immediately: false });
     setEditingCourse(null);
     setError(null);
   };
@@ -62,7 +63,7 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
       description: course.description || '',
       program_id: course.program_id || '',
       duration_hours: course.duration_hours?.toString() || '',
-      is_published: course.is_published,
+      publish_immediately: course.status === 'published',
     });
     setEditingCourse(course);
     setShowCreateModal(true);
@@ -73,31 +74,39 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
     setLoading(true);
     setError(null);
 
-    const courseData = {
-      title: formData.title,
-      description: formData.description || null,
-      program_id: formData.program_id || null,
-      duration_hours: formData.duration_hours ? parseInt(formData.duration_hours) : null,
-      is_published: formData.is_published,
-    };
-
     try {
       if (editingCourse) {
-        // Update existing course via API
-        const res = await apiPatch<any>(`/api/admin/lms/courses/${editingCourse.id}`, courseData);
+        // Update title/description on the canonical course
+        const res = await apiPatch<{ course: Course }>(`/api/admin/lms/courses/${editingCourse.id}`, {
+          title: formData.title,
+          description: formData.description || null,
+        });
         if (res.error) throw new Error(res.error);
-        setCourses(courses.map(c => c.id === editingCourse.id ? res.data : c));
+        const updated = res.data?.course ?? { ...editingCourse, title: formData.title, description: formData.description || null };
+        setCourses(courses.map(c => c.id === editingCourse.id ? { ...c, ...updated } : c));
       } else {
-        // Create new course via API
-        const res = await apiPost<any>('/api/admin/courses', courseData);
+        // Create a canonical draft course — slug auto-derived from title server-side
+        const slug = formData.title
+          .toLowerCase().trim()
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .slice(0, 80);
+
+        const res = await apiPost<{ course: Course }>('/api/admin/lms/courses', {
+          slug,
+          title: formData.title,
+          description: formData.description || null,
+          program_id: formData.program_id || null,
+        });
         if (res.error) throw new Error(res.error);
-        setCourses([res.data, ...courses]);
+        if (res.data?.course) setCourses([res.data.course, ...courses]);
       }
 
       setShowCreateModal(false);
       resetForm();
     } catch (err: any) {
-      setError('An error occurred');
+      setError(err?.message ?? 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -116,28 +125,35 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
       if (deleteError) throw deleteError;
       setCourses(courses.filter(c => c.id !== courseId));
     } catch (err: any) {
-      setError('An error occurred');
+      setError(err?.message ?? 'Delete failed');
     } finally {
       setLoading(false);
     }
   };
 
   const togglePublish = async (course: Course) => {
+    const isPublished = course.status === 'published';
     try {
-      // Publish via canonical API — enforces health check + versioning
-      const endpoint = course.is_published
-        ? `/api/admin/lms/courses/${course.id}`
-        : `/api/admin/lms/courses/${course.id}/publish`;
-      const method = course.is_published ? 'PATCH' : 'POST';
-      const body = course.is_published ? JSON.stringify({ status: 'draft' }) : undefined;
-      const res = await fetch(endpoint, { method, body, headers: { 'Content-Type': 'application/json' } });
-      if (!res.ok) throw new Error('Publish toggle failed');
-      const updateError = null;
-
-      if (updateError) throw updateError;
-      setCourses(courses.map(c => c.id === course.id ? { ...c, is_published: !c.is_published } : c));
+      if (isPublished) {
+        // Unpublish: PATCH status back to draft via canonical API
+        const res = await fetch(`/api/admin/lms/courses/${course.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'draft' }),
+        });
+        if (!res.ok) throw new Error('Unpublish failed');
+        setCourses(courses.map(c => c.id === course.id ? { ...c, status: 'draft' } : c));
+      } else {
+        // Publish: POST to /publish — enforces health check + versioning
+        const res = await fetch(`/api/admin/lms/courses/${course.id}/publish`, { method: 'POST' });
+        if (!res.ok) {
+          const body = await res.json().catch(() => null);
+          throw new Error(body?.error ?? 'Publish failed');
+        }
+        setCourses(courses.map(c => c.id === course.id ? { ...c, status: 'published' } : c));
+      }
     } catch (err: any) {
-      setError('An error occurred');
+      setError(err?.message ?? 'An error occurred');
     }
   };
 
@@ -146,8 +162,8 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
     course.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const publishedCount = courses.filter(c => c.is_published).length;
-  const draftCount = courses.filter(c => !c.is_published).length;
+  const publishedCount = courses.filter(c => c.status === 'published').length;
+  const draftCount = courses.filter(c => c.status !== 'published').length;
   const [activeTab, setActiveTab] = useState<'manual' | 'ai'>('manual');
 
   return (
@@ -256,8 +272,8 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
                     <h3 className="font-semibold text-gray-900">{course.title}</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${course.is_published ? 'bg-brand-green-100 text-brand-green-700' : 'bg-brand-orange-100 text-brand-orange-700'}`}>
-                      {course.is_published ? 'Published' : 'Draft'}
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${course.status === 'published' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-brand-orange-100 text-brand-orange-700'}`}>
+                      {course.status === 'published' ? 'Published' : course.status === 'archived' ? 'Archived' : 'Draft'}
                     </span>
                   </div>
                   <p className="text-sm text-gray-500 mt-1">{course.description?.substring(0, 100) || 'No description'}</p>
@@ -268,8 +284,8 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => togglePublish(course)} className={`px-3 py-1.5 text-sm rounded-lg ${course.is_published ? 'bg-brand-orange-100 text-brand-orange-700 hover:bg-brand-orange-200' : 'bg-brand-green-100 text-brand-green-700 hover:bg-brand-green-200'}`}>
-                    {course.is_published ? 'Unpublish' : 'Publish'}
+                  <button onClick={() => togglePublish(course)} className={`px-3 py-1.5 text-sm rounded-lg ${course.status === 'published' ? 'bg-brand-orange-100 text-brand-orange-700 hover:bg-brand-orange-200' : 'bg-brand-green-100 text-brand-green-700 hover:bg-brand-green-200'}`}>
+                    {course.status === 'published' ? 'Unpublish' : 'Publish'}
                   </button>
                   <button onClick={() => openEditModal(course)} className="px-3 py-1.5 text-sm border rounded-lg hover:bg-gray-50">Edit</button>
                   <Link href={`/admin/courses/${course.id}/content`} className="px-3 py-1.5 text-sm border rounded-lg hover:bg-gray-50">Lessons</Link>
@@ -346,12 +362,12 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
-                  id="is_published"
-                  checked={formData.is_published}
-                  onChange={(e) => setFormData({ ...formData, is_published: e.target.checked })}
+                  id="publish_immediately"
+                  checked={formData.publish_immediately}
+                  onChange={(e) => setFormData({ ...formData, publish_immediately: e.target.checked })}
                   className="w-4 h-4 rounded"
                 />
-                <label htmlFor="is_published" className="text-sm text-gray-700">Publish immediately</label>
+                <label htmlFor="publish_immediately" className="text-sm text-gray-700">Publish immediately</label>
               </div>
               <div className="flex gap-3 pt-4">
                 <button

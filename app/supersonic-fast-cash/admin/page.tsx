@@ -105,7 +105,7 @@ export default function SupersonicAdminDashboard() {
             <div className="text-sm text-gray-600">Pending Returns</div>
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <CheckCircle className="w-8 h-8 text-emerald-600 mb-2" />
             <div className="text-2xl font-bold text-gray-900">{stats.completedReturns}</div>
             <div className="text-sm text-gray-600">Completed</div>
           </div>

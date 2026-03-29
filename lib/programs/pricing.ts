@@ -1,28 +1,29 @@
 /**
  * BARBER APPRENTICESHIP PRICING - Single Source of Truth
- * 
- * Full Program Price: $4,980 (non-negotiable)
- * Setup Fee (35%): $1,743 (due at enrollment)
- * Remaining Balance: $3,237 (paid weekly on Fridays)
- * 
- * Weekly payments calculated based on remaining hours and schedule.
- * Verified transfer hours may change weekly payment amount,
- * but the setup fee remains $1,743.
- * 
- * Billing: Setup fee at enrollment, weekly charges every Friday.
+ *
+ * Full Program Price: $4,980
+ * Minimum Down Payment: $600 (due at enrollment — customizable upward)
+ * Payment Term: 29 weeks (fixed), weekly invoices every Friday
+ * Weekly Payment: ($4,980 - down payment) / 29 weeks
+ *
+ * Billing: Down payment at enrollment, weekly charges every Friday.
  * If enrolled on Friday, first weekly charge is the following Friday.
  */
 
 // Fixed pricing constants
 export const BARBER_PRICING = {
   fullPrice: 4980,
-  setupFeeRate: 0.35,
-  setupFee: 1743,
-  remainingBalance: 3237,
+  minDownPayment: 600,
+  defaultDownPayment: 600,
+  paymentTermWeeks: 29,
   totalHoursRequired: 2000,
   billingDay: 5, // Friday (0=Sunday, 5=Friday)
   billingTimezone: 'America/Indiana/Indianapolis',
   billingHour: 10, // 10:00 AM local
+  // Legacy fields kept for backward compatibility
+  setupFeeRate: 0.35,
+  setupFee: 600,
+  remainingBalance: 4380,
 } as const;
 
 // Stripe price IDs — resolved via centralized config (lib/stripe/prices.ts)
@@ -42,28 +43,22 @@ export interface WeeklyPaymentCalculation {
 }
 
 /**
- * Calculate weekly payment based on hours per week and transfer hours
+ * Calculate weekly payment based on down payment chosen.
+ * Term is fixed at 29 weeks regardless of hours.
  */
 export function calculateWeeklyPayment(
   hoursPerWeek: number,
-  transferredHoursVerified: number = 0
+  transferredHoursVerified: number = 0,
+  downPayment: number = BARBER_PRICING.defaultDownPayment
 ): WeeklyPaymentCalculation {
-  const { remainingBalance, totalHoursRequired } = BARBER_PRICING;
-  
-  // Calculate remaining hours after transfers
+  const { fullPrice, paymentTermWeeks, totalHoursRequired } = BARBER_PRICING;
+
   const hoursRemaining = Math.max(0, totalHoursRequired - transferredHoursVerified);
-  
-  // Calculate weeks remaining (ceiling to ensure full coverage)
-  const weeksRemaining = Math.ceil(hoursRemaining / hoursPerWeek);
-  
-  // Calculate weekly payment
-  const weeklyPaymentDollars = weeksRemaining > 0 
-    ? Math.round((remainingBalance / weeksRemaining) * 100) / 100
-    : 0;
-  
-  // Convert to cents for Stripe
+  const weeksRemaining = paymentTermWeeks;
+  const remainingBalance = Math.max(0, fullPrice - downPayment);
+  const weeklyPaymentDollars = Math.round((remainingBalance / weeksRemaining) * 100) / 100;
   const weeklyPaymentCents = Math.round(weeklyPaymentDollars * 100);
-  
+
   return {
     hoursRemaining,
     weeksRemaining,

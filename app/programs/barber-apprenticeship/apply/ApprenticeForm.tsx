@@ -11,17 +11,20 @@ import { ACTIVE_BNPL_PROVIDERS } from '@/lib/bnpl-config';
 const PRICING = {
   totalHours: 2000,
   fullPrice: 4980,
-  setupFee: 1743,
-  setupFeeRate: 0.35,
-  remainingBalance: 3237,
+  minDownPayment: 600,
+  defaultDownPayment: 600,
+  paymentTermWeeks: 29,
   billingDay: 'Friday',
+  // legacy
+  setupFee: 600,
+  setupFeeRate: 0.12,
+  remainingBalance: 4380,
 };
 
-function calculateWeeklyPayment(hoursPerWeek: number, transferHours: number = 0) {
-  const remainingHours = PRICING.totalHours - transferHours;
-  const weeks = Math.ceil(remainingHours / hoursPerWeek);
-  const weeklyDollars = weeks > 0 ? Math.round((PRICING.remainingBalance / weeks) * 100) / 100 : 0;
-  return { weeklyDollars, weeks, remainingHours };
+function calculateWeeklyPayment(downPayment: number) {
+  const remaining = Math.max(0, PRICING.fullPrice - downPayment);
+  const weeklyDollars = Math.round((remaining / PRICING.paymentTermWeeks) * 100) / 100;
+  return { weeklyDollars, weeks: PRICING.paymentTermWeeks, remaining };
 }
 
 function getNextFriday(): string {
@@ -45,7 +48,7 @@ export default function ApprenticeForm() {
   
   // Payment option
   const [paymentOption, setPaymentOption] = useState<'weekly' | 'full' | 'custom' | 'sezzle' | 'affirm'>('weekly');
-  const [customAmount, setCustomAmount] = useState(PRICING.setupFee);
+  const [customAmount, setCustomAmount] = useState(PRICING.defaultDownPayment);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -63,7 +66,9 @@ export default function ApprenticeForm() {
     setNextFriday(getNextFriday());
   }, []);
 
-  const { weeklyDollars, weeks, remainingHours } = calculateWeeklyPayment(hoursPerWeek, transferHours);
+  const { weeklyDollars, weeks, remaining } = calculateWeeklyPayment(
+    paymentOption === 'custom' ? customAmount : PRICING.defaultDownPayment
+  );
 
   const updateField = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -600,56 +605,36 @@ export default function ApprenticeForm() {
                     </div>
                   </button>
 
-                  {/* Option 2: Payment Plan */}
+                  {/* Option 2: Payment Plan — small down, you pick */}
                   <button
                     type="button"
-                    onClick={() => setPaymentOption('weekly')}
+                    onClick={() => { setPaymentOption('custom'); }}
                     className={`w-full p-4 rounded-xl border-2 mb-3 text-left transition ${
-                      paymentOption === 'weekly' 
-                        ? 'border-brand-orange-600 bg-brand-orange-50' 
+                      paymentOption === 'custom' || paymentOption === 'weekly'
+                        ? 'border-brand-orange-600 bg-brand-orange-50'
                         : 'border-slate-300 bg-white hover:border-slate-400'
                     }`}
                   >
                     <div className="flex justify-between items-center">
                       <div>
-                        <p className="font-bold text-black text-lg">Payment Plan</p>
-                        <p className="text-black text-sm">${PRICING.setupFee.toLocaleString()} today + ${weeklyDollars.toFixed(2)}/week</p>
+                        <p className="font-bold text-black text-lg">Payment Plan — You Pick</p>
+                        <p className="text-black text-sm">Small down payment, small weekly payments</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-brand-orange-600 text-xl">${PRICING.setupFee.toLocaleString()}</p>
-                        <p className="text-xs text-black">due today</p>
+                        <p className="font-bold text-brand-orange-600 text-xl">from $600</p>
+                        <p className="text-xs text-black">down today</p>
                       </div>
                     </div>
                   </button>
 
-                  {/* Option 3: Custom Amount */}
-                  <button
-                    type="button"
-                    onClick={() => setPaymentOption('custom')}
-                    className={`w-full p-4 rounded-xl border-2 mb-3 text-left transition ${
-                      paymentOption === 'custom' 
-                        ? 'border-brand-blue-600 bg-brand-blue-50' 
-                        : 'border-slate-300 bg-white hover:border-slate-400'
-                    }`}
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="font-bold text-black text-lg">Custom Amount</p>
-                        <p className="text-black text-sm">Pay what you can today (min ${Math.round(PRICING.fullPrice * 0.35).toLocaleString()})</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-brand-blue-600 text-lg">You Choose</p>
-                      </div>
-                    </div>
-                  </button>
-
-                  {/* Custom Amount Input */}
-                  {paymentOption === 'custom' && (
-                    <div className="bg-brand-blue-50 rounded-xl p-4 mb-3 border-2 border-brand-blue-200">
-                      <label className="block text-sm font-medium text-black mb-2">
-                        Enter your payment amount (min ${Math.round(PRICING.fullPrice * 0.35).toLocaleString()})
+                  {/* Live payment calculator — always visible when plan selected */}
+                  {(paymentOption === 'custom' || paymentOption === 'weekly') && (
+                    <div className="bg-brand-orange-50 rounded-xl p-5 mb-3 border-2 border-brand-orange-200">
+                      <label className="block text-sm font-bold text-black mb-1">
+                        How much can you put down today?
                       </label>
-                      <div className="flex items-center gap-2">
+                      <p className="text-xs text-slate-500 mb-3">Minimum $600 — the more you put down, the lower your weekly payment.</p>
+                      <div className="flex items-center gap-2 mb-2">
                         <span className="text-2xl font-bold text-black">$</span>
                         <input
                           type="text"
@@ -658,19 +643,53 @@ export default function ApprenticeForm() {
                           value={customAmount || ''}
                           onChange={(e) => {
                             const val = e.target.value.replace(/[^0-9]/g, '');
-                            setCustomAmount(val ? parseInt(val) : 0);
+                            const num = val ? parseInt(val) : PRICING.minDownPayment;
+                            setCustomAmount(Math.min(num, PRICING.fullPrice));
                           }}
                           onBlur={() => {
-                            const min = Math.round(PRICING.fullPrice * 0.35);
-                            if (customAmount < min) setCustomAmount(min);
+                            if (!customAmount || customAmount < PRICING.minDownPayment) setCustomAmount(PRICING.minDownPayment);
                             if (customAmount > PRICING.fullPrice) setCustomAmount(PRICING.fullPrice);
                           }}
-                          className="w-full px-4 py-3 text-2xl font-bold border-2 border-brand-blue-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                          className="w-full px-4 py-3 text-2xl font-bold border-2 border-brand-orange-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
                         />
                       </div>
-                      <p className="text-sm text-black mt-2">
-                        Remaining ${(PRICING.fullPrice - customAmount).toLocaleString()} will be billed weekly at ${((PRICING.fullPrice - customAmount) / weeks).toFixed(2)}/week
-                      </p>
+                      {/* Live estimate */}
+                      {/* Slider */}
+                      <input
+                        type="range"
+                        min={PRICING.minDownPayment}
+                        max={PRICING.fullPrice}
+                        step={50}
+                        value={Math.max(customAmount || PRICING.minDownPayment, PRICING.minDownPayment)}
+                        onChange={(e) => setCustomAmount(parseInt(e.target.value))}
+                        className="w-full accent-brand-orange-600 mb-1"
+                      />
+                      <div className="flex justify-between text-xs text-slate-400 mb-4">
+                        <span>$600 min</span>
+                        <span>$4,980 full</span>
+                      </div>
+
+                      {/* Live estimate */}
+                      <div className="bg-white rounded-lg p-4 border border-brand-orange-200">
+                        <p className="text-xs text-slate-500 uppercase font-semibold mb-2">Your Payment Estimate</p>
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-sm text-slate-700">Down payment today</span>
+                          <span className="font-bold text-black">${Math.max(customAmount || PRICING.minDownPayment, PRICING.minDownPayment).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-sm text-slate-700">Remaining balance</span>
+                          <span className="font-bold text-black">${Math.max(0, PRICING.fullPrice - Math.max(customAmount || PRICING.minDownPayment, PRICING.minDownPayment)).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-sm text-slate-700">Weekly payment</span>
+                          <span className="font-bold text-brand-orange-600 text-lg">${calculateWeeklyPayment(Math.max(customAmount || PRICING.minDownPayment, PRICING.minDownPayment)).weeklyDollars.toFixed(2)}/wk</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-slate-700">Term</span>
+                          <span className="font-bold text-black">{PRICING.paymentTermWeeks} weeks</span>
+                        </div>
+                        <p className="text-xs text-slate-400 mt-2">Weekly invoices sent every Friday. Pay by link or saved card.</p>
+                      </div>
                     </div>
                   )}
 

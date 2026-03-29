@@ -110,13 +110,16 @@ export default function CurriculumLessonManager({ courseId, moduleOrder }: Props
 
     setSaving(lesson.id);
     try {
-      const supabase = createClient();
-      const { error: saveError } = await supabase
-        .from('curriculum_lessons')
-        .update({ ...patch, updated_at: new Date().toISOString() })
-        .eq('id', lesson.id);
+      const res = await fetch(`/api/admin/curriculum/lessons/${lesson.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patch),
+      });
 
-      if (saveError) throw saveError;
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error ?? `Save failed (${res.status})`);
+      }
 
       setLessons(prev => prev.map(l => l.id === lesson.id ? { ...l, ...patch } : l));
       setEdits(prev => { const n = { ...prev }; delete n[lesson.id]; return n; });

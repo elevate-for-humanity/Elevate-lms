@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { requireAdmin } from '@/lib/authGuards';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import CourseBuilderClient from './CourseBuilderClient';
@@ -15,13 +15,9 @@ export const metadata: Metadata = {
 };
 
 export default async function CourseBuilderPage() {
-  const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
+  await requireAdmin(); // enforces admin/super_admin/staff, redirects on failure
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
+  const supabase = await createClient();
 
   // Fetch courses from database
   const { data: courses } = await supabase

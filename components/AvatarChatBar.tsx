@@ -15,7 +15,7 @@ const getAvatarConfig = (pathname: string) => {
     return { video: '/videos/avatars/healthcare-guide.mp4', name: 'Healthcare Guide', message: 'Interested in healthcare careers? I can help you explore CNA, Medical Assistant, and more!' };
   }
   if (pathname.includes('/programs/barber') || pathname.includes('/cosmetology')) {
-    return { video: '/videos/avatars/barber-guide.mp4', name: 'Beauty Guide', message: 'Ready to start your career in barbering or cosmetology? Let me show you how!' };
+    return { video: '/videos/avatars/barber-guide.mp4', name: 'Barber Apprenticeship Guide', message: 'Ready to start your career in barbering? Let me show you how the apprenticeship works!' };
   }
   if (pathname.includes('/programs/skilled-trades') || pathname.includes('/hvac') || pathname.includes('/electrical')) {
     return { video: '/videos/avatars/trades-guide.mp4', name: 'Trades Guide', message: 'Skilled trades offer great careers! Ask me about HVAC, electrical, welding, and more.' };

@@ -62,6 +62,7 @@ function hvacDefIdFromSlug(slug: string): string | undefined {
   return defKeys[n - 1];
 }
 import { buildLessonContent, isPlaceholderContent } from '@/lib/courses/hvac-content-builder';
+import { transformLessonContent, isAiJsonBlob } from '@/lib/lms/transformLessonContent';
 import { HVAC_COURSE_ID } from '@/lib/courses/hvac-uuids';
 import dynamic from 'next/dynamic';
 import { lessonUuidToSimulationKey } from '@/lib/lms/hvac-simulations';
@@ -274,8 +275,20 @@ export default function LessonPage() {
         }
       }
       // Enrich placeholder content with generated rich HTML
-      let enrichedContent = lessonData.content;
-      if (isPlaceholderContent(lessonData.content)) {
+      // If the lesson has pre-rendered HTML (written by the generate route), use it.
+      // Otherwise fall back to runtime transform for legacy JSON blobs.
+      let enrichedContent: string | null = lessonData.rendered_html || lessonData.content;
+
+      if (isAiJsonBlob(enrichedContent)) {
+        const { html, quizQuestions: transformedQuiz } = transformLessonContent(enrichedContent, lessonData.slug);
+        enrichedContent = html;
+        // Only use transformed quiz if no quiz_questions already set
+        if (transformedQuiz.length > 0 && (!quizQuestions || quizQuestions.length === 0)) {
+          quizQuestions = transformedQuiz;
+        }
+      }
+
+      if (isPlaceholderContent(enrichedContent)) {
         const defId =
           HVAC_UUID_TO_DEF[lessonData.id] ??
           (lessonData.slug ? hvacDefIdFromSlug(lessonData.slug) : undefined);
@@ -286,7 +299,8 @@ export default function LessonPage() {
 
       setLesson({
         ...lessonData,
-        content: enrichedContent || lessonData.content,
+        content: enrichedContent || lessonData.rendered_html || lessonData.content,
+        rendered_html: enrichedContent || lessonData.rendered_html || null,
         quiz_questions: quizQuestions || lessonData.quiz_questions,
         passing_score: quizPassingScore || lessonData.passing_score,
         quiz_id: lessonData.quiz_id || (quizQuestions?.length ? lessonData.id : null),

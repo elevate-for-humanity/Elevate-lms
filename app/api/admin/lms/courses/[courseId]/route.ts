@@ -37,8 +37,9 @@ export async function PATCH(
     const { courseId } = await params;
     const body = await request.json();
 
-    // Whitelist updatable fields — no status changes via PATCH (use /publish)
-    const allowed = ['title', 'short_description', 'description', 'slug'] as const;
+    // Whitelist updatable fields. status may be set to 'draft' to unpublish;
+    // use /publish endpoint to publish (enforces health check).
+    const allowed = ['title', 'short_description', 'description', 'slug', 'status'] as const;
     const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
     for (const key of allowed) {
       if (key in body) updates[key] = body[key];

@@ -87,16 +87,26 @@ export default async function CoursePage({ params }: { params: Params }) {
   const heroImage = program?.hero_image_url || program?.image_url || '/images/pages/hvac-unit.jpg';
   const credentialName = program?.credential_name || program?.credential || null;
 
+  // Check if user is admin/staff — they bypass enrollment requirements entirely.
+  const { data: profile } = await db
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  const isAdminUser = ['admin', 'super_admin', 'staff'].includes(profile?.role ?? '');
+
   const { data: enrollment } = await db
     .from('program_enrollments')
     .select('status, enrollment_state, enrolled_at')
     .eq('user_id', user.id).eq('course_id', lessonCourseId).maybeSingle();
 
-  if (enrollment?.status === 'revoked') redirect('/lms/programs');
-  if (enrollment?.enrollment_state === 'pending_funding_verification')
+  if (!isAdminUser && enrollment?.status === 'revoked') redirect('/lms/programs');
+  if (!isAdminUser && enrollment?.enrollment_state === 'pending_funding_verification')
     redirect(`/lms/enrollment-pending?courseId=${lessonCourseId}`);
 
-  const isPendingApproval = enrollment?.status === 'pending_approval';
+  // Admins are always treated as enrolled — they should never see "Enroll Now".
+  const isPendingApproval = !isAdminUser && enrollment?.status === 'pending_approval';
 
   const { data: modulesRaw } = await db
     .from('course_modules').select('id, title, order_index')
@@ -132,7 +142,7 @@ export default async function CoursePage({ params }: { params: Params }) {
   const remainingMinutes = totalMinutes % 60;
   const checkpointCount = allLessons.filter((l) =>
     l.step_type === 'checkpoint' || l.content_type === 'quiz').length;
-  const isEnrolled = !!enrollment && !isPendingApproval;
+  const isEnrolled = isAdminUser || (!!enrollment && !isPendingApproval);
 
   // Derive activity types actually present across all lessons from DB records.
   // activities is stored as JSONB — either {video:true, reading:true, ...}

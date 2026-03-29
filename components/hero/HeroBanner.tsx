@@ -1,7 +1,9 @@
 'use client';
 
+import { useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Volume2, VolumeX } from 'lucide-react';
 import CanonicalVideo from '@/components/video/CanonicalVideo';
 
 type HeroBannerProps = {
@@ -15,6 +17,8 @@ type HeroBannerProps = {
   posterSrc?: string;
   heroImageSrc?: string;
   heroImageAlt?: string;
+  /** Voiceover caption shown when unmuted */
+  caption?: string;
 };
 
 export default function HeroBanner({
@@ -28,20 +32,63 @@ export default function HeroBanner({
   posterSrc = '/images/pages/comp-home-hero-programs.jpg',
   heroImageSrc = '/images/pages/workforce-training.jpg',
   heroImageAlt = 'Elevate for Humanity',
+  caption,
 }: HeroBannerProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [muted, setMuted] = useState(true);
+
+  function toggleMute() {
+    const video = wrapperRef.current?.querySelector('video');
+    if (!video) return;
+    video.muted = !video.muted;
+    if (!video.muted && video.paused) video.play().catch(() => {});
+    setMuted(video.muted);
+  }
+
   return (
     <section className="relative w-full overflow-hidden rounded-3xl">
-      <div className="relative h-[50svh] sm:h-[55svh] md:h-[60svh] lg:h-[65svh] min-h-[320px] w-full">
+      <div ref={wrapperRef} className="relative h-[50svh] sm:h-[55svh] md:h-[60svh] lg:h-[65svh] min-h-[320px] w-full">
         {type === 'video' ? (
           <CanonicalVideo
             src={videoSrc}
-            poster={posterSrc}
+            poster={posterSrc as `/${string}`}
             className="absolute inset-0 w-full h-full object-cover"
+            autoPlayOnMount
           />
         ) : (
           <Image src={heroImageSrc} alt={heroImageAlt} fill priority sizes="100vw" className="object-cover" />
         )}
+
+        {/* Mute button — only for video type */}
+        {type === 'video' && (
+          <button
+            onClick={toggleMute}
+            aria-label={muted ? 'Unmute video' : 'Mute video'}
+            className="absolute bottom-4 right-4 z-20 flex items-center gap-2 bg-black/60 hover:bg-black/80 text-white text-xs font-semibold px-3 py-2 rounded-full transition-colors backdrop-blur-sm border border-white/20"
+          >
+            {muted ? (
+              <>
+                <VolumeX className="w-4 h-4 flex-shrink-0" />
+                <span className="hidden sm:inline">Tap to hear</span>
+              </>
+            ) : (
+              <>
+                <Volume2 className="w-4 h-4 flex-shrink-0 text-brand-red-400" />
+                <span className="hidden sm:inline">Mute</span>
+              </>
+            )}
+          </button>
+        )}
+
+        {caption && type === 'video' && !muted && (
+          <div className="absolute bottom-16 left-4 right-20 z-20 pointer-events-none">
+            <p className="bg-black/75 text-white text-xs sm:text-sm leading-relaxed px-4 py-3 rounded-lg backdrop-blur-sm max-w-xl">
+              {caption}
+            </p>
+          </div>
+        )}
       </div>
+
       <div className="bg-white py-10">
         <div className="mx-auto w-full max-w-5xl px-4 md:px-8 text-center">
           <h1 className="text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">{title}</h1>

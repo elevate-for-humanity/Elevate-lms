@@ -31,7 +31,11 @@ export default function HomePage() {
       {/* ── HERO ── */}
       <section className="grid lg:grid-cols-2">
         <div className="relative h-72 sm:h-96 lg:h-auto min-h-[560px] overflow-hidden bg-slate-900">
-          <HeroVideoBg src="/videos/barber-hero.mp4" />
+          <HeroVideoBg
+            src="/videos/homepage-hero-new.mp4"
+            poster="/images/pages/about-career-training.jpg"
+            caption="At Elevate for Humanity, education changes your life — without debt. Our programs connect you to JRI, WRG, WIOA, and registered apprenticeships for free training and paid opportunities. Train online, practice hands-on, earn while you learn. From healthcare to trades to technology — we offer stacked credentials and real career pathways. You don't need perfect circumstances — just the courage to begin. Apply today at ElevateForHumanity.org"
+          />
           <div className="absolute inset-0 bg-slate-900/30 pointer-events-none" />
         </div>
         <div className="bg-slate-900 flex items-center">

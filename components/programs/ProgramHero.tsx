@@ -13,10 +13,9 @@ export function ProgramHero({ program }: { program: Program }) {
   const isCNAProgram = program.slug === 'cna';
   const isWorkforceProgram = program.slug === 'workforce-readiness';
   const isMedicalAssistant = program.slug === 'medical-assistant';
-  const isBuildingTech = program.slug === 'building-technician';
   const hasVideo =
     isBarberProgram || isHVACProgram || isCDLProgram || isCNAProgram ||
-    isWorkforceProgram || isMedicalAssistant || isBuildingTech;
+    isWorkforceProgram || isMedicalAssistant;
 
   const getIcon = () => {
     if (program.slug.includes('barber')) return '✂️';

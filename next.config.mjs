@@ -387,6 +387,8 @@ const nextConfig = {
       { source: '/programs/building-maintenance', destination: '/programs/hvac-technician', permanent: true },
       { source: '/programs/building-maintenance-tech', destination: '/programs/hvac-technician', permanent: true },
       { source: '/programs/building-services-technician', destination: '/programs/hvac-technician', permanent: true },
+      { source: '/programs/building-technician', destination: '/programs/hvac-technician', permanent: true },
+      { source: '/programs/hvac-building-technician', destination: '/programs/hvac-technician', permanent: true },
       { source: '/programs/business-financial', destination: '/programs/tax-preparation', permanent: true },
       { source: '/programs/cpr-first-aid-hsi', destination: '/programs/cpr-first-aid', permanent: true },
       { source: '/programs/direct-support-professional', destination: '/programs/peer-recovery-specialist', permanent: true },

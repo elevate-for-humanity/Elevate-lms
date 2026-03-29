@@ -9,7 +9,19 @@ export async function GET(request: Request) {
   const code = requestUrl.searchParams.get('code');
   const error = requestUrl.searchParams.get('error');
   const errorDescription = requestUrl.searchParams.get('error_description');
+  const type = requestUrl.searchParams.get('type');
   const next = validateRedirect(requestUrl.searchParams.get('next'), '/learner/dashboard');
+
+  // Password reset flow — exchange code then send to reset form
+  if (code && type === 'recovery') {
+    try {
+      const supabase = await createClient();
+      await supabase.auth.exchangeCodeForSession(code);
+      return NextResponse.redirect(new URL('/auth/reset-password', requestUrl.origin));
+    } catch {
+      return NextResponse.redirect(new URL('/login?error=reset_failed', requestUrl.origin));
+    }
+  }
 
   // Handle OAuth errors from Supabase
   if (error) {

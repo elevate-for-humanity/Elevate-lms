@@ -236,22 +236,7 @@ The lesson page runs both paths in parallel for backward compatibility. New prog
 
 ### Migrations Pending (apply in Supabase Dashboard)
 
-These files exist in `supabase/migrations/` but have **not** been applied to the live DB:
-
-| File | Effect |
-|------|--------|
-| `20260401000005_curriculum_lessons_quiz_questions.sql` | Adds `quiz_questions` to `curriculum_lessons`, backfills HVAC data, fixes `lms_lessons` view |
-| `20260402000003_programs_lms_columns.sql` | Adds `short_description` and `display_order` to `programs`; backfills `short_description` from `excerpt` |
-
-Until `20260401000005` is applied:
-- `curriculum_lessons.quiz_questions` column does not exist
-- `lms_lessons` view returns `NULL` for `quiz_questions` on curriculum rows
-- HVAC checkpoint quiz player falls back to `HVAC_QUIZ_MAP` (still functional, but not DB-driven)
-
-Until `20260402000003` is applied:
-- `programs.short_description` column does not exist
-- `lib/lms/api.ts` `getPrograms()` falls back to `excerpt` then `description` (functional, but verbose)
-- `/lms/programs` catalog shows empty state if no `published=true` programs exist in DB
+None currently pending. All migrations are live as of 2026-04.
 
 **Verify after applying `20260402000003`:**
 ```sql

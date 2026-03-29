@@ -31,6 +31,32 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
+const WEEKLY_CURRICULUM = [
+  { weeks: 'Week 1–2',  topic: 'HVAC Fundamentals',          detail: 'How heating and cooling systems work. Tools, safety, and industry standards.' },
+  { weeks: 'Week 3–4',  topic: 'Electrical Systems',          detail: 'Wiring, circuits, controls, and electrical diagnostics on real equipment.' },
+  { weeks: 'Week 5–6',  topic: 'Refrigeration Cycle',         detail: 'Refrigerant handling, pressure-temperature relationships, EPA 608 core concepts.' },
+  { weeks: 'Week 7–8',  topic: 'System Installation & Repair', detail: 'AC units, furnaces, heat pumps — install, troubleshoot, and repair.' },
+  { weeks: 'Week 9–10', topic: 'Advanced Diagnostics',        detail: 'Fault isolation, system performance testing, and customer communication.' },
+  { weeks: 'Week 11',   topic: 'EPA 608 Exam Prep',           detail: 'Proctored practice exams. Core, Type I, II, III, and Universal certification prep.' },
+  { weeks: 'Week 12',   topic: 'Career Readiness',            detail: 'Resume, job placement support, employer introductions, and certification wrap-up.' },
+];
+
+const OUTCOMES = [
+  { role: 'HVAC Helper / Installer',    pay: '$18–$22/hr',  timeline: 'Day 1 after cert' },
+  { role: 'HVAC Technician',            pay: '$22–$30/hr',  timeline: '6–12 months' },
+  { role: 'Senior Tech / Lead',         pay: '$30–$40/hr',  timeline: '2–3 years' },
+  { role: 'Business Owner',             pay: '$60K–$100K+', timeline: '3–5 years' },
+];
+
+const AUTHORITY = [
+  'EPA 608 Universal — proctored on-site',
+  'OSHA 30 — nationally recognized safety cert',
+  'State-recognized workforce training provider',
+  'WIOA & Workforce Ready Grant approved',
+  'NRF Rise Up credential included',
+  'CPR / First Aid certification',
+];
+
 export default async function HVACTechnicianPage() {
   let program;
   try {
@@ -57,21 +83,28 @@ export default async function HVACTechnicianPage() {
         analyticsName={banner.analyticsName}
       />
 
-      {/* ── Program identity + CTAs (below video) ────────────────────────── */}
+      {/* ── FUNDING HEADLINE — lead with the strongest weapon ────────────── */}
+      <section className="bg-brand-orange-600 text-white py-5 px-6 text-center">
+        <p className="text-lg font-bold tracking-tight">
+          This program may cost you <span className="underline decoration-wavy">$0</span> — WIOA and Workforce Ready Grant funding available for eligible Indiana residents.
+        </p>
+        <p className="text-sm mt-1 text-orange-100">Check your eligibility in 2 minutes. No commitment required.</p>
+      </section>
+
+      {/* ── Program identity + CTAs ───────────────────────────────────────── */}
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 py-12 md:grid-cols-2 md:items-center">
           <div>
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
-              Workforce Training Program
+              12-Week Workforce Training Program
             </p>
             <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
               {program.hero_headline ?? program.title}
             </h1>
-            {program.hero_subheadline && (
-              <p className="mt-4 max-w-2xl text-lg text-slate-600">
-                {program.hero_subheadline}
-              </p>
-            )}
+            {/* Emotional hook */}
+            <p className="mt-4 text-xl text-slate-600 leading-relaxed">
+              You could be earning <strong className="text-slate-900">$18–$25/hr fixing AC units</strong> 90 days from now — with certifications that follow you for life.
+            </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
               {program.program_ctas.map((cta) => {
@@ -82,59 +115,111 @@ export default async function HVACTechnicianPage() {
                     : cta.style_variant === 'secondary'
                     ? `${base} border border-slate-300 text-slate-900 hover:bg-slate-50`
                     : `${base} border border-slate-200 text-slate-600 hover:bg-slate-50`;
-
                 if (cta.is_external) {
-                  return (
-                    <a key={cta.id} href={cta.href} target="_blank" rel="noreferrer" className={variant}>
-                      {cta.label}
-                    </a>
-                  );
+                  return <a key={cta.id} href={cta.href} target="_blank" rel="noreferrer" className={variant}>{cta.label}</a>;
                 }
-                return (
-                  <Link key={cta.id} href={cta.href} className={variant}>
-                    {cta.label}
-                  </Link>
-                );
+                return <Link key={cta.id} href={cta.href} className={variant}>{cta.label}</Link>;
               })}
             </div>
 
             <div className="mt-8 flex flex-wrap gap-6 text-sm text-slate-500">
-              {program.length_weeks     && <span>{program.length_weeks} weeks</span>}
-              {program.delivery_model   && <span className="capitalize">{program.delivery_model}</span>}
-              {program.certificate_title && <span>{program.certificate_title}</span>}
+              {program.length_weeks      && <span>⏱ {program.length_weeks} weeks</span>}
+              {program.delivery_model    && <span className="capitalize">📍 {program.delivery_model}</span>}
+              {program.certificate_title && <span>🎓 {program.certificate_title}</span>}
             </div>
           </div>
 
           <div className="relative">
             <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
-              <Image
-                src={hero.url}
-                alt={hero.alt_text ?? program.title}
-                width={1200}
-                height={800}
-                className="h-full w-full object-cover"
-                priority
-              />
+              {hero?.url ? (
+                <Image
+                  src={hero.url}
+                  alt={hero.alt_text ?? program.title}
+                  width={1200}
+                  height={800}
+                  className="h-full w-full object-cover"
+                  priority
+                />
+              ) : (
+                <Image
+                  src="/images/pages/programs-hvac-course-hero.jpg"
+                  alt="HVAC technician training"
+                  width={1200}
+                  height={800}
+                  className="h-full w-full object-cover"
+                  priority
+                />
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── About + Enrollment tracks ─────────────────────────────────────── */}
-      <section className="mx-auto max-w-7xl px-6 py-12">
-        <div className="grid gap-10 lg:grid-cols-[1.4fr,0.9fr]">
+      {/* ── Authority stacking ────────────────────────────────────────────── */}
+      <section className="bg-slate-900 text-white py-8 px-6">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-4 text-center">What you earn when you complete this program</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {AUTHORITY.map((item, i) => (
+              <div key={i} className="flex items-start gap-2 text-sm text-slate-200">
+                <span className="text-brand-orange-400 mt-0.5 shrink-0">✓</span>
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-          {/* About */}
+      {/* ── What you'll learn — weekly breakdown ─────────────────────────── */}
+      <section className="mx-auto max-w-7xl px-6 py-16">
+        <div className="mb-8">
+          <p className="text-sm font-semibold uppercase tracking-widest text-brand-orange-600 mb-2">Week by week</p>
+          <h2 className="text-3xl font-bold">What You&apos;ll Learn</h2>
+          <p className="mt-2 text-slate-600">No fluff. Every week builds toward a job-ready skill set.</p>
+        </div>
+        <div className="grid md:grid-cols-2 gap-4">
+          {WEEKLY_CURRICULUM.map((item, i) => (
+            <div key={i} className="flex gap-4 rounded-xl border border-slate-200 p-5">
+              <div className="shrink-0 w-20 text-xs font-bold text-brand-orange-600 uppercase tracking-wide pt-0.5">{item.weeks}</div>
+              <div>
+                <p className="font-semibold text-slate-900">{item.topic}</p>
+                <p className="text-sm text-slate-600 mt-1">{item.detail}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Outcome clarity — training → job → money ─────────────────────── */}
+      <section className="bg-slate-50 border-y border-slate-200 py-16 px-6">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-8">
+            <p className="text-sm font-semibold uppercase tracking-widest text-brand-orange-600 mb-2">Career pathway</p>
+            <h2 className="text-3xl font-bold">Training → Job → Money</h2>
+            <p className="mt-2 text-slate-600">HVAC is one of the highest-demand trades in Indiana. Here&apos;s where this program takes you.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {OUTCOMES.map((o, i) => (
+              <div key={i} className="bg-white rounded-xl border border-slate-200 p-5">
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-2">{o.timeline}</p>
+                <p className="font-bold text-slate-900 text-lg">{o.role}</p>
+                <p className="text-2xl font-black text-brand-orange-600 mt-1">{o.pay}</p>
+              </div>
+            ))}
+          </div>
+          {program.outcomes && (
+            <p className="mt-6 text-sm text-slate-600 max-w-2xl">{program.outcomes}</p>
+          )}
+        </div>
+      </section>
+
+      {/* ── About + Enrollment tracks ─────────────────────────────────────── */}
+      <section className="mx-auto max-w-7xl px-6 py-16">
+        <div className="grid gap-10 lg:grid-cols-[1.4fr,0.9fr]">
           <div>
-            <h2 className="text-2xl font-bold">About this program</h2>
+            <h2 className="text-2xl font-bold">About This Program</h2>
             {program.description && (
               <p className="mt-4 text-slate-700 leading-relaxed">{program.description}</p>
-            )}
-            {program.outcomes && (
-              <>
-                <h3 className="mt-8 text-xl font-semibold">Outcomes</h3>
-                <p className="mt-3 text-slate-700">{program.outcomes}</p>
-              </>
             )}
             {program.requirements && (
               <>
@@ -155,9 +240,8 @@ export default async function HVACTechnicianPage() {
             )}
           </div>
 
-          {/* Enrollment tracks */}
           <aside className="self-start rounded-2xl border border-slate-200 p-6">
-            <h2 className="text-xl font-bold">Enrollment options</h2>
+            <h2 className="text-xl font-bold">Enrollment Options</h2>
             <div className="mt-4 space-y-4">
               {program.program_tracks.map((track) => (
                 <div key={track.id} className="rounded-xl border border-slate-200 p-4">
@@ -182,9 +266,9 @@ export default async function HVACTechnicianPage() {
         </div>
       </section>
 
-      {/* ── Curriculum ───────────────────────────────────────────────────── */}
+      {/* ── Curriculum modules ────────────────────────────────────────────── */}
       <section className="mx-auto max-w-7xl px-6 pb-16">
-        <h2 className="mb-6 text-2xl font-bold">Curriculum</h2>
+        <h2 className="mb-6 text-2xl font-bold">Full Curriculum</h2>
         <div className="space-y-4">
           {program.program_modules.map((mod) => (
             <div key={mod.id} className="overflow-hidden rounded-2xl border border-slate-200">
@@ -197,15 +281,13 @@ export default async function HVACTechnicianPage() {
                     <h3 className="text-lg font-semibold text-slate-900">{mod.title}</h3>
                   </div>
                   <div className="text-sm text-slate-500">
-                    {mod.lesson_count} lessons
-                    {mod.duration_hours ? ` · ${mod.duration_hours}h` : ''}
+                    {mod.lesson_count} lessons{mod.duration_hours ? ` · ${mod.duration_hours}h` : ''}
                   </div>
                 </div>
                 {mod.description && (
                   <p className="mt-2 text-sm text-slate-600">{mod.description}</p>
                 )}
               </div>
-
               {mod.program_lessons?.length > 0 && (
                 <ol className="divide-y divide-slate-100">
                   {mod.program_lessons.map((lesson) => (
@@ -226,26 +308,23 @@ export default async function HVACTechnicianPage() {
       </section>
 
       {/* ── Footer CTA ───────────────────────────────────────────────────── */}
-      <section className="border-t border-slate-200 bg-slate-50 py-12">
+      <section className="border-t border-slate-200 bg-slate-900 text-white py-16">
         <div className="mx-auto max-w-3xl px-6 text-center">
-          <h2 className="text-2xl font-bold">Ready to start?</h2>
-          <p className="mt-3 text-slate-600">
-            WIOA and Workforce Ready Grant funding available for eligible Indiana residents.
-            EPA 608 Universal certification proctored on-site.
+          <p className="text-sm font-semibold uppercase tracking-widest text-brand-orange-400 mb-3">Ready to start?</p>
+          <h2 className="text-3xl font-bold">This could cost you $0.</h2>
+          <p className="mt-4 text-slate-300 text-lg">
+            WIOA and Workforce Ready Grant funding covers tuition for eligible Indiana residents.
+            EPA 608 Universal certification proctored on-site. Most students pay nothing.
           </p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
             {program.program_ctas
               .filter((c) => c.cta_type === 'apply' || c.cta_type === 'request_info')
               .map((cta) => {
                 const cls =
                   cta.style_variant === 'primary'
-                    ? 'rounded-xl bg-slate-900 px-6 py-3 font-semibold text-white hover:bg-slate-800 transition-colors'
-                    : 'rounded-xl border border-slate-300 px-6 py-3 font-semibold text-slate-900 hover:bg-slate-100 transition-colors';
-                return (
-                  <Link key={cta.id} href={cta.href} className={cls}>
-                    {cta.label}
-                  </Link>
-                );
+                    ? 'rounded-xl bg-brand-orange-600 px-6 py-3 font-semibold text-white hover:bg-brand-orange-700 transition-colors'
+                    : 'rounded-xl border border-slate-600 px-6 py-3 font-semibold text-white hover:bg-slate-800 transition-colors';
+                return <Link key={cta.id} href={cta.href} className={cls}>{cta.label}</Link>;
               })}
           </div>
         </div>

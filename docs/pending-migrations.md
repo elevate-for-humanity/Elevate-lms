@@ -1,5 +1,11 @@
 # Pending Migrations
 
+**Status as of 2026-06-02:** All app-referenced tables and forward reconciliation
+columns have been applied to the live DB directly via the exec_sql RPC.
+See the "Applied" section below. Only the 6 deferred tables remain unapplied.
+
+
+
 19 tables declared in migration files that do not yet exist in the live DB.
 Assessed by app code reference count. Apply in Supabase Dashboard SQL Editor.
 

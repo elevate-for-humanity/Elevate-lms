@@ -49,9 +49,10 @@ async function _GET(req: Request) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const db = createAdminClient() ?? supabase;
-
-    const { data: profile } = await db
+    // Use the cookie-authenticated client for the profile lookup so RLS
+    // allows the user to read their own row regardless of whether the
+    // service role key is configured.
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -59,6 +60,8 @@ async function _GET(req: Request) {
     if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+
+    const db = createAdminClient() ?? supabase;
 
     // Run all queries in parallel with individual timeouts
     const [

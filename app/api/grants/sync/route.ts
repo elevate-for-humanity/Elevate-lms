@@ -19,6 +19,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -32,6 +33,9 @@ async function _POST(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+  const auth = await apiRequireAdmin(request);
+  if (auth.error) return auth.error;
+
 
     // Ensure grant source exists
     const { data: source, error: sourceError } = await supabaseAdmin

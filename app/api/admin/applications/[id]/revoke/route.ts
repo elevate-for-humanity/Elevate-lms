@@ -40,6 +40,11 @@ export async function POST(
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return safeError('Unauthorized', 401);
 
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+    if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+      return safeError('Forbidden', 403);
+    }
+
     const { data, error } = await db.rpc('revoke_application_access_atomic', {
       p_application_id: applicationId,
       p_actor_user_id:  user.id,

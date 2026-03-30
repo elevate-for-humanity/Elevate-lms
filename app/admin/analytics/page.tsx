@@ -3,6 +3,20 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+const JobPlacementTracking = dynamic(
+  () => import('@/components/JobPlacementTracking').then((m) => ({ default: m.JobPlacementTracking })),
+  { ssr: false }
+);
+const EmployerTalentPipeline = dynamic(
+  () => import('@/components/EmployerTalentPipeline').then((m) => ({ default: m.EmployerTalentPipeline })),
+  { ssr: false }
+);
+const ExcelChartGenerator = dynamic(
+  () => import('@/components/admin/ExcelChartGenerator').then((m) => ({ default: m.ExcelChartGenerator })),
+  { ssr: false }
+);
 
 export const dynamic = 'force-dynamic';
 
@@ -147,6 +161,13 @@ export default async function AnalyticsPage() {
               <p className="text-gray-600 text-sm">{category.description}</p>
             </Link>
           ))}
+        </div>
+
+        {/* Job Placement & Employer Pipeline */}
+        <div className="mt-10 space-y-8">
+          <JobPlacementTracking />
+          <EmployerTalentPipeline />
+          <ExcelChartGenerator />
         </div>
       </div>
     </div>

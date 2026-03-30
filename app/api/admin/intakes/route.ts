@@ -16,7 +16,12 @@ async function _GET(request: Request) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }
+    const { data: _roleProfile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+    if (!_roleProfile || !['admin', 'super_admin', 'staff'].includes(_roleProfile.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+, { status: 401 });
     }
 
     // Get intakes/applications

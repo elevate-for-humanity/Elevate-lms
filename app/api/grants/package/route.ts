@@ -16,12 +16,16 @@ import {
 } from '@/lib/grants/package-builder';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 export const maxDuration = 60;
 
 async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
+
 
     const body = await req.json();
     const { action, applicationId, entityId, format } = body;

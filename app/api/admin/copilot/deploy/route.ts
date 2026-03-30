@@ -28,6 +28,10 @@ async function _GET(request: Request) {
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const { data: _roleProfile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+    if (!_roleProfile || !['admin', 'super_admin', 'staff'].includes(_roleProfile.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     const { data: deployments, error } = await supabase
       .from('copilot_deployments')
@@ -63,6 +67,10 @@ async function _POST(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const { data: _roleProfile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+    if (!_roleProfile || !['admin', 'super_admin', 'staff'].includes(_roleProfile.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const body = await request.json();
@@ -152,6 +160,10 @@ async function _PATCH(request: NextRequest) {
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const { data: _roleProfile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+    if (!_roleProfile || !['admin', 'super_admin', 'staff'].includes(_roleProfile.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     const body = await request.json();
     const { deployment_id, action } = body;
@@ -205,6 +217,10 @@ async function _DELETE(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const { data: _roleProfile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+    if (!_roleProfile || !['admin', 'super_admin', 'staff'].includes(_roleProfile.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);

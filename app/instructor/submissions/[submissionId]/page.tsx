@@ -86,6 +86,12 @@ export default function SubmissionReviewPage() {
     setSuccess(null);
 
     const { data: { user } } = await supabase.auth.getUser();
+    const now = new Date().toISOString();
+
+    // Map submission status to instructor_status (approved/rejected only; others stay pending)
+    const instructorStatus: 'approved' | 'rejected' | 'pending' =
+      newStatus === 'approved' ? 'approved' :
+      newStatus === 'rejected' ? 'rejected' : 'pending';
 
     const { error: updateError } = await supabase
       .from('step_submissions')
@@ -93,8 +99,11 @@ export default function SubmissionReviewPage() {
         status: newStatus,
         instructor_note: note || null,
         instructor_id: user?.id ?? null,
-        reviewed_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        instructor_status: instructorStatus,
+        instructor_feedback: note || null,
+        reviewed_by: user?.id ?? null,
+        reviewed_at: now,
+        updated_at: now,
       })
       .eq('id', submission.id);
 

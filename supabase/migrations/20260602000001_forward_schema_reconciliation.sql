@@ -8,6 +8,40 @@
 -- where columns may already exist from manual dashboard edits.
 
 -- ============================================================
+-- page_sections
+-- Live has: id, page_id, component, position, props, created_at, updated_at
+-- lib/data/pages.ts reads: section_type, content, is_visible (newer shape)
+-- lib/data/pages.ts writes: component, position, props (older shape)
+-- Adding new columns additively — both shapes coexist until a cleanup migration
+-- ============================================================
+
+ALTER TABLE public.page_sections
+  ADD COLUMN IF NOT EXISTS section_type TEXT NOT NULL DEFAULT 'content',
+  ADD COLUMN IF NOT EXISTS content      JSONB NOT NULL DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS is_visible   BOOLEAN NOT NULL DEFAULT true;
+
+-- ============================================================
+-- direct_messages
+-- Live has: id, user_id, title, content, is_read, created_at, updated_at
+-- MessagesClient.tsx expects: conversation_id, sender_id
+-- ============================================================
+
+ALTER TABLE public.direct_messages
+  ADD COLUMN IF NOT EXISTS conversation_id UUID,
+  ADD COLUMN IF NOT EXISTS sender_id       UUID;
+
+-- ============================================================
+-- credentials
+-- Live has: id, partner_id, name, type, description, created_at, expires_at,
+--           issued_at, revoked_at
+-- App references: abbreviation, issuing_authority (via program_credentials join)
+-- ============================================================
+
+ALTER TABLE public.credentials
+  ADD COLUMN IF NOT EXISTS abbreviation      TEXT,
+  ADD COLUMN IF NOT EXISTS issuing_authority TEXT;
+
+-- ============================================================
 -- pages
 -- Live has: id, path, title, description, section, is_published,
 --           requires_auth, roles_allowed, created_at, updated_at
@@ -50,11 +84,15 @@ CREATE UNIQUE INDEX IF NOT EXISTS pages_slug_unique ON public.pages (slug)
 -- ============================================================
 
 ALTER TABLE public.placement_records
-  ADD COLUMN IF NOT EXISTS hire_date           DATE,
-  ADD COLUMN IF NOT EXISTS employer_id         UUID,
-  ADD COLUMN IF NOT EXISTS enrollment_id       UUID,
-  ADD COLUMN IF NOT EXISTS annual_salary       NUMERIC,
-  ADD COLUMN IF NOT EXISTS verification_source TEXT;
+  ADD COLUMN IF NOT EXISTS hire_date            DATE,
+  ADD COLUMN IF NOT EXISTS employer_id          UUID,
+  ADD COLUMN IF NOT EXISTS enrollment_id        UUID,
+  ADD COLUMN IF NOT EXISTS annual_salary        NUMERIC,
+  ADD COLUMN IF NOT EXISTS verification_source  TEXT,
+  ADD COLUMN IF NOT EXISTS employed_q2          BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS employed_q4          BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS median_earnings_q2   NUMERIC,
+  ADD COLUMN IF NOT EXISTS tenant_id            UUID;
 
 -- Backfill hire_date from start_date where not set (same semantic for most records)
 UPDATE public.placement_records

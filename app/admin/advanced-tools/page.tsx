@@ -81,6 +81,7 @@ const CATEGORIES: ToolCategory[] = [
       { title: "System Status", href: "/admin/system-status", badge: "SYSTEM" },
       { title: "Monitoring", href: "/admin/monitoring", badge: "SYSTEM" },
       { title: "Site Health", href: "/admin/site-health", badge: "SYSTEM" },
+      { title: "Feature Registry", href: "/admin/features", badge: "SYSTEM" },
     ],
   },
   {

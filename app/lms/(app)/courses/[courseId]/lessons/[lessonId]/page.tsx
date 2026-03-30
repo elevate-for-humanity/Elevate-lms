@@ -79,6 +79,16 @@ const LessonVideoWithSimulation = dynamic(
   { ssr: false }
 );
 
+const ARTrainingModules = dynamic(
+  () => import('@/components/ARTrainingModules').then((m) => ({ default: m.ARTrainingModules })),
+  { ssr: false }
+);
+
+const TikTokStyleVideoPlayer = dynamic(
+  () => import('@/components/video/TikTokStyleVideoPlayer'),
+  { ssr: false }
+);
+
 // Reads ?activity= once on mount inside its own Suspense boundary.
 // Defined outside LessonPage so it has a stable identity across renders.
 // onActivity MUST be useCallback-stable — do not pass an inline function.
@@ -113,6 +123,7 @@ export default function LessonPage() {
   const [activeActivity, setActiveActivity] = useState<ActivityId>('video');
   const [attempted, setAttempted] = useState<Set<ActivityId>>(new Set());
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [tiktokMode, setTiktokMode] = useState(false);
   const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(new Set());
   const [courseCompleted, setCourseCompleted] = useState(false);
   const [certificate, setCertificate] = useState<any>(null);
@@ -803,6 +814,10 @@ export default function LessonPage() {
                 stepType="lab"
                 lessonTitle={lesson.title}
               />
+              {/* AR Training — beta, shown below lab submission */}
+              <div className="mt-6">
+                <ARTrainingModules />
+              </div>
             </div>
           </div>
         ) : lesson.step_type === 'assignment' ? (
@@ -1083,16 +1098,34 @@ export default function LessonPage() {
               />
             ) : (
               /* Generic video player for all other courses */
-              <InteractiveVideoPlayer
-                videoUrl={lesson.video_url}
-                title={lesson.title}
-                onComplete={() => {
-                  if (!isCompleted) {
-                    setIsCompleted(true);
-                    markComplete();
-                  }
-                }}
-              />
+              <div>
+                <div className="flex justify-end mb-2">
+                  <button
+                    onClick={() => setTiktokMode((v) => !v)}
+                    className="text-xs text-slate-500 hover:text-brand-blue-600 underline"
+                  >
+                    {tiktokMode ? 'Standard view' : 'Short-form view'}
+                  </button>
+                </div>
+                {tiktokMode ? (
+                  <TikTokStyleVideoPlayer
+                    src={lesson.video_url}
+                    poster={lesson.thumbnail_url ?? undefined}
+                    title={lesson.title}
+                    onComplete={() => {
+                      if (!isCompleted) { setIsCompleted(true); markComplete(); }
+                    }}
+                  />
+                ) : (
+                  <InteractiveVideoPlayer
+                    videoUrl={lesson.video_url}
+                    title={lesson.title}
+                    onComplete={() => {
+                      if (!isCompleted) { setIsCompleted(true); markComplete(); }
+                    }}
+                  />
+                )}
+              </div>
             )}
             {/* Show lesson content below video */}
             {lesson.content && (

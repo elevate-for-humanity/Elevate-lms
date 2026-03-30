@@ -2,6 +2,12 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+const UniversalCoursePlayer = dynamic(
+  () => import('@/components/UniversalCoursePlayer').then((m) => ({ default: m.UniversalCoursePlayer })),
+  { ssr: false }
+);
 import {
   ArrowLeft,
   Globe,
@@ -248,6 +254,21 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
               <p className="text-slate-500 text-center py-4">No courses configured</p>
             )}
           </div>
+
+          {/* Course Preview */}
+          {courses && courses.length > 0 && courses[0].course_url && (
+            <div className="bg-white rounded-xl border border-slate-200 p-6">
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">Course Preview</h2>
+              <UniversalCoursePlayer
+                courseId={courses[0].id}
+                courseName={courses[0].course_name}
+                partnerName={provider.provider_name}
+                courseUrl={courses[0].course_url}
+                userId={user.id}
+                enrollmentId={courses[0].id}
+              />
+            </div>
+          )}
 
           {/* Sync History */}
           <div className="bg-white rounded-xl border border-slate-200 p-6">

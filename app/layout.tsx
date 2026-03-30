@@ -7,9 +7,19 @@ import ToasterClient from '@/components/ui/ToasterClient';
 import CookieConsent from '@/components/CookieConsent';
 import { SkipToContent } from '@/components/ui/SkipToContent';
 import { DMCATrackingPixel } from '@/components/InvisibleWatermark';
+import dynamic from 'next/dynamic';
 
 import { Inter } from 'next/font/google';
 import { GoogleAnalytics } from '@/components/analytics/google-analytics';
+
+// Global feature components — client-only, loaded after hydration
+const GlobalAvatar = dynamic(() => import('@/components/GlobalAvatar'), { ssr: false });
+const AvatarChatBar = dynamic(() => import('@/components/AvatarChatBar'), { ssr: false });
+const FacebookPixel = dynamic(() => import('@/components/FacebookPixel'), { ssr: false });
+const AIAssistantBubble = dynamic(
+  () => import('@/components/AIAssistantBubble').then((m) => ({ default: m.AIAssistantBubble })),
+  { ssr: false }
+);
 
 const inter = Inter({
   subsets: ['latin'],
@@ -223,10 +233,13 @@ export default function RootLayout({
       >
         <SkipToContent />
         <GoogleAnalytics />
+        <FacebookPixel />
         <PublicLayout>{children}</PublicLayout>
         <CookieConsent />
         <DMCATrackingPixel />
-
+        <GlobalAvatar />
+        <AvatarChatBar />
+        <AIAssistantBubble />
         <ToasterClient />
       </body>
     </html>

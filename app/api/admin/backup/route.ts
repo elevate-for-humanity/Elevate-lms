@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createBackup, exportBackupToJSON, listBackups } from '@/lib/backup';
-import { requireAdmin } from '@/lib/authGuards';
+import { requireAdmin } from '@/lib/admin/guards';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -12,7 +12,7 @@ const _POST = withAuth(
   async (request: NextRequest, user) => {
 
   try {
-    await requireAdmin();
+    await apiRequireAdmin();
 
     const { tables } = await request.json();
     const result = await createBackup(tables);
@@ -46,7 +46,7 @@ const _GET = withAuth(
   async (request: NextRequest, user) => {
 
   try {
-    await requireAdmin();
+    await apiRequireAdmin();
 
     const backups = await listBackups();
 

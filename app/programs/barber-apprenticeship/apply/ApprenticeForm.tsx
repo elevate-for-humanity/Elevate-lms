@@ -6,25 +6,19 @@ import Link from 'next/link';
 import { ArrowLeft, Loader2, CreditCard, Calculator, Info } from 'lucide-react';
 import LazyVideo from '@/components/ui/LazyVideo';
 import { ACTIVE_BNPL_PROVIDERS } from '@/lib/bnpl-config';
+import { BARBER_PRICING, calculateWeeklyPayment as calcWeekly } from '@/lib/programs/pricing';
 
-// Pricing constants - matches lib/programs/pricing.ts
-const PRICING = {
-  totalHours: 2000,
-  fullPrice: 4980,
-  minDownPayment: 600,
-  defaultDownPayment: 600,
-  paymentTermWeeks: 29,
-  billingDay: 'Friday',
-  // legacy
-  setupFee: 600,
-  setupFeeRate: 0.12,
-  remainingBalance: 4380,
-};
+// Single source of truth — do not duplicate pricing constants here.
+const PRICING = BARBER_PRICING;
 
 function calculateWeeklyPayment(downPayment: number) {
-  const remaining = Math.max(0, PRICING.fullPrice - downPayment);
-  const weeklyDollars = Math.round((remaining / PRICING.paymentTermWeeks) * 100) / 100;
-  return { weeklyDollars, weeks: PRICING.paymentTermWeeks, remaining };
+  // hoursPerWeek=40, transferredHours=0 — standard full-program calculation
+  const result = calcWeekly(40, 0, downPayment);
+  return {
+    weeklyDollars: result.weeklyPaymentDollars,
+    weeks: result.weeksRemaining,
+    remaining: result.totalWeeklyPayments,
+  };
 }
 
 function getNextFriday(): string {

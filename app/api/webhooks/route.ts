@@ -1,7 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
-import { apiRequireAdmin } from '@/lib/authGuards';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { logger } from '@/lib/logger';
 import {
   createWebhook,

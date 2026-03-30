@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Stripe from 'stripe';
 import { BARBER_PRICING, calculateWeeklyPayment } from '@/lib/programs/pricing';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -104,11 +105,9 @@ async function _POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
-  const supabase = await createClient();
-  const adminClient = createAdminClient();
-  if (!supabase) {
-    return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
-  }
+  // Webhook handlers must use the admin (service role) client — there is no user session.
+  // createAdminClient() throws if env vars are missing, which is the correct behaviour.
+  const supabase = createAdminClient();
 
   try {
     switch (event.type) {
@@ -167,16 +166,12 @@ async function _POST(request: NextRequest) {
             invoiceWeeks = weeksRemaining;
             weeklyPaymentCents = Math.ceil(remainingBalanceCents / invoiceWeeks);
 
-            // Schedule weekly invoices for remaining balance
-            await scheduleWeeklyInvoices(stripe, {
-              customerId,
-              customerEmail,
-              weeksRemaining: invoiceWeeks,
-              weeklyPaymentCents,
-              hoursPerWeek,
-              transferredHours,
-              applicationId,
-            });
+            // NOTE: Weekly invoices are NOT pre-created here.
+            // Pre-creating all 29 invoices at once sends 29 emails to the student immediately.
+            // Weekly billing is handled by the Stripe subscription created at checkout
+            // (barber/checkout route, subscription mode) or by a cron job.
+            // The weeklyPaymentCents value is stored on barber_subscriptions for reference.
+            logger.info(`[barber/webhook] Payment plan: $${(weeklyPaymentCents / 100).toFixed(2)}/week for ${invoiceWeeks} weeks — billing handled by subscription`);
           }
 
           // Create enrollment record
@@ -279,17 +274,11 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
           const fullyPaid = paymentType === 'pay_in_full' || amountPaidCents >= adjustedPriceCents;
           const remainingBalanceCents = Math.max(0, adjustedPriceCents - amountPaidCents);
 
-          // Schedule weekly invoices if setup-fee only
+          // NOTE: Weekly invoices are NOT pre-created here.
+          // Pre-creating all 29 invoices at once sends 29 emails to the student immediately.
+          // Weekly billing is handled by the Stripe subscription or a cron job.
           if (!fullyPaid && weeklyPaymentCents > 0 && weeksRemaining > 0) {
-            await scheduleWeeklyInvoices(stripe, {
-              customerId,
-              customerEmail,
-              weeksRemaining,
-              weeklyPaymentCents,
-              hoursPerWeek,
-              transferredHours,
-              applicationId,
-            });
+            logger.info(`[barber/webhook] Payment plan: $${(weeklyPaymentCents / 100).toFixed(2)}/week for ${weeksRemaining} weeks — billing handled by subscription`);
           }
 
           const { data: subRecord } = await supabase.from('barber_subscriptions').insert({
@@ -318,25 +307,30 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
           // regardless of how Stripe or the user cased it at checkout.
           const normalizedEmail = customerEmail.toLowerCase().trim();
 
-          // Create program_enrollments row. user_id is null — public checkout has no
-          // Supabase account yet. enrollment-success links it by email on first login.
-          await supabase.from('program_enrollments').insert({
-            user_id: null,
+          // Create program_enrollments row via canonical service.
+          // user_id is null — public checkout has no Supabase account yet.
+          // linkOrphanedEnrollments() in auth/confirm links it by email on first login.
+          const { createOrUpdateEnrollment, linkOrphanedEnrollments } = await import('@/lib/enrollment-service');
+          const enrollResult = await createOrUpdateEnrollment(supabase, {
+            userId: null as unknown as string, // linked by email post-signup
+            programId: session.metadata?.program_id || 'barber-apprenticeship',
+            programSlug: 'barber-apprenticeship',
+            fundingSource: 'self_pay',
+            amountPaidCents,
+            stripeCheckoutSessionId: session.id,
+            isDeposit: !fullyPaid,
             email: normalizedEmail,
-            full_name: customerName,
-            phone: customerPhone,
-            amount_paid_cents: amountPaidCents,
-            funding_source: 'self-pay',
-            stripe_checkout_session_id: session.id,   // DB col name
-            stripe_customer_id: customerId,
-            program_slug: 'barber-apprenticeship',
-            status: 'paid',
-            enrollment_state: 'confirmed',
-            enrolled_at: new Date().toISOString(),
-            enrollment_confirmed_at: new Date().toISOString(), // DB col name
-            payment_status: fullyPaid ? 'paid_in_full' : 'setup_fee_paid',
-            barber_sub_id: subRecord?.id || null,
-          }).catch((err: any) => logger.error('program_enrollments insert error:', err));
+            fullName: customerName,
+            status: fullyPaid ? 'active' : 'deposit_paid',
+            paymentStatus: fullyPaid ? 'paid_in_full' : 'setup_fee_paid',
+          });
+          if (enrollResult.error) {
+            logger.error('[barber/webhook] program_enrollments write failed:', enrollResult.error);
+          } else {
+            logger.info(`[barber/webhook] program_enrollments ${enrollResult.action}: ${enrollResult.id}`);
+          }
+          // Link to account if one already exists for this email
+          await linkOrphanedEnrollments(supabase, normalizedEmail).catch(() => {});
 
           // Send enrollment confirmation email
           try {
@@ -475,9 +469,9 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
         // Generate magic link for dashboard access
         let magicLink = `${process.env.NEXT_PUBLIC_SITE_URL}/apprentice`;
         
-        if (adminClient && customerEmail) {
+        if (customerEmail) {
           try {
-            const { data: linkData } = await adminClient.auth.admin.generateLink({
+            const { data: linkData } = await supabase.auth.admin.generateLink({
               type: 'magiclink',
               email: customerEmail,
               options: {

@@ -513,3 +513,13 @@ export async function apiRequireStudent() {
 
   return result;
 }
+
+// =====================================================
+// DEPRECATION NOTICE
+// =====================================================
+// For API routes: import apiAuthGuard and apiRequireAdmin from '@/lib/admin/guards'.
+// The implementations above (apiAuthGuard, apiRequireAdmin, apiRequireInstructor,
+// apiRequireStudent) are kept for backward compatibility with page components
+// but will be removed in a future cleanup pass.
+//
+// Do NOT add new imports from this file in API routes.

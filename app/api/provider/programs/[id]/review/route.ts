@@ -3,7 +3,7 @@
 // On approval, sets programs.is_published = true.
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { apiAuthGuard } from '@/lib/authGuards';
+import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAuditEvent, AuditActions } from '@/lib/audit';
 

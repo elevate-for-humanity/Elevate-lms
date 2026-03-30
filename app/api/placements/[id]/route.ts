@@ -2,7 +2,7 @@
 // PATCH /api/placements/[id]  — update verification status or details
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { apiAuthGuard } from '@/lib/authGuards';
+import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAuditEvent, AuditActions } from '@/lib/audit';
 

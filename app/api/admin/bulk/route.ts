@@ -11,7 +11,7 @@ import {
   bulkSendNotifications,
   bulkExportData,
 } from '@/lib/bulkOperations';
-import { requireAdmin } from '@/lib/authGuards';
+import { requireAdmin } from '@/lib/admin/guards';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -21,7 +21,7 @@ const _POST = withAuth(
   async (request: NextRequest, { user }) => {
 
   try {
-    await requireAdmin();
+    await apiRequireAdmin();
     const { operation, ...params } = await request.json();
 
     let result;

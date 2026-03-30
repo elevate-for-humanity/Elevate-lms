@@ -1,28 +1,24 @@
-import { requireAdmin } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@supabase/supabase-js';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { apiRequireAdmin } from '@/lib/admin/guards';
+import { handleRoute } from '@/lib/api/route';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// This endpoint checks migration status
-// Only accessible with service role key
+// Checks migration status. Requires admin/super_admin/staff session.
 async function _POST(request: NextRequest) {
-  try {
-    const rateLimited = await applyRateLimit(request, 'api');
+  return handleRoute(async () => {
+    const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
 
-    const authHeader = request.headers.get('authorization');
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    
-    if (!authHeader || !authHeader.includes(serviceKey || '')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    await apiRequireAdmin(request);
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!supabaseUrl || !serviceKey) {
       return NextResponse.json({ error: 'Missing configuration' }, { status: 500 });
     }
@@ -88,12 +84,6 @@ async function _POST(request: NextRequest) {
         '/supabase/migrations/20260116_program_discussions.sql'
       ]
     });
-
-  } catch (error: any) {
-    return NextResponse.json({ 
-      error: 'Migration failed', 
-      details: 'Internal server error' 
-    }, { status: 500 });
-  }
+  });
 }
 export const POST = withApiAudit('/api/admin/run-migrations', _POST);

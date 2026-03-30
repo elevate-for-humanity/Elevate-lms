@@ -1,12 +1,12 @@
-import { requireAdmin } from '@/lib/auth';
 /**
  * Admin-only diagnostic endpoint — checks BNPL provider configuration status.
  * Returns which env vars are present (not their values).
- * Requires admin authentication.
+ * Requires admin/super_admin/staff authentication.
  */
 
 import { NextResponse } from 'next/server';
-import { apiRequireAdmin } from '@/lib/authGuards';
+import { apiRequireAdmin } from '@/lib/admin/guards';
+import { handleRoute } from '@/lib/api/route';
 import { sezzle } from '@/lib/sezzle/client';
 import { affirm } from '@/lib/affirm/client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -16,11 +16,11 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
-  
+  return handleRoute(async () => {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const guard = await apiRequireAdmin();
-  if (guard) return guard;
+
+    await apiRequireAdmin(request);
 
   const response = NextResponse.json({
     timestamp: new Date().toISOString(),
@@ -58,8 +58,9 @@ const guard = await apiRequireAdmin();
     },
   });
 
-  response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
-  response.headers.set('Vary', 'Authorization, Cookie');
-  return response;
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    response.headers.set('Vary', 'Authorization, Cookie');
+    return response;
+  });
 }
 export const GET = withApiAudit('/api/admin/payment-config', _GET);

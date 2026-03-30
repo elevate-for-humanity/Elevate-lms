@@ -40,6 +40,7 @@ export const BNPL_PROVIDERS: BnplProvider[] = [
     badgeBg: 'bg-purple-100',
     badgeText: 'text-purple-700',
     minAmount: 35,
+    // Max $2,500 — cannot finance the full $4,980 program. Use for setup fee only.
     maxAmount: 2500,
     description: '4 interest-free payments',
     enabled: true,

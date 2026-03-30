@@ -1,6 +1,6 @@
 import { requireAdmin } from '@/lib/auth';
 import { NextResponse } from 'next/server';
-import { apiRequireAdmin } from '@/lib/authGuards';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

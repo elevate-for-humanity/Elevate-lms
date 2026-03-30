@@ -3,4 +3,4 @@
  * This file is kept only for backward compatibility.
  */
 export { getCurrentUser, type AuthUser } from '@/lib/auth';
-export { requireAuth } from '@/lib/authGuards';
+export { requireAuth } from '@/lib/admin/guards';

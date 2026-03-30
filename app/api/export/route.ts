@@ -1,7 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
-import { apiRequireAdmin, apiRequireInstructor } from '@/lib/authGuards';
+import { apiRequireAdmin, apiRequireInstructor } from '@/lib/admin/guards';
 import {
   exportStudents,
   exportCourses,

@@ -127,19 +127,25 @@ CREATE INDEX IF NOT EXISTS idx_wp_program  ON public.wioa_participants(program_i
 CREATE INDEX IF NOT EXISTS idx_wp_tenant   ON public.wioa_participants(tenant_id);
 CREATE INDEX IF NOT EXISTS idx_wp_exit     ON public.wioa_participants(date_of_exit);
 
--- wioa_participant_records (individual PIRL data points per participant)
-CREATE TABLE IF NOT EXISTS public.wioa_participant_records (
-  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  participant_id    UUID NOT NULL REFERENCES public.wioa_participants(id) ON DELETE CASCADE,
-  field_name        TEXT NOT NULL,   -- PIRL element name
-  field_value       TEXT,
-  data_source       TEXT,            -- which table/column this was pulled from
-  reporting_period  TEXT,            -- e.g. 'PY2025Q2'
-  created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE INDEX IF NOT EXISTS idx_wpr_participant ON public.wioa_participant_records(participant_id);
-CREATE INDEX IF NOT EXISTS idx_wpr_period      ON public.wioa_participant_records(reporting_period);
+-- [NEUTRALIZED: 2026-06-02]
+-- This EAV redesign of wioa_participant_records (field_name/field_value) conflicts
+-- with the canonical typed schema in 20260217000001_lms_operational_readiness.sql
+-- which is what the live DB has (23 typed columns). Running this would silently
+-- do nothing (IF NOT EXISTS), but it is retained as a comment to prevent
+-- future confusion about intent.
+-- Canonical definition: 20260217000001_lms_operational_readiness.sql
+--
+-- CREATE TABLE IF NOT EXISTS public.wioa_participant_records (
+--   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+--   participant_id    UUID NOT NULL REFERENCES public.wioa_participants(id) ON DELETE CASCADE,
+--   field_name        TEXT NOT NULL,
+--   field_value       TEXT,
+--   data_source       TEXT,
+--   reporting_period  TEXT,
+--   created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+-- );
+-- CREATE INDEX IF NOT EXISTS idx_wpr_participant ON public.wioa_participant_records(participant_id);
+-- CREATE INDEX IF NOT EXISTS idx_wpr_period      ON public.wioa_participant_records(reporting_period);
 
 ALTER TABLE public.wioa_participants ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.wioa_participant_records ENABLE ROW LEVEL SECURITY;

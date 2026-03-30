@@ -451,26 +451,19 @@ RAISE NOTICE 'Migration 11/14 complete: certification pipeline';
 -- 12. 20260326000002 — certification pathways
 -- =============================================================================
 
-CREATE TABLE IF NOT EXISTS program_certification_pathways (
-  id                      uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-  program_id              uuid        NOT NULL REFERENCES programs(id) ON DELETE CASCADE,
-  credential_id           uuid        NOT NULL REFERENCES credentials(id) ON DELETE CASCADE,
-  certification_body      text        NOT NULL,
-  pathway_name            text        NOT NULL,
-  is_primary              boolean     NOT NULL DEFAULT false,
-  exam_fee_cents          int,
-  exam_site_type          text        CHECK (exam_site_type IN ('on_site','testing_center','online','hybrid')),
-  eligibility_notes       text,
-  state_specific          text,
-  active                  boolean     NOT NULL DEFAULT true,
-  created_at              timestamptz NOT NULL DEFAULT now(),
-  updated_at              timestamptz NOT NULL DEFAULT now()
-  UNIQUE (program_id, credential_id, certification_body)
-);
+-- [NEUTRALIZED: 2026-06-02]
+-- This text-based redesign of program_certification_pathways conflicts with the
+-- canonical FK-based definition in 20260326000002_certification_pathways.sql,
+-- which is what the live DB has (17 cols, certification_body_id UUID FK).
+-- Running this would silently do nothing (IF NOT EXISTS), but the intent
+-- (downgrading certification_body_id UUID → certification_body TEXT) is wrong.
+-- Canonical definition: 20260326000002_certification_pathways.sql
+--
+-- CREATE TABLE IF NOT EXISTS program_certification_pathways ( ... );
+-- CREATE INDEX IF NOT EXISTS idx_pcp_program_id ...
+-- CREATE INDEX IF NOT EXISTS idx_pcp_credential_id ...
 
-CREATE INDEX IF NOT EXISTS idx_pcp_program_id    ON program_certification_pathways (program_id);
-CREATE INDEX IF NOT EXISTS idx_pcp_credential_id ON program_certification_pathways (credential_id);
-
+-- pathway_id column is still valid — added to exam_authorizations separately
 ALTER TABLE exam_authorizations
   ADD COLUMN IF NOT EXISTS pathway_id uuid REFERENCES program_certification_pathways(id) ON DELETE SET NULL;
 

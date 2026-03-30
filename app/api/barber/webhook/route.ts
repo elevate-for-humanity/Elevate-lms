@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Stripe from 'stripe';
 import { BARBER_PRICING, calculateWeeklyPayment } from '@/lib/programs/pricing';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -468,9 +469,9 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
         // Generate magic link for dashboard access
         let magicLink = `${process.env.NEXT_PUBLIC_SITE_URL}/apprentice`;
         
-        if (adminClient && customerEmail) {
+        if (customerEmail) {
           try {
-            const { data: linkData } = await adminClient.auth.admin.generateLink({
+            const { data: linkData } = await supabase.auth.admin.generateLink({
               type: 'magiclink',
               email: customerEmail,
               options: {

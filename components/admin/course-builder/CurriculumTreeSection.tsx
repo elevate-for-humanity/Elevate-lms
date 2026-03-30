@@ -393,6 +393,19 @@ function LessonRow({
         : <AlertCircle className="h-3.5 w-3.5 flex-shrink-0 text-amber-400" title="No content yet" />
       }
 
+      {/* Published toggle */}
+      <button
+        onClick={() => onUpdate({ is_published: !lesson.is_published })}
+        title={lesson.is_published ? 'Published — click to unpublish' : 'Draft — click to publish'}
+        className={`flex-shrink-0 rounded px-1.5 py-0.5 text-xs font-medium transition-colors ${
+          lesson.is_published
+            ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+            : 'bg-slate-100 text-slate-400 hover:bg-slate-200'
+        }`}
+      >
+        {lesson.is_published ? 'Live' : 'Draft'}
+      </button>
+
       {/* Remove */}
       <button
         onClick={onRemove}

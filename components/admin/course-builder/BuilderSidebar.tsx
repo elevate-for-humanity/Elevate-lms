@@ -112,8 +112,11 @@ export default function BuilderSidebar({ state, derived, onAddLesson, onAddModul
           />
           <HealthRow
             icon={AlertTriangle}
-            label="Orphan modules"
-            value={String(derived.totalModules > 0 && derived.totalLessons === 0 ? derived.totalModules : 0)}
+            label="Unpublished lessons"
+            value={String(
+              state.phases.flatMap(p => p.modules.flatMap(m => m.lessons))
+                .filter(l => !l.is_published).length
+            )}
             status="ok"
           />
         </div>

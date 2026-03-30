@@ -56,6 +56,7 @@ export default async function CourseBuilderPage({ searchParams }: PageProps) {
   const [
     { data: outcomesRaw },
     { data: credentialsRaw },
+    { data: phasesRaw },
     { data: modulesRaw },
     { data: ctasRaw },
     { data: tracksRaw },
@@ -72,8 +73,13 @@ export default async function CourseBuilderPage({ searchParams }: PageProps) {
       .eq('program_id', programId)
       .order('sort_order'),
 
+    db.from('program_phases')
+      .select('id, title, sort_order')
+      .eq('program_id', programId)
+      .order('sort_order'),
+
     db.from('program_modules')
-      .select('id, title, sort_order, program_lessons(id, title, lesson_type, sort_order, duration_minutes)')
+      .select('id, title, sort_order, phase_id, program_lessons(id, title, lesson_type, sort_order, duration_minutes, is_published)')
       .eq('program_id', programId)
       .order('sort_order'),
 
@@ -96,26 +102,54 @@ export default async function CourseBuilderPage({ searchParams }: PageProps) {
       .order('name'),
   ]);
 
-  // Shape modules into a single phase (phase column not yet on program_modules)
-  const modules: ProgramModule[] = (modulesRaw ?? []).map((m: any) => ({
-    id: m.id,
-    title: m.title,
-    sort_order: m.sort_order,
-    lessons: (m.program_lessons ?? []).map((l: any): ProgramLesson => ({
-      id: l.id,
-      title: l.title,
-      lesson_type: l.lesson_type ?? 'lesson',
-      sort_order: l.sort_order,
-      duration_minutes: l.duration_minutes ?? null,
-      is_published: false,
-      has_video: false,
-      has_reading: false,
-    })),
-  }));
+  // Shape modules into phases using real phase_id grouping
+  const modulesByPhase = new Map<string | null, ProgramModule[]>();
+  for (const m of (modulesRaw ?? [])) {
+    const key = (m as any).phase_id ?? null;
+    if (!modulesByPhase.has(key)) modulesByPhase.set(key, []);
+    modulesByPhase.get(key)!.push({
+      id: (m as any).id,
+      title: (m as any).title,
+      sort_order: (m as any).sort_order,
+      lessons: ((m as any).program_lessons ?? []).map((l: any): ProgramLesson => ({
+        id: l.id,
+        title: l.title,
+        lesson_type: l.lesson_type ?? 'lesson',
+        sort_order: l.sort_order,
+        duration_minutes: l.duration_minutes ?? null,
+        is_published: l.is_published ?? false,
+        has_video: false,
+        has_reading: false,
+      })),
+    });
+  }
 
-  const phases: ProgramPhase[] = modules.length > 0
-    ? [{ id: 'default', title: 'Program Curriculum', sort_order: 0, modules }]
-    : [];
+  let phases: ProgramPhase[];
+
+  if ((phasesRaw ?? []).length > 0) {
+    // Real phases from DB
+    phases = (phasesRaw ?? []).map((p: any) => ({
+      id: p.id,
+      title: p.title,
+      sort_order: p.sort_order,
+      modules: modulesByPhase.get(p.id) ?? [],
+    }));
+    // Attach any unphased modules to the first phase
+    const unphased = modulesByPhase.get(null) ?? [];
+    if (unphased.length > 0 && phases.length > 0) {
+      phases[0] = { ...phases[0], modules: [...phases[0].modules, ...unphased] };
+    }
+  } else if ((modulesRaw ?? []).length > 0) {
+    // No phases yet — group all modules under one default phase
+    phases = [{
+      id: 'default',
+      title: 'Program Curriculum',
+      sort_order: 0,
+      modules: modulesByPhase.get(null) ?? [],
+    }];
+  } else {
+    phases = [];
+  }
 
   const initialState: ProgramBuilderState = {
     id: program.id,

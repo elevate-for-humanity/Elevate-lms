@@ -104,36 +104,56 @@ export async function PATCH(
       }
     }
 
-    // ── 4. Modules + lessons ────────────────────────────────────────────────
-    // Phases are a UI concept — flatten to modules for storage
+    // ── 4. Phases + modules + lessons ──────────────────────────────────────
     if (Array.isArray(body.phases)) {
-      // Collect all module IDs being saved so we can delete orphans
+      const incomingPhaseIds: string[] = [];
       const incomingModuleIds: string[] = [];
 
       for (const phase of body.phases) {
         if (!Array.isArray(phase.modules)) continue;
 
-        for (const mod of phase.modules) {
-          const isNew = !mod.id || mod.id === 'default';
+        // Resolve phase ID — create real DB row if synthetic ('default') or missing
+        let phaseId: string | null = null;
+        const isNewPhase = !phase.id || phase.id === 'default';
 
-          if (isNew) {
-            // Insert new module
-            const { data: newMod, error } = await db
+        if (isNewPhase) {
+          const { data: newPhase } = await db
+            .from('program_phases')
+            .insert({ program_id: programId, title: phase.title, sort_order: phase.sort_order ?? 0 })
+            .select('id')
+            .single();
+          phaseId = newPhase?.id ?? null;
+        } else {
+          await db.from('program_phases').update({
+            title:      phase.title,
+            sort_order: phase.sort_order ?? 0,
+          }).eq('id', phase.id).eq('program_id', programId);
+          phaseId = phase.id;
+        }
+
+        if (phaseId) incomingPhaseIds.push(phaseId);
+
+        for (const mod of phase.modules) {
+          const isNewMod = !mod.id;
+
+          if (isNewMod) {
+            const { data: newMod } = await db
               .from('program_modules')
               .insert({
-                program_id: programId,
-                title:      mod.title,
-                sort_order: mod.sort_order ?? 0,
+                program_id:    programId,
+                phase_id:      phaseId,
+                title:         mod.title,
+                sort_order:    mod.sort_order ?? 0,
                 module_number: mod.sort_order ?? 0,
               })
               .select('id')
               .single();
-            if (error || !newMod) continue;
+            if (!newMod) continue;
             incomingModuleIds.push(newMod.id);
             await upsertLessons(db, newMod.id, mod.lessons ?? []);
           } else {
-            // Update existing module
             await db.from('program_modules').update({
+              phase_id:   phaseId,
               title:      mod.title,
               sort_order: mod.sort_order ?? 0,
             }).eq('id', mod.id).eq('program_id', programId);
@@ -143,15 +163,21 @@ export async function PATCH(
         }
       }
 
-      // Delete modules that were removed in the builder
+      // Delete removed phases
+      if (incomingPhaseIds.length > 0) {
+        await db.from('program_phases').delete()
+          .eq('program_id', programId)
+          .not('id', 'in', `(${incomingPhaseIds.map(id => `'${id}'`).join(',')})`);
+      } else {
+        await db.from('program_phases').delete().eq('program_id', programId);
+      }
+
+      // Delete removed modules
       if (incomingModuleIds.length > 0) {
-        await db
-          .from('program_modules')
-          .delete()
+        await db.from('program_modules').delete()
           .eq('program_id', programId)
           .not('id', 'in', `(${incomingModuleIds.map(id => `'${id}'`).join(',')})`);
       } else {
-        // All modules removed
         await db.from('program_modules').delete().eq('program_id', programId);
       }
     }
@@ -215,6 +241,7 @@ async function upsertLessons(db: any, moduleId: string, lessons: any[]) {
           sort_order:       lesson.sort_order ?? 0,
           lesson_number:    lesson.sort_order ?? 0,
           duration_minutes: lesson.duration_minutes ?? null,
+          is_published:     lesson.is_published ?? false,
         })
         .select('id')
         .single();
@@ -225,6 +252,7 @@ async function upsertLessons(db: any, moduleId: string, lessons: any[]) {
         lesson_type:      normalizeLessonType(lesson.lesson_type),
         sort_order:       lesson.sort_order ?? 0,
         duration_minutes: lesson.duration_minutes ?? null,
+        is_published:     lesson.is_published ?? false,
       }).eq('id', lesson.id).eq('module_id', moduleId);
       incomingIds.push(lesson.id);
     }

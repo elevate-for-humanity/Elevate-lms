@@ -1,4 +1,4 @@
 /**
- * @deprecated Use '@/lib/authGuards' apiRequireAdmin() instead.
+ * @deprecated Use apiRequireAdmin from '@/lib/admin/guards' instead.
  */
-export { requireAdmin, requireAdmin as isAdmin } from '@/lib/admin/guards';
+export { apiRequireAdmin as requireAdmin, apiRequireAdmin as isAdmin } from '@/lib/admin/guards';

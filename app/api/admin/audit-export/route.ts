@@ -1,7 +1,7 @@
 import { logger } from "@/lib/logger";
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { requireAdmin } from '@/lib/auth/require-admin';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
@@ -17,9 +17,10 @@ export const dynamic = 'force-dynamic';
  * Requires admin/super_admin role.
  */
 async function _POST(request: Request) {
-  const auth = await requireAdmin();
-  if (!auth.authorized) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+  try {
+    await apiRequireAdmin(request);
+  } catch (e: any) {
+    return e instanceof Response ? e : NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const supabase = createAdminClient();

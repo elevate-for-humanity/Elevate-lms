@@ -609,6 +609,53 @@ export default function LessonPage() {
           { label: lesson.title },
         ]} />
       </div>
+
+      {/* Momentum strip — behavioral copy that drives forward motion */}
+      {lessons.length > 0 && (
+        <div className="flex-shrink-0 bg-slate-900 px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            {/* Progress bar */}
+            <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
+              <div className="w-24 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-brand-blue-500 rounded-full transition-all"
+                  style={{ width: `${lessons.length > 0 ? Math.round((completedLessonIds.size / lessons.length) * 100) : 0}%` }}
+                />
+              </div>
+              <span className="text-xs font-bold text-white tabular-nums">
+                {Math.round((completedLessonIds.size / lessons.length) * 100)}%
+              </span>
+            </div>
+            {/* Behavioral copy */}
+            <span className="text-xs text-slate-400 truncate">
+              {completedLessonIds.size === 0
+                ? `Lesson 1 of ${lessons.length} — let's go`
+                : lessons.length - completedLessonIds.size === 0
+                  ? 'All lessons complete — claim your certificate'
+                  : lessons.length - completedLessonIds.size === 1
+                    ? 'Last lesson — finish strong'
+                    : `${lessons.length - completedLessonIds.size} lessons left · Lesson ${currentIndex + 1} of ${lessons.length}`}
+            </span>
+          </div>
+          {/* Next lesson shortcut */}
+          {hasNext && (
+            <Link
+              href={`/lms/courses/${courseId}/lessons/${lessons[currentIndex + 1].id}`}
+              className="flex-shrink-0 flex items-center gap-1.5 text-xs font-bold text-brand-blue-400 hover:text-white transition-colors"
+            >
+              Up next <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+          )}
+          {!hasNext && completedLessonIds.size > 0 && (
+            <Link
+              href={`/lms/courses/${courseId}`}
+              className="flex-shrink-0 flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-white transition-colors"
+            >
+              View certificate <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+          )}
+        </div>
+      )}
       <div className="flex flex-1 overflow-hidden">
 {/* Mobile Sidebar Toggle */}
       <button

@@ -96,8 +96,21 @@ async function runMigrations() {
       console.log('OK');
       ok++;
     } catch (e) {
-      console.log('FAIL: ' + e.message.slice(0, 120));
-      fail++;
+      const msg = e.message || '';
+      // Already-applied objects are not failures — mark as applied and continue
+      const alreadyExists =
+        msg.includes('already exists') ||
+        msg.includes('42710') || // duplicate_object
+        msg.includes('42P07') || // duplicate_table
+        msg.includes('42723');   // duplicate_function
+      if (alreadyExists) {
+        await markApplied(file);
+        console.log('SKIP (already exists)');
+        skip++;
+      } else {
+        console.log('FAIL: ' + msg.slice(0, 120));
+        fail++;
+      }
     }
   }
 

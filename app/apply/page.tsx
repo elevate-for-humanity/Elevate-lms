@@ -69,6 +69,16 @@ export default async function ApplyPage({
 
 
 
+      {/* Enrollment path links — required for accessibility and E2E navigation */}
+      <div className="max-w-6xl mx-auto px-4 pt-2 pb-4 flex flex-wrap gap-4 text-sm">
+        <a href="/inquiry" className="text-brand-blue-600 hover:underline font-medium">
+          Submit an Inquiry
+        </a>
+        <a href="/programs" className="text-brand-blue-600 hover:underline font-medium">
+          Browse Programs
+        </a>
+      </div>
+
       {/* Application cards */}
       <section className="max-w-6xl mx-auto px-4 pb-10 sm:pb-14 space-y-8">
 

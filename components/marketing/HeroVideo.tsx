@@ -86,26 +86,14 @@ export default function HeroVideo({
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
-  // Attempt to autoplay voiceover immediately on mount.
-  // Browsers may block autoplay with audio — if blocked, stay muted so the
-  // user can manually unmute via the on-screen button.
-  // Respects prefers-reduced-motion.
+  // Voiceover is user-initiated only — no autoplay.
+  // Audio plays only when the user clicks the unmute button.
+  // Preload metadata so playback starts quickly when requested.
   useEffect(() => {
     if (!mounted) return;
     const audio = audioRef.current;
     if (!audio) return;
-
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) return;
-
     audio.load();
-    audio.currentTime = 0;
-    audio.play()
-      .then(() => setMuted(false))
-      .catch(() => {
-        // Browser blocked autoplay — stay muted; user can click unmute button
-        setMuted(true);
-      });
   }, [mounted]);
 
   // Voiceover audio toggle — only controls the separate audio track, not the video

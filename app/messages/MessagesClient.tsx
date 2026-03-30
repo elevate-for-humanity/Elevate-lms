@@ -145,7 +145,16 @@ export default function MessagesClient({ userId, initialConversations, participa
               {conversations.length === 0 ? (
                 <div className="p-8 text-center">
                   <User className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500">No conversations yet</p>
+                  <p className="font-medium text-gray-700 mb-1">No conversations yet</p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Threads are opened by staff when needed.
+                  </p>
+                  <a
+                    href="/contact?subject=support"
+                    className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Contact Support
+                  </a>
                 </div>
               ) : (
                 conversations.map((conv) => {
@@ -273,7 +282,8 @@ export default function MessagesClient({ userId, initialConversations, participa
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center">
                   <User className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">Select a conversation to start messaging</p>
+                  <p className="font-medium text-gray-700 mb-1">Select a conversation</p>
+                  <p className="text-sm text-gray-500">Choose a thread from the list to read and reply.</p>
                 </div>
               </div>
             )}

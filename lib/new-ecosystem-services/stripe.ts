@@ -1,8 +1,7 @@
 import { loadStripe } from '@stripe/stripe-js';
 
-// Initialize Stripe with publishable key
 const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_Content'
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''
 );
 
 export interface CheckoutSessionData {
@@ -13,16 +12,13 @@ export interface CheckoutSessionData {
 }
 
 /**
- * Create a Stripe Checkout session for program enrollment
- * Note: This requires a backend API endpoint to create the session
+ * Create a Stripe Checkout session via /api/create-checkout-session.
+ * Returns the Stripe session ID.
  */
-export async function createCheckoutSession(data: CheckoutSessionData) {
-  // Note: Replace with your actual backend API endpoint
+export async function createCheckoutSession(data: CheckoutSessionData): Promise<string> {
   const response = await fetch('/api/create-checkout-session', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       programId: data.programId,
       programName: data.programName,
@@ -33,7 +29,8 @@ export async function createCheckoutSession(data: CheckoutSessionData) {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to create checkout session');
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body.error || 'Failed to create checkout session');
   }
 
   const { sessionId } = await response.json();
@@ -41,39 +38,32 @@ export async function createCheckoutSession(data: CheckoutSessionData) {
 }
 
 /**
- * Redirect to Stripe Checkout
+ * Redirect to Stripe Checkout using a session ID.
  */
-export async function redirectToCheckout(sessionId: string) {
+export async function redirectToCheckout(sessionId: string): Promise<void> {
   const stripe = await stripePromise;
   if (!stripe) {
-    throw new Error('Stripe failed to load');
+    throw new Error('Stripe failed to load — check NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY');
   }
 
   const { error } = await stripe.redirectToCheckout({ sessionId });
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 }
 
 /**
- * Handle free enrollment (no payment required)
+ * Enroll a user in a free program via /api/enrollments/create-enforced.
  */
-export async function enrollFree(programId: string, userId: string) {
-  // Note: Replace with your actual backend API endpoint
-  const response = await fetch('/api/enroll-free', {
+export async function enrollFree(programId: string, userId: string): Promise<{ enrollmentId: string }> {
+  const response = await fetch('/api/enrollments/create-enforced', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      programId,
-      userId,
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ programId, userId }),
   });
 
   if (!response.ok) {
-    throw new Error('Failed to enroll');
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body.error || 'Failed to enroll');
   }
 
-  return await response.json();
+  return response.json();
 }

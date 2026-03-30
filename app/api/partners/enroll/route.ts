@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { trySendEmail } from '@/lib/email/resend';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -95,8 +96,34 @@ async function _POST(req: Request) {
       );
     }
 
-    // Note: Send notification email to admin
-    // Note: Send confirmation email to partner
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@elevateforhumanity.org';
+
+    // Confirmation to partner — fire-and-forget
+    trySendEmail({
+      to: contactEmail,
+      subject: 'Partner Enrollment Received — Elevate for Humanity',
+      html: `<p>Hi ${contactName},</p>
+<p>Thank you for submitting a partner enrollment request on behalf of <strong>${organizationName}</strong>. Our team will review your application and follow up within 2 business days.</p>
+<p>Questions? Call us at (317) 314-3757 or reply to this email.</p>
+<p>— Elevate for Humanity Partnership Team</p>`,
+    });
+
+    // Internal notification to admin — fire-and-forget
+    trySendEmail({
+      to: adminEmail,
+      subject: `New Partner Enrollment — ${organizationName}`,
+      html: `<p>A new partner enrollment has been submitted.</p>
+<ul>
+  <li><strong>Organization:</strong> ${organizationName} (${organizationType})</li>
+  <li><strong>Industry:</strong> ${industry}</li>
+  <li><strong>Contact:</strong> ${contactName}, ${contactTitle}</li>
+  <li><strong>Email:</strong> ${contactEmail}</li>
+  <li><strong>Phone:</strong> ${contactPhone || '—'}</li>
+  <li><strong>Programs Interested:</strong> ${(programsInterested || []).join(', ') || '—'}</li>
+  <li><strong>Capacity/Month:</strong> ${capacityPerMonth || '—'}</li>
+</ul>
+<p><a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org'}/admin/partners">Review in Admin →</a></p>`,
+    });
 
     return NextResponse.json({ ok: true });
   } catch (err: any) {

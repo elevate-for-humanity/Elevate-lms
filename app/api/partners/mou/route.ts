@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { trySendEmail } from '@/lib/email/resend';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -66,8 +67,31 @@ async function _POST(req: Request) {
       );
     }
 
-    // Note: Send confirmation email to partner
-    // Note: Send notification email to admin
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@elevateforhumanity.org';
+
+    // Confirmation to partner — fire-and-forget
+    trySendEmail({
+      to: email,
+      subject: 'MOU Signed — Elevate for Humanity',
+      html: `<p>Hi ${contactName},</p>
+<p>Thank you for signing the Memorandum of Understanding on behalf of <strong>${orgName}</strong>. We have received your signature and will be in touch shortly to discuss next steps.</p>
+<p>If you have any questions, reply to this email or call us at (317) 314-3757.</p>
+<p>— Elevate for Humanity Partnership Team</p>`,
+    });
+
+    // Internal notification to admin — fire-and-forget
+    trySendEmail({
+      to: adminEmail,
+      subject: `New MOU Signed — ${orgName}`,
+      html: `<p>A new MOU has been signed.</p>
+<ul>
+  <li><strong>Organization:</strong> ${orgName}</li>
+  <li><strong>Contact:</strong> ${contactName} (${title})</li>
+  <li><strong>Email:</strong> ${email}</li>
+  <li><strong>Signed:</strong> ${new Date().toLocaleString()}</li>
+</ul>
+<p><a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org'}/admin/partners">View in Admin →</a></p>`,
+    });
 
     return NextResponse.json({ ok: true });
   } catch (err: any) {

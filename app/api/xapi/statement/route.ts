@@ -33,7 +33,16 @@ async function _POST(request: NextRequest) {
     // xAPI statement can be single or array; normalize
     const statements = Array.isArray(body) ? body : [body];
 
-    const records = statements.map((item: any) => {
+    // Resolve tenant from the authenticated user's profile
+    const db = createAdminClient();
+    const { data: actorProfile } = await db
+      .from('profiles')
+      .select('tenant_id')
+      .eq('id', auth.user.id)
+      .maybeSingle();
+    const tenantId = actorProfile?.tenant_id ?? null;
+
+    const records = statements.map((st: any) => {
       const verbId = st?.verb?.id || null;
       const objectId = st?.object?.id || null;
       const objectType = st?.object?.objectType || 'Activity';
@@ -41,7 +50,7 @@ async function _POST(request: NextRequest) {
       const learnerId = auth.user.id;
 
       return {
-        tenant_id: null, // Note: Extract from auth or statement context
+        tenant_id: tenantId,
         learner_id: learnerId,
         raw: st,
         verb: verbId,

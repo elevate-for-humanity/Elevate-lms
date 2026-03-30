@@ -28,7 +28,7 @@ const supabase = await createClient();
     .eq('id', user.id)
     .single();
 
-  if (profile?.role !== 'admin') {
+  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
@@ -55,13 +55,11 @@ const supabase = await createClient();
       ? 0
       : ((completedEnrollments || 0) / (totalEnrollments || 1)) * 100;
 
-  // Get total hours (if you have this field)
-  // Note: Adjust field name based on your schema
+  // Sum training hours via RPC — returns null if function not yet deployed
   const { data: hoursData } = await supabase.rpc('sum_training_hours');
   const totalHours = hoursData || 0;
 
-  // Get enrollments by sector (if you have this field)
-  // Note: This is a Content - adjust based on your schema
+  // Sector breakdown — program_enrollments.sector column (nullable)
   const { data: bySectorData } = await supabase
     .from('program_enrollments')
     .select('sector')

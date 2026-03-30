@@ -143,21 +143,25 @@ export default function InteractiveVideoPlayer({
     setQuizAnswer(answerIndex);
   };
 
-  const submitQuizAnswer = () => {
+  const submitQuizAnswer = async () => {
     if (quizAnswer === null || !activeQuiz) return;
 
     const isCorrect = quizAnswer === activeQuiz.correctAnswer;
 
-    // Save quiz result to database
-    try {
-      // Note: Implement with your backend API
-      // await fetch('/api/quiz-results', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ quizId: activeQuiz.id, answer: quizAnswer, isCorrect })
-      // });
-    } catch (error) { /* Error handled silently */ 
-      // Error: $1
-    }
+    // Persist quiz result — fire-and-forget, non-blocking
+    fetch('/api/lms/video-quiz-results', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        question: activeQuiz.question,
+        selectedAnswer: quizAnswer,
+        correctAnswer: activeQuiz.correctAnswer,
+        isCorrect,
+        timestamp: activeQuiz.timestamp,
+      }),
+    }).catch(() => {
+      // Non-fatal — progress continues even if persistence fails
+    });
 
     if (isCorrect) {
       setActiveQuiz(null);

@@ -82,6 +82,7 @@
     "ioredis": "5.8.2",
     "isomorphic-dompurify": "^2.35.0",
     "joi": "18.0.2",
+    "jose": "^6.2.2",
     "jsonwebtoken": "9.0.2",
     "jspdf": "^4.0.0",
     "jspdf-autotable": "^5.0.7",

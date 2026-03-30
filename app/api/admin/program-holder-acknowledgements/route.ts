@@ -15,12 +15,6 @@ const _GET = withAuth(
     try {
       const supabase = await createClient();
 
-      // Note: Add authentication check here
-      // const { data: { user } } = await supabase.auth.getUser();
-      // if (!user || user.role !== 'admin') {
-      //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      // }
-
       const { data, error }: any = await supabase
         .from('program_holder_acknowledgements')
         .select('*')

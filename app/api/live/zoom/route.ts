@@ -18,7 +18,15 @@ export async function POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
+  // Resolve authenticated user for audit attribution
+  const db = createAdminClient();
   const supabase = createSupabaseClient();
+  let sessionUserId: string | null = null;
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    sessionUserId = user?.id ?? null;
+  } catch { /* non-fatal — audit will record null if session unavailable */ }
+
   try {
     const { courseId, topic, startTime, durationMinutes, instructorZoomId, tenantId } = await request.json();
 
@@ -72,7 +80,7 @@ export async function POST(request: NextRequest) {
     const { ipAddress, userAgent } = getRequestMetadata(request);
     await logAuditEvent({
       tenantId: tenantId || null,
-      userId: null, // Note: Get from session
+      userId: sessionUserId,
       action: 'live_session_created',
       resourceType: 'live_session',
       resourceId: liveSession.id,

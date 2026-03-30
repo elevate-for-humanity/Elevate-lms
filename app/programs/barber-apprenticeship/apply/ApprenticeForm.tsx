@@ -36,7 +36,9 @@ type PaymentOption = 'weekly' | 'full' | 'custom' | 'sezzle' | 'affirm';
 function resolveInitialPayment(param: string | null): PaymentOption {
   if (param === 'pay_in_full') return 'full';
   if (param === 'payment_plan') return 'custom';
-  if (param === 'bnpl') return 'sezzle';
+  if (param === 'affirm') return 'affirm';
+  if (param === 'sezzle') return 'sezzle';
+  if (param === 'bnpl') return 'sezzle'; // legacy fallback
   return 'weekly';
 }
 

@@ -41,15 +41,16 @@ export function BarberEnrollment() {
             <div className="bg-white rounded-xl p-5 border border-slate-200 text-center">
               <CreditCard className="w-8 h-8 text-brand-blue-600 mx-auto mb-2" />
               <h3 className="font-bold text-slate-900 mb-1">Buy Now, Pay Later</h3>
-              <p className="text-slate-500 text-xs mb-2">Finance with {BNPL_PROVIDER_NAMES}</p>
-              <div className="flex flex-wrap justify-center gap-1 mb-3">
-                {ACTIVE_BNPL_PROVIDERS.map((p) => (
-                  <span key={p.id} className={`px-2 py-0.5 ${p.badgeBg} ${p.badgeText} rounded-full text-xs font-medium`}>{p.name}</span>
-                ))}
+              <p className="text-slate-500 text-xs mb-3">Choose your provider at checkout</p>
+              <div className="flex flex-col gap-2 mb-3">
+                <Link href="/programs/barber-apprenticeship/apply?type=apprentice&payment=affirm" className="inline-block w-full bg-[#0FA0EA] hover:bg-[#0d8fd0] text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors">
+                  Affirm — Pay over time
+                </Link>
+                <Link href="/programs/barber-apprenticeship/apply?type=apprentice&payment=sezzle" className="inline-block w-full bg-[#392558] hover:bg-[#2e1d47] text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors">
+                  Sezzle — 4 payments
+                </Link>
               </div>
-              <Link href="/programs/barber-apprenticeship/apply?type=apprentice&payment=bnpl" className="inline-block text-sm font-semibold text-brand-blue-600 hover:text-brand-blue-700">
-                Apply for BNPL &rarr;
-              </Link>
+              <p className="text-slate-400 text-[10px]">Subject to provider approval</p>
             </div>
           </div>
           <p className="mt-4 text-xs text-slate-500 text-center max-w-2xl mx-auto">

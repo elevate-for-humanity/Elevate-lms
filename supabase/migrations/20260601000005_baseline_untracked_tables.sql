@@ -2639,20 +2639,29 @@ CREATE TABLE IF NOT EXISTS public.direct_deposit_accounts (
 
 CREATE TABLE IF NOT EXISTS public.direct_message_conversations (
   id uuid DEFAULT gen_random_uuid(),
-  add text,
-  elevateforhumanity text,
+  participant_1_id uuid,
+  participant_2_id uuid,
+  last_message_at timestamptz,
+  last_message_preview text,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
+  -- Original live table had columns named 'add' and 'elevateforhumanity' due to
+  -- a malformed migration. Fixed by 20260602000007_fix_direct_message_conversations.sql.
 );
 
 CREATE TABLE IF NOT EXISTS public.direct_messages (
   id uuid DEFAULT gen_random_uuid(),
-  user_id uuid,
   title text,
   content text,
   is_read boolean,
   created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
+  updated_at timestamptz DEFAULT now(),
+  conversation_id uuid,
+  sender_id uuid
+  -- user_id was present in the original live table; dropped by
+  -- 20260602000005_direct_messages_canonical.sql in favour of sender_id.
+  -- This baseline reflects the canonical post-migration shape so that
+  -- fresh environment replays do not create the column only to drop it.
 );
 
 CREATE TABLE IF NOT EXISTS public.discussion_forums (

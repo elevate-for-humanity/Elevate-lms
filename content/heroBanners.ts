@@ -263,7 +263,7 @@ const heroBanners: Record<string, HeroBannerConfig> = {
   platform: {
     pageKey: 'platform',
     posterImage: '/hero-images/technology-hero.jpg',
-    videoSrcDesktop: '/videos/training-providers-video-with-narration.mp4',
+    videoSrcDesktop: '/videos/training-providers-hero.mp4',
     voiceoverSrc: '/audio/heroes/programs.mp3',
     microLabel: 'Workforce Infrastructure',
     belowHeroHeadline: 'Workforce infrastructure, not just a website.',
@@ -329,7 +329,7 @@ const heroBanners: Record<string, HeroBannerConfig> = {
   store: {
     pageKey: 'store',
     posterImage: '/hero-images/programs-hero.jpg',
-    videoSrcDesktop: '/videos/store-whitelabel-narrated.mp4',
+    videoSrcDesktop: '/videos/lms-learning.mp4',
     videoSrcMobile: '/videos/store-demo-narrated.mp4',
     voiceoverSrc: '/audio/heroes/store.mp3',
     microLabel: 'White-Label Platform',

@@ -33,6 +33,8 @@ async function getDashboardData(supabase: any, db: any) {
     recentApplicationsRes,
     activityLogRes,
     paymentsRes,
+    blockedProgramsRes,
+    inactiveLearnersRes,
   ] = await Promise.all([
     supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student'),
     supabase.from('programs').select('id', { count: 'exact', head: true }).eq('status', 'active'),
@@ -72,6 +74,20 @@ async function getDashboardData(supabase: any, db: any) {
     supabase.from('payments')
       .select('amount_cents')
       .eq('status', 'paid'),
+    // Programs blocking revenue — unpublished and incomplete
+    supabase.from('programs')
+      .select('id, title, slug, status, updated_at')
+      .eq('published', false)
+      .neq('status', 'archived')
+      .order('updated_at', { ascending: false })
+      .limit(8),
+    // Inactive learners — enrolled but no lesson_progress update in 3+ days
+    supabase.from('program_enrollments')
+      .select('id, user_id, enrolled_at, profiles(id, full_name, email)')
+      .eq('status', 'active')
+      .lt('updated_at', new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString())
+      .order('updated_at', { ascending: true })
+      .limit(8),
   ]);
 
   // Build enrollment trend by month
@@ -220,6 +236,20 @@ async function getDashboardData(supabase: any, db: any) {
     totalRevenueCents,
     profile,
     generatedAt: new Date().toISOString(),
+    blockedPrograms: (blockedProgramsRes.data ?? []).map((p: any) => ({
+      id: p.id,
+      title: p.title ?? 'Untitled',
+      slug: p.slug ?? '',
+      status: p.status ?? 'draft',
+      updatedAt: p.updated_at ?? '',
+    })),
+    inactiveLearners: (inactiveLearnersRes.data ?? []).map((e: any) => ({
+      enrollmentId: e.id,
+      userId: e.user_id,
+      enrolledAt: e.enrolled_at ?? '',
+      fullName: (e.profiles as any)?.full_name ?? null,
+      email: (e.profiles as any)?.email ?? null,
+    })),
   };
 }
 

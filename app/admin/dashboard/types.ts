@@ -45,4 +45,20 @@ export interface DashboardData {
   profile: { full_name: string | null; role: string | null } | null;
   /** ISO string — server snapshot time for display */
   generatedAt: string;
+  /** Programs that are unpublished and not archived — blocking revenue */
+  blockedPrograms: {
+    id: string;
+    title: string;
+    slug: string;
+    status: string;
+    updatedAt: string;
+  }[];
+  /** Active enrollments with no progress update in 3+ days */
+  inactiveLearners: {
+    enrollmentId: string;
+    userId: string;
+    enrolledAt: string;
+    fullName: string | null;
+    email: string | null;
+  }[];
 }

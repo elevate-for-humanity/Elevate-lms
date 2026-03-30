@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 /**
  * POST /api/lms/video-quiz-results
  * Persists an in-video quiz answer from InteractiveVideoPlayer.
- * Stored in lesson_progress.metadata as a running log of quiz attempts.
+ * Upserts into interactive_video_quiz_answers — one row per user+lesson+question.
  */
 export async function POST(request: NextRequest) {
   const auth = await apiAuthGuard(request);
@@ -34,41 +34,32 @@ export async function POST(request: NextRequest) {
 
   const { question, selectedAnswer, correctAnswer, isCorrect, timestamp, lessonId } = body;
 
-  if (question === undefined || selectedAnswer === undefined || isCorrect === undefined) {
+  if (!question || selectedAnswer === undefined || isCorrect === undefined) {
     return safeError('Missing required fields: question, selectedAnswer, isCorrect', 400);
   }
 
   try {
     const supabase = await createClient();
 
-    const result = {
-      question,
-      selectedAnswer,
-      correctAnswer,
-      isCorrect,
-      timestamp: timestamp ?? null,
-      answeredAt: new Date().toISOString(),
-    };
+    const { error } = await supabase
+      .from('interactive_video_quiz_answers')
+      .upsert(
+        {
+          user_id: user.id,
+          lesson_id: lessonId ?? null,
+          question,
+          selected_answer: selectedAnswer,
+          correct_answer: correctAnswer ?? null,
+          is_correct: isCorrect,
+          timestamp_sec: timestamp ?? null,
+          answered_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id,lesson_id,question' }
+      );
 
-    // If a lessonId is provided, append to lesson_progress.metadata
-    if (lessonId) {
-      const { data: existing } = await supabase
-        .from('lesson_progress')
-        .select('id, metadata')
-        .eq('user_id', user.id)
-        .eq('lesson_id', lessonId)
-        .maybeSingle();
-
-      if (existing) {
-        const meta = (existing.metadata as Record<string, any>) ?? {};
-        const videoQuizzes: any[] = Array.isArray(meta.videoQuizzes) ? meta.videoQuizzes : [];
-        videoQuizzes.push(result);
-
-        await supabase
-          .from('lesson_progress')
-          .update({ metadata: { ...meta, videoQuizzes } })
-          .eq('id', existing.id);
-      }
+    if (error) {
+      logger.error('video-quiz-results upsert error', error);
+      return safeError('Failed to save quiz result', 500);
     }
 
     return NextResponse.json({ ok: true, isCorrect });

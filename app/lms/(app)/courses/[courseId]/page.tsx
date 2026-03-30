@@ -299,32 +299,38 @@ export default async function CoursePage({ params }: { params: Params }) {
 
               {modules.length > 0 ? (
                 <>
-                  {/* Phase grouping — renders phase label before each phase's first module */}
-                  {PHASE_MAP.map((phase) => {
+                  {/* Phase grouping — each phase is a collapsible section.
+                      Current phase opens by default; completed phases collapse;
+                      future phases are locked until the current phase is done. */}
+                  {PHASE_MAP.map((phase, phaseIdx) => {
                     const phaseModules = modules.filter((_: any, i: number) =>
                       i + 1 >= phase.range[0] && i + 1 <= phase.range[1]
                     );
                     if (phaseModules.length === 0) return null;
+
                     const phaseComplete = phaseModules.every((mod: any) =>
                       mod.lessons.length > 0 && mod.lessons.every((l: any) => progressMap.get(l.id)?.completed)
                     );
                     const isActivePhase = activePhase?.label === phase.label;
+
+                    // A phase is locked if it comes after the active phase and the active phase isn't complete
+                    const activePhaseIdx = PHASE_MAP.findIndex(p => p.label === activePhase?.label);
+                    const isLocked = !isActivePhase && !phaseComplete && phaseIdx > activePhaseIdx;
+
+                    const phaseStatus: 'current' | 'completed' | 'locked' =
+                      phaseComplete ? 'completed' : isLocked ? 'locked' : 'current';
+
                     return (
-                      <div key={phase.label} className="mb-6">
-                        <div className="flex items-center gap-2 mb-3">
-                          <span className={`text-xs font-bold uppercase tracking-widest ${isActivePhase ? 'text-brand-blue-600' : phaseComplete ? 'text-green-600' : 'text-slate-400'}`}>
-                            {phase.label}
-                          </span>
-                          <span className="text-xs text-slate-500 font-medium">— {phase.name}</span>
-                          {phaseComplete && <CheckCircle className="w-3.5 h-3.5 text-green-500 ml-auto" />}
-                          {isActivePhase && !phaseComplete && <span className="ml-auto text-[10px] font-bold text-brand-blue-600 bg-brand-blue-50 border border-brand-blue-200 px-2 py-0.5 rounded-full">Current</span>}
-                        </div>
+                      <div key={phase.label} className="mb-3">
                         <CourseModuleAccordion
                           modules={phaseModules}
                           courseId={courseId}
                           progressMap={Object.fromEntries(progressMap)}
                           isEnrolled={isEnrolled}
                           isPendingApproval={!!isPendingApproval}
+                          phaseLabel={phase.label}
+                          phaseName={phase.name}
+                          phaseStatus={phaseStatus}
                         />
                       </div>
                     );

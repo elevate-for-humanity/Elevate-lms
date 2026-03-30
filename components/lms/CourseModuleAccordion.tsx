@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   ChevronDown, ChevronUp, Play, CheckCircle, Lock,
   Video, FileText, Brain, FlaskConical, Zap, Shield,
-  Clock,
+  Clock, ChevronRight,
 } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -42,6 +42,11 @@ interface Props {
   progressMap: Record<string, { completed?: boolean } | undefined>;
   isEnrolled: boolean;
   isPendingApproval: boolean;
+  /** When set, wraps modules in a collapsible phase header */
+  phaseLabel?: string;
+  phaseName?: string;
+  /** 'current' = open by default, 'completed' = collapsed, 'locked' = collapsed + locked icon */
+  phaseStatus?: 'current' | 'completed' | 'locked';
 }
 
 // ── Activity icon map ──────────────────────────────────────────────────
@@ -288,7 +293,10 @@ export function CourseModuleAccordion({
     mod.lessons.some(l => !progressMap[l.id]?.completed)
   );
 
-  return (
+  // Phase-level collapse: non-current phases start closed
+  const [phaseOpen, setPhaseOpen] = useState(phaseStatus === 'current' || !phaseStatus);
+
+  const moduleList = (
     <div className="space-y-3">
       {modules.map((mod, idx) => (
         <ModuleRow
@@ -298,9 +306,91 @@ export function CourseModuleAccordion({
           progressMap={progressMap}
           isEnrolled={isEnrolled}
           isPendingApproval={isPendingApproval}
-          defaultOpen={idx === (firstIncompleteIdx >= 0 ? firstIncompleteIdx : 0)}
+          defaultOpen={
+            phaseStatus === 'current'
+              ? idx === (firstIncompleteIdx >= 0 ? firstIncompleteIdx : 0)
+              : false
+          }
         />
       ))}
+    </div>
+  );
+
+  // No phase wrapper — render modules directly
+  if (!phaseLabel) return moduleList;
+
+  const totalLessons = modules.reduce((s, m) => s + m.lessons.length, 0);
+  const completedLessons = modules.reduce(
+    (s, m) => s + m.lessons.filter(l => progressMap[l.id]?.completed).length,
+    0
+  );
+
+  const statusColors = {
+    current:   { badge: 'bg-blue-100 text-blue-700 border-blue-200',   dot: 'bg-blue-500',   header: 'border-blue-200 bg-blue-50/50' },
+    completed: { badge: 'bg-green-100 text-green-700 border-green-200', dot: 'bg-green-500',  header: 'border-slate-200 bg-white' },
+    locked:    { badge: 'bg-slate-100 text-slate-500 border-slate-200', dot: 'bg-slate-300',  header: 'border-slate-200 bg-slate-50' },
+  };
+  const colors = statusColors[phaseStatus ?? 'locked'];
+
+  return (
+    <div className={`rounded-xl border overflow-hidden ${colors.header}`}>
+      {/* Phase header — always visible, click to expand/collapse */}
+      <button
+        onClick={() => phaseStatus !== 'locked' && setPhaseOpen(o => !o)}
+        className={`w-full flex items-center gap-3 px-5 py-4 text-left transition-colors ${
+          phaseStatus === 'locked' ? 'cursor-default' : 'hover:bg-black/5'
+        }`}
+        disabled={phaseStatus === 'locked'}
+      >
+        {/* Status dot */}
+        <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${colors.dot}`} />
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-black uppercase tracking-widest text-slate-500">
+              {phaseLabel}
+            </span>
+            <span className="text-sm font-bold text-slate-900">{phaseName}</span>
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${colors.badge}`}>
+              {phaseStatus === 'current' ? 'Current' : phaseStatus === 'completed' ? 'Complete' : 'Locked'}
+            </span>
+          </div>
+          <p className="text-xs text-slate-400 mt-0.5">
+            {modules.length} module{modules.length !== 1 ? 's' : ''} · {totalLessons} lessons
+            {phaseStatus !== 'locked' && ` · ${completedLessons}/${totalLessons} done`}
+          </p>
+        </div>
+
+        {/* Progress bar (current/completed only) */}
+        {phaseStatus !== 'locked' && totalLessons > 0 && (
+          <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
+            <div className="w-24 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${phaseStatus === 'completed' ? 'bg-green-500' : 'bg-blue-500'}`}
+                style={{ width: `${Math.round((completedLessons / totalLessons) * 100)}%` }}
+              />
+            </div>
+            <span className="text-xs font-bold text-slate-600 tabular-nums w-8 text-right">
+              {Math.round((completedLessons / totalLessons) * 100)}%
+            </span>
+          </div>
+        )}
+
+        {/* Expand/collapse icon */}
+        {phaseStatus === 'locked'
+          ? <Lock className="w-4 h-4 text-slate-300 flex-shrink-0" />
+          : phaseOpen
+            ? <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0" />
+            : <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />
+        }
+      </button>
+
+      {/* Module list — only shown when phase is open */}
+      {phaseOpen && phaseStatus !== 'locked' && (
+        <div className="border-t border-slate-200 p-4">
+          {moduleList}
+        </div>
+      )}
     </div>
   );
 }

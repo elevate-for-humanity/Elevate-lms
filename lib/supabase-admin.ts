@@ -35,18 +35,22 @@ export const supabaseAdmin = new Proxy({} as ReturnType<typeof createClient>, {
   },
 });
 
-// Helper function to get user by email
+// Helper function to get user by email.
+// Queries profiles table directly — O(1) indexed lookup, not a full auth.admin.listUsers() scan.
 export async function getUserByEmail(email: string) {
-  // Note: For production, create a database RPC function for efficient email lookup
-  // Current implementation fetches all users - optimize for large user bases
-  const { data: listData, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+  const { data, error } = await supabaseAdmin
+    .from('profiles')
+    .select('id, email')
+    .ilike('email', email.trim())
+    .maybeSingle();
 
-  if (listError) {
-    throw listError;
-  }
+  if (error) throw error;
+  if (!data) return null;
 
-  const user = listData.users.find((u: any) => u.email === email);
-  return user || null;
+  // Return the auth user record so callers get the same shape as before
+  const { data: authData, error: authError } = await supabaseAdmin.auth.admin.getUserById(data.id);
+  if (authError) throw authError;
+  return authData.user ?? null;
 }
 
 // Helper function to get user by ID

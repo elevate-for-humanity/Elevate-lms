@@ -6,7 +6,7 @@ import {
   Users, TrendingUp, Inbox, DollarSign, AlertTriangle, Award,
   CheckCircle, Eye, ChevronUp, ChevronDown, Download,
   Clock, BookOpen, BarChart3, Shield, Settings, Zap,
-  Activity, Target, ArrowRight,
+  Activity, Target, ArrowRight, XCircle, UserX,
 } from 'lucide-react';
 import type { DashboardData } from './types';
 
@@ -248,7 +248,97 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
           </div>
         </div>
 
-        {/* Row 3: Students + Activity + Quick actions */}
+        {/* Row 3: Programs blocking revenue + Inactive learners */}
+        {(data.blockedPrograms.length > 0 || data.inactiveLearners.length > 0) && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+            {/* Programs blocking revenue */}
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+              <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <XCircle className="w-4 h-4 text-red-500" />
+                  Programs Blocking Revenue
+                  <span className="ml-1 text-[10px] font-black bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full">
+                    {data.blockedPrograms.length}
+                  </span>
+                </h2>
+                <Link href="/admin/programs" className="text-xs text-blue-600 font-medium hover:underline">
+                  View all →
+                </Link>
+              </div>
+              <div className="divide-y divide-slate-50">
+                {data.blockedPrograms.length === 0 ? (
+                  <div className="px-5 py-8 text-center">
+                    <CheckCircle className="w-7 h-7 text-emerald-400 mx-auto mb-2" />
+                    <p className="text-xs text-slate-400">All programs are published</p>
+                  </div>
+                ) : data.blockedPrograms.map(p => (
+                  <Link key={p.id} href={`/admin/programs/${p.id}/edit`}
+                    className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group">
+                    <div className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-slate-800 truncate">{p.title}</div>
+                      <div className="text-xs text-slate-400 mt-0.5">
+                        Status: <span className="capitalize">{p.status}</span>
+                        {p.updatedAt && ` · Last edited ${new Date(p.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700 flex-shrink-0">
+                      Unpublished
+                    </span>
+                    <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 flex-shrink-0" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Inactive learners */}
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+              <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <UserX className="w-4 h-4 text-amber-500" />
+                  Inactive Learners
+                  <span className="ml-1 text-[10px] font-black bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">
+                    {data.inactiveLearners.length}
+                  </span>
+                </h2>
+                <Link href="/admin/at-risk" className="text-xs text-blue-600 font-medium hover:underline">
+                  View all →
+                </Link>
+              </div>
+              <div className="divide-y divide-slate-50">
+                {data.inactiveLearners.length === 0 ? (
+                  <div className="px-5 py-8 text-center">
+                    <CheckCircle className="w-7 h-7 text-emerald-400 mx-auto mb-2" />
+                    <p className="text-xs text-slate-400">All learners are active</p>
+                  </div>
+                ) : data.inactiveLearners.map(l => (
+                  <Link key={l.enrollmentId} href={`/admin/learner/${l.userId}`}
+                    className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group">
+                    <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-xs font-bold text-amber-700 flex-shrink-0">
+                      {(l.fullName || l.email || '?')[0].toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-slate-800 truncate">
+                        {l.fullName || l.email || 'Unknown learner'}
+                      </div>
+                      <div className="text-xs text-slate-400 mt-0.5">
+                        Enrolled {l.enrolledAt ? new Date(l.enrolledAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—'} · No activity 3+ days
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 flex-shrink-0">
+                      Stalled
+                    </span>
+                    <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 flex-shrink-0" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* Row 4: Students + Activity + Quick actions */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
           {/* Students table */}

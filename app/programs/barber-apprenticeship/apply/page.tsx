@@ -115,7 +115,7 @@ function BarberApplyPageInner() {
           </div>
         )}
 
-        {applicantType === 'apprentice' && <ApprenticeForm />}
+        {applicantType === 'apprentice' && <ApprenticeForm initialPayment={searchParams.get('payment')} />}
         {applicantType === 'partner_shop' && <PartnerShopForm />}
         {applicantType === 'program_holder' && <ProgramHolderForm />}
       </div>

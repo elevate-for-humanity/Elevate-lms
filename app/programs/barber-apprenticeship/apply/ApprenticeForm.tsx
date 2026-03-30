@@ -30,7 +30,17 @@ function getNextFriday(): string {
   return nextFriday.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 }
 
-export default function ApprenticeForm() {
+type PaymentOption = 'weekly' | 'full' | 'custom' | 'sezzle' | 'affirm';
+
+// Map URL ?payment= values to internal option names
+function resolveInitialPayment(param: string | null): PaymentOption {
+  if (param === 'pay_in_full') return 'full';
+  if (param === 'payment_plan') return 'custom';
+  if (param === 'bnpl') return 'sezzle';
+  return 'weekly';
+}
+
+export default function ApprenticeForm({ initialPayment }: { initialPayment?: string | null }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [errorSeverity, setErrorSeverity] = useState<'info' | 'critical'>('info');
@@ -40,8 +50,8 @@ export default function ApprenticeForm() {
   const [transferHours, setTransferHours] = useState(0);
   const [hoursPerWeek, setHoursPerWeek] = useState(40);
   
-  // Payment option
-  const [paymentOption, setPaymentOption] = useState<'weekly' | 'full' | 'custom' | 'sezzle' | 'affirm'>('weekly');
+  // Payment option — pre-selected from URL param if provided
+  const [paymentOption, setPaymentOption] = useState<PaymentOption>(() => resolveInitialPayment(initialPayment ?? null));
   const [customAmount, setCustomAmount] = useState(PRICING.defaultDownPayment);
   
   // Form state

@@ -6,6 +6,7 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -54,6 +55,9 @@ async function _POST(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+  const auth = await apiRequireAdmin(request);
+  if (auth.error) return auth.error;
+
 
     const { data: entities, error: entitiesError } = await supabaseAdmin
       .from('entities')

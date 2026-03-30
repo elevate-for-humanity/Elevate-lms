@@ -5,6 +5,7 @@ import { mkdir, writeFile, readFile } from 'fs/promises';
 import path from 'path';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { apiAuthGuard } from '@/lib/admin/guards';
 import { COURSE_DEFINITIONS } from '@/lib/courses/definitions';
 import type { CourseLesson, CourseModule } from '@/lib/courses/definitions';
 import { getInstructorForCourse } from '@/lib/ai-instructors';
@@ -280,6 +281,9 @@ async function _GET(
 
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
+
+  const auth = await apiAuthGuard(request);
+  if (auth.error) return auth.error;
 
   const ctx = findLesson(lessonId);
   if (!ctx) {

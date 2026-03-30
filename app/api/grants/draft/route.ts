@@ -9,6 +9,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -26,6 +27,9 @@ function getOpenAI() {
 async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
+
 
   if (
     !process.env.OPENAI_API_KEY ||

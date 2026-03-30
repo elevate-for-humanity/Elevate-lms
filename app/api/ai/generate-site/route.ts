@@ -4,6 +4,7 @@ import OpenAI from 'openai';
 import { getRecommendedTemplate } from '@/lib/templates/designs';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { apiAuthGuard } from '@/lib/admin/guards';
 
 // Lazy-load OpenAI client to prevent build-time errors
 function getOpenAI() {
@@ -24,6 +25,9 @@ async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+  const auth = await apiAuthGuard(request);
+  if (auth.error) return auth.error;
+
 
     const body = await request.json();
     const { 

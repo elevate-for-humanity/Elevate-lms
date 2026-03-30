@@ -399,7 +399,7 @@ export default function LessonPage() {
         setCheckpointBlocked(true);
       }
     }
-  }, [lessonId, courseId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [lessonId, courseId]); // eslint-disable-next-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     lessonStartTime.current = Date.now();

@@ -37,6 +37,10 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
 
+      # Migration lint — runs before any other check, no secrets needed
+      - name: Migration lint
+        run: node scripts/lint-migrations.cjs
+
       # Integrity checks - each fails the build if issues found
       - name: Link integrity check
         run: pnpm run integrity:links

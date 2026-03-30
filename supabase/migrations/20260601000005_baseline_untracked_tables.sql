@@ -8472,49 +8472,7 @@ CREATE TABLE IF NOT EXISTS public.student_credentials (
   created_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS public.student_enrollments (
-  id uuid DEFAULT gen_random_uuid(),
-  student_id uuid,
-  program_id uuid,
-  stripe_checkout_session_id text,
-  status text,
-  transfer_hours numeric,
-  rapids_status text,
-  rapids_id text,
-  milady_enrolled boolean,
-  milady_enrolled_at timestamptz,
-  shop_id uuid,
-  supervisor_id uuid,
-  started_at timestamptz,
-  completed_at timestamptz,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now(),
-  hours_needed bigint,
-  total_program_fee numeric,
-  down_payment numeric,
-  amount_paid numeric,
-  balance_remaining numeric,
-  payment_plan_months bigint,
-  monthly_payment_amount numeric,
-  payment_status text,
-  stripe_subscription_id text,
-  next_payment_date date,
-  vendor_paid boolean,
-  vendor_paid_at timestamptz,
-  vendor_payment_amount numeric,
-  certificate_issued_at timestamptz,
-  program_slug text,
-  funding_source text,
-  case_id uuid,
-  region_id text,
-  payment_option text,
-  required_hours numeric,
-  has_host_shop boolean,
-  host_shop_name text,
-  enrollment_state text,
-  progress text,
-  cohort_id uuid
-);
+-- student_enrollments: defined in 20260201000004_student_enrollments_canonical.sql
 
 CREATE TABLE IF NOT EXISTS public.student_funding_assignments (
   id uuid DEFAULT gen_random_uuid(),

@@ -1,6 +1,8 @@
 // =====================================================
 // ELEVATE FOR HUMANITY - DATABASE TYPES
-// Auto-generated from Supabase schema
+// Hand-written domain interfaces (business logic layer).
+// For full table row types generated from live schema, see:
+//   types/database.generated.ts  (run: pnpm gen:types to refresh)
 // =====================================================
 
 export type UserRole =

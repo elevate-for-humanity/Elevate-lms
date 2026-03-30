@@ -197,6 +197,7 @@
   },
   "scripts": {
     "preinstall": "corepack enable || true",
+    "gen:types": "node scripts/gen-db-types.cjs",
     "check:redirects": "node scripts/check-redirect-conflicts.mjs",
     "integrity:links": "node scripts/integrity/links.mjs",
     "integrity:media": "node scripts/integrity/media.mjs",

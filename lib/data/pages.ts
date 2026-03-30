@@ -1,11 +1,15 @@
 import { createClient } from '@/lib/supabase/server';
 
+// Canonical page_sections shape — matches live DB exactly.
+// Do not add section_type/content/is_visible here; those columns do not exist.
 export interface PageSection {
   id: string;
   page_id: string;
   component: string;
   position: number;
   props: Record<string, unknown>;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Page {
@@ -23,7 +27,7 @@ export async function getPage(slug: string): Promise<Page | null> {
 
   const { data: page } = await supabase
     .from('pages')
-    .select('*')
+    .select('id, slug, path, title, description, section, status, meta_title, meta_desc, is_published, requires_auth, roles_allowed, created_at, updated_at')
     .eq('slug', slug)
     .eq('status', 'published')
     .single();
@@ -32,7 +36,7 @@ export async function getPage(slug: string): Promise<Page | null> {
 
   const { data: sections } = await supabase
     .from('page_sections')
-    .select('*')
+    .select('id, page_id, component, position, props, created_at, updated_at')
     .eq('page_id', page.id)
     .order('position');
 

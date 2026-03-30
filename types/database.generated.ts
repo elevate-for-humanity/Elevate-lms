@@ -1,6 +1,6 @@
 // =============================================================================
 // DATABASE TYPES — auto-generated from live Supabase schema
-// Generated: 2026-03-30T10:53:10.247Z
+// Generated: 2026-03-30T11:49:33.558Z
 // Project: cuxzzpsyufcewtmicszk
 // DO NOT EDIT MANUALLY — regenerate with: node scripts/gen-db-types.js
 // =============================================================================
@@ -11353,6 +11353,8 @@ export interface Database {
           expires_at: string | null
           issued_at: string | null
           revoked_at: string | null
+          abbreviation: string | null
+          issuing_authority: string | null
         }
         Insert: {
           id?: string | undefined
@@ -11364,6 +11366,8 @@ export interface Database {
           expires_at?: string | null | undefined
           issued_at?: string | null | undefined
           revoked_at?: string | null | undefined
+          abbreviation?: string | null | undefined
+          issuing_authority?: string | null | undefined
         }
         Update: {
           id?: string | undefined
@@ -11375,6 +11379,8 @@ export interface Database {
           expires_at?: string | null | undefined
           issued_at?: string | null | undefined
           revoked_at?: string | null | undefined
+          abbreviation?: string | null | undefined
+          issuing_authority?: string | null | undefined
         }
       }
       credentials_attained: {
@@ -13168,6 +13174,8 @@ export interface Database {
           is_read: boolean | null
           created_at: string | null
           updated_at: string | null
+          conversation_id: string | null
+          sender_id: string | null
         }
         Insert: {
           id?: string | undefined
@@ -13177,6 +13185,8 @@ export interface Database {
           is_read?: boolean | null | undefined
           created_at?: string | null | undefined
           updated_at?: string | null | undefined
+          conversation_id?: string | null | undefined
+          sender_id?: string | null | undefined
         }
         Update: {
           id?: string | undefined
@@ -13186,6 +13196,8 @@ export interface Database {
           is_read?: boolean | null | undefined
           created_at?: string | null | undefined
           updated_at?: string | null | undefined
+          conversation_id?: string | null | undefined
+          sender_id?: string | null | undefined
         }
       }
       discussion_forums: {
@@ -32441,6 +32453,10 @@ export interface Database {
           enrollment_id: string | null
           annual_salary: number | null
           verification_source: string | null
+          employed_q2: boolean | null
+          employed_q4: boolean | null
+          median_earnings_q2: number | null
+          tenant_id: string | null
         }
         Insert: {
           id?: string | undefined
@@ -32464,6 +32480,10 @@ export interface Database {
           enrollment_id?: string | null | undefined
           annual_salary?: number | null | undefined
           verification_source?: string | null | undefined
+          employed_q2?: boolean | null | undefined
+          employed_q4?: boolean | null | undefined
+          median_earnings_q2?: number | null | undefined
+          tenant_id?: string | null | undefined
         }
         Update: {
           id?: string | undefined
@@ -32487,6 +32507,10 @@ export interface Database {
           enrollment_id?: string | null | undefined
           annual_salary?: number | null | undefined
           verification_source?: string | null | undefined
+          employed_q2?: boolean | null | undefined
+          employed_q4?: boolean | null | undefined
+          median_earnings_q2?: number | null | undefined
+          tenant_id?: string | null | undefined
         }
       }
       placements: {

@@ -189,34 +189,29 @@ function LoginForm() {
                 Quick Access:
               </p>
               <div className="grid grid-cols-2 gap-3">
-                <Link
-                  href="/learner/dashboard"
-                  prefetch={false}
-                  className="text-center px-4 py-3 bg-white text-black rounded-lg hover:bg-slate-200 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center"
-                >
-                  Student Portal
-                </Link>
-                <Link
-                  href="/admin"
-                  prefetch={false}
-                  className="text-center px-4 py-3 bg-white text-black rounded-lg hover:bg-slate-200 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center"
-                >
-                  Admin Portal
-                </Link>
-                <Link
-                  href="/program-holder/dashboard"
-                  prefetch={false}
-                  className="text-center px-4 py-3 bg-white text-black rounded-lg hover:bg-slate-200 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center"
-                >
-                  Program Holder
-                </Link>
-                <Link
-                  href="/instructor/dashboard"
-                  prefetch={false}
-                  className="text-center px-4 py-3 bg-white text-black rounded-lg hover:bg-slate-200 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center"
-                >
-                  Instructor Portal
-                </Link>
+                {[
+                  { label: 'Student Portal',     href: '/learner/dashboard' },
+                  { label: 'Admin Portal',        href: '/admin/dashboard' },
+                  { label: 'Program Holder',      href: '/program-holder/dashboard' },
+                  { label: 'Instructor',          href: '/instructor/dashboard' },
+                  { label: 'Employer',            href: '/employer/dashboard' },
+                  { label: 'Partner Portal',      href: '/partner-portal' },
+                  { label: 'Staff Portal',        href: '/staff-portal/dashboard' },
+                  { label: 'Mentor',              href: '/mentor/dashboard' },
+                  { label: 'Case Manager',        href: '/case-manager/dashboard' },
+                  { label: 'Workforce Board',     href: '/workforce-board/dashboard' },
+                  { label: 'Provider Admin',      href: '/provider/dashboard' },
+                  { label: 'Creator',             href: '/creator/dashboard' },
+                ].map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    prefetch={false}
+                    className="text-center px-4 py-3 bg-white text-black rounded-lg hover:bg-slate-200 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
               </div>
             </div>
           </div>

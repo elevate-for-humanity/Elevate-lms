@@ -3,7 +3,7 @@ import { Facebook, Linkedin, Instagram } from "lucide-react";
 
 export default function SocialMediaHighlight() {
   return (
-    <section className="py-20     relative overflow-hidden">
+    <section className="py-20 relative overflow-hidden bg-slate-800">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '30px 30px' }} />

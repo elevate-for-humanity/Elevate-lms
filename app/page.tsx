@@ -32,22 +32,20 @@ export default function HomePage() {
     <main className="min-h-screen bg-white">
 
       {/* ── HERO ── */}
-      <section className="grid lg:grid-cols-2">
-        <div className="relative h-72 sm:h-96 lg:h-auto min-h-[560px] overflow-hidden bg-slate-900">
+      <section className="grid lg:grid-cols-2 gap-0">
+        <div className="relative h-72 sm:h-96 lg:h-auto min-h-[560px] overflow-hidden bg-slate-700">
           <HeroVideoBg
             src="/videos/homepage-hero-new.mp4"
+            poster="/images/hero-banner.jpg"
             audioSrc="/videos/homepage-hero-new.mp3"
-            caption="Welcome to Elevate For Humanity — where opportunity, training, and community come together to change lives. Approved for WIOA, Workforce Ready Grant, Registered Apprenticeship, and industry-recognized credentials. Whether you're starting fresh, leveling up, or reinventing your path — Elevate For Humanity is where your journey begins. Enroll today at ElevateForHumanity.org"
           />
-          <div className="absolute inset-0 bg-slate-900/30 pointer-events-none" />
         </div>
-        <div className="bg-slate-900 flex items-center">
+        <div className="bg-slate-700 flex items-center">
           <div className="px-8 py-12 lg:px-14 lg:py-16 max-w-xl w-full">
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-4">Indianapolis, Indiana</p>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
               Get Certified.<br />Get Funded.<br />Get Hired — In Weeks.
             </h1>
-            <p className="text-slate-300 text-base leading-relaxed mb-6">
+            <p className="text-slate-200 text-base leading-relaxed mb-6">
               Free and low-cost career training programs in Indiana. Earn industry-recognized certifications and start working fast.
             </p>
             {/* Proof bullets */}
@@ -84,7 +82,7 @@ export default function HomePage() {
       <MarqueeBanner />
 
       {/* ── FUNDING — near top, very prominent ── */}
-      <section className="bg-brand-red-700 py-14 sm:py-18 px-6">
+      <section className="bg-brand-red-700 py-14 sm:py-16 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
             <div className="max-w-2xl">
@@ -99,10 +97,10 @@ export default function HomePage() {
                   { label: 'Workforce Ready Grant', tag: 'Indiana State', desc: 'Covers high-demand certification programs.' },
                   { label: 'JRI / Employer-Sponsored', tag: 'Indiana State', desc: 'For justice-involved individuals and employer OJT.' },
                 ].map((f) => (
-                  <div key={f.label} className="bg-slate-900 border border-slate-700 rounded-xl p-4">
-                    <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>
-                    <h3 className="text-white font-bold text-sm mb-1">{f.label}</h3>
-                    <p className="text-slate-300 text-xs leading-relaxed">{f.desc}</p>
+                  <div key={f.label} className="bg-white rounded-xl p-4 shadow-sm">
+                    <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>
+                    <h3 className="text-slate-900 font-bold text-sm mb-1">{f.label}</h3>
+                    <p className="text-slate-600 text-xs leading-relaxed">{f.desc}</p>
                   </div>
                 ))}
               </div>
@@ -110,17 +108,17 @@ export default function HomePage() {
                 Check My Eligibility
               </Link>
             </div>
-            <div className="lg:flex-shrink-0 bg-slate-900 border border-slate-700 rounded-2xl p-8 text-center lg:w-64">
-              <p className="text-5xl font-black text-white mb-2">$0</p>
-              <p className="text-slate-300 text-sm font-semibold mb-4">Cost to eligible participants</p>
-              <p className="text-slate-400 text-xs leading-relaxed">Federal and Indiana state funding covers tuition, books, tools, and exam fees.</p>
+            <div className="lg:flex-shrink-0 bg-white rounded-2xl p-8 text-center lg:w-64 shadow-sm">
+              <p className="text-5xl font-black text-brand-red-600 mb-2">$0</p>
+              <p className="text-slate-800 text-sm font-semibold mb-4">Cost to eligible participants</p>
+              <p className="text-slate-500 text-xs leading-relaxed">Federal and Indiana state funding covers tuition, books, tools, and exam fees.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section className="bg-slate-950 py-16 sm:py-20 px-6">
+      <section className="bg-slate-800 py-16 px-6">
         <div className="max-w-5xl mx-auto">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3 text-center">Simple process</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3 text-center">Simple. Fast. Built for Real Jobs.</h2>
@@ -136,7 +134,7 @@ export default function HomePage() {
                 <div className="w-14 h-14 rounded-full bg-brand-red-600 text-white font-black text-xl flex items-center justify-center mb-4 flex-shrink-0">
                   {s.step}
                 </div>
-                {i < 3 && <div className="hidden sm:block absolute top-7 left-[calc(50%+28px)] right-[calc(-50%+28px)] h-px bg-slate-700" />}
+                {i < 3 && <div className="hidden sm:block absolute top-7 left-[calc(50%+28px)] right-[calc(-50%+28px)] h-px bg-slate-600" />}
                 <p className="text-white font-bold text-base mb-2">{s.label}</p>
                 <p className="text-slate-400 text-sm leading-relaxed">{s.desc}</p>
               </div>
@@ -151,7 +149,7 @@ export default function HomePage() {
       </section>
 
       {/* ── PROGRAMS — video hero cards ── */}
-      <section className="bg-slate-950 py-16 sm:py-20 px-6 border-t border-slate-800">
+      <section className="bg-slate-900 py-16 px-6">
         <div className="max-w-6xl mx-auto">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3 text-center">Programs</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3 text-center">Career Programs That Lead to Jobs</h2>
@@ -166,7 +164,7 @@ export default function HomePage() {
       </section>
 
       {/* ── WHY ELEVATE ── */}
-      <section className="bg-slate-50 border-t border-slate-200 py-16 sm:py-20 px-6">
+      <section className="bg-slate-50 py-16 px-6">
         <div className="max-w-5xl mx-auto">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-3 text-center">Why us</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-12 text-center">Why Students Choose Elevate</h2>
@@ -192,7 +190,7 @@ export default function HomePage() {
       </section>
 
       {/* ── CREDIBILITY ── */}
-      <section className="bg-white border-t border-slate-100 py-12 px-6">
+      <section className="bg-slate-50 py-12 px-6">
         <div className="max-w-6xl mx-auto">
           <p className="text-xs font-bold uppercase tracking-widest text-slate-600 mb-8 text-center">Approved &amp; recognized by</p>
           <div className="flex flex-wrap justify-center gap-3">
@@ -213,7 +211,7 @@ export default function HomePage() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section className="bg-slate-50 border-t border-slate-200 py-16 sm:py-20 px-6">
+      <section className="bg-white border-t border-slate-100 py-16 px-6">
         <div className="max-w-4xl mx-auto">
           <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3 text-center">Student Outcomes</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-10 text-center">Real students. Real results.</h2>
@@ -245,7 +243,7 @@ export default function HomePage() {
       <HomeClientFeatures />
 
       {/* ── FINAL CTA ── */}
-      <div className="bg-slate-900 border-t border-slate-800 py-20 sm:py-24 px-6">
+      <div className="bg-slate-700 border-t border-slate-600 py-16 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <BlurIn>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Ready to Start Your Career?</h2>

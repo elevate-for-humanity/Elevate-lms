@@ -72,7 +72,7 @@ export function AIAssistantBubble() {
 
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: data.message 
+        content: data.message ?? data.error ?? "I'm having trouble responding right now. Please try again."
       }]);
     } catch (error) {
       setMessages(prev => [...prev, { 
@@ -91,12 +91,12 @@ export function AIAssistantBubble() {
     }
   };
 
-  const renderMessage = (content: string) => {
+  const renderMessage = (content: string | undefined | null) => {
+    if (!content) return null;
     const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
     const parts: (string | JSX.Element)[] = [];
     let lastIndex = 0;
     let match;
-
     while ((match = linkRegex.exec(content)) !== null) {
       if (match.index > lastIndex) {
         parts.push(content.slice(lastIndex, match.index));
@@ -186,7 +186,7 @@ export function AIAssistantBubble() {
                     ? 'bg-brand-orange-600 text-white'
                     : 'bg-white text-gray-800 shadow-sm border border-gray-200'
                 }`}>
-                  <div className="text-sm whitespace-pre-line">{renderMessage(message.content)}</div>
+                  <div className="text-sm whitespace-pre-line">{renderMessage(message.content ?? '')}</div>
                 </div>
               </div>
             ))}

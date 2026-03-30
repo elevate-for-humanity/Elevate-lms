@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuditLogs, getAuditStats } from '@/lib/auditLog';
-import { requireAdmin } from '@/lib/authGuards';
+import { requireAdmin } from '@/lib/admin/guards';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 export const runtime = 'edge';
@@ -11,7 +11,7 @@ export const maxDuration = 60;
 export const GET = withAuth(
   async (request: NextRequest, user) => {
     try {
-      await requireAdmin();
+      await apiRequireAdmin();
 
       const { searchParams } = new URL(request.url);
       const action = searchParams.get('action');

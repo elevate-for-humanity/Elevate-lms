@@ -117,8 +117,9 @@ async function _POST(request: NextRequest) {
     let checkoutAmount: number;
     let productName: string;
     let productDescription: string;
-    const minSetupFee = Math.round(adjustedFullPrice * 0.35);
-    const weeksRemaining = Math.ceil(hoursRemaining / hours_per_week);
+    // Minimum down payment is $600 as advertised — never override with a percentage.
+    const minSetupFee = BARBER_PRICING.minDownPayment; // $600
+    const weeksRemaining = BARBER_PRICING.paymentTermWeeks; // fixed 29 weeks
 
     if (payment_type === 'pay_in_full') {
       // Pay in full with 5% discount
@@ -135,17 +136,18 @@ async function _POST(request: NextRequest) {
         ? `Adjusted tuition ($${adjustedFullPrice}) with ${transferred_hours_verified} transfer hours. ${bnpl_provider || 'BNPL'} handles payments.`
         : `Complete program tuition. ${bnpl_provider || 'BNPL provider'} handles your payment plan.`;
     } else {
-      // Payment plan - custom or default setup fee (based on adjusted price)
-      const setupFee = custom_setup_fee 
+      // Payment plan — honour the student's chosen down payment.
+      // Clamp: must be at least $600, at most the full adjusted price.
+      const setupFee = custom_setup_fee
         ? Math.max(minSetupFee, Math.min(custom_setup_fee, adjustedFullPrice))
-        : Math.round(adjustedFullPrice * 0.35); // Default 35%
+        : minSetupFee; // default $600
       checkoutAmount = setupFee;
       const remainingBalance = adjustedFullPrice - setupFee;
       const weeklyPayment = weeksRemaining > 0 ? Math.round((remainingBalance / weeksRemaining) * 100) / 100 : 0;
-      productName = 'Barber Apprenticeship - Setup Fee';
+      productName = 'Barber Apprenticeship - Down Payment';
       productDescription = transferred_hours_verified > 0
-        ? `Setup fee. ${transferred_hours_verified} transfer hours applied. $${weeklyPayment}/week for ${weeksRemaining} weeks.`
-        : `Setup fee of $${setupFee}. Remaining $${remainingBalance} at $${weeklyPayment}/week for ${weeksRemaining} weeks.`;
+        ? `Down payment. ${transferred_hours_verified} transfer hours applied. $${weeklyPayment}/week for ${weeksRemaining} weeks.`
+        : `Down payment of $${setupFee}. Remaining $${remainingBalance} at $${weeklyPayment}/week for ${weeksRemaining} weeks.`;
     }
 
     // Determine which Payment Method Configuration to use based on environment

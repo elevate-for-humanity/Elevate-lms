@@ -10,7 +10,7 @@
 
 
 import { NextRequest, NextResponse } from 'next/server';
-import { apiAuthGuard } from '@/lib/authGuards';
+import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { resolvePaymentResponsibility } from '@/lib/services/credential-pipeline';
 import { createAdminClient } from '@/lib/supabase/admin';

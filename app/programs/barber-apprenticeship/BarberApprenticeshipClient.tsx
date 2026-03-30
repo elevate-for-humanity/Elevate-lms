@@ -198,21 +198,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
               </Link>
             </div>
           </div>
-          {/* Indiana Career Connect */}
-          <div className="mt-8 bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-5 max-w-4xl mx-auto">
-            <p className="text-brand-blue-900 font-semibold text-sm mb-1">Indiana Career Connect</p>
-            <p className="text-brand-blue-800 text-sm leading-relaxed mb-3">
-              For WIOA-eligible and apprenticeship pathway applicants, the next step may require Indiana Career Connect.
-            </p>
-            <a
-              href="https://www.indianacareerconnect.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-2.5 rounded-lg transition-colors text-sm"
-            >
-              Go to Indiana Career Connect
-            </a>
-          </div>
+
 
         </div>
       </section>

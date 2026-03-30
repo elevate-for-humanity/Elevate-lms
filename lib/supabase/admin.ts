@@ -1,13 +1,25 @@
 import { logger } from '@/lib/logger';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-export function createAdminClient(): SupabaseClient<any> | null {
+/**
+ * Returns a Supabase client authenticated with the service role key.
+ *
+ * Throws if either env var is missing — there is no anon fallback.
+ * A missing service role key must be caught at startup, not silently
+ * degraded to an RLS-blocked anon client that fails at query time.
+ *
+ * Call sites that previously handled `null` returns must be updated to
+ * handle a thrown error instead.
+ */
+export function createAdminClient(): SupabaseClient<any> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!url || !key) {
-    logger.warn('[Supabase Admin] SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_URL missing — admin queries will use anon client and may be blocked by RLS.');
-    return null;
+  if (!url) {
+    throw new Error('MISSING_ENV: NEXT_PUBLIC_SUPABASE_URL is not set');
+  }
+  if (!key) {
+    throw new Error('MISSING_ENV: SUPABASE_SERVICE_ROLE_KEY is not set');
   }
 
   return createClient(url, key, {
@@ -30,9 +42,8 @@ export async function createAuditedAdminClient(ctx: {
   actorUserId?: string | null;
   systemActor?: string | null;
   requestId?: string | null;
-}): Promise<SupabaseClient<any> | null> {
+}): Promise<SupabaseClient<any>> {
   const client = createAdminClient();
-  if (!client) return null;
 
   try {
     await client.rpc('set_audit_context', {

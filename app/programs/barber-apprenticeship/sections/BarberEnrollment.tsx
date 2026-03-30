@@ -15,7 +15,7 @@ export function BarberEnrollment() {
             Total tuition: <strong>$4,980</strong>. Small down payment, small weekly payments — you pick.
           </p>
           <p className="text-slate-500 text-center text-sm mb-8 max-w-2xl mx-auto">
-            WIOA, JRI, and workforce funding may cover tuition at no cost — check eligibility before paying.
+            Self-pay program. Payment plans and BNPL financing available — pick what works for you.
           </p>
           <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
             <div className="bg-white rounded-xl p-5 border border-slate-200 text-center">
@@ -41,9 +41,9 @@ export function BarberEnrollment() {
             <div className="bg-white rounded-xl p-5 border border-slate-200 text-center">
               <CreditCard className="w-8 h-8 text-brand-blue-600 mx-auto mb-2" />
               <h3 className="font-bold text-slate-900 mb-1">Buy Now, Pay Later</h3>
-              <p className="text-slate-500 text-xs mb-2">Finance your down payment with Affirm or Sezzle</p>
+              <p className="text-slate-500 text-xs mb-2">Finance with {BNPL_PROVIDER_NAMES}</p>
               <div className="flex flex-wrap justify-center gap-1 mb-3">
-                {ACTIVE_BNPL_PROVIDERS.slice(0, 3).map((p) => (
+                {ACTIVE_BNPL_PROVIDERS.map((p) => (
                   <span key={p.id} className={`px-2 py-0.5 ${p.badgeBg} ${p.badgeText} rounded-full text-xs font-medium`}>{p.name}</span>
                 ))}
               </div>
@@ -53,7 +53,7 @@ export function BarberEnrollment() {
             </div>
           </div>
           <p className="mt-4 text-xs text-slate-500 text-center max-w-2xl mx-auto">
-            Weekly invoices sent every Friday. BNPL finances your down payment — remaining balance paid weekly. Subject to provider approval.
+            Payment plans start at $600 down. BNPL financing available through {BNPL_PROVIDER_NAMES} — subject to provider approval.
           </p>
         </div>
       </section>
@@ -131,18 +131,18 @@ export function BarberEnrollment() {
             </div>
           </div>
 
-          {/* Funding info */}
+          {/* Payment options info */}
           <div className="max-w-2xl mx-auto mb-10 bg-white p-6 rounded-xl border border-slate-200">
-            <h3 className="font-bold text-slate-900 mb-3">Funding Sources</h3>
+            <h3 className="font-bold text-slate-900 mb-3">Payment Options</h3>
             <div className="space-y-3">
               <p className="text-sm text-slate-700">
-                <strong>JRI (Job Ready Indy):</strong> If you are justice-involved (currently on probation, parole, or recently released), JRI funding may cover your entire apprenticeship at no cost. JRI also provides supportive services like transportation assistance and work supplies.
+                <strong>Payment Plan:</strong> Start with a $600 down payment, then pay the remaining balance in small weekly installments over 29 weeks. No interest.
               </p>
               <p className="text-sm text-slate-700">
-                <strong>WIOA:</strong> Adults and dislocated workers who meet income guidelines or are receiving public assistance may qualify for WIOA funding, which covers tuition, books, supplies, and in some cases transportation and childcare.
+                <strong>Pay in Full:</strong> Pay the full $4,980 upfront and receive a 5% discount — total $4,731.
               </p>
               <p className="text-sm text-slate-700">
-                <strong>Self-Pay:</strong> Payment plans and BNPL financing ({BNPL_PROVIDER_NAMES}) available. Contact us or submit the intake form to find out which options you qualify for.
+                <strong>BNPL Financing:</strong> Split your tuition into installments through {BNPL_PROVIDER_NAMES}. Select your preferred provider at checkout.
               </p>
             </div>
           </div>

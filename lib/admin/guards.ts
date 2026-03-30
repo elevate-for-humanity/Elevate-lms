@@ -137,5 +137,99 @@ export const SENSITIVE_ROUTES = [
   '/admin/syllabus-generator',
 ] as const;
 
-// Re-export API guards — routes import from this path
-export { apiAuthGuard, apiRequireAdmin } from '@/lib/authGuards';
+// =====================================================
+// API ROUTE GUARDS (canonical — import from here, not from lib/authGuards)
+// =====================================================
+
+import { createClient } from '@/lib/supabase/server';
+import { unauthorized, forbidden, serverError } from '@/lib/api/responses';
+
+export type UserRole =
+  | 'student'
+  | 'instructor'
+  | 'admin'
+  | 'super_admin'
+  | 'staff'
+  | 'program_holder'
+  | 'provider_admin'
+  | 'case_manager'
+  | 'employer'
+  | 'partner'
+  | 'delegate';
+
+export type GuardedUser = {
+  id: string;
+  email: string | null;
+  role: UserRole | null;
+};
+
+/**
+ * Verify the request carries a valid Supabase session.
+ * Throws a 401 NextResponse if not authenticated.
+ * Throws a 500 NextResponse if the profile lookup fails.
+ *
+ * Usage (inside handleRoute):
+ *   const user = await apiAuthGuard(req);
+ */
+export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    throw unauthorized();
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (profileError) {
+    throw serverError('PROFILE_LOOKUP_FAILED');
+  }
+
+  return {
+    id: user.id,
+    email: user.email ?? null,
+    role: (profile?.role as UserRole) ?? null,
+  };
+}
+
+const ADMIN_ROLES: UserRole[] = ['admin', 'super_admin', 'staff'];
+const INSTRUCTOR_ROLES: UserRole[] = ['instructor', 'admin', 'super_admin', 'staff'];
+
+/**
+ * Verify the request is from an admin, super_admin, or staff user.
+ * Throws 401 if unauthenticated, 403 if authenticated but wrong role.
+ *
+ * Usage (inside handleRoute):
+ *   const user = await apiRequireAdmin(req);
+ */
+export async function apiRequireAdmin(_req?: Request): Promise<GuardedUser> {
+  const user = await apiAuthGuard(_req);
+
+  if (!user.role || !ADMIN_ROLES.includes(user.role)) {
+    throw forbidden();
+  }
+
+  return user;
+}
+
+/**
+ * Verify the request is from an instructor, admin, super_admin, or staff user.
+ * Throws 401 if unauthenticated, 403 if authenticated but wrong role.
+ */
+export async function apiRequireInstructor(_req?: Request): Promise<GuardedUser> {
+  const user = await apiAuthGuard(_req);
+
+  if (!user.role || !INSTRUCTOR_ROLES.includes(user.role)) {
+    throw forbidden();
+  }
+
+  return user;
+}

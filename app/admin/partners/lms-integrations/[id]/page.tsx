@@ -2,12 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 
-const UniversalCoursePlayer = dynamic(
-  () => import('@/components/UniversalCoursePlayer').then((m) => ({ default: m.UniversalCoursePlayer })),
-  { ssr: false }
-);
 import {
   ArrowLeft,
   Globe,
@@ -24,6 +19,7 @@ import {
   ExternalLink,
 CheckCircle, } from 'lucide-react';
 import Image from 'next/image';
+import LmsIntegrationClientFeatures from '@/components/admin/LmsIntegrationClientFeatures';
 
 export const dynamic = 'force-dynamic';
 

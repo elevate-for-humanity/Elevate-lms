@@ -34,7 +34,6 @@ export default function HomePage() {
           <HeroVideoBg
             src="/videos/homepage-hero-new.mp4"
             audioSrc="/videos/homepage-hero-new.mp3"
-            poster="/images/pages/about-career-training.jpg"
             caption="Welcome to Elevate For Humanity — where opportunity, training, and community come together to change lives. Approved for WIOA, Workforce Ready Grant, Registered Apprenticeship, and industry-recognized credentials. Whether you're starting fresh, leveling up, or reinventing your path — Elevate For Humanity is where your journey begins. Enroll today at ElevateForHumanity.org"
           />
           <div className="absolute inset-0 bg-slate-900/30 pointer-events-none" />

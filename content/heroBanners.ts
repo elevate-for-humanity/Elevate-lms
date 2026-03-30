@@ -263,7 +263,7 @@ const heroBanners: Record<string, HeroBannerConfig> = {
   platform: {
     pageKey: 'platform',
     posterImage: '/hero-images/technology-hero.jpg',
-    videoSrcDesktop: '/videos/elevate-overview-with-narration.mp4',
+    videoSrcDesktop: '/videos/training-providers-video-with-narration.mp4',
     voiceoverSrc: '/audio/heroes/programs.mp3',
     microLabel: 'Workforce Infrastructure',
     belowHeroHeadline: 'Workforce infrastructure, not just a website.',
@@ -370,8 +370,7 @@ Try the live demo — no signup, no time limit. Every screen is clickable. Searc
   programs: {
     pageKey: 'programs',
     posterImage: '/hero-images/programs-hero.jpg',
-    videoSrcDesktop: '/videos/programs-overview-video-with-narration.mp4',
-    videoSrcMobile: '/videos/program-hero.mp4',
+    videoSrcDesktop: '/videos/program-hero.mp4',
     voiceoverSrc: '/audio/heroes/programs.mp3',
     microLabel: 'Career Training',
     belowHeroHeadline: 'Start a Career — Not Just a Class',

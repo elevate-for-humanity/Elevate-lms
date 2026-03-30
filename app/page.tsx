@@ -2,14 +2,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
-import dynamic from 'next/dynamic';
 import MarqueeBanner from '@/components/MarqueeBanner';
 import { BlurIn } from '@/components/animations/PremiumAnimations';
 import { ProgramVideoCards } from '@/components/marketing/ProgramVideoCards';
 import { HeroVideoBg } from '@/components/marketing/HeroVideoBg';
-
-const NewsletterSignup = dynamic(() => import('@/components/NewsletterSignup'), { ssr: false });
-const SocialMediaHighlight = dynamic(() => import('@/components/SocialMediaHighlight'), { ssr: false });
+import HomeClientShell from './HomeClientShell';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600;
@@ -243,8 +240,7 @@ export default function HomePage() {
       </section>
 
       {/* ── SOCIAL + NEWSLETTER ── */}
-      <SocialMediaHighlight />
-      <NewsletterSignup />
+      <HomeClientShell />
 
       {/* ── FINAL CTA ── */}
       <div className="bg-slate-900 border-t border-slate-800 py-20 sm:py-24 px-6">

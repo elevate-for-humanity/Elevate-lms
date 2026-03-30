@@ -5,12 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import WIOAComplianceDashboard from '@/components/admin/WIOAComplianceDashboard';
-import dynamic from 'next/dynamic';
-
-const BlockchainCredentialVerification = dynamic(
-  () => import('@/components/BlockchainCredentialVerification').then((m) => ({ default: m.BlockchainCredentialVerification })),
-  { ssr: false }
-);
+import ComplianceClientShell from './ComplianceClientShell';
 import {
 
   getAllGuardrails,
@@ -264,7 +259,7 @@ export default async function CompliancePage() {
       {/* Blockchain Credential Verification */}
       <section className="py-8 px-6">
         <div className="max-w-7xl mx-auto">
-          <BlockchainCredentialVerification />
+          <ComplianceClientShell />
         </div>
       </section>
     </div>

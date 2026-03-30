@@ -190,22 +190,22 @@ function LoginForm() {
               </p>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: 'Student Portal',     href: '/learner/dashboard' },
-                  { label: 'Admin Portal',        href: '/admin/dashboard' },
-                  { label: 'Program Holder',      href: '/program-holder/dashboard' },
-                  { label: 'Instructor',          href: '/instructor/dashboard' },
-                  { label: 'Employer',            href: '/employer/dashboard' },
-                  { label: 'Partner Portal',      href: '/partner-portal' },
-                  { label: 'Staff Portal',        href: '/staff-portal/dashboard' },
-                  { label: 'Mentor',              href: '/mentor/dashboard' },
-                  { label: 'Case Manager',        href: '/case-manager/dashboard' },
-                  { label: 'Workforce Board',     href: '/workforce-board/dashboard' },
-                  { label: 'Provider Admin',      href: '/provider/dashboard' },
-                  { label: 'Creator',             href: '/creator/dashboard' },
+                  { label: 'Student Portal',     dest: '/learner/dashboard' },
+                  { label: 'Admin Portal',        dest: '/admin/dashboard' },
+                  { label: 'Program Holder',      dest: '/program-holder/dashboard' },
+                  { label: 'Instructor',          dest: '/instructor/dashboard' },
+                  { label: 'Employer',            dest: '/employer/dashboard' },
+                  { label: 'Partner Portal',      dest: '/partner-portal' },
+                  { label: 'Staff Portal',        dest: '/staff-portal/dashboard' },
+                  { label: 'Mentor',              dest: '/mentor/dashboard' },
+                  { label: 'Case Manager',        dest: '/case-manager/dashboard' },
+                  { label: 'Workforce Board',     dest: '/workforce-board/dashboard' },
+                  { label: 'Provider Admin',      dest: '/provider/dashboard' },
+                  { label: 'Creator',             dest: '/creator/dashboard' },
                 ].map((item) => (
                   <Link
-                    key={item.href}
-                    href={item.href}
+                    key={item.dest}
+                    href={`/login?redirect=${encodeURIComponent(item.dest)}`}
                     prefetch={false}
                     className="text-center px-4 py-3 bg-white text-black rounded-lg hover:bg-slate-200 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center"
                   >

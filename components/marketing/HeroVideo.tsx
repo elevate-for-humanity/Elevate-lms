@@ -12,7 +12,6 @@
  */
 
 import { useEffect, useRef, useState, useId } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
 import CanonicalVideo from '@/components/video/CanonicalVideo';
 
 /* ------------------------------------------------------------------ */
@@ -32,8 +31,7 @@ export interface HeroVideoProps {
   videoSrcMobile?: string;
   /** Poster image shown while video loads and as reduced-motion fallback */
   posterImage?: string;
-  /** Optional separate voiceover audio track */
-  voiceoverSrc?: string;
+
   /** 2–4 word micro-label rendered in bottom-left corner of video */
   microLabel?: string;
   /** Show small brand bug in top-left corner */
@@ -64,7 +62,6 @@ export default function HeroVideo({
   videoSrcDesktop,
   videoSrcMobile,
   posterImage,
-  voiceoverSrc,
   microLabel,
   showBrandBug = false,
   belowHeroHeadline,
@@ -76,40 +73,13 @@ export default function HeroVideo({
   className = '',
   children,
 }: HeroVideoProps) {
-  const audioRef = useRef<HTMLAudioElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const [muted, setMuted] = useState(true);
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const transcriptId = useId();
 
   // Track whether we're mounted on the client (avoids SSR/client hydration mismatch)
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
-
-  // Voiceover is user-initiated only — no autoplay.
-  // Audio plays only when the user clicks the unmute button.
-  // Preload metadata so playback starts quickly when requested.
-  useEffect(() => {
-    if (!mounted) return;
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.load();
-  }, [mounted]);
-
-  // Voiceover audio toggle — only controls the separate audio track, not the video
-  function toggleMute() {
-    const audio = audioRef.current;
-    const nextMuted = !muted;
-    setMuted(nextMuted);
-    if (audio) {
-      if (nextMuted) {
-        audio.pause();
-      } else {
-        if (audio.ended) audio.currentTime = 0;
-        audio.play().catch(() => setMuted(true));
-      }
-    }
-  }
 
   // Always use desktop src on server. Switch to mobile src after mount if viewport is narrow.
   // This prevents the SSR/client src mismatch hydration error.
@@ -135,10 +105,7 @@ export default function HeroVideo({
           autoPlayOnMount
         />
 
-        {/* Voiceover audio — preload metadata so it's ready when scroll fires */}
-        {voiceoverSrc && (
-          <audio ref={audioRef} src={voiceoverSrc} preload="metadata" aria-hidden="true" />
-        )}
+
 
         {/* ── ON-VIDEO ELEMENTS (only these three are allowed) ── */}
 
@@ -162,22 +129,7 @@ export default function HeroVideo({
           </div>
         )}
 
-        {/* Sound toggle — only shown when a voiceover track is present */}
-        {voiceoverSrc && (
-          <div className="absolute bottom-4 right-4 z-10">
-            <button
-              onClick={toggleMute}
-              aria-label={muted ? 'Unmute voiceover' : 'Mute voiceover'}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-black/40 text-white text-xs backdrop-blur-sm hover:bg-black/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white transition-colors"
-            >
-              {muted ? (
-                <VolumeX className="w-3.5 h-3.5 flex-shrink-0" />
-              ) : (
-                <Volume2 className="w-3.5 h-3.5 flex-shrink-0" />
-              )}
-            </button>
-          </div>
-        )}
+
       </section>
 
       {/* ── BELOW-HERO CONTENT ── */}

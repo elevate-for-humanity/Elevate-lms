@@ -275,7 +275,7 @@ CREATE TABLE IF NOT EXISTS nds_course_purchases (
   nds_access_url TEXT,
   purchased_at TIMESTAMPTZ DEFAULT NOW(),
   completed_at TIMESTAMPTZ,
-  certificate_url TEXT,
+  certificate_url TEXT
   UNIQUE(user_id, course_id)
 );
 

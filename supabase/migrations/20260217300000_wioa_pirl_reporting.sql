@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS wioa_pirl_mappings (
   source_column TEXT NOT NULL,
   transform TEXT,  -- optional: 'boolean_to_01', 'gender_code', 'race_hispanic', etc.
   notes TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(schema_id, element)
 );
 

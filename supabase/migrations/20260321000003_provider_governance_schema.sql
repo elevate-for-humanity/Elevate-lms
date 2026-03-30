@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS provider_onboarding_steps (
   completed   BOOLEAN NOT NULL DEFAULT false,
   completed_at TIMESTAMPTZ,
   completed_by UUID REFERENCES auth.users(id),  -- NULL = system-completed
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 
   UNIQUE (tenant_id, step)
 );

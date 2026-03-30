@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS guide_messages (
   action_href TEXT,
   sort_order INTEGER NOT NULL DEFAULT 0,
   is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(page_id, message_id)
 );
 
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS product_recommendations (
   savings TEXT,
   sort_order INTEGER DEFAULT 0,
   is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(source_product_id, target_product_id, recommendation_type)
 );
 
@@ -184,7 +184,7 @@ CREATE TABLE IF NOT EXISTS wishlists (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL,
   product_id UUID NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(user_id, product_id)
 );
 

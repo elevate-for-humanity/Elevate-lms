@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS public.program_holder_programs (
   program_id UUID NOT NULL REFERENCES public.programs(id) ON DELETE CASCADE,
   role_in_program TEXT NOT NULL DEFAULT 'owner',
   status TEXT NOT NULL DEFAULT 'active',
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   UNIQUE (program_holder_id, program_id)
 );
 

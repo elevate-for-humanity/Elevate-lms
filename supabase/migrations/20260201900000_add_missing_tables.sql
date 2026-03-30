@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS organization_settings (
   organization_id UUID NOT NULL,
   settings JSONB DEFAULT '{}',
   updated_at TIMESTAMPTZ DEFAULT NOW(),
-  created_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(organization_id)
 );
 
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS organization_roles (
   organization_id UUID NOT NULL,
   role_name TEXT NOT NULL,
   permissions TEXT[] DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(organization_id, role_name)
 );
 

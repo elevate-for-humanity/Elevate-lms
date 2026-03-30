@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS public.module_completion_rules (
   required_previous_module_id UUID REFERENCES public.course_modules(id) ON DELETE SET NULL,
   required_checkpoint_lesson_id UUID REFERENCES public.course_lessons(id) ON DELETE SET NULL,
   minimum_score               INTEGER,
-  created_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_at                  TIMESTAMPTZ NOT NULL DEFAULT now()
   UNIQUE(course_id, module_id)
 );
 
@@ -26,12 +26,12 @@ CREATE TABLE IF NOT EXISTS public.student_module_progress (
   user_id      UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   course_id    UUID NOT NULL REFERENCES public.courses(id)  ON DELETE CASCADE,
   module_id    UUID NOT NULL REFERENCES public.course_modules(id) ON DELETE CASCADE,
-  status       TEXT NOT NULL DEFAULT 'locked'
+  status       TEXT NOT NULL DEFAULT 'locked',
                CHECK (status IN ('locked','unlocked','in_progress','completed')),
   unlocked_at  TIMESTAMPTZ,
   completed_at TIMESTAMPTZ,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
   UNIQUE(user_id, module_id)
 );
 

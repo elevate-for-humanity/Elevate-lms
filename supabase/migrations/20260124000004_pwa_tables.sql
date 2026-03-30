@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS lesson_progress (
   completed BOOLEAN DEFAULT FALSE,
   completed_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(user_id, course_slug, lesson_id)
 );
 
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS push_subscriptions (
   p256dh TEXT,
   auth TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(user_id, endpoint)
 );
 

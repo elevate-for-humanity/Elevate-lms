@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS site_content (
   content_json JSONB,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(page_slug, section_key)
 );
 

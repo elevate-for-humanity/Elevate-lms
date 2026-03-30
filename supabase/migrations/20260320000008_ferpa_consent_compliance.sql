@@ -16,12 +16,12 @@ CREATE TABLE IF NOT EXISTS public.data_deletion_requests (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   learner_id      UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   requested_by    UUID NOT NULL REFERENCES public.profiles(id) ON DELETE SET NULL,
-  request_type    TEXT NOT NULL DEFAULT 'full_deletion'
+  request_type    TEXT NOT NULL DEFAULT 'full_deletion',
     CHECK (request_type IN ('full_deletion', 'anonymization', 'partial_deletion', 'export_only')),
-  legal_basis     TEXT NOT NULL DEFAULT 'ferpa'
+  legal_basis     TEXT NOT NULL DEFAULT 'ferpa',
     CHECK (legal_basis IN ('ferpa', 'ccpa', 'gdpr', 'learner_request', 'court_order')),
 
-  status          TEXT NOT NULL DEFAULT 'pending'
+  status          TEXT NOT NULL DEFAULT 'pending',
     CHECK (status IN ('pending', 'under_review', 'approved', 'processing', 'completed', 'rejected')),
 
   -- What was done
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS public.consent_records (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   learner_id      UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
 
-  consent_type    TEXT NOT NULL
+  consent_type    TEXT NOT NULL,
     CHECK (consent_type IN (
       'employer_data_sharing',
       'workforce_agency_sharing',
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS public.consent_records (
   revoked_at      TIMESTAMPTZ,
 
   -- How consent was collected
-  collection_method TEXT NOT NULL DEFAULT 'enrollment_form'
+  collection_method TEXT NOT NULL DEFAULT 'enrollment_form',
     CHECK (collection_method IN ('enrollment_form', 'explicit_prompt', 'email_confirmation', 'paper_form', 'system_import')),
 
   ip_address      INET,
@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS public.consent_records (
 
   tenant_id       UUID REFERENCES public.tenants(id) ON DELETE SET NULL,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 
   -- One active consent record per learner+type+grantee
   UNIQUE NULLS NOT DISTINCT (learner_id, consent_type, granted_to_type, granted_to_id)
@@ -145,13 +145,13 @@ CREATE TABLE IF NOT EXISTS public.tenant_compliance_records (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id       UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
 
-  compliance_area TEXT NOT NULL
+  compliance_area TEXT NOT NULL,
     CHECK (compliance_area IN (
       'ferpa', 'wioa', 'workforce_ready_grant', 'jri', 'dol_apprenticeship',
       'hipaa', 'ccpa', 'ada', 'title_ix', 'etpl'
     )),
 
-  status          TEXT NOT NULL DEFAULT 'not_assessed'
+  status          TEXT NOT NULL DEFAULT 'not_assessed',
     CHECK (status IN ('compliant', 'non_compliant', 'under_review', 'not_applicable', 'not_assessed')),
 
   assessed_by     UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
@@ -161,7 +161,7 @@ CREATE TABLE IF NOT EXISTS public.tenant_compliance_records (
   documentation_url TEXT,
 
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 
   UNIQUE (tenant_id, compliance_area)
 );

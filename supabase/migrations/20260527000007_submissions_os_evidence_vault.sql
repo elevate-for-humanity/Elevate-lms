@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS public.sos_past_performance (
   contact_phone    TEXT,
   approved_by      UUID REFERENCES auth.users(id),
   approved_at      TIMESTAMPTZ,
-  status           TEXT NOT NULL DEFAULT 'draft'
+  status           TEXT NOT NULL DEFAULT 'draft',
                    CHECK (status IN ('draft','approved','archived')),
   created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS public.sos_rate_sheets (
   effective_date   DATE NOT NULL,
   expiration_date  DATE,
   rates_json       JSONB NOT NULL,    -- [{ role: "Instructor", rate: 65.00, unit: "hour" }, ...]
-  status           TEXT NOT NULL DEFAULT 'draft'
+  status           TEXT NOT NULL DEFAULT 'draft',
                    CHECK (status IN ('draft','approved','expired','superseded')),
   approved_by      UUID REFERENCES auth.users(id),
   approved_at      TIMESTAMPTZ,
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS public.sos_compliance_records (
   file_path        TEXT,
   effective_date   DATE,
   expiration_date  DATE,
-  status           TEXT NOT NULL DEFAULT 'active'
+  status           TEXT NOT NULL DEFAULT 'active',
                    CHECK (status IN ('active','expired','pending_renewal','revoked','unknown')),
   approved_by      UUID REFERENCES auth.users(id),
   approved_at      TIMESTAMPTZ,

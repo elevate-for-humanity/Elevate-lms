@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS public.sos_attachment_library (
   file_path        TEXT,
   effective_date   DATE,
   expiration_date  DATE,
-  status           TEXT NOT NULL DEFAULT 'pending'
+  status           TEXT NOT NULL DEFAULT 'pending',
                    CHECK (status IN ('pending','approved','rejected','expired')),
   approved_by      UUID REFERENCES auth.users(id),
   approved_at      TIMESTAMPTZ,

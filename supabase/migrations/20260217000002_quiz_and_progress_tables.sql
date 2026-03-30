@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS public.quizzes (
 CREATE TABLE IF NOT EXISTS public.quiz_questions (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   quiz_id UUID REFERENCES public.quizzes(id) ON DELETE CASCADE,
-  question_type TEXT NOT NULL DEFAULT 'multiple_choice'
+  question_type TEXT NOT NULL DEFAULT 'multiple_choice',
     CHECK (question_type IN ('multiple_choice', 'true_false', 'short_answer', 'matching', 'fill_blank')),
   question_text TEXT NOT NULL,
   explanation TEXT,
@@ -82,16 +82,16 @@ CREATE TABLE IF NOT EXISTS public.course_progress (
   enrollment_id UUID,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   course_id UUID NOT NULL,
-  status TEXT NOT NULL DEFAULT 'not_started'
+  status TEXT NOT NULL DEFAULT 'not_started',
     CHECK (status IN ('not_started', 'in_progress', 'completed')),
-  progress_percentage INTEGER DEFAULT 0
+  progress_percentage INTEGER DEFAULT 0,
     CHECK (progress_percentage >= 0 AND progress_percentage <= 100),
   completed_lessons JSONB DEFAULT '[]',
   current_lesson TEXT,
   last_accessed TIMESTAMPTZ,
   completed_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(user_id, course_id)
 );
 

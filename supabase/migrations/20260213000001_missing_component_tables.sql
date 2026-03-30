@@ -223,7 +223,7 @@ CREATE TABLE IF NOT EXISTS study_group_members (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   study_group_id uuid,
   user_id uuid,
-  joined_at timestamptz DEFAULT now(),
+  joined_at timestamptz DEFAULT now()
   UNIQUE(study_group_id, user_id)
 );
 ALTER TABLE study_group_members ENABLE ROW LEVEL SECURITY;
@@ -371,7 +371,7 @@ CREATE TABLE IF NOT EXISTS google_classroom_sync (
   last_sync_at timestamptz,
   settings jsonb DEFAULT '{}',
   status text DEFAULT 'disconnected',
-  created_at timestamptz DEFAULT now(),
+  created_at timestamptz DEFAULT now()
   UNIQUE(user_id)
 );
 ALTER TABLE google_classroom_sync ENABLE ROW LEVEL SECURITY;
@@ -384,7 +384,7 @@ CREATE TABLE IF NOT EXISTS live_session_attendance (
   session_id text NOT NULL,
   user_id uuid,
   joined_at timestamptz DEFAULT now(),
-  left_at timestamptz,
+  left_at timestamptz
   UNIQUE(session_id, user_id)
 );
 ALTER TABLE live_session_attendance ENABLE ROW LEVEL SECURITY;
@@ -457,7 +457,7 @@ CREATE TABLE IF NOT EXISTS user_learning_paths (
   started_at timestamptz DEFAULT now(),
   completed_at timestamptz,
   status text DEFAULT 'active',
-  progress numeric DEFAULT 0,
+  progress numeric DEFAULT 0
   UNIQUE(user_id, learning_path_id)
 );
 ALTER TABLE user_learning_paths ENABLE ROW LEVEL SECURITY;

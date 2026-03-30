@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS career_course_purchases (
   stripe_payment_id TEXT,
   stripe_session_id TEXT,
   status TEXT DEFAULT 'completed',
-  purchased_at TIMESTAMPTZ DEFAULT NOW(),
+  purchased_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(user_id, course_id)
 );
 

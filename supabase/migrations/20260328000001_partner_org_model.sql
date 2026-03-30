@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS public.program_organizations (
     'credential_partner','apprenticeship_partner'
   )),
   is_active         boolean NOT NULL DEFAULT true,
-  created_at        timestamptz NOT NULL DEFAULT now(),
+  created_at        timestamptz NOT NULL DEFAULT now()
   UNIQUE (program_id, organization_id, relationship_type)
 );
 ALTER TABLE public.program_organizations ENABLE ROW LEVEL SECURITY;
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS public.cohort_enrollments (
   enrolled_at       timestamptz NOT NULL DEFAULT now(),
   completed_at      timestamptz,
   created_at        timestamptz NOT NULL DEFAULT now(),
-  updated_at        timestamptz NOT NULL DEFAULT now(),
+  updated_at        timestamptz NOT NULL DEFAULT now()
   UNIQUE (cohort_id, learner_id)
 );
 ALTER TABLE public.cohort_enrollments ENABLE ROW LEVEL SECURITY;

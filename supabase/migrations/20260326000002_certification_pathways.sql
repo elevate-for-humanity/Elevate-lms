@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS public.certification_bodies (
   notes                 TEXT,
   is_active             BOOLEAN NOT NULL DEFAULT true,
   created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at            TIMESTAMPTZ NOT NULL DEFAULT now()
 
   UNIQUE (name)
 );
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS public.program_certification_pathways (
   application_url             TEXT,                   -- override body-level URL if pathway-specific
   -- Exam
   exam_fee_cents              INTEGER NOT NULL DEFAULT 0,
-  fee_payer                   TEXT NOT NULL DEFAULT 'elevate'
+  fee_payer                   TEXT NOT NULL DEFAULT 'elevate',
     CHECK (fee_payer IN ('elevate', 'student', 'grant')),
   -- State scope — NULL means available in all states
   state_scope                 TEXT,
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS public.program_certification_pathways (
   is_active                   BOOLEAN NOT NULL DEFAULT true,
   sort_order                  INTEGER NOT NULL DEFAULT 0,
   created_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at                  TIMESTAMPTZ NOT NULL DEFAULT now()
 
   UNIQUE (program_id, certification_body_id, credential_abbreviation)
 );

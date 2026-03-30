@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS public.checkpoint_scores (
   passed          boolean     NOT NULL GENERATED ALWAYS AS (score >= passing_score) STORED,
   attempt_number  integer     NOT NULL DEFAULT 1,
   answers         jsonb,
-  created_at      timestamptz NOT NULL DEFAULT now(),
+  created_at      timestamptz NOT NULL DEFAULT now()
   UNIQUE (user_id, lesson_id, attempt_number)
 );
 
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS public.step_submissions (
   step_type       public.step_type_enum NOT NULL,
   submission_text text,
   file_urls       text[]      DEFAULT '{}',
-  status          text        NOT NULL DEFAULT 'submitted'
+  status          text        NOT NULL DEFAULT 'submitted',
                   CHECK (status IN ('submitted','under_review','approved','rejected','revision_requested')),
   instructor_id   uuid        REFERENCES auth.users(id),
   instructor_note text,

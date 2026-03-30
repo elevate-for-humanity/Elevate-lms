@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS program_external_completions (
   completed_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   marked_by         UUID REFERENCES profiles(id) ON DELETE SET NULL,
   notes             TEXT,
-  proof_url         TEXT,                                -- optional upload link
+  proof_url         TEXT-- optional upload link
   UNIQUE (external_course_id, user_id)
 );
 

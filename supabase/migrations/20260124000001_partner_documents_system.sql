@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS partner_document_requirements (
   max_file_size_mb INTEGER DEFAULT 10,
   requires_expiration BOOLEAN DEFAULT false,
   
-  created_at TIMESTAMPTZ DEFAULT now(),
+  created_at TIMESTAMPTZ DEFAULT now()
   
   UNIQUE(state, program_id, document_type)
 );

@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS public.program_tracks (
   available           BOOLEAN NOT NULL DEFAULT TRUE,
   coming_soon_message TEXT,
   sort_order          INTEGER NOT NULL DEFAULT 0,
-  created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
   UNIQUE (program_id, track_code)
 );
 
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS public.program_modules (
   lesson_count   INTEGER NOT NULL DEFAULT 0,
   duration_hours NUMERIC(6,2),
   sort_order     INTEGER NOT NULL DEFAULT 0,
-  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
   UNIQUE (program_id, module_number)
 );
 
@@ -104,11 +104,11 @@ CREATE TABLE IF NOT EXISTS public.program_lessons (
   module_id        UUID    NOT NULL REFERENCES public.program_modules(id) ON DELETE CASCADE,
   lesson_number    INTEGER NOT NULL,
   title            TEXT    NOT NULL,
-  lesson_type      TEXT    NOT NULL DEFAULT 'lesson'
+  lesson_type      TEXT    NOT NULL DEFAULT 'lesson',
                      CHECK (lesson_type IN ('lesson','quiz','lab','exam','orientation')),
   duration_minutes INTEGER,
   sort_order       INTEGER NOT NULL DEFAULT 0,
-  created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
   UNIQUE (module_id, lesson_number)
 );
 

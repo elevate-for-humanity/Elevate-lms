@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS certification_submissions (
   id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id         uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   program_id      uuid REFERENCES programs(id) ON DELETE SET NULL,
-  status          text NOT NULL DEFAULT 'pending'
+  status          text NOT NULL DEFAULT 'pending',
                     CHECK (status IN ('pending','approved','rejected')),
   reviewed_by     uuid REFERENCES auth.users(id) ON DELETE SET NULL,
   reviewed_at     timestamptz,
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS id_verifications (
   first_name text NOT NULL,
   last_name  text NOT NULL,
   id_type    text NOT NULL,
-  status     text NOT NULL DEFAULT 'pending'
+  status     text NOT NULL DEFAULT 'pending',
                CHECK (status IN ('pending','approved','rejected','under_review')),
   reviewed_by  uuid REFERENCES auth.users(id) ON DELETE SET NULL,
   reviewed_at  timestamptz,
@@ -136,7 +136,7 @@ CREATE TABLE IF NOT EXISTS certiport_exam_requests (
   student_email   text,
   funding_source  text,
   voucher_code    text,
-  status          text NOT NULL DEFAULT 'pending'
+  status          text NOT NULL DEFAULT 'pending',
                     CHECK (status IN ('pending','paid','voucher_assigned','completed','cancelled')),
   created_at      timestamptz NOT NULL DEFAULT now(),
   updated_at      timestamptz NOT NULL DEFAULT now()
@@ -254,7 +254,7 @@ CREATE TABLE IF NOT EXISTS user_certifications (
   certification_type_id uuid REFERENCES certification_types(id) ON DELETE SET NULL,
   certification_name    text,
   certification_type    text,
-  status                text NOT NULL DEFAULT 'pending'
+  status                text NOT NULL DEFAULT 'pending',
                           CHECK (status IN ('pending','active','expired','revoked')),
   earned_date           date,
   expires_at            timestamptz,
@@ -352,7 +352,7 @@ CREATE TABLE IF NOT EXISTS external_credentials (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   student_id   uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   provider     text NOT NULL,
-  status       text NOT NULL DEFAULT 'in_progress'
+  status       text NOT NULL DEFAULT 'in_progress',
                  CHECK (status IN ('in_progress','completed','failed','expired')),
   completed_at timestamptz,
   created_at   timestamptz NOT NULL DEFAULT now()

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS studio_workspaces (
   settings JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
-  last_accessed_at TIMESTAMPTZ DEFAULT NOW(),
+  last_accessed_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(user_id, name)
 );
 
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS studio_files (
   mime_type TEXT,
   checksum TEXT, -- For sync conflict detection
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(workspace_id, path)
 );
 

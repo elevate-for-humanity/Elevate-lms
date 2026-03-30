@@ -22,7 +22,7 @@
 CREATE TABLE IF NOT EXISTS public.credential_providers (
   id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name                  TEXT NOT NULL,
-  provider_type         TEXT NOT NULL
+  provider_type         TEXT NOT NULL,
     CHECK (provider_type IN ('federal_agency','state_agency','industry_body','elevate')),
   -- Exam scheduling: URL or NULL if scheduling is manual / external
   exam_scheduling_url   TEXT,

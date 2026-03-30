@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS staff_permissions (
   
   -- Timestamps
   created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
   
   -- Ensure unique permission per user per tenant
   UNIQUE(user_id, tenant_id)

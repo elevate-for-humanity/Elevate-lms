@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS curriculum_lesson_plans (
   lesson_slug                text        NOT NULL,
   lesson_title               text        NOT NULL,
   learning_objective         text        NOT NULL,
-  cognitive_level            text        NOT NULL
+  cognitive_level            text        NOT NULL,
     CHECK (cognitive_level IN ('remember','understand','apply','analyze','evaluate','create')),
   primary_competency_key     text        NOT NULL,
   supporting_competency_keys text[]      NOT NULL DEFAULT '{}',
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS curriculum_lesson_plans (
   exam_subdomain             text,
   estimated_minutes          int         NOT NULL DEFAULT 15,
   created_at                 timestamptz NOT NULL DEFAULT now(),
-  updated_at                 timestamptz NOT NULL DEFAULT now(),
+  updated_at                 timestamptz NOT NULL DEFAULT now()
   UNIQUE (program_id, lesson_slug)
 );
 
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS competency_exam_profiles (
   distractor_phrases     text[]      NOT NULL DEFAULT '{}',
   distractor_explanation text        NOT NULL DEFAULT '',
   cognitive_operation    text        NOT NULL,
-  response_depth         text        NOT NULL
+  response_depth         text        NOT NULL,
     CHECK (response_depth IN ('surface','conceptual','applied','analytical')),
   created_at             timestamptz NOT NULL DEFAULT now(),
   updated_at             timestamptz NOT NULL DEFAULT now()
@@ -189,11 +189,11 @@ CREATE TABLE IF NOT EXISTS program_holder_courses (
   program_id        uuid        REFERENCES programs(id) ON DELETE SET NULL,
   syllabus_path     text,
   syllabus_bucket   text,
-  status            text        NOT NULL DEFAULT 'pending'
+  status            text        NOT NULL DEFAULT 'pending',
     CHECK (status IN ('pending','active','inactive','suspended')),
   assigned_at       timestamptz NOT NULL DEFAULT now(),
   created_at        timestamptz NOT NULL DEFAULT now(),
-  updated_at        timestamptz NOT NULL DEFAULT now(),
+  updated_at        timestamptz NOT NULL DEFAULT now()
   UNIQUE (program_holder_id, course_id)
 );
 
@@ -349,7 +349,7 @@ CREATE TABLE IF NOT EXISTS exam_authorizations (
   credential_id       uuid        NOT NULL REFERENCES credentials(id) ON DELETE CASCADE,
   program_id          uuid        REFERENCES programs(id) ON DELETE SET NULL,
   enrollment_id       uuid        REFERENCES program_enrollments(id) ON DELETE SET NULL,
-  status              text        NOT NULL DEFAULT 'pending'
+  status              text        NOT NULL DEFAULT 'pending',
     CHECK (status IN ('pending','fee_charged','authorized','scheduled','passed','failed','expired','revoked')),
   authorized_at       timestamptz,
   expires_at          timestamptz,
@@ -396,7 +396,7 @@ CREATE TABLE IF NOT EXISTS exam_fee_charges (
   currency            text        NOT NULL DEFAULT 'usd',
   stripe_payment_id   text,
   stripe_invoice_id   text,
-  status              text        NOT NULL DEFAULT 'pending'
+  status              text        NOT NULL DEFAULT 'pending',
     CHECK (status IN ('pending','charged','refunded','waived','failed')),
   charged_at          timestamptz,
   created_at          timestamptz NOT NULL DEFAULT now()
@@ -464,7 +464,7 @@ CREATE TABLE IF NOT EXISTS program_certification_pathways (
   state_specific          text,
   active                  boolean     NOT NULL DEFAULT true,
   created_at              timestamptz NOT NULL DEFAULT now(),
-  updated_at              timestamptz NOT NULL DEFAULT now(),
+  updated_at              timestamptz NOT NULL DEFAULT now()
   UNIQUE (program_id, credential_id, certification_body)
 );
 

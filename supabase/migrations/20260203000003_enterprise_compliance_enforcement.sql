@@ -169,7 +169,7 @@ CREATE TABLE IF NOT EXISTS onboarding_progress (
   
   -- Metadata
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   
   UNIQUE(user_id)
 );
@@ -207,7 +207,7 @@ CREATE TABLE IF NOT EXISTS handbook_acknowledgments (
   acknowledgment_statement TEXT NOT NULL DEFAULT 'I have read and understand the Student Handbook. I agree to abide by all policies and procedures outlined therein.',
   
   -- Immutable
-  is_immutable BOOLEAN NOT NULL DEFAULT TRUE,
+  is_immutable BOOLEAN NOT NULL DEFAULT TRUE
   
   UNIQUE(user_id, handbook_version)
 );

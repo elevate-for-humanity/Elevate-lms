@@ -31,12 +31,12 @@ CREATE TABLE IF NOT EXISTS public.exam_fee_payments (
   stripe_charge_id      TEXT,                          -- Stripe Charge ID (set after capture)
   amount_cents          INTEGER NOT NULL,
   currency              TEXT NOT NULL DEFAULT 'usd',
-  status                TEXT NOT NULL DEFAULT 'pending'
+  status                TEXT NOT NULL DEFAULT 'pending',
     CHECK (status IN ('pending', 'processing', 'paid', 'failed', 'refunded')),
   paid_at               TIMESTAMPTZ,
   failure_reason        TEXT,
   created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at            TIMESTAMPTZ NOT NULL DEFAULT now()
 
   UNIQUE (user_id, program_id, credential_id)          -- one charge per learner per credential
 );
@@ -75,13 +75,13 @@ CREATE TABLE IF NOT EXISTS public.student_credential_uploads (
   user_id             UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   program_id          UUID NOT NULL REFERENCES public.programs(id),
   credential_id       UUID REFERENCES public.credential_registry(id),
-  upload_type         TEXT NOT NULL
+  upload_type         TEXT NOT NULL,
     CHECK (upload_type IN ('prerequisite', 'exam_result')),
   -- Supabase Storage: bucket = 'credential-uploads', path = {uid}/{program_id}/{filename}
   storage_bucket      TEXT NOT NULL DEFAULT 'credential-uploads',
   storage_path        TEXT NOT NULL,
   original_filename   TEXT,
-  verification_status TEXT NOT NULL DEFAULT 'pending'
+  verification_status TEXT NOT NULL DEFAULT 'pending',
     CHECK (verification_status IN ('pending', 'approved', 'rejected')),
   verified_by         UUID REFERENCES auth.users(id),
   verified_at         TIMESTAMPTZ,
@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS public.certification_requests (
   user_id                 UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   program_id              UUID NOT NULL REFERENCES public.programs(id),
   credential_id           UUID NOT NULL REFERENCES public.credential_registry(id),
-  status                  TEXT NOT NULL DEFAULT 'pending_completion'
+  status                  TEXT NOT NULL DEFAULT 'pending_completion',
     CHECK (status IN (
       'pending_completion',
       'awaiting_payment',
@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS public.certification_requests (
   -- Metadata
   notes                   TEXT,
   created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at              TIMESTAMPTZ NOT NULL DEFAULT now()
 
   UNIQUE (user_id, program_id, credential_id)
 );

@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS public.competency_log (
   supervisor_name   TEXT,
   supervisor_verified BOOLEAN NOT NULL DEFAULT FALSE,
   supervisor_verified_at TIMESTAMPTZ,
-  status            TEXT NOT NULL DEFAULT 'pending'
+  status            TEXT NOT NULL DEFAULT 'pending',
                     CHECK (status IN ('pending', 'verified', 'rejected')),
   created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()

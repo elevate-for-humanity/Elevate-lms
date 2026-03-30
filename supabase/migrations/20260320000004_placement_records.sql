@@ -19,18 +19,18 @@ CREATE TABLE IF NOT EXISTS public.placement_records (
   -- Employment details
   hire_date           DATE NOT NULL,
   job_title           TEXT NOT NULL,
-  employment_type     TEXT NOT NULL DEFAULT 'full_time'
+  employment_type     TEXT NOT NULL DEFAULT 'full_time',
     CHECK (employment_type IN ('full_time', 'part_time', 'contract', 'apprenticeship', 'ojt', 'other')),
   hourly_wage         NUMERIC(8, 2),
   annual_salary       NUMERIC(12, 2),
 
   -- Verification
   verified_by         UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
-  verification_source TEXT NOT NULL DEFAULT 'self_report'
+  verification_source TEXT NOT NULL DEFAULT 'self_report',
     CHECK (verification_source IN ('employer', 'case_manager', 'self_report', 'system_import', 'third_party')),
   verified_at         TIMESTAMPTZ,
 
-  status              TEXT NOT NULL DEFAULT 'pending'
+  status              TEXT NOT NULL DEFAULT 'pending',
     CHECK (status IN ('pending', 'verified', 'rejected', 'superseded')),
 
   -- Outcome tracking (WIOA quarters)

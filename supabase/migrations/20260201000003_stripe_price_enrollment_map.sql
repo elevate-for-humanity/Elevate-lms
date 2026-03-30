@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS stripe_price_enrollment_map (
   description TEXT,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
   
   -- Constraints
   CONSTRAINT price_or_product_required CHECK (

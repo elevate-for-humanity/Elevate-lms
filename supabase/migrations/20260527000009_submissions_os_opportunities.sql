@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS public.sos_source_links (
   final_url        TEXT,               -- after redirects
   source_domain    TEXT,
   content_type     TEXT CHECK (content_type IN ('html','pdf','docx','xlsx','unknown')),
-  fetch_status     TEXT NOT NULL DEFAULT 'pending'
+  fetch_status     TEXT NOT NULL DEFAULT 'pending',
                    CHECK (fetch_status IN ('pending','fetching','success','failed','blocked')),
   fetched_at       TIMESTAMPTZ,
   error_message    TEXT,
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS public.sos_opportunities (
   issuer_name         TEXT NOT NULL,
   title               TEXT NOT NULL,
   reference_number    TEXT,            -- CFDA, solicitation #, RFP #, etc.
-  status              TEXT NOT NULL DEFAULT 'profiling'
+  status              TEXT NOT NULL DEFAULT 'profiling',
                       CHECK (status IN (
                         'profiling','requirements_extracted','mapping',
                         'packet_building','review','ready','submitted',
@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS public.sos_opportunity_requirements (
   attachment_type     TEXT,            -- e.g. 'w9', 'insurance_certificate'
   due_date            TIMESTAMPTZ,
   -- Classification — the backbone of the submission safety system
-  review_class        TEXT NOT NULL DEFAULT 'review_required'
+  review_class        TEXT NOT NULL DEFAULT 'review_required',
                       CHECK (review_class IN (
                         'auto_safe',        -- legal name, EIN, address, pre-approved attachments
                         'ask_if_missing',   -- service area, counts, program list
@@ -209,12 +209,12 @@ CREATE TABLE IF NOT EXISTS public.sos_requirement_mappings (
                            )),
   mapped_source_id         UUID,        -- FK to the relevant table row
   mapping_confidence       NUMERIC(3,2) DEFAULT 1.00,  -- 0.00–1.00
-  submission_class         TEXT NOT NULL DEFAULT 'review_required'
+  submission_class         TEXT NOT NULL DEFAULT 'review_required',
                            CHECK (submission_class IN (
                              'auto_safe','ask_if_missing',
                              'review_required','blocked'
                            )),
-  resolution_status        TEXT NOT NULL DEFAULT 'unresolved'
+  resolution_status        TEXT NOT NULL DEFAULT 'unresolved',
                            CHECK (resolution_status IN (
                              'unresolved','resolved','approved',
                              'blocked','waived'

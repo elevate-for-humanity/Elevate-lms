@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS automation_rulesets (
   rules JSONB NOT NULL,
   is_active BOOLEAN DEFAULT true,
   created_by UUID,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(name, version)
 );
 

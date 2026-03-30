@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS curriculum_lesson_plans (
   lesson_slug                text        NOT NULL,
   lesson_title               text        NOT NULL,
   learning_objective         text        NOT NULL,
-  cognitive_level            text        NOT NULL
+  cognitive_level            text        NOT NULL,
     CHECK (cognitive_level IN ('remember','understand','apply','analyze','evaluate','create')),
   primary_competency_key     text        NOT NULL,
   supporting_competency_keys text[]      NOT NULL DEFAULT '{}',
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS curriculum_lesson_plans (
   exam_subdomain             text,
   estimated_minutes          int         NOT NULL DEFAULT 15,
   created_at                 timestamptz NOT NULL DEFAULT now(),
-  updated_at                 timestamptz NOT NULL DEFAULT now(),
+  updated_at                 timestamptz NOT NULL DEFAULT now()
   UNIQUE (program_id, lesson_slug)
 );
 
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS competency_exam_profiles (
   distractor_phrases     text[]      NOT NULL DEFAULT '{}',
   distractor_explanation text        NOT NULL DEFAULT '',
   cognitive_operation    text        NOT NULL,
-  response_depth         text        NOT NULL
+  response_depth         text        NOT NULL,
     CHECK (response_depth IN ('surface','conceptual','applied','analytical')),
   created_at             timestamptz NOT NULL DEFAULT now(),
   updated_at             timestamptz NOT NULL DEFAULT now()

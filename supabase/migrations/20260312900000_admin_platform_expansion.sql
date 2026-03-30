@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS curriculum_lessons (
   duration_minutes integer,
   status text NOT NULL DEFAULT 'published',
   created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
   UNIQUE(program_id, lesson_slug)
 );
 
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS partner_programs (
   program_id uuid NOT NULL REFERENCES programs(id),
   approved_at timestamptz,
   status text NOT NULL DEFAULT 'pending',
-  created_at timestamptz NOT NULL DEFAULT now(),
+  created_at timestamptz NOT NULL DEFAULT now()
   UNIQUE(partner_id, program_id)
 );
 

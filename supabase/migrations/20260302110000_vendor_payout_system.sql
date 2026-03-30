@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS vendor_payouts (
   status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'failed', 'reversed')),
   paid_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
   UNIQUE(enrollment_id, provider_id)
 );
 

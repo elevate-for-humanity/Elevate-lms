@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS public.course_versions (
   is_published   BOOLEAN     NOT NULL DEFAULT false,
   published_at   TIMESTAMPTZ,
   created_by     UUID        REFERENCES auth.users(id) ON DELETE SET NULL,
-  created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
   UNIQUE(course_id, version_number)
 );
 
@@ -24,7 +24,7 @@ CREATE INDEX IF NOT EXISTS idx_cv_published    ON public.course_versions(course_
 CREATE TABLE IF NOT EXISTS public.course_version_modules (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   version_id UUID NOT NULL REFERENCES public.course_versions(id) ON DELETE CASCADE,
-  module_id  UUID NOT NULL REFERENCES public.course_modules(id)  ON DELETE CASCADE,
+  module_id  UUID NOT NULL REFERENCES public.course_modules(id)  ON DELETE CASCADE
   UNIQUE(version_id, module_id)
 );
 
@@ -35,7 +35,7 @@ CREATE INDEX IF NOT EXISTS idx_cvm_version_id ON public.course_version_modules(v
 CREATE TABLE IF NOT EXISTS public.course_version_lessons (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   version_id UUID NOT NULL REFERENCES public.course_versions(id)  ON DELETE CASCADE,
-  lesson_id  UUID NOT NULL REFERENCES public.course_lessons(id)   ON DELETE CASCADE,
+  lesson_id  UUID NOT NULL REFERENCES public.course_lessons(id)   ON DELETE CASCADE
   UNIQUE(version_id, lesson_id)
 );
 

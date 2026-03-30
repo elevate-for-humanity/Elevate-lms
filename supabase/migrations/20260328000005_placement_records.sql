@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS public.placement_records (
                                   )),
   hourly_wage         numeric(8,2),
   start_date          date,
-  status              text        NOT NULL DEFAULT 'pending'
+  status              text        NOT NULL DEFAULT 'pending',
                                   CHECK (status IN ('pending','verified','rejected','lost')),
   verified_at         timestamptz,
   verified_by         uuid        REFERENCES auth.users(id) ON DELETE SET NULL,

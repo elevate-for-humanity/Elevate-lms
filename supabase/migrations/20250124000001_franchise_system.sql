@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS franchise_preparers (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   created_by UUID REFERENCES auth.users(id),
-  notes TEXT,
+  notes TEXT
   
   UNIQUE(office_id, ptin)
 );

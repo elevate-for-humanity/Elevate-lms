@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS public.sos_organization_profiles (
   insurance_status      TEXT CHECK (insurance_status IN ('current','expired','none','unknown')) DEFAULT 'unknown',
   audit_status          TEXT CHECK (audit_status IN ('current','overdue','not_required','unknown')) DEFAULT 'unknown',
   created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at            TIMESTAMPTZ NOT NULL DEFAULT NOW()
   UNIQUE (organization_id)
 );
 
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS public.sos_organization_facts (
   approved_by      UUID REFERENCES auth.users(id),
   approved_at      TIMESTAMPTZ,
   expires_at       TIMESTAMPTZ,
-  status           TEXT NOT NULL DEFAULT 'draft'
+  status           TEXT NOT NULL DEFAULT 'draft',
                    CHECK (status IN ('draft','pending_review','approved','rejected','expired')),
   created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()

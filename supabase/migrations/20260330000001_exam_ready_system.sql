@@ -23,7 +23,7 @@
 CREATE TABLE IF NOT EXISTS program_exam_ready_rules (
   id                        uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
   program_id                uuid        NOT NULL REFERENCES programs(id) ON DELETE CASCADE,
-  min_avg_checkpoint_score  integer     NOT NULL DEFAULT 85
+  min_avg_checkpoint_score  integer     NOT NULL DEFAULT 85,
     CHECK (min_avg_checkpoint_score BETWEEN 50 AND 100),
   require_all_checkpoints   boolean     NOT NULL DEFAULT true,
   require_all_lessons       boolean     NOT NULL DEFAULT true,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS program_exam_ready_rules (
   allow_manual_override     boolean     NOT NULL DEFAULT false,
   notes                     text,
   created_at                timestamptz NOT NULL DEFAULT now(),
-  updated_at                timestamptz NOT NULL DEFAULT now(),
+  updated_at                timestamptz NOT NULL DEFAULT now()
   UNIQUE (program_id)
 );
 
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS program_competency_domains (
   domain_name  text    NOT NULL,
   exam_weight  numeric(5,2),   -- % of exam questions from this domain
   is_required  boolean NOT NULL DEFAULT true,
-  created_at   timestamptz NOT NULL DEFAULT now(),
+  created_at   timestamptz NOT NULL DEFAULT now()
   UNIQUE (program_id, domain_key)
 );
 

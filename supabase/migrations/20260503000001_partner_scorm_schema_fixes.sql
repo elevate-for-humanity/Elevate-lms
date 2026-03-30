@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS public.scorm_enrollments (
   scorm_package_id    UUID        NOT NULL REFERENCES public.scorm_packages(id) ON DELETE CASCADE,
   user_id             UUID        NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   enrollment_id       UUID,       -- optional link to program_enrollments
-  status              TEXT        NOT NULL DEFAULT 'not_attempted'
+  status              TEXT        NOT NULL DEFAULT 'not_attempted',
                       CHECK (status IN ('not_attempted','incomplete','completed','passed','failed','browsed')),
   progress_percentage NUMERIC     NOT NULL DEFAULT 0 CHECK (progress_percentage BETWEEN 0 AND 100),
   score               NUMERIC,
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS public.scorm_enrollments (
   last_accessed_at    TIMESTAMPTZ,
   cmi_data            JSONB       DEFAULT '{}',
   created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
   UNIQUE (scorm_package_id, user_id)
 );
 
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS public.lms_sync_log (
   id                UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   provider_id       UUID        REFERENCES public.partner_lms_providers(id) ON DELETE SET NULL,
   sync_type         TEXT        NOT NULL,
-  status            TEXT        NOT NULL DEFAULT 'pending'
+  status            TEXT        NOT NULL DEFAULT 'pending',
                     CHECK (status IN ('pending','success','failed')),
   records_processed INTEGER     DEFAULT 0,
   sync_data         JSONB       DEFAULT '{}',

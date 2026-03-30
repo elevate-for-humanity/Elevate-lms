@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS public.provider_program_approvals (
   tenant_id       UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   program_id      UUID NOT NULL REFERENCES public.programs(id) ON DELETE CASCADE,
 
-  status          TEXT NOT NULL DEFAULT 'submitted'
+  status          TEXT NOT NULL DEFAULT 'submitted',
     CHECK (status IN ('submitted', 'under_review', 'approved', 'rejected')),
 
   submitted_by    UUID NOT NULL REFERENCES public.profiles(id) ON DELETE SET NULL,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS public.provider_program_approvals (
   program_snapshot JSONB DEFAULT '{}',
 
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 
   UNIQUE (tenant_id, program_id)
 );

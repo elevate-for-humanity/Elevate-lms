@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS ojt_competency_signoffs (
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'verified', 'needs_review')),
   notes TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 
   -- One sign-off per competency per student
   UNIQUE (student_id, program_id, competency_id)

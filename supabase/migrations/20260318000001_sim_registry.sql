@@ -7,7 +7,7 @@ CREATE TABLE training_simulations (
   sim_key         TEXT NOT NULL UNIQUE,
   title           TEXT NOT NULL,
   system          TEXT NOT NULL,
-  difficulty      TEXT NOT NULL DEFAULT 'intermediate'
+  difficulty      TEXT NOT NULL DEFAULT 'intermediate',
                     CHECK (difficulty IN ('beginner','intermediate','advanced')),
   credential_id   UUID REFERENCES credential_registry(id) ON DELETE SET NULL,
   competency_area TEXT,

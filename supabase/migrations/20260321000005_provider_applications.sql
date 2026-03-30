@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS provider_applications (
   agreed_at             TIMESTAMPTZ,
 
   -- Workflow
-  status                TEXT NOT NULL DEFAULT 'pending'
+  status                TEXT NOT NULL DEFAULT 'pending',
                           CHECK (status IN ('pending', 'under_review', 'approved', 'denied', 'withdrawn')),
   status_reason         TEXT,
   reviewed_by           UUID REFERENCES auth.users(id),

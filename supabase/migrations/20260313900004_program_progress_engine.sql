@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS program_courses (
   course_id    UUID NOT NULL REFERENCES training_courses(id) ON DELETE CASCADE,
   is_required  BOOLEAN NOT NULL DEFAULT true,
   sort_order   INTEGER NOT NULL DEFAULT 0,
-  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
   UNIQUE (program_id, course_id)
 );
 

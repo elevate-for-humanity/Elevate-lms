@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS public.user_roles (
   org_id UUID REFERENCES public.partner_organizations(id),
   granted_by UUID REFERENCES public.profiles(id),
   granted_at TIMESTAMPTZ DEFAULT NOW(),
-  expires_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ
   UNIQUE(user_id, role_id, org_id)
 );
 
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS public.program_funding_links (
   funding_source_id UUID NOT NULL REFERENCES public.funding_sources(id) ON DELETE CASCADE,
   coverage_percent INTEGER DEFAULT 100 CHECK (coverage_percent >= 0 AND coverage_percent <= 100),
   notes TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(program_id, funding_source_id)
 );
 

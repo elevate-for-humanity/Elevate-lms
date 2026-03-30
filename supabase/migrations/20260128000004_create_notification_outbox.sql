@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS notification_outbox (
   
   -- Reference to related entity (optional)
   entity_type TEXT,
-  entity_id UUID,
+  entity_id UUID
   
   -- Constraints
   CONSTRAINT valid_recipient CHECK (

@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS partner_users (
   
   -- Timestamps
   created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
   
   UNIQUE(user_id, partner_id)
 );
@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS partner_program_access (
   -- Timestamps
   granted_at TIMESTAMPTZ DEFAULT now(),
   granted_by UUID REFERENCES auth.users(id),
-  revoked_at TIMESTAMPTZ,
+  revoked_at TIMESTAMPTZ
   
   UNIQUE(partner_id, program_id)
 );
@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS progress_entries (
   
   -- Timestamps
   created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
   
   -- Prevent duplicate entries for same apprentice/week
   UNIQUE(apprentice_id, partner_id, program_id, week_ending)

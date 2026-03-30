@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS credentials (
   description           TEXT,
 
   -- Three-lane classification (enforced by CHECK)
-  issuer_type           TEXT NOT NULL
+  issuer_type           TEXT NOT NULL,
     CHECK (issuer_type IN ('elevate_issued', 'elevate_proctored', 'partner_delivered')),
 
   -- Who issues the certificate
@@ -28,23 +28,23 @@ CREATE TABLE IF NOT EXISTS credentials (
   issuing_authority_url TEXT,
 
   -- Who administers the exam/assessment
-  proctor_authority     TEXT NOT NULL DEFAULT 'elevate'
+  proctor_authority     TEXT NOT NULL DEFAULT 'elevate',
     CHECK (proctor_authority IN ('elevate', 'partner', 'external_vendor', 'none')),
 
   -- How the credential is delivered
-  delivery              TEXT NOT NULL DEFAULT 'internal'
+  delivery              TEXT NOT NULL DEFAULT 'internal',
     CHECK (delivery IN ('internal', 'external', 'hybrid')),
 
   -- Exam/assessment requirements
   requires_exam         BOOLEAN NOT NULL DEFAULT false,
-  exam_type             TEXT
+  exam_type             TEXT,
     CHECK (exam_type IN ('proctored', 'vendor', 'assessment', 'portfolio', 'none', NULL)),
-  exam_location         TEXT
+  exam_location         TEXT,
     CHECK (exam_location IN ('on_site', 'online', 'testing_center', 'partner_site', NULL)),
   passing_score         INTEGER,                       -- percentage, e.g. 70
 
   -- Verification
-  verification_source   TEXT NOT NULL DEFAULT 'elevate'
+  verification_source   TEXT NOT NULL DEFAULT 'elevate',
     CHECK (verification_source IN ('elevate', 'issuer_api', 'external_link', 'open_badges', 'credly')),
   verification_url      TEXT,                          -- external verify URL if not Elevate
   verification_token_prefix TEXT DEFAULT 'EFH',        -- prefix for generated tokens
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS credentials (
 
   -- Credential stacks (grouping for employer clarity)
   credential_stack      TEXT,                          -- e.g. 'workforce_readiness', 'hvac_trades', 'customer_service'
-  stack_level           TEXT
+  stack_level           TEXT,
     CHECK (stack_level IN ('foundational', 'intermediate', 'advanced', NULL)),
 
   -- Digital credential integration (future)
@@ -102,11 +102,11 @@ CREATE TABLE IF NOT EXISTS learner_credentials (
   issued_by           UUID REFERENCES profiles(id) ON DELETE SET NULL,
 
   -- Verification
-  verification_code   TEXT NOT NULL UNIQUE DEFAULT
+  verification_code   TEXT NOT NULL UNIQUE DEFAULT,
     CONCAT('EFH-', UPPER(SUBSTRING(gen_random_uuid()::TEXT, 1, 8))),
 
   -- Status
-  status              TEXT NOT NULL DEFAULT 'active'
+  status              TEXT NOT NULL DEFAULT 'active',
     CHECK (status IN ('active', 'expired', 'revoked', 'suspended')),
   revoked_at          TIMESTAMPTZ,
   revoked_reason      TEXT,
@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS learner_credentials (
   metadata            JSONB DEFAULT '{}',
 
   created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
 
   UNIQUE (learner_id, credential_id, issued_at)
 );
@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS program_credentials (
   is_required     BOOLEAN NOT NULL DEFAULT true,
   sort_order      INTEGER NOT NULL DEFAULT 0,
   notes           TEXT,                                -- e.g. "Complete before EPA exam"
-  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
   UNIQUE (program_id, credential_id)
 );
 

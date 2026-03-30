@@ -21,12 +21,12 @@ CREATE TABLE IF NOT EXISTS public.credential_exam_domains (
   domain_key       TEXT NOT NULL,          -- stable machine key, e.g. 'core', 'patient_care'
   domain_name      TEXT NOT NULL,          -- human label, e.g. 'EPA 608 Core'
   description      TEXT,
-  weight_percent   INTEGER NOT NULL DEFAULT 0
+  weight_percent   INTEGER NOT NULL DEFAULT 0,
     CHECK (weight_percent >= 0 AND weight_percent <= 100),
   question_count   INTEGER,               -- number of exam questions in this domain
   required_pass_count INTEGER,            -- for sim-based eligibility (mirrors epa_exam_domains)
   sort_order       INTEGER NOT NULL DEFAULT 0,
-  created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT now()
 
   UNIQUE (credential_id, domain_key)      -- idempotency key for generator
 );

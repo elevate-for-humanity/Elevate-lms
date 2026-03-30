@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS public.sos_submission_packets (
   id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   organization_id  UUID NOT NULL REFERENCES public.sos_organizations(id) ON DELETE CASCADE,
   opportunity_id   UUID NOT NULL REFERENCES public.sos_opportunities(id) ON DELETE CASCADE,
-  packet_status    TEXT NOT NULL DEFAULT 'building'
+  packet_status    TEXT NOT NULL DEFAULT 'building',
                    CHECK (packet_status IN (
                      'building','review','ready','blocked',
                      'submitted','withdrawn','archived'
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS public.sos_generated_documents (
   content_html         TEXT,
   output_file_url      TEXT,
   output_file_path     TEXT,
-  review_status        TEXT NOT NULL DEFAULT 'pending'
+  review_status        TEXT NOT NULL DEFAULT 'pending',
                        CHECK (review_status IN ('pending','approved','rejected','superseded')),
   reviewed_by          UUID REFERENCES auth.users(id),
   reviewed_at          TIMESTAMPTZ,
@@ -111,9 +111,9 @@ CREATE TABLE IF NOT EXISTS public.sos_review_tasks (
   description          TEXT,
   related_record_type  TEXT,
   related_record_id    UUID,
-  priority             TEXT NOT NULL DEFAULT 'medium'
+  priority             TEXT NOT NULL DEFAULT 'medium',
                        CHECK (priority IN ('low','medium','high','critical')),
-  status               TEXT NOT NULL DEFAULT 'open'
+  status               TEXT NOT NULL DEFAULT 'open',
                        CHECK (status IN ('open','in_progress','resolved','waived','cancelled')),
   assigned_to          UUID REFERENCES auth.users(id),
   resolved_by          UUID REFERENCES auth.users(id),
@@ -143,12 +143,12 @@ CREATE POLICY "sos_tasks_admin" ON public.sos_review_tasks FOR ALL
 CREATE TABLE IF NOT EXISTS public.sos_submission_runs (
   id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   submission_packet_id UUID NOT NULL REFERENCES public.sos_submission_packets(id) ON DELETE CASCADE,
-  run_status           TEXT NOT NULL DEFAULT 'pending'
+  run_status           TEXT NOT NULL DEFAULT 'pending',
                        CHECK (run_status IN (
                          'pending','running','completed','failed',
                          'blocked','cancelled'
                        )),
-  submit_mode          TEXT NOT NULL DEFAULT 'manual'
+  submit_mode          TEXT NOT NULL DEFAULT 'manual',
                        CHECK (submit_mode IN ('manual','automated')),
   submitted_by         UUID REFERENCES auth.users(id),
   submitted_at         TIMESTAMPTZ,

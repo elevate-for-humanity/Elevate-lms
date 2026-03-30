@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS instructor_attestations (
   )),
   
   -- Immutable after creation
-  created_at timestamptz NOT NULL DEFAULT now(),
+  created_at timestamptz NOT NULL DEFAULT now()
   
   CONSTRAINT attestation_has_context CHECK (
     program_id IS NOT NULL OR course_id IS NOT NULL OR 

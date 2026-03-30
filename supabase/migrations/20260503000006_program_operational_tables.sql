@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS public.program_enrollment_tracks (
   available        BOOLEAN DEFAULT TRUE,
   coming_soon_msg  TEXT,
   track_order      INTEGER NOT NULL DEFAULT 0,
-  created_at       TIMESTAMPTZ DEFAULT NOW(),
+  created_at       TIMESTAMPTZ DEFAULT NOW()
   UNIQUE (program_id, track_type)
 );
 

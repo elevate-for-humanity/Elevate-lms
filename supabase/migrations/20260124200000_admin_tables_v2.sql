@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS leads (
   assigned_to UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   last_contacted_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(email)
 );
 
@@ -191,7 +191,7 @@ CREATE TABLE IF NOT EXISTS notification_preferences (
   in_app_all BOOLEAN DEFAULT true,
   in_app_sound BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(user_id)
 );
 

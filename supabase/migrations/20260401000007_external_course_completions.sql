@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS external_course_completions (
   external_course_id  uuid NOT NULL REFERENCES program_external_courses(id) ON DELETE CASCADE,
   program_id          uuid NOT NULL REFERENCES programs(id) ON DELETE CASCADE,
   completed_at        timestamptz NOT NULL DEFAULT now(),
-  created_at          timestamptz NOT NULL DEFAULT now(),
+  created_at          timestamptz NOT NULL DEFAULT now()
 
   UNIQUE (user_id, external_course_id)
 );

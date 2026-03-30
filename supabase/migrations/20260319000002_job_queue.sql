@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS job_queue (
   id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   type         TEXT        NOT NULL,
   payload      JSONB       NOT NULL DEFAULT '{}',
-  status       TEXT        NOT NULL DEFAULT 'pending'
+  status       TEXT        NOT NULL DEFAULT 'pending',
                            CHECK (status IN ('pending', 'processing', 'completed', 'failed')),
   attempts     INTEGER     NOT NULL DEFAULT 0,
   run_after    TIMESTAMPTZ NOT NULL DEFAULT now(),

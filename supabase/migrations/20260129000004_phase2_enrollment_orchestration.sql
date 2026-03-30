@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
   operation TEXT NOT NULL,
   idempotency_key TEXT NOT NULL,
   result JSONB,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(user_id, operation, idempotency_key)
 );
 

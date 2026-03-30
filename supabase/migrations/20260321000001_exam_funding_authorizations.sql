@@ -41,10 +41,10 @@ CREATE TABLE IF NOT EXISTS public.exam_funding_authorizations (
   credential_attempt_id       UUID REFERENCES public.credential_attempts(id) ON DELETE SET NULL,
   program_id                  UUID REFERENCES public.programs(id) ON DELETE SET NULL,
 
-  funding_source              TEXT NOT NULL DEFAULT 'self_pay'
+  funding_source              TEXT NOT NULL DEFAULT 'self_pay',
     CHECK (funding_source IN ('self_pay', 'elevate', 'grant', 'employer', 'partner', 'scholarship')),
 
-  funding_status              TEXT NOT NULL DEFAULT 'unresolved'
+  funding_status              TEXT NOT NULL DEFAULT 'unresolved',
     CHECK (funding_status IN ('unresolved', 'pending', 'approved', 'denied', 'paid', 'waived')),
 
   funded_amount_cents         INTEGER,
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS public.exam_funding_authorizations (
 
   tenant_id                   UUID REFERENCES public.tenants(id) ON DELETE SET NULL,
   created_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at                  TIMESTAMPTZ NOT NULL DEFAULT now()
 
   UNIQUE (learner_id, credential_id, credential_attempt_id)
 );

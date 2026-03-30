@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS public.sos_content_blocks (
                    ) STORED,
   approved_by      UUID REFERENCES auth.users(id),
   approved_at      TIMESTAMPTZ,
-  status           TEXT NOT NULL DEFAULT 'draft'
+  status           TEXT NOT NULL DEFAULT 'draft',
                    CHECK (status IN ('draft','pending_review','approved','archived')),
   created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS public.sos_document_templates (
                    )),
   style_id         UUID REFERENCES public.sos_document_styles(id),
   body_template    TEXT NOT NULL,      -- HTML with {{merge_fields}}
-  output_format    TEXT NOT NULL DEFAULT 'pdf'
+  output_format    TEXT NOT NULL DEFAULT 'pdf',
                    CHECK (output_format IN ('pdf','docx','html')),
   requires_review  BOOLEAN NOT NULL DEFAULT TRUE,
   active           BOOLEAN NOT NULL DEFAULT TRUE,

@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS content_versions (
   
   -- Change tracking
   change_type TEXT CHECK (change_type IN ('create', 'update', 'sync', 'rollback')),
-  change_summary TEXT,
+  change_summary TEXT
   
   UNIQUE(course_id, version)
 );

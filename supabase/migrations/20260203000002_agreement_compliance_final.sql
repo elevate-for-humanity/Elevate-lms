@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS license_agreement_acceptances (
   
   -- Legal
   legal_acknowledgment BOOLEAN NOT NULL DEFAULT TRUE,
-  is_immutable BOOLEAN NOT NULL DEFAULT TRUE,
+  is_immutable BOOLEAN NOT NULL DEFAULT TRUE
   
   -- Unique constraint: one acceptance per user per agreement type per version
   CONSTRAINT unique_user_agreement UNIQUE(user_id, agreement_type, document_version)
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS agreement_versions (
   summary_of_changes TEXT,
   requires_re_acceptance BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  created_by UUID REFERENCES auth.users(id),
+  created_by UUID REFERENCES auth.users(id)
   UNIQUE(agreement_type, version)
 );
 

@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS public.webinars (
   registration_url TEXT,
   recording_url   TEXT,
   thumbnail_url   TEXT,
-  status          TEXT        NOT NULL DEFAULT 'upcoming'
+  status          TEXT        NOT NULL DEFAULT 'upcoming',
                   CHECK (status IN ('upcoming', 'live', 'completed', 'cancelled')),
   attendee_count  INTEGER     DEFAULT 0,
   view_count      INTEGER     DEFAULT 0,
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS public.webinar_registrations (
   email       TEXT        NOT NULL,
   name        TEXT,
   registered_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  attended    BOOLEAN     DEFAULT false,
+  attended    BOOLEAN     DEFAULT false
   UNIQUE (webinar_id, email)
 );
 

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS public.webhook_events_processed (
   processed_at TIMESTAMPTZ,
   status TEXT NOT NULL DEFAULT 'processing' CHECK (status IN ('processing', 'processed', 'skipped', 'errored')),
   error_message TEXT,
-  metadata JSONB DEFAULT '{}',
+  metadata JSONB DEFAULT '{}'
   UNIQUE (provider, event_id)
 );
 

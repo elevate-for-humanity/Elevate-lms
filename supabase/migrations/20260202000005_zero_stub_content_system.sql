@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS marketing_sections (
   heading TEXT NOT NULL,
   body TEXT NOT NULL CHECK (length(body) > 10), -- Minimum content length
   section_order INT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT now(),
+  created_at TIMESTAMPTZ DEFAULT now()
   UNIQUE(page_id, section_order)
 );
 
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS program_outcomes (
   program_id UUID,
   outcome TEXT NOT NULL CHECK (length(outcome) > 5),
   outcome_order INT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT now(),
+  created_at TIMESTAMPTZ DEFAULT now()
   UNIQUE(program_id, outcome_order)
 );
 
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS program_requirements (
   program_id UUID,
   requirement TEXT NOT NULL,
   requirement_order INT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT now(),
+  created_at TIMESTAMPTZ DEFAULT now()
   UNIQUE(program_id, requirement_order)
 );
 
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS program_tasks (
   instructions TEXT NOT NULL CHECK (length(instructions) > 10),
   due_days INT NOT NULL CHECK (due_days > 0),
   task_order INT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT now(),
+  created_at TIMESTAMPTZ DEFAULT now()
   UNIQUE(program_id, task_order)
 );
 

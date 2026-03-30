@@ -243,7 +243,7 @@ CREATE TABLE IF NOT EXISTS lesson_completions (
   module_id UUID,
   lesson_id UUID,
   completed_at TIMESTAMPTZ DEFAULT NOW(),
-  created_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(user_id, module_id)
 );
 CREATE INDEX IF NOT EXISTS idx_lesson_completions_user ON lesson_completions(user_id);
@@ -276,7 +276,7 @@ CREATE TABLE IF NOT EXISTS video_progress (
   last_watched TIMESTAMPTZ DEFAULT NOW(),
   last_watched_at TIMESTAMPTZ DEFAULT NOW(),
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(user_id, lesson_id)
 );
 CREATE INDEX IF NOT EXISTS idx_video_progress_user ON video_progress(user_id);
@@ -307,7 +307,7 @@ CREATE TABLE IF NOT EXISTS lms_progress (
   evidence_url TEXT,
   last_activity_at TIMESTAMPTZ DEFAULT NOW(),
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(user_id, course_id)
 );
 CREATE INDEX IF NOT EXISTS idx_lms_progress_user ON lms_progress(user_id);

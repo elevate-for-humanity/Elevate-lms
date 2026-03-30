@@ -365,7 +365,7 @@ CREATE TABLE IF NOT EXISTS exam_scheduling (
   outcome_recorded_at timestamptz,
   notes               text,
   created_at          timestamptz NOT NULL DEFAULT now(),
-  updated_at          timestamptz NOT NULL DEFAULT now(),
+  updated_at          timestamptz NOT NULL DEFAULT now()
   UNIQUE (authorization_id, scheduled_date)
 );
 

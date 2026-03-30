@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS public.cmi_attendance (
   student_id UUID    NOT NULL REFERENCES public.cmi_students(id) ON DELETE CASCADE,
   date       DATE    NOT NULL,
   present    BOOLEAN NOT NULL DEFAULT TRUE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   UNIQUE (student_id, date)
 );
 
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS public.cmi_competencies (
   student_id UUID    NOT NULL REFERENCES public.cmi_students(id) ON DELETE CASCADE,
   skill      TEXT    NOT NULL,
   passed     BOOLEAN NOT NULL DEFAULT FALSE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   UNIQUE (student_id, skill)
 );
 
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS public.cmi_certificates (
   id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   student_id UUID        NOT NULL REFERENCES public.cmi_students(id) ON DELETE CASCADE,
   issued_by  TEXT        NOT NULL DEFAULT 'CMI',
-  issued_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  issued_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
   UNIQUE (student_id)
 );
 

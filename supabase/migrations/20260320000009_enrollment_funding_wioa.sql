@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS public.enrollment_funding_records (
   learner_id            UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   program_id            UUID REFERENCES public.programs(id) ON DELETE SET NULL,
 
-  funding_source        TEXT NOT NULL
+  funding_source        TEXT NOT NULL,
     CHECK (funding_source IN (
       'wioa_title_i', 'wioa_title_ii', 'workforce_ready_grant', 'jri',
       'job_ready_indy', 'dol_apprenticeship', 'pell_grant', 'self_pay',
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS public.enrollment_funding_records (
   approved_by           UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   approved_at           TIMESTAMPTZ,
 
-  status                TEXT NOT NULL DEFAULT 'pending'
+  status                TEXT NOT NULL DEFAULT 'pending',
     CHECK (status IN ('pending', 'approved', 'disbursed', 'reconciled', 'cancelled')),
 
   case_manager_id       UUID REFERENCES public.profiles(id) ON DELETE SET NULL,

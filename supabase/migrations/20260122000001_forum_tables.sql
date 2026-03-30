@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS forum_upvotes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   reply_id UUID,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(user_id, reply_id)
 );
 

@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS transcripts (
   certificate_id        UUID,           -- FK to certificates after issuance
   pdf_url               TEXT,           -- generated transcript PDF
   tenant_id             UUID,
-  created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW()
   UNIQUE (user_id, program_enrollment_id)
 );
 

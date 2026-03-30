@@ -225,7 +225,7 @@ CREATE TABLE IF NOT EXISTS public.apprentice_assignments (
   supervisor_id UUID REFERENCES public.profiles(id),
   notes TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(enrollment_id, site_id, start_date)
 );
 
@@ -259,7 +259,7 @@ CREATE TABLE IF NOT EXISTS public.attendance_hours (
   verified_at TIMESTAMPTZ,
   notes TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
   UNIQUE(enrollment_id, date, type)
 );
 

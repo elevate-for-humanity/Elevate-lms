@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS public.course_lessons (
   quiz_questions   JSONB,
   is_required      BOOLEAN     NOT NULL DEFAULT true,
   created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()
   UNIQUE(course_id, slug),
   UNIQUE(course_id, order_index)
 );

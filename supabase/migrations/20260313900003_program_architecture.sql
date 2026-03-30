@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS program_completion (
   completed_at TIMESTAMPTZ DEFAULT now(),
   completion_criteria JSONB DEFAULT '{}',
   progress_percent INTEGER DEFAULT 100,
-  created_at TIMESTAMPTZ DEFAULT now(),
+  created_at TIMESTAMPTZ DEFAULT now()
   UNIQUE(user_id, program_id)
 );
 

@@ -13,14 +13,14 @@ CREATE TABLE IF NOT EXISTS workone_checklist (
   organization_id uuid REFERENCES organizations(id) ON DELETE SET NULL,
   step_key        text NOT NULL,
   step_label      text NOT NULL,
-  status          text NOT NULL DEFAULT 'todo'
+  status          text NOT NULL DEFAULT 'todo',
     CHECK (status IN ('todo', 'in_progress', 'done')),
   notes           text,
   due_date        date,
   completed_at    timestamptz,
   sort_order      integer NOT NULL DEFAULT 0,
   created_at      timestamptz NOT NULL DEFAULT now(),
-  updated_at      timestamptz NOT NULL DEFAULT now(),
+  updated_at      timestamptz NOT NULL DEFAULT now()
 
   UNIQUE (user_id, step_key)
 );

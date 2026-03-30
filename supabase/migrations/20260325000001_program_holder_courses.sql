@@ -27,16 +27,16 @@ CREATE TABLE IF NOT EXISTS program_holder_courses (
   id                  uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
 
   -- The holder teaching this course
-  program_holder_id   uuid        NOT NULL
+  program_holder_id   uuid        NOT NULL,
     REFERENCES program_holders(id) ON DELETE CASCADE,
 
   -- The course being taught (training_courses is the canonical course table)
-  course_id           uuid        NOT NULL
+  course_id           uuid        NOT NULL,
     REFERENCES training_courses(id) ON DELETE CASCADE,
 
   -- The program this course belongs to (denormalized for query convenience;
   -- must match training_courses.program_id when that column exists)
-  program_id          uuid
+  program_id          uuid,
     REFERENCES programs(id) ON DELETE SET NULL,
 
   -- Syllabus the holder uploaded for this course
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS program_holder_courses (
   syllabus_uploaded_at timestamptz,
 
   -- Onboarding / approval state for this course assignment
-  status              text        NOT NULL DEFAULT 'pending'
+  status              text        NOT NULL DEFAULT 'pending',
     CHECK (status IN ('pending', 'under_review', 'approved', 'rejected')),
 
   -- Free-text notes from admin review
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS program_holder_courses (
   reviewed_at         timestamptz,
 
   created_at          timestamptz NOT NULL DEFAULT now(),
-  updated_at          timestamptz NOT NULL DEFAULT now(),
+  updated_at          timestamptz NOT NULL DEFAULT now()
 
   -- One holder can only be assigned to a given course once
   UNIQUE (program_holder_id, course_id)

@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS tax_preparers (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   created_by UUID REFERENCES auth.users(id),
-  notes TEXT,
+  notes TEXT
   
   UNIQUE(ptin),
   UNIQUE(email)

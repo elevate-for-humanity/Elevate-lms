@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS public.apprentice_document_types (
   accepted_formats    TEXT[] NOT NULL DEFAULT ARRAY['pdf','jpg','jpeg','png'],
   max_file_size_mb    INTEGER NOT NULL DEFAULT 10,
   display_order       INTEGER NOT NULL DEFAULT 0,
-  created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
   UNIQUE (program_slug, document_type)
 );
 
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS public.apprentice_documents (
   file_url            TEXT,                   -- deprecated; kept for backward compat
   file_size_bytes     INTEGER,
   mime_type           TEXT,
-  status              TEXT NOT NULL DEFAULT 'pending'
+  status              TEXT NOT NULL DEFAULT 'pending',
                       CHECK (status IN ('pending', 'approved', 'rejected', 'expired')),
   rejection_reason    TEXT,
   reviewed_by         UUID REFERENCES auth.users(id),

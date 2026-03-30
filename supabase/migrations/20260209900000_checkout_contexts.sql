@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS checkout_contexts (
   
   -- Timestamps
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '24 hours'),
+  expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '24 hours')
   
   -- Indexes
   CONSTRAINT checkout_contexts_provider_order_unique UNIQUE (provider, order_id)

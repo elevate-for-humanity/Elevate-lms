@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS learner_exam_eligibility (
   modules_required    INTEGER NOT NULL DEFAULT 0,
   is_eligible         BOOLEAN NOT NULL DEFAULT false,
   eligible_at         TIMESTAMPTZ,
-  last_evaluated_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  last_evaluated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
   UNIQUE (learner_id, credential_id, domain_key)
 );
 
@@ -180,17 +180,17 @@ CREATE TABLE IF NOT EXISTS employer_cohort_enrollments (
   employer_contact_email       TEXT,
   employer_contact_phone       TEXT,
   technician_count             INTEGER NOT NULL DEFAULT 1,
-  exam_type                    TEXT NOT NULL DEFAULT 'universal'
+  exam_type                    TEXT NOT NULL DEFAULT 'universal',
                                  CHECK (exam_type IN ('core','type_i','type_ii','type_iii','universal')),
-  preferred_certifying_body    TEXT DEFAULT 'no_preference'
+  preferred_certifying_body    TEXT DEFAULT 'no_preference',
                                  CHECK (preferred_certifying_body IN ('esco','mainstream','no_preference')),
-  preferred_exam_format        TEXT DEFAULT 'in_person'
+  preferred_exam_format        TEXT DEFAULT 'in_person',
                                  CHECK (preferred_exam_format IN ('in_person','remote','no_preference')),
   requested_exam_window_start  DATE,
   requested_exam_window_end    DATE,
   funding_source               TEXT,
   po_number                    TEXT,
-  status                       TEXT NOT NULL DEFAULT 'pending'
+  status                       TEXT NOT NULL DEFAULT 'pending',
                                  CHECK (status IN ('pending','confirmed','in_training','exam_scheduled','completed','cancelled')),
   notes                        TEXT,
   created_by                   UUID REFERENCES profiles(id) ON DELETE SET NULL,
@@ -223,14 +223,14 @@ CREATE TABLE IF NOT EXISTS exam_schedule_requests (
   credential_id            UUID NOT NULL REFERENCES credential_registry(id) ON DELETE CASCADE,
   cohort_id                UUID REFERENCES cohorts(id) ON DELETE SET NULL,
   employer_enrollment_id   UUID REFERENCES employer_cohort_enrollments(id) ON DELETE SET NULL,
-  exam_type                TEXT NOT NULL
+  exam_type                TEXT NOT NULL,
                              CHECK (exam_type IN ('core','type_i','type_ii','type_iii','universal')),
   certifying_body          TEXT NOT NULL CHECK (certifying_body IN ('esco','mainstream')),
-  exam_format              TEXT NOT NULL DEFAULT 'in_person'
+  exam_format              TEXT NOT NULL DEFAULT 'in_person',
                              CHECK (exam_format IN ('in_person','remote')),
   requested_date           DATE,
   requested_time_slot      TEXT,
-  status                   TEXT NOT NULL DEFAULT 'pending'
+  status                   TEXT NOT NULL DEFAULT 'pending',
                              CHECK (status IN ('pending','scheduled','confirmed','completed','cancelled','no_show')),
   scheduled_exam_session_id UUID REFERENCES exam_sessions(id) ON DELETE SET NULL,
   eligibility_verified_at  TIMESTAMPTZ,
@@ -276,7 +276,7 @@ CREATE TABLE IF NOT EXISTS certifying_body_routing (
   id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   rule_name        TEXT NOT NULL,
   certifying_body  TEXT NOT NULL CHECK (certifying_body IN ('esco','mainstream')),
-  context          TEXT NOT NULL
+  context          TEXT NOT NULL,
                      CHECK (context IN ('workforce_program','employer_cohort','individual','school_partnership','quick_turnaround')),
   exam_type        TEXT CHECK (exam_type IN ('core','type_i','type_ii','type_iii','universal')),
   priority         INTEGER NOT NULL DEFAULT 50,

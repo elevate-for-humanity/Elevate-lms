@@ -8,9 +8,9 @@
 CREATE TABLE IF NOT EXISTS managed_licenses (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   organization_id UUID NOT NULL,
-  status TEXT NOT NULL DEFAULT 'trial'
+  status TEXT NOT NULL DEFAULT 'trial',
     CHECK (status IN ('trial', 'active', 'past_due', 'canceled', 'suspended')),
-  tier TEXT NOT NULL DEFAULT 'trial'
+  tier TEXT NOT NULL DEFAULT 'trial',
     CHECK (tier IN ('trial', 'managed-trial', 'starter', 'pro', 'enterprise')),
   plan_id TEXT NOT NULL,
 
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS managed_licenses (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   canceled_at TIMESTAMPTZ,
-  suspended_at TIMESTAMPTZ,
+  suspended_at TIMESTAMPTZ
 
   UNIQUE(organization_id)
 );

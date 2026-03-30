@@ -45,7 +45,7 @@ export default function ProgramBuilderClient({ initialState, availableCredential
     setSaving(true);
     setSaveError(null);
     try {
-      const res = await fetch(`/api/admin/programs/${state.id}`, {
+      const res = await fetch(`/api/admin/programs/${state.id}/builder`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -91,9 +91,13 @@ export default function ProgramBuilderClient({ initialState, availableCredential
       // Save first, then publish
       await handleSave();
       const res = await fetch(`/api/admin/programs/${state.id}/publish`, { method: 'POST' });
+      const body = await res.json().catch(() => null);
       if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        throw new Error(body?.error ?? 'Publish failed');
+        // 422 = validation failure — surface the missing list
+        const detail = body?.missing?.length
+          ? `\n• ${body.missing.join('\n• ')}`
+          : '';
+        throw new Error((body?.error ?? 'Publish failed') + detail);
       }
       setState(prev => ({ ...prev, status: 'published', published: true }));
     } catch (err: any) {

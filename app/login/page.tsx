@@ -76,8 +76,9 @@ function LoginForm() {
         router.push(getRoleDestination(role));
       }
     } catch (err: any) {
-      const msg = err?.message || 'Invalid email or password';
-      console.error('Login error:', err);
+      // Supabase error objects have non-enumerable properties — extract explicitly
+      const msg = err?.message || err?.error_description || err?.msg || 'Invalid email or password';
+      console.error('Login error:', msg, err?.status ?? '');
       setError(msg);
     } finally {
       setLoading(false);
@@ -201,6 +202,20 @@ function LoginForm() {
                   className="text-center px-4 py-3 bg-white text-black rounded-lg hover:bg-slate-200 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center"
                 >
                   Admin Portal
+                </Link>
+                <Link
+                  href="/program-holder/dashboard"
+                  prefetch={false}
+                  className="text-center px-4 py-3 bg-white text-black rounded-lg hover:bg-slate-200 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center"
+                >
+                  Program Holder
+                </Link>
+                <Link
+                  href="/instructor/dashboard"
+                  prefetch={false}
+                  className="text-center px-4 py-3 bg-white text-black rounded-lg hover:bg-slate-200 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center"
+                >
+                  Instructor Portal
                 </Link>
               </div>
             </div>

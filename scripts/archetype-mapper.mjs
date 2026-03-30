@@ -221,6 +221,7 @@ const main = async () => {
 
   if (errors.length) fail(errors);
 
+  console.log(
     `ARCTYPE CHECK PASSED: ${pages.length} pages mapped, forbidden phrases clear, metadata/hero contracts enforced.`
   );
 };

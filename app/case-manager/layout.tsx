@@ -8,28 +8,27 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Mentor Portal | Elevate for Humanity',
-    template: '%s | Mentor Portal',
+    default: 'Case Manager Portal | Elevate for Humanity',
+    template: '%s | Case Manager Portal',
   },
-  description: 'Manage your mentees, schedule sessions, and track mentoring progress.',
+  description: 'Manage participant cases, track progress, and report outcomes.',
 };
 
-const ALLOWED_ROLES = ['mentor', 'admin', 'super_admin'];
+const ALLOWED_ROLES = ['case_manager', 'admin', 'super_admin', 'staff'];
 
 const NAV_ITEMS = [
-  { href: '/mentor/dashboard', label: 'Dashboard' },
-  { href: '/mentor/mentees',   label: 'Mentees' },
-  { href: '/mentor/sessions',  label: 'Sessions' },
-  { href: '/mentor/messages',  label: 'Messages' },
-  { href: '/mentor/resources', label: 'Resources' },
+  { href: '/case-manager/dashboard',    label: 'Dashboard' },
+  { href: '/case-manager/participants', label: 'Participants' },
+  { href: '/case-manager/placements',   label: 'Placements' },
+  { href: '/case-manager/reports',      label: 'Reports' },
 ];
 
-export default async function MentorLayout({ children }: { children: React.ReactNode }) {
+export default async function CaseManagerLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?redirect=/mentor/dashboard');
+    redirect('/login?redirect=/case-manager/dashboard');
   }
 
   const { data: profile } = await supabase
@@ -49,7 +48,7 @@ export default async function MentorLayout({ children }: { children: React.React
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-14">
             <div className="flex items-center gap-6">
-              <span className="text-lg font-bold text-brand-blue-700">Mentor Portal</span>
+              <span className="text-lg font-bold text-brand-blue-700">Case Manager Portal</span>
               <div className="hidden md:flex items-center gap-4">
                 {NAV_ITEMS.map((item) => (
                   <a key={item.href} href={item.href} className="text-sm text-gray-600 hover:text-brand-blue-700 transition-colors">

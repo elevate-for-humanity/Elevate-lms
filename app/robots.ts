@@ -69,7 +69,7 @@ export default function robots(): MetadataRoute.Robots {
           '/franchise/office/',
           '/programs/admin/',
           '/pwa/',
-          '/shop/dashboard',
+
           '/shop/checkout',
           '/shop/onboarding',
 

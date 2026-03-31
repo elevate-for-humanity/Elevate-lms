@@ -66,8 +66,8 @@ export default async function OnboardingStartPage() {
   if (progress?.is_complete) {
     // Redirect to appropriate dashboard based on role
     const dashboardMap: Record<string, string> = {
-      PROGRAM_HOLDER: '/shop/dashboard',
-      WORKSITE_ONLY: '/shop/dashboard',
+      PROGRAM_HOLDER: '/program-holder/dashboard',
+      WORKSITE_ONLY: '/dashboard',
       SITE_COORDINATOR: '/coordinator/dashboard',
     };
 

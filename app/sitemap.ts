@@ -80,7 +80,7 @@ const EXCLUDED_PREFIXES = [
   '/partner-portal',
   '/partner/onboarding',
   '/pwa',
-  '/shop/dashboard',
+
   '/shop/checkout',
   '/shop/onboarding',
   '/client-portal',

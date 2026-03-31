@@ -213,7 +213,7 @@ export default function NewClientPage() {
 
   return (
     <div className="container mx-auto py-8 max-w-2xl space-y-6">
-            <Breadcrumbs items={[{ label: "Franchise", href: "/franchise" }, { label: "Office", href: "/franchise/office/dashboard" }, { label: "Clients" }]} />
+            <Breadcrumbs items={[{ label: "Franchise", href: "/franchise" }, { label: "Office", href: "/franchise/office" }, { label: "Clients" }]} />
 {/* Header */}
       <div className="flex items-center gap-4">
         <Link href="/franchise/office/clients">

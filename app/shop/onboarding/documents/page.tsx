@@ -27,7 +27,7 @@ export default async function ShopDocumentsPage() {
     .eq('user_id', user.id);
 
   const shop = staff?.[0]?.shops;
-  if (!shop) redirect('/shop/dashboard');
+  if (!shop) redirect('/dashboard');
 
   return (
     <ShopDocumentUpload shopId={(shop as any).id} requirements={[]} />

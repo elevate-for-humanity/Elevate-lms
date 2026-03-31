@@ -207,10 +207,10 @@ export default function EROQueuePage() {
 
   return (
     <div className="container mx-auto py-8 space-y-6">
-            <Breadcrumbs items={[{ label: "Franchise", href: "/franchise" }, { label: "Office", href: "/franchise/office/dashboard" }, { label: "Ero Queue" }]} />
+            <Breadcrumbs items={[{ label: "Franchise", href: "/franchise" }, { label: "Office", href: "/franchise/office" }, { label: "Ero Queue" }]} />
 {/* Header */}
       <div className="flex items-center gap-4">
-        <Link href="/franchise/office/dashboard">
+        <Link href="/franchise/office">
           <Button variant="ghost" size="icon">
             <ArrowLeft className="h-4 w-4" />
           </Button>

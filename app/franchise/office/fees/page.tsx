@@ -251,7 +251,7 @@ export default function FeeSchedulesPage() {
 
   return (
     <div className="container mx-auto py-8 space-y-6">
-            <Breadcrumbs items={[{ label: "Franchise", href: "/franchise" }, { label: "Office", href: "/franchise/office/dashboard" }, { label: "Fees" }]} />
+            <Breadcrumbs items={[{ label: "Franchise", href: "/franchise" }, { label: "Office", href: "/franchise/office" }, { label: "Fees" }]} />
 {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">

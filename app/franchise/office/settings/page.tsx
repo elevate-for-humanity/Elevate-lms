@@ -240,10 +240,10 @@ export default function OfficeSettingsPage() {
 
   return (
     <div className="container mx-auto py-8 max-w-3xl space-y-6">
-            <Breadcrumbs items={[{ label: "Franchise", href: "/franchise" }, { label: "Office", href: "/franchise/office/dashboard" }, { label: "Settings" }]} />
+            <Breadcrumbs items={[{ label: "Franchise", href: "/franchise" }, { label: "Office", href: "/franchise/office" }, { label: "Settings" }]} />
 {/* Header */}
       <div className="flex items-center gap-4">
-        <Link href="/franchise/office/dashboard">
+        <Link href="/franchise/office">
           <Button variant="ghost" size="icon">
             <ArrowLeft className="h-4 w-4" />
           </Button>

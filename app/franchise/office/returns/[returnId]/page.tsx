@@ -137,7 +137,7 @@ export default function ReturnDetailPage() {
 
   return (
     <div className="container mx-auto py-8 space-y-6">
-            <Breadcrumbs items={[{ label: "Franchise", href: "/franchise" }, { label: "Office", href: "/franchise/office/dashboard" }, { label: "Returns" }]} />
+            <Breadcrumbs items={[{ label: "Franchise", href: "/franchise" }, { label: "Office", href: "/franchise/office" }, { label: "Returns" }]} />
 {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">

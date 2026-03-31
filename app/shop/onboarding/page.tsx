@@ -37,7 +37,7 @@ export default async function ShopOnboardingPage() {
   const shop = staff?.[0]?.shops;
 
   if (!shop) {
-    redirect('/shop/dashboard');
+    redirect('/dashboard');
   }
 
   // Get onboarding status
@@ -351,7 +351,7 @@ export default async function ShopOnboardingPage() {
         {/* Back to Dashboard */}
         <div className="text-center">
           <Link
-            href="/shop/dashboard"
+            href="/dashboard"
             className="text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
           >
             ← Back to Dashboard

@@ -35,7 +35,7 @@ export default async function NewWeeklyReport() {
   const shopId = staff?.[0]?.shop_id;
 
   if (!shopId) {
-    redirect('/shop/dashboard');
+    redirect('/dashboard');
   }
 
   // Get active placements for this shop

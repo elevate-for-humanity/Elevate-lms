@@ -61,11 +61,19 @@ export default async function ProgramHolderDashboardPage() {
           .limit(5)
       : Promise.resolve({ data: [] }),
 
+    // Revenue: join payments → programs via program_slug
     programIds.length > 0
-      ? db.from('payments')
-          .select('amount_cents')
-          .in('program_id', programIds)
-          .eq('status', 'paid')
+      ? db.from('programs')
+          .select('slug')
+          .in('id', programIds)
+          .then(async ({ data: slugRows }) => {
+            const slugs = (slugRows ?? []).map((r: any) => r.slug).filter(Boolean);
+            if (slugs.length === 0) return { data: [] };
+            return db.from('payments')
+              .select('amount_cents')
+              .in('program_slug', slugs)
+              .eq('status', 'paid');
+          })
       : Promise.resolve({ data: [] }),
   ]);
 

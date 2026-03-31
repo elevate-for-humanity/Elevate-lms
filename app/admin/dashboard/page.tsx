@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { requireAdmin } from '@/lib/admin/guards';
+import { requireAdmin } from '@/lib/authGuards';
 import { getAdminDashboardData } from '@/lib/admin/get-admin-dashboard-data';
 import { DashboardShell } from '@/components/admin/dashboard/DashboardShell';
 import { BuiltCoursesPanel } from './BuiltCoursesPanel';

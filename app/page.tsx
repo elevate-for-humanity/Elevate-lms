@@ -6,7 +6,6 @@ import HomeClientFeatures from '@/components/home/HomeClientFeatures';
 import MarqueeBanner from '@/components/MarqueeBanner';
 import { BlurIn } from '@/components/animations/PremiumAnimations';
 import { ProgramVideoCards } from '@/components/marketing/ProgramVideoCards';
-import { HeroVideoBg } from '@/components/marketing/HeroVideoBg';
 
 
 
@@ -34,9 +33,13 @@ export default function HomePage() {
       {/* ── HERO ── */}
       <section className="grid lg:grid-cols-2 gap-0">
         <div className="relative h-72 sm:h-96 lg:h-auto min-h-[560px] overflow-hidden bg-slate-700">
-          <HeroVideoBg
-            src="/videos/homepage-hero-new.mp4"
-            audioSrc="/videos/homepage-hero-new.mp3"
+          <Image
+            src="/images/pages/about-career-training.jpg"
+            alt="Students in career training at Elevate for Humanity"
+            fill
+            className="object-cover object-center"
+            priority
+            sizes="(max-width: 1024px) 100vw, 50vw"
           />
         </div>
         <div className="bg-slate-700 flex items-center">

@@ -150,13 +150,8 @@ async function _POST(request: NextRequest) {
         : `Down payment of $${setupFee}. Remaining $${remainingBalance} at $${weeklyPayment}/week for ${weeksRemaining} weeks.`;
     }
 
-    // Determine which Payment Method Configuration to use based on environment
-    // Live mode: pmc_1SczlEIRNf5vPH3Ai841igCB (has Klarna, Afterpay, Cash App, Apple Pay, Google Pay)
-    // Test mode: requires a separate PMC configured in Stripe Dashboard for test mode
-    const isTestMode = process.env.STRIPE_SECRET_KEY?.startsWith('sk_test_');
-    const paymentMethodConfig = isTestMode
-      ? process.env.STRIPE_PMC_BARBER_TEST || undefined // Falls back to automatic if not set
-      : 'pmc_1SczlEIRNf5vPH3Ai841igCB';
+    // Use explicit payment_method_types so BNPL (Klarna, Afterpay) is always available.
+    // PMC approach was removed — the configured PMC had BNPL disabled.
 
     // Create Checkout Session
     const sessionConfig: Stripe.Checkout.SessionCreateParams = {
@@ -216,19 +211,17 @@ async function _POST(request: NextRequest) {
           message: `Full tuition: $${BARBER_PRICING.fullPrice.toLocaleString()}. Use Affirm/Klarna/Afterpay to split into payments, or pay in full with card.`,
         },
       },
-      // Save payment method for any remaining balance
-      payment_intent_data: {
-        setup_future_usage: 'off_session',
-      },
+      // Save card for future weekly charges — scoped to card only.
+      // Klarna and Afterpay do not support setup_future_usage.
+      payment_method_options: {
+        card: { setup_future_usage: 'off_session' },
+      } as any,
       // Allow promotion codes
       allow_promotion_codes: true,
     };
 
-    // Add payment method configuration if available
-    if (paymentMethodConfig) {
-      sessionConfig.payment_method_configuration = paymentMethodConfig;
-    }
-    // If no PMC (test mode without config), Stripe uses Dashboard default settings
+    // Enable card + BNPL for all payment types
+    sessionConfig.payment_method_types = ['card', 'klarna', 'afterpay_clearpay'] as any;
 
     const session = await stripe.checkout.sessions.create(sessionConfig);
 

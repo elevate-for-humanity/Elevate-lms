@@ -142,7 +142,7 @@ export function AutoAttritionTracker() {
           id: s.user_id,
           name: (s.profiles as any)?.full_name || `Student ${i + 1}`,
           program: (s.training_programs as any)?.name || 'Unknown',
-          riskScore: 60 + Math.floor(Math.random() * 30),
+          riskScore: 70, // inactivity > 7 days = high risk baseline
           riskFactors: ['Inactivity > 7 days'],
           lastActivity: sevenDaysAgo,
           interventionStatus: 'none' as const,

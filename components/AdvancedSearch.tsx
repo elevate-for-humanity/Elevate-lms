@@ -95,39 +95,15 @@ export function AdvancedSearch({ onSearch }: AdvancedSearchProps) {
         duration: p.duration_weeks ? `${p.duration_weeks} weeks` : 'Self-paced',
         level: p.skill_level || 'Beginner',
         price: p.price || 0,
-        rating: 4.5 + Math.random() * 0.5,
-        students: countMap[p.id] || Math.floor(Math.random() * 200) + 50,
+        rating: 0,
+        students: countMap[p.id] || 0,
         image: p.image_url || '/media/programs/default.jpg',
       }));
 
       setResults(searchResults);
     } catch (err) {
       console.error('Search error:', err);
-      // Fallback to mock data
-      setResults([
-        {
-          id: '1',
-          title: 'Certified Nursing Assistant (CNA)',
-          category: 'Healthcare',
-          duration: '6-8 weeks',
-          level: 'Beginner',
-          price: 0,
-          rating: 4.8,
-          students: 342,
-          image: '/media/programs/healthcare-1.jpg',
-        },
-        {
-          id: '2',
-          title: 'HVAC Technician',
-          category: 'Skilled Trades',
-          duration: '12 weeks',
-          level: 'Beginner',
-          price: 0,
-          rating: 4.7,
-          students: 256,
-          image: '/media/programs/trades-1.jpg',
-        },
-      ]);
+      setResults([]);
     } finally {
       setLoading(false);
     }

@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -62,18 +62,57 @@ export default async function HVACTechnicianPage() {
   try {
     program = await getPublishedProgramBySlug('hvac-technician');
   } catch {
-    notFound();
+    // DB row missing or unpublished — render static page from heroBanners config.
+    // Apply migration 20260603000003_publish_hvac_program.sql to fix the DB state.
+    program = null;
   }
 
-  if (!program.isComplete) {
+  if (program && !program.isComplete) {
     return <ProgramComingSoon title={program.title} slug={program.slug} />;
+  }
+
+  const banner = heroBanners['hvac-technician'];
+
+  // DB row missing — render static shell so the page is never a 404.
+  // Fix: apply migration 20260603000003_publish_hvac_program.sql in Supabase Dashboard.
+  if (!program) {
+    return (
+      <main className="min-h-screen bg-white text-slate-900">
+        <HeroVideo
+          videoSrcDesktop={banner.videoSrcDesktop}
+          posterImage={banner.posterImage}
+          microLabel={banner.microLabel}
+          analyticsName={banner.analyticsName}
+        />
+        <section className="bg-brand-orange-600 text-white py-5 px-6 text-center">
+          <p className="text-lg font-bold tracking-tight">
+            This program may cost you <span className="underline decoration-wavy">$0</span> — WIOA and Workforce Ready Grant funding available for eligible Indiana residents.
+          </p>
+          <p className="text-sm mt-1 text-orange-100">Check your eligibility in 2 minutes. No commitment required.</p>
+        </section>
+        <section className="border-b border-slate-200 bg-white">
+          <div className="mx-auto max-w-7xl px-6 py-12">
+            <h1 className="text-4xl font-black text-slate-900 mb-4">{banner.belowHeroHeadline}</h1>
+            <p className="text-slate-600 text-lg mb-8">{banner.belowHeroSubheadline}</p>
+            <div className="flex flex-wrap gap-4">
+              <a href={banner.primaryCta.href} className="inline-flex items-center gap-2 rounded-xl bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-bold px-6 py-3 transition-colors">
+                {banner.primaryCta.label}
+              </a>
+              {banner.secondaryCta && (
+                <a href={banner.secondaryCta.href} className="inline-flex items-center gap-2 rounded-xl border-2 border-slate-300 hover:border-slate-400 text-slate-700 font-bold px-6 py-3 transition-colors">
+                  {banner.secondaryCta.label}
+                </a>
+              )}
+            </div>
+          </div>
+        </section>
+      </main>
+    );
   }
 
   const hero =
     program.program_media.find((m) => m.media_type === 'hero_image') ??
     program.program_media[0];
-
-  const banner = heroBanners['hvac-technician'];
 
   return (
     <main className="min-h-screen bg-white text-slate-900">
@@ -82,7 +121,7 @@ export default async function HVACTechnicianPage() {
       <HeroVideo
         videoSrcDesktop={banner.videoSrcDesktop}
         posterImage={banner.posterImage}
-        voiceoverSrc={banner.voiceoverSrc}
+
         microLabel={banner.microLabel}
         analyticsName={banner.analyticsName}
       />

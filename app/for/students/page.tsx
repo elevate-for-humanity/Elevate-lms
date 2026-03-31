@@ -71,7 +71,7 @@ export default function ForStudentsPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {PROGRAMS.map((p) => (
               <Link key={p.title} href={p.href} className="group flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-brand-red-300 hover:shadow-lg transition-all">
-                <div className="relative w-full flex-shrink-0" style={{ aspectRatio: '16/9' }}>
+                <div className="relative w-full flex-shrink-0 aspect-[4/3]" style={{ aspectRatio: '16/9' }}>
                   <Image src={p.image} alt={p.title} fill className="object-cover" sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw" />
                   <span className="absolute top-3 left-3 bg-white/90 text-slate-700 text-xs font-bold px-2.5 py-1 rounded-full">{p.sector}</span>
                   <span className="absolute top-3 right-3 bg-brand-green-600 text-white text-xs font-bold px-2.5 py-1 rounded-full">Funded</span>
@@ -145,7 +145,7 @@ export default function ForStudentsPage() {
                 <Link href="/funding" className="border border-slate-300 text-slate-700 font-bold px-6 py-3 rounded-lg text-sm hover:bg-slate-50 transition-colors">All Funding Options</Link>
               </div>
             </div>
-            <div className="relative rounded-2xl overflow-hidden" style={{ aspectRatio: '4/3' }}>
+            <div className="relative rounded-2xl overflow-hidden aspect-[4/3]" style={{ aspectRatio: '4/3' }}>
               <Image src="/images/pages/wioa-meeting.jpg" alt="WorkOne career counseling appointment" fill className="object-cover" sizes="(max-width:1024px) 100vw, 50vw" />
             </div>
           </div>

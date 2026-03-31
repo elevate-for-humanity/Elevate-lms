@@ -127,7 +127,7 @@ export default function AgreementsPage() {
           {AGREEMENT_POINTS.map((pt) => (
             <div key={pt.title} className="rounded-2xl overflow-hidden shadow-md flex flex-col">
               {/* Image fills a fixed aspect ratio — no clipping, no overflow */}
-              <div className="relative w-full" style={{ paddingBottom: '66%' }}>
+              <div className="relative w-full aspect-[4/3]" style={{ paddingBottom: '66%' }}>
                 <Image
                   src={pt.image}
                   alt={pt.title}

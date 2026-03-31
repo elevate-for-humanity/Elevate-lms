@@ -175,7 +175,7 @@ export default function JRIPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {programBenefits.map((benefit, index) => (
               <div key={index} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
                   <Image src={benefit.image} alt={benefit.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                 </div>
                 <div className="p-5">

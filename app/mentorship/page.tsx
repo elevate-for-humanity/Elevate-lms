@@ -105,7 +105,7 @@ export default function MentorshipPage() {
       <section className="py-16 border-t">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-10 items-center">
-            <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '4/3' }}>
+            <div className="relative rounded-xl overflow-hidden aspect-[4/3]" style={{ aspectRatio: '4/3' }}>
               <Image src="/images/pages/mentorship-page-2.jpg" alt="Experienced mentor sharing career guidance" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
             </div>
             <div>

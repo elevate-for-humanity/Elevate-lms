@@ -187,7 +187,7 @@ export default function LicensingPartnershipsPage() {
                 key={type.title}
                 className="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
               >
-                <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
                   <Image
                     src={type.image}
                     alt={type.alt}
@@ -255,7 +255,7 @@ export default function LicensingPartnershipsPage() {
                 </Link>
               </div>
             </div>
-            <div className="relative rounded-xl overflow-hidden shadow-xl" style={{ aspectRatio: '4/3' }}>
+            <div className="relative rounded-xl overflow-hidden shadow-xl aspect-video" style={{ aspectRatio: '4/3' }}>
               <Image
                 src="/images/pages/admin-licensing-hero.jpg"
                 alt="Elevate platform admin dashboard — licensable workforce operating system"
@@ -270,7 +270,7 @@ export default function LicensingPartnershipsPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {PLATFORM_FEATURES.map((f) => (
               <div key={f.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
                   <Image
                     src={f.image}
                     alt={f.alt}

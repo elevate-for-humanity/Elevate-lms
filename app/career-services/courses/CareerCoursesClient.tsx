@@ -164,7 +164,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                     )}
                   </button>
                 </div>
-                <div className="relative hidden lg:block">
+                <div className="relative hidden lg:block aspect-[4/3]">
                   <Image
                     src={bundle.image_url || '/images/pages/career-services-page-3.jpg'}
                     alt={bundle.title}

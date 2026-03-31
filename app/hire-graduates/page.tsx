@@ -88,7 +88,7 @@ export default async function HireGraduatesPage() {
                 { image: '/images/pages/about-employer-partners.jpg', alt: 'Graduates placed with employer partners', title: 'Work', desc: 'We connect certified graduates directly with employers hiring in their field.' },
               ].map((card) => (
                 <div key={card.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                  <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                  <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
                     <Image src={card.image} alt={card.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
                   </div>
                   <div className="p-5">

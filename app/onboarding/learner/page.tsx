@@ -489,7 +489,7 @@ export default async function LearnerOnboardingPage() {
 
         {/* Help Section */}
         <section className="mt-12 sm:mt-16">
-          <div className="relative overflow-hidden rounded-2xl bg-white">
+          <div className="relative overflow-hidden rounded-2xl bg-white aspect-[4/3]">
             <div className="absolute inset-0">
               <Image
                 src="/images/pages/onboarding.jpg"

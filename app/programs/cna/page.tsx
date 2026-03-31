@@ -190,7 +190,7 @@ export default function CNAPage() {
               { src: '/images/pages/cna-nursing-real.jpg', alt: 'CNA nursing skills' },
               { src: '/images/pages/cna-nursing.jpg',      alt: 'CNA clinical training' },
             ].map((img) => (
-              <div key={img.src} className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '3/2' }}>
+              <div key={img.src} className="relative rounded-xl overflow-hidden aspect-[4/3]" style={{ aspectRatio: '3/2' }}>
                 <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="25vw" />
               </div>
             ))}

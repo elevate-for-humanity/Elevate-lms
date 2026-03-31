@@ -123,7 +123,7 @@ export default function ConnectsLandingPage() {
 
       {/* HERO — static image, portal directory page does not need video */}
       <section className="pt-16">
-        <div className="relative w-full overflow-hidden" style={{ minHeight: '280px', maxHeight: '360px' }}>
+        <div className="relative w-full overflow-hidden aspect-[4/3]" style={{ minHeight: '280px', maxHeight: '360px' }}>
           <Image src="/images/pages/career-services-page-1.jpg" alt="Elevate Connects portal directory" fill sizes="100vw" className="object-cover" priority />
         </div>
         <div className="bg-white py-10 md:py-14 px-6">
@@ -166,7 +166,7 @@ export default function ConnectsLandingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {PORTALS.map((p) => (
               <div key={p.title} className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow border border-gray-100">
-                <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
+                <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/9' }}>
                   <Image src={p.image} alt={p.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
                 </div>
                 <div className="p-5">

@@ -218,7 +218,7 @@ export default function LicensingGuidePage() {
               <span className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">1</span>
               <h2 className="text-xl font-bold text-slate-900">Choose Your License Type</h2>
             </div>
-            <div className="relative w-full rounded-xl overflow-hidden mb-5" style={{ aspectRatio: '16/7' }}>
+            <div className="relative w-full rounded-xl overflow-hidden mb-5 aspect-square" style={{ aspectRatio: '16/7' }}>
               <Image
                 src="/images/pages/admin-licensing-hero.jpg"
                 alt="License tier comparison — managed vs source-use"
@@ -264,7 +264,7 @@ export default function LicensingGuidePage() {
                 </span>
                 <h2 className="text-xl font-bold text-slate-900">{step.title}</h2>
               </div>
-              <div className="relative w-full rounded-xl overflow-hidden mb-5" style={{ aspectRatio: '16/7' }}>
+              <div className="relative w-full rounded-xl overflow-hidden mb-5 aspect-[4/3]" style={{ aspectRatio: '16/7' }}>
                 <Image
                   src={step.image}
                   alt={step.imageAlt}
@@ -283,7 +283,7 @@ export default function LicensingGuidePage() {
               <span className="w-8 h-8 bg-amber-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">7</span>
               <h2 className="text-xl font-bold text-slate-900">Billing &amp; Enforcement</h2>
             </div>
-            <div className="relative w-full rounded-xl overflow-hidden mb-5" style={{ aspectRatio: '16/7' }}>
+            <div className="relative w-full rounded-xl overflow-hidden mb-5 aspect-[4/3]" style={{ aspectRatio: '16/7' }}>
               <Image
                 src="/images/pages/platform-page-7.jpg"
                 alt="Billing and subscription management"

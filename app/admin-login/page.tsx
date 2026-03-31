@@ -55,7 +55,7 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen bg-slate-900 flex">
       {/* Left side — branding */}
-      <div className="hidden lg:flex lg:w-1/2 relative">
+      <div className="hidden lg:flex lg:w-1/2 relative aspect-video">
         <Image
           src="/images/pages/admin-login-hero.jpg"
           alt="Elevate administration"

@@ -70,7 +70,7 @@ export default function AgenciesPage() {
           <div className="grid md:grid-cols-4 gap-8">
             {complianceFeatures.map((feature, index) => (
               <div key={index} className="bg-white rounded-xl border border-slate-200 overflow-hidden flex flex-col">
-                <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
                   <Image src={feature.image} alt={feature.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
                 </div>
                 <div className="p-5 flex flex-col flex-1">

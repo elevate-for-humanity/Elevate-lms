@@ -10,7 +10,7 @@ export default function Highlights() {
         </h2>
         
         <div className="grid md:grid-cols-3 gap-8">
-          <div className="relative overflow-hidden rounded-lg shadow-lg group">
+          <div className="relative overflow-hidden rounded-lg shadow-lg group aspect-[4/3]">
             <div className="relative h-64">
               <Image
                 src="/images/pages/comp-home-highlight-biz.jpg"
@@ -33,7 +33,7 @@ export default function Highlights() {
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-lg shadow-lg group">
+          <div className="relative overflow-hidden rounded-lg shadow-lg group aspect-[4/3]">
             <div className="relative h-64">
               <Image
                 src="/images/pages/comp-home-highlight-health.jpg"
@@ -56,7 +56,7 @@ export default function Highlights() {
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-lg shadow-lg group">
+          <div className="relative overflow-hidden rounded-lg shadow-lg group aspect-[4/3]">
             <div className="relative h-64">
               <Image
                 src="/images/pages/comp-home-highlight-success.jpg"

@@ -102,7 +102,7 @@ export default async function CalendarPage() {
                     {enrollments && enrollments.length > 0 ? enrollments.map((enrollment: any) => (
                       <div key={enrollment.id} className="bg-white rounded-lg shadow-sm border overflow-hidden">
                         <div className="flex items-stretch">
-                          <div className="relative w-24 flex-shrink-0">
+                          <div className="relative w-24 flex-shrink-0 aspect-[4/3]">
                             <Image src="/images/pages/calendar-page-1.jpg" alt={enrollment.course?.title || 'Course'} fill sizes="100vw" className="object-cover" />
                           </div>
                           <div className="flex-1 p-4">

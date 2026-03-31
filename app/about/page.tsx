@@ -415,7 +415,7 @@ export default function AboutPage() {
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">Our Founder</h2>
           <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
             <div className="flex flex-col sm:flex-row">
-              <div className="relative w-full sm:w-72 flex-shrink-0 overflow-hidden" style={{ aspectRatio: '3/4' }}>
+              <div className="relative w-full sm:w-72 flex-shrink-0 overflow-hidden aspect-square" style={{ aspectRatio: '3/4' }}>
                 <Image
                   src="/images/team/elizabeth-greene-headshot.jpg"
                   alt="Elizabeth Greene, Founder & CEO of Elevate for Humanity"

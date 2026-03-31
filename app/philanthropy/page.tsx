@@ -51,7 +51,7 @@ export default function PhilanthropyPage() {
           <div className="grid sm:grid-cols-2 gap-6">
             {impactAreas.map((area) => (
               <div key={area.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
                   <Image src={area.image} alt={area.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
                 </div>
                 <div className="p-5">

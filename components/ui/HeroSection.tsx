@@ -316,7 +316,7 @@ export function HeroSection({
         </div>
         
         {/* Image panel - NO overlay, clean edge */}
-        <div className="relative hidden lg:block">
+        <div className="relative hidden lg:block aspect-[4/3]">
           <Image
             src={image}
             alt={imageAlt || title}

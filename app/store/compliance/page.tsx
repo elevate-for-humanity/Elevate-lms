@@ -51,7 +51,7 @@ export default async function CompliancePage() {
           <h2 className="text-3xl font-bold text-center mb-12">Compliance Standards</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200">
-              <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+              <div className="relative w-full aspect-video" style={{ aspectRatio: '16/10' }}>
                 <Image src="/images/pages/admin-wioa-hero.jpg" alt="WIOA compliance reporting dashboard" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-8">
@@ -88,7 +88,7 @@ export default async function CompliancePage() {
             </div>
 
             <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200">
-              <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+              <div className="relative w-full aspect-video" style={{ aspectRatio: '16/10' }}>
                 <Image src="/images/pages/admin-compliance-hero.jpg" alt="FERPA student data protection dashboard" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-8">
@@ -161,7 +161,7 @@ export default async function CompliancePage() {
             </div>
 
             <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200">
-              <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+              <div className="relative w-full aspect-video" style={{ aspectRatio: '16/10' }}>
                 <Image src="/images/pages/admin-grants-hero.jpg" alt="Grant reporting and compliance documentation" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-8">

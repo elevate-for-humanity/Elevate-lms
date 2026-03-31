@@ -27,7 +27,7 @@ export default function TuitionPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative py-12 sm:py-16">
+      <section className="relative py-12 sm:py-16 min-h-[300px] sm:min-h-[400px]">
         <Image
           src="/images/pages/tuition-hero.jpg"
           alt="Tuition and Payment Options"

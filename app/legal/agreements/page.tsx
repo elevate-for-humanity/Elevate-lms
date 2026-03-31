@@ -550,7 +550,7 @@ function LegalAgreementsContent() {
             { img: '/images/pages/admin-signatures-hero.jpg', label: 'Secure E-Signature' },
             { img: '/images/pages/onboarding-page-2.jpg', label: 'DOL Registered' },
           ].map((badge) => (
-            <div key={badge.label} className="relative rounded-xl overflow-hidden border border-slate-200">
+            <div key={badge.label} className="relative rounded-xl overflow-hidden border border-slate-200 aspect-[4/3]">
               <div className="relative h-20">
                 <Image src={badge.img} alt={badge.label} fill sizes="33vw" className="object-cover" />
                 

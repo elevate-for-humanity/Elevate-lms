@@ -69,7 +69,7 @@ export default function FeaturesPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f) => (
               <div key={f.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition">
-                <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
                   <Image src={f.image} alt={f.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                 </div>
                 <div className="p-5">

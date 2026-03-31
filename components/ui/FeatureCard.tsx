@@ -23,7 +23,7 @@ export function FeatureCard({ image, alt, title, description, href, ratio = 'fea
 
   const inner = (
     <div className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition h-full flex flex-col">
-      <div className="relative w-full overflow-hidden" style={aspectStyle}>
+      <div className="relative w-full overflow-hidden aspect-[4/3]" style={aspectStyle}>
         <Image
           src={image}
           alt={alt}

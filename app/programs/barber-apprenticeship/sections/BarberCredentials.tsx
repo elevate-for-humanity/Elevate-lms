@@ -47,7 +47,7 @@ export function BarberCredentials() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {CURRICULUM.map((mod, i) => (
               <div key={i} className="bg-white rounded-xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow">
-                <div className="relative" style={{ aspectRatio: "3/2" }}>
+                <div className="relative aspect-[4/3]" style={{ aspectRatio: "3/2" }}>
                   <Image src={CURRICULUM_IMAGES[i] || CURRICULUM_IMAGES[0]} alt={mod.title} fill className="object-cover" sizes="(max-width: 768px) 50vw, 25vw" />
                 </div>
                 <div className="p-5">
@@ -69,7 +69,7 @@ export function BarberCredentials() {
           </p>
           <div className="grid sm:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
-              <div className="relative" style={{ aspectRatio: "3/2" }}>
+              <div className="relative aspect-[4/3]" style={{ aspectRatio: "3/2" }}>
                 <Image src="/images/pages/barber-gallery-1.jpg" alt="Supervised barber training" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
               </div>
               <div className="p-6">
@@ -78,7 +78,7 @@ export function BarberCredentials() {
               </div>
             </div>
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
-              <div className="relative" style={{ aspectRatio: "3/2" }}>
+              <div className="relative aspect-[4/3]" style={{ aspectRatio: "3/2" }}>
                 <Image src="/images/pages/barber-gallery-2.jpg" alt="Barber performance evaluation" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
               </div>
               <div className="p-6">
@@ -87,7 +87,7 @@ export function BarberCredentials() {
               </div>
             </div>
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
-              <div className="relative" style={{ aspectRatio: "3/2" }}>
+              <div className="relative aspect-[4/3]" style={{ aspectRatio: "3/2" }}>
                 <Image src="/images/pages/barber-gallery-3.jpg" alt="Barbershop employment" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
               </div>
               <div className="p-6">
@@ -96,7 +96,7 @@ export function BarberCredentials() {
               </div>
             </div>
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
-              <div className="relative" style={{ aspectRatio: "3/2" }}>
+              <div className="relative aspect-video" style={{ aspectRatio: "3/2" }}>
                 <Image src="/images/pages/admin-career-courses-create-hero.jpg" alt="OJT hour logging" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
               </div>
               <div className="p-6">

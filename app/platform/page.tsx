@@ -165,7 +165,7 @@ export default function PlatformPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {capabilities.map((cap) => (
               <div key={cap.label} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
                   <Image
                     src={cap.image}
                     alt={cap.alt}
@@ -223,7 +223,7 @@ export default function PlatformPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {audiences.map((a) => (
               <div key={a.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden flex flex-col">
-                <div className="relative w-full" style={{ aspectRatio: '4/3' }}>
+                <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '4/3' }}>
                   <Image
                     src={a.image}
                     alt={a.alt}

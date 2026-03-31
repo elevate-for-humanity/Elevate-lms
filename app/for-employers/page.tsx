@@ -153,7 +153,7 @@ export default async function ForEmployersPage() {
               },
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
                   <Image src={item.image} alt={item.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                 </div>
                 <div className="p-5">

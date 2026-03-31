@@ -78,7 +78,7 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
   if (variant === 'horizontal') {
     return (
       <div className="group bg-white rounded-xl border hover:shadow-lg transition-all duration-300 overflow-hidden flex">
-        <div className="relative w-48 flex-shrink-0">
+        <div className="relative w-48 flex-shrink-0 aspect-[4/3]">
           <Image
             src={product.image}
             alt={product.name}

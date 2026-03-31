@@ -29,7 +29,7 @@ export function HomeHero({ images }: HomeHeroProps) {
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-3 py-4 md:px-4 md:py-6">
         {/* IMAGE ON TOP FOR MOBILE */}
         <div className="md:hidden">
-          <div className="relative mx-auto w-full max-w-md">
+          <div className="relative mx-auto w-full max-w-md aspect-[4/3]">
             <div className="relative w-full overflow-hidden rounded-2xl border border-slate-800 bg-white aspect-[4/3]">
               <Image
                 src={current.src}
@@ -80,8 +80,8 @@ export function HomeHero({ images }: HomeHeroProps) {
           </div>
 
           {/* IMAGE SIDE FOR DESKTOP / TABLET */}
-          <div className="relative hidden md:block">
-            <div className="relative h-full w-full max-w-xl md:ml-auto">
+          <div className="relative hidden md:block aspect-[4/3]">
+            <div className="relative h-full w-full max-w-xl md:ml-auto aspect-[4/3]">
               <div className="relative w-full overflow-hidden rounded-2xl border border-slate-800 bg-white aspect-[16/9]">
                 <Image
                   src={current.src}

@@ -75,7 +75,7 @@ export default function ImpactPage() {
           <div className="grid sm:grid-cols-2 gap-8">
             {FUNDER_REASONS.map((item) => (
               <div key={item.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
                   <Image
                     src={item.image}
                     alt={item.alt}

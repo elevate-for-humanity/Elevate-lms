@@ -108,7 +108,7 @@ export default async function StudentPortalSchedulePage() {
           </div>
 
           {activeEnrollments.length === 0 ? (
-            <div className="relative rounded-2xl overflow-hidden border border-gray-200">
+            <div className="relative rounded-2xl overflow-hidden border border-gray-200 aspect-[4/3]">
               <div className="relative h-56 sm:h-72">
                 <Image
                   src="/images/pages/student-portal-page-3.jpg"
@@ -204,7 +204,7 @@ export default async function StudentPortalSchedulePage() {
           </div>
 
           {upcomingAppointments.length === 0 ? (
-            <div className="relative rounded-2xl overflow-hidden border border-gray-200">
+            <div className="relative rounded-2xl overflow-hidden border border-gray-200 aspect-[4/3]">
               <div className="relative h-56 sm:h-72">
                 <Image
                   src="/images/pages/student-portal-page-5.jpg"

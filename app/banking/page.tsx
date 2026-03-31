@@ -66,7 +66,7 @@ export default function BankingPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white border-2 border-brand-blue-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+              <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
                 <Image
                   src="/images/pages/tax-prep-desk.jpg"
                   alt="Tax preparer reviewing refund advance options with a client"
@@ -93,7 +93,7 @@ export default function BankingPage() {
             </div>
 
             <div className="bg-white border-2 border-brand-green-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+              <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
                 <Image
                   src="/images/pages/tax-preparation.jpg"
                   alt="Direct deposit tax refund processing"
@@ -120,7 +120,7 @@ export default function BankingPage() {
             </div>
 
             <div className="bg-white border-2 border-brand-blue-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+              <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
                 <Image
                   src="/images/pages/pathways-page-6.jpg"
                   alt="Prepaid debit card for tax refund disbursement"
@@ -176,7 +176,7 @@ export default function BankingPage() {
       <section className="py-16 sm:py-20 bg-slate-50">
         <div className="max-w-5xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-10 items-center">
-            <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '4/3' }}>
+            <div className="relative rounded-xl overflow-hidden aspect-[4/3]" style={{ aspectRatio: '4/3' }}>
               <Image
                 src="/images/pages/pathways-page-7.jpg"
                 alt="Professional tax preparation services powered by EPS Financial"

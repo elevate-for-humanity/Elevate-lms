@@ -159,7 +159,7 @@ export default function EducationLandingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {PROGRAMS.map((p) => (
               <div key={p.title} className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow border border-gray-100">
-                <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
+                <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/9' }}>
                   <Image src={p.image} alt={`${p.title} training`} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
                 </div>
                 <div className="p-5">
@@ -188,7 +188,7 @@ export default function EducationLandingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {LOCATIONS.map((loc) => (
               <div key={loc.state} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border border-gray-100">
-                <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
+                <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/9' }}>
                   <Image src={loc.image} alt={`Training in ${loc.state}`} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
                 </div>
                 <div className="p-4">

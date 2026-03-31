@@ -39,7 +39,7 @@ async function _POST(req: Request) {
       return Response.json({ error: 'No signature' }, { status: 400 });
     }
 
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_STORE || process.env.STRIPE_WEBHOOK_SECRET;
     if (!webhookSecret) {
       return Response.json(
         { error: 'Webhook secret not configured' },

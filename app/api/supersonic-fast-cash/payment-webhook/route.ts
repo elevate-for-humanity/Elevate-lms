@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { stripe } from '@/lib/stripe/client';
+import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 import Stripe from 'stripe';
 
 export const runtime = 'nodejs';
@@ -8,10 +10,10 @@ export const dynamic = 'force-dynamic';
 
 // This is the ONLY place payment_status is set to 'paid'.
 // Never trust the browser success redirect — only this webhook.
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   const body = await request.text();
   const sig = request.headers.get('stripe-signature');
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_TAX || process.env.STRIPE_WEBHOOK_SECRET;
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_SUPERSONIC || process.env.STRIPE_WEBHOOK_SECRET_TAX || process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!sig || !webhookSecret) {
     return NextResponse.json({ error: 'Missing signature or webhook secret' }, { status: 400 });
@@ -25,11 +27,15 @@ export async function POST(request: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (err) {
-    return NextResponse.json({ error: `Webhook signature verification failed: ${(err as Error).message}` }, { status: 400 });
+    logger.error('[payment-webhook] Signature verification failed:', err);
+    return NextResponse.json({ error: 'Webhook signature verification failed' }, { status: 400 });
   }
 
-  const admin = createAdminClient();
-  if (!admin) {
+  let admin;
+  try {
+    admin = createAdminClient();
+  } catch (err) {
+    logger.error('[payment-webhook] Admin client unavailable:', err);
     return NextResponse.json({ error: 'Admin client unavailable' }, { status: 503 });
   }
 
@@ -57,7 +63,7 @@ export async function POST(request: NextRequest) {
       .eq('stripe_checkout_session_id', session.id);
 
     if (error) {
-      console.error('[payment-webhook] Failed to update tax_payments:', error);
+      logger.error('[payment-webhook] Failed to update tax_payments:', error);
       // Return 500 so Stripe retries
       return NextResponse.json({ error: 'DB update failed' }, { status: 500 });
     }
@@ -88,3 +94,5 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ received: true });
 }
+
+export const POST = withApiAudit('/api/supersonic-fast-cash/payment-webhook', _POST, { actor_type: 'webhook', skip_body: true });

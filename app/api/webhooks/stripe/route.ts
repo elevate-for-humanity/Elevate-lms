@@ -1,4 +1,3 @@
-import { createAdminClient } from '@/lib/supabase/admin';
 /**
  * Canonical Stripe Webhook Handler
  * 
@@ -33,7 +32,8 @@ import Stripe from 'stripe';
 import { stripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/lib/supabase/admin';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 import { createEnrollmentCase, submitCaseForSignatures } from '@/lib/workflow/case-management';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
@@ -56,11 +56,15 @@ export const dynamic = 'force-dynamic';
 
 
 
-// Supabase admin client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const supabase =
-  supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
+// Supabase admin client — resolved per-request to avoid frozen null at cold start.
+// Returns null if env vars are missing rather than throwing.
+function getSupabase(): SupabaseClient | null {
+  try {
+    return createAdminClient();
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Flag certificates as funding-invalid when a refund occurs.
@@ -69,7 +73,7 @@ const supabase =
  * know the payment backing this credential was reversed.
  */
 async function flagCertificatesForRefund(
-  db: ReturnType<typeof createClient>,
+  db: SupabaseClient,
   userId: string,
   paymentIntentId: string,
   chargeId: string,
@@ -146,7 +150,7 @@ async function flagCertificatesForRefund(
 const SYSTEM_WEBHOOK_ACTOR = '00000000-0000-0000-0000-000000000001';
 
 async function flagCertRows(
-  db: ReturnType<typeof createClient>,
+  db: SupabaseClient,
   certs: Array<{ id: string; certificate_number?: string }>,
   chargeId: string,
   paymentIntentId: string,
@@ -172,6 +176,9 @@ async function flagCertRows(
 }
 
 async function _POST(request: NextRequest) {
+  // Resolve per-request — avoids frozen null from module-level cold-start init.
+  const supabase = getSupabase();
+
   // Read secret at request time — module-level init would freeze a missing value permanently.
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -179,26 +186,37 @@ async function _POST(request: NextRequest) {
   logger.info('[webhook] Env check:', {
     hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
     hasWebhookSecret: !!webhookSecret,
-    hasSupabaseUrl: !!supabaseUrl,
-    hasSupabaseKey: !!supabaseKey,
+    hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+    hasSupabaseKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
     stripeInitialized: !!stripe,
     supabaseInitialized: !!supabase,
   });
 
   if (!webhookSecret) {
-    logger.error('[webhook] STRIPE_WEBHOOK_SECRET is not set');
-    return NextResponse.json(
-      { error: 'Webhook not configured' },
-      { status: 500 }
-    );
+    // STRIPE_WEBHOOK_SECRET missing — alert loudly but return 200 so Stripe
+    // does not keep retrying. This is a misconfiguration, not a bad request.
+    logger.error('[webhook] STRIPE_WEBHOOK_SECRET is not set — event dropped. Set this env var in Netlify immediately.');
+    Sentry.captureException(new Error('STRIPE_WEBHOOK_SECRET not set — webhook events are being dropped'), {
+      tags: { subsystem: 'stripe_webhook', failure: 'missing_secret' },
+    });
+    return NextResponse.json({ received: true, warning: 'misconfigured' }, { status: 200 });
   }
 
-  if (!stripe || !supabase) {
-    logger.error('[webhook] Missing config:', { stripe: !!stripe, supabase: !!supabase });
-    return NextResponse.json(
-      { error: 'Stripe or Supabase not configured' },
-      { status: 503 }
-    );
+  if (!stripe) {
+    logger.error('[webhook] Stripe client not initialized — STRIPE_SECRET_KEY missing');
+    Sentry.captureException(new Error('Stripe client not initialized in webhook handler'), {
+      tags: { subsystem: 'stripe_webhook', failure: 'missing_stripe_client' },
+    });
+    // Return 200 — misconfiguration, not a bad request. Retrying won't help.
+    return NextResponse.json({ received: true, warning: 'stripe_not_configured' }, { status: 200 });
+  }
+
+  if (!supabase) {
+    logger.error('[webhook] Supabase admin client not initialized — SUPABASE_SERVICE_ROLE_KEY missing');
+    Sentry.captureException(new Error('Supabase admin client not initialized in webhook handler'), {
+      tags: { subsystem: 'stripe_webhook', failure: 'missing_supabase_client' },
+    });
+    return NextResponse.json({ received: true, warning: 'db_not_configured' }, { status: 200 });
   }
 
   const body = await request.text();
@@ -371,10 +389,6 @@ async function _POST(request: NextRequest) {
     case 'checkout.session.completed': {
       // Dispatched to lib/stripe/handlers/checkout-session-completed.ts
       // All checkout.session.completed business logic lives there.
-      if (!supabase) {
-        logger.error('[webhook] checkout.session.completed: supabase client not initialised — skipping');
-        break;
-      }
       try {
         await handleCheckoutSessionCompleted(event, { stripe, supabase });
       } catch (err) {

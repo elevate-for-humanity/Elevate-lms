@@ -15,7 +15,10 @@ export const maxDuration = 60;
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+// Read at request time — module-level init freezes missing values at cold start
+function getWebhookSecret() {
+  return process.env.STRIPE_WEBHOOK_SECRET_SUPERSONIC || process.env.STRIPE_WEBHOOK_SECRET || '';
+}
 
 async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
@@ -34,7 +37,7 @@ async function _POST(request: NextRequest) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    event = stripe.webhooks.constructEvent(body, signature, getWebhookSecret());
   } catch (err: any) {
     return NextResponse.json(
       { error: 'Webhook processing error' },

@@ -9,7 +9,7 @@ export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_DONATIONS || process.env.STRIPE_WEBHOOK_SECRET!;
 
 async function _POST(request: Request) {
   try {

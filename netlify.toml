@@ -5,7 +5,7 @@
 [build]
   # libxml2-utils provides xmllint, required for IRS MeF XSD validation.
   # Without it, schema-validator.ts returns XMLLINT_NOT_AVAILABLE and blocks all submissions.
-  command = "corepack enable && pnpm install --no-frozen-lockfile && npx tsx scripts/ci-token-gate.ts && pnpm run build"
+  command = "corepack enable && pnpm install --no-frozen-lockfile && npx tsx scripts/ci-token-gate.ts && pnpm run audit:garbage && pnpm run audit:admin && pnpm run audit:dashboard && pnpm run typecheck && pnpm run build"
   # publish is intentionally omitted — @netlify/plugin-nextjs manages the output directory.
   # Setting publish = ".next" causes Turbopack to error: distDirRoot navigates outside projectPath.
   functions = "netlify/functions"

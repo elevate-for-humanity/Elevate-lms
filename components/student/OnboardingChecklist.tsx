@@ -127,8 +127,6 @@ export function OnboardingChecklist({ onboarding }: OnboardingChecklistProps) {
             <OnboardingItem
               done={onboarding.shop_placed}
               label="Get Shop Placement"
-              action={undefined}
-              href={undefined}
             />
           </div>
         )}

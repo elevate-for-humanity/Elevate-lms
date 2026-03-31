@@ -73,6 +73,15 @@ jobs:
         run: bash scripts/smoke-test.sh
         continue-on-error: false
 
+      - name: Garbage audit
+        run: pnpm run audit:garbage
+
+      - name: Admin route audit
+        run: pnpm run audit:admin
+
+      - name: Dashboard audit
+        run: pnpm run audit:dashboard
+
       - name: Type check
         run: pnpm run typecheck
         continue-on-error: true  # 543 files have pre-existing TS errors; next build uses ignoreBuildErrors

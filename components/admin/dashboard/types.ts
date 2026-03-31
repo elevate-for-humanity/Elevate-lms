@@ -1,0 +1,88 @@
+// Shared types for the admin dashboard — data layer → shell → section components.
+// All route strings are resolved before reaching JSX (never built inline in render).
+
+export interface KPICard {
+  label: string;
+  value: number;
+  delta: number;        // % change vs prior period; 0 if unknown
+  deltaLabel: string;
+  href: string;
+  urgent?: boolean;
+}
+
+export interface EnrollmentTrendPoint {
+  month: string;        // e.g. "Jan"
+  enrollments: number;
+}
+
+export interface StatusPoint {
+  name: string;
+  value: number;
+}
+
+export interface TopProgramPoint {
+  id: string;
+  name: string;
+  learners: number;
+  completed: number;
+  completionRate: number;
+}
+
+export interface ActivityItem {
+  id: string;
+  title: string;
+  timestamp: string;
+}
+
+export interface RecentStudent {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  enrollment_status: string | null;
+  created_at: string | null;
+  program_name: string | null;
+  href: string;         // resolved: /admin/students/[id]
+}
+
+export interface RecentApplication {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  full_name: string | null;
+  program_interest: string | null;
+  status: string;
+  created_at: string;
+  href: string;         // resolved: /admin/applications/review/[id]
+}
+
+export interface BlockedProgram {
+  id: string;
+  title: string;
+  slug: string;
+  status: string;
+  updatedAt: string;
+  href: string;         // resolved: /admin/programs/[id]
+}
+
+export interface InactiveLearner {
+  enrollmentId: string;
+  userId: string;
+  enrolledAt: string;
+  fullName: string | null;
+  email: string | null;
+  href: string;         // resolved: /admin/students/[userId]
+}
+
+export interface AdminDashboardData {
+  kpis: KPICard[];
+  enrollmentTrend: EnrollmentTrendPoint[];
+  studentStatuses: StatusPoint[];
+  topPrograms: TopProgramPoint[];
+  recentActivity: ActivityItem[];
+  recentStudents: RecentStudent[];
+  recentApplications: RecentApplication[];
+  blockedPrograms: BlockedProgram[];
+  inactiveLearners: InactiveLearner[];
+  profile: { full_name: string | null } | null;
+  generatedAt: string;
+}

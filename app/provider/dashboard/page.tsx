@@ -28,8 +28,6 @@ export default async function ProviderDashboardPage() {
 
   const tenantId = profile.tenant_id;
 
-  const tenantId = profile.tenant_id;
-
   const [
     { data: onboardingSteps },
     { count: programCount },

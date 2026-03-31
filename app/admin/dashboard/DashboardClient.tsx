@@ -308,7 +308,7 @@ export default function DashboardClient({data}:{data:DashboardData}){
             ):data.recentApplications.slice(0,6).map(app=>{
               const name=[app.first_name,app.last_name].filter(Boolean).join(" ")||app.full_name||"Unknown";
               return(
-                <Link key={app.id} href={}
+                <Link key={app.id} href={`/admin/applications/review/${app.id}`}
                   className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group">
                   <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600 flex-shrink-0">
                     {name[0].toUpperCase()}

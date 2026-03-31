@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 
 // Partner portal is now consolidated into program-holder dashboard.
-export default function PartnerPortalRedirect() {
+function PartnerPortalRedirect() {
   redirect('/program-holder/dashboard');
 }
 

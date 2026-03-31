@@ -54,7 +54,7 @@ export default function SuccessStoryCards() {
                   alt={story.name}
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-zinc-900 mb-2">{story.name}</h3>

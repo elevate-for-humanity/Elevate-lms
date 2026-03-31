@@ -54,7 +54,7 @@ export default async function ProgramHolderLanding() {
 
       {/* Hero */}
       <section className="relative min-h-48 md:h-80 flex items-end overflow-hidden bg-slate-900">
-        <Image src="/images/pages/program-holder-page-2.jpg" alt="Program Holder Portal" fill className="object-cover opacity-50" priority />
+        <Image src="/images/pages/program-holder-page-2.jpg" alt="Program Holder Portal" fill className="object-cover opacity-50" priority  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
         <div className="relative z-10 w-full max-w-6xl mx-auto px-4 pb-10">
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">Program Holder Portal</h1>
           <p className="text-white/80 text-lg mb-6 max-w-2xl">

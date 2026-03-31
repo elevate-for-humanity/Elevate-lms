@@ -50,7 +50,7 @@ export default function TaxServicesPage() {
           fill
           className="object-cover"
           priority
-        />
+         sizes="100vw" />
         
       </section>
 
@@ -101,7 +101,7 @@ export default function TaxServicesPage() {
                   alt="VITA Free Tax Preparation"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
                 <div className="absolute bottom-4 left-4">
                   <span className="bg-brand-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                     FREE TAX PREP
@@ -161,7 +161,7 @@ export default function TaxServicesPage() {
                   alt="Supersonic Fast Cash Tax Services"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
                 <div className="absolute bottom-4 left-4">
                   <span className="bg-brand-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                     PROFESSIONAL

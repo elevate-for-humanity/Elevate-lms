@@ -102,7 +102,7 @@ export default function AnalyticsProPage() {
           fill
           className="object-cover"
           priority
-        />
+         sizes="100vw" />
         
       </section>
 
@@ -147,7 +147,7 @@ export default function AnalyticsProPage() {
                     alt={useCase.title}
                     fill
                     className="object-cover"
-                  />
+                   sizes="100vw" />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-slate-900 mb-2">{useCase.title}</h3>

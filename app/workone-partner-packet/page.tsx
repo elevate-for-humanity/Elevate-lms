@@ -142,7 +142,7 @@ export default function WorkOnePartnerPacketPage() {
                   alt="Workforce partnership"
                   fill
                   quality={85} className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
                 <h3 className="text-xl font-bold text-gray-900 mb-6">What Makes Us Different</h3>

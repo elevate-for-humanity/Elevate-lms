@@ -337,7 +337,7 @@ export default function SocialMediaPage() {
                     alt={video.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                   <div className="absolute inset-0" />
                   
                   {/* Play Button */}
@@ -427,7 +427,7 @@ export default function SocialMediaPage() {
                       alt="Post image"
                       fill
                       className="object-cover"
-                    />
+                     sizes="100vw" />
                   </div>
                 )}
 

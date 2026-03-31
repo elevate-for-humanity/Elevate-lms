@@ -33,7 +33,7 @@ export default function TuitionPage() {
           alt="Tuition and Payment Options"
           fill
           className="object-cover"
-        />
+         sizes="100vw" />
       </section>
 
       {/* Intro */}

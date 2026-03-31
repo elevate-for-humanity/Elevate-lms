@@ -107,7 +107,7 @@ export default function PartnersPage() {
           fill
           className="object-cover"
           priority
-        />
+         sizes="100vw" />
       </header>
 
       {/* Avatar Guide */}

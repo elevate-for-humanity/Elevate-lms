@@ -26,22 +26,22 @@ export default function ApplyPage() {
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="grid md:grid-cols-3 gap-6 mb-10">
           <div className="rounded-2xl overflow-hidden shadow-sm">
-            <Image src="/images/pages/pathways.jpg" alt="Medical Assistant training" width={400} height={300} className="w-full h-48 object-cover" />
+            <Image src="/images/pages/pathways.jpg" alt="Medical Assistant training" width={400} height={300} className="w-full h-48 object-cover"  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
             <div className="bg-white p-4 border-t"><p className="font-bold text-lg text-black">Duration</p><p className="text-black">12-16 Weeks</p></div>
           </div>
           <div className="rounded-2xl overflow-hidden shadow-sm">
-            <Image src="/images/pages/programs-medical-apply-d1.jpg" alt="Medical Assistant program" width={400} height={300} className="w-full h-48 object-cover" />
+            <Image src="/images/pages/programs-medical-apply-d1.jpg" alt="Medical Assistant program" width={400} height={300} className="w-full h-48 object-cover"  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
             <div className="bg-white p-4 border-t"><p className="font-bold text-lg text-black">Cost</p><p className="text-black">Free with WIOA funding</p></div>
           </div>
           <div className="rounded-2xl overflow-hidden shadow-sm">
-            <Image src="/images/pages/programs-medical-apply-d2.jpg" alt="Medical Assistant career" width={400} height={300} className="w-full h-48 object-cover" />
+            <Image src="/images/pages/programs-medical-apply-d2.jpg" alt="Medical Assistant career" width={400} height={300} className="w-full h-48 object-cover"  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
             <div className="bg-white p-4 border-t"><p className="font-bold text-lg text-black">Format</p><p className="text-black">Rolling enrollment</p></div>
           </div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 mb-10">
           <Link href="/inquiry?program=medical-assistant" className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border">
-            <Image src="/images/pages/about-career-pathways.jpg" alt="Request information about Medical Assistant" width={600} height={300} className="w-full h-52 object-cover" />
+            <Image src="/images/pages/about-career-pathways.jpg" alt="Request information about Medical Assistant" width={600} height={300} className="w-full h-52 object-cover"  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
             <div className="p-6 text-center">
               <h3 className="text-2xl font-bold text-black mb-2">Request Information</h3>
               <p className="text-black mb-4">Get program details, schedules, and eligibility info sent to you.</p>
@@ -49,7 +49,7 @@ export default function ApplyPage() {
             </div>
           </Link>
           <Link href="/apply/student?program=medical-assistant" className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border">
-            <Image src="/images/pages/comp-home-pathways-support.jpg" alt="Apply for Medical Assistant" width={600} height={300} className="w-full h-52 object-cover" />
+            <Image src="/images/pages/comp-home-pathways-support.jpg" alt="Apply for Medical Assistant" width={600} height={300} className="w-full h-52 object-cover"  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
             <div className="p-6 text-center">
               <h3 className="text-2xl font-bold text-black mb-2">Start Application</h3>
               <p className="text-black mb-4">Ready to enroll? Complete your application online now.</p>

@@ -140,7 +140,7 @@ export default function InstantTestsPage() {
                     alt={test.name}
                     fill
                     className="object-cover"
-                  />
+                   sizes="100vw" />
                   {test.popular && (
                     <div className="absolute top-4 left-4 bg-brand-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold">
                       BEST VALUE

@@ -136,7 +136,7 @@ export default async function InterviewsPage() {
                           alt={interview.candidate.name}
                           fill
                           className="object-cover"
-                        />
+                         sizes="100vw" />
                       </div>
                       <div>
                         <h4 className="font-semibold text-gray-900">{interview.candidate.name}</h4>
@@ -200,7 +200,7 @@ export default async function InterviewsPage() {
                         alt={interview.candidate.name}
                         fill
                         className="object-cover"
-                      />
+                       sizes="100vw" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-gray-900 truncate">{interview.candidate.name}</p>

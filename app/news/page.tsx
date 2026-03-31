@@ -32,7 +32,7 @@ export default async function NewsPage() {
           src="/images/pages/success-stories-hero.jpg"
           alt="Elevate for Humanity news and updates"
           fill className="object-cover" priority
-        />
+         sizes="100vw" />
         
         <div className="absolute inset-x-0 bottom-0 max-w-6xl mx-auto px-4 pb-8">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-300 mb-1">Elevate for Humanity</p>
@@ -67,7 +67,7 @@ export default async function NewsPage() {
                 <Link href={`/news/${featured.slug}`} className="group block mb-10 rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                   <div className="relative aspect-[16/7] overflow-hidden bg-white">
                     {featured.featured_image ? (
-                      <Image src={featured.featured_image} alt={featured.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <Image src={featured.featured_image} alt={featured.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500"  sizes="100vw" />
                     ) : (
                       <div className="absolute inset-0 bg-gradient-to-br from-brand-blue-600 to-brand-blue-800 flex items-center justify-center">
                         <Newspaper className="w-16 h-16 text-white/30" />
@@ -96,7 +96,7 @@ export default async function NewsPage() {
                     <Link key={post.id} href={`/news/${post.slug}`} className="group block rounded-2xl border border-slate-200 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all">
                       <div className="relative aspect-[16/9] bg-white overflow-hidden">
                         {post.featured_image ? (
-                          <Image src={post.featured_image} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                          <Image src={post.featured_image} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500"  sizes="100vw" />
                         ) : (
                           <div className="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center">
                             <Newspaper className="w-8 h-8 text-slate-400" />

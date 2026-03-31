@@ -114,7 +114,7 @@ export default function CurvatureCareersPage() {
           fill
           className="object-cover"
           priority
-        />
+         sizes="100vw" />
       </section>
 
       {/* Headline — below the image */}

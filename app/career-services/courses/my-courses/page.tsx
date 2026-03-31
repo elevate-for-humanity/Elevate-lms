@@ -100,7 +100,7 @@ export default async function MyCoursesPage() {
                       alt={purchase.course?.title}
                       fill
                       className="object-cover"
-                    />
+                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                     <div className="absolute inset-0 bg-white/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                       <div className="bg-white rounded-full p-4">
                         <Play className="w-8 h-8 text-brand-blue-600" fill="currentColor" />
@@ -143,7 +143,7 @@ export default async function MyCoursesPage() {
                       alt={course.title}
                       fill
                       className="object-cover"
-                    />
+                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                     <div className="absolute top-3 right-3 bg-white px-3 py-1 rounded-full text-sm font-bold">
                       ${course.price}
                     </div>

@@ -52,7 +52,7 @@ export default function TransparencyPage() {
           fill
           className="object-cover"
           priority
-        />
+         sizes="100vw" />
       </section>
 
       <div className="max-w-7xl mx-auto px-4 py-16">

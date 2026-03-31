@@ -157,7 +157,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
             fill
             className="object-cover"
             priority
-          />
+           sizes="100vw" />
         ) : null}
 
 

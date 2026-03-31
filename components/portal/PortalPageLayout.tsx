@@ -104,7 +104,7 @@ export function PortalPageLayout({
                       alt={action.title}
                       fill
                       className="object-cover group-hover:scale-105 transition duration-300"
-                    />
+                     sizes="100vw" />
                   </div>
                   <div className="p-4">
                     <h3 className="text-lg font-bold text-slate-900 mb-1">{action.title}</h3>

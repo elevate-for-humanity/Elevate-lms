@@ -150,7 +150,7 @@ export default function ServicesPage() {
           fill
           className="object-cover"
           priority
-        />
+         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
       </section>
 
       {/* Headline — below the image */}

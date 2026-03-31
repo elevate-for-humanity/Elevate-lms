@@ -57,7 +57,7 @@ export function ProgramPageVisual({ program }: Props) {
             className="object-cover"
             priority
             quality={90}
-          />
+           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
         )}
         
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pb-12">
@@ -130,7 +130,7 @@ export function ProgramPageVisual({ program }: Props) {
                   fill
                   className="object-cover"
                   quality={85}
-                />
+                 sizes="100vw" />
               </div>
               
               {/* Content */}

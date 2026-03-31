@@ -281,7 +281,7 @@ function CheckoutForm({
 
               <div className="flex gap-4 mb-6 pb-6 border-b">
                 <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                  <Image src={productImage} alt={productName} fill className="object-cover" />
+                  <Image src={productImage} alt={productName} fill className="object-cover"  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">{productName}</h3>

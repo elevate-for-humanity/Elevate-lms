@@ -207,7 +207,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
                       alt={related.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
+                     sizes="100vw" />
                   </div>
                   <div className="p-6">
                     <h3 className="font-bold text-black group-hover:text-brand-blue-600 transition line-clamp-2">

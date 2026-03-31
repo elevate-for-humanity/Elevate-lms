@@ -64,7 +64,7 @@ export default function Programs() {
                   alt={program.title}
                   fill
                   className="object-cover"
-                />
+                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-black mb-3">

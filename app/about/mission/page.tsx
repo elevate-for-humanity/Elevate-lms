@@ -124,7 +124,7 @@ export default function MissionPage() {
                 alt="Students in hands-on training"
                 fill
                 className="object-cover"
-              />
+               sizes="100vw" />
             </div>
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">

@@ -199,7 +199,7 @@ export default async function CoursePage({ params }: { params: Params }) {
 
         {/* ENROLLED HERO — compact, action-first */}
         <div className="relative h-[180px] sm:h-[220px] w-full overflow-hidden bg-slate-900">
-          <Image src={heroImage} alt={course.title} fill className="object-cover object-center opacity-30" priority />
+          <Image src={heroImage} alt={course.title} fill className="object-cover object-center opacity-30" priority  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/60 to-slate-900/30" />
           <div className="absolute inset-0 flex flex-col justify-end p-5 sm:p-8 max-w-5xl mx-auto w-full">
             <nav className="flex items-center gap-1.5 text-xs text-white/40 mb-2">
@@ -425,7 +425,7 @@ export default async function CoursePage({ params }: { params: Params }) {
 
       {/* HERO */}
       <div className="relative h-[340px] sm:h-[440px] w-full overflow-hidden bg-slate-900">
-        <Image src={heroImage} alt={course.title} fill className="object-cover object-center opacity-50" priority />
+        <Image src={heroImage} alt={course.title} fill className="object-cover object-center opacity-50" priority  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
         {/* gradient: dark at bottom for text legibility, slight tint at top */}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-slate-900/20" />
         <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-12 max-w-5xl mx-auto w-full">

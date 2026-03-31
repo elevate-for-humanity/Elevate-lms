@@ -27,7 +27,7 @@ export function PathwayBlock({ variant = 'light', className = '' }: PathwayBlock
                 alt="Eligibility screening"
                 fill
                 className="object-cover"
-              />
+               sizes="100vw" />
             </div>
             <div className={`text-sm font-bold mb-2 ${isDark ? 'text-brand-blue-400' : 'text-brand-blue-600'}`}>Step 1</div>
             <h3 className={`text-lg font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -46,7 +46,7 @@ export function PathwayBlock({ variant = 'light', className = '' }: PathwayBlock
                 alt="Training classroom"
                 fill
                 className="object-cover"
-              />
+               sizes="100vw" />
             </div>
             <div className={`text-sm font-bold mb-2 ${isDark ? 'text-brand-green-400' : 'text-brand-green-600'}`}>Step 2</div>
             <h3 className={`text-lg font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -65,7 +65,7 @@ export function PathwayBlock({ variant = 'light', className = '' }: PathwayBlock
                 alt="Job placement"
                 fill
                 className="object-cover"
-              />
+               sizes="100vw" />
             </div>
             <div className={`text-sm font-bold mb-2 ${isDark ? 'text-brand-orange-400' : 'text-brand-orange-600'}`}>Step 3</div>
             <h3 className={`text-lg font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>

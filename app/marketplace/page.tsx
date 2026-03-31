@@ -77,7 +77,7 @@ export default async function MarketplacePage() {
           fill
           className="object-cover"
           priority
-        />
+         sizes="100vw" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -110,7 +110,7 @@ export default async function MarketplacePage() {
                   alt={course.title}
                   fill
                   className="object-cover"
-                />
+                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
               </div>
               <div className="p-6">
                 <span className="text-xs text-indigo-600 font-medium">{course.category}</span>

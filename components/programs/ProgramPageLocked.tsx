@@ -72,7 +72,7 @@ export function ProgramPageLocked({
           fill
           className="object-cover"
           priority
-        />
+         sizes="100vw" />
         
 
         <div className="relative">

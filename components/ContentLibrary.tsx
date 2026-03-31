@@ -251,7 +251,7 @@ export default function ContentLibrary({
                       alt={item.title}
                       fill
                       className="object-cover"
-                    />
+                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                     {item.type === 'video' && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                         <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center">

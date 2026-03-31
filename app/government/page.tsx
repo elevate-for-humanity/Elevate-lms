@@ -89,7 +89,7 @@ export default async function GovernmentPage() {
                   alt="Workforce Development Boards"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-8">
                 <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-white">
@@ -125,7 +125,7 @@ export default async function GovernmentPage() {
                   alt="State Agencies"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-8">
                 <div className="w-14 h-14 bg-brand-green-100 rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-white">
@@ -161,7 +161,7 @@ export default async function GovernmentPage() {
                   alt="Federal Programs"
                   fill
                   className="object-cover"
-                />
+                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
               </div>
               <div className="p-8">
                 <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-white">
@@ -221,7 +221,7 @@ export default async function GovernmentPage() {
                       alt="ETPL Training"
                       fill
                       className="object-cover"
-                    />
+                     sizes="100vw" />
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-2">ETPL-Approved Training Programs</h3>
@@ -240,7 +240,7 @@ export default async function GovernmentPage() {
                       alt="Apprenticeships"
                       fill
                       className="object-cover"
-                    />
+                     sizes="100vw" />
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-2">Registered Apprenticeships</h3>
@@ -259,7 +259,7 @@ export default async function GovernmentPage() {
                       alt="Career Services"
                       fill
                       className="object-cover"
-                    />
+                     sizes="100vw" />
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-2">Career Services & Job Placement</h3>
@@ -278,7 +278,7 @@ export default async function GovernmentPage() {
                       alt="Compliance"
                       fill
                       className="object-cover"
-                    />
+                     sizes="100vw" />
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-2">Compliance & Reporting</h3>
@@ -299,7 +299,7 @@ export default async function GovernmentPage() {
                   alt="DOL Program"
                   fill
                   className="object-cover"
-                />
+                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
               </div>
               <div className="bg-white rounded-2xl p-8">
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">Program Outcomes</h3>
@@ -372,7 +372,7 @@ export default async function GovernmentPage() {
                   alt="Proven Results"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-6 text-center">
                 <div className="w-14 h-14 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
@@ -393,7 +393,7 @@ export default async function GovernmentPage() {
                   alt="Priority Populations"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-6 text-center">
                 <div className="w-14 h-14 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
@@ -414,7 +414,7 @@ export default async function GovernmentPage() {
                   alt="Employer Partnerships"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-6 text-center">
                 <div className="w-14 h-14 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
@@ -435,7 +435,7 @@ export default async function GovernmentPage() {
                   alt="Transparent Reporting"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-6 text-center">
                 <div className="w-14 h-14 bg-brand-orange-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">

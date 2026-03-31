@@ -161,7 +161,7 @@ export default function TrialPage() {
             {/* Left: visual */}
             <div className="hidden lg:block">
               <div className="relative aspect-video rounded-2xl overflow-hidden shadow-xl border border-slate-200 mb-4">
-                <Image src="/images/pages/store-trial-detail.jpg" alt="Your admin dashboard after trial setup" fill className="object-cover" />
+                <Image src="/images/pages/store-trial-detail.jpg" alt="Your admin dashboard after trial setup" fill className="object-cover"  sizes="100vw" />
               </div>
               <p className="text-sm text-slate-500 text-center mb-6">Your admin dashboard — ready in under 60 seconds</p>
               <div className="bg-white rounded-xl p-5 border border-slate-200">

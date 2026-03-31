@@ -20,7 +20,7 @@ export default function UniversalPartnerLanding({ config }: { config: ProgramCon
       {/* Hero */}
       <section className="relative bg-brand-blue-700 text-white py-20 overflow-hidden">
         <div className="absolute inset-0">
-          <Image src={config.heroImage} alt={`${config.shortName} training`} fill className="object-cover" priority />
+          <Image src={config.heroImage} alt={`${config.shortName} training`} fill className="object-cover" priority  sizes="100vw" />
         </div>
         <div className="relative max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">{config.shortName} Partner Program</h1>

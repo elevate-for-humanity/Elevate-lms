@@ -273,7 +273,7 @@ export default function BookkeepingPage() {
           className="object-cover"
           quality={85}
           priority
-        />
+         sizes="100vw" />
       </section>
 
       {/* Services */}

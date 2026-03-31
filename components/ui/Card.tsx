@@ -95,7 +95,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
             alt={title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-200"
-          />
+           sizes="100vw" />
         </div>
         <div className="p-6">
           <div className="flex items-center gap-2 mb-3">
@@ -160,7 +160,7 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
             alt={name}
             fill
             className="object-cover"
-          />
+           sizes="100vw" />
         </div>
         <div>
           <h4 className="font-bold text-black">{name}</h4>
@@ -213,7 +213,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({
             alt={title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-200"
-          />
+           sizes="100vw" />
         </div>
         <div className="p-6">
           <div className="flex items-center gap-2 mb-3">

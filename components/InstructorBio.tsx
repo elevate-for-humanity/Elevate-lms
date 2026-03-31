@@ -39,7 +39,7 @@ export function InstructorBio({
               alt={`${name} - ${title}`}
               fill
               className="object-cover"
-            />
+             sizes="(max-width: 768px) 48px, 64px" />
           </div>
         </div>
 

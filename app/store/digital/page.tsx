@@ -138,7 +138,7 @@ export default function StoreDigitalPage() {
                     alt={product.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                   <div className="absolute bottom-4 left-4 right-4">
                     <span className="inline-block px-3 py-1 bg-indigo-600 text-slate-900 text-xs font-bold rounded-full">
                       {product.priceDisplay}
@@ -224,7 +224,7 @@ export default function StoreDigitalPage() {
                     alt={product.name}
                     fill
                     quality={85} className="object-cover"
-                  />
+                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                   <div className="absolute bottom-4 left-4">
                     <span className="px-3 py-1 bg-brand-blue-600 text-white text-xs font-bold rounded-full">
                       {product.priceDisplay}

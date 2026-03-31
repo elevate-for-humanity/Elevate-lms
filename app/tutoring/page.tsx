@@ -130,7 +130,7 @@ export default function TutoringPage() {
                 className="bg-white rounded-2xl overflow-hidden shadow-sm"
               >
                 <div className="relative h-40 overflow-hidden">
-                  <Image src={item.image} alt={item.title} fill className="object-cover" />
+                  <Image src={item.image} alt={item.title} fill className="object-cover"  sizes="100vw" />
                   <div className="absolute top-3 left-3 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">{item.step}</div>
                 </div>
                 <div className="p-5">
@@ -160,7 +160,7 @@ export default function TutoringPage() {
                 className="bg-white rounded-2xl overflow-hidden"
               >
                 <div className="relative h-48 overflow-hidden">
-                  <Image src={subject.image} alt={subject.title} fill className="object-cover" />
+                  <Image src={subject.image} alt={subject.title} fill className="object-cover"  sizes="100vw" />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-2">{subject.title}</h3>

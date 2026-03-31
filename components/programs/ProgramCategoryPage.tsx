@@ -181,7 +181,7 @@ export default function ProgramCategoryPage({
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                     quality={85}
-                  />
+                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                   <div className="absolute bottom-4 left-4 right-4">
                     <div className="flex items-center gap-2 text-white/90 text-sm">
                       <Clock className="w-4 h-4" />

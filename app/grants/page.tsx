@@ -28,7 +28,7 @@ export default function GrantsPage() {
           fill
           className="object-cover"
           priority
-        />
+         sizes="100vw" />
       </section>
 
       {/* What This Means For You */}

@@ -63,7 +63,7 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
           fill
           className="object-cover"
           priority
-        />
+         sizes="100vw" />
       </header>
 
       <section className="">

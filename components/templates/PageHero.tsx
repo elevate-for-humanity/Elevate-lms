@@ -62,7 +62,7 @@ export default function PageHero({ title, description, forceHero }: PageHeroProp
           quality={100}
           priority={priority}
           unoptimized
-        />
+         sizes="100vw" />
       )}
 
       {title && (

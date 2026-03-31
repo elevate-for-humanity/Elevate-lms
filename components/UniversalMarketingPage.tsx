@@ -61,7 +61,7 @@ export default function UniversalMarketingPage({
           className="object-cover"
           priority
           quality={100}
-        />
+         sizes="100vw" />
         
 
         <div className="relative h-full flex items-center">
@@ -145,7 +145,7 @@ export default function UniversalMarketingPage({
                         fill
                         className="object-cover"
                         quality={100}
-                      />
+                       sizes="100vw" />
                     </div>
                   )}
                 </>
@@ -159,7 +159,7 @@ export default function UniversalMarketingPage({
                         fill
                         className="object-cover"
                         quality={100}
-                      />
+                       sizes="100vw" />
                     </div>
                   )}
                   <div>
@@ -190,7 +190,7 @@ export default function UniversalMarketingPage({
                   fill
                   className="object-cover"
                   quality={100}
-                />
+                 sizes="100vw" />
               </div>
               <div className="text-white">
                 <h2 className="text-4xl md:text-5xl font-bold mb-6">

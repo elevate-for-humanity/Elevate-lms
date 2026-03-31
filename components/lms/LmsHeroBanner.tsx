@@ -31,7 +31,7 @@ export function LmsHeroBanner({
           fill
           className="object-cover"
           priority
-        />
+         sizes="100vw" />
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-3xl px-8 md:px-12">
             {eyebrow && (

@@ -153,7 +153,7 @@ export function ShoppingCart() {
                           alt={item.title}
                           fill
                           className="object-cover rounded"
-                        />
+                         sizes="100vw" />
                       </div>
 
                       <div className="flex-1">

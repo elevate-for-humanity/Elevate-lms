@@ -135,7 +135,7 @@ export default function WorkforceBoardPage() {
                     alt={feature.title}
                     fill
                     className="object-cover group-hover:scale-105 transition duration-300"
-                  />
+                   sizes="100vw" />
                   <h3 className="absolute bottom-4 left-4 text-xl font-bold text-white">
                     {feature.title}
                   </h3>
@@ -174,7 +174,7 @@ export default function WorkforceBoardPage() {
                     alt={link.title}
                     fill
                     className="object-cover group-hover:scale-105 transition duration-300"
-                  />
+                   sizes="100vw" />
                   <div className="absolute bottom-4 left-4 right-4 text-white">
                     <h3 className="text-lg font-bold mb-1">{link.title}</h3>
                     <p className="text-white/80 text-sm">{link.description}</p>

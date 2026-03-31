@@ -46,7 +46,7 @@ export default async function AdminPWAPage() {
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
       <div className="relative h-48 sm:h-56">
-        <Image src="/images/pages/demo-page-1.jpg" alt="Elevate admin portal" fill className="object-cover" priority />
+        <Image src="/images/pages/demo-page-1.jpg" alt="Elevate admin portal" fill className="object-cover" priority  sizes="100vw" />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <Image src="/logo.png" alt="Elevate" width={40} height={40} className="mb-3" />
           <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>

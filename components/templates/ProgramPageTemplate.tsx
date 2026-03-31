@@ -113,7 +113,7 @@ export function ProgramPageTemplate({
             fill
             className="object-cover"
             priority
-          />
+           sizes="100vw" />
         )}
       </section>
 

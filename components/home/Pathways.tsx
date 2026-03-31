@@ -17,7 +17,7 @@ export default function Pathways() {
                 alt="Students learning"
                 fill
                 className="object-cover group-hover:scale-105 transition"
-              />
+               sizes="100vw" />
               <div className="absolute inset-0 " />
               <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
                 <h3 className="text-xl font-bold mb-1">Explore Programs</h3>
@@ -33,7 +33,7 @@ export default function Pathways() {
                 alt="Career pathways"
                 fill
                 className="object-cover group-hover:scale-105 transition"
-              />
+               sizes="100vw" />
               <div className="absolute inset-0 " />
               <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
                 <h3 className="text-xl font-bold mb-1">Get Funded</h3>

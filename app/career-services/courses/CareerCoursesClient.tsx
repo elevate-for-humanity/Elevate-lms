@@ -170,7 +170,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                     alt={bundle.title}
                     fill
                     className="object-cover"
-                  />
+                   sizes="100vw" />
                 </div>
               </div>
             </div>
@@ -195,7 +195,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                       alt={course.title}
                       fill
                       className="object-cover"
-                    />
+                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                     {course.is_bestseller && (
                       <span className="absolute top-4 left-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full">
                         BESTSELLER

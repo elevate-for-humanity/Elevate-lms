@@ -44,7 +44,7 @@ export default function CertificationsPage() {
                     alt={cert.name}
                     fill
                     className="object-cover"
-                  />
+                   sizes="100vw" />
                   <span className={`absolute top-3 right-3 text-xs font-bold px-2 py-1 rounded ${cert.demand === 'Required' ? 'bg-brand-red-500 text-white' : 'bg-brand-green-500 text-white'}`}>
                     {cert.demand} Demand
                   </span>

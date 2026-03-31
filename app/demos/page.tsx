@@ -152,7 +152,7 @@ export default function DemosPage() {
                     alt={demo.title}
                     fill
                     className="object-cover"
-                  />
+                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                   <div className="absolute inset-0 bg-white/40 flex items-center justify-center">
                     <Link 
                       href={demo.demoUrl}

@@ -17,7 +17,7 @@ export function ProgramCard({ title, description, image, href }: ProgramCardProp
           alt={title}
           fill
           className="object-cover"
-        />
+         sizes="100vw" />
       </div>
       <div className="p-6">
         <h3 className="text-xl font-semibold mb-2 text-black">{title}</h3>

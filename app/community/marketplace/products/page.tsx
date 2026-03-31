@@ -82,7 +82,7 @@ export default async function MarketplaceProductsPage() {
                         alt={product.title}
                         fill
                         className="object-cover"
-                      />
+                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                     </div>
                   )}
                   <div className="p-6">

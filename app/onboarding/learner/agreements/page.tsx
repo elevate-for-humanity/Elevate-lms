@@ -207,7 +207,7 @@ export default function AgreementsPage() {
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
               <div className="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
-                <Image src="/images/pages/career-services-page-2.jpg" alt="Enrollment Agreement" fill className="object-cover" />
+                <Image src="/images/pages/career-services-page-2.jpg" alt="Enrollment Agreement" fill className="object-cover"  sizes="100vw" />
               </div>
               <div>
                 <h3 className="font-bold text-slate-900">{AGREEMENT.title}</h3>

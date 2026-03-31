@@ -594,7 +594,7 @@ export default function CurvatureShopPage() {
                           alt={product.name}
                           fill
                           className="object-cover group-hover:scale-105 transition"
-                        />
+                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                       ) : (
                         <Sparkles className="w-16 h-16 text-purple-300 group-hover:scale-110 transition" />
                       )}

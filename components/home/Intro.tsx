@@ -17,7 +17,7 @@ export default function Intro() {
                 fill
                 className="object-cover"
                 priority
-              />
+               sizes="100vw" />
             </div>
             <div className="p-6">
               <h3 className="text-xl font-bold text-brand-blue-900 mb-3">Funded Workforce Training</h3>
@@ -38,7 +38,7 @@ export default function Intro() {
                 fill
                 className="object-cover"
                 priority
-              />
+               sizes="100vw" />
             </div>
             <div className="p-6">
               <h3 className="text-xl font-bold text-brand-green-900 mb-3">Industry Credentials</h3>

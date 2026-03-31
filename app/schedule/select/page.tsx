@@ -132,7 +132,7 @@ export default async function SelectSchedulePage() {
                     alt={opt.imageAlt}
                     fill
                     className="object-cover"
-                  />
+                   sizes="100vw" />
                 </div>
                 {/* Content */}
                 <div className="flex items-start gap-3 p-5 flex-1">

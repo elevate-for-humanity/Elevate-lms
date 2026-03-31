@@ -83,7 +83,7 @@ export default function CurvatureBodySculptingPage() {
           fill
           className="object-cover"
           priority
-        />
+         sizes="100vw" />
       </section>
 
       {/* Headline + CTAs — below the image */}

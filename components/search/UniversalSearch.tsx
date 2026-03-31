@@ -260,7 +260,7 @@ export default function UniversalSearch({
                         alt={item.title}
                         fill
                         className="object-cover"
-                      />
+                       sizes="100vw" />
                     </div>
                   )}
                   

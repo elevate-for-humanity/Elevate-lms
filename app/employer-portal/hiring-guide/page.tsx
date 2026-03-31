@@ -74,7 +74,7 @@ export default function HiringGuidePage() {
           alt="Hiring guide"
           fill
           className="object-cover"
-        />
+         sizes="100vw" />
         
       </div>
 
@@ -106,7 +106,7 @@ export default function HiringGuidePage() {
                     alt={step.title}
                     fill
                     className="object-cover"
-                  />
+                   sizes="100vw" />
                   <div className="absolute top-4 left-4 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold">
                     {step.number}
                   </div>

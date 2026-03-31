@@ -75,7 +75,7 @@ export default function FundingImpactPage() {
                   alt="Participants in training"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-6 text-center">
                 <div className="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
@@ -94,7 +94,7 @@ export default function FundingImpactPage() {
                   alt="Credential attainment"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-6 text-center">
                 <div className="w-14 h-14 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
@@ -113,7 +113,7 @@ export default function FundingImpactPage() {
                   alt="Employment success"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-6 text-center">
                 <div className="w-14 h-14 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
@@ -132,7 +132,7 @@ export default function FundingImpactPage() {
                   alt="Wage increase"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-6 text-center">
                 <div className="w-14 h-14 bg-brand-orange-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
@@ -223,7 +223,7 @@ export default function FundingImpactPage() {
                   alt="WIOA funding process"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="bg-indigo-50 rounded-2xl p-8">
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">Funding Sources We Accept</h3>
@@ -273,7 +273,7 @@ export default function FundingImpactPage() {
                   alt="Graduate J. success story"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-4">
@@ -304,7 +304,7 @@ export default function FundingImpactPage() {
                   alt="Sarah T. success story"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-4">
@@ -334,7 +334,7 @@ export default function FundingImpactPage() {
                   alt="David W. success story"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-4">
@@ -391,7 +391,7 @@ export default function FundingImpactPage() {
                   alt="Family stability"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-8">
                 <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-indigo-50">
@@ -426,7 +426,7 @@ export default function FundingImpactPage() {
                   alt="Employer benefits"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-8">
                 <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-brand-blue-50">
@@ -461,7 +461,7 @@ export default function FundingImpactPage() {
                   alt="Economic growth"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-8">
                 <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-brand-green-50">

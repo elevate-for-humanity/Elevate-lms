@@ -272,7 +272,7 @@ export default async function TalentPipelinePage() {
                 alt="Training in progress"
                 fill
                 className="object-cover"
-              />
+               sizes="100vw" />
             </div>
           </div>
         </div>

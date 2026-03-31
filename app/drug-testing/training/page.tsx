@@ -64,7 +64,7 @@ export default async function DrugTestingTrainingPage() {
           fill 
           className="object-cover" 
           priority 
-        />
+         sizes="100vw" />
         
       </section>
 

@@ -114,7 +114,7 @@ export default function PurchaseLicensePage() {
                           alt={license.name}
                           fill
                           className="object-cover"
-                        />
+                         sizes="100vw" />
                       </div>
                       <div className="flex-1">
                         <h3 className="text-lg font-semibold mb-1">

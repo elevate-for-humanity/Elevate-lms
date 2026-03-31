@@ -125,7 +125,7 @@ export default async function VideosPage() {
                             alt={video.title}
                             fill
                             className="object-cover"
-                          />
+                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                           <div className="absolute inset-0 flex items-center justify-center bg-slate-800/20">
                             <Play className="h-12 w-12 text-white" />
                           </div>

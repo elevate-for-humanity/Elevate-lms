@@ -35,7 +35,7 @@ export default async function EmployerProgramsPage() {
           alt="Employer programs"
           fill
           className="object-cover"
-        />
+         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
         
       </div>
 
@@ -65,7 +65,7 @@ export default async function EmployerProgramsPage() {
                     alt={program.name}
                     fill
                     className="object-cover"
-                  />
+                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                 </div>
                 <div className="md:w-2/3 p-8">
                   <div className="flex items-center gap-3 mb-4">

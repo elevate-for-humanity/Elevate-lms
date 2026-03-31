@@ -110,7 +110,7 @@ export default function WritingCenterPage() {
               className="bg-white rounded-2xl overflow-hidden shadow-sm"
             >
               <div className="relative h-56 overflow-hidden">
-                <Image src="/images/pages/writing-center.jpg" alt="Student submitting a draft for written review" fill className="object-cover" />
+                <Image src="/images/pages/writing-center.jpg" alt="Student submitting a draft for written review" fill className="object-cover"  sizes="100vw" />
               </div>
               <div className="p-8">
                 <h3 className="text-xl font-bold mb-3">Submit for Written Review</h3>
@@ -128,7 +128,7 @@ export default function WritingCenterPage() {
               className="bg-white rounded-2xl overflow-hidden shadow-sm"
             >
               <div className="relative h-56 overflow-hidden">
-                <Image src="/images/pages/career-services-page-10.jpg" alt="Live tutoring session via Zoom" fill className="object-cover" />
+                <Image src="/images/pages/career-services-page-10.jpg" alt="Live tutoring session via Zoom" fill className="object-cover"  sizes="100vw" />
               </div>
               <div className="p-8">
                 <h3 className="text-xl font-bold mb-3">Book a Live Session</h3>
@@ -160,7 +160,7 @@ export default function WritingCenterPage() {
                 className="bg-white rounded-2xl overflow-hidden"
               >
                 <div className="relative h-48 overflow-hidden">
-                  <Image src={service.image} alt={service.title} fill className="object-cover" />
+                  <Image src={service.image} alt={service.title} fill className="object-cover"  sizes="100vw" />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-2">{service.title}</h3>

@@ -115,7 +115,7 @@ export default async function EnrollPage({ searchParams }: Props) {
                           alt={course.course_name}
                           fill
                           className="object-cover"
-                        />
+                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                       </div>
                     ) : (
                       <div className="h-40 bg-brand-blue-600 flex items-center justify-center">

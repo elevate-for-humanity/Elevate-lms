@@ -17,7 +17,7 @@ export default function Highlights() {
                 alt="Students in training"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
-              />
+               sizes="100vw" />
               <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                 <h3 className="text-2xl font-bold mb-2">1. Check Eligibility</h3>
                 <p className="text-sm mb-4">
@@ -40,7 +40,7 @@ export default function Highlights() {
                 alt="Training programs"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
-              />
+               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
               <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                 <h3 className="text-2xl font-bold mb-2">2. Choose Training</h3>
                 <p className="text-sm mb-4">
@@ -63,7 +63,7 @@ export default function Highlights() {
                 alt="Career success"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
-              />
+               sizes="100vw" />
               <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                 <h3 className="text-2xl font-bold mb-2">3. Get Certified</h3>
                 <p className="text-sm mb-4">

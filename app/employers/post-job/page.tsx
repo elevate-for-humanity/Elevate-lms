@@ -59,7 +59,7 @@ export default function PostJobPage() {
                 alt="Success"
                 fill
                 className="object-cover rounded-full"
-              />
+               sizes="100vw" />
             </div>
             <h1 className="text-3xl font-bold mb-4">Job Posted Successfully!</h1>
             <p className="text-black mb-6">

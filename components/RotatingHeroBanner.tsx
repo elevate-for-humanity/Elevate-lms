@@ -43,7 +43,7 @@ export default function RotatingHeroBanner() {
           key={index}
           className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? "opacity-100" : "opacity-0"}`}
         >
-          <Image src={s.image} alt="" fill className="object-cover object-center" priority={index === 0} quality={90} />
+          <Image src={s.image} alt="" fill className="object-cover object-center" priority={index === 0} quality={90}  sizes="100vw" />
         </div>
       ))}
 

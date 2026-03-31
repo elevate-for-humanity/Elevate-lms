@@ -29,7 +29,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                       alt="Funded training"
                       fill
                       className="object-cover"
-                    />
+                     sizes="100vw" />
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">No-Cost Training Available</h3>
@@ -44,7 +44,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                       alt="Job placement"
                       fill
                       className="object-cover"
-                    />
+                     sizes="100vw" />
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">Job Placement Support</h3>
@@ -59,7 +59,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                       alt="Hands-on training"
                       fill
                       className="object-cover"
-                    />
+                     sizes="100vw" />
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">Hands-On Training</h3>
@@ -90,7 +90,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                 alt="Students in training"
                 fill
                 className="object-cover"
-              />
+               sizes="100vw" />
             </div>
           </div>
         </div>
@@ -106,7 +106,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                 alt="Indiana Career Connect"
                 fill
                 className="object-cover"
-              />
+               sizes="100vw" />
             </div>
 
             <div className="order-1 md:order-2">
@@ -170,7 +170,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                   alt="Career counseling"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-black mb-3">Career Counseling</h3>
@@ -191,7 +191,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                   alt="Job placement"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-black mb-3">Job Placement</h3>
@@ -212,7 +212,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                   alt="Supportive services"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-black mb-3">Supportive Services</h3>

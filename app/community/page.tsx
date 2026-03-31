@@ -101,7 +101,7 @@ export default async function CommunityPage() {
           fill
           className="object-cover"
           priority
-        />
+         sizes="(max-width: 768px) 48px, 64px" />
       </section>
 
       {/* Title + Info Section */}
@@ -243,7 +243,7 @@ export default async function CommunityPage() {
                     alt={event.title}
                     fill
                     className="object-cover"
-                  />
+                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                 </div>
                 <div className="p-4">
                   <div className="flex items-center gap-2 text-sm text-brand-blue-600 mb-2">
@@ -285,7 +285,7 @@ export default async function CommunityPage() {
                 alt="Community members"
                 fill
                 className="object-cover"
-              />
+               sizes="(max-width: 768px) 48px, 64px" />
             </div>
           </div>
         </div>

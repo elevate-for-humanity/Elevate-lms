@@ -160,7 +160,7 @@ export default function Page() {
                         width={600}
                         height={400}
                         className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
+                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                       <div className="p-5 flex flex-col flex-1">
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-bold text-lg text-slate-900">{prog.title}</span>

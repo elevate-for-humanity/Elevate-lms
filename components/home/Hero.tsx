@@ -13,7 +13,7 @@ export function Hero() {
           fill
           priority
           className="object-cover"
-        />
+         sizes="100vw" />
       </div>
 
       {/* HERO SECTION WITH TEXT AND IMAGE */}

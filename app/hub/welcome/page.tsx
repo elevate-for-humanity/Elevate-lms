@@ -145,7 +145,7 @@ export default async function HubWelcomePage() {
                       alt={feature.title}
                       fill
                       className="object-cover"
-                    />
+                     sizes="100vw" />
                   </div>
                 </div>
                 <div className={index % 2 === 1 ? 'lg:order-1' : ''}>
@@ -195,7 +195,7 @@ export default async function HubWelcomePage() {
                     alt={page.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+                   sizes="100vw" />
                   <h3 className="absolute bottom-4 left-4 text-xl font-bold text-slate-900">{page.title}</h3>
                 </div>
                 <div className="p-5">
@@ -230,7 +230,7 @@ export default async function HubWelcomePage() {
                     alt={story.name}
                     fill
                     className="object-cover"
-                  />
+                   sizes="100vw" />
                 </div>
                 <div className="p-6">
                   <p className="text-slate-600 mb-4 italic">"{story.quote}"</p>
@@ -262,7 +262,7 @@ export default async function HubWelcomePage() {
                     alt="Apply for a program"
                     fill
                     className="object-cover"
-                  />
+                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">Apply for a Program</h3>
                 <p className="text-slate-600">Choose from healthcare, skilled trades, technology, or business programs. Funding may be available through WIOA and state programs.</p>
@@ -278,7 +278,7 @@ export default async function HubWelcomePage() {
                     alt="Get enrolled"
                     fill
                     className="object-cover"
-                  />
+                   sizes="100vw" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">Get Enrolled</h3>
                 <p className="text-slate-600">Once approved, you'll receive access to your personalized Hub with your courses and schedule.</p>
@@ -294,7 +294,7 @@ export default async function HubWelcomePage() {
                     alt="Complete and succeed"
                     fill
                     className="object-cover"
-                  />
+                   sizes="100vw" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">Complete & Succeed</h3>
                 <p className="text-slate-600">Follow the system's guidance, track your progress, and graduate ready for your new career.</p>

@@ -61,7 +61,7 @@ export default function StoreCoursesPage() {
                     alt={course.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                   <div className="absolute top-4 left-4 px-3 py-1 bg-brand-blue-600 text-white text-xs font-bold rounded-full">
                     {course.provider}
                   </div>

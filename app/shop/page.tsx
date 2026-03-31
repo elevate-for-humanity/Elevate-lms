@@ -76,7 +76,7 @@ export default async function ShopPage() {
           fill
           className="object-cover"
           priority
-        />
+         sizes="100vw" />
       </div>
 
       <ShopClient products={products} categories={categories} />

@@ -27,7 +27,7 @@ export default async function StorePWAPage() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="relative h-48 sm:h-56 overflow-hidden">
-        <Image src="/images/pages/demo-page-5.jpg" alt="Elevate Store" fill className="object-cover" priority />
+        <Image src="/images/pages/demo-page-5.jpg" alt="Elevate Store" fill className="object-cover" priority  sizes="100vw" />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <Image src="/logo.png" alt="Elevate" width={40} height={40} className="mb-3" />
           <h1 className="text-2xl font-bold text-white">Elevate Store</h1>
@@ -58,7 +58,7 @@ export default async function StorePWAPage() {
               <Link key={product.id} href={`/store/${product.slug || product.id}`} className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
                 <div className="relative h-28 bg-white overflow-hidden">
                   {product.image_url ? (
-                    <Image src={product.image_url} alt={product.name} fill className="object-cover" />
+                    <Image src={product.image_url} alt={product.name} fill className="object-cover"  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-400 text-3xl">🛒</div>
                   )}

@@ -161,7 +161,7 @@ export default async function ActivityLogPage() {
                             alt={activity.user.name}
                             fill
                             className="object-cover"
-                          />
+                           sizes="(max-width: 768px) 48px, 64px" />
                         </div>
                       ) : (
                         <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">

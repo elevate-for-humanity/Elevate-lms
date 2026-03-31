@@ -173,7 +173,7 @@ function RecommendationCard({
             alt={recommendation.product.name}
             fill
             className="object-cover"
-          />
+           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
           <div className={`absolute top-2 left-2 ${color} text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1`}>
             <Icon className="w-3 h-3" />
             {label}
@@ -225,7 +225,7 @@ function SmallRecommendationCard({
           alt={recommendation.product.name}
           fill
           className="object-cover"
-        />
+         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
       </div>
       <div className="flex-1 min-w-0">
         <p className="font-medium text-black text-sm truncate">{recommendation.product.shortName}</p>

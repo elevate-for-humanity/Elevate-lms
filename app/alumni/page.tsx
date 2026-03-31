@@ -127,7 +127,7 @@ export default function AlumniPage() {
                       alt={alumni.name}
                       fill
                       className="object-cover"
-                    />
+                     sizes="100vw" />
                   </div>
                   <div className="p-6">
                     <h3 className="font-semibold text-lg">{alumni.name}</h3>

@@ -58,7 +58,7 @@ export default async function CandidatesPage() {
     <div className="min-h-screen bg-white">
       <Breadcrumbs items={[{ label: 'Employer Portal', href: '/employer-portal' }, { label: 'Candidates' }]} />
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/pages/employer-portal-page-1.jpg" alt="Candidates" fill className="object-cover" />
+        <Image src="/images/pages/employer-portal-page-1.jpg" alt="Candidates" fill className="object-cover"  sizes="100vw" />
       </section>
 
       <CandidatesClient candidates={candidates} />

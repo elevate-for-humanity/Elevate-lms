@@ -65,7 +65,7 @@ export default function ProgramHighlights({ highlights = defaultHighlights }: Pr
                   alt={highlight.title}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-5">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -89,7 +89,7 @@ export default function ProgramHighlights({ highlights = defaultHighlights }: Pr
                   alt="Small class sizes"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <h4 className="font-bold text-black mb-1">Small Classes</h4>
               <p className="text-sm text-black">8-12 students per class</p>
@@ -101,7 +101,7 @@ export default function ProgramHighlights({ highlights = defaultHighlights }: Pr
                   alt="Expert instructors"
                   fill
                   className="object-cover"
-                />
+                 sizes="(max-width: 768px) 48px, 64px" />
               </div>
               <h4 className="font-bold text-black mb-1">Expert Instructors</h4>
               <p className="text-sm text-black">10+ years experience</p>
@@ -113,7 +113,7 @@ export default function ProgramHighlights({ highlights = defaultHighlights }: Pr
                   alt="Modern equipment"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <h4 className="font-bold text-black mb-1">Modern Equipment</h4>
               <p className="text-sm text-black">Industry-standard tools</p>
@@ -125,7 +125,7 @@ export default function ProgramHighlights({ highlights = defaultHighlights }: Pr
                   alt="Job placement"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <h4 className="font-bold text-black mb-1">Job Placement</h4>
               <p className="text-sm text-black">Employer connections</p>

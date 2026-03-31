@@ -540,7 +540,7 @@ export default function CourseAuthoringTool() {
                           Add Video
                         </button>
                         <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 w-full">
-                          <Image className="w-4 h-4" />
+                          <Image className="w-4 h-4" / fill sizes="100vw" />
                           Add Image
                         </button>
                         <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 w-full">

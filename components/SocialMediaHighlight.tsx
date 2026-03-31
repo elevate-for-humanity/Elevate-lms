@@ -35,7 +35,7 @@ export default function SocialMediaHighlight() {
                 alt="Follow us on Facebook"
                 fill
                 className="object-cover group-hover:scale-110 transition-transform duration-300"
-              />
+               sizes="100vw" />
               <div className="absolute bottom-4 left-4 right-4">
                 <div className="flex items-center gap-3 text-white">
                   <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg">
@@ -72,7 +72,7 @@ export default function SocialMediaHighlight() {
                 alt="Connect on LinkedIn"
                 fill
                 className="object-cover group-hover:scale-110 transition-transform duration-300"
-              />
+               sizes="(max-width: 768px) 48px, 64px" />
               <div className="absolute bottom-4 left-4 right-4">
                 <div className="flex items-center gap-3 text-white">
                   <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg">
@@ -109,7 +109,7 @@ export default function SocialMediaHighlight() {
                 alt="Follow us on Instagram"
                 fill
                 className="object-cover group-hover:scale-110 transition-transform duration-300"
-              />
+               sizes="(max-width: 768px) 48px, 64px" />
               <div className="absolute bottom-4 left-4 right-4">
                 <div className="flex items-center gap-3 text-white">
                   <div className="w-12 h-12 rounded-full    flex items-center justify-center shadow-lg">

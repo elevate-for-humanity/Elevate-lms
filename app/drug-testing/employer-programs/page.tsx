@@ -277,7 +277,7 @@ export default function EmployerProgramsPage() {
                 alt="DOT Compliance"
                 fill
                 className="object-cover"
-              />
+               sizes="100vw" />
             </div>
           </div>
         </div>

@@ -56,7 +56,7 @@ export default async function ProductPage({
                   alt={product.title}
                   fill
                   className="object-cover"
-                />
+                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
               ) : (
                 <svg
                   className="w-32 h-32 text-white opacity-50"

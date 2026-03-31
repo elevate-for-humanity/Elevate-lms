@@ -124,7 +124,7 @@ export default async function ClassroomPage() {
                           alt={course.course_name}
                           fill
                           className="object-cover"
-                        />
+                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                       ) : (
                         <div className="absolute inset-0 bg-white flex items-center justify-center">
                           <BookOpen className="w-16 h-16 text-slate-400" />

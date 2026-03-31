@@ -39,7 +39,7 @@ export function ArchetypeBase({
             fill
             className="object-cover"
             priority
-          />
+           sizes="100vw" />
         )}
         <div className="absolute inset-0 flex items-center">
           <div className="container mx-auto px-4">

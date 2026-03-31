@@ -51,7 +51,7 @@ export default function HostShopsPage() {
                 alt="Barber training apprentice"
                 fill
                 className="object-cover"
-              />
+               sizes="100vw" />
             </div>
             <div>
               <div className="w-16 h-16 bg-brand-green-100 rounded-2xl flex items-center justify-center mb-6">
@@ -103,7 +103,7 @@ export default function HostShopsPage() {
                 alt="Professional barbershop"
                 fill
                 className="object-cover"
-              />
+               sizes="100vw" />
             </div>
           </div>
 
@@ -115,7 +115,7 @@ export default function HostShopsPage() {
                 alt="Barber with client"
                 fill
                 className="object-cover"
-              />
+               sizes="100vw" />
             </div>
             <div>
               <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mb-6">

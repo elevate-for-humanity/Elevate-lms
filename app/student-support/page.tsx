@@ -171,7 +171,7 @@ export default function StudentSupportPage() {
           alt="Students succeeding in workforce training"
           fill
           className="object-cover"
-        />
+         sizes="100vw" />
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Ready to Start Your Career?</h2>
           <p className="text-brand-green-100 text-lg mb-8">Check your eligibility for funded career training programs. Most students pay $0 out of pocket.</p>

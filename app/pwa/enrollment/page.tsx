@@ -29,7 +29,7 @@ export default async function EnrollmentPWAPage() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="relative h-48 sm:h-56 overflow-hidden">
-        <Image src="/images/pages/demo-page-3.jpg" alt="Student enrollment" fill className="object-cover" priority />
+        <Image src="/images/pages/demo-page-3.jpg" alt="Student enrollment" fill className="object-cover" priority  sizes="100vw" />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <Image src="/logo.png" alt="Elevate" width={40} height={40} className="mb-3" />
           <h1 className="text-2xl font-bold text-slate-900">Enrollment Center</h1>

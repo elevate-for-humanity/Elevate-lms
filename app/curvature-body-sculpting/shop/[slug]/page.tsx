@@ -96,7 +96,7 @@ export default async function ProductDetailPage({ params }: Props) {
                   fill
                   className="object-cover"
                   priority
-                />
+                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
@@ -178,7 +178,7 @@ export default async function ProductDetailPage({ params }: Props) {
                         alt={related.name}
                         fill
                         className="object-cover group-hover:scale-105 transition"
-                      />
+                       sizes="100vw" />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center">
                         <ShoppingCart className="w-8 h-8 text-purple-300" />

@@ -10,7 +10,7 @@ export default function Assurance() {
           fill
           className="object-cover"
           priority
-        />
+         sizes="100vw" />
       </div>
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="grid md:grid-cols-2 gap-12 items-center">

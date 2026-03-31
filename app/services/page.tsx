@@ -111,7 +111,7 @@ export default function ServicesPage() {
                     alt={service.title}
                     fill
                     className="object-cover"
-                  />
+                   sizes="100vw" />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-blue-600">

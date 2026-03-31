@@ -62,7 +62,7 @@ export default function AdminLoginPage() {
           fill
           className="object-cover"
           priority
-        />
+         sizes="100vw" />
         <div className="relative z-10 flex flex-col justify-center px-12">
           <div className="flex items-center gap-3 mb-6">
             <Shield className="w-10 h-10 text-cyan-400" />

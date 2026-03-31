@@ -29,7 +29,7 @@ export default async function EventsPage() {
           src="/images/pages/events-page-1.jpg"
           alt="Elevate for Humanity community events"
           fill className="object-cover" priority
-        />
+         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
         
         <div className="absolute inset-x-0 bottom-0 max-w-6xl mx-auto px-4 pb-8">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-300 mb-1">Elevate for Humanity</p>

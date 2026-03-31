@@ -53,7 +53,7 @@ export default async function SuccessStoriesPage() {
                   alt="CNA student providing patient care"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-2">Healthcare Careers</h3>
@@ -74,7 +74,7 @@ export default async function SuccessStoriesPage() {
                   alt="Barber apprentice cutting hair"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-2">Skilled Trades</h3>
@@ -95,7 +95,7 @@ export default async function SuccessStoriesPage() {
                   alt="Business and technology training"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-2">Business & Tech</h3>

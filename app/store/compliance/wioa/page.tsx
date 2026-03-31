@@ -195,7 +195,7 @@ export default function WIOACompliancePage() {
                     alt={feature.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+                   sizes="100vw" />
                   <h3 className="absolute bottom-4 left-4 text-xl font-bold text-slate-900">{feature.title}</h3>
                 </div>
                 <div className="p-6">
@@ -314,7 +314,7 @@ export default function WIOACompliancePage() {
                   alt="WIOA Resources"
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
             </div>
           </div>

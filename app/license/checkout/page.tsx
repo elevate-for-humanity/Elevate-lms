@@ -150,7 +150,7 @@ function LicenseCheckoutPageInner() {
                   alt={plan.name}
                   fill
                   className="object-cover"
-                />
+                 sizes="100vw" />
               </div>
 
               <h3 className="font-bold text-slate-900">{plan.name}</h3>

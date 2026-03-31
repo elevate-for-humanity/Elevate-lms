@@ -94,7 +94,7 @@ export default async function ApplyPage({
                 alt="Students in hands-on career training"
                 fill
                 className="object-cover"
-              />
+               sizes="100vw" />
             </div>
             <div className="flex-1 bg-white p-6 sm:p-8">
               <span className="inline-block bg-brand-blue-600 text-white text-xs font-bold uppercase tracking-wider px-3 py-0.5 rounded-full mb-3">
@@ -132,7 +132,7 @@ export default async function ApplyPage({
                 alt="Employer partnership meeting"
                 fill
                 className="object-cover"
-              />
+               sizes="100vw" />
             </div>
             <div className="bg-white p-5">
               <div className="flex items-center gap-2 mb-2">
@@ -175,7 +175,7 @@ export default async function ApplyPage({
                 alt="Launch your own training program with Elevate"
                 fill
                 className="object-cover"
-              />
+               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
               <div className="absolute bottom-0 left-0 right-0 p-5">
                 <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">Become a Program Holder</h2>
                 <p className="text-slate-900 text-sm leading-relaxed mb-3">
@@ -249,7 +249,7 @@ export default async function ApplyPage({
                     alt={item.alt}
                     fill
                     className="object-cover"
-                  />
+                   sizes="100vw" />
                 </div>
                 <div className="p-4">
                   <h3 className="font-semibold text-slate-900 mb-1">{item.title}</h3>

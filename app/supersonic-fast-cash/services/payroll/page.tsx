@@ -334,7 +334,7 @@ export default async function PayrollPage() {
           className="object-cover"
           quality={85}
           priority
-        />
+         sizes="100vw" />
       </section>
 
       {/* Services */}

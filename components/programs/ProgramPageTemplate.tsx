@@ -325,7 +325,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                         quality={85}
-                      />
+                       sizes="100vw" />
                       <div className="absolute bottom-4 left-4">
                         <span className="inline-flex items-center gap-1 bg-white/90 text-slate-900 text-xs font-semibold px-3 py-1 rounded-full">
                           <Briefcase className="w-3 h-3" />

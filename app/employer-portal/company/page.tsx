@@ -115,7 +115,7 @@ export default async function CompanyProfilePage() {
             alt="Company cover"
             fill
             className="object-cover"
-          />
+           sizes="100vw" />
         )}
         
         <Link 

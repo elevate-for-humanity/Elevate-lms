@@ -76,7 +76,7 @@ export default function FinancialAidPage() {
           fill
           className="object-cover"
           priority
-        />
+         sizes="100vw" />
       </section>
 
       {/* Quick Links to Related Pages */}

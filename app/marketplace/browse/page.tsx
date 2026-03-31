@@ -90,7 +90,7 @@ export default async function MarketplaceBrowsePage() {
                     alt={item.title} 
                     fill 
                     className="object-cover" 
-                  />
+                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                 </div>
                 <div className="p-4">
                   <span className="text-xs text-gray-500">{item.category || 'General'}</span>

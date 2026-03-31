@@ -77,7 +77,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
           className="object-cover"
           priority
           quality={100}
-        />
+         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
 
         <div className="relative h-full flex items-center">
           <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full">
@@ -381,7 +381,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
                 fill
                 className="object-cover"
                 quality={100}
-              />
+               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
             </div>
             <div className="text-white">
               <h2 className="text-4xl md:text-5xl font-bold mb-6">

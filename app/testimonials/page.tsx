@@ -155,7 +155,7 @@ export default function TestimonialsPage() {
                         alt={story.name}
                         fill
                         className="object-cover"
-                      />
+                       sizes="100vw" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-white">
                         <span className="text-4xl font-bold text-slate-900">

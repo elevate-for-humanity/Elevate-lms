@@ -73,7 +73,7 @@ export default function Page() {
               {programs.map((p, i) => (
                 <ScrollReveal key={p.title} delay={i * 80} direction="up">
                   <div className="flex flex-col bg-white rounded-xl border-2 border-slate-200 hover:shadow-md transition-all overflow-hidden">
-                    <Image src={p.image} alt={p.title} width={600} height={400} className="w-full h-44 object-cover" />
+                    <Image src={p.image} alt={p.title} width={600} height={400} className="w-full h-44 object-cover"  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                     <div className="p-5 flex flex-col flex-1">
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-bold text-lg text-slate-900">{p.title}</span>

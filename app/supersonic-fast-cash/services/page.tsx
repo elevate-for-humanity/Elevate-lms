@@ -138,7 +138,7 @@ export default async function ServicesPage() {
           className="object-cover" 
           quality={85}
           priority
-        />
+         sizes="100vw" />
       </section>
 
       {/* Services Grid */}

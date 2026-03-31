@@ -62,7 +62,7 @@ export default function SupersonicPage() {
           alt="Supersonic Program"
           fill
           className="object-cover"
-        />
+         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
       </div>
       <div className="max-w-7xl mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-white text-center mb-12">Why Supersonic?</h2>

@@ -102,7 +102,7 @@ export default function ProgramLandingPage({
               alt={imageAlt}
               fill
               className="rounded-2xl object-cover shadow-lg"
-            />
+             sizes="100vw" />
           </div>
         </div>
       </section>

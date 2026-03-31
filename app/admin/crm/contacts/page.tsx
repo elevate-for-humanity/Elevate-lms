@@ -144,7 +144,7 @@ export default async function ContactsPage() {
                         alt={contact.name}
                         fill
                         className="object-cover"
-                      />
+                       sizes="100vw" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">{contact.name}</h3>

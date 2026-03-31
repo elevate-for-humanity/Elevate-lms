@@ -182,7 +182,7 @@ export default async function HVACTechnicianPage() {
                   height={800}
                   className="h-full w-full object-cover"
                   priority
-                />
+                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
               ) : (
                 <Image
                   src="/images/pages/programs-hvac-course-hero.jpg"
@@ -191,7 +191,7 @@ export default async function HVACTechnicianPage() {
                   height={800}
                   className="h-full w-full object-cover"
                   priority
-                />
+                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
               )}
             </div>
           </div>

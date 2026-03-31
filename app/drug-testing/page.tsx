@@ -168,7 +168,7 @@ export default async function DrugTestingLandingPage() {
                     alt={category.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+                   sizes="100vw" />
                   
                   <div className="absolute bottom-4 left-4">
                     <span className="bg-white text-gray-900 px-3 py-1 rounded-full text-sm font-bold">
@@ -209,7 +209,7 @@ export default async function DrugTestingLandingPage() {
                 alt="Employer Drug Testing Programs"
                 fill
                 className="object-cover"
-              />
+               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
             </div>
             <div>
               <div className="inline-flex items-center gap-2 bg-brand-blue-100 text-brand-blue-800 px-4 py-2 rounded-full text-sm font-bold mb-4">
@@ -294,7 +294,7 @@ export default async function DrugTestingLandingPage() {
                 alt="DOT Drug Testing for Commercial Drivers"
                 fill
                 className="object-cover"
-              />
+               sizes="100vw" />
             </div>
           </div>
         </div>

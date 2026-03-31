@@ -73,7 +73,7 @@ export default async function EnrollmentPage() {
             {featured.map((p) => (
               <Link key={p.name} href={p.href} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all group">
                 <div className="relative h-40 overflow-hidden">
-                  <Image src={p.image} alt={p.name} fill className="object-cover" />
+                  <Image src={p.image} alt={p.name} fill className="object-cover"  sizes="100vw" />
                   <div className="absolute bottom-3 left-4">
                     <h3 className="text-lg font-bold text-white">{p.name}</h3>
                   </div>

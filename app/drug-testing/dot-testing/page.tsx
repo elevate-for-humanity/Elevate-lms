@@ -203,7 +203,7 @@ export default function DotTestingPage() {
                     alt={test.name}
                     fill
                     className="object-cover"
-                  />
+                   sizes="100vw" />
                   {test.popular && (
                     <div className="absolute top-3 left-3 bg-white text-slate-900 px-3 py-1 rounded-full text-xs font-bold">
                       MOST COMMON
@@ -308,7 +308,7 @@ export default function DotTestingPage() {
                 alt="DOT Random Testing Consortium"
                 fill
                 className="object-cover"
-              />
+               sizes="100vw" />
             </div>
           </div>
         </div>

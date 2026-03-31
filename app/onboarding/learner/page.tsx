@@ -496,7 +496,7 @@ export default async function LearnerOnboardingPage() {
                 alt="Contact Elevate for Humanity support"
                 fill
                 className="object-cover opacity-20"
-              />
+               sizes="100vw" />
             </div>
             <div className="relative p-6 sm:p-10 text-center">
               <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-2">Need Help?</h3>

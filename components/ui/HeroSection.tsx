@@ -150,7 +150,7 @@ export function HeroSection({
           fill
           className="object-cover"
           priority
-        />
+         sizes="100vw" />
         
         {/* Content panel - solid background, no gradient */}
         <div className="relative z-10 w-full">
@@ -254,7 +254,7 @@ export function HeroSection({
                 alt={imageAlt || title}
                 fill
                 className="object-contain p-4"
-              />
+               sizes="100vw" />
             </div>
           </div>
         </div>
@@ -323,7 +323,7 @@ export function HeroSection({
             fill
             className="object-cover"
             priority
-          />
+           sizes="100vw" />
         </div>
       </div>
       
@@ -334,7 +334,7 @@ export function HeroSection({
           alt={imageAlt || title}
           fill
           className="object-cover"
-        />
+         sizes="100vw" />
       </div>
     </section>
   );

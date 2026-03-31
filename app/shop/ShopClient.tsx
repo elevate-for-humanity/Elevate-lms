@@ -99,7 +99,7 @@ export function ShopClient({ products, categories }: ShopClientProps) {
                 alt={product.name}
                 fill
                 className="object-cover"
-              />
+               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
             </div>
             <div className="p-6">
               <span className="text-xs text-brand-blue-600 font-medium">{product.category}</span>

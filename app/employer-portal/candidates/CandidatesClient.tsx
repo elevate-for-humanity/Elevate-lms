@@ -93,7 +93,7 @@ export function CandidatesClient({ candidates }: { candidates: Candidate[] }) {
                     <div className="flex items-start gap-4">
                       <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
                         {candidate.image ? (
-                          <Image src={candidate.image} alt={candidate.name} fill className="object-cover" />
+                          <Image src={candidate.image} alt={candidate.name} fill className="object-cover"  sizes="100vw" />
                         ) : (
                           <div className="w-full h-full bg-brand-blue-700 flex items-center justify-center text-white text-xl font-bold">
                             {candidate.name.charAt(0)}

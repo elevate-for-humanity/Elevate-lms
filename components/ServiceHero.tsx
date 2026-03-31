@@ -29,7 +29,7 @@ export default function ServiceHero({
           fill
           className="object-cover"
           priority
-        />
+         sizes="100vw" />
       </div>
       
       <div className="relative h-full flex items-center">

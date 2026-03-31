@@ -60,7 +60,7 @@ export default function ThreeBlockHero() {
                 alt={block.title}
                 fill
                 className="object-cover group-hover:scale-110 transition-transform duration-500"
-              />
+               sizes="100vw" />
 
               {/* Content */}
               <div className="relative h-full flex flex-col justify-between p-6 text-white">

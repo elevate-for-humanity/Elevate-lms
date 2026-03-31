@@ -58,7 +58,7 @@ export default async function VolunteerPage() {
           fill
           className="object-cover"
           priority
-        />
+         sizes="100vw" />
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-12">

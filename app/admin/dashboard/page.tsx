@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 };
 
 async function getDashboardData(supabase: any, db: any) {
+  // All queries use the admin client (db) to bypass RLS
   const [
     studentsRes,
     programsRes,
@@ -36,53 +37,54 @@ async function getDashboardData(supabase: any, db: any) {
     blockedProgramsRes,
     inactiveLearnersRes,
   ] = await Promise.all([
-    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student'),
-    supabase.from('programs').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-    supabase.from('courses').select('id', { count: 'exact', head: true }).eq('is_active', true),
-    supabase.from('program_enrollments').select('id', { count: 'exact', head: true }),
-    supabase.from('certificates').select('id', { count: 'exact', head: true }),
-    supabase.from('course_lessons').select('id', { count: 'exact', head: true }),
-    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'partner'),
-    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student').eq('enrollment_status', 'at_risk'),
+    db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student'),
+    // Count all non-archived programs regardless of published/active state
+    db.from('programs').select('id', { count: 'exact', head: true }).neq('status', 'archived'),
+    db.from('courses').select('id', { count: 'exact', head: true }),
+    db.from('program_enrollments').select('id', { count: 'exact', head: true }),
+    db.from('certificates').select('id', { count: 'exact', head: true }),
+    db.from('course_lessons').select('id', { count: 'exact', head: true }),
+    db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'partner'),
+    db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student').eq('enrollment_status', 'at_risk'),
     // Action Center counts
-    supabase.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-    supabase.from('documents').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-    supabase.from('applications').select('id', { count: 'exact', head: true }).in('status', ['submitted', 'pending', 'in_review']),
-    // Full data for charts
-    supabase.from('profiles').select('enrollment_status').eq('role', 'student'),
-    supabase.from('program_enrollments').select('status, enrolled_at, progress, course_id'),
-    supabase.from('programs').select('id, name, status'),
-    supabase.from('courses').select('id, title, is_active'),
+    db.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    db.from('documents').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    db.from('applications').select('id', { count: 'exact', head: true }).in('status', ['submitted', 'pending', 'in_review']),
+    // Full data
+    db.from('profiles').select('enrollment_status').eq('role', 'student'),
+    db.from('program_enrollments').select('status, enrolled_at, progress, course_id'),
+    db.from('programs').select('id, name, title, status'),
+    db.from('courses').select('id, title, is_active'),
     // Recent students with their latest enrolled program name
-    supabase.from('profiles')
-      .select('id, full_name, email, enrollment_status, created_at, program_enrollments(program_id, programs(name))')
+    db.from('profiles')
+      .select('id, full_name, email, enrollment_status, created_at, program_enrollments(program_id, programs(name, title))')
       .eq('role', 'student')
       .order('created_at', { ascending: false })
       .limit(10),
-    supabase.from('program_enrollments').select('course_id, status').limit(500),
+    db.from('program_enrollments').select('course_id, status').limit(500),
     // Recent applications — newest 8
-    supabase.from('applications')
+    db.from('applications')
       .select('id, first_name, last_name, full_name, email, program_interest, status, created_at')
       .order('created_at', { ascending: false })
       .limit(8),
     // Admin activity log — newest 10 events
-    supabase.from('admin_activity_log')
+    db.from('admin_activity_log')
       .select('id, action, details, timestamp')
       .order('timestamp', { ascending: false })
       .limit(10),
-    // Payments — sum paid amount_cents
-    supabase.from('payments')
+    // Payments
+    db.from('payments')
       .select('amount_cents')
       .eq('status', 'paid'),
-    // Programs blocking revenue — unpublished and incomplete
-    supabase.from('programs')
+    // Programs not yet published
+    db.from('programs')
       .select('id, title, slug, status, updated_at')
       .eq('published', false)
       .neq('status', 'archived')
       .order('updated_at', { ascending: false })
       .limit(8),
-    // Inactive learners — enrolled but no lesson_progress update in 3+ days
-    supabase.from('program_enrollments')
+    // Inactive learners — active enrollment, no progress update in 3+ days
+    db.from('program_enrollments')
       .select('id, user_id, enrolled_at, profiles(id, full_name, email)')
       .eq('status', 'active')
       .lt('updated_at', new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString())
@@ -145,12 +147,12 @@ async function getDashboardData(supabase: any, db: any) {
     .sort((a, b) => b.enrollments - a.enrollments)
     .slice(0, 8);
 
-  // Get user profile
+  // Get current admin's profile for the greeting
   let profile = null;
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      const { data } = await supabase.from('profiles').select('full_name, role').eq('id', user.id).single();
+      const { data } = await db.from('profiles').select('full_name, role').eq('id', user.id).single();
       profile = data;
     }
   } catch { /* non-fatal */ }
@@ -165,7 +167,7 @@ async function getDashboardData(supabase: any, db: any) {
       email: s.email ?? null,
       enrollment_status: s.enrollment_status ?? null,
       created_at: s.created_at ?? null,
-      program_name: (program as any)?.name ?? null,
+      program_name: (program as any)?.name ?? (program as any)?.title ?? null,
     };
   });
 

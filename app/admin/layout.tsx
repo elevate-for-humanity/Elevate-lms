@@ -79,19 +79,50 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Auth check — proxy.ts handles request-layer auth; this is the render-layer guard
+  // Auth check — one call, result reused below
   await requireAdmin();
 
-  // Get license context for banner
-  const context = await getLicenseContext();
+  // Fetch user + notifications + license context in parallel — single round-trip
+  const supabase = await createClient();
+  const db = createAdminClient();
 
-  // Reconcile trial onboarding state if the fire-and-forget call missed
+  const [context, headerData] = await Promise.all([
+    getLicenseContext(),
+    (async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return { userName: 'Admin', userInitial: 'A', notifs: [] };
+
+        const [profileRes, appsRes, docsRes] = await Promise.all([
+          db.from('profiles').select('full_name, first_name').eq('id', user.id).maybeSingle(),
+          db.from('applications').select('id', { count: 'exact', head: true }).in('status', ['submitted', 'pending', 'in_review']),
+          db.from('documents').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+        ]);
+
+        const name = profileRes.data?.first_name || profileRes.data?.full_name?.split(' ')[0] || 'Admin';
+        const notifs: import('@/components/admin/AdminHeader').AdminHeaderNotif[] = [];
+
+        if ((appsRes.count ?? 0) > 0) {
+          notifs.push({ id: 'apps', unread: true, href: '/admin/applications?status=pending',
+            title: `${appsRes.count} application${appsRes.count !== 1 ? 's' : ''} pending review`,
+            time: 'Pending action' });
+        }
+        if ((docsRes.count ?? 0) > 0) {
+          notifs.push({ id: 'docs', unread: true, href: '/admin/documents/review',
+            title: `${docsRes.count} document${docsRes.count !== 1 ? 's' : ''} need review`,
+            time: 'Compliance required' });
+        }
+
+        return { userName: name, userInitial: name[0].toUpperCase(), notifs };
+      } catch {
+        return { userName: 'Admin', userInitial: 'A', notifs: [] };
+      }
+    })(),
+  ]);
+
+  // Reconcile trial onboarding — fire and forget
   if (context?.tenantId) {
-    const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (supabase) {
-      reconcileTrialOnboarding(supabase, context.tenantId).catch(() => {});
-    }
+    reconcileTrialOnboarding(supabase, context.tenantId).catch(() => {});
   }
 
   // Check if user should be blocked (non-admin with expired license)
@@ -108,14 +139,17 @@ export default async function AdminLayout({
   }
 
   const content = (
-    <>
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <IdleTimeoutGuard />
       <AdminSidebar />
       <div className="lg:pl-64">
-        <AdminHeader />
-        <main id="main-content" className="pt-24 min-h-screen bg-slate-50">{children}</main>
+        <AdminHeader userName={headerData.userName} userInitial={headerData.userInitial} notifs={headerData.notifs} />
+        {/* pt-20 matches fixed header h-20 */}
+        <main id="main-content" className="min-h-screen px-4 pb-6 pt-20 sm:px-6 lg:px-8">
+          {children}
+        </main>
       </div>
-    </>
+    </div>
   );
 
   if (!context) {

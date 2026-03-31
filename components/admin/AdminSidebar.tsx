@@ -1,201 +1,202 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useMemo, useState, useEffect } from "react";
 import {
-  LayoutDashboard, Inbox, Users, TrendingUp, GraduationCap,
-  UserCheck, CreditCard, BarChart3, Settings, Menu, X,
-  BookOpen, Shield, FileText, Briefcase, Building2,
-  Award, ClipboardList, Bell, ChevronDown, ChevronRight,
-  Wrench, Globe, HeartHandshake, DollarSign, AlertTriangle,
-} from 'lucide-react';
+  LayoutDashboard, Users, FileText, GraduationCap, Briefcase,
+  Bell, Settings, Menu, X, ChevronRight, BookOpen, Shield,
+  CreditCard, BarChart3, Wrench, Globe, HeartHandshake,
+  DollarSign, AlertTriangle, UserCheck, Award, ClipboardList,
+  Building2, TrendingUp, Inbox,
+} from "lucide-react";
 
-const NAV_GROUPS = [
+type NavItem = {
+  label: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+};
+
+type NavSection = {
+  title: string;
+  items: NavItem[];
+};
+
+const navSections: NavSection[] = [
   {
-    label: 'Operations',
+    title: "Overview",
     items: [
-      { name: 'Dashboard',    href: '/admin/dashboard',     icon: LayoutDashboard },
-      { name: 'Applications', href: '/admin/applications',  icon: Inbox },
-      { name: 'Students',     href: '/admin/students',      icon: Users },
-      { name: 'Enrollments',  href: '/admin/enrollments',   icon: TrendingUp },
-      { name: 'At-Risk',      href: '/admin/at-risk',       icon: AlertTriangle },
+      { label: "Dashboard",    href: "/admin/dashboard",    icon: LayoutDashboard },
     ],
   },
   {
-    label: 'Programs',
+    title: "Operations",
     items: [
-      { name: 'Programs',     href: '/admin/programs',      icon: GraduationCap },
-      { name: 'Curriculum',   href: '/admin/curriculum',    icon: BookOpen },
-      { name: 'Courses',      href: '/admin/courses',       icon: ClipboardList },
-      { name: 'Instructors',  href: '/admin/instructors',   icon: UserCheck },
-      { name: 'Certificates', href: '/admin/certificates',  icon: Award },
+      { label: "Applications", href: "/admin/applications", icon: Inbox },
+      { label: "Students",     href: "/admin/students",     icon: Users },
+      { label: "Enrollments",  href: "/admin/enrollments",  icon: TrendingUp },
+      { label: "At-Risk",      href: "/admin/at-risk",      icon: AlertTriangle },
     ],
   },
   {
-    label: 'Funding & Finance',
+    title: "Programs",
     items: [
-      { name: 'WIOA',         href: '/admin/wioa',          icon: HeartHandshake },
-      { name: 'Funding',      href: '/admin/funding',       icon: DollarSign },
-      { name: 'Payments',     href: '/admin/payroll',       icon: CreditCard },
-      { name: 'Grants',       href: '/admin/grants',        icon: Briefcase },
+      { label: "Programs",     href: "/admin/programs",     icon: GraduationCap },
+      { label: "Curriculum",   href: "/admin/curriculum",   icon: BookOpen },
+      { label: "Courses",      href: "/admin/courses",      icon: ClipboardList },
+      { label: "Instructors",  href: "/admin/instructors",  icon: UserCheck },
+      { label: "Certificates", href: "/admin/certificates", icon: Award },
     ],
   },
   {
-    label: 'Compliance',
+    title: "Funding & Finance",
     items: [
-      { name: 'Documents',    href: '/admin/documents',     icon: FileText },
-      { name: 'Compliance',   href: '/admin/compliance',    icon: Shield },
-      { name: 'Audit Logs',   href: '/admin/audit-logs',    icon: ClipboardList },
+      { label: "WIOA",         href: "/admin/wioa",         icon: HeartHandshake },
+      { label: "Funding",      href: "/admin/funding",      icon: DollarSign },
+      { label: "Payments",     href: "/admin/payroll",      icon: CreditCard },
+      { label: "Grants",       href: "/admin/grants",       icon: Briefcase },
     ],
   },
   {
-    label: 'Partners',
+    title: "Compliance",
     items: [
-      { name: 'Employers',    href: '/admin/employers',     icon: Building2 },
-      { name: 'Partners',     href: '/admin/partners',      icon: Globe },
-      { name: 'Jobs',         href: '/admin/jobs',          icon: Briefcase },
+      { label: "Documents",    href: "/admin/documents",    icon: FileText },
+      { label: "Compliance",   href: "/admin/compliance",   icon: Shield },
+      { label: "Audit Logs",   href: "/admin/audit-logs",   icon: ClipboardList },
     ],
   },
   {
-    label: 'System',
+    title: "Partners",
     items: [
-      { name: 'Reports',      href: '/admin/reports',       icon: BarChart3 },
-      { name: 'Settings',     href: '/admin/settings',      icon: Settings },
-      { name: 'Tools',        href: '/admin/advanced-tools',icon: Wrench },
+      { label: "Employers",    href: "/admin/employers",    icon: Building2 },
+      { label: "Partners",     href: "/admin/partners",     icon: Globe },
+      { label: "Jobs",         href: "/admin/jobs",         icon: Briefcase },
+    ],
+  },
+  {
+    title: "System",
+    items: [
+      { label: "Reports",      href: "/admin/reports",      icon: BarChart3 },
+      { label: "Notifications",href: "/admin/notifications",icon: Bell },
+      { label: "Settings",     href: "/admin/settings",     icon: Settings },
+      { label: "Tools",        href: "/admin/advanced-tools",icon: Wrench },
     ],
   },
 ];
 
-function NavGroup({ group, pathname, onNav }: { group: typeof NAV_GROUPS[0]; pathname: string; onNav: () => void }) {
-  const hasActive = group.items.some(i =>
-    pathname === i.href || (i.href !== '/admin/dashboard' && pathname.startsWith(i.href))
-  );
-  const [open, setOpen] = useState(hasActive);
-
-  return (
-    <div className="mb-1">
-      <button
-        onClick={() => setOpen(v => !v)}
-        className="w-full flex items-center justify-between px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-300 transition-colors"
-      >
-        {group.label}
-        {open ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
-      </button>
-      {open && (
-        <div className="space-y-0.5">
-          {group.items.map(({ name, href, icon: Icon }) => {
-            const active = pathname === href || (href !== '/admin/dashboard' && pathname.startsWith(href));
-            return (
-              <Link
-                key={href}
-                href={href}
-                onClick={onNav}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${
-                  active
-                    ? 'bg-brand-red-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                }`}
-              >
-                <Icon className="w-4 h-4 flex-shrink-0" />
-                <span className="flex-1 font-medium">{name}</span>
-                {active && <div className="w-1.5 h-1.5 rounded-full bg-white/60" />}
-              </Link>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
+function isItemActive(pathname: string, href: string) {
+  if (href === "/admin/dashboard") return pathname === href;
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 export default function AdminSidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const sidebarContent = (
-    <nav className="flex flex-col h-full bg-slate-900" aria-label="Admin navigation">
+  // Close drawer on route change
+  useEffect(() => { setMobileOpen(false); }, [pathname]);
 
-      {/* Brand */}
-      <div className="px-4 py-5 border-b border-slate-800">
-        <Link href="/admin/dashboard" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
-          <div className="w-9 h-9 bg-brand-red-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-            <span className="text-white font-extrabold text-sm">E</span>
-          </div>
-          <div>
-            <div className="text-white font-extrabold text-sm leading-tight">Elevate Admin</div>
-            <div className="text-slate-500 text-[10px] leading-tight font-medium">Operations Console</div>
-          </div>
-        </Link>
+  // Lock body scroll when drawer open
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
+
+  const renderedSections = useMemo(() => navSections.map((section) => (
+    <div key={section.title} className="space-y-1">
+      <div className="px-3 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+        {section.title}
       </div>
-
-      {/* Quick actions */}
-      <div className="px-3 py-3 border-b border-slate-800">
-        <div className="grid grid-cols-3 gap-1.5">
-          {[
-            { label: 'Inbox',   href: '/admin/applications', icon: Inbox },
-            { label: 'Alerts',  href: '/admin/at-risk',      icon: Bell },
-            { label: 'Reports', href: '/admin/reports',      icon: BarChart3 },
-          ].map(({ label, href, icon: Icon }) => (
+      <div className="space-y-0.5">
+        {section.items.map((item) => {
+          const active = isItemActive(pathname, item.href);
+          const Icon = item.icon;
+          return (
             <Link
-              key={href}
-              href={href}
+              key={item.href}
+              href={item.href}
               onClick={() => setMobileOpen(false)}
-              className="flex flex-col items-center gap-1 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
+              className={[
+                "group flex items-center gap-3 rounded-xl border-l-2 px-3 py-2.5 text-sm transition-colors",
+                active
+                  ? "border-cyan-400 bg-slate-800 text-white"
+                  : "border-transparent text-slate-300 hover:bg-slate-800/80 hover:text-white",
+              ].join(" ")}
             >
-              <Icon className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-[9px] font-semibold text-slate-500 uppercase tracking-wide">{label}</span>
+              <Icon className={["h-4 w-4 shrink-0", active ? "text-cyan-300" : "text-slate-400 group-hover:text-slate-200"].join(" ")} />
+              <span className="flex-1 truncate">{item.label}</span>
+              <ChevronRight className={["h-3.5 w-3.5 shrink-0", active ? "text-cyan-300" : "text-slate-600 group-hover:text-slate-400"].join(" ")} />
             </Link>
-          ))}
+          );
+        })}
+      </div>
+    </div>
+  )), [pathname]);
+
+  const sidebarInner = (
+    <>
+      {/* Brand */}
+      <div className="flex h-20 items-center justify-between border-b border-slate-800 px-4 flex-shrink-0">
+        <div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-300">
+            Elevate Admin
+          </div>
+          <div className="mt-0.5 text-sm font-semibold text-white">Operations Console</div>
         </div>
+        <button
+          type="button"
+          aria-label="Close navigation"
+          onClick={() => setMobileOpen(false)}
+          className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white lg:hidden"
+        >
+          <X className="h-5 w-5" />
+        </button>
       </div>
 
-      {/* Nav groups */}
-      <div className="flex-1 overflow-y-auto py-3 px-2">
-        {NAV_GROUPS.map(group => (
-          <NavGroup
-            key={group.label}
-            group={group}
-            pathname={pathname}
-            onNav={() => setMobileOpen(false)}
-          />
-        ))}
+      {/* Nav */}
+      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
+        {renderedSections}
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-4 border-t border-slate-800 space-y-2">
+      <div className="border-t border-slate-800 px-4 py-4 flex-shrink-0">
         <Link href="/" className="flex items-center gap-2 text-xs text-slate-500 hover:text-slate-300 transition-colors">
-          <Globe className="w-3.5 h-3.5" />
+          <Globe className="h-3.5 w-3.5" />
           View public site
         </Link>
-        <p className="text-[10px] text-slate-700 font-medium">Elevate for Humanity · Admin</p>
       </div>
-    </nav>
+    </>
   );
 
   return (
     <>
+      {/* Mobile hamburger — top-left, inside header height */}
       <button
+        type="button"
+        aria-label="Open admin navigation"
         onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-900 rounded-lg text-slate-400 hover:text-white shadow-lg"
+        className="fixed left-4 top-5 z-50 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm lg:hidden"
       >
-        <Menu className="w-5 h-5" />
+        <Menu className="h-5 w-5" />
       </button>
 
+      {/* Mobile backdrop */}
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 flex">
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <div className="relative w-64 h-full shadow-2xl">
-            <button onClick={() => setMobileOpen(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white z-10">
-              <X className="w-5 h-5" />
-            </button>
-            {sidebarContent}
-          </div>
-        </div>
+        <div
+          className="fixed inset-0 z-40 bg-slate-950/50 backdrop-blur-[1px] lg:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
       )}
 
-      <aside className="hidden lg:block lg:w-64 lg:fixed lg:inset-y-0 z-40">
-        {sidebarContent}
+      {/* Sidebar — fixed desktop, slide-in mobile */}
+      <aside
+        className={[
+          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-slate-800 bg-slate-900 transition-transform duration-200 ease-out",
+          mobileOpen ? "translate-x-0" : "-translate-x-full",
+          "lg:translate-x-0",
+        ].join(" ")}
+      >
+        {sidebarInner}
       </aside>
     </>
   );

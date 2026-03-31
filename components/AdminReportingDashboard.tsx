@@ -105,9 +105,9 @@ export function AdminReportingDashboard() {
         completionRate,
         revenue: totalRevenue,
         studentChange: 12.5, // Would calculate from historical data
-        enrollmentChange: 8.3,
-        completionChange: 3.1,
-        revenueChange: 15.7,
+        enrollmentChange: 0,
+        completionChange: 0,
+        revenueChange: 0,
       });
 
       // Format program performance
@@ -115,10 +115,10 @@ export function AdminReportingDashboard() {
         const formattedPrograms: ProgramPerformance[] = programs.map(p => ({
           id: p.id,
           name: p.name,
-          students: (p.enrollments as any)?.[0]?.count || Math.floor(Math.random() * 300) + 50,
-          completion: Math.floor(Math.random() * 15) + 80,
-          revenue: Math.floor(Math.random() * 40000) + 10000,
-          placement: Math.floor(Math.random() * 10) + 85,
+          students: (p.enrollments as any)?.[0]?.count || 0,
+          completion: 0,
+          revenue: 0,
+          placement: 0,
         }));
         setProgramPerformance(formattedPrograms);
       }
@@ -139,35 +139,12 @@ export function AdminReportingDashboard() {
         setRecentActivity(formattedActivities);
       }
 
-      // Generate monthly data for chart
-      setMonthlyData([65, 72, 68, 85, 92, 88, 95, 90, 98, 102, 108, 115]);
+      // Monthly data from real enrollments would go here
+      setMonthlyData([]);
 
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
-      // Set fallback data
-      setMetrics({
-        totalStudents: 2547,
-        activeEnrollments: 1834,
-        completionRate: 87,
-        revenue: 124580,
-        studentChange: 12.5,
-        enrollmentChange: 8.3,
-        completionChange: 3.1,
-        revenueChange: 15.7,
-      });
-      setProgramPerformance([
-        { id: '1', name: 'CNA Certification', students: 342, completion: 92, revenue: 45600, placement: 94 },
-        { id: '2', name: 'HVAC Technician', students: 256, completion: 88, revenue: 38400, placement: 91 },
-        { id: '3', name: 'Barber Apprenticeship', students: 189, completion: 95, revenue: 28350, placement: 96 },
-        { id: '4', name: 'Web Development', students: 167, completion: 85, revenue: 25050, placement: 88 },
-        { id: '5', name: 'Truck Driving CDL', students: 145, completion: 90, revenue: 21750, placement: 93 },
-      ]);
-      setRecentActivity([
-        { id: '1', type: 'enrollment', student: 'Sarah Johnson', program: 'CNA', time: '5 min ago', created_at: new Date().toISOString() },
-        { id: '2', type: 'completion', student: 'Michael Chen', program: 'HVAC', time: '12 min ago', created_at: new Date().toISOString() },
-        { id: '3', type: 'payment', student: 'Emily Rodriguez', amount: 299, time: '23 min ago', created_at: new Date().toISOString() },
-      ]);
-      setMonthlyData([65, 72, 68, 85, 92, 88, 95, 90, 98, 102, 108, 115]);
+      setError('Failed to load reporting data. Please refresh.');
     } finally {
       setLoading(false);
     }

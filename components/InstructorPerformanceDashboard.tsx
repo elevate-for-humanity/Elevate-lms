@@ -1,27 +1,27 @@
 "use client";
 
 import React from 'react';
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
 
 export default function InstructorPerformanceDashboard() {
   const [timeRange, setTimeRange] = useState('30');
+  const [metrics, setMetrics] = useState({ totalStudents: 0, avgRating: 0, coursesTeaching: 0, completionRate: 0, responseTime: 0, engagement: 0 });
+  const [courses, setCourses] = useState<{ name: string; students: number; rating: number; completion: number }[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const metrics = {
-    totalStudents: 245,
-    avgRating: 4.8,
-    coursesTeaching: 3,
-    completionRate: 87,
-    responseTime: 2.5,
-    engagement: 92,
-  };
-
-  const courses = [
-    { name: 'Full-Stack Web Development', students: 120, rating: 4.9, completion: 85 },
-    { name: 'JavaScript Advanced', students: 85, rating: 4.7, completion: 90 },
-    { name: 'React Fundamentals', students: 40, rating: 4.8, completion: 88 },
-  ];
+  useEffect(() => {
+    fetch(`/api/instructor/performance?days=${timeRange}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.data) {
+          setMetrics(m => d.data.metrics || m);
+          setCourses(d.data.courses || []);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [timeRange]);
 
   return (
     <div className="min-h-screen bg-gray-50">

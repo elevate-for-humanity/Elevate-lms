@@ -18,28 +18,10 @@ export default function ProgramOutcomesTracker() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate data fetch
-    setTimeout(() => {
-      setOutcomes([
-        {
-          id: '1',
-          program: 'CNA Training',
-          completionRate: 92,
-          employmentRate: 88,
-          avgSalary: 35000,
-          studentSatisfaction: 4.5,
-        },
-        {
-          id: '2',
-          program: 'CDL Training',
-          completionRate: 85,
-          employmentRate: 95,
-          avgSalary: 48000,
-          studentSatisfaction: 4.7,
-        },
-      ]);
-      setLoading(false);
-    }, 1000);
+    fetch('/api/admin/program-outcomes')
+      .then(r => r.json())
+      .then(d => { setOutcomes(d.data || []); setLoading(false); })
+      .catch(() => { setOutcomes([]); setLoading(false); });
   }, []);
 
   if (loading) {

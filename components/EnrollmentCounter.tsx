@@ -16,32 +16,36 @@ interface EnrollmentData {
 
 export default function EnrollmentCounter() {
   const [enrollmentData, setEnrollmentData] = useState<EnrollmentData>({
-    total: 2847,
-    thisMonth: 156,
-    today: 12,
-    activeStudents: 1234,
+    total: 0,
+    thisMonth: 0,
+    today: 0,
+    activeStudents: 0,
     lastUpdated: new Date()
   });
 
-  const [isLive, setIsLive] = useState(true);
+  const [isLive, setIsLive] = useState(false);
 
-  // Animated counters
   const totalCount = useMotionValue(0);
   const monthCount = useMotionValue(0);
   const todayCount = useMotionValue(0);
   const activeCount = useMotionValue(0);
 
-  // Simulate real-time updates
   useEffect(() => {
-    // Animate initial values
-    animate(totalCount, enrollmentData.total, { duration: 2 });
-    animate(monthCount, enrollmentData.thisMonth, { duration: 2 });
-    animate(todayCount, enrollmentData.today, { duration: 2 });
-    animate(activeCount, enrollmentData.activeStudents, { duration: 2 });
+    fetch('/api/admin/enrollment-stats')
+      .then(r => r.json())
+      .then(d => {
+        if (d.data) {
+          setEnrollmentData({ ...d.data, lastUpdated: new Date() });
+          setIsLive(true);
+          animate(totalCount, d.data.total, { duration: 1.5 });
+          animate(monthCount, d.data.thisMonth, { duration: 1.5 });
+          animate(todayCount, d.data.today, { duration: 1.5 });
+          animate(activeCount, d.data.activeStudents, { duration: 1.5 });
+        }
+      })
+      .catch(() => {});
 
-    // No fake updates - show static data only
-    return () => {};
-  }, []);
+  }, [totalCount, monthCount, todayCount, activeCount]);
 
   // Format number with commas
   const formatNumber = (num: number) => {

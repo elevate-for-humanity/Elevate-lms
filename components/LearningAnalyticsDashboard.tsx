@@ -108,18 +108,6 @@ export default function LearningAnalyticsDashboard() {
         ]);
       } catch (err) {
         console.error('Error loading analytics:', err);
-        // Set fallback data
-        setLearningMetrics({
-          studyTime: 42,
-          completionRate: 87,
-          averageScore: 91,
-          engagementScore: 78,
-          predictedGrade: 'A-',
-          onTrackPercentage: 94,
-        });
-        setInsights([
-          { id: '1', type: 'recommendation', title: 'Optimize Study Schedule', description: 'Your peak learning hours are 9-11 AM', confidence: 85, action: 'Adjust schedule' },
-        ]);
       } finally {
         setLoading(false);
       }

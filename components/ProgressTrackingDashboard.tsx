@@ -19,65 +19,36 @@ interface CourseProgress {
 
 export function ProgressTrackingDashboard() {
   const [timeRange, setTimeRange] = useState('week');
+  const [overallProgress, setOverallProgress] = useState({ completionRate: 0, studyHours: 0, coursesInProgress: 0, coursesCompleted: 0, streak: 0, averageScore: 0 });
+  const [courses, setCourses] = useState<CourseProgress[]>([]);
+  const [weeklyActivity, setWeeklyActivity] = useState<{ day: string; hours: number; completed: number }[]>([]);
+  const [milestones, setMilestones] = useState<{ title: string; completed: boolean; date: string }[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const overallProgress = {
-    completionRate: 68,
-    studyHours: 42,
-    coursesInProgress: 3,
-    coursesCompleted: 2,
-    streak: 7,
-    averageScore: 87,
-  };
+  useEffect(() => {
+    fetch(`/api/learner/progress?range=${timeRange}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.data) {
+          setOverallProgress(p => d.data.overallProgress || p);
+          setCourses(d.data.courses || []);
+          setWeeklyActivity(d.data.weeklyActivity || []);
+          setMilestones(d.data.milestones || []);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [timeRange]);
 
-  const courses: CourseProgress[] = [
-    {
-      id: '1',
-      title: 'Full-Stack Web Development',
-      progress: 75,
-      lessonsCompleted: 30,
-      totalLessons: 40,
-      lastActivity: '2 hours ago',
-      status: 'on-track',
-      nextMilestone: 'Complete React Module',
-    },
-    {
-      id: '2',
-      title: 'JavaScript Advanced Concepts',
-      progress: 45,
-      lessonsCompleted: 18,
-      totalLessons: 40,
-      lastActivity: '1 day ago',
-      status: 'behind',
-      nextMilestone: 'Async Programming Quiz',
-    },
-    {
-      id: '3',
-      title: 'Database Design',
-      progress: 90,
-      lessonsCompleted: 27,
-      totalLessons: 30,
-      lastActivity: '3 hours ago',
-      status: 'ahead',
-      nextMilestone: 'Final Project',
-    },
-  ];
+  const maxHours = weeklyActivity.length ? Math.max(...weeklyActivity.map(d => d.hours)) : 1;
 
-  const weeklyActivity = [
-    { day: 'Mon', hours: 6, completed: 3 },
-    { day: 'Tue', hours: 4, completed: 2 },
-    { day: 'Wed', hours: 8, completed: 5 },
-    { day: 'Thu', hours: 5, completed: 3 },
-    { day: 'Fri', hours: 7, completed: 4 },
-    { day: 'Sat', hours: 3, completed: 2 },
-    { day: 'Sun', hours: 9, completed: 6 },
-  ];
+  if (loading) return <div className="py-12 text-center text-slate-500">Loading progress...</div>;
+  if (!courses.length) return <div className="py-12 text-center text-slate-500">No progress data yet. Enroll in a course to get started.</div>;
 
-  const maxHours = Math.max(...weeklyActivity.map(d => d.hours));
-
-  const milestones = [
-    { title: 'Complete 10 Lessons', completed: true, date: '2024-01-10' },
-    { title: 'First Quiz Passed', completed: true, date: '2024-01-15' },
-    { title: 'Mid-Course Project', completed: true, date: '2024-01-20' },
+  const milestonesFull = milestones.length ? milestones : [
+    { title: 'Complete 10 Lessons', completed: false, date: '' },
+    { title: 'First Quiz Passed', completed: false, date: '' },
+    { title: 'Mid-Course Project', completed: false, date: '' },
     { title: 'Advanced Module Started', completed: false, date: 'In Progress' },
     { title: 'Final Project', completed: false, date: 'Upcoming' },
   ];
@@ -172,7 +143,7 @@ export function ProgressTrackingDashboard() {
           <Card className="p-6">
             <h3 className="text-xl font-bold mb-4">Learning Milestones</h3>
             <div className="space-y-3">
-              {milestones.map((milestone, index) => (
+              {milestonesFull.map((milestone, index) => (
                 <div key={index} className="flex items-start gap-3">
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
                     milestone.completed ? 'bg-brand-green-500 text-white' : 'bg-gray-300 text-black'

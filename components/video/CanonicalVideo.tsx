@@ -68,17 +68,25 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.1
   // Immediate autoplay for above-the-fold hero videos.
   // Fires on mount so the video starts as soon as the component renders,
   // without waiting for the IntersectionObserver tick.
+  // Only one play path runs — autoPlayOnMount OR observer, never both.
   useEffect(() => {
     if (!autoPlayOnMount || reducedMotion || failed) return;
     const video = ref.current;
     if (!video) return;
-    video.play().catch(() => {});
+    // Wait for enough data before calling play() to avoid AbortError races
+    if (video.readyState >= 2) {
+      video.play().catch(() => {});
+    } else {
+      const onReady = () => { video.play().catch(() => {}); };
+      video.addEventListener('canplay', onReady, { once: true });
+      return () => video.removeEventListener('canplay', onReady);
+    }
   }, [autoPlayOnMount, reducedMotion, failed]);
 
   // Visibility-gated playback — starts when video enters view.
   // If playThrough=true (default for hero videos), keeps playing after scrolling away.
   // If playThrough=false, pauses when scrolled out of view.
-  // Skipped when autoPlayOnMount=true since playback is already started above.
+  // Skipped entirely when autoPlayOnMount=true.
   useEffect(() => {
     if (autoPlayOnMount || reducedMotion || failed) return;
     const video = ref.current;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Volume2, VolumeX } from 'lucide-react';
 
@@ -52,6 +52,24 @@ function ProgramCard({ prog }: { prog: typeof PROGRAMS[number] }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
 
+  // Play only when the card is visible — not all 4 on page load
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.25 }
+    );
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, []);
+
   function toggleSound(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
@@ -65,7 +83,7 @@ function ProgramCard({ prog }: { prog: typeof PROGRAMS[number] }) {
       <video
         ref={videoRef}
         src={prog.video}
-        autoPlay muted loop playsInline
+        muted loop playsInline
         className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent" />

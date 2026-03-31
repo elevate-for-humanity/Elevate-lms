@@ -1,449 +1,487 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import Link from 'next/link';
+import { useState, useMemo } from "react";
+import Link from "next/link";
 import {
-  Users, TrendingUp, Inbox, DollarSign, AlertTriangle, Award,
-  CheckCircle, Eye, ChevronUp, ChevronDown, Download,
-  Clock, BookOpen, BarChart3, Shield, Settings, Zap,
-  Activity, Target, ArrowRight, XCircle, UserX,
-} from 'lucide-react';
-import type { DashboardData } from './types';
+  ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip,
+  PieChart, Pie, Cell, BarChart, Bar,
+} from "recharts";
+import {
+  ArrowUpRight, ArrowDownRight, Activity, FileClock, DollarSign, Award,
+  AlertTriangle, CheckCircle, ArrowRight, Download, ChevronUp, ChevronDown,
+  XCircle, UserX, BookOpen, Shield, BarChart3, Zap, Target, Settings, Users,
+} from "lucide-react";
+import type { DashboardData, KPICard } from "./types";
 
-const STATUS_BADGE: Record<string, string> = {
-  pending:    'bg-amber-100 text-amber-800',
-  submitted:  'bg-amber-100 text-amber-800',
-  in_review:  'bg-blue-100 text-blue-800',
-  approved:   'bg-emerald-100 text-emerald-800',
-  enrolled:   'bg-teal-100 text-teal-800',
-  rejected:   'bg-red-100 text-red-800',
-  waitlisted: 'bg-purple-100 text-purple-800',
-  active:     'bg-emerald-100 text-emerald-800',
-  at_risk:    'bg-red-100 text-red-800',
-  completed:  'bg-gray-100 text-gray-700',
+const PIE_COLORS = ["#0f172a","#06b6d4","#94a3b8","#22c55e","#f59e0b","#ef4444"];
+const LINE_COLOR = "#3b82f6";
+const BAR_COLOR  = "#06b6d4";
+
+const STATUS_BADGE: Record<string,string> = {
+  pending:"bg-amber-100 text-amber-800", submitted:"bg-amber-100 text-amber-800",
+  in_review:"bg-blue-100 text-blue-800", approved:"bg-emerald-100 text-emerald-800",
+  enrolled:"bg-teal-100 text-teal-800",  rejected:"bg-red-100 text-red-800",
+  waitlisted:"bg-purple-100 text-purple-800", active:"bg-emerald-100 text-emerald-800",
+  at_risk:"bg-red-100 text-red-800",     completed:"bg-gray-100 text-gray-700",
+};
+const STATUS_LABEL: Record<string,string> = {
+  pending:"Pending", submitted:"Submitted", in_review:"In Review",
+  approved:"Approved", enrolled:"Enrolled", rejected:"Rejected",
+  waitlisted:"Waitlisted", active:"Active", at_risk:"At Risk", completed:"Completed",
 };
 
-const STATUS_LABEL: Record<string, string> = {
-  pending: 'Pending', submitted: 'Submitted', in_review: 'In Review',
-  approved: 'Approved', enrolled: 'Enrolled', rejected: 'Rejected',
-  waitlisted: 'Waitlisted', active: 'Active', at_risk: 'At Risk', completed: 'Completed',
-};
-
-function Badge({ status }: { status: string }) {
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold ${STATUS_BADGE[status] || 'bg-gray-100 text-gray-600'}`}>
-      {STATUS_LABEL[status] || status}
-    </span>
-  );
+function fmt(n:number){ return new Intl.NumberFormat("en-US").format(n); }
+function fmtDollars(n:number){ return n>=1000?"$"+(n/1000).toFixed(1)+"k":"$"+n.toLocaleString(); }
+function exportCSV(rows:Record<string,any>[],filename:string){
+  if(!rows.length)return;
+  const keys=Object.keys(rows[0]);
+  const csv=[keys.join(","),...rows.map(r=>keys.map(k=>JSON.stringify(r[k]??"")).join(","))].join("\n");
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download=filename; a.click();
 }
 
-function exportCSV(rows: any[], filename: string) {
-  if (!rows.length) return;
-  const keys = Object.keys(rows[0]);
-  const csv = [keys.join(','), ...rows.map(r => keys.map(k => JSON.stringify(r[k] ?? '')).join(','))].join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-  a.download = filename;
-  a.click();
+function Badge({status}:{status:string}){
+  return <span className={"inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold "+(STATUS_BADGE[status]||"bg-gray-100 text-gray-600")}>{STATUS_LABEL[status]||status}</span>;
 }
 
-type SortKey = 'full_name' | 'enrollment_status' | 'created_at';
-
-function SortIcon({ active, dir }: { active: boolean; dir: 'asc' | 'desc' }) {
-  if (!active) return <ChevronDown className="w-3 h-3 text-slate-300" />;
-  return dir === 'asc'
-    ? <ChevronUp className="w-3 h-3 text-blue-500" />
-    : <ChevronDown className="w-3 h-3 text-blue-500" />;
-}
-
-function OpsCard({ label, value, sub, icon: Icon, color, bg, href, urgent }: {
-  label: string; value: string | number; sub: string;
-  icon: React.ElementType; color: string; bg: string; href: string; urgent?: boolean;
-}) {
-  return (
-    <Link href={href}
-      className={`relative bg-white rounded-xl border ${urgent ? 'border-red-300 shadow-red-100 shadow-md' : 'border-slate-200'} p-5 hover:shadow-lg transition-all group`}>
-      {urgent && <span className="absolute top-3 right-3 w-2 h-2 rounded-full bg-red-500 animate-pulse" />}
-      <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center mb-3`}>
-        <Icon className={`w-5 h-5 ${color}`} />
+function KPICardView({card}:{card:KPICard}){
+  const pos=card.delta>=0;
+  const Icon=card.label.toLowerCase().includes("learner")||card.label.toLowerCase().includes("student")?Activity
+    :card.label.toLowerCase().includes("application")?FileClock
+    :card.label.toLowerCase().includes("revenue")?DollarSign:Award;
+  return(
+    <Link href={card.href} className={"relative overflow-hidden rounded-2xl border bg-white shadow-sm hover:shadow-md transition-shadow "+(card.urgent?"border-rose-300":"border-slate-200")}>
+      <div className={"h-1.5 "+(card.urgent?"bg-rose-500":"bg-cyan-500")} />
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-slate-500 truncate">{card.label}</p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 tabular-nums">
+              {card.label.toLowerCase().includes("revenue")?fmtDollars(card.value):fmt(card.value)}
+            </p>
+          </div>
+          <div className={("rounded-xl p-2 flex-shrink-0 ")+(card.urgent?"bg-rose-50 text-rose-600":"bg-slate-100 text-slate-600")}>
+            <Icon className="h-5 w-5" />
+          </div>
+        </div>
+        <div className="mt-4 flex items-center gap-2 flex-wrap">
+          {card.delta!==0&&(
+            <span className={"inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold "+(pos?"bg-emerald-50 text-emerald-700":"bg-rose-50 text-rose-700")}>
+              {pos?<ArrowUpRight className="h-3.5 w-3.5"/>:<ArrowDownRight className="h-3.5 w-3.5"/>}
+              {Math.abs(card.delta)}%
+            </span>
+          )}
+          <span className="text-xs text-slate-500">{card.deltaLabel}</span>
+        </div>
       </div>
-      <div className="text-3xl font-black text-slate-900 leading-none tabular-nums">{value}</div>
-      <div className="text-sm font-semibold text-slate-700 mt-1">{label}</div>
-      <div className="text-xs text-slate-400 mt-0.5">{sub}</div>
-      <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-        <ArrowRight className="w-4 h-4 text-slate-400" />
-      </div>
+      {card.urgent&&<span className="absolute top-4 right-4 w-2 h-2 rounded-full bg-rose-500 animate-pulse"/>}
     </Link>
   );
 }
 
-function DecisionPanel({ title, icon: Icon, iconColor, items, emptyLabel, viewAllHref }: {
-  title: string; icon: React.ElementType; iconColor: string;
-  items: { label: string; sub?: string; href: string; badge?: string; badgeColor?: string; urgent?: boolean }[];
-  emptyLabel: string; viewAllHref?: string;
-}) {
-  return (
-    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-      <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-        <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-          <Icon className={`w-4 h-4 ${iconColor}`} />
-          {title}
-        </h2>
-        {viewAllHref && (
-          <Link href={viewAllHref} className="text-xs text-blue-600 font-medium hover:underline">View all →</Link>
-        )}
-      </div>
-      <div className="divide-y divide-slate-50">
-        {items.length === 0 ? (
-          <div className="px-5 py-8 text-center">
-            <CheckCircle className="w-7 h-7 text-emerald-400 mx-auto mb-2" />
-            <p className="text-xs text-slate-400">{emptyLabel}</p>
-          </div>
-        ) : items.map((item, i) => (
-          <Link key={i} href={item.href}
-            className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group">
-            {item.urgent && <span className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" />}
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-slate-800 truncate">{item.label}</div>
-              {item.sub && <div className="text-xs text-slate-400 mt-0.5">{item.sub}</div>}
-            </div>
-            {item.badge && (
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${item.badgeColor || 'bg-slate-100 text-slate-600'}`}>
-                {item.badge}
-              </span>
-            )}
-            <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 flex-shrink-0" />
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
+type SortKey="full_name"|"enrollment_status"|"created_at";
+function SortIcon({active,dir}:{active:boolean;dir:"asc"|"desc"}){
+  if(!active)return <ChevronDown className="w-3 h-3 text-slate-300"/>;
+  return dir==="asc"?<ChevronUp className="w-3 h-3 text-blue-500"/>:<ChevronDown className="w-3 h-3 text-blue-500"/>;
 }
 
-export default function DashboardClient({ data }: { data: DashboardData }) {
-  const c = data.counts;
-  const [studentSearch, setStudentSearch] = useState('');
-  const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({ key: 'created_at', dir: 'desc' });
+export default function DashboardClient({data}:{data:DashboardData}){
+  const [trendRange,setTrendRange]=useState<"7d"|"30d"|"3mo">("30d");
+  const [search,setSearch]=useState("");
+  const [sort,setSort]=useState<{key:SortKey;dir:"asc"|"desc"}>({key:"created_at",dir:"desc"});
+  function toggleSort(key:SortKey){setSort(p=>({key,dir:p.key===key&&p.dir==="asc"?"desc":"asc"}));}
 
-  function toggleSort(key: SortKey) {
-    setSort(prev => ({ key, dir: prev.key === key && prev.dir === 'asc' ? 'desc' : 'asc' }));
-  }
+  const now=new Date(data.generatedAt);
+  const hour=now.getHours();
+  const greeting=hour<12?"Good morning":hour<17?"Good afternoon":"Good evening";
+  const firstName=data.profile?.full_name?.split(" ")[0]||"Admin";
 
-  const filteredStudents = useMemo(() => {
-    let list = [...data.recentStudents];
-    if (studentSearch) {
-      const q = studentSearch.toLowerCase();
-      list = list.filter(s => (s.full_name || '').toLowerCase().includes(q) || (s.email || '').toLowerCase().includes(q));
-    }
-    list.sort((a, b) => {
-      const av = a[sort.key] ?? '';
-      const bv = b[sort.key] ?? '';
-      return sort.dir === 'asc' ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
-    });
+  const trendData=useMemo(()=>{
+    const n=trendRange==="7d"?2:trendRange==="30d"?4:data.enrollmentTrend.length;
+    return data.enrollmentTrend.slice(-n);
+  },[data.enrollmentTrend,trendRange]);
+
+  const filteredStudents=useMemo(()=>{
+    let list=[...data.recentStudents];
+    if(search){const q=search.toLowerCase();list=list.filter(s=>(s.full_name||"").toLowerCase().includes(q)||(s.email||"").toLowerCase().includes(q));}
+    list.sort((a,b)=>{const av=a[sort.key]??"";const bv=b[sort.key]??"";return sort.dir==="asc"?String(av).localeCompare(String(bv)):String(bv).localeCompare(String(av));});
     return list;
-  }, [data.recentStudents, studentSearch, sort]);
+  },[data.recentStudents,search,sort]);
 
-  const certRate = c.enrollments > 0 ? Math.round((c.certificates / c.enrollments) * 100) : 0;
-  const revenueDollars = Math.round(data.totalRevenueCents / 100);
-  const revenueDisplay = revenueDollars >= 1000 ? `$${(revenueDollars / 1000).toFixed(1)}k` : `$${revenueDollars.toLocaleString()}`;
-  const firstName = data.profile?.full_name?.split(' ')[0] || 'Admin';
-  const now = new Date(data.generatedAt);
-  const hour = now.getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  const timeLabel = now.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-
-  const opsMetrics = [
-    { label: 'Active Learners',       value: c.enrollments.toLocaleString(), sub: `${c.atRisk} flagged at-risk`,  icon: Activity,  color: 'text-blue-600',    bg: 'bg-blue-50',    href: '/admin/enrollments',                  urgent: c.atRisk > 0 },
-    { label: 'Pending Applications',  value: c.pendingApplications,          sub: 'Awaiting review',              icon: Inbox,     color: 'text-amber-600',   bg: 'bg-amber-50',   href: '/admin/applications?status=pending',  urgent: c.pendingApplications > 0 },
-    { label: 'Revenue Collected',     value: revenueDisplay,                 sub: `${certRate}% cert rate`,       icon: DollarSign,color: 'text-emerald-600', bg: 'bg-emerald-50', href: '/admin/payroll' },
-    { label: 'Certificates Issued',   value: c.certificates.toLocaleString(),sub: `${c.students} total students`, icon: Award,     color: 'text-purple-600',  bg: 'bg-purple-50',  href: '/admin/certificates' },
-  ];
-
-  const blockers = [
-    c.pendingApplications > 0 && { label: `${c.pendingApplications} application${c.pendingApplications !== 1 ? 's' : ''} need review`, sub: 'Learners waiting for a decision', href: '/admin/applications?status=pending', badge: 'Urgent', badgeColor: 'bg-red-100 text-red-700', urgent: true },
-    c.pendingEnrollments > 0  && { label: `${c.pendingEnrollments} enrollment${c.pendingEnrollments !== 1 ? 's' : ''} awaiting approval`, sub: 'Cannot start training until approved', href: '/admin/enrollments?status=pending', badge: 'Blocking', badgeColor: 'bg-orange-100 text-orange-700', urgent: true },
-    c.pendingDocs > 0         && { label: `${c.pendingDocs} document${c.pendingDocs !== 1 ? 's' : ''} need review`, sub: 'Required for compliance', href: '/admin/documents/review', badge: 'Review', badgeColor: 'bg-blue-100 text-blue-700' },
-    c.atRisk > 0              && { label: `${c.atRisk} learner${c.atRisk !== 1 ? 's' : ''} flagged at-risk`, sub: 'No activity or falling behind', href: '/admin/at-risk', badge: 'At Risk', badgeColor: 'bg-red-100 text-red-700', urgent: true },
+  const pendingAppsKpi = data.kpis.find(k => k.label === "Pending Applications");
+  const blockers=[
+    pendingAppsKpi?.urgent && { label: `${pendingAppsKpi.value} application${pendingAppsKpi.value !== 1 ? "s" : ""} need review`, sub:"Learners waiting for a decision", href:"/admin/applications?status=pending", badge:"Urgent", badgeColor:"bg-red-100 text-red-700", urgent:true },
+    data.blockedPrograms.length>0 && { label: `${data.blockedPrograms.length} program${data.blockedPrograms.length !== 1 ? "s" : ""} unpublished`, sub:"Blocking revenue", href:"/admin/programs", badge:"Blocking", badgeColor:"bg-orange-100 text-orange-700", urgent:true },
+    data.inactiveLearners.length>0 && { label: `${data.inactiveLearners.length} learner${data.inactiveLearners.length !== 1 ? "s" : ""} inactive 3+ days`, sub:"No activity or falling behind", href:"/admin/at-risk", badge:"At Risk", badgeColor:"bg-red-100 text-red-700", urgent:true },
   ].filter(Boolean) as any[];
 
-  const recentAppsItems = data.recentApplications.slice(0, 6).map(app => {
-    const name = [app.first_name, app.last_name].filter(Boolean).join(' ') || app.full_name || 'Unknown';
-    return {
-      label: name,
-      sub: `${app.program_interest || 'Program not specified'} · ${new Date(app.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`,
-      href: `/admin/applications/review/${app.id}`,
-      badge: STATUS_LABEL[app.status] || app.status,
-      badgeColor: STATUS_BADGE[app.status] || 'bg-gray-100 text-gray-600',
-      urgent: ['pending', 'submitted', 'in_review'].includes(app.status),
-    };
-  });
-
-  const activityItems = data.recentActivity.slice(0, 8).map(item => ({
-    label: item.label,
-    sub: new Date(item.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }),
-    href: '#',
-  }));
-
-  const quickActions = [
-    { label: 'Course Builder',  sub: 'Create or edit programs',  href: '/admin/course-builder',  icon: BookOpen,  color: 'text-blue-600',    bg: 'bg-blue-50' },
-    { label: 'Compliance',      sub: 'Documents & audits',       href: '/admin/compliance',       icon: Shield,    color: 'text-emerald-600', bg: 'bg-emerald-50' },
-    { label: 'Reports',         sub: 'Analytics & exports',      href: '/admin/reports',          icon: BarChart3, color: 'text-purple-600',  bg: 'bg-purple-50' },
-    { label: 'HVAC Activation', sub: 'Manage HVAC program',      href: '/admin/hvac-activation',  icon: Zap,       color: 'text-amber-600',   bg: 'bg-amber-50' },
-    { label: 'Funding',         sub: 'WIOA & grants',            href: '/admin/funding',          icon: Target,    color: 'text-green-600',   bg: 'bg-green-50' },
-    { label: 'Settings',        sub: 'System configuration',     href: '/admin/settings',         icon: Settings,  color: 'text-slate-600',   bg: 'bg-slate-100' },
+  const quickActions=[
+    {label:"Course Builder",sub:"Create or edit programs",href:"/admin/course-builder",icon:BookOpen,bg:"bg-blue-50",color:"text-blue-600"},
+    {label:"Compliance",sub:"Documents & audits",href:"/admin/compliance",icon:Shield,bg:"bg-emerald-50",color:"text-emerald-600"},
+    {label:"Reports",sub:"Analytics & exports",href:"/admin/reports",icon:BarChart3,bg:"bg-purple-50",color:"text-purple-600"},
+    {label:"HVAC",sub:"Manage HVAC program",href:"/admin/hvac-activation",icon:Zap,bg:"bg-amber-50",color:"text-amber-600"},
+    {label:"Funding",sub:"WIOA & grants",href:"/admin/funding",icon:Target,bg:"bg-green-50",color:"text-green-600"},
+    {label:"Settings",sub:"System configuration",href:"/admin/settings",icon:Settings,bg:"bg-slate-100",color:"text-slate-600"},
   ];
 
-  return (
-    <div className="min-h-screen bg-slate-50">
+  return(
+    <div className="space-y-6">
 
-      {/* Command bar */}
-      <div className="bg-white border-b border-slate-200 px-6 py-4">
-        <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-4">
+      {/* Welcome bar */}
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">{greeting}, {firstName}</h2>
+          <p className="text-sm text-slate-500 mt-0.5">
+            {now.toLocaleString("en-US",{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}
+            {blockers.length>0&&<span className="ml-2 font-semibold text-rose-600">· {blockers.length} item{blockers.length!==1?"s":""} need attention</span>}
+          </p>
+        </div>
+        <Link href="/admin/reports" className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 transition-colors">
+          <BarChart3 className="h-4 w-4"/>Reports
+        </Link>
+      </div>
+
+      {/* KPI cards */}
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {data.kpis.map(card=><KPICardView key={card.label} card={card}/>)}
+      </section>
+
+      {/* Enrollment trend chart */}
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="mb-4 flex items-center justify-between flex-wrap gap-2">
           <div>
-            <h1 className="text-xl font-black text-slate-900">{greeting}, {firstName}</h1>
-            <p className="text-xs text-slate-400 mt-0.5">{timeLabel} · Operations overview</p>
+            <h2 className="text-lg font-semibold text-slate-900">Enrollment Trend</h2>
+            <p className="text-sm text-slate-500">Monthly learner enrollment volume</p>
           </div>
-          <div className="flex items-center gap-3">
-            {blockers.length > 0 && (
-              <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold px-3 py-2 rounded-lg">
-                <AlertTriangle className="w-3.5 h-3.5" />
-                {blockers.length} item{blockers.length !== 1 ? 's' : ''} need attention
+          <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1">
+            {(["7d","30d","3mo"] as const).map(r=>(
+              <button key={r} onClick={()=>setTrendRange(r)}
+                className={"px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors "+(trendRange===r?"bg-white text-slate-900 shadow-sm":"text-slate-500 hover:text-slate-700")}>
+                {r}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="h-72">
+          {trendData.length>0?(
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={trendData} margin={{top:4,right:8,left:-20,bottom:0}}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9"/>
+                <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{fontSize:12,fill:"#94a3b8"}}/>
+                <YAxis tickLine={false} axisLine={false} tick={{fontSize:12,fill:"#94a3b8"}}/>
+                <Tooltip contentStyle={{fontSize:12,borderRadius:12,border:"1px solid #e2e8f0"}}/>
+                <Line type="monotone" dataKey="enrollments" stroke={LINE_COLOR} strokeWidth={3} dot={{r:4,fill:LINE_COLOR}} activeDot={{r:6}} name="Enrollments"/>
+              </LineChart>
+            </ResponsiveContainer>
+          ):(
+            <div className="h-full flex items-center justify-center text-sm text-slate-400">No enrollment data yet</div>
+          )}
+        </div>
+      </section>
+
+      {/* Status donut + Top programs bar */}
+      <section className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+
+        {/* Status donut */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-900 mb-1">Student Statuses</h2>
+          <p className="text-sm text-slate-500 mb-4">Current distribution by learner status</p>
+          {data.studentStatuses.length>0?(
+            <>
+              <div className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={data.studentStatuses} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={3}>
+                      {data.studentStatuses.map((_,i)=><Cell key={i} fill={PIE_COLORS[i%PIE_COLORS.length]}/>)}
+                    </Pie>
+                    <Tooltip contentStyle={{fontSize:12,borderRadius:12,border:"1px solid #e2e8f0"}}/>
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
-            )}
-            <Link href="/admin/reports"
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
-              <BarChart3 className="w-3.5 h-3.5" /> Reports
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-[1400px] mx-auto px-6 py-6 space-y-6">
-
-        {/* Row 1: Ops metrics */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {opsMetrics.map(m => <OpsCard key={m.label} {...m} />)}
-        </div>
-
-        {/* Row 2: Blockers + Applications */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-1">
-            <DecisionPanel
-              title="Needs a Decision"
-              icon={AlertTriangle}
-              iconColor="text-red-500"
-              items={blockers}
-              emptyLabel="Nothing blocking — all clear"
-            />
-          </div>
-          <div className="lg:col-span-2">
-            <DecisionPanel
-              title="Recent Applications"
-              icon={Inbox}
-              iconColor="text-amber-500"
-              items={recentAppsItems}
-              emptyLabel="No applications yet"
-              viewAllHref="/admin/applications"
-            />
-          </div>
-        </div>
-
-        {/* Row 3: Programs blocking revenue + Inactive learners */}
-        {(data.blockedPrograms.length > 0 || data.inactiveLearners.length > 0) && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-            {/* Programs blocking revenue */}
-            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-              <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-                <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <XCircle className="w-4 h-4 text-red-500" />
-                  Programs Blocking Revenue
-                  <span className="ml-1 text-[10px] font-black bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full">
-                    {data.blockedPrograms.length}
-                  </span>
-                </h2>
-                <Link href="/admin/programs" className="text-xs text-blue-600 font-medium hover:underline">
-                  View all →
-                </Link>
-              </div>
-              <div className="divide-y divide-slate-50">
-                {data.blockedPrograms.length === 0 ? (
-                  <div className="px-5 py-8 text-center">
-                    <CheckCircle className="w-7 h-7 text-emerald-400 mx-auto mb-2" />
-                    <p className="text-xs text-slate-400">All programs are published</p>
-                  </div>
-                ) : data.blockedPrograms.map(p => (
-                  <Link key={p.id} href={`/admin/programs/${p.id}/edit`}
-                    className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group">
-                    <div className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-slate-800 truncate">{p.title}</div>
-                      <div className="text-xs text-slate-400 mt-0.5">
-                        Status: <span className="capitalize">{p.status}</span>
-                        {p.updatedAt && ` · Last edited ${new Date(p.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
-                      </div>
+              <div className="mt-3 space-y-2">
+                {data.studentStatuses.map((item,i)=>(
+                  <div key={item.name} className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-block h-2.5 w-2.5 rounded-full flex-shrink-0" style={{backgroundColor:PIE_COLORS[i%PIE_COLORS.length]}}/>
+                      <span className="text-slate-600">{item.name}</span>
                     </div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700 flex-shrink-0">
-                      Unpublished
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 flex-shrink-0" />
-                  </Link>
+                    <span className="font-semibold text-slate-900 tabular-nums">{item.value}</span>
+                  </div>
                 ))}
               </div>
-            </div>
+            </>
+          ):(
+            <div className="h-48 flex items-center justify-center text-sm text-slate-400">No status data yet</div>
+          )}
+        </div>
 
-            {/* Inactive learners */}
-            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-              <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-                <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <UserX className="w-4 h-4 text-amber-500" />
-                  Inactive Learners
-                  <span className="ml-1 text-[10px] font-black bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">
-                    {data.inactiveLearners.length}
-                  </span>
-                </h2>
-                <Link href="/admin/at-risk" className="text-xs text-blue-600 font-medium hover:underline">
-                  View all →
-                </Link>
+        {/* Top programs bar */}
+        <div className="xl:col-span-2 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-900 mb-1">Top Programs</h2>
+          <p className="text-sm text-slate-500 mb-4">Highest learner volume by program</p>
+          {data.topPrograms.length>0?(
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data.topPrograms} layout="vertical" margin={{left:8,right:8,top:0,bottom:0}}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9"/>
+                  <XAxis type="number" tickLine={false} axisLine={false} tick={{fontSize:11,fill:"#94a3b8"}}/>
+                  <YAxis type="category" dataKey="name" tickLine={false} axisLine={false} tick={{fontSize:11,fill:"#64748b"}} width={120}/>
+                  <Tooltip contentStyle={{fontSize:12,borderRadius:12,border:"1px solid #e2e8f0"}}/>
+                  <Bar dataKey="learners" fill={BAR_COLOR} radius={[0,8,8,0]} name="Learners"/>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          ):(
+            <div className="h-64 flex items-center justify-center text-sm text-slate-400">No program data yet</div>
+          )}
+        </div>
+      </section>
+
+      {/* Program performance progress bars */}
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold text-slate-900">Program Performance Snapshot</h2>
+          <p className="text-sm text-slate-500">Enrollment and completion rate by program</p>
+        </div>
+        <div className="space-y-4">
+          {data.topPrograms.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">
+              No program performance data available yet.
+            </div>
+          ) : data.topPrograms.map(p => (
+            <div key={p.id || p.name}>
+              <div className="mb-1.5 flex items-center justify-between text-sm">
+                <span className="font-medium text-slate-800 truncate max-w-xs">{p.name}</span>
+                <span className="text-slate-500 flex-shrink-0 ml-4">
+                  {p.learners} learners · {p.completed} completed · {p.completionRate}% completion
+                </span>
               </div>
-              <div className="divide-y divide-slate-50">
-                {data.inactiveLearners.length === 0 ? (
-                  <div className="px-5 py-8 text-center">
-                    <CheckCircle className="w-7 h-7 text-emerald-400 mx-auto mb-2" />
-                    <p className="text-xs text-slate-400">All learners are active</p>
-                  </div>
-                ) : data.inactiveLearners.map(l => (
-                  <Link key={l.enrollmentId} href={`/admin/learner/${l.userId}`}
-                    className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group">
-                    <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-xs font-bold text-amber-700 flex-shrink-0">
-                      {(l.fullName || l.email || '?')[0].toUpperCase()}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-slate-800 truncate">
-                        {l.fullName || l.email || 'Unknown learner'}
-                      </div>
-                      <div className="text-xs text-slate-400 mt-0.5">
-                        Enrolled {l.enrolledAt ? new Date(l.enrolledAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—'} · No activity 3+ days
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 flex-shrink-0">
-                      Stalled
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 flex-shrink-0" />
-                  </Link>
-                ))}
+              <div className="h-2.5 rounded-full bg-slate-100">
+                <div
+                  className="h-2.5 rounded-full bg-cyan-500 transition-all"
+                  style={{width:`${Math.max(0,Math.min(100,p.completionRate))}%`}}
+                />
               </div>
             </div>
+          ))}
+        </div>
+      </section>
 
+      {/* Blockers + Recent applications */}
+      <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Blockers */}
+        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-rose-500"/>
+            <h2 className="text-sm font-bold text-slate-900">Needs a Decision</h2>
           </div>
-        )}
+          <div className="divide-y divide-slate-50">
+            {blockers.length===0?(
+              <div className="px-5 py-8 text-center">
+                <CheckCircle className="w-7 h-7 text-emerald-400 mx-auto mb-2"/>
+                <p className="text-xs text-slate-400">Nothing blocking — all clear</p>
+              </div>
+            ):blockers.map((b:any,i:number)=>(
+              <Link key={i} href={b.href} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group">
+                {b.urgent&&<span className="w-2 h-2 rounded-full bg-rose-500 flex-shrink-0"/>}
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-slate-800 truncate">{b.label}</div>
+                  {b.sub&&<div className="text-xs text-slate-400 mt-0.5">{b.sub}</div>}
+                </div>
+                <span className={"text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 "+(b.badgeColor||"bg-slate-100 text-slate-600")}>{b.badge}</span>
+                <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 flex-shrink-0"/>
+              </Link>
+            ))}
+          </div>
+        </div>
 
-        {/* Row 4: Students + Activity + Quick actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Recent applications */}
+        <div className="lg:col-span-2 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h2 className="text-sm font-bold text-slate-900">Recent Applications</h2>
+            <Link href="/admin/applications" className="text-xs text-blue-600 font-medium hover:underline">View all →</Link>
+          </div>
+          <div className="divide-y divide-slate-50">
+            {data.recentApplications.length===0?(
+              <div className="px-5 py-8 text-center"><p className="text-xs text-slate-400">No applications yet</p></div>
+            ):data.recentApplications.slice(0,6).map(app=>{
+              const name=[app.first_name,app.last_name].filter(Boolean).join(" ")||app.full_name||"Unknown";
+              return(
+                <Link key={app.id} href={}
+                  className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group">
+                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600 flex-shrink-0">
+                    {name[0].toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-slate-800 truncate">{name}</div>
+                    <div className="text-xs text-slate-400 mt-0.5 truncate">{app.program_interest||"Program not specified"} · {new Date(app.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric"})}</div>
+                  </div>
+                  <Badge status={app.status}/>
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 flex-shrink-0"/>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
-          {/* Students table */}
-          <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 overflow-hidden">
-            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between gap-2">
+      {/* Blocked programs + Inactive learners */}
+      {(data.blockedPrograms.length>0||data.inactiveLearners.length>0)&&(
+        <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
               <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <Users className="w-4 h-4 text-slate-400" /> Recent Students
+                <XCircle className="w-4 h-4 text-rose-500"/>Programs Blocking Revenue
+                <span className="text-[10px] font-black bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full">{data.blockedPrograms.length}</span>
               </h2>
-              <div className="flex items-center gap-2">
-                <input value={studentSearch} onChange={e => setStudentSearch(e.target.value)}
-                  placeholder="Search…"
-                  className="text-xs px-3 py-1.5 border border-slate-200 rounded-lg w-36 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                <button
-                  onClick={() => exportCSV(data.recentStudents.map(s => ({ Name: s.full_name || '', Email: s.email || '', Status: s.enrollment_status || '', Program: (s as any).program_name || '', Registered: s.created_at ? new Date(s.created_at).toLocaleDateString() : '' })), 'students.csv')}
-                  className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition" title="Export CSV">
-                  <Download className="w-3.5 h-3.5" />
-                </button>
-                <Link href="/admin/students" className="text-xs text-blue-600 font-medium hover:underline">View all →</Link>
-              </div>
+              <Link href="/admin/programs" className="text-xs text-blue-600 font-medium hover:underline">View all →</Link>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-slate-50 border-b border-slate-100">
-                  <tr>
-                    <th className="px-5 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer select-none" onClick={() => toggleSort('full_name')}>
-                      <span className="flex items-center gap-1">Student <SortIcon active={sort.key === 'full_name'} dir={sort.dir} /></span>
-                    </th>
-                    <th className="px-5 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Program</th>
-                    <th className="px-5 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer select-none" onClick={() => toggleSort('enrollment_status')}>
-                      <span className="flex items-center gap-1">Status <SortIcon active={sort.key === 'enrollment_status'} dir={sort.dir} /></span>
-                    </th>
-                    <th className="px-5 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer select-none" onClick={() => toggleSort('created_at')}>
-                      <span className="flex items-center gap-1">Joined <SortIcon active={sort.key === 'created_at'} dir={sort.dir} /></span>
-                    </th>
-                    <th className="px-5 py-2.5 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {filteredStudents.length === 0 ? (
-                    <tr><td colSpan={5} className="px-5 py-10 text-center text-sm text-slate-400">{studentSearch ? 'No matching students' : 'No students yet'}</td></tr>
-                  ) : filteredStudents.map(s => (
-                    <tr key={s.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-5 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-700 flex-shrink-0">
-                            {(s.full_name || s.email || '?')[0].toUpperCase()}
-                          </div>
-                          <div>
-                            <div className="text-sm font-semibold text-slate-900">{s.full_name || 'Unknown'}</div>
-                            <div className="text-xs text-slate-400">{s.email}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-5 py-3 text-xs text-slate-500">{(s as any).program_name || <span className="text-slate-300">—</span>}</td>
-                      <td className="px-5 py-3"><Badge status={s.enrollment_status || 'pending'} /></td>
-                      <td className="px-5 py-3 text-xs text-slate-400">{s.created_at ? new Date(s.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</td>
-                      <td className="px-5 py-3">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <Link href={`/admin/learner/${s.id}`} className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
-                            <Eye className="w-3 h-3" /> View
-                          </Link>
-                          <Link href={`/admin/students/${s.id}/edit`} className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition">
-                            Edit
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="divide-y divide-slate-50">
+              {data.blockedPrograms.length===0?(
+                <div className="px-5 py-8 text-center"><CheckCircle className="w-7 h-7 text-emerald-400 mx-auto mb-2"/><p className="text-xs text-slate-400">All programs published</p></div>
+              ):data.blockedPrograms.map(p=>(
+                <Link key={p.id} href={} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group">
+                  <div className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0"/>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-slate-800 truncate">{p.title}</div>
+                    <div className="text-xs text-slate-400 mt-0.5">Status: <span className="capitalize">{p.status}</span>{p.updatedAt && ` · ${new Date(p.updatedAt).toLocaleDateString("en-US",{month:"short",day:"numeric"})}`}</div>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700 flex-shrink-0">Unpublished</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 flex-shrink-0"/>
+                </Link>
+              ))}
             </div>
           </div>
 
-          {/* Right rail */}
-          <div className="space-y-4">
-            <DecisionPanel
-              title="Recent Activity"
-              icon={Clock}
-              iconColor="text-slate-400"
-              items={activityItems}
-              emptyLabel="No recent activity"
-            />
-            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-              <div className="px-5 py-4 border-b border-slate-100">
-                <h2 className="text-sm font-bold text-slate-900">Quick Actions</h2>
-              </div>
-              <div className="p-3 grid grid-cols-2 gap-2">
-                {quickActions.map(a => (
-                  <Link key={a.href} href={a.href}
-                    className="flex items-center gap-2.5 p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-200">
-                    <div className={`w-8 h-8 rounded-lg ${a.bg} flex items-center justify-center flex-shrink-0`}>
-                      <a.icon className={`w-4 h-4 ${a.color}`} />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-xs font-semibold text-slate-800 truncate">{a.label}</div>
-                      <div className="text-[10px] text-slate-400 truncate">{a.sub}</div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
+          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <UserX className="w-4 h-4 text-amber-500"/>Inactive Learners
+                <span className="text-[10px] font-black bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">{data.inactiveLearners.length}</span>
+              </h2>
+              <Link href="/admin/at-risk" className="text-xs text-blue-600 font-medium hover:underline">View all →</Link>
             </div>
+            <div className="divide-y divide-slate-50">
+              {data.inactiveLearners.length===0?(
+                <div className="px-5 py-8 text-center"><CheckCircle className="w-7 h-7 text-emerald-400 mx-auto mb-2"/><p className="text-xs text-slate-400">All learners active</p></div>
+              ):data.inactiveLearners.map(l=>(
+                <Link key={l.enrollmentId} href={} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group">
+                  <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-xs font-bold text-amber-700 flex-shrink-0">
+                    {(l.fullName||l.email||"?")[0].toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-slate-800 truncate">{l.fullName||l.email||"Unknown"}</div>
+                    <div className="text-xs text-slate-400 mt-0.5">Enrolled {l.enrolledAt?new Date(l.enrolledAt).toLocaleDateString("en-US",{month:"short",day:"numeric"}):"—"} · No activity 3+ days</div>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 flex-shrink-0">Stalled</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 flex-shrink-0"/>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Students table + Activity + Quick actions */}
+      <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+
+        {/* Students table */}
+        <div className="lg:col-span-2 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between gap-2 flex-wrap">
+            <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2"><Users className="w-4 h-4 text-slate-400"/>Recent Students</h2>
+            <div className="flex items-center gap-2">
+              <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search…"
+                className="text-xs px-3 py-1.5 border border-slate-200 rounded-lg w-36 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+              <button onClick={()=>exportCSV(data.recentStudents.map(s=>({Name:s.full_name||"",Email:s.email||"",Status:s.enrollment_status||"",Program:s.program_name||"",Registered:s.created_at?new Date(s.created_at).toLocaleDateString():""})),"students.csv")}
+                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition" title="Export CSV">
+                <Download className="w-3.5 h-3.5"/>
+              </button>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-slate-100 bg-slate-50">
+                  {([["full_name","Name"],["enrollment_status","Status"],["created_at","Registered"]] as [SortKey,string][]).map(([key,label])=>(
+                    <th key={key} className="px-5 py-3 text-left font-semibold text-slate-500 cursor-pointer select-none whitespace-nowrap" onClick={()=>toggleSort(key)}>
+                      <span className="flex items-center gap-1">{label}<SortIcon active={sort.key===key} dir={sort.dir}/></span>
+                    </th>
+                  ))}
+                  <th className="px-5 py-3 text-left font-semibold text-slate-500">Program</th>
+                  <th className="px-5 py-3"/>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {filteredStudents.length===0?(
+                  <tr><td colSpan={5} className="px-5 py-8 text-center text-slate-400">No students found</td></tr>
+                ):filteredStudents.map(s=>(
+                  <tr key={s.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-5 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-600 flex-shrink-0">
+                          {(s.full_name||s.email||"?")[0].toUpperCase()}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-semibold text-slate-800 truncate max-w-[140px]">{s.full_name||"—"}</div>
+                          <div className="text-slate-400 truncate max-w-[140px]">{s.email||""}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3"><Badge status={s.enrollment_status||"pending"}/></td>
+                    <td className="px-5 py-3 text-slate-500 whitespace-nowrap">{s.created_at?new Date(s.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"2-digit"}):"—"}</td>
+                    <td className="px-5 py-3 text-slate-500 truncate max-w-[120px]">{s.program_name||"—"}</td>
+                    <td className="px-5 py-3"><Link href={} className="text-blue-600 hover:underline font-medium">View</Link></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
-      </div>
+        {/* Activity + Quick actions */}
+        <div className="space-y-6">
+          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100">
+              <h2 className="text-sm font-bold text-slate-900">Recent Activity</h2>
+              <p className="text-xs text-slate-500 mt-0.5">Latest administrative events</p>
+            </div>
+            <div className="divide-y divide-slate-50">
+              {data.recentActivity.length===0?(
+                <div className="px-5 py-8 text-center"><p className="text-xs text-slate-400">No recent activity</p></div>
+              ):data.recentActivity.map(item=>(
+                <div key={item.id} className="flex gap-3 px-5 py-3">
+                  <div className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-cyan-500"/>
+                  <div>
+                    <p className="text-sm font-medium text-slate-800">{item.title}</p>
+                    <p className="mt-0.5 text-xs text-slate-500">{item.timestamp}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100">
+              <h2 className="text-sm font-bold text-slate-900">Quick Actions</h2>
+            </div>
+            <div className="grid grid-cols-2 gap-px bg-slate-100">
+              {quickActions.map(a=>(
+                <Link key={a.href} href={a.href} className="flex items-center gap-3 px-4 py-3 bg-white hover:bg-slate-50 transition-colors">
+                  <div className={"w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 "+a.bg}>
+                    <a.icon className={"w-4 h-4 "+a.color}/>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs font-semibold text-slate-800 truncate">{a.label}</div>
+                    <div className="text-[10px] text-slate-400 truncate">{a.sub}</div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }

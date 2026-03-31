@@ -2,7 +2,8 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { BuiltCoursesPanel } from './BuiltCoursesPanel';
-import { DashboardClientWrapper } from './DashboardClientWrapper';
+import DashboardClient from './DashboardClient';
+import type { DashboardData } from './types';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   title: 'Admin Dashboard | Elevate For Humanity',
 };
 
-async function getDashboardData(supabase: any, db: any) {
+async function getDashboardData(db: any, adminProfile: { full_name: string | null; role: string } | null) {
   // All queries use the admin client (db) to bypass RLS
   const [
     studentsRes,
@@ -61,7 +62,10 @@ async function getDashboardData(supabase: any, db: any) {
       .eq('role', 'student')
       .order('created_at', { ascending: false })
       .limit(10),
-    db.from('program_enrollments').select('course_id, status').limit(500),
+    db.from('program_enrollments')
+      .select('program_id, status, programs(id, name, title)')
+      .not('program_id', 'is', null)
+      .limit(1000),
     // Recent applications — newest 8
     db.from('applications')
       .select('id, first_name, last_name, full_name, email, program_interest, status, created_at')
@@ -131,31 +135,30 @@ async function getDashboardData(supabase: any, db: any) {
     programStatuses[p.status || 'unknown'] = (programStatuses[p.status || 'unknown'] || 0) + 1;
   }
 
-  // Course enrollment counts
-  const courseEnrollments: Record<string, number> = {};
+  // Program enrollment counts + completion rates
+  const programTotals: Record<string, { name: string; total: number; completed: number }> = {};
   for (const e of (topCoursesRes.data || [])) {
-    if (e.course_id) {
-      courseEnrollments[e.course_id] = (courseEnrollments[e.course_id] || 0) + 1;
-    }
+    const pid = e.program_id;
+    if (!pid) continue;
+    const prog = e.programs as any;
+    const name = prog?.name || prog?.title || pid.slice(0, 8);
+    if (!programTotals[pid]) programTotals[pid] = { name, total: 0, completed: 0 };
+    programTotals[pid].total += 1;
+    if (e.status === 'completed') programTotals[pid].completed += 1;
   }
-  const courseMap: Record<string, string> = {};
-  for (const c of (allCoursesRes.data || [])) {
-    courseMap[c.id] = c.title;
-  }
-  const topCourses = Object.entries(courseEnrollments)
-    .map(([id, count]) => ({ name: courseMap[id] || id.slice(0, 8), enrollments: count }))
+  const topCourses = Object.entries(programTotals)
+    .map(([id, p]) => ({
+      id,
+      name: p.name,
+      enrollments: toSafeNumber(p.total),
+      completed: toSafeNumber(p.completed),
+      completionRate: p.total > 0 ? clampPercent((p.completed / p.total) * 100) : 0,
+    }))
     .sort((a, b) => b.enrollments - a.enrollments)
     .slice(0, 8);
 
-  // Get current admin's profile for the greeting
-  let profile = null;
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data } = await db.from('profiles').select('full_name, role').eq('id', user.id).single();
-      profile = data;
-    }
-  } catch { /* non-fatal */ }
+  // Profile is passed in from layout — no extra getUser call needed here
+  const profile = null; // resolved in AdminDashboardPage from requireAdmin result
 
   // Flatten program name onto each recent student row
   const recentStudents = (recentStudentsRes.data ?? []).map((s: any) => {
@@ -236,7 +239,7 @@ async function getDashboardData(supabase: any, db: any) {
     recentApplications: recentApplicationsRes.data ?? [],
     recentActivity,
     totalRevenueCents,
-    profile,
+    profile: adminProfile,
     generatedAt: new Date().toISOString(),
     blockedPrograms: (blockedProgramsRes.data ?? []).map((p: any) => ({
       id: p.id,
@@ -255,15 +258,99 @@ async function getDashboardData(supabase: any, db: any) {
   };
 }
 
+
+function toSafeNumber(value: unknown): number {
+  const n = Number(value ?? 0);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function clampPercent(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+function percentChange(current: number, previous: number): number {
+  if (!previous && !current) return 0;
+  if (!previous) return 100;
+  return Math.round(((current - previous) / previous) * 100);
+}
+
 export default async function AdminDashboardPage() {
   const supabase = await createClient();
   const db = createAdminClient();
 
-  const data = await getDashboardData(supabase, db);
+  // Get user once — reuse across all queries, no repeated getUser calls
+  let adminProfile: { full_name: string | null; role: string } | null = null;
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data } = await db.from('profiles').select('full_name, role').eq('id', user.id).maybeSingle();
+      adminProfile = data ?? null;
+    }
+  } catch { /* non-fatal */ }
+
+  const raw = await getDashboardData(db, adminProfile);
+
+  // ── Normalize enrollmentsByMonth (Record<string,number>) → sorted array ──
+  const trendArray = Object.entries(raw.enrollmentsByMonth)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, count]) => ({
+      month: new Date(key + '-01').toLocaleString('en-US', { month: 'short' }),
+      enrollments: count,
+    }));
+
+  const lastEnroll  = trendArray.at(-1)?.enrollments ?? 0;
+  const prevEnroll  = trendArray.at(-2)?.enrollments ?? 0;
+  const enrollDelta = percentChange(lastEnroll, prevEnroll);
+
+  // ── Normalize studentStatuses (Record<string,number>) → array ──
+  const STATUS_LABEL: Record<string, string> = {
+    active: 'Active', at_risk: 'At Risk', completed: 'Completed',
+    pending: 'Pending', enrolled: 'Enrolled', inactive: 'Inactive',
+  };
+  const statusArray = Object.entries(raw.studentStatuses)
+    .filter(([, v]) => v > 0)
+    .map(([key, value]) => ({ name: STATUS_LABEL[key] || key, value }));
+
+  // ── topCourses → topPrograms (completionRate computed from real enrollment statuses) ──
+  const topPrograms = raw.topCourses.map(c => ({
+    id: (c as any).id ?? '',
+    name: c.name,
+    learners: toSafeNumber(c.enrollments),
+    completed: toSafeNumber((c as any).completed ?? 0),
+    completionRate: clampPercent((c as any).completionRate ?? 0),
+  }));
+
+  // ── Revenue ──
+  const revenueDollars = Math.round(raw.totalRevenueCents / 100);
+
+  // ── Build normalized DashboardData ──
+  const data: DashboardData = {
+    kpis: [
+      { label: 'Active Learners',      value: raw.counts.enrollments,         delta: enrollDelta, deltaLabel: 'vs last month', href: '/admin/enrollments',                 urgent: raw.counts.atRisk > 0 },
+      { label: 'Pending Applications', value: raw.counts.pendingApplications,  delta: 0,           deltaLabel: 'awaiting review', href: '/admin/applications?status=pending', urgent: raw.counts.pendingApplications > 0 },
+      { label: 'Revenue Collected',    value: revenueDollars,                  delta: 0,           deltaLabel: 'total collected', href: '/admin/payroll' },
+      { label: 'Certificates Issued',  value: raw.counts.certificates,         delta: 0,           deltaLabel: `of ${raw.counts.students} students`, href: '/admin/certificates' },
+    ],
+    enrollmentTrend: trendArray,
+    studentStatuses: statusArray,
+    topPrograms,
+    recentActivity: raw.recentActivity.map(a => ({
+      id: a.id,
+      title: a.label,
+      timestamp: new Date(a.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }),
+    })),
+    recentStudents: raw.recentStudents,
+    recentApplications: raw.recentApplications,
+    blockedPrograms: raw.blockedPrograms,
+    inactiveLearners: raw.inactiveLearners,
+    profile: raw.profile,
+    generatedAt: raw.generatedAt,
+  };
 
   return (
     <>
-      <DashboardClientWrapper data={data} />
+      <DashboardClient data={data} />
       <div className="max-w-7xl mx-auto px-4 pb-8">
         <BuiltCoursesPanel />
       </div>

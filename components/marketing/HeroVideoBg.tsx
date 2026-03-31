@@ -89,7 +89,6 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
       {!reducedMotion && (
         <video
           ref={videoRef}
-          autoPlay
           muted
           loop
           playsInline

@@ -341,7 +341,7 @@ export default function DashboardClient({data}:{data:DashboardData}){
               {data.blockedPrograms.length===0?(
                 <div className="px-5 py-8 text-center"><CheckCircle className="w-7 h-7 text-emerald-400 mx-auto mb-2"/><p className="text-xs text-slate-400">All programs published</p></div>
               ):data.blockedPrograms.map(p=>(
-                <Link key={p.id} href={} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group">
+                <Link key={p.id} href={`/admin/programs/${p.id}`} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group">
                   <div className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0"/>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium text-slate-800 truncate">{p.title}</div>
@@ -366,7 +366,7 @@ export default function DashboardClient({data}:{data:DashboardData}){
               {data.inactiveLearners.length===0?(
                 <div className="px-5 py-8 text-center"><CheckCircle className="w-7 h-7 text-emerald-400 mx-auto mb-2"/><p className="text-xs text-slate-400">All learners active</p></div>
               ):data.inactiveLearners.map(l=>(
-                <Link key={l.enrollmentId} href={} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group">
+                <Link key={l.enrollmentId} href={`/admin/students/${l.userId}`} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group">
                   <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-xs font-bold text-amber-700 flex-shrink-0">
                     {(l.fullName||l.email||"?")[0].toUpperCase()}
                   </div>
@@ -431,7 +431,7 @@ export default function DashboardClient({data}:{data:DashboardData}){
                     <td className="px-5 py-3"><Badge status={s.enrollment_status||"pending"}/></td>
                     <td className="px-5 py-3 text-slate-500 whitespace-nowrap">{s.created_at?new Date(s.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"2-digit"}):"—"}</td>
                     <td className="px-5 py-3 text-slate-500 truncate max-w-[120px]">{s.program_name||"—"}</td>
-                    <td className="px-5 py-3"><Link href={} className="text-blue-600 hover:underline font-medium">View</Link></td>
+                    <td className="px-5 py-3"><Link href={`/admin/students/${s.id}`} className="text-blue-600 hover:underline font-medium">View</Link></td>
                   </tr>
                 ))}
               </tbody>

@@ -1,3 +1,11 @@
+import { redirect } from 'next/navigation';
+
+// Partner portal is now consolidated into program-holder dashboard.
+export default function PartnerPortalRedirect() {
+  redirect('/program-holder/dashboard');
+}
+
+// Dead code below — kept for reference until fully removed
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createAdminClient } from '@/lib/supabase/admin';

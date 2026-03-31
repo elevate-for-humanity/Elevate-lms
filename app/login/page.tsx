@@ -195,7 +195,7 @@ function LoginForm() {
                   { label: 'Program Holder',      dest: '/program-holder/dashboard' },
                   { label: 'Instructor',          dest: '/instructor/dashboard' },
                   { label: 'Employer',            dest: '/employer/dashboard' },
-                  { label: 'Partner Portal',      dest: '/partner-portal' },
+                  { label: 'Partner Portal',      dest: '/program-holder/dashboard' },
                   { label: 'Staff Portal',        dest: '/staff-portal/dashboard' },
                   { label: 'Mentor',              dest: '/mentor/dashboard' },
                   { label: 'Case Manager',        dest: '/case-manager/dashboard' },

@@ -4,12 +4,15 @@ import React from 'react';
 
 import { useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getRoleDestination } from '@/lib/auth/role-destinations';
+import { validateRedirect } from '@/lib/auth/validate-redirect';
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectParam = validateRedirect(searchParams.get('redirect') || searchParams.get('next') || '');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -40,6 +43,12 @@ export default function LoginForm() {
         .select('role, onboarding_completed')
         .eq('id', data.user.id)
         .single();
+
+      // ?redirect param always takes priority over role-based destination
+      if (redirectParam) {
+        router.push(redirectParam);
+        return;
+      }
 
       // Redirect based on role + onboarding status
       const onboardingDone = profile?.onboarding_completed === true;

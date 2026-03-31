@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
-import { Palette, BookOpen, Users, TrendingUp, Plus, Eye, Edit, BarChart3 } from 'lucide-react';
+import { Palette, BookOpen, Users, TrendingUp, Plus, Eye, Edit, BarChart3, FileText } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -13,45 +13,57 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function CreatorDashboardPage() {
+  const { user } = await requireRole(['creator', 'admin', 'super_admin']);
   const supabase = await createClient();
 
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/creator/dashboard');
-
-  // Role guard — creator, admin, super_admin only
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (!profile || !['creator', 'admin', 'super_admin'].includes(profile.role)) {
-    redirect('/unauthorized');
-  }
-
-  // Fetch courses created by this user
+  // Fetch courses created by this user with lesson counts
   const { data: coursesData } = await supabase
     .from('training_courses')
     .select('id, course_name, is_active, enrolled_count, created_at')
     .eq('created_by', user.id)
     .order('created_at', { ascending: false });
 
-  const courses = (coursesData || []).map(c => ({
+  const courseIds = (coursesData ?? []).map((c: any) => c.id);
+
+  // Lesson counts per course
+  const { data: lessonCounts } = courseIds.length > 0
+    ? await supabase
+        .from('training_lessons')
+        .select('course_id')
+        .in('course_id', courseIds)
+    : { data: [] };
+
+  const lessonsByCourseid: Record<string, number> = {};
+  for (const l of (lessonCounts ?? [])) {
+    if (l.course_id) lessonsByCourseid[l.course_id] = (lessonsByCourseid[l.course_id] || 0) + 1;
+  }
+
+  // Total lesson completions across all creator's courses
+  const { count: totalCompletions } = courseIds.length > 0
+    ? await supabase
+        .from('lesson_progress')
+        .select('id', { count: 'exact', head: true })
+        .in('course_id', courseIds)
+        .eq('completed', true)
+    : { count: 0 };
+
+  const courses = (coursesData ?? []).map((c: any) => ({
     id: c.id,
     title: c.course_name || 'Untitled Course',
     students: c.enrolled_count || 0,
+    lessons: lessonsByCourseid[c.id] ?? 0,
     status: c.is_active ? 'published' : 'draft',
   }));
 
   const totalStudents = courses.reduce((sum, c) => sum + c.students, 0);
+  const totalLessons = courses.reduce((sum, c) => sum + c.lessons, 0);
   const publishedCount = courses.filter(c => c.status === 'published').length;
 
   const stats = [
     { label: 'Total Courses', value: courses.length.toString(), icon: BookOpen },
     { label: 'Total Students', value: totalStudents.toLocaleString(), icon: Users },
-    { label: 'Published', value: publishedCount.toString(), icon: TrendingUp },
-    { label: 'Drafts', value: (courses.length - publishedCount).toString(), icon: Edit },
+    { label: 'Total Lessons', value: totalLessons.toLocaleString(), icon: FileText },
+    { label: 'Completions', value: (totalCompletions ?? 0).toLocaleString(), icon: TrendingUp },
   ];
 
   return (
@@ -104,6 +116,7 @@ export default async function CreatorDashboardPage() {
               <thead>
                 <tr className="text-left text-sm text-gray-500 border-b">
                   <th className="pb-3">Course</th>
+                  <th className="pb-3 text-center">Lessons</th>
                   <th className="pb-3 text-center">Students</th>
                   <th className="pb-3 text-center">Status</th>
                   <th className="pb-3 text-center">Actions</th>
@@ -113,6 +126,7 @@ export default async function CreatorDashboardPage() {
                 {courses.slice(0, 10).map((course) => (
                   <tr key={course.id} className="hover:bg-white">
                     <td className="py-4 font-medium text-gray-900">{course.title}</td>
+                    <td className="py-4 text-center text-gray-500">{course.lessons}</td>
                     <td className="py-4 text-center text-gray-600">{course.students}</td>
                     <td className="py-4 text-center">
                       <span className={`px-2 py-1 rounded text-xs font-medium ${course.status === 'published' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-white text-gray-700'}`}>

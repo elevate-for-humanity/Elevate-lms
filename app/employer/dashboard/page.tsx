@@ -6,6 +6,7 @@ export const metadata: Metadata = {
 };
 
 import { createClient } from '@/lib/supabase/server';
+import { requireRole } from '@/lib/auth/require-role';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { safeFormatDate } from '@/lib/format-utils';
@@ -15,7 +16,6 @@ import {
   SectionCard,
 } from '@/components/dashboards/StateAwareDashboard';
 import {
-
   Briefcase,
   Users,
   FileText,
@@ -24,6 +24,7 @@ import {
   TrendingUp,
   BarChart3,
 } from 'lucide-react';
+
 export const dynamic = 'force-dynamic';
 
 /**
@@ -39,24 +40,26 @@ export const dynamic = 'force-dynamic';
  */
 
 export default async function EmployerDashboardOrchestrated() {
+  // requireRole handles auth + redirect; employer + admins allowed
+  const { user } = await requireRole(['employer', 'admin', 'super_admin']);
   const supabase = await createClient();
 
-
-  // Require authentication
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/employer/dashboard');
-
-  // Get employer profile
+  // Get full employer profile (select * needed for company_name, verified, etc.)
   const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
 
-  if (!profile || profile.role !== 'employer') {
-    // Application submitted but not yet approved — show pending state
+  if (!profile) redirect('/unauthorized');
+
+  // Non-employer roles (admin viewing) skip the pending state
+  if (profile.role !== 'employer' && !['admin', 'super_admin'].includes(profile.role)) {
+    redirect('/unauthorized');
+  }
+
+  // Employer account exists but not yet approved — show pending state
+  if (profile.role === 'employer' && !profile.verified) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
@@ -221,7 +224,7 @@ export default async function EmployerDashboardOrchestrated() {
                 <SectionCard
                   title="Manage Job Postings"
                   description={`${postings?.length || 0} active posting${(postings?.length || 0) !== 1 ? 's' : ''}`}
-                  href="/employer/dashboard"
+                  href="/employer/jobs"
                   icon={<Briefcase className="h-10 w-10" />}
                 />
               )}
@@ -252,7 +255,7 @@ export default async function EmployerDashboardOrchestrated() {
                       ? 'Track apprentices and compliance'
                       : 'Build your talent pipeline'
                   }
-                  href="/employer/dashboard"
+                  href="/employer/apprenticeship"
                   icon={<TrendingUp className="h-10 w-10" />}
                   badge={apprenticeshipProgram ? 'Active' : undefined}
                 />
@@ -345,7 +348,7 @@ export default async function EmployerDashboardOrchestrated() {
             <div className="space-y-3">
               {profile.verified && (
                 <a
-                  href="/employer/dashboard"
+                  href="/employer/post-job"
                   className="block w-full text-center px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition"
                 >
                   Post New Job
@@ -371,7 +374,7 @@ export default async function EmployerDashboardOrchestrated() {
                 for your needs.
               </p>
               <a
-                href="/employer/dashboard"
+                href="/employer/apprenticeship"
                 className="block w-full text-center px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition"
               >
                 Learn More

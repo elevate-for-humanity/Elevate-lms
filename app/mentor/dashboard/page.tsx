@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
-import { Users, Calendar, MessageSquare, ChevronRight } from 'lucide-react';
+import { Users, Calendar, MessageSquare, ChevronRight, Clock, CheckCircle, Award } from 'lucide-react';
 
 export const metadata: Metadata = { 
   title: 'Mentor Dashboard | Elevate for Humanity',
@@ -76,11 +76,11 @@ export default async function MentorDashboardPage() {
     });
   }
 
-  // Get session count this month
+  // Session count this month
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
-  
+
   const { count: monthSessions } = await supabase
     .from('mentor_sessions')
     .select('*', { count: 'exact', head: true })
@@ -89,7 +89,30 @@ export default async function MentorDashboardPage() {
 
   sessionCount = monthSessions || 0;
 
-  // Unread messages addressed to this mentor
+  // Total completed sessions (all time)
+  const { count: totalCompletedSessions } = await supabase
+    .from('mentor_sessions')
+    .select('*', { count: 'exact', head: true })
+    .eq('mentor_id', user.id)
+    .eq('status', 'completed');
+
+  // Recent completed sessions (last 5)
+  const { data: recentSessionsData } = await supabase
+    .from('mentor_sessions')
+    .select('id, scheduled_at, topic, status, profiles!mentor_sessions_mentee_id_fkey(full_name)')
+    .eq('mentor_id', user.id)
+    .eq('status', 'completed')
+    .order('scheduled_at', { ascending: false })
+    .limit(5);
+
+  const recentSessions = (recentSessionsData ?? []).map((s: any) => ({
+    id: s.id,
+    mentee: s.profiles?.full_name ?? 'Mentee',
+    topic: s.topic ?? 'Mentoring Session',
+    date: new Date(s.scheduled_at).toLocaleDateString(),
+  }));
+
+  // Unread messages
   const { count: unreadMessages } = await supabase
     .from('messages')
     .select('*', { count: 'exact', head: true })
@@ -99,6 +122,7 @@ export default async function MentorDashboardPage() {
   const stats = [
     { label: 'Active Mentees', value: String(menteeCount), icon: Users },
     { label: 'Sessions This Month', value: String(sessionCount), icon: Calendar },
+    { label: 'Total Sessions', value: String(totalCompletedSessions ?? 0), icon: CheckCircle },
     { label: 'Unread Messages', value: String(unreadMessages ?? 0), icon: MessageSquare },
   ];
 
@@ -125,6 +149,21 @@ export default async function MentorDashboardPage() {
             </div>
           ))}
         </div>
+        {/* Messages banner */}
+        {(unreadMessages ?? 0) > 0 && (
+          <div className="mb-6 bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <MessageSquare className="w-5 h-5 text-brand-blue-600" />
+              <p className="text-sm font-semibold text-brand-blue-800">
+                You have {unreadMessages} unread message{(unreadMessages ?? 0) > 1 ? 's' : ''}
+              </p>
+            </div>
+            <Link href="/mentor/messages" className="text-sm font-semibold text-brand-blue-700 hover:underline">
+              View →
+            </Link>
+          </div>
+        )}
+
         <div className="grid lg:grid-cols-2 gap-8">
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-6">
@@ -190,6 +229,33 @@ export default async function MentorDashboardPage() {
             )}
           </div>
         </div>
+        {/* Session history */}
+        {recentSessions.length > 0 && (
+          <div className="mt-8 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <Clock className="w-5 h-5 text-teal-600" />
+                Recent Sessions
+              </h2>
+              <Link href="/mentor/sessions" className="text-sm text-teal-600 hover:underline">View all</Link>
+            </div>
+            <div className="divide-y divide-gray-100">
+              {recentSessions.map((s) => (
+                <div key={s.id} className="flex items-center justify-between py-3 text-sm">
+                  <div>
+                    <p className="font-medium text-gray-900">{s.mentee}</p>
+                    <p className="text-gray-500 text-xs">{s.topic}</p>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-400 text-xs">
+                    <CheckCircle className="w-3.5 h-3.5 text-green-500" />
+                    {s.date}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="mt-8 grid md:grid-cols-3 gap-6">
           <Link href="/mentor/mentees" className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">

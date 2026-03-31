@@ -185,7 +185,10 @@ async function _POST(request: NextRequest) {
 
     // Only add payment method types for paid checkouts
     if (amountCents > 0) {
-      sessionParams.payment_method_types = ['card'];
+      // Enable BNPL for self-pay enrollments
+      sessionParams.payment_method_types = funding_source === 'self_pay'
+        ? ['card', 'klarna', 'afterpay_clearpay']
+        : ['card'];
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams);

@@ -311,9 +311,21 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
           // user_id is null — public checkout has no Supabase account yet.
           // linkOrphanedEnrollments() in auth/confirm links it by email on first login.
           const { createOrUpdateEnrollment, linkOrphanedEnrollments } = await import('@/lib/enrollment-service');
+          // Resolve program UUID — metadata.program_id is set by checkout/public.
+          // Fall back to DB lookup by slug if missing (legacy sessions).
+          const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+          let resolvedProgramId = session.metadata?.program_id || '';
+          if (!UUID_RE.test(resolvedProgramId)) {
+            const { data: prog } = await supabase
+              .from('programs')
+              .select('id')
+              .eq('slug', 'barber-apprenticeship')
+              .single();
+            resolvedProgramId = prog?.id || '5ff21fcb-1968-41fd-99d3-37d69a31bd5c';
+          }
           const enrollResult = await createOrUpdateEnrollment(supabase, {
             userId: null as unknown as string, // linked by email post-signup
-            programId: session.metadata?.program_id || 'barber-apprenticeship',
+            programId: resolvedProgramId,
             programSlug: 'barber-apprenticeship',
             fundingSource: 'self_pay',
             amountPaidCents,

@@ -180,6 +180,7 @@ async function _POST(request: NextRequest) {
       metadata: {
         program: 'barber-apprenticeship',
         programSlug: 'barber-apprenticeship',
+        program_id: '5ff21fcb-1968-41fd-99d3-37d69a31bd5c',
         checkout_type: 'barber_enrollment',
         payment_type: payment_type,
         checkout_amount_cents: (checkoutAmount * 100).toString(),

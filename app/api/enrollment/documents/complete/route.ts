@@ -119,6 +119,36 @@ async function _POST(req: Request) {
       }
     }
 
+    // Ensure an external_program_enrollments row exists so the learner dashboard
+    // shows the program card under "Your Programs".
+    if (enrollment.program_id) {
+      try {
+        const { data: prog } = await supabase
+          .from('programs')
+          .select('slug')
+          .eq('id', enrollment.program_id)
+          .single();
+        if (prog?.slug) {
+          await supabase
+            .from('external_program_enrollments')
+            .upsert({
+              user_id: user.id,
+              program_slug: prog.slug,
+              enrollment_state: 'active',
+              status: 'active',
+              source: 'stripe_checkout',
+              email: enrollment.email,
+              full_name: enrollment.full_name,
+              enrolled_at: now,
+              created_at: now,
+              updated_at: now,
+            }, { onConflict: 'user_id,program_slug' });
+        }
+      } catch (extErr) {
+        logger.error('Failed to write external_program_enrollments', extErr as Error);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Documents submitted. Enrollment activated.',

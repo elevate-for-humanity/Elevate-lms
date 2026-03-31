@@ -228,6 +228,24 @@ export default async function LearnerDashboardPage() {
     }
   }
 
+  // Fetch recent messages (unread)
+  const { data: recentMessages } = await supabase
+    .from('messages')
+    .select('id, subject, body, created_at, sender_id, read')
+    .eq('recipient_id', user.id)
+    .eq('read', false)
+    .order('created_at', { ascending: false })
+    .limit(3);
+
+  // Fetch upcoming schedule (cohort sessions, appointments)
+  const now = new Date().toISOString();
+  const { data: upcomingSchedule } = await supabase
+    .from('cohort_sessions')
+    .select('id, title, session_date, start_time, end_time, location, session_type')
+    .gte('session_date', now.split('T')[0])
+    .order('session_date', { ascending: true })
+    .limit(3);
+
   // Check whether the learner has a pending_workone application — gates WorkOne checklist
   const { data: workoneApp } = await supabase
     .from('applications')
@@ -459,30 +477,52 @@ export default async function LearnerDashboardPage() {
                 )}
               </div>
 
-              {/* External (admin-managed) program enrollments — no LMS progress, no course links */}
+              {/* External (admin-managed) program enrollments */}
               {(externalEnrollments ?? []).length > 0 && (
                 <div className="divide-y divide-gray-200 border-t border-gray-200">
                   {(externalEnrollments ?? []).map((ext: any) => (
                     <div key={ext.id} className="p-6">
                       <div className="flex gap-4 items-start">
-                        <div className="w-20 h-20 bg-brand-blue-50 rounded-lg flex-shrink-0 flex items-center justify-center">
-                          <GraduationCap className="w-8 h-8 text-brand-blue-400" />
+                        <div className="w-16 h-16 bg-brand-blue-50 rounded-lg flex-shrink-0 flex items-center justify-center">
+                          <GraduationCap className="w-7 h-7 text-brand-blue-400" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 mb-1 capitalize">
-                            {ext.program_slug.replace(/-/g, ' ')}
-                          </h3>
-                          <p className="text-sm text-gray-500 mb-3">
-                            This program is managed by an administrator. Your advisor will contact you with next steps.
-                          </p>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-gray-900 capitalize">
+                              {ext.program_slug.replace(/-/g, ' ')}
+                            </h3>
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand-blue-100 text-brand-blue-800">
+                              Advisor Managed
+                            </span>
+                          </div>
                           {ext.start_date && (
-                            <p className="text-xs text-gray-400">
+                            <p className="text-xs text-gray-400 mb-3">
                               Start date: {new Date(ext.start_date).toLocaleDateString()}
                             </p>
                           )}
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-blue-100 text-brand-blue-800 mt-2">
-                            Enrolled — Advisor Managed
-                          </span>
+                          {ext.notes && (
+                            <p className="text-sm text-gray-500 mb-3">{ext.notes}</p>
+                          )}
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            <Link
+                              href={`/programs/${ext.program_slug}`}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-brand-blue-700 transition"
+                            >
+                              <BookOpen className="w-3.5 h-3.5" /> View Program
+                            </Link>
+                            <Link
+                              href="/support/contact"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 text-gray-600 text-xs font-semibold rounded-lg hover:bg-gray-50 transition"
+                            >
+                              <MessageSquare className="w-3.5 h-3.5" /> Contact Advisor
+                            </Link>
+                            <Link
+                              href="/learner/attendance"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 text-gray-600 text-xs font-semibold rounded-lg hover:bg-gray-50 transition"
+                            >
+                              <Calendar className="w-3.5 h-3.5" /> Track Hours
+                            </Link>
+                          </div>
                         </div>
                       </div>
                     </div>

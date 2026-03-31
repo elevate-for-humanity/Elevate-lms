@@ -57,6 +57,27 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
     redirect('/program-holder?error=pending-approval');
   }
 
+  // Gate: check MOU signed + account active before allowing dashboard access
+  const { data: holder } = await db
+    .from('program_holders')
+    .select('status, mou_signed, approved_at, payout_status')
+    .eq('id', holderId)
+    .single();
+
+  if (!holder) {
+    redirect('/program-holder?error=pending-approval');
+  }
+
+  // Not yet approved — send to onboarding
+  if (holder.status !== 'active' || !holder.approved_at) {
+    redirect('/program-holder/onboarding?status=pending-approval');
+  }
+
+  // MOU not signed — send to MOU page
+  if (!holder.mou_signed) {
+    redirect('/program-holder/mou?required=true');
+  }
+
   // Get programs via the association table
   const { data: associations } = await db
     .from('program_holder_programs')

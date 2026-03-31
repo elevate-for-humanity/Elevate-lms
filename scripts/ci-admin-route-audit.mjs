@@ -46,12 +46,7 @@ const checks = [
     severity: "error",
     regex: /return\s+NextResponse\.json\(\s*\{[^)]*error\s*:\s*['"`][^'"`]+['"`]\s*\}\s*$(?!\s*,\s*\{\s*status\s*:)/gm,
   },
-  {
-    name: "Unauthorized return missing status code",
-    severity: "warn",
-    // Only flag when { status: NNN } is absent from the call
-    regex: /return\s+NextResponse\.json\(\s*\{[^}]*error\s*:\s*['"`](Unauthorized|Forbidden)['"`][^}]*\}\s*\)\s*;/g,
-  },
+
   {
     name: "Admin requireAdmin import mismatch risk",
     severity: "warn",

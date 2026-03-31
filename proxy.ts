@@ -146,6 +146,10 @@ const WEBHOOK_PATHS = [
   '/api/donations/webhook',    // Donations (separate product)
 ];
 
+export async function middleware(request: NextRequest) {
+  return proxy(request);
+}
+
 export async function proxy(request: NextRequest) {
   const host = request.headers.get('host') || '';
   const { pathname } = request.nextUrl;

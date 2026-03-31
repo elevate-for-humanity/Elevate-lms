@@ -21,11 +21,8 @@ import { useEffect, useRef, useState } from 'react';
 
 type Props = {
   src: string;
-  /**
-   * Local static path only. Template literal type blocks remote URLs at compile time.
-   * Must start with `/` — no https://, no Supabase signed URLs, no expiring CDN links.
-   */
-  poster: `/${string}`;
+  /** Optional poster — shown while video loads and as reduced-motion fallback */
+  poster?: string;
   className?: string;
   /** Intersection threshold to trigger play (default 0.1) */
   threshold?: number;
@@ -41,17 +38,14 @@ type Props = {
    * blocked by the browser.
    */
   autoPlayOnMount?: boolean;
+  /**
+   * When true, use preload="auto" to aggressively buffer the video.
+   * Use only for the primary above-the-fold hero to reduce load delay.
+   */
+  preloadFull?: boolean;
 };
 
-export default function CanonicalVideo({ src, poster, className, threshold = 0.1, playThrough = true, autoPlayOnMount = false }: Props) {
-  if (process.env.NODE_ENV === 'development') {
-    if (!poster) {
-      throw new Error('CanonicalVideo requires a local poster. This is not optional.');
-    }
-    if (poster.startsWith('http')) {
-      throw new Error(`CanonicalVideo poster must be a local path, not a remote URL: ${poster}`);
-    }
-  }
+export default function CanonicalVideo({ src, poster, className, threshold = 0.1, playThrough = true, autoPlayOnMount = false, preloadFull = false }: Props) {
   const ref = useRef<HTMLVideoElement | null>(null);
   const [failed, setFailed] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -115,8 +109,9 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.1
     return () => observer.disconnect();
   }, [autoPlayOnMount, reducedMotion, failed, threshold, playThrough]);
 
-  // Reduced-motion or error: render poster image only
+  // Reduced-motion or error: render poster or blank
   if (reducedMotion || failed) {
+    if (!poster) return null;
     return (
       <img
         src={poster}
@@ -134,8 +129,7 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.1
       className={className}
       muted
       playsInline
-      preload="metadata"
-      poster={poster}
+      preload={preloadFull ? 'auto' : 'metadata'}
       aria-hidden="true"
       onError={() => setFailed(true)}
     >

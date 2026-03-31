@@ -73,28 +73,17 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
 
   return (
     <>
-      {/* Poster — always rendered behind video, loads instantly as LCP image.
-          z-0 ensures it sits below the video (z-10) and controls (z-20). */}
-      {poster && (
-        <img
-          src={poster}
-          alt=""
-          aria-hidden="true"
-          fetchPriority="high"
-          className="absolute inset-0 w-full h-full object-cover z-0"
-        />
-      )}
-
-      {/* Video — fades in once playing, src set after mount to not block paint */}
+      {/* Video — preload auto so it starts immediately, no poster fallback */}
       {!reducedMotion && (
         <video
           ref={videoRef}
           muted
           loop
           playsInline
+          preload="auto"
           aria-hidden="true"
           onCanPlay={() => setVideoReady(true)}
-          className={`absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-300 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
         />
       )}
 

@@ -97,12 +97,12 @@ export default function HeroVideo({
         style={{ height: 'clamp(400px, 56vw, 780px)' }}
         aria-label={analyticsName ? `${analyticsName} hero video` : 'Hero video'}
       >
-        {/* autoPlayOnMount — hero is always above the fold on page entry */}
+        {/* autoPlayOnMount + preloadFull — hero is above the fold, load immediately */}
         <CanonicalVideo
           src={videoSrc}
-          poster={posterImage ?? undefined}
           className="absolute inset-0 w-full h-full object-cover object-center"
           autoPlayOnMount
+          preloadFull
         />
 
 

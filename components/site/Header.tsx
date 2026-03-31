@@ -21,7 +21,7 @@ export const NAV_ITEMS = [
       { name: '— Training Areas —', href: '/programs', isHeader: true },
       { name: 'Healthcare', href: '/programs/healthcare' },
       { name: 'Skilled Trades', href: '/programs/skilled-trades' },
-      { name: 'CDL Driving', href: '/programs/cdl-training' },
+      { name: 'HVAC Technician', href: '/programs/hvac-technician' },
       { name: 'Technology', href: '/programs/technology' },
       { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
       { name: 'Business & Finance', href: '/programs/finance-bookkeeping-accounting' },

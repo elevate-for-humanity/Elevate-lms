@@ -20,7 +20,7 @@ const navItems: NavItem[] = [
       { label: 'Healthcare', href: '/programs/healthcare' },
       { label: 'Skilled Trades', href: '/programs/skilled-trades' },
       { label: 'Business', href: '/programs/business' },
-      { label: 'CDL Training', href: '/programs/cdl' },
+      { label: 'HVAC Technician', href: '/programs/hvac-technician' },
     ]
   },
   { label: 'About', href: '/about' },

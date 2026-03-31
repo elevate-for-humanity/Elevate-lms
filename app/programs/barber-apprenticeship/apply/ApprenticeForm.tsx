@@ -362,7 +362,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                 <div className="grid grid-cols-2 gap-4 text-center">
                   <div>
                     <div className="text-brand-blue-200 text-xs uppercase mb-1">Remaining Hours</div>
-                    <div className="text-2xl font-black">{remainingHours.toLocaleString()}</div>
+                    <div className="text-2xl font-black">{remaining.toLocaleString()}</div>
                   </div>
                   <div>
                     <div className="text-brand-blue-200 text-xs uppercase mb-1">Est. Duration</div>

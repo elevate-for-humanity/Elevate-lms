@@ -45,19 +45,19 @@ done
 echo "Running build/lint/typecheck if available..."
 
 if [[ -f package.json ]]; then
-  if pnpm run -s build >/dev/null 2>&1; then
+  if node -e "const p=require('./package.json'); process.exit(p.scripts&&p.scripts.build?0:1)"; then
     pnpm run build
   else
     echo "NOTE: No build script detected."
   fi
 
-  if pnpm run -s lint >/dev/null 2>&1; then
+  if node -e "const p=require('./package.json'); process.exit(p.scripts&&p.scripts.lint?0:1)"; then
     pnpm run lint
   else
     echo "NOTE: No lint script detected."
   fi
 
-  if pnpm run -s typecheck >/dev/null 2>&1; then
+  if node -e "const p=require('./package.json'); process.exit(p.scripts&&p.scripts.typecheck?0:1)"; then
     pnpm run typecheck
   else
     echo "NOTE: No typecheck script detected."

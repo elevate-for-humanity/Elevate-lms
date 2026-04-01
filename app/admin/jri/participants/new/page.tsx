@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
-  title: 'Add JRI Participant | Elevate For Humanity',
+  title: 'Add Job Ready Indy Participant | Elevate For Humanity',
 };
 
 export default async function NewJRIParticipantPage() {
@@ -39,7 +39,7 @@ export default async function NewJRIParticipantPage() {
             { label: 'Participants', href: '/admin/jri/participants' },
             { label: 'New' },
           ]} />
-          <h1 className="text-3xl font-bold text-gray-900 mt-4">Add JRI Participant</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mt-4">Add Job Ready Indy Participant</h1>
         </div>
 
         <form action="/api/admin/jri/participants" method="POST" className="bg-white rounded-xl shadow-sm border p-6 space-y-5">

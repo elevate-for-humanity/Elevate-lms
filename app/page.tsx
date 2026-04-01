@@ -93,7 +93,7 @@ export default function HomePage() {
                 {[
                   { label: 'WIOA', tag: 'Federal', desc: 'For adults, dislocated workers, and youth 16–24.' },
                   { label: 'Workforce Ready Grant', tag: 'Indiana State', desc: 'Covers high-demand certification programs.' },
-                  { label: 'JRI / Employer-Sponsored', tag: 'Indiana State', desc: 'For justice-involved individuals and employer OJT.' },
+                  { label: 'Job Ready Indy / Employer-Sponsored', tag: 'Indiana State', desc: 'For justice-involved individuals and employer OJT.' },
                 ].map((f) => (
                   <div key={f.label} className="bg-white rounded-xl p-4 shadow-sm">
                     <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>

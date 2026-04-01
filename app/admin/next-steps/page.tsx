@@ -429,7 +429,7 @@ function QuickEdit({
               <option value="">—</option>
               <option value="wioa">WIOA</option>
               <option value="wrg">WRG</option>
-              <option value="jri">Job Ready Indy (JRI)</option>
+              <option value="jri">Job Ready Indy (Job Ready Indy)</option>
               <option value="employer_paid">Employer Paid</option>
               <option value="self_pay">Self Pay</option>
             </select>

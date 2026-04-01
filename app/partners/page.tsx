@@ -19,7 +19,7 @@ const PARTNER_TYPES = [
     color: 'blue',
     title: 'Workforce Agencies',
     who: 'WorkOne centers, workforce boards, DWD case managers, and WIOA service providers.',
-    what: 'Refer WIOA, Workforce Ready Grant, and JRI participants to Elevate for funded career training. We handle enrollment, training, testing, and outcome reporting.',
+    what: 'Refer WIOA, Workforce Ready Grant, and Job Ready Indy participants to Elevate for funded career training. We handle enrollment, training, testing, and outcome reporting.',
     steps: [
       'Contact us to set up a referral agreement',
       'Send participant referrals via our intake form',
@@ -79,10 +79,10 @@ const PARTNER_TYPES = [
     color: 'green',
     title: 'Reentry Organizations',
     who: 'Community corrections, probation departments, reentry nonprofits, and case managers serving justice-involved individuals.',
-    what: 'Connect your clients to JRI-funded career training in trades, CDL, healthcare, and barbering. We work with background-friendly employers and provide wrap-around support.',
+    what: 'Connect your clients to Job Ready Indy-funded career training in trades, CDL, healthcare, and barbering. We work with background-friendly employers and provide wrap-around support.',
     steps: [
       'Contact us to discuss your population and needs',
-      'Set up a referral pipeline for JRI-eligible participants',
+      'Set up a referral pipeline for Job Ready Indy-eligible participants',
       'We enroll, train, and report employment outcomes',
     ],
     cta: { label: 'Learn More', href: '/partners/reentry' },

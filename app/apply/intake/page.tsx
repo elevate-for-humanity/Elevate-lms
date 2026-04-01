@@ -78,7 +78,7 @@ function IntakeForm() {
           </p>
           {fundingTag === 'jri' && (
             <p className="text-base text-slate-700 mb-6">
-              Based on your responses, you may qualify for Job Ready Indy (JRI) funding.
+              Based on your responses, you may qualify for Job Ready Indy funding.
               Our team will review your eligibility and contact you within 2 business days.
             </p>
           )}
@@ -117,7 +117,7 @@ function IntakeForm() {
           </h1>
           <p className="text-slate-600 text-lg">
             This form screens your eligibility for workforce-funded training programs
-            including WIOA, WRG, and JRI. Funding is not guaranteed and requires partner review.
+            including WIOA, WRG, and Job Ready Indy. Funding is not guaranteed and requires partner review.
           </p>
         </div>
       </section>

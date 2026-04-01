@@ -48,7 +48,7 @@ export default function GetStartedPage() {
             <Link href="/wioa-eligibility" className="bg-white rounded-xl p-8 shadow-sm border hover:border-brand-blue-500 hover:shadow-md transition group">
               <DollarSign className="w-10 h-10 text-brand-orange-600 mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-orange-600">Check Funding Eligibility</h3>
-              <p className="text-gray-600 mb-4">See if you qualify for free training through WIOA, WRG, or JRI funding. Takes less than 2 minutes.</p>
+              <p className="text-gray-600 mb-4">See if you qualify for free training through WIOA, WRG, or Job Ready Indy funding. Takes less than 2 minutes.</p>
               <span className="text-brand-orange-600 font-semibold flex items-center gap-2">Check Eligibility <ArrowRight className="w-4 h-4" /></span>
             </Link>
 

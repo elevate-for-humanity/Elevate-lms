@@ -145,7 +145,7 @@ export default async function FundingPlaybookPage() {
               Funding Playbook
                         </h2>
             <p className="text-base md:text-lg text-brand-blue-100 mb-8">
-              Guides for WIOA, JRI, DOL, and grant funding applications.
+              Guides for WIOA, Job Ready Indy, DOL, and grant funding applications.
                         </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link

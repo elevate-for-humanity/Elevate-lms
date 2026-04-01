@@ -290,7 +290,7 @@ export default function AboutPage() {
               {
                 title: 'Justice-Involved Individuals',
                 image: '/images/pages/funding-page-2.jpg',
-                desc: 'People on probation, parole, or recently released. JRI funding covers training, supplies, and supportive services at no cost. We work directly with community corrections and reentry programs across Central Indiana.',
+                desc: 'People on probation, parole, or recently released. Job Ready Indy funding covers training, supplies, and supportive services at no cost. We work directly with community corrections and reentry programs across Central Indiana.',
               },
               {
                 title: 'Low-Income Adults & Dislocated Workers',
@@ -367,7 +367,7 @@ export default function AboutPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
             {[
               { name: 'WIOA', role: 'Eligible Training Provider', desc: 'Programs approved for WIOA Adult, Dislocated Worker, and Youth funding.' },
-              { name: 'JRI', role: 'Approved Provider', desc: 'Approved for Job Ready Indy funding for justice-involved participants.' },
+              { name: 'Job Ready Indy', role: 'Approved Provider', desc: 'Approved Job Ready Indy training provider serving justice-involved individuals in Marion County.' },
               { name: 'EmployIndy', role: 'Workforce Partner', desc: 'Partner with EmployIndy for workforce development in Marion County.' },
               { name: 'Indiana State Board', role: 'Cosmetology & Barber Examiners', desc: 'Barber apprenticeship aligned with Indiana State Board licensing requirements.' },
             ].map((cred) => (

@@ -36,7 +36,7 @@ export default function PhilanthropyPage() {
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-6">Why Your Support Matters</h2>
           <p className="text-slate-700 leading-relaxed mb-4">
-            Elevate for Humanity provides workforce training to individuals facing barriers to employment — justice-involved individuals, low-income families, veterans, and career changers. While government funding (WIOA, WRG, JRI) covers many participants, not everyone qualifies.
+            Elevate for Humanity provides workforce training to individuals facing barriers to employment — justice-involved individuals, low-income families, veterans, and career changers. While government funding (WIOA, WRG, Job Ready Indy) covers many participants, not everyone qualifies.
           </p>
           <p className="text-slate-700 leading-relaxed">
             Your contribution directly funds training, supplies, and support services for students who would otherwise be unable to access career education. Every dollar goes toward putting someone on a path to stable employment and self-sufficiency.

@@ -54,7 +54,7 @@ All programs include job placement assistance! Visit elevateforhumanity.org/prog
         fallbackReply = `Many programs are available at no cost to eligible participants through:
 
 • **WIOA** - For low-income individuals
-• **JRI** - For justice-involved individuals  
+• **Job Ready Indy** - For justice-involved individuals  
 • **WRG** - Indiana Workforce Ready Grant
 
 Check your eligibility at elevateforhumanity.org/wioa-eligibility or call (317) 314-3757.`;
@@ -101,7 +101,7 @@ You are the Elevate for Humanity AI Assistant - a warm, helpful guide for prospe
 **About Us:**
 - Nonprofit workforce training in Indianapolis, Indiana
 - DOL Registered Apprenticeship Sponsor (Barber program)
-- WIOA & JRI approved - Training is 100% FREE for eligible participants
+- WIOA & Job Ready Indy approved - Training is 100% FREE for eligible participants
 
 **Our Programs:**
 - Healthcare: CNA ($1,200 - payment plans available), Phlebotomy, Medical Assistant
@@ -113,7 +113,7 @@ You are the Elevate for Humanity AI Assistant - a warm, helpful guide for prospe
 - Indiana residents
 - 18+ years old (some programs 17+)
 - Low-income individuals (WIOA funding)
-- Justice-involved individuals (JRI funding)
+- Justice-involved individuals (Job Ready Indy funding)
 - Veterans and their families
 
 **How to Apply:**

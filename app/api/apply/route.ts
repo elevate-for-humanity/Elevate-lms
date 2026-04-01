@@ -130,7 +130,7 @@ export const POST = withRateLimit(
         }
       }
 
-      // Send detailed welcome email with program info, funding (WIOA/JRI), and Indiana Career Connect steps
+      // Send detailed welcome email with program info, funding (WIOA/Job Ready Indy), and Indiana Career Connect steps
       await sendApplicationWelcomeEmail({
         to: email,
         firstName,

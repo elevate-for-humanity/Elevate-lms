@@ -9,30 +9,30 @@ export const revalidate = 86400;
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
-  title: 'Federal-Funded Training Programs | WIOA & JRI | Indianapolis',
-  description: 'No-cost career training for eligible participants through WIOA, WRG, and JRI federal funding. Healthcare, Skilled Trades, Technology, and CDL programs in Indianapolis.',
+  title: 'Federal-Funded Training Programs | WIOA & Job Ready Indy | Indianapolis',
+  description: 'No-cost career training for eligible participants through WIOA, WRG, and Job Ready Indy federal funding. Healthcare, Skilled Trades, Technology, and CDL programs in Indianapolis.',
   alternates: { canonical: `${SITE_URL}/programs/federal-funded` },
   openGraph: {
-    title: 'Federal-Funded Training Programs | WIOA & JRI | Indianapolis',
-    description: 'No-cost career training for eligible participants through WIOA, WRG, and JRI federal funding. Healthcare, Skilled Trades, Technology, and CDL programs in Indianapolis.',
+    title: 'Federal-Funded Training Programs | WIOA & Job Ready Indy | Indianapolis',
+    description: 'No-cost career training for eligible participants through WIOA, WRG, and Job Ready Indy federal funding. Healthcare, Skilled Trades, Technology, and CDL programs in Indianapolis.',
     url: `${SITE_URL}/programs/federal-funded`,
     siteName: 'Elevate for Humanity',
-    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Federal-Funded Training Programs | WIOA & JRI | Indianapolis' }],
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Federal-Funded Training Programs | WIOA & Job Ready Indy | Indianapolis' }],
     type: 'website',
   },
 };
 
 const config: ProgramPageConfig = {
   heroImage: '/images/pages/funding-hero.jpg',
-  title: 'Federal-Funded Programs', subtitle: 'No-cost career training for eligible participants through WIOA, WRG, and JRI. Tuition, books, supplies, and certifications covered.',
+  title: 'Federal-Funded Programs', subtitle: 'No-cost career training for eligible participants through WIOA, WRG, and Job Ready Indy. Tuition, books, supplies, and certifications covered.',
   badge: 'Funded Training', badgeColor: 'green',
   duration: '3–16 weeks', cost: '$0 for eligible participants', format: 'In-person, Indianapolis', credential: 'Varies by program',
-  overview: 'Federal workforce programs cover the full cost of training for eligible participants. WIOA (Workforce Innovation and Opportunity Act), WRG (Workforce Ready Grant), and JRI (Job Ready Indy) fund tuition, textbooks, supplies, certification exams, and supportive services like transportation and childcare. Eligible participants pay nothing out of pocket. Credentials earned depend on the program — some are issued by Elevate (certificates of completion), while others are administered by external certifying bodies (state licenses, national exams).',
+  overview: 'Federal workforce programs cover the full cost of training for eligible participants. WIOA (Workforce Innovation and Opportunity Act), WRG (Workforce Ready Grant), and Job Ready Indy (Job Ready Indy) fund tuition, textbooks, supplies, certification exams, and supportive services like transportation and childcare. Eligible participants pay nothing out of pocket. Credentials earned depend on the program — some are issued by Elevate (certificates of completion), while others are administered by external certifying bodies (state licenses, national exams).',
   highlights: ['$0 tuition for eligible participants', 'Books, supplies, and uniforms included', 'Certification exam fees covered', 'Supportive services (transportation, childcare)', 'Career counseling and job placement', 'Available for unemployed, underemployed, and justice-involved individuals'],
   overviewImage: '/images/pages/funding-impact-1.jpg', overviewImageAlt: 'Students in a funded training program',
   salaryNumber: 0, salaryLabel: 'No-cost training for eligible participants', salaryPrefix: '',
   curriculum: [
-    { title: 'Funding Sources', topics: ['WIOA (Workforce Innovation and Opportunity Act)', 'WRG (Workforce Ready Grant)', 'JRI (Job Ready Indy)', 'Registered Apprenticeship incentives'] },
+    { title: 'Funding Sources', topics: ['WIOA (Workforce Innovation and Opportunity Act)', 'WRG (Workforce Ready Grant)', 'Job Ready Indy (Job Ready Indy)', 'Registered Apprenticeship incentives'] },
     { title: 'What\'s Covered', topics: ['Tuition and training fees', 'Textbooks and training materials', 'Certification and licensing exam fees', 'Uniforms, tools, and required supplies'] },
     { title: 'Support Services', topics: ['Transportation assistance', 'Childcare assistance', 'Work clothing and tools', 'Emergency support funds'] },
     { title: 'Career Services', topics: ['Career counseling and assessment', 'Resume building and interview prep', 'Job placement assistance', 'Employer connections and referrals'] },
@@ -71,7 +71,7 @@ const config: ProgramPageConfig = {
   faqs: [
     { question: 'Who qualifies for funded training?', answer: 'You may qualify if you are unemployed, underemployed, receiving public assistance (SNAP, TANF, Medicaid), a veteran, justice-involved, or have household income below 200% of the federal poverty level. Eligibility is determined by your local WorkOne office or our enrollment team.' },
     { question: 'What does WIOA cover?', answer: 'WIOA covers tuition, textbooks, supplies, uniforms, certification exam fees, and supportive services (transportation, childcare, work tools). You pay nothing out of pocket.' },
-    { question: 'What is JRI funding?', answer: 'JRI (Job Ready Indy) is Indiana state funding specifically for justice-involved individuals. It covers the same costs as WIOA and is available for participants with criminal records.' },
+    { question: 'What is Job Ready Indy funding?', answer: 'Job Ready Indy (Job Ready Indy) is Indiana state funding specifically for justice-involved individuals. It covers the same costs as WIOA and is available for participants with criminal records.' },
     { question: 'How do I check my eligibility?', answer: 'Take our 2-minute online eligibility check, or visit your local WorkOne office. You can also call us at (317) 314-3757 and we will help you determine your eligibility.' },
   ],
   applyHref: '/wioa-eligibility',

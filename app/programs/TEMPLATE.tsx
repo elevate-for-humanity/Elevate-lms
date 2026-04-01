@@ -173,7 +173,7 @@ export default function ProgramTemplate() {
             Funded with Funding
           </h2>
           <p className="text-xl text-black mb-8 max-w-3xl">
-            Most students qualify for free training through WIOA, WRG, JRI, or
+            Most students qualify for free training through WIOA, WRG, Job Ready Indy, or
             DOL-registered apprenticeships.
           </p>
           <div className="grid md:grid-cols-3 gap-6">
@@ -192,7 +192,7 @@ export default function ProgramTemplate() {
               </p>
             </div>
             <div className="bg-white rounded-xl p-6">
-              <h3 className="font-bold text-black mb-2">JRI Funding</h3>
+              <h3 className="font-bold text-black mb-2">Job Ready Indy Funding</h3>
               <p className="text-black text-sm">
                 Job Ready Indy for individuals with criminal
                 justice involvement.

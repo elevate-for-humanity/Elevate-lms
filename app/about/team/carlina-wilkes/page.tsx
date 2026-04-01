@@ -41,7 +41,7 @@ export default function Page() {
               <p className="text-brand-red-600 font-bold text-lg mb-6">Executive Director of Financial Operations & Organizational Compliance</p>
               <div className="text-slate-800 space-y-4 text-[16px] leading-relaxed">
                 <p>Dr. Wilkes brings over 24 years of federal experience with the Defense Finance and Accounting Service (DFAS), holding DoD Financial Management Certification Level II. She oversees financial operations and compliance at Elevate for Humanity.</p>
-                <p>Her extensive background in federal financial management, audit readiness, and regulatory compliance ensures that Elevate maintains the highest standards of fiscal accountability across all funded programs including WIOA, WRG, and JRI.</p>
+                <p>Her extensive background in federal financial management, audit readiness, and regulatory compliance ensures that Elevate maintains the highest standards of fiscal accountability across all funded programs including WIOA, WRG, and Job Ready Indy.</p>
               </div>
             </div>
           </div>

@@ -8,7 +8,7 @@ import EligibilityPreQualifier from '@/components/enrollment/EligibilityPreQuali
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/wioa-eligibility' },
   title: 'WIOA Funding | Elevate For Humanity',
-  description: 'Learn about WIOA, WRG, and JRI funding for career training in Indiana. Register at Indiana Career Connect and schedule a WorkOne appointment.',
+  description: 'Learn about WIOA, WRG, and Job Ready Indy funding for career training in Indiana. Register at Indiana Career Connect and schedule a WorkOne appointment.',
 };
 
 export default function WIOAEligibilityPage() {
@@ -169,7 +169,7 @@ export default function WIOAEligibilityPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {[
               { title: 'Workforce Ready Grant', desc: 'Indiana state grant for high-demand certifications. No income requirements.', href: '/funding', image: '/images/pages/wioa-meeting.jpg' },
-              { title: 'Justice Reinvestment (JRI)', desc: 'Funding for justice-involved individuals. Training, support, and job placement.', href: '/programs/jri', image: '/hero-images/jri-hero.jpg' },
+              { title: 'Job Ready Indy', desc: 'Funding for justice-involved individuals. Training, support, and job placement.', href: '/programs/jri', image: '/hero-images/jri-hero.jpg' },
               { title: 'Payment Plans', desc: 'Flexible payments, Sezzle, and Affirm for programs not covered by grants.', href: '/apply', image: '/images/pages/wioa-meeting.jpg' },
             ].map((item) => (
               <Link key={item.title} href={item.href} className="block rounded-2xl overflow-hidden border border-slate-200 bg-white hover:shadow-lg transition-shadow group">
@@ -196,7 +196,7 @@ export default function WIOAEligibilityPage() {
               { q: 'Do I have to pay anything back?', a: 'No. WIOA is a grant, not a loan.' },
               { q: 'How long does approval take?', a: 'Typically 1-2 weeks after your WorkOne appointment.' },
               { q: 'Can I work while in training?', a: 'Yes. Many students work part-time during training.' },
-              { q: 'What if I have a criminal record?', a: 'You can still qualify. JRI funding is specifically for justice-involved individuals.' },
+              { q: 'What if I have a criminal record?', a: 'You can still qualify. Job Ready Indy funding is specifically for justice-involved individuals.' },
               { q: 'What programs are eligible?', a: 'Healthcare, Skilled Trades, CDL, IT, Barbering, and more.' },
             ].map((faq) => (
               <details key={faq.q} className="bg-white rounded-lg border border-slate-200 group">

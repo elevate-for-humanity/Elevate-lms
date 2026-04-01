@@ -88,7 +88,7 @@ function seedContent() {
       id: 'workforce',
       title: 'Workforce Programs',
       tags: ['programs', 'workforce'],
-      body: 'Modern Apprenticeship, WIOA, WRG, JRI, VR programs available',
+      body: 'Modern Apprenticeship, WIOA, WRG, Job Ready Indy, VR programs available',
     },
   ];
 }

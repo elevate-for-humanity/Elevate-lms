@@ -105,7 +105,7 @@ export default function FranchisePage() {
               </div>
               <h3 className="text-xl font-bold mb-3">Government Funding</h3>
               <p className="text-black">
-                Students pay $0 through WIOA, WRG, JRI funding. You get paid
+                Students pay $0 through WIOA, WRG, Job Ready Indy funding. You get paid
                 directly by government programs
               </p>
             </div>

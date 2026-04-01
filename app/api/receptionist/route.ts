@@ -19,7 +19,7 @@ Your role is to:
 
 Key Information:
 - Programs: Medical Assistant, Barber Apprenticeship, HVAC, Building Maintenance, CDL, Workforce Readiness
-- Funding: WRG, WIOA, JRI - most programs are free or low-cost
+- Funding: WRG, WIOA, Job Ready Indy - most programs are free or low-cost
 - Apply: /apply or /start
 - Contact: /contact for all inquiries
 - Partners: We work with barbershops, clinics, employers, workforce boards

@@ -53,7 +53,7 @@ export default function FerpaConsentPage() {
           <ul>
             <li><strong>Indiana Department of Workforce Development (DWD)</strong> — WIOA Title I compliance and outcome reporting</li>
             <li><strong>WorkOne / Local Workforce Development Boards</strong> — Case management and co-enrollment services</li>
-            <li><strong>Indiana Department of Correction / JRI Program</strong> — Justice Reinvestment Initiative reporting</li>
+            <li><strong>Indiana Department of Correction / Job Ready Indy Program</strong> — Justice Reinvestment Initiative reporting</li>
             <li><strong>U.S. Department of Labor</strong> — Registered Apprenticeship RAPIDS reporting</li>
             <li><strong>Funding Agencies</strong> — Organizations providing tuition assistance, grants, or scholarships</li>
             <li><strong>Employer Partners</strong> — Limited to attendance and progress for apprenticeship and OJT placements</li>

@@ -18,7 +18,7 @@ const SESSIONS = [
 
 const WHAT_TO_EXPECT = [
   'Overview of available training programs and career pathways',
-  'Eligibility requirements and funding options (WIOA, DOL, JRI)',
+  'Eligibility requirements and funding options (WIOA, DOL, Job Ready Indy)',
   'Document checklist and enrollment process walkthrough',
   'Meet your enrollment advisor and ask questions',
   'Tour of training facilities (in-person sessions)',

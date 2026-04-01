@@ -196,7 +196,7 @@ export default function PartnersPage() {
                   'Barrier removal support: transportation referrals, childcare coordination, supportive service connections',
                   'Bilingual intake support where available',
                   'Regular progress updates sent directly to your case managers or program directors',
-                  'No cost to participants who qualify for WIOA, WRG, or JRI funding',
+                  'No cost to participants who qualify for WIOA, WRG, or Job Ready Indy funding',
                 ],
               },
               {
@@ -267,13 +267,13 @@ export default function PartnersPage() {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {[
-                  { name: 'CNA Certification', href: '/programs/cna', duration: '4–6 weeks', credential: 'CNA (Indiana ISDH)', funding: 'WIOA, JRI, Self-Pay' },
+                  { name: 'CNA Certification', href: '/programs/cna', duration: '4–6 weeks', credential: 'CNA (Indiana ISDH)', funding: 'WIOA, Job Ready Indy, Self-Pay' },
                   { name: 'CDL Class A/B', href: '/programs/cdl-training', duration: '4–6 weeks', credential: 'CDL (Indiana BMV)', funding: 'WIOA, WRG, Self-Pay' },
                   { name: 'HVAC Technician', href: '/programs/hvac-technician', duration: '12 weeks', credential: 'EPA 608 + OSHA 10', funding: 'WIOA, WRG, Employer' },
                   { name: 'Electrical', href: '/programs/electrical', duration: '12–16 weeks', credential: 'OSHA 10 + NCCER Level 1', funding: 'WIOA, WRG, Employer' },
                   { name: 'Welding', href: '/programs/welding', duration: '12–16 weeks', credential: 'AWS + OSHA 10', funding: 'WIOA, WRG, Employer' },
-                  { name: 'IT Help Desk Technician', href: '/programs/it-help-desk', duration: '8 weeks', credential: 'Certiport IT Specialist', funding: 'WIOA, JRI, Self-Pay' },
-                  { name: 'Cybersecurity Analyst', href: '/programs/cybersecurity-analyst', duration: '12 weeks', credential: 'Certiport IT Specialist — Cybersecurity', funding: 'WIOA, JRI, Self-Pay' },
+                  { name: 'IT Help Desk Technician', href: '/programs/it-help-desk', duration: '8 weeks', credential: 'Certiport IT Specialist', funding: 'WIOA, Job Ready Indy, Self-Pay' },
+                  { name: 'Cybersecurity Analyst', href: '/programs/cybersecurity-analyst', duration: '12 weeks', credential: 'Certiport IT Specialist — Cybersecurity', funding: 'WIOA, Job Ready Indy, Self-Pay' },
                   { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', duration: '~18 months', credential: 'Indiana Barber License', funding: 'State Grant, Employer' },
                 ].map((r) => (
                   <tr key={r.name} className="hover:bg-white">

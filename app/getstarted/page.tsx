@@ -234,7 +234,7 @@ export default function Page() {
                 </div>
                 <h3 className="text-lg font-semibold mb-3">Funding Available</h3>
                 <p className="text-black">
-                  Most participants qualify for full funding through WIOA, WRG, or JRI
+                  Most participants qualify for full funding through WIOA, WRG, or Job Ready Indy
                 </p>
               </div>
 

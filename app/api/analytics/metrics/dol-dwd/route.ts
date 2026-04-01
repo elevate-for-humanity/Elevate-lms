@@ -25,7 +25,7 @@ const supabase = await createServerSupabaseClient();
       courses (title, duration_hours)
     `
     )
-    .in('funding_source', ['WIOA', 'WRG', 'JRI', 'DOL']);
+    .in('funding_source', ['WIOA', 'WRG', 'Job Ready Indy', 'DOL']);
 
   return NextResponse.json({
     provider: 'DOL/DWD',
@@ -34,7 +34,7 @@ const supabase = await createServerSupabaseClient();
     by_funding: {
       WIOA: enrollments?.filter((e) => e.funding_source === 'WIOA').length || 0,
       WRG: enrollments?.filter((e) => e.funding_source === 'WRG').length || 0,
-      JRI: enrollments?.filter((e) => e.funding_source === 'JRI').length || 0,
+      Job Ready Indy: enrollments?.filter((e) => e.funding_source === 'Job Ready Indy').length || 0,
       DOL: enrollments?.filter((e) => e.funding_source === 'DOL').length || 0,
     },
     integration_status: 'ready',

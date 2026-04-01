@@ -22,7 +22,7 @@ export default function DataSharingPage() {
       >
         <DocumentSection heading="Purpose" number={1}>
           <p>
-            This consent authorizes Elevate for Humanity to share your personal and educational data with designated agencies and partners as required for program funding, compliance reporting, and workforce development services under WIOA, JRI, the Workforce Ready Grant, and DOL Registered Apprenticeship programs.
+            This consent authorizes Elevate for Humanity to share your personal and educational data with designated agencies and partners as required for program funding, compliance reporting, and workforce development services under WIOA, Job Ready Indy, the Workforce Ready Grant, and DOL Registered Apprenticeship programs.
           </p>
         </DocumentSection>
 
@@ -43,7 +43,7 @@ export default function DataSharingPage() {
           <ul>
             <li><strong>Indiana Department of Workforce Development (DWD)</strong> — WIOA Title I compliance and outcome reporting</li>
             <li><strong>WorkOne / Local Workforce Development Boards</strong> — Case management and co-enrollment services</li>
-            <li><strong>Indiana Department of Correction / JRI Program</strong> — Justice Reinvestment Initiative reporting</li>
+            <li><strong>Indiana Department of Correction / Job Ready Indy Program</strong> — Justice Reinvestment Initiative reporting</li>
             <li><strong>U.S. Department of Labor</strong> — Registered Apprenticeship RAPIDS reporting</li>
             <li><strong>Employer Partners</strong> — Limited to attendance and progress for apprenticeship and OJT placements</li>
             <li><strong>Funding Agencies</strong> — Organizations providing tuition assistance, grants, or scholarships</li>

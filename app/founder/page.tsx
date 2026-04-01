@@ -79,7 +79,7 @@ export default function FounderPage() {
                 <p>
                   Under her leadership, Elevate has secured approvals across federal, state, and
                   local agencies: U.S. DOL Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301),
-                  Indiana ETPL listed, Workforce Ready Grant (WRG) approved, WIOA and JRI funding
+                  Indiana ETPL listed, Workforce Ready Grant (WRG) approved, WIOA and Job Ready Indy funding
                   approved, and Job Ready Indy partner. Elevate is enrolled in PECOS with an NPI,
                   holds a federal CAGE code (0Q856), UEI VX2GK5S8SZH8, is ITAP/INDOT registered,
                   and ByBlack certified through the U.S. Black Chambers / NAACP.
@@ -160,7 +160,7 @@ export default function FounderPage() {
                   'Indiana ETPL Listed Provider',
                   'Workforce Ready Grant (WRG) Approved',
                   'WIOA Funding Approved',
-                  'JRI Funding Approved',
+                  'Job Ready Indy Funding Approved',
                   'Job Ready Indy Partner',
                   'WorkOne Partner',
                   'PECOS / NPI Enrolled',
@@ -227,7 +227,7 @@ export default function FounderPage() {
               {
                 name: 'Elevate for Humanity',
                 role: 'Career & Technical Institute',
-                desc: 'Workforce training, apprenticeship sponsorship, funding navigation, and employer partnerships. DOL Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301), ETPL listed, WRG, WIOA, and JRI approved. CAGE Code: 0Q856.',
+                desc: 'Workforce training, apprenticeship sponsorship, funding navigation, and employer partnerships. DOL Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301), ETPL listed, WRG, WIOA, and Job Ready Indy approved. CAGE Code: 0Q856.',
                 href: '/about',
               },
               {

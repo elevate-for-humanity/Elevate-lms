@@ -21,7 +21,7 @@ const features = [
     image: '/images/pages/admin-funding-hero.jpg',
     alt: 'Funding verification and eligibility dashboard',
     title: 'Funding Verification',
-    desc: 'Check your eligibility for WIOA, WRG, and JRI funding online. See which programs are covered before you apply.',
+    desc: 'Check your eligibility for WIOA, WRG, and Job Ready Indy funding online. See which programs are covered before you apply.',
   },
   {
     image: '/images/pages/comp-pathway-healthcare.jpg',

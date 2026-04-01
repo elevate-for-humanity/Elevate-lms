@@ -9,11 +9,11 @@ export const revalidate = 600;
 
 export const metadata: Metadata = {
   title: 'Peer Recovery Specialist (CPRS) | Indiana Certification | Elevate for Humanity',
-  description: 'Become a Certified Peer Recovery Specialist in Indiana. WIOA and JRI funding available for eligible residents. 8-week program, state-approved.',
+  description: 'Become a Certified Peer Recovery Specialist in Indiana. WIOA and Job Ready Indy funding available for eligible residents. 8-week program, state-approved.',
   alternates: { canonical: '/programs/peer-recovery-specialist' },
   openGraph: {
     title: 'Peer Recovery Specialist (CPRS) | Elevate for Humanity',
-    description: 'Become a Certified Peer Recovery Specialist in Indiana. WIOA and JRI funding available.',
+    description: 'Become a Certified Peer Recovery Specialist in Indiana. WIOA and Job Ready Indy funding available.',
     type: 'website',
     url: 'https://www.elevateforhumanity.org/programs/peer-recovery-specialist',
   },
@@ -30,7 +30,7 @@ const FALLBACK = {
   length_weeks: 8,
   delivery_model: 'hybrid',
   certificate_title: 'Indiana CPRS Certification',
-  funding: 'WIOA and Justice Reinvestment Initiative (JRI) funding available for eligible Indiana residents.',
+  funding: 'WIOA and Justice Reinvestment Initiative (Job Ready Indy) funding available for eligible Indiana residents.',
   program_tracks: [
     { id: '1', title: 'WIOA Funded', description: 'For eligible unemployed or underemployed Indiana residents. Covers full tuition, books, and exam fees.', cost_cents: 0, funding_type: 'wioa', available: true },
     { id: '2', title: 'Self-Pay', description: 'Pay out of pocket. Payment plans available.', cost_cents: 149500, funding_type: 'self_pay', available: true },

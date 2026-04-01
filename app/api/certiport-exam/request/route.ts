@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
  *
  * Two paths based on student funding:
  *
- * FUNDED (WIOA/WRG/JRI/Employer):
+ * FUNDED (WIOA/WRG/Job Ready Indy/Employer):
  *   → Exam request created (status: pending)
  *   → Admin assigns voucher from Certiport portal
  *   → Student gets voucher for free

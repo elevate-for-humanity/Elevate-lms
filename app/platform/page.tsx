@@ -30,7 +30,7 @@ const capabilities = [
     image: '/images/pages/platform-page-3.jpg',
     alt: 'WIOA and workforce funding compliance tools',
     label: 'Funding Compliance',
-    desc: 'WIOA Title I, Workforce Ready Grant, JRI, and DOL Registered Apprenticeship standards built into the data model. Compliance documentation maintained per program.',
+    desc: 'WIOA Title I, Workforce Ready Grant, Job Ready Indy, and DOL Registered Apprenticeship standards built into the data model. Compliance documentation maintained per program.',
   },
   {
     image: '/images/pages/platform-page-4.jpg',
@@ -96,7 +96,7 @@ const audiences = [
 const complianceItems = [
   'FERPA-aware student data handling with row-level security',
   'Role-based access: admin, staff, instructor, partner, learner, case manager',
-  'WIOA / WRG / JRI compliance-ready reporting',
+  'WIOA / WRG / Job Ready Indy compliance-ready reporting',
   'Immutable audit logs on all operations',
   'Credential authority separation — platform stores records, authorities issue credentials',
   'Secure provider onboarding and MOU management',
@@ -255,7 +255,7 @@ export default function PlatformPage() {
                 Designed for organizations that answer to funders and auditors
               </h2>
               <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                Every design decision in this platform was made with workforce funding compliance in mind. WIOA, WRG, JRI, and DOL Registered Apprenticeship requirements are not bolted on — they are in the data model.
+                Every design decision in this platform was made with workforce funding compliance in mind. WIOA, WRG, Job Ready Indy, and DOL Registered Apprenticeship requirements are not bolted on — they are in the data model.
               </p>
               <ul className="space-y-3">
                 {complianceItems.map((item) => (

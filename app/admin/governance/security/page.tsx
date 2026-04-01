@@ -96,7 +96,7 @@ export default function SecurityDocumentPage() {
               <li>Learning Management System (LMS)</li>
               <li>Store, checkout, and payment flows</li>
               <li>Student enrollment and credentialing systems</li>
-              <li>WIOA/WRG/JRI funding and compliance workflows</li>
+              <li>WIOA/WRG/Job Ready Indy funding and compliance workflows</li>
               <li>Administrative, instructor, and partner portals</li>
             </ul>
             <p className="text-slate-700 leading-relaxed mt-4">

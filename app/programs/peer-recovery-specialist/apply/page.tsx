@@ -56,7 +56,7 @@ export default function PeerRecoveryApplyPage() {
           ← Back to program
         </Link>
         <h1 className="text-3xl font-bold">Apply — Peer Recovery Specialist</h1>
-        <p className="mt-2 text-slate-600">WIOA and JRI funding available for eligible Indiana residents.</p>
+        <p className="mt-2 text-slate-600">WIOA and Job Ready Indy funding available for eligible Indiana residents.</p>
 
         {error && (
           <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error}</div>

@@ -105,7 +105,7 @@ export default async function ApplyPage({
               </h2>
               <p className="text-slate-700 mb-3">
                 Apply for career training in healthcare, skilled trades, barbering, IT, and more.
-                Many programs are funded through WIOA, WRG, and JRI grants. Some programs
+                Many programs are funded through WIOA, WRG, and Job Ready Indy grants. Some programs
                 have tuition with flexible payment options available.
               </p>
               <ul className="text-slate-600 text-sm space-y-1 mb-4 list-disc list-inside">
@@ -204,7 +204,7 @@ export default async function ApplyPage({
                 image: '/images/pages/apply-page-1.jpg',
                 alt: 'Funding assistance',
                 title: 'Funding & Grants',
-                desc: 'WIOA covers tuition, books, and supplies for qualifying adults and dislocated workers. WRG (Workforce Ready Grant) funds high-demand certifications in Indiana. JRI (Job Ready Indy) supports individuals with justice involvement.',
+                desc: 'WIOA covers tuition, books, and supplies for qualifying adults and dislocated workers. WRG (Workforce Ready Grant) funds high-demand certifications in Indiana. Job Ready Indy supports individuals with justice involvement.',
                 link: '/funding',
                 linkLabel: 'View Funding Options',
               },

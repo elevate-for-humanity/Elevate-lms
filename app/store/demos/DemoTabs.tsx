@@ -19,7 +19,7 @@ const DEMOS = [
     features: [
       'Enrollment pipeline with real-time status',
       'Compliance tracking and PIRL reporting',
-      'Funding utilization across WIOA, WRG, JRI',
+      'Funding utilization across WIOA, WRG, Job Ready Indy',
       'At-risk student alerts and intervention tools',
       'Application review and approval workflow',
     ],

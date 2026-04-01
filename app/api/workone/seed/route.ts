@@ -34,9 +34,9 @@ const FUNDING_EXTRA_STEPS: Record<string, { key: string; label: string }[]> = {
     { key: 'wrg_authorization',  label: 'Receive Workforce Ready Grant authorization' },
   ],
   jri: [
-    { key: 'jri_case_manager',   label: 'Connect with JRI case manager or reentry coordinator' },
+    { key: 'jri_case_manager',   label: 'Connect with Job Ready Indy case manager or reentry coordinator' },
     { key: 'jri_docs',           label: 'Provide justice-involved documentation to Elevate' },
-    { key: 'jri_approval',       label: 'JRI funding confirmed by Elevate' },
+    { key: 'jri_approval',       label: 'Job Ready Indy funding confirmed by Elevate' },
   ],
   employer_sponsored: [
     { key: 'employer_agreement', label: 'Employer signs sponsorship agreement with Elevate' },

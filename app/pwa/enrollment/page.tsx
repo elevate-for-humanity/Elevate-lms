@@ -114,7 +114,7 @@ export default async function EnrollmentPWAPage() {
         <div className="space-y-2">
           {[
             { step: '1', title: 'Apply Online', desc: 'Submit your application with program preference' },
-            { step: '2', title: 'Check Funding', desc: 'Register at indianacareerconnect.com for WIOA/JRI' },
+            { step: '2', title: 'Check Funding', desc: 'Register at indianacareerconnect.com for WIOA/Job Ready Indy' },
             { step: '3', title: 'Get Approved', desc: 'Receive acceptance and enrollment instructions' },
             { step: '4', title: 'Start Training', desc: 'Begin your program and track progress in the LMS' },
           ].map((s) => (

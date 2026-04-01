@@ -232,7 +232,7 @@ export default function FundingImpactPage() {
                     { name: 'WIOA Title I', desc: 'Adult, Dislocated Worker, Youth programs', amount: 'Up to $10,000' },
                     { name: 'Workforce Ready Grant', desc: 'Indiana state funding for high-demand training', amount: 'Up to $5,500' },
                     { name: 'SNAP E&T', desc: 'Training for SNAP recipients', amount: 'Varies' },
-                    { name: 'JRI Funding', desc: 'Job Ready Indy', amount: 'Up to $8,000' },
+                    { name: 'Job Ready Indy Funding', desc: 'Job Ready Indy', amount: 'Up to $8,000' },
                     { name: 'TAA', desc: 'Trade Adjustment Assistance', amount: 'Up to $10,000' },
                     { name: 'Veterans Benefits', desc: 'GI Bill and VR&E', amount: 'Full tuition' },
                   ].map((source, index) => (
@@ -343,11 +343,11 @@ export default function FundingImpactPage() {
                   </div>
                   <div>
                     <div className="font-bold text-gray-900">David W.</div>
-                    <div className="text-sm text-gray-500">JRI Funding</div>
+                    <div className="text-sm text-gray-500">Job Ready Indy Funding</div>
                   </div>
                 </div>
                 <p className="text-gray-600 mb-4">
-                  &quot;Coming out of incarceration, I thought no one would give me a chance. JRI funding 
+                  &quot;Coming out of incarceration, I thought no one would give me a chance. Job Ready Indy funding 
                   got me into the barber apprenticeship. Now I have my license and my own chair.&quot;
                 </p>
                 <div className="flex items-center gap-2 text-brand-green-600 font-semibold">

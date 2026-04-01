@@ -32,11 +32,11 @@ export const metadata: Metadata = {
 /* ── Program Summary Data ── */
 const PROGRAMS = [
   { name: 'Barber Apprenticeship', duration: '~18 months', format: 'In-Person + LMS', rtiHours: 144, ojtHours: 1500, credential: 'Indiana Barber License', funding: 'Self-Pay / Employer-Sponsored', registered: true },
-  { name: 'CNA Certification', duration: '4–6 weeks', format: 'Hybrid', rtiHours: 105, ojtHours: 45, credential: 'CNA Certification (ISDH)', funding: 'WIOA / JRI / Self-Pay', registered: false },
+  { name: 'CNA Certification', duration: '4–6 weeks', format: 'Hybrid', rtiHours: 105, ojtHours: 45, credential: 'CNA Certification (ISDH)', funding: 'WIOA / Job Ready Indy / Self-Pay', registered: false },
   { name: 'CDL Commercial Driving', duration: '4–6 weeks', format: 'In-Person', rtiHours: 40, ojtHours: 120, credential: 'CDL Class A/B (BMV)', funding: 'WIOA / WRG / Self-Pay', registered: false },
   { name: 'HVAC Technician', duration: '8–16 weeks', format: 'Hybrid', rtiHours: 200, ojtHours: 200, credential: 'EPA 608 + OSHA 10', funding: 'WIOA / WRG / Employer', registered: false },
-  { name: 'IT Help Desk', duration: '8 weeks', format: 'In-Person + Labs', rtiHours: 280, ojtHours: 40, credential: 'Certiport IT Specialist', funding: 'WIOA / JRI / Self-Pay', registered: false },
-  { name: 'Cybersecurity Analyst', duration: '12 weeks', format: 'In-Person + Labs', rtiHours: 440, ojtHours: 40, credential: 'Certiport IT Specialist — Cybersecurity', funding: 'WIOA / JRI / Self-Pay', registered: false },
+  { name: 'IT Help Desk', duration: '8 weeks', format: 'In-Person + Labs', rtiHours: 280, ojtHours: 40, credential: 'Certiport IT Specialist', funding: 'WIOA / Job Ready Indy / Self-Pay', registered: false },
+  { name: 'Cybersecurity Analyst', duration: '12 weeks', format: 'In-Person + Labs', rtiHours: 440, ojtHours: 40, credential: 'Certiport IT Specialist — Cybersecurity', funding: 'WIOA / Job Ready Indy / Self-Pay', registered: false },
   { name: 'Welding', duration: '10–16 weeks', format: 'In-Person', rtiHours: 160, ojtHours: 240, credential: 'AWS D1.1 + OSHA 10', funding: 'WIOA / WRG / Employer', registered: false },
   { name: 'Electrical', duration: '10–16 weeks', format: 'Hybrid', rtiHours: 200, ojtHours: 200, credential: 'OSHA 10 + NCCER Core', funding: 'WIOA / WRG / Employer', registered: false },
 ];
@@ -263,7 +263,7 @@ export default function WorkforcePartnershipPacketPage() {
           <div className="space-y-3">
             {[
               { day: 'Day 1–2', title: 'Partnership Agreement', desc: 'MOU execution, cohort parameters defined (size, program, timeline, reporting requirements).' },
-              { day: 'Day 3–5', title: 'Student Intake', desc: 'Eligibility screening, enrollment forms, funding determination (WIOA/JRI/WRG/self-pay).' },
+              { day: 'Day 3–5', title: 'Student Intake', desc: 'Eligibility screening, enrollment forms, funding determination (WIOA/Job Ready Indy/WRG/self-pay).' },
               { day: 'Day 5–7', title: 'Credential Partner Alignment', desc: 'RTI provider confirmed, instructor assignment, module sequencing, LMS accounts created.' },
               { day: 'Day 7–10', title: 'Employer OJT Setup', desc: 'OJT agreements signed, work process schedules documented, supervisors designated (if applicable).' },
               { day: 'Day 10–14', title: 'Cohort Launch', desc: 'Orientation, first RTI session, LMS access activated, progress tracking begins.' },

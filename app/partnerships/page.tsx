@@ -34,7 +34,7 @@ export default function PartnershipsPage() {
           </h1>
           <p className="text-lg text-slate-600 max-w-2xl">
             ETPL-listed training provider serving Marion County and Central Indiana.
-            Refer WIOA, WRG, and JRI participants directly. We handle enrollment, training, credentialing, and placement reporting.
+            Refer WIOA, WRG, and Job Ready Indy participants directly. We handle enrollment, training, credentialing, and placement reporting.
           </p>
         </div>
       </section>
@@ -47,7 +47,7 @@ export default function PartnershipsPage() {
             {[
               { icon: Building2, title: 'Housing Authorities', desc: 'FSS and Section 3 resident referrals. We accept IHA and other Indiana housing authority participants for career training and credential programs.' },
               { icon: Users, title: 'WorkOne & Workforce Boards', desc: 'We are listed on INTraining under 2Exclusive LLC-S. Send WIOA Adult, Dislocated Worker, or Youth referrals. We submit attendance and completion data back to your office.' },
-              { icon: Shield, title: 'Case Managers & Reentry', desc: 'JRI-approved provider. We accept referrals from probation, community corrections, and reentry coordinators. Progress reports sent on your schedule.' },
+              { icon: Shield, title: 'Case Managers & Reentry', desc: 'Job Ready Indy-approved provider. We accept referrals from probation, community corrections, and reentry coordinators. Progress reports sent on your schedule.' },
               { icon: Briefcase, title: 'Employers & OJT Hosts', desc: 'Host apprentices and OJT participants at your site. We provide trained candidates in HVAC, electrical, plumbing, barbering, healthcare, and CDL.' },
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-xl p-6 border border-slate-200">
@@ -66,7 +66,7 @@ export default function PartnershipsPage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">How Referrals Work</h2>
           <div className="grid md:grid-cols-4 gap-6">
             {[
-              { step: '1', title: 'Send a Referral', desc: 'Email info@elevateforhumanity.org or call (317) 314-3757 with participant name, contact info, funding source (WIOA/WRG/JRI/self-pay), and program interest.' },
+              { step: '1', title: 'Send a Referral', desc: 'Email info@elevateforhumanity.org or call (317) 314-3757 with participant name, contact info, funding source (WIOA/WRG/Job Ready Indy/self-pay), and program interest.' },
               { step: '2', title: 'Intake & Enrollment', desc: 'We contact the participant within 48 hours, verify eligibility, complete enrollment paperwork, and coordinate IEP documentation with your office if needed.' },
               { step: '3', title: 'Training & Tracking', desc: 'Related Technical Instruction delivered online via our LMS. On-the-Job Training at employer partner sites. We log attendance, competency assessments, and OJT hours.' },
               { step: '4', title: 'Completion & Reporting', desc: 'We issue credentials, submit completion data to your agency, and provide job placement support including resume prep and employer matching.' },
@@ -92,7 +92,7 @@ export default function PartnershipsPage() {
               { label: 'ETPL Provider', value: '2Exclusive LLC-S — listed on Indiana INTraining system' },
               { label: 'DOL Registered Apprenticeship', value: 'Barber and Building Technician programs registered with USDOL/RAPIDS' },
               { label: 'WIOA Eligible', value: 'Programs approved for Adult, Dislocated Worker, and Youth funding' },
-              { label: 'JRI Approved', value: 'Approved provider for Job Ready Indy participants' },
+              { label: 'Job Ready Indy Approved', value: 'Approved provider for Job Ready Indy participants' },
               { label: 'Workforce Ready Grant', value: 'High-demand certification programs qualify for WRG through Next Level Jobs' },
               { label: 'Certificate Verification', value: 'All completions verifiable at elevateforhumanity.org/cert/verify' },
             ].map((item) => (

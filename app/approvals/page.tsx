@@ -377,7 +377,7 @@ export default function ApprovalsPage() {
                 For Students
               </h3>
               <p className="text-black text-lg leading-relaxed">
-                Our students can access funded training through WRG, WIOA, JRI,
+                Our students can access funded training through WRG, WIOA, Job Ready Indy,
                 and apprenticeships. Your training is legitimate, recognized,
                 and leads to real employment.
               </p>

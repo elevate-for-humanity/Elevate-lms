@@ -165,7 +165,7 @@ export default function PrivacyPolicyPage() {
                 <li>Process tuition payments and workforce funding</li>
                 <li>Prepare and file tax returns (tax preparation clients, governed by separate addendum)</li>
                 <li>Communicate about programs, schedules, and deadlines</li>
-                <li>Comply with WIOA, WRG, JRI, and DOL reporting requirements</li>
+                <li>Comply with WIOA, WRG, Job Ready Indy, and DOL reporting requirements</li>
                 <li>Report apprenticeship outcomes to the U.S. Department of Labor</li>
                 <li>Improve our programs, website, and services</li>
                 <li>Prevent fraud and protect the security of our systems</li>
@@ -179,7 +179,7 @@ export default function PrivacyPolicyPage() {
               <div className="bg-white rounded-lg p-5 space-y-3">
                 <div>
                   <p className="font-semibold text-slate-900">Workforce Development Agencies</p>
-                  <p className="text-sm">Indiana DWD, WorkOne, EmployIndy — as required for WIOA, WRG, and JRI funding compliance and outcome reporting.</p>
+                  <p className="text-sm">Indiana DWD, WorkOne, EmployIndy — as required for WIOA, WRG, and Job Ready Indy funding compliance and outcome reporting.</p>
                 </div>
                 <div className="border-t border-slate-200 pt-3">
                   <p className="font-semibold text-slate-900">U.S. Department of Labor</p>
@@ -240,7 +240,7 @@ export default function PrivacyPolicyPage() {
             <Section id="wioa" number="06" title="WIOA & Workforce Reporting">
               <p>
                 Participants enrolled through WIOA, Workforce Ready Grant (WRG), or Job-Ready
-                Incentive (JRI) funding are subject to federal and state reporting requirements.
+                Incentive (Job Ready Indy) funding are subject to federal and state reporting requirements.
                 We are required to report:
               </p>
               <ul className="list-disc pl-6 space-y-1">
@@ -331,7 +331,7 @@ export default function PrivacyPolicyPage() {
                       <td className="p-3">7 years after last enrollment</td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-3">WIOA/WRG/JRI participant data</td>
+                      <td className="p-3">WIOA/WRG/Job Ready Indy participant data</td>
                       <td className="p-3">Per federal retention schedule (typically 3-7 years)</td>
                     </tr>
                     <tr className="border-b">

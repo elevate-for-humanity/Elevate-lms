@@ -238,7 +238,7 @@ export default function HvacCourseLicensePage() {
               { title: 'Workforce Boards', desc: 'Deploy for WIOA Title I participants. Meets ETPL curriculum standards.' },
               { title: 'Community Colleges', desc: 'Add to your trades catalog. SCORM export integrates with Blackboard, Canvas, Moodle.' },
               { title: 'Apprenticeship Programs', desc: 'Use as the related technical instruction (RTI) component of a DOL Registered Apprenticeship.' },
-              { title: 'Reentry Programs', desc: 'Designed for adult learners. Used by JRI and justice-involved workforce programs.' },
+              { title: 'Reentry Programs', desc: 'Designed for adult learners. Used by Job Ready Indy and justice-involved workforce programs.' },
             ].map((item) => (
               <div key={item.title} className="bg-slate-800 rounded-xl p-5">
                 <div className="flex items-start gap-2 mb-2">

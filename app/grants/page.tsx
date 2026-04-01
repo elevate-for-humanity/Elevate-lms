@@ -161,16 +161,16 @@ export default function GrantsPage() {
               </div>
             </div>
 
-            {/* JRI */}
+            {/* Job Ready Indy */
             <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
               <div className="flex flex-col md:flex-row md:items-start gap-6">
                 <div className="w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
                   <GraduationCap className="w-8 h-8 text-brand-blue-600" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-slate-900 mb-2">JRI (Job Ready Indy)</h3>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-2">Job Ready Indy</h3>
                   <p className="text-slate-600 mb-4">
-                    Everyone deserves a second chance. JRI funding helps justice-involved individuals get career training and support services to build a stable future. We believe in your potential.
+                    Everyone deserves a second chance. Job Ready Indy funding helps justice-involved individuals get career training and support services to build a stable future. We believe in your potential.
                   </p>
                   <div className="bg-white rounded-lg p-4 mb-4">
                     <h4 className="font-semibold text-slate-900 mb-2">This program is for you if:</h4>
@@ -187,7 +187,7 @@ export default function GrantsPage() {
                     </ul>
                   </div>
                   <Link href="/jri" className="text-brand-blue-600 font-semibold hover:underline inline-flex items-center gap-1">
-                    Learn About JRI Programs <ArrowRight className="w-4 h-4" />
+                    Learn About Job Ready Indy Programs <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
               </div>

@@ -341,7 +341,7 @@ export default function TrackApplicationPage() {
               {application.status === 'approved' && (
                 <div className="space-y-3 text-sm text-black">
                   <p>• An advisor will contact you to complete enrollment</p>
-                  <p>• We'll discuss funding options (WIOA, WRG, JRI)</p>
+                  <p>• We'll discuss funding options (WIOA, WRG, Job Ready Indy)</p>
                   <p>• You'll receive program start date and details</p>
                 </div>
               )}

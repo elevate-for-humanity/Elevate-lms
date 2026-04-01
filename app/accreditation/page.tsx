@@ -139,6 +139,7 @@ export default function AccreditationPage() {
             <div className="grid sm:grid-cols-2 gap-4">
               {[
 
+                { label: 'Job Ready Indy — Approved Provider', detail: 'Approved Job Ready Indy training provider for justice-involved individuals in Marion County.' },
                 { label: 'Workforce Ready Grant (WRG)', detail: 'Approved provider under Indiana\'s Workforce Ready Grant for high-demand certification programs.' },
                 { label: 'WIOA — Workforce Innovation and Opportunity Act', detail: 'Eligible Training Provider on the Indiana ETPL. Programs available at no cost to qualifying participants.' },
                 { label: 'U.S. Department of Labor — Registered Apprenticeship', detail: 'DOL Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301). Barber Apprenticeship program registered and active.' },

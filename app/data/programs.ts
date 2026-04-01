@@ -150,7 +150,7 @@ export const programs: Program[] = [
     shortDescription:
       'Get paid while you learn. Work in a real barbershop from day one, earning approximately $10/hour plus commissions while building your skills and clientele. Skip the $25,000 barber school debt. Graduate in 15-17 months ready to rent your own chair, work in a top shop, or open your own business.',
     longDescription:
-      "The Indiana Barber Apprenticeship is a federally registered program allowing you to earn wages while training to become a licensed barber. Complete 2,000 hours of on-the-job training plus 144 hours of related instruction over 15-17 months.\n\nWhat You'll Learn:\n- Haircutting techniques: fades, tapers, lineups, beard work\n- Hot towel shaves and grooming\n- Sanitation and infection control\n- Client consultation and communication\n- Business management and shop operations\n- Building and maintaining clientele\n\nWho This Program Is For:\n- Individuals seeking a skilled trade career\n- Those who enjoy working with people\n- Adults needing stable, in-demand work\n- Career changers looking for entrepreneurial opportunities\n\nProgram Format:\n- Work at registered apprenticeship sponsor shop\n- Earn $10/hour base pay plus commissions and tips\n- Complete online theory coursework (3-4 hours/week)\n- Total time: 15-17 months\n\nFunding & Approvals:\n- WIOA Funding\n- Workforce Ready Grant\n- JRI Funding for Justice-Involved Individuals\n- Employer sponsorship options\n- Self-pay with payment plans\n\nCareer Outcomes:\n- Indiana Registered Barber (licensed)\n- Chair rental - be your own boss\n- Barbershop employee with established clientele\n- Barbershop owner/entrepreneur\n- Earning potential: $35,000-$65,000+ per year",
+      "The Indiana Barber Apprenticeship is a federally registered program allowing you to earn wages while training to become a licensed barber. Complete 2,000 hours of on-the-job training plus 144 hours of related instruction over 15-17 months.\n\nWhat You'll Learn:\n- Haircutting techniques: fades, tapers, lineups, beard work\n- Hot towel shaves and grooming\n- Sanitation and infection control\n- Client consultation and communication\n- Business management and shop operations\n- Building and maintaining clientele\n\nWho This Program Is For:\n- Individuals seeking a skilled trade career\n- Those who enjoy working with people\n- Adults needing stable, in-demand work\n- Career changers looking for entrepreneurial opportunities\n\nProgram Format:\n- Work at registered apprenticeship sponsor shop\n- Earn $10/hour base pay plus commissions and tips\n- Complete online theory coursework (3-4 hours/week)\n- Total time: 15-17 months\n\nFunding & Approvals:\n- WIOA Funding\n- Workforce Ready Grant\n- Job Ready Indy Funding for Justice-Involved Individuals\n- Employer sponsorship options\n- Self-pay with payment plans\n\nCareer Outcomes:\n- Indiana Registered Barber (licensed)\n- Chair rental - be your own boss\n- Barbershop employee with established clientele\n- Barbershop owner/entrepreneur\n- Earning potential: $35,000-$65,000+ per year",
     heroImage: '/images/pages/barber-hero-main.jpg',
     heroImageAlt:
       'Barber apprentice working with real clients in professional barbershop',
@@ -167,13 +167,13 @@ export const programs: Program[] = [
       'Indiana House Bill 1135 & 1320 Approved',
       'WIOA Eligible',
       'Workforce Ready Grant Eligible',
-      'JRI Funding Available',
+      'Job Ready Indy Funding Available',
     ],
     fundingOptions: [
       '100% Employer-Paid curriculum cost',
       'WIOA Funding',
       'Workforce Ready Grant',
-      'JRI Funding for Justice-Involved Individuals',
+      'Job Ready Indy Funding for Justice-Involved Individuals',
       'Earn $10/hour + commissions while training',
     ],
     highlights: [
@@ -1243,7 +1243,7 @@ export const programs: Program[] = [
     shortDescription:
       'Comprehensive 45-day program combining Certified Peer Recovery Coach (CPRC), Certified Peer Support Professional, and Certified Community Healthcare Worker (CCHW) certifications.',
     longDescription:
-      "The Public Safety Reentry Specialist Program is designed specifically for justice-involved individuals seeking meaningful careers in behavioral health, addiction recovery, and community support. This comprehensive 45-day program combines three powerful certifications: Certified Peer Recovery Coach (CPRC), Certified Peer Support Professional, and Certified Community Healthcare Worker (CCHW).\n\nWhat You'll Learn:\n- Peer recovery coaching and support\n- Motivational interviewing techniques\n- Trauma-informed care\n- Crisis intervention and de-escalation\n- Community resource navigation\n- Relapse prevention strategies\n- Basic healthcare and vital signs\n- Professional boundaries and ethics\n- Documentation and case management\n\nWho This Program Is For:\n- Justice-involved individuals\n- Individuals in recovery\n- Career changers seeking purpose-driven work\n- Those passionate about helping others\n\nProgram Format:\n- Hybrid: Classroom + practicum\n- Length: 45 days\n- Schedule: Full-time\n\nFunding & Approvals:\n- ETPL Program ID: #10004666\n- WIOA Eligible\n- JRI (Job Ready Indy) Eligible\n- Workforce Ready Grant Eligible\n\nCareer Outcomes:\n- Certified Peer Recovery Coach\n- Peer Support Specialist\n- Community Healthcare Worker\n- Reentry Navigator\n- Average salary: $32,000-$45,000/year",
+      "The Public Safety Reentry Specialist Program is designed specifically for justice-involved individuals seeking meaningful careers in behavioral health, addiction recovery, and community support. This comprehensive 45-day program combines three powerful certifications: Certified Peer Recovery Coach (CPRC), Certified Peer Support Professional, and Certified Community Healthcare Worker (CCHW).\n\nWhat You'll Learn:\n- Peer recovery coaching and support\n- Motivational interviewing techniques\n- Trauma-informed care\n- Crisis intervention and de-escalation\n- Community resource navigation\n- Relapse prevention strategies\n- Basic healthcare and vital signs\n- Professional boundaries and ethics\n- Documentation and case management\n\nWho This Program Is For:\n- Justice-involved individuals\n- Individuals in recovery\n- Career changers seeking purpose-driven work\n- Those passionate about helping others\n\nProgram Format:\n- Hybrid: Classroom + practicum\n- Length: 45 days\n- Schedule: Full-time\n\nFunding & Approvals:\n- ETPL Program ID: #10004666\n- WIOA Eligible\n- Job Ready Indy (Job Ready Indy) Eligible\n- Workforce Ready Grant Eligible\n\nCareer Outcomes:\n- Certified Peer Recovery Coach\n- Peer Support Specialist\n- Community Healthcare Worker\n- Reentry Navigator\n- Average salary: $32,000-$45,000/year",
     heroImage: '/images/pages/career-counseling.jpg',
     heroImageAlt: 'Peer recovery coach supporting client',
     heroVideo: '/videos/career-services-hero.mp4',
@@ -1255,12 +1255,12 @@ export const programs: Program[] = [
     approvals: [
       'ETPL Program ID: #10004666',
       'WIOA Eligible',
-      'JRI Eligible',
+      'Job Ready Indy Eligible',
       'WRG Eligible',
     ],
     fundingOptions: [
       'WIOA',
-      'JRI (Job Ready Indy)',
+      'Job Ready Indy (Job Ready Indy)',
       'Workforce Ready Grant',
       'Self-Pay: $4,750',
       'Payment plans available',

@@ -34,7 +34,7 @@ export default function EnrollmentAgreementPage() {
 
         <DocumentSection heading="Tuition and Fees" number={3}>
           <p>
-            Tuition and fees vary by program. Students may be eligible for funding through WIOA, the Workforce Ready Grant (WRG), Job Ready Indy, JRI, DOL Registered Apprenticeship, or other sources. Students are responsible for any balance not covered by approved funding.
+            Tuition and fees vary by program. Students may be eligible for funding through WIOA, the Workforce Ready Grant (WRG), Job Ready Indy, Job Ready Indy, DOL Registered Apprenticeship, or other sources. Students are responsible for any balance not covered by approved funding.
           </p>
           <ul>
             <li>Tuition is due prior to the program start date unless a payment plan or funding approval is in place</li>

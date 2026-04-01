@@ -7,7 +7,7 @@ import { ArrowRight, Phone, Mail } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Job Ready Indy Policy | Elevate for Humanity',
-  description: 'JRI funding policy for workforce training for justice-involved individuals. Eligibility, covered services, and application process.',
+  description: 'Job Ready Indy funding policy for workforce training for justice-involved individuals. Eligibility, covered services, and application process.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/policies/jri' },
 };
 
@@ -44,8 +44,8 @@ export default function JRIPage() {
           <div className="prose prose-lg max-w-none">
             <h2>Overview</h2>
             <p>
-              The Job Ready Indy (JRI) provides funding for workforce training programs
-              designed to reduce recidivism and support successful reentry into the community. Through JRI,
+              The Job Ready Indy (Job Ready Indy) provides funding for workforce training programs
+              designed to reduce recidivism and support successful reentry into the community. Through Job Ready Indy,
               eligible individuals can access career training, job placement assistance, and supportive
               services at no cost.
             </p>
@@ -92,7 +92,7 @@ export default function JRIPage() {
 
           <div className="prose prose-lg max-w-none">
             <h2>Available Programs</h2>
-            <p>JRI-funded participants may enroll in any of our approved training programs, including:</p>
+            <p>Job Ready Indy-funded participants may enroll in any of our approved training programs, including:</p>
             <ul>
               <li>Barber Apprenticeship (2,000 hours)</li>
               <li>HVAC Technician Training (12 weeks)</li>
@@ -122,7 +122,7 @@ export default function JRIPage() {
 
             <h2>Supportive Services</h2>
             <p>
-              In addition to training, JRI participants may access wraparound support services including
+              In addition to training, Job Ready Indy participants may access wraparound support services including
               housing referrals, mental health resources, substance abuse counseling, and financial literacy
               workshops. These services are coordinated through our case management team.
             </p>
@@ -130,8 +130,8 @@ export default function JRIPage() {
 
           {/* Contact */}
           <div className="mt-12 bg-white rounded-xl p-8 border">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Questions About JRI?</h2>
-            <p className="text-gray-600 mb-6">Contact our enrollment team for more information about JRI eligibility and available programs.</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Questions About Job Ready Indy?</h2>
+            <p className="text-gray-600 mb-6">Contact our enrollment team for more information about Job Ready Indy eligibility and available programs.</p>
             <div className="flex flex-wrap gap-4">
               <a href="/contact" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition">
                 <Mail className="w-4 h-4" /> Email Us

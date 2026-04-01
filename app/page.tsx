@@ -34,7 +34,7 @@ export default function HomePage() {
         <div className="relative h-72 sm:h-96 lg:h-auto min-h-[560px] overflow-hidden bg-slate-700">
           <HeroVideoBg
             src="/videos/homepage-hero-new.mp4"
-            poster="/images/hero-banner.jpg"
+            poster="/images/pages/about-career-training.jpg"
             audioSrc="/videos/homepage-hero-new.mp3"
           />
         </div>

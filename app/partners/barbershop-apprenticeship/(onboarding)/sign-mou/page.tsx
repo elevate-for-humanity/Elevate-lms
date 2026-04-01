@@ -19,7 +19,7 @@ import { InstitutionalHeader } from '@/components/documents/InstitutionalHeader'
 const MOU_SECTIONS = [
   {
     title: '1. Parties and Purpose',
-    content: `This Memorandum of Understanding ("MOU") is entered into between 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Training Institute ("Sponsor") and the barbershop identified at execution ("Worksite Partner" or "Shop").
+    content: `This Memorandum of Understanding ("MOU") is entered into between 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute ("Sponsor") and the barbershop identified at execution ("Worksite Partner" or "Shop").
 
 This MOU establishes the terms under which the Shop will serve as a worksite for the Indiana Barbershop Apprenticeship Program, RAPIDS Program ID: 2025-IN-132301, a USDOL Registered Apprenticeship sponsored by Elevate for Humanity.
 

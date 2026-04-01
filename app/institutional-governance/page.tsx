@@ -4,7 +4,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Institutional Governance & Compliance | Elevate for Humanity',
-  description: 'Governance framework, legal structure, and compliance posture of 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Training Institute.',
+  description: 'Governance framework, legal structure, and compliance posture of 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/institutional-governance' },
 };
 
@@ -174,10 +174,10 @@ export default function InstitutionalGovernancePage() {
                   {[
                     { occ: 'Building Services Technician', provider: '2Exclusive LLC-S', hours: '432', method: 'Classroom / Shop / Web-Based' },
                     { occ: 'Hair Stylist', provider: '2Exclusive LLC-S', hours: '154', method: 'Classroom / Shop / Web-Based' },
-                    { occ: 'Barber', provider: 'Elevate for Humanity Career & Training Institute', hours: '260', method: 'Classroom / Web-Based' },
-                    { occ: 'Esthetician', provider: 'Elevate for Humanity Career & Training Institute', hours: '300', method: 'Classroom / Web-Based' },
-                    { occ: 'Nail Tech', provider: 'Elevate for Humanity Career & Training Institute', hours: '200', method: 'Classroom / Web-Based' },
-                    { occ: 'Youth Culinary', provider: 'Elevate for Humanity Career & Training Institute', hours: '144', method: 'Classroom / Web-Based' },
+                    { occ: 'Barber', provider: 'Elevate for Humanity Career & Technical Institute', hours: '260', method: 'Classroom / Web-Based' },
+                    { occ: 'Esthetician', provider: 'Elevate for Humanity Career & Technical Institute', hours: '300', method: 'Classroom / Web-Based' },
+                    { occ: 'Nail Tech', provider: 'Elevate for Humanity Career & Technical Institute', hours: '200', method: 'Classroom / Web-Based' },
+                    { occ: 'Youth Culinary', provider: 'Elevate for Humanity Career & Technical Institute', hours: '144', method: 'Classroom / Web-Based' },
                   ].map((r) => (
                     <tr key={r.occ}>
                       <td className="px-4 py-2.5 font-medium text-slate-900">{r.occ}</td>

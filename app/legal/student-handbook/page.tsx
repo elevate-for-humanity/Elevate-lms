@@ -16,7 +16,7 @@ export default function StudentHandbookPage() {
       <DocumentPage
         documentType="Student Handbook Acknowledgment"
         title="Student Handbook"
-        subtitle="Elevate for Humanity Career & Training Institute"
+        subtitle="Elevate for Humanity Career & Technical Institute"
         date="2025-01-01"
         version="2.0"
       >

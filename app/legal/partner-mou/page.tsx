@@ -16,7 +16,7 @@ export default function PartnerMOUPage() {
       <DocumentPage
         documentType="Memorandum of Understanding"
         title="Training Network Partner Agreement"
-        subtitle="Elevate for Humanity Career & Training Institute — Indiana Workforce Training Network"
+        subtitle="Elevate for Humanity Career & Technical Institute — Indiana Workforce Training Network"
         date="2025-01-01"
         version="3.0"
         confidential

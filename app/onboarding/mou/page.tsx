@@ -18,7 +18,7 @@ const MOU_SECTIONS = [
   {
     id: 'parties',
     title: '1. Parties',
-    content: `This Memorandum of Understanding ("Agreement") is entered into between 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Training Institute ("Operating Company") and the collaborating organization identified at execution ("Collaborating Party").
+    content: `This Memorandum of Understanding ("Agreement") is entered into between 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute ("Operating Company") and the collaborating organization identified at execution ("Collaborating Party").
 
 Elevate is the sole Program Owner and primary training provider. The Collaborating Party is a delivery-site collaborator operating under one of the participation tiers defined in Section 5. This Agreement does not create a partnership, joint venture, or shared ownership of any kind.`,
   },

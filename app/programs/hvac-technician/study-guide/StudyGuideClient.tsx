@@ -141,7 +141,7 @@ function StudyGuideContent() {
 
   const buildTextContent = () => {
     let text = 'EPA 608 UNIVERSAL CERTIFICATION STUDY GUIDE\n';
-    text += 'Elevate for Humanity Career & Training Institute\n';
+    text += 'Elevate for Humanity Career & Technical Institute\n';
     text += '='.repeat(60) + '\n\n';
 
     text += 'CERTIFICATION TYPES\n' + '-'.repeat(40) + '\n';
@@ -356,7 +356,7 @@ function StudyGuideContent() {
 
         {/* Footer */}
         <div className="text-center text-xs text-slate-400 pb-8 print:pb-4">
-          <p>Elevate for Humanity Career & Training Institute · Indianapolis, IN</p>
+          <p>Elevate for Humanity Career & Technical Institute · Indianapolis, IN</p>
           <p className="mt-1">{sg('footer')}</p>
           <p className="mt-1">{sg('footerNote')}</p>
         </div>

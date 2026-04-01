@@ -123,9 +123,8 @@ export default function DisclosuresPage() {
                 <div className="space-y-3">
                   {[
                     'DOL Registered Apprenticeship Sponsor',
-                    'WIOA Eligible Training Provider (ETPL)',
-                    'Indiana Workforce Ready Grant Approved',
-                    'State Board of Cosmetology Approved',
+                    'WIOA Eligible Training Provider (pursuing ETPL)',
+                    'Indiana Workforce Ready Grant Aligned',
                     'Indiana DWD Partner'
                   ].map((item, i) => (
                     <div key={i} className="flex items-center gap-3">

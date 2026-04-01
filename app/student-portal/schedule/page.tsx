@@ -302,7 +302,7 @@ export default async function StudentPortalSchedulePage() {
                 />
               </div>
               <div className="p-6 sm:p-8 flex flex-col justify-center space-y-4">
-                <h3 className="text-lg font-bold text-gray-900">Elevate for Humanity Career & Training Institute</h3>
+                <h3 className="text-lg font-bold text-gray-900">Elevate for Humanity Career & Technical Institute</h3>
                 <div className="flex items-start gap-3 text-sm text-gray-700">
                   <MapPin className="w-4 h-4 text-brand-blue-500 mt-0.5 flex-shrink-0" />
                   <div>

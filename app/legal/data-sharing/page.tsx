@@ -16,7 +16,7 @@ export default function DataSharingPage() {
       <DocumentPage
         documentType="Data Sharing Consent"
         title="Data Sharing Consent Form"
-        subtitle="Elevate for Humanity Career & Training Institute"
+        subtitle="Elevate for Humanity Career & Technical Institute"
         date="2025-01-01"
         version="1.0"
       >

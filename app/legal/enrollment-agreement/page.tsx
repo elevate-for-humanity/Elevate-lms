@@ -16,7 +16,7 @@ export default function EnrollmentAgreementPage() {
       <DocumentPage
         documentType="Enrollment Agreement"
         title="Student Enrollment Agreement"
-        subtitle="Elevate for Humanity Career & Training Institute"
+        subtitle="Elevate for Humanity Career & Technical Institute"
         date="2025-01-01"
         version="1.0"
       >

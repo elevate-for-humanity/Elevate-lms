@@ -212,7 +212,7 @@ export default function ServerFooter() {
                 className="w-auto h-7"
               />
               <p className="text-slate-500 text-sm">
-                © {new Date().getFullYear()} 2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Training Institute.
+                © {new Date().getFullYear()} 2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Technical Institute.
               </p>
             </div>
             
@@ -254,7 +254,7 @@ export default function ServerFooter() {
             {/* Legal Disclaimer */}
             <div className="mt-6 pt-6 border-t border-slate-800">
               <p className="text-[10px] leading-relaxed text-slate-500 max-w-4xl mx-auto text-center">
-                Elevate for Humanity Career & Training Institute is a workforce training provider operating under 2Exclusive LLC-S. Programs are not institutionally accredited degree programs. Certification outcomes are issued by the respective certifying organizations upon successful completion of required examinations. Elevate for Humanity Career & Training Institute provides training, preparation, and authorized proctored testing access but does not independently issue federal or state licenses. Financial aid through federal student aid (FAFSA, Pell Grants, and federal loans) is not currently offered. Training may be fully funded for eligible participants through workforce programs such as WIOA, JRI, and approved funding partners. Eligibility and funding determinations are subject to program and agency guidelines.
+                Elevate for Humanity Career &amp; Technical Institute is a workforce training provider operating under 2Exclusive LLC-S. Programs are industry-aligned and designed to lead to employment outcomes. Certifications are issued by the respective certifying organizations upon successful completion of required examinations. Training may be fully funded for eligible participants through workforce programs such as WIOA, JRI, and approved funding partners. Eligibility and funding determinations are subject to program and agency guidelines. Elevate for Humanity Career &amp; Technical Institute is not currently approved as a postsecondary institution through the Indiana Department of Education.
               </p>
             </div>
           </div>

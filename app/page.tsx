@@ -14,14 +14,14 @@ export const dynamic = 'force-static';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Elevate for Humanity | Workforce Training — Indianapolis, Indiana',
-  description: 'Career training in Indiana. WIOA and Workforce Ready Grant funded programs include HVAC, CDL, and IT. CNA and Barber Apprenticeship also available. Apply today.',
-  keywords: 'workforce training Indianapolis, WIOA training Indiana, CNA certification Indianapolis, CDL training Indiana, barber apprenticeship Indianapolis, HVAC training Indiana, career training Indianapolis, Elevate for Humanity',
+  title: 'Elevate for Humanity Career & Technical Institute | Workforce Training — Indianapolis, Indiana',
+  description: 'Workforce training institute delivering industry-recognized certifications, career pathways, and employment outcomes. WIOA and Workforce Ready Grant eligible programs in HVAC, CDL, CNA, and Barber Apprenticeship.',
+  keywords: 'workforce training Indianapolis, WIOA training Indiana, CNA certification Indianapolis, CDL training Indiana, barber apprenticeship Indianapolis, HVAC training Indiana, career technical institute Indianapolis, Elevate for Humanity',
   openGraph: {
-    title: 'Elevate for Humanity | Workforce Training — Indianapolis, Indiana',
-    description: 'Free and low-cost career training in Indiana. Earn industry-recognized certifications and start working fast.',
+    title: 'Elevate for Humanity Career & Technical Institute',
+    description: 'Workforce training institute delivering industry-recognized certifications, career pathways, and employment outcomes.',
     url: 'https://www.elevateforhumanity.org',
-    siteName: 'Elevate for Humanity',
+    siteName: 'Elevate for Humanity Career & Technical Institute',
     locale: 'en_US',
     type: 'website',
   },
@@ -46,7 +46,7 @@ export default function HomePage() {
               Get Certified.<br />Get Funded.<br />Get Hired — In Weeks.
             </h1>
             <p className="text-slate-200 text-base leading-relaxed mb-6">
-              Free and low-cost career training programs in Indiana. Earn industry-recognized certifications and start working fast.
+              Workforce training institute delivering industry-recognized certifications, career pathways, and employment outcomes for underserved and justice-impacted populations.
             </p>
             {/* Proof bullets */}
             <ul className="space-y-2 mb-8">
@@ -192,7 +192,7 @@ export default function HomePage() {
       {/* ── CREDIBILITY ── */}
       <section className="bg-slate-50 py-12 px-6">
         <div className="max-w-6xl mx-auto">
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-600 mb-8 text-center">Approved &amp; recognized by</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-600 mb-8 text-center">Partners &amp; Funding Alignment</p>
           <div className="flex flex-wrap justify-center gap-3">
             {[
               { title: 'DOL Registered Apprenticeship', bg: 'bg-blue-600' },

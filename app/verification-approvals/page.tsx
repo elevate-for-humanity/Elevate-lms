@@ -1,129 +1,106 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { CheckCircle, Users, TrendingUp, Briefcase, Mail, Award } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Verification & Approvals | Elevate for Humanity',
-  description: 'Verifiable registrations, approvals, and compliance documentation for 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Training Institute.',
+  title: 'Transparency & Outcomes | Elevate for Humanity Career & Technical Institute',
+  description: 'Elevate for Humanity Career & Technical Institute is committed to transparency in how we deliver training and track outcomes.',
+  robots: { index: true, follow: true },
   alternates: { canonical: 'https://www.elevateforhumanity.org/verification-approvals' },
 };
 
-const verifications = [
-  {
-    category: 'Federal Apprenticeship Registration',
-    items: [
-      { label: 'RAPIDS Program Number', value: '2025-IN-132301' },
-      { label: 'Sponsor of Record', value: '2Exclusive LLC-S' },
-      { label: 'DBA', value: 'Elevate for Humanity Career & Training Institute' },
-      { label: 'Registration Status', value: 'Registered (OA)' },
-      { label: 'Registration Date', value: 'January 14, 2025' },
-      { label: 'Oversight Agency', value: 'U.S. Department of Labor — Office of Apprenticeship' },
-      { label: 'Assigned ATR', value: 'George D. Hutchinson, U.S. DOL' },
-    ],
-  },
-  {
-    category: 'Entity Information',
-    items: [
-      { label: 'Legal Entity', value: '2Exclusive LLC-S' },
-      { label: 'EIN', value: '88-2609728' },
-      { label: 'SAM UEI', value: '[Pending — provide your UEI to update]' },
-      { label: 'Sponsor Type', value: 'Single Employer' },
-      { label: 'NAICS', value: '[Pending — provide NAICS code to update]' },
-      { label: 'Location', value: '8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240 (Marion County)' },
-    ],
-  },
-  {
-    category: 'RTI Provider Registrations',
-    items: [
-      { label: 'Provider ID (Sponsor)', value: '206251 — 2Exclusive LLC-S' },
-      { label: 'Provider ID (Institute)', value: '208029 — Elevate for Humanity Career & Training Institute' },
-      { label: 'Instruction Methods', value: 'Classroom, Correspondence/Shop, Web-Based Learning' },
-    ],
-  },
-  {
-    category: 'Registered Occupations',
-    items: [
-      { label: 'Building Services Technician', value: '432 RTI hours — Provider 206251' },
-      { label: 'Hair Stylist', value: '154 RTI hours — Provider 206251' },
-      { label: 'Barber', value: '260 RTI hours — Provider 208029' },
-      { label: 'Esthetician', value: '300 RTI hours — Provider 208029' },
-      { label: 'Nail Tech', value: '200 RTI hours — Provider 208029' },
-      { label: 'Youth Culinary', value: '144 RTI hours — Provider 208029' },
-    ],
-  },
-  {
-    category: 'State Workforce Alignment',
-    items: [
-      { label: 'ETPL Status', value: 'Listed on Indiana INTraining system under 2Exclusive LLC-S' },
-      { label: 'Workforce Region', value: 'Region 5 — Marion County, Indiana' },
-      { label: 'WorkOne Alignment', value: 'Indianapolis WorkOne career center referral partner' },
-      { label: 'Indiana PLA Compliance', value: 'Programs aligned with Indiana Professional Licensing Agency requirements for applicable occupations' },
-    ],
-  },
-  {
-    category: 'Licensing & Compliance Statements',
-    items: [
-      { label: 'Institutional Accreditation', value: 'Not applicable — programs are non-degree workforce training and registered apprenticeships' },
-      { label: 'Federal Student Aid', value: 'Not offered — participants may access WIOA, JRI, WRG, employer sponsorship, or self-pay' },
-      { label: 'Certification Issuance', value: 'Industry certifications issued by respective certifying bodies (EPA, OSHA, NRF, AHA, state boards) upon successful examination' },
-      { label: 'Program Standards', value: 'Local Apprenticeship Standards (not based on National Guidelines)' },
-    ],
-  },
-];
+export const revalidate = 3600;
 
-export default function VerificationApprovalsPage() {
+export default function TransparencyPage() {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Breadcrumbs */}
-      <div className="bg-white border-b">
-        <div className="max-w-5xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Verification & Approvals' }]} />
-        </div>
+    <main className="min-h-screen bg-white">
+      <div className="max-w-4xl mx-auto px-4 pt-8">
+        <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Transparency & Outcomes' }]} />
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-          Verification &amp; Approvals
-        </h1>
-        <p className="text-base text-slate-600 mb-10 max-w-3xl">
-          This page lists verifiable registrations, approvals, and compliance documentation for 2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Training Institute. All items listed are factual and verifiable through the referenced agencies.
-        </p>
+      {/* Hero */}
+      <section className="bg-slate-900 py-16 px-4 mt-4">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3">Transparency &amp; Outcomes</p>
+          <h1 className="text-4xl font-extrabold text-white mb-4">Program Verification</h1>
+          <p className="text-slate-300 text-lg max-w-2xl">Elevate for Humanity Career &amp; Technical Institute is committed to transparency in how we deliver training and track outcomes.</p>
+        </div>
+      </section>
 
-        <div className="space-y-8">
-          {verifications.map((section) => (
-            <section key={section.category} className="border border-slate-200 rounded-xl overflow-hidden">
-              <div className="bg-white px-5 py-3 border-b border-slate-200">
-                <h2 className="font-bold text-slate-900 text-sm uppercase tracking-wider">{section.category}</h2>
+      {/* What We Provide */}
+      <section className="py-14 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-slate-900 mb-8">What We Provide</h2>
+          <div className="grid sm:grid-cols-2 gap-6">
+            {[
+              { icon: <Award className="w-5 h-5 text-brand-red-600" />, title: 'Industry-Recognized Certifications', desc: 'Programs are designed to prepare participants for nationally recognized certifications issued by the respective certifying organizations.' },
+              { icon: <TrendingUp className="w-5 h-5 text-brand-red-600" />, title: 'Career Readiness Training', desc: 'Structured pathways that build job-ready skills aligned with high-demand industries.' },
+              { icon: <Briefcase className="w-5 h-5 text-brand-red-600" />, title: 'Job Placement Support', desc: 'Employer connections and placement assistance for program completers.' },
+              { icon: <Users className="w-5 h-5 text-brand-red-600" />, title: 'Reentry Workforce Pathways', desc: 'Structured programs for individuals entering or re-entering the workforce, including justice-impacted populations.' },
+            ].map((item, i) => (
+              <div key={i} className="flex gap-3 p-5 rounded-xl border border-slate-100 bg-slate-50">
+                <div className="flex-shrink-0 mt-0.5">{item.icon}</div>
+                <div>
+                  <p className="font-semibold text-slate-900 mb-1">{item.title}</p>
+                  <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                </div>
               </div>
-              <div className="divide-y divide-slate-100">
-                {section.items.map((item) => (
-                  <div key={item.label} className="px-5 py-3 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4">
-                    <dt className="text-sm text-slate-500 sm:min-w-[220px] sm:max-w-[220px] flex-shrink-0">{item.label}</dt>
-                    <dd className="text-sm font-medium text-slate-900">{item.value}</dd>
-                  </div>
-                ))}
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Verification of Participation */}
+      <section className="py-14 px-4 bg-slate-50">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">Verification of Participation</h2>
+          <p className="text-slate-600 leading-relaxed mb-6">Participants and partners can verify the following through our platform or by contacting us directly:</p>
+          <div className="space-y-3">
+            {[
+              'Enrollment status in a specific program',
+              'Program completion and credential issuance',
+              'Certificates issued through our LMS platform',
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3 p-4 bg-white rounded-lg border border-slate-100">
+                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                <span className="text-slate-700">{item}</span>
               </div>
-            </section>
-          ))}
+            ))}
+          </div>
+          <p className="text-slate-500 text-sm mt-6">To submit a verification request, contact: <a href="mailto:support@elevateforhumanity.org" className="text-brand-red-600 font-semibold hover:underline">support@elevateforhumanity.org</a></p>
         </div>
+      </section>
 
-        {/* Disclaimer */}
-        <div className="mt-10 bg-white border border-slate-200 rounded-lg p-5">
-          <p className="text-xs text-slate-500 leading-relaxed">
-            Information on this page is provided for verification purposes by workforce partners, reviewing agencies, and authorized parties. Registration and approval status is subject to change based on agency review cycles. For the most current status, contact the referenced agency directly. This page does not constitute a claim of institutional accreditation.
-          </p>
+      {/* Partnership Alignment */}
+      <section className="py-14 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">Partnership Alignment</h2>
+          <p className="text-slate-600 leading-relaxed mb-4">We work alongside employers, nonprofits, and workforce agencies to ensure training translates into employment opportunities. Program design is informed by real labor market demand and partner feedback.</p>
+          <p className="text-slate-600 leading-relaxed">Our programs are designed to align with WIOA, Indiana Workforce Ready Grant, and DOL apprenticeship standards where applicable.</p>
         </div>
+      </section>
 
-        {/* Navigation */}
-        <div className="border-t border-slate-200 pt-8 mt-8 flex flex-wrap gap-3">
-          <Link href="/institutional-governance" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition-colors">
-            Institutional Governance
-          </Link>
-          <Link href="/compliance" className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 px-5 py-2.5 rounded-lg font-semibold text-sm hover:border-brand-blue-400 hover:text-brand-blue-600 transition-colors">
-            Compliance &amp; Security
+      {/* Ongoing Development */}
+      <section className="py-14 px-4 bg-amber-50 border-y border-amber-100">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">Ongoing Development</h2>
+          <p className="text-slate-700 leading-relaxed">We are actively expanding our partnerships and pursuing additional approvals and recognitions where appropriate. Elevate for Humanity Career &amp; Technical Institute is <strong>not currently approved as a postsecondary institution</strong> through the Indiana Department of Education. Our focus remains on delivering measurable outcomes and scalable workforce solutions.</p>
+        </div>
+      </section>
+
+      {/* Contact */}
+      <section className="py-14 px-4 bg-slate-900">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div>
+            <h2 className="text-xl font-bold text-white mb-2">Funders, Employers &amp; Agency Partners</h2>
+            <p className="text-slate-400 text-sm">If you are seeking verification or partnership information, contact us directly.</p>
+          </div>
+          <Link href="mailto:support@elevateforhumanity.org" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors whitespace-nowrap">
+            <Mail className="w-4 h-4" />Contact Us
           </Link>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

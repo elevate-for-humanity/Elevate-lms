@@ -24,7 +24,7 @@ export function CredentialsOutcomes({
           <span className="text-slate-400 flex-shrink-0">•</span>
           <div>
             <p className="text-black font-medium">
-              Certificate of Completion issued by Elevate for Humanity Career & Training Institute
+              Certificate of Completion issued by Elevate for Humanity Career & Technical Institute
             </p>
             <p className="text-sm text-slate-600 mt-1">
               Documents successful completion of the {programName} training program

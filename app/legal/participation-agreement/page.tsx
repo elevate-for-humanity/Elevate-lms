@@ -16,7 +16,7 @@ export default function ParticipationAgreementPage() {
       <DocumentPage
         documentType="Participation Agreement"
         title="Participation Agreement"
-        subtitle="Elevate for Humanity Career & Training Institute"
+        subtitle="Elevate for Humanity Career & Technical Institute"
         date="2025-01-01"
         version="1.0"
       >

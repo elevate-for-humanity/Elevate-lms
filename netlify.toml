@@ -60,6 +60,11 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+# Local no-op stub overrides the broken Neon marketplace extension.
+# Remove once the Neon extension is uninstalled from Netlify dashboard.
+[[plugins]]
+  package = "./netlify/plugins/neon"
+
 # CDN caching — pages cached 60s at edge, static assets cached 1 year
 [[headers]]
   for = "/*"

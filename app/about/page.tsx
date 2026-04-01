@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     description: 'A workforce development institute providing funded career training in Indianapolis, Indiana. Founded by Elizabeth Greene.',
     url: `${SITE_URL}/about`,
     siteName: 'Elevate for Humanity',
-    images: [{ url: '/images/pages/about-hero.jpg', width: 1200, height: 630, alt: 'About Elevate for Humanity' }],
+    images: [{ url: '/images/team/elizabeth-greene-headshot.jpg', width: 800, height: 1080, alt: 'Elizabeth Greene, Founder of Elevate for Humanity' }],
     type: 'website',
   },
 };
@@ -35,10 +35,10 @@ export default function AboutPage() {
       {/* Hero — clean image, no overlay */}
       <section className="relative h-[45vh] min-h-[280px] max-h-[560px] overflow-hidden">
         <Image
-          src="/images/pages/about-hero.jpg"
-          alt="Elevate for Humanity — workforce development in Indianapolis"
+          src="/images/team/elizabeth-greene-headshot.jpg"
+          alt="Elizabeth Greene, Founder of Elevate for Humanity"
           fill
-          className="object-cover"
+          className="object-cover object-top"
           priority
           sizes="100vw"
         />

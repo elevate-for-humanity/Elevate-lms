@@ -60,8 +60,6 @@ export default tseslint.config(
       'react-hooks/gating': 'off',
       'react-hooks/unsupported-syntax': 'off',
       'no-unsafe-optional-chaining': 'warn',
-      // @next/eslint-plugin-next is not registered — suppress inline-disable warnings
-      '@next/next/no-img-element': 'off',
     },
   },
   {

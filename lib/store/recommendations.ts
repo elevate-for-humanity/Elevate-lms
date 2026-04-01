@@ -164,7 +164,7 @@ export const ALL_PRODUCTS: Product[] = [
     id: 'barber-program',
     name: 'Barber Apprenticeship Program',
     shortName: 'Barber Program',
-    description: '2,000-hour DOL-registered apprenticeship curriculum.',
+    description: '2,000-hour state-approved apprenticeship curriculum.',
     price: 0,
     priceDisplay: 'WIOA Funded',
     href: '/programs/barber-apprenticeship',

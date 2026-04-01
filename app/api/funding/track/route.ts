@@ -26,7 +26,7 @@ async function _POST(request: Request) {
     .from('funding_tracking')
     .insert({
       student_id: body.student_id,
-      funding_source: body.funding_source, // WIOA, WRG, JRI
+      funding_source: body.funding_source, // WIOA, WRG, JRI (DB value — do not rename without data migration)
       program_id: body.program_id,
       amount: body.amount || 0,
       status: 'active',

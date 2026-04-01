@@ -55,7 +55,7 @@ export const NAV_REGISTRY: NavCategory[] = [
     items: [
       { label: 'Apply', href: '/apply', description: 'Start your application' },
       { label: 'Enroll', href: '/enroll', description: 'Enroll in a program' },
-      { label: 'Funding Options', href: '/funding', description: 'WIOA, WRG, JRI, and more' },
+      { label: 'Funding Options', href: '/funding', description: 'WIOA, WRG, Job Ready Indy, and more' },
       { label: 'How It Works', href: '/how-it-works', description: 'Our enrollment process' },
       { label: 'Student Dashboard', href: '/dashboard', public: false, description: 'Access your dashboard' },
       { label: 'Next Steps Checklist', href: '/dashboard/next-steps', public: false, description: 'Track your progress' },

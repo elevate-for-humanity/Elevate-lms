@@ -1,8 +1,9 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/server';
+import { createAdminClient, createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { checkBarberSuspension } from '@/lib/barber/suspension';
 
 const MAX_ACCURACY_M = 50;
 const LUNCH_DURATION_MINUTES = 60;
@@ -81,6 +82,19 @@ async function _POST(request: NextRequest) {
       lng,
       accuracy_m,
     } = body;
+
+    // Suspension gate — block hour logging for suspended/past-due accounts
+    const authClient = await createClient();
+    if (authClient) {
+      const { data: { user } } = await authClient.auth.getUser();
+      if (user) {
+        const db = createAdminClient();
+        if (db) {
+          const suspended = await checkBarberSuspension(user.id, db);
+          if (suspended) return suspended;
+        }
+      }
+    }
 
     // Validate required fields (partner_id is optional — some apprentices have no shop yet)
     if (!action || !apprentice_id || !program_id || !site_id) {

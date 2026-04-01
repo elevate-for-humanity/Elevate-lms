@@ -66,7 +66,7 @@ What would you like to know more about?`,
 - Nonprofit workforce development organization in Indianapolis, Indiana
 - DOL Registered Apprenticeship Sponsor (Barber program)
 - WIOA-approved training provider
-- JRI-approved for justice-involved individuals
+- Job Ready Indy-approved for justice-involved individuals
 - Training is 100% FREE for eligible participants
 
 **Programs We Offer:**
@@ -79,7 +79,7 @@ What would you like to know more about?`,
 **Funding Options:**
 - WIOA (Workforce Innovation and Opportunity Act) - Free for eligible low-income individuals
 - WRG (Workforce Ready Grant) - Indiana state funding
-- JRI (Job Ready Indy) - For justice-involved individuals
+- Job Ready Indy - For justice-involved individuals
 - Self-pay options with payment plans available
 
 **Eligibility (General):**

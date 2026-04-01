@@ -31,7 +31,7 @@ export default function WorkforcePartnersPage() {
             Expand Training Capacity.<br />Deliver Compliant Outcomes.
           </h1>
           <p className="text-slate-300 text-lg leading-relaxed mb-8 max-w-2xl">
-            Elevate for Humanity helps agencies connect residents to industry-recognized credentials and supports compliant delivery for workforce-funded programs — WIOA, RAPIDS, WRG, and JRI.
+            Elevate for Humanity helps agencies connect residents to industry-recognized credentials and supports compliant delivery for workforce-funded programs — WIOA, RAPIDS, WRG, and Job Ready Indy.
           </p>
           <div className="flex flex-wrap gap-4">
             <a href="#partner-form" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-lg transition-colors text-base">
@@ -112,7 +112,7 @@ export default function WorkforcePartnersPage() {
               { label: 'Indiana ETPL Certified', desc: 'On the Indiana DWD Eligible Training Provider List — eligible for WIOA Individual Training Accounts.' },
               { label: 'WIOA Title I Aligned', desc: 'Programs structured for Adult, Dislocated Worker, and Youth funding streams.' },
               { label: 'Workforce Ready Grant', desc: 'Indiana state grant-eligible programs for high-demand certifications.' },
-              { label: 'JRI / Justice Reinvestment', desc: 'Approved to serve justice-involved individuals through Indiana DWD funding.' },
+              { label: 'Job Ready Indy / Justice Reinvestment', desc: 'Approved to serve justice-involved individuals through Indiana DWD funding.' },
               { label: 'EmployIndy Partner', desc: 'Integrated with Indianapolis workforce ecosystem for referrals and co-enrollment.' },
             ].map((c) => (
               <div key={c.label} className="bg-slate-900 border border-slate-700 rounded-xl p-5 flex items-start gap-3">

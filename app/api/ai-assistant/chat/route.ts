@@ -21,7 +21,7 @@ Key information about Elevate for Humanity:
 - Nonprofit workforce development organization in Indianapolis, Indiana
 - Offers FREE career training through WIOA (Workforce Innovation and Opportunity Act) funding
 - Programs include: Healthcare (CNA, Medical Assistant, Phlebotomy), Skilled Trades (HVAC, Electrical, Welding), Technology (IT Support, Cybersecurity), CDL Training, Barbering
-- Also serves JRI (Job Ready Indy) participants
+- Also serves Job Ready Indy participants
 - Phone: 317-314-3757
 - Website sections: /programs, /wioa-eligibility, /apply, /about, /contact
 

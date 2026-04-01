@@ -151,7 +151,7 @@ export default function CheckEligibilityPage() {
               <div>
                 <p className="font-extrabold text-green-900 text-base">You may qualify for free or low-cost training</p>
                 <p className="text-green-800 text-sm mt-1">
-                  WIOA, Workforce Ready Grant, and JRI may cover your full tuition, books, and certification fees.
+                  WIOA, Workforce Ready Grant, and Job Ready Indy may cover your full tuition, books, and certification fees.
                   Fill in your info and we&apos;ll confirm your options.
                 </p>
               </div>

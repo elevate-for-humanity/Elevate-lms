@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { CheckCircle, AlertCircle, Building2, Award, Users, Mail } from 'lucide-react';
+import { Shield, CheckCircle, Building2, Users, TrendingUp, Mail } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Institutional Status | Elevate for Humanity Career & Technical Institute',
-  description: 'Elevate for Humanity Career & Technical Institute is a workforce training provider delivering industry-recognized certifications and career pathways. Not a postsecondary institution.',
+  description: 'Elevate for Humanity Career & Technical Institute is a workforce training provider delivering industry-recognized certifications and career pathways.',
   robots: { index: true, follow: true },
   alternates: { canonical: 'https://www.elevateforhumanity.org/accreditation' },
 };
@@ -14,95 +14,38 @@ export const revalidate = 3600;
 export default function AccreditationPage() {
   return (
     <main className="min-h-screen bg-white">
-
-      {/* Hero */}
       <section className="bg-slate-900 py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3">Institutional Status</p>
-          <h1 className="text-4xl font-extrabold text-white mb-4">
-            Elevate for Humanity<br />Career &amp; Technical Institute
-          </h1>
-          <p className="text-slate-300 text-lg max-w-2xl">
-            A workforce training provider focused on industry-recognized certifications, career readiness, and employment pathways for underserved and justice-impacted populations in Indiana.
-          </p>
+          <h1 className="text-4xl font-extrabold text-white mb-4">Elevate for Humanity<br />Career &amp; Technical Institute</h1>
+          <p className="text-slate-300 text-lg max-w-2xl">A workforce training provider focused on delivering industry-recognized certifications, career readiness training, and employment pathways for underserved and justice-impacted populations.</p>
         </div>
       </section>
 
-      {/* Disclosure */}
-      <section className="py-12 px-4 bg-amber-50 border-b border-amber-200">
+      <section className="py-14 px-4 bg-amber-50 border-b border-amber-100">
         <div className="max-w-4xl mx-auto flex gap-4 items-start">
-          <AlertCircle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-1" />
+          <Shield className="w-6 h-6 text-amber-600 flex-shrink-0 mt-1" />
           <div>
-            <h2 className="text-xl font-bold text-slate-900 mb-3">What We Are — and Are Not</h2>
-            <div className="space-y-3 text-slate-700 leading-relaxed">
-              <p>
-                Elevate for Humanity Career &amp; Technical Institute is a <strong>workforce training provider</strong> operating under 2Exclusive LLC-S. We are <strong>not a postsecondary institution</strong> and are not currently approved by the Indiana Department of Education as a degree-granting or accredited academic institution.
-              </p>
-              <p>
-                We do not grant degrees, diplomas, or academic credits. Certifications earned through our programs are issued by the respective industry certifying organizations — not by Elevate for Humanity — upon successful completion of their required examinations.
-              </p>
-              <p>
-                Our programs are workforce training programs designed to lead to employment. They are not substitutes for accredited academic programs.
-              </p>
-            </div>
+            <h2 className="text-xl font-bold text-slate-900 mb-2">Postsecondary Approval Status</h2>
+            <p className="text-slate-700 leading-relaxed">Elevate for Humanity Career &amp; Technical Institute is <strong>not currently approved as a postsecondary institution</strong> through the Indiana Department of Education. We are actively building program quality, employer partnerships, and measurable outcomes as part of our long-term approval and expansion strategy.</p>
+            <p className="text-slate-600 mt-3 leading-relaxed">Our programs are workforce training programs — not degree-granting or federally accredited academic programs. Certifications are issued by the respective industry certifying organizations upon successful completion of required examinations.</p>
           </div>
         </div>
       </section>
 
-      {/* Recognized designations */}
       <section className="py-14 px-4">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Recognized Workforce Designations</h2>
-          <p className="text-slate-600 mb-8">The actual designations and recognitions Elevate for Humanity holds.</p>
-          <div className="grid sm:grid-cols-2 gap-5">
+          <h2 className="text-2xl font-bold text-slate-900 mb-8">What We Deliver</h2>
+          <div className="grid sm:grid-cols-2 gap-6">
             {[
-              {
-                icon: <Award className="w-5 h-5 text-brand-red-600" />,
-                title: 'ETPL-Listed Training Provider',
-                desc: "Listed on Indiana's Eligible Training Provider List (ETPL), administered by the Indiana Department of Workforce Development. ETPL listing allows eligible participants to use WIOA Title I funding for our programs.",
-              },
-              {
-                icon: <Building2 className="w-5 h-5 text-brand-red-600" />,
-                title: 'DOL Registered Apprenticeship Sponsor',
-                desc: 'Registered with the U.S. Department of Labor as an apprenticeship sponsor for the Barber Apprenticeship program. DOL registration is the federal standard for structured on-the-job training.',
-              },
-              {
-                icon: <CheckCircle className="w-5 h-5 text-brand-red-600" />,
-                title: 'WIOA Title I Aligned',
-                desc: 'Programs are designed to meet WIOA performance accountability requirements including employment, credential attainment, and earnings outcomes.',
-              },
-              {
-                icon: <Users className="w-5 h-5 text-brand-red-600" />,
-                title: 'WorkOne Workforce Partner',
-                desc: "Recognized partner of Indiana's WorkOne workforce development system, connecting participants to employment services and funding navigation.",
-              },
+              { title: 'Skilled Trades & Safety', desc: 'HVAC, EPA 608, and OSHA-aligned safety training for high-demand trades.' },
+              { title: 'Healthcare Pathways', desc: 'CNA certification preparation and clinical readiness training.' },
+              { title: 'Transportation', desc: 'CDL Class A training with employer placement support.' },
+              { title: 'Apprenticeship Programs', desc: 'DOL-registered Barber Apprenticeship with structured on-the-job training.' },
+              { title: 'Reentry Workforce Development', desc: 'Career readiness and job placement support for justice-impacted individuals.' },
+              { title: 'Digital & Technical Pathways', desc: 'Entry-level IT and digital skills training aligned with employer demand.' },
             ].map((item, i) => (
               <div key={i} className="flex gap-3 p-5 rounded-xl border border-slate-100 bg-slate-50">
-                <div className="flex-shrink-0 mt-0.5">{item.icon}</div>
-                <div>
-                  <p className="font-semibold text-slate-900 mb-1">{item.title}</p>
-                  <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Programs */}
-      <section className="py-14 px-4 bg-slate-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-slate-900 mb-8">Programs We Deliver</h2>
-          <div className="grid sm:grid-cols-2 gap-5">
-            {[
-              { title: 'HVAC & EPA 608', desc: 'Technician training aligned with EPA Section 608 certification requirements.' },
-              { title: 'CNA — Nursing Assistant', desc: 'Clinical readiness training delivered in partnership with accredited nursing program partners.' },
-              { title: 'CDL Class A', desc: 'Commercial driver training aligned with FMCSA ELDT requirements, with employer placement support.' },
-              { title: 'Barber Apprenticeship', desc: 'DOL-registered 2,000-hour apprenticeship leading to Indiana barber licensure.' },
-              { title: 'IT & Digital Skills', desc: 'Entry-level IT training aligned with CompTIA A+ and employer demand.' },
-              { title: 'Reentry Workforce Development', desc: 'Career readiness and job placement support for justice-impacted individuals.' },
-            ].map((item, i) => (
-              <div key={i} className="flex gap-3 p-5 rounded-xl border border-slate-100 bg-white">
                 <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-slate-900 mb-1">{item.title}</p>
@@ -114,47 +57,130 @@ export default function AccreditationPage() {
         </div>
       </section>
 
-      {/* Credential issuers */}
-      <section className="py-14 px-4">
+      <section className="py-14 px-4 bg-slate-50">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">Who Issues Certifications</h2>
-          <p className="text-slate-600 leading-relaxed mb-6">
-            Elevate for Humanity does not issue industry certifications. Certifications are issued by the respective certifying organizations upon successful completion of their required examinations. Our role is to prepare participants to pass those exams.
-          </p>
-          <div className="grid sm:grid-cols-3 gap-4">
+          <h2 className="text-2xl font-bold text-slate-900 mb-6">Commitment to Quality</h2>
+          <div className="grid sm:grid-cols-2 gap-4">
             {[
-              { org: 'EPA', cert: 'Section 608 Technician Certification' },
-              { org: 'CompTIA', cert: 'A+, Security+, Network+' },
-              { org: 'PTCB', cert: 'Pharmacy Technician (CPhT)' },
-              { org: 'Microsoft', cert: 'Office Specialist (MOS)' },
-              { org: 'OSHA', cert: 'OSHA 10 / OSHA 30' },
-              { org: 'Indiana IPLA', cert: 'Barber License' },
-            ].map((item, i) => (
-              <div key={i} className="p-4 rounded-lg border border-slate-100 bg-slate-50">
-                <p className="font-bold text-slate-900 text-sm">{item.org}</p>
-                <p className="text-slate-600 text-xs mt-1">{item.cert}</p>
+              'Transparent reporting of enrollment and completion outcomes',
+              'Industry-aligned curriculum informed by employer demand',
+              'Employer-driven program design and placement support',
+              'Continuous improvement and compliance readiness',
+            ].map((text, i) => (
+              <div key={i} className="flex gap-3 items-start p-4 rounded-lg bg-white border border-slate-100">
+                <CheckCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
+                <p className="text-slate-700 text-sm leading-relaxed">{text}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Contact */}
+      <section className="py-14 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">Workforce Alignment</h2>
+          <p className="text-slate-600 leading-relaxed mb-4">We operate in partnership with employers, community organizations, and workforce agencies to ensure training leads to real employment outcomes. Our programs are designed to align with WIOA, Indiana Workforce Ready Grant, and DOL apprenticeship standards where applicable.</p>
+          <p className="text-slate-600 leading-relaxed">We are actively pursuing additional state approvals and recognitions as we expand our program offerings and outcomes data.</p>
+        </div>
+      </section>
+
+      {/* Founder Credentials & Authorizations */}
+      <section className="py-14 px-4 border-t border-slate-200">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Founder Credentials &amp; Authorizations</h2>
+          <p className="text-slate-600 text-sm mb-8">
+            Elizabeth Greene, Founder &amp; CEO — credentials held personally and applied through Elevate for Humanity and SupersonicFastCash.
+          </p>
+
+          <div className="mb-10">
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">IRS &amp; Tax Authorizations</p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {[
+                { label: 'IRS Enrolled Agent (EA)', detail: 'Authorized to represent taxpayers before the IRS in audits, collections, and appeals.' },
+                { label: 'EFIN — Electronic Filing Identification Number', detail: 'IRS-issued number authorizing the preparation and e-filing of federal tax returns.' },
+                { label: 'PTIN — Preparer Tax Identification Number', detail: 'IRS-required identification for all paid tax return preparers.' },
+                { label: 'ERO — Electronic Return Originator', detail: 'Authorized IRS e-file originator for individual and business returns.' },
+                { label: 'SBIN — IRS Submitter ID', detail: 'Authorized to submit returns directly to the IRS for both for-profit and non-profit filers.' },
+                { label: 'VITA Site', detail: 'IRS-authorized Volunteer Income Tax Assistance site — free tax preparation for qualifying individuals.' },
+              ].map((cred) => (
+                <div key={cred.label} className="flex gap-3 p-4 rounded-xl border border-slate-100 bg-slate-50">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-slate-900 text-sm mb-1">{cred.label}</p>
+                    <p className="text-slate-600 text-xs leading-relaxed">{cred.detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-10">
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Testing &amp; Curriculum Authorizations</p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {[
+                { label: 'EPA 608 Certified Proctor', detail: 'Authorized to proctor EPA Section 608 refrigerant handling certification exams.' },
+                { label: 'ACT WorkKeys — Authorized Proctor Site', detail: 'Authorized testing site for ACT WorkKeys workforce readiness and career readiness assessments.' },
+                { label: 'Milady RISE — Proctor & Curriculum Partner', detail: 'Authorized proctor and curriculum delivery partner for Milady RISE cosmetology and barbering coursework.' },
+                { label: 'Black Certified — Partner', detail: 'Certified partner for Black Certified credentialing and professional development programs.' },
+              ].map((cred) => (
+                <div key={cred.label} className="flex gap-3 p-4 rounded-xl border border-slate-100 bg-slate-50">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-slate-900 text-sm mb-1">{cred.label}</p>
+                    <p className="text-slate-600 text-xs leading-relaxed">{cred.detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-10">
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Workforce Funding &amp; Program Partners</p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {[
+
+                { label: 'Job Ready Indy — Approved Provider', detail: 'Approved Job Ready Indy training provider for justice-involved individuals in Marion County.' },
+                { label: 'Workforce Ready Grant (WRG)', detail: 'Approved provider under Indiana\'s Workforce Ready Grant for high-demand certification programs.' },
+                { label: 'WIOA — Workforce Innovation and Opportunity Act', detail: 'Eligible Training Provider on the Indiana ETPL. Programs available at no cost to qualifying participants.' },
+                { label: 'U.S. Department of Labor — Registered Apprenticeship', detail: 'DOL Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301). Barber Apprenticeship program registered and active.' },
+                { label: 'Indiana State Board (IPLA)', detail: 'Programs aligned with Indiana Professional Licensing Agency standards for barber and cosmetology licensure.' },
+                { label: 'ITAP — Indiana Training Approval Process', detail: 'Programs approved through Indiana\'s Training Approval Process for ETPL eligibility and workforce funding.' },
+              ].map((cred) => (
+                <div key={cred.label} className="flex gap-3 p-4 rounded-xl border border-slate-100 bg-slate-50">
+                  <CheckCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-slate-900 text-sm mb-1">{cred.label}</p>
+                    <p className="text-slate-600 text-xs leading-relaxed">{cred.detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Military Service</p>
+            <div className="flex gap-3 p-4 rounded-xl border border-slate-100 bg-slate-50 max-w-md">
+              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-slate-900 text-sm mb-1">U.S. Army Veteran</p>
+                <p className="text-slate-600 text-xs leading-relaxed">Unit Supply Specialist — honorably served.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="py-14 px-4 bg-slate-900">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
             <h2 className="text-xl font-bold text-white mb-2">Partnership &amp; Compliance Inquiries</h2>
             <p className="text-slate-400 text-sm">For funding, partnership, or compliance questions, contact our team directly.</p>
           </div>
-          <Link
-            href="mailto:support@elevateforhumanity.org"
-            className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors whitespace-nowrap"
-          >
+          <Link href="mailto:support@elevateforhumanity.org" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors whitespace-nowrap">
             <Mail className="w-4 h-4" />Contact Us
           </Link>
         </div>
       </section>
-
     </main>
   );
 }

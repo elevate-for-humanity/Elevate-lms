@@ -38,7 +38,7 @@ const CURRICULUM = [
 const FUNDING = [
   { name: 'WIOA', tag: 'Federal', desc: 'Covers tuition, books, and exam fees for eligible adults, dislocated workers, and youth 16–24.' },
   { name: 'Workforce Ready Grant', tag: 'Indiana State', desc: 'Indiana state grant for high-demand healthcare programs. No cost for eligible participants.' },
-  { name: 'JRI — Job Ready Indy', tag: 'Indiana State', desc: 'Funded training for eligible justice-involved individuals through Indiana DWD.' },
+  { name: 'Job Ready Indy', tag: 'Indiana State', desc: 'Funded training for eligible justice-involved individuals through Indiana DWD.' },
 ];
 
 const FAQ = [
@@ -46,7 +46,7 @@ const FAQ = [
   { q: 'Can I enroll right now?', a: 'Enrollment opens when a cohort is confirmed. Join the waitlist to be first in line and receive step-by-step enrollment instructions.' },
   { q: 'Is the state exam included?', a: 'Yes. The Indiana state CNA certification exam is proctored on-site at the end of the program. No separate testing center visit required.' },
   { q: 'Do I need prior healthcare experience?', a: 'No prior experience is required. The program is designed for adults entering healthcare for the first time.' },
-  { q: 'What funding is available?', a: 'WIOA, Workforce Ready Grant, and JRI funding may cover 100% of tuition, books, and exam fees for eligible Indiana residents. We help you apply.' },
+  { q: 'What funding is available?', a: 'WIOA, Workforce Ready Grant, and Job Ready Indy funding may cover 100% of tuition, books, and exam fees for eligible Indiana residents. We help you apply.' },
 ];
 
 export default function CNAPage() {

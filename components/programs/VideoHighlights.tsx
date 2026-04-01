@@ -78,7 +78,6 @@ function VideoCard({
           </>
         ) : poster ? (
           // No video — show poster image only, no text on frame
-          // eslint-disable-next-line @next/next/no-img-element
           <img src={poster} alt={title} className="w-full h-full object-cover" />
         ) : (
           // No video, no poster — neutral placeholder

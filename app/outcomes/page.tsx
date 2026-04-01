@@ -78,7 +78,7 @@ export default function OutcomesMethodologyPage() {
               </div>
               <p className="text-slate-700 text-sm mb-2">
                 Count of individuals who completed the enrollment process and were admitted into 
-                a training program. Includes students funded through WIOA, WRG, JRI, self-pay, 
+                a training program. Includes students funded through WIOA, WRG, Job Ready Indy, self-pay, 
                 and employer-sponsored pathways.
               </p>
               <p className="text-slate-600 text-xs">

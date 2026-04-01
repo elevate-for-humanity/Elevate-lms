@@ -172,7 +172,7 @@ export default function PlatformLicensingPage() {
                 <div className="flex items-start gap-2">
                   <span className="text-slate-500 flex-shrink-0">•</span>
                   <div>
-                    <div className="font-semibold">JRI Partner</div>
+                    <div className="font-semibold">Job Ready Indy Partner</div>
                     <div className="text-black">
                       Justice-involved approved
                     </div>
@@ -274,7 +274,7 @@ export default function PlatformLicensingPage() {
                   </div>
                   <div>
                     <span className="text-slate-500 flex-shrink-0">•</span> WIOA, WRG,
-                    JRI, WorkOne, SNAP E&T
+                    Job Ready Indy, WorkOne, SNAP E&T
                   </div>
                 </div>
               </div>

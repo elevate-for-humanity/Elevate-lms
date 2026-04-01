@@ -44,7 +44,7 @@ export default function HomePage() {
               Get Certified.<br />Get Funded.<br />Get Hired — In Weeks.
             </h1>
             <p className="text-slate-200 text-base leading-relaxed mb-6">
-              Workforce training in HVAC, CNA, CDL, IT, and Barber Apprenticeship. Most eligible Indiana residents pay $0 through WIOA and Workforce Ready Grant funding.
+              Free and low-cost career training programs in Indiana. Earn industry-recognized certifications and start working fast.
             </p>
             {/* Proof bullets */}
             <ul className="space-y-2 mb-8">
@@ -52,7 +52,7 @@ export default function HomePage() {
                 'WIOA & Workforce Ready Grant funded programs available',
                 'Certifications included',
                 'Job placement support',
-                'ETPL-listed workforce training provider',
+                'Indiana-approved training provider',
               ].map((b) => (
                 <li key={b} className="flex items-start gap-2 text-sm text-slate-200">
                   <span className="text-brand-red-400 font-bold flex-shrink-0">✔</span> {b}
@@ -93,7 +93,7 @@ export default function HomePage() {
                 {[
                   { label: 'WIOA', tag: 'Federal', desc: 'For adults, dislocated workers, and youth 16–24.' },
                   { label: 'Workforce Ready Grant', tag: 'Indiana State', desc: 'Covers high-demand certification programs.' },
-                  { label: 'JRI / Employer-Sponsored', tag: 'Indiana State', desc: 'For justice-involved individuals and employer OJT.' },
+                  { label: 'Job Ready Indy / Employer-Sponsored', tag: 'Indiana State', desc: 'For justice-involved individuals and employer OJT.' },
                 ].map((f) => (
                   <div key={f.label} className="bg-white rounded-xl p-4 shadow-sm">
                     <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>

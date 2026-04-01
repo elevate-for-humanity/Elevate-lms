@@ -194,6 +194,87 @@ async function _POST(request: NextRequest) {
             created_at: new Date().toISOString(),
           });
 
+          // ── Wire weekly billing via Stripe subscription ──────────────────
+          // Only for card payments on a payment plan (BNPL providers manage
+          // their own schedules; fully-paid students have no recurring balance).
+          if (!fullyPaid && !bnplProvider && weeklyPaymentCents > 0) {
+            try {
+              // Retrieve the payment method saved during checkout
+              const checkoutSession = await stripe.checkout.sessions.retrieve(
+                session.id,
+                { expand: ['payment_intent.payment_method'] }
+              );
+              const pi = checkoutSession.payment_intent as Stripe.PaymentIntent | null;
+              const pmId = typeof pi?.payment_method === 'string'
+                ? pi.payment_method
+                : (pi?.payment_method as Stripe.PaymentMethod | null)?.id;
+
+              if (pmId) {
+                // Attach payment method to customer and set as default
+                await stripe.paymentMethods.attach(pmId, { customer: customerId }).catch(() => {});
+                await stripe.customers.update(customerId, {
+                  invoice_settings: { default_payment_method: pmId },
+                });
+
+                // Create a one-time price for the weekly amount
+                const weeklyPrice = await stripe.prices.create({
+                  currency: 'usd',
+                  unit_amount: weeklyPaymentCents,
+                  recurring: { interval: 'week', interval_count: 1 },
+                  product_data: { name: 'Barber Apprenticeship — Weekly Tuition' },
+                });
+
+                // Billing anchor: next Friday at 10 AM ET
+                const billingAnchor = Math.floor(getBillingCycleAnchor().getTime() / 1000);
+
+                const subscription = await stripe.subscriptions.create({
+                  customer: customerId,
+                  items: [{ price: weeklyPrice.id }],
+                  billing_cycle_anchor: billingAnchor,
+                  proration_behavior: 'none',
+                  cancel_at_period_end: false,
+                  metadata: {
+                    program: 'barber-apprenticeship',
+                    weeks_remaining: invoiceWeeks.toString(),
+                    application_id: applicationId || '',
+                  },
+                  // Cancel automatically after all weeks are billed
+                  cancel_at: Math.floor(
+                    (getBillingCycleAnchor().getTime() + invoiceWeeks * 7 * 24 * 60 * 60 * 1000) / 1000
+                  ),
+                });
+
+                // Store subscription ID on the enrollment record
+                await supabase
+                  .from('barber_subscriptions')
+                  .update({ stripe_subscription_id: subscription.id })
+                  .eq('stripe_customer_id', customerId)
+                  .order('created_at', { ascending: false })
+                  .limit(1);
+
+                logger.info('[Barber Webhook] Weekly subscription created', {
+                  customerId,
+                  subscriptionId: subscription.id,
+                  weeklyPaymentCents,
+                  weeks: invoiceWeeks,
+                });
+              } else {
+                logger.warn('[Barber Webhook] No payment method found — weekly billing not scheduled', { customerId });
+              }
+            } catch (billingErr) {
+              // Non-fatal — log and alert admin but do not block enrollment
+              logger.error('[Barber Webhook] Failed to create weekly subscription', { customerId, billingErr });
+              try {
+                const { sendEmail } = await import('@/lib/email/sendgrid');
+                await sendEmail({
+                  to: 'info@elevateforhumanity.org',
+                  subject: '⚠️ Weekly billing setup failed — manual action required',
+                  html: `<p>Student: ${customerEmail}<br>Customer ID: ${customerId}<br>Weekly amount: $${(weeklyPaymentCents / 100).toFixed(2)}<br>Weeks: ${invoiceWeeks}</p><p>Stripe subscription was not created. Set up manually in Stripe dashboard.</p>`,
+                });
+              } catch { /* non-fatal */ }
+            }
+          }
+
           // Send welcome email
           try {
             const { sendEmail } = await import('@/lib/email/sendgrid');
@@ -213,25 +294,31 @@ async function _POST(request: NextRequest) {
 • Weekly payment: $${(weeklyPaymentCents / 100).toFixed(2)} for ~${invoiceWeeks} weeks`;
             }
 
+            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
             await sendEmail({
               to: customerEmail,
-              subject: 'Welcome to Barber Apprenticeship - Enrollment Confirmed!',
+              subject: 'Payment Received — Complete Your Barber Apprenticeship Application',
               html: `
+<div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1a1a1a">
 <p>Hi ${customerName || 'there'},</p>
 
-<p>Your enrollment in the Barber Apprenticeship program is confirmed!</p>
+<p>Your payment for the <strong>Barber Apprenticeship</strong> program has been received. Your spot is reserved.</p>
 
-<p><strong>Payment Summary:</strong></p>
-<p>${paymentSummary}</p>
+<p><strong>Payment:</strong> ${paymentSummary}</p>
 
-<p><strong>What's next:</strong></p>
-<p>• Milady will email you login credentials for coursework<br>
-• Log into your dashboard to track hours<br>
-${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}</p>
+<p style="font-size:16px;font-weight:bold;margin:24px 0 8px">Your next steps — complete in order:</p>
+<ol style="line-height:2;margin:0 0 20px;padding-left:20px">
+  <li><strong>Complete your application</strong> — submit your apprentice application so we can verify eligibility and match you with a host shop.<br>
+  <a href="${siteUrl}/programs/barber-apprenticeship/apply?type=apprentice" style="color:#1d4ed8">Complete Application →</a></li>
+  <li><strong>Complete orientation</strong> — a short online module covering program expectations, hour logging, and your host shop assignment. Available after your application is submitted.</li>
+  <li><strong>Access your dashboard</strong> — log hours, track progress, and access your Milady coursework once orientation is complete.</li>
+</ol>
 
-<p>Questions? Reply to this email or call (317) 314-3757.</p>
+${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive every Friday starting next week.</p>` : ''}
 
-<p>— Elevate for Humanity Team</p>
+<p>Questions? Call <a href="tel:3173143757">(317) 314-3757</a> or reply to this email.</p>
+<p>— Elevate for Humanity</p>
+</div>
               `,
             });
           } catch (emailErr) {
@@ -351,18 +438,33 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
               ? `Paid in full: $${(amountPaidCents / 100).toLocaleString()}`
               : `Setup fee paid: $${(amountPaidCents / 100).toFixed(2)} — $${(weeklyPaymentCents / 100).toFixed(2)}/week for ~${weeksRemaining} weeks`;
 
+            const siteUrl2 = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
             await sendEmail({
               to: customerEmail,
-              subject: 'Enrollment Confirmed — Barber Apprenticeship',
-              html: `<p>Hi ${customerName || 'there'},</p>
-<p>Your enrollment in the Barber Apprenticeship program is confirmed.</p>
+              subject: 'Payment Received — Complete Your Barber Apprenticeship Application',
+              html: `
+<div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1a1a1a">
+<p>Hi ${customerName || 'there'},</p>
+
+<p>Your payment for the <strong>Barber Apprenticeship</strong> program has been received. Your spot is reserved.</p>
+
 <p><strong>Payment:</strong> ${paymentSummary}</p>
-<p><strong>Next steps:</strong><br>
-• Complete orientation at <a href="${process.env.NEXT_PUBLIC_SITE_URL}/programs/barber-apprenticeship/orientation">your orientation page</a><br>
-• Log hours weekly in your apprentice dashboard<br>
-${!fullyPaid ? '• Weekly invoices will arrive every Friday<br>' : ''}</p>
-<p>Questions? Call (317) 314-3757 or reply to this email.</p>
-<p>— Elevate for Humanity</p>`,
+
+<p style="font-size:16px;font-weight:bold;margin:24px 0 8px">Your next steps — complete in order:</p>
+<ol style="line-height:2;margin:0 0 20px;padding-left:20px">
+  <li><strong>Create your account</strong> — use the same email address you used at checkout.<br>
+  <a href="${siteUrl2}/signup?role=apprentice&redirect=/programs/barber-apprenticeship/apply?type=apprentice" style="color:#1d4ed8">Create Account →</a></li>
+  <li><strong>Complete your application</strong> — submit your apprentice application so we can verify eligibility and match you with a host shop.</li>
+  <li><strong>Complete orientation</strong> — a short online module covering program expectations, hour logging, and your host shop assignment.</li>
+  <li><strong>Access your dashboard</strong> — log hours, track progress, and access your Milady coursework once orientation is complete.</li>
+</ol>
+
+${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive every Friday starting next week.</p>` : ''}
+
+<p>Questions? Call <a href="tel:3173143757">(317) 314-3757</a> or reply to this email.</p>
+<p>— Elevate for Humanity</p>
+</div>
+              `,
             });
 
             // Admin notification
@@ -689,6 +791,96 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
         break;
       }
 
+      // ── Failed payment — immediate notice + grace-period suspension ──────
+      case 'invoice.payment_failed':
+      case 'payment_intent.payment_failed': {
+        const failedObj = event.data.object as Stripe.Invoice | Stripe.PaymentIntent;
+        const failedCustomerId = 'customer' in failedObj
+          ? (typeof failedObj.customer === 'string' ? failedObj.customer : failedObj.customer?.id)
+          : undefined;
+        const failedEmail = 'customer_email' in failedObj
+          ? failedObj.customer_email
+          : undefined;
+
+        if (!failedCustomerId) break;
+
+        const db = createAdminClient();
+
+        // 1. Mark enrollment as past_due and record failure timestamp
+        const { data: sub } = await db
+          .from('barber_subscriptions')
+          .select('id, customer_email, payment_status, failed_payment_at')
+          .eq('stripe_customer_id', failedCustomerId)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (!sub) {
+          logger.warn('[Barber Webhook] payment_failed: no subscription found', { failedCustomerId });
+          break;
+        }
+
+        // Idempotent — only update if not already past_due or suspended
+        if (!['past_due', 'suspended', 'cancelled'].includes(sub.payment_status ?? '')) {
+          await db
+            .from('barber_subscriptions')
+            .update({
+              payment_status: 'past_due',
+              failed_payment_at: new Date().toISOString(),
+              suspension_deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+            })
+            .eq('id', sub.id);
+        }
+
+        // 2. Send immediate email with update-card link
+        const studentEmail = failedEmail || sub.customer_email;
+        if (studentEmail) {
+          try {
+            const { sendEmail } = await import('@/lib/email/sendgrid');
+            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+            await sendEmail({
+              to: studentEmail,
+              subject: '⚠️ Payment Failed — Action Required to Keep Your Enrollment',
+              html: `
+<div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1a1a1a">
+<p style="font-size:18px;font-weight:bold;color:#dc2626">Your weekly tuition payment failed.</p>
+<p>We were unable to charge your card on file for your Barber Apprenticeship weekly payment.</p>
+<p><strong>What you need to do:</strong></p>
+<ol style="line-height:2">
+  <li>Update your payment method immediately using the link below.</li>
+  <li>Stripe will automatically retry the charge once your card is updated.</li>
+</ol>
+<p style="margin:24px 0">
+  <a href="${siteUrl}/apprentice/billing" style="background:#1d4ed8;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block">
+    Update Payment Method →
+  </a>
+</p>
+<p style="color:#dc2626;font-weight:bold">Important: If this is not resolved within 7 days, your program access will be suspended.</p>
+<p>Suspended students cannot log hours or access coursework. Suspended hours do not count toward your apprenticeship total.</p>
+<p>Call us at <a href="tel:3173143757">(317) 314-3757</a> if you need help — we can work with you before suspension occurs.</p>
+<p>— Elevate for Humanity</p>
+</div>`,
+            });
+          } catch (emailErr) {
+            logger.error('[Barber Webhook] Failed to send payment-failed email', { studentEmail, emailErr });
+          }
+        }
+
+        // 3. Alert admin
+        try {
+          const { sendEmail } = await import('@/lib/email/sendgrid');
+          await sendEmail({
+            to: 'info@elevateforhumanity.org',
+            subject: `Payment failed — ${studentEmail}`,
+            html: `<p>Student: ${studentEmail}<br>Customer ID: ${failedCustomerId}<br>Subscription ID: ${sub.id}<br>Suspension deadline: 7 days from now.</p>`,
+          });
+        } catch { /* non-fatal */ }
+
+        logger.info('[Barber Webhook] Payment failed — marked past_due', { failedCustomerId, studentEmail });
+        break;
+      }
+
+      // ── Payment succeeded after failure — restore access ──────────────
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice;
         const subscriptionId = invoice.subscription as string;
@@ -712,6 +904,48 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
         }).catch(() => {
           // Table may not exist
         });
+
+        // Reinstate if previously suspended or past_due
+        const { data: subRecord } = await supabase
+          .from('barber_subscriptions')
+          .select('id, user_id, payment_status, customer_email, customer_name')
+          .eq('stripe_subscription_id', subscriptionId)
+          .maybeSingle();
+
+        if (subRecord && ['past_due', 'suspended'].includes(subRecord.payment_status ?? '')) {
+          await supabase
+            .from('barber_subscriptions')
+            .update({
+              payment_status: 'active',
+              failed_payment_at: null,
+              suspension_deadline: null,
+              suspended_at: null,
+              suspension_reason: null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', subRecord.id);
+
+          await supabase.from('billing_events').insert({
+            barber_subscription_id: subRecord.id,
+            user_id: subRecord.user_id,
+            event_type: 'reinstated',
+            stripe_invoice_id: invoice.id,
+            amount_cents: invoice.amount_paid,
+            metadata: { source: 'invoice.paid_webhook' },
+          }).catch(() => {});
+
+          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+          if (subRecord.customer_email) {
+            const { sendEmail } = await import('@/lib/email/sendgrid');
+            await sendEmail({
+              to: subRecord.customer_email,
+              subject: 'Your Barber Apprenticeship access has been restored',
+              html: `<p>Hi ${subRecord.customer_name || 'Apprentice'},</p><p>Your payment was processed and your access has been fully restored.</p><p><a href="${siteUrl}/learner/dashboard">Go to Dashboard</a></p><p>— Elevate for Humanity</p>`,
+            }).catch(() => {});
+          }
+
+          logger.info(`[Barber Webhook] Reinstated subscription: ${subscriptionId}`);
+        }
 
         // Decrement weeks remaining
         const currentWeeks = parseInt(subscription.metadata?.weeks_remaining || '0');

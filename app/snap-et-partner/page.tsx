@@ -119,7 +119,7 @@ export default function SNAPETPartnerPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <Circle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
-                  <span>JRI partner (justice-involved)</span>
+                  <span>Job Ready Indy partner (justice-involved)</span>
                 </li>
               </ul>
             </div>

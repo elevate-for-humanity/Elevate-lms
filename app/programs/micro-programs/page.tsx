@@ -49,7 +49,7 @@ const config: ProgramPageConfig = {
     { title: 'Get Certified', desc: 'Receive your certification — often the same day.' },
   ],
   faqs: [
-    { question: 'What do micro programs cost?', answer: 'Micro programs are included at no extra cost with most funded training programs (WIOA, WRG, JRI). Standalone pricing varies by course. Contact us for current pricing.' },
+    { question: 'What do micro programs cost?', answer: 'Micro programs are included at no extra cost with most funded training programs (WIOA, WRG, Job Ready Indy). Standalone pricing varies by course. Contact us for current pricing.' },
     { question: 'Do I need to be enrolled in another program?', answer: 'No. You can take any micro program as a standalone course. However, they are included at no additional cost with most funded training programs.' },
     { question: 'How long do certifications last?', answer: 'Validity varies: CPR/First Aid is 2 years, OSHA cards do not expire, ServSafe is 5 years. Check individual course details.' },
   ],

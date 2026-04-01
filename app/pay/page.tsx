@@ -25,7 +25,7 @@ export default function PayPage() {
           Payment Options
         </h1>
         <p className="text-black mb-6">
-          If you&apos;re not using WIOA/WRG/JRI or other funding, you can pay with
+          If you&apos;re not using WIOA/WRG/Job Ready Indy or other funding, you can pay with
           card, bank transfer, or split your payment with {BNPL_PROVIDER_NAMES}.
         </p>
 
@@ -35,7 +35,7 @@ export default function PayPage() {
             • Check Free Funding First!
           </h2>
           <p className="text-black mb-4">
-            Many students qualify for no-cost training through WIOA, WRG, or JRI.
+            Many students qualify for no-cost training through WIOA, WRG, or Job Ready Indy.
           </p>
           <Link
             href="/start"

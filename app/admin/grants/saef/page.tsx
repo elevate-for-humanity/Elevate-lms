@@ -84,7 +84,7 @@ No wage subsidies or supplanting of other committed funds included.
 All costs align with allowable uses as defined in the RFA.`,
 
   // ── Section 7: Capacity & Experience ─────────────────────────────────────
-  organizationalCapacity: `2Exclusive LLC (DBA: Elevate for Humanity Technical and Career Institute) is a DOL Registered Apprenticeship Sponsor, ETPL provider, WRG/WIOA/JRI approved organization with active partnerships across Indiana's workforce ecosystem. Key credentials include:
+  organizationalCapacity: `2Exclusive LLC (DBA: Elevate for Humanity Technical and Career Institute) is a DOL Registered Apprenticeship Sponsor, ETPL provider, WRG/WIOA/Job Ready Indy approved organization with active partnerships across Indiana's workforce ecosystem. Key credentials include:
 - SAM.gov registered (CAGE: 0QH19, UEI: VX2GK5S8SZH8), active federal government contractor, active through June 29, 2026
 - ByBlack certified
 - CareerSafe OSHA provider, Milady partner, NRF Rise Up provider, Certiport CATC

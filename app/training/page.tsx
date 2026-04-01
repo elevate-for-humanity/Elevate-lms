@@ -80,7 +80,7 @@ const INCLUDED = [
   },
   {
     title: 'Funding Navigation',
-    desc: 'We help you identify WIOA, WRG, JRI, and other funding sources. Eligibility is determined through WorkOne.',
+    desc: 'We help you identify WIOA, WRG, Job Ready Indy, and other funding sources. Eligibility is determined through WorkOne.',
   },
 ];
 
@@ -250,7 +250,7 @@ export default function TrainingPage() {
               {[
                 { label: 'WIOA', desc: 'Federal funding for adults, dislocated workers, and youth. Covers tuition, books, and support services.' },
                 { label: 'Workforce Ready Grant (WRG)', desc: 'Indiana state grant for high-demand certificate programs. No repayment required.' },
-                { label: 'JRI (Justice Reinvestment Initiative)', desc: 'Funding for justice-involved individuals. Covers training and support services.' },
+                { label: 'Job Ready Indy', desc: 'Funding for justice-involved individuals. Covers training and support services.' },
                 { label: 'Self-Pay / BNPL', desc: 'Flexible payment plans and buy-now-pay-later options for students who do not qualify for funding.' },
               ].map((f) => (
                 <div key={f.label} className="bg-slate-50 rounded-xl border border-slate-200 p-4">

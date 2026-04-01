@@ -146,7 +146,7 @@ export default function WebDevelopmentPage() {
                 professional portfolio demonstrating your skills to employers.
               </p>
               <p className="text-slate-600 text-base leading-relaxed">
-                This program may be available at no cost if you qualify through WIOA, WRG, or JRI
+                This program may be available at no cost if you qualify through WIOA, WRG, or Job Ready Indy
                 funding. Students from outside Indiana can enroll through the self-pay option.
               </p>
             </div>
@@ -321,7 +321,7 @@ export default function WebDevelopmentPage() {
               </h2>
               <p className="text-slate-600 text-sm leading-relaxed mb-4">
                 This program may be available at no cost for eligible Indiana residents through
-                WIOA, Workforce Ready Grant, or JRI funding. Eligibility is determined through
+                WIOA, Workforce Ready Grant, or Job Ready Indy funding. Eligibility is determined through
                 WorkOne — not Elevate.
               </p>
               <p className="text-slate-600 text-sm leading-relaxed">

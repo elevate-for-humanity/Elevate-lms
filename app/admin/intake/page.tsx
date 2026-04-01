@@ -496,7 +496,7 @@ function IntakeDetailModal({
             >
               <Building2 className="w-6 h-6 text-brand-green-600 mb-2" />
               <p className="font-medium text-gray-900">Workforce-Funded</p>
-              <p className="text-xs text-gray-500 mt-1">WIOA, VR, JRI, etc.</p>
+              <p className="text-xs text-gray-500 mt-1">WIOA, VR, Job Ready Indy, etc.</p>
             </button>
             
             <button

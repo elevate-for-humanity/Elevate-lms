@@ -13,10 +13,10 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding' },
   title: 'Workforce Funding | Elevate For Humanity',
   description:
-    'Explore funding options for your career training — WIOA, WRG, JRI, payment plans, and more. Many students qualify for funded training.',
+    'Explore funding options for your career training — WIOA, WRG, Job Ready Indy, payment plans, and more. Many students qualify for funded training.',
   openGraph: {
     title: 'Workforce Funding | Elevate for Humanity',
-    description: 'WIOA, WRG, JRI, payment plans, and more. Many students qualify for funded career training.',
+    description: 'WIOA, WRG, Job Ready Indy, payment plans, and more. Many students qualify for funded career training.',
     url: 'https://www.elevateforhumanity.org/funding',
     siteName: 'Elevate for Humanity',
     images: [{ url: '/images/pages/funding-page-5.jpg', width: 1200, height: 630, alt: 'Career training funding options' }],
@@ -53,14 +53,14 @@ const FUNDING_OPTIONS = [
   {
     tag: 'State — Indiana',
     tagColor: 'bg-brand-red-100 text-brand-red-800',
-    title: 'JRI — Justice Reinvestment Initiative',
+    title: 'Job Ready Indy — Justice Reinvestment Initiative',
     desc: 'State funding for justice-involved individuals. Covers training, certifications, and wraparound support services.',
     bullets: ['Full tuition coverage', 'Certification and exam fees', 'Transportation assistance', 'Case management support'],
     bulletColor: 'bg-brand-red-500',
     image: '/images/pages/funding-page-5.jpg',
-    imageAlt: 'JRI funding',
+    imageAlt: 'Job Ready Indy funding',
     link: '/funding/jri',
-    linkText: 'Learn about JRI',
+    linkText: 'Learn about Job Ready Indy',
   },
   {
     tag: 'Indianapolis',

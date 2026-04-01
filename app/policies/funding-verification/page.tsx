@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 const fundingSources = [
   { title: 'WIOA Voucher', description: 'Workforce Innovation and Opportunity Act Individual Training Account (ITA) voucher from your local WorkOne office.' },
   { title: 'Workforce Ready Grant', description: 'Indiana state grant covering up to $7,500/year for eligible certificate programs.' },
-  { title: 'JRI Funding', description: 'Job Ready Indy funding for justice-involved individuals.' },
+  { title: 'Job Ready Indy Funding', description: 'Job Ready Indy funding for justice-involved individuals.' },
   { title: 'SNAP E&T', description: 'Supplemental Nutrition Assistance Program Employment & Training funding.' },
   { title: 'Employer Sponsorship', description: 'Employer-paid tuition with a signed sponsorship agreement.' },
   { title: 'Self-Pay', description: 'Direct payment via credit card, payment plan, or bank transfer.' },
@@ -100,7 +100,7 @@ export default function FundingVerificationPage() {
             <ul>
               <li><strong>WIOA:</strong> ITA voucher or authorization letter from WorkOne</li>
               <li><strong>WRG:</strong> WRG eligibility documentation and award letter</li>
-              <li><strong>JRI:</strong> Referral letter from probation/parole officer</li>
+              <li><strong>Job Ready Indy:</strong> Referral letter from probation/parole officer</li>
               <li><strong>SNAP E&T:</strong> SNAP E&T referral from FSSA or case manager</li>
               <li><strong>Employer:</strong> Signed employer sponsorship agreement</li>
               <li><strong>Self-Pay:</strong> Signed enrollment agreement and payment method on file</li>

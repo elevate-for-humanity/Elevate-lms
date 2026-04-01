@@ -16,7 +16,7 @@ export default function WorkforcePage() {
         tag: 'Workforce Agencies',
         tagColor: 'text-brand-blue-600',
         title: 'Workforce Agency Partnership',
-        subtitle: 'Refer WIOA, Workforce Ready Grant, and JRI participants to Elevate for funded career training. We handle enrollment, training, testing, and outcome reporting.',
+        subtitle: 'Refer WIOA, Workforce Ready Grant, and Job Ready Indy participants to Elevate for funded career training. We handle enrollment, training, testing, and outcome reporting.',
       },
       intro: {
         heading: 'A Turnkey Training Partner for Your Agency',

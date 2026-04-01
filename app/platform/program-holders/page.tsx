@@ -171,7 +171,7 @@ export default async function ProgramHolderLicensePage() {
                 <div className="flex items-start gap-2">
                   <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <div className="font-semibold">
-                    Job Ready Indy (JRI) Partner
+                    Job Ready Indy Partner
                   </div>
                 </div>
                 <div className="flex items-start gap-2">

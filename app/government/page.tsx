@@ -180,7 +180,7 @@ export default async function GovernmentPage() {
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-slate-500 flex-shrink-0">•</span>
-                    Reentry Programs (JRI)
+                    Reentry Programs (Job Ready Indy)
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-slate-500 flex-shrink-0">•</span>

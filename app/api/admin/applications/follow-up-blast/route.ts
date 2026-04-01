@@ -33,7 +33,7 @@ function buildFollowUpHtml(firstName: string, programInterest: string): string {
 
     <p>We received your application for the <strong>${program}</strong> program and we have not forgotten about you.</p>
 
-    <p>We want to make sure you get started. <strong>Training is free for most applicants</strong> through WIOA, WRG, or JRI funding — the government pays your tuition so you pay nothing out of pocket.</p>
+    <p>We want to make sure you get started. <strong>Training is free for most applicants</strong> through WIOA, WRG, or Job Ready Indy funding — the government pays your tuition so you pay nothing out of pocket.</p>
 
     <h2 style="color:#1e293b;font-size:17px;border-bottom:2px solid #f97316;padding-bottom:6px;margin-top:28px">YOUR NEXT STEP — DO THIS TODAY</h2>
 
@@ -85,7 +85,7 @@ function buildFollowUpText(firstName: string, programInterest: string): string {
 
 We received your application for the ${program} program at Elevate for Humanity and we have not forgotten about you.
 
-Training is free for most applicants through WIOA, WRG, or JRI funding.
+Training is free for most applicants through WIOA, WRG, or Job Ready Indy funding.
 
 YOUR NEXT STEPS:
 

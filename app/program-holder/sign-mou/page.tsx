@@ -147,7 +147,7 @@ export default async function SignMOUPage() {
             <p>This MOU shall be governed by the laws of the State of Indiana and applicable federal regulations, including 29 CFR Parts 29 and 30.</p>
 
             <div className="mt-6 p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-600">
-              <p><strong>Sponsor:</strong> 2Exclusive LLC-S (DBA: Elevate for Humanity Technical and Career Institute) &nbsp;|&nbsp; CAGE: 0QH19 &nbsp;|&nbsp; UEI: VX2GK5S8SZH8</p>
+              <p><strong>Sponsor:</strong> 2Exclusive LLC-S (DBA: Elevate for Humanity Technical and Career Institute)</p>
               <p className="mt-1"><strong>RAPIDS Program No.:</strong> 2025-IN-132301 &nbsp;|&nbsp; <strong>RTI Provider ID:</strong> 208029</p>
               <p className="mt-1">8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240 &nbsp;|&nbsp; (317) 314-3757</p>
             </div>

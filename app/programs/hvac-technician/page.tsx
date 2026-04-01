@@ -73,7 +73,7 @@ export default async function HVACTechnicianPage() {
 
   const banner = heroBanners['hvac-technician'];
 
-  // DB row missing — render static shell so the page is never a 404.
+  // DB row missing — render full static page so the page is never sparse.
   // Fix: apply migration 20260603000003_publish_hvac_program.sql in Supabase Dashboard.
   if (!program) {
     return (
@@ -84,22 +84,107 @@ export default async function HVACTechnicianPage() {
           microLabel={banner.microLabel}
           analyticsName={banner.analyticsName}
         />
+
+        {/* Funding bar */}
         <section className="bg-brand-orange-600 text-white py-5 px-6 text-center">
           <p className="text-lg font-bold tracking-tight">
             This program may cost you <span className="underline decoration-wavy">$0</span> — WIOA and Workforce Ready Grant funding available for eligible Indiana residents.
           </p>
           <p className="text-sm mt-1 text-orange-100">Check your eligibility in 2 minutes. No commitment required.</p>
         </section>
+
+        {/* Program identity + CTAs */}
         <section className="border-b border-slate-200 bg-white">
           <div className="mx-auto max-w-7xl px-6 py-12">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">12-Week Workforce Training Program</p>
             <h1 className="text-4xl font-black text-slate-900 mb-4">{banner.belowHeroHeadline}</h1>
-            <p className="text-slate-600 text-lg mb-8">{banner.belowHeroSubheadline}</p>
+            <p className="text-slate-600 text-lg mb-6">{banner.belowHeroSubheadline}</p>
+            <p className="mt-2 text-xl text-slate-700 leading-relaxed mb-8">
+              You could be earning <strong className="text-slate-900">$18–$25/hr fixing AC units</strong> 90 days from now — with certifications that follow you for life.
+            </p>
             <div className="flex flex-wrap gap-4">
               <a href={banner.primaryCta.href} className="inline-flex items-center gap-2 rounded-xl bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-bold px-6 py-3 transition-colors">
                 {banner.primaryCta.label}
               </a>
               {banner.secondaryCta && (
                 <a href={banner.secondaryCta.href} className="inline-flex items-center gap-2 rounded-xl border-2 border-slate-300 hover:border-slate-400 text-slate-700 font-bold px-6 py-3 transition-colors">
+                  {banner.secondaryCta.label}
+                </a>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Authority strip */}
+        <section className="bg-slate-900 text-white py-8 px-6">
+          <div className="mx-auto max-w-7xl">
+            <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-4 text-center">What you earn when you complete this program</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+              {AUTHORITY.map((item, i) => (
+                <div key={i} className="flex items-start gap-2 text-sm text-slate-200">
+                  <span className="text-brand-orange-400 mt-0.5 shrink-0">✓</span>
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Weekly curriculum */}
+        <section className="mx-auto max-w-7xl px-6 py-16">
+          <div className="mb-8">
+            <p className="text-sm font-semibold uppercase tracking-widest text-brand-orange-600 mb-2">Week by week</p>
+            <h2 className="text-3xl font-bold">What You&apos;ll Learn</h2>
+            <p className="mt-2 text-slate-600">No fluff. Every week builds toward a job-ready skill set.</p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            {WEEKLY_CURRICULUM.map((item, i) => (
+              <div key={i} className="flex gap-4 rounded-xl border border-slate-200 p-5">
+                <div className="shrink-0 w-20 text-xs font-bold text-brand-orange-600 uppercase tracking-wide pt-0.5">{item.weeks}</div>
+                <div>
+                  <p className="font-semibold text-slate-900">{item.topic}</p>
+                  <p className="text-sm text-slate-600 mt-1">{item.detail}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Career outcomes */}
+        <section className="bg-slate-50 border-y border-slate-200 py-16 px-6">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-8">
+              <p className="text-sm font-semibold uppercase tracking-widest text-brand-orange-600 mb-2">Career pathway</p>
+              <h2 className="text-3xl font-bold">Training → Job → Money</h2>
+              <p className="mt-2 text-slate-600">HVAC is one of the highest-demand trades in Indiana. Here&apos;s where this program takes you.</p>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {OUTCOMES.map((o, i) => (
+                <div key={i} className="bg-white rounded-xl border border-slate-200 p-5">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-2">{o.timeline}</p>
+                  <p className="font-bold text-slate-900 text-lg">{o.role}</p>
+                  <p className="text-2xl font-black text-brand-orange-600 mt-1">{o.pay}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Footer CTA */}
+        <section className="border-t border-slate-200 bg-slate-900 text-white py-16">
+          <div className="mx-auto max-w-3xl px-6 text-center">
+            <p className="text-sm font-semibold uppercase tracking-widest text-brand-orange-400 mb-3">Ready to start?</p>
+            <h2 className="text-3xl font-bold">This could cost you $0.</h2>
+            <p className="mt-4 text-slate-300 text-lg">
+              WIOA and Workforce Ready Grant funding covers tuition for eligible Indiana residents.
+              EPA 608 Universal certification proctored on-site. Most students pay nothing.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <a href={banner.primaryCta.href} className="rounded-xl bg-brand-orange-600 px-6 py-3 font-semibold text-white hover:bg-brand-orange-700 transition-colors">
+                {banner.primaryCta.label}
+              </a>
+              {banner.secondaryCta && (
+                <a href={banner.secondaryCta.href} className="rounded-xl border border-slate-600 px-6 py-3 font-semibold text-white hover:bg-slate-800 transition-colors">
                   {banner.secondaryCta.label}
                 </a>
               )}

@@ -90,7 +90,7 @@ export default async function CompliancePage() {
               <span className="text-gray-500">INTraining ID: 10004621</span>
             </div>
             <div className="flex justify-between">
-              <span className="font-medium">WIOA / WRG / JRI Eligible Programs</span>
+              <span className="font-medium">WIOA / WRG / Job Ready Indy Eligible Programs</span>
               <span className="text-gray-500">Via EmployIndy and regional workforce boards</span>
             </div>
           </div>
@@ -140,7 +140,7 @@ export default async function CompliancePage() {
             <p>
               Elevate for Humanity collects personal information — including government-issued IDs,
               Social Security Numbers, and eligibility documents — as required for workforce funding
-              verification under WIOA, WRG, and JRI guidelines. We treat this data with the highest
+              verification under WIOA, WRG, and Job Ready Indy guidelines. We treat this data with the highest
               level of care.
             </p>
             <div className="grid sm:grid-cols-2 gap-4 mt-4">

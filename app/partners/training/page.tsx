@@ -31,7 +31,7 @@ export default function TrainingPartnerPage() {
         heading: 'What We Bring to the Partnership',
         items: [
           'Student enrollment pipeline from WorkOne and community referrals',
-          'WIOA, WRG, and JRI funding for eligible participants',
+          'WIOA, WRG, and Job Ready Indy funding for eligible participants',
           'LMS platform for blended learning delivery',
           'Career services and job placement for graduates',
           'Compliance and outcome reporting',

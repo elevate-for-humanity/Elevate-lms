@@ -175,7 +175,7 @@ async function _POST(request: NextRequest) {
           first_billing_date: firstBillingDateFormatted,
         },
       },
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/programs/barber-apprenticeship/enrollment-success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/programs/barber-apprenticeship/apply/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/programs/barber-apprenticeship?canceled=true`,
       metadata: {
         user_id: user.id,

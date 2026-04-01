@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     description: 'A workforce development institute providing funded career training in Indianapolis, Indiana. Founded by Elizabeth Greene.',
     url: `${SITE_URL}/about`,
     siteName: 'Elevate for Humanity',
-    images: [{ url: '/images/pages/about-hero.jpg', width: 1200, height: 630, alt: 'About Elevate for Humanity' }],
+    images: [{ url: '/images/team/elizabeth-greene-headshot.jpg', width: 800, height: 1080, alt: 'Elizabeth Greene, Founder of Elevate for Humanity' }],
     type: 'website',
   },
 };
@@ -35,10 +35,10 @@ export default function AboutPage() {
       {/* Hero — clean image, no overlay */}
       <section className="relative h-[45vh] min-h-[280px] max-h-[560px] overflow-hidden">
         <Image
-          src="/images/pages/about-hero.jpg"
-          alt="Elevate for Humanity — workforce development in Indianapolis"
+          src="/images/team/elizabeth-greene-headshot.jpg"
+          alt="Elizabeth Greene, Founder of Elevate for Humanity"
           fill
-          className="object-cover"
+          className="object-cover object-top"
           priority
           sizes="100vw"
         />
@@ -82,9 +82,8 @@ export default function AboutPage() {
             <p>
               Many of our programs are available at no cost to eligible participants through
               WIOA (Workforce Innovation and Opportunity Act), the Workforce Ready Grant, and
-              JRI (Job Ready Indy) funding. Eligibility is determined through
-              Indiana WorkOne career centers. We assist with the screening and paperwork —
-              participants focus on training.
+              Eligibility is determined through Indiana WorkOne career centers.
+              We assist with the screening and paperwork — participants focus on training.
             </p>
           </div>
           <div className="mt-6 flex flex-wrap gap-4">
@@ -151,8 +150,7 @@ export default function AboutPage() {
                   Most people do not know they may qualify for funded training. We walk every participant
                   through the eligibility process for WIOA (covers tuition, books, supplies, and
                   sometimes transportation and childcare), the Workforce Ready Grant (covers
-                  high-demand certifications regardless of income), and JRI (covers training for
-                  justice-involved individuals). We handle the paperwork with WorkOne and DWD.
+                  high-demand certifications regardless of income). We handle the paperwork with WorkOne and DWD.
                 </p>
                 <Link href="/funding" className="text-brand-red-600 font-semibold text-sm inline-flex items-center hover:text-brand-red-700">
                   See Funding Options <ArrowRight className="ml-1 w-4 h-4" />
@@ -292,7 +290,7 @@ export default function AboutPage() {
               {
                 title: 'Justice-Involved Individuals',
                 image: '/images/pages/funding-page-2.jpg',
-                desc: 'People on probation, parole, or recently released. JRI funding covers training, supplies, and supportive services at no cost. We work directly with community corrections and reentry programs across Central Indiana.',
+                desc: 'People on probation, parole, or recently released. Job Ready Indy funding covers training, supplies, and supportive services at no cost. We work directly with community corrections and reentry programs across Central Indiana.',
               },
               {
                 title: 'Low-Income Adults & Dislocated Workers',
@@ -369,7 +367,7 @@ export default function AboutPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
             {[
               { name: 'WIOA', role: 'Eligible Training Provider', desc: 'Programs approved for WIOA Adult, Dislocated Worker, and Youth funding.' },
-              { name: 'JRI', role: 'Approved Provider', desc: 'Approved for Job Ready Indy funding for justice-involved participants.' },
+              { name: 'Job Ready Indy', role: 'Approved Provider', desc: 'Approved Job Ready Indy training provider serving justice-involved individuals in Marion County.' },
               { name: 'EmployIndy', role: 'Workforce Partner', desc: 'Partner with EmployIndy for workforce development in Marion County.' },
               { name: 'Indiana State Board', role: 'Cosmetology & Barber Examiners', desc: 'Barber apprenticeship aligned with Indiana State Board licensing requirements.' },
             ].map((cred) => (
@@ -430,12 +428,55 @@ export default function AboutPage() {
                 <p className="text-brand-red-600 font-semibold text-sm mb-4">{founder.title}</p>
                 <p className="text-sm text-slate-700 mb-4">{founder.bio}</p>
                 <p className="text-sm text-slate-700 mb-4">
-                  Elizabeth is a U.S. Army veteran (Unit Supply Specialist), IRS Enrolled Agent (EA) with an EFIN 
-                  and PTIN, and EPA 608 Certified Proctor through Mainstream Engineering. She 
-                  is authorized to represent taxpayers before the IRS and to proctor EPA Section 
-                  608 refrigerant handling exams. She also operates SupersonicFastCash, a tax 
-                  preparation software company.
+                  Elizabeth is a U.S. Army veteran (Unit Supply Specialist), IRS Enrolled Agent (EA) with an EFIN
+                  and PTIN, and EPA 608 Certified Proctor. She is authorized to represent taxpayers
+                  before the IRS and to proctor EPA Section 608 refrigerant handling exams. She also
+                  operates SupersonicFastCash, a tax preparation software company.
                 </p>
+
+                {/* Credentials & Authorizations */}
+                <div className="mb-5">
+                  <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Credentials &amp; Authorizations</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {[
+                      { label: 'IRS Enrolled Agent (EA)', detail: 'Authorized to represent taxpayers before the IRS' },
+                      { label: 'EFIN & PTIN', detail: 'IRS Electronic Filing Identification Number and Preparer Tax Identification Number' },
+                      { label: 'ERO — Electronic Return Originator', detail: 'Authorized IRS e-file originator for individual and business returns' },
+                      { label: 'SBIN — IRS Submitter', detail: 'Authorized to submit returns directly to the IRS for both for-profit and non-profit filers' },
+                      { label: 'VITA Site', detail: 'IRS-authorized Volunteer Income Tax Assistance site' },
+                      { label: 'EPA 608 Certified Proctor', detail: 'Authorized to proctor EPA Section 608 refrigerant handling certification exams' },
+                      { label: 'ACT WorkKeys Proctor', detail: 'Authorized testing site for ACT WorkKeys workforce readiness assessments' },
+                      { label: 'Milady RISE — Proctor & Partner', detail: 'Authorized proctor and curriculum partner for Milady RISE cosmetology and barbering coursework' },
+                      { label: 'Black Certified', detail: 'Certified partner for Black Certified credentialing programs' },
+                      { label: 'U.S. Army Veteran', detail: 'Unit Supply Specialist — honorably served' },
+                    ].map((cred) => (
+                      <div key={cred.label} className="flex gap-2 items-start bg-slate-50 rounded-lg px-3 py-2 border border-slate-100">
+                        <span className="text-brand-red-500 mt-0.5 flex-shrink-0">✓</span>
+                        <div>
+                          <p className="text-xs font-semibold text-slate-900">{cred.label}</p>
+                          <p className="text-xs text-slate-500 leading-snug">{cred.detail}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Workforce Funding Partners */}
+                <div className="mb-5">
+                  <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Workforce Funding &amp; Program Partners</p>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      'Workforce Ready Grant (WRG)',
+                      'WIOA',
+                      'U.S. Department of Labor — Registered Apprenticeship',
+                      'Indiana State Board (IPLA)',
+                      'ITAP — Indiana Training Approval Process',
+                    ].map((p) => (
+                      <span key={p} className="text-xs bg-white border border-slate-200 text-slate-700 rounded-full px-3 py-1 font-medium">{p}</span>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="flex flex-wrap gap-3">
                   <Link href="/about/team" className="text-brand-red-600 font-semibold text-sm inline-flex items-center hover:text-brand-red-700">
                     Meet the Full Team <ArrowRight className="ml-1 w-4 h-4" />

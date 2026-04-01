@@ -39,7 +39,7 @@ const programs = [
     href: '/programs/skilled-trades',
     image: '/images/pages/programs-hvac-hero.jpg',
     certs: ['HVAC', 'Electrical', 'Welding', 'Plumbing'],
-    funding: 'WIOA & JRI eligible',
+    funding: 'WIOA & Job Ready Indy eligible',
   },
   {
     name: 'CDL Training',
@@ -73,7 +73,7 @@ const programs = [
 
 const quickLinks = [
   { label: 'Apply Now', href: '/apply/student', desc: 'Start your enrollment application' },
-  { label: 'Funding & Eligibility', href: '/funding', desc: 'WIOA, WRG, and JRI funding options' },
+  { label: 'Funding & Eligibility', href: '/funding', desc: 'WIOA, WRG, and Job Ready Indy funding options' },
   { label: 'Career Services', href: '/career-services', desc: 'Resume help, interview prep, job placement' },
   { label: 'Employer Partners', href: '/employer', desc: 'Hire trained, certified graduates' },
   { label: 'About Elevate', href: '/about', desc: 'Our mission, team, and programs' },

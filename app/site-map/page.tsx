@@ -111,7 +111,7 @@ const sitemapSections = [
     links: [
       { name: 'Funding Overview', href: '/funding' },
       { name: 'WIOA Funding', href: '/funding/wioa' },
-      { name: 'JRI Funding', href: '/funding/jri' },
+      { name: 'Job Ready Indy Funding', href: '/funding/jri' },
       { name: 'DOL Programs', href: '/funding/dol' },
       { name: 'Federal Programs', href: '/funding/federal-programs' },
       { name: 'State Programs', href: '/funding/state-programs' },

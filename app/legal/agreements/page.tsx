@@ -53,7 +53,7 @@ const AGREEMENT_DEFINITIONS: Record<string, Omit<Agreement, 'type' | 'version'> 
   },
   data_sharing: {
     title: 'Data Sharing Consent',
-    description: 'Authorization for sharing data with workforce agencies and employers as required for WIOA, JRI, and other funded program reporting.',
+    description: 'Authorization for sharing data with workforce agencies and employers as required for WIOA, Job Ready Indy, and other funded program reporting.',
     documentUrl: '/legal/data-sharing',
     img: '/images/pages/admin-governance-legal-hero.jpg',
     icon: Shield,

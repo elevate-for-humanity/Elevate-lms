@@ -96,11 +96,9 @@ Most apprentices work during regular shop hours. Your weekly payment amount is b
 
   'pay|earn|wage|salary': `Yes, you **earn while you learn**!
 
-As an apprentice, you'll earn:
-• Starting: $10-12/hour + tips
-• As you progress: $12-18/hour + tips
+As a registered apprentice, you are a W-2 employee of your host shop. Your compensation is set by your employer and must meet or exceed applicable minimum wage laws — the platform does not set or suggest pay rates.
 
-After licensure, barbers typically earn $35,000-$65,000+/year depending on location, clientele, and whether you rent a chair or own a shop.`,
+After licensure, barbers typically earn $35,000–$65,000+/year depending on location, clientele, and whether you rent a chair or own a shop.`,
 };
 
 export default function BarberChatAssistant() {

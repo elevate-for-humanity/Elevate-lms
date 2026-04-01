@@ -18,8 +18,8 @@ import {
 CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Job Ready Indy (JRI) | Funded Career Training | Elevate for Humanity',
-  description: 'Indiana JRI program provides funded career training for justice-involved individuals. Get certified in healthcare, skilled trades, and more.',
+  title: 'Job Ready Indy | Funded Career Training | Elevate for Humanity',
+  description: 'Indiana Job Ready Indy program provides funded career training for justice-involved individuals. Get certified in healthcare, skilled trades, and more.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/jri',
   },
@@ -132,7 +132,7 @@ export default function JRIPage() {
       <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
           src="/images/pages/jri-hero.jpg"
-          alt="JRI Program participants"
+          alt="Job Ready Indy Program participants"
           fill
           className="object-cover"
           priority
@@ -158,7 +158,7 @@ export default function JRIPage() {
         </div>
       </section>
 
-      {/* What is JRI */}
+      {/* What is Job Ready Indy */}
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center mb-12">
@@ -166,9 +166,9 @@ export default function JRIPage() {
               What is the Job Ready Indy?
             </h2>
             <p className="text-lg text-gray-600">
-              JRI is an Indiana state-funded program designed to reduce recidivism by investing in 
+              Job Ready Indy is an Indiana state-funded program designed to reduce recidivism by investing in 
               workforce training and support services. Instead of cycling people back through the 
-              criminal justice system, JRI helps build sustainable careers.
+              criminal justice system, Job Ready Indy helps build sustainable careers.
             </p>
           </div>
           
@@ -194,10 +194,10 @@ export default function JRIPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                Do You Qualify for JRI?
+                Do You Qualify for Job Ready Indy?
               </h2>
               <p className="text-lg text-gray-600 mb-8">
-                JRI funding is available to Indiana residents who meet the following criteria.
+                Job Ready Indy funding is available to Indiana residents who meet the following criteria.
               </p>
               
               <ul className="space-y-4">
@@ -246,10 +246,10 @@ export default function JRIPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              JRI-Approved Training Programs
+              Job Ready Indy-Approved Training Programs
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Choose from high-demand career paths. All programs are fully funded through JRI.
+              Choose from high-demand career paths. All programs are fully funded through Job Ready Indy.
             </p>
           </div>
           
@@ -258,7 +258,7 @@ export default function JRIPage() {
               <div key={index} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition">
                 <div className="flex items-center gap-2 mb-3">
                   <BookOpen className="w-5 h-5 text-brand-green-600" />
-                  <span className="text-xs text-brand-green-600 font-semibold uppercase">JRI Approved</span>
+                  <span className="text-xs text-brand-green-600 font-semibold uppercase">Job Ready Indy Approved</span>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{program.name}</h3>
                 <p className="text-gray-600 text-sm mb-4">{program.description}</p>
@@ -290,16 +290,16 @@ export default function JRIPage() {
       {/* FAQ */}
       <section className="py-16">
         <div className="max-w-3xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">JRI Program FAQ</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Job Ready Indy Program FAQ</h2>
           <div className="space-y-4">
             {[
-              { q: 'What is JRI funding?', a: 'Job Ready Indy (JRI) is Indiana state funding that provides free career training to justice-involved individuals. It covers tuition, materials, certifications, and supportive services.' },
-              { q: 'Do I qualify if I have a felony?', a: 'Yes. JRI is specifically designed for people with criminal records, including felonies. Your conviction type does not automatically disqualify you.' },
+              { q: 'What is Job Ready Indy funding?', a: 'Job Ready Indy is Indiana state funding that provides free career training to justice-involved individuals. It covers tuition, materials, certifications, and supportive services.' },
+              { q: 'Do I qualify if I have a felony?', a: 'Yes. Job Ready Indy is specifically designed for people with criminal records, including felonies. Your conviction type does not automatically disqualify you.' },
               { q: 'How recent does my involvement need to be?', a: 'Generally, you should have been released from incarceration or supervision within the past 3 years. Contact us to discuss your specific situation.' },
-              { q: 'What programs can I use JRI for?', a: 'JRI covers approved training programs including healthcare (CNA), skilled trades (HVAC, welding), technology, CDL, and more. See the list above for current options.' },
-              { q: 'Is JRI really free?', a: 'Yes. JRI covers 100% of training costs for eligible participants. There are no hidden fees or repayment requirements.' },
+              { q: 'What programs can I use Job Ready Indy for?', a: 'Job Ready Indy covers approved training programs including healthcare (CNA), skilled trades (HVAC, welding), technology, CDL, and more. See the list above for current options.' },
+              { q: 'Is Job Ready Indy really free?', a: 'Yes. Job Ready Indy covers 100% of training costs for eligible participants. There are no hidden fees or repayment requirements.' },
               { q: 'How long does the application take?', a: 'The initial application takes about 10 minutes. Eligibility verification typically takes 1-2 weeks. You can start training as soon as you\'re approved.' },
-              { q: 'What if I don\'t qualify for JRI?', a: 'You may still qualify for other funding programs like WIOA or SNAP E&T. Our team will help identify all available options for you.' },
+              { q: 'What if I don\'t qualify for Job Ready Indy?', a: 'You may still qualify for other funding programs like WIOA or SNAP E&T. Our team will help identify all available options for you.' },
               { q: 'Will employers hire me with a record?', a: 'Yes. Many employers actively hire our graduates. We work with employers who believe in second chances and understand the value of trained, motivated workers.' },
             ].map((faq, i) => (
               <details key={i} className="bg-white rounded-xl overflow-hidden shadow-sm group">

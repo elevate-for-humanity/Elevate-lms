@@ -55,7 +55,7 @@ serve(async (req) => {
             <li>Schedule your Remote Skills Verification session</li>
           </ul>
           <p>If you have any questions, please contact us at support@www.elevateforhumanity.org</p>
-          <p>Best regards,<br>Elevate for Humanity Career & Technical Institute</p>
+          <p>Best regards,<br>Elevate for Humanity Career Training Institute</p>
         `;
         break;
 
@@ -76,7 +76,7 @@ serve(async (req) => {
             <li>Receive your certification upon completion</li>
           </ul>
           <p>Need help? Contact us at support@www.elevateforhumanity.org</p>
-          <p>Best regards,<br>Elevate for Humanity Career & Technical Institute</p>
+          <p>Best regards,<br>Elevate for Humanity Career Training Institute</p>
         `;
         break;
 
@@ -89,7 +89,7 @@ serve(async (req) => {
           <p><a href="${enrollment.hsi_enrollment_link}" style="display: inline-block; padding: 12px 24px; background-color: #ea580c; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Continue Training</a></p>
           <p>Your certification is waiting! Complete the course to receive your official certificate.</p>
           <p>Questions? We're here to help at support@www.elevateforhumanity.org</p>
-          <p>Best regards,<br>Elevate for Humanity Career & Technical Institute</p>
+          <p>Best regards,<br>Elevate for Humanity Career Training Institute</p>
         `;
         break;
     }

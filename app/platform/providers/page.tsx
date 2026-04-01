@@ -40,7 +40,7 @@ const programRequirements = [
   },
   {
     title: 'Compliance Documentation',
-    desc: 'Programs operating under WIOA, Workforce Ready Grant, JRI, or DOL Registered Apprenticeship funding must maintain documentation required by those programs. Elevate provides templates and reporting infrastructure; providers are responsible for accuracy.',
+    desc: 'Programs operating under WIOA, Workforce Ready Grant, Job Ready Indy, or DOL Registered Apprenticeship funding must maintain documentation required by those programs. Elevate provides templates and reporting infrastructure; providers are responsible for accuracy.',
   },
 ];
 
@@ -152,7 +152,7 @@ export default function ProvidersPage() {
               {
                 icon: Shield,
                 title: 'Workforce Funding Compliance',
-                desc: 'Programs operating under WIOA, Workforce Ready Grant, JRI, or DOL Registered Apprenticeship must comply with those programs\' documentation and reporting requirements. Non-compliance results in program suspension pending remediation.',
+                desc: 'Programs operating under WIOA, Workforce Ready Grant, Job Ready Indy, or DOL Registered Apprenticeship must comply with those programs\' documentation and reporting requirements. Non-compliance results in program suspension pending remediation.',
               },
             ].map((control) => (
               <div key={control.title} className="bg-white rounded-xl border border-slate-200 p-6">
@@ -311,7 +311,7 @@ export default function ProvidersPage() {
           <div className="grid sm:grid-cols-2 gap-4">
             {[
               { icon: Users, title: 'Learner Management', desc: 'Enrollment, attendance, progress tracking, and cohort management for all enrolled learners.' },
-              { icon: FileText, title: 'Compliance Reporting', desc: 'WIOA, WRG, JRI, and DOL reporting templates. Audit-ready documentation maintained automatically.' },
+              { icon: FileText, title: 'Compliance Reporting', desc: 'WIOA, WRG, Job Ready Indy, and DOL reporting templates. Audit-ready documentation maintained automatically.' },
               { icon: Award, title: 'Credential Pathway Tools', desc: 'Exam scheduling coordination, credential record storage, and verification link management.' },
               { icon: Building2, title: 'Employer Pipeline Access', desc: 'Connect graduates to the Elevate employer network. Post hiring needs and track placement outcomes.' },
             ].map((item) => (

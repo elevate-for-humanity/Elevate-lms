@@ -65,7 +65,7 @@ export const PROGRAMS: ProgramData[] = [
   {
     slug: 'barber-apprenticeship',
     name: 'Barber Apprenticeship',
-    blurb: 'Earn while you learn! This DOL-registered apprenticeship places you in real barbershops where you\'ll master fades, tapers, razor work, and client service while building your hours toward Indiana barber licensure. Perfect for career changers and re-entry participants. Get paid on-the-job training, business coaching, and a clear path to owning your own chair or shop.',
+    blurb: 'Earn while you learn! This state-approved apprenticeship places you in real barbershops where you\'ll master fades, tapers, razor work, and client service while building your hours toward Indiana barber licensure. Perfect for career changers and re-entry participants. Get paid on-the-job training, business coaching, and a clear path to owning your own chair or shop.',
     funding: 'Registered Apprenticeship • WIOA • WRG',
     duration: '12–18 Months • Barbershop + Classroom',
     image: '/images/pages/barber-hero-main.jpg',

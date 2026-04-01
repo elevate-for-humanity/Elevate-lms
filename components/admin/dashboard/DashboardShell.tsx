@@ -72,7 +72,7 @@ const QUICK_ACTIONS = [
 
 // ── Main shell ────────────────────────────────────────────────────────────────
 export function DashboardShell({ data }: { data: AdminDashboardData }) {
-  const [trendRange, setTrendRange] = useState<"7d"|"30d"|"3mo">("30d");
+
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<{ key: SortKey; dir: "asc"|"desc" }>({ key: "created_at", dir: "desc" });
 
@@ -91,10 +91,7 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
   }, []);
   const firstName = data.profile?.full_name?.split(" ")[0] || "Admin";
 
-  const trendData = useMemo(() => {
-    const n = trendRange === "7d" ? 2 : trendRange === "30d" ? 4 : data.enrollmentTrend.length;
-    return data.enrollmentTrend.slice(-n);
-  }, [data.enrollmentTrend, trendRange]);
+  const trendData = data.enrollmentTrend;
 
   const filteredStudents = useMemo(() => {
     let list = [...data.recentStudents];
@@ -164,14 +161,7 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
             <h2 className="text-lg font-semibold text-slate-900">Enrollment Trend</h2>
             <p className="text-sm text-slate-500">Monthly learner enrollment volume</p>
           </div>
-          <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1">
-            {(["7d","30d","3mo"] as const).map(r => (
-              <button key={r} onClick={() => setTrendRange(r)}
-                className={"px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors " + (trendRange === r ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700")}>
-                {r}
-              </button>
-            ))}
-          </div>
+          <p className="text-sm text-slate-500">Enrollment trend by month</p>
         </div>
         <div className="h-72">
           {trendData.length > 0 ? (

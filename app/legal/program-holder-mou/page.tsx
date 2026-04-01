@@ -37,7 +37,7 @@ export default function ProgramHolderMOUPage() {
           <ul>
             <li>Provide LMS access and platform infrastructure for program delivery</li>
             <li>Manage student enrollment, progress tracking, and certificate issuance</li>
-            <li>Coordinate funding applications (WIOA, WRG, JRI) where applicable</li>
+            <li>Coordinate funding applications (WIOA, WRG, Job Ready Indy) where applicable</li>
             <li>Maintain RAPIDS registration and DOL apprenticeship compliance</li>
             <li>Provide technical support and training for platform use</li>
             <li>Conduct compliance audits and quality assurance reviews</li>

@@ -79,9 +79,9 @@ export default function FounderPage() {
                 <p>
                   Under her leadership, Elevate has secured approvals across federal, state, and
                   local agencies: U.S. DOL Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301),
-                  Indiana ETPL listed, Workforce Ready Grant (WRG) approved, WIOA and JRI funding
+                  Indiana ETPL listed, Workforce Ready Grant (WRG) approved, WIOA and Job Ready Indy funding
                   approved, and Job Ready Indy partner. Elevate is enrolled in PECOS with an NPI,
-                  holds a federal CAGE code (0Q856), UEI VX2GK5S8SZH8, is ITAP/INDOT registered,
+                  is SAM.gov registered as a federal government contractor, ITAP/INDOT registered,
                   and ByBlack certified through the U.S. Black Chambers / NAACP.
                 </p>
 
@@ -160,15 +160,13 @@ export default function FounderPage() {
                   'Indiana ETPL Listed Provider',
                   'Workforce Ready Grant (WRG) Approved',
                   'WIOA Funding Approved',
-                  'JRI Funding Approved',
+                  'Job Ready Indy Funding Approved',
                   'Job Ready Indy Partner',
                   'WorkOne Partner',
                   'PECOS / NPI Enrolled',
                   'ITAP / INDOT Registered',
                   'Indiana State Bidder',
                   'SAM.gov Registered — Federal Government Contractor',
-                  'CAGE Code: 0Q856',
-                  'UEI: VX2GK5S8SZH8',
                 ].map((c) => (
                   <li key={c} className="flex items-start gap-2 text-slate-600 text-sm">
                     <span className="text-brand-red-400 mt-0.5">▸</span>{c}
@@ -191,7 +189,7 @@ export default function FounderPage() {
                   'Milady Curriculum Partner',
                   'NRF Rise Up Provider',
                   'Certiport Authorized Testing Center (CATC)',
-                  'Choice Medical CNA School Partner',
+
                   'Selfish Inc. — 501(c)(3) Nonprofit',
                   'The Rise Foundation (DBA of Selfish Inc.) — VITA Free Tax Prep',
                   'SupersonicFastCash — Tax Software',
@@ -227,7 +225,7 @@ export default function FounderPage() {
               {
                 name: 'Elevate for Humanity',
                 role: 'Career & Technical Institute',
-                desc: 'Workforce training, apprenticeship sponsorship, funding navigation, and employer partnerships. DOL Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301), ETPL listed, WRG, WIOA, and JRI approved. CAGE Code: 0Q856.',
+                desc: 'Workforce training, apprenticeship sponsorship, funding navigation, and employer partnerships. DOL Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301), ETPL listed, WRG, WIOA, and Job Ready Indy approved.',
                 href: '/about',
               },
               {

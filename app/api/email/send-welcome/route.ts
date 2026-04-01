@@ -69,7 +69,7 @@ async function _POST(request: NextRequest) {
         <p><strong>Hours:</strong> Monday-Friday, 9:00 AM - 5:00 PM EST</p>
       </div>
 
-      <p><strong>Important:</strong> This is a WIOA/WRG/JRI-funded program. Your training is Funded. There is no cost to you.</p>
+      <p><strong>Important:</strong> This is a WIOA/WRG/Job Ready Indy-funded program. Your training is Funded. There is no cost to you.</p>
 
       <p>We're excited to have you in our program!</p>
 
@@ -79,7 +79,7 @@ async function _POST(request: NextRequest) {
     <div class="footer">
       <p>Elevate for Humanity | Indianapolis, IN 46240</p>
       <p>An Equal Opportunity Employer/Program</p>
-      <p>Funded by WIOA, WRG, and JRI programs</p>
+      <p>Funded by WIOA, WRG, and Job Ready Indy programs</p>
     </div>
   </div>
 </body>

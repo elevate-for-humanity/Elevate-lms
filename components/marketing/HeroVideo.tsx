@@ -100,6 +100,7 @@ export default function HeroVideo({
         {/* autoPlayOnMount + preloadFull — hero is above the fold, load immediately */}
         <CanonicalVideo
           src={videoSrc}
+          poster={posterImage}
           className="absolute inset-0 w-full h-full object-cover object-center"
           autoPlayOnMount
           preloadFull

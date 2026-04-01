@@ -135,21 +135,7 @@ export default function ApprovalsPage() {
               </div>
             </div>
 
-            {/* JRI */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
-              <div className="flex items-start gap-4">
-                <span className="text-slate-400 flex-shrink-0">•</span>
-                <div>
-                  <h3 className="text-lg md:text-lg font-bold mb-3">
-                    Job Ready Indy (JRI) Training Partner – Marion County
-                  </h3>
-                  <p className="text-lg text-black">
-                    Approved partner for Job Ready Indy workforce readiness
-                    training in Marion County
-                  </p>
-                </div>
-              </div>
-            </div>
+
 
             {/* ITAP */}
             <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
@@ -208,16 +194,9 @@ export default function ApprovalsPage() {
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <h3 className="text-lg md:text-lg font-bold mb-3">
-                    SAM.gov Active Entity (Selfish Inc)
+                    SAM.gov Active Entity
                   </h3>
-                  <div className="space-y-2 text-lg text-black">
-                    <p>
-                      <strong>UEI:</strong> VX2GK5S8SZH8
-                    </p>
-                    <p>
-                      <strong>CAGE:</strong> 0Q856
-                    </p>
-                  </div>
+                  <p className="text-lg text-black">Registered active federal government contractor.</p>
                 </div>
               </div>
             </div>
@@ -398,7 +377,7 @@ export default function ApprovalsPage() {
                 For Students
               </h3>
               <p className="text-black text-lg leading-relaxed">
-                Our students can access funded training through WRG, WIOA, JRI,
+                Our students can access funded training through WRG, WIOA, Job Ready Indy,
                 and apprenticeships. Your training is legitimate, recognized,
                 and leads to real employment.
               </p>
@@ -437,7 +416,7 @@ export default function ApprovalsPage() {
           </h2>
           <p className="text-base md:text-lg text-black mb-8 leading-relaxed">
             Start your career transformation today
-            through our industry-aligned, workforce-funded training programs.
+            through our state-approved, federally recognized training programs.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link

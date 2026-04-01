@@ -14,7 +14,7 @@ const PARTNER_TYPES = [
   {
     icon: Building2,
     title: 'Workforce Agency',
-    desc: 'Refer WIOA, JRI, or WRG-funded participants to our approved training programs.',
+    desc: 'Refer WIOA, Job Ready Indy, or WRG-funded participants to our approved training programs.',
     href: '/partners/apply',
     cta: 'Apply as Agency',
   },
@@ -35,7 +35,7 @@ const PARTNER_TYPES = [
   {
     icon: RefreshCw,
     title: 'Reentry Organization',
-    desc: 'Connect justice-involved individuals to JRI-funded training and placement services.',
+    desc: 'Connect justice-involved individuals to Job Ready Indy-funded training and placement services.',
     href: '/partners/apply',
     cta: 'Apply as Reentry Org',
   },

@@ -228,7 +228,6 @@ function PreviewDrawer({
           {/* Hero */}
           {state.hero_image_url && (
             <div className="h-40 w-full overflow-hidden rounded-xl bg-slate-100">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={state.hero_image_url} alt="" className="h-full w-full object-cover" />
             </div>
           )}

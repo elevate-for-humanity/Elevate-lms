@@ -65,7 +65,7 @@ export default async function FundingPage() {
   const sourceColors: Record<string, string> = {
     WIOA: 'bg-brand-blue-500',
     WRG: 'bg-green-500',
-    JRI: 'bg-purple-500',
+    'Job Ready Indy': 'bg-purple-500',
     DOL: 'bg-brand-orange-500',
     Other: 'bg-gray-400',
   };
@@ -78,7 +78,7 @@ export default async function FundingPage() {
           <div className="flex justify-between items-center mt-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Funding Management</h1>
-              <p className="text-gray-600 mt-1">WIOA, WRG, JRI, DOL, and grant tracking</p>
+              <p className="text-gray-600 mt-1">WIOA, WRG, Job Ready Indy, DOL, and grant tracking</p>
             </div>
             <div className="flex gap-3">
               <Link href="/admin/grants" className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 text-sm">

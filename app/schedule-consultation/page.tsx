@@ -13,7 +13,7 @@ const TIME_SLOTS = [
 
 const MEETING_TYPES = [
   { value: 'enrollment', label: 'Enrollment Consultation', duration: '30 min', desc: 'Discuss programs, eligibility, and next steps' },
-  { value: 'funding', label: 'Financial Aid & Funding Review', duration: '30 min', desc: 'WIOA, JRI, grants, and payment options' },
+  { value: 'funding', label: 'Financial Aid & Funding Review', duration: '30 min', desc: 'WIOA, Job Ready Indy, grants, and payment options' },
   { value: 'info', label: 'Program Information Session', duration: '20 min', desc: 'Learn about a specific training program' },
   { value: 'career', label: 'Career Advising', duration: '30 min', desc: 'Explore career paths and program fit' },
 ];

@@ -62,25 +62,27 @@ export default function CurvaturePage() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* Hero */}
-      <section className="relative h-[340px] sm:h-[440px] overflow-hidden bg-slate-900">
+      {/* Hero — clean image, no overlay */}
+      <section className="relative h-[40vh] min-h-[240px] overflow-hidden">
         <Image
           src="/images/pages/admin-api-keys-hero.jpg"
           alt="CurvatureBody Sculpting non-invasive body contouring Indianapolis"
           fill sizes="100vw"
-          className="object-cover"
+          className="object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 flex items-end pb-10 px-6">
-          <div className="max-w-4xl mx-auto w-full">
-            <p className="text-pink-400 font-bold text-xs uppercase tracking-widest mb-2">Selfish Inc. 501(c)(3)</p>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-2">
-              CurvatureBody Sculpting
-            </h1>
-            <p className="text-white/80 text-lg max-w-2xl">
-              Non-invasive body contouring, skin tightening, and wellness services. Indianapolis, Indiana.
-            </p>
-          </div>
+      </section>
+
+      {/* Identity — below the hero */}
+      <section className="bg-white border-b border-slate-200 px-6 py-8">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Selfish Inc. 501(c)(3)</p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-2">
+            CurvatureBody Sculpting
+          </h1>
+          <p className="text-slate-600 text-lg max-w-2xl">
+            Non-invasive body contouring, skin tightening, and wellness services. Indianapolis, Indiana.
+          </p>
         </div>
       </section>
 

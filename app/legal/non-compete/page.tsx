@@ -105,7 +105,7 @@ export default function NonCompetePage() {
               <li><strong>Replicate the program model.</strong> You may not develop, operate, or support a training program that is substantially similar to any Elevate program using materials, systems, methods, or relationships obtained through your Elevate collaboration.</li>
               <li><strong>Redirect students or partners.</strong> You may not solicit or redirect enrolled students, instructors, credential partners, or employer partners into a competing program derived from the Elevate training model.</li>
               <li><strong>Use Elevate&apos;s credential relationships.</strong> You may not use relationships with credential bodies (EPA, PTCB, CompTIA, NCCER, Indiana SDOH, etc.) that were established or facilitated through your Elevate collaboration to independently offer competing programs.</li>
-              <li><strong>Apply for competing workforce funding.</strong> You may not use Elevate&apos;s program structure, ETPL relationships, or DWD contacts to apply independently for WIOA, JRI, WRG, or other workforce funding for a competing program.</li>
+              <li><strong>Apply for competing workforce funding.</strong> You may not use Elevate&apos;s program structure, ETPL relationships, or DWD contacts to apply independently for WIOA, Job Ready Indy, WRG, or other workforce funding for a competing program.</li>
             </ul>
             <p className="text-sm text-slate-500">
               <strong>Plain language:</strong> When your agreement ends, you have 3 years during which you

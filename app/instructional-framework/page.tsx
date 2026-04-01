@@ -42,7 +42,7 @@ const PROVIDER_TIERS = [
       'Signed Memorandum of Understanding (MOU) with Elevate',
       'Credential match: license/approval must correspond to the program delivered',
     ],
-    examples: 'Accredited nursing programs (CNA), ELDT-compliant CDL schools, licensed trade schools, licensed barber schools',
+    examples: 'Accredited nursing programs (CNA), ELDT-compliant CDL schools, DOE-approved trade schools, licensed barber schools',
   },
   {
     tier: 2,

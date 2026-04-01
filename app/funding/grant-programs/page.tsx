@@ -59,7 +59,7 @@ export default function GrantProgramsPage() {
           <p className="text-lg text-black mb-6">
             ETPL stands for <strong>Eligible Training Provider List</strong>. It
             means our programs are approved by the state for Funded training
-            through government funding programs like WIOA, WRG, and JRI.
+            through government funding programs like WIOA, WRG, and Job Ready Indy.
           </p>
 
           <div className="grid md:grid-cols-3 gap-6 mb-8">
@@ -86,7 +86,7 @@ export default function GrantProgramsPage() {
             </div>
 
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="text-lg font-bold mb-3 text-brand-blue-900">JRI</h3>
+              <h3 className="text-lg font-bold mb-3 text-brand-blue-900">Job Ready Indy</h3>
               <p className="text-sm text-black mb-2">
                 Job Ready Indy
               </p>
@@ -241,7 +241,7 @@ export default function GrantProgramsPage() {
               <h3 className="text-lg font-bold mb-2">Check Eligibility</h3>
               <p className="text-black">
                 We'll help you determine which funding program you qualify for
-                (WIOA, WRG, or JRI).
+                (WIOA, WRG, or Job Ready Indy).
               </p>
             </div>
 

@@ -27,7 +27,7 @@ const PARTNERSHIP_HTML = `<!DOCTYPE html>
 <p>Elevate for Humanity is a U.S. Department of Labor Registered Apprenticeship sponsor, an ETPL-approved training provider listed with Indiana DWD, and an authorized Certiport testing center. We operate as a career and technical instructional institution providing industry-recognized certifications.</p>
 <p style="font-size:17px; font-weight:bold; margin:24px 0 12px;">What we do</p>
 <p>We provide career training programs in healthcare (CNA, Medical Assistant, Phlebotomy), skilled trades (HVAC, Electrical, Welding, Plumbing), CDL trucking (Class A and B), technology (IT Support, Cybersecurity), barbering (DOL Registered Apprenticeship), and tax preparation. Most programs run 4 to 16 weeks and include hands-on training, certification exam preparation, proctored testing on-site, and job placement assistance.</p>
-<p>Training is funded through WIOA, the Indiana Workforce Ready Grant, and JRI (Job Ready Indy). We handle the eligibility screening and paperwork with WorkOne and DWD — participants pay nothing out of pocket when they qualify.</p>
+<p>Training is funded through WIOA, the Indiana Workforce Ready Grant, and Job Ready Indy. We handle the eligibility screening and paperwork with WorkOne and DWD — participants pay nothing out of pocket when they qualify.</p>
 <p style="font-size:17px; font-weight:bold; margin:24px 0 12px;">Who we serve</p>
 <p>Our participants include justice-involved individuals, low-income families, veterans, dislocated workers, and anyone facing barriers to employment. If your clients are looking for a path to stable employment with an industry-recognized credential, we can help.</p>
 <p style="font-size:17px; font-weight:bold; margin:24px 0 12px;">How a partnership works</p>
@@ -79,7 +79,7 @@ Elevate for Humanity is a U.S. Department of Labor Registered Apprenticeship spo
 WHAT WE DO
 We provide career training programs in healthcare (CNA, Medical Assistant, Phlebotomy), skilled trades (HVAC, Electrical, Welding, Plumbing), CDL trucking (Class A and B), technology (IT Support, Cybersecurity), barbering (DOL Registered Apprenticeship), and tax preparation. Most programs run 4 to 16 weeks and include hands-on training, certification exam preparation, proctored testing on-site, and job placement assistance.
 
-Training is funded through WIOA, the Indiana Workforce Ready Grant, and JRI (Job Ready Indy). We handle the eligibility screening and paperwork with WorkOne and DWD — participants pay nothing out of pocket when they qualify.
+Training is funded through WIOA, the Indiana Workforce Ready Grant, and Job Ready Indy. We handle the eligibility screening and paperwork with WorkOne and DWD — participants pay nothing out of pocket when they qualify.
 
 WHO WE SERVE
 Our participants include justice-involved individuals, low-income families, veterans, dislocated workers, and anyone facing barriers to employment. If your clients are looking for a path to stable employment with an industry-recognized credential, we can help.

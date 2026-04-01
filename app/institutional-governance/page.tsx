@@ -195,7 +195,7 @@ export default function InstitutionalGovernancePage() {
           <section className="mb-10">
             <h2 className="text-xl font-bold text-slate-900 mb-4">Funding &amp; Eligibility Disclosure</h2>
             <p className="text-sm text-slate-700 leading-relaxed">
-              Training may be fully funded for eligible participants through workforce programs such as WIOA, JRI, and approved funding partners. Eligibility and funding determinations are subject to program and agency guidelines. Elevate for Humanity Career &amp; Training Institute does not guarantee funding approval. Self-pay enrollment options are available for participants who do not qualify for funded programs.
+              Training may be fully funded for eligible participants through workforce programs such as WIOA, Job Ready Indy, and approved funding partners. Eligibility and funding determinations are subject to program and agency guidelines. Elevate for Humanity Career &amp; Training Institute does not guarantee funding approval. Self-pay enrollment options are available for participants who do not qualify for funded programs.
             </p>
           </section>
 

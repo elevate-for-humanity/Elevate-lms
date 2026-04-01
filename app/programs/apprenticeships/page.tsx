@@ -38,7 +38,7 @@ const config: ProgramPageConfig = {
   badge: 'Earn While You Learn', badgeColor: 'red',
   duration: '6–18 months', cost: 'Varies by program', format: 'OJT + classroom, Indianapolis', credential: 'State Licensure Pathway',
   overview: 'Our apprenticeship programs combine on-the-job training with structured classroom instruction. You work with real clients and customers from day one under the supervision of licensed professionals. Apprenticeships are the fastest path to licensure in barber, cosmetology, and culinary careers.',
-  highlights: ['Paid on-the-job training from day one', 'Work with real clients under supervision', 'DOL-registered apprenticeship structure', 'State licensure exam preparation', 'Payment plans available for self-pay programs', 'JRI funding available for eligible participants'],
+  highlights: ['Paid on-the-job training from day one', 'Work with real clients under supervision', 'DOL-registered apprenticeship structure', 'State licensure exam preparation', 'Payment plans available for self-pay programs', 'Job Ready Indy funding available for eligible participants'],
   overviewImage: '/images/pages/comp-program-template.jpg', overviewImageAlt: 'Apprentice working with a client',
   salaryNumber: 40000, salaryLabel: 'Average starting salary across apprenticeship programs', salaryPrefix: '$',
   steps: [
@@ -49,7 +49,7 @@ const config: ProgramPageConfig = {
   ],
   faqs: [
     { question: 'Do I get paid during the apprenticeship?', answer: 'Compensation varies by program and partner location. Barber and cosmetology apprentices may earn tips and commission. Culinary apprentices are typically paid hourly. Details are discussed during your interview.' },
-    { question: 'What if I have a criminal record?', answer: 'We specialize in serving justice-involved individuals. Many apprenticeship participants are funded through JRI. Having a record does not automatically disqualify you.' },
+    { question: 'What if I have a criminal record?', answer: 'We specialize in serving justice-involved individuals. Many apprenticeship participants are funded through Job Ready Indy. Having a record does not automatically disqualify you.' },
     { question: 'How is an apprenticeship different from school?', answer: 'Traditional schools are mostly classroom-based. Apprenticeships put you in a real work environment from day one. You learn by doing, not just watching.' },
   ],
   applyHref: '/apply?program=apprenticeship',

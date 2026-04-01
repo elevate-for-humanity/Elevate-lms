@@ -29,20 +29,26 @@ export default async function ApplicationsPage({
   const { data: profile } = await sessionClient.from('profiles').select('role').eq('id', user.id).single();
   if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
-  // All application queries use admin client to bypass RLS
-  const supabase = createAdminClient();
-
-  const statusFilter = params.status;
+  const rawStatus = params.status;
   const search = params.search;
   const page = parseInt(params.page || '1', 10);
   const pageSize = 25;
   const offset = (page - 1) * pageSize;
 
+  // Resolve virtual filter aliases and comma-separated multi-status
+  const resolvedStatuses: string[] =
+    rawStatus === 'awaiting_review'
+      ? ['submitted', 'pending', 'in_review']
+      : rawStatus && rawStatus !== 'all'
+        ? rawStatus.split(',').filter(Boolean)
+        : [];
+
   // Use admin client for data queries to bypass RLS
   const adminDb = createAdminClient();
 
   let query = adminDb.from('applications').select('*', { count: 'exact' }).order('created_at', { ascending: false });
-  if (statusFilter && statusFilter !== 'all') query = query.eq('status', statusFilter);
+  if (resolvedStatuses.length === 1) query = query.eq('status', resolvedStatuses[0]);
+  else if (resolvedStatuses.length > 1) query = query.in('status', resolvedStatuses);
   if (search) query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%,full_name.ilike.%${search}%`);
   query = query.range(offset, offset + pageSize - 1);
 
@@ -59,7 +65,7 @@ export default async function ApplicationsPage({
   const totalPages = Math.ceil((totalCount || 0) / pageSize);
   const pending = (statusCounts['pending'] || 0) + (statusCounts['submitted'] || 0);
 
-  const baseHref = `/admin/applications${statusFilter && statusFilter !== 'all' ? `?status=${statusFilter}` : ''}${search ? `${statusFilter && statusFilter !== 'all' ? '&' : '?'}search=${search}` : ''}`;
+  const baseHref = `/admin/applications${rawStatus && rawStatus !== 'all' ? `?status=${rawStatus}` : ''}${search ? `${rawStatus && rawStatus !== 'all' ? '&' : '?'}search=${search}` : ''}`;
 
   return (
     <AdminPageShell
@@ -82,7 +88,7 @@ export default async function ApplicationsPage({
         <form method="GET" className="flex flex-wrap gap-3 items-end">
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Status</label>
-            <select name="status" defaultValue={statusFilter || 'all'}
+            <select name="status" defaultValue={rawStatus || 'all'}
               className="px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-brand-blue-500 focus:outline-none">
               <option value="all">All Statuses</option>
               <option value="submitted">Submitted</option>
@@ -117,7 +123,7 @@ export default async function ApplicationsPage({
             <AdminPagination page={page} totalPages={totalPages} baseHref={baseHref} />
           </>
         ) : (
-          <AdminEmptyState message={`No applications found${statusFilter && statusFilter !== 'all' ? ' matching your filters' : ''}.`} />
+          <AdminEmptyState message={`No applications found${rawStatus && rawStatus !== 'all' ? ' matching your filters' : ''}.`} />
         )}
       </AdminCard>
     </AdminPageShell>

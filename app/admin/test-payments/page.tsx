@@ -190,7 +190,7 @@ export default function TestPaymentsPage() {
                   Funding Source Tracking
                 </div>
                 <div className="text-sm text-brand-blue-700">
-                  All enrollments track funding_source (WIOA, WRG, JRI, DOL,
+                  All enrollments track funding_source (WIOA, WRG, Job Ready Indy, DOL,
                   etc.)
                 </div>
               </div>
@@ -238,7 +238,7 @@ export default function TestPaymentsPage() {
               <div className="text-xs text-black">Workforce Ready Grant</div>
             </div>
             <div className="p-3 border border-gray-200 rounded">
-              <div className="font-medium text-black">Job Ready Indy (JRI)</div>
+              <div className="font-medium text-black">Job Ready Indy</div>
               <div className="text-xs text-black">
                 Job Ready Indy
               </div>

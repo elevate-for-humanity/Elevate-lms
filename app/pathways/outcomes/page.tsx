@@ -28,7 +28,7 @@ const PROGRAMS = [
       { employer: 'Assisted living facilities', pay: '$30K–$37K/year' },
       { employer: 'Rehabilitation centers', pay: '$32K–$40K/year' },
     ],
-    funding: 'If you qualify for WIOA funding, the program is covered at no cost — tuition, materials, clinical placement, and the state exam fee. JRI funding is also available for justice-impacted individuals.',
+    funding: 'If you qualify for WIOA funding, the program is covered at no cost — tuition, materials, clinical placement, and the state exam fee. Job Ready Indy funding is also available for justice-impacted individuals.',
     nextStep: 'Many CNAs advance to Medical Assistant, LPN, or RN. Each step increases your pay and scope of practice. You can use additional WIOA funding for the next credential.',
   },
   {
@@ -144,7 +144,7 @@ const PROGRAMS = [
       { employer: 'IT support specialist', pay: '$42K–$60K' },
       { employer: 'Field technician', pay: '$38K–$52K' },
     ],
-    funding: 'If you qualify for WIOA or JRI funding, the program is covered for eligible participants. Remote work is available in many IT support roles.',
+    funding: 'If you qualify for WIOA or Job Ready Indy funding, the program is covered for eligible participants. Remote work is available in many IT support roles.',
     nextStep: 'IT Help Desk leads to Cybersecurity Analyst, Network Support Technician, or Software Development. This is a defined career ladder: help desk → systems administrator → network engineer → cybersecurity analyst.',
   },
   {
@@ -163,7 +163,7 @@ const PROGRAMS = [
       { employer: 'Cybersecurity specialist', pay: '$65K–$100K' },
       { employer: 'Network security administrator', pay: '$60K–$95K' },
     ],
-    funding: 'If you qualify for WIOA or JRI funding, the program is covered for eligible participants. Remote work is standard in cybersecurity.',
+    funding: 'If you qualify for WIOA or Job Ready Indy funding, the program is covered for eligible participants. Remote work is standard in cybersecurity.',
     nextStep: 'Cybersecurity Analyst leads to advanced roles in penetration testing, security engineering, and security architecture. Senior cybersecurity professionals earn $100K+.',
   },
 ];

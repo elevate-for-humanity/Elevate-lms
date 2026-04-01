@@ -25,7 +25,7 @@ export const SEARCH_INDEX: SearchItem[] = [
   {
     id: 'barber-apprenticeship',
     title: 'Barber Apprenticeship Program',
-    description: '2,000-hour DOL-registered apprenticeship with master barber instruction and job placement.',
+    description: '2,000-hour state-approved apprenticeship with master barber instruction and job placement.',
     href: '/programs/barber-apprenticeship',
     category: 'program',
     audiences: ['students', 'everyone'],

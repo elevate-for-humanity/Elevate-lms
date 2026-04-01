@@ -98,7 +98,7 @@ export default function MissionPage() {
               <HandHeart className="w-12 h-12 text-brand-orange-600 mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-3">Accessibility</h3>
               <p className="text-gray-600">
-                Training funded through WIOA, WRG, and JRI for eligible participants. 
+                Training funded through WIOA, WRG, and Job Ready Indy for eligible participants. 
                 No tuition for those who qualify. Financial barriers should never prevent career advancement.
               </p>
             </div>

@@ -18,12 +18,18 @@ const AIAssistantBubble = dynamicImport(
   { ssr: false }
 );
 
+const ServiceWorkerRegistration = dynamicImport(
+  () => import('@/components/pwa/ServiceWorkerRegistration').then((m) => ({ default: m.ServiceWorkerRegistration })),
+  { ssr: false }
+);
+
 export default function LayoutClientShell() {
   return (
     <>
       <GlobalAvatar />
       <FacebookPixel />
       <AIAssistantBubble />
+      <ServiceWorkerRegistration />
     </>
   );
 }

@@ -10,9 +10,9 @@ const OFFLINE_URL = '/offline.html';
 const PRECACHE_ASSETS = [
   '/',
   '/offline.html',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
-  '/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/manifest.webmanifest',
 ];
 
 // Patterns for different caching strategies

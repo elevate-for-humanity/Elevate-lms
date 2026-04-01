@@ -49,10 +49,10 @@ export default function HomePage() {
             {/* Proof bullets */}
             <ul className="space-y-2 mb-8">
               {[
-                'WIOA & Workforce Ready Grant funded programs available',
-                'Certifications included',
+                'Many students pay $0 — WIOA & Workforce Ready Grant available',
+                'Industry-recognized certifications included',
                 'Job placement support',
-                'Indiana-approved training provider',
+                'DOL Registered Apprenticeship Sponsor · ETPL listed',
               ].map((b) => (
                 <li key={b} className="flex items-start gap-2 text-sm text-slate-200">
                   <span className="text-brand-red-400 font-bold flex-shrink-0">✔</span> {b}
@@ -60,15 +60,22 @@ export default function HomePage() {
               ))}
             </ul>
             <div className="flex flex-wrap gap-3">
-              <Link href="/apply/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-base">
-                Start My Application
+              <Link href="/check-eligibility" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-base">
+                Check My Eligibility
               </Link>
-              <Link href="/check-eligibility" className="border-2 border-white/30 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors text-base">
-                Check If I Qualify
+              <Link href="/programs" className="border-2 border-white/30 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors text-base">
+                Explore Programs
               </Link>
             </div>
+            {/* Audience routing */}
+            <p className="mt-5 text-slate-400 text-sm">
+              Not a student?{' '}
+              <Link href="/partnerships" className="text-slate-300 underline underline-offset-2 hover:text-white transition-colors">Partner with us</Link>
+              {' '}·{' '}
+              <Link href="/program-holder/dashboard" className="text-slate-300 underline underline-offset-2 hover:text-white transition-colors">Program Holder</Link>
+            </p>
             {/* Phone */}
-            <p className="mt-6 text-slate-400 text-sm">
+            <p className="mt-3 text-slate-400 text-sm">
               Questions? Call or text{' '}
               <a href="tel:3173143757" className="text-white font-bold hover:text-brand-red-300 transition-colors">(317) 314-3757</a>
             </p>
@@ -123,8 +130,8 @@ export default function HomePage() {
           <p className="text-slate-400 text-sm text-center mb-12 max-w-lg mx-auto">From application to employment — we guide you every step of the way.</p>
           <div className="grid sm:grid-cols-4 gap-6">
             {[
-              { step: '1', label: 'Apply', desc: 'Tell us your goals and background. Takes 5 minutes.' },
-              { step: '2', label: 'Get Approved', desc: 'We match you with funding and the right program.' },
+              { step: '1', label: 'Check Eligibility', desc: 'Find out which funding programs you qualify for. Takes 2 minutes.' },
+              { step: '2', label: 'Get Matched', desc: 'We match you with the right program and funding source.' },
               { step: '3', label: 'Train + Get Certified', desc: 'Complete training in weeks — not years.' },
               { step: '4', label: 'Get Placed', desc: 'We connect you with employers hiring now.' },
             ].map((s, i) => (
@@ -139,8 +146,8 @@ export default function HomePage() {
             ))}
           </div>
           <div className="text-center mt-12">
-            <Link href="/apply/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-10 py-4 rounded-lg transition-colors text-base inline-block">
-              Start My Application
+            <Link href="/check-eligibility" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-10 py-4 rounded-lg transition-colors text-base inline-block">
+              Check My Eligibility
             </Link>
           </div>
         </div>
@@ -244,17 +251,17 @@ export default function HomePage() {
       <div className="bg-slate-700 border-t border-slate-600 py-16 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <BlurIn>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Ready to Start Your Career?</h2>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Find Out If You Qualify — Free</h2>
             <p className="text-slate-300 text-lg mb-8 leading-relaxed max-w-xl mx-auto">
-              Apply in 5 minutes. Training may be fully funded. Graduate with a nationally recognized credential and a job offer.
+              Many students pay $0 through WIOA, Workforce Ready Grant, or Job Ready Indy. Check your eligibility in 2 minutes.
             </p>
             <div className="flex flex-wrap gap-4 justify-center mb-8">
-              <Link href="/apply/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-lg font-bold text-lg transition-colors">
-                Apply Now
+              <Link href="/check-eligibility" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-lg font-bold text-lg transition-colors">
+                Check My Eligibility
               </Link>
-              <a href="tel:3173143757" className="border-2 border-white/30 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition-colors">
-                Talk to an Advisor
-              </a>
+              <Link href="/programs" className="border-2 border-white/30 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition-colors">
+                Explore Programs
+              </Link>
             </div>
             <p className="text-slate-400 text-sm">
               Or call / text us directly:{' '}

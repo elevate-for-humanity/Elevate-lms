@@ -42,14 +42,23 @@ const SELECT_COLS =
   'id, title, event_type, description, start_date, end_date, location, virtual_link, is_virtual, max_attendees, registration_required, is_active, slug';
 
 async function getDb() {
-  const admin = createAdminClient();
-  if (admin) return admin;
-  return await createClient();
+  try {
+    const admin = createAdminClient();
+    if (admin) return admin;
+  } catch {
+    // Admin client unavailable (missing env vars) — fall through to server client
+  }
+  try {
+    return await createClient();
+  } catch {
+    return null;
+  }
 }
 
 /** Fetch upcoming events, optionally filtered by type. */
 export async function getUpcomingEvents(filter: EventFilter = {}): Promise<ElevateEvent[]> {
   const db = await getDb();
+  if (!db) return [];
   const now = filter.from ?? new Date().toISOString();
   let q = db
     .from('events')
@@ -74,6 +83,7 @@ export async function getUpcomingEvents(filter: EventFilter = {}): Promise<Eleva
 /** Fetch past events, optionally filtered by type. */
 export async function getPastEvents(filter: EventFilter = {}): Promise<ElevateEvent[]> {
   const db = await getDb();
+  if (!db) return [];
   const now = new Date().toISOString();
   let q = db
     .from('events')
@@ -98,6 +108,7 @@ export async function getPastEvents(filter: EventFilter = {}): Promise<ElevateEv
 /** Fetch a single event by id or slug. */
 export async function getEvent(idOrSlug: string): Promise<ElevateEvent | null> {
   const db = await getDb();
+  if (!db) return null;
   const { data, error } = await db
     .from('events')
     .select(SELECT_COLS)

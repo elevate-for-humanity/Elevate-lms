@@ -3,6 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { Facebook, Instagram, Linkedin, Youtube } from 'lucide-react';
 
 // GOVERNMENT-GRADE FOOTER STRUCTURE
 // 4 columns: About, Programs, Compliance & Trust, Access
@@ -110,7 +111,7 @@ export default function ServerFooter() {
         <nav aria-label="Footer navigation" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-12">
           {/* Column 1: Programs */}
           <div>
-            <h3 className="font-semibold mb-4 text-slate-900 text-sm uppercase tracking-wide">Programs</h3>
+            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Programs</h3>
             <ul className="space-y-3">
               {footerLinks.programs.map((link) => (
                 <li key={link.name}>
@@ -124,7 +125,7 @@ export default function ServerFooter() {
 
           {/* Column 2: Students */}
           <div>
-            <h3 className="font-semibold mb-4 text-slate-900 text-sm uppercase tracking-wide">Students</h3>
+            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Students</h3>
             <ul className="space-y-3">
               {footerLinks.students.map((link) => (
                 <li key={link.name}>
@@ -138,7 +139,7 @@ export default function ServerFooter() {
 
           {/* Column 3: Funding */}
           <div>
-            <h3 className="font-semibold mb-4 text-slate-900 text-sm uppercase tracking-wide">Funding</h3>
+            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Funding</h3>
             <ul className="space-y-3">
               {footerLinks.funding.map((link) => (
                 <li key={link.name}>
@@ -152,7 +153,7 @@ export default function ServerFooter() {
 
           {/* Column 4: Partners */}
           <div>
-            <h3 className="font-semibold mb-4 text-slate-900 text-sm uppercase tracking-wide">Partners</h3>
+            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Partners</h3>
             <ul className="space-y-3">
               {footerLinks.partners.map((link) => (
                 <li key={link.name}>
@@ -166,7 +167,7 @@ export default function ServerFooter() {
 
           {/* Column 5: Organization */}
           <div>
-            <h3 className="font-semibold mb-4 text-slate-900 text-sm uppercase tracking-wide">Organization</h3>
+            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Organization</h3>
             <ul className="space-y-3">
               {footerLinks.organization.map((link) => (
                 <li key={link.name}>
@@ -221,6 +222,22 @@ export default function ServerFooter() {
               <a href="tel:+13173143757" className="hover:text-white">(317) 314-3757</a>
               <span className="text-slate-700">|</span>
               <a href="mailto:info@elevateforhumanity.org" className="hover:text-white">info@elevateforhumanity.org</a>
+            </div>
+
+            {/* Social Icons */}
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <a href="https://www.facebook.com/elevateforhumanity" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-slate-400 hover:text-white transition-colors">
+                <Facebook className="w-5 h-5" />
+              </a>
+              <a href="https://www.instagram.com/elevateforhumanity" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-slate-400 hover:text-white transition-colors">
+                <Instagram className="w-5 h-5" />
+              </a>
+              <a href="https://www.linkedin.com/company/elevate-for-humanity" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-slate-400 hover:text-white transition-colors">
+                <Linkedin className="w-5 h-5" />
+              </a>
+              <a href="https://www.youtube.com/@elevateforhumanity" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="text-slate-400 hover:text-white transition-colors">
+                <Youtube className="w-5 h-5" />
+              </a>
             </div>
 
             {/* Authority Badges */}

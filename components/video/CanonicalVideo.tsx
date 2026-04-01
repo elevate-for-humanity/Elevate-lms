@@ -130,6 +130,7 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.1
       muted
       playsInline
       preload={preloadFull ? 'auto' : 'metadata'}
+      poster={poster}
       aria-hidden="true"
       onError={() => setFailed(true)}
     >

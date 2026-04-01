@@ -11,7 +11,6 @@
 import dynamic from 'next/dynamic';
 
 const GlobalAvatar = dynamic(() => import('@/components/GlobalAvatar'), { ssr: false });
-const AvatarChatBar = dynamic(() => import('@/components/AvatarChatBar'), { ssr: false });
 const FacebookPixel = dynamic(() => import('@/components/FacebookPixel'), { ssr: false });
 const AIAssistantBubble = dynamic(
   () => import('@/components/AIAssistantBubble').then((m) => ({ default: m.AIAssistantBubble })),
@@ -22,7 +21,6 @@ export default function ClientOnlyFeatures() {
   return (
     <>
       <GlobalAvatar />
-      <AvatarChatBar />
       <FacebookPixel />
       <AIAssistantBubble />
     </>

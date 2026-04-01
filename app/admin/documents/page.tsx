@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
@@ -12,13 +13,16 @@ export const metadata: Metadata = {
 };
 
 export default async function DocumentsPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  // Auth check via session client
+  const sessionClient = await createClient();
+  const { data: { user } } = await sessionClient.auth.getUser();
   if (!user) redirect('/login');
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
+  const { data: profile } = await sessionClient.from('profiles').select('role').eq('id', user.id).single();
+  if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
-  const { data: documents, count } = await supabase.from('documents').select('*', { count: 'exact' }).order('created_at', { ascending: false }).limit(20);
+  // Use admin client to bypass RLS and see all documents
+  const supabase = createAdminClient();
+  const { data: documents, count } = await supabase.from('documents').select('*', { count: 'exact' }).order('created_at', { ascending: false }).limit(50);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -41,7 +45,7 @@ export default async function DocumentsPage() {
               <div key={doc.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 bg-brand-blue-100 rounded flex items-center justify-center"><svg className="w-5 h-5 text-brand-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></div>
-                  <div><p className="font-medium">{doc.title || doc.filename}</p><p className="text-sm text-gray-500">{doc.file_type} • {new Date(doc.created_at).toLocaleDateString()}</p></div>
+                  <div><p className="font-medium">{doc.title || doc.file_name || doc.filename}</p><p className="text-sm text-gray-500">{doc.document_type || doc.file_type} • {new Date(doc.created_at).toLocaleDateString()}</p></div>
                 </div>
                 <button className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">Download</button>
               </div>

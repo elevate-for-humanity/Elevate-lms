@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -18,25 +19,15 @@ export const metadata: Metadata = {
 };
 
 export default async function ApplicantsLivePage() {
-  const supabase = await createClient();
+  // Auth check via session client
+  const sessionClient = await createClient();
+  const { data: { user } } = await sessionClient.auth.getUser();
+  if (!user) redirect('/login');
+  const { data: profile } = await sessionClient.from('profiles').select('role').eq('id', user.id).single();
+  if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login');
-  }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
-    redirect('/unauthorized');
-  }
+  // All data queries use admin client to bypass RLS
+  const supabase = createAdminClient();
 
   const { data: items, count: totalItems } = await supabase
     .from('profiles')
@@ -48,10 +39,6 @@ export default async function ApplicantsLivePage() {
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
-
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
-    redirect('/unauthorized');
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">

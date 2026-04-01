@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Inbox, Clock, CheckCircle, XCircle, Eye, Users } from 'lucide-react';
@@ -20,12 +21,16 @@ export default async function ApplicationsPage({
   searchParams: Promise<{ status?: string; search?: string; page?: string }>;
 }) {
   const params = await searchParams;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  // Auth check via session client
+  const sessionClient = await createClient();
+  const { data: { user } } = await sessionClient.auth.getUser();
+  if (!user) redirect('/login');
+  const { data: profile } = await sessionClient.from('profiles').select('role').eq('id', user.id).single();
   if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
+
+  // All application queries use admin client to bypass RLS
+  const supabase = createAdminClient();
 
   const statusFilter = params.status;
   const search = params.search;

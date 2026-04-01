@@ -44,7 +44,7 @@ export default function HomePage() {
               Get Certified.<br />Get Funded.<br />Get Hired — In Weeks.
             </h1>
             <p className="text-slate-200 text-base leading-relaxed mb-6">
-              Free and low-cost career training programs in Indiana. Earn industry-recognized certifications and start working fast.
+              Workforce training in HVAC, CNA, CDL, IT, and Barber Apprenticeship. Most eligible Indiana residents pay $0 through WIOA and Workforce Ready Grant funding.
             </p>
             {/* Proof bullets */}
             <ul className="space-y-2 mb-8">
@@ -52,7 +52,7 @@ export default function HomePage() {
                 'WIOA & Workforce Ready Grant funded programs available',
                 'Certifications included',
                 'Job placement support',
-                'Indiana-approved training provider',
+                'ETPL-listed workforce training provider',
               ].map((b) => (
                 <li key={b} className="flex items-start gap-2 text-sm text-slate-200">
                   <span className="text-brand-red-400 font-bold flex-shrink-0">✔</span> {b}

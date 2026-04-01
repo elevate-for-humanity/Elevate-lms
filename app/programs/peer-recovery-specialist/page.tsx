@@ -9,7 +9,7 @@ export const revalidate = 600;
 
 export const metadata: Metadata = {
   title: 'Peer Recovery Specialist (CPRS) | Indiana Certification | Elevate for Humanity',
-  description: 'Become a Certified Peer Recovery Specialist in Indiana. WIOA and JRI funding available for eligible residents. 8-week program, state-approved.',
+  description: 'Become a Certified Peer Recovery Specialist in Indiana. WIOA and JRI funding available for eligible residents. 8-week program aligned with CPRS certification requirements.',
   alternates: { canonical: '/programs/peer-recovery-specialist' },
   openGraph: {
     title: 'Peer Recovery Specialist (CPRS) | Elevate for Humanity',

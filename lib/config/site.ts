@@ -6,6 +6,10 @@
 export const siteConfig = {
   // Brand
   name: 'Elevate for Humanity',
+  // Official school/training entity name — use this wherever the institution is referenced
+  schoolName: 'Elevate for Humanity Career & Technical Institute',
+  // Full legal DBA name for contracts, MOUs, and legal documents
+  legalName: '2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute',
   shortName: 'Elevate',
   tagline: 'Workforce Infrastructure',
   description: 'Workforce infrastructure that connects public funding, employer demand, and credential-backed training to drive measurable outcomes.',

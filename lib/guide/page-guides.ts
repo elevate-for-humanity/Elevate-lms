@@ -192,7 +192,7 @@ export const PROGRAM_GUIDES: Record<string, PageGuide> = {
       {
         id: 'welcome',
         type: 'welcome',
-        message: "Interested in becoming a barber? This is a 2,000-hour state-approved apprenticeship. You'll learn from master barbers and be ready to pass your state board exam.",
+        message: "Interested in becoming a barber? This is a 2,000-hour DOL-registered apprenticeship. You'll learn from master barbers and be ready to pass your state board exam.",
       },
       {
         id: 'explain',

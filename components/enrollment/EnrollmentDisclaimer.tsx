@@ -15,7 +15,7 @@ export function EnrollmentDisclaimer({
         Enrollment is program-based. Courses, projects, and hands-on activities are part of your program and cannot be accessed independently.
       </p>
       <p className="text-sm text-gray-600">
-        Some programs are publicly funded. Some are self-pay. All pathways are sponsor-managed and state-approved.
+        Some programs are publicly funded. Some are self-pay. All pathways are sponsor-managed through workforce funding partners.
       </p>
     </>
   );

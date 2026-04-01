@@ -437,7 +437,7 @@ export default function ApprovalsPage() {
           </h2>
           <p className="text-base md:text-lg text-black mb-8 leading-relaxed">
             Start your career transformation today
-            through our state-approved, federally recognized training programs.
+            through our industry-aligned, workforce-funded training programs.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link

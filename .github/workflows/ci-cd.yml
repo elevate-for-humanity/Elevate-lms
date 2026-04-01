@@ -144,8 +144,14 @@ jobs:
             echo "No TS/JS files changed. Skipping lint."
             exit 0
           fi
-          echo "Linting changed files: $CHANGED"
-          npx eslint $CHANGED --max-warnings=0
+          # Filter to only existing files (skip deleted files)
+          EXISTING_FILES=$(for file in $CHANGED; do [ -f "$file" ] && echo "$file"; done | tr '\n' ' ')
+          if [ -z "$EXISTING_FILES" ]; then
+            echo "No existing TS/JS files to lint (changed files were deleted)."
+            exit 0
+          fi
+          echo "Linting changed files: $EXISTING_FILES"
+          npx eslint $EXISTING_FILES --max-warnings=0
 
   # Deployment verification (runs after successful merge to main)
   post-deployment-check:

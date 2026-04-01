@@ -72,14 +72,15 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
       if (result.success) {
         trackEvent('application_complete', 'conversion', data.programInterest);
 
-        // Inquiry path — thank you page, no enrollment, no payment
-        if (applicationType === 'inquiry') {
+        // Inquiry path or email-only fallback — thank you page, no payment
+        if (applicationType === 'inquiry' || result.status === 'email_only') {
           router.push('/apply/inquiry-received');
           return;
         }
 
-        // Enrollment path — must complete payment before access is granted
-        // Redirect to checkout for the selected program
+        // Enrollment path — application is submitted and pending review.
+        // Redirect to checkout so the applicant can complete payment.
+        // Enrollment is not granted until payment is verified and admin approves.
         router.push(`/enroll/checkout?program=${encodeURIComponent(data.programInterest)}&application_id=${result.applicationId}`);
         return;
       } else {

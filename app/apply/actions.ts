@@ -533,17 +533,25 @@ async function insertApplication(payload: {
 
         await sendEnrollmentEmails(accountResult.magicLink);
         revalidatePath('/admin/applications');
-        return { success: true, applicationId: data.id, referenceNumber, email: payload.email };
+        return {
+          success: true,
+          status: 'submitted' as const,
+          applicationId: data.id,
+          referenceNumber,
+          email: payload.email,
+        };
       }
     } catch (error) {
       logger.error(`[Application] DB error for ${payload.email}`, error as Error);
     }
   }
 
-  // Path B: Email-only fallback
+  // Path B: Email-only fallback — DB unavailable, no record created.
+  // Return success:true so the user gets a confirmation, but status:'email_only'
+  // so the form routes to the thank-you page instead of checkout.
   try {
     await sendEnrollmentEmails();
-    return { success: true, applicationId: `email-${referenceNumber}`, referenceNumber };
+    return { success: true, status: 'email_only' as const, applicationId: `email-${referenceNumber}`, referenceNumber };
   } catch (emailError) {
     logger.error(`[Application] Email send failed for ${payload.email}`, emailError as Error);
     return { success: false, error: 'We could not process your application. Please email us directly at info@elevateforhumanity.org with your name, phone number, and program interest.' };

@@ -46,7 +46,9 @@ export default async function RiseFoundationPage() {
 
   try {
     const db = createAdminClient();
-    const { data: eventsData } = await supabase
+    if (!db) throw new Error('DB unavailable');
+
+    const { data: eventsData } = await db
       .from('events')
       .select('id, title, description, start_date')
       .eq('organization', 'rise-foundation')
@@ -55,7 +57,7 @@ export default async function RiseFoundationPage() {
       .limit(3);
     events = eventsData;
 
-    const { data: testimonialsData } = await supabase
+    const { data: testimonialsData } = await db
       .from('testimonials')
       .select('id, content, name')
       .eq('is_featured', true)
@@ -73,48 +75,45 @@ export default async function RiseFoundationPage() {
         </div>
       </div>
 
-      {/* Hero */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
+      {/* Hero — clean image, no overlay */}
+      <section className="relative h-[45vh] sm:h-[50vh] md:h-[55vh] min-h-[280px] w-full overflow-hidden">
         <Image
           src="/images/pages/rise-foundation-page-2.jpg"
           alt="Selfish Inc. community programs in Indianapolis"
           fill
-          className="object-cover"
+          className="object-cover object-center"
           priority
           sizes="100vw"
           quality={90}
         />
-        
-        <div className="absolute inset-0 flex items-center">
-          <div className="max-w-7xl mx-auto px-6 w-full">
-            <p className="text-sm md:text-base text-slate-600 uppercase tracking-wider mb-3">
-              501(c)(3) Nonprofit Organization
-            </p>
-            <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-2">
-              Selfish Inc.
-            </h1>
-            <p className="text-xl md:text-2xl text-slate-600 mb-4">
-              Operating The Rise Foundation &middot; CurvatureBody Sculpting &middot; Meri-Go-Round Products
-            </p>
-            <p className="text-lg text-slate-500 max-w-2xl mb-8">
-              Mental wellness counseling, body sculpting, holistic healing, free VITA tax preparation, 
-              and community services. Serving Indianapolis families with compassion and dignity.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/rise-foundation/get-involved"
-                className="inline-flex items-center justify-center gap-2 bg-white text-slate-900 px-8 py-4 rounded-xl font-bold hover:bg-white transition text-lg"
-              >
-                Get Help Now
-              </Link>
-              <Link
-                href="/rise-foundation/donate"
-                className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white/10 transition text-lg"
-              >
-                <Gift className="w-5 h-5" />
-                Donate
-              </Link>
-            </div>
+      </section>
+
+      {/* Identity — below the hero */}
+      <section className="bg-white border-b border-slate-200 px-6 py-10">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">501(c)(3) Nonprofit Organization</p>
+          <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-3">Selfish Inc.</h1>
+          <p className="text-lg text-slate-600 mb-2">
+            Operating The Rise Foundation &middot; CurvatureBody Sculpting &middot; Meri-Go-Round Products
+          </p>
+          <p className="text-slate-500 max-w-2xl mb-6">
+            Mental wellness counseling, body sculpting, holistic healing, free VITA tax preparation,
+            and community services. Serving Indianapolis families with compassion and dignity.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/rise-foundation/get-involved"
+              className="inline-flex items-center gap-2 bg-brand-blue-700 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-800 transition"
+            >
+              Get Help Now
+            </Link>
+            <Link
+              href="/rise-foundation/donate"
+              className="inline-flex items-center gap-2 border-2 border-brand-blue-700 text-brand-blue-700 px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-50 transition"
+            >
+              <Gift className="w-4 h-4" />
+              Donate
+            </Link>
           </div>
         </div>
       </section>

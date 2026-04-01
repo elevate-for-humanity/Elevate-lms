@@ -54,25 +54,27 @@ export default function YoungAdultWellnessPage() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* Hero */}
-      <section className="relative h-[320px] sm:h-[420px] overflow-hidden">
+      {/* Hero — clean image, no overlay */}
+      <section className="relative h-[40vh] min-h-[240px] overflow-hidden">
         <Image
           src="/images/pages/rise-foundation.jpg"
           alt="Young adult wellness support"
           fill sizes="100vw"
-          className="object-cover"
+          className="object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 flex items-end pb-10 px-6">
-          <div className="max-w-4xl mx-auto w-full">
-            <p className="text-pink-400 font-bold text-xs uppercase tracking-widest mb-2">Selfish Inc. 501(c)(3)</p>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-2">
-              Young Adult Wellness Support
-            </h1>
-            <p className="text-white/80 text-lg max-w-2xl">
-              Essential support strategies for teen and young adult mental health — for young adults, parents, and caregivers.
-            </p>
-          </div>
+      </section>
+
+      {/* Identity — below the hero */}
+      <section className="bg-white border-b border-slate-200 px-6 py-8">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Selfish Inc. 501(c)(3)</p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-2">
+            Young Adult Wellness Support
+          </h1>
+          <p className="text-slate-600 text-lg max-w-2xl">
+            Essential support strategies for teen and young adult mental health — for young adults, parents, and caregivers.
+          </p>
         </div>
       </section>
 
@@ -154,7 +156,7 @@ export default function YoungAdultWellnessPage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <a
-              href="mailto:info@selfishincsupport.org"
+              href="mailto:elevate4humanityedu@gmail.com"
               className="inline-flex items-center gap-2 bg-pink-600 hover:bg-pink-700 text-white font-bold px-6 py-3 rounded-lg transition"
             >
               <Mail className="w-4 h-4" /> Email Us
@@ -168,7 +170,7 @@ export default function YoungAdultWellnessPage() {
           </div>
           <p className="text-slate-500 text-sm mt-4">
             Selfish Inc. 501(c)(3) &middot; Indianapolis, Indiana &middot;{' '}
-            <a href="https://www.selfishincsupport.org" target="_blank" rel="noopener noreferrer" className="underline">selfishincsupport.org</a>
+            <a href="/rise-foundation" className="underline">our Rise Foundation page</a>
           </p>
         </div>
       </section>

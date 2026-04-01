@@ -191,7 +191,7 @@ export default function FounderPage() {
                   'Milady Curriculum Partner',
                   'NRF Rise Up Provider',
                   'Certiport Authorized Testing Center (CATC)',
-                  'Choice Medical CNA School Partner',
+
                   'Selfish Inc. — 501(c)(3) Nonprofit',
                   'The Rise Foundation (DBA of Selfish Inc.) — VITA Free Tax Prep',
                   'SupersonicFastCash — Tax Software',

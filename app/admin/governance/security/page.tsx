@@ -74,7 +74,7 @@ export default function SecurityDocumentPage() {
               protects personal, educational, and operational data across the workforce training platform. 
               It provides clear, accurate, and reviewable information to students, partners, regulators, 
               and funding agencies regarding security practices and data handling.
-              Rise Forward Foundation and training partners (e.g., Choice Medical CNA School) operate 
+              Rise Forward Foundation and approved training partners operate 
               their own systems independently. This document covers only Elevate for Humanity systems.
             </p>
             <p className="text-slate-700 leading-relaxed mt-4">

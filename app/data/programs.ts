@@ -243,15 +243,15 @@ export const programs: Program[] = [
     schedule: 'Day, evening, or weekend options',
     delivery: 'Classroom + clinicals',
     credential:
-      'CNA certification eligibility (state-approved program partner)',
+      'CNA certification eligibility (state-approved program)',
     approvals: [
-      'Training Partner: Choice Medical (State-Approved CNA Program)',
+      'State-Approved CNA Program',
       'Indiana State Board of Health Approved',
     ],
     fundingOptions: [
       'Self-Pay Program',
       'Payment plans available',
-      'Training delivered by Choice Medical',
+      'State-approved clinical training',
     ],
     highlights: [
       'Get certified in just 4-8 weeks - fastest path to healthcare',

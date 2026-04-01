@@ -148,20 +148,10 @@ export default function LegalGovernancePage() {
             <h2 className="text-xl font-bold text-slate-900">Training Partner</h2>
           </div>
           <div className="bg-slate-50 rounded-xl p-6 space-y-3">
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-slate-500">Partner Name</p>
-                <p className="font-semibold text-slate-900">Choice Medical CNA School</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-500">Role</p>
-                <p className="font-semibold text-slate-900">Training Partner</p>
-              </div>
-            </div>
-            <p className="text-slate-700 text-sm pt-2 border-t border-slate-200">
-              Certain training programs may be delivered in collaboration with third-party training
-              partners such as Choice Medical CNA School. Where a third-party partner delivers
-              instruction or clinical components, this will be disclosed at or before enrollment.
+            <p className="text-slate-700 text-sm">
+              Certain training programs may be delivered in collaboration with approved third-party training
+              partners. Where a third-party partner delivers instruction or clinical components, this will
+              be disclosed at or before enrollment.
             </p>
           </div>
         </section>
@@ -226,11 +216,7 @@ export default function LegalGovernancePage() {
                   <td className="p-3 text-slate-700">Mental wellness program (under Rise Forward)</td>
                   <td className="p-3 text-slate-700">Participation status only (no PII beyond name)</td>
                 </tr>
-                <tr>
-                  <td className="p-3 text-slate-900 font-medium">Choice Medical CNA School</td>
-                  <td className="p-3 text-slate-700">Training partner &mdash; instruction, clinical placements</td>
-                  <td className="p-3 text-slate-700">Name, enrollment, attendance, clinical records (per enrollment agreement)</td>
-                </tr>
+
               </tbody>
             </table>
           </div>

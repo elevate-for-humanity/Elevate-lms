@@ -203,7 +203,7 @@ export default function PrivacyPolicyPage() {
                 </div>
                 <div className="border-t border-slate-200 pt-3">
                   <p className="font-semibold text-slate-900">Training Partners</p>
-                  <p className="text-sm">We may share limited information with training partners (e.g., Choice Medical CNA School) when required to deliver instruction, clinical components, attendance verification, credentialing, or program administration.</p>
+                  <p className="text-sm">We may share limited information with approved training partners when required to deliver instruction, clinical components, attendance verification, credentialing, or program administration.</p>
                 </div>
                 <div className="border-t border-slate-200 pt-3">
                   <p className="font-semibold text-slate-900">IRS</p>

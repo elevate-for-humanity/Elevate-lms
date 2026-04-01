@@ -42,7 +42,7 @@ export default function TermsOfServicePage() {
               We may collaborate with Selfish Inc. (d/b/a Rise Forward Foundation) to provide 
               supportive services, including mental wellness programming (CurvatureBody Sculpting).
               Certain training programs may be delivered in collaboration with third-party training 
-              partners such as Choice Medical CNA School.
+              approved clinical training partners.
               These Terms govern your use of the Elevate for Humanity websites, portals, and 
               services provided by the School.
               By accessing or using our website, learning management system,

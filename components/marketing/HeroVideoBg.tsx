@@ -26,19 +26,27 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
   }, []);
 
   // Load video after mount so it does not block initial page paint.
-  // Play only after canplay fires — avoids poster getting stuck on slow connections.
+  // Poster stays visible (z-0) until video is playing — video fades in over it.
   useEffect(() => {
     if (reducedMotion) return;
     const v = videoRef.current;
     if (!v) return;
     const onCanPlay = () => {
-      setVideoReady(true);
       v.play().catch(() => {});
     };
+    const onPlaying = () => {
+      // Only mark ready once video is actually playing, not just buffered.
+      // This keeps the poster visible until the first frame is on screen.
+      setVideoReady(true);
+    };
     v.addEventListener('canplay', onCanPlay, { once: true });
+    v.addEventListener('playing', onPlaying, { once: true });
     v.src = src;
     v.load();
-    return () => v.removeEventListener('canplay', onCanPlay);
+    return () => {
+      v.removeEventListener('canplay', onCanPlay);
+      v.removeEventListener('playing', onPlaying);
+    };
   }, [reducedMotion, src]);
 
   // Start audio on first user interaction — browser autoplay policy
@@ -79,27 +87,26 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
 
   return (
     <>
-      {/* Poster — always rendered behind video, loads instantly as LCP image */}
+      {/* Poster — always visible until video is playing. fetchPriority=high for LCP. */}
       {poster && (
         <img
           src={poster}
           alt=""
           aria-hidden="true"
           fetchPriority="high"
-          className="absolute inset-0 w-full h-full object-cover"
+          className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-700 ${videoReady ? 'opacity-0' : 'opacity-100'}`}
         />
       )}
 
-      {/* Video — fades in once playing, src set after mount to not block paint */}
+      {/* Video — fades in once playing. No autoPlay attr (src set dynamically). */}
       {!reducedMotion && (
         <video
           ref={videoRef}
-          autoPlay
           muted
           loop
           playsInline
+          poster={poster}
           aria-hidden="true"
-          onCanPlay={() => setVideoReady(true)}
           className={`absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
         />
       )}

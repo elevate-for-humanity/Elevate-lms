@@ -103,7 +103,7 @@ export default async function GrantIntakePage() {
                   <option value="">Select type</option>
                   <option value="wioa">WIOA</option>
                   <option value="wrg">WRG</option>
-                  <option value="jri">Job Ready Indy (Job Ready Indy)</option>
+                  <option value="jri">Job Ready Indy</option>
                   <option value="federal">Federal</option>
                   <option value="state">State</option>
                   <option value="private">Private Foundation</option>

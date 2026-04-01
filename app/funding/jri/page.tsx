@@ -6,9 +6,9 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Job Ready Indy — Job Ready Indy | Elevate for Humanity',
+  title: 'Job Ready Indy | Elevate for Humanity',
   description:
-    'Job Ready Indy (Job Ready Indy) funding may cover tuition for eligible justice-involved individuals. Career training in healthcare, skilled trades, CDL, and more.',
+    'Job Ready Indy funding may cover tuition for eligible justice-involved individuals. Career training in healthcare, skilled trades, CDL, and more.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding/jri' },
 };
 
@@ -26,7 +26,7 @@ export default function JRIFundingPage() {
       </section>
       <div className="bg-white border-b border-slate-200 py-8 px-4">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Job Ready Indy (Job Ready Indy)</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Job Ready Indy</h1>
           <p className="text-slate-600 mt-2">Funded career training for justice-involved individuals through Indiana DWD.</p>
         </div>
       </div>
@@ -38,7 +38,7 @@ export default function JRIFundingPage() {
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">What Is Job Ready Indy?</h2>
               <p className="text-slate-700 leading-relaxed mb-4">
-                The <strong>Job Ready Indy (Job Ready Indy)</strong> is an Indiana state program that funds career training for eligible justice-involved individuals. Administered by the Indiana Department of Workforce Development (DWD), Job Ready Indy removes financial barriers so participants can focus on earning certifications and building careers.
+                The <strong>Job Ready Indy</strong> is an Indiana state program that funds career training for eligible justice-involved individuals. Administered by the Indiana Department of Workforce Development (DWD), Job Ready Indy removes financial barriers so participants can focus on earning certifications and building careers.
               </p>
               <p className="text-slate-700 leading-relaxed mb-6">
                 Elevate for Humanity is an approved Job Ready Indy credential pathway provider. Our programs are designed to get participants certified with nationally recognized credentials and employed in high-demand fields within weeks, not years.

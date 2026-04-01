@@ -18,7 +18,7 @@ import {
 CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Job Ready Indy (Job Ready Indy) | Funded Career Training | Elevate for Humanity',
+  title: 'Job Ready Indy | Funded Career Training | Elevate for Humanity',
   description: 'Indiana Job Ready Indy program provides funded career training for justice-involved individuals. Get certified in healthcare, skilled trades, and more.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/jri',
@@ -293,7 +293,7 @@ export default function JRIPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Job Ready Indy Program FAQ</h2>
           <div className="space-y-4">
             {[
-              { q: 'What is Job Ready Indy funding?', a: 'Job Ready Indy (Job Ready Indy) is Indiana state funding that provides free career training to justice-involved individuals. It covers tuition, materials, certifications, and supportive services.' },
+              { q: 'What is Job Ready Indy funding?', a: 'Job Ready Indy is Indiana state funding that provides free career training to justice-involved individuals. It covers tuition, materials, certifications, and supportive services.' },
               { q: 'Do I qualify if I have a felony?', a: 'Yes. Job Ready Indy is specifically designed for people with criminal records, including felonies. Your conviction type does not automatically disqualify you.' },
               { q: 'How recent does my involvement need to be?', a: 'Generally, you should have been released from incarceration or supervision within the past 3 years. Contact us to discuss your specific situation.' },
               { q: 'What programs can I use Job Ready Indy for?', a: 'Job Ready Indy covers approved training programs including healthcare (CNA), skilled trades (HVAC, welding), technology, CDL, and more. See the list above for current options.' },

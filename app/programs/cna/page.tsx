@@ -38,7 +38,7 @@ const CURRICULUM = [
 const FUNDING = [
   { name: 'WIOA', tag: 'Federal', desc: 'Covers tuition, books, and exam fees for eligible adults, dislocated workers, and youth 16–24.' },
   { name: 'Workforce Ready Grant', tag: 'Indiana State', desc: 'Indiana state grant for high-demand healthcare programs. No cost for eligible participants.' },
-  { name: 'Job Ready Indy — Job Ready Indy', tag: 'Indiana State', desc: 'Funded training for eligible justice-involved individuals through Indiana DWD.' },
+  { name: 'Job Ready Indy', tag: 'Indiana State', desc: 'Funded training for eligible justice-involved individuals through Indiana DWD.' },
 ];
 
 const FAQ = [

@@ -34,7 +34,7 @@ const PROGRAMS = [
     eligible: ['Determined by specific initiative', 'Typically targets underserved populations or regions'],
   },
   {
-    name: 'Job Ready Indy (Job Ready Indy)',
+    name: 'Job Ready Indy',
     admin: 'Indiana Department of Correction / DWD',
     desc: 'Provides funding for career training and supportive services for justice-involved individuals transitioning back into the workforce.',
     fields: ['Skilled Trades', 'Healthcare', 'CDL/Transportation', 'Technology'],

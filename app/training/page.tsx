@@ -250,7 +250,7 @@ export default function TrainingPage() {
               {[
                 { label: 'WIOA', desc: 'Federal funding for adults, dislocated workers, and youth. Covers tuition, books, and support services.' },
                 { label: 'Workforce Ready Grant (WRG)', desc: 'Indiana state grant for high-demand certificate programs. No repayment required.' },
-                { label: 'Job Ready Indy (Job Ready Indy)', desc: 'Funding for justice-involved individuals. Covers training and support services.' },
+                { label: 'Job Ready Indy', desc: 'Funding for justice-involved individuals. Covers training and support services.' },
                 { label: 'Self-Pay / BNPL', desc: 'Flexible payment plans and buy-now-pay-later options for students who do not qualify for funding.' },
               ].map((f) => (
                 <div key={f.label} className="bg-slate-50 rounded-xl border border-slate-200 p-4">

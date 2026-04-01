@@ -238,7 +238,7 @@ export default function TestPaymentsPage() {
               <div className="text-xs text-black">Workforce Ready Grant</div>
             </div>
             <div className="p-3 border border-gray-200 rounded">
-              <div className="font-medium text-black">Job Ready Indy (Job Ready Indy)</div>
+              <div className="font-medium text-black">Job Ready Indy</div>
               <div className="text-xs text-black">
                 Job Ready Indy
               </div>

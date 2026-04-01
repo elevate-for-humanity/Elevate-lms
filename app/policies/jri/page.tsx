@@ -44,7 +44,7 @@ export default function JRIPage() {
           <div className="prose prose-lg max-w-none">
             <h2>Overview</h2>
             <p>
-              The Job Ready Indy (Job Ready Indy) provides funding for workforce training programs
+              The Job Ready Indy provides funding for workforce training programs
               designed to reduce recidivism and support successful reentry into the community. Through Job Ready Indy,
               eligible individuals can access career training, job placement assistance, and supportive
               services at no cost.

@@ -100,7 +100,7 @@ const credentials: VerifiableCredential[] = [
     category: 'funding',
   },
   {
-    name: 'Job Ready Indy (Job Ready Indy) Partner',
+    name: 'Job Ready Indy Partner',
     issuer: 'Indiana Department of Correction',
     idNumber: null,
     status: 'active',

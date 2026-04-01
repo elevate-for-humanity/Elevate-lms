@@ -14,7 +14,7 @@ import {
 CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Job Ready Indy (Job Ready Indy) | Partner Courses | Elevate For Humanity',
+  title: 'Job Ready Indy | Partner Courses | Elevate For Humanity',
   description: 'Employability Skills and Workforce Readiness Training',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/partners/jri',
@@ -204,7 +204,7 @@ export default function JRIPage() {
             Ready to Get Started?
           </h2>
           <p className="text-base md:text-lg text-white mb-8">
-            Enroll in Job Ready Indy (Job Ready Indy) courses through Elevate for Humanity
+            Enroll in Job Ready Indy courses through Elevate for Humanity
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a

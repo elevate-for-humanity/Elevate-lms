@@ -89,6 +89,8 @@ const nextConfig = {
       { protocol: 'https', hostname: 'www.elevateforhumanity.org' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'images.pexels.com' },
+      { protocol: 'https', hostname: 'static.wixstatic.com' },
+      { protocol: 'https', hostname: '*.wixstatic.com' },
       { protocol: 'https', hostname: '*.r2.dev' },
       { protocol: 'https', hostname: '*.cloudflarestream.com' },
       { protocol: 'https', hostname: '*.githubusercontent.com' },
@@ -830,7 +832,7 @@ const nextConfig = {
             ? "script-src 'self' 'unsafe-inline' https://connect.facebook.net https://js.stripe.com https://www.googletagmanager.com https://widget.sezzle.com"
             : "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://connect.facebook.net https://js.stripe.com https://widget.sezzle.com",
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-          "img-src 'self' data: blob: https://*.supabase.co https://*.elevateforhumanity.org https://www.elevateforhumanity.org https://images.unsplash.com https://images.pexels.com https://*.r2.dev https://*.cloudflarestream.com https://*.githubusercontent.com https://cdn.elevatelms.com https://cdn1.affirm.com https://cms-artifacts.artlist.io",
+          "img-src 'self' data: blob: https://*.supabase.co https://*.elevateforhumanity.org https://www.elevateforhumanity.org https://images.unsplash.com https://images.pexels.com https://*.r2.dev https://*.cloudflarestream.com https://*.githubusercontent.com https://cdn.elevatelms.com https://cdn1.affirm.com https://cms-artifacts.artlist.io https://static.wixstatic.com https://*.wixstatic.com",
           "font-src 'self' data: https://fonts.gstatic.com",
           "connect-src 'self' https://*.supabase.co https://api.stripe.com wss://*.supabase.co https://us06web.zoom.us",
           "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://js.stripe.com https://us06web.zoom.us",

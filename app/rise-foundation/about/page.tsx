@@ -1,25 +1,45 @@
 import { Metadata } from 'next';
-
 import Link from 'next/link';
 import Image from 'next/image';
+import UniversalNav from '@/components/UniversalNav';
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://elevateforhumanity.org/rise-foundation/programs',
+    canonical: 'https://elevateforhumanity.org/rise-foundation/about',
   },
-  title: 'Programs | Elevate For Humanity',
+  title: 'About | Elevate For Humanity',
   description:
-    'Explore Programs and discover opportunities for career growth and development.',
+    'Explore About and discover opportunities for career growth and development.',
 };
 
-export default async function ProgramsPage() {
+const navLinks = [
+  { label: 'Home', href: '/rise-foundation' },
+  { label: 'About', href: '/rise-foundation/about' },
+  { label: 'Programs', href: '/rise-foundation/programs' },
+  { label: 'Trauma Recovery', href: '/rise-foundation/trauma-recovery' },
+  { label: 'Addiction', href: '/rise-foundation/addiction-rehabilitation' },
+  { label: 'Divorce Support', href: '/rise-foundation/divorce-support' },
+  { label: 'Events', href: '/rise-foundation/events' },
+  { label: 'Get Involved', href: '/rise-foundation/get-involved' },
+];
+
+export default async function AboutPage() {
   return (
     <div className="min-h-screen bg-gray-50">
+      <UniversalNav
+        links={navLinks}
+        ctaText="Donate"
+        ctaHref="https://donate.stripe.com/5kA5kn7EsfrD08w4gg"
+        bgColor="bg-purple-600"
+        textColor="text-white"
+        logo="Selfish Inc."
+        logoHref="/rise-foundation"
+      />
       {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
         <Image
           src="/images/artlist/hero-training-1.jpg"
-          alt="Programs"
+          alt="About"
           fill
           className="object-cover"
           quality={100}
@@ -29,10 +49,10 @@ export default async function ProgramsPage() {
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Programs
+            About
           </h1>
           <p className="text-base md:text-lg mb-8 text-gray-100">
-            Explore Programs and discover opportunities for career growth and
+            Explore About and discover opportunities for career growth and
             development.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -59,12 +79,10 @@ export default async function ProgramsPage() {
             {/* Feature Grid */}
             <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold mb-6">
-                  Programs
-                </h2>
+                <h2 className="text-2xl md:text-3xl font-bold mb-6">About</h2>
                 <p className="text-gray-700 mb-6">
-                  Explore Programs and discover opportunities for career growth
-                  and development.
+                  Explore About and discover opportunities for career growth and
+                  development.
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start">
@@ -120,7 +138,7 @@ export default async function ProgramsPage() {
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
                   src="/images/artlist/hero-training-2.jpg"
-                  alt="Programs"
+                  alt="About"
                   fill
                   className="object-cover"
                   quality={100}

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient, createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { checkBarberSuspension } from '@/lib/barber/suspension';
 
 const MAX_ACCURACY_M = 50;
 
@@ -70,6 +71,12 @@ async function _POST(request: NextRequest) {
     }
 
     const supabase = createAdminClient();
+
+    // Suspension gate — suspended accounts cannot send heartbeats
+    if (supabase) {
+      const suspended = await checkBarberSuspension(user.id, supabase);
+      if (suspended) return suspended;
+    }
     if (!supabase) {
       return NextResponse.json(
         { error: 'Database not configured' },
@@ -127,32 +134,43 @@ async function _POST(request: NextRequest) {
       );
     }
 
-    // Compute within_geofence using haversine
-    const distance = haversineDistance(lat, lng, site.latitude, site.longitude);
-    const withinGeofence = distance <= site.radius_meters;
-
-    // Call update_geofence_state DB function
-    const { error: geofenceError } = await supabase.rpc('update_geofence_state', {
-      progress_entry_id,
-      within_geofence: withinGeofence,
-      seen_at: new Date().toISOString(),
-    });
+    // Call update_geofence_state — DB function takes (p_entry_id, p_lat, p_lng)
+    // and handles geofence math + auto-clock-out internally.
+    const { data: geofenceResult, error: geofenceError } = await supabase.rpc(
+      'update_geofence_state',
+      {
+        p_entry_id: progress_entry_id,
+        p_lat: lat,
+        p_lng: lng,
+      },
+    );
 
     if (geofenceError) {
       logger.error('[Heartbeat] update_geofence_state error:', geofenceError);
     }
 
-    // Call auto_clock_out_if_needed DB function
-    const { error: autoClockError } = await supabase.rpc('auto_clock_out_if_needed', {
-      progress_entry_id,
-      now: new Date().toISOString(),
-    });
+    // Call auto_clock_out_if_needed — DB function takes only (p_entry_id UUID)
+    const { error: autoClockError } = await supabase.rpc(
+      'auto_clock_out_if_needed',
+      { p_entry_id: progress_entry_id },
+    );
 
     if (autoClockError) {
       logger.error('[Heartbeat] auto_clock_out_if_needed error:', autoClockError);
     }
 
-    // Reload row to get updated state
+    // Use result from update_geofence_state if available, otherwise reload
+    const geofenceRow = Array.isArray(geofenceResult) ? geofenceResult[0] : geofenceResult;
+
+    if (geofenceRow) {
+      return NextResponse.json({
+        within_geofence: geofenceRow.within_geofence ?? false,
+        auto_clocked_out: geofenceRow.auto_clocked_out ?? false,
+        clock_out_at: geofenceRow.clock_out_at ?? null,
+      });
+    }
+
+    // Fallback: reload row
     const { data: updatedEntry, error: reloadError } = await supabase
       .from('progress_entries')
       .select('clock_out_at, auto_clocked_out, auto_clock_out_reason')
@@ -162,9 +180,13 @@ async function _POST(request: NextRequest) {
     if (reloadError) {
       return NextResponse.json(
         { error: 'Failed to reload entry state' },
-        { status: 500 }
+        { status: 500 },
       );
     }
+
+    // Compute within_geofence for response (haversine against loaded site)
+    const distance = haversineDistance(lat, lng, site.latitude, site.longitude);
+    const withinGeofence = distance <= site.radius_meters;
 
     return NextResponse.json({
       within_geofence: withinGeofence,

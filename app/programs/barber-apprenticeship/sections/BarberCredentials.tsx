@@ -92,7 +92,7 @@ export function BarberCredentials() {
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-slate-900 mb-2">Employment Structure</h3>
-                <p className="text-slate-600 text-sm">Apprentices may train under hourly paid, booth-based, or hybrid arrangements depending on the partner shop&apos;s operational policies. All models require licensed supervision and documented OJT hours.</p>
+                <p className="text-slate-600 text-sm">Apprentices are W-2 employees of their host shop. Compensation is set by the employer and must meet or exceed applicable minimum wage laws. All models require licensed supervision and documented OJT hours.</p>
               </div>
             </div>
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
@@ -101,7 +101,7 @@ export function BarberCredentials() {
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-slate-900 mb-2">OJT Hour Logging</h3>
-                <p className="text-slate-600 text-sm">All 2,000 OJT hours are documented through digital hour tracking, supervisor verification, and competency progression records maintained in the institutional LMS.</p>
+                <p className="text-slate-600 text-sm">All 2,000 apprenticeship hours are documented through digital hour tracking, supervisor verification, and competency progression records maintained in the institutional LMS.</p>
               </div>
             </div>
           </div>

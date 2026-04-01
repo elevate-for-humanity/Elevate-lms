@@ -373,6 +373,15 @@ async function insertApplication(payload: {
       });
     });
 
+    // Barber Apprenticeship requires payment before onboarding.
+    // Student welcome email is sent by the Stripe webhook after checkout.session.completed.
+    // Only the admin notification fires here.
+    const isPaymentGated = payload.programInterest.toLowerCase().includes('barber');
+    if (isPaymentGated) {
+      logger.info('[Apply] Skipping student welcome email — payment-gated program, webhook will send after payment', { email: payload.email });
+      return;
+    }
+
     // Send student confirmation email
     await sendEmailDirect(
       payload.email,

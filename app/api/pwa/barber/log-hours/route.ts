@@ -2,9 +2,11 @@ import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { checkNewMilestone } from '@/lib/pwa/milestones';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { checkBarberSuspension } from '@/lib/barber/suspension';
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -20,6 +22,13 @@ async function _POST(request: NextRequest) {
     
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Suspension gate
+    const adminDb = createAdminClient();
+    if (adminDb) {
+      const suspended = await checkBarberSuspension(user.id, adminDb);
+      if (suspended) return suspended;
     }
 
     const body = await request.json();

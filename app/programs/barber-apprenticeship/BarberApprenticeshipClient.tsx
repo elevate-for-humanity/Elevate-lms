@@ -91,7 +91,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
               <h2 className="text-xl font-bold text-slate-900">Career Pathway</h2>
             </div>
             <p className="text-slate-700 leading-relaxed">
-              Start as a <strong>Barber Apprentice</strong> earning $24,000–$30,000 while you train under a licensed barber at a host shop.
+              Start as a <strong>Barber Apprentice</strong> — a paid W-2 employee at your host shop — while you train under a licensed barber.
               After completing 2,000 hours and passing the Indiana state exam, you become a <strong>Licensed Barber</strong> ($30,000–$45,000).
               With 3–5 years of experience and an established clientele, you advance to <strong>Senior Barber</strong> ($45,000–$65,000).
               Many graduates go on to open their own shop as a <strong>Shop Owner / Master Barber</strong> ($65,000–$100,000+).
@@ -121,7 +121,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
                 By program completion, apprentices perform six standard haircut styles — fade, taper, buzz, scissor-over-comb,
                 flat top, and shape-up — to client satisfaction. You will execute straight razor shaves following Indiana
                 sanitation protocols, identify and treat common scalp conditions, and demonstrate proper disinfection procedures
-                per Indiana Board standards. Each apprentice completes 1,500 hours of on-the-job training at a licensed shop,
+                per Indiana Board standards. Each apprentice completes 2,000 apprenticeship hours total — 1,500 hours of on-the-job training at a licensed shop and 500 hours of related technical instruction (Milady RISE) —
                 builds a client portfolio of 50+ documented services, and passes the Indiana Barber License written and practical exams.
               </p>
             </div>

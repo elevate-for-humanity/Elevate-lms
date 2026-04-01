@@ -8,7 +8,7 @@
  * A confirmation notification is sent to admin when the applicant responds.
  */
 
-const SITE = 'https://www.elevateforhumanityeducation.com';
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 const LOGO = `${SITE}/logo.png`;
 
 export interface BarberFullOnboardingData {

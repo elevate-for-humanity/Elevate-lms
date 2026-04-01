@@ -99,7 +99,7 @@ export function BarberPartnership() {
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Partnership Barbershops &amp; Training Sites</h2>
           <p className="text-slate-600 mb-8 max-w-3xl">
-            The Barber Apprenticeship Program is delivered in collaboration with approved licensed barbershop partners that serve as official On-the-Job Training (OJT) sites. Partnership shops may operate under hourly employment, booth-based training, or hybrid arrangements depending on shop policies.
+            The Barber Apprenticeship Program is delivered in collaboration with approved licensed barbershop partners that serve as official On-the-Job Training (OJT) sites. Apprentices are W-2 employees of their host shop for the duration of the apprenticeship.
           </p>
           <div className="grid sm:grid-cols-2 gap-8 mb-10">
             <div>

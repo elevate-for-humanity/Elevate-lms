@@ -67,8 +67,8 @@ export function BarberDeliveryModel() {
             </div>
             <div className="bg-white rounded-xl p-6 border border-slate-200 text-center">
               <div className="text-3xl font-black text-brand-red-600 mb-1">2,000</div>
-              <div className="text-sm font-bold text-slate-900">OJT Hours</div>
-              <div className="text-slate-500 text-xs mt-1">Licensed Shops</div>
+              <div className="text-sm font-bold text-slate-900">Total Hours</div>
+              <div className="text-slate-500 text-xs mt-1">1,500 OJT + 500 RTI</div>
             </div>
             <div className="bg-white rounded-xl p-6 border border-slate-200 text-center">
               <div className="text-3xl font-black text-brand-red-600 mb-1">RTI</div>

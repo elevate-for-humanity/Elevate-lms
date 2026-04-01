@@ -486,7 +486,7 @@ async function insertApplication(payload: {
           zip: payload.zip,
           program_interest: payload.programInterest,
           support_notes: `Reference: ${referenceNumber} | ${payload.supportNotes}`,
-          status: 'pending',
+          status: 'submitted',
           source: payload.source,
         })
         .select('id')

@@ -136,7 +136,7 @@ async function _POST(req: NextRequest) {
       email: lead.email || '',
       phone: lead.phone || '',
       program_interest: program.title,
-      status: 'pending',
+      status: 'submitted',
       source: 'intake-funnel',
       support_notes: `Lead ID: ${data.leadId} | ${data.additionalInfo || ''}`.trim(),
     }).then(({ error: appErr }) => {

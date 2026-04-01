@@ -70,7 +70,7 @@ async function _POST(request: NextRequest) {
         email: data.email,
         phone: data.phone,
         program_id: 'employer',
-        status: 'pending',
+        status: 'submitted',
         notes: JSON.stringify({
           type: 'employer',
           tenant_id: defaultTenant.id,

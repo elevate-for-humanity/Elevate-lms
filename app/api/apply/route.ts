@@ -77,7 +77,7 @@ export const POST = withRateLimit(
         zip: '00000',
         program_interest: program,
         program_id: resolvedProgramId,
-        status: 'pending',
+        status: 'submitted',
         support_notes: `Funding: ${funding}. ${eligible ? 'Prescreen pass' : 'Manual review'}${pathway_slug ? `. Pathway: ${pathway_slug}` : ''}`,
       };
 

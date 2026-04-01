@@ -38,13 +38,16 @@ export default async function ApplicationsPage({
   const pageSize = 25;
   const offset = (page - 1) * pageSize;
 
-  let query = supabase.from('applications').select('*', { count: 'exact' }).order('created_at', { ascending: false });
+  // Use admin client for data queries to bypass RLS
+  const adminDb = createAdminClient();
+
+  let query = adminDb.from('applications').select('*', { count: 'exact' }).order('created_at', { ascending: false });
   if (statusFilter && statusFilter !== 'all') query = query.eq('status', statusFilter);
   if (search) query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%,full_name.ilike.%${search}%`);
   query = query.range(offset, offset + pageSize - 1);
 
   const { data: applications, count: totalCount, error } = await query;
-  const { data: allApps } = await supabase.from('applications').select('status');
+  const { data: allApps } = await adminDb.from('applications').select('status');
 
   const statusCounts: Record<string, number> = {};
   let totalApplications = 0;
@@ -82,8 +85,8 @@ export default async function ApplicationsPage({
             <select name="status" defaultValue={statusFilter || 'all'}
               className="px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-brand-blue-500 focus:outline-none">
               <option value="all">All Statuses</option>
-              <option value="pending">Pending</option>
               <option value="submitted">Submitted</option>
+              <option value="pending">Pending (legacy)</option>
               <option value="in_review">In Review</option>
               <option value="approved">Approved</option>
               <option value="rejected">Rejected</option>

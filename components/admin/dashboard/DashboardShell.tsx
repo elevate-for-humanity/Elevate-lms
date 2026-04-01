@@ -116,7 +116,7 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
     pendingAppsKpi?.urgent && {
       label: `${pendingAppsKpi.value} application${pendingAppsKpi.value !== 1 ? "s" : ""} need review`,
       sub: "Learners waiting for a decision",
-      href: "/admin/applications?status=pending",
+      href: "/admin/applications?status=submitted",
       badge: "Urgent", badgeColor: "bg-red-100 text-red-700", urgent: true,
     },
     data.blockedPrograms.length > 0 && {

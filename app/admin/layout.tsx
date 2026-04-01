@@ -95,7 +95,7 @@ export default async function AdminLayout({
 
         const [profileRes, appsRes, docsRes] = await Promise.all([
           db.from('profiles').select('full_name, first_name').eq('id', user.id).maybeSingle(),
-          db.from('applications').select('id', { count: 'exact', head: true }).in('status', ['submitted', 'pending', 'in_review']),
+          db.from('applications').select('id', { count: 'exact', head: true }).in('status', ['submitted', 'in_review']),
           db.from('documents').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
         ]);
 
@@ -103,7 +103,7 @@ export default async function AdminLayout({
         const notifs: import('@/components/admin/AdminHeader').AdminHeaderNotif[] = [];
 
         if ((appsRes.count ?? 0) > 0) {
-          notifs.push({ id: 'apps', unread: true, href: '/admin/applications?status=pending',
+          notifs.push({ id: 'apps', unread: true, href: '/admin/applications?status=submitted',
             title: `${appsRes.count} application${appsRes.count !== 1 ? 's' : ''} pending review`,
             time: 'Pending action' });
         }

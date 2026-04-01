@@ -4,7 +4,7 @@ import { createAdminClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
-import { approveApplication } from '@/lib/enrollment/approve';
+
 import { sendWorkOneHoldEmail } from '@/lib/email/workone-hold';
 
 // info@elevateforhumanity.org removed — domain MX points to Resend/SES inbound
@@ -505,8 +505,6 @@ async function insertApplication(payload: {
         logger.error(`[Application] DB insert failed for ${payload.email}`, new Error(error.message));
       } else {
         // Create auth account so the applicant can log in immediately.
-        // For student applications this also resolves the program/course IDs
-        // needed by approveApplication below.
         const accountResult = await createStudentAccount(
           supabase,
           data.id,
@@ -526,27 +524,12 @@ async function insertApplication(payload: {
         };
         const profileRole = roleBySource[payload.source] ?? 'student';
 
-        // Auto-approve: all steps passed on submit — no admin action required.
-        const approvalResult = await approveApplication(supabase, {
+        // Application lands in admin queue as 'submitted' — admin reviews and approves.
+        // Approval requires funding verification or a paid Stripe session before enrollment.
+        logger.info('[Apply] Application submitted, pending admin review', {
           applicationId: data.id,
-          programId: accountResult.programId ?? null,
-          fundingType: null,
-          role: profileRole,
+          userId: accountResult.userId,
         });
-
-        if (!approvalResult.success) {
-          // Non-fatal: application is saved, approval can be retried from admin.
-          logger.warn('[Apply] Auto-approval failed after insert', {
-            applicationId: data.id,
-            error: approvalResult.error,
-          });
-        } else {
-          logger.info('[Apply] Application auto-approved on submit', {
-            applicationId: data.id,
-            userId: approvalResult.userId,
-            enrollmentId: approvalResult.enrollmentId,
-          });
-        }
 
         await sendEnrollmentEmails(accountResult.magicLink);
         revalidatePath('/admin/applications');

@@ -161,7 +161,7 @@ export default function GrantsPage() {
               </div>
             </div>
 
-            {/* Job Ready Indy */
+            {/* Job Ready Indy */}
             <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
               <div className="flex flex-col md:flex-row md:items-start gap-6">
                 <div className="w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">

@@ -65,7 +65,7 @@ export default async function FundingPage() {
   const sourceColors: Record<string, string> = {
     WIOA: 'bg-brand-blue-500',
     WRG: 'bg-green-500',
-    Job Ready Indy: 'bg-purple-500',
+    'Job Ready Indy': 'bg-purple-500',
     DOL: 'bg-brand-orange-500',
     Other: 'bg-gray-400',
   };

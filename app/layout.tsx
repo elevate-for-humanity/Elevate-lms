@@ -9,7 +9,7 @@ import { SkipToContent } from '@/components/ui/SkipToContent';
 import { DMCATrackingPixel } from '@/components/InvisibleWatermark';
 import { Inter } from 'next/font/google';
 import { GoogleAnalytics } from '@/components/analytics/google-analytics';
-import ClientOnlyFeatures from '@/components/layout/ClientOnlyFeatures';
+import LayoutClientShell from './LayoutClientShell';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -223,11 +223,10 @@ export default function RootLayout({
       >
         <SkipToContent />
         <GoogleAnalytics />
-
         <PublicLayout>{children}</PublicLayout>
         <CookieConsent />
         <DMCATrackingPixel />
-        <ClientOnlyFeatures />
+        <LayoutClientShell />
         <ToasterClient />
       </body>
     </html>

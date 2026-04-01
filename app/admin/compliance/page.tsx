@@ -5,8 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import WIOAComplianceDashboard from '@/components/admin/WIOAComplianceDashboard';
-import ComplianceClientFeatures from '@/components/admin/ComplianceClientFeatures';
-
+import ComplianceClientShell from './ComplianceClientShell';
 import {
 
   getAllGuardrails,
@@ -260,7 +259,7 @@ export default async function CompliancePage() {
       {/* Blockchain Credential Verification */}
       <section className="py-8 px-6">
         <div className="max-w-7xl mx-auto">
-          
+          <ComplianceClientShell />
         </div>
       </section>
     </div>

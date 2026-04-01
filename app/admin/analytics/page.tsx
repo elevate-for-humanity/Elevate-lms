@@ -3,8 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import AnalyticsClientFeatures from '@/components/admin/AnalyticsClientFeatures';
-
+import AnalyticsClientShell from './AnalyticsClientShell';
 
 export const dynamic = 'force-dynamic';
 
@@ -152,11 +151,7 @@ export default async function AnalyticsPage() {
         </div>
 
         {/* Job Placement & Employer Pipeline */}
-        <div className="mt-10 space-y-8">
-          
-          
-          
-        </div>
+        <AnalyticsClientShell />
       </div>
     </div>
   );

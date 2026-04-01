@@ -56,6 +56,17 @@ export const POST = withRateLimit(
       );
     }
     
+      // Resolve program_id from slug or title so the review page can approve without guessing
+      let resolvedProgramId: string | null = null;
+      if (program) {
+        const { data: matchedProgram } = await supabase
+          .from('programs')
+          .select('id')
+          .or(`slug.ilike.${program},title.ilike.${program}`)
+          .maybeSingle();
+        resolvedProgramId = matchedProgram?.id ?? null;
+      }
+
       // Build insert object - only include pathway_slug/source if migration has been run
       const insertData: Record<string, any> = {
         first_name: firstName,
@@ -65,6 +76,7 @@ export const POST = withRateLimit(
         city: 'Not provided',
         zip: '00000',
         program_interest: program,
+        program_id: resolvedProgramId,
         status: 'pending',
         support_notes: `Funding: ${funding}. ${eligible ? 'Prescreen pass' : 'Manual review'}${pathway_slug ? `. Pathway: ${pathway_slug}` : ''}`,
       };

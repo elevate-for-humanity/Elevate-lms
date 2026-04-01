@@ -29,11 +29,23 @@ async function _POST(req: Request) {
       );
     }
 
+    // Resolve program_id so the review page can approve without guessing
+    let resolvedProgramId: string | null = null;
+    if (program) {
+      const { data: matchedProgram } = await supabase
+        .from('programs')
+        .select('id')
+        .or(`slug.ilike.${program},title.ilike.${program}`)
+        .maybeSingle();
+      resolvedProgramId = matchedProgram?.id ?? null;
+    }
+
     const { error } = await supabase.from("applications").insert({
       name: data.get("name"),
       email: data.get("email"),
       phone: data.get("phone"),
       program,
+      program_id: resolvedProgramId,
       funding,
       eligible,
       notes: eligible ? "Prescreen passed" : "Needs review",

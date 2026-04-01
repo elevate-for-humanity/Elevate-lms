@@ -135,21 +135,7 @@ export default function ApprovalsPage() {
               </div>
             </div>
 
-            {/* JRI */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
-              <div className="flex items-start gap-4">
-                <span className="text-slate-400 flex-shrink-0">•</span>
-                <div>
-                  <h3 className="text-lg md:text-lg font-bold mb-3">
-                    Job Ready Indy (JRI) Training Partner – Marion County
-                  </h3>
-                  <p className="text-lg text-black">
-                    Approved partner for Job Ready Indy workforce readiness
-                    training in Marion County
-                  </p>
-                </div>
-              </div>
-            </div>
+
 
             {/* ITAP */}
             <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
@@ -208,16 +194,9 @@ export default function ApprovalsPage() {
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <h3 className="text-lg md:text-lg font-bold mb-3">
-                    SAM.gov Active Entity (Selfish Inc)
+                    SAM.gov Active Entity
                   </h3>
-                  <div className="space-y-2 text-lg text-black">
-                    <p>
-                      <strong>UEI:</strong> VX2GK5S8SZH8
-                    </p>
-                    <p>
-                      <strong>CAGE:</strong> 0Q856
-                    </p>
-                  </div>
+                  <p className="text-lg text-black">Registered active federal government contractor.</p>
                 </div>
               </div>
             </div>

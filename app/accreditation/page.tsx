@@ -84,6 +84,91 @@ export default function AccreditationPage() {
         </div>
       </section>
 
+      {/* Founder Credentials & Authorizations */}
+      <section className="py-14 px-4 border-t border-slate-200">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Founder Credentials &amp; Authorizations</h2>
+          <p className="text-slate-600 text-sm mb-8">
+            Elizabeth Greene, Founder &amp; CEO — credentials held personally and applied through Elevate for Humanity and SupersonicFastCash.
+          </p>
+
+          <div className="mb-10">
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">IRS &amp; Tax Authorizations</p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {[
+                { label: 'IRS Enrolled Agent (EA)', detail: 'Authorized to represent taxpayers before the IRS in audits, collections, and appeals.' },
+                { label: 'EFIN — Electronic Filing Identification Number', detail: 'IRS-issued number authorizing the preparation and e-filing of federal tax returns.' },
+                { label: 'PTIN — Preparer Tax Identification Number', detail: 'IRS-required identification for all paid tax return preparers.' },
+                { label: 'ERO — Electronic Return Originator', detail: 'Authorized IRS e-file originator for individual and business returns.' },
+                { label: 'SBIN — IRS Submitter ID', detail: 'Authorized to submit returns directly to the IRS for both for-profit and non-profit filers.' },
+                { label: 'VITA Site', detail: 'IRS-authorized Volunteer Income Tax Assistance site — free tax preparation for qualifying individuals.' },
+              ].map((cred) => (
+                <div key={cred.label} className="flex gap-3 p-4 rounded-xl border border-slate-100 bg-slate-50">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-slate-900 text-sm mb-1">{cred.label}</p>
+                    <p className="text-slate-600 text-xs leading-relaxed">{cred.detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-10">
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Testing &amp; Curriculum Authorizations</p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {[
+                { label: 'EPA 608 Certified Proctor', detail: 'Authorized to proctor EPA Section 608 refrigerant handling certification exams.' },
+                { label: 'ACT WorkKeys — Authorized Proctor Site', detail: 'Authorized testing site for ACT WorkKeys workforce readiness and career readiness assessments.' },
+                { label: 'Milady RISE — Proctor & Curriculum Partner', detail: 'Authorized proctor and curriculum delivery partner for Milady RISE cosmetology and barbering coursework.' },
+                { label: 'Black Certified — Partner', detail: 'Certified partner for Black Certified credentialing and professional development programs.' },
+              ].map((cred) => (
+                <div key={cred.label} className="flex gap-3 p-4 rounded-xl border border-slate-100 bg-slate-50">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-slate-900 text-sm mb-1">{cred.label}</p>
+                    <p className="text-slate-600 text-xs leading-relaxed">{cred.detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-10">
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Workforce Funding &amp; Program Partners</p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {[
+
+                { label: 'Workforce Ready Grant (WRG)', detail: 'Approved provider under Indiana\'s Workforce Ready Grant for high-demand certification programs.' },
+                { label: 'WIOA — Workforce Innovation and Opportunity Act', detail: 'Eligible Training Provider on the Indiana ETPL. Programs available at no cost to qualifying participants.' },
+                { label: 'U.S. Department of Labor — Registered Apprenticeship', detail: 'DOL Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301). Barber Apprenticeship program registered and active.' },
+                { label: 'Indiana State Board (IPLA)', detail: 'Programs aligned with Indiana Professional Licensing Agency standards for barber and cosmetology licensure.' },
+                { label: 'ITAP — Indiana Training Approval Process', detail: 'Programs approved through Indiana\'s Training Approval Process for ETPL eligibility and workforce funding.' },
+              ].map((cred) => (
+                <div key={cred.label} className="flex gap-3 p-4 rounded-xl border border-slate-100 bg-slate-50">
+                  <CheckCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-slate-900 text-sm mb-1">{cred.label}</p>
+                    <p className="text-slate-600 text-xs leading-relaxed">{cred.detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Military Service</p>
+            <div className="flex gap-3 p-4 rounded-xl border border-slate-100 bg-slate-50 max-w-md">
+              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-slate-900 text-sm mb-1">U.S. Army Veteran</p>
+                <p className="text-slate-600 text-xs leading-relaxed">Unit Supply Specialist — honorably served.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="py-14 px-4 bg-slate-900">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>

@@ -73,7 +73,17 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
 
   return (
     <>
-      {/* Video — preload auto so it starts immediately, no poster fallback */}
+      {/* Poster — shown behind the video while it loads, hidden once video is ready */}
+      {poster && (
+        <img
+          src={poster}
+          alt=""
+          aria-hidden="true"
+          className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-300 ${videoReady ? 'opacity-0' : 'opacity-100'}`}
+        />
+      )}
+
+      {/* Video — preload auto so it starts immediately */}
       {!reducedMotion && (
         <video
           ref={videoRef}

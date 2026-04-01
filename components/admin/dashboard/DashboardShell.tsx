@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip,
@@ -80,9 +80,15 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
     setSort(p => ({ key, dir: p.key === key && p.dir === "asc" ? "desc" : "asc" }));
   }
 
-  const now = new Date(data.generatedAt);
-  const hour = now.getHours();
-  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  // Defer time-dependent values to client to avoid SSR/hydration mismatch
+  const [greeting, setGreeting] = useState("Good morning");
+  const [dateLabel, setDateLabel] = useState("");
+  useEffect(() => {
+    const now = new Date();
+    const hour = now.getHours();
+    setGreeting(hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening");
+    setDateLabel(now.toLocaleString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }));
+  }, []);
   const firstName = data.profile?.full_name?.split(" ")[0] || "Admin";
 
   const trendData = useMemo(() => {
@@ -135,7 +141,7 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
         <div>
           <h2 className="text-2xl font-bold text-slate-900">{greeting}, {firstName}</h2>
           <p className="text-sm text-slate-500 mt-0.5">
-            {now.toLocaleString("en-US", { weekday:"short", month:"short", day:"numeric", hour:"numeric", minute:"2-digit" })}
+            {dateLabel}
             {blockers.length > 0 && (
               <span className="ml-2 font-semibold text-rose-600">
                 · {blockers.length} item{blockers.length !== 1 ? "s" : ""} need attention

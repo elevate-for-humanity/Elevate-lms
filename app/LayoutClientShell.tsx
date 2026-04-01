@@ -6,10 +6,6 @@ const GlobalAvatar = dynamicImport(() => import('@/components/GlobalAvatar'), {
   ssr: false,
 });
 
-const AvatarChatBar = dynamicImport(() => import('@/components/AvatarChatBar'), {
-  ssr: false,
-});
-
 const FacebookPixel = dynamicImport(() => import('@/components/FacebookPixel'), {
   ssr: false,
 });
@@ -26,7 +22,6 @@ export default function LayoutClientShell() {
   return (
     <>
       <GlobalAvatar />
-      <AvatarChatBar />
       <FacebookPixel />
       <AIAssistantBubble />
     </>

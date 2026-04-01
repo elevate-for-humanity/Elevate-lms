@@ -25,14 +25,20 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  // Load video after mount so it does not block initial page paint
+  // Load video after mount so it does not block initial page paint.
+  // Play only after canplay fires — avoids poster getting stuck on slow connections.
   useEffect(() => {
     if (reducedMotion) return;
     const v = videoRef.current;
     if (!v) return;
+    const onCanPlay = () => {
+      setVideoReady(true);
+      v.play().catch(() => {});
+    };
+    v.addEventListener('canplay', onCanPlay, { once: true });
     v.src = src;
     v.load();
-    v.play().catch(() => {});
+    return () => v.removeEventListener('canplay', onCanPlay);
   }, [reducedMotion, src]);
 
   // Start audio on first user interaction — browser autoplay policy
@@ -94,7 +100,7 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
           playsInline
           aria-hidden="true"
           onCanPlay={() => setVideoReady(true)}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
         />
       )}
 

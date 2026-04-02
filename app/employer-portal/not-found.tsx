@@ -12,7 +12,7 @@ export default function EmployerNotFound() {
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href="/employer-portal"
+            href="/employer/dashboard"
             className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold text-sm"
           >
             <Briefcase className="h-4 w-4" />

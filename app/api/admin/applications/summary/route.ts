@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { safeInternalError } from '@/lib/api/safe-error';
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -34,9 +35,7 @@ export async function GET(request: NextRequest) {
     .from('applications')
     .select('status, program_slug');
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  if (error) return safeInternalError(error, 'Failed to load applications');
 
   // Group by program_slug + status
   const counts: Record<string, Record<string, number>> = {};

@@ -147,7 +147,7 @@ export default function StudentProfilePage() {
         }, { onConflict: 'user_id' });
 
       setMessage({ type: 'success', text: 'Profile saved! Redirecting to onboarding...' });
-      setTimeout(() => router.push('/student-portal/onboarding'), 1500);
+      setTimeout(() => router.push('/onboarding/learner'), 1500);
     } catch {
       setMessage({ type: 'error', text: 'Failed to save profile. Please try again.' });
     } finally {
@@ -171,7 +171,7 @@ export default function StudentProfilePage() {
       </section>
 
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <Link href="/student-portal/onboarding" className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700 mb-6">
+        <Link href="/onboarding/learner" className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700 mb-6">
           <ArrowLeft className="w-4 h-4" />
           Back to Onboarding
         </Link>

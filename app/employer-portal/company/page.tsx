@@ -282,19 +282,19 @@ export default async function CompanyProfilePage() {
               <h3 className="font-bold text-gray-900 mb-4">Quick Actions</h3>
               <div className="space-y-3">
                 <Link
-                  href="/employer-portal/jobs/new"
+                  href="/employer/jobs/new"
                   className="block w-full px-4 py-3 bg-brand-blue-600 text-white text-center rounded-lg hover:bg-brand-blue-700 transition"
                 >
                   Post New Job
                 </Link>
                 <Link
-                  href="/employer-portal/candidates"
+                  href="/employer/candidates"
                   className="block w-full px-4 py-3 border border-brand-blue-600 text-brand-blue-600 text-center rounded-lg hover:bg-brand-blue-50 transition"
                 >
                   Browse Candidates
                 </Link>
                 <Link
-                  href="/employer-portal/wotc"
+                  href="/employer/wotc"
                   className="block w-full px-4 py-3 border border-gray-300 text-gray-700 text-center rounded-lg hover:bg-white transition"
                 >
                   View WOTC Status

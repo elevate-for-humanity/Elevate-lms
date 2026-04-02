@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { safeInternalError } from '@/lib/api/safe-error';
 import { sendSlackMessage } from '@/lib/notifications/slack';
 export const runtime = 'nodejs';
 
@@ -57,7 +58,7 @@ export async function GET(req: Request) {
       ],
     });
 
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return safeInternalError(error, 'Funding escalation cron failed');
   }
 
   const escalated = typeof data === 'number' ? data : 0;

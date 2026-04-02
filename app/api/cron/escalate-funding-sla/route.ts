@@ -6,6 +6,7 @@
 
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -31,7 +32,7 @@ async function _GET(request: Request) {
 
     if (error) {
       logger.error('escalate_funding_verification_sla RPC error:', error);
-      return NextResponse.json({ error: 'RPC failed', detail: error.message }, { status: 500 });
+      return safeInternalError(error, 'RPC escalate_funding_verification_sla failed');
     }
 
     // Also fetch current queue size for monitoring

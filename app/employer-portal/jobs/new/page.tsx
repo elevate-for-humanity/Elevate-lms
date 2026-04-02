@@ -76,7 +76,7 @@ export default function NewJobPage() {
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
-        router.push('/login?redirect=/employer-portal/jobs/new');
+        router.push('/login?redirect=/employer/jobs/new');
         return;
       }
 
@@ -110,7 +110,7 @@ export default function NewJobPage() {
         return;
       }
 
-      router.push('/employer-portal/jobs');
+      router.push('/employer/jobs');
     } catch {
       setError('Failed to create job posting. Please try again.');
     } finally {
@@ -120,11 +120,11 @@ export default function NewJobPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Jobs", href: "/employer-portal/jobs" }, { label: "New Job" }]} />
+      <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer/dashboard" }, { label: "Jobs", href: "/employer/jobs" }, { label: "New Job" }]} />
 
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <Link href="/employer-portal/jobs" className="flex items-center gap-2 text-gray-600 hover:text-brand-blue-600 mb-4">
+          <Link href="/employer/jobs" className="flex items-center gap-2 text-gray-600 hover:text-brand-blue-600 mb-4">
             <ArrowLeft className="w-4 h-4" />
             Back to Jobs
           </Link>

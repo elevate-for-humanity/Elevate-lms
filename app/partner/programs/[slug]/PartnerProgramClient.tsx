@@ -152,7 +152,7 @@ export default function PartnerProgramClient({ slug, programName }: Props) {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <Link href="/partner-portal" className="p-2 hover:bg-slate-100 rounded-lg">
+            <Link href="/program-holder/dashboard" className="p-2 hover:bg-slate-100 rounded-lg">
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>

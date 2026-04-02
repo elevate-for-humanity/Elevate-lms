@@ -188,7 +188,7 @@ export default function HandbookAcknowledgePage() {
 
       // Redirect after delay
       setTimeout(() => {
-        router.push('/student-portal/onboarding');
+        router.push('/onboarding/learner');
       }, 2000);
     } catch (err) {
       setError('Failed to submit acknowledgment. Please try again.');
@@ -235,7 +235,7 @@ export default function HandbookAcknowledgePage() {
                 View Handbook
               </Link>
               <Link
-                href="/student-portal/onboarding"
+                href="/onboarding/learner"
                 className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-brand-blue-700 transition-colors"
               >
                 Continue Onboarding
@@ -274,7 +274,7 @@ export default function HandbookAcknowledgePage() {
       <div className="max-w-3xl mx-auto px-4">
         {/* Back Link */}
         <Link
-          href="/student-portal/onboarding"
+          href="/onboarding/learner"
           className="inline-flex items-center gap-1 text-slate-600 hover:text-slate-900 mb-6"
         >
           <ChevronLeft className="w-4 h-4" />

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { safeInternalError } from '@/lib/api/safe-error';
 import { validateEnrollmentIntegrity } from '@/lib/enrollment-integrity-audit';
 import { trySendEmail } from '@/lib/email/resend';
 export const runtime = 'nodejs';
@@ -43,9 +44,7 @@ export async function GET(request: NextRequest) {
     .from('applications')
     .select('id, status, program_slug, updated_at, created_at');
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  if (error) return safeInternalError(error, 'Failed to load applications');
 
   const now = new Date();
 

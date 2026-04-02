@@ -54,6 +54,7 @@ export default function InteractiveDemoPlayer({
   const [muted, setMuted]           = useState(true);
   const [ended, setEnded]           = useState(false);
   const [loaded, setLoaded]         = useState(false);
+  const [videoError, setVideoError] = useState(false);
   const [showChoices, setShowChoices] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -64,6 +65,7 @@ export default function InteractiveDemoPlayer({
     setPlaying(false);
     setEnded(false);
     setLoaded(false);
+    setVideoError(false);
     setShowChoices(false);
     const v = videoRef.current;
     if (v) {
@@ -147,19 +149,37 @@ export default function InteractiveDemoPlayer({
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
           onEnded={() => { setPlaying(false); setEnded(true); setShowChoices(true); }}
+          onError={() => { setVideoError(true); setLoaded(true); }}
         >
           <source src={scene.videoSrc} type="video/mp4" />
         </video>
 
+        {/* Video unavailable — show poster with message */}
+        {videoError && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/90">
+            {scene.poster && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={scene.poster} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30" />
+            )}
+            <div className="relative z-10 text-center px-6">
+              <div className="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Play className="w-6 h-6 text-white/60" />
+              </div>
+              <p className="text-white font-semibold text-sm">Video walkthrough coming soon</p>
+              <p className="text-white/50 text-xs mt-1">{scene.title}</p>
+            </div>
+          </div>
+        )}
+
         {/* Loading spinner */}
-        {!loaded && (
+        {!loaded && !videoError && (
           <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
             <div className="animate-spin rounded-full h-10 w-10 border-4 border-slate-700 border-t-brand-red-500" />
           </div>
         )}
 
         {/* Click-to-play overlay (before video starts) */}
-        {loaded && !playing && !ended && (
+        {loaded && !playing && !ended && !videoError && (
           <div
             className="absolute inset-0 flex items-center justify-center bg-black/30 cursor-pointer"
             onClick={togglePlay}

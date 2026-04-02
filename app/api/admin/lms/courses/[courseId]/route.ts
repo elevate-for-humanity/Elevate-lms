@@ -9,7 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeInternalError } from '@/lib/api/safe-error';
+import { safeInternalError, safeDbError } from '@/lib/api/safe-error';
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -52,7 +52,7 @@ export async function PATCH(
       .select('id, slug, title, status')
       .single();
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    if (error) return safeDbError(error, 'DB query failed');
     return NextResponse.json({ course: data });
   } catch (error) {
     return safeInternalError(error, 'Failed to update course');
@@ -79,7 +79,7 @@ export async function DELETE(
       .update({ status: 'archived', is_active: false, updated_at: new Date().toISOString() })
       .eq('id', courseId);
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    if (error) return safeDbError(error, 'DB query failed');
     return NextResponse.json({ success: true });
   } catch (error) {
     return safeInternalError(error, 'Failed to archive course');

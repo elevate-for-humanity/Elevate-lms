@@ -73,7 +73,7 @@ export default async function PartnerSettingsPage() {
             <h1 className="text-3xl font-bold text-gray-900">Partner Settings</h1>
             <p className="text-gray-600">Manage your organization profile and preferences</p>
           </div>
-          <Link href="/partner-portal" className="text-brand-blue-600 hover:text-brand-blue-700">
+          <Link href="/program-holder/dashboard" className="text-brand-blue-600 hover:text-brand-blue-700">
             ← Back to Portal
           </Link>
         </div>

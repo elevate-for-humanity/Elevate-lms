@@ -197,7 +197,7 @@ export default async function ActivityLogPage() {
 
           {/* Pagination */}
           <div className="flex items-center justify-between mt-6">
-            <p className="text-gray-600 text-sm">Showing 1-6 of 1,234 activities</p>
+            <p className="text-gray-600 text-sm">Showing {Math.min(activities.length, 6)} of {activities.length} activities</p>
             <div className="flex gap-2">
               <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50" disabled>
                 Previous

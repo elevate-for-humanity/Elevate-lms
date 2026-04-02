@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { requireAdmin } from '@/lib/authGuards';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Video, Upload, Play, Eye } from 'lucide-react';
@@ -19,22 +19,17 @@ export const metadata: Metadata = {
 };
 
 export default async function VideosPage() {
-  const supabase = await createClient();
+  await requireAdmin();
+  const db = createAdminClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
+  const { data: videos, error } = await db
+    .from('videos')
+    .select('id, title, description, url, video_url, thumbnail_url, duration_seconds, published, category, created_at')
+    .order('created_at', { ascending: false });
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
-
-  const videos: any[] = [];
-  const totalVideos = 0;
-  const publishedVideos = 0;
+  const rows = videos ?? [];
+  const totalVideos = rows.length;
+  const publishedVideos = rows.filter((v: any) => v.published).length;
 
   return (
     <div className="min-h-screen bg-gray-50">

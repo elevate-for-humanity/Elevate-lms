@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { requireAdmin } from '@/lib/authGuards';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FileSignature, Clock, XCircle } from 'lucide-react';
@@ -18,23 +18,18 @@ export const metadata: Metadata = {
 };
 
 export default async function SignaturesPage() {
-  const supabase = await createClient();
+  await requireAdmin();
+  const db = createAdminClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
+  const { data: signatures, error } = await db
+    .from('signatures')
+    .select('id, user_id, document_type, document_id, signed_at, status, created_at')
+    .order('created_at', { ascending: false });
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
-
-  const signatures: any[] = [];
-  const totalSignatures = 0;
-  const pendingSignatures = 0;
-  const completedSignatures = 0;
+  const rows = signatures ?? [];
+  const totalSignatures = rows.length;
+  const pendingSignatures = rows.filter((s: any) => s.status === 'pending').length;
+  const completedSignatures = rows.filter((s: any) => s.status === 'completed' || s.signed_at).length;
 
   return (
     <div className="min-h-screen bg-gray-50">

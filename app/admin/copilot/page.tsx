@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { requireAdmin } from '@/lib/authGuards';
+import { createAdminClient } from '@/lib/supabase/admin';
+
 import Link from 'next/link';
 import CopilotAssistant from '@/components/admin/CopilotAssistant';
 
@@ -15,31 +16,19 @@ export const metadata: Metadata = {
 };
 
 export default async function CopilotPage() {
-  const supabase = await createClient();
+  await requireAdmin();
+  const db = createAdminClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login');
-  }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
-    redirect('/unauthorized');
-  }
-
-  // Query real deployment status from copilot_deployments table
-  const { data: deployments } = await supabase
-    .from('copilot_deployments')
-    .select('copilot_type, status')
-    .order('created_at', { ascending: false });
+  // Query real deployment status and active user count
+  const [{ data: deployments }, { count: activeUsers }] = await Promise.all([
+    db.from('copilot_deployments')
+      .select('copilot_type, status')
+      .order('created_at', { ascending: false }),
+    db.from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_active', true),
+  ]);
+  const totalDeployments = (deployments ?? []).filter((d: any) => d.status === 'active').length;
 
   const deploymentMap = new Map((deployments || []).map((d: any) => [d.copilot_type, d.status]));
 
@@ -106,8 +95,8 @@ export default async function CopilotPage() {
                 </svg>
               </span>
             </div>
-            <p className="text-3xl font-bold text-gray-900 mt-2">2,847</p>
-            <p className="text-sm text-brand-green-600 mt-1">+12% this week</p>
+            <p className="text-3xl font-bold text-gray-900 mt-2">{totalDeployments}</p>
+            <p className="text-sm text-gray-500 mt-1">Active deployments</p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -119,8 +108,8 @@ export default async function CopilotPage() {
                 </svg>
               </span>
             </div>
-            <p className="text-3xl font-bold text-gray-900 mt-2">342</p>
-            <p className="text-sm text-gray-500 mt-1">Using AI features</p>
+            <p className="text-3xl font-bold text-gray-900 mt-2">{(activeUsers ?? 0).toLocaleString()}</p>
+            <p className="text-sm text-gray-500 mt-1">Active users</p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -132,8 +121,8 @@ export default async function CopilotPage() {
                 </svg>
               </span>
             </div>
-            <p className="text-3xl font-bold text-gray-900 mt-2">94%</p>
-            <p className="text-sm text-gray-500 mt-1">Positive feedback</p>
+            <p className="text-3xl font-bold text-gray-900 mt-2">—</p>
+            <p className="text-sm text-gray-500 mt-1">No feedback data yet</p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -145,8 +134,8 @@ export default async function CopilotPage() {
                 </svg>
               </span>
             </div>
-            <p className="text-3xl font-bold text-gray-900 mt-2">45K</p>
-            <p className="text-sm text-gray-500 mt-1">Tokens this month</p>
+            <p className="text-3xl font-bold text-gray-900 mt-2">—</p>
+            <p className="text-sm text-gray-500 mt-1">Token tracking not configured</p>
           </div>
         </div>
 

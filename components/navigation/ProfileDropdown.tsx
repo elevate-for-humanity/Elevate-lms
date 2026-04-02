@@ -258,10 +258,10 @@ export function ProfileDropdown({ className }: Props) {
 
           {/* Quick Stats */}
           <div className="px-4 py-3 border-b bg-gray-50 flex items-center justify-between text-sm">
-            <Link href="/learner/courses" className="text-center hover:text-brand-blue-600" onClick={() => setIsOpen(false)}>
+            <Link href="/lms/courses" className="text-center hover:text-brand-blue-600" onClick={() => setIsOpen(false)}>
               <div className="font-semibold text-gray-900">My Courses</div>
             </Link>
-            <Link href="/learner/certificates" className="text-center hover:text-brand-blue-600" onClick={() => setIsOpen(false)}>
+            <Link href="/lms/certificates" className="text-center hover:text-brand-blue-600" onClick={() => setIsOpen(false)}>
               <div className="font-semibold text-gray-900">Certificates</div>
             </Link>
             <Link href="/notifications" className="text-center hover:text-brand-blue-600 relative" onClick={() => setIsOpen(false)}>
@@ -277,7 +277,7 @@ export function ProfileDropdown({ className }: Props) {
           {/* Menu Items */}
           <div className="py-2">
             <Link
-              href="/learner/profile"
+              href="/lms/profile"
               className="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
               onClick={() => setIsOpen(false)}
             >
@@ -289,7 +289,7 @@ export function ProfileDropdown({ className }: Props) {
             </Link>
             
             <Link
-              href="/learner/courses"
+              href="/lms/courses"
               className="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
               onClick={() => setIsOpen(false)}
             >
@@ -301,7 +301,7 @@ export function ProfileDropdown({ className }: Props) {
             </Link>
             
             <Link
-              href="/learner/certificates"
+              href="/lms/certificates"
               className="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
               onClick={() => setIsOpen(false)}
             >
@@ -330,7 +330,7 @@ export function ProfileDropdown({ className }: Props) {
             </Link>
 
             <Link
-              href="/learner/settings"
+              href="/lms/settings"
               className="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
               onClick={() => setIsOpen(false)}
             >

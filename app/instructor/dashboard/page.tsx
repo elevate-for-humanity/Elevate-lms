@@ -285,7 +285,7 @@ export default async function ProgramHolderDashboard() {
                     <p className="text-xs text-brand-blue-700">Connect with students and instructors</p>
                   </Link>
                   <Link 
-                    href="/learner/forums" 
+                    href="/lms/forums" 
                     className="block w-full text-left px-4 py-3 bg-brand-blue-50 hover:bg-brand-blue-100 rounded-lg transition border border-brand-blue-200"
                   >
                     <p className="font-medium text-brand-blue-900">Discussion Forums</p>

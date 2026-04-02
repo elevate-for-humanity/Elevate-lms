@@ -12,11 +12,11 @@ export default function CourseNotFound() {
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href="/courses/catalog"
+            href="/lms/courses"
             className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700 transition font-semibold text-sm"
           >
             <Search className="h-4 w-4" />
-            Course Catalog
+            Browse Courses
           </Link>
           <Link
             href="/"

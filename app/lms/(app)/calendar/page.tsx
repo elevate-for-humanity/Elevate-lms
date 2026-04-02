@@ -300,10 +300,10 @@ export default async function CalendarPage() {
             <div className="bg-brand-blue-600 rounded-2xl p-6 text-white">
               <h3 className="font-bold mb-4">Quick Actions</h3>
               <div className="space-y-2">
-                <Link href="/learner/assignments" className="block w-full text-center bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition">
+                <Link href="/lms/assignments" className="block w-full text-center bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition">
                   View All Assignments
                 </Link>
-                <Link href="/learner/grades" className="block w-full text-center bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition">
+                <Link href="/lms/grades" className="block w-full text-center bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition">
                   Check Grades
                 </Link>
                 <Link href="/lms/support" className="block w-full text-center bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition">

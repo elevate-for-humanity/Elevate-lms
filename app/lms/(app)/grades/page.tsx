@@ -439,14 +439,14 @@ export default async function GradesPage() {
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
-                href="/learner/assignments"
+                href="/lms/assignments"
                 className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
               >
                 <FileText className="w-5 h-5" />
                 View Assignments
               </Link>
               <Link
-                href="/learner/quizzes"
+                href="/lms/quizzes"
                 className="inline-flex items-center gap-2 border border-slate-200 text-slate-700 px-6 py-3 rounded-xl font-bold hover:bg-white transition"
               >
                 <Circle className="w-5 h-5" />

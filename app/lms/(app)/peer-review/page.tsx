@@ -135,7 +135,7 @@ export default async function PeerReviewPage() {
                   Submit assignments in your courses to receive peer feedback
                 </p>
                 <Link
-                  href="/learner/courses"
+                  href="/lms/courses"
                   className="text-brand-blue-600 hover:text-brand-blue-700 font-medium text-sm"
                 >
                   Go to My Courses →

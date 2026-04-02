@@ -190,7 +190,7 @@ export default function RiseFoundationPage() {
           {/* Programs Link */}
           <div className="text-center mt-12">
             <Link
-              href="/rise-foundation/our-programs"
+              href="/rise-foundation"
               className="text-lg text-purple-600 hover:text-purple-700 font-semibold underline"
             >
               Mindfulness Workshops, Mental Wellness Programs Holistic, Mental

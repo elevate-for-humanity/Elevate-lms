@@ -313,7 +313,7 @@ export default async function LibraryPage() {
               Course materials and resources will appear here once you enroll in courses.
             </p>
             <Link
-              href="/learner/courses"
+              href="/lms/courses"
               className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
             >
               <BookOpen className="w-5 h-5" />
@@ -327,21 +327,21 @@ export default async function LibraryPage() {
           <h2 className="text-xl font-bold mb-4">Quick Access</h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
             <Link
-              href="/learner/courses"
+              href="/lms/courses"
               className="flex items-center gap-3 p-3 bg-white/10 rounded-lg hover:bg-white/20 transition"
             >
               <BookOpen className="w-5 h-5" />
               <span>My Courses</span>
             </Link>
             <Link
-              href="/learner/assignments"
+              href="/lms/assignments"
               className="flex items-center gap-3 p-3 bg-white/10 rounded-lg hover:bg-white/20 transition"
             >
               <FileText className="w-5 h-5" />
               <span>Assignments</span>
             </Link>
             <Link
-              href="/learner/resources"
+              href="/lms/resources"
               className="flex items-center gap-3 p-3 bg-white/10 rounded-lg hover:bg-white/20 transition"
             >
               <Folder className="w-5 h-5" />

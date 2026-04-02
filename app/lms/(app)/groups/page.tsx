@@ -220,14 +220,14 @@ export default async function GroupsPage() {
                     Join a Group
                   </Link>
                   <Link
-                    href="/learner/messages"
+                    href="/lms/messages"
                     className="flex items-center gap-2 w-full px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition"
                   >
                     <MessageSquare className="w-4 h-4" />
                     Messages
                   </Link>
                   <Link
-                    href="/learner/calendar"
+                    href="/lms/calendar"
                     className="flex items-center gap-2 w-full px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition"
                   >
                     <Calendar className="w-4 h-4" />
@@ -262,7 +262,7 @@ export default async function GroupsPage() {
 
         {/* Back Link */}
         <div className="mt-8 text-center">
-          <Link href="/learner/community" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
+          <Link href="/lms/community" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
             ← Back to Community
           </Link>
         </div>

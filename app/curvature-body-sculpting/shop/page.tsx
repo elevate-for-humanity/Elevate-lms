@@ -665,7 +665,7 @@ export default function CurvatureShopPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/nonprofit/mental-wellness"
+              href="/contact"
               className="px-6 py-3 bg-white text-purple-900 font-medium rounded-lg hover:bg-purple-50 transition"
             >
               Learn About Selfish Inc.

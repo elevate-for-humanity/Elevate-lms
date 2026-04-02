@@ -57,6 +57,12 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
   // Use string so the field can be cleared while typing without snapping back
   const [customAmountStr, setCustomAmountStr] = useState(String(PRICING.defaultDownPayment));
   const customAmount = parseInt(customAmountStr) || 0;
+  // Clamped value used at checkout — prevents submitting 0 or out-of-range amounts
+  // even if the user clears the field and submits without blurring.
+  const clampedCheckoutAmount = Math.min(
+    PRICING.fullPrice,
+    Math.max(PRICING.minDownPayment, customAmount || PRICING.minDownPayment),
+  );
   
   // Form state
   const [formData, setFormData] = useState({
@@ -133,7 +139,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
         // 1. Get checkout config from our API
         // 2. Load Affirm JS SDK
         // 3. Call affirm.checkout() which opens their modal
-        const affirmAmount = Math.max(PRICING.setupFee, customAmount);
+        const affirmAmount = Math.max(PRICING.setupFee, clampedCheckoutAmount);
         checkoutResponse = await fetch('/api/affirm/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -203,7 +209,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
         return;
       } else if (paymentOption === 'sezzle') {
         // Sezzle - pay over time. Minimum is the setup fee ($1,743).
-        const sezzleAmount = Math.min(2500, Math.max(PRICING.setupFee, customAmount));
+        const sezzleAmount = Math.min(2500, Math.max(PRICING.setupFee, clampedCheckoutAmount));
         checkoutResponse = await fetch('/api/sezzle/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -255,7 +261,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
           body: JSON.stringify({
             ...basePayload,
             payment_type: 'payment_plan',
-            custom_setup_fee: customAmount,
+            custom_setup_fee: clampedCheckoutAmount,
           }),
         });
       } else {

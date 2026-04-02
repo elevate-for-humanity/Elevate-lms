@@ -25,7 +25,7 @@ export default function ProgramPaymentOptions({
 
   const handlePayment = async (method: string) => {
     try {
-      const response = await fetch('/api/programs/checkout', {
+      const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

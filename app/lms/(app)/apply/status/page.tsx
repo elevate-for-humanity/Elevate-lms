@@ -163,7 +163,7 @@ export default function ApplicationStatusPage() {
 
           {config.showEnrollButton && (
             <Link
-              href="/learner/enroll"
+              href="/lms/enroll"
               className="inline-flex items-center gap-2 bg-emerald-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-emerald-700"
             >
               Proceed to Enrollment

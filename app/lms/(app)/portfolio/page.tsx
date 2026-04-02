@@ -177,7 +177,7 @@ export default async function PortfolioPage() {
                     Complete courses to earn certificates and credentials
                   </p>
                   <Link
-                    href="/learner/courses"
+                    href="/lms/courses"
                     className="text-brand-blue-600 hover:text-brand-blue-700 font-medium text-sm"
                   >
                     Browse Courses →
@@ -283,7 +283,7 @@ export default async function PortfolioPage() {
                   <Trophy className="w-5 h-5 text-yellow-600" />
                   Recent Badges
                 </h2>
-                <Link href="/learner/badges" className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium">
+                <Link href="/lms/badges" className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium">
                   View All
                 </Link>
               </div>

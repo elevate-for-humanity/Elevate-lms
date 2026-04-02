@@ -8,6 +8,9 @@ import { BARBER_PRICING, calculateWeeklyPayment } from '@/lib/programs/pricing';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { runBarberPostPayment } from '@/lib/enrollment/barber-post-payment';
 
+const MILADY_LOGIN_URL =
+  process.env.MILADY_LOGIN_URL || 'https://milady.cengage.com/';
+
 /**
  * Schedule weekly invoices for a customer
  * Creates invoice items for each Friday until program completion
@@ -195,15 +198,17 @@ async function _POST(request: NextRequest) {
 
           // Update applications.payment_status so the admin approval gate passes
           if (applicationId) {
-            await supabase
+            const appUpdateResult = await supabase
               .from('applications')
               .update({
                 payment_status: 'paid',
                 payment_intent_id: session.payment_intent as string ?? null,
                 updated_at: new Date().toISOString(),
               })
-              .eq('id', applicationId)
-              .catch((err: unknown) => logger.error('[barber/webhook] applications payment_status update (full_tuition) failed (non-fatal):', err));
+              .eq('id', applicationId);
+            if (appUpdateResult?.error) {
+              logger.error('[barber/webhook] applications payment_status update (full_tuition) failed (non-fatal):', appUpdateResult.error);
+            }
           }
 
           // ── Wire weekly billing via Stripe subscription ──────────────────
@@ -301,6 +306,7 @@ async function _POST(request: NextRequest) {
             }
           } else {
             // No application_id — send legacy welcome email
+            try {
             const { sendEmail } = await import('@/lib/email/sendgrid');
             let paymentSummary = '';
             if (fullyPaid) {
@@ -409,22 +415,24 @@ ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive ev
             transferred_hours_verified: transferredHours,
             payment_model: fullyPaid ? 'paid_in_full' : 'invoices',
             created_at: new Date().toISOString(),
-          }).select('id').single().catch((err: any) => {
-            logger.error('barber_subscriptions insert error:', err);
-            return { data: null };
-          });
+          }).select('id').single();
+          if (subRecord?.error) {
+            logger.error('barber_subscriptions insert error:', subRecord.error);
+          }
 
           // Update applications.payment_status so the admin approval gate passes
           if (applicationId) {
-            await supabase
+            const enrollAppUpdate = await supabase
               .from('applications')
               .update({
                 payment_status: 'paid',
                 payment_intent_id: session.payment_intent as string ?? null,
                 updated_at: new Date().toISOString(),
               })
-              .eq('id', applicationId)
-              .catch((err: unknown) => logger.error('[barber/webhook] applications payment_status update failed (non-fatal):', err));
+              .eq('id', applicationId);
+            if (enrollAppUpdate?.error) {
+              logger.error('[barber/webhook] applications payment_status update failed (non-fatal):', enrollAppUpdate.error);
+            }
           }
 
           // Normalize email so the account-linking query in auth/confirm matches
@@ -567,17 +575,34 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
             logger.error('[barber/webhook] Milady email failed (non-fatal):', miladyEmailErr);
           }
 
-          // Queue Milady provisioning record for admin dashboard visibility
-          await supabase
+          // Queue Milady provisioning — idempotent: skip if a non-failed row already exists
+          const { data: existingQueue } = await supabase
             .from('milady_provisioning_queue')
-            .insert({
-              student_email: customerEmail,
-              student_name: customerName || null,
-              program_slug: 'barber-apprenticeship',
-              status: 'pending',
-            })
-            .catch((err: unknown) => logger.error('[barber/webhook] milady_provisioning_queue insert failed (non-fatal):', err));
-          } catch (legacyErr) { logger.error('[barber/webhook] legacy Milady email failed (non-fatal)', legacyErr); } } // end legacy path
+            .select('id')
+            .eq('student_email', customerEmail)
+            .eq('program_slug', 'barber-apprenticeship')
+            .in('status', ['pending', 'processing', 'complete'])
+            .limit(1)
+            .maybeSingle();
+
+          if (!existingQueue) {
+            const { error: queueErr } = await supabase
+              .from('milady_provisioning_queue')
+              .insert({
+                student_email: customerEmail,
+                student_name: customerName || null,
+                program_slug: 'barber-apprenticeship',
+                status: 'pending',
+              });
+            if (queueErr) {
+              logger.error('[barber/webhook] milady_provisioning_queue insert failed', {
+                error: queueErr.message,
+                student_email: customerEmail,
+              });
+              throw queueErr;
+            }
+          }
+          } // end if (!applicationId) — legacy path
 
           logger.info(`Barber public enrollment complete: ${customerEmail}, fullyPaid: ${fullyPaid}`);
           break;
@@ -814,7 +839,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
 
             // Queue Milady provisioning so admins have an in-app record.
             // Email alone is fragile — if missed, student waits with no visibility.
-            await supabase
+            const miladyQueueResult = await supabase
               .from('milady_provisioning_queue')
               .insert({
                 student_id: userId || null,
@@ -822,8 +847,10 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
                 student_name: customerName || null,
                 program_slug: 'barber-apprenticeship',
                 status: 'pending',
-              })
-              .catch((err: unknown) => logger.error('milady_provisioning_queue insert failed:', err));
+              });
+            if (miladyQueueResult?.error) {
+              logger.error('milady_provisioning_queue insert failed:', miladyQueueResult.error);
+            }
 
             logger.info(`Milady email sent to ${customerEmail}`);
           } catch (emailErr) {

@@ -9,13 +9,9 @@ import { ArrowRight } from 'lucide-react';
 export const dynamic = 'force-static';
 export const revalidate = 86400;
 
-// EligibilityScreener is a client component — imported dynamically so it
-// doesn't break static generation of the rest of the page.
-import dynamic_import from 'next/dynamic';
-const EligibilityScreener = dynamic_import(
-  () => import('@/components/funding/EligibilityScreener'),
-  { ssr: false },
-);
+// EligibilityScreener is a client component — imported via a client wrapper
+// so ssr:false is valid (not allowed directly in Server Components).
+import EligibilityScreener from '@/components/funding/EligibilityScreenerClient';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding' },

@@ -1,36 +1,14 @@
-/** @deprecated Use canonical clients: @/lib/supabase/client, @/lib/supabase/server, @/lib/supabase/admin */
-// lib/supabaseAdmin.ts
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+/** @deprecated Use '@/lib/supabase/admin' instead. */
+import { createAdminClient } from '@/lib/supabase/admin';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
-// Lazy initialization to prevent build-time errors
-let _supabaseAdmin: SupabaseClient | null = null;
+// Lazy singleton — evaluated on first access, not at module load time.
+let _client: SupabaseClient<any> | null = null;
 
-function getSupabaseAdmin(): SupabaseClient {
-  if (_supabaseAdmin) return _supabaseAdmin;
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !supabaseKey) {
-    // Return a no-op client — never throw on cold start
-    _supabaseAdmin = createClient('https://placeholder.supabase.co', 'placeholder', {
-      auth: { persistSession: false },
-    });
-    return _supabaseAdmin;
-  }
-
-  _supabaseAdmin = createClient(supabaseUrl, supabaseKey, {
-    auth: {
-      persistSession: false,
-    },
-  });
-
-  return _supabaseAdmin;
-}
-
-// Export a proxy that lazily initializes
-export const supabaseAdmin = new Proxy({} as SupabaseClient, {
-  get(_, prop) {
-    return getSupabaseAdmin()[prop as keyof SupabaseClient];
+/** @deprecated Use createAdminClient() from '@/lib/supabase/admin' instead. */
+export const supabaseAdmin: SupabaseClient<any> = new Proxy({} as SupabaseClient<any>, {
+  get(_target, prop) {
+    if (!_client) _client = createAdminClient();
+    return (_client as any)[prop];
   },
 });

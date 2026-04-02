@@ -376,7 +376,7 @@ export default async function StudyGroupsPage() {
 
         {/* Back Link */}
         <div className="mt-8 text-center">
-          <Link href="/learner/community" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
+          <Link href="/lms/community" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
             ← Back to Community
           </Link>
         </div>

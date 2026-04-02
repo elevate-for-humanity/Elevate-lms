@@ -139,7 +139,7 @@ export default function CurvatureCareersPage() {
               View Open Positions
             </a>
             <Link
-              href="/programs/esthetician-apprenticeship"
+              href="/programs"
               className="px-8 py-4 border-2 border-purple-700 text-purple-700 font-bold rounded-lg hover:bg-purple-50 transition"
             >
               Get Trained First
@@ -202,7 +202,7 @@ export default function CurvatureCareersPage() {
                 </p>
                 <div className="flex flex-wrap gap-3">
                   <Link
-                    href="/programs/esthetician-apprenticeship"
+                    href="/programs"
                     className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition"
                   >
                     Esthetician Program <ArrowRight className="w-4 h-4" />
@@ -306,7 +306,7 @@ export default function CurvatureCareersPage() {
               Apply Now
             </Link>
             <Link
-              href="/programs/esthetician-apprenticeship"
+              href="/programs"
               className="px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition"
             >
               Get Free Training

@@ -45,7 +45,7 @@ export default async function CareerMessagesPage() {
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <Link href="/learner/messages" className="p-2 hover:bg-white rounded-lg">
+            <Link href="/lms/messages" className="p-2 hover:bg-white rounded-lg">
               <ChevronLeft className="w-5 h-5" />
             </Link>
             <div>

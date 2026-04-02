@@ -173,7 +173,7 @@ export default async function StateBoardExamPage() {
                 </span>
               ) : (
                 <Link
-                  href="/learner/progress"
+                  href="/lms/progress"
                   className="px-3 py-2 bg-brand-blue-100 text-brand-blue-700 text-sm font-semibold rounded-full hover:bg-brand-blue-200"
                 >
                   Access Milady →
@@ -326,7 +326,7 @@ export default async function StateBoardExamPage() {
               Complete all requirements above to unlock exam scheduling.
             </p>
             <Link
-              href="/learner/progress"
+              href="/lms/progress"
               className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700"
             >
               View My Progress <ArrowRight className="w-4 h-4" />

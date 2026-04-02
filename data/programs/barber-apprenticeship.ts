@@ -69,25 +69,25 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
       title: 'Barber Apprentice',
       timeframe: '0–12 months (during program)',
       requirements: 'Enrolled in DOL Registered Apprenticeship',
-      salaryRange: '$24,000–$30,000 (after licensing)',
+      salaryRange: 'Employer-set (min. wage compliant)',
     },
     {
       title: 'Licensed Barber',
       timeframe: '1–3 years',
       requirements: 'Indiana Barber License + 2,000 hours completed',
-      salaryRange: '$30,000–$45,000',
+      salaryRange: 'Employer-set',
     },
     {
       title: 'Senior Barber / Specialist',
       timeframe: '3–5 years',
       requirements: 'Established clientele + advanced techniques',
-      salaryRange: '$45,000–$65,000',
+      salaryRange: 'Employer-set',
     },
     {
       title: 'Shop Owner / Master Barber',
       timeframe: '5+ years',
       requirements: 'Business license + management experience',
-      salaryRange: '$65,000–$100,000+',
+      salaryRange: 'Independent',
     },
   ],
 
@@ -211,18 +211,18 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   ],
 
   laborMarket: {
-    medianSalary: 35760,
-    salaryRange: '$24,000–$65,000+',
+    medianSalary: 0,
+    salaryRange: 'Employer-determined',
     growthRate: '+5% (average)',
     source: 'U.S. Bureau of Labor Statistics, Occupational Outlook Handbook',
     sourceYear: 2024,
     region: 'Indiana',
   },
   careers: [
-    { title: 'Licensed Barber', salary: '$30,000–$45,000' },
-    { title: 'Senior Barber', salary: '$45,000–$65,000' },
-    { title: 'Barbershop Manager', salary: '$50,000–$70,000' },
-    { title: 'Shop Owner', salary: '$65,000–$100,000+' },
+    { title: 'Licensed Barber', salary: 'Employer-set' },
+    { title: 'Senior Barber', salary: 'Employer-set' },
+    { title: 'Barbershop Manager', salary: 'Employer-set' },
+    { title: 'Shop Owner', salary: 'Independent' },
   ],
 
   cta: {

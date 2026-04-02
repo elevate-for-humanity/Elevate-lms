@@ -320,7 +320,7 @@ export default async function ProgramDashboardPage({ params }: { params: Params 
             <span className="text-sm font-medium text-gray-700">Back to Dashboard</span>
           </Link>
           <Link
-            href="/learner/certificates"
+            href="/lms/certificates"
             className="bg-white rounded-xl border p-4 hover:border-brand-blue-300 transition text-center"
           >
             <span className="text-sm font-medium text-gray-700">All Certificates</span>

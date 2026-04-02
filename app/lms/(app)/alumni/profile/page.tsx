@@ -148,7 +148,7 @@ export default function AlumniProfilePage() {
           <nav className="flex items-center gap-2 text-sm text-gray-500 mb-4">
             <Link href="/lms/dashboard" className="hover:text-gray-700">LMS</Link>
             <ChevronRight className="w-4 h-4" />
-            <Link href="/learner/alumni" className="hover:text-gray-700">Alumni</Link>
+            <Link href="/lms/alumni" className="hover:text-gray-700">Alumni</Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-gray-900 font-medium">My Profile</span>
           </nav>
@@ -369,7 +369,7 @@ export default function AlumniProfilePage() {
 
           {/* Submit */}
           <div className="flex items-center justify-end gap-4">
-            <Link href="/learner/alumni" className="px-4 py-2 text-gray-700 hover:text-gray-900">
+            <Link href="/lms/alumni" className="px-4 py-2 text-gray-700 hover:text-gray-900">
               Cancel
             </Link>
             <button

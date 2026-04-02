@@ -517,7 +517,7 @@ export default async function LearnerDashboardPage() {
                               <MessageSquare className="w-3.5 h-3.5" /> Contact Advisor
                             </Link>
                             <Link
-                              href="/learner/attendance"
+                              href="/lms/attendance"
                               className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 text-gray-600 text-xs font-semibold rounded-lg hover:bg-gray-50 transition"
                             >
                               <Calendar className="w-3.5 h-3.5" /> Track Hours
@@ -699,7 +699,7 @@ export default async function LearnerDashboardPage() {
                 <div className="p-6 border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <h2 className="text-lg font-semibold text-gray-900">Certification Progress</h2>
-                    <Link href="/learner/certifications" className="text-sm text-brand-orange-600 hover:text-brand-orange-700">
+                    <Link href="/lms/certificates" className="text-sm text-brand-orange-600 hover:text-brand-orange-700">
                       View All
                     </Link>
                   </div>
@@ -790,7 +790,7 @@ export default async function LearnerDashboardPage() {
                               </div>
                             )}
                             <Link
-                              href={`/learner/certifications/${req.id}/upload`}
+                              href={`/lms/certificates/${req.id}/upload`}
                               className="flex items-center justify-center gap-2 w-full px-3 py-2 bg-brand-blue-600 text-white text-xs font-medium rounded-lg hover:bg-brand-blue-700"
                             >
                               <Upload className="w-3.5 h-3.5" />
@@ -808,7 +808,7 @@ export default async function LearnerDashboardPage() {
 
                         {req.status === 'certificate_issued' && (
                           <Link
-                            href={`/learner/certifications/${req.id}`}
+                            href={`/lms/certificates/${req.id}`}
                             className="flex items-center justify-center gap-2 w-full px-3 py-2 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700"
                           >
                             <Award className="w-3.5 h-3.5" />

@@ -55,25 +55,25 @@ export function DashboardSidebar({
         </h3>
         <div className="space-y-2">
           <Link
-            href="/learner/courses"
+            href="/lms/courses"
             className="block px-3 py-2 text-sm text-black hover:bg-brand-red-50 hover:text-brand-red-700 rounded-lg transition"
           >
             Browse Courses
           </Link>
           <Link
-            href="/learner/assignments"
+            href="/lms/assignments"
             className="block px-3 py-2 text-sm text-black hover:bg-brand-red-50 hover:text-brand-red-700 rounded-lg transition"
           >
             View Assignments
           </Link>
           <Link
-            href="/learner/grades"
+            href="/lms/grades"
             className="block px-3 py-2 text-sm text-black hover:bg-brand-red-50 hover:text-brand-red-700 rounded-lg transition"
           >
             Check Grades
           </Link>
           <Link
-            href="/learner/certificates"
+            href="/lms/certificates"
             className="block px-3 py-2 text-sm text-black hover:bg-brand-red-50 hover:text-brand-red-700 rounded-lg transition"
           >
             My Certificates
@@ -119,7 +119,7 @@ export function DashboardSidebar({
           </div>
         </div>
         <Link
-          href="/learner/calendar"
+          href="/lms/calendar"
           className="block mt-3 text-center text-sm text-brand-orange-600 hover:text-brand-red-700 font-medium"
         >
           View Full Calendar →
@@ -167,7 +167,7 @@ export function DashboardSidebar({
           )}
         </h3>
         <Link
-          href="/learner/notifications"
+          href="/lms/notifications"
           className="block text-sm text-brand-orange-600 hover:text-brand-red-700 font-medium"
         >
           View All Notifications →
@@ -211,28 +211,28 @@ export function LeftSidebar() {
           Dashboard
         </Link>
         <Link
-          href="/learner/courses"
+          href="/lms/courses"
           className="flex items-center gap-3 px-3 py-2 text-sm text-black hover:bg-white rounded-lg transition"
         >
           <BookOpen className="w-4 h-4" />
           My Courses
         </Link>
         <Link
-          href="/learner/calendar"
+          href="/lms/calendar"
           className="flex items-center gap-3 px-3 py-2 text-sm text-black hover:bg-white rounded-lg transition"
         >
           <Calendar className="w-4 h-4" />
           Calendar
         </Link>
         <Link
-          href="/learner/grades"
+          href="/lms/grades"
           className="flex items-center gap-3 px-3 py-2 text-sm text-black hover:bg-white rounded-lg transition"
         >
           <Award className="w-4 h-4" />
           Grades
         </Link>
         <Link
-          href="/learner/notifications"
+          href="/lms/notifications"
           className="flex items-center gap-3 px-3 py-2 text-sm text-black hover:bg-white rounded-lg transition"
         >
           <Bell className="w-4 h-4" />

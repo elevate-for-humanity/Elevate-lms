@@ -111,7 +111,7 @@ export default function UnifiedPaymentFlow({
     setError('');
 
     try {
-      const response = await fetch('/api/programs/checkout', {
+      const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

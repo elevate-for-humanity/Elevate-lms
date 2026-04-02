@@ -84,7 +84,7 @@ export default async function ApplyPage({
 
         {/* Student — full width, image fills left side */}
         <Link
-          href="/start"
+          href="/funding"
           className="block rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow group"
         >
           <div className="flex flex-col md:flex-row">
@@ -101,21 +101,19 @@ export default async function ApplyPage({
                 Most Popular
               </span>
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">
-                Student Application
+                Student Programs
               </h2>
               <p className="text-slate-700 mb-3">
-                Apply for career training in healthcare, skilled trades, barbering, IT, and more.
-                Many programs are funded through WIOA, WRG, and Job Ready Indy grants. Some programs
-                have tuition with flexible payment options available.
+                Start by checking eligibility for funded training and apprenticeships.
               </p>
               <ul className="text-slate-600 text-sm space-y-1 mb-4 list-disc list-inside">
-                <li>Register at indianacareerconnect.com for funding</li>
-                <li>Pick your program during the application</li>
-                <li>Payment plans and BNPL options for paid programs</li>
+                <li>Many programs are fully funded through WIOA, WRG, and Job Ready Indy</li>
+                <li>Takes 2 minutes to check eligibility</li>
+                <li>Self-pay options with payment plans available if you don't qualify</li>
                 <li>Response within 1-2 business days</li>
               </ul>
               <span className="inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold px-5 py-2.5 rounded-lg group-hover:gap-3 transition-all text-sm">
-                Apply Now <ArrowRight className="w-4 h-4" />
+                Check My Eligibility <ArrowRight className="w-4 h-4" />
               </span>
             </div>
           </div>

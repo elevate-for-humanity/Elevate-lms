@@ -135,6 +135,15 @@ export function BarberEnrollment() {
             </div>
           </div>
 
+          {/* Self-pay messaging */}
+          <div className="max-w-2xl mx-auto mb-6 bg-amber-50 p-6 rounded-xl border border-amber-200">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Self-Pay Enrollment Option</h3>
+            <p className="text-slate-700">
+              If you do not qualify for funding, you can enroll directly. Paid applicants are
+              reviewed and approved before onboarding begins.
+            </p>
+          </div>
+
           {/* Payment options info */}
           <div className="max-w-2xl mx-auto mb-10 bg-white p-6 rounded-xl border border-slate-200">
             <h3 className="font-bold text-slate-900 mb-3">Payment Options</h3>

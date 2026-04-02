@@ -53,10 +53,10 @@ export const CURRICULUM = [
 ];
 
 export const CAREERS = [
-  { title: 'Licensed Barber', salary: '$30K-$50K', demand: 'High demand' },
-  { title: 'Senior Barber / Stylist', salary: '$50K-$70K', demand: 'Experience-based' },
-  { title: 'Shop Manager', salary: '$45K-$65K', demand: 'Leadership path' },
-  { title: 'Shop Owner', salary: '$60K-$120K+', demand: 'Entrepreneurship' },
+  { title: 'Licensed Barber', salary: 'Employer-set', demand: 'High demand' },
+  { title: 'Senior Barber / Stylist', salary: 'Employer-set', demand: 'Experience-based' },
+  { title: 'Shop Manager', salary: 'Employer-set', demand: 'Leadership path' },
+  { title: 'Shop Owner', salary: 'Independent', demand: 'Entrepreneurship' },
 ];
 
 export const ENROLLMENT_STEPS = [

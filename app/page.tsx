@@ -60,11 +60,11 @@ export default function HomePage() {
               ))}
             </ul>
             <div className="flex flex-wrap gap-3">
-              <Link href="/check-eligibility" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-base">
+              <Link href="/funding" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-base">
                 Check My Eligibility
               </Link>
-              <Link href="/programs" className="border-2 border-white/30 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors text-base">
-                Explore Programs
+              <Link href="/licensing-partnerships" className="border-2 border-white/30 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors text-base">
+                License the Platform
               </Link>
             </div>
             {/* Audience routing */}

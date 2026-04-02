@@ -7,7 +7,7 @@ import HeroVideo from '@/components/marketing/HeroVideo';
 import heroBanners from '@/content/heroBanners';
 import {
   Award, Clock, ChevronRight, MapPin, BookOpen,
-  Briefcase, TrendingUp, DollarSign, AlertTriangle,
+  Briefcase, TrendingUp, AlertTriangle,
   Building2, FileText, Users, Scissors, ClipboardList,
 } from 'lucide-react';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
@@ -91,10 +91,10 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
               <h2 className="text-xl font-bold text-slate-900">Career Pathway</h2>
             </div>
             <p className="text-slate-700 leading-relaxed">
-              Start as a <strong>Barber Apprentice</strong> — a paid W-2 employee at your host shop — while you train under a licensed barber.
-              After completing 2,000 hours and passing the Indiana state exam, you become a <strong>Licensed Barber</strong> ($30,000–$45,000).
-              With 3–5 years of experience and an established clientele, you advance to <strong>Senior Barber</strong> ($45,000–$65,000).
-              Many graduates go on to open their own shop as a <strong>Shop Owner / Master Barber</strong> ($65,000–$100,000+).
+              Start as a <strong>Barber Apprentice</strong> — a W-2 employee at your host shop — while you train under a licensed barber.
+              After completing 2,000 hours and passing the Indiana state exam, you become a <strong>Licensed Barber</strong>.
+              With experience and an established clientele, you can advance to <strong>Senior Barber</strong> or open your own shop.
+              Compensation is determined by each participating shop and must comply with applicable wage requirements. Elevate tracks training progress and hours.
             </p>
           </div>
           <div className="relative h-72 rounded-xl overflow-hidden shadow-lg">
@@ -215,12 +215,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
             </div>
             <h2 className="text-xl font-bold text-slate-900">Career Outcomes</h2>
           </div>
-          <div className="grid sm:grid-cols-3 gap-4 mb-6">
-            <div className="bg-brand-green-50 rounded-lg p-6 text-center border border-brand-green-100">
-              <DollarSign className="w-8 h-8 text-brand-green-600 mx-auto" />
-              <div className="text-3xl font-bold text-slate-900 mt-2">${p.laborMarket.medianSalary.toLocaleString()}</div>
-              <div className="text-sm text-slate-600">Median Annual Salary</div>
-            </div>
+          <div className="grid sm:grid-cols-2 gap-4 mb-6">
             <div className="bg-brand-blue-50 rounded-lg p-6 text-center border border-brand-blue-100">
               <TrendingUp className="w-8 h-8 text-brand-blue-600 mx-auto" />
               <div className="text-3xl font-bold text-slate-900 mt-2">{p.laborMarket.growthRate}</div>
@@ -228,19 +223,21 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
             </div>
             <div className="bg-white rounded-lg p-6 text-center border border-slate-200">
               <Building2 className="w-8 h-8 text-slate-600 mx-auto" />
-              <div className="text-lg font-bold text-slate-900 mt-2">{p.laborMarket.salaryRange}</div>
-              <div className="text-sm text-slate-600">Salary Range ({p.laborMarket.region})</div>
+              <div className="text-lg font-bold text-slate-900 mt-2">Indiana</div>
+              <div className="text-sm text-slate-600">Program Region</div>
             </div>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {p.careers.map((c, i) => (
               <div key={i} className="flex items-center justify-between bg-white rounded-lg px-4 py-3 border border-slate-200">
                 <span className="font-medium text-slate-900 text-sm">{c.title}</span>
-                <span className="text-sm text-brand-green-700 font-medium">{c.salary}</span>
+                <span className="text-sm text-slate-500 font-medium">{c.salary}</span>
               </div>
             ))}
           </div>
-          <p className="text-xs text-slate-500 mt-3">Source: {p.laborMarket.source}, {p.laborMarket.sourceYear}</p>
+          <p className="text-xs text-slate-500 mt-3">
+            Compensation is determined by each participating shop and must comply with applicable wage requirements. Elevate tracks training progress and hours.
+          </p>
         </div>
       </section>
 

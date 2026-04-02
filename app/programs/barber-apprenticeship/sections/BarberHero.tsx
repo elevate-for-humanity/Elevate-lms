@@ -41,12 +41,12 @@ export function BarberHero() {
       {/* CTAs below hero */}
       <section className="py-6 border-b">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="flex flex-wrap gap-3">
-            <a href="#program-overview" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-3 rounded-lg transition-colors">
-              Learn More <ArrowRight className="w-4 h-4" />
-            </a>
-            <Link href="/inquiry?subject=Barber+Apprenticeship" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors">
-              Join Waitlist <ArrowRight className="w-4 h-4" />
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link href="/funding?program=barber-apprenticeship" className="inline-flex items-center justify-center rounded-lg bg-red-600 px-6 py-3 text-base font-semibold text-white hover:bg-red-700 transition-colors">
+              Check Eligibility
+            </Link>
+            <Link href="/checkout/barber-apprenticeship" className="inline-flex items-center justify-center rounded-lg border-2 border-gray-300 px-6 py-3 text-base font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+              Self-Pay Enrollment
             </Link>
           </div>
         </div>

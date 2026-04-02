@@ -244,6 +244,8 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
         .from('applications')
         .update({
           status: 'payment_received',
+          payment_status: 'paid',
+          payment_intent_id: session.payment_intent as string ?? null,
           payment_received_at: new Date().toISOString(),
         })
         .eq('id', applicationId);

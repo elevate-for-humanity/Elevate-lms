@@ -194,6 +194,19 @@ async function _POST(request: NextRequest) {
             created_at: new Date().toISOString(),
           });
 
+          // Update applications.payment_status so the admin approval gate passes
+          if (applicationId) {
+            await supabase
+              .from('applications')
+              .update({
+                payment_status: 'paid',
+                payment_intent_id: session.payment_intent as string ?? null,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', applicationId)
+              .catch((err: unknown) => logger.error('[barber/webhook] applications payment_status update (full_tuition) failed (non-fatal):', err));
+          }
+
           // ── Wire weekly billing via Stripe subscription ──────────────────
           // Only for card payments on a payment plan (BNPL providers manage
           // their own schedules; fully-paid students have no recurring balance).
@@ -389,6 +402,19 @@ ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive ev
             logger.error('barber_subscriptions insert error:', err);
             return { data: null };
           });
+
+          // Update applications.payment_status so the admin approval gate passes
+          if (applicationId) {
+            await supabase
+              .from('applications')
+              .update({
+                payment_status: 'paid',
+                payment_intent_id: session.payment_intent as string ?? null,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', applicationId)
+              .catch((err: unknown) => logger.error('[barber/webhook] applications payment_status update failed (non-fatal):', err));
+          }
 
           // Normalize email so the account-linking query in auth/confirm matches
           // regardless of how Stripe or the user cased it at checkout.

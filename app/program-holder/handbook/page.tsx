@@ -166,38 +166,11 @@ export default async function ProgramHolderHandbookPage() {
             <li>You may not disenroll, dismiss, or transfer a student without Elevate authorization.</li>
           </ul>
 
-          <h2 className="text-2xl font-bold text-slate-900 border-b pb-2">5. Participation Tiers and How You Get Paid</h2>
+          <h2 className="text-2xl font-bold text-slate-900 border-b pb-2">5. Participation and Compensation</h2>
           <p>
-            Your compensation is determined by the tier you signed under in your Training Network Partner Agreement.
-            These amounts are fixed. They are not subject to renegotiation after signing.
-          </p>
-          <div className="not-prose space-y-4 my-4">
-            <div className="border border-slate-200 rounded-xl p-5">
-              <h3 className="font-bold text-slate-900 mb-1">Tier 1 — Facility Host: 1/3 of net program revenue per cohort</h3>
-              <p className="text-sm text-slate-600 mb-3">You provide a dedicated physical training facility and on-site operational support for the full cohort duration.</p>
-              <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
-                <p className="font-semibold text-brand-blue-900 text-sm">Payment Example (Per Student):</p>
-                <p className="text-sm text-brand-blue-800 mt-1">
-                  Barber Program — $6,000 WIOA funding · Direct costs ~$550 · Net Revenue ~$5,450<br />
-                  Your Share (1/3): ~$1,816.50 · Payment 1 at 50% completion: ~$908.25 · Payment 2 at credential: ~$908.25<br />
-                  <strong>10 students = ~$18,165 · 50 students = ~$90,825</strong>
-                </p>
-              </div>
-            </div>
-            <div className="border border-slate-200 rounded-xl p-5">
-              <h3 className="font-bold text-slate-900 mb-1">Tier 2 — Coordination Partner: 15% of net program revenue per cohort</h3>
-              <p className="text-sm text-slate-600">You provide student coordination and supervision support. You do not provide a training facility.</p>
-            </div>
-            <div className="border border-slate-200 rounded-xl p-5">
-              <h3 className="font-bold text-slate-900 mb-1">Tier 3 — Referral Partner: $250–$500 flat fee per enrolled student</h3>
-              <p className="text-sm text-slate-600">You refer eligible individuals to Elevate programs. No operational responsibility. No revenue share.</p>
-            </div>
-          </div>
-          <p className="text-sm text-slate-500">
-            Net revenue = gross tuition minus direct program costs (credential exam fees, LMS, curriculum, marketing,
-            compliance, administration, payment processing, insurance, student services, and Program Support Fee).
-            Payments are per student, not per cohort lump sum. Invoices must include supporting documentation.
-            Payments are processed within 30 days of invoice approval.
+            Your compensation structure is defined in your signed Training Network Partner Agreement (MOU).
+            Refer to your MOU for the specific terms applicable to your partnership tier.
+            Payment terms, milestones, and invoicing requirements are governed exclusively by that agreement.
           </p>
 
           <h2 className="text-2xl font-bold text-slate-900 border-b pb-2">6. Compliance Requirements — Federal Law, Not Our Preference</h2>

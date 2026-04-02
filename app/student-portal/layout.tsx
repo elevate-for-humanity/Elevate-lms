@@ -20,8 +20,8 @@ const navItems = [
   { href: '/student-portal/announcements', label: 'Announcements' },
   { href: '/student-portal/resources', label: 'Resources' },
   { href: '/student-portal/handbook/acknowledge', label: 'Handbook' },
-  { href: '/student-portal/onboarding/documents', label: 'Documents' },
-  { href: '/student-portal/onboarding/agreements', label: 'Agreements' },
+  { href: '/onboarding/learner/documents', label: 'Documents' },
+  { href: '/onboarding/learner/agreements', label: 'Agreements' },
 ];
 
 export default function StudentPortalLayout({

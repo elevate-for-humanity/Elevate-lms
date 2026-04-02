@@ -29,13 +29,35 @@ export default async function CandidatesPage() {
     redirect('/');
   }
 
-  // Get candidates (students)
-  const { data: candidates } = await supabase
-    .from('profiles')
-    .select('id, full_name, email, phone, city, state, created_at')
-    .eq('role', 'student')
-    .order('created_at', { ascending: false })
+  // Get completed/graduated candidates only — not all students
+  const { data: enrollments } = await supabase
+    .from('program_enrollments')
+    .select(`
+      id,
+      progress,
+      completed_at,
+      profiles:user_id (
+        id,
+        full_name,
+        email,
+        phone,
+        city,
+        state
+      ),
+      training_courses:course_id (
+        id,
+        title
+      )
+    `)
+    .eq('progress', 100)
+    .order('completed_at', { ascending: false })
     .limit(50);
+
+  const candidates = (enrollments ?? []).map((e: any) => ({
+    ...e.profiles,
+    course_title: e.training_courses?.title ?? null,
+    completed_at: e.completed_at,
+  }));
 
   return (
     <div className="min-h-screen bg-white">

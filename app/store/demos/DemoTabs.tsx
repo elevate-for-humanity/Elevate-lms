@@ -222,7 +222,7 @@ export default function DemoTabs() {
           </div>
 
           <p className="text-xs text-slate-400 mt-3 text-center">
-            Demo uses sample data. Nothing affects real systems.
+            Guided video walkthrough. Nothing affects any real system.
           </p>
         </div>
       </div>

@@ -761,6 +761,26 @@ export default async function CoursePage({ params }: { params: Params }) {
                 </div>
               </div>
             )}
+
+            {/* Program resources — HVAC-specific */}
+            {program?.slug === 'hvac-technician' && (
+              <div className="bg-white rounded-xl border border-slate-200 p-5">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Resources</h3>
+                <div className="space-y-2">
+                  {[
+                    { href: '/programs/hvac-technician/study-guide', label: 'EPA 608 Study Guide' },
+                    { href: '/credentials/hvac-standards', label: 'Competency Standards' },
+                    { href: '/credentials/checksheets', label: 'OJT Checksheets' },
+                  ].map(({ href, label }) => (
+                    <Link key={href} href={href}
+                      className="flex items-center gap-2 text-sm text-slate-700 hover:text-brand-orange-600 transition-colors">
+                      <FileText className="w-4 h-4 flex-shrink-0 text-slate-400" />
+                      {label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

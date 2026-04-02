@@ -293,7 +293,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     id: 'partner-portal',
     title: 'Partner Dashboard',
     description: 'Track sponsored students and generate outcome reports.',
-    href: '/partner/dashboard',
+    href: '/program-holder/dashboard',
     category: 'dashboard',
     audiences: ['organizations'],
     keywords: ['partner', 'sponsor', 'workforce', 'outcomes', 'reports'],

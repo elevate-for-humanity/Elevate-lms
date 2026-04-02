@@ -435,6 +435,27 @@ export default async function HVACTechnicianPage() {
         </div>
       </section>
 
+      {/* ── Program Resources ─────────────────────────────────────────────── */}
+      <section className="border-t border-slate-200 bg-slate-50 py-12 px-6">
+        <div className="mx-auto max-w-7xl">
+          <h2 className="text-lg font-bold text-slate-900 mb-6">Program Resources</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[
+              { href: '/programs/hvac-technician/study-guide', label: 'EPA 608 Study Guide', desc: 'Full exam prep — Core, Type I, II, III' },
+              { href: '/credentials', label: 'Credentials & Standards', desc: 'Competency framework and checksheets' },
+              { href: '/credentials/hvac-standards', label: 'HVAC Standards', desc: 'Domain codes, hours, lesson map' },
+              { href: '/credentials/checksheets', label: 'OJT Checksheets', desc: 'Skill verification forms' },
+            ].map(({ href, label, desc }) => (
+              <Link key={href} href={href}
+                className="rounded-xl border border-slate-200 bg-white p-4 hover:border-brand-orange-400 hover:shadow-sm transition-all">
+                <p className="font-semibold text-slate-900 text-sm">{label}</p>
+                <p className="text-xs text-slate-500 mt-1">{desc}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Footer CTA ───────────────────────────────────────────────────── */}
       <section className="border-t border-slate-200 bg-slate-900 text-white py-16">
         <div className="mx-auto max-w-3xl px-6 text-center">

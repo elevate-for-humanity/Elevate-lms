@@ -17,7 +17,13 @@ export const metadata: Metadata = {
 
 export default async function EmployerProgramsPage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('employers').select('*').limit(50);
+  const { data: dbRows } = await supabase
+    .from('programs')
+    .select('id, title, description, status, image_url, savings, eligibility')
+    .eq('is_active', true)
+    .neq('status', 'archived')
+    .order('created_at', { ascending: false })
+    .limit(50);
   const programs = (dbRows as any[]) || [];
 
   const { count: programCount } = await supabase
@@ -61,15 +67,15 @@ export default async function EmployerProgramsPage() {
               <div className="md:flex">
                 <div className="md:w-1/3 relative h-64 md:h-auto overflow-hidden">
                   <Image
-                    src={program.image}
-                    alt={program.name}
+                    src={program.image_url ?? '/images/placeholder.jpg'}
+                    alt={program.title}
                     fill
                     className="object-cover"
                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                 </div>
                 <div className="md:w-2/3 p-8">
                   <div className="flex items-center gap-3 mb-4">
-                    <h2 className="text-2xl font-bold text-gray-900">{program.name}</h2>
+                    <h2 className="text-2xl font-bold text-gray-900">{program.title}</h2>
                     <span className="px-3 py-1 bg-brand-green-100 text-brand-green-700 text-sm font-medium rounded-full">
                       {program.status}
                     </span>
@@ -95,7 +101,7 @@ export default async function EmployerProgramsPage() {
 
                   <div className="flex gap-4">
                     <Link
-                      href={`/employer-portal/programs/${program.id}`}
+                      href={`/employer/programs/${program.id}`}
                       className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2"
                     >
                       Learn More <ArrowRight className="w-4 h-4" />

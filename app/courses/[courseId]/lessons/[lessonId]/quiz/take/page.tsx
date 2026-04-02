@@ -86,9 +86,8 @@ export default function TakeQuizPage({
       const data = await response.json();
 
       if (response.ok) {
-        router.push(
-          `/courses/${params.courseId}/lessons/${params.lessonId}/quiz/results/${data.attemptId}`
-        );
+        // Redirect to the canonical LMS lesson page after quiz submission
+        router.push(`/lms/courses/${params.courseId}/lessons/${params.lessonId}`);
       } else {
         alert('Failed to submit quiz. Please start again.');
         setSubmitting(false);

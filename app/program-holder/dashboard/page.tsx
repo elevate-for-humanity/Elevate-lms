@@ -250,7 +250,6 @@ export default async function ProgramHolderDashboardPage() {
                   { label: 'Add New Program', href: '/program-holder/programs', icon: BookOpen, highlight: true },
                   { label: 'Manage Students', href: '/program-holder/students', icon: Users },
                   { label: 'View Reports', href: '/program-holder/reports', icon: BarChart3 },
-                  { label: 'Payroll & Payouts', href: '/program-holder/payroll', icon: DollarSign },
                   { label: 'Analytics', href: '/program-holder/analytics', icon: TrendingUp },
                   { label: 'Settings', href: '/program-holder/settings', icon: Settings },
                 ].map((action) => (

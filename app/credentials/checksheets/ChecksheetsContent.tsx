@@ -382,7 +382,9 @@ function PrintableChecksheet({ sheet }: { sheet: Checksheet }) {
 
 /* ── Main Page ── */
 
-export default function ChecksheetsContent() {
+interface LessonRef { id: string; title: string; slug: string; }
+
+export default function ChecksheetsContent({ lessonMap }: { lessonMap?: Map<number, LessonRef> }) {
   const [selected, setSelected] = useState<string | null>(null);
 
   const handlePrint = () => {

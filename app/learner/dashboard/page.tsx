@@ -20,6 +20,8 @@ import {
   AlertCircle,
   FileCheck,
   Calendar,
+  FileText,
+  ScrollText,
 } from 'lucide-react';
 import { logger } from '@/lib/logger';
 
@@ -578,6 +580,20 @@ export default async function LearnerDashboardPage() {
                 >
                   <MessageSquare className="w-8 h-8 text-brand-blue-600 mb-2" />
                   <span className="text-sm font-medium text-gray-700">Get Help</span>
+                </Link>
+                <Link
+                  href="/credentials"
+                  className="flex flex-col items-center p-4 bg-white rounded-lg hover:bg-white transition"
+                >
+                  <FileText className="w-8 h-8 text-brand-orange-600 mb-2" />
+                  <span className="text-sm font-medium text-gray-700">Credentials</span>
+                </Link>
+                <Link
+                  href="/transcript"
+                  className="flex flex-col items-center p-4 bg-white rounded-lg hover:bg-white transition"
+                >
+                  <ScrollText className="w-8 h-8 text-slate-600 mb-2" />
+                  <span className="text-sm font-medium text-gray-700">Transcript</span>
                 </Link>
               </div>
             </div>

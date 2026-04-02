@@ -8,7 +8,7 @@ import DemoTabs from './DemoTabs';
 
 export const metadata: Metadata = {
   title: 'Platform Demos | Elevate for Humanity',
-  description: 'Try the Elevate platform yourself. Interactive demos of the admin dashboard, student portal, and employer tools — no signup required.',
+  description: 'Watch guided video walkthroughs of the Elevate platform — admin dashboard, student portal, and employer tools. No signup required.',
 };
 
 const demos = [
@@ -19,8 +19,8 @@ const demos = [
     image: '/images/pages/career-counseling.jpg',
     alt: 'Training program administrator reviewing enrollment data',
     href: '/demo/admin',
-    description: 'This is what your staff sees every day. Search students, review applications, track compliance, and generate WIOA reports. Everything clicks through — try it.',
-    highlights: ['Search and filter students by program or status', 'Track enrollment and completion in real time', 'Generate compliance reports for your workforce board', 'Review applications and manage the intake pipeline'],
+    description: 'This is what your staff sees every day. Watch how enrollment tracking, compliance reporting, and application management work inside the admin portal.',
+    highlights: ['Enrollment and completion tracking', 'Compliance reporting for workforce boards', 'Application and intake pipeline management', 'WIOA documentation and audit tools'],
   },
   {
     id: 'employer',
@@ -29,8 +29,8 @@ const demos = [
     image: '/images/pages/employer-handshake.jpg',
     alt: 'Employer reviewing candidate profiles from training programs',
     href: '/demo/employer',
-    description: 'Your employer partners use this to find trained candidates, track their apprentices, and see what hiring incentives they\'ve earned. OJT reimbursements, WOTC credits — it\'s all here.',
-    highlights: ['Browse pre-screened candidates with verified credentials', 'Track apprenticeship hours and wage progression', 'Manage OJT contracts and hiring incentives', 'Sign MOUs and compliance documents'],
+    description: 'See what your employer partners see — how they track apprentices, view hiring incentives, and manage OJT contracts inside their portal.',
+    highlights: ['Apprenticeship hour and wage progression tracking', 'OJT contract and incentive management', 'MOU and compliance document signing', 'WOTC credit visibility'],
   },
   {
     id: 'learner',
@@ -70,10 +70,10 @@ export default function StoreDemosPage() {
             Try It Before You Buy It
           </h1>
           <p className="text-lg text-slate-700 max-w-2xl mx-auto mb-3">
-            These are live, interactive demos with sample data. Click through every screen — search students, generate reports, review candidates. No signup required.
+            Guided video walkthroughs of each portal. See exactly how the platform works before you sign up. No login required.
           </p>
           <p className="text-sm text-slate-500 mb-8">
-            Each demo uses sample data from a fictional training organization. Nothing you do here affects any real system.
+            These are guided video walkthroughs. Nothing you do here affects any real system.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/demo/admin" className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-red-700 transition">

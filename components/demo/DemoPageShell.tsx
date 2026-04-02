@@ -64,7 +64,7 @@ export function DemoPageShell({ title, description, portal = 'admin', children }
 
       {/* Demo notice */}
       <div className="bg-brand-red-600 text-white text-center py-2 px-4 text-xs font-semibold flex items-center justify-center gap-3">
-        <span className="hidden sm:inline">Interactive Demo — sample data, every button works</span>
+        <span className="hidden sm:inline">Video Walkthrough — no real data, no account required</span>
         <span className="sm:hidden">Interactive Demo</span>
         <Link href="/store/demos" className="underline underline-offset-2 opacity-90 hover:opacity-100 flex items-center gap-1">
           All Demos <ArrowRight className="w-3 h-3" />

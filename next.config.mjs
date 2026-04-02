@@ -309,7 +309,7 @@ const nextConfig = {
       { source: '/admin/governance', destination: '/admin/compliance', permanent: false },
       { source: '/admin/governance/:path*', destination: '/admin/compliance', permanent: false },
       { source: '/admin/ai-studio', destination: '/admin/dashboard', permanent: false },
-      { source: '/admin/marketplace', destination: '/admin/dashboard', permanent: false },
+      // duplicate removed — canonical entry below sends /admin/marketplace to /admin/store
       { source: '/admin/dashboard/etpl', destination: '/admin/etpl-alignment', permanent: false },
       { source: '/admin/integrations/salesforce', destination: '/admin/integrations', permanent: false },
       { source: '/admin/certifications', destination: '/admin/certificates', permanent: false },
@@ -632,7 +632,7 @@ const nextConfig = {
       { source: '/creator/analytics', destination: '/admin', permanent: true },
       { source: '/franchise/office/:path*', destination: '/admin', permanent: true },
       { source: '/leaderboard', destination: '/lms/dashboard', permanent: true },
-      { source: '/portal/staff/dashboard', destination: '/staff-portal', permanent: true },
+      // duplicate removed — canonical entry at line 464 sends to /staff-portal/dashboard
       { source: '/app-hub', destination: '/apps', permanent: true },
       { source: '/card', destination: '/', permanent: true },
       { source: '/calculator/revenue-share', destination: '/admin', permanent: true },
@@ -720,7 +720,7 @@ const nextConfig = {
       // Partner portal redirects
       // NOTE: /partner/dashboard is the canonical partner dashboard page.
       // /partner/page.tsx redirects TO /partner/dashboard, so do NOT redirect /partner/dashboard back.
-      // Removed: { source: '/partner/dashboard', destination: '/partner', permanent: true },
+      // duplicate removed — canonical entry below sends /partner/dashboard to /program-holder/dashboard
       // Removed: { source: '/partner/courses', destination: '/partner', permanent: true },
       // Removed: { source: '/partner/students', destination: '/partner', permanent: true },
       
@@ -752,7 +752,7 @@ const nextConfig = {
       { source: '/partner/apply',                          destination: '/partner/onboarding',                 permanent: true  },
       { source: '/partner/programs',                       destination: '/partner/dashboard',                  permanent: true  },
       { source: '/partners/barber-shop',                   destination: '/partners/barbershop-apprenticeship', permanent: true  },
-      { source: '/partners/portal',                        destination: '/partner-portal',                     permanent: true  },
+      { source: '/partners/portal',                        destination: '/program-holder/dashboard',            permanent: true  },
       { source: '/onboarding/handbook',                    destination: '/onboarding/learner/handbook',        permanent: true  },
       { source: '/onboarding/partner',                     destination: '/partner/onboarding',                 permanent: true  },
       { source: '/onboarding/employer/agreement',          destination: '/onboarding/mou',                    permanent: true  },
@@ -769,9 +769,10 @@ const nextConfig = {
       { source: '/student-portal/handbook',   destination: '/student-handbook', permanent: true },
 
       // /cert/verify kept as page.tsx — passes query params to /verify
-      { source: '/partner/dashboard',           destination: '/partner-portal',      permanent: true  },
-      { source: '/partner',                     destination: '/partner-portal',      permanent: true  },
-      { source: '/programs/admin/dashboard',    destination: '/programs/admin',      permanent: true  },
+      { source: '/partner/dashboard',           destination: '/program-holder/dashboard', permanent: true  },
+      { source: '/partner',                     destination: '/program-holder/dashboard', permanent: true  },
+      { source: '/partner-portal',              destination: '/program-holder/dashboard', permanent: true  },
+      { source: '/programs/admin/dashboard',    destination: '/admin/dashboard',      permanent: true  },
       // /store/licenses/managed passes query params — handled by next.config rewrite
       // pwa auth-redirect stubs: redirect to canonical pwa pages
       { source: '/pwa/barber/dashboard',        destination: '/pwa/barber',          permanent: false },
@@ -779,6 +780,22 @@ const nextConfig = {
 
       // /employer-portal root → canonical employer dashboard
       { source: '/employer-portal',           destination: '/employer/dashboard',  permanent: true },
+
+
+
+      // ============================================
+      // STUB PAGE REPLACEMENTS — working redirect stubs moved to config
+      // ============================================
+      { source: '/courses',                                    destination: '/lms/courses',                                                    permanent: true },
+      { source: '/courses/:courseId',                          destination: '/lms/courses/:courseId',                                          permanent: true },
+      { source: '/courses/:courseId/lessons/:lessonId',        destination: '/lms/courses/:courseId/lessons/:lessonId',                        permanent: true },
+      { source: '/register',                                   destination: '/signup',                                                         permanent: true },
+      { source: '/update-password',                            destination: '/auth/reset-password',                                            permanent: true },
+      { source: '/programs/hvac-technician/course',            destination: '/lms/courses/0ba9a61c-1f1b-4019-be6f-90e92eba2bc0',               permanent: true },
+      { source: '/programs/hvac-technician/curriculum',        destination: '/programs/hvac-technician',                                       permanent: true },
+      { source: '/hvac/lesson/:lessonId',                      destination: '/lms/courses/0ba9a61c-1f1b-4019-be6f-90e92eba2bc0/lessons/:lessonId', permanent: true },
+      { source: '/mentor/messages',                            destination: '/lms/messages',                                                   permanent: true },
+      { source: '/onboarding/legal',                           destination: '/onboarding/learner/agreements',                                  permanent: true },
 
       // ============================================
       // DEAD LINK FIXES — public-facing

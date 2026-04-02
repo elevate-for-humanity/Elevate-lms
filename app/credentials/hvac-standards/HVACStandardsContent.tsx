@@ -148,7 +148,9 @@ const OJT_COMPETENCIES = DOMAINS.reduce(
 
 /* ── Component ── */
 
-export default function HVACStandardsContent() {
+interface LessonRef { id: string; title: string; slug: string; }
+
+export default function HVACStandardsContent({ lessonMap }: { lessonMap?: Map<number, LessonRef> }) {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -402,7 +404,18 @@ export default function HVACStandardsContent() {
                         <div className="flex-1">
                           <p className="text-gray-800">{comp.name}</p>
                           <p className="text-xs text-gray-400 mt-0.5">
-                            Lessons: {comp.lessons.join(", ")}
+                            Lessons:{' '}
+                            {comp.lessons.map((num: number, i: number) => {
+                              const ref = lessonMap?.get(num);
+                              return ref ? (
+                                <a key={num} href={`/lms/courses/f0593164-55be-5867-98e7-8a86770a8dd0/lessons/${ref.id}`}
+                                  className="underline hover:text-brand-blue-600 mr-1">
+                                  {num}
+                                </a>
+                              ) : (
+                                <span key={num} className="mr-1">{num}</span>
+                              );
+                            })}
                             {comp.verification && (
                               <span className="ml-2 inline-flex items-center gap-1 text-brand-green-700 bg-brand-green-50 px-1.5 py-0.5 rounded">
                                 <CheckCircle2 className="w-3 h-3" />

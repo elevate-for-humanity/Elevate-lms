@@ -28,14 +28,14 @@ export default async function ProgramHolderPayrollPage() {
   const { db, user, tenantId } = await requireProgramHolder();
 
   // Fetch payout profile
-  const { data: payoutProfile } = await supabase
+  const { data: payoutProfile } = await db
     .from('program_holder_payouts')
     .select('*')
     .eq('user_id', user.id)
     .maybeSingle();
 
   // Fetch payroll runs scoped to this holder's tenant
-  const payrollRunsQuery = supabase
+  const payrollRunsQuery = db
     .from('payroll_runs')
     .select('id, pay_period_start, pay_period_end, pay_date, status, total_gross, total_net, total_taxes, employee_count, created_at')
     .order('pay_date', { ascending: false })
@@ -46,7 +46,7 @@ export default async function ProgramHolderPayrollPage() {
     : await payrollRunsQuery.eq('processed_by', user.id);
 
   // Fetch pay stubs for this user
-  const { data: stubs } = await supabase
+  const { data: stubs } = await db
     .from('pay_stubs')
     .select('id, gross_pay, net_pay, federal_tax, state_tax, social_security, medicare, created_at, payroll_run_id, payroll_runs(pay_period_start, pay_period_end, pay_date, status)')
     .eq('employee_id', user.id)

@@ -8,16 +8,15 @@ import {
 } from 'lucide-react';
 
 const items = [
-  { href: '/employer/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/employer-portal/jobs', label: 'Job Postings', icon: Briefcase },
-  { href: '/employer-portal/applications', label: 'Applications', icon: FileText },
-  { href: '/employer-portal/candidates', label: 'Candidates', icon: Users },
-  { href: '/employer-portal/interviews', label: 'Interviews', icon: MessageSquare },
-  { href: '/employer-portal/programs', label: 'Programs', icon: BookOpen },
-  { href: '/employer-portal/analytics', label: 'Analytics', icon: BarChart3 },
-  { href: '/employer-portal/wotc', label: 'WOTC Credits', icon: TrendingUp },
-  { href: '/employer-portal/company', label: 'Company Profile', icon: Building2 },
-  { href: '/employer-portal/settings', label: 'Settings', icon: Settings },
+  { href: '/employer/dashboard',     label: 'Dashboard',       icon: LayoutDashboard },
+  { href: '/employer/jobs',          label: 'Job Postings',    icon: Briefcase },
+  { href: '/employer/applications',  label: 'Applications',    icon: FileText },
+  { href: '/employer/candidates',    label: 'Candidates',      icon: Users },
+  { href: '/employer/programs',      label: 'Programs',        icon: BookOpen },
+  { href: '/employer/analytics',     label: 'Analytics',       icon: BarChart3 },
+  { href: '/employer/wotc',          label: 'WOTC Credits',    icon: TrendingUp },
+  { href: '/employer/company',       label: 'Company Profile', icon: Building2 },
+  { href: '/employer/settings',      label: 'Settings',        icon: Settings },
 ];
 
 export default function EmployerNav() {

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-// Barber program now served by the generic partner/programs/[slug] route.
+// Barber program served by the generic partner/programs/[slug] route.
 export default function BarberProgramRedirect() {
-  redirect('/partner/programs/barber-apprenticeship');
+  redirect('/partner/programs/barber');
 }

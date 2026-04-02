@@ -22,7 +22,7 @@ export default async function LivePage({ params }: { params: { courseId: string 
     <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <Link href={`/courses/${params.courseId}`} className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">← Back to Course</Link>
+          <Link href={`/lms/courses/${params.courseId}`} className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">← Back to Course</Link>
           <h1 className="text-2xl font-bold text-gray-900 mt-2">{course?.title} - Live Sessions</h1>
           <p className="text-gray-600 mt-1">Join live classes and interact with instructors</p>
         </div>

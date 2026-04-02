@@ -25,9 +25,16 @@ export default async function EmployerSettingsPage() {
     .eq('id', user.id)
     .single();
 
-  if (!profile || profile.role !== 'employer') {
+  if (!profile || !['employer', 'admin', 'super_admin'].includes(profile.role)) {
     redirect('/');
   }
+
+  // Merge employer record for company-level data
+  const { data: employer } = await supabase
+    .from('employers')
+    .select('*')
+    .eq('user_id', user.id)
+    .maybeSingle();
 
   return (
     <div className="min-h-screen bg-white">
@@ -64,7 +71,7 @@ export default async function EmployerSettingsPage() {
               </label>
               <input
                 type="text"
-                defaultValue={profile.company_name || ''}
+                defaultValue={employer?.company_name || profile.company_name || ''}
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                 placeholder="Your Company Name"
               />

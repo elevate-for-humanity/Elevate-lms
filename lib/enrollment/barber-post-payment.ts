@@ -43,7 +43,7 @@ export async function runBarberPostPayment(
   const { data: app, error: appErr } = await db
     .from('applications')
     .update({
-      status: 'paid',
+      status: 'ready_to_enroll',
       payment_status: 'paid',
       payment_intent_id: stripePaymentIntentId ?? null,
       payment_received_at: new Date().toISOString(),

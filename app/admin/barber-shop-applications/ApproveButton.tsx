@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { CheckCircle, Loader2 } from 'lucide-react';
 
 export default function ApproveButton({ applicationId, status }: { applicationId: string; status: string }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
 
@@ -22,13 +24,18 @@ export default function ApproveButton({ applicationId, status }: { applicationId
       });
       const data = await res.json();
 
+      if (!res.ok) {
+        throw new Error(data?.error || `Server error ${res.status}`);
+      }
+
       if (data.success) {
-        setResult(data.status === 'approved' ? 'approved' : `partial: ${data.status}`);
+        setResult('approved');
+        router.refresh();
       } else {
         setResult(`error: ${data.error || 'Failed'}`);
       }
-    } catch {
-      setResult('error: Network error');
+    } catch (err) {
+      setResult(`error: ${err instanceof Error ? err.message : 'Network error'}`);
     } finally {
       setLoading(false);
     }

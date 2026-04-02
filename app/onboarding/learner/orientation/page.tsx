@@ -91,18 +91,59 @@ async function completeOrientation() {
   redirect('/onboarding/learner/complete');
 }
 
+// Per-program credential and duration data from INTraining
+const PROGRAM_META: Record<string, { duration: string; hours: string; credentials: string[]; hasOJT: boolean }> = {
+  'hvac-technician':          { duration: '20 weeks', hours: '240 hours', credentials: ['EPA 608 Universal', 'OSHA 30', 'CPR', 'Rise Up Certificate', 'Residential HVAC Cert 1 & 2'], hasOJT: true },
+  'barber-apprenticeship':    { duration: '15 months', hours: '2,000 hours', credentials: ['Indiana Registered Barber License', 'Rise Up Certificate'], hasOJT: true },
+  'beauty-educator':          { duration: '84 days', hours: '336 hours', credentials: ['CPR', 'OSHA 10', 'Rise Up Certificate'], hasOJT: false },
+  'bookkeeping':              { duration: '8 weeks', hours: '80 hours', credentials: ['QuickBooks Certified User', 'Microsoft Office Specialist Associate'], hasOJT: false },
+  'business-management':      { duration: '5 weeks', hours: '50 hours', credentials: ['Business of Retail Certified Specialist', 'Certified Business Professional'], hasOJT: false },
+  'cpr-aed':                  { duration: '1 day', hours: '8 hours', credentials: ['CPR/AED Certification'], hasOJT: false },
+  'emergency-health':         { duration: '4 weeks', hours: '80 hours', credentials: ['CPR', 'Emergency Medical Responder (EMR)', 'OSHA 10'], hasOJT: false },
+  'home-health-aide':         { duration: '4 weeks', hours: '80 hours', credentials: ['Home Health Aide (HHA) License', 'CCHW', 'CPR', 'Rise Up Certificate'], hasOJT: true },
+  'medical-assistant':        { duration: '21 days', hours: '168 hours', credentials: ['CCHW', 'CPR', 'Rise Up Certificate'], hasOJT: false },
+  'esthetician':              { duration: '5 weeks', hours: '100 hours', credentials: ['OSHA 10', 'Business of Retail Certified Specialist'], hasOJT: false },
+  'reentry-specialist':       { duration: '45 days', hours: '360 hours', credentials: ['CPRC', 'CPSP', 'CCHW', 'CPR', 'Rise Up Certificate'], hasOJT: false },
+  'pharmacy-technician':      { duration: '10 weeks', hours: '120 hours', credentials: ['PTCB CPhT'], hasOJT: false },
+  'cna':                      { duration: '6 weeks', hours: '120 hours', credentials: ['Indiana CNA License', 'CPR'], hasOJT: true },
+  'cdl':                      { duration: '4 weeks', hours: '160 hours', credentials: ['CDL Class A License'], hasOJT: true },
+};
+
 export default async function OrientationPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
+  // Pull the student's most recent active enrollment + program details
+  const { data: enrollment } = await supabase
+    .from('program_enrollments')
+    .select('program_id, programs ( title, slug, duration_weeks, description )')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const program = enrollment?.programs as { title: string; slug: string; duration_weeks: number; description: string } | null;
+  const slug = program?.slug ?? '';
+  const meta = PROGRAM_META[slug];
+
+  const programTitle = program?.title ?? 'Your Program';
+  const duration = meta?.duration ?? (program?.duration_weeks ? `${program.duration_weeks} weeks` : 'your program duration');
+  const hours = meta?.hours ?? '';
+  const credentials = meta?.credentials ?? [];
+  const hasOJT = meta?.hasOJT ?? false;
+
+  const overviewItems = [
+    `Your program is ${duration}${hours ? ` (${hours})` : ''} combining online coursework${hasOJT ? ' and hands-on training' : ''}.`,
+    'Related Technical Instruction (RTI) is delivered through the Elevate LMS.',
+    ...(hasOJT ? ['On-the-Job Training (OJT) is completed at employer partner sites.'] : []),
+    credentials.length > 0
+      ? `You will prepare for and earn the following credentials: ${credentials.join(', ')}.`
+      : 'You will prepare for and sit for industry-recognized credential exams administered through their respective certifying organizations.',
+  ];
+
   const sections = [
-    { title: 'Program Overview', icon: BookOpen, items: [
-      'Your program is 12 weeks (240 hours) combining online coursework and hands-on training.',
-      'Related Technical Instruction (RTI) is delivered through the Elevate LMS.',
-      'On-the-Job Training (OJT) is completed at employer partner sites.',
-      'You will prepare for and sit for industry-recognized credential exams including EPA 608 and OSHA certifications, administered through their respective certifying organizations.',
-    ]},
+    { title: `Program Overview — ${programTitle}`, icon: BookOpen, items: overviewItems },
     { title: 'Attendance & Expectations', icon: Clock, items: [
       'Attendance is tracked daily. Two consecutive unexcused absences trigger an intervention.',
       'You must complete all assigned coursework, quizzes, and assessments.',

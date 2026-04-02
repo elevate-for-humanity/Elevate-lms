@@ -318,7 +318,7 @@ export default function ModulePage({ module, quiz, totalModules, showLab = false
                 </a>
               ) : (
                 <a
-                  href="/preview/hvac-final-exam"
+                  href="/lms/courses"
                   className="mt-4 inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-2 rounded-lg font-semibold text-sm transition"
                 >
                   Take Final Exam →

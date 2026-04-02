@@ -98,7 +98,7 @@ export default async function AnalyticsPage() {
             </div>
             <div className="flex gap-3">
               <a
-                href="/employer-portal/analytics/export"
+                href="/employer-portal/analytics"
                 className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-slate-50"
               >
                 <Download className="w-4 h-4" />

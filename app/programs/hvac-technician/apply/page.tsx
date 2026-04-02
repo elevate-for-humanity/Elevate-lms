@@ -188,7 +188,7 @@ export default function HvacApplyPage() {
       // Stripe BNPL (Afterpay/Klarna) — routes through same Stripe Checkout endpoint
       // with BNPL payment methods enabled on the session
       if (paymentOption === 'stripe-bnpl') {
-        const bnplResponse = await fetch('/api/enroll/checkout', {
+        const bnplResponse = await fetch('/api/enrollments/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -213,7 +213,7 @@ export default function HvacApplyPage() {
       }
 
       // Stripe checkout (full or weekly)
-      const checkoutResponse = await fetch('/api/enroll/checkout', {
+      const checkoutResponse = await fetch('/api/enrollments/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

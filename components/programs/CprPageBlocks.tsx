@@ -323,7 +323,7 @@ function FinalCTA() {
             Enroll Now — $130
           </Link>
           <Link
-            href="/programs/cpr-first-aid/request-info"
+            href="/contact"
             className="border-2 border-white/30 text-white hover:bg-white/10 font-bold px-8 py-3.5 rounded-lg transition-colors text-sm sm:text-base"
           >
             Request Information

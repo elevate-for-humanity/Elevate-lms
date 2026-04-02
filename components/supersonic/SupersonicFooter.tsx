@@ -98,8 +98,8 @@ export default function SupersonicFooter() {
             Rise Up Foundation VITA services are provided by IRS-certified volunteers at no cost to qualifying taxpayers.
           </p>
           <div className="flex gap-4 flex-shrink-0">
-            <Link href="/supersonic-fast-cash/privacy" className="text-slate-500 text-xs hover:text-slate-300 transition-colors">Privacy</Link>
-            <Link href="/supersonic-fast-cash/terms" className="text-slate-500 text-xs hover:text-slate-300 transition-colors">Terms</Link>
+            <Link href="/supersonic-fast-cash/legal/privacy" className="text-slate-500 text-xs hover:text-slate-300 transition-colors">Privacy</Link>
+            <Link href="/supersonic-fast-cash/legal/terms" className="text-slate-500 text-xs hover:text-slate-300 transition-colors">Terms</Link>
           </div>
         </div>
       </div>

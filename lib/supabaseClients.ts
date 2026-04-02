@@ -1,57 +1,21 @@
 /** @deprecated Use '@/lib/supabase/server', '@/lib/supabase/client', '@/lib/supabase/admin' instead. */
-// lib/supabaseClients.ts
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { createAdminClient } from '@/lib/supabase/admin';
+import { createBrowserClient } from '@/lib/supabase/client';
 
-// Lazy initialization to avoid build-time errors
-let clientSupabase: SupabaseClient | null = null;
-let serverSupabase: SupabaseClient | null = null;
-let adminSupabase: SupabaseClient | null = null;
-
-function getEnvVars() {
-  return {
-    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-    supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
-    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
-  };
-}
-
-// For client-side components (React hooks, etc.)
+/** @deprecated Use createBrowserClient() from '@/lib/supabase/client' instead. */
 export function getClientSupabase() {
-  const { supabaseUrl, supabaseAnonKey } = getEnvVars();
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return null;
-  }
-  if (!clientSupabase) {
-    clientSupabase = createClient(supabaseUrl, supabaseAnonKey);
-  }
-  return clientSupabase;
+  return createBrowserClient();
 }
 
-// For server components (App Router async page components)
+/** @deprecated Use createClient() from '@/lib/supabase/server' instead. */
 export function getServerSupabase() {
-  const { supabaseUrl, supabaseAnonKey } = getEnvVars();
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return null;
-  }
-  if (!serverSupabase) {
-    serverSupabase = createClient(supabaseUrl, supabaseAnonKey);
-  }
-  return serverSupabase;
+  return createAdminClient();
 }
 
-// For admin / backend API routes only (service role key)
+/** @deprecated Use createAdminClient() from '@/lib/supabase/admin' instead. */
 export function getAdminSupabase() {
-  const { supabaseUrl, serviceRoleKey } = getEnvVars();
-  if (!supabaseUrl || !serviceRoleKey) {
-    return null;
-  }
-  if (!adminSupabase) {
-    adminSupabase = createClient(supabaseUrl, serviceRoleKey, {
-      auth: { persistSession: false },
-    });
-  }
-  return adminSupabase;
+  return createAdminClient();
 }
 
-// Legacy export for backward compatibility
-export const supabaseAdmin = null; // Use getAdminSupabase() instead
+/** @deprecated */
+export const supabaseAdmin = null;

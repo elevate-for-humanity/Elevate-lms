@@ -4,17 +4,11 @@ import React from 'react';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
 import {
   LayoutDashboard,
   BookOpen,
   Users,
-  ClipboardCheck,
-  MessageCircle,
-  Calendar,
   Settings,
-  ChevronDown,
-  ChevronRight,
   HelpCircle,
 } from 'lucide-react';
 
@@ -31,13 +25,7 @@ interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
-interface NavGroup {
-  name: string;
-  icon: React.ComponentType<{ className?: string }>;
-  children: NavItem[];
-}
-
-const navigation: (NavItem | NavGroup)[] = [
+const navigation: NavItem[] = [
   {
     name: 'Dashboard',
     href: '/instructor/dashboard',
@@ -45,55 +33,13 @@ const navigation: (NavItem | NavGroup)[] = [
   },
   {
     name: 'My Courses',
+    href: '/instructor/courses',
     icon: BookOpen,
-    children: [
-      { name: 'All Courses', href: '/instructor/courses', icon: BookOpen },
-      { name: 'Active', href: '/instructor/courses/active', icon: BookOpen },
-      {
-        name: 'Archived',
-        href: '/instructor/courses/archived',
-        icon: BookOpen,
-      },
-    ],
   },
   {
     name: 'Students',
+    href: '/instructor/students',
     icon: Users,
-    children: [
-      { name: 'All Students', href: '/instructor/students', icon: Users },
-      {
-        name: 'Progress Tracking',
-        href: '/instructor/students/progress',
-        icon: Users,
-      },
-      { name: 'At-Risk', href: '/instructor/students/at-risk', icon: Users },
-    ],
-  },
-  {
-    name: 'Grading',
-    icon: ClipboardCheck,
-    children: [
-      {
-        name: 'Pending',
-        href: '/instructor/grading/pending',
-        icon: ClipboardCheck,
-      },
-      {
-        name: 'Completed',
-        href: '/instructor/grading/completed',
-        icon: ClipboardCheck,
-      },
-    ],
-  },
-  {
-    name: 'Messages',
-    href: '/instructor/messages',
-    icon: MessageCircle,
-  },
-  {
-    name: 'Calendar',
-    href: '/instructor/calendar',
-    icon: Calendar,
   },
   {
     name: 'Settings',
@@ -104,22 +50,9 @@ const navigation: (NavItem | NavGroup)[] = [
 
 export default function InstructorNav() {
   const pathname = usePathname();
-  const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
-
-  const toggleGroup = (groupName: string) => {
-    setExpandedGroups((prev) =>
-      prev.includes(groupName)
-        ? prev.filter((name) => name !== groupName)
-        : [...prev, groupName]
-    );
-  };
 
   const isActive = (href: string) => {
     return pathname === href || pathname.startsWith(href + '/');
-  };
-
-  const isGroupActive = (children: NavItem[]) => {
-    return children.some((child) => isActive(child.href));
   };
 
   return (
@@ -152,71 +85,21 @@ export default function InstructorNav() {
       {/* Navigation Items */}
       <div className="space-y-1">
         {navigation.map((item) => {
-          if ('children' in item) {
-            const isExpanded = expandedGroups.includes(item.name);
-            const hasActiveChild = isGroupActive(item.children);
-
-            return (
-              <div key={item.name} className="mb-2">
-                <button
-                  onClick={() => toggleGroup(item.name)}
-                  className={`w-full flex items-center justify-between px-3 py-2 text-sm font-semibold rounded-lg transition ${
-                    hasActiveChild
-                      ? 'bg-brand-blue-600 text-white'
-                      : 'text-gray-300 hover:bg-gray-800'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <item.icon className="w-4 h-4" />
-                    {item.name}
-                  </div>
-                  {isExpanded ? (
-                    <ChevronDown className="w-4 h-4" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4" />
-                  )}
-                </button>
-
-                {isExpanded && (
-                  <div className="ml-4 mt-1 space-y-1">
-                    {item.children.map((child) => {
-                      const active = isActive(child.href);
-                      return (
-                        <Link
-                          key={child.href}
-                          href={child.href}
-                          className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition ${
-                            active
-                              ? 'bg-brand-blue-600 text-white'
-                              : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                          }`}
-                        >
-                          <child.icon className="w-4 h-4" />
-                          {child.name}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          } else {
-            const active = isActive(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-2 px-3 py-2 text-sm font-semibold rounded-lg transition ${
-                  active
-                    ? 'bg-brand-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                }`}
-              >
-                <item.icon className="w-4 h-4" />
-                {item.name}
-              </Link>
-            );
-          }
+          const active = isActive(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-semibold rounded-lg transition ${
+                active
+                  ? 'bg-brand-blue-600 text-white'
+                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+              }`}
+            >
+              <item.icon className="w-4 h-4" />
+              {item.name}
+            </Link>
+          );
         })}
       </div>
 

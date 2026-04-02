@@ -81,7 +81,7 @@ export default async function ForumsPage() {
             <p className="text-slate-500 mt-1 text-sm">Ask questions, share knowledge, and connect with the community.</p>
           </div>
           <Link
-            href="/lms/forums/new"
+            href="/lms/forums"
             className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4" /> New Topic

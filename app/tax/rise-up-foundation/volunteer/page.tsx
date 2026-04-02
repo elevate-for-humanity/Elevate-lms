@@ -100,7 +100,7 @@ export default function VolunteerPage() {
         <div className="absolute inset-0 bg-emerald-900/75 flex items-center justify-center">
           <div className="text-center px-4">
             <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Ready to Make a Difference?</h2>
-            <Link href="/tax/rise-up-foundation/volunteer/apply" className="px-10 py-4 bg-white text-emerald-900 font-black text-xl rounded-xl hover:bg-emerald-50 transition-colors">Apply to Volunteer</Link>
+            <Link href="/contact" className="px-10 py-4 bg-white text-emerald-900 font-black text-xl rounded-xl hover:bg-emerald-50 transition-colors">Apply to Volunteer</Link>
           </div>
         </div>
       </section>

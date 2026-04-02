@@ -293,7 +293,7 @@ export default function CurvatureBodySculptingPage() {
                   View Open Positions
                 </Link>
                 <Link
-                  href="/programs/esthetician-apprenticeship"
+                  href="/programs"
                   className="px-6 py-3 border border-white/30 text-white font-medium rounded-lg hover:bg-white/10 transition"
                 >
                   Get Trained First

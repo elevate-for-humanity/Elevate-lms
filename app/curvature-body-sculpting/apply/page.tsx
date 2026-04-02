@@ -271,7 +271,7 @@ function ApplyPageInner() {
                 <p className="text-blue-800 text-sm">
                   <strong>Need training?</strong> Elevate for Humanity offers FREE esthetician 
                   training through WIOA funding.{' '}
-                  <Link href="/programs/esthetician-apprenticeship" className="underline font-medium">
+                  <Link href="/programs" className="underline font-medium">
                     Learn more →
                   </Link>
                 </p>

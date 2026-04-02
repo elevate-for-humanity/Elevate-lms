@@ -34,7 +34,7 @@ export default function PaymentButton({
     setError(null);
 
     try {
-      const response = await fetch('/api/programs/checkout', {
+      const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

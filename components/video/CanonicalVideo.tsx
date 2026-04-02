@@ -13,6 +13,14 @@
  *   - prefers-reduced-motion — shows poster only, no video
  *   - onError fallback    — hides the video element; poster remains visible via CSS
  *
+ * Poster rendering:
+ *   The browser's native <video poster> attribute does not honour object-fit,
+ *   causing a layout flash on load (image renders at intrinsic size before CSS
+ *   applies). Instead, we render a separate <img> poster that is always
+ *   object-cover, then cross-fade the video in once it is actually playing.
+ *   The parent container must be position:relative for this to work — all hero
+ *   usages already satisfy this requirement.
+ *
  * DO NOT add props for autoPlay, preload, muted, or playsInline.
  * Those are not configurable — they are the standard.
  */
@@ -49,6 +57,8 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.1
   const ref = useRef<HTMLVideoElement | null>(null);
   const [failed, setFailed] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  // True once the video is actually playing — drives the poster → video cross-fade
+  const [playing, setPlaying] = useState(false);
 
   // Detect prefers-reduced-motion once on mount
   useEffect(() => {
@@ -109,7 +119,7 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.1
     return () => observer.disconnect();
   }, [autoPlayOnMount, reducedMotion, failed, threshold, playThrough]);
 
-  // Reduced-motion or error: render poster or blank
+  // Reduced-motion or error: render poster only
   if (reducedMotion || failed) {
     if (!poster) return null;
     return (
@@ -123,6 +133,40 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.1
     );
   }
 
+  // When a poster is provided, render it as a separate <img> underneath the
+  // video so it always fills the container with object-cover. The video fades
+  // in on top once playing, eliminating the browser-native poster flash where
+  // the image renders at its intrinsic size before CSS object-fit applies.
+  // Both elements share the same className (absolute inset-0 in hero usage)
+  // so they stack correctly inside the relative parent container.
+  if (poster) {
+    return (
+      <>
+        <img
+          src={poster}
+          alt=""
+          aria-hidden="true"
+          fetchPriority={autoPlayOnMount ? 'high' : 'auto'}
+          className={`${className} transition-opacity duration-500 ${playing ? 'opacity-0' : 'opacity-100'}`}
+          style={{ objectFit: 'cover' }}
+        />
+        <video
+          ref={ref}
+          className={`${className} transition-opacity duration-500 ${playing ? 'opacity-100' : 'opacity-0'}`}
+          muted
+          playsInline
+          preload={preloadFull ? 'auto' : 'metadata'}
+          aria-hidden="true"
+          onPlaying={() => setPlaying(true)}
+          onError={() => setFailed(true)}
+        >
+          <source src={src} type="video/mp4" />
+        </video>
+      </>
+    );
+  }
+
+  // No poster — single video element, no cross-fade needed
   return (
     <video
       ref={ref}
@@ -130,7 +174,6 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.1
       muted
       playsInline
       preload={preloadFull ? 'auto' : 'metadata'}
-      poster={poster}
       aria-hidden="true"
       onError={() => setFailed(true)}
     >

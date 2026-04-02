@@ -28,22 +28,22 @@ export default async function TuitionFeesPage() {
   // Static program data — authoritative tuition schedule
   // DB programs supplement this if tuition_cost is populated
   const STATIC_PROGRAMS = [
-    { name: 'Barber Apprenticeship', duration: '52 weeks', tuition: 0, examFees: 75, examFeesNote: 'Indiana PSI barber exam', materials: 0, fundingType: 'DOL Registered Apprenticeship' },
-    { name: 'Cosmetology Apprenticeship', duration: '52 weeks', tuition: 0, examFees: 75, examFeesNote: 'Indiana PSI cosmetology exam', materials: 0, fundingType: 'DOL Registered Apprenticeship' },
-    { name: 'Esthetician Apprenticeship', duration: '36 weeks', tuition: 0, examFees: 75, examFeesNote: 'Indiana PSI esthetician exam', materials: 0, fundingType: 'DOL Registered Apprenticeship' },
-    { name: 'Nail Technician Apprenticeship', duration: '24 weeks', tuition: 0, examFees: 75, examFeesNote: 'Indiana PSI nail tech exam', materials: 0, fundingType: 'DOL Registered Apprenticeship' },
-    { name: 'CNA Certification', duration: '6 weeks', tuition: 0, examFees: 115, examFeesNote: 'Pearson VUE CNA exam', materials: 0, fundingType: 'WIOA / WRG Eligible' },
+    // Prices sourced from INTraining / ETPL official listing (2Exclusive LLC-S / Elevate for Humanity Training Center)
+    { name: 'Barber Apprenticeship', duration: '15 months', tuition: 4890, examFees: 75, examFeesNote: 'Indiana PSI barber exam', materials: 0, fundingType: 'WIOA Eligible — most students pay $0' },
+    { name: 'Beauty & Career Educator Training', duration: '84 days', tuition: 4730, examFees: 75, examFeesNote: 'Indiana PSI exam', materials: 0, fundingType: 'WIOA Eligible — most students pay $0' },
+    { name: 'Bookkeeping / Accounting Clerk', duration: '8 weeks', tuition: 4925, examFees: 0, examFeesNote: 'QuickBooks + MOS exams included', materials: 0, fundingType: 'WIOA Eligible — most students pay $0' },
+    { name: 'Business Management', duration: '5 weeks', tuition: 4900, examFees: 0, examFeesNote: 'Certifications included', materials: 0, fundingType: 'WIOA Eligible — most students pay $0' },
+    { name: 'CPR / AED / First Aid', duration: '1 day', tuition: 575, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA Eligible' },
+    { name: 'Emergency Health & Safety Technician', duration: '4 weeks', tuition: 4950, examFees: 0, examFeesNote: 'CPR + EMR + OSHA 10 included', materials: 0, fundingType: 'WIOA Eligible — most students pay $0' },
+    { name: 'Home Health Aide', duration: '4 weeks', tuition: 4700, examFees: 0, examFeesNote: 'HHA licensure + CPR + CCHW included', materials: 0, fundingType: 'WIOA Eligible — most students pay $0' },
+    { name: 'HVAC Technician', duration: '20 weeks', tuition: 5000, examFees: 0, examFeesNote: 'EPA 608 + OSHA 30 + CPR + Rise Up included', materials: 0, fundingType: 'WIOA / WRG Eligible — most students pay $0' },
+    { name: 'Medical Assistant', duration: '21 days', tuition: 4325, examFees: 0, examFeesNote: 'CCHW + CPR + Rise Up included', materials: 0, fundingType: 'WIOA Eligible — most students pay $0' },
+    { name: 'Professional Esthetician & Client Services', duration: '5 weeks', tuition: 4575, examFees: 0, examFeesNote: 'OSHA 10 + certifications included', materials: 0, fundingType: 'WIOA Eligible — most students pay $0' },
+    { name: 'Public Safety Reentry Specialist', duration: '45 days', tuition: 4750, examFees: 0, examFeesNote: 'CPRC + CPSP + CCHW + CPR included', materials: 0, fundingType: 'WIOA Eligible — most students pay $0' },
     { name: 'CDL Training (Class A)', duration: '4 weeks', tuition: 0, examFees: 50, examFeesNote: 'Indiana BMV CDL skills test', materials: 0, fundingType: 'WIOA / WRG Eligible' },
-    { name: 'HVAC Technician', duration: '12 weeks', tuition: 0, examFees: 0, examFeesNote: 'EPA 608 exam — contact admissions for current fee schedule', materials: 0, fundingType: 'WIOA / WRG Eligible' },
-    { name: 'Electrical Technician', duration: '12 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA / WRG Eligible' },
-    { name: 'Plumbing Technician', duration: '12 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA / WRG Eligible' },
-    { name: 'Welding', duration: '10 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA / WRG Eligible' },
-    { name: 'Phlebotomy Technician', duration: '8 weeks', tuition: 1795, examFees: 135, examFeesNote: 'NHA CPT exam', materials: 75, fundingType: 'Self-Pay · BNPL Available' },
-    { name: 'Medical Assistant', duration: '16 weeks', tuition: 0, examFees: 155, examFeesNote: 'NHA CCMA exam', materials: 0, fundingType: 'WIOA / WRG Eligible' },
     { name: 'Tax Preparation', duration: '8 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'Grant-Funded' },
     { name: 'Web Development', duration: '16 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA / WRG Eligible' },
     { name: 'Cybersecurity Fundamentals', duration: '12 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA / WRG Eligible' },
-    { name: 'CPR / First Aid (HSI)', duration: '1 day', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'Included with programs' },
   ];
 
   // Use DB data if tuition fields are populated, otherwise use static

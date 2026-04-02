@@ -21,12 +21,21 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+// Prices from INTraining / ETPL official listing (2Exclusive LLC-S / Elevate for Humanity Training Center)
 const PROGRAM_DETAILS: Record<string, { name: string; totalPrice: number }> = {
-  cna: { name: 'Certified Nursing Assistant (CNA)', totalPrice: 1200 },
-  barber: { name: 'Barber Apprenticeship', totalPrice: 4980 },
-  hvac: { name: 'HVAC Technician', totalPrice: 5500 },
-  'medical-assistant': { name: 'Medical Assistant', totalPrice: 4200 },
+  cna: { name: 'Certified Nursing Assistant (CNA)', totalPrice: 4700 },
+  barber: { name: 'Barber Apprenticeship', totalPrice: 4890 },
+  hvac: { name: 'HVAC Technician', totalPrice: 5000 },
+  'medical-assistant': { name: 'Medical Assistant', totalPrice: 4325 },
   cdl: { name: 'CDL Training', totalPrice: 5000 },
+  'bookkeeping': { name: 'Bookkeeping / Accounting Clerk', totalPrice: 4925 },
+  'business-management': { name: 'Business Management', totalPrice: 4900 },
+  'esthetician': { name: 'Professional Esthetician & Client Services', totalPrice: 4575 },
+  'emergency-health': { name: 'Emergency Health & Safety Technician', totalPrice: 4950 },
+  'home-health-aide': { name: 'Home Health Aide', totalPrice: 4700 },
+  'reentry-specialist': { name: 'Public Safety Reentry Specialist', totalPrice: 4750 },
+  'beauty-educator': { name: 'Beauty & Career Educator Training', totalPrice: 4730 },
+  'cpr-aed': { name: 'CPR / AED / First Aid', totalPrice: 575 },
 };
 
 async function _POST(req: Request) {

@@ -108,7 +108,7 @@ export default function HvacCourseLicensePage() {
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
               <h3 className="font-bold text-slate-900 mb-1">Single Organization</h3>
               <div className="mb-3">
-                <span className="text-3xl font-black text-slate-900">$4,500</span>
+                <span className="text-3xl font-black text-slate-900">$5,000</span>
                 <span className="text-slate-500 text-sm ml-1">/ year</span>
               </div>
               <p className="text-slate-600 text-sm mb-4">Up to 50 active students. Delivered via your Elevate LMS instance or SCORM export.</p>

@@ -55,6 +55,33 @@ export default async function ProgramHolderHandbookPage() {
         </div>
       </div>
 
+      {/* Orientation Video */}
+      <div className="max-w-4xl mx-auto px-6 pt-10">
+        <div className="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden">
+          <div className="p-5 border-b border-slate-200">
+            <h2 className="text-base font-bold text-slate-900">Watch Before You Read</h2>
+            <p className="text-sm text-slate-500 mt-0.5">
+              This 7-minute orientation video covers every section of the handbook. Watch it first, then read the full text below.
+            </p>
+          </div>
+          <div className="aspect-video bg-black">
+            <video
+              controls
+              className="w-full h-full"
+              poster="/images/pages/program-holder-page-1.jpg"
+              preload="metadata"
+            >
+              <source src="/videos/program-holder-orientation.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <div className="px-5 py-3 bg-amber-50 border-t border-amber-100">
+            <p className="text-xs text-amber-800 font-medium">
+              ⚠️ Watching this video does not substitute for reading the handbook. You must read every section before acknowledging.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-12">
         <div className="bg-red-50 border-l-4 border-red-600 p-5 rounded-r-xl mb-10 flex gap-3">

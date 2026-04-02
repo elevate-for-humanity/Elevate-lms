@@ -88,7 +88,7 @@ async function completeOrientation() {
     logger.error('[orientation] Post-orientation email failed', emailErr);
   }
 
-  redirect('/learner/dashboard');
+  redirect('/onboarding/learner/complete');
 }
 
 export default async function OrientationPage() {

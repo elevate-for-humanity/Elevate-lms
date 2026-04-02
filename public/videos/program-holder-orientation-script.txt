@@ -1,0 +1,174 @@
+PROGRAM HOLDER ORIENTATION VIDEO SCRIPT — Elevate for Humanity
+==============================================================
+
+Duration: 6-8 minutes
+Voice: Professional, clear, authoritative but welcoming
+Target: New Program Holders — facility hosts, coordination partners, referral partners
+Delivery: Text-to-speech (OpenAI TTS, alloy voice)
+
+NOTE: Each scene is a separate audio file. B-roll video plays underneath.
+Scene durations are approximate based on speaking pace (~140 words/minute).
+
+==============================================================
+SCENE 01 — Welcome (approx 30 sec)
+==============================================================
+
+Welcome to Elevate for Humanity's Program Holder Orientation.
+
+If you're watching this, you've been approved as a Program Holder in our Training Network — and we're glad to have you.
+
+This video covers everything you need to know before you begin: how the platform works, what the handbook requires, how students are managed, how you get paid, and what your rights are.
+
+Watch it fully. The handbook acknowledgement at the end is legally binding.
+
+==============================================================
+SCENE 02 — What Elevate Is (approx 40 sec)
+==============================================================
+
+Elevate for Humanity is a workforce development organization based in Indianapolis, Indiana.
+
+We provide career training, credentialing, and job placement support to job seekers, returning citizens, veterans, and underserved communities.
+
+We operate as an Eligible Training Provider under Indiana's INTraining system — administered by the Indiana Department of Workforce Development.
+
+This means our programs qualify for WIOA funding and the Workforce Ready Grant. Most students pay zero out of pocket.
+
+When you deliver training under the Elevate name, you are an authorized delivery site within our Training Network. Elevate owns the programs, the curriculum, the credentials, and the brand. You provide the space, the students, or the coordination — depending on your tier.
+
+==============================================================
+SCENE 03 — The Platform: Elevate LMS (approx 45 sec)
+==============================================================
+
+All training is delivered through the Elevate LMS — our online learning management system.
+
+Students access their coursework, complete quizzes, track attendance, and earn credentials entirely through the platform.
+
+As a Program Holder, you have your own dashboard at elevateforhumanity.org — under Program Holder.
+
+From your dashboard you can: view enrolled students, track their progress, submit attendance records, upload required documents, view your payment status, and access the handbook and compliance materials.
+
+You do not manage student accounts directly. All enrollment, credentialing, and record-keeping is handled by Elevate. Your job is to support students at your site and keep your records current.
+
+If you ever have trouble accessing the platform, contact your assigned Elevate coordinator immediately.
+
+==============================================================
+SCENE 04 — The Handbook (approx 50 sec)
+==============================================================
+
+The Program Holder Handbook is required reading. It is not optional, and it is not a formality.
+
+The handbook covers six things you must understand before you begin.
+
+First: your role. What you are responsible for — student recruitment, WorkOne registration, attendance tracking, facility readiness, and communication.
+
+Second: required documents. You cannot enroll students or receive payments until all required documents are submitted and approved. This includes your business license, training provider license, facility inspection certificate, instructor credentials, liability insurance, workers compensation insurance, background checks, your federal EIN, a W-9, and approved curriculum confirmation.
+
+Third: student management. All students are Elevate students. Student records are protected under FERPA. You may not share student information with any third party without written authorization.
+
+Fourth: compliance. These are federal WIOA requirements and Indiana state law. They are not negotiable.
+
+Fifth: confidentiality and non-compete. What you learn about our curriculum, pricing, and operations is confidential. You may not replicate the program model.
+
+Sixth: your right to exit. You can leave at any time with 30 days written notice. No reason required.
+
+Read every section before you acknowledge.
+
+==============================================================
+SCENE 05 — WorkOne Registration (approx 35 sec)
+==============================================================
+
+This is one of the most important compliance requirements — and one of the most commonly missed.
+
+Every student seeking WIOA funding must be registered through WorkOne before enrollment begins. This is a federal requirement. It is not optional.
+
+WorkOne is Indiana's workforce development system. Students register at IndianaCareerConnect.com, schedule an appointment with their local WorkOne office, and receive a training voucher before their tuition can be funded.
+
+If a student begins training before completing WorkOne registration, their funding may be denied — and you may be responsible for the gap.
+
+Do not enroll WIOA-funded students without confirmed WorkOne registration. If you are unsure, contact your Elevate coordinator before proceeding.
+
+==============================================================
+SCENE 06 — How You Get Paid (approx 45 sec)
+==============================================================
+
+Your compensation depends on which participation tier you signed under.
+
+Tier One is the Facility Host tier. You provide a dedicated physical training space and on-site operational support. You receive one-third of net program revenue per cohort. Payments are split: fifty percent at the midpoint of the program, and fifty percent when the student earns their credential. For a ten-student barber cohort, that's approximately eighteen thousand dollars. For fifty students, approximately ninety thousand.
+
+Tier Two is the Coordination Partner tier. You provide student coordination and supervision support — no facility required. You receive fifteen percent of net program revenue.
+
+Tier Three is the Referral Partner tier. You refer eligible individuals to Elevate programs. You receive a flat fee of two hundred fifty to five hundred dollars per enrolled student. No operational responsibility.
+
+Net revenue is gross tuition minus direct program costs — credential exam fees, LMS, curriculum, marketing, compliance, administration, and student services.
+
+Payments are processed within thirty days of invoice approval. Invoices must include supporting documentation.
+
+==============================================================
+SCENE 07 — Funded Programs (approx 40 sec)
+==============================================================
+
+Here are the programs currently available through the Elevate Training Network — all listed on Indiana's Eligible Training Provider List.
+
+Barber Apprenticeship — fifteen months — four thousand eight hundred ninety dollars.
+
+Beauty and Career Educator Training — eighty-four days — four thousand seven hundred thirty dollars.
+
+Bookkeeping and Accounting Clerk — eight weeks — four thousand nine hundred twenty-five dollars.
+
+Business Management — five weeks — four thousand nine hundred dollars.
+
+Emergency Health and Safety Technician — four weeks — four thousand nine hundred fifty dollars.
+
+Home Health Aide — four weeks — four thousand seven hundred dollars.
+
+HVAC Technician — twenty weeks — five thousand dollars.
+
+Medical Assistant — twenty-one days — four thousand three hundred twenty-five dollars.
+
+Professional Esthetician and Client Services — five weeks — four thousand five hundred seventy-five dollars.
+
+Public Safety Reentry Specialist — forty-five days — four thousand seven hundred fifty dollars.
+
+CPR, AED, and First Aid — one day — five hundred seventy-five dollars.
+
+Most students pay zero through WIOA or the Workforce Ready Grant.
+
+==============================================================
+SCENE 08 — Your Rights (approx 30 sec)
+==============================================================
+
+You have rights as a Program Holder — and they are guaranteed.
+
+You have the right to transparent payment calculations. You can request a full breakdown of any payment at any time.
+
+You have the right to exit. Either party can terminate this agreement with thirty days written notice. No reason required. Send written notice to your Elevate coordinator and copy elevate4humanityedu@gmail.com.
+
+You have the right to a fair process. If Elevate believes you have violated the agreement, you will receive written notice and an opportunity to respond before any action is taken.
+
+Your rights and your responsibilities carry equal weight. Neither is optional.
+
+==============================================================
+SCENE 09 — Next Steps (approx 25 sec)
+==============================================================
+
+Here is what happens next.
+
+First: read the full Program Holder Handbook at your dashboard under Handbook. Then acknowledge it.
+
+Second: read the Rights and Responsibilities document and acknowledge it.
+
+Third: upload all required documents through your dashboard under Documents.
+
+Fourth: complete your facility or coordination setup with your assigned Elevate coordinator.
+
+You cannot enroll students until all documents are submitted and approved.
+
+If you have questions at any point, contact your coordinator or email elevate4humanityedu@gmail.com.
+
+Welcome to the Elevate Training Network. Let's get to work.
+
+==============================================================
+END OF SCRIPT
+==============================================================
+Total estimated duration: 6.5 to 8 minutes
+Scene count: 9

@@ -35,7 +35,7 @@ export default async function CompliancePage() {
     .eq('id', user.id)
     .single();
 
-  if (!profile || profile.role !== 'program_holder') redirect('/');
+  if (!profile || !['program_holder','admin','super_admin','staff'].includes(profile.role)) redirect('/login');
 
   // Get program holder record
   const { data: programHolder } = await supabase

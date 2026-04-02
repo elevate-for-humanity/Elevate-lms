@@ -165,14 +165,7 @@ export default function RootLayout({
           sizes="180x180"
         />
         <meta name="theme-color" content="#dc2626" />
-        {/* Preload hero image for faster LCP */}
-        <link
-          rel="preload"
-          href="/images/pages/home-hero-video.jpg"
-          as="image"
-          type="image/webp"
-          fetchPriority="high"
-        />
+        {/* LCP preload is set per-page in each page's metadata/head, not globally */}
         {!isProduction && (
           <>
             <meta httpEquiv="Cache-Control" content="no-cache" />

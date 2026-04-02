@@ -1,8 +1,9 @@
-// Server component — enforces admin auth and passes real stats to client.
+// Server component — enforces admin auth and passes real SendGrid stats to client.
 import AdminClientPage from '@/components/admin/AdminClientPage';
 import EmailMarketingClient from './EmailMarketingClient';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/authGuards';
+import { getSendGridStats } from '@/lib/email/sendgrid-stats';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,20 +11,25 @@ export default async function Page() {
   await requireAdmin();
   const db = createAdminClient();
 
-  // Real subscriber count from profiles
-  const [{ count: subscriberCount }, { count: sentCount }] = await Promise.all([
+  const [{ count: subscriberCount }, sgStats] = await Promise.all([
     db.from('profiles').select('*', { count: 'exact', head: true }),
-    db.from('email_automations')
-      .select('total_recipients', { count: 'exact', head: false })
-      .gte('updated_at', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()),
+    getSendGridStats(),
   ]);
-
-  const emailsSentThisMonth = sentCount ?? 0;
-  const totalSubscribers = subscriberCount ?? 0;
 
   return (
     <AdminClientPage>
-      <EmailMarketingClient stats={{ emailsSentThisMonth, totalSubscribers }} />
+      <EmailMarketingClient
+        stats={{
+          totalSubscribers:      subscriberCount ?? 0,
+          emailsSentThisMonth:   sgStats.thisMonth?.requests ?? 0,
+          deliveredThisMonth:    sgStats.thisMonth?.delivered ?? 0,
+          openRateThisMonth:     sgStats.thisMonth?.openRate ?? null,
+          clickRateThisMonth:    sgStats.thisMonth?.clickRate ?? null,
+          openRateLastMonth:     sgStats.lastMonth?.openRate ?? null,
+          clickRateLastMonth:    sgStats.lastMonth?.clickRate ?? null,
+          bouncesThisMonth:      sgStats.thisMonth?.bounces ?? 0,
+        }}
+      />
     </AdminClientPage>
   );
 }

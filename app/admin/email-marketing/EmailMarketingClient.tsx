@@ -19,9 +19,21 @@ import {
 
 interface EmailMarketingPageProps {
   stats?: {
-    emailsSentThisMonth: number;
     totalSubscribers: number;
+    emailsSentThisMonth: number;
+    deliveredThisMonth: number;
+    openRateThisMonth: number | null;
+    clickRateThisMonth: number | null;
+    openRateLastMonth: number | null;
+    clickRateLastMonth: number | null;
+    bouncesThisMonth: number;
   };
+}
+
+function rateTrend(current: number | null, previous: number | null): string | null {
+  if (current === null || previous === null || previous === 0) return null;
+  const diff = current - previous;
+  return `${diff >= 0 ? '+' : ''}${diff.toFixed(1)}% vs last month`;
 }
 
 export default function EmailMarketingPage({ stats }: EmailMarketingPageProps) {
@@ -65,8 +77,8 @@ export default function EmailMarketingPage({ stats }: EmailMarketingPageProps) {
           </p>
         </div>
 
-        {/* Stats Cards — real data from server */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2 mb-8">
+        {/* Stats Cards — live from SendGrid + Supabase */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
           <div className="rounded-xl bg-white p-6 shadow-sm border border-slate-200">
             <div className="flex items-center justify-between mb-2">
               <Mail className="h-11 w-11 text-brand-blue-600" />
@@ -76,6 +88,23 @@ export default function EmailMarketingPage({ stats }: EmailMarketingPageProps) {
               {stats?.emailsSentThisMonth?.toLocaleString() ?? '—'}
             </div>
             <div className="text-sm text-black">Emails Sent</div>
+            {stats?.deliveredThisMonth != null && stats.deliveredThisMonth > 0 && (
+              <div className="text-xs text-slate-400 mt-1">{stats.deliveredThisMonth.toLocaleString()} delivered</div>
+            )}
+          </div>
+
+          <div className="rounded-xl bg-white p-6 shadow-sm border border-slate-200">
+            <div className="flex items-center justify-between mb-2">
+              <Eye className="h-11 w-11 text-brand-green-600" />
+              <span className="text-xs font-semibold text-slate-500">OPEN RATE</span>
+            </div>
+            <div className="text-2xl font-bold text-black">
+              {stats?.openRateThisMonth != null ? `${stats.openRateThisMonth}%` : '—'}
+            </div>
+            <div className="text-sm text-black">Unique Opens</div>
+            {rateTrend(stats?.openRateThisMonth ?? null, stats?.openRateLastMonth ?? null) && (
+              <div className="text-xs text-slate-400 mt-1">{rateTrend(stats?.openRateThisMonth ?? null, stats?.openRateLastMonth ?? null)}</div>
+            )}
           </div>
 
           <div className="rounded-xl bg-white p-6 shadow-sm border border-slate-200">
@@ -87,6 +116,20 @@ export default function EmailMarketingPage({ stats }: EmailMarketingPageProps) {
               {stats?.totalSubscribers?.toLocaleString() ?? '—'}
             </div>
             <div className="text-sm text-black">Total Subscribers</div>
+          </div>
+
+          <div className="rounded-xl bg-white p-6 shadow-sm border border-slate-200">
+            <div className="flex items-center justify-between mb-2">
+              <BarChart3 className="h-11 w-11 text-brand-orange-600" />
+              <span className="text-xs font-semibold text-slate-500">CLICK RATE</span>
+            </div>
+            <div className="text-2xl font-bold text-black">
+              {stats?.clickRateThisMonth != null ? `${stats.clickRateThisMonth}%` : '—'}
+            </div>
+            <div className="text-sm text-black">Unique Clicks</div>
+            {rateTrend(stats?.clickRateThisMonth ?? null, stats?.clickRateLastMonth ?? null) && (
+              <div className="text-xs text-slate-400 mt-1">{rateTrend(stats?.clickRateThisMonth ?? null, stats?.clickRateLastMonth ?? null)}</div>
+            )}
           </div>
         </div>
 
@@ -201,12 +244,39 @@ export default function EmailMarketingPage({ stats }: EmailMarketingPageProps) {
         {activeTab === 'analytics' && (
           <div className="space-y-6">
             <h2 className="text-xl font-semibold text-black">Email Analytics</h2>
-            <div className="rounded-xl bg-slate-50 border border-slate-200 p-10 text-center">
-              <BarChart3 className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-              <p className="font-semibold text-slate-700 mb-1">No analytics data yet</p>
-              <p className="text-sm text-slate-500">
-                Send your first campaign to start tracking opens, clicks, and conversions.
-              </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-xl bg-white p-6 shadow-sm border border-slate-200">
+                <h3 className="font-semibold text-black mb-4">This Month</h3>
+                <div className="space-y-3">
+                  {[
+                    { label: 'Sent',        value: stats?.emailsSentThisMonth?.toLocaleString() ?? '—' },
+                    { label: 'Delivered',   value: stats?.deliveredThisMonth?.toLocaleString() ?? '—' },
+                    { label: 'Open Rate',   value: stats?.openRateThisMonth != null ? `${stats.openRateThisMonth}%` : '—' },
+                    { label: 'Click Rate',  value: stats?.clickRateThisMonth != null ? `${stats.clickRateThisMonth}%` : '—' },
+                    { label: 'Bounces',     value: stats?.bouncesThisMonth?.toLocaleString() ?? '—' },
+                  ].map((row) => (
+                    <div key={row.label} className="flex justify-between items-center">
+                      <span className="text-sm text-slate-600">{row.label}</span>
+                      <span className="text-sm font-semibold text-black">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-xl bg-white p-6 shadow-sm border border-slate-200">
+                <h3 className="font-semibold text-black mb-4">Last Month</h3>
+                <div className="space-y-3">
+                  {[
+                    { label: 'Open Rate',  value: stats?.openRateLastMonth != null ? `${stats.openRateLastMonth}%` : '—' },
+                    { label: 'Click Rate', value: stats?.clickRateLastMonth != null ? `${stats.clickRateLastMonth}%` : '—' },
+                  ].map((row) => (
+                    <div key={row.label} className="flex justify-between items-center">
+                      <span className="text-sm text-slate-600">{row.label}</span>
+                      <span className="text-sm font-semibold text-black">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-slate-400 mt-4">Source: SendGrid Stats API</p>
+              </div>
             </div>
           </div>
         )}

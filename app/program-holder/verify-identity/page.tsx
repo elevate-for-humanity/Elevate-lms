@@ -31,7 +31,7 @@ export default async function IdentityVerificationPage() {
     .eq('id', user.id)
     .single();
 
-  if (!profile || profile.role !== 'program_holder') {
+  if (!profile || !['program_holder','admin','super_admin','staff'].includes(profile.role)) {
     redirect('/unauthorized');
   }
 

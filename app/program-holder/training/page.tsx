@@ -32,8 +32,8 @@ export default async function TrainingPage() {
     .eq('id', user.id)
     .single();
 
-  if (!profile || profile.role !== 'program_holder') {
-    redirect('/');
+  if (!profile || !['program_holder', 'admin', 'super_admin', 'staff'].includes(profile.role)) {
+    redirect('/program-holder/dashboard');
   }
 
   return (
@@ -68,14 +68,15 @@ export default async function TrainingPage() {
               </p>
 
               {/* Video Player */}
-              <div className="relative aspect-video bg-white rounded-lg overflow-hidden">
+              <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
                 <video
                   controls
                   className="w-full h-full"
                   poster="/images/pages/program-holder-page-1.jpg"
+                  preload="metadata"
                 >
                   <source
-                    src="/videos/training-providers-video-with-narration.mp4"
+                    src="/videos/program-holder-orientation.mp4"
                     type="video/mp4"
                   />
                   Your browser does not support the video tag.
@@ -84,10 +85,8 @@ export default async function TrainingPage() {
 
               <div className="mt-6 p-4 bg-brand-blue-50 rounded-lg border border-brand-blue-200">
                 <p className="text-sm text-brand-blue-900">
-                  <strong>Duration:</strong> ~5 minutes |
-                  <strong className="ml-4">Topics Covered:</strong> Platform
-                  navigation, student enrollment, progress tracking, compliance
-                  reporting, and support resources
+                  <strong>Duration:</strong> ~7 minutes ·
+                  <strong className="ml-2">Topics:</strong> What Elevate is · The LMS platform · The handbook · WorkOne registration · How you get paid · All 11 funded programs · Your rights · Next steps
                 </p>
               </div>
             </div>
@@ -103,113 +102,25 @@ export default async function TrainingPage() {
           </h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Module 1 */}
-            <div className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition">
-              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-brand-blue-700">1</span>
+            {[
+              { num: 1, color: 'brand-blue', title: 'Getting Started', desc: 'Set up your account, complete verification, and navigate your dashboard.', href: '/program-holder/onboarding/setup', label: 'View Guide' },
+              { num: 2, color: 'brand-blue', title: 'Student Management', desc: 'View enrolled students, track progress, and manage your roster.', href: '/program-holder/students', label: 'Manage Students' },
+              { num: 3, color: 'brand-blue', title: 'Compliance & Reporting', desc: 'Attendance reporting, WIOA compliance, and audit requirements.', href: '/program-holder/compliance', label: 'View Compliance' },
+              { num: 4, color: 'brand-orange', title: 'Document Management', desc: 'Upload and manage required licenses, insurance, and certifications.', href: '/program-holder/documents', label: 'Manage Documents' },
+              { num: 5, color: 'brand-blue', title: 'Support & Resources', desc: 'Contact your Elevate coordinator and access help resources.', href: '/program-holder/support', label: 'Get Support' },
+              { num: 6, color: 'brand-blue', title: 'Handbook & Rights', desc: 'Required reading — your responsibilities, rights, and exit terms.', href: '/program-holder/handbook', label: 'Read Handbook' },
+            ].map(({ num, color, title, desc, href, label }) => (
+              <div key={num} className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition">
+                <div className={`w-12 h-12 bg-${color}-100 rounded-lg flex items-center justify-center mb-4`}>
+                  <span className={`text-2xl font-bold text-${color}-700`}>{num}</span>
+                </div>
+                <h3 className="text-xl font-bold mb-3">{title}</h3>
+                <p className="text-gray-600 mb-4">{desc}</p>
+                <Link href={href} className="text-brand-blue-700 font-semibold hover:underline">
+                  {label} →
+                </Link>
               </div>
-              <h3 className="text-xl font-bold mb-3">Getting Started</h3>
-              <p className="text-black mb-4">
-                Learn how to set up your account, complete verification, and
-                navigate the dashboard.
-              </p>
-              <Link
-                href="/program-holder/onboarding"
-                className="text-brand-blue-700 font-semibold hover:underline"
-              >
-                View Guide →
-              </Link>
-            </div>
-
-            {/* Module 2 */}
-            <div className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition">
-              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-brand-green-700">2</span>
-              </div>
-              <h3 className="text-xl font-bold mb-3">Student Management</h3>
-              <p className="text-black mb-4">
-                Enroll students, track progress, and manage your student roster
-                effectively.
-              </p>
-              <Link
-                href="/program-holder/students"
-                className="text-brand-blue-700 font-semibold hover:underline"
-              >
-                Manage Students →
-              </Link>
-            </div>
-
-            {/* Module 3 */}
-            <div className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition">
-              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-brand-blue-700">3</span>
-              </div>
-              <h3 className="text-xl font-bold mb-3">Compliance & Reporting</h3>
-              <p className="text-black mb-4">
-                Understand reporting requirements and maintain compliance with
-                program standards.
-              </p>
-              <Link
-                href="/program-holder/compliance"
-                className="text-brand-blue-700 font-semibold hover:underline"
-              >
-                View Compliance →
-              </Link>
-            </div>
-
-            {/* Module 4 */}
-            <div className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition">
-              <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-brand-orange-700">4</span>
-              </div>
-              <h3 className="text-xl font-bold mb-3">Document Management</h3>
-              <p className="text-black mb-4">
-                Upload and manage required documents, licenses, and
-                certifications.
-              </p>
-              <Link
-                href="/program-holder/documents"
-                className="text-brand-blue-700 font-semibold hover:underline"
-              >
-                Manage Documents →
-              </Link>
-            </div>
-
-            {/* Module 5 */}
-            <div className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition">
-              <div className="w-12 h-12 bg-brand-red-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-brand-red-700">5</span>
-              </div>
-              <h3 className="text-xl font-bold mb-3">Support & Resources</h3>
-              <p className="text-black mb-4">
-                Access help documentation, contact support, and find answers to
-                common questions.
-              </p>
-              <Link
-                href="/program-holder/support"
-                className="text-brand-blue-700 font-semibold hover:underline"
-              >
-                Get Support →
-              </Link>
-            </div>
-
-            {/* Module 6 */}
-            <div className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition">
-              <div className="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-teal-700">6</span>
-              </div>
-              <h3 className="text-xl font-bold mb-3">Best Practices</h3>
-              <p className="text-black mb-4">
-                Learn proven strategies for student success and program
-                excellence.
-              </p>
-              <Link
-                href="/program-holder/handbook"
-                className="text-brand-blue-700 font-semibold hover:underline"
-              >
-                Read Handbook →
-              </Link>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -222,21 +133,20 @@ export default async function TrainingPage() {
               Need Help?
             </h2>
             <p className="text-base md:text-lg text-brand-blue-100 mb-8">
-              Contact support if you have questions about managing your
-              programs or need assistance.
+              Contact your Elevate coordinator or reach us directly at (317) 314-3757.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
-                href="/support"
-                className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg"
+                href="/program-holder/support"
+                className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 text-lg"
               >
-                Apply Now
+                Contact Support
               </Link>
               <Link
                 href="/program-holder/dashboard"
                 className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg"
               >
-                Browse Programs
+                Go to Dashboard
               </Link>
             </div>
           </div>

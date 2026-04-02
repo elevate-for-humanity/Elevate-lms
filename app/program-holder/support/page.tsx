@@ -31,7 +31,7 @@ export default async function SupportPage() {
     .eq('id', user.id)
     .single();
 
-  if (!profile || profile.role !== 'program_holder') redirect('/');
+  if (!profile || !['program_holder','admin','super_admin','staff'].includes(profile.role)) redirect('/login');
 
   const supportChannels = [
     {

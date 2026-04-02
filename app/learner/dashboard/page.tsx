@@ -308,20 +308,41 @@ export default async function LearnerDashboardPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome */}
+        {/* Welcome + How to use */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">
             Welcome back, {userName}
           </h1>
           {activeEnrollments.length > 0 ? (
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 text-sm mb-6">
               {activeEnrollments.length === 1
                 ? `1 active program — ${averageProgress}% complete`
                 : `${activeEnrollments.length} active programs — ${averageProgress}% average progress`}
             </p>
           ) : (
-            <p className="text-gray-500 text-sm">No active programs yet.</p>
+            <p className="text-gray-500 text-sm mb-6">No active programs yet — see available programs below.</p>
           )}
+
+          {/* How to use your dashboard */}
+          <div className="bg-brand-blue-50 border border-brand-blue-100 rounded-xl p-5">
+            <h2 className="text-sm font-bold text-brand-blue-900 mb-3">How to use your dashboard</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {[
+                { step: '1', title: 'My Programs', desc: 'Your active enrollments are listed below. Click Continue to pick up where you left off.' },
+                { step: '2', title: 'Track Progress', desc: 'Your completion percentage updates automatically as you finish lessons and pass checkpoints.' },
+                { step: '3', title: 'Earn Certificates', desc: 'Complete all lessons and pass every checkpoint to unlock your credential certificate.' },
+                { step: '4', title: 'Get Help', desc: 'Use Quick Actions below to view attendance, contact your advisor, or find your certificates.' },
+              ].map(({ step, title, desc }) => (
+                <div key={step} className="flex gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-brand-blue-600 text-white text-xs font-bold flex items-center justify-center mt-0.5">{step}</span>
+                  <div>
+                    <p className="text-xs font-semibold text-brand-blue-900">{title}</p>
+                    <p className="text-xs text-brand-blue-700 mt-0.5 leading-relaxed">{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Onboarding Banner — shown when student has a pending program enrollment */}
@@ -415,12 +436,8 @@ export default async function LearnerDashboardPage() {
             {/* Current Programs */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200">
               <div className="p-6 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-gray-900">My Programs</h2>
-                  <Link href="/programs" className="text-sm text-brand-orange-600 hover:text-brand-orange-700 font-medium">
-                    Browse All Programs
-                  </Link>
-                </div>
+                <h2 className="text-lg font-semibold text-gray-900">My Programs</h2>
+                <p className="text-xs text-gray-400 mt-0.5">Programs you are currently enrolled in</p>
               </div>
               <div className="divide-y divide-gray-200">
                 {activeEnrollments.length > 0 ? (
@@ -468,19 +485,10 @@ export default async function LearnerDashboardPage() {
                   );})
                   
                 ) : (
-                  <div className="p-12 text-center">
-                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                      <BookOpen className="w-8 h-8 text-gray-400" />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No Active Programs</h3>
-                    <p className="text-gray-500 mb-4">Start your learning journey by enrolling in a program.</p>
-                    <Link
-                      href="/programs"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-brand-orange-600 text-white font-medium rounded-lg hover:bg-brand-orange-700 transition"
-                    >
-                      Browse Programs
-                      <ChevronRight className="w-4 h-4" />
-                    </Link>
+                  <div className="p-10 text-center">
+                    <BookOpen className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                    <h3 className="text-base font-medium text-gray-900 mb-1">No active programs yet</h3>
+                    <p className="text-sm text-gray-400">Once you enroll, your programs will appear here. See the WIOA-Funded Programs section below to get started.</p>
                   </div>
                 )}
               </div>
@@ -886,13 +894,13 @@ export default async function LearnerDashboardPage() {
           </div>
         </div>
 
-        {/* Funded Programs — INTraining / ETPL official listing */}
-        <div className="mt-10">
+        {/* Browse Programs — clearly separated from My Programs above */}
+        <div className="mt-10 pt-8 border-t border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">WIOA-Funded Programs</h2>
+              <h2 className="text-lg font-bold text-gray-900">Browse Available Programs</h2>
               <p className="text-sm text-gray-500 mt-0.5">
-                All programs below are listed on Indiana&apos;s Eligible Training Provider List (ETPL) — most students pay $0 through WIOA or the Workforce Ready Grant.
+                All programs are listed on Indiana&apos;s Eligible Training Provider List (ETPL) — most students pay $0 through WIOA or the Workforce Ready Grant.
               </p>
             </div>
             <a

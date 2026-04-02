@@ -893,13 +893,23 @@ const nextConfig = {
           { key: 'X-Build-ID', value: process.env.COMMIT_REF?.slice(0, 7) || 'dev' },
         ],
       },
-      // 1) Never allow HTML / app routes to be cached for a year
+      // 1) Public marketing pages — short CDN cache, revalidate in background.
+      //    Netlify edge will serve stale while fetching fresh, keeping TTFB fast.
       {
-        source: '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|studio).*)',
+        source: '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|studio|api|lms|admin|learner|instructor|employer|partner|program-holder|staff-portal|mentor|student-portal|onboarding|franchise|tax|supersonic).*)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, s-maxage=60, stale-while-revalidate=300' },
+          { key: 'X-Build-ID', value: process.env.COMMIT_REF?.slice(0, 7) || 'dev' },
+          { key: 'X-Deployment-ID', value: process.env.DEPLOY_ID || 'local' },
+          ...securityHeaders,
+        ],
+      },
+      // 1b) Authenticated / dynamic routes — never cache at edge
+      {
+        source: '/(api|lms|admin|learner|instructor|employer|partner|program-holder|staff-portal|mentor|student-portal|onboarding|franchise|tax|supersonic)/:path*',
         headers: [
           { key: 'Cache-Control', value: 'no-store, max-age=0' },
           { key: 'Pragma', value: 'no-cache' },
-          { key: 'Expires', value: '0' },
           { key: 'Surrogate-Control', value: 'no-store' },
           { key: 'X-Build-ID', value: process.env.COMMIT_REF?.slice(0, 7) || 'dev' },
           { key: 'X-Deployment-ID', value: process.env.DEPLOY_ID || 'local' },

@@ -199,7 +199,7 @@ export async function provisionLicense(ctx: ProvisioningContext): Promise<Provis
       });
       if (userError || !newUser.user) throw new Error(`Failed to create admin user: ${userError?.message}`);
       adminUserId = newUser.user.id;
-      await supabase.from('profiles').insert({ id: adminUserId, email, tenant_id: tenantId, role: 'admin', full_name: orgName + ' Admin' });
+      await supabase.from('profiles').insert({ id: adminUserId, email: email, tenant_id: tenantId, role: 'admin', full_name: orgName + ' Admin' });
     }
     await logProvisioningEvent(correlationId, 'admin_created', 'completed', tenantId, paymentIntentId, undefined, { admin_user_id: adminUserId, new_user: !!temporaryPassword });
 

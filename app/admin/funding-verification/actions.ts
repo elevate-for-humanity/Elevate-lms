@@ -65,7 +65,7 @@ export async function verifyFunding(enrollmentId: string, note?: string) {
 
   await db.from('audit_logs').insert({
     actor_id: adminId,
-    actor_type: 'admin',
+    actor_role: 'admin',
     action: 'funding.verified',
     resource_type: 'enrollment',
     resource_id: enrollmentId,
@@ -123,7 +123,7 @@ export async function rejectFunding(enrollmentId: string, reason: string) {
 
   await db.from('audit_logs').insert({
     actor_id: adminId,
-    actor_type: 'admin',
+    actor_role: 'admin',
     action: 'funding.rejected',
     resource_type: 'enrollment',
     resource_id: enrollmentId,

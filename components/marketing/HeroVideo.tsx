@@ -29,9 +29,6 @@ export interface HeroVideoProps {
   videoSrcDesktop: string;
   /** Mobile video source — falls back to desktop if omitted */
   videoSrcMobile?: string;
-  /** Poster image shown while video loads and as reduced-motion fallback */
-  posterImage?: string;
-
   /** 2–4 word micro-label rendered in bottom-left corner of video */
   microLabel?: string;
   /** Show small brand bug in top-left corner */
@@ -61,7 +58,6 @@ export interface HeroVideoProps {
 export default function HeroVideo({
   videoSrcDesktop,
   videoSrcMobile,
-  posterImage,
   microLabel,
   showBrandBug = false,
   belowHeroHeadline,
@@ -100,7 +96,6 @@ export default function HeroVideo({
         {/* autoPlayOnMount + preloadFull — hero is above the fold, load immediately */}
         <CanonicalVideo
           src={videoSrc}
-          poster={posterImage}
           className="absolute inset-0 w-full h-full object-cover object-center"
           autoPlayOnMount
           preloadFull

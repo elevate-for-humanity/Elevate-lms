@@ -480,6 +480,53 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
             logger.error('Enrollment email error:', emailErr);
           }
 
+          // Send Milady student email and queue provisioning
+          try {
+            const { sendEmail } = await import('@/lib/email/sendgrid');
+            await sendEmail({
+              to: customerEmail,
+              subject: 'Your Milady Access — Barber Apprenticeship',
+              html: `
+<div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1a1a1a">
+<p>Hi ${customerName || 'there'},</p>
+
+<p>As part of your Barber Apprenticeship enrollment, your related instruction is provided through <strong>Milady</strong>.</p>
+
+<p><strong>What to expect:</strong></p>
+<p>• Milady will send you a separate email with your login credentials<br>
+• This email may take up to 24 hours to arrive — check your spam folder<br>
+• Once active, you can log in at <a href="${MILADY_LOGIN_URL}">${MILADY_LOGIN_URL}</a></p>
+
+<p>If you do not receive access within 24 hours, call us at (317) 314-3757.</p>
+
+<p>— Elevate for Humanity</p>
+</div>
+              `,
+            });
+
+            // Admin notification to manually provision Milady account
+            await sendEmail({
+              to: 'elevate4humanityedu@gmail.com',
+              subject: `Milady Provisioning Required — ${customerName || customerEmail}`,
+              html: `<p>Please create a Milady account for this new barber apprentice:</p>
+<p>• Name: ${customerName}<br>• Email: ${customerEmail}<br>• Phone: ${customerPhone}</p>
+<p>Payment received: $${(amountPaidCents / 100).toFixed(2)}</p>`,
+            });
+          } catch (miladyEmailErr) {
+            logger.error('[barber/webhook] Milady email failed (non-fatal):', miladyEmailErr);
+          }
+
+          // Queue Milady provisioning record for admin dashboard visibility
+          await supabase
+            .from('milady_provisioning_queue')
+            .insert({
+              student_email: customerEmail,
+              student_name: customerName || null,
+              program_slug: 'barber-apprenticeship',
+              status: 'pending',
+            })
+            .catch((err: unknown) => logger.error('[barber/webhook] milady_provisioning_queue insert failed (non-fatal):', err));
+
           logger.info(`Barber public enrollment complete: ${customerEmail}, fullyPaid: ${fullyPaid}`);
           break;
         }

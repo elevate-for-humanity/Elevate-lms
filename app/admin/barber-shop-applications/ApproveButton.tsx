@@ -17,7 +17,7 @@ export default function ApproveButton({ applicationId, status }: { applicationId
     setResult(null);
 
     try {
-      const res = await fetch(`/api/partner/applications/${applicationId}/approve`, {
+      const res = await fetch(`/api/admin/barber-shop-applications/${applicationId}/approve`, {
         method: 'POST',
       });
       const data = await res.json();

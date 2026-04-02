@@ -2,14 +2,7 @@
 
 import { useState } from 'react';
 import { Calculator, Info } from 'lucide-react';
-
-// Barber program pricing constants (from SSOT)
-const pricing = {
-  hours_total: 2000,
-  full_price: 4980,
-  setup_fee_amount: 1743,
-  remaining_balance: 3237,
-};
+import { BARBER_PRICING, calculateWeeklyPayment as calcWeekly } from '@/lib/programs/pricing';
 
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('en-US', {
@@ -21,17 +14,15 @@ function formatCurrency(amount: number): string {
 }
 
 function calculateWeeklyPayment(hoursPerWeek: number, transferHours: number = 0) {
-  const remainingHours = pricing.hours_total - transferHours;
-  const weeks = Math.ceil(remainingHours / hoursPerWeek);
-  const weekly = pricing.remaining_balance / weeks;
-  return { weekly: Math.round(weekly * 100) / 100, weeks };
+  const result = calcWeekly(hoursPerWeek, transferHours, BARBER_PRICING.minDownPayment);
+  return { weekly: result.weeklyPaymentDollars, weeks: result.weeksRemaining };
 }
 
 export function TransferHoursCalculator() {
   const [transferHours, setTransferHours] = useState(0);
   const [hoursPerWeek, setHoursPerWeek] = useState(40);
 
-  const remainingHours = Math.max(0, pricing.hours_total - transferHours);
+  const remainingHours = Math.max(0, BARBER_PRICING.totalHoursRequired - transferHours);
   const { weekly, weeks } = calculateWeeklyPayment(hoursPerWeek, transferHours);
 
   return (
@@ -53,14 +44,14 @@ export function TransferHoursCalculator() {
           <input
             type="number"
             min="0"
-            max={pricing.hours_total - 100}
+            max={BARBER_PRICING.totalHoursRequired - 100}
             step="50"
             value={transferHours}
-            onChange={(e) => setTransferHours(Math.min(pricing.hours_total - 100, Math.max(0, parseInt(e.target.value) || 0)))}
+            onChange={(e) => setTransferHours(Math.min(BARBER_PRICING.totalHoursRequired - 100, Math.max(0, parseInt(e.target.value) || 0)))}
             className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-white/50 focus:border-transparent"
             placeholder="e.g., 500"
           />
-          <p className="text-xs text-amber-200 mt-1">Max: {pricing.hours_total - 100} hours</p>
+          <p className="text-xs text-amber-200 mt-1">Max: {BARBER_PRICING.totalHoursRequired - 100} hours</p>
         </div>
         <div>
           <label className="block text-sm font-medium text-amber-100 mb-2">
@@ -100,8 +91,8 @@ export function TransferHoursCalculator() {
         <div className="mt-4 pt-4 border-t border-white/20 flex items-start gap-2">
           <Info className="w-4 h-4 text-amber-200 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-amber-100">
-            <strong>Setup fee remains {formatCurrency(pricing.setup_fee_amount)}</strong> regardless of transferred hours. 
-            Weekly payments are calculated from the remaining balance of {formatCurrency(pricing.remaining_balance)}.
+            <strong>Down payment starts at {formatCurrency(BARBER_PRICING.minDownPayment)}</strong>. 
+            Transfer hours reduce program duration, not tuition. Full tuition: {formatCurrency(BARBER_PRICING.fullPrice)}.
           </p>
         </div>
       </div>

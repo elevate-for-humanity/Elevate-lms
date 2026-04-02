@@ -17,7 +17,7 @@ function calculateWeeklyPayment(downPayment: number) {
   return {
     weeklyDollars: result.weeklyPaymentDollars,
     weeks: result.weeksRemaining,
-    remaining: result.totalWeeklyPayments,
+    hoursRemaining: result.hoursRemaining,
   };
 }
 
@@ -54,7 +54,9 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
   
   // Payment option — pre-selected from URL param if provided
   const [paymentOption, setPaymentOption] = useState<PaymentOption>(() => resolveInitialPayment(initialPayment ?? null));
-  const [customAmount, setCustomAmount] = useState(PRICING.defaultDownPayment);
+  // Use string so the field can be cleared while typing without snapping back
+  const [customAmountStr, setCustomAmountStr] = useState(String(PRICING.defaultDownPayment));
+  const customAmount = parseInt(customAmountStr) || 0;
   
   // Form state
   const [formData, setFormData] = useState({
@@ -72,7 +74,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
     setNextFriday(getNextFriday());
   }, []);
 
-  const { weeklyDollars, weeks, remaining } = calculateWeeklyPayment(
+  const { weeklyDollars, weeks, hoursRemaining } = calculateWeeklyPayment(
     paymentOption === 'custom' ? customAmount : PRICING.defaultDownPayment
   );
 
@@ -362,7 +364,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                 <div className="grid grid-cols-2 gap-4 text-center">
                   <div>
                     <div className="text-brand-blue-200 text-xs uppercase mb-1">Remaining Hours</div>
-                    <div className="text-2xl font-black">{remaining.toLocaleString()}</div>
+                    <div className="text-2xl font-black">{hoursRemaining.toLocaleString()}</div>
                   </div>
                   <div>
                     <div className="text-brand-blue-200 text-xs uppercase mb-1">Est. Duration</div>
@@ -646,28 +648,27 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                           type="text"
                           inputMode="numeric"
                           pattern="[0-9]*"
-                          value={customAmount || ''}
+                          value={customAmountStr}
                           onChange={(e) => {
                             const val = e.target.value.replace(/[^0-9]/g, '');
-                            const num = val ? parseInt(val) : PRICING.minDownPayment;
-                            setCustomAmount(Math.min(num, PRICING.fullPrice));
+                            setCustomAmountStr(val);
                           }}
                           onBlur={() => {
-                            if (!customAmount || customAmount < PRICING.minDownPayment) setCustomAmount(PRICING.minDownPayment);
-                            if (customAmount > PRICING.fullPrice) setCustomAmount(PRICING.fullPrice);
+                            const num = parseInt(customAmountStr) || 0;
+                            const clamped = Math.max(PRICING.minDownPayment, Math.min(num, PRICING.fullPrice));
+                            setCustomAmountStr(String(clamped));
                           }}
                           className="w-full px-4 py-3 text-2xl font-bold border-2 border-brand-orange-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
                         />
                       </div>
-                      {/* Live estimate */}
-                      {/* Slider */}
+                      {/* Slider — tracks the typed value; only clamps for slider position */}
                       <input
                         type="range"
                         min={PRICING.minDownPayment}
                         max={PRICING.fullPrice}
                         step={50}
-                        value={Math.max(customAmount || PRICING.minDownPayment, PRICING.minDownPayment)}
-                        onChange={(e) => setCustomAmount(parseInt(e.target.value))}
+                        value={Math.min(Math.max(customAmount, PRICING.minDownPayment), PRICING.fullPrice)}
+                        onChange={(e) => setCustomAmountStr(e.target.value)}
                         className="w-full accent-brand-orange-600 mb-1"
                       />
                       <div className="flex justify-between text-xs text-slate-400 mb-4">
@@ -675,27 +676,35 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                         <span>$4,980 full</span>
                       </div>
 
-                      {/* Live estimate */}
-                      <div className="bg-white rounded-lg p-4 border border-brand-orange-200">
-                        <p className="text-xs text-slate-500 uppercase font-semibold mb-2">Your Payment Estimate</p>
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-sm text-slate-700">Down payment today</span>
-                          <span className="font-bold text-black">${Math.max(customAmount || PRICING.minDownPayment, PRICING.minDownPayment).toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-sm text-slate-700">Remaining balance</span>
-                          <span className="font-bold text-black">${Math.max(0, PRICING.fullPrice - Math.max(customAmount || PRICING.minDownPayment, PRICING.minDownPayment)).toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-sm text-slate-700">Weekly payment</span>
-                          <span className="font-bold text-brand-orange-600 text-lg">${calculateWeeklyPayment(Math.max(customAmount || PRICING.minDownPayment, PRICING.minDownPayment)).weeklyDollars.toFixed(2)}/wk</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-slate-700">Term</span>
-                          <span className="font-bold text-black">{PRICING.paymentTermWeeks} weeks</span>
-                        </div>
-                        <p className="text-xs text-slate-400 mt-2">Weekly invoices sent every Friday. Pay by link or saved card.</p>
-                      </div>
+                      {/* Live estimate — uses customAmount directly; shows dashes while field is empty */}
+                      {(() => {
+                        const isTyping = customAmountStr === '' || customAmount < PRICING.minDownPayment;
+                        const displayDown = isTyping ? null : customAmount;
+                        const displayRemaining = displayDown !== null ? Math.max(0, PRICING.fullPrice - displayDown) : null;
+                        const displayWeekly = displayDown !== null ? calculateWeeklyPayment(displayDown).weeklyDollars : null;
+                        return (
+                          <div className="bg-white rounded-lg p-4 border border-brand-orange-200">
+                            <p className="text-xs text-slate-500 uppercase font-semibold mb-2">Your Payment Estimate</p>
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="text-sm text-slate-700">Down payment today</span>
+                              <span className="font-bold text-black">{displayDown !== null ? `$${displayDown.toLocaleString()}` : '—'}</span>
+                            </div>
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="text-sm text-slate-700">Remaining balance</span>
+                              <span className="font-bold text-black">{displayRemaining !== null ? `$${displayRemaining.toLocaleString()}` : '—'}</span>
+                            </div>
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="text-sm text-slate-700">Weekly payment</span>
+                              <span className="font-bold text-brand-orange-600 text-lg">{displayWeekly !== null ? `$${displayWeekly.toFixed(2)}/wk` : '—'}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-slate-700">Term</span>
+                              <span className="font-bold text-black">{PRICING.paymentTermWeeks} weeks</span>
+                            </div>
+                            <p className="text-xs text-slate-400 mt-2">Weekly invoices sent every Friday. Pay by link or saved card.</p>
+                          </div>
+                        );
+                      })()}
                     </div>
                   )}
 
@@ -733,14 +742,15 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                           type="text"
                           inputMode="numeric"
                           pattern="[0-9]*"
-                          value={customAmount || ''}
+                          value={customAmountStr}
                           onChange={(e) => {
                             const val = e.target.value.replace(/[^0-9]/g, '');
-                            setCustomAmount(val ? parseInt(val) : 0);
+                            setCustomAmountStr(val);
                           }}
                           onBlur={() => {
-                            if (customAmount < PRICING.setupFee) setCustomAmount(PRICING.setupFee);
-                            if (customAmount > PRICING.fullPrice) setCustomAmount(PRICING.fullPrice);
+                            const num = parseInt(customAmountStr) || 0;
+                            const clamped = Math.max(PRICING.setupFee, Math.min(num, PRICING.fullPrice));
+                            setCustomAmountStr(String(clamped));
                           }}
                           className="w-full px-4 py-3 text-2xl font-bold border-2 border-brand-blue-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                         />
@@ -785,14 +795,15 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                           type="text"
                           inputMode="numeric"
                           pattern="[0-9]*"
-                          value={customAmount || ''}
+                          value={customAmountStr}
                           onChange={(e) => {
                             const val = e.target.value.replace(/[^0-9]/g, '');
-                            setCustomAmount(val ? parseInt(val) : 0);
+                            setCustomAmountStr(val);
                           }}
                           onBlur={() => {
-                            if (customAmount < PRICING.setupFee) setCustomAmount(PRICING.setupFee);
-                            if (customAmount > 2500) setCustomAmount(2500);
+                            const num = parseInt(customAmountStr) || 0;
+                            const clamped = Math.max(PRICING.setupFee, Math.min(num, 2500));
+                            setCustomAmountStr(String(clamped));
                           }}
                           className="w-full px-4 py-3 text-2xl font-bold border-2 border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         />

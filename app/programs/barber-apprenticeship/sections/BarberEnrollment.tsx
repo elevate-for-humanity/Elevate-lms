@@ -43,12 +43,15 @@ export function BarberEnrollment() {
               <h3 className="font-bold text-slate-900 mb-1">Buy Now, Pay Later</h3>
               <p className="text-slate-500 text-xs mb-3">Choose your provider at checkout</p>
               <div className="flex flex-col gap-2 mb-3">
-                <Link href="/programs/barber-apprenticeship/apply?type=apprentice&payment=affirm" className="inline-block w-full bg-[#0FA0EA] hover:bg-[#0d8fd0] text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors">
-                  Affirm — Pay over time
-                </Link>
-                <Link href="/programs/barber-apprenticeship/apply?type=apprentice&payment=sezzle" className="inline-block w-full bg-[#392558] hover:bg-[#2e1d47] text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors">
-                  Sezzle — 4 payments
-                </Link>
+                {ACTIVE_BNPL_PROVIDERS.map((p) => (
+                  <Link
+                    key={p.id}
+                    href={`/programs/barber-apprenticeship/apply?type=apprentice&payment=${p.id}`}
+                    className={`inline-block w-full ${p.badgeBg} ${p.badgeText} text-xs font-bold px-3 py-2 rounded-lg transition-opacity hover:opacity-80`}
+                  >
+                    {p.name} — {p.description}
+                  </Link>
+                ))}
               </div>
               <p className="text-slate-400 text-[10px]">Subject to provider approval</p>
             </div>
@@ -175,7 +178,7 @@ export function BarberEnrollment() {
             <div className="flex items-start gap-3">
               <Shield className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-brand-blue-800 leading-relaxed">
-                This program is aligned with workforce training standards and apprenticeship-based learning models, incorporating structured RTI, employer-supervised OJT, mapped competencies, and documented progress reporting suitable for workforce partners and cohort training programs. Enrollment is contingent upon eligibility, funding availability, and employer participation.
+                This is a self-pay program. Tuition is $4,980 with flexible payment options — pay in full, use a payment plan starting at $600 down, or finance through a BNPL provider. The program is structured to meet workforce training standards (RTI + OJT, mapped competencies, documented progress) and may be eligible for employer-sponsored or workforce funding on a case-by-case basis. Enrollment is contingent upon eligibility and employer participation.
               </p>
             </div>
           </div>

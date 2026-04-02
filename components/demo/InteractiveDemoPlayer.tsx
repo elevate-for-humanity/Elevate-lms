@@ -154,20 +154,13 @@ export default function InteractiveDemoPlayer({
           <source src={scene.videoSrc} type="video/mp4" />
         </video>
 
-        {/* Video unavailable — show poster with message */}
+        {/* Video error — show poster silently */}
         {videoError && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/90">
+          <div className="absolute inset-0 bg-slate-900">
             {scene.poster && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={scene.poster} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30" />
+              <img src={scene.poster} alt={scene.title} className="absolute inset-0 w-full h-full object-cover" />
             )}
-            <div className="relative z-10 text-center px-6">
-              <div className="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Play className="w-6 h-6 text-white/60" />
-              </div>
-              <p className="text-white font-semibold text-sm">Video walkthrough coming soon</p>
-              <p className="text-white/50 text-xs mt-1">{scene.title}</p>
-            </div>
           </div>
         )}
 

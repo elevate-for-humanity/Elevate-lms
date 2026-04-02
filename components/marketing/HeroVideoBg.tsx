@@ -98,14 +98,13 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
         />
       )}
 
-      {/* Video — fades in once playing. No autoPlay attr (src set dynamically). */}
+      {/* Video — fades in once playing. No poster attr — handled by <img> above to ensure object-cover. */}
       {!reducedMotion && (
         <video
           ref={videoRef}
           muted
           loop
           playsInline
-          poster={poster}
           aria-hidden="true"
           className={`absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
         />

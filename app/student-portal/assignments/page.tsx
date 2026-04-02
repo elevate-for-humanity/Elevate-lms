@@ -164,7 +164,7 @@ export default async function AssignmentsPage() {
             <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-2">No assignments</h2>
             <p className="text-gray-600 mb-6">You don't have any assignments yet.</p>
-            <Link href="/learner/courses" className="text-brand-blue-600 hover:underline">
+            <Link href="/lms/courses" className="text-brand-blue-600 hover:underline">
               View your courses
             </Link>
           </div>

@@ -53,7 +53,7 @@ export default async function ThreadPage({ params }: Props) {
     <div className="min-h-screen bg-white py-8">
       <div className="max-w-4xl mx-auto px-4">
         <nav className="flex items-center gap-2 text-sm text-slate-600 mb-6">
-          <Link href="/learner/forums" className="hover:text-slate-900">Forums</Link>
+          <Link href="/lms/forums" className="hover:text-slate-900">Forums</Link>
           <span>/</span>
           <Link href={`/lms/forums/${forumId}`} className="hover:text-slate-900">{forum?.name ?? 'Forum'}</Link>
           <span>/</span>

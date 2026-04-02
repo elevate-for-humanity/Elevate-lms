@@ -30,7 +30,7 @@ export default async function ProfileSettingsPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
       <Link 
-        href="/learner/settings" 
+        href="/lms/settings" 
         className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
       >
         <ArrowLeft className="w-4 h-4" />

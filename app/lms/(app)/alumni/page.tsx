@@ -229,7 +229,7 @@ export default async function AlumniPage() {
               <Link href="/lms/alumni/jobs" className="flex items-center gap-2 text-amber-700 hover:underline">
                 <Briefcase className="w-4 h-4" /> Job Board
               </Link>
-              <Link href="/learner/certificates" className="flex items-center gap-2 text-amber-700 hover:underline">
+              <Link href="/lms/certificates" className="flex items-center gap-2 text-amber-700 hover:underline">
                 <Award className="w-4 h-4" /> Certificates
               </Link>
             </div>

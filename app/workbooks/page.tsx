@@ -205,7 +205,7 @@ export default function WorkbooksPage() {
               </p>
             </Link>
             <Link
-              href="/learner/resources"
+              href="/lms/resources"
               className="block p-6 bg-white rounded-lg hover:shadow-md transition"
             >
               <BookOpen className="w-8 h-8 text-brand-green-600 mb-3" />

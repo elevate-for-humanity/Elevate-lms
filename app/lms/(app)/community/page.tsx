@@ -38,7 +38,7 @@ export default async function CommunityPage() {
           {/* Quick Links */}
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <Link
-              href="/learner/forums"
+              href="/lms/forums"
               className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow"
             >
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
@@ -63,7 +63,7 @@ export default async function CommunityPage() {
             </Link>
 
             <Link
-              href="/learner/groups"
+              href="/lms/groups"
               className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow"
             >
               <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
@@ -88,7 +88,7 @@ export default async function CommunityPage() {
             </Link>
 
             <Link
-              href="/learner/leaderboard"
+              href="/lms/leaderboard"
               className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow"
             >
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
@@ -127,7 +127,7 @@ export default async function CommunityPage() {
                     Join the conversation in our forums
                   </p>
                   <Link
-                    href="/learner/forums"
+                    href="/lms/forums"
                     className="text-sm text-brand-blue-600 hover:text-brand-blue-700"
                   >
                     View Forums →
@@ -142,7 +142,7 @@ export default async function CommunityPage() {
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Featured Groups</h2>
               <Link
-                href="/learner/groups"
+                href="/lms/groups"
                 className="text-brand-blue-600 hover:text-brand-blue-700 font-medium text-sm"
               >
                 View All →
@@ -155,7 +155,7 @@ export default async function CommunityPage() {
                   Connect with all learners
                 </p>
                 <Link
-                  href="/learner/groups"
+                  href="/lms/groups"
                   className="text-sm text-brand-blue-600"
                 >
                   Join Group
@@ -167,7 +167,7 @@ export default async function CommunityPage() {
                   Find study partners for your courses
                 </p>
                 <Link
-                  href="/learner/groups"
+                  href="/lms/groups"
                   className="text-sm text-brand-blue-600"
                 >
                   Join Group

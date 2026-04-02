@@ -229,7 +229,7 @@ export default async function AssignmentsPage() {
               <BookOpen className="w-16 h-16 text-slate-300 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-slate-900 mb-2">No Assignments Yet</h3>
               <p className="text-slate-600 mb-6">Assignments from your enrolled courses will appear here.</p>
-              <Link href="/learner/courses" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition">
+              <Link href="/lms/courses" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition">
                 Browse Courses
               </Link>
             </div>

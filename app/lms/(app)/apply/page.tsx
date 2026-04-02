@@ -161,7 +161,7 @@ export default function StudentApplicationPage() {
           {existingApplication.status === 'approved' && (
             <div className="mt-6">
               <a
-                href="/learner/enroll"
+                href="/lms/enroll"
                 className="inline-block bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700"
               >
                 Proceed to Enrollment

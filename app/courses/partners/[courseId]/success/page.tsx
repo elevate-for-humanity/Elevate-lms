@@ -209,7 +209,7 @@ export default async function EnrollmentSuccessPage({
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                href="/learner/courses"
+                href="/lms/courses"
                 className="flex-1 px-6 py-3 bg-brand-blue-600 text-white text-center rounded-lg hover:bg-brand-blue-700 transition-colors font-medium"
               >
                 Go to My Courses

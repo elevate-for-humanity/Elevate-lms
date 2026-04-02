@@ -74,7 +74,7 @@ export default async function AssignmentDetailPage({ params }: Props) {
       <div className="max-w-4xl mx-auto px-4">
         {/* Back Link */}
         <Link
-          href="/learner/assignments"
+          href="/lms/assignments"
           className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6"
         >
           <ArrowLeft className="w-4 h-4" />

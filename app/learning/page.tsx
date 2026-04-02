@@ -59,7 +59,7 @@ export default async function LearningHubPage() {
               icon={<BookOpen className="w-12 h-12 text-brand-green-600" />}
               title="Lessons"
               description="Browse and access all course lessons"
-              href="/learner/courses"
+              href="/lms/courses"
               count="500+ lessons"
             />
             <ResourceCard
@@ -106,12 +106,12 @@ export default async function LearningHubPage() {
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Quick Access</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <QuickLink title="My Courses" href="/learner/courses" />
-            <QuickLink title="Assignments" href="/learner/assignments" />
-            <QuickLink title="Grades" href="/learner/grades" />
-            <QuickLink title="Calendar" href="/learner/calendar" />
-            <QuickLink title="Messages" href="/learner/messages" />
-            <QuickLink title="Resources" href="/learner/resources" />
+            <QuickLink title="My Courses" href="/lms/courses" />
+            <QuickLink title="Assignments" href="/lms/assignments" />
+            <QuickLink title="Grades" href="/lms/grades" />
+            <QuickLink title="Calendar" href="/lms/calendar" />
+            <QuickLink title="Messages" href="/lms/messages" />
+            <QuickLink title="Resources" href="/lms/resources" />
             <QuickLink title="Support" href="/support" />
             <QuickLink title="Help Center" href="/support/help" />
           </div>

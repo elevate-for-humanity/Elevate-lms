@@ -53,7 +53,7 @@ export default async function ForumPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-white py-8">
       <div className="max-w-4xl mx-auto px-4">
-        <Link href="/learner/forums" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6">
+        <Link href="/lms/forums" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6">
           <ArrowLeft className="w-4 h-4" />
           Back to Forums
         </Link>

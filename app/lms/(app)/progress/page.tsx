@@ -324,7 +324,7 @@ export default async function ProgressPage() {
                     Enroll in courses to start tracking your progress.
                   </p>
                   <Link
-                    href="/learner/courses"
+                    href="/lms/courses"
                     className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
                   >
                     Browse Courses
@@ -388,13 +388,13 @@ export default async function ProgressPage() {
               <h3 className="font-bold text-slate-900 mb-4">Quick Actions</h3>
               <div className="space-y-2">
                 <Link 
-                  href="/learner/courses"
+                  href="/lms/courses"
                   className="block w-full text-center bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-brand-blue-700 transition"
                 >
                   Continue Learning
                 </Link>
                 <Link 
-                  href="/learner/certificates"
+                  href="/lms/certificates"
                   className="block w-full text-center border border-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-white transition"
                 >
                   View Certificates

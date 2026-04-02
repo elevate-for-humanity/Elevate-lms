@@ -105,7 +105,7 @@ export default async function CertificatesPage() {
               automatically generated when you finish all course requirements.
             </p>
             <Link
-              href="/learner/courses"
+              href="/lms/courses"
               className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition"
             >
               View My Courses

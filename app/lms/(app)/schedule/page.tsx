@@ -52,7 +52,7 @@ export default async function SchedulePage() {
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold">Schedule</h1>
             <Link
-              href="/learner/calendar"
+              href="/lms/calendar"
               className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
             >
               View Calendar
@@ -87,7 +87,7 @@ export default async function SchedulePage() {
             ) : (
               <p className="text-gray-600">
                 No scheduled activities for today.{' '}
-                <Link href="/learner/courses" className="text-brand-blue-600">
+                <Link href="/lms/courses" className="text-brand-blue-600">
                   Browse courses
                 </Link>
               </p>
@@ -106,7 +106,7 @@ export default async function SchedulePage() {
                   </p>
                 </div>
                 <Link
-                  href="/learner/assignments"
+                  href="/lms/assignments"
                   className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
                 >
                   View →
@@ -130,7 +130,7 @@ export default async function SchedulePage() {
             </div>
             <p className="text-sm text-gray-600 mt-4 text-center">
               Your scheduled activities will appear here.{' '}
-              <Link href="/learner/calendar" className="text-brand-blue-600">
+              <Link href="/lms/calendar" className="text-brand-blue-600">
                 Open full calendar
               </Link>
             </p>

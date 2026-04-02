@@ -341,14 +341,14 @@ export default async function AnalyticsPage() {
               <h3 className="font-bold text-slate-900 mb-4">Quick Links</h3>
               <div className="space-y-2">
                 <Link
-                  href="/learner/progress"
+                  href="/lms/progress"
                   className="flex items-center gap-2 p-3 bg-white rounded-lg hover:bg-white transition"
                 >
                   <TrendingUp className="w-4 h-4 text-brand-blue-600" />
                   <span className="text-slate-700">View Progress</span>
                 </Link>
                 <Link
-                  href="/learner/grades"
+                  href="/lms/grades"
                   className="flex items-center gap-2 p-3 bg-white rounded-lg hover:bg-white transition"
                 >
                   <Award className="w-4 h-4 text-brand-green-600" />

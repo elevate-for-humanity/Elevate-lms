@@ -4,7 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 // app/api/reports/wioa/route.ts
 import { NextResponse } from 'next/server';
 import { requireApiAuth } from '@/lib/auth';
-import { createSupabaseClient } from '@/lib/supabase-api';
+
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditPiiAccess } from '@/lib/auditLog';
 export const runtime = 'nodejs';
@@ -19,7 +19,7 @@ export async function GET(request: Request) {
 
     await auditPiiAccess({ action: 'PII_ACCESS', entity: 'pii', req: request, metadata: { route: '/api/reports/wioa' } });
 
-    const supabase = createSupabaseClient();
+    const supabase = createAdminClient();
   const session = await requireApiAuth();
   if (!(session as string).isAdmin) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

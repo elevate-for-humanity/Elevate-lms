@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
-import { getUserById } from '@/lib/supabase-admin';
+
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -59,8 +59,9 @@ async function _POST(req: NextRequest) {
 
   // Get related data
   try {
-    const [learnerUser, courseResult, programResult] = await Promise.all([
-      getUserById(app.user_id),
+    const adminDb = createAdminClient();
+    const [learnerAuth, courseResult, programResult] = await Promise.all([
+      adminDb.auth.admin.getUserById(app.user_id),
       supabase
         .from('training_courses')
         .select('title')
@@ -73,7 +74,7 @@ async function _POST(req: NextRequest) {
         .maybeSingle(),
     ]);
 
-    const learnerEmail = learnerUser?.email;
+    const learnerEmail = learnerAuth?.data?.user?.email;
     const courseTitle = courseResult.data?.title || 'your course';
     const programName = programResult.data?.name || programResult.data?.code;
 

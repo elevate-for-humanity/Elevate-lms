@@ -2,9 +2,8 @@
 import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
-import { createAdminClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { randomBytes } from 'node:crypto';
-import { getUserById } from '@/lib/supabase-admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -70,13 +69,8 @@ async function _POST(req: NextRequest) {
   }
 
   // Fetch user details using admin client
-  let learner;
-  try {
-    learner = await getUserById(user_id);
-  } catch (error) { 
-    logger.error('Error fetching user:', error);
-    return new Response('Failed to fetch user', { status: 500 });
-  }
+  const { data: learnerAuth } = await adminDb.auth.admin.getUserById(user_id);
+  const learner = learnerAuth?.user;
 
   // Mark enrollment as completed
   await supabase.from('program_enrollments').upsert({

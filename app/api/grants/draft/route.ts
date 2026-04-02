@@ -2,7 +2,7 @@
 
 // app/api/grants/draft/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import OpenAI from 'openai';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -29,6 +29,7 @@ async function _POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
   const auth = await apiRequireAdmin(req);
   if (auth.error) return auth.error;
+  const supabaseAdmin = createAdminClient();
 
 
   if (

@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { jotFormIntegration } from '@/lib/integrations/jotform';
 import { supersonicTaxEngine } from '@/lib/integrations/supersonic-tax';
-import { supabaseServer } from '@/lib/supabaseServer';
+
 import { resend } from '@/lib/resend';
 import { auditPiiAccess } from '@/lib/auditLog';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
@@ -71,8 +71,8 @@ async function _POST(request: NextRequest) {
       }
     }
 
-    const supabase = supabaseServer();
     const adminDb = createAdminClient();
+    const supabase = adminDb;
     const body = await request.json();
 
     // Get submission ID from webhook

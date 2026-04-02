@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
-import { getUserById } from '@/lib/supabase-admin';
+
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -30,12 +30,9 @@ const supabase = await createRouteHandlerClient({ cookies });
   if (!cert) return new Response('Certificate not found', { status: 404 });
 
   // Fetch user and course details
-  let u;
-  try {
-    u = await getUserById(cert.user_id);
-  } catch (error) {
-      logger.error("Unhandled error", error instanceof Error ? error : undefined);
-    }
+  const db = createAdminClient();
+  const { data: userAuth } = await db.auth.admin.getUserById(cert.user_id);
+  const u = userAuth?.user;
 
   const { data: c } = await supabase
     .from('training_courses')

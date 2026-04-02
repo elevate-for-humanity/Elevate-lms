@@ -2,7 +2,7 @@
 // LTI 1.3 launch endpoint — verifies state nonce (CSRF) + JWT signature via JWKS.
 import { NextResponse } from 'next/server';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
-import { createSupabaseClient } from '@/lib/supabase-api';
+
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -28,8 +28,8 @@ async function _POST(request: Request) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const supabase = createSupabaseClient();
   const db = createAdminClient();
+  const supabase = db;
 
   const req = request as Request & { cookies?: any };
   const formData = await request.formData();

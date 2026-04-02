@@ -1,6 +1,6 @@
 
 import { NextRequest } from 'next/server';
-import { getUserById } from '@/lib/supabase-admin';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -25,9 +25,11 @@ async function getHandler(
   }
 
   try {
-    const userData = await getUserById(user_id);
+    const db = createAdminClient();
+    const { data, error } = await db.auth.admin.getUserById(user_id);
+    const userData = data?.user;
 
-    if (!userData) {
+    if (error || !userData) {
       return new Response('User not found', { status: 404 });
     }
 

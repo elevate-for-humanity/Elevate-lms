@@ -2,7 +2,7 @@ import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+
 import OpenAI from 'openai';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -27,7 +27,7 @@ const userId = req.headers.get('x-user-id');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = supabaseServer();
+  const supabase = createAdminClient();
   
   let query = supabase
     .from('studio_chat_history')
@@ -104,7 +104,7 @@ Be concise, direct, and provide working code. Focus on the task at hand.`;
             
             // Save to history if user is authenticated
             if (userId && repo_id) {
-              const supabase = supabaseServer();
+              const supabase = createAdminClient();
               const updatedMessages = [...messages, { role: 'assistant', content: fullContent }];
               
               if (session_id) {
@@ -160,7 +160,7 @@ Be concise, direct, and provide working code. Focus on the task at hand.`;
 
       // Save to history
       if (userId && repo_id) {
-        const supabase = supabaseServer();
+        const supabase = createAdminClient();
         const updatedMessages = [...messages, { role: 'assistant', content }];
         
         if (session_id) {

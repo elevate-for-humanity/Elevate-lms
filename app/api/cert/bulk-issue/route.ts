@@ -2,9 +2,8 @@
 import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
-import { createAdminClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { randomBytes } from 'node:crypto';
-import { getUserByEmail } from '@/lib/supabase-admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -70,8 +69,13 @@ async function _POST(req: NextRequest) {
         continue;
       }
 
-      // user - use admin client
-      const u = await getUserByEmail(email);
+      // user - look up by email via profiles
+      const { data: profileRow } = await adminDb
+        .from('profiles')
+        .select('id, email')
+        .ilike('email', email.trim())
+        .maybeSingle();
+      const u = profileRow;
       if (!u?.id) {
         errors.push({ row: r, err: 'User not found' });
         continue;

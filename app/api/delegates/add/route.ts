@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
-import { getUserByEmail } from '@/lib/supabase-admin';
+
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -38,8 +38,14 @@ async function _POST(req: NextRequest) {
   }
 
   try {
-    // Find user by email using admin client
-    const u = await getUserByEmail(email);
+    // Find user by email via profiles table
+    const adminDb = createAdminClient();
+    const { data: profileRow } = await adminDb
+      .from('profiles')
+      .select('id, email')
+      .ilike('email', email.trim())
+      .maybeSingle();
+    const u = profileRow;
 
     if (!u) {
       return new Response('User not found (create account first)', {

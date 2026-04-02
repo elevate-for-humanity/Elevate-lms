@@ -2,7 +2,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 
 // app/api/cash-advances/applications/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -16,7 +16,7 @@ async function _GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = supabaseServer();
+    const supabase = createAdminClient();
     const searchParams = request.nextUrl.searchParams;
 
     // Get query parameters

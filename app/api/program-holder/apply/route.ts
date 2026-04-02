@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 
-import { supabaseServer } from '@/lib/supabaseServer';
+
 import {
   sendProgramHolderApplicationConfirmation,
   sendAdminProgramHolderNotification,
@@ -63,7 +63,7 @@ async function _POST(req: NextRequest) {
     }
 
     // Check for duplicate by email
-    const supabase = supabaseServer();
+    const supabase = createAdminClient();
     // Check for duplicate by email
     const { data: existing } = await supabase
       .from('applications')

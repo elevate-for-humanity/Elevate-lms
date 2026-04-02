@@ -12,7 +12,7 @@ import {
   notifyGrantSubmitted,
   notifyDeadlineApproaching,
 } from '@/lib/grants/notification-system';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -28,7 +28,7 @@ async function _POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
   const auth = await apiRequireAdmin(req);
   if (auth.error) return auth.error;
-
+  const supabaseAdmin = createAdminClient();
 
     const body = await req.json();
     const { action, applicationId, grantId, submittedBy, confirmationNumber, daysRemaining } = body;
@@ -102,6 +102,7 @@ async function _GET(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
+    const supabaseAdmin = createAdminClient();
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('userId');
     const unreadOnly = searchParams.get('unreadOnly') === 'true';
@@ -146,6 +147,7 @@ async function _PATCH(req: NextRequest) {
       );
     }
 
+    const supabaseAdmin = createAdminClient();
     const { error } = await supabaseAdmin
       .from('grant_notifications')
       .update({ read: read !== false })

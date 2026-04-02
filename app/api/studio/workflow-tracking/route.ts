@@ -2,7 +2,7 @@ import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -22,7 +22,7 @@ const userId = req.headers.get('x-user-id');
   }
 
   try {
-    const supabase = supabaseServer();
+    const supabase = createAdminClient();
     
     let query = supabase
       .from('studio_workflow_tracking')
@@ -69,7 +69,7 @@ async function _POST(req: NextRequest) {
       );
     }
 
-    const supabase = supabaseServer();
+    const supabase = createAdminClient();
 
     // Upsert tracking record
     const { data, error } = await supabase
@@ -121,7 +121,7 @@ const userId = req.headers.get('x-user-id');
       return NextResponse.json({ error: 'Missing tracking ID' }, { status: 400 });
     }
 
-    const supabase = supabaseServer();
+    const supabase = createAdminClient();
 
     const updates: Record<string, any> = { updated_at: new Date().toISOString() };
     if (last_run_id !== undefined) updates.last_run_id = last_run_id;
@@ -165,7 +165,7 @@ const userId = req.headers.get('x-user-id');
   }
 
   try {
-    const supabase = supabaseServer();
+    const supabase = createAdminClient();
 
     const { error } = await supabase
       .from('studio_workflow_tracking')

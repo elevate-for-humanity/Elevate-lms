@@ -4,7 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 // app/api/exams/submit/route.ts
 import { NextResponse } from 'next/server';
 import { requireApiAuth } from '@/lib/auth';
-import { createSupabaseClient } from '@/lib/supabase-api';
+
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -16,8 +16,7 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
 
-  const supabase = createSupabaseClient();
-  const db = supabase;
+  const db = createAdminClient();
   const session = await requireApiAuth();
   const { attemptId, answers } = await request.json();
 

@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 // app/api/tax-filing/applications/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
-import { supabaseServer } from '@/lib/supabase-server';
+
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -19,7 +19,7 @@ async function _GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = supabaseServer();
+    const supabase = createAdminClient();
     const searchParams = request.nextUrl.searchParams;
 
     // Get query parameters
@@ -73,7 +73,7 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = supabaseServer();
+    const supabase = createAdminClient();
     const body = await parseBody<Record<string, any>>(request);
 
     const { data, error }: any = await supabase

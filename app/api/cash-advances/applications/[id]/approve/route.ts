@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 // app/api/cash-advances/applications/[id]/approve/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
-import { supabaseServer } from '@/lib/supabase-server';
+
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -21,7 +21,7 @@ async function _POST(
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = supabaseServer();
+    const supabase = createAdminClient();
     const { id } = await params;
     const body = await parseBody<Record<string, any>>(request);
     const { approved_amount, notes } = body;

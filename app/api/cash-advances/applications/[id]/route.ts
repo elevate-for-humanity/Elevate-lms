@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 // app/api/cash-advances/applications/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
-import { supabaseServer } from '@/lib/supabase-server';
+
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -20,7 +20,7 @@ async function _GET(
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = supabaseServer();
+    const supabase = createAdminClient();
     const { id } = await params;
 
     const { data, error }: any = await supabase
@@ -47,7 +47,7 @@ async function _PATCH(
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = supabaseServer();
+    const supabase = createAdminClient();
     const { id } = await params;
     const body = await parseBody<Record<string, any>>(request);
 

@@ -6,7 +6,7 @@
 
 
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import {
   searchWorkforceGrants,
@@ -35,7 +35,7 @@ async function _POST(request: Request) {
     if (rateLimited) return rateLimited;
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
-
+  const supabaseAdmin = createAdminClient();
 
     // Ensure grant source exists
     const { data: source, error: sourceError } = await supabaseAdmin
@@ -144,6 +144,7 @@ async function _GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
+    const supabaseAdmin = createAdminClient();
     // Get grant counts
     const { count: totalGrants } = await supabaseAdmin
       .from('grant_opportunities')

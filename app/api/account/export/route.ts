@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 // app/api/account/export/route.ts
 import { NextResponse } from 'next/server';
 import { requireApiAuth } from '@/lib/auth';
-import { createSupabaseClient } from '@/lib/supabase-api';
+
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logStudentSelfAccess } from '@/lib/audit/ferpa';
@@ -25,8 +25,7 @@ async function _GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = createSupabaseClient();
-  const db = supabase;
+    const db = createAdminClient();
     const { data: user, error: userError } = await db
       .from('users')
       .select('*')

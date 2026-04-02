@@ -1,7 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -17,7 +17,7 @@ const userId = req.headers.get('x-user-id');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = supabaseServer();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('studio_settings')
     .select('*')
@@ -48,7 +48,7 @@ const userId = req.headers.get('x-user-id');
   }
 
   const body = await req.json();
-  const supabase = supabaseServer();
+  const supabase = createAdminClient();
 
   const { data, error } = await supabase
     .from('studio_settings')

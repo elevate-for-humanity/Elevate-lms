@@ -2,7 +2,7 @@ import { requireAdmin } from '@/lib/auth';
 
 // app/api/admin/external-progress/update/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
@@ -34,8 +34,9 @@ export const POST = withAuth(
       }
 
       // Build update object based on status
+      const db = createAdminClient();
       if (status === 'approved') {
-        const { error } = await (supabaseAdmin as any)
+        const { error } = await db
           .from('external_partner_progress')
           .update({
             status,
@@ -53,7 +54,7 @@ export const POST = withAuth(
         }
       } else {
         // status === "in_progress"
-        const { error } = await (supabaseAdmin as any)
+        const { error } = await db
           .from('external_partner_progress')
           .update({
             status,

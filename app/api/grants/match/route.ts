@@ -2,7 +2,7 @@
 
 // app/api/grants/match/route.ts
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -57,7 +57,7 @@ async function _POST(request: Request) {
     if (rateLimited) return rateLimited;
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
-
+  const supabaseAdmin = createAdminClient();
 
     const { data: entities, error: entitiesError } = await supabaseAdmin
       .from('entities')

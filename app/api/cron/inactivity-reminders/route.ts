@@ -1,7 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 
 import { NextResponse } from 'next/server';
-import { createSupabaseClient } from '@/lib/supabase-api';
+
 import { sendEmail, emailTemplates } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -22,7 +22,7 @@ async function _GET(request: Request) {
     }
 
     // Use service role key for admin operations
-    const supabase = createSupabaseClient();
+    const supabase = createAdminClient();
 
     // Find students who haven't logged in for 7+ days
     const sevenDaysAgo = new Date();

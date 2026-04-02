@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { approveApplication } from '@/lib/enrollment/approve';
+import { runPostApprovalActions } from '@/lib/enrollment/post-approval';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -84,32 +85,49 @@ async function _POST(
       req,
     });
 
-    // Send approval email (non-blocking)
+    // Post-approval actions: program-specific emails, Milady, CRM update (non-blocking)
     try {
       const { data: app } = await supabase
         .from('applications')
-        .select('email, first_name')
+        .select('email, first_name, last_name, phone, program_interest, program_slug')
         .eq('id', id)
         .single();
 
       if (app?.email) {
-        const { sendEmail } = await import('@/lib/email/sendgrid');
-        const siteUrl =
-          process.env.NEXT_PUBLIC_SITE_URL ||
-          'https://www.elevateforhumanity.org';
-        await sendEmail({
-          to: app.email,
-          subject: 'Application Approved — Elevate for Humanity',
-          html: `
-            <h2>Congratulations, ${app.first_name || 'Student'}!</h2>
-            <p>Your application has been <strong style="color:#10b981;">approved</strong>.</p>
-            <p><a href="${siteUrl}/learner/dashboard" style="display:inline-block;padding:12px 24px;background:#ea580c;color:white;text-decoration:none;border-radius:8px;font-weight:bold;">Go to Dashboard</a></p>
-            <p>Questions? Call <a href="tel:317-314-3757">317-314-3757</a></p>
-          `,
+        const studentName = [app.first_name, app.last_name].filter(Boolean).join(' ') || app.email;
+        const programSlug = app.program_slug || app.program_interest || null;
+
+        await runPostApprovalActions({
+          db,
+          applicationId: id,
+          programSlug,
+          studentEmail:      app.email,
+          studentName,
+          studentPhone:      app.phone ?? null,
+          passwordSetupLink: result.passwordSetupLink ?? null,
+          enrollmentId:      result.enrollmentId ?? null,
         });
+
+        // Mark CRM lead converted
+        await db
+          .from('crm_leads')
+          .update({
+            stage:         'converted',
+            status:        'won',
+            enrollment_id: result.enrollmentId ?? null,
+            updated_at:    new Date().toISOString(),
+          })
+          .eq('email', app.email.toLowerCase().trim());
+
+        // Close any pending follow-up reminders for this application
+        await db
+          .from('follow_up_reminders')
+          .update({ status: 'completed' })
+          .eq('application_id', id)
+          .eq('status', 'pending');
       }
-    } catch (emailErr) {
-      logger.warn('Approval email failed (non-critical)', emailErr);
+    } catch (postErr) {
+      logger.warn('[approve route] Post-approval actions failed (non-critical)', postErr);
     }
 
     return NextResponse.json({

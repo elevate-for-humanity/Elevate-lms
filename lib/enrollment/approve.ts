@@ -282,6 +282,28 @@ export async function approveApplication(
     }
   }
 
+  // Update CRM lead to converted (non-fatal)
+  try {
+    await supabase
+      .from('crm_leads')
+      .update({
+        stage:         'converted',
+        status:        'won',
+        profile_id:    userId ?? null,
+        enrollment_id: enrollmentId ?? null,
+        updated_at:    new Date().toISOString(),
+      })
+      .eq('application_id', applicationId);
+
+    await supabase
+      .from('follow_up_reminders')
+      .update({ status: 'completed' })
+      .eq('application_id', applicationId)
+      .eq('status', 'pending');
+  } catch (crmErr) {
+    logger.warn('[approve] CRM lead update failed (non-fatal)', crmErr);
+  }
+
   logger.info('[approve] Application approved', {
     applicationId,
     userId,

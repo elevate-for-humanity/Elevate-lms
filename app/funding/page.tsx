@@ -9,6 +9,14 @@ import { ArrowRight } from 'lucide-react';
 export const dynamic = 'force-static';
 export const revalidate = 86400;
 
+// EligibilityScreener is a client component — imported dynamically so it
+// doesn't break static generation of the rest of the page.
+import dynamic_import from 'next/dynamic';
+const EligibilityScreener = dynamic_import(
+  () => import('@/components/funding/EligibilityScreener'),
+  { ssr: false },
+);
+
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding' },
   title: 'Workforce Funding | Elevate For Humanity',
@@ -192,6 +200,18 @@ export default function FundingPage() {
               Apply for Training
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Eligibility screener */}
+      <section className="py-12 bg-slate-50 border-b border-slate-100">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center mb-8">
+            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">2-minute screener</p>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">Find Out What You Qualify For</h2>
+            <p className="text-slate-500 text-sm max-w-md mx-auto">Answer 4 questions and we'll point you to the right funding path — or self-pay options if funding doesn't apply.</p>
+          </div>
+          <EligibilityScreener />
         </div>
       </section>
 

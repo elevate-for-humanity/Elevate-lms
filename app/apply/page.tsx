@@ -20,9 +20,10 @@ export const metadata: Metadata = {
 export default async function ApplyPage({
   searchParams,
 }: {
-  searchParams: Promise<{ program?: string; pathway?: string }>;
+  searchParams: Promise<{ program?: string; pathway?: string; qualified?: string }>;
 }) {
   const params = await searchParams;
+  const qualified = params.qualified; // 'true' | 'false' | undefined — set by EligibilityScreener
   const rawProgram = (params?.program || params?.pathway || '').trim();
 
   // With a program param, resolve and redirect to student form
@@ -78,6 +79,35 @@ export default async function ApplyPage({
           Browse Programs
         </a>
       </div>
+
+      {/* Eligibility result banner — shown when arriving from EligibilityScreener */}
+      {qualified === 'true' && (
+        <div className="max-w-6xl mx-auto px-4 pt-6">
+          <div className="bg-green-50 border border-green-200 rounded-xl p-6 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex-1">
+              <h2 className="text-lg font-bold text-green-900 mb-1">You likely qualify for funded training</h2>
+              <p className="text-green-800 text-sm">Based on your answers, you may be eligible for WIOA, WRG, or Job Ready Indy funding. Continue your application to confirm eligibility with WorkOne.</p>
+            </div>
+            <Link href="/apply/student" className="flex-shrink-0 bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors">
+              Start Application
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {qualified === 'false' && (
+        <div className="max-w-6xl mx-auto px-4 pt-6">
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex-1">
+              <h2 className="text-lg font-bold text-amber-900 mb-1">You may still qualify — or enroll directly</h2>
+              <p className="text-amber-800 text-sm">Funded programs may not be the right fit based on your answers, but you can still enroll through self-pay with flexible payment options starting at $600 down.</p>
+            </div>
+            <Link href="/programs" className="flex-shrink-0 bg-amber-600 hover:bg-amber-700 text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors">
+              View Programs
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Application cards */}
       <section className="max-w-6xl mx-auto px-4 pb-10 sm:pb-14 space-y-8">

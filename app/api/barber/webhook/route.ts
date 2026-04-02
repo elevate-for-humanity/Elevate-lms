@@ -6,8 +6,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import Stripe from 'stripe';
 import { BARBER_PRICING, calculateWeeklyPayment } from '@/lib/programs/pricing';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-
-const MILADY_LOGIN_URL = 'https://www.miladytraining.com/users/sign_in';
+import { runBarberPostPayment } from '@/lib/enrollment/barber-post-payment';
 
 /**
  * Schedule weekly invoices for a customer
@@ -288,10 +287,21 @@ async function _POST(request: NextRequest) {
             }
           }
 
-          // Send welcome email
-          try {
+          // Run post-payment pipeline (enrollment, Milady queue, emails)
+          if (applicationId) {
+            const adminDb = createAdminClient();
+            if (adminDb) {
+              await runBarberPostPayment({
+                db: adminDb,
+                applicationId,
+                stripeSessionId: session.id,
+                stripePaymentIntentId: session.payment_intent as string ?? null,
+                amountPaidCents,
+              }).catch((err: unknown) => logger.error('[barber/webhook] runBarberPostPayment failed (non-fatal)', err));
+            }
+          } else {
+            // No application_id — send legacy welcome email
             const { sendEmail } = await import('@/lib/email/sendgrid');
-            
             let paymentSummary = '';
             if (fullyPaid) {
               if (bnplProvider) {
@@ -357,6 +367,7 @@ ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive ev
           } catch (emailErr) {
             logger.error('Failed to send Milady notification:', emailErr);
           }
+          } // end else (no applicationId — legacy email path)
 
           logger.info(`Barber enrollment complete: ${customerId}, fullyPaid: ${fullyPaid}, bnpl: ${bnplProvider}`);
           break;
@@ -506,8 +517,22 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
             logger.error('Enrollment email error:', emailErr);
           }
 
-          // Send Milady student email and queue provisioning
-          try {
+          // Run post-payment pipeline (enrollment, Milady queue, onboarding + admin emails)
+          if (applicationId) {
+            const adminDb = createAdminClient();
+            if (adminDb) {
+              await runBarberPostPayment({
+                db: adminDb,
+                applicationId,
+                stripeSessionId: session.id,
+                stripePaymentIntentId: session.payment_intent as string ?? null,
+                amountPaidCents,
+              }).catch((err: unknown) => logger.error('[barber/webhook] runBarberPostPayment (enrollment) failed (non-fatal)', err));
+            }
+          }
+
+          // Legacy Milady email path (no application_id — kept for backward compat)
+          if (!applicationId) { try {
             const { sendEmail } = await import('@/lib/email/sendgrid');
             await sendEmail({
               to: customerEmail,
@@ -552,6 +577,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
               status: 'pending',
             })
             .catch((err: unknown) => logger.error('[barber/webhook] milady_provisioning_queue insert failed (non-fatal):', err));
+          } catch (legacyErr) { logger.error('[barber/webhook] legacy Milady email failed (non-fatal)', legacyErr); } } // end legacy path
 
           logger.info(`Barber public enrollment complete: ${customerEmail}, fullyPaid: ${fullyPaid}`);
           break;

@@ -36,32 +36,23 @@ import HvacLessonVideo from '@/components/lms/HvacLessonVideo';
 import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 import { NoteTaking } from '@/components/NoteTaking';
 import DigitalBinder from '@/components/DigitalBinder';
-import { HVAC_QUIZ_MAP } from '@/lib/courses/hvac-quiz-map';
 import { HVAC_LESSON_UUID } from '@/lib/courses/hvac-uuids';
 
 // Reverse map: UUID → definition key (e.g. '2f172cb2-...' → 'hvac-01-01').
-// Built once at module load to avoid O(n) scan on every lesson render.
+// Used by HvacLessonVideo to resolve local MP3/MP4 files in /public/hvac/.
 const HVAC_UUID_TO_DEF: Record<string, string> = Object.fromEntries(
   Object.entries(HVAC_LESSON_UUID).map(([defId, uuid]) => [uuid, defId])
 );
 
-// Slug-based fallback: maps DB lesson slug → HVAC_LESSON_UUID defId.
-// Supports:
-//   hvac-MM-NN        → direct key lookup (e.g. hvac-01-01)
-//   hvac-MM-checkpoint → no dedicated video; caller falls back to b-roll
-//   hvac-lesson-N     → legacy absolute-index format
+// Slug-based fallback for HvacLessonVideo defId resolution.
 function hvacDefIdFromSlug(slug: string): string | undefined {
-  // New canonical format: hvac-MM-PP (e.g. hvac-01-01) — direct match
   if (/^hvac-\d{2}-\d{2}$/.test(slug)) return slug;
-
-  // Legacy format: hvac-lesson-N (1-based absolute index)
   const match = slug.match(/^hvac-lesson-(\d+)$/);
   if (!match) return undefined;
   const n = parseInt(match[1], 10);
   const defKeys = Object.keys(HVAC_LESSON_UUID);
   return defKeys[n - 1];
 }
-import { buildLessonContent, isPlaceholderContent } from '@/lib/courses/hvac-content-builder';
 import { transformLessonContent, isAiJsonBlob } from '@/lib/lms/transformLessonContent';
 import { HVAC_COURSE_ID } from '@/lib/courses/hvac-uuids';
 import dynamic from 'next/dynamic';
@@ -274,24 +265,10 @@ export default function LessonPage() {
 
     // 2. Set state
     if (lessonData) {
-      // Fall back to local HVAC quiz bank when quiz_questions is absent.
-      // Applies to legacy training_lessons rows (content_type='quiz') only.
-      // After migration 20260401000005, curriculum_lessons rows carry quiz_questions
-      // directly, so this fallback is only needed for the training_lessons path.
       let quizQuestions = lessonData.quiz_questions;
       let quizPassingScore = lessonData.passing_score;
-      if (lessonData.content_type === 'quiz' && (!quizQuestions || quizQuestions.length === 0)) {
-        // Fast O(1) reverse-lookup: UUID → definition ID → quiz config.
-        // Falls back to slug-based lookup for curriculum_lessons rows.
-        const defId =
-          HVAC_UUID_TO_DEF[lessonData.id] ??
-          (lessonData.slug ? hvacDefIdFromSlug(lessonData.slug) : undefined);
-        if (defId && HVAC_QUIZ_MAP[defId]) {
-          quizQuestions = HVAC_QUIZ_MAP[defId].questions;
-          quizPassingScore = quizPassingScore || HVAC_QUIZ_MAP[defId].passingScore;
-        }
-      }
-      // Enrich placeholder content with generated rich HTML
+
+      // Enrich placeholder content with generated rich HTML.
       // If the lesson has pre-rendered HTML (written by the generate route), use it.
       // Otherwise fall back to runtime transform for legacy JSON blobs.
       let enrichedContent: string | null = lessonData.rendered_html || lessonData.content;
@@ -302,26 +279,6 @@ export default function LessonPage() {
         // Only use transformed quiz if no quiz_questions already set
         if (transformedQuiz.length > 0 && (!quizQuestions || quizQuestions.length === 0)) {
           quizQuestions = transformedQuiz;
-        }
-      }
-
-      if (isPlaceholderContent(enrichedContent)) {
-        const defId =
-          HVAC_UUID_TO_DEF[lessonData.id] ??
-          (lessonData.slug ? hvacDefIdFromSlug(lessonData.slug) : undefined);
-        if (defId) {
-          enrichedContent = buildLessonContent(defId);
-        }
-      }
-
-      // Seatbelt: if curriculum-source lesson still has no content after DB read,
-      // fall back to the codebase content library so the reading tab is never blank.
-      if (!enrichedContent && lessonData.lesson_source === 'curriculum') {
-        const defId =
-          HVAC_UUID_TO_DEF[lessonData.id] ??
-          (lessonData.slug ? hvacDefIdFromSlug(lessonData.slug) : undefined);
-        if (defId) {
-          enrichedContent = buildLessonContent(defId);
         }
       }
 

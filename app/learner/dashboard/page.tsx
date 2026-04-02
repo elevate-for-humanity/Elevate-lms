@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import Image from 'next/image';
 import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
 import WorkOneChecklistSection from '@/components/workone/WorkOneChecklist';
@@ -12,9 +11,7 @@ import {
   ChevronRight,
   Trophy,
   BookOpen,
-  Video,
   BarChart3,
-  HelpCircle,
   GraduationCap,
   Award,
   CheckCircle,
@@ -22,6 +19,7 @@ import {
   ExternalLink,
   AlertCircle,
   FileCheck,
+  Calendar,
 } from 'lucide-react';
 import { logger } from '@/lib/logger';
 
@@ -215,15 +213,8 @@ export default async function LearnerDashboardPage() {
         .maybeSingle();
 
       if (stripeSession) {
-        // Paid session exists but no active enrollment — trigger repair silently
-        import('@/lib/logger').then(({ logger }) =>
-          logger.info('[dashboard] Auto-repair triggered', { userId: user.id, appId: paidApp.id })
-        ).catch(() => {});
-        db.rpc('enroll_application', {
-          p_application_id: paidApp.id,
-          p_actor_id: user.id,
-          p_source: 'stripe_repair',
-        }).then(() => {}).catch(() => {});
+        // Paid session exists but no active enrollment — log only, do not block render
+        logger.info('[dashboard] Paid session found but no active enrollment', { userId: user.id, appId: paidApp.id });
       }
     }
   }
@@ -267,23 +258,34 @@ export default async function LearnerDashboardPage() {
 
   const userName = profile?.full_name || user.email?.split('@')[0] || 'Learner';
 
-  return (
-    <div className="min-h-screen bg-white">
+  // INTraining / ETPL official funded programs (2Exclusive LLC-S / Elevate for Humanity Training Center)
+  const FUNDED_PROGRAMS = [
+    { name: 'Barber Apprenticeship', id: '#10004637', duration: '15 months', cost: '$4,890', credentials: ['Registered Barber License', 'Rise Up Certificate'], href: '/programs/barber-apprenticeship' },
+    { name: 'Beauty & Career Educator Training', id: '#10004648', duration: '84 days', cost: '$4,730', credentials: ['CPR', 'OSHA 10', 'Rise Up Certificate'], href: '/programs/beauty-educator' },
+    { name: 'Bookkeeping, Accounting & Auditing Clerk', id: '#10004627', duration: '8 weeks', cost: '$4,925', credentials: ['QuickBooks Certified User', 'Microsoft Office Specialist'], href: '/programs/bookkeeping' },
+    { name: 'Business Management', id: '#10004645', duration: '5 weeks', cost: '$4,900', credentials: ['Business of Retail Certified Specialist', 'Certified Business Professional'], href: '/programs/business-management' },
+    { name: 'CPR, AED & First Aid', id: '#10004674', duration: '1 day', cost: '$575', credentials: ['CPR Certification'], href: '/programs/cpr-aed' },
+    { name: 'Emergency Health & Safety Technician', id: '#10004621', duration: '4 weeks', cost: '$4,950', credentials: ['CPR', 'EMR', 'OSHA 10'], href: '/programs/emergency-health' },
+    { name: 'Home Health Aide', id: '#10004626', duration: '4 weeks', cost: '$4,700', credentials: ['HHA License', 'CCHW', 'CPR', 'Rise Up Certificate'], href: '/programs/home-health-aide' },
+    { name: 'HVAC Technician', id: '#10004322', duration: '20 weeks', cost: '$5,000', credentials: ['Residential HVAC Cert 1 & 2', 'EPA 608', 'OSHA 30', 'CPR', 'Rise Up Certificate'], href: '/programs/hvac-technician' },
+    { name: 'Medical Assistant', id: '#10004639', duration: '21 days', cost: '$4,325', credentials: ['CCHW', 'CPR', 'Rise Up Certificate'], href: '/programs/medical-assistant' },
+    { name: 'Professional Esthetician & Client Services', id: '#10004628', duration: '5 weeks', cost: '$4,575', credentials: ['OSHA 10', 'Business of Retail Certified Specialist'], href: '/programs/esthetician' },
+    { name: 'Public Safety Reentry Specialist', id: '#10004666', duration: '45 days', cost: '$4,750', credentials: ['CPRC', 'CPSP', 'CCHW', 'CPR', 'Rise Up Certificate'], href: '/programs/reentry-specialist' },
+  ];
 
-      {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-        <Image src="/images/pages/learner-page-1.jpg" alt="Learning dashboard" fill sizes="100vw" className="object-cover" priority />
-      </section>
+  return (
+    <div className="min-h-screen bg-gray-50">
+
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <Link href="/" className="text-xl font-bold text-gray-900">
                 Elevate LMS
               </Link>
-              <span className="text-slate-600">|</span>
-              <span className="text-gray-600">Learner Portal</span>
+              <span className="text-slate-300">|</span>
+              <span className="text-gray-500 text-sm">Learner Portal</span>
             </div>
             <div className="flex items-center gap-4">
               <button className="relative p-2 text-gray-500 hover:text-gray-700">
@@ -306,14 +308,20 @@ export default async function LearnerDashboardPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
+        {/* Welcome */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {userName}!
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">
+            Welcome back, {userName}
           </h1>
-          <p className="text-gray-600">
-            Continue your learning journey. You&apos;re making great progress!
-          </p>
+          {activeEnrollments.length > 0 ? (
+            <p className="text-gray-500 text-sm">
+              {activeEnrollments.length === 1
+                ? `1 active program — ${averageProgress}% complete`
+                : `${activeEnrollments.length} active programs — ${averageProgress}% average progress`}
+            </p>
+          ) : (
+            <p className="text-gray-500 text-sm">No active programs yet.</p>
+          )}
         </div>
 
         {/* Onboarding Banner — shown when student has a pending program enrollment */}
@@ -536,31 +544,31 @@ export default async function LearnerDashboardPage() {
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Link
-                  href="/learner/dashboard"
-                  className="flex flex-col items-center p-4 bg-white rounded-lg hover:bg-white transition"
+                  href="/lms/courses"
+                  className="flex flex-col items-center p-4 rounded-lg border border-gray-100 hover:bg-gray-50 transition"
                 >
-                  <Video className="w-8 h-8 text-brand-blue-600 mb-2" />
+                  <BookOpen className="w-8 h-8 text-brand-blue-600 mb-2" />
                   <span className="text-sm font-medium text-gray-700">My Courses</span>
                 </Link>
                 <Link
-                  href="/certificates"
-                  className="flex flex-col items-center p-4 bg-white rounded-lg hover:bg-white transition"
+                  href="/lms/certificates"
+                  className="flex flex-col items-center p-4 rounded-lg border border-gray-100 hover:bg-gray-50 transition"
                 >
-                  <Award className="w-8 h-8 text-brand-green-600 mb-2" />
+                  <Award className="w-8 h-8 text-emerald-600 mb-2" />
                   <span className="text-sm font-medium text-gray-700">Certificates</span>
                 </Link>
                 <Link
-                  href="/achievements"
-                  className="flex flex-col items-center p-4 bg-white rounded-lg hover:bg-white transition"
+                  href="/lms/attendance"
+                  className="flex flex-col items-center p-4 rounded-lg border border-gray-100 hover:bg-gray-50 transition"
                 >
-                  <Trophy className="w-8 h-8 text-yellow-600 mb-2" />
-                  <span className="text-sm font-medium text-gray-700">Achievements</span>
+                  <Calendar className="w-8 h-8 text-amber-600 mb-2" />
+                  <span className="text-sm font-medium text-gray-700">Attendance</span>
                 </Link>
                 <Link
-                  href="/contact"
-                  className="flex flex-col items-center p-4 bg-white rounded-lg hover:bg-white transition"
+                  href="/support/contact"
+                  className="flex flex-col items-center p-4 rounded-lg border border-gray-100 hover:bg-gray-50 transition"
                 >
-                  <HelpCircle className="w-8 h-8 text-brand-blue-600 mb-2" />
+                  <MessageSquare className="w-8 h-8 text-brand-blue-600 mb-2" />
                   <span className="text-sm font-medium text-gray-700">Get Help</span>
                 </Link>
               </div>
@@ -877,6 +885,67 @@ export default async function LearnerDashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Funded Programs — INTraining / ETPL official listing */}
+        <div className="mt-10">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">WIOA-Funded Programs</h2>
+              <p className="text-sm text-gray-500 mt-0.5">
+                All programs below are listed on Indiana&apos;s Eligible Training Provider List (ETPL) — most students pay $0 through WIOA or the Workforce Ready Grant.
+              </p>
+            </div>
+            <a
+              href="https://www.nextleveljobs.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700 border border-brand-blue-200 rounded-lg px-3 py-2 bg-white"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              Check Funding Eligibility
+            </a>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {FUNDED_PROGRAMS.map((prog) => (
+              <div key={prog.id} className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-3">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="font-semibold text-gray-900 text-sm leading-snug">{prog.name}</h3>
+                  <span className="flex-shrink-0 text-[10px] font-mono text-gray-400 bg-gray-50 border border-gray-100 rounded px-1.5 py-0.5">{prog.id}</span>
+                </div>
+
+                <div className="flex items-center gap-3 text-xs text-gray-500">
+                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{prog.duration}</span>
+                  <span className="flex items-center gap-1"><FileCheck className="w-3 h-3" />{prog.cost} total</span>
+                </div>
+
+                <div className="flex flex-wrap gap-1">
+                  {prog.credentials.map((c) => (
+                    <span key={c} className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full px-2 py-0.5 font-medium">{c}</span>
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
+                  <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1">
+                    <CheckCircle className="w-3.5 h-3.5" /> WIOA / WRG Eligible
+                  </span>
+                  <Link
+                    href={prog.href}
+                    className="text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1"
+                  >
+                    Learn more <ChevronRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-xs text-gray-400 mt-4 text-center">
+            Provider: 2Exclusive LLC-S · Elevate for Humanity Training Center · Indianapolis, Indiana (Marion County) ·{' '}
+            <a href="https://www.nextleveljobs.org" target="_blank" rel="noopener noreferrer" className="underline">NextLevelJobs.org</a>
+          </p>
+        </div>
+
       </main>
     </div>
   );

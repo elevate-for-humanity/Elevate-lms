@@ -114,22 +114,35 @@ export default async function OrientationPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  // Pull the student's most recent active enrollment + program details
-  const { data: enrollment } = await supabase
-    .from('program_enrollments')
-    .select('program_id, programs ( title, slug, duration_weeks, description )')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  // Pull from program_enrollments first, fall back to training_enrollments (legacy HVAC)
+  const [{ data: enrollment }, { data: legacyEnrollment }] = await Promise.all([
+    supabase
+      .from('program_enrollments')
+      .select('program_id, programs ( title, slug, duration_weeks, description )')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from('training_enrollments')
+      .select('training_courses ( course_name, slug, duration_hours )')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
 
   const program = enrollment?.programs as { title: string; slug: string; duration_weeks: number; description: string } | null;
-  const slug = program?.slug ?? '';
+
+  // Legacy fallback — training_enrollments (HVAC and older courses)
+  const legacyCourse = legacyEnrollment?.training_courses as { course_name: string; slug: string; duration_hours: number } | null;
+
+  const slug = program?.slug ?? legacyCourse?.slug ?? '';
   const meta = PROGRAM_META[slug];
 
-  const programTitle = program?.title ?? 'Your Program';
+  const programTitle = program?.title ?? legacyCourse?.course_name ?? 'Your Program';
   const duration = meta?.duration ?? (program?.duration_weeks ? `${program.duration_weeks} weeks` : 'your program duration');
-  const hours = meta?.hours ?? '';
+  const hours = meta?.hours ?? (legacyCourse?.duration_hours ? `${legacyCourse.duration_hours} hours` : '');
   const credentials = meta?.credentials ?? [];
   const hasOJT = meta?.hasOJT ?? false;
 

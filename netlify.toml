@@ -615,12 +615,7 @@
 
 # ── Course consolidation redirects ────────────────────────────────────────────
 # Static hardcoded course pages removed — all traffic goes to DB-driven LMS
-
-[[redirects]]
-  from = "/courses"
-  to = "/lms/programs"
-  status = 301
-  force = true
+# /courses redirect is owned by next.config.mjs → /lms/courses
 
 [[redirects]]
   from = "/courses/epa-608"

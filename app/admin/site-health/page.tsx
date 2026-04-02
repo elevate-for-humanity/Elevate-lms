@@ -1,56 +1,74 @@
-import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
+import type { Metadata } from 'next';
+import { requireAdmin } from '@/lib/authGuards';
+import { getSiteHealthSnapshot } from '@/lib/admin/get-site-health';
+import type { HealthStatus } from '@/lib/admin/get-site-health';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/admin/site-health' },
+  robots: { index: false, follow: false },
   title: 'Site Health | Elevate For Humanity',
-  description: 'Monitor website health and performance metrics.',
 };
 
-export default async function SiteHealthPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
+function statusBadge(status: HealthStatus) {
+  if (status === 'healthy')  return 'bg-green-100 text-green-800';
+  if (status === 'degraded') return 'bg-yellow-100 text-yellow-800';
+  return 'bg-red-100 text-red-800';
+}
 
-  const healthChecks = [
-    { name: 'Database', status: 'healthy', latency: '12ms' },
-    { name: 'Authentication', status: 'healthy', latency: '45ms' },
-    { name: 'Storage', status: 'healthy', latency: '23ms' },
-    { name: 'Email Service', status: 'healthy', latency: '156ms' },
-  ];
+function statusDot(status: HealthStatus) {
+  if (status === 'healthy')  return 'bg-green-500';
+  if (status === 'degraded') return 'bg-yellow-500';
+  return 'bg-red-500';
+}
+
+function overallBanner(status: HealthStatus) {
+  if (status === 'healthy')
+    return { bg: 'bg-green-50 border-green-200', text: 'text-green-800', label: 'All Systems Operational' };
+  if (status === 'degraded')
+    return { bg: 'bg-yellow-50 border-yellow-200', text: 'text-yellow-800', label: 'Partial Degradation' };
+  return { bg: 'bg-red-50 border-red-200', text: 'text-red-800', label: 'Service Disruption' };
+}
+
+export default async function SiteHealthPage() {
+  await requireAdmin();
+  const health = await getSiteHealthSnapshot();
+  const banner = overallBanner(health.overallStatus);
 
   return (
     <div className="min-h-screen bg-gray-50">
-
-      {/* Hero Image */}
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/admin" className="hover:text-primary">Admin</Link></li><li>/</li><li className="text-gray-900 font-medium">Site Health</li></ol></nav>
+        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Site Health' }]} />
+        <div className="mt-4 mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Site Health</h1>
-          <p className="text-gray-600 mt-2">Monitor system status and performance</p>
+          <p className="text-gray-500 text-sm mt-1">
+            Live checks — last run {new Date(health.checkedAt).toLocaleString()}
+          </p>
         </div>
-        <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4 mb-6 flex items-center gap-3">
-          <svg className="w-6 h-6 text-brand-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-          <div><p className="font-medium text-brand-green-800">All Systems Operational</p><p className="text-sm text-brand-green-700">Last checked: just now</p></div>
+        <div className={`border rounded-lg p-4 mb-6 flex items-center gap-3 ${banner.bg}`}>
+          <span className={`w-3 h-3 rounded-full flex-shrink-0 ${statusDot(health.overallStatus)}`} />
+          <p className={`font-semibold ${banner.text}`}>{banner.label}</p>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border">
-          <div className="p-4 border-b"><h2 className="font-semibold">Service Status</h2></div>
+        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+          <div className="px-4 py-3 border-b bg-slate-50">
+            <h2 className="font-semibold text-slate-800">Service Status</h2>
+          </div>
           <div className="divide-y">
-            {healthChecks.map((check) => (
-              <div key={check.name} className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="w-3 h-3 bg-brand-green-500 rounded-full"></span>
-                  <span className="font-medium">{check.name}</span>
+            {health.services.map((svc) => (
+              <div key={svc.name} className="px-4 py-4 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${statusDot(svc.status)}`} />
+                  <span className="font-medium text-slate-900">{svc.name}</span>
                 </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-sm text-gray-500">{check.latency}</span>
-                  <span className="px-2 py-1 bg-brand-green-100 text-brand-green-800 rounded text-xs">{check.status}</span>
+                <div className="flex items-center gap-4 flex-shrink-0">
+                  <span className="text-sm text-slate-500 hidden sm:block">{svc.detail}</span>
+                  {svc.latencyMs !== null && (
+                    <span className="text-sm text-slate-400">{svc.latencyMs} ms</span>
+                  )}
+                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${statusBadge(svc.status)}`}>
+                    {svc.status}
+                  </span>
                 </div>
               </div>
             ))}

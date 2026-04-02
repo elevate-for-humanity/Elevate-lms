@@ -1,52 +1,116 @@
-import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
+import { requireAdmin } from '@/lib/authGuards';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/admin/docs/mou' },
-  title: 'MOU Documentation | Elevate For Humanity',
-  description: 'MOU templates and documentation.',
+  robots: { index: false, follow: false },
+  title: 'MOU Documents | Admin | Elevate For Humanity',
 };
 
-export default async function MOUDocsPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
+const STATUS_BADGE: Record<string, string> = {
+  draft:    'bg-gray-100 text-gray-600',
+  sent:     'bg-blue-100 text-blue-800',
+  signed:   'bg-green-100 text-green-800',
+  expired:  'bg-red-100 text-red-800',
+  archived: 'bg-slate-100 text-slate-600',
+};
 
-  const templates = [
-    { name: 'Standard Partnership MOU', type: 'Partnership', lastUpdated: '2024-01-15' },
-    { name: 'Training Provider Agreement', type: 'Training', lastUpdated: '2024-01-10' },
-    { name: 'Employer Hiring Commitment', type: 'Employment', lastUpdated: '2024-01-05' },
-  ];
+export default async function MouDocumentsPage() {
+  await requireAdmin();
+  const db = createAdminClient();
+
+  const { data: documents } = await db
+    .from('mou_documents')
+    .select('*')
+    .order('updated_at', { ascending: false });
+
+  const rows = documents ?? [];
+  const signed  = rows.filter((r: any) => r.document_status === 'signed').length;
+  const expiring = rows.filter((r: any) => {
+    if (!r.expiration_date) return false;
+    const exp = new Date(r.expiration_date);
+    const soon = new Date();
+    soon.setDate(soon.getDate() + 30);
+    return exp >= new Date() && exp <= soon;
+  }).length;
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Docs', href: '/admin/docs' }, { label: 'MOUs' }]} />
 
-      {/* Hero Image */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/admin" className="hover:text-primary">Admin</Link></li><li>/</li><li><Link href="/admin/docs" className="hover:text-primary">Docs</Link></li><li>/</li><li className="text-gray-900 font-medium">MOU</li></ol></nav>
-          <div className="flex justify-between items-center">
-            <div><h1 className="text-3xl font-bold text-gray-900">MOU Documentation</h1><p className="text-gray-600 mt-2">Templates and agreements</p></div>
-            <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Upload Template</button>
+        <div className="flex items-center justify-between mt-4 mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">MOU Documents</h1>
+            <p className="text-gray-500 text-sm mt-1">Live MOU records from the database</p>
           </div>
+          <Link href="/admin/docs/mou/new"
+            className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
+            + New MOU
+          </Link>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border">
-          <div className="divide-y">
-            {templates.map((t, i) => (
-              <div key={i} className="p-4 flex items-center justify-between hover:bg-gray-50">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-brand-blue-100 rounded flex items-center justify-center"><svg className="w-5 h-5 text-brand-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></div>
-                  <div><p className="font-medium">{t.name}</p><p className="text-sm text-gray-500">{t.type} • Updated {t.lastUpdated}</p></div>
-                </div>
-                <button className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">Download</button>
-              </div>
-            ))}
+
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+          {[
+            { label: 'Total MOUs',         value: rows.length },
+            { label: 'Signed',             value: signed },
+            { label: 'Expiring in 30 Days', value: expiring },
+          ].map((kpi) => (
+            <div key={kpi.label} className="bg-white rounded-lg border p-4 shadow-sm">
+              <p className="text-xs text-gray-500 uppercase tracking-wide">{kpi.label}</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">{kpi.value}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+          <div className="px-4 py-3 border-b bg-slate-50">
+            <h2 className="font-semibold text-slate-800">Documents</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-slate-50 border-b">
+                <tr>
+                  {['Title', 'Organization', 'Status', 'Effective', 'Expiration', 'File'].map((h) => (
+                    <th key={h} className="px-4 py-3 text-left font-medium text-slate-600">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {rows.map((r: any) => (
+                  <tr key={r.id} className="hover:bg-slate-50">
+                    <td className="px-4 py-3 font-medium text-slate-900">{r.title}</td>
+                    <td className="px-4 py-3 text-slate-600">{r.organization_name ?? '—'}</td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_BADGE[r.document_status] ?? 'bg-gray-100 text-gray-600'}`}>
+                        {r.document_status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-slate-600">{r.effective_date ?? '—'}</td>
+                    <td className="px-4 py-3 text-slate-600">{r.expiration_date ?? '—'}</td>
+                    <td className="px-4 py-3">
+                      {r.file_url ? (
+                        <a href={r.file_url} target="_blank" rel="noreferrer"
+                          className="text-brand-blue-600 hover:underline text-xs font-medium">
+                          Open
+                        </a>
+                      ) : '—'}
+                    </td>
+                  </tr>
+                ))}
+                {rows.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
+                      No MOU documents yet. Add your first document to get started.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

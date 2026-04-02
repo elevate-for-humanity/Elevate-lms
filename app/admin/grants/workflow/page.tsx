@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
@@ -15,16 +15,17 @@ export const metadata: Metadata = {
 };
 
 async function getWorkflowData() {
-  const { data: grants } = await supabaseAdmin
+  const db = createAdminClient();
+  const { data: grants } = await db
     .from('grants')
     .select('*')
     .order('due_date', { ascending: true });
 
-  const { data: entities } = await supabaseAdmin
+  const { data: entities } = await db
     .from('grant_entities')
     .select('*');
 
-  const { data: applications } = await supabaseAdmin
+  const { data: applications } = await db
     .from('grant_applications')
     .select('*');
 

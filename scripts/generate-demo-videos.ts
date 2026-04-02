@@ -301,16 +301,17 @@ async function processScene(scene: DemoScene): Promise<void> {
 
   console.log(`\n▶ ${scene.title} (${scene.id})`);
 
+  if (DRY_RUN) {
+    console.log('  [DRY RUN] Script prompt:\n');
+    console.log(scene.scriptPrompt.trim());
+    console.log(`\n  Output would be: ${videoPath}`);
+    return;
+  }
+
   // Step 1 — GPT-4o script
   console.log('  1/4 Generating script...');
   const script = await generateScript(scene);
   console.log(`  Script (${script.split(' ').length} words):\n  "${script.slice(0, 120)}..."`);
-
-  if (DRY_RUN) {
-    console.log('\n  [DRY RUN] Full script:\n');
-    console.log(script);
-    return;
-  }
 
   // Step 2 — OpenAI TTS
   console.log('  2/4 Generating audio...');

@@ -211,6 +211,7 @@ async function _POST(request: NextRequest) {
             }
           }
 
+
           // ── Wire weekly billing via Stripe subscription ──────────────────
           // Only for card payments on a payment plan (BNPL providers manage
           // their own schedules; fully-paid students have no recurring balance).

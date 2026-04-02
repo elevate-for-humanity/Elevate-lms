@@ -134,7 +134,9 @@ export default async function ApplyPage({
                 Student Programs
               </h2>
               <p className="text-slate-700 mb-3">
-                Start by checking eligibility for funded training and apprenticeships.
+                Apply for career training in healthcare, skilled trades, barbering, IT, and more.
+                Many programs are funded through WIOA, WRG, and Job Ready Indy grants. Some programs
+                have tuition with flexible payment options available.
               </p>
               <ul className="text-slate-600 text-sm space-y-1 mb-4 list-disc list-inside">
                 <li>Many programs are fully funded through WIOA, WRG, and Job Ready Indy</li>

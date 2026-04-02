@@ -91,10 +91,10 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
               <h2 className="text-xl font-bold text-slate-900">Career Pathway</h2>
             </div>
             <p className="text-slate-700 leading-relaxed">
-              Start as a <strong>Barber Apprentice</strong> — a W-2 employee at your host shop — while you train under a licensed barber.
-              After completing 2,000 hours and passing the Indiana state exam, you become a <strong>Licensed Barber</strong>.
-              With experience and an established clientele, you can advance to <strong>Senior Barber</strong> or open your own shop.
-              Compensation is determined by each participating shop and must comply with applicable wage requirements. Elevate tracks training progress and hours.
+              Start as a <strong>Barber Apprentice</strong> — a paid W-2 employee at your host shop — while you train under a licensed barber.
+              After completing 2,000 hours and passing the Indiana state exam, you become a <strong>Licensed Barber</strong> ($30,000–$45,000).
+              With 3–5 years of experience and an established clientele, you advance to <strong>Senior Barber</strong> ($45,000–$65,000).
+              Many graduates go on to open their own shop as a <strong>Shop Owner / Master Barber</strong> ($65,000–$100,000+).
             </p>
           </div>
           <div className="relative h-72 rounded-xl overflow-hidden shadow-lg">

@@ -9,7 +9,7 @@ import {
   Play, Clock, BookOpen, Award, Lock, ChevronRight,
   CheckCircle, Shield, FileText, Zap, FlaskConical,
   Brain, ClipboardList, Video, Wrench, Thermometer, BadgeCheck,
-  TrendingUp, MapPin, DollarSign,
+  TrendingUp, MapPin, DollarSign, Trophy, Radio,
 } from 'lucide-react';
 import { CourseModuleAccordion } from '@/components/lms/CourseModuleAccordion';
 
@@ -781,6 +781,27 @@ export default async function CoursePage({ params }: { params: Params }) {
                 </div>
               </div>
             )}
+
+            {/* Leaderboard + Live Session */}
+            <div className="bg-white rounded-xl border border-slate-200 p-5">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Community</h3>
+              <div className="space-y-2">
+                <Link
+                  href={`/lms/courses/${courseId}/leaderboard`}
+                  className="flex items-center gap-2 text-sm text-slate-700 hover:text-brand-orange-600 transition-colors"
+                >
+                  <Trophy className="w-4 h-4 flex-shrink-0 text-amber-500" />
+                  Leaderboard
+                </Link>
+                <Link
+                  href={`/lms/courses/${courseId}/live`}
+                  className="flex items-center gap-2 text-sm text-slate-700 hover:text-brand-orange-600 transition-colors"
+                >
+                  <Radio className="w-4 h-4 flex-shrink-0 text-red-500" />
+                  Live Session
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </div>

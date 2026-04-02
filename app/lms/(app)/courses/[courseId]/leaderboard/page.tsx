@@ -80,8 +80,8 @@ export default function CourseLeaderboardPage() {
       <div className="min-h-screen bg-white">
         <Breadcrumbs
           items={[
-            { label: 'Courses', href: '/courses' },
-            { label: 'Course', href: `/courses/${courseId}` },
+            { label: 'Courses', href: '/lms/courses' },
+            { label: 'Course', href: `/lms/courses/${courseId}` },
             { label: 'Leaderboard' },
           ]}
         />
@@ -199,8 +199,8 @@ export default function CourseLeaderboardPage() {
     <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
-          { label: 'Courses', href: '/courses' },
-          { label: course?.title || 'Course', href: `/courses/${courseId}` },
+          { label: 'Courses', href: '/lms/courses' },
+          { label: course?.title || 'Course', href: `/lms/courses/${courseId}` },
           { label: 'Leaderboard' },
         ]}
       />

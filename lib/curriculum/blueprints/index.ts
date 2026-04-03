@@ -23,12 +23,14 @@ export type {
 export { prsIndianaBlueprint } from './prs-indiana';
 export { HVAC_EPA608_BLUEPRINT } from './hvac-epa-608';
 export { bookkeepingQuickbooksBlueprint } from './bookkeeping-quickbooks';
+export { barberApprenticeshipBlueprint } from './barber-apprenticeship';
 export { validateBlueprint } from './validateBlueprint';
 
 import type { CredentialBlueprint } from './types';
 import { prsIndianaBlueprint } from './prs-indiana';
 import { HVAC_EPA608_BLUEPRINT } from './hvac-epa-608';
 import { bookkeepingQuickbooksBlueprint } from './bookkeeping-quickbooks';
+import { barberApprenticeshipBlueprint } from './barber-apprenticeship';
 
 // ── Blueprint registry ────────────────────────────────────────────────────────
 // All programs in a single registry. Add new blueprints here.
@@ -37,6 +39,7 @@ const REGISTRY: CredentialBlueprint[] = [
   prsIndianaBlueprint,
   HVAC_EPA608_BLUEPRINT,
   bookkeepingQuickbooksBlueprint,
+  barberApprenticeshipBlueprint,
 ];
 
 export function getBlueprintByCredentialSlug(credentialSlug: string): CredentialBlueprint | null {

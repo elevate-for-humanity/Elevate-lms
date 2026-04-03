@@ -80,6 +80,13 @@ export type BlueprintLessonRef = {
   durationMinutes?: number;
 
   /**
+   * Path to a demo video file in /public/videos/.
+   * Used for real demo videos (not avatar/AI generated).
+   * Stored as video_url on the course_lessons row.
+   */
+  videoFile?: string;
+
+  /**
    * Certiport or external exam code.
    * Required for exam lessons that use an external proctoring system.
    */
@@ -132,7 +139,7 @@ export type BlueprintModule = {
    * Suggested lesson titles for the AI generator.
    * Not enforced — generator may deviate within bounds.
    */
-  suggestedLessonSkeleton: string[];
+  suggestedLessonSkeleton?: string[];
 
   /**
    * Flat lesson list consumed by buildCourseFromBlueprint.
@@ -256,7 +263,7 @@ export type CredentialBlueprint = {
 
   modules: BlueprintModule[];
 
-  assessmentRules: BlueprintAssessmentRule[];
+  assessmentRules?: BlueprintAssessmentRule[];
 
   /**
    * Locked video format for this program.

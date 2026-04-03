@@ -196,7 +196,9 @@ function validateLessons(modules: CredentialBlueprint['modules']): void {
         // Certification exams must have a recognisable exam code in the slug
         // (enforced at DB level via partner_exam_code — validated here as a preflight)
         const hasCode = lesson.slug.includes('qbocu') || lesson.slug.includes('icbp') ||
-                        lesson.slug.includes('epa') || lesson.slug.includes('certiport');
+                        lesson.slug.includes('epa') || lesson.slug.includes('certiport') ||
+                        lesson.slug.includes('indiana') || lesson.slug.includes('state-board') ||
+                        lesson.slug.includes('nha') || lesson.slug.includes('act-workkeys');
         if (!hasCode) throw new Error(`Exam lesson '${lesson.slug}' has no recognisable cert code in slug`);
       }
     }
@@ -465,7 +467,7 @@ async function upsertLesson(
   // this function is called, so these are safe to spread directly.
   const contentPayload: Record<string, unknown> = {};
   if (lessonRef.content)       contentPayload.content         = lessonRef.content;
-  if (lessonRef.objective)     contentPayload.description     = lessonRef.objective;
+  if (lessonRef.objective)     contentPayload.scenario_prompt = lessonRef.objective;
   if (lessonRef.quizQuestions) contentPayload.quiz_questions  = lessonRef.quizQuestions;
   if (lessonRef.passingScore != null) contentPayload.passing_score = lessonRef.passingScore;
   if (lessonRef.durationMinutes != null) contentPayload.duration_minutes = lessonRef.durationMinutes;
@@ -513,7 +515,7 @@ async function upsertLesson(
       ...(videoConfig ? { video_config: videoConfig } : {}),
     });
 
-  if (error) logger.error(`[seeder] DB insert error [${lessonRef.slug}]:`, error.message, error.details);
+  if (error) logger.error(`[seeder] DB insert error [${lessonRef.slug}]:`, { code: error.code, message: error.message, details: error.details });
   return !error;
 }
 

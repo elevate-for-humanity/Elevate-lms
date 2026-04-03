@@ -194,7 +194,7 @@ export default async function OrientationPage() {
               </h3>
               <div className="space-y-2">
                 <Link
-                  href="/programs"
+                  href="/lms/programs"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-white transition"
                 >
                   <Book className="w-5 h-5 text-brand-blue-600" />

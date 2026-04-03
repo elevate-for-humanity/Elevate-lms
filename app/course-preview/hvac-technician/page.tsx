@@ -27,7 +27,6 @@ import EPA608PracticeExam from '@/components/hvac-labs/EPA608PracticeExam';
 import ComponentIDLab from '@/components/hvac-labs/ComponentIDLab';
 import { CONDENSER_SCENARIOS } from '@/lib/simulations/condenser-scenarios';
 import { HVAC_QUIZ_BANKS } from '@/lib/courses/hvac-quiz-banks';
-import { HVAC_MODULE_CONTENT } from '@/lib/courses/hvac-module-content';
 import { getModuleDiagrams } from '@/lib/courses/hvac-visual-library';
 import { getModuleEquipment } from '@/lib/courses/hvac-equipment-models';
 import { getModuleScenarios } from '@/lib/courses/hvac-service-scenarios';
@@ -352,7 +351,7 @@ export default function HVACClassroomPreview() {
                 <p className="text-slate-600 mt-2 text-sm">These credentials are delivered through CareerSafe&apos;s online platform. Elevate provides access — CareerSafe issues the DOL cards.</p>
               </div>
               <div className="space-y-8">
-                {HVAC_MODULE_CONTENT['careersafe']}
+                <p className="text-slate-500 text-sm">Module content preview not available.</p>
               </div>
             </>
           ) : (
@@ -433,8 +432,6 @@ export default function HVACClassroomPreview() {
           {activeTab === 'content' && (
             <div className="space-y-8">
               {/* Module content from data-driven renderer */}
-              {HVAC_MODULE_CONTENT[modId]}
-
               {/* Interactive Diagrams — always rendered when available */}
               {(() => {
                 const diagrams = getModuleDiagrams(modId);

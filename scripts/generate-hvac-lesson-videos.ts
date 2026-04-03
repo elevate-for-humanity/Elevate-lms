@@ -389,7 +389,8 @@ async function main() {
 
     if (dryRun) {
       console.log(`  Module: ${moduleTitle}`);
-      console.log(`  Content: ${stripHtml(lesson.content || '').length} chars`);
+      const rawContent = typeof lesson.content === 'object' ? (lesson.content as any)?.text || '' : lesson.content || '';
+      console.log(`  Content: ${stripHtml(rawContent).length} chars`);
       console.log(`  Current video: ${lesson.video_url ? 'avatar loop' : 'none'}`);
       continue;
     }
@@ -400,9 +401,10 @@ async function main() {
     try {
       // 1. Plan lesson with GPT-4o
       process.stdout.write('  Planning...');
+      const lessonContent = typeof lesson.content === 'object' ? (lesson.content as any)?.text || '' : lesson.content || '';
       const plan = await planLesson(
         lesson.title,
-        lesson.content || '',
+        lessonContent,
         lessonNum,
         moduleTitle,
         nextLesson?.title

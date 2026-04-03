@@ -57,7 +57,7 @@ import { transformLessonContent, isAiJsonBlob } from '@/lib/lms/transformLessonC
 import { HVAC_COURSE_ID } from '@/lib/courses/hvac-uuids';
 import dynamic from 'next/dynamic';
 import { lessonUuidToSimulationKey } from '@/lib/lms/hvac-simulations';
-import { HVAC_QUICK_CHECKS } from '@/lib/courses/hvac-quick-checks';
+
 import { ExplainSimply } from '@/components/lms/ai/ExplainSimply';
 import { TranslateToggle } from '@/components/lms/ai/TranslateToggle';
 import SpacedRepetitionReview from '@/components/lms/SpacedRepetitionReview';
@@ -1064,18 +1064,17 @@ export default function LessonPage() {
               </div>
             )}
             {/* Quick Check quiz below simulation lessons */}
-            {HVAC_QUICK_CHECKS[lessonId] && (
+            {lesson.quiz_questions?.length > 0 && (
               <div className="mt-8">
                 <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
                   <ClipboardList className="w-6 h-6 text-brand-blue-600" />
                   Quick Check — Test Your Understanding
                 </h3>
                 <QuizPlayer
-                  questions={HVAC_QUICK_CHECKS[lessonId]}
+                  questions={lesson.quiz_questions}
                   title="Quick Check"
                   passingScore={60}
-                  onComplete={(score) => {
-                  }}
+                  onComplete={() => {}}
                 />
               </div>
             )}
@@ -1141,19 +1140,17 @@ export default function LessonPage() {
               </div>
             )}
             {/* Quick Check quiz below video lessons */}
-            {HVAC_QUICK_CHECKS[lessonId] && (
+            {lesson.quiz_questions?.length > 0 && (
               <div className="mt-8">
                 <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
                   <ClipboardList className="w-6 h-6 text-brand-blue-600" />
                   Quick Check — Test Your Understanding
                 </h3>
                 <QuizPlayer
-                  questions={HVAC_QUICK_CHECKS[lessonId]}
+                  questions={lesson.quiz_questions}
                   title="Quick Check"
                   passingScore={60}
-                  onComplete={(score) => {
-                    // Quick checks don't block progress — just reinforcement
-                  }}
+                  onComplete={() => {}}
                 />
               </div>
             )}
@@ -1329,14 +1326,7 @@ export default function LessonPage() {
                   {/* PRACTICE QUESTIONS */}
                   {activeActivity === 'practice' && (
                     <div>
-                      {HVAC_QUICK_CHECKS[lessonId] ? (
-                        <QuizPlayer
-                          questions={HVAC_QUICK_CHECKS[lessonId]}
-                          title="Practice Questions"
-                          passingScore={60}
-                          onComplete={() => markAttempted('practice')}
-                        />
-                      ) : lesson.quiz_questions?.length > 0 ? (
+                      {lesson.quiz_questions?.length > 0 ? (
                         <QuizPlayer
                           questions={lesson.quiz_questions}
                           title="Practice Questions"

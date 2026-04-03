@@ -17,6 +17,10 @@ export default async function PlacementsPage() {
   if (!user) redirect('/login');
 
   const { data: placements, count } = await supabase.from('job_placements').select('*, profiles!inner(full_name)', { count: 'exact' }).eq('employer_id', user.id).order('placement_date', { ascending: false }).limit(20);
+  const thisMonthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+  const { count: thisMonthCount } = await supabase.from('job_placements').select('*', { count: 'exact', head: true }).eq('employer_id', user.id).gte('placement_date', thisMonthStart);
+  const { count: activeCount } = await supabase.from('job_placements').select('*', { count: 'exact', head: true }).eq('employer_id', user.id).eq('status', 'active');
+  const retentionRate = count && count > 0 ? Math.round((activeCount ?? 0) / count * 100) : null;
 
   return (
     <div className="min-h-screen bg-white">
@@ -29,9 +33,9 @@ export default async function PlacementsPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total Hires</h3><p className="text-3xl font-bold text-brand-green-600 mt-2">{count || 0}</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">This Month</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">5</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Retention Rate</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">92%</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-black">Total Hires</h3><p className="text-3xl font-bold text-black mt-2">{count ?? 0}</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-black">This Month</h3><p className="text-3xl font-bold text-black mt-2">{thisMonthCount ?? 0}</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-black">Retention Rate</h3><p className="text-3xl font-bold text-black mt-2">{retentionRate !== null ? `${retentionRate}%` : '—'}</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="p-4 border-b"><h2 className="font-semibold">Recent Placements</h2></div>

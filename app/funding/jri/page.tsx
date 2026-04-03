@@ -108,7 +108,7 @@ export default function JRIFundingPage() {
           <p className="text-slate-300 text-base leading-relaxed mb-10">Job Ready Indy funding may give you a fresh start with funded career training. Check your eligibility today.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/start" className="bg-white text-brand-green-700 px-10 py-5 rounded-full font-bold text-xl hover:bg-white transition hover:scale-105 shadow-lg">Apply Now</Link>
-            <Link href="/partners/jri" className="border-2 border-slate-600 hover:border-slate-400 text-white px-10 py-4 rounded-xl font-bold text-base transition">Job Ready Indy Partner Courses</Link>
+            <Link href="/partners/jri" className="border-2 border-slate-600 hover:border-slate-400 text-white px-10 py-4 rounded-xl font-bold text-base transition">Job Ready Indy Courses</Link>
             <Link href="/contact" className="border-2 border-slate-600 hover:border-slate-400 text-white px-10 py-4 rounded-xl font-bold text-base transition">Contact Us</Link>
           </div>
         </div>

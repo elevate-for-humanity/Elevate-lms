@@ -121,7 +121,7 @@ export default function ExternalModuleLauncher({
         <h3 className="text-white font-semibold mb-3">📋 Instructions</h3>
         <ol className="text-slate-300 text-sm space-y-2 list-decimal list-inside">
           <li>
-            Click the button above to open the partner course in a new tab
+            Click the button above to open the short-term course in a new tab
           </li>
           <li>Complete all required activities on the partner platform</li>
           <li>Download your completion certificate from the partner site</li>

@@ -14,7 +14,7 @@ import {
 CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'NRF Foundation RISE Up | Partner Courses | Elevate For Humanity',
+  title: 'NRF Foundation RISE Up | Short-Term Courses | Elevate For Humanity',
   description: 'Retail Industry Skills and Employability Training',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/partners/nrf',

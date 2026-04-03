@@ -96,7 +96,7 @@ export default function EnrollmentDashboard() {
   const getDeliveryModeLabel = (mode: string) => {
     switch (mode) {
       case 'partner':
-        return { label: 'Partner Course', icon: Building2, color: 'text-brand-blue-600 bg-brand-blue-50' };
+        return { label: 'Short-Term Course', icon: Building2, color: 'text-brand-blue-600 bg-brand-blue-50' };
       case 'hybrid':
         return { label: 'Apprenticeship', icon: GraduationCap, color: 'text-brand-orange-600 bg-brand-orange-50' };
       default:

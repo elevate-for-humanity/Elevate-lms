@@ -14,8 +14,7 @@ import {
 CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title:
-    'Health & Safety Institute (HSI) | Partner Courses | Elevate For Humanity',
+  title: 'Health & Safety Institute (HSI) | Short-Term Courses | Elevate For Humanity',
   description: 'CPR, AED, First Aid, and Emergency Medical Responder Training',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/partners/hsi',

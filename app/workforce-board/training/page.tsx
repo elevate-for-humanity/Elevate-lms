@@ -19,6 +19,11 @@ export default async function TrainingPage() {
 
   const { data: programs, count } = await supabase.from('programs').select('*', { count: 'exact' }).order('created_at', { ascending: false }).limit(20);
   const { count: activeCount } = await supabase.from('programs').select('*', { count: 'exact', head: true }).eq('status', 'active');
+  const { count: participantCount } = await supabase.from('program_enrollments').select('*', { count: 'exact', head: true });
+  const { count: completedCount } = await supabase.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed');
+  const completionRate = participantCount && participantCount > 0
+    ? Math.round((completedCount ?? 0) / participantCount * 100)
+    : null;
 
   return (
     <div className="min-h-screen bg-white">
@@ -36,10 +41,10 @@ export default async function TrainingPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total Programs</h3><p className="text-3xl font-bold text-gray-900 mt-2">{count || 0}</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Active</h3><p className="text-3xl font-bold text-brand-green-600 mt-2">{activeCount || 0}</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Participants</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">847</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Completion Rate</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">76%</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-black">Total Programs</h3><p className="text-3xl font-bold text-black mt-2">{count ?? 0}</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-black">Active</h3><p className="text-3xl font-bold text-black mt-2">{activeCount ?? 0}</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-black">Participants</h3><p className="text-3xl font-bold text-black mt-2">{participantCount ?? 0}</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-black">Completion Rate</h3><p className="text-3xl font-bold text-black mt-2">{completionRate !== null ? `${completionRate}%` : '—'}</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="p-4 border-b"><h2 className="font-semibold">Training Programs</h2></div>

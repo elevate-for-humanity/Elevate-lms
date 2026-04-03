@@ -172,10 +172,10 @@ export default async function EnrollPage({ searchParams }: Props) {
           </section>
         )}
 
-        {/* Partner Courses */}
+        {/* Short-Term Courses */}
         {availablePartnerCourses.length > 0 && (
           <section className="mb-12">
-            <h2 className="text-xl font-bold text-slate-900 mb-6">Partner Courses</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-6">Short-Term Courses</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {availablePartnerCourses.map((course) => {
                 const provider = course.partner_lms_providers as { provider_name: string; provider_type: string } | null;

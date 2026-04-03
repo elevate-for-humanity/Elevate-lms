@@ -14,7 +14,7 @@ import {
 CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Job Ready Indy | Partner Courses | Elevate For Humanity',
+  title: 'Job Ready Indy | Funding Eligible Program | Elevate For Humanity',
   description: 'Employability Skills and Workforce Readiness Training',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/partners/jri',

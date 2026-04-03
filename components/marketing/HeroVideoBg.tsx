@@ -19,9 +19,9 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
   // mounted prevents SSR/hydration mismatch — video element only renders client-side
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
-
   useEffect(() => {
+    setMounted(true);
+    // Read reduced-motion preference on mount (not before — avoids SSR mismatch)
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     setReducedMotion(mq.matches);
     const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
@@ -30,28 +30,35 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
   }, []);
 
   // Load video after mount so it does not block initial page paint.
-  // Poster stays visible (z-0) until video is playing — video fades in over it.
+  // Poster stays visible until video is playing — video fades in over it.
   useEffect(() => {
-    if (reducedMotion) return;
+    if (!mounted || reducedMotion) return;
     const v = videoRef.current;
     if (!v) return;
-    const onCanPlay = () => {
-      v.play().catch(() => {});
-    };
-    const onPlaying = () => {
-      // Only mark ready once video is actually playing, not just buffered.
-      // This keeps the poster visible until the first frame is on screen.
+
+    let timeout: ReturnType<typeof setTimeout>;
+
+    const markReady = () => {
       setVideoReady(true);
+      clearTimeout(timeout);
     };
-    v.addEventListener('canplay', onCanPlay, { once: true });
-    v.addEventListener('playing', onPlaying, { once: true });
+
+    v.addEventListener('playing', markReady, { once: true });
+    // canplay → attempt play
+    v.addEventListener('canplay', () => { v.play().catch(() => {}); }, { once: true });
+
     v.src = src;
     v.load();
+
+    // Fallback: if video hasn't started playing within 3s (autoplay blocked,
+    // slow connection, etc.) hide the poster anyway so the video frame shows.
+    timeout = setTimeout(() => setVideoReady(true), 3000);
+
     return () => {
-      v.removeEventListener('canplay', onCanPlay);
-      v.removeEventListener('playing', onPlaying);
+      v.removeEventListener('playing', markReady);
+      clearTimeout(timeout);
     };
-  }, [reducedMotion, src]);
+  }, [mounted, reducedMotion, src]);
 
   // Start audio on first user interaction — browser autoplay policy
   useEffect(() => {

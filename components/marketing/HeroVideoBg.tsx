@@ -6,7 +6,6 @@ import { Volume2, VolumeX } from 'lucide-react';
 interface HeroVideoBgProps {
   src: string;
   poster?: string;
-  /** Separate MP3 voiceover — starts on first user interaction */
   audioSrc?: string;
 }
 
@@ -14,55 +13,30 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [muted, setMuted] = useState(true);
-  const [reducedMotion, setReducedMotion] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
-  // mounted prevents SSR/hydration mismatch — video element only renders client-side
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    // Read reduced-motion preference on mount (not before — avoids SSR mismatch)
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
-
-  // Load video after mount so it does not block initial page paint.
-  // Poster stays visible until video is playing — video fades in over it.
-  useEffect(() => {
-    if (!mounted || reducedMotion) return;
     const v = videoRef.current;
     if (!v) return;
 
-    let timeout: ReturnType<typeof setTimeout>;
+    // Mark ready on first frame
+    const onPlaying = () => setVideoReady(true);
+    v.addEventListener('playing', onPlaying, { once: true });
 
-    const markReady = () => {
-      setVideoReady(true);
-      clearTimeout(timeout);
-    };
+    // Fallback: clear poster after 4s regardless (slow connection / autoplay blocked)
+    const timeout = setTimeout(() => setVideoReady(true), 4000);
 
-    v.addEventListener('playing', markReady, { once: true });
-    // canplay → attempt play
-    v.addEventListener('canplay', () => { v.play().catch(() => {}); }, { once: true });
-
-    v.src = src;
-    v.load();
-
-    // Fallback: if video hasn't started playing within 3s (autoplay blocked,
-    // slow connection, etc.) hide the poster anyway so the video frame shows.
-    timeout = setTimeout(() => setVideoReady(true), 3000);
+    v.play().catch(() => {});
 
     return () => {
-      v.removeEventListener('playing', markReady);
+      v.removeEventListener('playing', onPlaying);
       clearTimeout(timeout);
     };
-  }, [mounted, reducedMotion, src]);
+  }, []);
 
-  // Start audio on first user interaction — browser autoplay policy
+  // Start audio on first user interaction
   useEffect(() => {
-    if (reducedMotion) return;
+    if (!audioSrc) return;
     const tryPlay = () => {
       const a = audioRef.current;
       const v = videoRef.current;
@@ -72,63 +46,63 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
       setMuted(false);
     };
     window.addEventListener('touchstart', tryPlay, { once: true, passive: true });
-    window.addEventListener('scroll', tryPlay, { once: true, passive: true });
-    window.addEventListener('click', tryPlay, { once: true });
+    window.addEventListener('scroll',     tryPlay, { once: true, passive: true });
+    window.addEventListener('click',      tryPlay, { once: true });
     return () => {
       window.removeEventListener('touchstart', tryPlay);
-      window.removeEventListener('scroll', tryPlay);
-      window.removeEventListener('click', tryPlay);
+      window.removeEventListener('scroll',     tryPlay);
+      window.removeEventListener('click',      tryPlay);
     };
-  }, [reducedMotion]);
+  }, [audioSrc]);
 
   function toggleMute() {
     const v = videoRef.current;
     const a = audioRef.current;
-    if (!v || !a) return;
+    if (!v) return;
     if (muted) {
-      a.currentTime = v.currentTime;
-      a.play().catch(() => {});
+      if (a) { a.currentTime = v.currentTime; a.play().catch(() => {}); }
       setMuted(false);
     } else {
-      a.pause();
-      a.currentTime = 0;
+      if (a) { a.pause(); a.currentTime = 0; }
       setMuted(true);
     }
   }
 
   return (
     <>
-      {/* Poster — always visible until video is playing. fetchPriority=high for LCP. */}
+      {/* Poster — LCP image, sits on top until video plays, then fades out */}
       {poster && (
         <img
           src={poster}
           alt=""
           aria-hidden="true"
           fetchPriority="high"
-          className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-700 ${videoReady ? 'opacity-0' : 'opacity-100'}`}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+            videoReady ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          }`}
+          style={{ zIndex: videoReady ? 0 : 10 }}
         />
       )}
 
-      {/* Video — only rendered client-side to prevent SSR hydration flash.
-          Fades in once playing. No poster attr — handled by <img> above. */}
-      {mounted && !reducedMotion && (
-        <video
-          ref={videoRef}
-          muted
-          loop
-          playsInline
-          aria-hidden="true"
-          className={`absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
-          style={{ backgroundColor: 'transparent' }}
-        />
-      )}
+      {/* Video — src set as attribute so browser starts loading on first render */}
+      <video
+        ref={videoRef}
+        src={src}
+        muted
+        loop
+        playsInline
+        autoPlay
+        aria-hidden="true"
+        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+          videoReady ? 'opacity-100' : 'opacity-0'
+        }`}
+        style={{ zIndex: videoReady ? 10 : 0 }}
+      />
 
-      {/* Voiceover — preload none, only fetched on interaction */}
       {audioSrc && (
         <audio ref={audioRef} src={audioSrc} preload="none" aria-hidden="true" />
       )}
 
-      {/* Mute toggle */}
       <button
         onClick={toggleMute}
         aria-label={muted ? 'Unmute voiceover' : 'Mute voiceover'}

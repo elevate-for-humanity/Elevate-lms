@@ -194,9 +194,9 @@ export default function ProgramSpecSheet({ spec }: { spec: LOCProgramSpec }) {
 
           {/* Pricing */}
           <Section icon={DollarSign} title="Pricing & Payment" id="spec-pricing">
-            <DataRow label="Cost Per Participant" value={`$${spec.costPerParticipant.toLocaleString()}`} />
+            <DataRow label="Cost Per Participant" value={`$${spec.costPerParticipant.toLocaleString('en-US')}`} />
             {spec.costPerCohort && (
-              <DataRow label="Cost Per Cohort" value={`$${spec.costPerCohort.toLocaleString()}`} />
+              <DataRow label="Cost Per Cohort" value={`$${spec.costPerCohort.toLocaleString('en-US')}`} />
             )}
             <DataRow label="Exam Fees" value={spec.examFeesIncluded ? 'Included' : 'Not included'} highlight={spec.examFeesIncluded} />
             <div className="mt-3">

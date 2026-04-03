@@ -78,7 +78,7 @@ export function HourTracker({ programName, requiredHours, studentId }: HourTrack
     const newTotalHours = totalHours + sessionHours;
 
     const newSession = {
-      date: now.toLocaleDateString(),
+      date: now.toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' }),
       hours: parseFloat(sessionHours.toFixed(2)),
       activity: 'Training Session',
     };

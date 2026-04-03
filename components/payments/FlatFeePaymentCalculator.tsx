@@ -144,7 +144,7 @@ export function FlatFeePaymentCalculator({
         {/* Program Fee Display */}
         <div className="bg-purple-50 border border-purple-200 rounded-lg p-6 text-center">
           <div className="text-sm text-purple-700 mb-1">Program Fee (Flat Rate)</div>
-          <div className="text-4xl font-black text-purple-600">${programFee.toLocaleString()}</div>
+          <div className="text-4xl font-black text-purple-600">${programFee.toLocaleString('en-US')}</div>
           <p className="text-xs text-purple-600 mt-2">
             Fee applies regardless of transferred hours
           </p>
@@ -193,7 +193,7 @@ export function FlatFeePaymentCalculator({
               onClick={() => handleQuickAmount(programFee)}
               className="px-4 py-2 bg-brand-green-100 hover:bg-brand-green-200 rounded-lg text-sm font-semibold text-brand-green-700 transition"
             >
-              Pay in Full (${programFee.toLocaleString()})
+              Pay in Full (${programFee.toLocaleString('en-US')})
             </button>
           </div>
         </div>
@@ -203,16 +203,16 @@ export function FlatFeePaymentCalculator({
           <div className="bg-slate-50 rounded-lg p-4">
             <div className="flex justify-between items-center">
               <span className="text-slate-600">Program Fee</span>
-              <span className="font-semibold">${programFee.toLocaleString()}</span>
+              <span className="font-semibold">${programFee.toLocaleString('en-US')}</span>
             </div>
             <div className="flex justify-between items-center mt-2">
               <span className="text-slate-600">Today&apos;s Payment</span>
-              <span className="font-semibold text-brand-green-600">-${downPaymentNum.toLocaleString()}</span>
+              <span className="font-semibold text-brand-green-600">-${downPaymentNum.toLocaleString('en-US')}</span>
             </div>
             <div className="border-t border-slate-300 mt-3 pt-3 flex justify-between items-center">
               <span className="font-semibold text-slate-800">Remaining Balance</span>
               <span className="text-xl font-bold text-purple-600">
-                ${balance.toLocaleString()}
+                ${balance.toLocaleString('en-US')}
               </span>
             </div>
           </div>
@@ -223,7 +223,7 @@ export function FlatFeePaymentCalculator({
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-3">
               <Calendar className="inline w-4 h-4 mr-1" />
-              Split your remaining ${balance.toLocaleString()} into monthly payments:
+              Split your remaining ${balance.toLocaleString('en-US')} into monthly payments:
             </label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {paymentPlans.map((plan) => (
@@ -237,7 +237,7 @@ export function FlatFeePaymentCalculator({
                   }`}
                 >
                   <div className="text-lg font-bold text-slate-800">
-                    ${plan.monthlyAmount.toLocaleString()}
+                    ${plan.monthlyAmount.toLocaleString('en-US')}
                     <span className="text-sm font-normal text-slate-500">/mo</span>
                   </div>
                   <div className="text-sm text-slate-600">{plan.label}</div>
@@ -263,19 +263,19 @@ export function FlatFeePaymentCalculator({
             <div className="space-y-1 text-sm">
               <div className="flex justify-between">
                 <span className="text-purple-700">Today&apos;s Payment</span>
-                <span className="font-semibold text-purple-900">${downPaymentNum.toLocaleString()}</span>
+                <span className="font-semibold text-purple-900">${downPaymentNum.toLocaleString('en-US')}</span>
               </div>
               {balance > 0 && selectedPlan && (
                 <div className="flex justify-between">
                   <span className="text-purple-700">Monthly Payment</span>
                   <span className="font-semibold text-purple-900">
-                    ${paymentPlans.find(p => p.months === selectedPlan)?.monthlyAmount.toLocaleString()}/mo × {selectedPlan}
+                    ${paymentPlans.find(p => p.months === selectedPlan)?.monthlyAmount.toLocaleString('en-US')}/mo × {selectedPlan}
                   </span>
                 </div>
               )}
               <div className="border-t border-purple-200 pt-2 mt-2 flex justify-between">
                 <span className="font-semibold text-purple-900">Total Program Fee</span>
-                <span className="font-bold text-purple-900">${programFee.toLocaleString()}</span>
+                <span className="font-bold text-purple-900">${programFee.toLocaleString('en-US')}</span>
               </div>
             </div>
           </div>
@@ -291,7 +291,7 @@ export function FlatFeePaymentCalculator({
           }`}
         >
           <CreditCard className="inline w-5 h-5 mr-2" />
-          {balance <= 0 ? `Pay $${downPaymentNum.toLocaleString()} Now` : 'Continue to Payment'}
+          {balance <= 0 ? `Pay $${downPaymentNum.toLocaleString('en-US')} Now` : 'Continue to Payment'}
         </button>
 
         {/* What's Included */}

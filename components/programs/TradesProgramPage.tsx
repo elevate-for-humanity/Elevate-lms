@@ -89,7 +89,7 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center text-sm border-t border-slate-700 pt-4">
             <div><div className="font-bold text-lg">{data.duration}</div><div className="text-slate-500">Duration</div></div>
             <div><div className="font-bold text-lg">{data.totalHours}</div><div className="text-slate-500">Total Hours</div></div>
-            <div><div className="font-bold text-lg">${data.costPerParticipant.toLocaleString()}</div><div className="text-slate-500">Per Participant</div></div>
+            <div><div className="font-bold text-lg">${data.costPerParticipant.toLocaleString('en-US')}</div><div className="text-slate-500">Per Participant</div></div>
             <div><div className="font-bold text-lg">{data.cohortMin}–{data.cohortMax}</div><div className="text-slate-500">Cohort Size</div></div>
           </div>
         </div>
@@ -214,7 +214,7 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-xl font-bold text-slate-900 border-b-2 border-slate-900 pb-2 mb-4">Pricing & Payment</h2>
           <table className="w-full text-sm mb-4"><tbody className="divide-y divide-slate-200">
-            <Row label="Cost Per Participant" value={`$${data.costPerParticipant.toLocaleString()}`} />
+            <Row label="Cost Per Participant" value={`$${data.costPerParticipant.toLocaleString('en-US')}`} />
             <Row label="Exam Fees" value={data.examFeesIncluded ? 'Included' : 'Not included'} />
             <Row label="Payment Terms" value={data.paymentTerms} />
           </tbody></table>
@@ -269,7 +269,7 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
         <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold text-slate-900">{data.name}</h2>
-            <p className="text-slate-500 text-sm">{data.duration} · ${data.costPerParticipant.toLocaleString()}/participant</p>
+            <p className="text-slate-500 text-sm">{data.duration} · ${data.costPerParticipant.toLocaleString('en-US')}/participant</p>
           </div>
           <div className="flex gap-3">
             <Link href={`/apply?program=${data.slug}`} className="bg-white text-slate-900 px-6 py-3 rounded font-semibold text-sm hover:bg-slate-100 transition-colors">Apply Now</Link>

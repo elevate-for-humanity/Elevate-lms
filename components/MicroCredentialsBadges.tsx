@@ -213,7 +213,7 @@ export default function MicroCredentialsBadges() {
               {badge.earnedDate && (
                 <div className="mb-4 p-3 bg-brand-green-50 rounded">
                   <p className="text-sm text-brand-green-700 font-semibold">
-                    • Earned on {new Date(badge.earnedDate).toLocaleDateString()}
+                    • Earned on {new Date(badge.earnedDate).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
                   <p className="text-xs text-brand-green-600 mt-1">Issued by {badge.issuer}</p>
                 </div>

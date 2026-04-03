@@ -65,7 +65,7 @@ export default function ExamReadinessPanel({
         </p>
         {authorizationExpiresAt && (
           <p className="text-green-600 text-xs mt-2">
-            Authorization expires {new Date(authorizationExpiresAt).toLocaleDateString()}.
+            Authorization expires {new Date(authorizationExpiresAt).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}.
             Contact your instructor if you need to reschedule.
           </p>
         )}

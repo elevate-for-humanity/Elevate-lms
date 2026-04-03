@@ -175,7 +175,7 @@ export default function FunderAnalytics() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalFunding.toLocaleString()}</div>
+            <div className="text-2xl font-bold">${totalFunding.toLocaleString('en-US')}</div>
             <p className="text-xs text-muted-foreground">Across all funders</p>
           </CardContent>
         </Card>
@@ -241,7 +241,7 @@ export default function FunderAnalytics() {
                     </CardDescription>
                   </div>
                   <Badge variant="outline" className="text-lg px-4 py-2">
-                    ${funder.totalFundingUsed.toLocaleString()}
+                    ${funder.totalFundingUsed.toLocaleString('en-US')}
                   </Badge>
                 </div>
               </CardHeader>
@@ -318,7 +318,7 @@ export default function FunderAnalytics() {
                 <CardContent>
                   <div className="text-2xl font-bold">${funder.averageWage.toFixed(2)}/hr</div>
                   <p className="text-xs text-muted-foreground">
-                    ${(funder.averageWage * 2080).toLocaleString()}/year
+                    ${(funder.averageWage * 2080).toLocaleString('en-US')}/year
                   </p>
                 </CardContent>
               </Card>
@@ -355,11 +355,11 @@ export default function FunderAnalytics() {
                 <CardContent className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Total Funding Used</span>
-                    <span className="text-2xl font-bold">${funder.totalFundingUsed.toLocaleString()}</span>
+                    <span className="text-2xl font-bold">${funder.totalFundingUsed.toLocaleString('en-US')}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Cost per Completion</span>
-                    <span className="text-2xl font-bold">${funder.costPerCompletion.toLocaleString()}</span>
+                    <span className="text-2xl font-bold">${funder.costPerCompletion.toLocaleString('en-US')}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">ROI Multiple</span>
@@ -426,12 +426,12 @@ export default function FunderAnalytics() {
                         {m.funderType}
                       </Badge>
                     </td>
-                    <td className="text-right py-2">${m.totalFundingUsed.toLocaleString()}</td>
+                    <td className="text-right py-2">${m.totalFundingUsed.toLocaleString('en-US')}</td>
                     <td className="text-right py-2">{m.totalEnrollments}</td>
                     <td className="text-right py-2">{m.completionRate.toFixed(1)}%</td>
                     <td className="text-right py-2">{m.placementRate.toFixed(1)}%</td>
                     <td className="text-right py-2">${m.averageWage.toFixed(2)}</td>
-                    <td className="text-right py-2">${m.costPerCompletion.toLocaleString()}</td>
+                    <td className="text-right py-2">${m.costPerCompletion.toLocaleString('en-US')}</td>
                     <td className="text-right py-2">
                       {m.costPerCompletion > 0 && m.averageWage > 0
                         ? `${((m.averageWage * 2080) / m.costPerCompletion).toFixed(1)}x`

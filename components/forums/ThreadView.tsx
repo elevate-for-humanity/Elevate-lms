@@ -112,7 +112,7 @@ export function ThreadView({
         <div className="flex items-center gap-2 text-sm text-slate-400 mb-4">
           <span>{authorName}</span>
           <span>•</span>
-          <span>{new Date(createdAt).toLocaleDateString()}</span>
+          <span>{new Date(createdAt).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}</span>
         </div>
         <div className="prose prose-invert max-w-none">
           <p className="text-slate-600">{content}</p>
@@ -144,7 +144,7 @@ export function ThreadView({
                     </span>
                   )}
                   <span className="text-xs text-slate-500">
-                    {new Date(reply.created_at).toLocaleDateString()}
+                    {new Date(reply.created_at).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                 </div>
                 <p className="text-slate-600 mb-3">{reply.content}</p>

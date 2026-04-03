@@ -42,7 +42,7 @@ function AnimatedCounter({ value, prefix = '', suffix = '', duration = 2000 }: {
     return () => cancelAnimationFrame(animationFrame);
   }, [value, duration]);
 
-  return <span>{prefix}{count.toLocaleString()}{suffix}</span>;
+  return <span>{prefix}{count.toLocaleString('en-US')}{suffix}</span>;
 }
 
 export function LiveOutcomesDashboard({ initialData }: { initialData?: Partial<OutcomesData> }) {

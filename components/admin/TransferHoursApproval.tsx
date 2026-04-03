@@ -215,14 +215,14 @@ export default function TransferHoursApproval({
                 <div>
                   <span className="text-slate-400">Submitted:</span>
                   <span className="text-slate-300 ml-2">
-                    {new Date(th.created_at).toLocaleDateString()}
+                    {new Date(th.created_at).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                 </div>
                 {th.effective_date && (
                   <div>
                     <span className="text-slate-400">Effective:</span>
                     <span className="text-slate-300 ml-2">
-                      {new Date(th.effective_date).toLocaleDateString()}
+                      {new Date(th.effective_date).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
                   </div>
                 )}

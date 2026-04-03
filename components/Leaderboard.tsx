@@ -73,7 +73,7 @@ export function Leaderboard({ entries, timeframe = 'week' }: LeaderboardProps) {
               </div>
 
               <div className="text-right">
-                <div className="font-bold text-brand-orange-600">{entry.points.toLocaleString()}</div>
+                <div className="font-bold text-brand-orange-600">{entry.points.toLocaleString('en-US')}</div>
                 <div className="text-xs text-gray-500">points</div>
               </div>
             </div>

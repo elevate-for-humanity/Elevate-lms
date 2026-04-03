@@ -95,10 +95,10 @@ export default function PeerReviewSystem() {
                   Submitted by: <span className="font-medium">{review.studentName}</span>
                 </p>
                 <p className="text-sm text-black">
-                  Submitted: {new Date(review.submittedDate).toLocaleDateString()}
+                  Submitted: {new Date(review.submittedDate).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
                 <p className="text-sm text-black">
-                  Review due: {new Date(review.dueDate).toLocaleDateString()}
+                  Review due: {new Date(review.dueDate).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
               </div>
               <div>

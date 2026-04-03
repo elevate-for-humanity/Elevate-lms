@@ -366,7 +366,7 @@ export function JobPlacementTracking({ programId, showPipeline = true }: Props) 
                       <div>
                         <p className="text-gray-500">Salary</p>
                         <p className="font-semibold text-brand-green-600">
-                          ${placement.salary.toLocaleString()}/year
+                          ${placement.salary.toLocaleString('en-US')}/year
                         </p>
                       </div>
                       <div>

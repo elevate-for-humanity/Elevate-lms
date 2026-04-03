@@ -155,7 +155,7 @@ export default function WorkOneChecklist({ fundingSource, pendingWorkone = false
                   </p>
                   {item.completed_at && (
                     <p className="text-xs text-emerald-600 mt-0.5">
-                      Completed {new Date(item.completed_at).toLocaleDateString()}
+                      Completed {new Date(item.completed_at).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                     </p>
                   )}
                 </div>

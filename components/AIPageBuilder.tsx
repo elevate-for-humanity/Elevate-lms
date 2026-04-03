@@ -373,7 +373,7 @@ export default function AIPageBuilder() {
                 />
                 <div className="mt-4 text-xs text-brand-text-light">
                   Generated at:{' '}
-                  {new Date(generatedPage.generatedAt).toLocaleString()}
+                  {new Date(generatedPage.generatedAt).toLocaleString('en-US')}
                 </div>
               </div>
             </div>

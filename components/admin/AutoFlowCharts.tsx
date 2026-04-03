@@ -12,8 +12,10 @@ interface FlowChartData {
 export function AutoFlowCharts() {
   const [flowCharts, setFlowCharts] = useState<FlowChartData[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState('');
 
   useEffect(() => {
+    setLastUpdated(new Date().toLocaleString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }));
     generateAutoFlowCharts();
   }, []);
 
@@ -267,7 +269,7 @@ export function AutoFlowCharts() {
               )}
               <div className="mt-4 flex justify-between items-center">
                 <span className="text-xs text-brand-text-light">
-                  Last updated: {new Date().toLocaleString()}
+                  Last updated: {lastUpdated}
                 </span>
                 <div className="flex space-x-2">
                   <button className="text-xs bg-brand-surface-dark text-brand-text-muted px-3 py-2 rounded hover:bg-brand-border">

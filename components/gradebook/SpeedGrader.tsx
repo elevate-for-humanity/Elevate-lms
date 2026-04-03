@@ -155,7 +155,7 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
                   Student Submission
                 </h2>
                 <p className="text-sm text-black">
-                  Submitted {new Date(currentSubmission.submittedAt).toLocaleString()}
+                  Submitted {new Date(currentSubmission.submittedAt).toLocaleString('en-US')}
                   {currentSubmission.isLate && (
                     <span className="ml-2 text-brand-orange-600 font-medium">LATE</span>
                   )}

@@ -111,9 +111,9 @@ export default function AdminDashboard() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{metrics.totalEnrollments.toLocaleString()}</div>
+              <div className="text-2xl font-bold">{metrics.totalEnrollments.toLocaleString('en-US')}</div>
               <p className="text-xs text-muted-foreground">
-                {metrics.activeStudents.toLocaleString()} currently active
+                {metrics.activeStudents.toLocaleString('en-US')} currently active
               </p>
               <div className="mt-2">
                 {metrics.activeStudents > 0 && (
@@ -134,7 +134,7 @@ export default function AdminDashboard() {
             <CardContent>
               <div className="text-2xl font-bold">{metrics.completionRate.toFixed(1)}%</div>
               <p className="text-xs text-muted-foreground">
-                {metrics.completions.toLocaleString()} total completions
+                {metrics.completions.toLocaleString('en-US')} total completions
               </p>
               <div className="mt-2">
                 {metrics.completionRate >= 70 ? (
@@ -160,7 +160,7 @@ export default function AdminDashboard() {
             <CardContent>
               <div className="text-2xl font-bold">{metrics.placementRate.toFixed(1)}%</div>
               <p className="text-xs text-muted-foreground">
-                {metrics.placedInEmployment.toLocaleString()} placed in employment
+                {metrics.placedInEmployment.toLocaleString('en-US')} placed in employment
               </p>
               <div className="mt-2">
                 {metrics.placementRate >= 60 ? (
@@ -186,7 +186,7 @@ export default function AdminDashboard() {
             <CardContent>
               <div className="text-2xl font-bold">${metrics.averageWage.toFixed(2)}/hr</div>
               <p className="text-xs text-muted-foreground">
-                ${(metrics.averageWage * 2080).toLocaleString()}/year
+                ${(metrics.averageWage * 2080).toLocaleString('en-US')}/year
               </p>
               <div className="mt-2">
                 <div className="text-sm text-muted-foreground">
@@ -228,11 +228,11 @@ export default function AdminDashboard() {
             <CardContent className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Total Funding Used</span>
-                <span className="text-lg font-bold">${metrics.totalFundingUsed.toLocaleString()}</span>
+                <span className="text-lg font-bold">${metrics.totalFundingUsed.toLocaleString('en-US')}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Cost per Completion</span>
-                <span className="text-lg font-bold">${metrics.costPerCompletion.toLocaleString()}</span>
+                <span className="text-lg font-bold">${metrics.costPerCompletion.toLocaleString('en-US')}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">ROI Multiple</span>
@@ -300,7 +300,7 @@ export default function AdminDashboard() {
                     <p className="text-sm font-medium">{activity.message}</p>
                     <p className="text-xs text-muted-foreground mt-1">
                       <Clock className="inline h-3 w-3 mr-1" />
-                      {new Date(activity.timestamp).toLocaleString()}
+                      {new Date(activity.timestamp).toLocaleString('en-US')}
                     </p>
                   </div>
                   {activity.priority && (

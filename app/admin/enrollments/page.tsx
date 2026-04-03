@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { TrendingUp, Users, CheckCircle, AlertTriangle, Clock } from 'lucide-react';
 import { AdminPageShell } from '@/components/admin/AdminPageShell';

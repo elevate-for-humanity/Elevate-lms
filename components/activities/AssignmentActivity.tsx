@@ -76,7 +76,7 @@ export function AssignmentActivity({
         <div className="flex items-center gap-4 text-sm text-black">
           <span className="flex items-center gap-1">
             <Calendar className="w-4 h-4" />
-            Due: {dueDate.toLocaleDateString()}
+            Due: {dueDate.toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
           </span>
           <span>Points: {maxPoints}</span>
           {isOverdue && (

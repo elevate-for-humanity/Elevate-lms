@@ -42,10 +42,10 @@ function CheckoutForm({
   const isMonthly = plan === 'monthly';
   const price = isMonthly ? monthlyPrice : oneTimePrice;
   const priceLabel = isMonthly
-    ? `$${monthlyPrice.toLocaleString()}/mo × ${monthlyCount}`
-    : `$${oneTimePrice.toLocaleString()}`;
+    ? `$${monthlyPrice.toLocaleString('en-US')}/mo × ${monthlyCount}`
+    : `$${oneTimePrice.toLocaleString('en-US')}`;
   const priceDesc = isMonthly
-    ? `${monthlyCount} monthly payments of $${monthlyPrice.toLocaleString()}`
+    ? `${monthlyCount} monthly payments of $${monthlyPrice.toLocaleString('en-US')}`
     : 'One-time payment';
   const totalMonthly = monthlyPrice * monthlyCount;
 
@@ -261,7 +261,7 @@ function CheckoutForm({
                 <>
                   {paymentMethod === 'stripe' && <>Purchase Now — {priceLabel}</>}
                   {paymentMethod === 'affirm' && <>Pay with Affirm — {priceLabel}</>}
-                  {paymentMethod === 'sezzle' && <>Pay with Sezzle — 4 × ${Math.round(price / 4).toLocaleString()}</>}
+                  {paymentMethod === 'sezzle' && <>Pay with Sezzle — 4 × ${Math.round(price / 4).toLocaleString('en-US')}</>}
                   <ArrowRight className="w-5 h-5" />
                 </>
               )}
@@ -316,20 +316,20 @@ function CheckoutForm({
                   {paymentMethod === 'sezzle' ? (
                     <>
                       <span className="text-2xl font-black text-gray-900">
-                        4 × ${Math.round(price / 4).toLocaleString()}
+                        4 × ${Math.round(price / 4).toLocaleString('en-US')}
                       </span>
                       <span className="text-sm text-gray-500 block">
-                        ${price.toLocaleString()} total
+                        ${price.toLocaleString('en-US')} total
                       </span>
                     </>
                   ) : (
                     <>
                       <span className="text-2xl font-black text-gray-900">
-                        {isMonthly ? `$${monthlyPrice.toLocaleString()}` : `$${oneTimePrice.toLocaleString()}`}
+                        {isMonthly ? `$${monthlyPrice.toLocaleString('en-US')}` : `$${oneTimePrice.toLocaleString('en-US')}`}
                       </span>
                       {isMonthly && (
                         <span className="text-sm text-gray-500 block">
-                          then ${monthlyPrice.toLocaleString()}/mo × {monthlyCount - 1}
+                          then ${monthlyPrice.toLocaleString('en-US')}/mo × {monthlyCount - 1}
                         </span>
                       )}
                     </>

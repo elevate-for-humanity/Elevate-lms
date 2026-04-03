@@ -595,7 +595,7 @@ export default function WIOAComplianceDashboard() {
                 </span>
                 <span>
                   Updated:{' '}
-                  {new Date(indicator.lastUpdated).toLocaleDateString()}
+                  {new Date(indicator.lastUpdated).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
               </div>
             </div>

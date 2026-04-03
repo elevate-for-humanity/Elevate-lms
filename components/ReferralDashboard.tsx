@@ -316,7 +316,7 @@ export default function ReferralDashboard({ userId }: ReferralDashboardProps) {
                       {referral.reward_amount ? `$${referral.reward_amount.toFixed(2)}` : '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(referral.created_at).toLocaleDateString()}
+                      {new Date(referral.created_at).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                     </td>
                   </tr>
                 ))}

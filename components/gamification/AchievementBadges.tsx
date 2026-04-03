@@ -109,7 +109,7 @@ export function AchievementBadges() {
               </p>
               {badge.earned && badge.earnedDate && (
                 <p className="text-xs text-slate-500 mt-2">
-                  Earned {new Date(badge.earnedDate).toLocaleDateString()}
+                  Earned {new Date(badge.earnedDate).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
               )}
               {!badge.earned && (

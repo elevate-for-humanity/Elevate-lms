@@ -186,7 +186,7 @@ export function AdminReportingDashboard() {
   const metricCards = [
     {
       title: 'Total Students',
-      value: metrics.totalStudents.toLocaleString(),
+      value: metrics.totalStudents.toLocaleString('en-US'),
       change: `+${metrics.studentChange}%`,
       trend: 'up',
       icon: Users,
@@ -195,7 +195,7 @@ export function AdminReportingDashboard() {
     },
     {
       title: 'Active Enrollments',
-      value: metrics.activeEnrollments.toLocaleString(),
+      value: metrics.activeEnrollments.toLocaleString('en-US'),
       change: `+${metrics.enrollmentChange}%`,
       trend: 'up',
       icon: TrendingUp,
@@ -213,7 +213,7 @@ export function AdminReportingDashboard() {
     },
     {
       title: 'Revenue (MTD)',
-      value: `$${metrics.revenue.toLocaleString()}`,
+      value: `$${metrics.revenue.toLocaleString('en-US')}`,
       change: `+${metrics.revenueChange}%`,
       trend: 'up',
       icon: DollarSign,
@@ -326,7 +326,7 @@ export function AdminReportingDashboard() {
                   <div key={program.id}>
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-medium">{program.name}</span>
-                      <span className="text-sm text-gray-600">${program.revenue.toLocaleString()}</span>
+                      <span className="text-sm text-gray-600">${program.revenue.toLocaleString('en-US')}</span>
                     </div>
                     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                       <div
@@ -376,7 +376,7 @@ export function AdminReportingDashboard() {
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right font-semibold">
-                      ${program.revenue.toLocaleString()}
+                      ${program.revenue.toLocaleString('en-US')}
                     </td>
                     <td className="py-3 px-4 text-right">
                       <span className="px-2 py-1 bg-brand-blue-100 text-brand-blue-800 rounded text-sm font-semibold">

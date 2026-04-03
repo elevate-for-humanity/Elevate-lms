@@ -71,7 +71,7 @@ export function EmailCampaignManager() {
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Total Sent</h3>
             <p className="text-3xl font-bold text-brand-orange-600">
-              {campaigns.reduce((sum, c) => sum + c.sent, 0).toLocaleString()}
+              {campaigns.reduce((sum, c) => sum + c.sent, 0).toLocaleString('en-US')}
             </p>
           </Card>
           <Card className="p-6">
@@ -127,22 +127,22 @@ export function EmailCampaignManager() {
                 <div className="grid grid-cols-4 gap-4 text-sm">
                   <div>
                     <p className="text-black">Recipients</p>
-                    <p className="font-bold">{campaign.recipients.toLocaleString()}</p>
+                    <p className="font-bold">{campaign.recipients.toLocaleString('en-US')}</p>
                   </div>
                   <div>
                     <p className="text-black">Sent</p>
-                    <p className="font-bold">{campaign.sent.toLocaleString()}</p>
+                    <p className="font-bold">{campaign.sent.toLocaleString('en-US')}</p>
                   </div>
                   <div>
                     <p className="text-black">Opened</p>
                     <p className="font-bold text-brand-orange-600">
-                      {campaign.opened.toLocaleString()} ({Math.round((campaign.opened / campaign.sent) * 100)}%)
+                      {campaign.opened.toLocaleString('en-US')} ({Math.round((campaign.opened / campaign.sent) * 100)}%)
                     </p>
                   </div>
                   <div>
                     <p className="text-black">Clicked</p>
                     <p className="font-bold text-brand-green-600">
-                      {campaign.clicked.toLocaleString()} ({Math.round((campaign.clicked / campaign.sent) * 100)}%)
+                      {campaign.clicked.toLocaleString('en-US')} ({Math.round((campaign.clicked / campaign.sent) * 100)}%)
                     </p>
                   </div>
                 </div>

@@ -445,7 +445,7 @@ export function AutoProgramGenerator() {
           </div>
           <div className="bg-white border rounded-lg p-4">
             <div className="text-2xl font-bold text-brand-orange-600">
-              {nationalStats.totalStudents.toLocaleString()}
+              {nationalStats.totalStudents.toLocaleString('en-US')}
             </div>
             <div className="text-sm text-brand-text-muted">Total Students</div>
           </div>
@@ -547,7 +547,7 @@ export function AutoProgramGenerator() {
                   Current Enrollment
                 </div>
                 <div className="text-lg font-bold text-purple-600">
-                  {program.nationalAvailability.currentEnrollment.toLocaleString()}
+                  {program.nationalAvailability.currentEnrollment.toLocaleString('en-US')}
                 </div>
                 <div className="text-xs text-brand-text-light">
                   {program.nationalAvailability.waitingList > 0 &&

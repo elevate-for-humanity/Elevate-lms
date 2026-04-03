@@ -42,7 +42,7 @@ export function DashboardSidebar({
     if (days === 0) return 'Today';
     if (days === 1) return 'Tomorrow';
     if (days < 7) return `In ${days} days`;
-    return date.toLocaleDateString();
+    return date.toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' });
   };
 
   return (
@@ -146,7 +146,7 @@ export function DashboardSidebar({
                 <div className="flex-1">
                   <p className="text-sm text-black">{activity.title}</p>
                   <p className="text-xs text-slate-500">
-                    {activity.timestamp.toLocaleDateString()}
+                    {activity.timestamp.toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
               </div>

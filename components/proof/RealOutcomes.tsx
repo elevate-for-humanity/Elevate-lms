@@ -76,14 +76,14 @@ export function RealOutcomes() {
   const outcomes = [
     {
       label: 'Total Students Enrolled',
-      value: metrics.metrics.totalEnrollments.toLocaleString(),
+      value: metrics.metrics.totalEnrollments.toLocaleString('en-US'),
       icon: Users,
       context: 'All-time platform enrollments',
       verified: true,
     },
     {
       label: 'Courses Completed',
-      value: metrics.metrics.completedCourses.toLocaleString(),
+      value: metrics.metrics.completedCourses.toLocaleString('en-US'),
       icon: Award,
       context: 'Successfully finished training',
       verified: true,
@@ -97,7 +97,7 @@ export function RealOutcomes() {
     },
     {
       label: 'Active Students',
-      value: metrics.metrics.activeStudents.toLocaleString(),
+      value: metrics.metrics.activeStudents.toLocaleString('en-US'),
       icon: Briefcase,
       context: 'Currently enrolled (last 30 days)',
       verified: true,

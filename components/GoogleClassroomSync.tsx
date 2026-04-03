@@ -76,7 +76,7 @@ export default function GoogleClassroomSync() {
           <div>
             <p className="text-sm text-black">Last Sync</p>
             <p className="font-medium">
-              {lastSync ? lastSync.toLocaleString() : 'Never'}
+              {lastSync ? lastSync.toLocaleString('en-US') : 'Never'}
             </p>
           </div>
           <Button

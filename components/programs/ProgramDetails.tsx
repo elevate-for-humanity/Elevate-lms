@@ -235,7 +235,7 @@ export function ProgramDetails({ program }: { program: Program }) {
                 <div className="space-y-3">
                   <div className="bg-white border-2 border-brand-blue-600 rounded-lg p-4 text-center">
                     <div className="text-3xl font-bold text-brand-blue-600 mb-1">
-                      ${programPrice.toLocaleString()}
+                      ${programPrice.toLocaleString('en-US')}
                     </div>
                     <div className="text-sm text-black">
                       Total Program Cost

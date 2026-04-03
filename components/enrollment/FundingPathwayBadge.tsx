@@ -144,7 +144,7 @@ export function FundingPathwayCard({
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Next Payment</span>
               <span className="text-gray-900">
-                {new Date(paymentStatus.nextPaymentDue).toLocaleDateString()}
+                {new Date(paymentStatus.nextPaymentDue).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
             </div>
           )}

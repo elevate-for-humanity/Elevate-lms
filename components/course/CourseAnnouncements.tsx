@@ -63,7 +63,7 @@ export function CourseAnnouncements({ courseId }: { courseId: string }) {
               {a.body}
             </p>
             <p className="mt-1 text-[10px] text-slate-500">
-              {new Date(a.created_at).toLocaleString()}
+              {new Date(a.created_at).toLocaleString('en-US')}
             </p>
           </li>
         ))}

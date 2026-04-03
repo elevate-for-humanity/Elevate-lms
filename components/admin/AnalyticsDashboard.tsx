@@ -63,7 +63,7 @@ export default function AnalyticsDashboard() {
       </div>
 
       <div className="text-xs text-slate-400 text-right">
-        Last updated: {new Date(data.timestamp).toLocaleTimeString()}
+        Last updated: {new Date(data.timestamp).toLocaleTimeString('en-US', { timeZone: 'UTC', hour: 'numeric', minute: '2-digit' })}
       </div>
     </div>
   );

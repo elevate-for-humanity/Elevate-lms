@@ -73,7 +73,7 @@ export default function MobileAchievementCard({
       {unlocked ? (
         unlockedAt && (
           <div className="text-xs text-gray-500">
-            Unlocked {new Date(unlockedAt).toLocaleDateString()}
+            Unlocked {new Date(unlockedAt).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
           </div>
         )
       ) : (

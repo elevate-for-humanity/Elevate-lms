@@ -229,7 +229,7 @@ export function CourseCatalog() {
                     <span className="text-yellow-500">★</span>
                     <span className="font-semibold">{course.rating}</span>
                   </div>
-                  <span>👥 {course.students.toLocaleString()}</span>
+                  <span>👥 {course.students.toLocaleString('en-US')}</span>
                   <span>⏱️ {course.duration}</span>
                 </div>
 

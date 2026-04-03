@@ -41,7 +41,7 @@ export function ProgramPaymentButton({
       <div className="mb-6">
         <div className="text-sm text-black mb-1">Program Cost</div>
         <div className="text-4xl font-bold text-black">
-          ${price.toLocaleString()}
+          ${price.toLocaleString('en-US')}
         </div>
         {etplProgramId && (
           <div className="text-sm text-brand-green-600 mt-2">
@@ -70,7 +70,7 @@ export function ProgramPaymentButton({
           className="w-full py-4 bg-brand-red-600 text-white font-bold rounded-xl hover:bg-brand-red-700 transition flex items-center justify-center gap-2"
         >
           <CreditCard className="w-5 h-5" />
-          Pay ${price.toLocaleString()} Now
+          Pay ${price.toLocaleString('en-US')} Now
         </button>
 
         {/* Payment Plan */}
@@ -81,7 +81,7 @@ export function ProgramPaymentButton({
             className="w-full py-4 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition flex items-center justify-center gap-2"
           >
             <Calendar className="w-5 h-5" />
-            4 Payments of ${Math.ceil(price / 4).toLocaleString()}
+            4 Payments of ${Math.ceil(price / 4).toLocaleString('en-US')}
           </button>
         )}
       </div>

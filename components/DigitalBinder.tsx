@@ -177,7 +177,7 @@ export default function DigitalBinder({
                     </div>
                     <div className="flex items-center gap-4 text-sm text-black">
                       <span>Type: {doc.type}</span>
-                      <span>Date: {new Date(doc.date).toLocaleDateString()}</span>
+                      <span>Date: {new Date(doc.date).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}</span>
                       {doc.uploadedBy && <span>By: {doc.uploadedBy}</span>}
                     </div>
                   </div>
@@ -238,7 +238,7 @@ export default function DigitalBinder({
                       </span>
                     </div>
                     <span className="text-sm text-gray-500">
-                      {new Date(note.date).toLocaleDateString()}
+                      {new Date(note.date).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
                   </div>
                   <p className="text-black">{note.note}</p>

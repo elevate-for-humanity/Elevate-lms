@@ -49,7 +49,7 @@ export default function ProgramOutcomesTracker() {
             <div>
               <p className="text-sm text-black">Avg Salary</p>
               <p className="text-2xl font-bold">
-                ${outcome.avgSalary.toLocaleString()}
+                ${outcome.avgSalary.toLocaleString('en-US')}
               </p>
             </div>
             <div>

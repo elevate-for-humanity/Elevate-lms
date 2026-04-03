@@ -89,7 +89,7 @@ export function VerificationReviewForm({ verification, adminId }: Props) {
             <div>
               <p className="text-sm text-black">Date of Birth</p>
               <p className="font-semibold text-black">
-                {new Date(verification.date_of_birth).toLocaleDateString()}
+                {new Date(verification.date_of_birth).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
               </p>
             </div>
           </div>
@@ -179,7 +179,7 @@ export function VerificationReviewForm({ verification, adminId }: Props) {
                 <p className="font-semibold text-black">
                   {new Date(
                     verification.id_expiration_date
-                  ).toLocaleDateString()}
+                  ).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
               </div>
             </div>
@@ -258,7 +258,7 @@ export function VerificationReviewForm({ verification, adminId }: Props) {
             <div>
               <p className="text-sm text-black">Submitted</p>
               <p className="font-semibold text-black">
-                {new Date(verification.created_at).toLocaleString()}
+                {new Date(verification.created_at).toLocaleString('en-US')}
               </p>
             </div>
           </div>
@@ -384,7 +384,7 @@ export function VerificationReviewForm({ verification, adminId }: Props) {
               : 'Verification Rejected'}
           </h2>
           <p className="text-sm mb-4">
-            Reviewed on {new Date(verification.verified_at).toLocaleString()}
+            Reviewed on {new Date(verification.verified_at).toLocaleString('en-US')}
           </p>
           {verification.rejection_reason && (
             <div className="p-4 bg-white rounded-lg border">

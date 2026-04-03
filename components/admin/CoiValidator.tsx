@@ -330,7 +330,7 @@ function ResultDisplay({
         <div>
           <p className="font-semibold">{approved ? 'COI Approved' : 'COI Rejected'}</p>
           <p className="text-sm opacity-80">
-            Extraction: {result.method} &middot; {v.extractedTextChars.toLocaleString()} chars
+            Extraction: {result.method} &middot; {v.extractedTextChars.toLocaleString('en-US')} chars
             {f.acordFormDetected && ' \u00B7 ACORD form detected'}
             {f.ocrConfidence !== null && ` \u00B7 OCR confidence: ${f.ocrConfidence.toFixed(0)}%`}
           </p>
@@ -583,5 +583,5 @@ function FieldRow({
 
 function fmtMoney(n: number | null): string {
   if (n === null) return 'Not parsed';
-  return '$' + n.toLocaleString();
+  return '$' + n.toLocaleString('en-US');
 }

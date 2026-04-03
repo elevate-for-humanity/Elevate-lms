@@ -61,7 +61,7 @@ export default function RecapList() {
             <div className="font-semibold text-sm">{r.title}</div>
             <div className="text-xs text-neutral-600 mt-1">
               {r.meeting_date
-                ? new Date(r.meeting_date).toLocaleString()
+                ? new Date(r.meeting_date).toLocaleString('en-US')
                 : 'No meeting date'}
               {r.attendee_email ? ` • ${r.attendee_email}` : ''}
             </div>

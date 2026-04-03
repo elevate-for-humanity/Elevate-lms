@@ -3,6 +3,7 @@ import { requireAdmin } from '@/lib/authGuards';
 import { getAdminDashboardData } from '@/lib/admin/get-admin-dashboard-data';
 import { DashboardShell } from '@/components/admin/dashboard/DashboardShell';
 import { BuiltCoursesPanel } from './BuiltCoursesPanel';
+import { AdminAIAssistant } from '@/components/admin/AdminAIAssistant';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +22,8 @@ export default async function AdminDashboardPage() {
       <div className="max-w-7xl mx-auto px-4 pb-8">
         <BuiltCoursesPanel />
       </div>
+      {/* Admin-only AI assistant — completely separate from marketing chat bubble */}
+      <AdminAIAssistant />
     </>
   );
 }

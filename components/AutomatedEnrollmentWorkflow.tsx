@@ -400,7 +400,7 @@ export default function AutomatedEnrollmentWorkflow({
                   
                   {step.completed_at && step.status === 'completed' && (
                     <p className="text-xs text-gray-400 mt-1">
-                      Completed {new Date(step.completed_at).toLocaleString()}
+                      Completed {new Date(step.completed_at).toLocaleString('en-US')}
                     </p>
                   )}
                   

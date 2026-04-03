@@ -137,7 +137,7 @@ export function PricingTiers({
                 <div className="text-3xl font-bold text-brand-green-600">FREE</div>
               ) : (
                 <div>
-                  <span className="text-3xl font-bold text-slate-900">${tier.price.toLocaleString()}</span>
+                  <span className="text-3xl font-bold text-slate-900">${tier.price.toLocaleString('en-US')}</span>
                 </div>
               )}
             </div>

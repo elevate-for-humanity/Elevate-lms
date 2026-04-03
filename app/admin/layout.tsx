@@ -9,8 +9,10 @@ import { getLicenseAccessMode } from '@/lib/licensing/billing-authority';
 import { reconcileTrialOnboarding } from '@/lib/trial/reconcile-onboarding';
 import AdminHeader from '@/components/admin/AdminHeader';
 import AdminSidebar from '@/components/admin/AdminSidebar';
+import AdminMobileNav from '@/components/admin/AdminMobileNav';
 import { DemoTourProvider } from '@/components/demo/DemoTourProvider';
 import { IdleTimeoutGuard } from '@/components/auth/IdleTimeoutGuard';
+import AdminPWAInit from '@/components/admin/AdminPWAInit';
 
 
 export const dynamic = 'force-dynamic';
@@ -140,15 +142,18 @@ export default async function AdminLayout({
 
   const content = (
     <div className="min-h-screen bg-slate-50 text-slate-900">
+      <AdminPWAInit />
       <IdleTimeoutGuard />
       <AdminSidebar />
+      {/* Desktop: offset by sidebar. Mobile: full width, bottom nav handles navigation */}
       <div className="lg:pl-64">
         <AdminHeader userName={headerData.userName} userInitial={headerData.userInitial} notifs={headerData.notifs} />
-        {/* pt-20 matches fixed header h-20 */}
-        <main id="main-content" className="min-h-screen px-4 pb-6 pt-20 sm:px-6 lg:px-8">
+        {/* pt-20 = fixed header. pb-24 on mobile = space above bottom nav */}
+        <main id="main-content" className="min-h-screen px-3 pb-24 pt-20 sm:px-6 lg:px-8 lg:pb-8">
           {children}
         </main>
       </div>
+      <AdminMobileNav />
     </div>
   );
 

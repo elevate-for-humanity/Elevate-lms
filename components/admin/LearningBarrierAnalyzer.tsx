@@ -322,7 +322,7 @@ export function LearningBarrierAnalyzer() {
                 </div>
                 <div className="text-xs text-brand-text-light">
                   Identified:{' '}
-                  {new Date(barrier.identifiedDate).toLocaleDateString()}
+                  {new Date(barrier.identifiedDate).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                 </div>
               </div>
               {/* Au Remediation */}

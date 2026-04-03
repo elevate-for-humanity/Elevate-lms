@@ -8,8 +8,45 @@ import {
   Bell, Settings, Menu, X, ChevronRight, BookOpen, Shield,
   CreditCard, BarChart3, Wrench, Globe, HeartHandshake,
   DollarSign, AlertTriangle, UserCheck, Award, ClipboardList,
-  Building2, TrendingUp, Inbox,
+  Building2, TrendingUp, Inbox, Download,
 } from "lucide-react";
+
+// ── PWA install button ────────────────────────────────────────────────────────
+type DeferredPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+};
+
+function PWAInstallButton() {
+  const [prompt, setPrompt] = useState<DeferredPromptEvent | null>(null);
+
+  useEffect(() => {
+    if (window.matchMedia("(display-mode: standalone)").matches) return;
+    function handler(e: Event) {
+      e.preventDefault();
+      setPrompt(e as DeferredPromptEvent);
+    }
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  if (!prompt) return null;
+
+  return (
+    <button
+      type="button"
+      onClick={async () => {
+        await prompt.prompt();
+        await prompt.userChoice;
+        setPrompt(null);
+      }}
+      className="flex w-full items-center gap-2 rounded-lg bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 transition-colors"
+    >
+      <Download className="h-3.5 w-3.5 flex-shrink-0" />
+      Install Elevate Admin App
+    </button>
+  );
+}
 
 type NavItem = {
   label: string;
@@ -159,7 +196,8 @@ export default function AdminSidebar() {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-slate-800 px-4 py-4 flex-shrink-0">
+      <div className="border-t border-slate-800 px-4 py-4 flex-shrink-0 space-y-2">
+        <PWAInstallButton />
         <Link href="/" className="flex items-center gap-2 text-xs text-slate-500 hover:text-slate-300 transition-colors">
           <Globe className="h-3.5 w-3.5" />
           View public site

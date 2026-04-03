@@ -82,10 +82,10 @@ export function BeautyEnrollmentAcknowledgment({
           Enrollment requires concurrent or subsequent participation in a licensed {schoolName} for state licensure eligibility.
         </p>
         <p className="text-sm text-slate-700 leading-relaxed mt-3">
-          <strong>Indiana Requirements:</strong> Indiana requires {hours.toLocaleString()} hours of training for licensure.
+          <strong>Indiana Requirements:</strong> Indiana requires {hours.toLocaleString('en-US')} hours of training for licensure.
         </p>
         <p className="text-sm text-slate-700 leading-relaxed mt-3">
-          <strong>Program Fee:</strong> The program fee of ${fee.toLocaleString()} is a flat rate. Credit for prior learning (transferred hours) 
+          <strong>Program Fee:</strong> The program fee of ${fee.toLocaleString('en-US')} is a flat rate. Credit for prior learning (transferred hours) 
           may reduce the duration of participation but does not alter the program fee.
         </p>
       </div>
@@ -106,7 +106,7 @@ export function BeautyEnrollmentAcknowledgment({
         )}
         <span className={`text-left text-sm ${isChecked ? 'text-brand-green-800' : 'text-slate-700'}`}>
           <strong>I understand</strong> this program provides apprenticeship sponsorship, oversight, and related instruction only 
-          and does not replace {schoolName} or grant state licensure hours. I acknowledge that the program fee of ${fee.toLocaleString()} 
+          and does not replace {schoolName} or grant state licensure hours. I acknowledge that the program fee of ${fee.toLocaleString('en-US')} 
           applies regardless of any transferred hours.
         </span>
       </button>

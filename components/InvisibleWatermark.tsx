@@ -157,7 +157,7 @@ export function VisibleWatermark({
   email?: string;
   showTimestamp?: boolean;
 }) {
-  const timestamp = new Date().toLocaleString();
+  const timestamp = new Date().toLocaleString('en-US');
   return (
     <div
       style={{

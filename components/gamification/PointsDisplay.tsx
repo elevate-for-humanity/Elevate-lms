@@ -76,7 +76,7 @@ export function PointsDisplay({
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Trophy className="w-6 h-6" />
-            <span className="text-2xl font-bold">{totalPoints.toLocaleString()}</span>
+            <span className="text-2xl font-bold">{totalPoints.toLocaleString('en-US')}</span>
           </div>
           <p className="text-brand-orange-100 text-sm">Total Points</p>
         </div>

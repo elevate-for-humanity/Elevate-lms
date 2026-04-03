@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { BarChart3, Users, GraduationCap, DollarSign, TrendingUp, FileText, Eye } from 'lucide-react';
 

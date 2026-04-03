@@ -5,7 +5,7 @@ import { ArrowUpRight, ArrowDownRight, Activity, FileClock, DollarSign, Award } 
 import type { KPICard } from "./types";
 
 function fmtDollars(n: number) {
-  return n >= 1000 ? "$" + (n / 1000).toFixed(1) + "k" : "$" + n.toLocaleString();
+  return n >= 1000 ? "$" + (n / 1000).toFixed(1) + "k" : "$" + n.toLocaleString('en-US');
 }
 function fmt(n: number) {
   return new Intl.NumberFormat("en-US").format(n);

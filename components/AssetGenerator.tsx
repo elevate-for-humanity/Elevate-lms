@@ -102,7 +102,7 @@ export default function AssetGenerator() {
       if (data.success) {
         setGeneratedAsset(data.asset);
         setAssetName(
-          `${ASSET_TYPES[assetType].name} - ${new Date().toLocaleDateString()}`
+          `${ASSET_TYPES[assetType].name} - ${new Date().toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}`
         );
       } else {
         alert('Failed to generate asset: ' + data.error);

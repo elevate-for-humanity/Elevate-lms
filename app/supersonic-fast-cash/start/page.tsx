@@ -118,16 +118,16 @@ export default function StartPage() {
       </section>
 
       {/* PRICING CTA */}
-      <section className="relative h-[45vh] min-h-[320px]">
-        <Image src="/images/pages/supersonic-page-7.jpg" alt="Supersonic Fast Cash pricing" fill className="object-cover object-center" sizes="100vw" />
-        <div className="absolute inset-0 bg-slate-900/70 flex items-center justify-center">
-          <div className="text-center px-4">
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Questions About Pricing?</h2>
-            <p className="text-xl text-slate-200 mb-8">See our transparent pricing before you start.</p>
-            <Link href="/supersonic-fast-cash/pricing" className="px-10 py-4 bg-white text-slate-900 font-black text-xl rounded-xl hover:bg-slate-100 transition-colors">
-              View Pricing
-            </Link>
-          </div>
+      <section className="relative w-full">
+        <div className="relative h-[40vh] min-h-[260px] overflow-hidden">
+          <Image src="/images/pages/supersonic-page-7.jpg" alt="Supersonic Fast Cash pricing" fill className="object-cover object-center" sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-12 text-center px-4">
+          <h2 className="text-3xl md:text-4xl font-black text-white mb-4">Questions About Pricing?</h2>
+          <p className="text-xl text-white mb-8">See our transparent pricing before you start.</p>
+          <Link href="/supersonic-fast-cash/pricing" className="px-10 py-4 bg-white text-black font-black text-xl rounded-xl hover:bg-slate-100 transition-colors">
+            View Pricing
+          </Link>
         </div>
       </section>
     </div>

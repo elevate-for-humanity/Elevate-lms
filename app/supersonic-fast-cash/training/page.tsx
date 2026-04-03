@@ -109,15 +109,15 @@ export default function TrainingPage() {
       </section>
 
       {/* CTA */}
-      <section className="relative h-[45vh] min-h-[320px]">
-        <Image src="/images/pages/supersonic-training-hero.jpg" alt="Start your tax career" fill className="object-cover object-center" sizes="100vw" />
-        <div className="absolute inset-0 bg-slate-900/70 flex items-center justify-center">
-          <div className="text-center px-4">
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Start Your Tax Career</h2>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/supersonic-fast-cash/training/courses" className="px-10 py-4 bg-brand-red-600 text-white font-black text-xl rounded-xl hover:bg-brand-red-700 transition-colors">View Courses</Link>
-              <Link href="/supersonic-fast-cash/careers" className="px-10 py-4 bg-white text-slate-900 font-black text-xl rounded-xl hover:bg-slate-100 transition-colors">Join Our Team</Link>
-            </div>
+      <section className="relative w-full">
+        <div className="relative h-[40vh] min-h-[260px] overflow-hidden">
+          <Image src="/images/pages/supersonic-training-hero.jpg" alt="Start your tax career" fill className="object-cover object-center" sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-12 text-center px-4">
+          <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Start Your Tax Career</h2>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/supersonic-fast-cash/training/courses" className="px-10 py-4 bg-brand-red-600 text-white font-black text-xl rounded-xl hover:bg-brand-red-700 transition-colors">View Courses</Link>
+            <Link href="/supersonic-fast-cash/careers" className="px-10 py-4 bg-white text-black font-black text-xl rounded-xl hover:bg-slate-100 transition-colors">Join Our Team</Link>
           </div>
         </div>
       </section>

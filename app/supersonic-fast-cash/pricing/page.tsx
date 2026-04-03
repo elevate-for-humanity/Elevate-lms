@@ -74,14 +74,14 @@ export default function PricingPage() {
               <div key={tier.name} className={`rounded-2xl overflow-hidden flex flex-col border-2 ${tier.featured ? 'border-brand-red-600 shadow-xl' : 'border-slate-200'}`}>
                 <div className="relative h-44 flex-shrink-0">
                   <Image src={tier.image} alt={tier.name} fill className="object-cover" sizes="(max-width: 768px) 100vw, 25vw" />
-                  {tier.featured && (
-                    <div className="absolute top-3 right-3 bg-brand-red-600 text-white text-xs font-black px-3 py-1 rounded-lg">Most Popular</div>
-                  )}
                 </div>
                 <div className="p-5 flex-1 bg-white flex flex-col">
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">{tier.name}</p>
-                  <p className="text-3xl font-black text-slate-900 mb-3">{tier.price}</p>
-                  <p className="text-slate-600 text-sm leading-relaxed flex-1">{tier.desc}</p>
+                  {tier.featured && (
+                    <span className="self-start bg-brand-red-600 text-white text-xs font-black px-3 py-1 rounded-lg mb-2">Most Popular</span>
+                  )}
+                  <p className="text-xs font-bold text-black uppercase tracking-wide mb-1">{tier.name}</p>
+                  <p className="text-3xl font-black text-black mb-3">{tier.price}</p>
+                  <p className="text-black text-sm leading-relaxed flex-1">{tier.desc}</p>
                   <Link href={tier.href} className="mt-5 block w-full text-center py-3 bg-brand-red-600 text-white font-bold rounded-xl hover:bg-brand-red-700 transition-colors">
                     Get Started
                   </Link>

@@ -128,15 +128,15 @@ export default function SupportPage() {
       </section>
 
       {/* CTA */}
-      <section className="relative h-[45vh] min-h-[320px]">
-        <Image src="/images/pages/supersonic-page-9.jpg" alt="Start your tax return" fill className="object-cover object-center" sizes="100vw" />
-        <div className="absolute inset-0 bg-slate-900/70 flex items-center justify-center">
-          <div className="text-center px-4">
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Ready to File?</h2>
-            <Link href="/supersonic-fast-cash/start" className="px-10 py-4 bg-brand-red-600 text-white font-black text-xl rounded-xl hover:bg-brand-red-700 transition-colors">
-              Start Tax Preparation
-            </Link>
-          </div>
+      <section className="relative w-full">
+        <div className="relative h-[40vh] min-h-[260px] overflow-hidden">
+          <Image src="/images/pages/supersonic-page-9.jpg" alt="Start your tax return" fill className="object-cover object-center" sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-12 text-center px-4">
+          <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Ready to File?</h2>
+          <Link href="/supersonic-fast-cash/start" className="px-10 py-4 bg-brand-red-600 text-white font-black text-xl rounded-xl hover:bg-brand-red-700 transition-colors">
+            Start Tax Preparation
+          </Link>
         </div>
       </section>
     </div>

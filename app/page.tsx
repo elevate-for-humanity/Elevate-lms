@@ -42,7 +42,7 @@ export default function HomePage() {
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
               Get Certified.<br />Get Funded.<br />Get Hired — In Weeks.
             </h1>
-            <p className="text-slate-200 text-base leading-relaxed mb-6">
+            <p className="text-white text-base leading-relaxed mb-6">
               Free and low-cost career training programs in Indiana. Earn industry-recognized certifications and start working fast.
             </p>
             {/* Proof bullets */}
@@ -53,7 +53,7 @@ export default function HomePage() {
                 'Job placement support',
                 'DOL Registered Apprenticeship Sponsor · ETPL listed',
               ].map((b) => (
-                <li key={b} className="flex items-start gap-2 text-sm text-slate-200">
+                <li key={b} className="flex items-start gap-2 text-sm text-white">
                   <span className="text-brand-red-400 font-bold flex-shrink-0">✔</span> {b}
                 </li>
               ))}
@@ -62,21 +62,21 @@ export default function HomePage() {
               <Link href="/funding" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-base">
                 Check My Eligibility
               </Link>
-              <Link href="/licensing-partnerships" className="border-2 border-white/30 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors text-base">
+              <Link href="/licensing-partnerships" className="border-2 border-white text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors text-base">
                 License the Platform
               </Link>
             </div>
             {/* Audience routing */}
-            <p className="mt-5 text-slate-400 text-sm">
+            <p className="mt-5 text-white text-sm">
               Not a student?{' '}
-              <Link href="/partnerships" className="text-slate-300 underline underline-offset-2 hover:text-white transition-colors">Partner with us</Link>
+              <Link href="/partnerships" className="text-white underline underline-offset-2 hover:text-brand-red-300 transition-colors">Partner with us</Link>
               {' '}·{' '}
-              <Link href="/program-holder/dashboard" className="text-slate-300 underline underline-offset-2 hover:text-white transition-colors">Program Holder</Link>
+              <Link href="/program-holder/dashboard" className="text-white underline underline-offset-2 hover:text-brand-red-300 transition-colors">Program Holder</Link>
             </p>
             {/* Phone */}
-            <p className="mt-3 text-slate-400 text-sm">
+            <p className="mt-3 text-white text-sm">
               Questions? Call or text{' '}
-              <a href="tel:3173143757" className="text-white font-bold hover:text-brand-red-300 transition-colors">(317) 314-3757</a>
+              <a href="tel:3173143757" className="text-white font-bold underline hover:text-brand-red-300 transition-colors">(317) 314-3757</a>
             </p>
           </div>
         </div>
@@ -104,7 +104,7 @@ export default function HomePage() {
                   <div key={f.label} className="bg-white rounded-xl p-4 shadow-sm">
                     <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>
                     <h3 className="text-slate-900 font-bold text-sm mb-1">{f.label}</h3>
-                    <p className="text-slate-600 text-xs leading-relaxed">{f.desc}</p>
+                    <p className="text-black text-xs leading-relaxed">{f.desc}</p>
                   </div>
                 ))}
               </div>
@@ -115,7 +115,7 @@ export default function HomePage() {
             <div className="lg:flex-shrink-0 bg-white rounded-2xl p-8 text-center lg:w-64 shadow-sm">
               <p className="text-5xl font-black text-brand-red-600 mb-2">$0</p>
               <p className="text-slate-800 text-sm font-semibold mb-4">Cost to eligible participants</p>
-              <p className="text-slate-500 text-xs leading-relaxed">Federal and Indiana state funding covers tuition, books, tools, and exam fees.</p>
+              <p className="text-black text-xs leading-relaxed">Federal and Indiana state funding covers tuition, books, tools, and exam fees.</p>
             </div>
           </div>
         </div>
@@ -126,7 +126,7 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3 text-center">Simple process</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3 text-center">Simple. Fast. Built for Real Jobs.</h2>
-          <p className="text-slate-400 text-sm text-center mb-12 max-w-lg mx-auto">From application to employment — we guide you every step of the way.</p>
+          <p className="text-white text-sm text-center mb-12 max-w-lg mx-auto">From application to employment — we guide you every step of the way.</p>
           <div className="grid sm:grid-cols-4 gap-6">
             {[
               { step: '1', label: 'Check Eligibility', desc: 'Find out which funding programs you qualify for. Takes 2 minutes.' },
@@ -138,9 +138,9 @@ export default function HomePage() {
                 <div className="w-14 h-14 rounded-full bg-brand-red-600 text-white font-black text-xl flex items-center justify-center mb-4 flex-shrink-0">
                   {s.step}
                 </div>
-                {i < 3 && <div className="hidden sm:block absolute top-7 left-[calc(50%+28px)] right-[calc(-50%+28px)] h-px bg-slate-600" />}
+                {i < 3 && <div className="hidden sm:block absolute top-7 left-[calc(50%+28px)] right-[calc(-50%+28px)] h-px bg-white/30" />}
                 <p className="text-white font-bold text-base mb-2">{s.label}</p>
-                <p className="text-slate-400 text-sm leading-relaxed">{s.desc}</p>
+                <p className="text-white text-sm leading-relaxed">{s.desc}</p>
               </div>
             ))}
           </div>
@@ -157,10 +157,10 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3 text-center">Programs</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3 text-center">Career Programs That Lead to Jobs</h2>
-          <p className="text-slate-400 text-sm text-center mb-12 max-w-xl mx-auto">Every program ends with a nationally recognized credential and a clear path to employment.</p>
+          <p className="text-white text-sm text-center mb-12 max-w-xl mx-auto">Every program ends with a nationally recognized credential and a clear path to employment.</p>
           <ProgramVideoCards />
           <div className="text-center">
-            <Link href="/programs" className="border-2 border-white/20 text-white hover:bg-white/10 font-bold px-8 py-3.5 rounded-lg transition-colors text-sm inline-block">
+            <Link href="/programs" className="border-2 border-white text-white hover:bg-white/10 font-bold px-8 py-3.5 rounded-lg transition-colors text-sm inline-block">
               View All Programs
             </Link>
           </div>
@@ -185,7 +185,7 @@ export default function HomePage() {
                 </div>
                 <div className="p-5">
                   <h3 className="font-extrabold text-slate-900 text-base mb-2">{w.title}</h3>
-                  <p className="text-slate-500 text-sm leading-relaxed">{w.desc}</p>
+                  <p className="text-black text-sm leading-relaxed">{w.desc}</p>
                 </div>
               </div>
             ))}
@@ -196,7 +196,7 @@ export default function HomePage() {
       {/* ── CREDIBILITY ── */}
       <section className="bg-slate-50 py-12 px-6">
         <div className="max-w-6xl mx-auto">
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-600 mb-8 text-center">Approved &amp; recognized by</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-black mb-8 text-center">Approved &amp; recognized by</p>
           <div className="flex flex-wrap justify-center gap-3">
             {[
               { title: 'DOL Registered Apprenticeship', bg: 'bg-blue-600' },
@@ -229,11 +229,11 @@ export default function HomePage() {
                 <Image src={t.photo} alt={t.name} width={64} height={64} className="rounded-full object-cover w-16 h-16 flex-shrink-0" />
                 <div>
                   <div className="flex gap-0.5 mb-3">{[1,2,3,4,5].map((s) => <span key={s} className="text-amber-400 text-sm">★</span>)}</div>
-                  <p className="text-slate-700 leading-relaxed mb-3">&ldquo;{t.quote}&rdquo;</p>
+                  <p className="text-black leading-relaxed mb-3">&ldquo;{t.quote}&rdquo;</p>
                   <div className="flex items-center gap-3 flex-wrap">
-                    <p className="font-bold text-slate-900 text-sm">{t.name}</p>
-                    <span className="text-slate-400">·</span>
-                    <p className="text-slate-500 text-sm">{t.program}</p>
+                    <p className="font-bold text-black text-sm">{t.name}</p>
+                    <span className="text-black">·</span>
+                    <p className="text-black text-sm">{t.program}</p>
                     <span className="text-brand-green-700 font-bold text-xs bg-brand-green-50 px-2 py-0.5 rounded-full">{t.salary}</span>
                   </div>
                 </div>
@@ -251,20 +251,20 @@ export default function HomePage() {
         <div className="max-w-3xl mx-auto text-center">
           <BlurIn>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Find Out If You Qualify — Free</h2>
-            <p className="text-slate-300 text-lg mb-8 leading-relaxed max-w-xl mx-auto">
+            <p className="text-white text-lg mb-8 leading-relaxed max-w-xl mx-auto">
               Many students pay $0 through WIOA, Workforce Ready Grant, or Job Ready Indy. Check your eligibility in 2 minutes.
             </p>
             <div className="flex flex-wrap gap-4 justify-center mb-8">
               <Link href="/check-eligibility" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-lg font-bold text-lg transition-colors">
                 Check My Eligibility
               </Link>
-              <Link href="/programs" className="border-2 border-white/30 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition-colors">
+              <Link href="/programs" className="border-2 border-white text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition-colors">
                 Explore Programs
               </Link>
             </div>
-            <p className="text-slate-400 text-sm">
+            <p className="text-white text-sm">
               Or call / text us directly:{' '}
-              <a href="tel:3173143757" className="text-white font-bold hover:text-brand-red-300 transition-colors">(317) 314-3757</a>
+              <a href="tel:3173143757" className="text-white font-bold underline hover:text-brand-red-300 transition-colors">(317) 314-3757</a>
             </p>
           </BlurIn>
         </div>

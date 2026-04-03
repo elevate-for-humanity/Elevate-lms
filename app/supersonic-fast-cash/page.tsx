@@ -246,7 +246,7 @@ export default function SupersonicFastCashPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {STEPS.map((step) => (
               <div key={step.number} className="flex flex-col">
-                <div className="relative h-48 w-full rounded-xl overflow-hidden mb-5">
+                <div className="relative h-48 w-full rounded-xl overflow-hidden mb-4">
                   <Image
                     src={step.image}
                     alt={step.title}
@@ -254,10 +254,8 @@ export default function SupersonicFastCashPage() {
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 25vw"
                   />
-                  <div className="absolute top-3 left-3 bg-brand-red-600 text-white text-sm font-black px-3 py-1 rounded-lg">
-                    {step.number}
-                  </div>
                 </div>
+                <div className="w-8 h-8 bg-brand-red-600 text-white text-sm font-black rounded-lg flex items-center justify-center mb-2">{step.number}</div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">{step.title}</h3>
                 <p className="text-slate-600 text-sm leading-relaxed">{step.description}</p>
               </div>

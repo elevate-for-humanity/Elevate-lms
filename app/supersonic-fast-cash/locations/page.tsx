@@ -99,15 +99,15 @@ export default function LocationsPage() {
       </section>
 
       {/* CTA */}
-      <section className="relative h-[45vh] min-h-[320px]">
-        <Image src="/images/pages/supersonic-page-6.jpg" alt="Book your tax appointment" fill className="object-cover object-center" sizes="100vw" />
-        <div className="absolute inset-0 bg-slate-900/70 flex items-center justify-center">
-          <div className="text-center px-4">
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Book Your Appointment</h2>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/supersonic-fast-cash/book-appointment" className="px-10 py-4 bg-brand-red-600 text-white font-black text-xl rounded-xl hover:bg-brand-red-700 transition-colors">Book Now</Link>
-              <a href="tel:+13173143757" className="px-10 py-4 bg-white text-slate-900 font-black text-xl rounded-xl hover:bg-slate-100 transition-colors">(317) 314-3757</a>
-            </div>
+      <section className="relative w-full">
+        <div className="relative h-[40vh] min-h-[260px] overflow-hidden">
+          <Image src="/images/pages/supersonic-page-6.jpg" alt="Book your tax appointment" fill className="object-cover object-center" sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-12 text-center px-4">
+          <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Book Your Appointment</h2>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/supersonic-fast-cash/book-appointment" className="px-10 py-4 bg-brand-red-600 text-white font-black text-xl rounded-xl hover:bg-brand-red-700 transition-colors">Book Now</Link>
+            <a href="tel:+13173143757" className="px-10 py-4 bg-white text-slate-900 font-black text-xl rounded-xl hover:bg-slate-100 transition-colors">(317) 314-3757</a>
           </div>
         </div>
       </section>

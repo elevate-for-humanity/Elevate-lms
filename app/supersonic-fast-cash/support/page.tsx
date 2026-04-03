@@ -129,7 +129,7 @@ export default function SupportPage() {
 
       {/* CTA */}
       <section className="relative w-full">
-        <div className="relative h-[40vh] min-h-[260px] overflow-hidden">
+        <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
           <Image src="/images/pages/supersonic-page-9.jpg" alt="Start your tax return" fill className="object-cover object-center" sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-12 text-center px-4">

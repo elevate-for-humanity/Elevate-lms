@@ -44,7 +44,7 @@ export default async function WebinarsPage() {
       </div>
 
       <section className="relative w-full">
-        <div className="relative h-[40vh] min-h-[240px] w-full overflow-hidden">
+        <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/hero-images/how-it-works-hero.jpg" alt="Webinars" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-white py-10">

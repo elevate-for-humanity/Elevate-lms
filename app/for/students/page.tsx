@@ -22,7 +22,7 @@ export default function ForStudentsPage() {
     <div className="bg-white">
 
       {/* HERO — image only, no text on frame */}
-      <section className="relative h-[340px] sm:h-[460px] overflow-hidden">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image src="/images/pages/for-students-hero.jpg" alt="Job seekers in workforce training" fill sizes="100vw" className="object-cover object-center" priority />
       </section>
 

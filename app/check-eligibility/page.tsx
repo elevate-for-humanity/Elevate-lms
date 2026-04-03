@@ -2,19 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { CheckCircle, ArrowRight, Phone, AlertCircle, Info } from 'lucide-react';
-
-const PROGRAMS = [
-  'CNA (Certified Nursing Assistant)',
-  'HVAC Technician',
-  'IT / Certiport Certifications',
-  'Barber Apprenticeship',
-  'CDL Class A',
-  'Phlebotomy Technician',
-  'Medical Assistant',
-  'Cosmetology Apprenticeship',
-  'Not Sure Yet',
-];
+import { CheckCircle, ArrowRight, Phone, AlertCircle, Info, Clock, DollarSign, Briefcase } from 'lucide-react';
 
 const EMPLOYMENT_STATUS = [
   'Unemployed',
@@ -27,10 +15,74 @@ const EMPLOYMENT_STATUS = [
 type YesNo = 'yes' | 'no' | null;
 type Path = 'A' | 'B' | 'C';
 
+interface RecommendedProgram {
+  name: string;
+  slug: string;
+  duration: string;
+  outcome: string;
+  funded: boolean;
+  fundedLabel?: string;
+}
+
+// Auto-match logic — returns top 3 programs based on qualifier answers.
+// Priority: fastest path to employment for unemployed/underemployed Indiana residents.
+function getRecommendedPrograms(q1: YesNo, q2: YesNo, employment: string): RecommendedProgram[] {
+  const isUnemployed = q1 === 'yes' || employment === 'Unemployed' || employment === 'Recently laid off';
+  const isIndiana = q2 === 'yes';
+  const isCareerChange = employment === 'Employed — looking to change careers';
+
+  // All ETPL-eligible programs (WIOA/Workforce Ready Grant funded for Indiana residents)
+  const allPrograms: RecommendedProgram[] = [
+    { name: 'CNA — Certified Nursing Assistant', slug: 'cna', duration: '4–6 weeks', outcome: 'Avg. $16–$20/hr starting wage', funded: true, fundedLabel: 'WIOA / Workforce Ready Grant' },
+    { name: 'Phlebotomy Technician (CPT)', slug: 'phlebotomy', duration: '4–6 weeks', outcome: 'NHA certification included', funded: true, fundedLabel: 'WIOA / Workforce Ready Grant' },
+    { name: 'HVAC Technician', slug: 'hvac-technician', duration: '10–16 weeks', outcome: 'EPA 608 certification included', funded: true, fundedLabel: 'WIOA / Workforce Ready Grant' },
+    { name: 'IT Support Specialist', slug: 'it-support', duration: '8–12 weeks', outcome: 'CompTIA A+ via Certiport', funded: true, fundedLabel: 'WIOA / Workforce Ready Grant' },
+    { name: 'Medical Assistant (CCMA)', slug: 'medical-assistant', duration: '8–12 weeks', outcome: 'NHA certification included', funded: true, fundedLabel: 'WIOA / Workforce Ready Grant' },
+    { name: 'Pharmacy Technician', slug: 'pharmacy-tech', duration: '8–10 weeks', outcome: 'PTCB exam prep included', funded: true, fundedLabel: 'WIOA / Workforce Ready Grant' },
+    { name: 'Barber Apprenticeship', slug: 'barber-apprenticeship', duration: '2 years (USDOL registered)', outcome: 'Indiana barber license pathway', funded: false },
+    { name: 'CDL Class A', slug: 'cdl', duration: '4–8 weeks', outcome: 'Avg. $55,000–$75,000/yr', funded: true, fundedLabel: 'WIOA eligible' },
+    { name: 'Cosmetology Apprenticeship', slug: 'cosmetology', duration: '2 years', outcome: 'Indiana cosmetology license', funded: false },
+  ];
+
+  // Fastest-to-employment programs for unemployed candidates
+  if (isUnemployed && isIndiana) {
+    return [
+      allPrograms[0], // CNA — fastest, highest demand
+      allPrograms[1], // Phlebotomy — fast, funded
+      allPrograms[2], // HVAC — strong wages
+    ];
+  }
+
+  // Career changers — higher-wage programs
+  if (isCareerChange && isIndiana) {
+    return [
+      allPrograms[2], // HVAC
+      allPrograms[3], // IT
+      allPrograms[7], // CDL
+    ];
+  }
+
+  // Healthcare interest (default for Indiana residents)
+  if (isIndiana) {
+    return [
+      allPrograms[0], // CNA
+      allPrograms[4], // Medical Assistant
+      allPrograms[5], // Pharmacy Tech
+    ];
+  }
+
+  // Non-Indiana — show self-pay options
+  return [
+    allPrograms[0],
+    allPrograms[2],
+    allPrograms[3],
+  ];
+}
+
 function getPath(q1: YesNo, q2: YesNo, q3: YesNo): Path {
-  if (q2 === 'no') return 'C';           // Not Indiana resident — no state funding
-  if (q1 === 'yes' && q3 === 'yes') return 'A'; // Unemployed + wants cert = strong match
-  return 'B';                             // Indiana resident, other factors vary
+  if (q2 === 'no') return 'C';
+  if (q1 === 'yes' && q3 === 'yes') return 'A';
+  return 'B';
 }
 
 export default function CheckEligibilityPage() {
@@ -48,6 +100,7 @@ export default function CheckEligibilityPage() {
 
   const allAnswered = q1 !== null && q2 !== null && q3 !== null;
   const path = getPath(q1, q2, q3);
+  const recommended = getRecommendedPrograms(q1, q2, employment);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -209,6 +262,62 @@ export default function CheckEligibilityPage() {
                 <p className="text-slate-700 text-sm mt-1">{banner.body}</p>
               </div>
             </div>
+            {/* Auto-matched program recommendations */}
+            <div className="mb-8">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
+                Recommended for you
+              </p>
+              <div className="space-y-2">
+                {recommended.map((p, i) => (
+                  <button
+                    key={p.slug}
+                    type="button"
+                    onClick={() => setProgram(p.name)}
+                    className={`w-full text-left rounded-xl border-2 px-4 py-3 transition-colors ${
+                      program === p.name
+                        ? 'border-brand-red-500 bg-brand-red-50'
+                        : 'border-slate-200 bg-white hover:border-brand-red-300'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start gap-2 min-w-0">
+                        {i === 0 && (
+                          <span className="shrink-0 mt-0.5 text-xs font-black bg-brand-red-600 text-white px-1.5 py-0.5 rounded">
+                            #1
+                          </span>
+                        )}
+                        <div className="min-w-0">
+                          <p className={`font-bold text-sm leading-snug ${program === p.name ? 'text-brand-red-900' : 'text-slate-900'}`}>
+                            {p.name}
+                          </p>
+                          <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
+                            <span className="flex items-center gap-1 text-xs text-slate-500">
+                              <Clock className="w-3 h-3" />{p.duration}
+                            </span>
+                            <span className="flex items-center gap-1 text-xs text-slate-500">
+                              <Briefcase className="w-3 h-3" />{p.outcome}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      {p.funded && (
+                        <span className="shrink-0 flex items-center gap-1 text-xs font-semibold text-brand-green-700 bg-brand-green-50 border border-brand-green-200 px-2 py-0.5 rounded-full">
+                          <DollarSign className="w-3 h-3" />Funded
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => setProgram('')}
+                className="mt-2 text-xs text-slate-400 hover:text-slate-600 underline"
+              >
+                Choose a different program
+              </button>
+            </div>
+
             <h2 className="text-xl font-extrabold text-slate-900 mb-6">Tell us about yourself</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -230,14 +339,22 @@ export default function CheckEligibilityPage() {
                   placeholder="you@email.com"
                   className="w-full min-h-[48px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent" />
               </div>
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">Program Interest</label>
-                <select value={program} onChange={(e) => setProgram(e.target.value)}
-                  className="w-full min-h-[48px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent bg-white">
-                  <option value="">Select a program</option>
-                  {PROGRAMS.map((p) => <option key={p} value={p}>{p}</option>)}
-                </select>
-              </div>
+              {/* Only show program dropdown if user clicked "Choose a different program" */}
+              {!recommended.find(r => r.name === program) && (
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Program Interest</label>
+                  <select value={program} onChange={(e) => setProgram(e.target.value)}
+                    className="w-full min-h-[48px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent bg-white">
+                    <option value="">Select a program</option>
+                    {recommended.map(r => <option key={r.slug} value={r.name}>{r.name}</option>)}
+                    <option disabled>──────────</option>
+                    <option value="Barber Apprenticeship">Barber Apprenticeship</option>
+                    <option value="CDL Class A">CDL Class A</option>
+                    <option value="Cosmetology Apprenticeship">Cosmetology Apprenticeship</option>
+                    <option value="Not Sure Yet">Not Sure Yet</option>
+                  </select>
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1">Employment Status</label>
                 <select value={employment} onChange={(e) => setEmployment(e.target.value)}
@@ -269,15 +386,41 @@ export default function CheckEligibilityPage() {
             </div>
             <h2 className="text-2xl font-extrabold text-slate-900 mb-3">{confirm.headline}</h2>
             <p className="text-slate-600 mb-2">{confirm.body}</p>
+
+            {/* Show selected program with direct enroll link */}
+            {program && (
+              <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-4 mb-6 text-left">
+                <p className="text-xs font-bold text-brand-blue-600 uppercase tracking-wider mb-1">Your selected program</p>
+                <p className="font-extrabold text-slate-900">{program}</p>
+                {recommended.find(r => r.name === program) && (
+                  <p className="text-xs text-slate-500 mt-1">
+                    {recommended.find(r => r.name === program)?.duration} · {recommended.find(r => r.name === program)?.outcome}
+                  </p>
+                )}
+              </div>
+            )}
+
             <p className="text-slate-500 text-sm mb-8">
               Can&apos;t wait? Call or text:{' '}
               <a href="tel:3173143757" className="text-brand-red-600 font-bold">(317) 314-3757</a>
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href={confirm.primaryHref} className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors">
-                {confirm.primaryLabel}
+            <div className="flex flex-col gap-3">
+              <Link
+                href={confirm.primaryHref}
+                className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl transition-colors text-base"
+              >
+                {confirm.primaryLabel} <ArrowRight className="inline w-4 h-4 ml-1" />
               </Link>
-              <Link href={confirm.secondaryHref} className="border border-slate-300 text-slate-700 font-semibold px-8 py-3.5 rounded-lg hover:bg-slate-50 transition-colors">
+              <Link
+                href="/programs"
+                className="border border-slate-300 text-slate-700 font-semibold px-8 py-3.5 rounded-xl hover:bg-slate-50 transition-colors"
+              >
+                View All Programs
+              </Link>
+              <Link
+                href={confirm.secondaryHref}
+                className="text-slate-400 text-sm hover:text-slate-600 transition-colors"
+              >
                 {confirm.secondaryLabel}
               </Link>
             </div>

@@ -15,6 +15,15 @@ export type ProctoringCapability =
   | 'IN_PERSON_OR_PROVIDER_REMOTE'
   | 'CENTER_REMOTE_ALLOWED';
 
+export interface ExamFee {
+  /** Label shown to the test-taker, e.g. "Per assessment" */
+  label: string;
+  /** Amount in dollars charged to the test-taker */
+  amount: number;
+  /** Optional note, e.g. "Includes $13.50 ACT fee + $31.50 proctoring" */
+  note?: string;
+}
+
 export interface CertProvider {
   key: string;
   name: string;
@@ -27,6 +36,13 @@ export interface CertProvider {
   verifyUrl?: string;
   /** Whether Elevate is currently an active authorized site */
   status: 'active' | 'available_through_partner';
+  /**
+   * Fees charged to test-takers. Multiple entries for different exam types.
+   * If empty, pricing is quoted on request.
+   */
+  fees?: ExamFee[];
+  /** Group/bulk discount note */
+  groupDiscount?: string;
 }
 
 export interface ProctoringOptions {
@@ -44,6 +60,11 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
     exams: ['Core', 'Type I — Small Appliances', 'Type II — High-Pressure', 'Type III — Low-Pressure', 'Universal'],
     verifyUrl: 'https://www.escogroup.org/esco/certifications/epa608.aspx',
     status: 'active',
+    fees: [
+      { label: 'Universal (all sections)', amount: 55, note: 'Includes exam fee + proctoring' },
+      { label: 'Single section', amount: 35, note: 'Includes exam fee + proctoring' },
+    ],
+    groupDiscount: 'Groups of 5+ — contact us for employer/cohort pricing',
   },
   nrf: {
     key: 'nrf',
@@ -53,10 +74,13 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
     exams: ['Customer Service & Sales', 'Business of Retail', 'Retail Industry Fundamentals'],
     verifyUrl: 'https://nrffoundation.org/riseup',
     status: 'active',
+    fees: [
+      { label: 'Per credential exam', amount: 45, note: 'Includes exam fee + proctoring' },
+    ],
   },
   certiport: {
     key: 'certiport',
-    name: 'Certiport (Pearson VUE)',
+    name: 'Certiport Authorized Testing Center',
     capability: 'IN_PERSON_OR_PROVIDER_REMOTE',
     description: 'Authorized Certiport testing center. Microsoft, Adobe, CompTIA, Intuit, and IC3 exams.',
     exams: [
@@ -66,27 +90,62 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
       'Entrepreneurship & Small Business (ESB)',
       'IC3 Digital Literacy',
       'Adobe Certified Professional',
+      'CompTIA A+ · Security+ · Network+',
     ],
     verifyUrl: 'https://certiport.pearsonvue.com/Locator',
     status: 'active',
+    fees: [
+      { label: 'Per exam', amount: 65, note: 'Includes exam voucher + proctoring' },
+    ],
+    groupDiscount: 'Groups of 5+ — contact us for cohort pricing',
+  },
+  nha: {
+    key: 'nha',
+    name: 'NHA — National Healthcareer Association',
+    capability: 'IN_PERSON_ONLY',
+    description: 'NHA Authorized Testing Center. Healthcare certification exams for phlebotomy, medical assisting, billing & coding, and more.',
+    exams: [
+      'Certified Phlebotomy Technician (CPT)',
+      'Certified Clinical Medical Assistant (CCMA)',
+      'Certified Billing and Coding Specialist (CBCS)',
+      'Certified EKG Technician (CET)',
+      'Certified Patient Care Technician/Assistant (CPCT/A)',
+    ],
+    verifyUrl: 'https://www.nhanow.com/',
+    status: 'active',
+    fees: [
+      { label: 'CPT — Phlebotomy', amount: 160, note: '$135 NHA exam fee + $25 proctoring' },
+      { label: 'CCMA — Medical Assistant', amount: 180, note: '$155 NHA exam fee + $25 proctoring' },
+      { label: 'CBCS, CET, CPCT/A', amount: 175, note: 'NHA exam fee + $25 proctoring' },
+    ],
+    groupDiscount: 'Groups of 5+ — contact us for cohort pricing',
   },
   workkeys: {
     key: 'workkeys',
     name: 'ACT WorkKeys / NCRC',
     capability: 'IN_PERSON_OR_PROVIDER_REMOTE',
-    description: 'National Career Readiness Certificate recognized by 22,000+ employers. Applied Math, Workplace Documents, Business Writing.',
+    description: 'National Career Readiness Certificate recognized by 22,000+ employers. Applied Math, Workplace Documents, Business Writing. Realm: 1317721865.',
     exams: ['Applied Math', 'Workplace Documents', 'Business Writing', 'National Career Readiness Certificate (NCRC)'],
     verifyUrl: 'https://www.act.org/content/act/en/products-and-services/workkeys-for-job-seekers.html',
-    status: 'available_through_partner',
+    status: 'active',
+    fees: [
+      { label: 'Per assessment (individual)', amount: 45, note: 'Includes ACT fee + proctoring' },
+      { label: 'Full NCRC (3 assessments)', amount: 120, note: 'Applied Math + Workplace Documents + Business Writing' },
+      { label: 'Per assessment (workforce agency referral)', amount: 35, note: 'WorkOne / WIOA-referred candidates' },
+    ],
+    groupDiscount: 'Groups of 5+ — $30/assessment. Contact us for employer or cohort scheduling.',
   },
   servsafe: {
     key: 'servsafe',
     name: 'ServSafe (National Restaurant Association)',
     capability: 'IN_PERSON_OR_PROVIDER_REMOTE',
-    description: 'Food handler and food manager certification required by most states for food service workers. Scheduling available — contact us to book a session.',
+    description: 'Food handler and food manager certification required by most states for food service workers.',
     exams: ['Food Handler', 'Food Manager', 'Alcohol', 'Allergens'],
     verifyUrl: 'https://www.servsafe.com/',
     status: 'available_through_partner',
+    fees: [
+      { label: 'Per exam', amount: 45, note: 'Includes exam fee + proctoring' },
+    ],
   },
   careersafe: {
     key: 'careersafe',
@@ -96,15 +155,22 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
     exams: ['OSHA 10-Hour General Industry', 'OSHA 10-Hour Construction', 'OSHA 30-Hour General Industry', 'OSHA 30-Hour Construction'],
     verifyUrl: 'https://www.osha.gov/training/outreach',
     status: 'active',
+    fees: [
+      { label: 'OSHA 10-Hour', amount: 65, note: 'Includes course + DOL card' },
+      { label: 'OSHA 30-Hour', amount: 185, note: 'Includes course + DOL card' },
+    ],
   },
   milady: {
     key: 'milady',
     name: 'Milady (Cosmetology & Esthetics)',
     capability: 'CENTER_REMOTE_ALLOWED',
-    description: 'Industry-standard assessments for cosmetology, esthetics, nail technology, and barbering programs. Contact us to schedule a session.',
+    description: 'Industry-standard assessments for cosmetology, esthetics, nail technology, and barbering programs.',
     exams: ['Cosmetology Theory', 'Esthetics Theory', 'Nail Technology Theory', 'Barbering Theory'],
     verifyUrl: 'https://www.miladypro.com/',
     status: 'available_through_partner',
+    fees: [
+      { label: 'Per assessment', amount: 40, note: 'Includes exam + proctoring' },
+    ],
   },
 };
 

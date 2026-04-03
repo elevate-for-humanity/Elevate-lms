@@ -78,10 +78,10 @@ export default function ProgressPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
-          <p className="text-slate-900">Loading progress...</p>
+          <p className="text-white">Loading progress...</p>
         </div>
       </div>
     );
@@ -89,10 +89,10 @@ export default function ProgressPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-6">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-brand-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-slate-900 mb-4">Unable to Load</h1>
+          <h1 className="text-2xl font-bold text-white mb-4">Unable to Load</h1>
           <p className="text-slate-500 mb-6">{error}</p>
           <Link
             href="/login?redirect=/pwa/barber/progress"
@@ -135,24 +135,24 @@ export default function ProgressPage() {
   });
 
   return (
-    <div className="min-h-screen bg-white pb-20">
+    <div className="min-h-screen bg-slate-900 pb-20">
       {/* Header */}
       <header className="bg-brand-blue-600 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center gap-4 mb-6">
-          <Link href="/pwa/barber" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+          <Link href="/pwa/barber" className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />
           </Link>
-          <h1 className="text-slate-900 font-bold text-xl">My Progress</h1>
+          <h1 className="text-white font-bold text-xl">My Progress</h1>
         </div>
 
         {/* Main Progress */}
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-5">
           <div className="text-center mb-4">
-            <p className="text-6xl font-black text-slate-900">{formatHours(totalHours)}</p>
-            <p className="text-brand-blue-200">of {formatHours(targetHours)} hours</p>
+            <p className="text-6xl font-black text-white">{formatHours(totalHours)}</p>
+            <p className="text-blue-200">of {formatHours(targetHours)} hours</p>
           </div>
           
-          <div className="h-4 bg-white/20 rounded-full overflow-hidden mb-4">
+          <div className="h-4 bg-slate-700 rounded-full overflow-hidden mb-4">
             <div 
               className="h-full bg-white rounded-full"
               style={{ width: `${Math.min(progressPercent, 100)}%` }}
@@ -161,16 +161,16 @@ export default function ProgressPage() {
 
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <p className="text-2xl font-bold text-slate-900">{progressPercent.toFixed(0)}%</p>
-              <p className="text-brand-blue-200 text-xs">Complete</p>
+              <p className="text-2xl font-bold text-white">{progressPercent.toFixed(0)}%</p>
+              <p className="text-blue-200 text-xs">Complete</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-900">{formatHours(Math.max(0, targetHours - totalHours))}</p>
-              <p className="text-brand-blue-200 text-xs">Remaining</p>
+              <p className="text-2xl font-bold text-white">{formatHours(Math.max(0, targetHours - totalHours))}</p>
+              <p className="text-blue-200 text-xs">Remaining</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-900">{weeksRemaining > 0 ? `~${weeksRemaining}` : '-'}</p>
-              <p className="text-brand-blue-200 text-xs">Weeks Left</p>
+              <p className="text-2xl font-bold text-white">{weeksRemaining > 0 ? `~${weeksRemaining}` : '-'}</p>
+              <p className="text-blue-200 text-xs">Weeks Left</p>
             </div>
           </div>
         </div>
@@ -178,12 +178,12 @@ export default function ProgressPage() {
 
       <main className="px-4 py-6 space-y-6">
         {/* Weekly Average */}
-        <div className="bg-white rounded-xl p-4">
+        <div className="bg-slate-800 rounded-xl p-4">
           <div className="flex items-center gap-3 mb-2">
             <TrendingUp className="w-5 h-5 text-brand-green-400" />
             <span className="text-slate-500 text-sm">Weekly Average</span>
           </div>
-          <p className="text-3xl font-bold text-slate-900">{avgWeeklyHours.toFixed(1)} hrs/week</p>
+          <p className="text-3xl font-bold text-white">{avgWeeklyHours.toFixed(1)} hrs/week</p>
           <p className="text-slate-500 text-sm mt-1">
             {weeklyData.length > 0 ? `Based on last ${weeklyData.length} weeks` : 'No data yet'}
           </p>
@@ -191,7 +191,7 @@ export default function ProgressPage() {
 
         {/* Milestones */}
         <div>
-          <h2 className="text-slate-900 font-bold text-lg mb-4">Milestones</h2>
+          <h2 className="text-white font-bold text-lg mb-4">Milestones</h2>
           <div className="space-y-3">
             {milestones.map((milestone) => (
               <div 
@@ -209,7 +209,7 @@ export default function ProgressPage() {
                     <Award className={`w-6 h-6 ${milestone.achieved ? 'text-white' : 'text-slate-500'}`} />
                   </div>
                   <div className="flex-1">
-                    <p className={`font-medium ${milestone.achieved ? 'text-brand-green-200' : 'text-white'}`}>
+                    <p className={`font-medium ${milestone.achieved ? 'text-emerald-300' : 'text-white'}`}>
                       {milestone.title}
                     </p>
                     <p className={`text-sm ${milestone.achieved ? 'text-brand-green-300' : 'text-slate-400'}`}>
@@ -227,18 +227,18 @@ export default function ProgressPage() {
 
         {/* Weekly History */}
         <div>
-          <h2 className="text-slate-900 font-bold text-lg mb-4">Recent Weeks</h2>
+          <h2 className="text-white font-bold text-lg mb-4">Recent Weeks</h2>
           {formattedWeeklyData.length > 0 ? (
             <div className="space-y-3">
               {formattedWeeklyData.map((week, index) => (
-                <div key={index} className="bg-white rounded-xl p-4">
+                <div key={index} className="bg-slate-800 rounded-xl p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-slate-900 font-medium">{week.week}</p>
+                      <p className="text-white font-medium">{week.week}</p>
                       <p className="text-slate-500 text-sm">{week.date}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-2xl font-bold text-slate-900">{week.hours}</p>
+                      <p className="text-2xl font-bold text-white">{week.hours}</p>
                       <p className="text-slate-500 text-sm">hours</p>
                     </div>
                   </div>
@@ -246,7 +246,7 @@ export default function ProgressPage() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-xl p-6 text-center">
+            <div className="bg-slate-800 rounded-xl p-6 text-center">
               <Clock className="w-12 h-12 text-slate-600 mx-auto mb-3" />
               <p className="text-slate-500">No hours logged yet</p>
               <Link 
@@ -260,12 +260,12 @@ export default function ProgressPage() {
         </div>
 
         {/* Shop Info */}
-        <div className="bg-white rounded-xl p-4">
+        <div className="bg-slate-800 rounded-xl p-4">
           <div className="flex items-center gap-3 mb-2">
             <Scissors className="w-5 h-5 text-brand-blue-400" />
             <span className="text-slate-500 text-sm">Training Location</span>
           </div>
-          <p className="text-slate-900 font-medium">{apprentice.shopName}</p>
+          <p className="text-white font-medium">{apprentice.shopName}</p>
           {apprentice.startDate && (
             <p className="text-slate-500 text-sm mt-1">
               Started {new Date(apprentice.startDate).toLocaleDateString()}

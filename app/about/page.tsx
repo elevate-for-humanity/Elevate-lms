@@ -445,7 +445,7 @@ export default function AboutPage() {
                       { label: 'SBIN — IRS Submitter', detail: 'Authorized to submit returns directly to the IRS for both for-profit and non-profit filers' },
                       { label: 'VITA Site', detail: 'IRS-authorized Volunteer Income Tax Assistance site' },
                       { label: 'EPA 608 Certified Proctor', detail: 'Authorized to proctor EPA Section 608 refrigerant handling certification exams' },
-                      { label: 'ACT WorkKeys Proctor', detail: 'Authorized testing site for ACT WorkKeys workforce readiness assessments' },
+                      { label: 'ACT WorkKeys Authorized Testing Site (Realm: 1317721865)', detail: 'Authorized to administer ACT WorkKeys assessments and issue the National Career Readiness Certificate (NCRC)' },
                       { label: 'Milady RISE — Proctor & Partner', detail: 'Authorized proctor and curriculum partner for Milady RISE cosmetology and barbering coursework' },
                       { label: 'Black Certified', detail: 'Certified partner for Black Certified credentialing programs' },
                       { label: 'U.S. Army Veteran', detail: 'Unit Supply Specialist — honorably served' },

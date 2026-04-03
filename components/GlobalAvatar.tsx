@@ -37,6 +37,7 @@ export default function GlobalAvatar() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasPlayed, setHasPlayed] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
 
   const config = avatarConfig.find(c => c.pattern.test(pathname));
   const isExcluded = excludedPatterns.some(p => p.test(pathname));
@@ -79,7 +80,7 @@ export default function GlobalAvatar() {
     return () => observer.disconnect();
   }, [pathname, isExcluded, config, hasPlayed]);
 
-  if (isExcluded || !config) return null;
+  if (isExcluded || !config || videoFailed) return null;
 
   return (
     <section ref={containerRef} className="relative w-full bg-slate-100 py-8">
@@ -90,6 +91,7 @@ export default function GlobalAvatar() {
             className="w-full aspect-video object-cover"
             playsInline
             preload="metadata"
+            onError={() => setVideoFailed(true)}
           >
             <source src={config.video} type="video/mp4" />
           </video>

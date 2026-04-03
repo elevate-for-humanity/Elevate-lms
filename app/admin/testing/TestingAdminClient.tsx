@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import {
-  CheckCircle, Clock, XCircle, Search, Filter,
-  Calendar, Users, User, Building2, ChevronDown, X,
-  AlertCircle, Download,
+  CheckCircle, Clock, XCircle, Search,
+  Calendar, Users, User, Building2, X,
+  AlertCircle, Plus, Trash2,
 } from 'lucide-react';
+import { CERT_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
 
 interface Booking {
   id: string;
@@ -30,8 +31,21 @@ interface Booking {
   created_at: string;
 }
 
+interface Slot {
+  id: string;
+  exam_type: string;
+  start_time: string;
+  end_time: string;
+  capacity: number;
+  booked_count: number;
+  location: string;
+  notes: string | null;
+  is_cancelled: boolean;
+}
+
 interface Props {
   bookings: Booking[];
+  slots: Slot[];
   stats: { pending: number; confirmed: number; total: number };
 }
 
@@ -53,11 +67,66 @@ function statusBadge(status: string) {
 
 const STATUSES = ['all', 'pending', 'confirmed', 'completed', 'cancelled', 'no_show'];
 
-export default function TestingAdminClient({ bookings: initial, stats }: Props) {
+export default function TestingAdminClient({ bookings: initial, slots: initialSlots, stats }: Props) {
   const [bookings, setBookings] = useState<Booking[]>(initial);
+  const [slots, setSlots] = useState<Slot[]>(initialSlots);
+  const [tab, setTab] = useState<'bookings' | 'slots'>('bookings');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selected, setSelected] = useState<Booking | null>(null);
+
+  // Slot creation form state
+  const [slotForm, setSlotForm] = useState({
+    exam_type: '',
+    date: '',
+    start_time: '09:00',
+    end_time: '11:00',
+    capacity: 10,
+    notes: '',
+  });
+  const [creatingSlot, setCreatingSlot] = useState(false);
+  const [slotError, setSlotError] = useState('');
+
+  async function handleCreateSlot(e: React.FormEvent) {
+    e.preventDefault();
+    if (!slotForm.exam_type || !slotForm.date) {
+      setSlotError('Exam type and date are required.');
+      return;
+    }
+    setCreatingSlot(true);
+    setSlotError('');
+    try {
+      const start = new Date(`${slotForm.date}T${slotForm.start_time}:00`);
+      const end   = new Date(`${slotForm.date}T${slotForm.end_time}:00`);
+      const res = await fetch('/api/testing/slots', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          exam_type:  slotForm.exam_type,
+          start_time: start.toISOString(),
+          end_time:   end.toISOString(),
+          capacity:   slotForm.capacity,
+          notes:      slotForm.notes || null,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Failed to create slot');
+      setSlots(prev => [...prev, data.slot].sort(
+        (a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+      ));
+      setSlotForm({ exam_type: '', date: '', start_time: '09:00', end_time: '11:00', capacity: 10, notes: '' });
+    } catch (err: unknown) {
+      setSlotError(err instanceof Error ? err.message : 'Failed to create slot');
+    } finally {
+      setCreatingSlot(false);
+    }
+  }
+
+  async function handleCancelSlot(id: string) {
+    if (!confirm('Cancel this slot? Candidates with bookings will need to be notified manually.')) return;
+    const res = await fetch(`/api/testing/slots?id=${id}`, { method: 'DELETE' });
+    if (res.ok) setSlots(prev => prev.filter(s => s.id !== id));
+  }
   const [updating, setUpdating] = useState(false);
   const [updateError, setUpdateError] = useState('');
   const [confirmForm, setConfirmForm] = useState({ date: '', time: '', adminNotes: '' });
@@ -120,6 +189,134 @@ export default function TestingAdminClient({ bookings: initial, stats }: Props) 
           </div>
         ))}
       </div>
+
+      {/* Tab bar */}
+      <div className="flex gap-1 bg-slate-100 rounded-xl p-1 mb-8 w-fit">
+        {(['bookings', 'slots'] as const).map(t => (
+          <button key={t} onClick={() => setTab(t)}
+            className={`px-5 py-2 rounded-lg text-sm font-semibold capitalize transition-colors ${
+              tab === t ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+            }`}>
+            {t === 'slots' ? 'Availability Slots' : 'Bookings'}
+          </button>
+        ))}
+      </div>
+
+      {/* ── SLOTS TAB ── */}
+      {tab === 'slots' && (
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Create slot form */}
+          <div className="bg-white rounded-2xl border p-6">
+            <h2 className="font-bold text-slate-900 mb-5 flex items-center gap-2">
+              <Plus className="w-4 h-4" /> Create Availability Slot
+            </h2>
+            <form onSubmit={handleCreateSlot} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">Exam Type *</label>
+                <select required value={slotForm.exam_type}
+                  onChange={e => setSlotForm(f => ({ ...f, exam_type: e.target.value }))}
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500 focus:outline-none bg-white">
+                  <option value="">Select exam</option>
+                  {Object.values(CERT_PROVIDERS).filter(p => p.status === 'active').map(p => (
+                    <option key={p.key} value={p.key}>{p.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">Date *</label>
+                <input required type="date" value={slotForm.date}
+                  min={new Date().toISOString().split('T')[0]}
+                  onChange={e => setSlotForm(f => ({ ...f, date: e.target.value }))}
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500 focus:outline-none" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">Start Time *</label>
+                  <input required type="time" value={slotForm.start_time}
+                    onChange={e => setSlotForm(f => ({ ...f, start_time: e.target.value }))}
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">End Time *</label>
+                  <input required type="time" value={slotForm.end_time}
+                    onChange={e => setSlotForm(f => ({ ...f, end_time: e.target.value }))}
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500 focus:outline-none" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">Capacity (seats)</label>
+                <input type="number" min={1} max={50} value={slotForm.capacity}
+                  onChange={e => setSlotForm(f => ({ ...f, capacity: parseInt(e.target.value) || 1 }))}
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500 focus:outline-none" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">Notes (optional)</label>
+                <input type="text" value={slotForm.notes} placeholder="e.g. Room 2, bring ID"
+                  onChange={e => setSlotForm(f => ({ ...f, notes: e.target.value }))}
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500 focus:outline-none" />
+              </div>
+              {slotError && (
+                <p className="text-red-600 text-xs bg-red-50 border border-red-200 rounded-lg px-3 py-2">{slotError}</p>
+              )}
+              <button type="submit" disabled={creatingSlot}
+                className="w-full bg-brand-blue-600 hover:bg-brand-blue-700 disabled:opacity-60 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">
+                {creatingSlot ? 'Creating…' : 'Create Slot'}
+              </button>
+            </form>
+          </div>
+
+          {/* Upcoming slots list */}
+          <div>
+            <h2 className="font-bold text-slate-900 mb-4">Upcoming Slots ({slots.length})</h2>
+            {slots.length === 0 ? (
+              <div className="bg-white rounded-2xl border p-8 text-center text-slate-400 text-sm">
+                No upcoming slots. Create one to start accepting bookings.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {slots.map(slot => {
+                  const provider = Object.values(CERT_PROVIDERS).find(p => p.key === slot.exam_type);
+                  const start = new Date(slot.start_time);
+                  const end   = new Date(slot.end_time);
+                  const seatsLeft = slot.capacity - slot.booked_count;
+                  return (
+                    <div key={slot.id} className="bg-white rounded-xl border p-4 flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-slate-900 text-sm">{provider?.name ?? slot.exam_type}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {start.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                          {' · '}
+                          {start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                          {' – '}
+                          {end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                        </p>
+                        <div className="flex items-center gap-3 mt-1.5">
+                          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                            seatsLeft === 0 ? 'bg-red-100 text-red-700' :
+                            seatsLeft <= 3 ? 'bg-amber-100 text-amber-700' :
+                            'bg-brand-green-100 text-brand-green-700'
+                          }`}>
+                            {seatsLeft}/{slot.capacity} seats
+                          </span>
+                          {slot.notes && <span className="text-xs text-slate-400">{slot.notes}</span>}
+                        </div>
+                      </div>
+                      <button onClick={() => handleCancelSlot(slot.id)}
+                        className="shrink-0 p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Cancel slot">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── BOOKINGS TAB ── */}
+      {tab === 'bookings' && <>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
@@ -292,6 +489,7 @@ export default function TestingAdminClient({ bookings: initial, stats }: Props) 
           </div>
         </div>
       )}
+      </> /* end bookings tab */}
     </div>
   );
 }

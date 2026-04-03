@@ -3,11 +3,10 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronRight, MapPinned, Monitor, Phone } from 'lucide-react';
+import { ChevronRight, MapPinned, Monitor, Phone, AlertTriangle, CreditCard } from 'lucide-react';
 import {
   ALL_PROVIDERS,
   getProctoringOptions,
-  getProctoringLabels,
   type CertProvider,
 } from '@/lib/testing/proctoring-capabilities';
 
@@ -42,6 +41,44 @@ function BookingForm() {
   const [notes, setNotes] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [enforcementHold, setEnforcementHold] = useState<{
+    id: string; enforcement_type: string; fee_cents: number;
+  } | null>(null);
+  const [checkingHold, setCheckingHold] = useState(false);
+  const [payingFee, setPayingFee] = useState(false);
+
+  // Check for no-show/retake hold when email is entered
+  const checkEnforcementHold = async (emailVal: string) => {
+    if (!emailVal || !emailVal.includes('@')) return;
+    setCheckingHold(true);
+    try {
+      const res = await fetch(`/api/testing/enforcement?email=${encodeURIComponent(emailVal)}`);
+      const data = await res.json();
+      setEnforcementHold(data.hasHold ? data.holds[0] : null);
+    } catch {
+      // non-blocking — don't block booking if check fails
+    } finally {
+      setCheckingHold(false);
+    }
+  };
+
+  const handlePayEnforcementFee = async () => {
+    if (!enforcementHold) return;
+    setPayingFee(true);
+    try {
+      const res = await fetch('/api/testing/enforcement/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enforcementId: enforcementHold.id, email }),
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+    } catch {
+      alert('Unable to start payment. Please call (317) 314-3757.');
+    } finally {
+      setPayingFee(false);
+    }
+  };
 
   // Pre-select org type from URL param
   useEffect(() => {
@@ -67,26 +104,76 @@ function BookingForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedProvider) return;
+
+    // Block if unpaid enforcement hold exists
+    if (enforcementHold) return;
+
     setSubmitting(true);
+    const [firstName, ...rest] = name.trim().split(' ');
+    const lastName = rest.join(' ') || '';
+    const isOrg = orgType !== 'Individual' && orgType !== '';
+    const qty = parseInt(participantCount, 10) || 1;
+
     try {
-      await fetch('/api/contact', {
+      // For individual bookings with a fee — go to Stripe first, booking created on success
+      const fee = selectedProvider.fees?.[0];
+      if (fee && !isOrg) {
+        const res = await fetch('/api/testing/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            examType: selectedProvider.key,
+            examName: selectedProvider.name,
+            feeCents: fee.amount * 100,
+            bookingType: 'individual',
+            participantCount: 1,
+            email,
+            name,
+          }),
+        });
+        const data = await res.json();
+        if (data.url) {
+          // Save booking intent to session storage so success page can complete it
+          sessionStorage.setItem('pendingBooking', JSON.stringify({
+            examType: selectedProvider.key,
+            examName: selectedProvider.name,
+            bookingType: 'individual',
+            firstName, lastName, email, phone,
+            organization: org, participantCount: 1,
+            preferredDate, preferredTime: '',
+            notes,
+          }));
+          window.location.href = data.url;
+          return;
+        }
+      }
+
+      // Organizations and waived-fee bookings — submit directly
+      const res = await fetch('/api/testing/book', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name,
-          email,
-          phone,
-          organization: org,
-          organizationType: orgType,
-          subject: `Testing Booking Request — ${selectedProvider?.name ?? 'Unknown'}`,
-          message: `Provider: ${selectedProvider?.name}\nProctoring mode: ${PROCTORING_MODE_LABELS[proctoringMode] ?? proctoringMode}\nParticipants: ${participantCount}\nPreferred date: ${preferredDate}\nNotes: ${notes}`,
-          type: 'testing-booking',
+          examType: selectedProvider.key,
+          examName: selectedProvider.name,
+          bookingType: isOrg ? 'organization' : 'individual',
+          firstName, lastName, email,
+          phone: phone || null,
+          organization: org || null,
+          participantCount: qty,
+          preferredDate,
+          preferredTime: '',
+          notes: notes || null,
         }),
       });
-      setSubmitted(true);
+      const data = await res.json();
+      if (data.success) {
+        setSubmitted(true);
+      } else {
+        alert(data.error ?? 'Booking failed. Please call (317) 314-3757.');
+      }
     } catch {
-      // Still show success — email fallback
-      setSubmitted(true);
+      setSubmitted(true); // email fallback
     } finally {
       setSubmitting(false);
     }
@@ -162,6 +249,32 @@ function BookingForm() {
             </div>
           </div>
 
+          {/* Fee summary — shown immediately after provider selection */}
+          {selectedProvider && selectedProvider.fees && selectedProvider.fees.length > 0 && (
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-2xl p-5">
+              <h2 className="font-extrabold text-slate-900 mb-3 flex items-center gap-2">
+                <span className="text-brand-blue-600">$</span> Fees for {selectedProvider.name}
+              </h2>
+              <div className="space-y-2 mb-3">
+                {selectedProvider.fees.map(fee => (
+                  <div key={fee.label} className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800">{fee.label}</p>
+                      {fee.note && <p className="text-xs text-slate-500">{fee.note}</p>}
+                    </div>
+                    <span className="text-brand-red-600 font-black text-xl shrink-0">${fee.amount}</span>
+                  </div>
+                ))}
+              </div>
+              {selectedProvider.groupDiscount && (
+                <p className="text-xs text-brand-blue-700 bg-brand-blue-100 rounded-lg px-3 py-2">
+                  {selectedProvider.groupDiscount}
+                </p>
+              )}
+              <p className="text-xs text-slate-400 mt-3">Payment due at time of booking confirmation.</p>
+            </div>
+          )}
+
           {/* Step 2 — Proctoring mode (driven by capability) */}
           {selectedProvider && availableModes.length > 0 && (
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
@@ -226,7 +339,9 @@ function BookingForm() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 mb-1">Email *</label>
-                  <input required type="email" value={email} onChange={e => setEmail(e.target.value)}
+                  <input required type="email" value={email}
+                    onChange={e => { setEmail(e.target.value); setEnforcementHold(null); }}
+                    onBlur={e => checkEnforcementHold(e.target.value)}
                     className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                     placeholder="you@example.com" />
                 </div>
@@ -269,12 +384,49 @@ function BookingForm() {
                   placeholder="Specific exam types, accessibility needs, or other details" />
               </div>
 
+              {/* Enforcement hold — must pay fee before booking */}
+              {checkingHold && (
+                <p className="text-xs text-slate-500 text-center">Checking account status...</p>
+              )}
+              {enforcementHold && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="font-bold text-red-900 text-sm">
+                        {enforcementHold.enforcement_type === 'no_show'
+                          ? 'Missed Appointment Fee Required'
+                          : enforcementHold.enforcement_type === 'retake'
+                          ? 'Retake Fee Required'
+                          : 'Reschedule Fee Required'}
+                      </p>
+                      <p className="text-red-700 text-xs mt-1">
+                        A ${(enforcementHold.fee_cents / 100).toFixed(0)} fee must be paid before you can book a new session.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handlePayEnforcementFee}
+                        disabled={payingFee}
+                        className="mt-3 inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors"
+                      >
+                        <CreditCard className="w-3.5 h-3.5" />
+                        {payingFee ? 'Redirecting...' : `Pay $${(enforcementHold.fee_cents / 100).toFixed(0)} to Unlock Booking`}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || !!enforcementHold || checkingHold}
                 className="w-full bg-brand-red-600 hover:bg-brand-red-700 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition-colors text-sm"
               >
-                {submitting ? 'Sending...' : 'Submit Booking Request'}
+                {submitting
+                  ? 'Processing...'
+                  : selectedProvider?.fees?.length && orgType === 'Individual'
+                  ? `Pay & Book — $${selectedProvider.fees[0].amount}`
+                  : 'Submit Booking Request'}
               </button>
 
               <p className="text-xs text-slate-500 text-center">

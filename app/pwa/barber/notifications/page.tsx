@@ -124,14 +124,14 @@ export default function NotificationsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <Loader2 className="w-12 h-12 text-brand-blue-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-slate-900">
       <header className="bg-slate-800 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -139,7 +139,7 @@ export default function NotificationsPage() {
               <ArrowLeft className="w-5 h-5 text-white" />
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-slate-900">Notifications</h1>
+              <h1 className="text-xl font-bold text-white">Notifications</h1>
               {unreadCount > 0 && (
                 <p className="text-brand-blue-400 text-sm">{unreadCount} unread</p>
               )}
@@ -160,10 +160,10 @@ export default function NotificationsPage() {
       <main className="px-4 py-6">
         {notifications.length === 0 ? (
           <div className="text-center py-12">
-            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-20 h-20 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
               <BellOff className="w-10 h-10 text-slate-600" />
             </div>
-            <h2 className="text-slate-900 font-medium mb-2">No notifications</h2>
+            <h2 className="text-white font-medium mb-2">No notifications</h2>
             <p className="text-slate-500 text-sm">You're all caught up!</p>
           </div>
         ) : (

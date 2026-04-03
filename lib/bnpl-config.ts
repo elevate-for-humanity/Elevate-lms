@@ -53,7 +53,7 @@ export const BNPL_PROVIDERS: BnplProvider[] = [
     minAmount: 35,
     maxAmount: 10000,
     description: '4 interest-free installments',
-    enabled: true,
+    enabled: false, // no checkout API — enable when integrated
   },
   {
     id: 'afterpay',
@@ -63,7 +63,7 @@ export const BNPL_PROVIDERS: BnplProvider[] = [
     minAmount: 35,
     maxAmount: 2000,
     description: '4 interest-free payments',
-    enabled: true,
+    enabled: false, // no checkout API — enable when integrated
   },
   {
     id: 'zip',
@@ -73,7 +73,7 @@ export const BNPL_PROVIDERS: BnplProvider[] = [
     minAmount: 35,
     maxAmount: 5000,
     description: 'Pay in 4 or finance longer',
-    enabled: true,
+    enabled: false, // no checkout API — enable when integrated
   },
 ];
 

@@ -44,6 +44,8 @@ export default async function LearnerDashboardPage() {
     .select(`
       id,
       course_id,
+      program_id,
+      program_slug,
       status,
       progress,
       enrolled_at,
@@ -56,6 +58,19 @@ export default async function LearnerDashboardPage() {
     `)
     .eq('user_id', user.id)
     .order('enrolled_at', { ascending: false });
+
+  // For program_enrollments with no course_id (e.g. barber apprenticeship),
+  // pull program name from apprenticeship_programs
+  const programIds = (legacyEnrollments || [])
+    .filter((e: any) => !e.course_id && e.program_id)
+    .map((e: any) => e.program_id);
+
+  const { data: apprenticeshipPrograms } = programIds.length > 0
+    ? await supabase
+        .from('apprenticeship_programs')
+        .select('id, name, slug, description')
+        .in('id', programIds)
+    : { data: [] };
 
   const { data: trainingEnrollments } = await supabase
     .from('training_enrollments')
@@ -83,9 +98,28 @@ export default async function LearnerDashboardPage() {
       : null,
   }));
 
+  // For program_enrollments with no course_id, inject apprenticeship program name as the course
+  const apMap = new Map((apprenticeshipPrograms || []).map((p: any) => [p.id, p]));
+  const normalizedLegacy = (legacyEnrollments || []).map((e: any) => {
+    if (!e.courses && !e.course_id && e.program_id && apMap.has(e.program_id)) {
+      const ap = apMap.get(e.program_id);
+      return {
+        ...e,
+        courses: {
+          id: ap.id,
+          title: ap.name,
+          description: ap.description || 'Registered Apprenticeship Program',
+          duration_hours: null,
+        },
+        _isApprenticeship: true,
+      };
+    }
+    return e;
+  });
+
   // Merge, dedup by course_id
   const seen = new Set<string>();
-  const enrollments = [...(legacyEnrollments || []), ...normalizedTraining].filter((e: any) => {
+  const enrollments = [...normalizedLegacy, ...normalizedTraining].filter((e: any) => {
     const key = e.course_id || e.id;
     if (seen.has(key)) return false;
     seen.add(key);
@@ -474,11 +508,13 @@ export default async function LearnerDashboardPage() {
                               </div>
                             </div>
                             <Link
-                              href={`/lms/courses/${enrollment.course_id}`}
+                              href={enrollment._isApprenticeship
+                                ? `/programs/${enrollment.program_slug || 'barber-apprenticeship'}`
+                                : `/lms/courses/${enrollment.course_id}`}
                               className="px-4 py-2 bg-brand-orange-600 text-white text-sm font-medium rounded-lg hover:bg-brand-orange-700 transition flex items-center gap-2"
                             >
                               <Play className="w-4 h-4" />
-                              Continue
+                              {enrollment._isApprenticeship ? 'View Program' : 'Continue'}
                             </Link>
                           </div>
                         </div>

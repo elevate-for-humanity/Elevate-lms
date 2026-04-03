@@ -1,8 +1,9 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, DollarSign } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { CERT_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
 
 export const metadata: Metadata = {
   title: 'Testing & Credential Exams | Elevate for Humanity',
@@ -17,7 +18,7 @@ const examCategories = [
   {
     id: 'certiport',
     name: 'Certiport Authorized Testing',
-    provider: 'Certiport (Pearson VUE)',
+    provider: 'Certiport',
     image: '/images/pages/testing-page-1.jpg',
     description: 'Proctor-supervised exams administered on-site through our Certiport Authorized Testing Center designation.',
     exams: [
@@ -91,9 +92,25 @@ const examCategories = [
     bookable: false,
   },
   {
+    id: 'nha',
+    name: 'NHA — National Healthcareer Association',
+    provider: 'NHA — Authorized Testing Center',
+    image: '/images/pages/medical-assistant.jpg',
+    description: 'Elevate for Humanity is an NHA Authorized Testing Center. We administer NHA certification exams on-site for healthcare program graduates and external candidates.',
+    exams: [
+      'Certified Phlebotomy Technician (CPT)',
+      'Certified Clinical Medical Assistant (CCMA)',
+      'Certified Billing and Coding Specialist (CBCS)',
+      'Certified EKG Technician (CET)',
+      'Certified Patient Care Technician/Assistant (CPCT/A)',
+    ],
+    access: 'Proctored on-site — by appointment',
+    bookable: true,
+  },
+  {
     id: 'workkeys',
     name: 'ACT WorkKeys / NCRC',
-    provider: 'ACT — Authorized Testing Site (Site Code: TBD)',
+    provider: 'ACT — Authorized Testing Site (Realm: 1317721865)',
     image: '/images/pages/career-services-page-4.jpg',
     description: 'Elevate for Humanity is an authorized ACT WorkKeys testing site. The National Career Readiness Certificate (NCRC) is a portable, employer-recognized credential that proves workplace skills. Required by many Indiana workforce programs and accepted by WorkOne as evidence of career readiness.',
     exams: [
@@ -325,6 +342,56 @@ export default function TestingPage() {
         </div>
       </section>
 
+      {/* Pricing Table */}
+      <section className="py-14 border-t border-slate-100">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="flex items-center gap-3 mb-8">
+            <DollarSign className="w-7 h-7 text-brand-red-600" />
+            <h2 className="text-3xl font-black text-slate-900">Testing Fees</h2>
+          </div>
+          <p className="text-slate-500 mb-8 max-w-2xl">
+            All fees include the exam and proctoring. No hidden charges. Group and workforce agency discounts available — see notes below or <Link href="/testing/book" className="text-brand-blue-600 hover:underline font-medium">contact us</Link>.
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Object.values(CERT_PROVIDERS)
+              .filter(p => p.fees && p.fees.length > 0)
+              .map(provider => (
+                <div key={provider.key} className="bg-white border border-slate-200 rounded-xl p-5">
+                  <h3 className="font-bold text-slate-900 mb-3 text-sm">{provider.name}</h3>
+                  <div className="space-y-2 mb-3">
+                    {provider.fees!.map(fee => (
+                      <div key={fee.label} className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-sm text-slate-700 font-medium leading-snug">{fee.label}</p>
+                          {fee.note && <p className="text-xs text-slate-400 mt-0.5">{fee.note}</p>}
+                        </div>
+                        <span className="text-brand-red-600 font-black text-lg shrink-0">${fee.amount}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {provider.groupDiscount && (
+                    <p className="text-xs text-brand-blue-700 bg-brand-blue-50 rounded-lg px-3 py-2 mt-2">
+                      {provider.groupDiscount}
+                    </p>
+                  )}
+                  {provider.status === 'active' && (
+                    <Link
+                      href={`/testing/book?exam=${provider.key}`}
+                      className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-red-600 hover:text-brand-red-700"
+                    >
+                      <CalendarDays className="w-3.5 h-3.5" />
+                      Book a seat
+                    </Link>
+                  )}
+                </div>
+              ))}
+          </div>
+          <p className="text-xs text-slate-400 mt-6">
+            Fees subject to change. Workforce agency and WorkOne-referred candidates may qualify for reduced rates. Payment due at time of booking.
+          </p>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-14">
         <div className="max-w-3xl mx-auto px-4 text-center">
@@ -334,8 +401,8 @@ export default function TestingPage() {
             <Link href="/programs" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-colors">
               View Programs
             </Link>
-            <Link href="/contact" className="bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-full font-bold text-lg border border-white/30 transition-colors">
-              Contact Us
+            <Link href="/testing/book" className="border border-slate-300 text-slate-700 px-8 py-4 rounded-full font-bold text-lg hover:bg-slate-50 transition-colors">
+              Book a Testing Session
             </Link>
           </div>
         </div>

@@ -142,23 +142,31 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.1
   if (poster) {
     return (
       <>
+        {/* Poster — z-0, always visible until video plays.
+            Explicit z-index prevents the video element (even at opacity-0)
+            from blocking the poster on Safari/iOS where stacking context
+            behaves differently from Chrome. */}
         <img
           src={poster}
           alt=""
           aria-hidden="true"
           fetchPriority={autoPlayOnMount ? 'high' : 'auto'}
-          className={`${className} transition-opacity duration-500 ${playing ? 'opacity-0' : 'opacity-100'}`}
-          style={{ objectFit: 'cover' }}
+          decoding="async"
+          className={`${className} transition-opacity duration-700 ${playing ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+          style={{ objectFit: 'cover', zIndex: 0 }}
         />
+        {/* Video — z-10, fades in once onPlaying fires (first real frame on screen).
+            No poster attr — handled by <img> above to guarantee object-cover. */}
         <video
           ref={ref}
-          className={`${className} transition-opacity duration-500 ${playing ? 'opacity-100' : 'opacity-0'}`}
+          className={`${className} transition-opacity duration-700 ${playing ? 'opacity-100' : 'opacity-0'}`}
           muted
           playsInline
           preload={preloadFull ? 'auto' : 'metadata'}
           aria-hidden="true"
           onPlaying={() => setPlaying(true)}
           onError={() => setFailed(true)}
+          style={{ zIndex: 10 }}
         >
           <source src={src} type="video/mp4" />
         </video>

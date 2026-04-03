@@ -124,24 +124,24 @@ export default function ExportReportsPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-6">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
         <div className="text-center max-w-md w-full">
-          <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-500 flex-shrink-0">•</span>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-4">Report Exported!</h1>
+          <h1 className="text-2xl font-bold text-white mb-4">Report Exported!</h1>
           <p className="text-slate-500 mb-8">
             Your {FORMAT_OPTIONS.find(f => f.value === options.format)?.label} has been generated.
           </p>
           
-          <div className="bg-white rounded-xl p-4 mb-6">
+          <div className="bg-slate-800 rounded-xl p-4 mb-6">
             <div className="flex justify-center gap-4">
               {options.format === 'pdf' && (
                 <button
                   onClick={handlePrint}
                   className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-slate-700 transition-colors"
                 >
-                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center">
                     <Printer className="w-5 h-5 text-brand-blue-400" />
                   </div>
                   <span className="text-slate-600 text-sm">Print</span>
@@ -151,7 +151,7 @@ export default function ExportReportsPage() {
                 onClick={handleEmail}
                 className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-slate-700 transition-colors"
               >
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center">
                   <Mail className="w-5 h-5 text-brand-blue-400" />
                 </div>
                 <span className="text-slate-600 text-sm">Email</span>
@@ -161,7 +161,7 @@ export default function ExportReportsPage() {
                   onClick={handleShare}
                   className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-slate-700 transition-colors"
                 >
-                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center">
                     <Share2 className="w-5 h-5 text-brand-blue-400" />
                   </div>
                   <span className="text-slate-600 text-sm">Share</span>
@@ -203,14 +203,14 @@ export default function ExportReportsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-slate-900">
       <header className="bg-slate-800 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center gap-4">
           <Link href="/pwa/barber" className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-slate-900">Export Report</h1>
+            <h1 className="text-xl font-bold text-white">Export Report</h1>
             <p className="text-slate-500 text-sm">Download your hours record</p>
           </div>
         </div>
@@ -225,7 +225,7 @@ export default function ExportReportsPage() {
         )}
 
         {/* Format Selection */}
-        <div className="bg-white rounded-xl p-4">
+        <div className="bg-slate-800 rounded-xl p-4">
           <label className="text-slate-400 text-sm mb-3 block">Export Format</label>
           <div className="space-y-2">
             {FORMAT_OPTIONS.map((format) => (
@@ -245,7 +245,7 @@ export default function ExportReportsPage() {
                 </div>
                 <div className="text-left flex-1">
                   <div className="font-medium">{format.label}</div>
-                  <div className={`text-sm ${options.format === format.value ? 'text-brand-blue-200' : 'text-slate-500'}`}>
+                  <div className={`text-sm ${options.format === format.value ? 'text-blue-200' : 'text-slate-500'}`}>
                     {format.description}
                   </div>
                 </div>
@@ -258,7 +258,7 @@ export default function ExportReportsPage() {
         </div>
 
         {/* Date Range */}
-        <div className="bg-white rounded-xl p-4">
+        <div className="bg-slate-800 rounded-xl p-4">
           <label className="flex items-center gap-3 text-slate-400 text-sm mb-3">
             <Calendar className="w-4 h-4" />
             Date Range
@@ -305,7 +305,7 @@ export default function ExportReportsPage() {
         </div>
 
         {/* Options */}
-        <div className="bg-white rounded-xl p-4">
+        <div className="bg-slate-800 rounded-xl p-4">
           <label className="text-slate-400 text-sm mb-3 block">Report Options</label>
           <div className="space-y-3">
             <label className="flex items-center justify-between p-3 bg-slate-700 rounded-xl cursor-pointer">

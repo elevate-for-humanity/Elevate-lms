@@ -32,13 +32,17 @@ function getNextFriday(): string {
 
 type PaymentOption = 'weekly' | 'full' | 'custom' | 'sezzle' | 'affirm';
 
-// Map URL ?payment= values to internal option names
+// Map URL ?payment= values to internal option names.
+// Any BNPL provider ID that has no dedicated checkout (klarna, afterpay, zip)
+// maps to 'affirm' — the user will see the BNPL section pre-selected and can
+// choose their actual provider there.
 function resolveInitialPayment(param: string | null): PaymentOption {
   if (param === 'pay_in_full') return 'full';
   if (param === 'payment_plan') return 'custom';
   if (param === 'affirm') return 'affirm';
   if (param === 'sezzle') return 'sezzle';
-  if (param === 'bnpl') return 'sezzle'; // legacy fallback
+  // Legacy or unsupported BNPL provider IDs → default to affirm tab
+  if (param === 'bnpl' || param === 'klarna' || param === 'afterpay' || param === 'zip') return 'affirm';
   return 'weekly';
 }
 

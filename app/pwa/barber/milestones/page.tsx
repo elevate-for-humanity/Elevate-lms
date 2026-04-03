@@ -64,7 +64,7 @@ export default function MilestonesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <Loader2 className="w-12 h-12 text-brand-blue-500 animate-spin" />
       </div>
     );
@@ -74,29 +74,29 @@ export default function MilestonesPage() {
   const nextMilestone = milestones.find(m => m.status !== 'completed' && m.status !== 'unlocked');
 
   return (
-    <div className="min-h-screen bg-white pb-20">
+    <div className="min-h-screen bg-slate-900 pb-20">
       <header className="bg-amber-500 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center gap-4 mb-4">
-          <Link href="/pwa/barber" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+          <Link href="/pwa/barber" className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-slate-900">Milestones & Achievements</h1>
+            <h1 className="text-xl font-bold text-white">Milestones & Achievements</h1>
             <p className="text-amber-100 text-sm">Track your progress</p>
           </div>
         </div>
 
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
-            <p className="text-3xl font-bold text-slate-900">{totalHours.toLocaleString()}</p>
+          <div className="bg-slate-700 backdrop-blur-sm rounded-xl p-3 text-center">
+            <p className="text-3xl font-bold text-white">{totalHours.toLocaleString()}</p>
             <p className="text-amber-100 text-xs">Total Hours</p>
           </div>
-          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
-            <p className="text-3xl font-bold text-slate-900">{unlocked.length}</p>
+          <div className="bg-slate-700 backdrop-blur-sm rounded-xl p-3 text-center">
+            <p className="text-3xl font-bold text-white">{unlocked.length}</p>
             <p className="text-amber-100 text-xs">Milestones</p>
           </div>
-          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
-            <p className="text-3xl font-bold text-slate-900">{milestones.length}</p>
+          <div className="bg-slate-700 backdrop-blur-sm rounded-xl p-3 text-center">
+            <p className="text-3xl font-bold text-white">{milestones.length}</p>
             <p className="text-amber-100 text-xs">Total</p>
           </div>
         </div>
@@ -105,14 +105,14 @@ export default function MilestonesPage() {
       {/* Next milestone progress */}
       {nextMilestone && (
         <div className="px-4 -mt-4">
-          <div className="bg-white border border-slate-700 rounded-xl p-4">
+          <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-slate-500">Next: {nextMilestone.title}</p>
               <p className="text-sm font-bold text-amber-400">
                 {totalHours} / {nextMilestone.required_hours} hrs
               </p>
             </div>
-            <div className="w-full bg-white rounded-full h-3">
+            <div className="w-full bg-slate-700 rounded-full h-3">
               <div
                 className="bg-amber-500 h-3 rounded-full transition-all"
                 style={{ width: `${Math.min(100, (totalHours / nextMilestone.required_hours) * 100)}%` }}
@@ -174,7 +174,7 @@ export default function MilestonesPage() {
                     </div>
                     {!isUnlocked && (
                       <div className="mt-3">
-                        <div className="w-full bg-white rounded-full h-2">
+                        <div className="w-full bg-slate-700 rounded-full h-2">
                           <div
                             className="bg-amber-500 h-2 rounded-full transition-all"
                             style={{ width: `${progress}%` }}

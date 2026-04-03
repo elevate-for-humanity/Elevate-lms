@@ -81,7 +81,7 @@ export default function WeeklySummaryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <Loader2 className="w-12 h-12 text-brand-blue-500 animate-spin" />
       </div>
     );
@@ -90,16 +90,16 @@ export default function WeeklySummaryPage() {
   if (!summary) return null;
 
   return (
-    <div className="min-h-screen bg-white pb-20">
+    <div className="min-h-screen bg-slate-900 pb-20">
       <header className="bg-slate-700 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
-            <Link href="/pwa/barber" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+            <Link href="/pwa/barber" className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
               <ArrowLeft className="w-5 h-5 text-white" />
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-slate-900">Weekly Summary</h1>
-              <p className="text-brand-blue-200 text-sm">
+              <h1 className="text-xl font-bold text-white">Weekly Summary</h1>
+              <p className="text-blue-200 text-sm">
                 Week ending {new Date(summary.weekEnding).toLocaleDateString()}
               </p>
             </div>
@@ -107,7 +107,7 @@ export default function WeeklySummaryPage() {
           {'share' in navigator && (
             <button 
               onClick={handleShare}
-              className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"
+              className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center"
             >
               <Share2 className="w-5 h-5 text-white" />
             </button>
@@ -116,9 +116,9 @@ export default function WeeklySummaryPage() {
 
         {/* Week Total */}
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
-          <p className="text-brand-blue-200 text-sm mb-1">Hours This Week</p>
-          <p className="text-5xl font-bold text-slate-900 mb-2">{summary.totalHours}</p>
-          <p className="text-brand-blue-200 text-sm">
+          <p className="text-blue-200 text-sm mb-1">Hours This Week</p>
+          <p className="text-5xl font-bold text-white mb-2">{summary.totalHours}</p>
+          <p className="text-blue-200 text-sm">
             {summary.daysWorked} days worked • {summary.avgHoursPerDay.toFixed(1)} hrs/day avg
           </p>
         </div>
@@ -126,8 +126,8 @@ export default function WeeklySummaryPage() {
 
       <main className="px-4 py-6 space-y-6">
         {/* Hours Breakdown */}
-        <div className="bg-white rounded-xl p-4">
-          <h2 className="text-slate-900 font-medium mb-4">Hours Breakdown</h2>
+        <div className="bg-slate-800 rounded-xl p-4">
+          <h2 className="text-white font-medium mb-4">Hours Breakdown</h2>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -153,7 +153,7 @@ export default function WeeklySummaryPage() {
           </div>
           
           {/* Visual Bar */}
-          <div className="mt-4 h-4 bg-white rounded-full overflow-hidden flex">
+          <div className="mt-4 h-4 bg-slate-700 rounded-full overflow-hidden flex">
             <div 
               className="bg-white h-full"
               style={{ width: `${(summary.practicalHours / summary.totalHours) * 100}%` }}
@@ -170,55 +170,55 @@ export default function WeeklySummaryPage() {
         </div>
 
         {/* Approval Status */}
-        <div className="bg-white rounded-xl p-4">
-          <h2 className="text-slate-900 font-medium mb-4">Approval Status</h2>
+        <div className="bg-slate-800 rounded-xl p-4">
+          <h2 className="text-white font-medium mb-4">Approval Status</h2>
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white/10 border border-brand-green-500/30 rounded-xl p-4 text-center">
               <span className="text-slate-500 flex-shrink-0">•</span>
-              <p className="text-2xl font-bold text-slate-900">{summary.approvedHours}</p>
+              <p className="text-2xl font-bold text-white">{summary.approvedHours}</p>
               <p className="text-brand-green-400 text-sm">Approved</p>
             </div>
             <div className="bg-white/10 border border-amber-500/30 rounded-xl p-4 text-center">
               <Clock className="w-6 h-6 text-amber-400 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-slate-900">{summary.pendingHours}</p>
+              <p className="text-2xl font-bold text-white">{summary.pendingHours}</p>
               <p className="text-amber-400 text-sm">Pending</p>
             </div>
           </div>
         </div>
 
         {/* Cumulative Progress */}
-        <div className="bg-white/20 border border-brand-blue-500/30 rounded-xl p-4">
+        <div className="bg-slate-700 border border-brand-blue-500/30 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-3">
             <TrendingUp className="w-5 h-5 text-brand-blue-400" />
             <span className="text-brand-blue-300 font-medium">Overall Progress</span>
           </div>
           <div className="flex items-end justify-between mb-3">
             <div>
-              <p className="text-3xl font-bold text-slate-900">{summary.cumulativeHours}</p>
-              <p className="text-brand-blue-200 text-sm">of 2,000 hours</p>
+              <p className="text-3xl font-bold text-white">{summary.cumulativeHours}</p>
+              <p className="text-blue-200 text-sm">of 2,000 hours</p>
             </div>
             <p className="text-2xl font-bold text-brand-blue-300">{summary.progressPercent}%</p>
           </div>
-          <div className="h-3 bg-white rounded-full overflow-hidden">
+          <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
             <div 
               className="h-full bg-white rounded-full"
               style={{ width: `${summary.progressPercent}%` }}
             />
           </div>
-          <p className="text-brand-blue-200 text-sm mt-2">
+          <p className="text-blue-200 text-sm mt-2">
             {2000 - summary.cumulativeHours} hours remaining
           </p>
         </div>
 
         {/* Training Location */}
-        <div className="bg-white rounded-xl p-4">
-          <h2 className="text-slate-900 font-medium mb-3">Training Location</h2>
+        <div className="bg-slate-800 rounded-xl p-4">
+          <h2 className="text-white font-medium mb-3">Training Location</h2>
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
               <Scissors className="w-6 h-6 text-brand-blue-400" />
             </div>
             <div>
-              <p className="text-slate-900 font-medium">{summary.shopName}</p>
+              <p className="text-white font-medium">{summary.shopName}</p>
               <p className="text-slate-500 text-sm">Supervisor: {summary.supervisorName}</p>
             </div>
           </div>

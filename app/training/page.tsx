@@ -36,7 +36,7 @@ const PROGRAM_AREAS = [
     desc: 'IT Help Desk, Cybersecurity, Web Development, Network Administration. Industry certifications.',
     href: '/programs/technology',
     image: '/images/pages/it-helpdesk-desk.jpg',
-    credential: 'CompTIA A+ · Security+ · Network+',
+    credential: 'CompTIA A+ · Security+ · Network+ (via Certiport)',
     duration: '6–12 weeks',
   },
   {

@@ -9,6 +9,7 @@ export interface ExamSession {
   student_id: string | null;
   student_name: string;
   student_email: string | null;
+  booking_id: string | null;
   provider: ExamProvider;
   exam_name: string;
   exam_code: string | null;
@@ -47,7 +48,7 @@ export const PROVIDER_LABELS: Record<ExamProvider, string> = {
   esco_epa608: 'ESCO Institute (EPA 608)',
   mainstream_epa608: 'Mainstream Engineering (EPA 608)',
   certiport: 'Certiport',
-  act_workkeys: 'ACT WorkKeys / NCRC (Site Code: TBD)',
+  act_workkeys: 'ACT WorkKeys / NCRC (Realm: 1317721865)',
   careersafe_osha: 'CareerSafe (OSHA)',
   other: 'Other',
 };

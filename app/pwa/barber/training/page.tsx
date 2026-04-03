@@ -76,7 +76,7 @@ function ModuleCard({ module, onSelect, apprenticeHours }: {
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-slate-900 font-semibold truncate">{module.title}</h3>
+          <h3 className="text-white font-semibold truncate">{module.title}</h3>
           <p className="text-slate-500 text-sm mt-1 line-clamp-2">{module.description}</p>
           <div className="flex items-center gap-4 mt-3">
             <span className="text-slate-500 text-xs">
@@ -90,7 +90,7 @@ function ModuleCard({ module, onSelect, apprenticeHours }: {
           </div>
           {!module.locked && (
             <div className="mt-3">
-              <div className="h-1.5 bg-white rounded-full overflow-hidden">
+              <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
                 <div 
                   className={`h-full rounded-full ${
                     progress === 100 ? 'bg-brand-green-500' : 'bg-brand-blue-500'
@@ -135,7 +135,7 @@ function ChapterItem({ chapter, onComplete }: {
   };
   
   return (
-    <div className="flex items-center gap-4 bg-white rounded-xl p-4">
+    <div className="flex items-center gap-4 bg-slate-800 rounded-xl p-4">
       <button
         onClick={handleToggleComplete}
         disabled={completing}
@@ -228,10 +228,10 @@ export default function BarberTrainingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
-          <p className="text-slate-900">Loading training materials...</p>
+          <p className="text-white">Loading training materials...</p>
         </div>
       </div>
     );
@@ -239,10 +239,10 @@ export default function BarberTrainingPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-6">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-brand-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-slate-900 mb-4">Unable to Load</h1>
+          <h1 className="text-2xl font-bold text-white mb-4">Unable to Load</h1>
           <p className="text-slate-500 mb-6">{error}</p>
           <Link
             href="/login?redirect=/pwa/barber/training"
@@ -266,7 +266,7 @@ export default function BarberTrainingPage() {
     const currentModule = data.modules.find(m => m.id === selectedModule.id) || selectedModule;
     
     return (
-      <div className="min-h-screen bg-white pb-20">
+      <div className="min-h-screen bg-slate-900 pb-20">
         <header className="bg-slate-800 px-4 pt-12 pb-6 safe-area-inset-top">
           <button 
             onClick={() => setSelectedModule(null)}
@@ -275,12 +275,12 @@ export default function BarberTrainingPage() {
             <ChevronLeft className="w-5 h-5" />
             Back to Modules
           </button>
-          <h1 className="text-xl font-bold text-slate-900">{currentModule.title}</h1>
+          <h1 className="text-xl font-bold text-white">{currentModule.title}</h1>
           <p className="text-slate-500 mt-1">{currentModule.description}</p>
           
           <div className="mt-4 flex items-center gap-4">
             <div className="flex-1">
-              <div className="h-2 bg-white rounded-full overflow-hidden">
+              <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-white rounded-full"
                   style={{ width: `${(currentModule.completed / currentModule.lessons) * 100}%` }}
@@ -328,28 +328,28 @@ export default function BarberTrainingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-20">
+    <div className="min-h-screen bg-slate-900 pb-20">
       <header className="bg-slate-700 px-4 pt-12 pb-6 safe-area-inset-top">
-        <h1 className="text-2xl font-bold text-slate-900 mb-1">{data.course.title}</h1>
-        <p className="text-brand-blue-200 text-sm mb-1">{data.course.subtitle}</p>
+        <h1 className="text-2xl font-bold text-white mb-1">{data.course.title}</h1>
+        <p className="text-blue-200 text-sm mb-1">{data.course.subtitle}</p>
         <p className="text-brand-blue-300 text-xs">Powered by {data.course.partner}</p>
         
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mt-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-brand-blue-200 text-sm">Overall Progress</span>
+            <span className="text-blue-200 text-sm">Overall Progress</span>
             <span className="text-white font-bold">{data.progress.percentComplete}%</span>
           </div>
-          <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+          <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
             <div 
               className="h-full bg-white rounded-full"
               style={{ width: `${data.progress.percentComplete}%` }}
             />
           </div>
           <div className="flex justify-between mt-2">
-            <p className="text-brand-blue-200 text-sm">
+            <p className="text-blue-200 text-sm">
               {data.progress.completedLessons} of {data.progress.totalLessons} lessons
             </p>
-            <p className="text-brand-blue-200 text-sm">
+            <p className="text-blue-200 text-sm">
               {data.apprenticeHours} hours logged
             </p>
           </div>

@@ -8,13 +8,14 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import InstructorPerformanceDashboard from '@/components/InstructorPerformanceDashboard';
 
 import {
-
   Users,
   BookOpen,
   Award,
   TrendingUp,
   Clock,
-CheckCircle, } from 'lucide-react';
+  CheckCircle,
+  ClipboardList,
+} from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Instructor Dashboard | Elevate For Humanity',
@@ -59,6 +60,15 @@ export default async function ProgramHolderDashboard() {
     students?.filter((e) => e.status === 'active').length || 0;
   const completedStudents =
     students?.filter((e) => e.status === 'completed').length || 0;
+
+  // Pending submissions needing review
+  const isAdmin = profile.role === 'admin' || profile.role === 'super_admin';
+  let pendingQuery = supabase
+    .from('step_submissions')
+    .select('id', { count: 'exact', head: true })
+    .in('status', ['submitted', 'under_review']);
+  if (!isAdmin) pendingQuery = pendingQuery.eq('instructor_id', user.id);
+  const { count: pendingSubmissions } = await pendingQuery;
 
   return (
     <div className="min-h-screen">
@@ -233,30 +243,44 @@ export default async function ProgramHolderDashboard() {
             <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
               <h3 className="font-bold text-black mb-4">Quick Actions</h3>
               <div className="space-y-3">
+                {/* Submissions — shown prominently with pending count */}
+                <Link
+                  href="/instructor/submissions"
+                  className="flex items-center justify-between w-full px-4 py-3 bg-brand-blue-50 hover:bg-brand-blue-100 rounded-lg border border-brand-blue-200 transition"
+                >
+                  <div className="flex items-center gap-3">
+                    <ClipboardList className="w-5 h-5 text-brand-blue-600 shrink-0" />
+                    <div>
+                      <p className="font-medium text-brand-blue-900">Review Submissions</p>
+                      <p className="text-xs text-brand-blue-700">Labs &amp; assignments awaiting sign-off</p>
+                    </div>
+                  </div>
+                  {(pendingSubmissions ?? 0) > 0 && (
+                    <span className="ml-2 shrink-0 bg-brand-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                      {pendingSubmissions}
+                    </span>
+                  )}
+                </Link>
                 <Link
                   href="/instructor/students"
-                  className="block w-full text-left px-4 py-3 bg-white hover:bg-white rounded-lg transition"
+                  className="block w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition"
                 >
                   <p className="font-medium text-black">Manage Students</p>
-                  <p className="text-xs text-black">
-                    View and manage all students
-                  </p>
+                  <p className="text-xs text-slate-500">View and manage all students</p>
                 </Link>
                 <Link
                   href="/instructor/programs"
-                  className="block w-full text-left px-4 py-3 bg-white hover:bg-white rounded-lg transition"
+                  className="block w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition"
                 >
                   <p className="font-medium text-black">View Programs</p>
-                  <p className="text-xs text-black">
-                    Browse available programs
-                  </p>
+                  <p className="text-xs text-slate-500">Browse available programs</p>
                 </Link>
                 <Link
                   href="/instructor/settings"
-                  className="block w-full text-left px-4 py-3 bg-white hover:bg-white rounded-lg transition"
+                  className="block w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition"
                 >
                   <p className="font-medium text-black">Settings</p>
-                  <p className="text-xs text-black">Update your profile</p>
+                  <p className="text-xs text-slate-500">Update your profile</p>
                 </Link>
               </div>
 
@@ -267,6 +291,12 @@ export default async function ProgramHolderDashboard() {
                   <Link href="/instructor/courses" aria-label="Courses" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Courses</Link>
                   <Link href="/instructor/students" aria-label="Students" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Students</Link>
                   <Link href="/instructor/programs" aria-label="Programs" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Programs</Link>
+                  <Link href="/instructor/submissions" aria-label="Submissions" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm flex items-center justify-between gap-1">
+                    <span>Submissions</span>
+                    {(pendingSubmissions ?? 0) > 0 && (
+                      <span className="bg-brand-blue-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">{pendingSubmissions}</span>
+                    )}
+                  </Link>
                   <Link href="/instructor/campaigns" aria-label="Campaigns" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Campaigns</Link>
                   <Link href="/instructor/analytics" aria-label="Analytics" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Analytics</Link>
                   <Link href="/instructor/settings" aria-label="Settings" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Settings</Link>

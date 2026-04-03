@@ -5,16 +5,12 @@
  * Runs in order; each step is non-fatal unless marked critical.
  *
  * States written to applications.status:
- *   submitted → paid → approved → milady_pending → milady_issued → onboarding_sent
- *
- * applications.milady_status:
- *   not_applicable | pending | queued | issued | failed
+ *   submitted → paid → approved → onboarding_sent
  */
 
 import { logger } from '@/lib/logger';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-const MILADY_LOGIN_URL = 'https://www.miladytraining.com/users/sign_in';
 const BARBER_PROGRAM_SLUG = 'barber-apprenticeship';
 
 export interface BarberPostPaymentInput {
@@ -81,15 +77,15 @@ export async function runBarberPostPayment(
     } else {
       const profileId = profile.id;
 
-      // Find the barber program
+      // Find the barber program — program_enrollments.program_id FK references apprenticeship_programs
       const { data: program } = await db
-        .from('programs')
+        .from('apprenticeship_programs')
         .select('id')
         .eq('slug', BARBER_PROGRAM_SLUG)
         .maybeSingle();
 
       if (!program?.id) {
-        logger.error('[barber-post-payment] Barber program not found in programs table');
+        logger.error('[barber-post-payment] Barber program not found in apprenticeship_programs table');
         steps['create_enrollment'] = 'failed';
       } else {
         // Upsert enrollment
@@ -147,46 +143,7 @@ export async function runBarberPostPayment(
     steps['create_enrollment'] = 'skipped'; // already linked
   }
 
-  // ── Step 3: Queue Milady provisioning ─────────────────────────────────────
-  try {
-    await db.from('milady_provisioning_queue').insert({
-      student_email: studentEmail,
-      student_name:  studentName,
-      program_slug:  BARBER_PROGRAM_SLUG,
-      status:        'pending',
-      notes:         `application_id:${applicationId}`,
-    });
-
-    await db
-      .from('applications')
-      .update({ milady_status: 'queued', updated_at: new Date().toISOString() })
-      .eq('id', applicationId);
-
-    // external_course_access record — tracks Milady seat (manual until API available)
-    if (enrollmentId) {
-      const { data: profile } = await db
-        .from('profiles')
-        .select('id')
-        .eq('email', studentEmail.toLowerCase().trim())
-        .maybeSingle();
-
-      await db.from('external_course_access').insert({
-        student_id:     profile?.id ?? null,
-        application_id: applicationId,
-        provider:       'milady',
-        login_email:    studentEmail,
-        access_status:  'pending',
-        notes:          'Awaiting manual seat provisioning. No Milady API available.',
-      });
-    }
-
-    steps['queue_milady'] = 'ok';
-  } catch (err) {
-    logger.error('[barber-post-payment] Milady queue failed (non-fatal)', err);
-    steps['queue_milady'] = 'failed';
-  }
-
-  // ── Step 4: Create follow-up reminder for admin ───────────────────────────
+  // ── Step 3: Create follow-up reminder for admin ───────────────────────────
   try {
     // Find CRM lead
     const { data: lead } = await db
@@ -198,10 +155,10 @@ export async function runBarberPostPayment(
     await db.from('follow_up_reminders').insert({
       due_at:         new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(), // 4 hours
       status:         'pending',
-      type:           'milady-fulfillment',
+      type:           'enrollment-followup',
       lead_id:        lead?.id ?? null,
       application_id: applicationId,
-      note:           `Paid barber student ${studentName} (${studentEmail}) — issue Milady access and confirm onboarding.`,
+      note:           `Paid barber student ${studentName} (${studentEmail}) — confirm host shop and start date.`,
     });
 
     // Advance CRM lead stage
@@ -224,7 +181,7 @@ export async function runBarberPostPayment(
     steps['crm_reminder'] = 'failed';
   }
 
-  // ── Step 5: Send student welcome + onboarding email ───────────────────────
+  // ── Step 4: Send student welcome + onboarding email ───────────────────────
   try {
     const { sendEmail } = await import('@/lib/email/sendgrid');
     const onboardingUrl = `${siteUrl}/onboarding/barber-apprenticeship`;
@@ -267,27 +224,11 @@ export async function runBarberPostPayment(
       </p>
     </div>
 
-    <div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:20px;margin:0 0 16px;">
-      <h3 style="margin:0 0 12px;color:#92400e;font-size:15px;">Step 3 — Milady Access (within 24 hours)</h3>
-      <p style="margin:0 0 12px;color:#374151;font-size:14px;">
-        Your related instruction is delivered through <strong>Milady</strong>, the industry-standard barbering curriculum platform.
-      </p>
-      <ul style="margin:0 0 12px;padding-left:20px;color:#374151;font-size:14px;">
-        <li style="margin-bottom:6px;">You will receive a separate email from Milady with your login credentials within 24 hours</li>
-        <li style="margin-bottom:6px;">Check your spam folder if you don't see it</li>
-        <li style="margin-bottom:0;">Once active, log in at <a href="${MILADY_LOGIN_URL}" style="color:#d97706;">${MILADY_LOGIN_URL}</a></li>
-      </ul>
-      <p style="color:#92400e;font-size:13px;margin:0;">
-        Didn't receive Milady credentials within 24 hours? Call <a href="tel:3173143757" style="color:#d97706;">317-314-3757</a>
-      </p>
-    </div>
-
     <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin:0 0 24px;">
       <p style="margin:0 0 8px;font-weight:700;color:#0f172a;font-size:14px;">Your checklist:</p>
       <ol style="margin:0;padding-left:20px;color:#374151;font-size:14px;">
         <li style="margin-bottom:6px;">Complete onboarding (10 min)</li>
         <li style="margin-bottom:6px;">Log in to your student portal</li>
-        <li style="margin-bottom:6px;">Watch for Milady credentials email (within 24 hrs)</li>
         <li style="margin-bottom:0;">Your advisor will contact you within 1–2 business days to confirm your host shop and start date</li>
       </ol>
     </div>
@@ -323,14 +264,14 @@ export async function runBarberPostPayment(
 
     await sendEmail({
       to: 'elevate4humanityedu@gmail.com',
-      subject: `ACTION REQUIRED — Milady Setup: ${studentName} (Barber Apprenticeship)`,
+      subject: `New Enrollment: ${studentName} — Barber Apprenticeship`,
       html: `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a;">
   <div style="background:#dc2626;padding:20px 28px;border-radius:8px 8px 0 0;">
-    <p style="margin:0;color:#fff;font-weight:700;font-size:16px;">⚡ Action Required — Milady Provisioning</p>
+    <p style="margin:0;color:#fff;font-weight:700;font-size:16px;">New Barber Apprenticeship Enrollment</p>
   </div>
   <div style="padding:28px;background:#fff;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px;">
-    <p style="margin:0 0 16px;font-size:15px;">A barber apprenticeship student has paid and needs a Milady account created.</p>
+    <p style="margin:0 0 16px;font-size:15px;">A barber apprenticeship student has paid and is ready to start.</p>
 
     <table style="border-collapse:collapse;width:100%;margin-bottom:20px;">
       <tr style="background:#f8fafc;">
@@ -362,10 +303,8 @@ export async function runBarberPostPayment(
     <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:16px;margin-bottom:20px;">
       <p style="margin:0 0 8px;font-weight:700;color:#dc2626;">Required Actions:</p>
       <ol style="margin:0;padding-left:20px;color:#374151;font-size:14px;">
-        <li style="margin-bottom:6px;">Create a Milady account for this student at <a href="${MILADY_LOGIN_URL}">${MILADY_LOGIN_URL}</a></li>
-        <li style="margin-bottom:6px;">Send the student their Milady login credentials</li>
         <li style="margin-bottom:6px;">Confirm host shop placement within 1–2 business days</li>
-        <li style="margin-bottom:0;">Mark Milady status as issued in the admin portal</li>
+        <li style="margin-bottom:0;">Contact student to confirm start date</li>
       </ol>
     </div>
 

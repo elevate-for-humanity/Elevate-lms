@@ -281,14 +281,14 @@ export default function HandbookPage() {
         {!alreadyAcknowledged && (
           <>
             {/* Progress */}
-            <div className="bg-white border rounded-lg p-4 mb-6">
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
               <div className="flex justify-between text-sm mb-2">
                 <span className="font-medium text-gray-700">Sections Acknowledged</span>
                 <span className="text-gray-500">{acknowledged.size} of {HANDBOOK_SECTIONS.length}</span>
               </div>
               <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-white rounded-full transition-all duration-500"
+                  className="h-full bg-brand-blue-600 rounded-full transition-all duration-500"
                   style={{ width: `${(acknowledged.size / HANDBOOK_SECTIONS.length) * 100}%` }}
                 />
               </div>
@@ -301,14 +301,16 @@ export default function HandbookPage() {
                 const isAcked = acknowledged.has(section.id);
 
                 return (
-                  <div key={section.id} className={`bg-white border rounded-xl overflow-hidden ${isAcked ? 'border-brand-blue-200' : 'border-gray-200'}`}>
+                  <div key={section.id} className={`border rounded-xl overflow-hidden ${isAcked ? 'border-brand-blue-300 bg-brand-blue-50' : 'border-gray-200 bg-white'}`}>
                     <button
                       type="button"
                       onClick={() => toggleExpand(section.id)}
-                      className="w-full p-4 flex items-center gap-3 text-left hover:bg-white"
+                      className="w-full p-4 flex items-center gap-3 text-left hover:bg-gray-50 transition-colors"
                     >
-                      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${isAcked ? 'bg-brand-blue-100' : 'bg-white'}`}>
-                        {isAcked ? <CheckCircle2 className="w-4 h-4 text-brand-blue-600" /> : <BookOpen className="w-4 h-4 text-gray-400" />}
+                      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${isAcked ? 'bg-brand-blue-600' : 'bg-gray-100'}`}>
+                        {isAcked
+                          ? <CheckCircle2 className="w-4 h-4 text-white" />
+                          : <BookOpen className="w-4 h-4 text-gray-500" />}
                       </div>
                       <span className={`flex-1 font-semibold ${isAcked ? 'text-brand-blue-900' : 'text-gray-900'}`}>
                         {section.title}
@@ -318,10 +320,10 @@ export default function HandbookPage() {
 
                     {isExpanded && (
                       <div className="border-t border-gray-100 px-4 pb-4">
-                        <div className="bg-white rounded-lg p-4 mt-3 mb-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed">
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-3 mb-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed">
                           {section.content}
                         </div>
-                        <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-white border border-gray-200">
+                        <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-brand-blue-50 border border-gray-200 bg-white transition-colors">
                           <input
                             type="checkbox"
                             checked={isAcked}

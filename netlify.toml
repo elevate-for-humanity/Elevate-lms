@@ -240,6 +240,12 @@
 # Compliance expiration — weekly, Monday 3 AM ET
 # Finds provider_compliance_artifacts expiring within 30 days and queues notifications.
 # Requires CRON_SECRET env var in Netlify site settings.
+# Testing center no-show enforcement — nightly 2 AM ET
+# Marks missed confirmed bookings as no-show, creates $50 rescheduling fee holds.
+# Requires CRON_SECRET env var.
+[functions."cron-testing-no-show"]
+  schedule = "0 7 * * *"
+
 [functions."cron-compliance-expiration"]
   schedule = "0 8 * * 1"
 

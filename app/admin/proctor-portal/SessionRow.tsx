@@ -1,6 +1,7 @@
 'use client';
 
-import { Edit2, ExternalLink, AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
+import { Edit2, ExternalLink, AlertTriangle, RefreshCw } from 'lucide-react';
 import type { ExamSession } from './types';
 import { PROVIDER_LABELS, STATUS_LABELS, RESULT_LABELS } from './types';
 
@@ -26,6 +27,32 @@ const DELIVERY_LABELS: Record<string, string> = {
 };
 
 export default function SessionRow({ session: s, onEdit }: { session: ExamSession; onEdit: (s: ExamSession) => void }) {
+  const [retakeSent, setRetakeSent] = useState(false);
+  const [retakeSending, setRetakeSending] = useState(false);
+
+  async function handleRetake() {
+    if (!s.student_email) return;
+    if (!confirm(`Issue retake fee hold for ${s.student_name} (${s.student_email})?`)) return;
+    setRetakeSending(true);
+    try {
+      const res = await fetch('/api/testing/retake', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bookingId: s.booking_id ?? s.id,
+          email: s.student_email,
+          examName: s.exam_name,
+        }),
+      });
+      if (res.ok) setRetakeSent(true);
+      else alert('Failed to issue retake hold. Check console.');
+    } catch {
+      alert('Network error. Try again.');
+    } finally {
+      setRetakeSending(false);
+    }
+  }
+
   return (
     <tr className="hover:bg-slate-50 transition-colors">
       <td className="px-4 py-3 text-slate-600 whitespace-nowrap">
@@ -89,6 +116,21 @@ export default function SessionRow({ session: s, onEdit }: { session: ExamSessio
             <a href={s.evidence_url} target="_blank" rel="noopener noreferrer" className="p-1.5 text-slate-400 hover:text-brand-blue-600 hover:bg-brand-blue-50 rounded" title="View evidence">
               <ExternalLink className="w-4 h-4" />
             </a>
+          )}
+          {/* Retake button — only shown for failed exams with an email on file */}
+          {s.result === 'fail' && s.student_email && (
+            <button
+              onClick={handleRetake}
+              disabled={retakeSending || retakeSent}
+              title={retakeSent ? 'Retake hold issued' : 'Issue retake fee hold'}
+              className={`p-1.5 rounded transition-colors ${
+                retakeSent
+                  ? 'text-brand-green-600 bg-brand-green-50 cursor-default'
+                  : 'text-amber-500 hover:text-amber-700 hover:bg-amber-50'
+              }`}
+            >
+              <RefreshCw className={`w-4 h-4 ${retakeSending ? 'animate-spin' : ''}`} />
+            </button>
           )}
         </div>
       </td>

@@ -16,6 +16,10 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
   const [muted, setMuted] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
+  // mounted prevents SSR/hydration mismatch — video element only renders client-side
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -98,8 +102,9 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
         />
       )}
 
-      {/* Video — fades in once playing. No poster attr — handled by <img> above to ensure object-cover. */}
-      {!reducedMotion && (
+      {/* Video — only rendered client-side to prevent SSR hydration flash.
+          Fades in once playing. No poster attr — handled by <img> above. */}
+      {mounted && !reducedMotion && (
         <video
           ref={videoRef}
           muted
@@ -107,6 +112,7 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
           playsInline
           aria-hidden="true"
           className={`absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+          style={{ backgroundColor: 'transparent' }}
         />
       )}
 

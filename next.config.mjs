@@ -766,7 +766,13 @@ const nextConfig = {
       // Redirect-only page.tsx files moved here to free build slots.
       // ============================================
       // Handbook canonicalization — /student-handbook is the single source
-      { source: '/student-portal/handbook',   destination: '/student-handbook', permanent: true },
+      { source: '/student-portal/handbook',            destination: '/student-handbook',              permanent: true },
+      // /student-portal/handbook/acknowledge → canonical onboarding handbook (has the acknowledge flow)
+      { source: '/student-portal/handbook/acknowledge', destination: '/onboarding/learner/handbook',  permanent: true },
+
+      // Orientation canonicalization
+      // Legacy enrollment orientation → onboarding flow
+      { source: '/onboarding/orientation',             destination: '/onboarding/learner/orientation', permanent: true },
 
       // /cert/verify kept as page.tsx — passes query params to /verify
       { source: '/partner/dashboard',           destination: '/program-holder/dashboard', permanent: true  },

@@ -89,23 +89,23 @@ export default function BarberEnrollPage() {
   // Info Step
   if (step === 'info') {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-slate-900">
         <header className="bg-slate-800 px-4 pt-12 pb-6 safe-area-inset-top">
           <div className="flex items-center gap-4">
             <Link href="/pwa/barber" className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
               <ArrowLeft className="w-5 h-5 text-white" />
             </Link>
-            <h1 className="text-xl font-bold text-slate-900">Enroll as Apprentice</h1>
+            <h1 className="text-xl font-bold text-white">Enroll as Apprentice</h1>
           </div>
         </header>
 
         <main className="px-4 py-6 space-y-6">
-          <div className="bg-white/20 border border-brand-blue-500/30 rounded-xl p-6">
-            <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-4">
+          <div className="bg-slate-700 border border-brand-blue-500/30 rounded-xl p-6">
+            <div className="w-16 h-16 bg-slate-800 rounded-xl flex items-center justify-center mb-4">
               <Scissors className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-xl font-bold text-slate-900 mb-2">Barber Apprenticeship</h2>
-            <p className="text-brand-blue-200 mb-4">
+            <h2 className="text-xl font-bold text-white mb-2">Barber Apprenticeship</h2>
+            <p className="text-blue-200 mb-4">
               Train at a licensed barbershop while earning hours toward your state license.
             </p>
             <ul className="space-y-2 text-sm text-slate-300">
@@ -128,8 +128,8 @@ export default function BarberEnrollPage() {
             </ul>
           </div>
 
-          <div className="bg-white rounded-xl p-4">
-            <h3 className="text-slate-900 font-semibold mb-3">Requirements</h3>
+          <div className="bg-slate-800 rounded-xl p-4">
+            <h3 className="text-white font-semibold mb-3">Requirements</h3>
             <ul className="space-y-2 text-sm text-slate-400">
               <li>• Must be at least 16 years old</li>
               <li>• High school diploma or GED (or currently enrolled)</li>
@@ -153,7 +153,7 @@ export default function BarberEnrollPage() {
   // Shop Selection Step
   if (step === 'shop') {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-slate-900">
         <header className="bg-slate-800 px-4 pt-12 pb-6 safe-area-inset-top">
           <div className="flex items-center gap-4">
             <button 
@@ -163,7 +163,7 @@ export default function BarberEnrollPage() {
               <ArrowLeft className="w-5 h-5 text-white" />
             </button>
             <div>
-              <h1 className="text-xl font-bold text-slate-900">Select a Shop</h1>
+              <h1 className="text-xl font-bold text-white">Select a Shop</h1>
               <p className="text-slate-500 text-sm">Choose where you'll train</p>
             </div>
           </div>
@@ -206,11 +206,11 @@ export default function BarberEnrollPage() {
                 }`}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
                     <Scissors className="w-6 h-6 text-brand-blue-400" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-slate-900 font-medium">{partner.name}</p>
+                    <p className="text-white font-medium">{partner.name}</p>
                     <p className="text-slate-500 text-sm flex items-center gap-1">
                       <MapPin className="w-3 h-3" />
                       {partner.city}, {partner.state}
@@ -229,7 +229,7 @@ export default function BarberEnrollPage() {
   // Confirmation Step
   if (step === 'confirm') {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-slate-900">
         <header className="bg-slate-800 px-4 pt-12 pb-6 safe-area-inset-top">
           <div className="flex items-center gap-4">
             <button 
@@ -238,7 +238,7 @@ export default function BarberEnrollPage() {
             >
               <ArrowLeft className="w-5 h-5 text-white" />
             </button>
-            <h1 className="text-xl font-bold text-slate-900">Confirm Enrollment</h1>
+            <h1 className="text-xl font-bold text-white">Confirm Enrollment</h1>
           </div>
         </header>
 
@@ -250,14 +250,14 @@ export default function BarberEnrollPage() {
             </div>
           )}
 
-          <div className="bg-white rounded-xl p-4">
+          <div className="bg-slate-800 rounded-xl p-4">
             <h3 className="text-slate-400 text-sm mb-3">Training Location</h3>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
                 <Scissors className="w-6 h-6 text-brand-blue-400" />
               </div>
               <div>
-                <p className="text-slate-900 font-medium">{selectedPartner?.name}</p>
+                <p className="text-white font-medium">{selectedPartner?.name}</p>
                 <p className="text-slate-500 text-sm">
                   {selectedPartner?.city}, {selectedPartner?.state}
                 </p>
@@ -265,7 +265,7 @@ export default function BarberEnrollPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-4">
+          <div className="bg-slate-800 rounded-xl p-4">
             <h3 className="text-slate-400 text-sm mb-3">Program Details</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
@@ -319,12 +319,12 @@ export default function BarberEnrollPage() {
 
   // Success Step
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-6">
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
       <div className="text-center max-w-md">
-        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
+        <div className="w-20 h-20 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-6">
           <span className="text-slate-500 flex-shrink-0">•</span>
         </div>
-        <h1 className="text-2xl font-bold text-slate-900 mb-4">Enrollment Complete!</h1>
+        <h1 className="text-2xl font-bold text-white mb-4">Enrollment Complete!</h1>
         <p className="text-slate-500 mb-8">
           Welcome to the Barber Apprenticeship program. You can now start logging your training hours.
         </p>

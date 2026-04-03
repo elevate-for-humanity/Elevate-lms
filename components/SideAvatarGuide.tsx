@@ -34,6 +34,7 @@ export default function SideAvatarGuide({
   const [isVisible, setIsVisible] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -199,17 +200,26 @@ export default function SideAvatarGuide({
           {/* Avatar Video Section - Larger */}
           <div className="bg-slate-900 p-4">
             <div className="relative">
-              <video
-                ref={videoRef}
-                src={avatarVideoUrl}
-                muted
-                playsInline
-                autoPlay
-                className="w-full h-52 object-contain rounded-xl bg-slate-900"
-                onEnded={() => setIsPlaying(false)}
-                onPlay={() => setIsPlaying(true)}
-                onPause={() => setIsPlaying(false)}
-              />
+              {!videoFailed ? (
+                <video
+                  ref={videoRef}
+                  src={avatarVideoUrl}
+                  muted
+                  playsInline
+                  autoPlay
+                  className="w-full h-52 object-contain rounded-xl bg-slate-900"
+                  onEnded={() => setIsPlaying(false)}
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
+                  onError={() => setVideoFailed(true)}
+                />
+              ) : (
+                <div className="w-full h-52 rounded-xl bg-slate-800 flex items-center justify-center">
+                  <div className="w-20 h-20 rounded-full bg-brand-orange-500 flex items-center justify-center text-white text-3xl font-bold">
+                    {avatarName?.charAt(0) ?? 'E'}
+                  </div>
+                </div>
+              )}
               
               {/* Play/Pause overlay */}
               <div className="absolute inset-0 flex items-center justify-center">

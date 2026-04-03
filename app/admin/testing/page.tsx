@@ -26,6 +26,13 @@ export default async function TestingAdminPage() {
     .select('*')
     .order('preferred_date', { ascending: true });
 
+  const { data: slots } = await supabase
+    .from('testing_slots')
+    .select('*')
+    .eq('is_cancelled', false)
+    .gte('start_time', new Date().toISOString())
+    .order('start_time', { ascending: true });
+
   const pending = (bookings ?? []).filter((b: any) => b.status === 'pending').length;
   const confirmed = (bookings ?? []).filter((b: any) => b.status === 'confirmed').length;
   const total = (bookings ?? []).length;
@@ -37,7 +44,7 @@ export default async function TestingAdminPage() {
           <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Testing Center' }]} />
         </div>
       </div>
-      <TestingAdminClient bookings={bookings ?? []} stats={{ pending, confirmed, total }} />
+      <TestingAdminClient bookings={bookings ?? []} slots={slots ?? []} stats={{ pending, confirmed, total }} />
     </div>
   );
 }

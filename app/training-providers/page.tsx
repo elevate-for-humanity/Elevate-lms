@@ -240,19 +240,19 @@ export default function TrainingProvidersPage() {
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
               <div className="text-4xl md:text-5xl font-bold mb-2">ETPL Listed</div>
-              <div className="text-brand-blue-200">Students Placed</div>
+              <div className="text-white">Students Placed</div>
             </div>
             <div>
               <div className="text-4xl md:text-5xl font-bold mb-2">50+</div>
-              <div className="text-brand-blue-200">Partner Providers</div>
+              <div className="text-white">Partner Providers</div>
             </div>
             <div>
               <div className="text-4xl md:text-5xl font-bold mb-2">85%</div>
-              <div className="text-brand-blue-200">Job Placement Rate</div>
+              <div className="text-white">Job Placement Rate</div>
             </div>
             <div>
               <div className="text-4xl md:text-5xl font-bold mb-2">$0</div>
-              <div className="text-brand-blue-200">Cost to Partners</div>
+              <div className="text-white">Cost to Partners</div>
             </div>
           </div>
         </div>

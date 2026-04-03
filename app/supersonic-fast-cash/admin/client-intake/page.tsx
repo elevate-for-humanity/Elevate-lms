@@ -164,7 +164,7 @@ export default function ClientIntakeDashboard() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors ${activeTab === tab ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors ${activeTab === tab ? 'bg-white shadow text-gray-900' : 'text-black hover:text-gray-700'}`}
             >
               <Icon className="w-4 h-4" />{label}
               {tab === 'documents' && documents.filter(d => d.status === 'pending_review').length > 0 && (
@@ -180,7 +180,7 @@ export default function ClientIntakeDashboard() {
         {activeTab === 'documents' && (
           <div className="space-y-4">
             <div className="bg-white rounded-xl shadow-sm p-4 flex items-center gap-3">
-              <Search className="w-4 h-4 text-gray-400" />
+              <Search className="w-4 h-4 text-black" />
               <input
                 type="text"
                 placeholder="Search by file name or user ID…"
@@ -188,7 +188,7 @@ export default function ClientIntakeDashboard() {
                 onChange={e => setDocSearch(e.target.value)}
                 className="flex-1 text-sm focus:outline-none"
               />
-              <button onClick={fetchDocuments} className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+              <button onClick={fetchDocuments} className="flex items-center gap-1 text-sm text-black hover:text-gray-700">
                 <RefreshCw className={`w-4 h-4 ${docsLoading ? 'animate-spin' : ''}`} /> Refresh
               </button>
             </div>
@@ -198,33 +198,33 @@ export default function ClientIntakeDashboard() {
                 <thead className="bg-gray-50 border-b">
                   <tr>
                     {['Client', 'Document', 'Type', 'Year', 'Size', 'Status', 'Actions'].map(h => (
-                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{h}</th>
+                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-black uppercase">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {docsLoading ? (
-                    <tr><td colSpan={7} className="px-4 py-10 text-center text-gray-400">
+                    <tr><td colSpan={7} className="px-4 py-10 text-center text-black">
                       <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2" />Loading…
                     </td></tr>
                   ) : documents.filter(d =>
                     !docSearch || d.file_name.toLowerCase().includes(docSearch.toLowerCase()) || d.user_id.includes(docSearch)
                   ).length === 0 ? (
-                    <tr><td colSpan={7} className="px-4 py-10 text-center text-gray-400">No documents uploaded yet</td></tr>
+                    <tr><td colSpan={7} className="px-4 py-10 text-center text-black">No documents uploaded yet</td></tr>
                   ) : (
                     documents
                       .filter(d => !docSearch || d.file_name.toLowerCase().includes(docSearch.toLowerCase()) || d.user_id.includes(docSearch))
                       .map(doc => (
                         <tr key={doc.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-3 font-mono text-xs text-gray-500">{doc.user_id.slice(0, 8)}…</td>
+                          <td className="px-4 py-3 font-mono text-xs text-black">{doc.user_id.slice(0, 8)}…</td>
                           <td className="px-4 py-3 max-w-[180px] truncate font-medium">{doc.file_name}</td>
                           <td className="px-4 py-3">
                             <span className="bg-blue-50 text-blue-700 text-xs px-2 py-0.5 rounded-full font-medium">
                               {DOC_TYPE_LABELS[doc.document_type] ?? doc.document_type}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-gray-600">{doc.tax_year}</td>
-                          <td className="px-4 py-3 text-gray-500">{formatBytes(doc.file_size)}</td>
+                          <td className="px-4 py-3 text-black">{doc.tax_year}</td>
+                          <td className="px-4 py-3 text-black">{formatBytes(doc.file_size)}</td>
                           <td className="px-4 py-3">
                             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${doc.status === 'reviewed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                               {doc.status === 'reviewed' ? 'Reviewed' : 'Pending'}
@@ -285,7 +285,7 @@ export default function ClientIntakeDashboard() {
               <span className="text-sm font-medium text-black">
                 Completed
               </span>
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
             </div>
             <div className="text-3xl font-bold">
               {clients.filter((c) => c.status === 'completed').length}
@@ -432,7 +432,7 @@ export default function ClientIntakeDashboard() {
                         }`}
                       >
                         {client.status === 'completed' && (
-                          <span className="text-slate-400 flex-shrink-0">•</span>
+                          <span className="text-black flex-shrink-0">•</span>
                         )}
                         {client.status === 'review' && (
                           <AlertCircle className="w-3 h-3" />

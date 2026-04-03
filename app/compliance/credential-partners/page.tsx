@@ -180,7 +180,7 @@ export default function CredentialPartnersPage() {
               <div key={i} className="bg-white rounded-xl border overflow-hidden">
                 <div className="bg-white px-6 py-3 flex items-center justify-between">
                   <h3 className="font-bold text-slate-900">{partner.program}</h3>
-                  <span className="text-xs text-brand-blue-100 bg-brand-blue-700 px-2 py-0.5 rounded">
+                  <span className="text-xs text-white bg-brand-blue-700 px-2 py-0.5 rounded">
                     {partner.licenseStatus}
                   </span>
                 </div>

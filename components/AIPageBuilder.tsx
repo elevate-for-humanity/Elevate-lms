@@ -353,7 +353,7 @@ export default function AIPageBuilder() {
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="   px-6 py-4">
                 <h2 className="text-2xl font-semibold text-white">Preview</h2>
-                <p className="text-brand-red-100 text-sm">{generatedPage.summary}</p>
+                <p className="text-white text-sm">{generatedPage.summary}</p>
               </div>
               <div className="p-6">
                 <div className="mb-4 flex flex-wrap gap-2">

@@ -62,7 +62,7 @@ export default async function ApplyPage({
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
             Start Your New Career
           </h1>
-          <p className="text-slate-600 max-w-xl mx-auto">
+          <p className="text-black max-w-xl mx-auto">
             Pick the path that fits you. Each application takes 5-10 minutes, no account needed. Funding available for qualifying students.
           </p>
         </div>
@@ -138,7 +138,7 @@ export default async function ApplyPage({
                 Many programs are funded through WIOA, WRG, and Job Ready Indy grants. Some programs
                 have tuition with flexible payment options available.
               </p>
-              <ul className="text-slate-600 text-sm space-y-1 mb-4 list-disc list-inside">
+              <ul className="text-black text-sm space-y-1 mb-4 list-disc list-inside">
                 <li>Many programs are fully funded through WIOA, WRG, and Job Ready Indy</li>
                 <li>Takes 2 minutes to check eligibility</li>
                 <li>Self-pay options with payment plans available if you don't qualify</li>
@@ -169,7 +169,7 @@ export default async function ApplyPage({
                 <h2 className="text-lg font-bold text-slate-900">Employer Partnership</h2>
                 <Image src="/logo.png" alt="Elevate" width={18} height={18} className="opacity-30" />
               </div>
-              <p className="text-slate-600 text-sm leading-relaxed mb-2">
+              <p className="text-black text-sm leading-relaxed mb-2">
                 Partner with Elevate to access pre-screened, trained candidates ready to work.
                 We handle recruiting, skills training, and onboarding so you get job-ready hires.
               </p>
@@ -225,7 +225,7 @@ export default async function ApplyPage({
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2 text-center">
             Every Applicant Gets a Support Bundle
           </h2>
-          <p className="text-slate-600 text-center mb-8 max-w-2xl mx-auto">
+          <p className="text-black text-center mb-8 max-w-2xl mx-auto">
             Training is just the start. We wrap services around you so nothing gets in the way of finishing.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
@@ -283,7 +283,7 @@ export default async function ApplyPage({
                 </div>
                 <div className="p-4">
                   <h3 className="font-semibold text-slate-900 mb-1">{item.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                  <p className="text-black text-sm leading-relaxed">{item.desc}</p>
                   {'link' in item && item.link && (
                     item.link.startsWith('http') ? (
                       <a
@@ -311,7 +311,7 @@ export default async function ApplyPage({
 
         {/* Track existing application */}
         <div className="text-center pt-2">
-          <p className="text-slate-500 text-sm">
+          <p className="text-black text-sm">
             Already applied?{' '}
             <Link href="/apply/track" className="text-brand-blue-600 hover:underline font-medium">
               Track your application status

@@ -104,7 +104,7 @@ export default function JoinPartnerPage() {
                 <p.icon className="w-5 h-5 text-brand-blue-600" />
               </div>
               <h3 className="font-bold text-slate-900 mb-2">{p.title}</h3>
-              <p className="text-slate-600 text-sm flex-1">{p.desc}</p>
+              <p className="text-black text-sm flex-1">{p.desc}</p>
               <Link
                 href={p.href}
                 className="mt-4 inline-flex items-center gap-1 text-brand-blue-600 text-sm font-medium hover:underline"
@@ -125,7 +125,7 @@ export default function JoinPartnerPage() {
               </div>
               <div>
                 <p className="font-semibold text-slate-900">{s.title}</p>
-                <p className="text-slate-600 text-sm mt-1">{s.desc}</p>
+                <p className="text-black text-sm mt-1">{s.desc}</p>
               </div>
             </div>
           ))}
@@ -134,7 +134,7 @@ export default function JoinPartnerPage() {
         {/* CTA */}
         <div className="bg-brand-blue-700 rounded-2xl p-8 text-center text-white">
           <h2 className="text-2xl font-bold mb-2">Ready to Partner?</h2>
-          <p className="text-white/80 mb-6">Submit your application and we will follow up within 2 business days.</p>
+          <p className="text-white mb-6">Submit your application and we will follow up within 2 business days.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href="/partners/apply"

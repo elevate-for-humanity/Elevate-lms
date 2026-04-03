@@ -45,7 +45,7 @@ export default function WorkforceBoardsPage() {
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Platform', href: '/platform' }, { label: 'Workforce Boards' }]} />
-          <p className="text-sm text-slate-600 font-medium mt-1">Part of the <a href="/platform" className="text-brand-red-600 hover:underline">Elevate Workforce Operating System</a></p>
+          <p className="text-sm text-black font-medium mt-1">Part of the <a href="/platform" className="text-brand-red-600 hover:underline">Elevate Workforce Operating System</a></p>
         </div>
       </div>
 
@@ -58,7 +58,7 @@ export default function WorkforceBoardsPage() {
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Workforce Board Solutions</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Streamline WIOA compliance, maximize participant outcomes, and simplify DOL reporting.</p>
+            <p className="text-lg text-white max-w-3xl mx-auto">Streamline WIOA compliance, maximize participant outcomes, and simplify DOL reporting.</p>
           </div>
         </div>
       </section>
@@ -69,7 +69,7 @@ export default function WorkforceBoardsPage() {
           <div className="flex flex-wrap gap-4 justify-center">
             {['WIOA Compliant', 'DOL Reporting', 'FERPA Secure', 'Real-time Analytics', 'Audit-Ready'].map((item, i) => (
               <span key={i} className="flex items-center gap-2 px-4 py-2 bg-white rounded-full text-brand-blue-700 text-sm font-medium shadow-sm">
-                <span className="text-slate-400 flex-shrink-0">•</span> {item}
+                <span className="text-black flex-shrink-0">•</span> {item}
               </span>
             ))}
           </div>
@@ -81,7 +81,7 @@ export default function WorkforceBoardsPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Platform Features</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-black max-w-2xl mx-auto">
               Built specifically for workforce development boards and their unique compliance requirements.
             </p>
           </div>
@@ -92,7 +92,7 @@ export default function WorkforceBoardsPage() {
                   <f.icon className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{f.title}</h3>
-                <p className="text-gray-600 text-sm">{f.description}</p>
+                <p className="text-black text-sm">{f.description}</p>
               </div>
             ))}
           </div>
@@ -104,7 +104,7 @@ export default function WorkforceBoardsPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Built for WIOA Compliance</h2>
-            <p className="text-lg text-gray-600">Every compliance area covered, from eligibility to performance reporting.</p>
+            <p className="text-lg text-black">Every compliance area covered, from eligibility to performance reporting.</p>
           </div>
           <div className="grid md:grid-cols-2 gap-8">
             {complianceAreas.map((area, i) => (
@@ -113,7 +113,7 @@ export default function WorkforceBoardsPage() {
                 <div className="space-y-2">
                   {area.items.map((item, j) => (
                     <div key={j} className="flex items-center gap-2">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-black flex-shrink-0">•</span>
                       <span className="text-gray-700 text-sm">{item}</span>
                     </div>
                   ))}
@@ -130,7 +130,7 @@ export default function WorkforceBoardsPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Integrates With Your Ecosystem</h2>
-              <p className="text-gray-600 mb-6">
+              <p className="text-black mb-6">
                 Connect with existing state systems and workforce tools for seamless data flow.
               </p>
               <div className="space-y-4">
@@ -143,7 +143,7 @@ export default function WorkforceBoardsPage() {
                   'Budget monitoring and fiscal reporting',
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     <span className="text-gray-700">{item}</span>
                   </div>
                 ))}
@@ -160,7 +160,7 @@ export default function WorkforceBoardsPage() {
       <section className="py-20 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Modernize Your Workforce Operations</h2>
-          <p className="text-brand-blue-100 text-lg mb-8">See how our platform can streamline your WIOA compliance and improve participant outcomes.</p>
+          <p className="text-white text-lg mb-8">See how our platform can streamline your WIOA compliance and improve participant outcomes.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/contact" className="px-8 py-4 bg-white text-brand-blue-800 font-bold rounded-lg hover:bg-brand-blue-50 transition inline-flex items-center gap-2">
               Schedule Demo <ArrowRight className="w-5 h-5" />

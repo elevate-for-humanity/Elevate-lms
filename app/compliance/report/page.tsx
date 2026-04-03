@@ -52,7 +52,7 @@ export default function ComplianceReportPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <FileText className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <h1 className="text-3xl font-bold mb-2">Submit a Compliance Report</h1>
-          <p className="text-brand-red-100">Report concerns about safety, ethics, or policy violations</p>
+          <p className="text-white">Report concerns about safety, ethics, or policy violations</p>
         </div>
       </div>
       <div className="max-w-2xl mx-auto px-4 py-12">

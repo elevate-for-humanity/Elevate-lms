@@ -40,7 +40,7 @@ export default async function PaymentSuccessPage({
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             {isPaid ? 'Payment Confirmed' : 'Payment Processing'}
           </h1>
-          <p className="text-gray-600 text-sm mb-6">
+          <p className="text-black text-sm mb-6">
             {isPaid
               ? 'Your $49 deposit has been received. You can now upload your tax documents.'
               : 'Your payment is being confirmed. This usually takes a few seconds. Refresh if needed.'}
@@ -49,18 +49,18 @@ export default async function PaymentSuccessPage({
           {payment && (
             <div className="bg-gray-50 rounded-lg p-4 text-left text-sm mb-6 space-y-2">
               <div className="flex justify-between">
-                <span className="text-gray-500">Amount</span>
+                <span className="text-black">Amount</span>
                 <span className="font-semibold">${((payment.amount ?? 0) / 100).toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Status</span>
+                <span className="text-black">Status</span>
                 <span className={`font-semibold capitalize ${isPaid ? 'text-green-600' : 'text-yellow-600'}`}>
                   {payment.status}
                 </span>
               </div>
               {payment.paid_at && (
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Paid at</span>
+                  <span className="text-black">Paid at</span>
                   <span className="font-medium">
                     {new Date(payment.paid_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
                   </span>
@@ -86,7 +86,7 @@ export default async function PaymentSuccessPage({
           )}
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-4">
+        <p className="text-center text-xs text-black mt-4">
           Questions? Contact us at{' '}
           <a href="mailto:elizabethpowell6262@gmail.com" className="underline">
             elizabethpowell6262@gmail.com

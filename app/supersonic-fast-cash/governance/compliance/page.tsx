@@ -128,31 +128,31 @@ export default function SupersonicCompliancePage() {
             </h2>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <div>
                   <p className="font-medium text-slate-900">Clear and Conspicuous</p>
-                  <p className="text-slate-600 text-sm">Disclosures are presented in plain language, visible without scrolling or clicking where possible.</p>
+                  <p className="text-black text-sm">Disclosures are presented in plain language, visible without scrolling or clicking where possible.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <div>
                   <p className="font-medium text-slate-900">Timely</p>
-                  <p className="text-slate-600 text-sm">Disclosures are presented before the user commits to a transaction or action.</p>
+                  <p className="text-black text-sm">Disclosures are presented before the user commits to a transaction or action.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <div>
                   <p className="font-medium text-slate-900">Accurate</p>
-                  <p className="text-slate-600 text-sm">All claims are supportable and aligned with authoritative documents.</p>
+                  <p className="text-black text-sm">All claims are supportable and aligned with authoritative documents.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <div>
                   <p className="font-medium text-slate-900">Complete</p>
-                  <p className="text-slate-600 text-sm">Material terms, conditions, and limitations are disclosed, not hidden.</p>
+                  <p className="text-black text-sm">Material terms, conditions, and limitations are disclosed, not hidden.</p>
                 </div>
               </div>
             </div>
@@ -260,7 +260,7 @@ export default function SupersonicCompliancePage() {
 
         {/* Footer */}
         <div className="mt-12 pt-8 border-t border-slate-200">
-          <p className="text-center text-slate-500 text-sm mb-6">End of Document</p>
+          <p className="text-center text-black text-sm mb-6">End of Document</p>
           <div className="flex justify-center gap-4">
             <Link 
               href="/admin/governance"

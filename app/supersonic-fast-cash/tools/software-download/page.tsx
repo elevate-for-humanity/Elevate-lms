@@ -121,11 +121,11 @@ export default function SupersonicFastCashDownloadPage() {
           <div className="flex items-start justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold mb-2">SupersonicFastCash Account Access</h2>
-              <p className="text-brand-blue-100">
+              <p className="text-white">
                 For authorized Supersonic Fast Cash staff only
               </p>
             </div>
-            <Key className="w-8 h-8 text-brand-blue-200" />
+            <Key className="w-8 h-8 text-white" />
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
@@ -160,7 +160,7 @@ export default function SupersonicFastCashDownloadPage() {
             </div>
 
             <div className="mt-6 pt-6 border-t border-white/20">
-              <p className="text-sm text-brand-blue-100 mb-3">
+              <p className="text-sm text-white mb-3">
                 <strong>Need Access?</strong> Contact:
               </p>
               <div className="space-y-2 text-sm">

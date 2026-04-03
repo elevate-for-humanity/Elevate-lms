@@ -36,7 +36,7 @@ export function ProgramCatalog() {
             <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-brand-orange-300">
               Popular programs
             </h2>
-            <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-50">
+            <p className="mt-3 text-3xl font-semibold tracking-tight text-white">
               Training that leads to real employment.
             </p>
             <p className="mt-3 text-sm text-slate-600">
@@ -47,7 +47,7 @@ export function ProgramCatalog() {
           </div>
           <Link
             href="/programs"
-            className="inline-flex items-center justify-center rounded-full border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-50 hover:border-brand-red-300 hover:bg-slate-900"
+            className="inline-flex items-center justify-center rounded-full border border-slate-700 px-5 py-2.5 text-sm font-semibold text-white hover:border-brand-red-300 hover:bg-slate-900"
           >
             View full program directory →
           </Link>
@@ -58,7 +58,7 @@ export function ProgramCatalog() {
           {paths.map((path) => (
             <span
               key={path}
-              className="rounded-full bg-slate-900 px-3 py-2 text-slate-200 ring-1 ring-slate-700"
+              className="rounded-full bg-slate-900 px-3 py-2 text-white ring-1 ring-slate-700"
             >
               {path}
             </span>
@@ -72,10 +72,10 @@ export function ProgramCatalog() {
               key={program.name}
               className="flex flex-col rounded-3xl bg-slate-900/80 p-5 ring-1 ring-slate-800"
             >
-              <h3 className="text-base font-semibold text-slate-50">
+              <h3 className="text-base font-semibold text-white">
                 {program.name}
               </h3>
-              <p className="mt-2 text-xs font-medium uppercase tracking-[0.2em] text-slate-500">
+              <p className="mt-2 text-xs font-medium uppercase tracking-[0.2em] text-white">
                 {program.meta}
               </p>
               <p className="mt-3 text-sm text-slate-600 flex-1">

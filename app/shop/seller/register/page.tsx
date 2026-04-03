@@ -69,7 +69,7 @@ export default function SellerRegisterPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Store className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <h1 className="text-3xl font-bold mb-2">Become a Seller</h1>
-          <p className="text-brand-blue-100">Sell your products and courses on the Elevate marketplace</p>
+          <p className="text-white">Sell your products and courses on the Elevate marketplace</p>
         </div>
       </div>
       <div className="max-w-2xl mx-auto px-4 py-12">

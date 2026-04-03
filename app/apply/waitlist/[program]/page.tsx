@@ -39,7 +39,7 @@ export default function WaitlistPage() {
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center max-w-md px-6">
           <h1 className="text-2xl font-bold text-slate-800 mb-4">Program Not Found</h1>
-          <p className="text-slate-600 mb-6">This program does not currently have a waitlist.</p>
+          <p className="text-black mb-6">This program does not currently have a waitlist.</p>
           <Link href="/apply/student" className="text-brand-blue-600 underline">View all programs</Link>
         </div>
       </div>
@@ -88,11 +88,11 @@ export default function WaitlistPage() {
             </svg>
           </div>
           <h2 className="text-2xl font-bold text-slate-800 mb-3">You're on the waitlist!</h2>
-          <p className="text-slate-600 mb-2">
+          <p className="text-black mb-2">
             You are <span className="font-bold text-brand-blue-600">#{result.position}</span> on the
             waitlist for <strong>{program.name}</strong>.
           </p>
-          <p className="text-slate-500 text-sm mb-6">
+          <p className="text-black text-sm mb-6">
             We'll email you as soon as a seat opens. Check your inbox for a confirmation.
           </p>
 
@@ -128,8 +128,8 @@ export default function WaitlistPage() {
             Waitlist Open
           </span>
           <h1 className="text-3xl font-bold text-slate-800 mb-3">{program.name}</h1>
-          <p className="text-slate-600">{program.description}</p>
-          <p className="text-sm text-slate-500 mt-2">
+          <p className="text-black">{program.description}</p>
+          <p className="text-sm text-black mt-2">
             Estimated wait: <strong>{program.estimatedWait}</strong>
           </p>
         </div>
@@ -206,7 +206,7 @@ export default function WaitlistPage() {
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
-                Anything else you'd like us to know? <span className="text-slate-400 font-normal">(optional)</span>
+                Anything else you'd like us to know? <span className="text-black font-normal">(optional)</span>
               </label>
               <textarea
                 rows={3}
@@ -246,7 +246,7 @@ export default function WaitlistPage() {
               {submitting ? 'Joining waitlist...' : 'Join the Waitlist'}
             </button>
 
-            <p className="text-center text-xs text-slate-400">
+            <p className="text-center text-xs text-black">
               Already approved for funding?{' '}
               <Link href={`/apply/student?program=${programSlug}`} className="text-brand-blue-600 underline">
                 Apply to enroll directly →

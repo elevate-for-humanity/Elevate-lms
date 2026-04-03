@@ -25,16 +25,16 @@ export default async function QuizPage({ params }: { params: { courseId: string;
         <div className="mb-6">
           <Link href={`/lms/courses/${params.courseId}/lessons/${params.lessonId}`} className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">← Back to Lesson</Link>
           <h1 className="text-2xl font-bold text-gray-900 mt-2">{lesson?.title} - Quiz</h1>
-          <p className="text-gray-600 mt-1">Test your understanding of this lesson</p>
+          <p className="text-black mt-1">Test your understanding of this lesson</p>
         </div>
         {quiz ? (
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between mb-6 pb-4 border-b">
               <div>
                 <h2 className="font-semibold">{quiz.title || 'Lesson Quiz'}</h2>
-                <p className="text-sm text-gray-500">{questions?.length || 0} questions • {quiz.passing_score || 70}% to pass</p>
+                <p className="text-sm text-black">{questions?.length || 0} questions • {quiz.passing_score || 70}% to pass</p>
               </div>
-              {quiz.time_limit && <span className="text-sm text-gray-500">Time limit: {quiz.time_limit} min</span>}
+              {quiz.time_limit && <span className="text-sm text-black">Time limit: {quiz.time_limit} min</span>}
             </div>
             <div className="space-y-6">
               {questions && questions.length > 0 ? questions.map((q: any, i: number) => (
@@ -57,13 +57,13 @@ export default async function QuizPage({ params }: { params: { courseId: string;
                     </div>
                   )}
                 </div>
-              )) : <p className="text-gray-500 text-center py-4">No questions available</p>}
+              )) : <p className="text-black text-center py-4">No questions available</p>}
             </div>
             <button className="w-full mt-6 bg-brand-blue-600 text-white px-4 py-3 rounded-lg hover:bg-brand-blue-700 font-medium">Submit Quiz</button>
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
-            <p className="text-gray-500">No quiz available for this lesson</p>
+            <p className="text-black">No quiz available for this lesson</p>
             <Link href={`/lms/courses/${params.courseId}/lessons/${params.lessonId}`} className="text-brand-blue-600 hover:text-brand-blue-800 mt-2 inline-block">Return to Lesson</Link>
           </div>
         )}

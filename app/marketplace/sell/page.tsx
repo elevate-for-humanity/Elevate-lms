@@ -107,7 +107,7 @@ export default async function SellOnMarketplacePage() {
       <div className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-bold mb-4">Share Your Expertise, Earn Revenue</h1>
-          <p className="text-xl text-brand-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-white mb-8 max-w-2xl mx-auto">
             Create and sell courses, resources, and learning materials to help others succeed while building your income.
           </p>
           {user ? (

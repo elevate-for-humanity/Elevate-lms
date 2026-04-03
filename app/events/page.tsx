@@ -34,7 +34,7 @@ export default async function EventsPage() {
         <div className="absolute inset-x-0 bottom-0 max-w-6xl mx-auto px-4 pb-8">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-300 mb-1">Elevate for Humanity</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-white">Events</h1>
-          <p className="text-slate-300 mt-1 text-sm max-w-xl">
+          <p className="text-white mt-1 text-sm max-w-xl">
             Workshops, info sessions, career fairs, and community gatherings in Indianapolis and online.
           </p>
         </div>
@@ -48,7 +48,7 @@ export default async function EventsPage() {
       <section className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-slate-900">Upcoming Events</h2>
-          <span className="text-sm text-slate-500">{upcoming.length} scheduled</span>
+          <span className="text-sm text-black">{upcoming.length} scheduled</span>
         </div>
         {upcoming.length === 0 ? (
           <EventsEmptyState
@@ -74,7 +74,7 @@ export default async function EventsPage() {
       <section className="py-12">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-white">Want to host or sponsor an event?</h2>
-          <p className="text-slate-400 mt-2 max-w-xl mx-auto text-sm">
+          <p className="text-black mt-2 max-w-xl mx-auto text-sm">
             Partner with Elevate for Humanity to connect with workforce-ready talent and the Indianapolis community.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">

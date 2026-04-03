@@ -104,7 +104,7 @@ export default function ENVCONFIGmdPage() {
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
               Ready to Get Started?
             </h2>
-            <p className="text-base md:text-lg text-brand-blue-100 mb-8">
+            <p className="text-base md:text-lg text-white mb-8">
               Explore training programs and earn industry certifications through our
               programs.
             </p>

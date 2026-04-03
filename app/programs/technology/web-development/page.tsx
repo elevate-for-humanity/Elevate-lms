@@ -85,7 +85,7 @@ export default function WebDevelopmentPage() {
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
             Web Development
           </h1>
-          <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed mb-2">
+          <p className="text-black text-base sm:text-lg max-w-2xl leading-relaxed mb-2">
             Full-stack development training covering HTML, CSS, JavaScript, React, Node.js, and databases.
             Graduate with a portfolio of real projects and the skills employers are hiring for.
           </p>
@@ -136,16 +136,16 @@ export default function WebDevelopmentPage() {
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">
                 What This Program Is
               </h2>
-              <p className="text-slate-600 text-base leading-relaxed mb-4">
+              <p className="text-black text-base leading-relaxed mb-4">
                 Our Web Development bootcamp teaches you to build modern, responsive websites and
                 full-stack web applications from scratch. You will learn HTML, CSS, JavaScript,
                 React, Node.js, and databases while building a portfolio of real projects.
               </p>
-              <p className="text-slate-600 text-base leading-relaxed mb-4">
+              <p className="text-black text-base leading-relaxed mb-4">
                 Training is project-based: you learn by building. By graduation, you will have a
                 professional portfolio demonstrating your skills to employers.
               </p>
-              <p className="text-slate-600 text-base leading-relaxed">
+              <p className="text-black text-base leading-relaxed">
                 This program may be available at no cost if you qualify through WIOA, WRG, or Job Ready Indy
                 funding. Students from outside Indiana can enroll through the self-pay option.
               </p>
@@ -162,7 +162,7 @@ export default function WebDevelopmentPage() {
                   ['Outcome', 'Job-ready portfolio + career placement support'],
                 ].map(([label, value]) => (
                   <div key={label} className="flex justify-between gap-4 border-b border-slate-200 pb-3 last:border-0 last:pb-0">
-                    <span className="text-slate-500 text-sm">{label}</span>
+                    <span className="text-black text-sm">{label}</span>
                     <span className="font-semibold text-slate-900 text-sm text-right">{value}</span>
                   </div>
                 ))}
@@ -182,7 +182,7 @@ export default function WebDevelopmentPage() {
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
               What You Will Learn
             </h2>
-            <p className="text-slate-600 text-base mt-2 max-w-xl mx-auto leading-relaxed">
+            <p className="text-black text-base mt-2 max-w-xl mx-auto leading-relaxed">
               A full-stack curriculum covering frontend, backend, and everything in between.
             </p>
           </div>
@@ -190,7 +190,7 @@ export default function WebDevelopmentPage() {
             {CURRICULUM.map((item) => (
               <div key={item.title} className="bg-white rounded-xl border border-slate-200 p-5">
                 <h3 className="font-bold text-slate-900 mb-2 text-sm">{item.title}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                <p className="text-black text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -217,7 +217,7 @@ export default function WebDevelopmentPage() {
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">
                 Build a Professional Portfolio
               </h2>
-              <p className="text-slate-600 text-base leading-relaxed mb-6">
+              <p className="text-black text-base leading-relaxed mb-6">
                 Graduate with a portfolio of real projects that demonstrate your skills to employers.
                 Every project is built from scratch — not copied from tutorials.
               </p>
@@ -244,7 +244,7 @@ export default function WebDevelopmentPage() {
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
               Career Opportunities
             </h2>
-            <p className="text-slate-600 text-base mt-2 max-w-xl mx-auto leading-relaxed">
+            <p className="text-black text-base mt-2 max-w-xl mx-auto leading-relaxed">
               Web development is one of the fastest-growing career fields. Graduates work across
               industries — from startups to healthcare to government.
             </p>
@@ -319,12 +319,12 @@ export default function WebDevelopmentPage() {
               <h2 className="text-xl font-extrabold text-slate-900 mb-3">
                 How Training Gets Paid For
               </h2>
-              <p className="text-slate-600 text-sm leading-relaxed mb-4">
+              <p className="text-black text-sm leading-relaxed mb-4">
                 This program may be available at no cost for eligible Indiana residents through
                 WIOA, Workforce Ready Grant, or Job Ready Indy funding. Eligibility is determined through
                 WorkOne — not Elevate.
               </p>
-              <p className="text-slate-600 text-sm leading-relaxed">
+              <p className="text-black text-sm leading-relaxed">
                 Students who do not qualify for funding can enroll through flexible self-pay and
                 buy-now-pay-later options.
               </p>
@@ -358,7 +358,7 @@ export default function WebDevelopmentPage() {
       <section className="py-14 bg-slate-900">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-extrabold text-white mb-3">Ready to Learn to Code?</h2>
-          <p className="text-slate-300 text-base leading-relaxed mb-8 max-w-xl mx-auto">
+          <p className="text-white text-base leading-relaxed mb-8 max-w-xl mx-auto">
             Apply now or check if you qualify for free training through workforce funding.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

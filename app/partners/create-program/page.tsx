@@ -42,7 +42,7 @@ export default function CreateProgramPage() {
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Create a Training Program</h1>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Partner with Elevate to deliver workforce training and receive funded student referrals.</p>
+            <p className="text-lg text-black max-w-3xl mx-auto">Partner with Elevate to deliver workforce training and receive funded student referrals.</p>
           </div>
         </div>
       </section>
@@ -57,7 +57,7 @@ export default function CreateProgramPage() {
                 <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-lg font-bold flex-shrink-0">{s.step}</div>
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-1">{s.title}</h3>
-                  <p className="text-gray-600">{s.desc}</p>
+                  <p className="text-black">{s.desc}</p>
                 </div>
               </div>
             ))}
@@ -76,7 +76,7 @@ export default function CreateProgramPage() {
                 <div key={b.title} className="bg-white border border-gray-200 rounded-xl p-6">
                   <Icon className="w-7 h-7 text-brand-blue-600 mb-3" />
                   <h3 className="font-bold text-gray-900 mb-2">{b.title}</h3>
-                  <p className="text-gray-600 text-sm">{b.desc}</p>
+                  <p className="text-black text-sm">{b.desc}</p>
                 </div>
               );
             })}
@@ -88,7 +88,7 @@ export default function CreateProgramPage() {
       <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to List Your Program?</h2>
-          <p className="text-brand-blue-100 mb-8 text-lg">Contact our partnerships team to get started.</p>
+          <p className="text-white mb-8 text-lg">Contact our partnerships team to get started.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/partners/join" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg">Partner Application</Link>
             <Link href="/contact" className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg">Contact Us</Link>

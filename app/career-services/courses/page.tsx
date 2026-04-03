@@ -56,7 +56,7 @@ export default async function CareerCoursesPage() {
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               Career Success Courses
             </h1>
-            <p className="text-xl text-brand-blue-100 mb-8">
+            <p className="text-xl text-white mb-8">
               Professional video training to help you land your dream job. Flexible scheduling with instructor support and lifetime access.
             </p>
             <div className="flex flex-wrap gap-6 text-sm">
@@ -93,28 +93,28 @@ export default async function CareerCoursesPage() {
                 <Video className="w-7 h-7 text-brand-blue-600" />
               </div>
               <h3 className="font-semibold mb-2">HD Video Lessons</h3>
-              <p className="text-sm text-gray-600">Professional quality videos you can watch anytime</p>
+              <p className="text-sm text-black">Professional quality videos you can watch anytime</p>
             </div>
             <div className="text-center">
               <div className="w-14 h-14 bg-brand-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Download className="w-7 h-7 text-brand-green-600" />
               </div>
               <h3 className="font-semibold mb-2">Downloadable Resources</h3>
-              <p className="text-sm text-gray-600">Templates, worksheets, and checklists</p>
+              <p className="text-sm text-black">Templates, worksheets, and checklists</p>
             </div>
             <div className="text-center">
               <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Award className="w-7 h-7 text-brand-blue-600" />
               </div>
               <h3 className="font-semibold mb-2">Certificate</h3>
-              <p className="text-sm text-gray-600">Earn a certificate upon completion</p>
+              <p className="text-sm text-black">Earn a certificate upon completion</p>
             </div>
             <div className="text-center">
               <div className="w-14 h-14 bg-brand-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <MessageSquare className="w-7 h-7 text-brand-orange-600" />
               </div>
               <h3 className="font-semibold mb-2">Lifetime Access</h3>
-              <p className="text-sm text-gray-600">Access your courses forever, including updates</p>
+              <p className="text-sm text-black">Access your courses forever, including updates</p>
             </div>
           </div>
         </div>

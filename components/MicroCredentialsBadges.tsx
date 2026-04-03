@@ -127,7 +127,7 @@ export default function MicroCredentialsBadges() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Micro-Credentials & Digital Badges</h1>
-          <p className="text-brand-red-100">Showcase your verified skills and achievements</p>
+          <p className="text-white">Showcase your verified skills and achievements</p>
         </div>
       </div>
 

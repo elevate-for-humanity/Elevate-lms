@@ -98,7 +98,7 @@ export default async function StateBoardExamPage() {
               </div>
               <div>
                 <h2 className="text-2xl font-bold">You're Ready!</h2>
-                <p className="text-brand-green-100">
+                <p className="text-white">
                   All requirements complete. You can now schedule your state board exam.
                 </p>
               </div>

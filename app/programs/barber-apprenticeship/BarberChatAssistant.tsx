@@ -219,7 +219,7 @@ export default function BarberChatAssistant() {
           </div>
           <div>
             <div className="font-semibold text-sm">Barber Program Assistant</div>
-            <div className="text-xs text-brand-blue-200">Ask me anything</div>
+            <div className="text-xs text-white">Ask me anything</div>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -260,7 +260,7 @@ export default function BarberChatAssistant() {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-white text-slate-500 px-4 py-2 rounded-2xl rounded-bl-md border border-slate-200 shadow-sm">
+                <div className="bg-white text-black px-4 py-2 rounded-2xl rounded-bl-md border border-slate-200 shadow-sm">
                   <div className="flex gap-1">
                     <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                     <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />

@@ -147,7 +147,7 @@ export default async function VerifyCertificatePage({
             <h1 className="text-4xl font-bold mb-4 text-2xl md:text-3xl lg:text-4xl">
               Certificate Verified
             </h1>
-            <p className="text-base md:text-lg text-brand-green-100">
+            <p className="text-base md:text-lg text-white">
               This certificate is authentic and valid
             </p>
           </div>

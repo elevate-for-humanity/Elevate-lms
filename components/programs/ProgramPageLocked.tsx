@@ -211,17 +211,17 @@ export function ProgramPageLocked({
             <div>
               <div className="text-4xl font-bold mb-2">1</div>
               <div className="text-lg font-semibold mb-2">Apply</div>
-              <div className="text-brand-blue-100">Fill out simple application</div>
+              <div className="text-white">Fill out simple application</div>
             </div>
             <div>
               <div className="text-4xl font-bold mb-2">2</div>
               <div className="text-lg font-semibold mb-2">Get Approved</div>
-              <div className="text-brand-blue-100">We handle funding paperwork</div>
+              <div className="text-white">We handle funding paperwork</div>
             </div>
             <div>
               <div className="text-4xl font-bold mb-2">3</div>
               <div className="text-lg font-semibold mb-2">Start Training</div>
-              <div className="text-brand-blue-100">Begin your program</div>
+              <div className="text-white">Begin your program</div>
             </div>
           </div>
 

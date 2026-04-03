@@ -194,7 +194,7 @@ export function UniversalCoursePlayer({
               <span className="text-slate-500 flex-shrink-0">•</span>
               <div>
                 <div className="font-semibold">Course Complete!</div>
-                <div className="text-sm text-brand-green-100">
+                <div className="text-sm text-white">
                   Your Elevate For Humanity certificate is being generated and will be emailed to you shortly
                 </div>
               </div>

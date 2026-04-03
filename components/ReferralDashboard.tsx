@@ -154,13 +154,13 @@ export default function ReferralDashboard({ userId }: ReferralDashboardProps) {
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <h2 className="text-2xl font-bold mb-2">Your Referral Code</h2>
-            <p className="text-brand-blue-100 mb-6">
+            <p className="text-white mb-6">
               Share this code with friends and earn $50 for each completed referral!
             </p>
 
             <div className="flex items-center gap-4">
               <div className="flex-1 bg-white/20 backdrop-blur-sm rounded-lg p-4">
-                <p className="text-sm text-brand-blue-100 mb-1">Referral Code</p>
+                <p className="text-sm text-white mb-1">Referral Code</p>
                 <p className="text-3xl font-bold tracking-wider">{referralCode || 'Loading...'}</p>
               </div>
 

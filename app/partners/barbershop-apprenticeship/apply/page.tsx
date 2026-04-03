@@ -199,7 +199,7 @@ export default function BarbershopPartnerApplyPage() {
       {/* Hero */}
       <section className="py-6 border-b">
         <div className="max-w-5xl mx-auto px-4">
-          <Link href="/partners/barbershop-apprenticeship" className="inline-flex items-center gap-1 text-gray-600 hover:text-brand-blue-700 text-sm mb-4">
+          <Link href="/partners/barbershop-apprenticeship" className="inline-flex items-center gap-1 text-black hover:text-brand-blue-700 text-sm mb-4">
             <ArrowLeft className="w-4 h-4" /> Back to Partner Information
           </Link>
           <InstitutionalHeader
@@ -216,7 +216,7 @@ export default function BarbershopPartnerApplyPage() {
           {/* Before You Apply checklist */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8">
             <h2 className="text-lg font-bold text-gray-900 mb-1">Before You Apply</h2>
-            <p className="text-sm text-gray-500 mb-5">Complete these steps first so you&apos;re ready to submit.</p>
+            <p className="text-sm text-black mb-5">Complete these steps first so you&apos;re ready to submit.</p>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {partnerSteps.map((step) => (
                 <Link
@@ -232,7 +232,7 @@ export default function BarbershopPartnerApplyPage() {
                       {step.label}
                       <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                     </span>
-                    <p className="text-xs text-gray-500 mt-0.5">{step.description}</p>
+                    <p className="text-xs text-black mt-0.5">{step.description}</p>
                   </div>
                 </Link>
               ))}
@@ -308,7 +308,7 @@ export default function BarbershopPartnerApplyPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
-                    <input type="text" value="Indiana" disabled className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-600" />
+                    <input type="text" value="Indiana" disabled className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-white text-black" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">ZIP *</label>
@@ -340,7 +340,7 @@ export default function BarbershopPartnerApplyPage() {
             {/* Employment & Compliance */}
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <h2 className="text-xl font-bold text-gray-900 mb-6">Employment & Compliance</h2>
-              <p className="text-sm text-gray-500 mb-6">
+              <p className="text-sm text-black mb-6">
                 As a DOL Registered Apprenticeship, apprentices must be employed by the host shop.
                 Elevate (as the registered sponsor) will register approved apprentices and employer
                 worksites in the federal RAPIDS system after compliance verification.
@@ -351,7 +351,7 @@ export default function BarbershopPartnerApplyPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Will apprentices be added to your payroll as employees? *
                   </label>
-                  <p className="text-xs text-gray-500 mb-2">
+                  <p className="text-xs text-black mb-2">
                     DOL Registered Apprenticeships require the apprentice to be an employee of the host shop,
                     regardless of compensation model (hourly or hybrid). Sole commission is not permitted.
                   </p>
@@ -480,7 +480,7 @@ export default function BarbershopPartnerApplyPage() {
             {/* Signature */}
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <h2 className="text-xl font-bold text-gray-900 mb-2">Applicant Signature *</h2>
-              <p className="text-sm text-gray-500 mb-4">Sign below to confirm that the information provided is accurate and complete.</p>
+              <p className="text-sm text-black mb-4">Sign below to confirm that the information provided is accurate and complete.</p>
               <div className="border-2 border-dashed border-gray-300 rounded-lg overflow-hidden bg-white">
                 <canvas
                   ref={canvasRef}
@@ -498,13 +498,13 @@ export default function BarbershopPartnerApplyPage() {
                 {hasSigned ? (
                   <p className="text-sm text-green-600 font-medium">Signature captured</p>
                 ) : (
-                  <p className="text-sm text-slate-500">Draw your signature above</p>
+                  <p className="text-sm text-black">Draw your signature above</p>
                 )}
-                <button type="button" onClick={clearSignature} className="text-sm text-gray-500 hover:text-gray-700 underline">
+                <button type="button" onClick={clearSignature} className="text-sm text-black hover:text-gray-700 underline">
                   Clear
                 </button>
               </div>
-              <p className="text-xs text-slate-500 mt-2">
+              <p className="text-xs text-black mt-2">
                 By signing, you agree that this electronic signature is legally binding under the Indiana Uniform Electronic Transactions Act (IC 26-2-8) and the federal ESIGN Act.
               </p>
             </div>

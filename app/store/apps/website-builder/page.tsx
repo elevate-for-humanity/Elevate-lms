@@ -68,7 +68,7 @@ export default function WebsiteBuilderAppPage() {
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 Website Builder for Training Providers
               </h1>
-              <p className="text-xl text-brand-blue-100 mb-8">
+              <p className="text-xl text-white mb-8">
                 Launch a professional training website in minutes. Pre-built templates, LMS integration, enrollment forms, and SEO tools included.
               </p>
               <div className="flex flex-wrap gap-4">
@@ -159,13 +159,13 @@ export default function WebsiteBuilderAppPage() {
                 <h3 className={`text-2xl font-bold mt-4 ${plan.popular ? 'text-slate-900' : 'text-gray-900'}`}>{plan.name}</h3>
                 <div className="mt-4 mb-6">
                   <span className="text-4xl font-bold">${plan.price}</span>
-                  <span className={plan.popular ? 'text-brand-blue-100' : 'text-gray-500'}>{plan.period}</span>
+                  <span className={plan.popular ? 'text-white' : 'text-gray-500'}>{plan.period}</span>
                 </div>
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((f, j) => (
                     <li key={j} className="flex items-center gap-2">
-                      <Check className={`w-5 h-5 ${plan.popular ? 'text-brand-blue-200' : 'text-brand-green-500'}`} />
-                      <span className={plan.popular ? 'text-brand-blue-100' : 'text-gray-600'}>{f}</span>
+                      <Check className={`w-5 h-5 ${plan.popular ? 'text-white' : 'text-brand-green-500'}`} />
+                      <span className={plan.popular ? 'text-white' : 'text-gray-600'}>{f}</span>
                     </li>
                   ))}
                 </ul>

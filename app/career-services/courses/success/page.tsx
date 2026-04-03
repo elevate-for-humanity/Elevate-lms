@@ -34,14 +34,14 @@ export default async function CourseSuccessPage({
       <div className="max-w-lg w-full">
         <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
           <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-slate-500 flex-shrink-0">•</span>
+            <span className="text-black flex-shrink-0">•</span>
           </div>
           
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
             Purchase Successful!
           </h1>
           
-          <p className="text-gray-600 mb-8">
+          <p className="text-black mb-8">
             Thank you for your purchase. You now have lifetime access to your courses.
           </p>
 
@@ -74,7 +74,7 @@ export default async function CourseSuccessPage({
           </div>
         </div>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-black mt-6">
           Questions? Contact us at{' '}
           <a href="/contact" className="text-brand-blue-600 hover:underline">
             our contact form

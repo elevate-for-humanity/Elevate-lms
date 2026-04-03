@@ -86,7 +86,7 @@ function SamGovScreenshot({ variant }: { variant: string }) {
             </div>
             <div>
               <h1 className="font-bold">SAM.gov Assistant</h1>
-              <p className="text-brand-blue-200 text-xs">Registration & Compliance</p>
+              <p className="text-white text-xs">Registration & Compliance</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -108,7 +108,7 @@ function SamGovScreenshot({ variant }: { variant: string }) {
             <button 
               key={tab}
               className={`px-4 py-2 text-sm font-medium rounded-t-lg ${
-                i === 0 ? 'bg-gray-50 text-brand-blue-900' : 'text-brand-blue-200 hover:bg-brand-blue-800'
+                i === 0 ? 'bg-gray-50 text-brand-blue-900' : 'text-white hover:bg-brand-blue-800'
               }`}
             >
               {tab}
@@ -223,7 +223,7 @@ function GrantsScreenshot({ variant }: { variant: string }) {
             </div>
             <div>
               <h1 className="font-bold">Grants Discovery</h1>
-              <p className="text-brand-green-200 text-xs">Find & Manage Funding</p>
+              <p className="text-white text-xs">Find & Manage Funding</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -243,7 +243,7 @@ function GrantsScreenshot({ variant }: { variant: string }) {
             <button 
               key={tab}
               className={`px-4 py-2 text-sm font-medium rounded-t-lg ${
-                i === 0 ? 'bg-gray-50 text-brand-green-900' : 'text-brand-green-200 hover:bg-brand-green-700'
+                i === 0 ? 'bg-gray-50 text-brand-green-900' : 'text-white hover:bg-brand-green-700'
               }`}
             >
               {tab}
@@ -380,7 +380,7 @@ function WebsiteBuilderScreenshot({ variant }: { variant: string }) {
             {/* Hero Block */}
             <div className="bg-gradient-to-r from-brand-blue-600 to-brand-blue-800 text-white p-8 rounded-t-lg">
               <h2 className="text-xl font-bold mb-2">Transform Your Career</h2>
-              <p className="text-brand-blue-100 text-sm mb-4">Industry-recognized certifications in healthcare, technology, and skilled trades.</p>
+              <p className="text-white text-sm mb-4">Industry-recognized certifications in healthcare, technology, and skilled trades.</p>
               <button className="bg-brand-orange-500 text-white px-4 py-2 rounded text-sm font-medium">Apply Now</button>
             </div>
             

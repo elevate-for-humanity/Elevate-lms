@@ -11,7 +11,7 @@ export function FinalCTA() {
               <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-brand-orange-300">
                 Ready to see what&apos;s possible?
               </h2>
-              <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-50">
+              <p className="mt-3 text-3xl font-semibold tracking-tight text-white">
                 For learners, employers, and partners who want more than
                 business-as-usual training.
               </p>
@@ -31,12 +31,12 @@ export function FinalCTA() {
                 </Link>
                 <Link
                   href="/employers"
-                  className="inline-flex flex-1 items-center justify-center rounded-full border border-slate-600 px-6 py-3 text-sm font-semibold text-slate-50 hover:border-brand-red-300 hover:bg-slate-900"
+                  className="inline-flex flex-1 items-center justify-center rounded-full border border-slate-600 px-6 py-3 text-sm font-semibold text-white hover:border-brand-red-300 hover:bg-slate-900"
                 >
                   I&apos;m an employer or partner
                 </Link>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-white">
                 Starting in Marion County with approvals expanding as new
                 partners and locations come online.
               </p>

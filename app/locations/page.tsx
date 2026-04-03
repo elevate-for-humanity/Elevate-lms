@@ -236,7 +236,7 @@ export default async function LocationsPage() {
         {/* CTA */}
         <section className="bg-brand-blue-700 rounded-2xl p-8 text-white text-center">
           <h2 className="text-2xl font-bold mb-4">Ready to Visit?</h2>
-          <p className="text-brand-blue-100 mb-6 max-w-xl mx-auto">
+          <p className="text-white mb-6 max-w-xl mx-auto">
             Schedule a campus tour or meet with an enrollment advisor to learn about our programs.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

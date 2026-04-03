@@ -182,17 +182,17 @@ export default function SolutionsPage() {
                   <GraduationCap className="w-5 h-5 inline-block" />
                 </div>
                 <div className="text-2xl font-bold mb-2">30+ Programs</div>
-                <div className="text-brand-blue-100 mb-6">
+                <div className="text-white mb-6">
                   Healthcare • Trades • Technology
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="bg-white/20 rounded-lg p-4">
                     <div className="text-3xl font-bold">10K+</div>
-                    <div className="text-brand-blue-100">Students Trained</div>
+                    <div className="text-white">Students Trained</div>
                   </div>
                   <div className="bg-white/20 rounded-lg p-4">
                     <div className="text-3xl font-bold">95%</div>
-                    <div className="text-brand-blue-100">Completion Rate</div>
+                    <div className="text-white">Completion Rate</div>
                   </div>
                 </div>
               </div>
@@ -314,7 +314,7 @@ export default function SolutionsPage() {
       <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>
+          <p className="text-white mb-6">Check your eligibility for funded career training programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"

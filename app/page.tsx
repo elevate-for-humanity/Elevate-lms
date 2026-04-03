@@ -92,7 +92,7 @@ export default function HomePage() {
             <div className="max-w-2xl">
               <p className="text-white font-bold text-xs uppercase tracking-widest mb-3">Funding</p>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">You May Qualify for Free Training</h2>
-              <p className="text-brand-red-100 text-base leading-relaxed mb-6">
+              <p className="text-white text-base leading-relaxed mb-6">
                 Many students pay $0 through state and workforce funding programs. We help you find and apply for the funding you qualify for.
               </p>
               <div className="grid sm:grid-cols-3 gap-3 mb-8">

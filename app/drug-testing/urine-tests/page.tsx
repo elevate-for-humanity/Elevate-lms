@@ -116,12 +116,12 @@ export default function UrineTestsPage() {
 {/* Hero */}
       <section className="relative py-20 bg-brand-blue-700 text-white">
         <div className="max-w-6xl mx-auto px-6">
-          <Link href="/drug-testing" className="inline-flex items-center gap-2 text-brand-blue-200 hover:text-white mb-6 transition">
+          <Link href="/drug-testing" className="inline-flex items-center gap-2 text-white hover:text-white mb-6 transition">
             <ArrowLeft className="w-4 h-4" />
             Back to Drug Testing
           </Link>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Urine Drug Tests</h1>
-          <p className="text-xl text-brand-blue-100 max-w-2xl">
+          <p className="text-xl text-white max-w-2xl">
             Lab-based urine testing is the most common and cost-effective method for workplace drug screening. 
             Results typically in 24-48 hours.
           </p>
@@ -219,7 +219,7 @@ export default function UrineTestsPage() {
       <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Need Help Choosing?</h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Contact us and we'll recommend the right test for your situation.
           </p>
           <a

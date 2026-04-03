@@ -28,11 +28,11 @@ export default async function FundingSuccessPage() {
       <div className="flex items-center justify-center px-4 py-12">
       <div className="max-w-2xl w-full text-center">
         <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-6">
-          <span className="text-slate-500 flex-shrink-0">•</span>
+          <span className="text-black flex-shrink-0">•</span>
         </div>
 
         <h1 className="text-4xl font-bold text-black mb-4">
-          <span className="text-slate-500 flex-shrink-0">•</span> Funding Approved &
+          <span className="text-black flex-shrink-0">•</span> Funding Approved &
           Processed!
         </h1>
 

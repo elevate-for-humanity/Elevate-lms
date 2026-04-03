@@ -54,7 +54,7 @@ export default function PaymentGatePage() {
   if (checking) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-gray-400 text-sm">Checking payment status…</div>
+        <div className="text-black text-sm">Checking payment status…</div>
       </div>
     );
   }
@@ -69,7 +69,7 @@ export default function PaymentGatePage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold">Secure Your Spot</h1>
-            <p className="text-slate-300 text-sm mt-1">
+            <p className="text-white text-sm mt-1">
               SupersonicFastCash · Step 3 of 4
             </p>
           </div>
@@ -81,8 +81,8 @@ export default function PaymentGatePage() {
         <div className="flex items-center gap-2 mb-8 text-sm">
           {['Intake', 'Agreement', 'Payment', 'Upload Docs'].map((step, i) => (
             <div key={step} className="flex items-center gap-2">
-              <div className={`flex items-center gap-1.5 font-medium ${i === 2 ? 'text-orange-600' : i < 2 ? 'text-green-600' : 'text-gray-400'}`}>
-                {i < 2 ? <CheckCircle className="w-4 h-4" /> : <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs ${i === 2 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-500'}`}>{i + 1}</span>}
+              <div className={`flex items-center gap-1.5 font-medium ${i === 2 ? 'text-orange-600' : i < 2 ? 'text-green-600' : 'text-black'}`}>
+                {i < 2 ? <CheckCircle className="w-4 h-4" /> : <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs ${i === 2 ? 'bg-orange-500 text-white' : 'bg-gray-200 text-black'}`}>{i + 1}</span>}
                 {step}
               </div>
               {i < 3 && <span className="text-gray-300">→</span>}
@@ -99,8 +99,8 @@ export default function PaymentGatePage() {
                 <p className="text-3xl font-bold text-gray-900 mt-1">$49</p>
               </div>
               <div className="text-right">
-                <p className="text-xs text-gray-500">Applied toward total fee</p>
-                <p className="text-xs text-gray-500 mt-1">Remainder due at completion</p>
+                <p className="text-xs text-black">Applied toward total fee</p>
+                <p className="text-xs text-black mt-1">Remainder due at completion</p>
               </div>
             </div>
           </div>
@@ -134,14 +134,14 @@ export default function PaymentGatePage() {
               <Lock className="w-4 h-4" />
               {loading ? 'Redirecting to Stripe…' : 'Pay $49 Deposit — Secure Checkout'}
             </button>
-            <div className="flex items-center justify-center gap-2 mt-3 text-xs text-gray-400">
+            <div className="flex items-center justify-center gap-2 mt-3 text-xs text-black">
               <Shield className="w-3 h-3" />
               Powered by Stripe · 256-bit SSL · PCI compliant
             </div>
           </div>
         </div>
 
-        <p className="text-center text-xs text-gray-400">
+        <p className="text-center text-xs text-black">
           SupersonicFastCash · 2Exclusive LLC-S · PTIN-credentialed preparers
         </p>
       </div>

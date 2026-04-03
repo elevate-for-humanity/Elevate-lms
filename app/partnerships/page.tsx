@@ -156,7 +156,7 @@ export default function PartnershipsPage() {
       <section className="py-12 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold mb-3">Set Up a Referral Pathway</h2>
-          <p className="text-brand-blue-100 mb-6 max-w-xl mx-auto">
+          <p className="text-white mb-6 max-w-xl mx-auto">
             Request our provider packet, schedule a site visit at our Indianapolis training center, or send your first participant referral.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

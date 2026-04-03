@@ -51,7 +51,7 @@ export default async function HSISuccessPage({
       <section className="py-16 bg-brand-green-50">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-slate-500 flex-shrink-0">•</span>
+            <span className="text-black flex-shrink-0">•</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Enrollment Confirmed!
@@ -61,7 +61,7 @@ export default async function HSISuccessPage({
               {enrollment.course.course_name}
             </p>
           )}
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-black mb-8 max-w-2xl mx-auto">
             You're now enrolled in HSI Safety Training. Check your email for login credentials and course access instructions.
           </p>
           <div className="inline-flex items-center gap-2 bg-brand-green-100 text-brand-green-800 px-6 py-3 rounded-full font-semibold">
@@ -76,7 +76,7 @@ export default async function HSISuccessPage({
         <section className="py-12 border-b">
           <div className="max-w-3xl mx-auto px-4 text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Access Your Course Now</h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-black mb-6">
               Click below to start your HSI training immediately. You'll also receive an email with this link.
             </p>
             <a
@@ -103,7 +103,7 @@ export default async function HSISuccessPage({
               </div>
               <div className="text-sm text-brand-blue-600 font-semibold mb-2">Step 1</div>
               <h3 className="font-bold text-gray-900 mb-2">Check Your Email</h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-black text-sm">
                 You'll receive an email from HSI with your login credentials within 24 hours.
               </p>
             </div>
@@ -114,7 +114,7 @@ export default async function HSISuccessPage({
               </div>
               <div className="text-sm text-brand-orange-600 font-semibold mb-2">Step 2</div>
               <h3 className="font-bold text-gray-900 mb-2">Complete Online Training</h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-black text-sm">
                 Log in to the HSI platform and complete your online coursework at your own pace.
               </p>
             </div>
@@ -125,7 +125,7 @@ export default async function HSISuccessPage({
               </div>
               <div className="text-sm text-brand-green-600 font-semibold mb-2">Step 3</div>
               <h3 className="font-bold text-gray-900 mb-2">Get Certified</h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-black text-sm">
                 Pass the skills assessment and receive your official HSI certification card.
               </p>
             </div>
@@ -143,25 +143,25 @@ export default async function HSISuccessPage({
             </h2>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
-                <span className="text-slate-500 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <span className="text-gray-700">
                   <strong>Course Access:</strong> Your HSI course access is valid for 1 year from enrollment date.
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-slate-500 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <span className="text-gray-700">
                   <strong>Certification Valid:</strong> CPR/First Aid certifications are valid for 2 years.
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-slate-500 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <span className="text-gray-700">
                   <strong>Skills Session:</strong> For CPR certification, you'll need to complete an in-person or remote skills verification session.
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-slate-500 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <span className="text-gray-700">
                   <strong>Certificate Download:</strong> Your digital certificate will be available immediately after passing.
                 </span>
@@ -178,7 +178,7 @@ export default async function HSISuccessPage({
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl p-6 shadow-sm border">
               <h3 className="font-bold text-gray-900 mb-4">Elevate for Humanity Support</h3>
-              <p className="text-gray-600 text-sm mb-4">
+              <p className="text-black text-sm mb-4">
                 Questions about your enrollment or funding?
               </p>
               <div className="space-y-2">
@@ -195,7 +195,7 @@ export default async function HSISuccessPage({
 
             <div className="bg-white rounded-xl p-6 shadow-sm border">
               <h3 className="font-bold text-gray-900 mb-4">HSI Technical Support</h3>
-              <p className="text-gray-600 text-sm mb-4">
+              <p className="text-black text-sm mb-4">
                 Issues with the HSI learning platform?
               </p>
               <div className="space-y-2">
@@ -215,7 +215,7 @@ export default async function HSISuccessPage({
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
             Explore More Training Opportunities
           </h2>
-          <p className="text-slate-600 mb-8">
+          <p className="text-black mb-8">
             Continue building your skills with our other free training programs.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

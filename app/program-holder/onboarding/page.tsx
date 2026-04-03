@@ -489,7 +489,7 @@ export default async function ProgramHolderOnboarding() {
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Need Help?
           </h2>
-          <p className="text-base md:text-lg text-brand-blue-100 mb-8">
+          <p className="text-base md:text-lg text-white mb-8">
             Apply now to become a program holder and start enrolling students in
             life-changing training programs or need assistance.
           </p>

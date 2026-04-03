@@ -248,7 +248,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
         }
         return;
       } else if (paymentOption === 'full') {
-        // Pay in full - one-time payment with 5% discount
+        // Pay in full - one-time payment
         checkoutResponse = await fetch('/api/barber/checkout/public', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -312,7 +312,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
         <div className="bg-white py-10 border-t">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Apply for Enrollment</h1>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Barber Apprenticeship Program</p>
+            <p className="text-lg text-black max-w-3xl mx-auto">Barber Apprenticeship Program</p>
           </div>
         </div>
       </section>
@@ -330,7 +330,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
 
               <div className="space-y-4 mb-6">
                 <div>
-                  <label className="block text-sm font-medium text-brand-blue-200 mb-2">
+                  <label className="block text-sm font-medium text-white mb-2">
                     Transfer Hours (if any)
                   </label>
                   <input
@@ -346,13 +346,13 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                     className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/50"
                     placeholder="0"
                   />
-                  <p className="text-xs text-brand-blue-200 mt-1">
+                  <p className="text-xs text-white mt-1">
                     Have documented hours from another program?
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-brand-blue-200 mb-2">
+                  <label className="block text-sm font-medium text-white mb-2">
                     Hours Per Week
                   </label>
                   <select
@@ -373,11 +373,11 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
               <div className="bg-white/10 rounded-xl p-4 mb-4">
                 <div className="grid grid-cols-2 gap-4 text-center">
                   <div>
-                    <div className="text-brand-blue-200 text-xs uppercase mb-1">Remaining Hours</div>
+                    <div className="text-white text-xs uppercase mb-1">Remaining Hours</div>
                     <div className="text-2xl font-black">{hoursRemaining.toLocaleString()}</div>
                   </div>
                   <div>
-                    <div className="text-brand-blue-200 text-xs uppercase mb-1">Est. Duration</div>
+                    <div className="text-white text-xs uppercase mb-1">Est. Duration</div>
                     <div className="text-2xl font-black">~{weeks} weeks</div>
                   </div>
                 </div>
@@ -386,7 +386,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
               {/* Pricing */}
               <div className="bg-white/10 rounded-xl p-4">
                 <div className="text-center">
-                  <div className="text-brand-blue-200 text-xs uppercase mb-1">Program Tuition</div>
+                  <div className="text-white text-xs uppercase mb-1">Program Tuition</div>
                   <div className="text-3xl font-black">${PRICING.fullPrice.toLocaleString()}</div>
                 </div>
               </div>
@@ -394,7 +394,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
               {/* Payment Options */}
               <div className="bg-white/20 rounded-xl p-4 mt-4">
                 <div className="text-center">
-                  <div className="text-brand-green-200 text-xs uppercase mb-1">Payment Options</div>
+                  <div className="text-white text-xs uppercase mb-1">Payment Options</div>
                   <div className="text-sm text-white mt-2 space-y-1">
                     <p><strong>Pay in Full:</strong> Card or Bank</p>
                     <p><strong>BNPL:</strong> Split into payments</p>
@@ -404,14 +404,14 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
 
               {/* If not approved for full BNPL */}
               <div className="bg-white/10 rounded-xl p-3 mt-4">
-                <p className="text-xs text-brand-blue-200 text-center">
+                <p className="text-xs text-white text-center">
                   If BNPL partially approved, remaining balance split into ~{weeks} weekly payments of ${weeklyDollars.toFixed(2)}
                 </p>
               </div>
 
               <div className="mt-4 flex items-start gap-2">
-                <Info className="w-4 h-4 text-brand-blue-200 flex-shrink-0 mt-0.5" />
-                <p className="text-xs text-brand-blue-200">
+                <Info className="w-4 h-4 text-white flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-white">
                   Transfer hours reduce program duration, not tuition cost.
                 </p>
               </div>
@@ -512,7 +512,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                     onChange={(e) => setSmsConsent(e.target.checked)}
                     className="mt-1 w-4 h-4 text-brand-blue-600 border-slate-300 rounded"
                   />
-                  <label htmlFor="smsConsent" className="text-sm text-slate-600">
+                  <label htmlFor="smsConsent" className="text-sm text-black">
                     I agree to receive text messages from Elevate for Humanity about my enrollment, program updates, and important notices. Message and data rates may apply. Reply STOP to opt out.
                   </label>
                 </div>
@@ -614,11 +614,10 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                     <div className="flex justify-between items-center">
                       <div>
                         <p className="font-bold text-black text-lg">Pay in Full</p>
-                        <p className="text-black text-sm">One-time payment - 5% discount</p>
+                        <p className="text-black text-sm">One-time payment</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-brand-green-600 text-xl">${Math.round(PRICING.fullPrice * 0.95).toLocaleString()}</p>
-                        <p className="text-xs text-black line-through">${PRICING.fullPrice.toLocaleString()}</p>
+                        <p className="font-bold text-brand-green-600 text-xl">${PRICING.fullPrice.toLocaleString('en-US')}</p>
                       </div>
                     </div>
                   </button>
@@ -651,7 +650,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                       <label className="block text-sm font-bold text-black mb-1">
                         How much can you put down today?
                       </label>
-                      <p className="text-xs text-slate-500 mb-3">Minimum $600 — the more you put down, the lower your weekly payment.</p>
+                      <p className="text-xs text-black mb-3">Minimum $600 — the more you put down, the lower your weekly payment.</p>
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-2xl font-bold text-black">$</span>
                         <input
@@ -681,7 +680,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                         onChange={(e) => setCustomAmountStr(e.target.value)}
                         className="w-full accent-brand-orange-600 mb-1"
                       />
-                      <div className="flex justify-between text-xs text-slate-400 mb-4">
+                      <div className="flex justify-between text-xs text-black mb-4">
                         <span>$600 min</span>
                         <span>$4,980 full</span>
                       </div>
@@ -694,7 +693,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                         const displayWeekly = displayDown !== null ? calculateWeeklyPayment(displayDown).weeklyDollars : null;
                         return (
                           <div className="bg-white rounded-lg p-4 border border-brand-orange-200">
-                            <p className="text-xs text-slate-500 uppercase font-semibold mb-2">Your Payment Estimate</p>
+                            <p className="text-xs text-black uppercase font-semibold mb-2">Your Payment Estimate</p>
                             <div className="flex justify-between items-center mb-1">
                               <span className="text-sm text-slate-700">Down payment today</span>
                               <span className="font-bold text-black">{displayDown !== null ? `$${displayDown.toLocaleString()}` : '—'}</span>
@@ -711,7 +710,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                               <span className="text-sm text-slate-700">Term</span>
                               <span className="font-bold text-black">{PRICING.paymentTermWeeks} weeks</span>
                             </div>
-                            <p className="text-xs text-slate-400 mt-2">Weekly invoices sent every Friday. Pay by link or saved card.</p>
+                            <p className="text-xs text-black mt-2">Weekly invoices sent every Friday. Pay by link or saved card.</p>
                           </div>
                         );
                       })()}
@@ -844,7 +843,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                       <span className="px-3 py-1 bg-brand-orange-400 text-white rounded-full text-xs font-bold">Amazon Pay</span>
                       <span className="px-3 py-1 bg-brand-blue-600 text-white rounded-full text-xs font-bold">Bank (ACH)</span>
                     </div>
-                    <p className="text-xs text-slate-600 mt-3 text-center">
+                    <p className="text-xs text-black mt-3 text-center">
                       Payment options subject to eligibility. Terms and availability vary by provider.
                     </p>
                   </div>

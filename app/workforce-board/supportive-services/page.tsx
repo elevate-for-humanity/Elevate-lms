@@ -51,15 +51,15 @@ export default function SupportiveServicesPage() {
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     <span>Free training for eligible participants</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     <span>Industry-standard certifications</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     <span>Career support and job placement</span>
                   </li>
                 </ul>
@@ -105,7 +105,7 @@ export default function SupportiveServicesPage() {
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
               Need Help?
             </h2>
-            <p className="text-base md:text-lg text-brand-blue-100 mb-8">
+            <p className="text-base md:text-lg text-white mb-8">
               Contact support if you have questions about workforce
               services or need assistance.
             </p>

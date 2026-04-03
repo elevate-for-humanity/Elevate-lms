@@ -214,7 +214,7 @@ export default function EPA608Overview({ mode = 'explore', onComplete }: Props) 
           <CheckCircle className="w-6 h-6 text-brand-green-400 flex-shrink-0" />
           <p className="font-extrabold text-lg">Universal Certification</p>
         </div>
-        <p className="text-brand-green-200 text-sm leading-relaxed">
+        <p className="text-white text-sm leading-relaxed">
           Pass Core + Type I + Type II + Type III = EPA 608 Universal.
           This is what every HVAC employer requires. It means you can legally purchase refrigerant
           and work on any equipment — residential, commercial, or industrial.

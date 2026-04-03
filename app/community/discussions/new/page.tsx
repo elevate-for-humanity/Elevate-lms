@@ -80,7 +80,7 @@ export default function NewDiscussionPage() {
         {/* Back Link */}
         <Link
           href="/community/discussions"
-          className="inline-flex items-center text-gray-600 hover:text-brand-blue-600 mb-6"
+          className="inline-flex items-center text-black hover:text-brand-blue-600 mb-6"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Discussions
@@ -112,7 +112,7 @@ export default function NewDiscussionPage() {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 maxLength={200}
               />
-              <p className="mt-1 text-sm text-gray-500">{title.length}/200 characters</p>
+              <p className="mt-1 text-sm text-black">{title.length}/200 characters</p>
             </div>
 
             {/* Category */}
@@ -146,7 +146,7 @@ export default function NewDiscussionPage() {
                 rows={8}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 resize-none"
               />
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-black">
                 Be specific and provide context to get better responses
               </p>
             </div>

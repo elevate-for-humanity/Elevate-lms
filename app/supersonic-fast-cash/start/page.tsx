@@ -62,7 +62,7 @@ export default function StartPage() {
                 </div>
                 <div className="p-6 flex flex-col flex-1 bg-white">
                   <h3 className="text-xl font-bold text-slate-900 mb-3">{opt.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed flex-1">{opt.description}</p>
+                  <p className="text-black text-sm leading-relaxed flex-1">{opt.description}</p>
                   <Link href={opt.href} className="mt-6 block w-full text-center py-3 px-4 bg-brand-red-600 text-white font-bold rounded-xl hover:bg-brand-red-700 transition-colors">
                     {opt.cta}
                   </Link>
@@ -78,7 +78,7 @@ export default function StartPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="mb-12">
             <h2 className="text-3xl font-black text-slate-900 mb-4">What to Bring</h2>
-            <p className="text-xl text-slate-600 max-w-2xl leading-relaxed">
+            <p className="text-xl text-black max-w-2xl leading-relaxed">
               Having these documents ready before you start will make the process faster and ensure your return is complete.
             </p>
           </div>
@@ -106,7 +106,7 @@ export default function StartPage() {
             </div>
             <div>
               <h2 className="text-3xl font-black text-slate-900 mb-4">Prefer to Talk First?</h2>
-              <p className="text-slate-600 mb-6 leading-relaxed">
+              <p className="text-black mb-6 leading-relaxed">
                 Not sure which option is right for you? Call us and we'll help you figure out the best approach for your tax situation. No commitment required.
               </p>
               <a href="tel:+13173143757" className="inline-block px-8 py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-colors">

@@ -207,7 +207,7 @@ export default function AvatarChatAssistant({
           </div>
           <div>
             <div className="font-semibold text-sm">{avatarName}</div>
-            <div className="text-xs text-brand-blue-200">{avatarRole}</div>
+            <div className="text-xs text-white">{avatarRole}</div>
           </div>
         </div>
         <div className="flex items-center gap-1">

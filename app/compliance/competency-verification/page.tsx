@@ -68,7 +68,7 @@ function ProgramRubricSection({ rubric }: { rubric: ProgramRubric }) {
     <div className="print:break-before-page">
       <div className="bg-white rounded-t-xl px-6 py-4 print:bg-white">
         <h3 className="text-xl font-bold text-slate-900">{rubric.program}</h3>
-        <p className="text-brand-blue-100 text-sm">{rubric.occupation}</p>
+        <p className="text-white text-sm">{rubric.occupation}</p>
       </div>
       <div className="bg-white border-x border-b rounded-b-xl p-6 mb-2">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">

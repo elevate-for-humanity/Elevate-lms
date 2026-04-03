@@ -24,7 +24,7 @@ export default function PageHero({ title, description, forceHero }: PageHeroProp
       <div className="bg-gradient-to-r from-brand-blue-600 to-purple-600 text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">{title}</h1>
-          {description && <p className="text-xl text-brand-blue-100">{description}</p>}
+          {description && <p className="text-xl text-white">{description}</p>}
         </div>
       </div>
     ) : null;

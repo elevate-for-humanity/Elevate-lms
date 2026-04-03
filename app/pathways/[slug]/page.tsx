@@ -79,7 +79,7 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
           </div>
 
           <div className="text-gray-800">
-            <div className="text-sm text-gray-600">Industry</div>
+            <div className="text-sm text-black">Industry</div>
             <div className="text-xl font-semibold">{pathway.industry}</div>
 
             <div className="mt-6 grid gap-4">

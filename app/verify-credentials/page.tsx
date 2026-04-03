@@ -229,7 +229,7 @@ export default function VerifyCredentialsPage() {
             <h2 className="text-xl font-bold mb-4">Quick Verification</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <p className="text-brand-blue-100 mb-4">
+                <p className="text-white mb-4">
                   For workforce board staff and government agencies conducting compliance reviews:
                 </p>
                 <ul className="space-y-2 text-sm">
@@ -248,7 +248,7 @@ export default function VerifyCredentialsPage() {
                 </ul>
               </div>
               <div className="flex flex-col justify-center">
-                <p className="text-brand-blue-100 mb-3">Need documentation?</p>
+                <p className="text-white mb-3">Need documentation?</p>
                 <Link
                   href="/contact"
                   className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-50 transition"

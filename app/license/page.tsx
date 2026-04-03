@@ -313,7 +313,7 @@ export default async function LicensePage() {
           <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Ready to Improve Your Workforce Programs?
           </h2>
-          <p className="text-brand-orange-100 mb-8">
+          <p className="text-white mb-8">
             Schedule a demo to see how the Elevate platform can work for your organization.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

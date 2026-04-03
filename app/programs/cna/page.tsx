@@ -76,7 +76,7 @@ export default function CNAPage() {
           {OUTCOMES.map(({ icon: Icon, label, value }) => (
             <div key={label}>
               <Icon className="w-5 h-5 text-brand-blue-400 mx-auto mb-2" />
-              <p className="text-xs text-slate-500 uppercase tracking-widest mb-1">{label}</p>
+              <p className="text-xs text-black uppercase tracking-widest mb-1">{label}</p>
               <p className="text-white font-bold text-sm leading-tight">{value}</p>
             </div>
           ))}
@@ -91,10 +91,10 @@ export default function CNAPage() {
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-5">
               Indiana CNA Certification — 6 weeks, state exam on-site.
             </h2>
-            <p className="text-slate-600 text-base leading-relaxed mb-5">
+            <p className="text-black text-base leading-relaxed mb-5">
               Elevate&apos;s CNA program prepares you for the Indiana state Certified Nursing Assistant exam in 6 weeks. You&apos;ll complete supervised clinical rotations at licensed healthcare facilities and sit for the state exam on-site — no separate testing center required.
             </p>
-            <p className="text-slate-600 text-base leading-relaxed mb-8">
+            <p className="text-black text-base leading-relaxed mb-8">
               CNAs are in high demand across Indiana hospitals, nursing homes, and home health agencies. Most Elevate CNA graduates receive job offers before or immediately after completing the program.
             </p>
             <ul className="space-y-3 mb-8">
@@ -142,7 +142,7 @@ export default function CNAPage() {
                 </div>
                 <ul className="grid sm:grid-cols-2 gap-2">
                   {block.topics.map((t) => (
-                    <li key={t} className="flex items-start gap-2 text-sm text-slate-600">
+                    <li key={t} className="flex items-start gap-2 text-sm text-black">
                       <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-brand-blue-500 flex-shrink-0" />
                       {t}
                     </li>
@@ -157,17 +157,17 @@ export default function CNAPage() {
       {/* FUNDING */}
       <section className="py-16 px-6 bg-brand-blue-700 border-b border-brand-blue-800">
         <div className="max-w-4xl mx-auto">
-          <p className="text-brand-blue-200 text-xs font-bold uppercase tracking-widest mb-3">Funding</p>
+          <p className="text-white text-xs font-bold uppercase tracking-widest mb-3">Funding</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">Most participants pay $0.</h2>
-          <p className="text-brand-blue-100 text-base leading-relaxed mb-8 max-w-2xl">
+          <p className="text-white text-base leading-relaxed mb-8 max-w-2xl">
             Federal and Indiana state workforce funding may cover 100% of tuition, books, and exam fees. We help you apply for every option you qualify for.
           </p>
           <div className="grid sm:grid-cols-3 gap-5 mb-8">
             {FUNDING.map((f) => (
               <div key={f.name} className="bg-white/10 rounded-xl p-5">
-                <p className="text-brand-blue-200 text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>
+                <p className="text-white text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>
                 <h3 className="text-white font-bold text-base mb-2">{f.name}</h3>
-                <p className="text-brand-blue-100 text-sm leading-relaxed">{f.desc}</p>
+                <p className="text-white text-sm leading-relaxed">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -207,7 +207,7 @@ export default function CNAPage() {
             {FAQ.map(({ q, a }) => (
               <div key={q} className="bg-white rounded-xl border border-slate-200 p-6">
                 <h3 className="font-bold text-slate-900 mb-2">{q}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">{a}</p>
+                <p className="text-black text-sm leading-relaxed">{a}</p>
               </div>
             ))}
           </div>
@@ -221,7 +221,7 @@ export default function CNAPage() {
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-5">
             Ready to become a Certified Nursing Assistant?
           </h2>
-          <p className="text-slate-300 text-base leading-relaxed mb-8 max-w-xl mx-auto">
+          <p className="text-white text-base leading-relaxed mb-8 max-w-xl mx-auto">
             Join the waitlist for the next CNA cohort. Training may be fully funded. State exam included.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

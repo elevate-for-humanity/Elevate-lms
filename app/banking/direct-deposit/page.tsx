@@ -299,7 +299,7 @@ export default function DirectDepositPage() {
           <h2 className="text-3xl font-bold mb-6">
             Ready to File Your Taxes?
           </h2>
-          <p className="text-xl mb-8 text-brand-green-100">
+          <p className="text-xl mb-8 text-white">
             Set up direct deposit and get your refund faster.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

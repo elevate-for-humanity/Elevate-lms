@@ -114,7 +114,7 @@ export default function StateCareerTrainingPage({ state }: StateCareerTrainingPa
           <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Ready to Start Your Career Journey?
           </h2>
-          <p className="text-brand-green-100 mb-8">
+          <p className="text-white mb-8">
             Many programs are free for qualifying {state.demonym}. Check your eligibility today.
           </p>
           <Link

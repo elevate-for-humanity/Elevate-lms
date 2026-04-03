@@ -50,31 +50,31 @@ export default async function CAREERSAFEPage() {
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">
                 Official OSHA certification cards
               </div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">
                 Required for many construction jobs
               </div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">Self-paced online training</div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">Lifetime access to materials</div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">24/7 customer support</div>
             </div>
           </div>

@@ -47,7 +47,7 @@ export default function InstitutionalGovernancePage() {
                 {/* Level 2 */}
                 <div className="w-full max-w-md bg-brand-blue-700 text-white rounded-lg px-6 py-4 text-center">
                   <p className="font-bold text-sm">Elevate for Humanity Career &amp; Training Institute</p>
-                  <p className="text-brand-blue-200 text-xs mt-1">Instruction, Programs &amp; Related Technical Instruction (RTI)</p>
+                  <p className="text-white text-xs mt-1">Instruction, Programs &amp; Related Technical Instruction (RTI)</p>
                 </div>
                 <div className="w-px h-6 bg-slate-400" />
                 <div className="text-slate-400 text-xs">↓</div>

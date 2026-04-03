@@ -172,11 +172,11 @@ export default function FundingPage() {
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
             Workforce Funding
           </h1>
-          <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed mb-2">
+          <p className="text-black text-base sm:text-lg max-w-2xl leading-relaxed mb-2">
             Federal and state funding covers tuition, tools, and certification fees for eligible
             participants. Eligibility is determined through WorkOne — not Elevate.
           </p>
-          <p className="text-slate-600 text-sm max-w-2xl leading-relaxed mb-6">
+          <p className="text-black text-sm max-w-2xl leading-relaxed mb-6">
             The process typically takes 1–3 weeks from registration to funding approval.
             Students who do not qualify for funding can enroll through flexible self-pay options.
           </p>
@@ -205,7 +205,7 @@ export default function FundingPage() {
           <div className="text-center mb-8">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">2-minute screener</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">Find Out What You Qualify For</h2>
-            <p className="text-slate-500 text-sm max-w-md mx-auto">Answer 4 questions and we'll point you to the right funding path — or self-pay options if funding doesn't apply.</p>
+            <p className="text-black text-sm max-w-md mx-auto">Answer 4 questions and we'll point you to the right funding path — or self-pay options if funding doesn't apply.</p>
           </div>
           <EligibilityScreener />
         </div>
@@ -219,7 +219,7 @@ export default function FundingPage() {
               Funding Sources
             </p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Funding Options</h2>
-            <p className="text-slate-600 text-base mt-2 max-w-2xl leading-relaxed">
+            <p className="text-black text-base mt-2 max-w-2xl leading-relaxed">
               Eligibility is determined by WorkOne, not Elevate. Register and schedule an appointment
               to find out what you qualify for.
             </p>
@@ -236,7 +236,7 @@ export default function FundingPage() {
                 </div>
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 text-base mb-2">{opt.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed mb-3">{opt.desc}</p>
+                  <p className="text-black text-sm leading-relaxed mb-3">{opt.desc}</p>
                   <div className="space-y-1.5 mb-4">
                     {opt.bullets.map((b) => (
                       <div key={b} className="flex items-center gap-2">
@@ -277,7 +277,7 @@ export default function FundingPage() {
               No Funding? No Problem
             </p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Self-Pay Options</h2>
-            <p className="text-slate-600 text-base mt-2 max-w-xl mx-auto leading-relaxed">
+            <p className="text-black text-base mt-2 max-w-xl mx-auto leading-relaxed">
               If you do not qualify for state or federal funding, we offer flexible payment options
               so cost is never a barrier to starting.
             </p>
@@ -305,7 +305,7 @@ export default function FundingPage() {
                   {item.tag}
                 </span>
                 <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed mb-4 flex-1">{item.desc}</p>
+                <p className="text-black text-sm leading-relaxed mb-4 flex-1">{item.desc}</p>
                 <Link
                   href="/apply"
                   className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold text-sm hover:underline mt-auto"
@@ -335,7 +335,7 @@ export default function FundingPage() {
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-sm mb-1">{item.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                  <p className="text-black text-sm leading-relaxed">{item.desc}</p>
                   {item.link && (
                     item.external ? (
                       <a
@@ -391,7 +391,7 @@ export default function FundingPage() {
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3">
             Find Out What You Qualify For
           </h2>
-          <p className="text-slate-300 text-base leading-relaxed mb-8 max-w-xl mx-auto">
+          <p className="text-white text-base leading-relaxed mb-8 max-w-xl mx-auto">
             Register at Indiana Career Connect and schedule a WorkOne appointment to explore your
             funding options. Or apply directly and we will help you navigate the process.
           </p>

@@ -41,7 +41,7 @@ export default function FundingHowItWorksPage() {
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">How Funding Works</h1>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Many of our training programs may be available at no cost to eligible participants through federal and state funding.</p>
+            <p className="text-lg text-black max-w-3xl mx-auto">Many of our training programs may be available at no cost to eligible participants through federal and state funding.</p>
           </div>
         </div>
       </section>
@@ -59,7 +59,7 @@ export default function FundingHowItWorksPage() {
                     {s.step}
                   </div>
                   <h3 className="text-lg font-bold text-slate-900 mb-2">{s.title}</h3>
-                  <p className="text-slate-600 text-sm">{s.desc}</p>
+                  <p className="text-black text-sm">{s.desc}</p>
                 </div>
               );
             })}
@@ -71,14 +71,14 @@ export default function FundingHowItWorksPage() {
       <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2 text-center">Available Funding Sources</h2>
-          <p className="text-slate-600 text-center mb-10 max-w-2xl mx-auto">
+          <p className="text-black text-center mb-10 max-w-2xl mx-auto">
             Eligibility varies by program and individual circumstances. Our enrollment team will help identify the right funding path for you.
           </p>
           <div className="grid md:grid-cols-2 gap-6">
             {FUNDING_SOURCES.map((f) => (
               <Link key={f.name} href={f.href} className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-md hover:border-brand-blue-300 transition-all group">
                 <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-brand-blue-600">{f.name}</h3>
-                <p className="text-slate-600 text-sm">{f.desc}</p>
+                <p className="text-black text-sm">{f.desc}</p>
               </Link>
             ))}
           </div>
@@ -101,7 +101,7 @@ export default function FundingHowItWorksPage() {
       <section className="py-16 bg-slate-900">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to See If You Qualify?</h2>
-          <p className="text-brand-blue-100 mb-8 text-lg">
+          <p className="text-white mb-8 text-lg">
             Attend a free orientation or contact our enrollment team to get started.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

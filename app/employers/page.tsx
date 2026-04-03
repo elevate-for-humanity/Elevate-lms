@@ -300,7 +300,7 @@ export default function EmployersPage() {
                   </p>
                   <Link
                     href="/programs/barber-apprenticeship/host-shops"
-                    className="text-brand-orange-300 text-sm font-semibold mt-2 inline-flex items-center hover:text-brand-orange-200"
+                    className="text-brand-orange-300 text-sm font-semibold mt-2 inline-flex items-center hover:text-white"
                   >
                     Learn about hosting a barber apprentice <ArrowRight className="w-3.5 h-3.5 ml-1" />
                   </Link>

@@ -37,7 +37,7 @@ export default function EmploymentPage() {
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Employment Services</h1>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">From training completion to career placement — we support you every step of the way.</p>
+            <p className="text-lg text-black max-w-3xl mx-auto">From training completion to career placement — we support you every step of the way.</p>
           </div>
         </div>
       </section>
@@ -46,7 +46,7 @@ export default function EmploymentPage() {
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 text-center">How We Help You Get Hired</h2>
-          <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+          <p className="text-black text-center mb-12 max-w-2xl mx-auto">
             Employment support is included with every training program at no additional cost.
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -56,7 +56,7 @@ export default function EmploymentPage() {
                 <div key={s.title} className="bg-white border border-gray-200 rounded-xl p-6">
                   <Icon className="w-8 h-8 text-brand-blue-600 mb-4" />
                   <h3 className="text-lg font-bold text-gray-900 mb-2">{s.title}</h3>
-                  <p className="text-gray-600 text-sm">{s.desc}</p>
+                  <p className="text-black text-sm">{s.desc}</p>
                 </div>
               );
             })}
@@ -80,7 +80,7 @@ export default function EmploymentPage() {
                   {item.step}
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-600 text-sm">{item.desc}</p>
+                <p className="text-black text-sm">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -91,7 +91,7 @@ export default function EmploymentPage() {
       <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Start Your Career?</h2>
-          <p className="text-brand-blue-100 mb-8 text-lg">
+          <p className="text-white mb-8 text-lg">
             Enroll in a training program and get access to employment services at no cost to eligible participants.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

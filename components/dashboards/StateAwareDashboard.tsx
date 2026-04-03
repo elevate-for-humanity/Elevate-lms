@@ -58,13 +58,13 @@ export function StateAwareDashboard({
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <div className="text-sm font-semibold text-brand-blue-100 mb-1">
+              <div className="text-sm font-semibold text-white mb-1">
                 NEXT STEP
               </div>
               <h2 className="text-2xl md:text-3xl font-bold mb-2">
                 {dominantAction.label}
               </h2>
-              <p className="text-brand-blue-100 text-lg">
+              <p className="text-white text-lg">
                 {dominantAction.description}
               </p>
             </div>
@@ -80,7 +80,7 @@ export function StateAwareDashboard({
           {/* Progress Bar */}
           {progressPercentage !== undefined && (
             <div className="mt-6">
-              <div className="flex items-center justify-between text-sm text-brand-blue-100 mb-2">
+              <div className="flex items-center justify-between text-sm text-white mb-2">
                 <span>Your Progress</span>
                 <span className="font-bold">{progressPercentage}%</span>
               </div>

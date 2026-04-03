@@ -55,7 +55,7 @@ export default async function PublicAssistancePage() {
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Public Assistance Recipients
           </h1>
-          <p className="text-xl text-brand-green-100">
+          <p className="text-xl text-white">
             If you receive public assistance, you automatically qualify for WIOA funding
           </p>
         </div>
@@ -143,7 +143,7 @@ export default async function PublicAssistancePage() {
         {/* CTA */}
         <div className="bg-brand-blue-700 rounded-lg p-8 text-center text-white">
           <h3 className="text-2xl font-bold mb-4">Ready to Start Your Career?</h3>
-          <p className="text-brand-green-100 mb-6">
+          <p className="text-white mb-6">
             Apply today - your public assistance status qualifies you for free training.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

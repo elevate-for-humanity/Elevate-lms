@@ -157,10 +157,10 @@ export default function CreateGroupForm({ userId, userName, programs }: Props) {
               <input type="radio" name="visibility" checked={!formData.isPrivate}
                 onChange={() => setFormData({ ...formData, isPrivate: false })}
                 className="w-4 h-4 text-brand-orange-500" />
-              <Globe className="w-5 h-5 text-gray-500" />
+              <Globe className="w-5 h-5 text-black" />
               <div>
                 <p className="font-medium">Public</p>
-                <p className="text-sm text-gray-500">Anyone can find and join</p>
+                <p className="text-sm text-black">Anyone can find and join</p>
               </div>
             </label>
             <label className={`flex-1 flex items-center gap-3 p-4 border rounded-lg cursor-pointer ${
@@ -169,10 +169,10 @@ export default function CreateGroupForm({ userId, userName, programs }: Props) {
               <input type="radio" name="visibility" checked={formData.isPrivate}
                 onChange={() => setFormData({ ...formData, isPrivate: true })}
                 className="w-4 h-4 text-brand-orange-500" />
-              <Lock className="w-5 h-5 text-gray-500" />
+              <Lock className="w-5 h-5 text-black" />
               <div>
                 <p className="font-medium">Private</p>
-                <p className="text-sm text-gray-500">Invite only</p>
+                <p className="text-sm text-black">Invite only</p>
               </div>
             </label>
           </div>

@@ -66,7 +66,7 @@ export default async function TeachersPage() {
         <div className="max-w-7xl mx-auto px-4 text-center">
           <GraduationCap className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Teacher Resources</h1>
-          <p className="text-xl text-brand-green-100 max-w-2xl mx-auto">
+          <p className="text-xl text-white max-w-2xl mx-auto">
             Tools, guides, and community support for instructors
           </p>
         </div>
@@ -90,7 +90,7 @@ export default async function TeachersPage() {
                 {displayResources.map((resource: any, index: number) => (
                   <div key={index} className="bg-white rounded-xl p-6 border hover:shadow-md transition">
                     <h3 className="font-bold mb-2">{resource.title}</h3>
-                    <p className="text-gray-600 text-sm mb-4">{resource.description}</p>
+                    <p className="text-black text-sm mb-4">{resource.description}</p>
                     <a
                       href={resource.url || '#'}
                       className="inline-flex items-center gap-2 text-brand-green-600 font-medium hover:underline"
@@ -118,11 +118,11 @@ export default async function TeachersPage() {
                       className="bg-white rounded-xl overflow-hidden border hover:shadow-md transition"
                     >
                       <div className="aspect-video bg-gray-200 flex items-center justify-center">
-                        <Video className="w-12 h-12 text-gray-400" />
+                        <Video className="w-12 h-12 text-black" />
                       </div>
                       <div className="p-4">
                         <h3 className="font-bold">{video.title}</h3>
-                        <p className="text-sm text-gray-500">{video.duration}</p>
+                        <p className="text-sm text-black">{video.duration}</p>
                       </div>
                     </Link>
                   ))}
@@ -132,12 +132,12 @@ export default async function TeachersPage() {
                   <Link href="/resources/instructor-training" className="bg-white rounded-xl p-6 border hover:shadow-lg transition">
                     <Video className="w-10 h-10 text-brand-blue-600 mb-3" />
                     <h3 className="font-bold">Getting Started Guide</h3>
-                    <p className="text-sm text-gray-500">15 min • Introduction to the platform</p>
+                    <p className="text-sm text-black">15 min • Introduction to the platform</p>
                   </Link>
                   <Link href="/resources/instructor-training" className="bg-white rounded-xl p-6 border hover:shadow-lg transition">
                     <Video className="w-10 h-10 text-brand-green-600 mb-3" />
                     <h3 className="font-bold">Best Practices</h3>
-                    <p className="text-sm text-gray-500">20 min • Teaching techniques</p>
+                    <p className="text-sm text-black">20 min • Teaching techniques</p>
                   </Link>
                 </div>
               )}
@@ -188,12 +188,12 @@ export default async function TeachersPage() {
                       className="block hover:bg-white p-2 -mx-2 rounded transition"
                     >
                       <div className="font-medium text-sm">{discussion.title}</div>
-                      <div className="text-xs text-gray-500">{discussion.reply_count || 0} replies</div>
+                      <div className="text-xs text-black">{discussion.reply_count || 0} replies</div>
                     </Link>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-sm">No discussions yet</p>
+                <p className="text-black text-sm">No discussions yet</p>
               )}
             </section>
           </div>

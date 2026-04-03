@@ -34,9 +34,9 @@ export default async function TrainingPage() {
       </section>
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/workforce-board" className="hover:text-primary">Workforce Board</Link></li><li>/</li><li className="text-gray-900 font-medium">Training</li></ol></nav>
+          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-black"><li><Link href="/workforce-board" className="hover:text-primary">Workforce Board</Link></li><li>/</li><li className="text-gray-900 font-medium">Training</li></ol></nav>
           <div className="flex justify-between items-center">
-            <div><h1 className="text-3xl font-bold text-gray-900">Training Programs</h1><p className="text-gray-600 mt-2">Manage training programs and providers</p></div>
+            <div><h1 className="text-3xl font-bold text-gray-900">Training Programs</h1><p className="text-black mt-2">Manage training programs and providers</p></div>
             <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Add Program</button>
           </div>
         </div>
@@ -51,10 +51,10 @@ export default async function TrainingPage() {
           <div className="divide-y">
             {programs && programs.length > 0 ? programs.map((prog: any) => (
               <div key={prog.id} className="p-4 flex items-center justify-between hover:bg-white">
-                <div><p className="font-medium">{prog.title}</p><p className="text-sm text-gray-500">{prog.provider || 'Provider'} • {prog.duration || 'Duration N/A'}</p></div>
-                <span className={`px-2 py-1 rounded-full text-xs ${prog.status === 'active' ? 'bg-brand-green-100 text-brand-green-800' : 'bg-white text-gray-600'}`}>{prog.status || 'draft'}</span>
+                <div><p className="font-medium">{prog.title}</p><p className="text-sm text-black">{prog.provider || 'Provider'} • {prog.duration || 'Duration N/A'}</p></div>
+                <span className={`px-2 py-1 rounded-full text-xs ${prog.status === 'active' ? 'bg-brand-green-100 text-brand-green-800' : 'bg-white text-black'}`}>{prog.status || 'draft'}</span>
               </div>
-            )) : <div className="p-8 text-center text-gray-500">No programs found</div>}
+            )) : <div className="p-8 text-center text-black">No programs found</div>}
           </div>
         </div>
       </div>

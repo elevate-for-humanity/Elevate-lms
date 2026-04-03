@@ -103,7 +103,7 @@ function CollapsibleQA() {
             className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-white transition print:hidden"
           >
             <span className="font-semibold text-slate-900 text-sm">{i + 1}. {item.q}</span>
-            {open === i ? <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />}
+            {open === i ? <ChevronUp className="w-4 h-4 text-black flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-black flex-shrink-0" />}
           </button>
           {/* Always visible in print */}
           <div className={`px-4 pb-3 ${open === i ? 'block' : 'hidden'} print:block`}>
@@ -179,7 +179,7 @@ function StudyGuideContent() {
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <div>
             <h1 className="font-bold text-slate-900">EPA 608 Study Guide</h1>
-            <p className="text-xs text-slate-500">Elevate for Humanity · HVAC Technician</p>
+            <p className="text-xs text-black">Elevate for Humanity · HVAC Technician</p>
           </div>
           <div className="flex gap-2">
             <button
@@ -209,9 +209,9 @@ function StudyGuideContent() {
             OFFICIAL STUDY GUIDE
           </div>
           <h1 className="text-3xl font-black text-slate-900 mb-2">{sg('title')}</h1>
-          <p className="text-lg text-slate-600 mb-1">{sg('subtitle')}</p>
-          <p className="text-sm text-slate-500">{sg('school')}</p>
-          <p className="text-xs text-slate-500 mt-1">ETPL Program #10004322 · WIOA-Approved · Free to Enrolled Students</p>
+          <p className="text-lg text-black mb-1">{sg('subtitle')}</p>
+          <p className="text-sm text-black">{sg('school')}</p>
+          <p className="text-xs text-black mt-1">ETPL Program #10004322 · WIOA-Approved · Free to Enrolled Students</p>
           <div className="mt-4 inline-flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2 rounded-lg text-sm">
             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
             {sg('warning')}
@@ -257,18 +257,18 @@ function StudyGuideContent() {
                 {REFRIGERANT_TABLE.map((r) => (
                   <tr key={r.name} className={r.safety === 'A2L' ? 'bg-amber-50' : r.odp !== '0' ? 'bg-red-50' : ''}>
                     <td className="px-2 py-2 font-bold text-slate-900">{r.name}</td>
-                    <td className="px-2 py-2 text-slate-600">{r.type}</td>
+                    <td className="px-2 py-2 text-black">{r.type}</td>
                     <td className="px-2 py-2 font-semibold text-slate-900">{r.odp}</td>
-                    <td className="px-2 py-2 text-slate-600">{r.gwp}</td>
-                    <td className="px-2 py-2 text-slate-600">{r.color}</td>
-                    <td className="px-2 py-2 text-slate-600">{r.status}</td>
+                    <td className="px-2 py-2 text-black">{r.gwp}</td>
+                    <td className="px-2 py-2 text-black">{r.color}</td>
+                    <td className="px-2 py-2 text-black">{r.status}</td>
                     <td className={`px-2 py-2 font-bold ${r.safety === 'A2L' ? 'text-amber-700' : r.safety === 'B1' ? 'text-red-700' : 'text-brand-green-700'}`}>{r.safety}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <p className="text-xs text-slate-500 mt-3">🟡 Yellow = A2L (mildly flammable — requires A2L-rated equipment) · 🔴 Red = ODP &gt; 0 (ozone depleting)</p>
+          <p className="text-xs text-black mt-3">🟡 Yellow = A2L (mildly flammable — requires A2L-rated equipment) · 🔴 Red = ODP &gt; 0 (ozone depleting)</p>
         </div>
 
         {/* Section 3 — Recovery Levels */}
@@ -288,7 +288,7 @@ function StudyGuideContent() {
                   <tr key={r.system}>
                     <td className="px-3 py-2.5 text-slate-700">{r.system}</td>
                     <td className="px-3 py-2.5 font-bold text-slate-900">{r.level}</td>
-                    <td className="px-3 py-2.5 text-slate-500 text-xs">{r.note}</td>
+                    <td className="px-3 py-2.5 text-black text-xs">{r.note}</td>
                   </tr>
                 ))}
               </tbody>
@@ -297,10 +297,10 @@ function StudyGuideContent() {
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
             {LEAK_RATES.map((r) => (
               <div key={r.type} className="bg-white rounded-xl p-3 border border-slate-200">
-                <p className="text-xs font-bold text-slate-500 uppercase mb-1">Leak Trigger Rate</p>
+                <p className="text-xs font-bold text-black uppercase mb-1">Leak Trigger Rate</p>
                 <p className="text-sm font-semibold text-slate-900">{r.type}</p>
                 <p className="text-2xl font-black text-brand-red-600 mt-1">{r.rate}</p>
-                <p className="text-xs text-slate-500">{r.days}</p>
+                <p className="text-xs text-black">{r.days}</p>
               </div>
             ))}
           </div>
@@ -350,12 +350,12 @@ function StudyGuideContent() {
         {/* Section 6 — 20 Must-Know Q&A */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 print:shadow-none print:border-0 print:rounded-none">
           <SectionHeader number="6" title={sg('mustKnow')} color="border-indigo-500" />
-          <p className="text-sm text-slate-500 mb-4 print:hidden">{sg('clickToReveal')}</p>
+          <p className="text-sm text-black mb-4 print:hidden">{sg('clickToReveal')}</p>
           <CollapsibleQA />
         </div>
 
         {/* Footer */}
-        <div className="text-center text-xs text-slate-400 pb-8 print:pb-4">
+        <div className="text-center text-xs text-black pb-8 print:pb-4">
           <p>Elevate for Humanity Career & Technical Institute · Indianapolis, IN</p>
           <p className="mt-1">{sg('footer')}</p>
           <p className="mt-1">{sg('footerNote')}</p>

@@ -39,7 +39,7 @@ export default function LocationsPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-12">
             <h2 className="text-3xl font-black text-slate-900 mb-4">Indianapolis Offices</h2>
-            <p className="text-xl text-slate-600 max-w-2xl leading-relaxed">Four locations across Indianapolis. All offices offer full tax preparation, refund advances, and document upload services.</p>
+            <p className="text-xl text-black max-w-2xl leading-relaxed">Four locations across Indianapolis. All offices offer full tax preparation, refund advances, and document upload services.</p>
           </div>
           <div className="grid md:grid-cols-2 gap-8">
             {LOCATIONS.map((loc) => (
@@ -60,7 +60,7 @@ export default function LocationsPage() {
                           <Image src={item.image} alt={item.label} fill className="object-cover" sizes="40px" />
                         </div>
                         <div>
-                          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{item.label}</p>
+                          <p className="text-xs font-semibold text-black uppercase tracking-wide">{item.label}</p>
                           <p className="text-slate-900 text-sm font-medium">{item.value}</p>
                         </div>
                       </div>
@@ -81,7 +81,7 @@ export default function LocationsPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-12">
             <h2 className="text-3xl font-black text-slate-900 mb-4">Service Areas by State</h2>
-            <p className="text-xl text-slate-600 max-w-2xl leading-relaxed">We serve clients in five states. Select your state for local VITA sites and tax preparation locations.</p>
+            <p className="text-xl text-black max-w-2xl leading-relaxed">We serve clients in five states. Select your state for local VITA sites and tax preparation locations.</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-5">
             {STATES.map((state) => (

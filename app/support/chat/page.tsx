@@ -122,7 +122,7 @@ export default function LiveChatPage() {
             </div>
             <div>
               <h1 className="font-semibold">Live Chat Support</h1>
-              <p className="text-xs text-brand-blue-200 flex items-center gap-1">
+              <p className="text-xs text-white flex items-center gap-1">
                 <span className="w-2 h-2 bg-brand-green-400 rounded-full"></span>
                 Online
               </p>
@@ -160,7 +160,7 @@ export default function LiveChatPage() {
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                 <p
                   className={`text-xs mt-1 ${
-                    message.role === 'user' ? 'text-brand-blue-200' : 'text-gray-400'
+                    message.role === 'user' ? 'text-white' : 'text-gray-400'
                   }`}
                 >
                   {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

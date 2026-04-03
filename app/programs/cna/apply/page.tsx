@@ -52,11 +52,11 @@ export default function CNAApplyPage() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <div className="mx-auto max-w-2xl px-6 py-12">
-        <Link href="/programs/cna" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 mb-8">
+        <Link href="/programs/cna" className="inline-flex items-center gap-2 text-sm text-black hover:text-slate-900 mb-8">
           ← Back to program
         </Link>
         <h1 className="text-3xl font-bold">Apply — Certified Nursing Assistant (CNA)</h1>
-        <p className="mt-2 text-slate-600">WIOA funding available for eligible Indiana residents. 6-week program.</p>
+        <p className="mt-2 text-black">WIOA funding available for eligible Indiana residents. 6-week program.</p>
         {error && <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error}</div>}
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -99,7 +99,7 @@ export default function CNAApplyPage() {
             className="w-full rounded-xl bg-slate-900 px-6 py-3 font-semibold text-white hover:bg-slate-800 disabled:opacity-50 transition-colors">
             {loading ? 'Submitting…' : 'Submit Application'}
           </button>
-          <p className="text-center text-xs text-slate-500">
+          <p className="text-center text-xs text-black">
             By submitting you agree to our <Link href="/legal/privacy" className="underline">Privacy Policy</Link>.
           </p>
         </form>

@@ -202,7 +202,7 @@ export default function GrantsPage() {
           <h2 className="text-3xl font-bold text-white mb-4 text-center">
             How to Get Started
           </h2>
-          <p className="text-xl text-brand-blue-100 text-center mb-12">
+          <p className="text-xl text-white text-center mb-12">
             We make the process simple. Here&apos;s what happens:
           </p>
           <div className="grid md:grid-cols-4 gap-8">
@@ -217,7 +217,7 @@ export default function GrantsPage() {
                   {step.num}
                 </div>
                 <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
-                <p className="text-brand-blue-100 text-sm">{step.desc}</p>
+                <p className="text-white text-sm">{step.desc}</p>
               </div>
             ))}
           </div>

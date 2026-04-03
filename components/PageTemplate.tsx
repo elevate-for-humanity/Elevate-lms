@@ -215,7 +215,7 @@ export function PageTemplate({
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-3xl font-bold mb-4">{finalCTA.title}</h2>
-              <p className="text-xl text-brand-blue-100 mb-8">
+              <p className="text-xl text-white mb-8">
                 {finalCTA.description}
               </p>
               <div className="flex flex-wrap gap-4 justify-center">

@@ -252,13 +252,13 @@ export default function EmployerApplicationForm() {
               <button
                 type="button"
                 onClick={() => setShowPassword(v => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-black hover:text-black"
                 tabIndex={-1}
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
-            <p className="mt-1 text-xs text-slate-500">You'll use this to log in to your employer dashboard.</p>
+            <p className="mt-1 text-xs text-black">You'll use this to log in to your employer dashboard.</p>
           </div>
 
           <div>

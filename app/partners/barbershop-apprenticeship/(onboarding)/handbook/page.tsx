@@ -181,7 +181,7 @@ export default function PartnerHandbookPage() {
       {/* Table of Contents */}
       <nav className="bg-white border-b py-6">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Contents</h2>
+          <h2 className="text-sm font-semibold text-black uppercase tracking-wider mb-3">Contents</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {sections.map((s) => {
               const photo = sectionPhotos[s.id];
@@ -192,7 +192,7 @@ export default function PartnerHandbookPage() {
                       <Image src={photo.src} alt={photo.alt} fill className="object-cover group-hover:scale-110 transition-transform" sizes="32px" />
                     </div>
                   ) : (
-                    <s.icon className="w-4 h-4 text-slate-400" />
+                    <s.icon className="w-4 h-4 text-black" />
                   )}
                   <span>{s.title.replace('Your Role as a Worksite Partner', 'Your Role')}</span>
                 </a>
@@ -239,12 +239,12 @@ export default function PartnerHandbookPage() {
                 {idx + 1}. {section.title}
               </h2>
               {section.content.map((p, i) => (
-                <p key={i} className="text-gray-600 mb-4 leading-relaxed">{p}</p>
+                <p key={i} className="text-black mb-4 leading-relaxed">{p}</p>
               ))}
               <ul className="mt-4 space-y-2 pl-1">
                 {section.items.map((item, i) => (
                   <li key={i} className="flex items-start gap-3 text-gray-700 text-[15px] leading-relaxed">
-                    <span className="w-6 h-6 rounded-full bg-white text-slate-500 text-xs font-semibold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+                    <span className="w-6 h-6 rounded-full bg-white text-black text-xs font-semibold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -276,7 +276,7 @@ export default function PartnerHandbookPage() {
         {/* Next Steps */}
         <section className="bg-brand-blue-50 rounded-xl p-8 text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">Ready to Get Started?</h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-black mb-6">
             Review and sign the MOU, complete the required forms, then submit your application.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

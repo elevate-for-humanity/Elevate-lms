@@ -37,7 +37,7 @@ export default async function ProgramHolderLicensePage() {
     <div className="bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Platform", href: "/platform" }, { label: "Program Holders" }]} />
-        <p className="text-sm text-slate-600 mt-1">Part of the <a href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</a>. <a href="/store/licensing" className="hover:underline">View pricing →</a></p>
+        <p className="text-sm text-black mt-1">Part of the <a href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</a>. <a href="/store/licensing" className="hover:underline">View pricing →</a></p>
       </div>
 {/* Hero */}
       <section className="bg-zinc-900    text-white py-20">
@@ -48,7 +48,7 @@ export default async function ProgramHolderLicensePage() {
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
             Join Our Program Holder Network
           </h1>
-          <p className="text-xl text-white/90 mb-8">
+          <p className="text-xl text-white mb-8">
             Bring your training programs under our umbrella.
             <br />
             Use our government credentials. Launch in 30 days.
@@ -57,15 +57,15 @@ export default async function ProgramHolderLicensePage() {
             <div className="grid md:grid-cols-3 gap-4 text-center">
               <div>
                 <div className="text-3xl font-bold mb-1">30 Days</div>
-                <div className="text-sm text-white/80">To Launch</div>
+                <div className="text-sm text-white">To Launch</div>
               </div>
               <div>
                 <div className="text-3xl font-bold mb-1">$650K</div>
-                <div className="text-sm text-white/80">Credential Value</div>
+                <div className="text-sm text-white">Credential Value</div>
               </div>
               <div>
                 <div className="text-3xl font-bold mb-1">4-8 Years</div>
-                <div className="text-sm text-white/80">Time Saved</div>
+                <div className="text-sm text-white">Time Saved</div>
               </div>
             </div>
           </div>
@@ -315,7 +315,7 @@ export default async function ProgramHolderLicensePage() {
               <div className="text-sm text-black mb-4">
                 Up to 500 students
               </div>
-              <div className="text-xs text-slate-500">Setup: $15,000</div>
+              <div className="text-xs text-black">Setup: $15,000</div>
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-lg border-2 border-brand-blue-500">
@@ -327,7 +327,7 @@ export default async function ProgramHolderLicensePage() {
               <div className="text-sm text-black mb-4">
                 Up to 2,500 students
               </div>
-              <div className="text-xs text-slate-500">Setup: $25,000</div>
+              <div className="text-xs text-black">Setup: $25,000</div>
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-lg">
@@ -339,7 +339,7 @@ export default async function ProgramHolderLicensePage() {
               <div className="text-sm text-black mb-4">
                 Up to 10,000 students
               </div>
-              <div className="text-xs text-slate-500">Setup: $35,000</div>
+              <div className="text-xs text-black">Setup: $35,000</div>
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-lg">
@@ -353,7 +353,7 @@ export default async function ProgramHolderLicensePage() {
               <div className="text-sm text-black mb-4">
                 Unlimited students
               </div>
-              <div className="text-xs text-slate-500">Setup: $50,000</div>
+              <div className="text-xs text-black">Setup: $50,000</div>
             </div>
           </div>
         </div>
@@ -379,27 +379,27 @@ export default async function ProgramHolderLicensePage() {
               </h3>
               <ul className="space-y-2 text-sm text-brand-green-800">
                 <li>
-                  <span className="text-slate-400 flex-shrink-0">•</span> Located in
+                  <span className="text-black flex-shrink-0">•</span> Located in
                   Indiana (for now - expanding soon)
                 </li>
                 <li>
-                  <span className="text-slate-400 flex-shrink-0">•</span> Clean
+                  <span className="text-black flex-shrink-0">•</span> Clean
                   compliance history
                 </li>
                 <li>
-                  <span className="text-slate-400 flex-shrink-0">•</span> Quality
+                  <span className="text-black flex-shrink-0">•</span> Quality
                   training programs
                 </li>
                 <li>
-                  <span className="text-slate-400 flex-shrink-0">•</span> Professional
+                  <span className="text-black flex-shrink-0">•</span> Professional
                   references
                 </li>
                 <li>
-                  <span className="text-slate-400 flex-shrink-0">•</span> Financial
+                  <span className="text-black flex-shrink-0">•</span> Financial
                   stability
                 </li>
                 <li>
-                  <span className="text-slate-400 flex-shrink-0">•</span> Programs
+                  <span className="text-black flex-shrink-0">•</span> Programs
                   align with our approvals
                 </li>
               </ul>
@@ -446,7 +446,7 @@ export default async function ProgramHolderLicensePage() {
           <h2 className="text-3xl font-bold mb-4">
             Ready to Join Our Network?
           </h2>
-          <p className="text-xl text-white/90 mb-8">
+          <p className="text-xl text-white mb-8">
             Application takes 15-20 minutes. Decision in 2-3 days.
           </p>
           <Link
@@ -455,7 +455,7 @@ export default async function ProgramHolderLicensePage() {
           >
             Apply Now →
           </Link>
-          <p className="mt-6 text-white/80 text-sm">
+          <p className="mt-6 text-white text-sm">
             Questions? Email us at our contact form or call (317)
             314-3757
           </p>

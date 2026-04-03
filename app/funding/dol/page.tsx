@@ -85,15 +85,15 @@ const programs = (dbRows as any[]) || [];
       <section className="py-14 sm:py-20">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-3">Available Apprenticeship Programs</h2>
-          <p className="text-slate-600 text-center mb-10 max-w-2xl mx-auto">Programs registered with the U.S. Department of Labor.</p>
+          <p className="text-black text-center mb-10 max-w-2xl mx-auto">Programs registered with the U.S. Department of Labor.</p>
           <div className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
             {programs.map((p) => (
               <Link key={p.name} href={p.href} className="flex items-center justify-between p-5 bg-white rounded-xl border border-slate-200 hover:border-brand-blue-300 hover:shadow-sm transition group">
                 <div>
                   <h3 className="font-bold text-slate-900 group-hover:text-brand-blue-600 transition-colors">{p.name}</h3>
-                  <p className="text-sm text-slate-500">{p.duration}</p>
+                  <p className="text-sm text-black">{p.duration}</p>
                 </div>
-                <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-brand-blue-600 transition-colors" />
+                <ArrowRight className="w-5 h-5 text-black group-hover:text-brand-blue-600 transition-colors" />
               </Link>
             ))}
           </div>
@@ -113,7 +113,7 @@ const programs = (dbRows as any[]) || [];
               <div key={s.step}>
                 <div className="w-12 h-12 rounded-full bg-brand-red-600 text-white text-xl font-bold flex items-center justify-center mx-auto mb-4">{s.step}</div>
                 <h3 className="font-bold text-lg mb-2">{s.title}</h3>
-                <p className="text-slate-600 text-sm">{s.desc}</p>
+                <p className="text-black text-sm">{s.desc}</p>
               </div>
             ))}
           </div>

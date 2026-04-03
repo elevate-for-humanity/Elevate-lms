@@ -223,13 +223,13 @@ export default function DiscussionsClient({
                 </h2>
               </div>
               <p className="mt-1 text-sm text-black">{t.body}</p>
-              <p className="mt-1 text-[10px] text-slate-500">
+              <p className="mt-1 text-[10px] text-black">
                 Posted {new Date(t.created_at).toLocaleString()}
               </p>
             </article>
           ))}
           {threads.length === 0 && (
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-black">
               No discussions yet. Be the first to post.
             </p>
           )}

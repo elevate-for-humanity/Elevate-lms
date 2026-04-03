@@ -92,7 +92,7 @@ export default function ResumeBuildingPage() {
             <div className="bg-white rounded-xl p-8 text-center hover:shadow-lg transition">
               <FileText className="w-12 h-12 text-brand-green-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-3">Resume Review</h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-black mb-4">
                 Get expert feedback on your existing resume with specific suggestions for improvement.
               </p>
               <p className="text-brand-green-600 font-bold">Free for participants</p>
@@ -101,7 +101,7 @@ export default function ResumeBuildingPage() {
             <div className="bg-brand-green-50 rounded-xl p-8 text-center border-2 border-brand-green-200 hover:shadow-lg transition">
               <Sparkles className="w-12 h-12 text-brand-green-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-3">Resume Writing</h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-black mb-4">
                 Work one-on-one with a career coach to create a professional resume from scratch.
               </p>
               <p className="text-brand-green-600 font-bold">Most Popular</p>
@@ -110,7 +110,7 @@ export default function ResumeBuildingPage() {
             <div className="bg-white rounded-xl p-8 text-center hover:shadow-lg transition">
               <Target className="w-12 h-12 text-brand-green-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-3">ATS Optimization</h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-black mb-4">
                 Ensure your resume passes Applicant Tracking Systems and reaches human reviewers.
               </p>
               <p className="text-brand-green-600 font-bold">Included with all services</p>
@@ -125,7 +125,7 @@ export default function ResumeBuildingPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">
             Essential Resume Sections
           </h2>
-          <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+          <p className="text-black text-center mb-12 max-w-2xl mx-auto">
             A well-structured resume makes it easy for employers to find the information they need.
           </p>
 
@@ -135,11 +135,11 @@ export default function ResumeBuildingPage() {
                 <div className="flex flex-col md:flex-row md:items-start gap-6">
                   <div className="md:w-1/3">
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{section.title}</h3>
-                    <p className="text-gray-600">{section.description}</p>
+                    <p className="text-black">{section.description}</p>
                   </div>
                   <div className="md:w-2/3">
                     <p className="text-sm font-semibold text-gray-700 mb-2">Tips:</p>
-                    <p className="text-gray-600 leading-relaxed">{section.tips.join('. ')}.</p>
+                    <p className="text-black leading-relaxed">{section.tips.join('. ')}.</p>
                   </div>
                 </div>
               </div>
@@ -154,7 +154,7 @@ export default function ResumeBuildingPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">
             Power Words for Your Resume
           </h2>
-          <p className="text-gray-600 text-center mb-8">
+          <p className="text-black text-center mb-8">
             Start your bullet points with strong action verbs to make your accomplishments stand out.
           </p>
 
@@ -184,7 +184,7 @@ export default function ResumeBuildingPage() {
                 <AlertCircle className="w-6 h-6 text-brand-red-500 mr-3 flex-shrink-0" />
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1">Typos and Grammar Errors</h3>
-                  <p className="text-gray-600 text-sm">Always proofread multiple times and have someone else review it.</p>
+                  <p className="text-black text-sm">Always proofread multiple times and have someone else review it.</p>
                 </div>
               </div>
             </div>
@@ -194,7 +194,7 @@ export default function ResumeBuildingPage() {
                 <AlertCircle className="w-6 h-6 text-brand-red-500 mr-3 flex-shrink-0" />
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1">Generic Objectives</h3>
-                  <p className="text-gray-600 text-sm">Replace with a tailored professional summary that shows your value.</p>
+                  <p className="text-black text-sm">Replace with a tailored professional summary that shows your value.</p>
                 </div>
               </div>
             </div>
@@ -204,7 +204,7 @@ export default function ResumeBuildingPage() {
                 <AlertCircle className="w-6 h-6 text-brand-red-500 mr-3 flex-shrink-0" />
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1">Listing Duties Instead of Achievements</h3>
-                  <p className="text-gray-600 text-sm">Focus on what you accomplished, not just what you were responsible for.</p>
+                  <p className="text-black text-sm">Focus on what you accomplished, not just what you were responsible for.</p>
                 </div>
               </div>
             </div>
@@ -214,7 +214,7 @@ export default function ResumeBuildingPage() {
                 <AlertCircle className="w-6 h-6 text-brand-red-500 mr-3 flex-shrink-0" />
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1">Too Long or Too Short</h3>
-                  <p className="text-gray-600 text-sm">Keep it to 1-2 pages. Be concise but include all relevant information.</p>
+                  <p className="text-black text-sm">Keep it to 1-2 pages. Be concise but include all relevant information.</p>
                 </div>
               </div>
             </div>
@@ -224,7 +224,7 @@ export default function ResumeBuildingPage() {
                 <AlertCircle className="w-6 h-6 text-brand-red-500 mr-3 flex-shrink-0" />
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1">Unprofessional Email Address</h3>
-                  <p className="text-gray-600 text-sm">Use a simple email format like firstname.lastname@email.com.</p>
+                  <p className="text-black text-sm">Use a simple email format like firstname.lastname@email.com.</p>
                 </div>
               </div>
             </div>
@@ -234,7 +234,7 @@ export default function ResumeBuildingPage() {
                 <AlertCircle className="w-6 h-6 text-brand-red-500 mr-3 flex-shrink-0" />
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1">Not Tailoring to the Job</h3>
-                  <p className="text-gray-600 text-sm">Customize your resume for each application using keywords from the job posting.</p>
+                  <p className="text-black text-sm">Customize your resume for each application using keywords from the job posting.</p>
                 </div>
               </div>
             </div>
@@ -268,7 +268,7 @@ export default function ResumeBuildingPage() {
           <h2 className="text-3xl font-bold mb-6">
             Ready to Build Your Resume?
           </h2>
-          <p className="text-xl mb-8 text-brand-green-100">
+          <p className="text-xl mb-8 text-white">
             Work with our career coaches to create a resume that gets results.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

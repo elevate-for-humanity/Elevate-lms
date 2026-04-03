@@ -105,7 +105,7 @@ export default async function UpdatesPage() {
               <Bell className="w-6 h-6" />
               <div>
                 <p className="font-semibold">Get Updates Delivered</p>
-                <p className="text-brand-orange-100 text-sm">Subscribe to receive program announcements and funding alerts</p>
+                <p className="text-white text-sm">Subscribe to receive program announcements and funding alerts</p>
               </div>
             </div>
             <Link

@@ -10,7 +10,7 @@ export default function PaymentCancelPage() {
             <XCircle className="w-10 h-10 text-red-400" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Payment Cancelled</h1>
-          <p className="text-gray-600 text-sm mb-8">
+          <p className="text-black text-sm mb-8">
             No charge was made. Your spot is not reserved until payment is complete.
           </p>
 

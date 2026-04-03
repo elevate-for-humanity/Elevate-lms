@@ -36,9 +36,9 @@ export default async function LeaderboardPage() {
 
   const getRankIcon = (rank: number) => {
     if (rank === 1) return <Crown className="w-6 h-6 text-yellow-500" />;
-    if (rank === 2) return <Medal className="w-6 h-6 text-gray-400" />;
+    if (rank === 2) return <Medal className="w-6 h-6 text-black" />;
     if (rank === 3) return <Medal className="w-6 h-6 text-amber-600" />;
-    return <span className="w-6 h-6 flex items-center justify-center font-bold text-gray-500">#{rank}</span>;
+    return <span className="w-6 h-6 flex items-center justify-center font-bold text-black">#{rank}</span>;
   };
 
   const getInitial = (name: string | null) => {
@@ -73,9 +73,9 @@ export default async function LeaderboardPage() {
                   {getInitial(topLearners![1]?.full_name)}
                 </div>
                 <p className="font-bold text-gray-900">{topLearners![1]?.full_name || 'Learner'}</p>
-                <p className="text-gray-500 text-sm">{(topLearners![1]?.points || 0).toLocaleString()} pts</p>
+                <p className="text-black text-sm">{(topLearners![1]?.points || 0).toLocaleString()} pts</p>
                 <div className="mt-4 w-24 h-32 bg-gray-200 rounded-t-lg mx-auto flex items-center justify-center">
-                  <Medal className="w-10 h-10 text-gray-400" />
+                  <Medal className="w-10 h-10 text-black" />
                 </div>
               </div>
 
@@ -88,7 +88,7 @@ export default async function LeaderboardPage() {
                   </div>
                 </div>
                 <p className="font-bold text-gray-900 text-lg">{topLearners![0]?.full_name || 'Learner'}</p>
-                <p className="text-gray-500">{(topLearners![0]?.points || 0).toLocaleString()} pts</p>
+                <p className="text-black">{(topLearners![0]?.points || 0).toLocaleString()} pts</p>
                 <div className="mt-4 w-28 h-44 bg-yellow-400 rounded-t-lg mx-auto flex items-center justify-center">
                   <Trophy className="w-12 h-12 text-yellow-700" />
                 </div>
@@ -100,7 +100,7 @@ export default async function LeaderboardPage() {
                   {getInitial(topLearners![2]?.full_name)}
                 </div>
                 <p className="font-bold text-gray-900">{topLearners![2]?.full_name || 'Learner'}</p>
-                <p className="text-gray-500 text-sm">{(topLearners![2]?.points || 0).toLocaleString()} pts</p>
+                <p className="text-black text-sm">{(topLearners![2]?.points || 0).toLocaleString()} pts</p>
                 <div className="mt-4 w-24 h-24 bg-white rounded-t-lg mx-auto flex items-center justify-center">
                   <Medal className="w-10 h-10 text-amber-200" />
                 </div>
@@ -134,11 +134,11 @@ export default async function LeaderboardPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-gray-900">{learner.full_name || 'Learner'}</p>
-                    <p className="text-gray-500 text-sm capitalize">{learner.role || 'Student'}</p>
+                    <p className="text-black text-sm capitalize">{learner.role || 'Student'}</p>
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-gray-900">{(learner.points || 0).toLocaleString()}</p>
-                    <p className="text-gray-500 text-sm">points</p>
+                    <p className="text-black text-sm">points</p>
                   </div>
                 </div>
               ))}
@@ -147,7 +147,7 @@ export default async function LeaderboardPage() {
             <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
               <Trophy className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2">No rankings yet</h3>
-              <p className="text-gray-600 mb-6">Be the first to earn points and claim the top spot!</p>
+              <p className="text-black mb-6">Be the first to earn points and claim the top spot!</p>
               <Link 
                 href="/programs" 
                 className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700"

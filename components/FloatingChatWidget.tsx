@@ -118,7 +118,7 @@ d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 
               </div>
               <div>
                 <h3 className="font-semibold text-sm">AI Assistant</h3>
-                <p className="text-xs text-brand-blue-100">Online • Instant replies</p>
+                <p className="text-xs text-white">Online • Instant replies</p>
               </div>
             </div>
             <button

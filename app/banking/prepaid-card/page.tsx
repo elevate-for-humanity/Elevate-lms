@@ -94,22 +94,22 @@ export default function PrepaidCardPage() {
             <div className="bg-brand-blue-700 rounded-2xl p-8 text-white">
               <div className="flex justify-between items-start mb-12">
                 <div>
-                  <p className="text-brand-blue-200 text-sm">Prepaid Visa</p>
+                  <p className="text-white text-sm">Prepaid Visa</p>
                   <p className="text-2xl font-bold">EPS Financial</p>
                 </div>
-                <CreditCard className="w-12 h-12 text-brand-blue-200" />
+                <CreditCard className="w-12 h-12 text-white" />
               </div>
               <div className="mb-8">
-                <p className="text-brand-blue-200 text-sm mb-1">Card Number</p>
+                <p className="text-white text-sm mb-1">Card Number</p>
                 <p className="text-xl tracking-widest">**** **** **** 1234</p>
               </div>
               <div className="flex justify-between">
                 <div>
-                  <p className="text-brand-blue-200 text-xs">VALID THRU</p>
+                  <p className="text-white text-xs">VALID THRU</p>
                   <p>12/28</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-brand-blue-200 text-xs">CVV</p>
+                  <p className="text-white text-xs">CVV</p>
                   <p>***</p>
                 </div>
               </div>
@@ -347,7 +347,7 @@ export default function PrepaidCardPage() {
           <h2 className="text-3xl font-bold mb-6">
             Get Your Prepaid Card Today
           </h2>
-          <p className="text-xl mb-8 text-brand-blue-100">
+          <p className="text-xl mb-8 text-white">
             No bank account needed. Start using your refund right away.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -197,7 +197,7 @@ export function ProgramPageTemplate({
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="text-white">
                 <p className="font-bold text-lg">Funding May Be Available</p>
-                <p className="text-brand-green-100">Eligible participants may qualify for {fundingTypes.join(', ')} funding</p>
+                <p className="text-white">Eligible participants may qualify for {fundingTypes.join(', ')} funding</p>
               </div>
               <Link
                 href="/funding"

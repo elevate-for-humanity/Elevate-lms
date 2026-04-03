@@ -117,7 +117,7 @@ export default async function CommunityPage() {
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Community Hub
           </h1>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto mb-8">
+          <p className="text-black text-lg max-w-2xl mx-auto mb-8">
             Connect with a supportive community of learners, mentors, and professionals. Share knowledge, get career advice, find study partners, and grow together.
           </p>
           
@@ -152,7 +152,7 @@ export default async function CommunityPage() {
             ].map((stat, index) => (
               <div key={index} className="bg-white rounded-xl p-6 text-center shadow-sm">
                 <div className="text-3xl font-bold text-gray-900">{stat.value}</div>
-                <div className="text-sm text-gray-500">{stat.label}</div>
+                <div className="text-sm text-black">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -163,7 +163,7 @@ export default async function CommunityPage() {
       <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">What is the Community Hub?</h2>
-          <p className="text-center text-gray-600 mb-12 max-w-3xl mx-auto">
+          <p className="text-center text-black mb-12 max-w-3xl mx-auto">
             The Community Hub is your space to connect with fellow students, alumni, instructors, and industry professionals. Whether you&apos;re looking for study partners, career advice, job leads, or just want to share your success story, this is the place.
           </p>
           
@@ -176,7 +176,7 @@ export default async function CommunityPage() {
               >
                 <feature.icon className="w-10 h-10 text-brand-blue-600 mb-4" />
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
-                <p className="text-gray-600 mb-4">{feature.description}</p>
+                <p className="text-black mb-4">{feature.description}</p>
                 <span className="inline-flex items-center gap-2 text-brand-blue-600 font-medium">
                   Explore <ArrowRight className="w-4 h-4" />
                 </span>
@@ -208,9 +208,9 @@ export default async function CommunityPage() {
               >
                 <div>
                   <h3 className="font-semibold text-gray-900">{category.name}</h3>
-                  <p className="text-sm text-gray-500">{category.posts} posts</p>
+                  <p className="text-sm text-black">{category.posts} posts</p>
                 </div>
-                <ArrowRight className="w-5 h-5 text-gray-400" />
+                <ArrowRight className="w-5 h-5 text-black" />
               </Link>
             ))}
           </div>
@@ -295,7 +295,7 @@ export default async function CommunityPage() {
       <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">Get Started</h2>
-          <p className="text-center text-gray-600 mb-12">Join the community or ask us a question</p>
+          <p className="text-center text-black mb-12">Join the community or ask us a question</p>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Join Form */}
@@ -347,7 +347,7 @@ export default async function CommunityPage() {
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Connect?</h2>
-          <p className="text-brand-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-white mb-8 max-w-2xl mx-auto">
             Connect with learners and professionals who support each other on their career journeys.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

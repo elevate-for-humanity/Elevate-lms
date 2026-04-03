@@ -246,7 +246,7 @@ export default function UnifiedChatAssistant({
               </div>
               <div>
                 <h3 className="font-semibold text-sm">{script.name}</h3>
-                <p className="text-xs text-brand-blue-100">{script.role}</p>
+                <p className="text-xs text-white">{script.role}</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -306,7 +306,7 @@ export default function UnifiedChatAssistant({
                       <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                       <p
                         className={`text-xs mt-1 ${
-                          message.role === 'user' ? 'text-brand-blue-100' : 'text-gray-400'
+                          message.role === 'user' ? 'text-white' : 'text-gray-400'
                         }`}
                       >
                         {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

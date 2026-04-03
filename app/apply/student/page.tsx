@@ -59,7 +59,7 @@ export default async function StudentApplicationPage({
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
             Start Your Career Journey
           </h1>
-          <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed">
+          <p className="text-black text-base sm:text-lg max-w-2xl leading-relaxed">
             This application helps us understand your goals and match you with the right
             training program. Many programs have funding available through WIOA, WRG, and Job Ready Indy grants.
           </p>
@@ -73,16 +73,16 @@ export default async function StudentApplicationPage({
       {/* Other application types */}
       <section className="border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 text-center">
-          <p className="text-slate-600 text-sm mb-3">Not a student?</p>
+          <p className="text-black text-sm mb-3">Not a student?</p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link href="/apply/employer" className="text-brand-blue-600 hover:underline font-medium text-sm">
               Employer Partnership
             </Link>
-            <span className="text-slate-300">|</span>
+            <span className="text-white">|</span>
             <Link href="/apply/program-holder" className="text-brand-blue-600 hover:underline font-medium text-sm">
               Become a Program Holder
             </Link>
-            <span className="text-slate-300">|</span>
+            <span className="text-white">|</span>
             <Link href="/apply/staff" className="text-brand-blue-600 hover:underline font-medium text-sm">
               Staff Application
             </Link>

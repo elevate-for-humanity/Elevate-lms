@@ -160,7 +160,7 @@ export default function CosmetologyDocumentsPage() {
       <div className="bg-white py-8 border-t">
         <div className="max-w-2xl mx-auto px-6">
           <h1 className="text-3xl font-black mb-2">Required Documents</h1>
-          <p className="text-slate-600">
+          <p className="text-black">
             Upload your documents to complete enrollment and access your program.
           </p>
         </div>
@@ -177,16 +177,16 @@ export default function CosmetologyDocumentsPage() {
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <h3 className="font-bold text-slate-900">{doc.name}</h3>
-                    <p className="text-sm text-slate-500">{doc.description}</p>
+                    <p className="text-sm text-black">{doc.description}</p>
                   </div>
                   {governmentId?.status === 'complete' && (
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                   )}
                 </div>
 
                 {governmentId ? (
                   <div className="flex items-center gap-3 p-3 bg-white rounded-lg">
-                    <FileText className="w-5 h-5 text-slate-400" />
+                    <FileText className="w-5 h-5 text-black" />
                     <span className="flex-1 text-sm text-slate-700 truncate">
                       {governmentId.name}
                     </span>
@@ -199,7 +199,7 @@ export default function CosmetologyDocumentsPage() {
                     {governmentId.status === 'complete' && (
                       <button
                         onClick={() => setGovernmentId(null)}
-                        className="text-slate-400 hover:text-brand-red-500"
+                        className="text-black hover:text-brand-red-500"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -207,8 +207,8 @@ export default function CosmetologyDocumentsPage() {
                   </div>
                 ) : (
                   <label className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition">
-                    <Upload className="w-5 h-5 text-slate-400" />
-                    <span className="text-slate-600">Click to upload</span>
+                    <Upload className="w-5 h-5 text-black" />
+                    <span className="text-black">Click to upload</span>
                     <input
                       type="file"
                       accept="image/*,.pdf"
@@ -232,12 +232,12 @@ export default function CosmetologyDocumentsPage() {
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <h3 className="font-medium text-slate-900">{doc.name}</h3>
-                    <p className="text-sm text-slate-500">{doc.description}</p>
+                    <p className="text-sm text-black">{doc.description}</p>
                   </div>
                 </div>
                 <label className="flex items-center justify-center gap-2 p-3 border border-slate-200 rounded-lg cursor-pointer hover:border-slate-300 hover:bg-white transition">
-                  <Upload className="w-4 h-4 text-slate-400" />
-                  <span className="text-sm text-slate-500">Upload (optional)</span>
+                  <Upload className="w-4 h-4 text-black" />
+                  <span className="text-sm text-black">Upload (optional)</span>
                   <input
                     type="file"
                     accept="image/*,.pdf"
@@ -270,7 +270,7 @@ export default function CosmetologyDocumentsPage() {
           </p>
         )}
 
-        <p className="text-center text-slate-500 text-sm mt-4">
+        <p className="text-center text-black text-sm mt-4">
           Your documents are encrypted and stored securely.
         </p>
       </div>

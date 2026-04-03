@@ -52,7 +52,7 @@ export default function FranchisePage() {
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
               Own Your Own Training Center
             </h1>
-            <p className="text-2xl text-brand-orange-100 mb-8">
+            <p className="text-2xl text-white mb-8">
               Turn-key workforce development franchise. DOL-approved programs,
               proven curriculum, full support. Start earning $100k-$500k+ per
               year.
@@ -238,8 +238,8 @@ export default function FranchisePage() {
               <h3 className="text-2xl font-bold mb-4">Professional Package</h3>
               <div className="mb-6">
                 <div className="text-4xl font-bold mb-2">$35,000</div>
-                <p className="text-sm text-brand-blue-100">One-time franchise fee</p>
-                <p className="text-sm text-brand-blue-100">+ 4% ongoing royalty</p>
+                <p className="text-sm text-white">One-time franchise fee</p>
+                <p className="text-sm text-white">+ 4% ongoing royalty</p>
               </div>
 
               <div className="mb-6">
@@ -301,7 +301,7 @@ export default function FranchisePage() {
                 <p className="text-sm font-bold text-yellow-400">
                   Payment Plans Available
                 </p>
-                <p className="text-xs text-brand-blue-100">
+                <p className="text-xs text-white">
                   $7,000 down + $1,000/month for 28 months
                 </p>
               </div>
@@ -417,7 +417,7 @@ export default function FranchisePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Revenue Potential</h2>
-            <p className="text-xl text-brand-green-100">
+            <p className="text-xl text-white">
               Real numbers from successful franchisees
             </p>
           </div>

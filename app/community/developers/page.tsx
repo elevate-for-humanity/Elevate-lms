@@ -55,7 +55,7 @@ export default async function DevelopersPage() {
         <div className="max-w-7xl mx-auto px-4 text-center">
           <Code className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Developer Resources</h1>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+          <p className="text-xl text-black max-w-2xl mx-auto">
             API documentation, SDKs, and tools for building on Elevate
           </p>
         </div>
@@ -81,7 +81,7 @@ export default async function DevelopersPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-bold">{endpoint.name}</h3>
-                        <p className="text-sm text-gray-600">{endpoint.description}</p>
+                        <p className="text-sm text-black">{endpoint.description}</p>
                       </div>
                       <code className="text-sm bg-white px-3 py-1 rounded font-mono">
                         {endpoint.path}
@@ -139,7 +139,7 @@ const client = new ElevateClient({
                       className="bg-white rounded-xl p-6 border hover:shadow-md transition"
                     >
                       <h3 className="font-bold mb-2">{example.title}</h3>
-                      <p className="text-gray-600 text-sm mb-3">{example.description}</p>
+                      <p className="text-black text-sm mb-3">{example.description}</p>
                       <span className="text-xs bg-white px-2 py-1 rounded">
                         {example.language}
                       </span>
@@ -203,7 +203,7 @@ const client = new ElevateClient({
             {/* Support */}
             <section className="rounded-xl p-6">
               <h3 className="font-bold text-lg mb-4">Need Help?</h3>
-              <p className="text-gray-600 text-sm mb-4">
+              <p className="text-black text-sm mb-4">
                 Our developer support team is here to help with integration questions.
               </p>
               <Link

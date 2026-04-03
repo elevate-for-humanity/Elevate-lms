@@ -245,7 +245,7 @@ export function ApprenticeProgressWidget({
           <div className="bg-gradient-to-r from-brand-green-500 to-emerald-500 rounded-lg p-4 text-center text-white">
             <Award className="w-8 h-8 mx-auto mb-2" />
             <div className="font-bold">Ready for State Board!</div>
-            <div className="text-sm text-brand-green-100">
+            <div className="text-sm text-white">
               Schedule your Indiana IPLA exam
             </div>
           </div>

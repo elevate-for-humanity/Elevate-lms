@@ -87,7 +87,7 @@ export default async function GroupsPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold mb-2">Community Groups</h1>
-              <p className="text-brand-blue-100">Find your tribe and grow together</p>
+              <p className="text-white">Find your tribe and grow together</p>
             </div>
             {user && (
               <Link
@@ -106,7 +106,7 @@ export default async function GroupsPage() {
         {/* Search */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-8">
           <div className="relative max-w-xl mx-auto">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-black" />
             <input
               type="text"
               placeholder="Search groups..."
@@ -148,11 +148,11 @@ export default async function GroupsPage() {
                       {group.isPublic ? (
                         <Globe className="w-4 h-4 text-brand-green-600" title="Public Group" />
                       ) : (
-                        <Lock className="w-4 h-4 text-gray-400" title="Private Group" />
+                        <Lock className="w-4 h-4 text-black" title="Private Group" />
                       )}
                     </div>
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">{group.description}</p>
-                    <div className="flex items-center text-sm text-gray-500">
+                    <p className="text-sm text-black mb-3 line-clamp-2">{group.description}</p>
+                    <div className="flex items-center text-sm text-black">
                       <Users className="w-4 h-4 mr-1" />
                       {group.members} members
                     </div>
@@ -165,7 +165,7 @@ export default async function GroupsPage() {
               <div className="text-center py-16 bg-white rounded-2xl border">
                 <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-gray-900 mb-2">No Groups Available</h3>
-                <p className="text-gray-600 mb-6">Be the first to create a community group!</p>
+                <p className="text-black mb-6">Be the first to create a community group!</p>
                 {user && (
                   <Link
                     href="/community/groups/create"
@@ -197,7 +197,7 @@ export default async function GroupsPage() {
                           />
                         ) : (
                           <div className="absolute inset-0 bg-white flex items-center justify-center">
-                            <Users className="w-12 h-12 text-slate-400" />
+                            <Users className="w-12 h-12 text-black" />
                           </div>
                         )}
                         <div className="absolute bottom-3 left-3 right-3 flex justify-between items-center">
@@ -217,11 +217,11 @@ export default async function GroupsPage() {
                           {group.is_public ? (
                             <Globe className="w-4 h-4 text-brand-green-600" title="Public Group" />
                           ) : (
-                            <Lock className="w-4 h-4 text-gray-400" title="Private Group" />
+                            <Lock className="w-4 h-4 text-black" title="Private Group" />
                           )}
                         </div>
-                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{group.description}</p>
-                        <div className="flex items-center text-sm text-gray-500">
+                        <p className="text-sm text-black mb-3 line-clamp-2">{group.description}</p>
+                        <div className="flex items-center text-sm text-black">
                           <Users className="w-4 h-4 mr-1" />
                           {group.member_count || 0} members
                         </div>
@@ -247,7 +247,7 @@ export default async function GroupsPage() {
                         className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-white transition"
                       >
                         <span className="text-gray-700">{category.name}</span>
-                        <span className="bg-white text-gray-600 text-sm px-2 py-1 rounded">
+                        <span className="bg-white text-black text-sm px-2 py-1 rounded">
                           {category.count}
                         </span>
                       </Link>
@@ -255,7 +255,7 @@ export default async function GroupsPage() {
                   ))}
                 </ul>
               ) : (
-                <p className="text-gray-500 text-sm">No categories yet</p>
+                <p className="text-black text-sm">No categories yet</p>
               )}
             </div>
 
@@ -264,17 +264,17 @@ export default async function GroupsPage() {
               <h2 className="text-lg font-bold text-gray-900 mb-4">Your Groups</h2>
               {user ? (
                 userGroups.length > 0 ? (
-                  <p className="text-gray-600 text-sm">You are a member of {userGroups.length} group(s)</p>
+                  <p className="text-black text-sm">You are a member of {userGroups.length} group(s)</p>
                 ) : (
                   <div className="text-center py-4">
                     <Users className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                    <p className="text-gray-600 text-sm">You have not joined any groups yet</p>
+                    <p className="text-black text-sm">You have not joined any groups yet</p>
                   </div>
                 )
               ) : (
                 <div className="text-center py-4">
                   <Users className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                  <p className="text-gray-600 mb-3">Sign in to join groups</p>
+                  <p className="text-black mb-3">Sign in to join groups</p>
                   <Link
                     href="/login?redirect=/community/groups"
                     className="text-brand-blue-600 font-medium hover:text-brand-blue-700"
@@ -291,7 +291,7 @@ export default async function GroupsPage() {
                 <Calendar className="w-5 h-5 mr-2 text-brand-blue-600" />
                 Community Events
               </h2>
-              <p className="text-gray-600 text-sm mb-4">
+              <p className="text-black text-sm mb-4">
                 Join live workshops, webinars, and networking events.
               </p>
               <Link

@@ -277,13 +277,13 @@ export function TrialChecklist({
             <h3 className="text-lg font-bold text-slate-900">
               {orgType === 'school' ? 'School Setup Checklist' : 'Organization Setup Checklist'}
             </h3>
-            <p className="text-brand-blue-100 text-sm mt-1">
+            <p className="text-white text-sm mt-1">
               Complete these steps to get the most from your trial
             </p>
           </div>
           <button
             onClick={() => setCollapsed(true)}
-            className="text-brand-blue-200 hover:text-white"
+            className="text-white hover:text-white"
           >
             <ChevronUp className="w-5 h-5" />
           </button>

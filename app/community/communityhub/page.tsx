@@ -71,7 +71,7 @@ export default async function CommunityHubPage() {
         <div className="max-w-7xl mx-auto px-4 text-center">
           <Users className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Community Hub</h1>
-          <p className="text-xl text-brand-blue-100 max-w-2xl mx-auto">
+          <p className="text-xl text-white max-w-2xl mx-auto">
             Connect with fellow learners, instructors, and industry professionals
           </p>
         </div>
@@ -110,8 +110,8 @@ export default async function CommunityHubPage() {
                     className="bg-white rounded-xl p-6 border hover:shadow-md transition"
                   >
                     <h3 className="font-bold text-lg mb-2">{group.name}</h3>
-                    <p className="text-gray-600 text-sm mb-3">{group.description}</p>
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <p className="text-black text-sm mb-3">{group.description}</p>
+                    <div className="flex items-center gap-2 text-sm text-black">
                       <Users className="w-4 h-4" />
                       {group.member_count} members
                     </div>
@@ -137,14 +137,14 @@ export default async function CommunityHubPage() {
                       className="block p-4 hover:bg-white transition"
                     >
                       <h3 className="font-medium mb-1">{discussion.title}</h3>
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <div className="flex items-center gap-4 text-sm text-black">
                         <span>by {discussion.author?.full_name || 'Anonymous'}</span>
                         <span>{discussion.reply_count || 0} replies</span>
                       </div>
                     </Link>
                   ))
                 ) : (
-                  <div className="p-8 text-center text-gray-500">
+                  <div className="p-8 text-center text-black">
                     <MessageSquare className="w-10 h-10 mx-auto mb-3 text-gray-300" />
                     <p>No discussions yet. Start one!</p>
                   </div>
@@ -177,7 +177,7 @@ export default async function CommunityHubPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-sm">No upcoming events</p>
+                <p className="text-black text-sm">No upcoming events</p>
               )}
               <Link
                 href="/events"

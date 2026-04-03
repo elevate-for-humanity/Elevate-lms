@@ -114,7 +114,7 @@ export default function AboutPage() {
         {/* CTA */}
         <div className="bg-brand-blue-700 rounded-2xl p-8 text-center text-white">
           <h2 className="text-2xl font-bold mb-4">Ready to Get Started?</h2>
-          <p className="text-brand-green-100 mb-6">
+          <p className="text-white mb-6">
             Learners across Indiana are transforming their careers.
           </p>
           <div className="flex items-center justify-center gap-4">

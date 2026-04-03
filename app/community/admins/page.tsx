@@ -73,7 +73,7 @@ export default async function AdminsPage() {
         <div className="max-w-7xl mx-auto px-4 text-center">
           <Settings className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Administrator Resources</h1>
-          <p className="text-xl text-brand-blue-100 max-w-2xl mx-auto">
+          <p className="text-xl text-white max-w-2xl mx-auto">
             Tools, guides, and support for platform administrators
           </p>
         </div>
@@ -98,7 +98,7 @@ export default async function AdminsPage() {
                 >
                   <Icon className="w-10 h-10 text-brand-blue-600 mx-auto mb-3" />
                   <h3 className="font-bold mb-1">{tool.name}</h3>
-                  <p className="text-gray-600 text-sm">{tool.description}</p>
+                  <p className="text-black text-sm">{tool.description}</p>
                 </Link>
               );
             })}
@@ -118,7 +118,7 @@ export default async function AdminsPage() {
                 {displayResources.map((resource: any, index: number) => (
                   <div key={index} className="bg-white rounded-xl p-6 border hover:shadow-md transition">
                     <h3 className="font-bold mb-2">{resource.title}</h3>
-                    <p className="text-gray-600 text-sm mb-4">{resource.description}</p>
+                    <p className="text-black text-sm mb-4">{resource.description}</p>
                     <a
                       href={resource.url || '#'}
                       className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:underline"
@@ -143,7 +143,7 @@ export default async function AdminsPage() {
                       className="block p-4 hover:bg-white transition"
                     >
                       <h3 className="font-medium">{guide.title}</h3>
-                      <p className="text-sm text-gray-600">{guide.description}</p>
+                      <p className="text-sm text-black">{guide.description}</p>
                     </Link>
                   ))}
                 </div>
@@ -195,19 +195,19 @@ export default async function AdminsPage() {
                       className="block hover:bg-white p-2 -mx-2 rounded transition"
                     >
                       <div className="font-medium text-sm">{discussion.title}</div>
-                      <div className="text-xs text-gray-500">{discussion.reply_count || 0} replies</div>
+                      <div className="text-xs text-black">{discussion.reply_count || 0} replies</div>
                     </Link>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-sm">No discussions yet</p>
+                <p className="text-black text-sm">No discussions yet</p>
               )}
             </section>
 
             {/* Support */}
             <section className="bg-brand-blue-50 rounded-xl p-6">
               <h3 className="font-bold text-lg mb-4">Need Help?</h3>
-              <p className="text-gray-600 text-sm mb-4">
+              <p className="text-black text-sm mb-4">
                 Our support team is available to help with admin questions.
               </p>
               <Link

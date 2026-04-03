@@ -187,7 +187,7 @@ export default async function OnboardingPage() {
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Ready to Get Started?
           </h2>
-          <p className="text-base md:text-lg text-brand-blue-100 mb-8">
+          <p className="text-base md:text-lg text-white mb-8">
             Create your account and start your career training journey today.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

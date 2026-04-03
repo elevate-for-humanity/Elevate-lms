@@ -195,7 +195,7 @@ export default function ContactClient() {
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
                 Already enrolled?
               </h2>
-              <p className="text-white/80 text-lg mb-8">
+              <p className="text-white text-lg mb-8">
                 Sign in to access your courses, track progress, and manage your
                 account.
               </p>

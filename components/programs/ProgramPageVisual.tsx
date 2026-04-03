@@ -249,7 +249,7 @@ export function ProgramPageVisual({ program }: Props) {
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
             Ready to Start?
           </h2>
-          <p className="text-brand-blue-100 text-lg mb-6">
+          <p className="text-white text-lg mb-6">
             {program.fundingType === 'funded' 
               ? 'Free training for eligible Indiana residents through WIOA funding.'
               : 'Flexible payment options available.'}

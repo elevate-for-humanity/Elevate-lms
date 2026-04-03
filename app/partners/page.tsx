@@ -130,7 +130,7 @@ export default function PartnersIndexPage() {
           <div className="max-w-5xl mx-auto px-4 text-center">
             <p className="font-semibold text-sm mb-2 uppercase tracking-wide text-brand-blue-600">Indianapolis, Indiana</p>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3">Partner With Elevate</h1>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+            <p className="text-lg text-black max-w-3xl mx-auto">
               We work with workforce agencies, employers, barbershops, training providers, and reentry organizations. Find your type below and apply in minutes.
             </p>
           </div>
@@ -150,7 +150,7 @@ export default function PartnersIndexPage() {
               <div key={s.step} className="flex flex-col items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-brand-blue-600 text-white font-extrabold text-lg flex items-center justify-center flex-shrink-0">{s.step}</div>
                 <h3 className="font-bold text-slate-900">{s.heading}</h3>
-                <p className="text-slate-600 text-sm">{s.body}</p>
+                <p className="text-black text-sm">{s.body}</p>
               </div>
             ))}
           </div>
@@ -221,7 +221,7 @@ export default function PartnersIndexPage() {
       <section className="py-12 border-t border-slate-100">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-2">Not sure which type fits?</h2>
-          <p className="text-slate-600 mb-6">Call us and we will figure it out together. Most partnerships are set up within a week.</p>
+          <p className="text-black mb-6">Call us and we will figure it out together. Most partnerships are set up within a week.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="tel:317-314-3757" className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-3 rounded-lg font-bold transition-colors">
               <Phone className="w-4 h-4" /> (317) 314-3757

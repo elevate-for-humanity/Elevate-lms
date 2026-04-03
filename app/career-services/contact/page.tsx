@@ -38,7 +38,7 @@ export default function CareerServicesContactPage() {
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Contact Career Services
           </h1>
-          <p className="text-xl text-brand-blue-100">
+          <p className="text-xl text-white">
             We are here to help you succeed in your career journey
           </p>
         </div>
@@ -54,14 +54,14 @@ export default function CareerServicesContactPage() {
                 <Phone className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h2 className="text-xl font-bold text-gray-900 mb-2">Contact Us</h2>
-              <p className="text-gray-600 mb-4">Speak directly with a career advisor</p>
+              <p className="text-black mb-4">Speak directly with a career advisor</p>
               <a
                 href="/support"
                 className="text-2xl font-bold text-brand-blue-600 hover:text-brand-blue-700"
               >
                 (317) 314-3757
               </a>
-              <p className="text-sm text-gray-500 mt-2">Mon-Fri, 9am-5pm EST</p>
+              <p className="text-sm text-black mt-2">Mon-Fri, 9am-5pm EST</p>
             </div>
 
             {/* Email */}
@@ -70,14 +70,14 @@ export default function CareerServicesContactPage() {
                 <Mail className="w-8 h-8 text-brand-green-600" />
               </div>
               <h2 className="text-xl font-bold text-gray-900 mb-2">Email Us</h2>
-              <p className="text-gray-600 mb-4">Get a response within 24 hours</p>
+              <p className="text-black mb-4">Get a response within 24 hours</p>
               <a
                 href="/contact"
                 className="text-lg font-bold text-brand-green-600 hover:text-brand-green-700 break-all"
               >
                 our contact form
               </a>
-              <p className="text-sm text-gray-500 mt-2">We respond within 1 business day</p>
+              <p className="text-sm text-black mt-2">We respond within 1 business day</p>
             </div>
 
             {/* Schedule */}
@@ -86,14 +86,14 @@ export default function CareerServicesContactPage() {
                 <Calendar className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h2 className="text-xl font-bold text-gray-900 mb-2">Schedule Appointment</h2>
-              <p className="text-gray-600 mb-4">Book a one-on-one session</p>
+              <p className="text-black mb-4">Book a one-on-one session</p>
               <Link
                 href="/schedule"
                 className="inline-flex items-center text-lg font-bold text-brand-blue-600 hover:text-brand-blue-700"
               >
                 Book Now <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
-              <p className="text-sm text-gray-500 mt-2">In-person or virtual available</p>
+              <p className="text-sm text-black mt-2">In-person or virtual available</p>
             </div>
           </div>
         </div>
@@ -113,7 +113,7 @@ export default function CareerServicesContactPage() {
                   <MapPin className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1" />
                   <div>
                     <h3 className="font-bold text-gray-900 mb-1">Career Services Center</h3>
-                    <p className="text-gray-600">
+                    <p className="text-black">
                       8888 Keystone Crossing, Suite 1300<br />
                       Indianapolis, IN 46240
                     </p>
@@ -124,7 +124,7 @@ export default function CareerServicesContactPage() {
                   <Clock className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1" />
                   <div>
                     <h3 className="font-bold text-gray-900 mb-1">Office Hours</h3>
-                    <p className="text-gray-600">
+                    <p className="text-black">
                       Monday - Friday: 9:00 AM - 5:00 PM<br />
                       Saturday: By appointment<br />
                       Sunday: Closed
@@ -136,7 +136,7 @@ export default function CareerServicesContactPage() {
                   <MessageSquare className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1" />
                   <div>
                     <h3 className="font-bold text-gray-900 mb-1">By Appointment Only</h3>
-                    <p className="text-gray-600">
+                    <p className="text-black">
                       By appointment only — for meetings, support, testing, and hands-on training. This is not a walk-in location.
                     </p>
                   </div>
@@ -145,8 +145,8 @@ export default function CareerServicesContactPage() {
 
               <div className="md:w-1/2 bg-gray-200 min-h-[300px] flex items-center justify-center">
                 <div className="text-center p-8">
-                  <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">
+                  <MapPin className="w-12 h-12 text-black mx-auto mb-4" />
+                  <p className="text-black">
                     <a
                       href="https://maps.google.com/?q=8888+Keystone+Crossing+Suite+1300+Indianapolis+IN+46240"
                       target="_blank"
@@ -180,9 +180,9 @@ export default function CareerServicesContactPage() {
               </div>
               <div>
                 <h3 className="font-bold text-gray-900">Resume Building</h3>
-                <p className="text-sm text-gray-600">Create a professional resume</p>
+                <p className="text-sm text-black">Create a professional resume</p>
               </div>
-              <ArrowRight className="w-5 h-5 text-gray-400 ml-auto" />
+              <ArrowRight className="w-5 h-5 text-black ml-auto" />
             </Link>
 
             <Link
@@ -194,9 +194,9 @@ export default function CareerServicesContactPage() {
               </div>
               <div>
                 <h3 className="font-bold text-gray-900">Interview Prep</h3>
-                <p className="text-sm text-gray-600">Practice with mock interviews</p>
+                <p className="text-sm text-black">Practice with mock interviews</p>
               </div>
-              <ArrowRight className="w-5 h-5 text-gray-400 ml-auto" />
+              <ArrowRight className="w-5 h-5 text-black ml-auto" />
             </Link>
 
             <Link
@@ -208,9 +208,9 @@ export default function CareerServicesContactPage() {
               </div>
               <div>
                 <h3 className="font-bold text-gray-900">Career Counseling</h3>
-                <p className="text-sm text-gray-600">Explore your career options</p>
+                <p className="text-sm text-black">Explore your career options</p>
               </div>
-              <ArrowRight className="w-5 h-5 text-gray-400 ml-auto" />
+              <ArrowRight className="w-5 h-5 text-black ml-auto" />
             </Link>
 
             <Link
@@ -222,9 +222,9 @@ export default function CareerServicesContactPage() {
               </div>
               <div>
                 <h3 className="font-bold text-gray-900">Job Placement</h3>
-                <p className="text-sm text-gray-600">Connect with employers</p>
+                <p className="text-sm text-black">Connect with employers</p>
               </div>
-              <ArrowRight className="w-5 h-5 text-gray-400 ml-auto" />
+              <ArrowRight className="w-5 h-5 text-black ml-auto" />
             </Link>
           </div>
         </div>
@@ -240,28 +240,28 @@ export default function CareerServicesContactPage() {
           <div className="space-y-4">
             <div className="bg-white rounded-lg p-6 shadow-sm">
               <h3 className="font-bold text-gray-900 mb-2">Are career services free?</h3>
-              <p className="text-gray-600">
+              <p className="text-black">
                 Yes, all career services are free for current students and program participants. Alumni also have access to many services.
               </p>
             </div>
 
             <div className="bg-white rounded-lg p-6 shadow-sm">
               <h3 className="font-bold text-gray-900 mb-2">Do I need an appointment?</h3>
-              <p className="text-gray-600">
+              <p className="text-black">
                 Yes — all visits are by appointment only. Elevate is a hybrid training institute, not a walk-in location. Schedule through the booking link on this page.
               </p>
             </div>
 
             <div className="bg-white rounded-lg p-6 shadow-sm">
               <h3 className="font-bold text-gray-900 mb-2">Can I get help virtually?</h3>
-              <p className="text-gray-600">
+              <p className="text-black">
                 Absolutely! We offer all services via video call. Schedule a virtual appointment through our booking system.
               </p>
             </div>
 
             <div className="bg-white rounded-lg p-6 shadow-sm">
               <h3 className="font-bold text-gray-900 mb-2">How long are appointments?</h3>
-              <p className="text-gray-600">
+              <p className="text-black">
                 Initial consultations are 30 minutes. Resume reviews and mock interviews are typically 60 minutes. Career counseling sessions can be 60-90 minutes.
               </p>
             </div>
@@ -275,7 +275,7 @@ export default function CareerServicesContactPage() {
           <h2 className="text-3xl font-bold mb-6">
             Ready to Take the Next Step?
           </h2>
-          <p className="text-xl mb-8 text-brand-blue-100">
+          <p className="text-xl mb-8 text-white">
             Our career services team is here to support your success.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

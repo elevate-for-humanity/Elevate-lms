@@ -7,7 +7,7 @@ export default function ProgramNotFound() {
       <div className="text-center px-4 max-w-lg">
         <div className="text-6xl font-black text-gray-200 mb-4">404</div>
         <h2 className="text-xl font-bold text-slate-900 mb-3">Program Not Found</h2>
-        <p className="text-slate-600 mb-6">
+        <p className="text-black mb-6">
           This program may have been renamed or is no longer available.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">

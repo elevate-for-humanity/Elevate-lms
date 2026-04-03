@@ -78,11 +78,11 @@ function ProfileStep({ onNext }: { onNext: (data: Record<string, string>) => voi
       </div>
 
       <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center">
-        <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+        <Upload className="w-8 h-8 text-black mx-auto mb-2" />
         <p className="text-sm font-semibold text-gray-700">Upload License Photos</p>
-        <p className="text-xs text-gray-500 mt-1">Upload full, clear photos of your Indiana Barber Shop License and all mentor/journeyperson barber licenses. Both front and back required.</p>
+        <p className="text-xs text-black mt-1">Upload full, clear photos of your Indiana Barber Shop License and all mentor/journeyperson barber licenses. Both front and back required.</p>
         <p className="text-xs text-red-600 mt-2 font-semibold">⚠ Partial or cropped images will not be accepted</p>
-        <input type="file" multiple accept="image/*,.pdf" className="mt-3 text-sm text-gray-600" />
+        <input type="file" multiple accept="image/*,.pdf" className="mt-3 text-sm text-black" />
       </div>
 
       {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">{error}</p>}
@@ -128,7 +128,7 @@ function MOUStep({ profileData, onNext }: { profileData: Record<string, string>;
     <div className="text-center space-y-4">
       <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
       <h3 className="text-xl font-bold text-gray-900">MOU Signed Successfully</h3>
-      <p className="text-gray-600 text-sm">Your Memorandum of Understanding has been recorded. Continue to the Employer Agreement.</p>
+      <p className="text-black text-sm">Your Memorandum of Understanding has been recorded. Continue to the Employer Agreement.</p>
       <button onClick={onNext} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors">
         Continue to Employer Agreement <ChevronRight className="w-5 h-5" />
       </button>
@@ -140,10 +140,10 @@ function MOUStep({ profileData, onNext }: { profileData: Record<string, string>;
       {/* MOU Document */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 max-h-96 overflow-y-auto text-sm text-gray-800 space-y-4">
         <div className="text-center border-b pb-4">
-          <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Version 2.0 — 2025</p>
+          <p className="text-xs text-black uppercase tracking-wide font-semibold">Version 2.0 — 2025</p>
           <h3 className="text-lg font-bold text-gray-900 mt-1">Employer Training Site MOU</h3>
-          <p className="text-xs text-gray-600">Barber Apprenticeship Program · RAPIDS: 2025-IN-132301</p>
-          <p className="text-xs text-gray-600 mt-1">Sponsor: 2Exclusive LLC-S (DBA: Elevate for Humanity Technical and Career Institute)</p>
+          <p className="text-xs text-black">Barber Apprenticeship Program · RAPIDS: 2025-IN-132301</p>
+          <p className="text-xs text-black mt-1">Sponsor: 2Exclusive LLC-S (DBA: Elevate for Humanity Technical and Career Institute)</p>
         </div>
         <p>This MOU is entered into between <strong>2Exclusive LLC-S (DBA: Elevate for Humanity Technical and Career Institute)</strong> ("Sponsor") and <strong>{profileData.shop_name || 'Employer Training Site'}</strong> ("Employer"), governed by 29 CFR Parts 29 and 30.</p>
         <p><strong>Employer agrees to:</strong></p>
@@ -179,7 +179,7 @@ function MOUStep({ profileData, onNext }: { profileData: Record<string, string>;
         <input type="text" value={sig} onChange={e => setSig(e.target.value)}
           placeholder={profileData.owner_name || 'Your full legal name'}
           className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 text-lg font-signature focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        <p className="text-xs text-gray-500 mt-1">By typing your name you are applying a legally binding digital signature</p>
+        <p className="text-xs text-black mt-1">By typing your name you are applying a legally binding digital signature</p>
       </div>
 
       <div className="flex items-start gap-3 p-4 bg-gray-50 border border-gray-200 rounded-xl">
@@ -242,7 +242,7 @@ function EmployerAgreementStep({ profileData, onNext }: { profileData: Record<st
     <div className="text-center space-y-4">
       <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
       <h3 className="text-xl font-bold text-gray-900">Employer Agreement Complete</h3>
-      <p className="text-gray-600 text-sm">Your employer agreement has been submitted and recorded for RAPIDS. Elevate will review and confirm your onboarding within 2 business days.</p>
+      <p className="text-black text-sm">Your employer agreement has been submitted and recorded for RAPIDS. Elevate will review and confirm your onboarding within 2 business days.</p>
       <button onClick={onNext} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition-colors">
         Complete Onboarding
       </button>
@@ -273,7 +273,7 @@ function EmployerAgreementStep({ profileData, onNext }: { profileData: Record<st
       </div>
 
       <h3 className="font-bold text-gray-900">Progressive Wage Schedule</h3>
-      <p className="text-xs text-gray-500">Apprentice wages must increase progressively. Enter hourly rates for each year of the apprenticeship.</p>
+      <p className="text-xs text-black">Apprentice wages must increase progressively. Enter hourly rates for each year of the apprenticeship.</p>
       <div className="grid grid-cols-3 gap-4">
         {field('Year 1 Hourly Rate ($)', 'wage_year1', 'text', 'e.g. 10.00')}
         {field('Year 2 Hourly Rate ($)', 'wage_year2', 'text', 'e.g. 12.00')}
@@ -343,9 +343,9 @@ export default function BarbershopOnboardingPage() {
 
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-          <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Barber Apprenticeship Program</p>
+          <p className="text-xs text-black uppercase tracking-wide font-semibold mb-1">Barber Apprenticeship Program</p>
           <h1 className="text-2xl font-bold text-gray-900">Employer Training Site Onboarding</h1>
-          <p className="text-sm text-gray-500 mt-1">2Exclusive LLC-S (DBA: Elevate for Humanity Technical and Career Institute) · RAPIDS: 2025-IN-132301</p>
+          <p className="text-sm text-black mt-1">2Exclusive LLC-S (DBA: Elevate for Humanity Technical and Career Institute) · RAPIDS: 2025-IN-132301</p>
 
           {/* Progress */}
           <div className="flex items-center gap-2 mt-5">
@@ -354,11 +354,11 @@ export default function BarbershopOnboardingPage() {
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
                   i < stepIndex ? 'bg-green-500 text-white' :
                   i === stepIndex ? 'bg-blue-600 text-white' :
-                  'bg-gray-200 text-gray-500'
+                  'bg-gray-200 text-black'
                 }`}>
                   {i < stepIndex ? <CheckCircle className="w-4 h-4" /> : i + 1}
                 </div>
-                <span className={`text-xs font-semibold hidden sm:block ${i === stepIndex ? 'text-blue-600' : 'text-gray-400'}`}>{s.label}</span>
+                <span className={`text-xs font-semibold hidden sm:block ${i === stepIndex ? 'text-blue-600' : 'text-black'}`}>{s.label}</span>
                 {i < STEPS.length - 1 && <div className={`flex-1 h-0.5 ${i < stepIndex ? 'bg-green-400' : 'bg-gray-200'}`} />}
               </div>
             ))}
@@ -384,7 +384,7 @@ export default function BarbershopOnboardingPage() {
             <div className="text-center space-y-4 py-8">
               <CheckCircle className="w-20 h-20 text-green-500 mx-auto" />
               <h3 className="text-2xl font-bold text-gray-900">Onboarding Complete!</h3>
-              <p className="text-gray-600">Thank you, {profileData.owner_name}. Your profile, MOU, and Employer Agreement have been submitted. Elevate for Humanity will review and confirm within 2 business days. You will receive a confirmation email at {profileData.contact_email}.</p>
+              <p className="text-black">Thank you, {profileData.owner_name}. Your profile, MOU, and Employer Agreement have been submitted. Elevate for Humanity will review and confirm within 2 business days. You will receive a confirmation email at {profileData.contact_email}.</p>
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800 text-left">
                 <p className="font-semibold mb-2">Next Steps:</p>
                 <ul className="list-disc pl-5 space-y-1">

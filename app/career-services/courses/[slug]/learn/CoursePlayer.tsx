@@ -70,7 +70,7 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
                 <Play className="w-10 h-10" />
               </div>
               <p className="text-xl font-semibold mb-2">{currentModule?.title}</p>
-              <p className="text-slate-500">Click play to start the lesson</p>
+              <p className="text-black">Click play to start the lesson</p>
             </div>
           )}
         </div>
@@ -83,9 +83,9 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
                 <h2 className="text-xl font-bold text-slate-900 mb-1">
                   {currentModule?.title}
                 </h2>
-                <p className="text-slate-500">{currentModule?.description}</p>
+                <p className="text-black">{currentModule?.description}</p>
               </div>
-              <div className="flex items-center gap-2 text-gray-400">
+              <div className="flex items-center gap-2 text-black">
                 <Clock className="w-4 h-4" />
                 <span>{currentModule?.duration_minutes} min</span>
               </div>
@@ -100,7 +100,7 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
                     : 'bg-gray-700 text-white hover:bg-gray-600'
                 }`}
               >
-                <span className="text-slate-500 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 {completedModules.includes(currentModule?.id) ? 'Completed' : 'Mark Complete'}
               </button>
 
@@ -123,7 +123,7 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
         {/* Progress */}
         <div className="p-4 border-b border-gray-700">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-slate-500">Your Progress</span>
+            <span className="text-sm text-black">Your Progress</span>
             <span className="text-sm font-medium text-white">{progress}%</span>
           </div>
           <div className="h-2 bg-white rounded-full overflow-hidden">
@@ -132,14 +132,14 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-black mt-2">
             {completedModules.length} of {modules.length} lessons completed
           </p>
         </div>
 
         {/* Module List */}
         <div className="p-2">
-          <h3 className="text-sm font-semibold text-gray-400 px-2 py-2">Course Content</h3>
+          <h3 className="text-sm font-semibold text-black px-2 py-2">Course Content</h3>
           <div className="space-y-1">
             {modules.map((module, index) => (
               <button
@@ -153,7 +153,7 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
               >
                 <div className="flex-shrink-0 mt-0.5">
                   {completedModules.includes(module.id) ? (
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                   ) : (
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center text-xs font-medium ${
                       currentModuleIndex === index ? 'border-white' : 'border-gray-500'
@@ -164,7 +164,7 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{module.title}</p>
-                  <p className={`text-xs ${currentModuleIndex === index ? 'text-brand-blue-200' : 'text-gray-500'}`}>
+                  <p className={`text-xs ${currentModuleIndex === index ? 'text-white' : 'text-black'}`}>
                     {module.duration_minutes} min
                   </p>
                 </div>
@@ -175,7 +175,7 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
 
         {/* Resources */}
         <div className="p-4 border-t border-gray-700">
-          <h3 className="text-sm font-semibold text-gray-400 mb-3">Resources</h3>
+          <h3 className="text-sm font-semibold text-black mb-3">Resources</h3>
           <div className="space-y-2">
             <button className="w-full flex items-center gap-2 text-sm text-gray-300 hover:text-white p-2 rounded hover:bg-gray-700">
               <Download className="w-4 h-4" />

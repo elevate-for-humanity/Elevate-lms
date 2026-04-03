@@ -206,7 +206,7 @@ export default function DemosPage() {
           <h2 className="text-3xl md:text-4xl font-black mb-4">
             Want a Personalized Demo?
           </h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Schedule a live walkthrough with our team to see how Elevate can work 
             for your organization. We&apos;ll customize the demo to your specific needs.
           </p>

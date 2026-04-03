@@ -11,7 +11,7 @@ export default function PartnerRequirementsPage() {
       <div className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-3xl md:text-4xl font-bold">Partner Site Requirements</h1>
-          <p className="mt-3 text-slate-300 text-lg">
+          <p className="mt-3 text-white text-lg">
             Standards for apprenticeship and hands-on training site approval
           </p>
         </div>
@@ -33,7 +33,7 @@ export default function PartnerRequirementsPage() {
           <div className="not-prose space-y-4 my-6">
             <div className="border border-gray-200 rounded-lg p-5">
               <h4 className="font-semibold text-gray-900">General Liability Insurance</h4>
-              <p className="text-sm text-gray-500 mt-1">Minimum: $1,000,000 per occurrence / $2,000,000 aggregate</p>
+              <p className="text-sm text-black mt-1">Minimum: $1,000,000 per occurrence / $2,000,000 aggregate</p>
               <p className="text-sm text-gray-700 mt-2">
                 Must cover client injury, property damage, and incidents occurring at the shop location.
               </p>
@@ -49,7 +49,7 @@ export default function PartnerRequirementsPage() {
 
             <div className="border border-gray-200 rounded-lg p-5">
               <h4 className="font-semibold text-gray-900">Workers&apos; Compensation Insurance</h4>
-              <p className="text-sm text-gray-500 mt-1">Required if the shop employs W-2 staff</p>
+              <p className="text-sm text-black mt-1">Required if the shop employs W-2 staff</p>
               <p className="text-sm text-gray-700 mt-2">
                 Independent contractor-only shops must confirm classification with their insurer.
               </p>
@@ -137,7 +137,7 @@ export default function PartnerRequirementsPage() {
         </section>
 
         <div className="mt-12 pt-8 border-t border-gray-200">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-black">
             These requirements align with Indiana State Board of Barber Examiners regulations
             and RAPIDS Registered Apprenticeship program standards. Last updated March 2026.
           </p>

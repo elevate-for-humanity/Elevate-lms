@@ -286,14 +286,14 @@ export default function OzoneDepletion({ onComplete }: Props) {
       ) : (
         <div className="bg-brand-blue-700 rounded-2xl p-6 text-white space-y-4">
           <h3 className="text-xl font-extrabold">Chain Reaction Complete ✓</h3>
-          <p className="text-brand-green-200 text-sm leading-relaxed">
+          <p className="text-white text-sm leading-relaxed">
             You now understand why CFCs were banned. One chlorine atom destroys up to 100,000 ozone molecules
             in a catalytic cycle. HFCs and HFOs have zero ODP because they contain no chlorine.
             This is the science behind the Montreal Protocol and the Clean Air Act.
           </p>
           <div className="bg-white/10 rounded-xl p-4 space-y-2">
             <p className="font-bold text-sm">Exam key points:</p>
-            <ul className="text-brand-green-200 text-sm space-y-1">
+            <ul className="text-white text-sm space-y-1">
               <li>• CFCs phased out 1996 — highest ODP</li>
               <li>• HCFCs (R-22) phased out 2020 — lower ODP</li>
               <li>• HFCs (R-410A) — zero ODP, no chlorine</li>

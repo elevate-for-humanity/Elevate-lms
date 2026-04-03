@@ -286,7 +286,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
               </h3>
               <ul className="space-y-2">
                 {config.outcomes.knowledge.map((item, i) => (
-                  <li key={i} className="text-brand-blue-100">• {item}</li>
+                  <li key={i} className="text-white">• {item}</li>
                 ))}
               </ul>
             </div>
@@ -297,7 +297,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
               </h3>
               <ul className="space-y-2">
                 {config.outcomes.skills.map((item, i) => (
-                  <li key={i} className="text-brand-blue-100">• {item}</li>
+                  <li key={i} className="text-white">• {item}</li>
                 ))}
               </ul>
             </div>
@@ -308,7 +308,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
               </h3>
               <ul className="space-y-2">
                 {config.outcomes.compliance.map((item, i) => (
-                  <li key={i} className="text-brand-blue-100">• {item}</li>
+                  <li key={i} className="text-white">• {item}</li>
                 ))}
               </ul>
             </div>

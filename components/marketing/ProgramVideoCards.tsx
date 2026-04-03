@@ -8,7 +8,7 @@ const PROGRAMS = [
     duration: '4–8 weeks',
     salary: '$28–$42K/yr',
     funding: 'Fee-Based',
-    fundingColor: 'text-slate-300',
+    fundingColor: 'text-white',
     image: '/images/pages/card-cna.jpg',
     href: '/programs/cna',
   },
@@ -38,7 +38,7 @@ const PROGRAMS = [
     duration: '15–17 months',
     salary: '$35–$65K+/yr',
     funding: 'Fee-Based · $4,980',
-    fundingColor: 'text-slate-300',
+    fundingColor: 'text-white',
     image: '/images/pages/barber-apprenticeship.jpg',
     href: '/programs/barber-apprenticeship',
   },
@@ -60,7 +60,7 @@ function ProgramCard({ prog }: { prog: typeof PROGRAMS[number] }) {
         <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-1">{prog.tag}</p>
         <h3 className="font-extrabold text-white text-base leading-snug mb-3">{prog.full}</h3>
         <div className="space-y-1">
-          <p className="text-xs text-slate-300">{prog.duration}</p>
+          <p className="text-xs text-white">{prog.duration}</p>
           <p className="text-sm font-bold text-green-400">{prog.salary}</p>
           <p className={`text-xs font-semibold ${prog.fundingColor}`}>{prog.funding}</p>
         </div>

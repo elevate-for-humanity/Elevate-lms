@@ -57,7 +57,7 @@ export function HomeProgramStrip({ items }: HomeProgramStripProps) {
                   {item.programId ? (
                     <Link
                       href={`/programs/${item.programId}`}
-                      className="text-[11px] font-semibold text-brand-orange-300 hover:text-brand-orange-200"
+                      className="text-[11px] font-semibold text-brand-orange-300 hover:text-white"
                     >
                       Explore this pathway →
                     </Link>

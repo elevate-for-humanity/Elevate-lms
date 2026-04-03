@@ -30,7 +30,7 @@ export function MarketingPageContent({ page }: MarketingPageContentProps) {
             {page.title}
           </h1>
           {page.subtitle && (
-            <p className="text-xl md:text-2xl text-white/90 max-w-3xl">
+            <p className="text-xl md:text-2xl text-white max-w-3xl">
               {page.subtitle}
             </p>
           )}
@@ -92,7 +92,7 @@ function FeaturesSection({ section }: { section: MarketingSection }) {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, idx) => (
             <div key={idx} className="bg-white rounded-xl p-6 shadow-sm">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black font-bold flex-shrink-0">→</span>
               <p className="text-gray-700">{feature}</p>
             </div>
           ))}
@@ -107,7 +107,7 @@ function CTASection({ section }: { section: MarketingSection }) {
     <section className="py-16">
       <div className="max-w-4xl mx-auto px-6 text-center">
         <h2 className="text-3xl font-bold text-white mb-4">{section.heading}</h2>
-        <p className="text-xl text-brand-blue-100 mb-8">{section.body}</p>
+        <p className="text-xl text-white mb-8">{section.body}</p>
         <Link
           href="/apply"
           className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-brand-blue-50 transition"
@@ -137,7 +137,7 @@ function StatsSection({ section }: { section: MarketingSection }) {
           {stats.map((stat, idx) => (
             <div key={idx} className="text-center">
               <div className="text-4xl font-bold text-brand-blue-400 mb-2">{stat.value}</div>
-              <div className="text-gray-400">{stat.label}</div>
+              <div className="text-white">{stat.label}</div>
             </div>
           ))}
         </div>

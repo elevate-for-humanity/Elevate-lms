@@ -284,7 +284,7 @@ export default function SmartUploadPage() {
                 <span>PDF</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <span>Max 10MB</span>
               </div>
             </div>
@@ -303,7 +303,7 @@ export default function SmartUploadPage() {
           </div>
 
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-black flex-shrink-0">•</span>
             <h3 className="font-bold text-lg mb-2">95%+ Accuracy</h3>
             <p className="text-sm text-black">
               Industry-leading OCR technology ensures accurate data extraction
@@ -375,7 +375,7 @@ export default function SmartUploadPage() {
                         )}
                         {file.status === 'completed' && (
                           <span className="flex items-center gap-2 px-3 py-2 bg-brand-green-100 text-brand-green-700 rounded-full text-sm font-semibold">
-                            <span className="text-slate-400 flex-shrink-0">•</span>
+                            <span className="text-black flex-shrink-0">•</span>
                             Completed
                           </span>
                         )}
@@ -519,7 +519,7 @@ export default function SmartUploadPage() {
             <h3 className="text-2xl font-bold mb-3">
               Ready to File Your Return?
             </h3>
-            <p className="text-brand-green-100 mb-6">
+            <p className="text-white mb-6">
               All your data has been extracted and saved. Continue to complete
               your tax return.
             </p>

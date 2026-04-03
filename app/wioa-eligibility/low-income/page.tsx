@@ -59,7 +59,7 @@ export default async function LowIncomePage() {
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Low Income Guidelines
           </h1>
-          <p className="text-xl text-brand-blue-100">
+          <p className="text-xl text-white">
             Check if your household income qualifies you for free training
           </p>
         </div>
@@ -182,7 +182,7 @@ export default async function LowIncomePage() {
         {/* CTA */}
         <div className="bg-brand-blue-700 rounded-lg p-8 text-center text-white">
           <h3 className="text-2xl font-bold mb-4">Not Sure If You Qualify?</h3>
-          <p className="text-brand-blue-100 mb-6">
+          <p className="text-white mb-6">
             Apply anyway! We'll help determine your eligibility and find funding options.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

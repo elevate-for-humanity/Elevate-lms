@@ -61,7 +61,7 @@ export default function TrainingProviderPage() {
       <section className="py-12">
         <div className="max-w-5xl mx-auto px-4">
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Training Provider Partnership</h1>
-          <p className="text-lg text-slate-600 max-w-3xl">
+          <p className="text-lg text-black max-w-3xl">
             Join our network of approved training providers. We connect you with WIOA-funded students, handle compliance reporting, and support your ETPL listing.
           </p>
         </div>
@@ -79,7 +79,7 @@ export default function TrainingProviderPage() {
                 </div>
                 <div className="py-4 pr-4">
                   <h3 className="font-bold text-slate-900 mb-1">{item.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                  <p className="text-black text-sm leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -126,7 +126,7 @@ export default function TrainingProviderPage() {
                 <div className="p-5">
                   <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm mb-3">{item.step}</div>
                   <h3 className="font-bold text-slate-900 mb-1">{item.title}</h3>
-                  <p className="text-slate-600 text-sm">{item.desc}</p>
+                  <p className="text-black text-sm">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -138,8 +138,8 @@ export default function TrainingProviderPage() {
       <section className="py-16 border-t border-slate-100">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Become an Approved Provider</h2>
-          <p className="text-slate-600 mb-3">Apply to join our training provider network and start receiving funded student referrals.</p>
-          <p className="text-slate-500 text-sm mb-8">Questions first? Call <a href="tel:317-314-3757" className="font-semibold text-brand-blue-600">(317) 314-3757</a> — most provider agreements are set up within a week.</p>
+          <p className="text-black mb-3">Apply to join our training provider network and start receiving funded student referrals.</p>
+          <p className="text-black text-sm mb-8">Questions first? Call <a href="tel:317-314-3757" className="font-semibold text-brand-blue-600">(317) 314-3757</a> — most provider agreements are set up within a week.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/apply/program-holder" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition text-base">
               Apply as Training Provider <ArrowRight className="w-5 h-5" />

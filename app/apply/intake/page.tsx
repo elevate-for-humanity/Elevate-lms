@@ -67,13 +67,13 @@ function IntakeForm() {
       <div className="min-h-screen bg-white">
         <div className="max-w-2xl mx-auto px-4 py-16 text-center">
           <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-slate-500 flex-shrink-0">•</span>
+            <span className="text-black flex-shrink-0">•</span>
           </div>
           <h1 className="text-3xl font-bold text-slate-900 mb-4">Application Received</h1>
-          <p className="text-lg text-slate-600 mb-2">
+          <p className="text-lg text-black mb-2">
             Thank you for your interest in Elevate for Humanity.
           </p>
-          <p className="text-sm text-slate-500 mb-2">
+          <p className="text-sm text-black mb-2">
             Check your email — we sent you a link to access your learner account and track your application status.
           </p>
           {fundingTag === 'jri' && (
@@ -115,7 +115,7 @@ function IntakeForm() {
           <h1 className="text-3xl sm:text-4xl font-bold mb-3">
             Funding & Apprenticeship Intake
           </h1>
-          <p className="text-slate-600 text-lg">
+          <p className="text-black text-lg">
             This form screens your eligibility for workforce-funded training programs
             including WIOA, WRG, and Job Ready Indy. Funding is not guaranteed and requires partner review.
           </p>
@@ -256,7 +256,7 @@ function IntakeForm() {
             </div>
 
             {/* Disclaimer */}
-            <div className="bg-white border border-slate-200 rounded-lg p-4 text-sm text-slate-600">
+            <div className="bg-white border border-slate-200 rounded-lg p-4 text-sm text-black">
               By submitting this form, you authorize 2Exclusive LLC-S (DBA Elevate for Humanity Career &amp; Technical Institute) to review your
               eligibility for workforce-funded training programs. Funding eligibility is determined
               by our workforce partners and is not guaranteed. Your information will be kept

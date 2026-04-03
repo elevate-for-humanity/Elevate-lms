@@ -45,7 +45,7 @@ export default async function MarketplaceProductsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Digital Products & Resources</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-black max-w-3xl mx-auto">
             Study guides, resume templates, career toolkits, and professional resources
             for workforce development students and graduates.
           </p>
@@ -67,7 +67,7 @@ export default async function MarketplaceProductsPage() {
           <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
             <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-bold text-gray-900 mb-2">No products yet</h2>
-            <p className="text-gray-500">No products listed yet. Contact us to request study guides, templates, or resources.</p>
+            <p className="text-black">No products listed yet. Contact us to request study guides, templates, or resources.</p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -96,7 +96,7 @@ export default async function MarketplaceProductsPage() {
                       {product.title}
                     </h3>
                     {product.description && (
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">{product.description}</p>
+                      <p className="text-black text-sm mb-4 line-clamp-2">{product.description}</p>
                     )}
                     <div className="flex items-center justify-between">
                       <span className={`text-lg font-bold ${
@@ -105,7 +105,7 @@ export default async function MarketplaceProductsPage() {
                         {product.price === 0 ? 'Free' : `$${product.price}`}
                       </span>
                       {product.condition && (
-                        <span className="text-xs text-gray-500 bg-white px-2 py-1 rounded">
+                        <span className="text-xs text-black bg-white px-2 py-1 rounded">
                           {product.condition}
                         </span>
                       )}

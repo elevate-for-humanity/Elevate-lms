@@ -17,7 +17,7 @@ export default function BarberApplySuccessPage() {
             <CheckCircle className="w-12 h-12 text-white" />
           </div>
           <h1 className="text-4xl font-black text-slate-900 mb-3">Payment Received</h1>
-          <p className="text-slate-600 text-lg">
+          <p className="text-black text-lg">
             Your enrollment in the Barber Apprenticeship program is confirmed.
           </p>
         </div>
@@ -29,12 +29,12 @@ export default function BarberApplySuccessPage() {
               <UserPlus className="w-6 h-6 text-white flex-shrink-0" />
               <div>
                 <h2 className="font-bold text-slate-900 text-lg leading-tight">Create your account</h2>
-                <p className="text-brand-blue-100 text-sm">Required to access orientation and your apprentice dashboard</p>
+                <p className="text-white text-sm">Required to access orientation and your apprentice dashboard</p>
               </div>
             </div>
           </div>
           <div className="p-6">
-            <p className="text-slate-600 text-sm mb-4">
+            <p className="text-black text-sm mb-4">
               Use the same email address you used at checkout. Your enrollment will be linked automatically.
             </p>
             <Link
@@ -43,7 +43,7 @@ export default function BarberApplySuccessPage() {
             >
               Create Account &amp; Continue
             </Link>
-            <p className="text-center text-xs text-slate-500 mt-3">
+            <p className="text-center text-xs text-black mt-3">
               Already have an account?{' '}
               <Link href="/login?redirect=/programs/barber-apprenticeship/enrollment-success" className="text-brand-blue-600 hover:underline">
                 Sign in
@@ -66,7 +66,7 @@ export default function BarberApplySuccessPage() {
                   <div className="w-6 h-6 bg-brand-blue-100 text-brand-blue-700 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5">
                     {i + 1}
                   </div>
-                  <p className="text-sm text-slate-600">{step}</p>
+                  <p className="text-sm text-black">{step}</p>
                 </div>
               ))}
             </div>
@@ -74,7 +74,7 @@ export default function BarberApplySuccessPage() {
         </div>
 
         <div className="bg-white rounded-xl p-5 mb-6">
-          <p className="text-slate-600 text-sm text-center mb-4">Questions? We're here to help.</p>
+          <p className="text-black text-sm text-center mb-4">Questions? We're here to help.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
               href="tel:3173143757"
@@ -96,7 +96,7 @@ export default function BarberApplySuccessPage() {
         <div className="text-center">
           <Link
             href="/programs/barber-apprenticeship"
-            className="text-slate-400 hover:text-white transition text-sm"
+            className="text-black hover:text-white transition text-sm"
           >
             Back to Program Details
           </Link>

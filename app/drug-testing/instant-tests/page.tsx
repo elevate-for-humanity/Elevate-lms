@@ -71,7 +71,7 @@ export default function InstantTestsPage() {
 {/* Hero */}
       <section className="relative py-20 bg-brand-blue-700 text-white">
         <div className="max-w-6xl mx-auto px-6">
-          <Link href="/drug-testing" className="inline-flex items-center gap-2 text-brand-green-200 hover:text-white mb-6 transition">
+          <Link href="/drug-testing" className="inline-flex items-center gap-2 text-white hover:text-white mb-6 transition">
             <ArrowLeft className="w-4 h-4" />
             Back to Drug Testing
           </Link>
@@ -79,7 +79,7 @@ export default function InstantTestsPage() {
             <Zap className="w-10 h-10" />
             <h1 className="text-4xl md:text-5xl font-bold">Instant Rapid Tests</h1>
           </div>
-          <p className="text-xl text-brand-green-100 max-w-2xl">
+          <p className="text-xl text-white max-w-2xl">
             Get preliminary results in just 5-10 minutes. Perfect for high-volume screening, 
             post-accident testing, or when you need answers fast.
           </p>
@@ -210,7 +210,7 @@ export default function InstantTestsPage() {
       <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Need Fast Results?</h2>
-          <p className="text-xl text-brand-green-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Schedule online to schedule instant testing at a location near you.
           </p>
           <a

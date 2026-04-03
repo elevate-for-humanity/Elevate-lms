@@ -43,7 +43,7 @@ export default function FundingImpactPage() {
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">The Impact of Federal Workforce Funding</h1>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto mb-6">
+            <p className="text-lg text-black max-w-3xl mx-auto mb-6">
               Every dollar invested in workforce development creates ripple effects across families, employers, and communities. See how WIOA, WRG, and other federal programs are transforming lives in Indiana.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -61,7 +61,7 @@ export default function FundingImpactPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Our Impact by the Numbers
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-black max-w-3xl mx-auto">
               Federal workforce funding has helped thousands of Hoosiers gain skills, 
               find good jobs, and achieve economic stability.
             </p>
@@ -83,7 +83,7 @@ export default function FundingImpactPage() {
                 </div>
                 <div className="text-4xl font-bold text-indigo-600 mb-2">Active</div>
                 <div className="text-gray-700 font-medium">Participants Served</div>
-                <div className="text-sm text-gray-500 mt-1">Since 2020</div>
+                <div className="text-sm text-black mt-1">Since 2020</div>
               </div>
             </div>
 
@@ -102,7 +102,7 @@ export default function FundingImpactPage() {
                 </div>
                 <div className="text-4xl font-bold text-brand-green-600 mb-2">92%</div>
                 <div className="text-gray-700 font-medium">Credential Attainment</div>
-                <div className="text-sm text-gray-500 mt-1">Industry certifications earned</div>
+                <div className="text-sm text-black mt-1">Industry certifications earned</div>
               </div>
             </div>
 
@@ -121,7 +121,7 @@ export default function FundingImpactPage() {
                 </div>
                 <div className="text-4xl font-bold text-brand-blue-600 mb-2">78%</div>
                 <div className="text-gray-700 font-medium">Employment Rate</div>
-                <div className="text-sm text-gray-500 mt-1">Within 90 days of completion</div>
+                <div className="text-sm text-black mt-1">Within 90 days of completion</div>
               </div>
             </div>
 
@@ -140,7 +140,7 @@ export default function FundingImpactPage() {
                 </div>
                 <div className="text-4xl font-bold text-brand-orange-600 mb-2">$18.50</div>
                 <div className="text-gray-700 font-medium">Average Starting Wage</div>
-                <div className="text-sm text-gray-500 mt-1">34% above minimum wage</div>
+                <div className="text-sm text-black mt-1">34% above minimum wage</div>
               </div>
             </div>
           </div>
@@ -155,7 +155,7 @@ export default function FundingImpactPage() {
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
                 How Federal Funding Works
               </h2>
-              <p className="text-lg text-gray-600 mb-8">
+              <p className="text-lg text-black mb-8">
                 Federal workforce funding flows through state and local workforce boards 
                 to approved training providers like Elevate for Humanity. This system 
                 ensures accountability, quality, and measurable outcomes.
@@ -168,7 +168,7 @@ export default function FundingImpactPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-2">Federal Investment</h3>
-                    <p className="text-gray-600">
+                    <p className="text-black">
                       Congress appropriates billions annually for workforce development through 
                       WIOA, which flows to states based on unemployment rates and population.
                     </p>
@@ -181,7 +181,7 @@ export default function FundingImpactPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-2">Local Delivery</h3>
-                    <p className="text-gray-600">
+                    <p className="text-black">
                       Local workforce boards (like WorkOne) determine which training providers 
                       and programs best meet their region&apos;s employer and job seeker needs.
                     </p>
@@ -194,7 +194,7 @@ export default function FundingImpactPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-2">Quality Training</h3>
-                    <p className="text-gray-600">
+                    <p className="text-black">
                       ETPL-approved providers like Elevate deliver training that leads to 
                       industry-recognized credentials and employment in high-demand occupations.
                     </p>
@@ -207,7 +207,7 @@ export default function FundingImpactPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-2">Measured Outcomes</h3>
-                    <p className="text-gray-600">
+                    <p className="text-black">
                       Every program is measured on employment rates, wage gains, and credential 
                       attainment—ensuring taxpayer dollars produce real results.
                     </p>
@@ -240,7 +240,7 @@ export default function FundingImpactPage() {
                       <div className="flex justify-between items-start">
                         <div>
                           <div className="font-bold text-gray-900">{source.name}</div>
-                          <div className="text-sm text-gray-600">{source.desc}</div>
+                          <div className="text-sm text-black">{source.desc}</div>
                         </div>
                         <div className="text-indigo-600 font-semibold text-sm">{source.amount}</div>
                       </div>
@@ -260,7 +260,7 @@ export default function FundingImpactPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Real Stories, Real Impact
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-black max-w-3xl mx-auto">
               Behind every statistic is a person whose life was transformed by workforce funding.
             </p>
           </div>
@@ -282,10 +282,10 @@ export default function FundingImpactPage() {
                   </div>
                   <div>
                     <div className="font-bold text-gray-900">Graduate J.</div>
-                    <div className="text-sm text-gray-500">WIOA Adult Program</div>
+                    <div className="text-sm text-black">WIOA Adult Program</div>
                   </div>
                 </div>
-                <p className="text-gray-600 mb-4">
+                <p className="text-black mb-4">
                   &quot;After being laid off from manufacturing, I didn&apos;t know what to do. WIOA funding 
                   covered my IT certification training, and now I&apos;m a network technician making 
                   $22/hour with benefits.&quot;
@@ -313,10 +313,10 @@ export default function FundingImpactPage() {
                   </div>
                   <div>
                     <div className="font-bold text-gray-900">Sarah T.</div>
-                    <div className="text-sm text-gray-500">WRG Program</div>
+                    <div className="text-sm text-black">WRG Program</div>
                   </div>
                 </div>
-                <p className="text-gray-600 mb-4">
+                <p className="text-black mb-4">
                   &quot;As a single mom, I couldn&apos;t afford training. The Workforce Ready Grant paid for 
                   my medical assistant certification. I went from retail to healthcare in 12 weeks.&quot;
                 </p>
@@ -343,10 +343,10 @@ export default function FundingImpactPage() {
                   </div>
                   <div>
                     <div className="font-bold text-gray-900">David W.</div>
-                    <div className="text-sm text-gray-500">Job Ready Indy Funding</div>
+                    <div className="text-sm text-black">Job Ready Indy Funding</div>
                   </div>
                 </div>
-                <p className="text-gray-600 mb-4">
+                <p className="text-black mb-4">
                   &quot;Coming out of incarceration, I thought no one would give me a chance. Job Ready Indy funding 
                   got me into the barber apprenticeship. Now I have my license and my own chair.&quot;
                 </p>
@@ -377,7 +377,7 @@ export default function FundingImpactPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Impact Beyond the Individual
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-black max-w-3xl mx-auto">
               When one person gains skills and employment, the benefits extend to families, 
               employers, and entire communities.
             </p>
@@ -398,21 +398,21 @@ export default function FundingImpactPage() {
                   <Heart className="w-7 h-7 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Family Stability</h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-black mb-4">
                   Higher wages mean families can afford housing, healthcare, and education. 
                   Children of employed parents have better outcomes in school and life.
                 </p>
-                <ul className="space-y-2 text-sm text-gray-600">
+                <ul className="space-y-2 text-sm text-black">
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     Reduced reliance on public assistance
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     Improved child outcomes
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     Generational wealth building
                   </li>
                 </ul>
@@ -433,21 +433,21 @@ export default function FundingImpactPage() {
                   <Building2 className="w-7 h-7 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Employer Benefits</h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-black mb-4">
                   Employers gain access to trained, credentialed workers ready to contribute 
                   from day one. Reduced turnover and training costs improve bottom lines.
                 </p>
-                <ul className="space-y-2 text-sm text-gray-600">
+                <ul className="space-y-2 text-sm text-black">
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     Pre-screened, trained candidates
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     Reduced hiring costs
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     Lower turnover rates
                   </li>
                 </ul>
@@ -468,21 +468,21 @@ export default function FundingImpactPage() {
                   <TrendingUp className="w-7 h-7 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Economic Growth</h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-black mb-4">
                   Every dollar invested in workforce development generates $7 in economic 
                   activity through increased spending, tax revenue, and reduced social costs.
                 </p>
-                <ul className="space-y-2 text-sm text-gray-600">
+                <ul className="space-y-2 text-sm text-black">
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     Increased tax revenue
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     Local spending boost
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     Reduced social service costs
                   </li>
                 </ul>
@@ -498,7 +498,7 @@ export default function FundingImpactPage() {
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
             Be Part of the Impact
           </h2>
-          <p className="text-xl text-white/90 mb-8">
+          <p className="text-xl text-white mb-8">
             Federal funding is available now for eligible Hoosiers. Check your eligibility 
             and start your career transformation today.
           </p>

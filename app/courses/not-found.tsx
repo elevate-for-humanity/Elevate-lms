@@ -7,7 +7,7 @@ export default function CourseNotFound() {
       <div className="text-center px-4 max-w-lg">
         <div className="text-6xl font-black text-gray-200 mb-4">404</div>
         <h2 className="text-xl font-bold text-gray-900 mb-3">Course Not Found</h2>
-        <p className="text-gray-600 mb-6">
+        <p className="text-black mb-6">
           This course may have been removed or the URL is incorrect.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">

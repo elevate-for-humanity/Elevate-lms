@@ -308,7 +308,7 @@ export default async function HubWelcomePage() {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6">Questions? Contact Us</h2>
-          <p className="text-xl text-brand-green-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-white mb-8 max-w-2xl mx-auto">
             Use the Hub to track your progress and achieve your career goals.
           </p>
           <div className="flex flex-wrap justify-center gap-4">

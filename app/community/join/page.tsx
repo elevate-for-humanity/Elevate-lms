@@ -59,7 +59,7 @@ export default async function JoinCommunityPage() {
                   <benefit.icon className="w-8 h-8 text-brand-blue-600" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{benefit.title}</h3>
-                <p className="text-slate-600">{benefit.description}</p>
+                <p className="text-black">{benefit.description}</p>
               </div>
             ))}
           </div>
@@ -88,7 +88,7 @@ export default async function JoinCommunityPage() {
                     </div>
                     <div>
                       <p className="font-semibold">{testimonial.name}</p>
-                      <p className="text-sm text-slate-500">{testimonial.role}</p>
+                      <p className="text-sm text-black">{testimonial.role}</p>
                     </div>
                   </div>
                 </div>
@@ -102,7 +102,7 @@ export default async function JoinCommunityPage() {
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Join?</h2>
-          <p className="text-lg text-slate-600 mb-8">
+          <p className="text-lg text-black mb-8">
             Start your journey with Elevate for Humanity today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

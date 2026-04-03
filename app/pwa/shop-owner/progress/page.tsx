@@ -151,15 +151,15 @@ export default function ShopOwnerProgressPage() {
     <div className="min-h-screen bg-white pb-20">
       <header className="bg-slate-700 px-4 pt-12 pb-6 safe-area-inset-top">
         <h1 className="text-2xl font-bold text-slate-900 mb-2">Shop Progress</h1>
-        <p className="text-brand-blue-200">Track your team's advancement</p>
+        <p className="text-white">Track your team's advancement</p>
 
         <div className="grid grid-cols-2 gap-3 mt-4">
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3">
-            <p className="text-brand-blue-200 text-xs">Total Shop Hours</p>
+            <p className="text-white text-xs">Total Shop Hours</p>
             <p className="text-2xl font-bold text-slate-900">{summary.totalShopHours.toLocaleString()}</p>
           </div>
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3">
-            <p className="text-brand-blue-200 text-xs">Avg Progress</p>
+            <p className="text-white text-xs">Avg Progress</p>
             <p className="text-2xl font-bold text-slate-900">{summary.avgProgress}%</p>
           </div>
         </div>

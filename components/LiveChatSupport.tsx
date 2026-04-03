@@ -108,7 +108,7 @@ export function LiveChatSupport() {
       <div className="   text-white p-4 rounded-t-lg flex justify-between items-center">
         <div>
           <h3 className="font-bold">Live Support</h3>
-          <p className="text-xs text-brand-red-100">● Online</p>
+          <p className="text-xs text-white">● Online</p>
         </div>
         <button onClick={() => setIsOpen(false)} className="text-2xl hover:opacity-80">
           ✕
@@ -122,7 +122,7 @@ export function LiveChatSupport() {
               msg.sender === 'user' ? 'bg-brand-orange-600 text-white' : 'bg-gray-100 text-black'
             }`}>
               <p className="text-sm">{msg.text}</p>
-              <p className={`text-xs mt-1 ${msg.sender === 'user' ? 'text-brand-red-200' : 'text-gray-500'}`}>
+              <p className={`text-xs mt-1 ${msg.sender === 'user' ? 'text-white' : 'text-gray-500'}`}>
                 {msg.timestamp}
               </p>
             </div>

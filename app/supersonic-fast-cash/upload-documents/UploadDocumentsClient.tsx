@@ -103,7 +103,7 @@ export default function UploadDocumentsClient({ userEmail, existingDocuments }: 
           </div>
           <div>
             <h1 className="text-2xl font-bold">Upload Your Tax Documents</h1>
-            <p className="text-slate-300 text-sm mt-1">{userEmail} · Step 4 of 4</p>
+            <p className="text-white text-sm mt-1">{userEmail} · Step 4 of 4</p>
           </div>
         </div>
       </div>
@@ -120,7 +120,7 @@ export default function UploadDocumentsClient({ userEmail, existingDocuments }: 
             ].map(({ type, label }) => {
               const done = docs.some(d => d.document_type === type || (type === 'w2' && d.document_type === '1099'));
               return (
-                <div key={type} className={`flex items-center gap-2 text-sm px-3 py-2 rounded-lg border ${done ? 'border-green-300 bg-green-50 text-green-700' : 'border-gray-200 bg-gray-50 text-gray-500'}`}>
+                <div key={type} className={`flex items-center gap-2 text-sm px-3 py-2 rounded-lg border ${done ? 'border-green-300 bg-green-50 text-green-700' : 'border-gray-200 bg-gray-50 text-black'}`}>
                   {done ? <CheckCircle className="w-4 h-4 flex-shrink-0" /> : <div className="w-4 h-4 rounded-full border-2 border-gray-300 flex-shrink-0" />}
                   {label}
                 </div>
@@ -172,13 +172,13 @@ export default function UploadDocumentsClient({ userEmail, existingDocuments }: 
             {uploading ? (
               <div className="flex flex-col items-center gap-2">
                 <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
-                <p className="text-sm text-gray-600">Uploading…</p>
+                <p className="text-sm text-black">Uploading…</p>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-2">
-                <Upload className="w-8 h-8 text-gray-400" />
+                <Upload className="w-8 h-8 text-black" />
                 <p className="text-sm font-semibold text-gray-700">Drop file here or click to browse</p>
-                <p className="text-xs text-gray-400">PDF, JPG, PNG · Max 25MB</p>
+                <p className="text-xs text-black">PDF, JPG, PNG · Max 25MB</p>
               </div>
             )}
           </div>
@@ -213,7 +213,7 @@ export default function UploadDocumentsClient({ userEmail, existingDocuments }: 
                   <FileText className="w-5 h-5 text-orange-400 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">{doc.file_name}</p>
-                    <p className="text-xs text-gray-500">{docTypeLabel(doc.document_type)} · {formatBytes(doc.file_size)}</p>
+                    <p className="text-xs text-black">{docTypeLabel(doc.document_type)} · {formatBytes(doc.file_size)}</p>
                   </div>
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${doc.status === 'pending_review' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}>
                     {doc.status === 'pending_review' ? 'Pending review' : doc.status}
@@ -242,13 +242,13 @@ export default function UploadDocumentsClient({ userEmail, existingDocuments }: 
               </Link>
             </div>
           ) : (
-            <p className="text-sm text-gray-500 text-center">
+            <p className="text-sm text-black text-center">
               Upload your W-2 (or 1099) and a photo ID to continue.
             </p>
           )}
         </div>
 
-        <p className="text-center text-xs text-gray-400">
+        <p className="text-center text-xs text-black">
           Documents are encrypted in transit and at rest · SupersonicFastCash · PTIN-credentialed preparers
         </p>
       </div>

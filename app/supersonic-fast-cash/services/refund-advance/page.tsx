@@ -112,7 +112,7 @@ export default function RefundAdvancePage() {
                   <benefit.icon className="w-7 h-7 text-brand-green-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{benefit.title}</h3>
-                <p className="text-gray-600">{benefit.description}</p>
+                <p className="text-black">{benefit.description}</p>
               </div>
             ))}
           </div>
@@ -126,7 +126,7 @@ export default function RefundAdvancePage() {
             <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
               How It Works
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-black">
               Get your money in 4 simple steps
             </p>
           </div>
@@ -138,7 +138,7 @@ export default function RefundAdvancePage() {
                   {item.step}
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-600">{item.description}</p>
+                <p className="text-black">{item.description}</p>
               </div>
             ))}
           </div>
@@ -152,7 +152,7 @@ export default function RefundAdvancePage() {
             <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
               Advance Amounts
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-black">
               Based on your expected refund
             </p>
           </div>
@@ -160,21 +160,21 @@ export default function RefundAdvancePage() {
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="bg-white rounded-2xl p-8 shadow-sm text-center border-2 border-gray-100">
               <div className="text-4xl font-black text-gray-900 mb-2">$500</div>
-              <div className="text-gray-600 mb-4">Minimum Advance</div>
-              <div className="text-sm text-gray-500">Expected refund: $1,000+</div>
+              <div className="text-black mb-4">Minimum Advance</div>
+              <div className="text-sm text-black">Expected refund: $1,000+</div>
             </div>
             <div className="bg-white rounded-2xl p-8 shadow-lg text-center border-2 border-brand-green-500 relative">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-green-500 text-white px-4 py-1 rounded-full text-sm font-bold">
                 Most Popular
               </div>
               <div className="text-4xl font-black text-brand-green-600 mb-2">$3,500</div>
-              <div className="text-gray-600 mb-4">Average Advance</div>
-              <div className="text-sm text-gray-500">Expected refund: $5,000+</div>
+              <div className="text-black mb-4">Average Advance</div>
+              <div className="text-sm text-black">Expected refund: $5,000+</div>
             </div>
             <div className="bg-white rounded-2xl p-8 shadow-sm text-center border-2 border-gray-100">
               <div className="text-4xl font-black text-gray-900 mb-2">$7,500</div>
-              <div className="text-gray-600 mb-4">Maximum Advance</div>
-              <div className="text-sm text-gray-500">Expected refund: $10,000+</div>
+              <div className="text-black mb-4">Maximum Advance</div>
+              <div className="text-sm text-black">Expected refund: $10,000+</div>
             </div>
           </div>
         </div>
@@ -193,7 +193,7 @@ export default function RefundAdvancePage() {
             {faqs.map((faq, idx) => (
               <div key={idx} className="bg-white rounded-xl p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{faq.question}</h3>
-                <p className="text-gray-600">{faq.answer}</p>
+                <p className="text-black">{faq.answer}</p>
               </div>
             ))}
           </div>
@@ -206,7 +206,7 @@ export default function RefundAdvancePage() {
           <h2 className="text-3xl md:text-4xl font-black text-white mb-6">
             Ready to Get Your Money?
           </h2>
-          <p className="text-xl text-brand-green-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Apply now and walk out with up to $7,500 today.
           </p>
           <Link

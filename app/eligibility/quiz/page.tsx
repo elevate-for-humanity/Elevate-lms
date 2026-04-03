@@ -19,7 +19,7 @@ export default function EligibilityQuizPage() {
           <h1 className="text-3xl sm:text-4xl font-bold mb-4">
             Could You Qualify for FREE Training?
           </h1>
-          <p className="text-xl text-brand-blue-100 max-w-2xl mx-auto">
+          <p className="text-xl text-white max-w-2xl mx-auto">
             Take this 2-minute quiz to see if you're eligible for government-funded workforce training programs
           </p>
         </div>

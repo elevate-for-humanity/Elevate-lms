@@ -142,9 +142,9 @@ export default function OJTSection() {
                 <div className="text-lg font-bold text-slate-900">$19,200</div>
               </div>
               <div className="bg-brand-green-600 text-white rounded-lg p-4">
-                <div className="text-brand-green-100 text-xs mb-1">OJT reimbursement (75%)</div>
+                <div className="text-white text-xs mb-1">OJT reimbursement (75%)</div>
                 <div className="text-3xl font-bold">$14,400</div>
-                <div className="text-brand-green-200 text-xs mt-1">Your actual training cost: $4,800</div>
+                <div className="text-white text-xs mt-1">Your actual training cost: $4,800</div>
               </div>
             </div>
           </div>
@@ -167,9 +167,9 @@ export default function OJTSection() {
                 <div className="text-lg font-bold text-slate-900">$7,200</div>
               </div>
               <div className="bg-brand-green-600 text-white rounded-lg p-4">
-                <div className="text-brand-green-100 text-xs mb-1">OJT reimbursement (75%)</div>
+                <div className="text-white text-xs mb-1">OJT reimbursement (75%)</div>
                 <div className="text-3xl font-bold">$5,400</div>
-                <div className="text-brand-green-200 text-xs mt-1">Your actual training cost: $1,800</div>
+                <div className="text-white text-xs mt-1">Your actual training cost: $1,800</div>
               </div>
             </div>
           </div>

@@ -60,7 +60,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
             </div>
             <div>
               <h1 className="font-bold">SAM.gov Assistant</h1>
-              <p className="text-brand-blue-200 text-sm">Registration & Compliance</p>
+              <p className="text-white text-sm">Registration & Compliance</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -80,7 +80,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
-              className={`px-4 py-3 text-sm font-medium rounded-t-lg ${activeTab === tab ? 'bg-white text-brand-blue-900' : 'text-brand-blue-200 hover:bg-brand-blue-800'}`}
+              className={`px-4 py-3 text-sm font-medium rounded-t-lg ${activeTab === tab ? 'bg-white text-brand-blue-900' : 'text-white hover:bg-brand-blue-800'}`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>

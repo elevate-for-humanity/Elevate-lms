@@ -10,27 +10,27 @@ function VITAHeader() {
             Rise Up Foundation - VITA
           </Link>
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="/tax/rise-up-foundation/free-tax-help" className="hover:text-brand-green-200">
+            <Link href="/tax/rise-up-foundation/free-tax-help" className="hover:text-white">
               Free Tax Help
             </Link>
-            <Link href="/tax/rise-up-foundation/volunteer" className="hover:text-brand-green-200">
+            <Link href="/tax/rise-up-foundation/volunteer" className="hover:text-white">
               Volunteer
             </Link>
-            <Link href="/tax/rise-up-foundation/training" className="hover:text-brand-green-200">
+            <Link href="/tax/rise-up-foundation/training" className="hover:text-white">
               Training
             </Link>
-            <Link href="/tax/rise-up-foundation/site-locator" className="hover:text-brand-green-200">
+            <Link href="/tax/rise-up-foundation/site-locator" className="hover:text-white">
               Find a Site
             </Link>
-            <Link href="/tax/rise-up-foundation/faq" className="hover:text-brand-green-200">
+            <Link href="/tax/rise-up-foundation/faq" className="hover:text-white">
               FAQ
             </Link>
-            <Link href="/tax/rise-up-foundation/documents" className="hover:text-brand-green-200">
+            <Link href="/tax/rise-up-foundation/documents" className="hover:text-white">
               Documents
             </Link>
           </nav>
           <div className="flex items-center gap-4">
-            <a href="/support" className="flex items-center gap-2 hover:text-brand-green-200">
+            <a href="/support" className="flex items-center gap-2 hover:text-white">
               <Phone className="w-4 h-4" />
               <span className="hidden lg:inline">(317) 314-3757</span>
             </a>

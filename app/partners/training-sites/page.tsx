@@ -49,16 +49,16 @@ function PartnerCard({ partner }: { partner: TrainingPartner }) {
     <div className="bg-white rounded-lg border border-slate-200 p-4 hover:shadow-md transition-shadow">
       <div className="flex items-start gap-3">
         <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
-          <Icon className="w-5 h-5 text-slate-600" />
+          <Icon className="w-5 h-5 text-black" />
         </div>
         <div className="min-w-0">
           <h3 className="font-semibold text-slate-900 text-sm">{partner.name}</h3>
-          <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
+          <div className="flex items-center gap-1 text-xs text-black mt-0.5">
             <MapPin className="w-3 h-3" />
             <span>{partner.city}, {partner.state}</span>
           </div>
           {partner.description && (
-            <p className="text-xs text-slate-600 mt-1.5">{partner.description}</p>
+            <p className="text-xs text-black mt-1.5">{partner.description}</p>
           )}
           <div className="flex flex-wrap gap-1.5 mt-2">
             {partner.programs.map((program) => (
@@ -91,7 +91,7 @@ function CategorySection({ category }: { category: PartnerCategory }) {
         </div>
         <div>
           <h2 className="text-lg font-bold text-slate-900">{meta.label}</h2>
-          <p className="text-xs text-slate-500">{meta.trainingDescription}</p>
+          <p className="text-xs text-black">{meta.trainingDescription}</p>
         </div>
       </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
@@ -123,7 +123,7 @@ export default function TrainingSitesPage() {
           <h1 className="text-3xl sm:text-4xl font-bold mt-4 mb-3">
             Employer Partners &amp; Training Sites
           </h1>
-          <p className="text-slate-300 text-lg max-w-3xl">
+          <p className="text-white text-lg max-w-3xl">
             Hands-on training, OJT hours, and clinical rotations are completed at approved
             employer partner locations throughout Indiana.
           </p>
@@ -138,21 +138,21 @@ export default function TrainingSitesPage() {
               <Monitor className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <div>
                 <h3 className="font-semibold text-slate-900 text-sm">Classroom / RTI</h3>
-                <p className="text-xs text-slate-600">Online via Elevate LMS</p>
+                <p className="text-xs text-black">Online via Elevate LMS</p>
               </div>
             </div>
             <div className="flex gap-3">
               <Building2 className="w-6 h-6 text-brand-orange-600 flex-shrink-0 mt-0.5" />
               <div>
                 <h3 className="font-semibold text-slate-900 text-sm">Hands-On / OJT</h3>
-                <p className="text-xs text-slate-600">At employer partner sites listed below</p>
+                <p className="text-xs text-black">At employer partner sites listed below</p>
               </div>
             </div>
             <div className="flex gap-3">
               <Shield className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
               <div>
                 <h3 className="font-semibold text-slate-900 text-sm">Documented &amp; Verified</h3>
-                <p className="text-xs text-slate-600">All sites operate under signed agreements</p>
+                <p className="text-xs text-black">All sites operate under signed agreements</p>
               </div>
             </div>
           </div>
@@ -164,7 +164,7 @@ export default function TrainingSitesPage() {
         <div className="max-w-5xl mx-auto px-4">
           {hasPartners ? (
             <>
-              <p className="text-sm text-slate-600 mb-8">
+              <p className="text-sm text-black mb-8">
                 The following employers and training sites have active, documented agreements with
                 Elevate for Humanity. Each site has been verified for licensing, supervision
                 capability, and safety standards appropriate to the training program.
@@ -179,7 +179,7 @@ export default function TrainingSitesPage() {
               <h2 className="text-xl font-bold text-slate-900 mb-4">
                 Training Site Categories
               </h2>
-              <p className="text-sm text-slate-600 mb-8">
+              <p className="text-sm text-black mb-8">
                 Elevate for Humanity partners with employers across multiple industries to provide
                 hands-on training. All training sites operate under documented agreements including
                 MOUs, training site agreements, OJT contracts, or clinical affiliation agreements.
@@ -195,12 +195,12 @@ export default function TrainingSitesPage() {
                       >
                         <div className="flex items-center gap-3 mb-2">
                           <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-slate-200">
-                            <Icon className="w-5 h-5 text-slate-600" />
+                            <Icon className="w-5 h-5 text-black" />
                           </div>
                           <h3 className="font-semibold text-slate-900">{meta.label}</h3>
                         </div>
-                        <p className="text-sm text-slate-600 mb-1">{meta.description}</p>
-                        <p className="text-xs text-slate-500 italic">{meta.trainingDescription}</p>
+                        <p className="text-sm text-black mb-1">{meta.description}</p>
+                        <p className="text-xs text-black italic">{meta.trainingDescription}</p>
                       </div>
                     );
                   }
@@ -218,7 +218,7 @@ export default function TrainingSitesPage() {
             <FileCheck className="w-5 h-5 inline-block mr-2 text-brand-blue-600" />
             Partner Documentation Standards
           </h2>
-          <p className="text-sm text-slate-600 mb-4">
+          <p className="text-sm text-black mb-4">
             Every employer training site listed on this page operates under at least one of the
             following documented agreements with Elevate for Humanity:
           </p>
@@ -233,11 +233,11 @@ export default function TrainingSitesPage() {
             ].map((doc) => (
               <div key={doc.title} className="bg-white rounded-lg border border-slate-200 p-4">
                 <h3 className="font-semibold text-slate-900 text-sm mb-1">{doc.title}</h3>
-                <p className="text-xs text-slate-500">{doc.desc}</p>
+                <p className="text-xs text-black">{doc.desc}</p>
               </div>
             ))}
           </div>
-          <p className="text-xs text-slate-500 mt-4">
+          <p className="text-xs text-black mt-4">
             Documentation is maintained on file and available for review by authorized regulatory
             agencies, workforce boards, and grant auditors upon request.
           </p>
@@ -249,7 +249,7 @@ export default function TrainingSitesPage() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="bg-brand-blue-700 rounded-xl p-8 text-white text-center">
             <h2 className="text-2xl font-bold mb-3">Become a Training Partner</h2>
-            <p className="text-white/80 mb-6 max-w-2xl mx-auto">
+            <p className="text-white mb-6 max-w-2xl mx-auto">
               Employers, barbershops, healthcare facilities, and training organizations can partner
               with Elevate to host apprentices, provide OJT placements, or hire trained graduates.
             </p>
@@ -278,15 +278,15 @@ export default function TrainingSitesPage() {
             <Link href="/disclosures/training-delivery" className="text-brand-red-600 hover:underline font-medium">
               Training Delivery Disclosure
             </Link>
-            <span className="text-slate-300">|</span>
+            <span className="text-white">|</span>
             <Link href="/accreditation" className="text-brand-red-600 hover:underline font-medium">
               Approvals &amp; Credentials
             </Link>
-            <span className="text-slate-300">|</span>
+            <span className="text-white">|</span>
             <Link href="/employers" className="text-brand-red-600 hover:underline font-medium">
               For Employers
             </Link>
-            <span className="text-slate-300">|</span>
+            <span className="text-white">|</span>
             <Link href="/disclosures" className="text-brand-red-600 hover:underline font-medium">
               All Disclosures
             </Link>

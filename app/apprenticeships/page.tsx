@@ -108,7 +108,7 @@ const apprenticeships = (dbRows as any[]) || [];
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">Earn While You Learn</h3>
-                    <p className="text-brand-blue-100">Get paid from day one while training on the job with experienced mentors.</p>
+                    <p className="text-white">Get paid from day one while training on the job with experienced mentors.</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
@@ -117,7 +117,7 @@ const apprenticeships = (dbRows as any[]) || [];
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">Industry Credentials</h3>
-                    <p className="text-brand-blue-100">Earn state licenses and nationally recognized certifications.</p>
+                    <p className="text-white">Earn state licenses and nationally recognized certifications.</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
@@ -126,7 +126,7 @@ const apprenticeships = (dbRows as any[]) || [];
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">Job Guarantee</h3>
-                    <p className="text-brand-blue-100">You&apos;re already employed - training leads directly to your career.</p>
+                    <p className="text-white">You&apos;re already employed - training leads directly to your career.</p>
                   </div>
                 </div>
               </div>

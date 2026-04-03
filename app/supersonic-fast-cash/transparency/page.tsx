@@ -32,7 +32,7 @@ export default function TransparencyPage() {
           <h1 className="text-4xl font-semibold text-gray-900 mb-4">
             How Supersonic Fast Cash Operates
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-black max-w-2xl mx-auto">
             Clear information about our services, processes, and commitments.
           </p>
         </div>
@@ -108,7 +108,7 @@ export default function TransparencyPage() {
                 <li>• Filing does not require selecting an advance</li>
               </ul>
             </div>
-            <p className="text-gray-600 text-sm">
+            <p className="text-black text-sm">
               Availability, amounts, and timing vary by individual return.
             </p>
           </div>
@@ -176,28 +176,28 @@ export default function TransparencyPage() {
                 className="flex items-center justify-between bg-white border border-gray-200 rounded-lg p-4 hover:bg-white transition-colors"
               >
                 <span className="text-gray-700">Privacy Policy</span>
-                <ArrowRight className="w-4 h-4 text-gray-400" />
+                <ArrowRight className="w-4 h-4 text-black" />
               </Link>
               <Link 
                 href="/supersonic-fast-cash/legal/terms"
                 className="flex items-center justify-between bg-white border border-gray-200 rounded-lg p-4 hover:bg-white transition-colors"
               >
                 <span className="text-gray-700">Terms of Service</span>
-                <ArrowRight className="w-4 h-4 text-gray-400" />
+                <ArrowRight className="w-4 h-4 text-black" />
               </Link>
               <Link 
                 href="/supersonic-fast-cash/support"
                 className="flex items-center justify-between bg-white border border-gray-200 rounded-lg p-4 hover:bg-white transition-colors"
               >
                 <span className="text-gray-700">Support Center</span>
-                <ArrowRight className="w-4 h-4 text-gray-400" />
+                <ArrowRight className="w-4 h-4 text-black" />
               </Link>
               <Link 
                 href="/supersonic-fast-cash/cash-advance"
                 className="flex items-center justify-between bg-white border border-gray-200 rounded-lg p-4 hover:bg-white transition-colors"
               >
                 <span className="text-gray-700">About Refund Advances</span>
-                <ArrowRight className="w-4 h-4 text-gray-400" />
+                <ArrowRight className="w-4 h-4 text-black" />
               </Link>
             </div>
           </div>
@@ -211,7 +211,7 @@ export default function TransparencyPage() {
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">
             Ready to file?
           </h2>
-          <p className="text-gray-600 mb-8">
+          <p className="text-black mb-8">
             Start your tax return with a platform built on clarity and trust.
           </p>
           <Link

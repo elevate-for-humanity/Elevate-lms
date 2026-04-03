@@ -213,7 +213,7 @@ export default function AvatarChatBar() {
                   <MessageCircle className="w-5 h-5" />
                   <div>
                     <p className="font-semibold text-sm">{name}</p>
-                    <p className="text-xs text-brand-blue-200">Ask me anything!</p>
+                    <p className="text-xs text-white">Ask me anything!</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">

@@ -161,7 +161,7 @@ export default async function OrientationPage() {
           <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Ready to Get Started?
           </h2>
-          <p className="text-brand-red-100 text-lg mb-8">
+          <p className="text-white text-lg mb-8">
             Apply online, then schedule your orientation above. Training may be free for eligible Indiana residents.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

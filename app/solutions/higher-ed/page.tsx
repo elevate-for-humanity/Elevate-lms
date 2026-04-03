@@ -98,7 +98,7 @@ export default function HigherEdPage() {
       <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Modernize Your Workforce Programs?</h2>
-          <p className="text-brand-blue-100 mb-8 text-lg">
+          <p className="text-white mb-8 text-lg">
             Schedule a demo to see how Elevate integrates with your institution.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

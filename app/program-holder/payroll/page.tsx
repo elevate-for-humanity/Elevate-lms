@@ -161,9 +161,9 @@ export default async function ProgramHolderPayrollPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`font-semibold text-sm ${primary ? 'text-white' : 'text-slate-900'}`}>{label}</p>
-                <p className={`text-xs mt-0.5 ${primary ? 'text-brand-blue-100' : 'text-slate-400'}`}>{desc}</p>
+                <p className={`text-xs mt-0.5 ${primary ? 'text-white' : 'text-slate-400'}`}>{desc}</p>
               </div>
-              <ChevronRight className={`w-4 h-4 flex-shrink-0 ${primary ? 'text-brand-blue-200' : 'text-slate-300'}`} />
+              <ChevronRight className={`w-4 h-4 flex-shrink-0 ${primary ? 'text-white' : 'text-slate-300'}`} />
             </Link>
           ))}
         </div>

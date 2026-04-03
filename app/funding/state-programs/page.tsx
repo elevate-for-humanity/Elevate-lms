@@ -58,7 +58,7 @@ export default function StateProgramsPage() {
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">State Funding Programs</h1>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Indiana workforce development grants and training funds for residents and employers.</p>
+            <p className="text-lg text-black max-w-3xl mx-auto">Indiana workforce development grants and training funds for residents and employers.</p>
           </div>
         </div>
       </section>
@@ -69,7 +69,7 @@ export default function StateProgramsPage() {
           {PROGRAMS.map((p) => (
             <div key={p.name} className="bg-white border border-slate-200 rounded-xl p-6 md:p-8">
               <h2 className="text-xl font-bold text-slate-900 mb-1">{p.name}</h2>
-              <p className="text-sm text-slate-500 mb-4">Administered by: {p.admin}</p>
+              <p className="text-sm text-black mb-4">Administered by: {p.admin}</p>
               <p className="text-slate-700 mb-4">{p.desc}</p>
 
               <div className="grid sm:grid-cols-2 gap-4">
@@ -83,7 +83,7 @@ export default function StateProgramsPage() {
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-slate-900 mb-1">Who May Be Eligible:</h3>
-                  <p className="text-slate-600 text-sm">{p.eligible.join('. ')}.</p>
+                  <p className="text-black text-sm">{p.eligible.join('. ')}.</p>
                 </div>
               </div>
             </div>
@@ -95,7 +95,7 @@ export default function StateProgramsPage() {
       <section className="py-16 bg-slate-900">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Explore Your Funding Options</h2>
-          <p className="text-brand-blue-100 mb-8 text-lg">Our enrollment team will help match you with the right state funding program.</p>
+          <p className="text-white mb-8 text-lg">Our enrollment team will help match you with the right state funding program.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/orientation/schedule" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg">Attend Orientation</Link>
             <Link href="/contact" className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg">Contact Us</Link>

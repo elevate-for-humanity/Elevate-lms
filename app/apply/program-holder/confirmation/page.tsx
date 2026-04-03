@@ -63,7 +63,7 @@ export default function ProgramHolderConfirmationPage() {
                   'Acknowledge Rights & Responsibilities',
                   'Upload required documents',
                 ].map((step, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-slate-600">
+                  <li key={i} className="flex items-start gap-3 text-sm text-black">
                     <span className="flex-shrink-0 w-5 h-5 rounded-full bg-brand-blue-100 text-brand-blue-700 font-bold text-xs flex items-center justify-center mt-0.5">
                       {i + 1}
                     </span>
@@ -75,7 +75,7 @@ export default function ProgramHolderConfirmationPage() {
 
             {/* Didn't get email */}
             <div className="border-t border-slate-100 pt-5">
-              <p className="text-xs text-slate-500 mb-3">
+              <p className="text-xs text-black mb-3">
                 Didn&apos;t receive the email, or the link expired? Check your spam folder, then contact us for a new link:
               </p>
               <div className="flex flex-col sm:flex-row gap-2 text-sm">
@@ -86,7 +86,7 @@ export default function ProgramHolderConfirmationPage() {
                   <Mail className="w-4 h-4" />
                   elevate4humanityedu@gmail.com
                 </a>
-                <span className="hidden sm:inline text-slate-300">|</span>
+                <span className="hidden sm:inline text-white">|</span>
                 <a
                   href="tel:3173143757"
                   className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
@@ -101,7 +101,7 @@ export default function ProgramHolderConfirmationPage() {
           <div className="bg-slate-50 px-8 py-4 border-t border-slate-100 flex items-center justify-between">
             <Link
               href="/"
-              className="text-sm text-slate-500 hover:text-slate-700"
+              className="text-sm text-black hover:text-slate-700"
             >
               Return to home
             </Link>
@@ -115,7 +115,7 @@ export default function ProgramHolderConfirmationPage() {
           </div>
         </div>
 
-        <p className="text-center text-xs text-slate-400 mt-6">
+        <p className="text-center text-xs text-black mt-6">
           Elevate for Humanity · 8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240
         </p>
       </div>

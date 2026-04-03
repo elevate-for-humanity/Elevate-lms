@@ -66,7 +66,7 @@ export default function GrantsAppPage() {
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 Grants Discovery & Management App
               </h1>
-              <p className="text-xl text-brand-green-100 mb-8">
+              <p className="text-xl text-white mb-8">
                 Find the right grants faster with AI-powered matching. Track applications, manage deadlines, and streamline compliance reporting.
               </p>
               <div className="flex flex-wrap gap-4">
@@ -157,13 +157,13 @@ export default function GrantsAppPage() {
                 <h3 className={`text-2xl font-bold mt-4 ${plan.popular ? 'text-slate-900' : 'text-gray-900'}`}>{plan.name}</h3>
                 <div className="mt-4 mb-6">
                   <span className="text-4xl font-bold">${plan.price}</span>
-                  <span className={plan.popular ? 'text-brand-green-100' : 'text-gray-500'}>{plan.period}</span>
+                  <span className={plan.popular ? 'text-white' : 'text-gray-500'}>{plan.period}</span>
                 </div>
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((f, j) => (
                     <li key={j} className="flex items-center gap-2">
-                      <Check className={`w-5 h-5 ${plan.popular ? 'text-brand-green-200' : 'text-brand-green-500'}`} />
-                      <span className={plan.popular ? 'text-brand-green-100' : 'text-gray-600'}>{f}</span>
+                      <Check className={`w-5 h-5 ${plan.popular ? 'text-white' : 'text-brand-green-500'}`} />
+                      <span className={plan.popular ? 'text-white' : 'text-gray-600'}>{f}</span>
                     </li>
                   ))}
                 </ul>

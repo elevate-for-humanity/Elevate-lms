@@ -86,7 +86,7 @@ export default async function CourseLearnPage({
             <Lock className="w-8 h-8 text-brand-red-600" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Required</h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-black mb-6">
             You need to purchase this course to access the content.
           </p>
           <div className="space-y-3">
@@ -116,13 +116,13 @@ export default async function CourseLearnPage({
           <div className="flex items-center gap-4">
             <Link 
               href="/career-services/courses/my-courses" 
-              className="text-gray-400 hover:text-white"
+              className="text-black hover:text-white"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
               <h1 className="text-slate-900 font-semibold">{course.title}</h1>
-              <p className="text-slate-500 text-sm">{sortedModules.length} lessons</p>
+              <p className="text-black text-sm">{sortedModules.length} lessons</p>
             </div>
           </div>
         </div>

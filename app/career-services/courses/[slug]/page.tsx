@@ -93,8 +93,8 @@ export default async function CourseDetailPage({
                 </span>
               )}
               <h1 className="text-4xl lg:text-5xl font-bold mb-4">{course.title}</h1>
-              <p className="text-xl text-brand-blue-200 mb-6">{course.subtitle}</p>
-              <p className="text-slate-600 mb-8">{course.description}</p>
+              <p className="text-xl text-white mb-6">{course.subtitle}</p>
+              <p className="text-black mb-8">{course.description}</p>
 
               <div className="flex flex-wrap gap-6 mb-8 text-sm">
                 <div className="flex items-center gap-2">
@@ -120,7 +120,7 @@ export default async function CourseDetailPage({
                   <div>
                     <span className="text-4xl font-bold sezzle-hero-price">${Number(course.price).toFixed(0)}</span>
                     {course.original_price && (
-                      <span className="text-xl text-slate-500 line-through ml-3">
+                      <span className="text-xl text-black line-through ml-3">
                         ${Number(course.original_price).toFixed(0)}
                       </span>
                     )}
@@ -133,7 +133,7 @@ export default async function CourseDetailPage({
                 </div>
                 {/* Sezzle Widget - shows "or 4 interest-free payments" */}
                 {Number(course.price) >= 35 && Number(course.price) <= 2500 && (
-                  <div className="sezzle-hero-widget text-brand-blue-200" />
+                  <div className="sezzle-hero-widget text-white" />
                 )}
               </div>
             </div>
@@ -168,7 +168,7 @@ export default async function CourseDetailPage({
           <div className="grid md:grid-cols-2 gap-4">
             {sortedFeatures.map((feature: any, index: number) => (
               <div key={index} className="flex items-start gap-3 bg-white p-4 rounded-lg">
-                <span className="text-slate-500 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <span className="text-gray-700">{feature.feature}</span>
               </div>
             ))}
@@ -181,7 +181,7 @@ export default async function CourseDetailPage({
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-gray-900">Course Curriculum</h2>
-            <p className="text-gray-600">
+            <p className="text-black">
               {sortedModules.length} lessons • {Math.floor(totalDuration / 60)}h {totalDuration % 60}m total
             </p>
           </div>
@@ -196,7 +196,7 @@ export default async function CourseDetailPage({
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
                     module.is_preview 
                       ? 'bg-brand-green-100 text-brand-green-600' 
-                      : 'bg-white text-gray-600'
+                      : 'bg-white text-black'
                   }`}>
                     {index + 1}
                   </div>
@@ -209,9 +209,9 @@ export default async function CourseDetailPage({
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-500">{module.description}</p>
+                    <p className="text-sm text-black">{module.description}</p>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <div className="flex items-center gap-2 text-sm text-black">
                     <Play className="w-4 h-4" />
                     {module.duration_minutes} min
                   </div>
@@ -231,21 +231,21 @@ export default async function CourseDetailPage({
                 <ShieldCheck className="w-8 h-8 text-brand-green-600" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">30-Day Money Back</h3>
-              <p className="text-gray-600 text-sm">Not satisfied? Get a full refund within 30 days, no questions asked.</p>
+              <p className="text-black text-sm">Not satisfied? Get a full refund within 30 days, no questions asked.</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Download className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Lifetime Access</h3>
-              <p className="text-gray-600 text-sm">Buy once, access forever. Including all future updates.</p>
+              <p className="text-black text-sm">Buy once, access forever. Including all future updates.</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <MessageSquare className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Expert Support</h3>
-              <p className="text-gray-600 text-sm">Get your questions answered by career experts.</p>
+              <p className="text-black text-sm">Get your questions answered by career experts.</p>
             </div>
           </div>
         </div>
@@ -255,7 +255,7 @@ export default async function CourseDetailPage({
       <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Improve Your Career?</h2>
-          <p className="text-brand-blue-100 mb-8">
+          <p className="text-white mb-8">
             Professionals across Indiana have accelerated their careers with our courses.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

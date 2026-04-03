@@ -201,7 +201,7 @@ export default function TestimonialsPage() {
         {/* CTA */}
         <section className="rounded-2xl p-8 text-center">
           <h2 className="text-2xl font-bold mb-4">Your Success Story Starts Here</h2>
-          <p className="text-brand-orange-100 mb-6 max-w-xl mx-auto">
+          <p className="text-white mb-6 max-w-xl mx-auto">
             Join the graduates who have transformed their lives through 
             career training. Your story could be next.
           </p>

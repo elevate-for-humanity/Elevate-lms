@@ -405,7 +405,7 @@ export default function TaxServicesPage() {
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-6">
             Ready to File Your Taxes?
           </h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Don&apos;t wait until the last minute. Get your maximum refund today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -424,7 +424,7 @@ export default function TaxServicesPage() {
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
-          <p className="mt-8 text-brand-blue-200">
+          <p className="mt-8 text-white">
             <Phone className="inline-block w-4 h-4 mr-2" />
             Questions? Contact us at (317) 314-3757
           </p>
@@ -434,7 +434,7 @@ export default function TaxServicesPage() {
       <section className="py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>
+          <p className="text-white mb-6">Check your eligibility for funded career training programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"

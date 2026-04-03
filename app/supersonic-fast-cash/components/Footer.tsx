@@ -17,7 +17,7 @@ export function SupersonicFooter() {
               <span className="text-brand-red-500"> Fast Cash</span>
               <span className="text-white text-sm font-normal ml-1">LLC</span>
             </div>
-            <p className="text-gray-400 text-sm">
+            <p className="text-black text-sm">
               Professional tax preparation services with optional refund advance access.
             </p>
           </div>
@@ -27,22 +27,22 @@ export function SupersonicFooter() {
             <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-300 mb-4">Services</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/supersonic-fast-cash/pricing" className="text-gray-400 hover:text-white text-sm">
+                <Link href="/supersonic-fast-cash/pricing" className="text-black hover:text-white text-sm">
                   Pricing
                 </Link>
               </li>
               <li>
-                <Link href="/supersonic-fast-cash/how-it-works" className="text-gray-400 hover:text-white text-sm">
+                <Link href="/supersonic-fast-cash/how-it-works" className="text-black hover:text-white text-sm">
                   How It Works
                 </Link>
               </li>
               <li>
-                <Link href="/supersonic-fast-cash/cash-advance" className="text-gray-400 hover:text-white text-sm">
+                <Link href="/supersonic-fast-cash/cash-advance" className="text-black hover:text-white text-sm">
                   Refund Advance
                 </Link>
               </li>
               <li>
-                <Link href="/supersonic-fast-cash/support" className="text-gray-400 hover:text-white text-sm">
+                <Link href="/supersonic-fast-cash/support" className="text-black hover:text-white text-sm">
                   Support
                 </Link>
               </li>
@@ -54,12 +54,12 @@ export function SupersonicFooter() {
             <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-300 mb-4">Legal</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/supersonic-fast-cash/legal/privacy" className="text-gray-400 hover:text-white text-sm">
+                <Link href="/supersonic-fast-cash/legal/privacy" className="text-black hover:text-white text-sm">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/supersonic-fast-cash/legal/terms" className="text-gray-400 hover:text-white text-sm">
+                <Link href="/supersonic-fast-cash/legal/terms" className="text-black hover:text-white text-sm">
                   Terms of Service
                 </Link>
               </li>
@@ -72,20 +72,20 @@ export function SupersonicFooter() {
             <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-300 mb-4">Contact</h3>
             <ul className="space-y-3">
               <li className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-gray-500" />
-                <a href="/support" className="text-gray-400 hover:text-white text-sm">
+                <Phone className="w-4 h-4 text-black" />
+                <a href="/support" className="text-black hover:text-white text-sm">
                   (317) 314-3757
                 </a>
               </li>
               <li className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-gray-500" />
-                <a href="mailto:supersonicfastcashllc@gmail.com" className="text-gray-400 hover:text-white text-sm">
+                <Mail className="w-4 h-4 text-black" />
+                <a href="mailto:supersonicfastcashllc@gmail.com" className="text-black hover:text-white text-sm">
                   supersonicfastcashllc@gmail.com
                 </a>
               </li>
               <li className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-gray-500" />
-                <span className="text-gray-400 text-sm">Indianapolis, IN</span>
+                <MapPin className="w-4 h-4 text-black" />
+                <span className="text-black text-sm">Indianapolis, IN</span>
               </li>
             </ul>
           </div>
@@ -93,7 +93,7 @@ export function SupersonicFooter() {
 
         {/* Global Disclosure - REQUIRED */}
         <div className="border-t border-gray-800 mt-10 pt-6">
-          <p className="text-gray-500 text-xs leading-relaxed max-w-4xl">
+          <p className="text-black text-xs leading-relaxed max-w-4xl">
             Supersonic Fast Cash is a trade name of 2Exclusive LLC-S. Tax preparation services are provided by licensed preparers. 
             Refund advance options, when available, are based on an individual&apos;s expected tax refund and eligibility requirements. 
             Refund advances are optional and are repaid from the taxpayer&apos;s refund. Supersonic Fast Cash does not provide loans 
@@ -103,7 +103,7 @@ export function SupersonicFooter() {
 
         {/* Copyright */}
         <div className="border-t border-gray-800 mt-6 pt-6 text-center">
-          <p className="text-gray-500 text-sm">
+          <p className="text-black text-sm">
             © {new Date().getFullYear()} 2Exclusive LLC-S (d/b/a Supersonic Fast Cash). All rights reserved.
           </p>
         </div>

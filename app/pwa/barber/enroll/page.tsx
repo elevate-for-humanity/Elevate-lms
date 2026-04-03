@@ -246,7 +246,7 @@ export default function BarberEnrollPage() {
           {error && (
             <div className="bg-white/10 border border-brand-red-500/30 rounded-xl p-4 flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
-              <p className="text-brand-red-200 text-sm">{error}</p>
+              <p className="text-white text-sm">{error}</p>
             </div>
           )}
 

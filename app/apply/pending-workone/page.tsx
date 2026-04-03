@@ -95,7 +95,7 @@ export default function PendingWorkOnePage({
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             One More Step Before Enrollment
           </h1>
-          <p className="text-lg text-gray-600 leading-relaxed">
+          <p className="text-lg text-black leading-relaxed">
             Your application is received and your account is ready.
             Because you selected WorkOne / WIOA funding, you must complete
             a <strong>WorkOne intake appointment</strong> before your enrollment
@@ -122,7 +122,7 @@ export default function PendingWorkOnePage({
         {/* ── Checklist ── */}
         <div className="mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-1">Track your progress</h2>
-          <p className="text-sm text-slate-500 mb-4">
+          <p className="text-sm text-black mb-4">
             Check off each step as you complete it. Add notes like appointment dates,
             advisor names, and authorization codes so nothing gets lost.
           </p>
@@ -156,7 +156,7 @@ export default function PendingWorkOnePage({
                     {step.icon}
                     <h3 className="font-semibold text-gray-900">{step.title}</h3>
                   </div>
-                  <p className="text-gray-600 text-sm leading-relaxed">{step.description}</p>
+                  <p className="text-black text-sm leading-relaxed">{step.description}</p>
                   {step.link && step.linkLabel && (
                     <Link
                       href={step.link}

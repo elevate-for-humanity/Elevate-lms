@@ -233,7 +233,7 @@ export default function PathwaysPage() {
       <section className="py-14">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-3">How the Pathway Works</h2>
-          <p className="text-gray-600 mb-10 max-w-3xl">
+          <p className="text-black mb-10 max-w-3xl">
             Every participant moves through these five stages in order. You do not skip stages.
             Each stage has a clear purpose, a defined timeline, and a specific outcome.
           </p>
@@ -283,7 +283,7 @@ export default function PathwaysPage() {
       <section className="py-14">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-3">Training Programs</h2>
-          <p className="text-gray-600 mb-10 max-w-3xl">
+          <p className="text-black mb-10 max-w-3xl">
             Each program follows the 5-stage pathway above. Click any program to see the full
             curriculum, schedule, and enrollment details.
           </p>
@@ -303,11 +303,11 @@ export default function PathwaysPage() {
                     <p className="text-sm text-gray-700 mb-4">{p.desc}</p>
 
                     <div className="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-sm mb-4">
-                      <div><span className="font-bold text-gray-900">Duration:</span> <span className="text-gray-600">{p.duration}</span></div>
-                      <div><span className="font-bold text-gray-900">Credential:</span> <span className="text-gray-600">{p.credential}</span></div>
-                      <div><span className="font-bold text-gray-900">Issued by:</span> <span className="text-gray-600">{p.issuer}</span></div>
-                      <div><span className="font-bold text-gray-900">Salary range:</span> <span className="text-gray-600">{p.salary}</span></div>
-                      <div className="sm:col-span-2"><span className="font-bold text-gray-900">Who hires you:</span> <span className="text-gray-600">{p.jobs}</span></div>
+                      <div><span className="font-bold text-gray-900">Duration:</span> <span className="text-black">{p.duration}</span></div>
+                      <div><span className="font-bold text-gray-900">Credential:</span> <span className="text-black">{p.credential}</span></div>
+                      <div><span className="font-bold text-gray-900">Issued by:</span> <span className="text-black">{p.issuer}</span></div>
+                      <div><span className="font-bold text-gray-900">Salary range:</span> <span className="text-black">{p.salary}</span></div>
+                      <div className="sm:col-span-2"><span className="font-bold text-gray-900">Who hires you:</span> <span className="text-black">{p.jobs}</span></div>
                     </div>
 
                     <div className="flex flex-wrap gap-3">
@@ -371,7 +371,7 @@ export default function PathwaysPage() {
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-lg border border-gray-200 p-6">
                 <h3 className="font-bold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-sm text-gray-600">{item.desc}</p>
+                <p className="text-sm text-black">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -430,15 +430,15 @@ export default function PathwaysPage() {
           <div className="grid sm:grid-cols-3 gap-4">
             <Link href="/pathways/outcomes" className="bg-white rounded-lg border border-gray-200 p-5 hover:shadow-md transition">
               <h3 className="font-bold text-gray-900 mb-1">Outcomes &amp; Metrics</h3>
-              <p className="text-sm text-gray-600">What each credential means, what jobs pay, and how we measure success.</p>
+              <p className="text-sm text-black">What each credential means, what jobs pay, and how we measure success.</p>
             </Link>
             <Link href="/pathways/partners" className="bg-white rounded-lg border border-gray-200 p-5 hover:shadow-md transition">
               <h3 className="font-bold text-gray-900 mb-1">Partners &amp; Cohorts</h3>
-              <p className="text-sm text-gray-600">How workforce boards, employers, and community organizations work with us.</p>
+              <p className="text-sm text-black">How workforce boards, employers, and community organizations work with us.</p>
             </Link>
             <Link href="/pathways/training-model" className="bg-white rounded-lg border border-gray-200 p-5 hover:shadow-md transition">
               <h3 className="font-bold text-gray-900 mb-1">Training Delivery</h3>
-              <p className="text-sm text-gray-600">What a student day looks like, how classes work, and how we track progress.</p>
+              <p className="text-sm text-black">What a student day looks like, how classes work, and how we track progress.</p>
             </Link>
           </div>
         </div>
@@ -448,7 +448,7 @@ export default function PathwaysPage() {
       <section className="py-14 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start?</h2>
-          <p className="text-lg text-brand-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-white mb-8 max-w-2xl mx-auto">
             The first step is checking your eligibility. It takes about 5 minutes online.
             If you qualify for funding, your entire training can be free.
           </p>

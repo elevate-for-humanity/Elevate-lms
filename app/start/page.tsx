@@ -173,7 +173,7 @@ export default function StartPage() {
           <h2 className="text-2xl font-bold text-slate-900 md:text-3xl">
             Ready to change your career?
           </h2>
-          <p className="mt-3 text-brand-red-100">
+          <p className="mt-3 text-white">
             Fill out the form above or call us directly.
           </p>
           <div className="mt-6 flex flex-col justify-center gap-4 sm:flex-row">

@@ -86,7 +86,7 @@ export default function SubOfficeAgreementPage() {
       <div className="min-h-screen bg-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-lg shadow-xl p-8 text-center">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-black flex-shrink-0">•</span>
             <h1 className="text-3xl font-bold text-black mb-4">
               Agreement Signed Successfully!
             </h1>
@@ -129,7 +129,7 @@ export default function SubOfficeAgreementPage() {
               <h1 className="text-3xl font-black uppercase">
                 Sub-Office Agreement
               </h1>
-              <p className="text-brand-blue-200">
+              <p className="text-white">
                 Supersonic Fast Cash Tax Preparation
               </p>
             </div>

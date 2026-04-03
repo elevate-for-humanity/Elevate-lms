@@ -137,10 +137,10 @@ export default function PlatformPage() {
             <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-6">
               Workforce infrastructure for providers, agencies, and employers — not a course platform.
             </h1>
-            <p className="text-slate-600 text-lg leading-relaxed mb-4 max-w-3xl">
+            <p className="text-black text-lg leading-relaxed mb-4 max-w-3xl">
               Elevate operates a multi-tenant Workforce Development Hub. Training providers deliver programs under the hub. Credential authorities issue certifications. Employers access a verified graduate pipeline. Workforce agencies run compliance reports. All roles operate from one coordinated system with isolated data and role-based access.
             </p>
-            <p className="text-slate-500 text-base leading-relaxed max-w-3xl mb-8">
+            <p className="text-black text-base leading-relaxed max-w-3xl mb-8">
               If you are a workforce board, training provider, government agency, or employer looking for infrastructure built for WIOA, DOL, and state funding compliance — this is what you are looking at.
             </p>
             <div className="flex flex-wrap gap-3">
@@ -176,7 +176,7 @@ export default function PlatformPage() {
                 </div>
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 mb-2">{cap.label}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{cap.desc}</p>
+                  <p className="text-black text-sm leading-relaxed">{cap.desc}</p>
                 </div>
               </div>
             ))}
@@ -190,7 +190,7 @@ export default function PlatformPage() {
           <div className="mb-12">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">End-to-End Pipeline</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Every stage in one system</h2>
-            <p className="text-slate-600 text-sm max-w-2xl leading-relaxed">
+            <p className="text-black text-sm max-w-2xl leading-relaxed">
               From first contact to verified employment outcome — no handoffs to disconnected tools.
             </p>
           </div>
@@ -200,11 +200,11 @@ export default function PlatformPage() {
                 <div className="bg-white rounded-xl border border-slate-200 p-5 h-full">
                   <div className="text-3xl font-black text-slate-100 mb-3 leading-none">{s.n}</div>
                   <h3 className="font-bold text-slate-900 text-sm mb-1">{s.label}</h3>
-                  <p className="text-slate-500 text-xs leading-relaxed">{s.desc}</p>
+                  <p className="text-black text-xs leading-relaxed">{s.desc}</p>
                 </div>
                 {i < pipeline.length - 1 && (
                   <div className="hidden sm:flex absolute top-1/2 -right-3 -translate-y-1/2 z-10">
-                    <ArrowRight className="w-5 h-5 text-slate-300" />
+                    <ArrowRight className="w-5 h-5 text-white" />
                   </div>
                 )}
               </div>
@@ -234,7 +234,7 @@ export default function PlatformPage() {
                 </div>
                 <div className="p-5 flex flex-col flex-1">
                   <h3 className="font-bold text-slate-900 mb-2">{a.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed flex-1 mb-4">{a.desc}</p>
+                  <p className="text-black text-sm leading-relaxed flex-1 mb-4">{a.desc}</p>
                   <Link href={a.href} className="inline-flex items-center gap-1 text-brand-red-600 hover:text-brand-red-700 text-sm font-semibold">
                     {a.cta} <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
@@ -254,14 +254,14 @@ export default function PlatformPage() {
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">
                 Designed for organizations that answer to funders and auditors
               </h2>
-              <p className="text-slate-600 text-sm leading-relaxed mb-6">
+              <p className="text-black text-sm leading-relaxed mb-6">
                 Every design decision in this platform was made with workforce funding compliance in mind. WIOA, WRG, Job Ready Indy, and DOL Registered Apprenticeship requirements are not bolted on — they are in the data model.
               </p>
               <ul className="space-y-3">
                 {complianceItems.map((item) => (
                   <li key={item} className="flex items-start gap-3">
                     <span className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0 mt-2" />
-                    <span className="text-slate-600 text-sm leading-relaxed">{item}</span>
+                    <span className="text-black text-sm leading-relaxed">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -291,7 +291,7 @@ export default function PlatformPage() {
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">
             Ready to operate on the platform?
           </h2>
-          <p className="text-slate-600 text-base leading-relaxed mb-8 max-w-xl mx-auto">
+          <p className="text-black text-base leading-relaxed mb-8 max-w-xl mx-auto">
             Whether you are a training provider, workforce board, employer, or organization looking to license the infrastructure — the next step is a conversation.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">

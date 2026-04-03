@@ -126,26 +126,26 @@ export default function CourseDiscussionsPage() {
                     </p>
                     <ul className="space-y-4">
                       <li className="flex items-start">
-                        <span className="text-slate-500 flex-shrink-0">•</span>
+                        <span className="text-black flex-shrink-0">•</span>
                         <span className="text-black">
                           Funded training - no tuition, no hidden costs
                         </span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-slate-500 flex-shrink-0">•</span>
+                        <span className="text-black flex-shrink-0">•</span>
                         <span className="text-black">
                           Industry-recognized certifications that employers
                           value
                         </span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-slate-500 flex-shrink-0">•</span>
+                        <span className="text-black flex-shrink-0">•</span>
                         <span className="text-black">
                           Job placement assistance and career support
                         </span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-slate-500 flex-shrink-0">•</span>
+                        <span className="text-black flex-shrink-0">•</span>
                         <span className="text-black">
                           Flexible scheduling for working adults
                         </span>
@@ -174,7 +174,7 @@ export default function CourseDiscussionsPage() {
                 <h2 className="text-2xl md:text-3xl font-bold mb-6">
                   Ready to Improve Your Career?
                 </h2>
-                <p className="text-base md:text-lg mb-8 text-brand-blue-100">
+                <p className="text-base md:text-lg mb-8 text-white">
                   Explore training programs and earn industry certifications through
                   Elevate for Humanity.
                 </p>

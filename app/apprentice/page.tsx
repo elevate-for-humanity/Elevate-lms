@@ -104,9 +104,9 @@ export default async function ApprenticePortalPage() {
         <div className="bg-brand-blue-700 text-white rounded-xl p-6 mb-8 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-brand-blue-100 text-sm font-medium uppercase tracking-wide mb-1">Next Required Action</p>
+              <p className="text-white text-sm font-medium uppercase tracking-wide mb-1">Next Required Action</p>
               <h2 className="text-2xl font-bold">{nextAction.label}</h2>
-              <p className="text-brand-blue-100 mt-1">{nextAction.description}</p>
+              <p className="text-white mt-1">{nextAction.description}</p>
             </div>
             <Link
               href={nextAction.href}

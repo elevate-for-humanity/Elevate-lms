@@ -78,11 +78,11 @@ export default function ProgramCoursesPage() {
         <div className="bg-white py-10 border-t">
           <div className="max-w-5xl mx-auto px-6 text-center">
             <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full mb-4">
-              <BookOpen className="w-5 h-5 text-slate-300" />
-              <span className="text-sm font-bold uppercase tracking-wide text-slate-600">{programName} Program</span>
+              <BookOpen className="w-5 h-5 text-white" />
+              <span className="text-sm font-bold uppercase tracking-wide text-black">{programName} Program</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Available Courses</h1>
-            <p className="text-lg text-slate-600 mb-6 max-w-3xl mx-auto">
+            <p className="text-lg text-black mb-6 max-w-3xl mx-auto">
               Choose a course to start your learning journey. Get certified and advance your career.
             </p>
           </div>
@@ -253,7 +253,7 @@ export default function ProgramCoursesPage() {
                     >
                       {course.price === 0 ? (
                         <>
-                          <span className="text-slate-500 flex-shrink-0">•</span>
+                          <span className="text-black flex-shrink-0">•</span>
                           Enroll Free
                         </>
                       ) : (

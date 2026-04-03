@@ -41,7 +41,7 @@ export default async function NetworkingEventsPage() {
         <div className="absolute inset-x-0 bottom-0 max-w-6xl mx-auto px-4 pb-8">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-300 mb-1">Career Services</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Networking Events</h1>
-          <p className="text-slate-600 mt-1 text-sm max-w-xl">
+          <p className="text-black mt-1 text-sm max-w-xl">
             Career fairs, employer meetups, and industry networking events connecting Elevate graduates with hiring employers.
           </p>
         </div>
@@ -101,7 +101,7 @@ export default async function NetworkingEventsPage() {
           </div>
           <div className="flex-1 text-center sm:text-left">
             <h3 className="text-lg font-bold text-slate-900">Are you an employer?</h3>
-            <p className="text-slate-600 text-sm mt-1">
+            <p className="text-black text-sm mt-1">
               Participate in our career fairs and meet pre-screened, credential-ready candidates from Elevate programs.
             </p>
           </div>

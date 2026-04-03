@@ -89,7 +89,7 @@ export function ProgramFitNavigator({
             <HelpCircle className="w-5 h-5" />
           </button>
         </div>
-        <p className="text-sm text-brand-blue-100 mt-1">
+        <p className="text-sm text-white mt-1">
           Guided intake for institutions evaluating program operations and credentialing systems.
         </p>
       </div>

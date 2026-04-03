@@ -115,7 +115,7 @@ function FallbackChatWidget() {
           </div>
           <div>
             <h3 className="font-bold">Elevate Support</h3>
-            <p className="text-xs text-brand-blue-100">We typically reply instantly</p>
+            <p className="text-xs text-white">We typically reply instantly</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -155,7 +155,7 @@ function FallbackChatWidget() {
                   <p className="text-sm">{message.text}</p>
                   <p
                     className={`text-xs mt-1 ${
-                      message.sender === 'user' ? 'text-brand-blue-100' : 'text-gray-400'
+                      message.sender === 'user' ? 'text-white' : 'text-gray-400'
                     }`}
                   >
                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

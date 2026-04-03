@@ -126,7 +126,7 @@ export default function OrientationSchedulePage() {
       <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Attend Orientation?</h2>
-          <p className="text-brand-blue-100 mb-8 text-lg">
+          <p className="text-white mb-8 text-lg">
             No registration required for weekly sessions. Walk-ins welcome, or call to confirm your spot.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

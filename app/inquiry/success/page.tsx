@@ -13,21 +13,21 @@ export default function InquirySuccessPage() {
     <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
         <div className="flex justify-center mb-6">
-          <span className="text-slate-500 flex-shrink-0">•</span>
+          <span className="text-black flex-shrink-0">•</span>
         </div>
         
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
           Thank You for Your Interest!
         </h1>
         
-        <p className="text-gray-600 mb-6">
+        <p className="text-black mb-6">
           We've received your inquiry and sent a confirmation to your email. 
           Our team will contact you within 1-2 business days.
         </p>
 
         <div className="bg-white rounded-lg p-4 mb-6">
           <h2 className="font-semibold text-gray-900 mb-3">What's Next?</h2>
-          <ul className="text-left text-gray-600 space-y-2">
+          <ul className="text-left text-black space-y-2">
             <li>• Check your email for confirmation</li>
             <li>• Expect a call from our admissions team</li>
             <li>• Prepare any questions you have</li>
@@ -35,7 +35,7 @@ export default function InquirySuccessPage() {
         </div>
 
         <div className="space-y-3">
-          <p className="text-gray-600">While you wait, explore more:</p>
+          <p className="text-black">While you wait, explore more:</p>
           <div className="flex flex-col sm:flex-row justify-center gap-3">
             <Link
               href="/start"

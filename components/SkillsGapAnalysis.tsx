@@ -109,7 +109,7 @@ export default function SkillsGapAnalysis() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2">Skills Gap Analysis</h2>
-          <p className="text-brand-red-100">Identify and close skill gaps in your workforce</p>
+          <p className="text-white">Identify and close skill gaps in your workforce</p>
         </div>
       </div>
 

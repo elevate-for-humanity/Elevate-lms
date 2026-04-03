@@ -58,32 +58,32 @@ export default async function ReportsPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <nav className="text-sm mb-4">
-            <ol className="flex items-center space-x-2 text-gray-500">
+            <ol className="flex items-center space-x-2 text-black">
               <li><Link href="/workforce-board" className="hover:text-primary">Workforce Board</Link></li>
               <li>/</li>
               <li className="text-gray-900 font-medium">Reports</li>
             </ol>
           </nav>
           <h1 className="text-3xl font-bold text-gray-900">Workforce Reports</h1>
-          <p className="text-gray-600 mt-2">WIOA performance tracking, quarterly submissions, and compliance reporting</p>
+          <p className="text-black mt-2">WIOA performance tracking, quarterly submissions, and compliance reporting</p>
         </div>
 
         {/* Key Metrics */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl border p-5">
-            <p className="text-sm text-gray-600">Total Enrollments</p>
+            <p className="text-sm text-black">Total Enrollments</p>
             <p className="text-3xl font-bold mt-1">{totalEnrollments.count ?? 0}</p>
           </div>
           <div className="bg-white rounded-xl border p-5">
-            <p className="text-sm text-gray-600">Active Participants</p>
+            <p className="text-sm text-black">Active Participants</p>
             <p className="text-3xl font-bold mt-1">{activeEnrollments.count ?? 0}</p>
           </div>
           <div className="bg-white rounded-xl border p-5">
-            <p className="text-sm text-gray-600">Completions</p>
+            <p className="text-sm text-black">Completions</p>
             <p className="text-3xl font-bold mt-1">{completions.count ?? 0}</p>
           </div>
           <div className="bg-white rounded-xl border p-5">
-            <p className="text-sm text-gray-600">Employment Rate</p>
+            <p className="text-sm text-black">Employment Rate</p>
             <p className="text-3xl font-bold mt-1">{performance?.employmentRate ? `${Math.round(performance.employmentRate)}%` : '—'}</p>
           </div>
         </div>
@@ -101,7 +101,7 @@ export default async function ReportsPage() {
                 { label: 'Measurable Skill Gains', value: performance.skillGains, target: 50 },
               ].map((m) => (
                 <div key={m.label} className="p-4 bg-white rounded-lg">
-                  <p className="text-sm text-gray-600">{m.label}</p>
+                  <p className="text-sm text-black">{m.label}</p>
                   <p className="text-2xl font-bold mt-1">
                     {m.prefix || ''}{m.value != null ? (typeof m.value === 'number' ? (m.prefix ? m.value.toLocaleString() : `${Math.round(m.value)}%`) : m.value) : '—'}
                   </p>
@@ -154,7 +154,7 @@ export default async function ReportsPage() {
               </div>
               <div>
                 <h3 className="font-bold text-gray-900">{r.name}</h3>
-                <p className="text-sm text-gray-600 mt-1">{r.description}</p>
+                <p className="text-sm text-black mt-1">{r.description}</p>
               </div>
             </Link>
           ))}

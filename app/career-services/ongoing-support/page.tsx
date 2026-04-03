@@ -96,7 +96,7 @@ export default async function OngoingSupportPage() {
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Ongoing Support</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Your success is our success. Career support doesn't end at graduation—we're here for the long haul.</p>
+            <p className="text-lg text-white max-w-3xl mx-auto">Your success is our success. Career support doesn't end at graduation—we're here for the long haul.</p>
           </div>
         </div>
       </section>
@@ -107,15 +107,15 @@ export default async function OngoingSupportPage() {
           <div className="grid grid-cols-3 gap-6 text-center">
             <div>
               <div className="text-3xl font-bold text-pink-600">{alumniCount || 500}+</div>
-              <div className="text-gray-600">Alumni Supported</div>
+              <div className="text-black">Alumni Supported</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-pink-600">Lifetime</div>
-              <div className="text-gray-600">Access to Services</div>
+              <div className="text-black">Access to Services</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-pink-600">Free</div>
-              <div className="text-gray-600">For All Graduates</div>
+              <div className="text-black">For All Graduates</div>
             </div>
           </div>
         </div>
@@ -133,8 +133,8 @@ export default async function OngoingSupportPage() {
                   <div key={service.title} className="bg-white rounded-xl shadow-sm border p-6">
                     <service.icon className="w-10 h-10 text-pink-600 mb-4" />
                     <h3 className="font-semibold text-lg mb-2">{service.title}</h3>
-                    <p className="text-gray-600 text-sm mb-4">{service.description}</p>
-                    <p className="text-sm text-gray-500">{service.features.join('. ')}.</p>
+                    <p className="text-black text-sm mb-4">{service.description}</p>
+                    <p className="text-sm text-black">{service.features.join('. ')}.</p>
                   </div>
                 ))}
               </div>
@@ -143,7 +143,7 @@ export default async function OngoingSupportPage() {
             {/* Benefits */}
             <div className="bg-white rounded-xl shadow-sm border p-6">
               <h2 className="text-xl font-semibold mb-4">Alumni Benefits</h2>
-              <p className="text-gray-600 leading-relaxed">{benefits.join('. ')}.</p>
+              <p className="text-black leading-relaxed">{benefits.join('. ')}.</p>
             </div>
 
             {/* Support History */}
@@ -155,7 +155,7 @@ export default async function OngoingSupportPage() {
                     <div key={session.id} className="flex items-center justify-between p-3 bg-white rounded-lg">
                       <div>
                         <p className="font-medium">{session.type}</p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-black">
                           {new Date(session.created_at).toLocaleDateString()}
                         </p>
                       </div>
@@ -174,7 +174,7 @@ export default async function OngoingSupportPage() {
             {/* Contact CTA */}
             <div className="bg-pink-50 border border-pink-200 rounded-xl p-6">
               <h3 className="font-semibold mb-3">Need Support?</h3>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-black mb-4">
                 Our career services team is here to help you succeed.
               </p>
               <Link
@@ -207,7 +207,7 @@ export default async function OngoingSupportPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">No upcoming events</p>
+                <p className="text-sm text-black">No upcoming events</p>
               )}
               <Link
                 href="/events"

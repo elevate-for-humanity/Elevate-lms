@@ -168,7 +168,7 @@ export default async function VerifyIdentityPage() {
               <h1 className="text-4xl md:text-5xl font-bold mb-2">
                 Verify Your Identity
               </h1>
-              <p className="text-xl text-brand-blue-100">
+              <p className="text-xl text-white">
                 Complete this one-time verification to access all platform
                 features
               </p>

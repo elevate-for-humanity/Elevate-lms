@@ -298,7 +298,7 @@ export default function FederalCompliancePage() {
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Questions About Compliance?</h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Contact our compliance team for more information about our policies and procedures.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

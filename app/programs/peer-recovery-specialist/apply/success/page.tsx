@@ -16,11 +16,11 @@ export default function PeerRecoveryApplySuccessPage() {
           </svg>
         </div>
         <h1 className="text-2xl font-bold text-slate-900">Application Submitted</h1>
-        <p className="mt-3 text-slate-600">
+        <p className="mt-3 text-black">
           Thank you for applying to the Peer Recovery Specialist program.
           Our team will contact you within 1–2 business days.
         </p>
-        <p className="mt-2 text-sm text-slate-500">
+        <p className="mt-2 text-sm text-black">
           Questions? Call <a href="tel:3173143757" className="underline">317-314-3757</a>
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">

@@ -149,7 +149,7 @@ export default async function SuccessStoriesPage() {
           <h2 className="text-3xl font-bold mb-4">
             Ready to Write Your Success Story?
           </h2>
-          <p className="text-xl text-brand-orange-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-white mb-8 max-w-2xl mx-auto">
             Students across Indiana have transformed their lives through
             our training programs.
           </p>

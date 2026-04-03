@@ -35,7 +35,7 @@ export default function WorkKeysPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">Career Readiness Assessment</p>
           <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 mb-3">ACT WorkKeys / NCRC</h1>
-          <p className="text-slate-500 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
+          <p className="text-black text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
             The National Career Readiness Certificate (NCRC) is a portable, employer-recognized credential that proves your workplace skills. Proctored on-site at Elevate for Humanity in Indianapolis.
           </p>
           <div className="flex flex-wrap gap-3">
@@ -59,10 +59,10 @@ export default function WorkKeysPage() {
             <div>
               <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">What Is WorkKeys?</p>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">Prove Your Workplace Skills</h2>
-              <p className="text-slate-500 text-sm leading-relaxed mb-4">
+              <p className="text-black text-sm leading-relaxed mb-4">
                 ACT WorkKeys is a job skills assessment system that measures real-world skills employers need. When you pass, you earn the National Career Readiness Certificate (NCRC) — a credential recognized by thousands of employers and required by many Indiana workforce programs.
               </p>
-              <p className="text-slate-500 text-sm leading-relaxed">
+              <p className="text-black text-sm leading-relaxed">
                 The NCRC is also required for some WIOA-funded training programs and is accepted by WorkOne as evidence of career readiness.
               </p>
             </div>
@@ -83,7 +83,7 @@ export default function WorkKeysPage() {
                 </div>
                 <div className="p-4 flex-1 bg-white">
                   <h3 className="font-bold text-slate-900 text-sm mb-1">{name}</h3>
-                  <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
+                  <p className="text-black text-sm leading-relaxed">{desc}</p>
                 </div>
               </div>
             ))}
@@ -106,7 +106,7 @@ export default function WorkKeysPage() {
                   </div>
                 </div>
                 <div className="p-3 bg-white flex-1">
-                  <p className="text-slate-500 text-xs leading-relaxed">{desc}</p>
+                  <p className="text-black text-xs leading-relaxed">{desc}</p>
                 </div>
               </div>
             ))}
@@ -121,17 +121,17 @@ export default function WorkKeysPage() {
             <div>
               <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-2">Schedule Your Test</p>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">Take WorkKeys at Elevate</h2>
-              <p className="text-slate-600 text-sm leading-relaxed mb-4">
+              <p className="text-black text-sm leading-relaxed mb-4">
                 We proctor ACT WorkKeys on-site at our Indianapolis testing center. Individual and group sessions available. By appointment only — contact us to schedule.
               </p>
               {/* Testing center identifiers — used when registering on ACT's portal */}
               <div className="flex flex-wrap gap-3 mb-6">
                 <span className="inline-flex items-center gap-1.5 bg-slate-100 border border-slate-200 rounded-md px-3 py-1.5 text-xs font-mono text-slate-700">
-                  <span className="font-semibold text-slate-500 not-italic">ESCO ID</span>
+                  <span className="font-semibold text-black not-italic">ESCO ID</span>
                   358010
                 </span>
                 <span className="inline-flex items-center gap-1.5 bg-slate-100 border border-slate-200 rounded-md px-3 py-1.5 text-xs font-mono text-slate-700">
-                  <span className="font-semibold text-slate-500 not-italic">ACT Site Code</span>
+                  <span className="font-semibold text-black not-italic">ACT Site Code</span>
                   IN-EFH-001
                 </span>
               </div>

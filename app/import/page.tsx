@@ -150,7 +150,7 @@ export default function ImportSitePage() {
                 <div className="flex items-start gap-3 p-4 bg-white/20 border border-brand-red-500/50 rounded-lg">
                   <AlertCircle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-brand-red-200 font-medium">Import Failed</p>
+                    <p className="text-white font-medium">Import Failed</p>
                     <p className="text-brand-red-300 text-sm">{error}</p>
                   </div>
                 </div>

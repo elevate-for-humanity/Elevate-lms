@@ -102,7 +102,7 @@ export default function ShopOwnerRegisterPage() {
               <Building2 className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-xl font-bold text-slate-900 mb-2">Partner Shop Program</h2>
-            <p className="text-brand-blue-200 mb-4">
+            <p className="text-white mb-4">
               Join our network of licensed barbershops training the next generation of barbers.
             </p>
             <ul className="space-y-2 text-sm text-slate-300">
@@ -309,7 +309,7 @@ export default function ShopOwnerRegisterPage() {
           {error && (
             <div className="bg-white/10 border border-brand-red-500/30 rounded-xl p-4 flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
-              <p className="text-brand-red-200 text-sm">{error}</p>
+              <p className="text-white text-sm">{error}</p>
             </div>
           )}
 

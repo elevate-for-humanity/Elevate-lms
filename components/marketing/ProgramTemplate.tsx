@@ -91,7 +91,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
                 {program.name}
               </h1>
 
-              <p className="text-xl md:text-2xl text-slate-200 font-light mb-8 leading-relaxed">
+              <p className="text-xl md:text-2xl text-white font-light mb-8 leading-relaxed">
                 {program.description}
               </p>
 
@@ -139,7 +139,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
       {/* GOVERNMENT PARTNERS BAR */}
       <section className="border-y border-slate-200 py-6">
         <div className="mx-auto max-w-7xl px-6">
-          <p className="text-center text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">
+          <p className="text-center text-xs font-semibold text-white uppercase tracking-wider mb-4">
             Approved Workforce Development Partner
           </p>
           <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
@@ -179,7 +179,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
                 className="flex items-start gap-4 p-6 bg-slate-50 rounded-xl border border-slate-200"
               >
                 <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-brand-red-100 flex items-center justify-center">
-                  <span className="text-slate-500 flex-shrink-0">•</span>
+                  <span className="text-white font-bold flex-shrink-0">→</span>
                 </div>
                 <div>
                   <h3 className="font-bold text-black mb-1">
@@ -321,7 +321,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
               <ul className="space-y-2 text-sm text-black">
                 {program.schedule.map((item, index) => (
                   <li key={index} className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-white font-bold flex-shrink-0">→</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -339,7 +339,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
               <ul className="space-y-2 text-sm text-black">
                 {program.requirements.map((item, index) => (
                   <li key={index} className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-white font-bold flex-shrink-0">→</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -359,7 +359,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
               <ul className="space-y-2 text-sm text-black">
                 {program.support.map((item, index) => (
                   <li key={index} className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-white font-bold flex-shrink-0">→</span>
                     <span>{item}</span>
                   </li>
                 ))}

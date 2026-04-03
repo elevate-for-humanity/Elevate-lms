@@ -84,7 +84,7 @@ export default function NailTechDocumentsPage() {
       <div className="bg-white py-8 border-t">
         <div className="max-w-2xl mx-auto px-6">
           <h1 className="text-3xl font-black mb-2">Required Documents</h1>
-          <p className="text-slate-600">Upload your documents to complete enrollment and access your program.</p>
+          <p className="text-black">Upload your documents to complete enrollment and access your program.</p>
         </div>
       </div>
 
@@ -98,26 +98,26 @@ export default function NailTechDocumentsPage() {
               <div className="flex items-start justify-between mb-2">
                 <div>
                   <h3 className="font-bold text-slate-900">Government-Issued ID</h3>
-                  <p className="text-sm text-slate-500">Driver's license, state ID, or passport</p>
+                  <p className="text-sm text-black">Driver's license, state ID, or passport</p>
                 </div>
-                {governmentId?.status === 'complete' && <span className="text-slate-400 flex-shrink-0">•</span>}
+                {governmentId?.status === 'complete' && <span className="text-black flex-shrink-0">•</span>}
               </div>
 
               {governmentId ? (
                 <div className="flex items-center gap-3 p-3 bg-white rounded-lg">
-                  <FileText className="w-5 h-5 text-slate-400" />
+                  <FileText className="w-5 h-5 text-black" />
                   <span className="flex-1 text-sm text-slate-700 truncate">{governmentId.name}</span>
                   {governmentId.status === 'uploading' && <span className="text-sm text-pink-600">Uploading...</span>}
                   {governmentId.status === 'complete' && (
-                    <button onClick={() => setGovernmentId(null)} className="text-slate-400 hover:text-brand-red-500">
+                    <button onClick={() => setGovernmentId(null)} className="text-black hover:text-brand-red-500">
                       <X className="w-4 h-4" />
                     </button>
                   )}
                 </div>
               ) : (
                 <label className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-pink-500 hover:bg-pink-50 transition">
-                  <Upload className="w-5 h-5 text-slate-400" />
-                  <span className="text-slate-600">Click to upload</span>
+                  <Upload className="w-5 h-5 text-black" />
+                  <span className="text-black">Click to upload</span>
                   <input type="file" accept="image/*,.pdf" onChange={handleFileUpload} className="hidden" />
                 </label>
               )}
@@ -140,7 +140,7 @@ export default function NailTechDocumentsPage() {
           </p>
         )}
 
-        <p className="text-center text-slate-500 text-sm mt-4">Your documents are encrypted and stored securely.</p>
+        <p className="text-center text-black text-sm mt-4">Your documents are encrypted and stored securely.</p>
       </div>
     </div>
   );

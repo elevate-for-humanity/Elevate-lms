@@ -36,21 +36,21 @@ export default function TaxPreparationPage() {
               </p>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <div>
                     <h3 className="font-semibold mb-1">W-2 and 1099 Income</h3>
                     <p className="text-black">Employment and contract income</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <div>
                     <h3 className="font-semibold mb-1">Itemized Deductions</h3>
                     <p className="text-black">Maximize your tax savings</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <div>
                     <h3 className="font-semibold mb-1">Tax Credits</h3>
                     <p className="text-black">EITC, Child Tax Credit, and more</p>
@@ -65,15 +65,15 @@ export default function TaxPreparationPage() {
               </p>
               <div className="space-y-4 mb-6">
                 <div className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <span>Free initial consultation</span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <span>Transparent pricing - no hidden fees</span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <span>Maximum refund guarantee</span>
                 </div>
               </div>
@@ -83,7 +83,7 @@ export default function TaxPreparationPage() {
               >
                 Book Free Consultation
               </Link>
-              <p className="text-center text-sm text-gray-500 mt-4">
+              <p className="text-center text-sm text-black mt-4">
                 Or call (317) 314-3757
               </p>
             </div>

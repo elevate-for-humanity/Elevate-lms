@@ -91,7 +91,7 @@ export default function BuyerProtectionPage() {
         <div className="bg-brand-blue-700 rounded-2xl p-8 text-white text-center mb-12">
           <Shield className="w-16 h-16 mx-auto mb-4" />
           <h2 className="text-3xl font-bold mb-2">Your Purchase is Protected</h2>
-          <p className="text-brand-green-100 max-w-xl mx-auto">
+          <p className="text-white max-w-xl mx-auto">
             We stand behind every purchase on our marketplace with comprehensive buyer protection.
           </p>
         </div>

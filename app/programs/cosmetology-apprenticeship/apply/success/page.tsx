@@ -15,14 +15,14 @@ export default function ApplicationSuccessPage() {
       <div className="max-w-lg w-full">
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
           <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-black flex-shrink-0">•</span>
           </div>
 
           <h1 className="text-2xl font-bold text-slate-900 mb-3">
             Application Submitted
           </h1>
           
-          <p className="text-slate-600 mb-8">
+          <p className="text-black mb-8">
             Thank you for applying to the Cosmetology Apprenticeship program. 
             We&apos;ve received your application and will be in touch soon.
           </p>
@@ -40,14 +40,14 @@ export default function ApplicationSuccessPage() {
                   <div className="w-5 h-5 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-medium mt-0.5">
                     {i + 1}
                   </div>
-                  <p className="text-sm text-slate-600">{text}</p>
+                  <p className="text-sm text-black">{text}</p>
                 </div>
               ))}
             </div>
           </div>
 
           <div className="border-t border-slate-200 pt-6">
-            <p className="text-sm text-slate-500 mb-4">Questions in the meantime?</p>
+            <p className="text-sm text-black mb-4">Questions in the meantime?</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <a
                 href="/support"

@@ -261,7 +261,7 @@ export default function InstructorCredentialsPage() {
                 {/* Header */}
                 <div className="bg-white px-6 py-4">
                   <h3 className="text-lg font-bold text-slate-900">{prog.program}</h3>
-                  <p className="text-brand-blue-100 text-sm">Occupation: {prog.occupation}</p>
+                  <p className="text-white text-sm">Occupation: {prog.occupation}</p>
                 </div>
 
                 <div className="p-6 space-y-5">

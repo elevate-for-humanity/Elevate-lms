@@ -317,25 +317,25 @@ export default async function ProgramDetailPage({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 p-4 bg-white rounded-lg">
               {displayProgram.duration && (
                 <div>
-                  <p className="text-sm text-gray-500">Duration</p>
+                  <p className="text-sm text-black">Duration</p>
                   <p className="font-semibold">{displayProgram.duration}</p>
                 </div>
               )}
               {displayProgram.hours && (
                 <div>
-                  <p className="text-sm text-gray-500">Training Hours</p>
+                  <p className="text-sm text-black">Training Hours</p>
                   <p className="font-semibold">{displayProgram.hours} hours</p>
                 </div>
               )}
               {displayProgram.credential && (
                 <div>
-                  <p className="text-sm text-gray-500">Credential</p>
+                  <p className="text-sm text-black">Credential</p>
                   <p className="font-semibold">{displayProgram.credential}</p>
                 </div>
               )}
               {displayProgram.deliveryMethod && (
                 <div>
-                  <p className="text-sm text-gray-500">Format</p>
+                  <p className="text-sm text-black">Format</p>
                   <p className="font-semibold capitalize">{displayProgram.deliveryMethod}</p>
                 </div>
               )}
@@ -403,7 +403,7 @@ export default async function ProgramDetailPage({
               <div className="mb-8">
                 <h2 className="text-xl font-semibold mb-2">Program Cost</h2>
                 <p className="text-2xl font-bold">${Number(displayProgram.cost).toLocaleString()}</p>
-                <p className="text-sm text-gray-500">Financial assistance may be available</p>
+                <p className="text-sm text-black">Financial assistance may be available</p>
               </div>
             )}
 

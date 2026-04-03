@@ -152,7 +152,7 @@ export default function PolicyAcknowledgmentPage() {
         <div className="max-w-md w-full bg-white rounded-xl shadow-sm border p-8 text-center">
           <CheckCircle2 className="w-16 h-16 text-brand-green-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Policies Acknowledged</h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-black mb-6">
             All {POLICIES.length} policy acknowledgments have been recorded. A confirmation
             will be sent to your email.
           </p>
@@ -182,7 +182,7 @@ export default function PolicyAcknowledgmentPage() {
       {/* Institutional Header */}
       <section className="py-6 border-b">
         <div className="max-w-4xl mx-auto px-4">
-          <Link href="/partners/barbershop-apprenticeship/forms" className="inline-flex items-center gap-1 text-gray-600 hover:text-brand-blue-700 text-sm mb-4">
+          <Link href="/partners/barbershop-apprenticeship/forms" className="inline-flex items-center gap-1 text-black hover:text-brand-blue-700 text-sm mb-4">
             <ArrowLeft className="w-4 h-4" /> Back to Forms
           </Link>
           <InstitutionalHeader
@@ -249,11 +249,11 @@ export default function PolicyAcknowledgmentPage() {
                   </button>
                   <div className="flex-1">
                     <h3 className="font-bold text-gray-900 mb-1">{policy.title}</h3>
-                    <p className="text-sm text-gray-600 mb-3">{policy.summary}</p>
+                    <p className="text-sm text-black mb-3">{policy.summary}</p>
                     <ul className="space-y-1.5">
                       {policy.details.map((detail, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-gray-500">
-                          <span className="text-slate-600 mt-1">•</span>
+                        <li key={i} className="flex items-start gap-2 text-sm text-black">
+                          <span className="text-black mt-1">•</span>
                           {detail}
                         </li>
                       ))}
@@ -324,7 +324,7 @@ export default function PolicyAcknowledgmentPage() {
         <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <h3 className="font-bold text-gray-900">Next: Submit Your Application</h3>
-            <p className="text-sm text-gray-600">After acknowledging policies, complete the partner application.</p>
+            <p className="text-sm text-black">After acknowledging policies, complete the partner application.</p>
           </div>
           <div className="flex gap-3">
             <Link

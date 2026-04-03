@@ -122,7 +122,7 @@ export default function SupersonicGovernanceContactPage() {
                   </div>
                   <h3 className="font-semibold text-slate-900">{category.title}</h3>
                 </div>
-                <p className="text-slate-600 text-sm mb-4">{category.description}</p>
+                <p className="text-black text-sm mb-4">{category.description}</p>
                 <a 
                   href={category.contactLink}
                   className="inline-flex items-center gap-2 text-emerald-600 font-medium hover:text-emerald-700"
@@ -130,7 +130,7 @@ export default function SupersonicGovernanceContactPage() {
                   <Mail className="w-4 h-4" />
                   Contact Us
                 </a>
-                <p className="text-xs text-slate-500 mt-2">
+                <p className="text-xs text-black mt-2">
                   Typical response: {category.responseTime}
                 </p>
               </div>
@@ -183,7 +183,7 @@ export default function SupersonicGovernanceContactPage() {
             <Shield className="w-4 h-4" />
             Report Security Issue
           </a>
-          <p className="text-sm text-slate-600 mt-4">
+          <p className="text-sm text-black mt-4">
             Security reports are prioritized and reviewed within 24 hours.
           </p>
         </section>

@@ -22,7 +22,7 @@ export default function ProviderApplyPage() {
       <div className="max-w-3xl mx-auto px-4 pb-16">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Provider Network Application</h1>
-          <p className="text-slate-600">
+          <p className="text-black">
             Complete this form to apply for approval as a training provider, workforce agency, or employer partner.
             Applications are reviewed by Elevate staff. You will receive an email when a decision is made.
           </p>

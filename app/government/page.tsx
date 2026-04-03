@@ -39,7 +39,7 @@ export default async function GovernmentPage() {
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Workforce Solutions for Government Agencies</h1>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto mb-6">
+            <p className="text-lg text-black max-w-3xl mx-auto mb-6">
               Partner with an ETPL-approved, WIOA-compliant training provider to deliver high-quality workforce development programs that meet federal requirements and produce measurable outcomes.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -56,11 +56,11 @@ export default async function GovernmentPage() {
           <div className="bg-white rounded-2xl p-8 border border-slate-200">
             <h3 className="text-xl font-bold text-slate-900 mb-6">Our Credentials</h3>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-              <div className="flex items-center gap-3"><span className="text-slate-500">•</span><span className="text-slate-700">ETPL Approved Provider</span></div>
-              <div className="flex items-center gap-3"><span className="text-slate-500">•</span><span className="text-slate-700">WIOA Title I Compliant</span></div>
-              <div className="flex items-center gap-3"><span className="text-slate-500">•</span><span className="text-slate-700">Registered Apprenticeship Sponsor</span></div>
-              <div className="flex items-center gap-3"><span className="text-slate-500">•</span><span className="text-slate-700">WRG Eligible Programs</span></div>
-              <div className="flex items-center gap-3"><span className="text-slate-500">•</span><span className="text-slate-700">DOL Oversight Compliant</span></div>
+              <div className="flex items-center gap-3"><span className="text-black">•</span><span className="text-slate-700">ETPL Approved Provider</span></div>
+              <div className="flex items-center gap-3"><span className="text-black">•</span><span className="text-slate-700">WIOA Title I Compliant</span></div>
+              <div className="flex items-center gap-3"><span className="text-black">•</span><span className="text-slate-700">Registered Apprenticeship Sponsor</span></div>
+              <div className="flex items-center gap-3"><span className="text-black">•</span><span className="text-slate-700">WRG Eligible Programs</span></div>
+              <div className="flex items-center gap-3"><span className="text-black">•</span><span className="text-slate-700">DOL Oversight Compliant</span></div>
             </div>
           </div>
         </div>
@@ -73,7 +73,7 @@ export default async function GovernmentPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Government Agencies We Serve
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-black max-w-3xl mx-auto">
               We partner with federal, state, and local agencies to deliver workforce 
               development programs that meet compliance requirements and achieve outcomes. 
               Our team understands the unique needs of government partners and provides 
@@ -96,22 +96,22 @@ export default async function GovernmentPage() {
                   <Building2 className="w-7 h-7 text-brand-blue-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Workforce Development Boards</h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-black mb-4">
                   Local and regional workforce boards seeking ETPL-approved training providers 
                   for WIOA-funded participants. We handle enrollment, training delivery, and 
                   outcome reporting with full transparency and compliance.
                 </p>
-                <ul className="space-y-2 text-sm text-gray-600">
+                <ul className="space-y-2 text-sm text-black">
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     WIOA Title I Adult & Dislocated Worker
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     Youth Programs (OSY & ISY)
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     Rapid Response Services
                   </li>
                 </ul>
@@ -132,22 +132,22 @@ export default async function GovernmentPage() {
                   <Users className="w-7 h-7 text-brand-green-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">State Agencies</h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-black mb-4">
                   State departments of labor, workforce development, and education seeking 
                   scalable training solutions that meet state and federal compliance requirements 
                   while delivering measurable employment outcomes.
                 </p>
-                <ul className="space-y-2 text-sm text-gray-600">
+                <ul className="space-y-2 text-sm text-black">
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     Department of Workforce Development
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     Department of Education
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     Vocational Rehabilitation
                   </li>
                 </ul>
@@ -168,22 +168,22 @@ export default async function GovernmentPage() {
                   <Shield className="w-7 h-7 text-brand-blue-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Federal Programs</h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-black mb-4">
                   Federal agencies and grant recipients seeking compliant training providers 
                   for workforce development initiatives and special population programs 
                   including veterans, reentry, and underserved communities.
                 </p>
-                <ul className="space-y-2 text-sm text-gray-600">
+                <ul className="space-y-2 text-sm text-black">
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     DOL Apprenticeship Programs
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     Reentry Programs (Job Ready Indy)
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     Veterans Programs (GI Bill, VR&E)
                   </li>
                 </ul>
@@ -201,12 +201,12 @@ export default async function GovernmentPage() {
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
                 Comprehensive Workforce Development Services
               </h2>
-              <p className="text-lg text-gray-600 mb-4">
+              <p className="text-lg text-black mb-4">
                 We provide end-to-end workforce development services that meet federal 
                 compliance requirements while delivering measurable outcomes for participants 
                 and funding agencies.
               </p>
-              <p className="text-gray-600 mb-8">
+              <p className="text-black mb-8">
                 Our approach combines industry-recognized training with wraparound support 
                 services to ensure participant success. We work closely with government 
                 partners to customize programs that address specific workforce needs and 
@@ -225,7 +225,7 @@ export default async function GovernmentPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-2">ETPL-Approved Training Programs</h3>
-                    <p className="text-gray-600">
+                    <p className="text-black">
                       Industry-recognized certifications in healthcare, IT, skilled trades, 
                       and business. All programs meet WIOA performance requirements and lead 
                       to credentials valued by employers in high-demand occupations.
@@ -244,7 +244,7 @@ export default async function GovernmentPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-2">Registered Apprenticeships</h3>
-                    <p className="text-gray-600">
+                    <p className="text-black">
                       DOL-registered apprenticeship programs with employer partners. 
                       Earn-and-learn model with structured OJT and related instruction 
                       that leads to journey-level credentials and sustainable careers.
@@ -263,7 +263,7 @@ export default async function GovernmentPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-2">Career Services & Job Placement</h3>
-                    <p className="text-gray-600">
+                    <p className="text-black">
                       Comprehensive career services including resume building, interview prep, 
                       and direct job placement with employer partners. We maintain relationships 
                       with 100+ employers actively hiring our graduates.
@@ -282,7 +282,7 @@ export default async function GovernmentPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-2">Compliance & Reporting</h3>
-                    <p className="text-gray-600">
+                    <p className="text-black">
                       Full compliance with WIOA, FERPA, ADA, and EEO requirements. 
                       Automated outcome tracking and reporting for funding agencies with 
                       real-time dashboards and quarterly performance reviews.
@@ -341,7 +341,7 @@ export default async function GovernmentPage() {
                     </div>
                   </div>
                 </div>
-                <p className="text-sm text-gray-500 mt-6">
+                <p className="text-sm text-black mt-6">
                   *Based on program year 2024 data for WIOA-funded participants
                 </p>
               </div>
@@ -357,7 +357,7 @@ export default async function GovernmentPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Why Partner With Elevate for Humanity
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-black max-w-3xl mx-auto">
               We understand the unique challenges government agencies face in workforce 
               development. Our team brings deep expertise in federal compliance, outcome 
               tracking, and serving priority populations.
@@ -379,7 +379,7 @@ export default async function GovernmentPage() {
                   <TrendingUp className="w-7 h-7 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">Proven Results</h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-black">
                   Consistent track record of exceeding WIOA performance measures across 
                   all primary indicators of performance.
                 </p>
@@ -400,7 +400,7 @@ export default async function GovernmentPage() {
                   <Target className="w-7 h-7 text-brand-green-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">Priority Populations</h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-black">
                   Specialized experience serving veterans, justice-involved individuals, 
                   and other priority populations with wraparound support.
                 </p>
@@ -421,7 +421,7 @@ export default async function GovernmentPage() {
                   <Handshake className="w-7 h-7 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">Employer Network</h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-black">
                   Strong relationships with 100+ employers actively hiring our graduates 
                   in healthcare, IT, and skilled trades.
                 </p>
@@ -442,7 +442,7 @@ export default async function GovernmentPage() {
                   <BarChart3 className="w-7 h-7 text-brand-orange-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">Transparent Reporting</h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-black">
                   Real-time dashboards and automated reporting that meets all federal 
                   and state compliance requirements.
                 </p>
@@ -459,7 +459,7 @@ export default async function GovernmentPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Eligible Funding Streams
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-black max-w-3xl mx-auto">
               Our programs are approved for multiple federal and state funding sources, 
               giving your agency flexibility in how you fund participant training.
             </p>
@@ -483,7 +483,7 @@ export default async function GovernmentPage() {
                     <IconComponent className="w-6 h-6 text-brand-blue-600" />
                   </div>
                   <h3 className="font-bold text-gray-900 mb-2">{item.name}</h3>
-                  <p className="text-sm text-gray-600">{item.desc}</p>
+                  <p className="text-sm text-black">{item.desc}</p>
                 </div>
               );
             })}
@@ -497,7 +497,7 @@ export default async function GovernmentPage() {
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
             Ready to Partner?
           </h2>
-          <p className="text-xl text-white/90 mb-8">
+          <p className="text-xl text-white mb-8">
             Contact us to discuss how we can support your workforce development goals. 
             Our team is ready to customize solutions that meet your agency&apos;s specific 
             needs and compliance requirements.

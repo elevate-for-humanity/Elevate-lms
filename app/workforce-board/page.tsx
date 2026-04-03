@@ -135,12 +135,10 @@ export default function WorkforceBoardPage() {
                     alt={feature.title}
                     fill
                     className="object-cover group-hover:scale-105 transition duration-300"
-                   sizes="100vw" />
-                  <h3 className="absolute bottom-4 left-4 text-xl font-bold text-white">
-                    {feature.title}
-                  </h3>
+                    sizes="100vw" />
                 </div>
                 <div className="p-4">
+                  <h3 className="text-base font-bold text-slate-900 mb-1">{feature.title}</h3>
                   <p className="text-slate-600 text-sm">{feature.description}</p>
                   <span className="inline-flex items-center gap-1 text-brand-blue-600 font-medium text-sm mt-2 group-hover:gap-2 transition-all">
                     Learn More <ArrowRight className="w-4 h-4" />

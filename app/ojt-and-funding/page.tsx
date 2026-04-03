@@ -62,11 +62,9 @@ export default function OjtAndFundingPage() {
               <div key={title} className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col">
                 <div className="relative h-40 flex-shrink-0">
                   <Image src={img} alt={title} fill sizes="300px" className="object-cover" />
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-3 py-2">
-                    <h3 className="font-bold text-slate-900 text-sm leading-tight">{title}</h3>
-                  </div>
                 </div>
                 <div className="p-4 flex-1">
+                  <h3 className="font-bold text-slate-900 text-sm leading-tight mb-1">{title}</h3>
                   <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
                 </div>
               </div>
@@ -85,11 +83,9 @@ export default function OjtAndFundingPage() {
               <div key={title} className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col">
                 <div className="relative h-44 flex-shrink-0">
                   <Image src={img} alt={title} fill sizes="400px" className="object-cover" />
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-4 py-2">
-                    <h3 className="font-bold text-slate-900 text-sm leading-tight">{title}</h3>
-                  </div>
                 </div>
                 <div className="p-4 flex-1">
+                  <h3 className="font-bold text-slate-900 text-sm leading-tight mb-1">{title}</h3>
                   <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
                 </div>
               </div>

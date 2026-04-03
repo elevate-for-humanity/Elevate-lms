@@ -80,11 +80,9 @@ export default function WorkKeysPage() {
               <div key={name} className="rounded-2xl overflow-hidden border border-slate-200 flex flex-col">
                 <div className="relative h-44 flex-shrink-0">
                   <Image src={img} alt={name} fill sizes="400px" className="object-cover" />
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-4 py-2">
-                    <h3 className="font-bold text-slate-900 text-sm">{name}</h3>
-                  </div>
                 </div>
                 <div className="p-4 flex-1 bg-white">
+                  <h3 className="font-bold text-slate-900 text-sm mb-1">{name}</h3>
                   <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
                 </div>
               </div>

@@ -153,31 +153,32 @@ export default function ProgramsPage() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* Hero — static image, no video/avatar */}
-      <section className="relative h-[60vh] min-h-[420px] max-h-[600px] overflow-hidden">
-        <Image
-          src="/images/pages/about-career-pathways.jpg"
-          alt="Career training at Elevate for Humanity"
-          fill
-          className="object-cover object-center"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/50 to-transparent" />
-        <div className="absolute inset-0 flex items-center">
-          <div className="max-w-5xl mx-auto px-6 w-full">
-            <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-3">Career Training Programs</p>
-            <h1 className="text-4xl sm:text-5xl font-extrabold text-white leading-tight mb-4 max-w-xl">
-              Start a Career —<br />Not Just a Class
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[55vh] min-h-[360px] max-h-[520px] overflow-hidden">
+          <Image
+            src="/images/pages/about-career-pathways.jpg"
+            alt="Career training at Elevate for Humanity"
+            fill
+            className="object-cover object-center"
+            priority
+            sizes="100vw"
+          />
+        </div>
+        <div className="bg-white py-10 border-t">
+          <div className="max-w-5xl mx-auto px-6 text-center">
+            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Career Training Programs</p>
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 leading-tight mb-4">
+              Start a Career — Not Just a Class
             </h1>
-            <p className="text-slate-200 text-lg max-w-lg mb-8 leading-relaxed">
+            <p className="text-slate-600 text-lg max-w-lg mx-auto mb-8 leading-relaxed">
               Short-term training. Real credentials. Most programs available at no cost to eligible Indiana residents.
             </p>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 justify-center">
               <Link href="/apply/student" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-xl transition-colors text-sm">
                 Apply Now
               </Link>
-              <a href="#programs" className="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold px-8 py-3.5 rounded-xl transition-colors text-sm">
+              <a href="#programs" className="bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 font-bold px-8 py-3.5 rounded-xl transition-colors text-sm">
                 Browse Programs
               </a>
             </div>

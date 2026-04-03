@@ -74,30 +74,33 @@ const scholarshipTypes = (dbRows as any[]) || [];
       </div>
 
       {/* Hero */}
-      <section className="relative h-[50vh] min-h-[400px] overflow-hidden">
-        <Image alt="Scholarship opportunities" 
-          src="/images/pages/scholarships-page-1.jpg" 
-          alt="Scholarships and Financial Aid" 
-          fill 
-          className="object-cover" 
-          priority 
-         sizes="100vw" />
-        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
-          <div className="max-w-5xl mx-auto">
+      <section className="relative w-full">
+        <div className="relative h-[50vh] min-h-[360px] overflow-hidden">
+          <Image
+            src="/images/pages/scholarships-page-1.jpg"
+            alt="Scholarships and Financial Aid"
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+          />
+        </div>
+        <div className="bg-white py-10 border-t">
+          <div className="max-w-5xl mx-auto px-6 text-center">
             <div className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
               <GraduationCap className="w-4 h-4" /> Funding Available
             </div>
-            <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-4">
-              Scholarships & Financial Aid
+            <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
+              Scholarships &amp; Financial Aid
             </h1>
-            <p className="text-xl text-white/90 max-w-xl mb-6">
+            <p className="text-lg text-slate-600 max-w-xl mx-auto mb-6">
               Don&apos;t let cost stop you. Most students pay $0 for training through WIOA funding, scholarships, and employer sponsorships.
             </p>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4 justify-center">
               <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 bg-brand-green-600 hover:bg-brand-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
                 Check Eligibility <ArrowRight className="w-5 h-5" />
               </Link>
-              <Link href="/start" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold text-lg transition-all border border-white/40">
+              <Link href="/start" className="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-900 px-8 py-4 rounded-full font-bold text-lg transition-all border border-slate-300">
                 Apply Now
               </Link>
             </div>

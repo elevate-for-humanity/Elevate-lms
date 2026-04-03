@@ -146,25 +146,26 @@ export default function LicensingPartnershipsPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-64 md:h-96 overflow-hidden">
-        <Image
-          src="/images/pages/workforce-partnership-hero.jpg"
-          alt="Workforce development partnerships — Elevate for Humanity"
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-slate-900/55" />
-        <div className="absolute inset-0 flex items-center">
-          <div className="max-w-6xl mx-auto px-6">
-            <p className="text-brand-red-300 font-bold text-xs uppercase tracking-widest mb-3">
+      <section className="relative w-full">
+        <div className="relative h-64 md:h-96 overflow-hidden">
+          <Image
+            src="/images/pages/workforce-partnership-hero.jpg"
+            alt="Workforce development partnerships — Elevate for Humanity"
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+          />
+        </div>
+        <div className="bg-white py-10 border-t">
+          <div className="max-w-6xl mx-auto px-6 text-center">
+            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">
               Licensing &amp; Partnerships
             </p>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight mb-4 max-w-3xl">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 leading-tight mb-4 max-w-3xl mx-auto">
               Build workforce programs on proven infrastructure.
             </h1>
-            <p className="text-slate-200 text-lg max-w-2xl">
+            <p className="text-slate-600 text-lg max-w-2xl mx-auto">
               License the platform, join the network, or partner as a training provider, employer, or community organization.
             </p>
           </div>

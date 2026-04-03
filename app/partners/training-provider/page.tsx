@@ -33,7 +33,7 @@ const BENEFITS = [
   {
     title: 'LMS & Student Tracking',
     desc: 'Access our platform for enrollment management, attendance tracking, credential issuance, and compliance reporting.',
-    image: '/images/pages/training-providers-page-1.jpg',
+    image: '/images/pages/partners-pub-page-1.jpg',
   },
   {
     title: 'Automated Outcome Reports',
@@ -94,9 +94,9 @@ export default function TrainingProviderPage() {
             <div>
               <h2 className="text-2xl font-bold text-slate-900 mb-6">Provider Requirements</h2>
               <ul className="space-y-4">
-                {REQUIREMENTS.map((r) => (
+                {REQUIREMENTS.map((r, i) => (
                   <li key={r} className="flex items-start gap-3">
-                    <span className="w-5 h-5 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xs flex-shrink-0 mt-0.5">✓</span>
+                    <span className="w-5 h-5 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">{i + 1}</span>
                     <span className="text-slate-700 text-sm">{r}</span>
                   </li>
                 ))}
@@ -122,11 +122,9 @@ export default function TrainingProviderPage() {
               <div key={item.step} className="rounded-xl overflow-hidden border border-slate-200 shadow-sm">
                 <div className="relative h-44 overflow-hidden">
                   <Image src={item.image} alt={item.title} fill sizes="33vw" className="object-cover" />
-                  <div className="absolute top-3 left-3 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow">
-                    {item.step}
-                  </div>
                 </div>
                 <div className="p-5">
+                  <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm mb-3">{item.step}</div>
                   <h3 className="font-bold text-slate-900 mb-1">{item.title}</h3>
                   <p className="text-slate-600 text-sm">{item.desc}</p>
                 </div>

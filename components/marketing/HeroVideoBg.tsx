@@ -5,7 +5,7 @@ import { Volume2, VolumeX } from 'lucide-react';
 
 interface HeroVideoBgProps {
   src: string;
-  poster?: string;
+  poster?: string; // kept for API compatibility — not rendered
   audioSrc?: string;
 }
 
@@ -13,25 +13,11 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [muted, setMuted] = useState(true);
-  const [videoReady, setVideoReady] = useState(false);
 
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-
-    // Mark ready on first frame
-    const onPlaying = () => setVideoReady(true);
-    v.addEventListener('playing', onPlaying, { once: true });
-
-    // Fallback: clear poster after 4s regardless (slow connection / autoplay blocked)
-    const timeout = setTimeout(() => setVideoReady(true), 4000);
-
     v.play().catch(() => {});
-
-    return () => {
-      v.removeEventListener('playing', onPlaying);
-      clearTimeout(timeout);
-    };
   }, []);
 
   // Start audio on first user interaction
@@ -70,21 +56,7 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
 
   return (
     <>
-      {/* Poster — LCP image, sits on top until video plays, then fades out */}
-      {poster && (
-        <img
-          src={poster}
-          alt=""
-          aria-hidden="true"
-          fetchPriority="high"
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
-            videoReady ? 'opacity-0 pointer-events-none' : 'opacity-100'
-          }`}
-          style={{ zIndex: videoReady ? 0 : 10 }}
-        />
-      )}
-
-      {/* Video — src set as attribute so browser starts loading on first render */}
+      {/* Video — no poster, dark bg shows until first frame loads */}
       <video
         ref={videoRef}
         src={src}
@@ -93,10 +65,8 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
         playsInline
         autoPlay
         aria-hidden="true"
-        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
-          videoReady ? 'opacity-100' : 'opacity-0'
-        }`}
-        style={{ zIndex: videoReady ? 10 : 0 }}
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ zIndex: 10 }}
       />
 
       {audioSrc && (

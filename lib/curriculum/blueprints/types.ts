@@ -265,6 +265,26 @@ export type CredentialBlueprint = {
    * without manual configuration per lesson.
    */
   videoConfig?: BlueprintVideoConfig;
+
+  /**
+   * Where the seeder reads lesson content (script_text), quiz_questions,
+   * passing_score, and step_type from.
+   *
+   * 'blueprint'           — content is embedded in lessons[].content /
+   *                         quizQuestions / passingScore (default for new programs).
+   *                         The production-content gate enforces all required fields.
+   *
+   * 'curriculum_lessons'  — content lives in the curriculum_lessons table, keyed
+   *                         by lesson_slug = lessons[].slug. The seeder fetches it
+   *                         at seed time and writes it into course_lessons.
+   *                         The production-content gate is bypassed for these rows
+   *                         because content is authoritative in the DB, not the file.
+   *                         step_type is also read from curriculum_lessons.step_type
+   *                         rather than inferred from the slug suffix.
+   *
+   * Defaults to 'blueprint' when omitted.
+   */
+  contentSource?: 'blueprint' | 'curriculum_lessons';
 };
 
 // ─── Audit result types (consumed by auditor.ts) ──────────────────────────────

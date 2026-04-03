@@ -20,6 +20,18 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import type { CredentialBlueprint, BlueprintModule, BlueprintLessonRef, BlueprintVideoConfig } from '../blueprints/types';
 import { logger } from '@/lib/logger';
 
+// ─── curriculum_lessons row shape (fields we read) ───────────────────────────
+
+type CurriculumRow = {
+  lesson_slug:      string;
+  script_text:      string | null;
+  step_type:        string | null;
+  passing_score:    number | null;
+  quiz_questions:   unknown | null;
+  duration_minutes: number | null;
+  video_file:       string | null;
+};
+
 // ─── Production completeness contract ────────────────────────────────────────
 //
 // A lesson row is only inserted when it carries the full production payload
@@ -263,6 +275,28 @@ export async function buildCanonicalCourseFromBlueprint(
     }
   }
 
+  // ── 4b. Pre-fetch curriculum_lessons content when contentSource = 'curriculum_lessons' ──
+  // Bulk-fetch all matching rows up front to avoid N+1 queries in the lesson loop.
+  const curriculumMap = new Map<string, CurriculumRow>();
+  if (input.blueprint.contentSource === 'curriculum_lessons') {
+    const allSlugs = input.blueprint.modules.flatMap(m => (m.lessons ?? []).map(l => l.slug));
+    if (allSlugs.length > 0) {
+      const { data: curRows, error: curErr } = await db
+        .from('curriculum_lessons')
+        .select('lesson_slug, script_text, step_type, passing_score, quiz_questions, duration_minutes, video_file')
+        .in('lesson_slug', allSlugs);
+
+      if (curErr) {
+        warnings.push(`curriculum_lessons fetch failed: ${curErr.message} — lessons will have no content`);
+      } else {
+        for (const row of curRows ?? []) {
+          curriculumMap.set(row.lesson_slug, row as CurriculumRow);
+        }
+        logger.info(`[seeder] Loaded ${curriculumMap.size}/${allSlugs.length} rows from curriculum_lessons`);
+      }
+    }
+  }
+
   // ── 5. Upsert modules + lessons in blueprint order ────────────────────────
   let totalLessons    = 0;
   let skipped         = 0;
@@ -288,32 +322,52 @@ export async function buildCanonicalCourseFromBlueprint(
         continue;
       }
 
-      // ── Production-content gate ──────────────────────────────────────────
-      // A lesson row is only inserted when it carries the full production
-      // payload required for its step_type. No draft shells. No placeholders.
-      const stepType   = inferStepType(lessonRef.slug);
-      const violations = validateProductionContent(lessonRef, stepType);
+      if (input.blueprint.contentSource === 'curriculum_lessons') {
+        // ── DB-sourced content path ────────────────────────────────────────
+        // Content, step_type, quiz_questions, and passing_score all come from
+        // curriculum_lessons. The production-content gate is skipped — the DB
+        // is the authority. A missing curriculum row is a warning, not a failure.
+        const curRow = curriculumMap.get(lessonRef.slug);
+        if (!curRow) {
+          warnings.push(`No curriculum_lessons row for slug '${lessonRef.slug}' — lesson inserted without content`);
+        }
 
-      if (violations.length > 0) {
-        const failure: LessonFailure = {
-          slug:       lessonRef.slug,
-          title:      lessonRef.title,
-          stepType,
-          violations,
-        };
-        contentFailures.push(failure);
-        logger.error(
-          `[seeder] SKIP ${lessonRef.slug} (${stepType}) — missing production content:`,
-          violations.map(v => `${v.field}: ${v.reason}`).join(', '),
+        const ok = await upsertLessonFromCurriculum(
+          db, courseId, moduleId, mod, lessonRef, curRow ?? null, input.blueprint.videoConfig,
         );
-        continue; // no row created
-      }
-
-      const ok = await upsertLesson(db, courseId, moduleId, mod, lessonRef, input.blueprint.videoConfig);
-      if (ok) {
-        totalLessons++;
+        if (ok) {
+          totalLessons++;
+        } else {
+          warnings.push(`Lesson '${lessonRef.slug}' failed to upsert — see console for DB error`);
+        }
       } else {
-        warnings.push(`Lesson '${lessonRef.slug}' failed to upsert — see console for DB error`);
+        // ── Blueprint-embedded content path (default) ──────────────────────
+        // Production-content gate: a lesson row is only inserted when it carries
+        // the full payload required for its step_type. No draft shells.
+        const stepType   = inferStepType(lessonRef.slug);
+        const violations = validateProductionContent(lessonRef, stepType);
+
+        if (violations.length > 0) {
+          const failure: LessonFailure = {
+            slug:       lessonRef.slug,
+            title:      lessonRef.title,
+            stepType,
+            violations,
+          };
+          contentFailures.push(failure);
+          logger.error(
+            `[seeder] SKIP ${lessonRef.slug} (${stepType}) — missing production content:`,
+            violations.map(v => `${v.field}: ${v.reason}`).join(', '),
+          );
+          continue;
+        }
+
+        const ok = await upsertLesson(db, courseId, moduleId, mod, lessonRef, input.blueprint.videoConfig);
+        if (ok) {
+          totalLessons++;
+        } else {
+          warnings.push(`Lesson '${lessonRef.slug}' failed to upsert — see console for DB error`);
+        }
       }
     }
   }
@@ -465,7 +519,8 @@ async function upsertLesson(
 
 /**
  * Infer lesson_type from slug suffix.
- * Blueprint lesson refs don't carry stepType — use slug conventions.
+ * Used for blueprint-embedded content path only.
+ * For curriculum_lessons path, step_type is read directly from the DB row.
  */
 export function inferStepType(slug: string): string {
   if (slug.endsWith('-checkpoint')) return 'checkpoint';
@@ -475,4 +530,69 @@ export function inferStepType(slug: string): string {
   if (slug.endsWith('-assignment')) return 'assignment';
   if (slug.endsWith('-certification')) return 'certification';
   return 'lesson';
+}
+
+/**
+ * Upsert a lesson whose content comes from a curriculum_lessons row.
+ * step_type is read from cur.step_type (not inferred from slug suffix).
+ * Content, quiz_questions, passing_score, and video_url are all DB-sourced.
+ */
+async function upsertLessonFromCurriculum(
+  db: ReturnType<typeof createAdminClient>,
+  courseId: string,
+  moduleId: string,
+  mod: BlueprintModule,
+  lessonRef: BlueprintLessonRef,
+  cur: CurriculumRow | null,
+  videoConfig?: BlueprintVideoConfig,
+): Promise<boolean> {
+  const orderIndex = mod.orderIndex * 1000 + lessonRef.order;
+
+  // step_type: use DB value when available, fall back to slug-suffix inference
+  const stepType = cur?.step_type ?? inferStepType(lessonRef.slug);
+  const activities = defaultActivities(stepType);
+
+  const payload: Record<string, unknown> = {
+    course_id:    courseId,
+    module_id:    moduleId,
+    slug:         lessonRef.slug,
+    title:        lessonRef.title,
+    lesson_type:  stepType,
+    order_index:  orderIndex,
+    is_required:  true,
+    is_published: true,
+    status:       'published',
+    activities,
+    ...(videoConfig ? { video_config: videoConfig } : {}),
+  };
+
+  // Merge curriculum_lessons content when available
+  if (cur) {
+    if (cur.script_text)      payload.content          = cur.script_text;
+    if (cur.quiz_questions)   payload.quiz_questions   = cur.quiz_questions;
+    if (cur.passing_score)    payload.passing_score    = cur.passing_score;
+    if (cur.duration_minutes) payload.duration_minutes = cur.duration_minutes;
+    if (cur.video_file)       payload.video_url        = cur.video_file;
+  }
+
+  const { data: existing } = await db
+    .from('course_lessons')
+    .select('id')
+    .eq('course_id', courseId)
+    .eq('slug', lessonRef.slug)
+    .maybeSingle();
+
+  if (existing?.id) {
+    const { id: _, course_id: __, slug: ___, ...updateFields } = payload as Record<string, unknown>;
+    const { error } = await db
+      .from('course_lessons')
+      .update({ ...updateFields, updated_at: new Date().toISOString() })
+      .eq('id', existing.id);
+    if (error) logger.error(`[seeder] DB update error [${lessonRef.slug}]:`, error.message);
+    return !error;
+  }
+
+  const { error } = await db.from('course_lessons').insert(payload);
+  if (error) logger.error(`[seeder] DB insert error [${lessonRef.slug}]:`, error.message);
+  return !error;
 }

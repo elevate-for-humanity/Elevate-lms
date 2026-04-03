@@ -52,6 +52,12 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
   expectedModuleCount: 10,
   expectedLessonCount: 95,
 
+  // Content (script_text, quiz_questions, passing_score, step_type, video_file)
+  // lives in curriculum_lessons, not in this file. The seeder reads it from the
+  // DB at seed time and writes it into course_lessons. The production-content
+  // gate in the builder is bypassed for this blueprint.
+  contentSource: 'curriculum_lessons',
+
   generationRules: {
     allowRemediation: true,
     allowExpansionLessons: false,

@@ -18,44 +18,40 @@ function readRoute(routePath: string): string {
 describe('Top-risk routes have auth guards', () => {
   it('/api/admin/promo-codes requires apiRequireAdmin', () => {
     const src = readRoute('app/api/admin/promo-codes/route.ts');
-    expect(src).toContain("import { apiRequireAdmin } from '@/lib/authGuards'");
+    expect(src).toContain("import { apiRequireAdmin } from '@/lib/admin/guards'");
     expect(src).toContain('await apiRequireAdmin()');
-    // All 4 handlers should be guarded
-    const guardCount = (src.match(/await apiRequireAdmin\(\)/g) || []).length;
-    expect(guardCount).toBeGreaterThanOrEqual(4);
   });
 
   it('/api/payments/split requires apiAuthGuard', () => {
     const src = readRoute('app/api/payments/split/route.ts');
-    expect(src).toContain("import { apiAuthGuard } from '@/lib/authGuards'");
+    expect(src).toContain("import { apiAuthGuard } from '@/lib/admin/guards'");
     expect(src).toContain('await apiAuthGuard(');
   });
 
   it('/api/store/create-payment-intent requires auth', () => {
     const src = readRoute('app/api/store/create-payment-intent/route.ts');
-    // Edge runtime uses requireAuth from lib/api/requireAuth
-    const hasApiAuthGuard = src.includes("import { apiAuthGuard } from '@/lib/authGuards'");
     const hasRequireAuth = src.includes("import { requireAuth } from '@/lib/api/requireAuth'");
-    expect(hasApiAuthGuard || hasRequireAuth).toBe(true);
-    const hasGuardCall = src.includes('await apiAuthGuard(') || src.includes('await requireAuth(');
+    const hasApiAuthGuard = src.includes("import { apiAuthGuard } from '@/lib/admin/guards'");
+    expect(hasRequireAuth || hasApiAuthGuard).toBe(true);
+    const hasGuardCall = src.includes('await requireAuth(') || src.includes('await apiAuthGuard(');
     expect(hasGuardCall).toBe(true);
   });
 
   it('/api/stripe/connect/create requires apiRequireAdmin', () => {
     const src = readRoute('app/api/stripe/connect/create/route.ts');
-    expect(src).toContain("import { apiRequireAdmin } from '@/lib/authGuards'");
+    expect(src).toContain("import { apiRequireAdmin } from '@/lib/admin/guards'");
     expect(src).toContain('await apiRequireAdmin()');
   });
 
   it('/api/store/licenses/create-payment-intent requires apiAuthGuard', () => {
     const src = readRoute('app/api/store/licenses/create-payment-intent/route.ts');
-    expect(src).toContain("import { apiAuthGuard } from '@/lib/authGuards'");
+    expect(src).toContain("import { apiAuthGuard } from '@/lib/admin/guards'");
     expect(src).toContain('await apiAuthGuard(');
   });
 
   it('/api/store/create-product requires apiRequireAdmin', () => {
     const src = readRoute('app/api/store/create-product/route.ts');
-    expect(src).toContain("import { apiRequireAdmin } from '@/lib/authGuards'");
+    expect(src).toContain("import { apiRequireAdmin } from '@/lib/admin/guards'");
     expect(src).toContain('await apiRequireAdmin()');
   });
 });

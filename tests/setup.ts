@@ -2,6 +2,39 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 
+// jsdom does not implement window.matchMedia — provide a default stub so
+// any test that imports a component/hook using matchMedia doesn't crash.
+// Individual tests can override this with vi.fn() as needed.
+if (typeof window !== 'undefined' && !window.matchMedia) {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    configurable: true,
+    value: (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    }),
+  });
+}
+
+// jsdom does not implement IntersectionObserver — stub it so components
+// that use it (e.g. CanonicalVideo) don't throw in unit tests.
+if (typeof window !== 'undefined' && !window.IntersectionObserver) {
+  class IntersectionObserverStub {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+  Object.defineProperty(window, 'IntersectionObserver', {
+    writable: true,
+    configurable: true,
+    value: IntersectionObserverStub,
+  });
+}
+
 // Mock Next.js router
 vi.mock('next/navigation', () => ({
   useRouter: () => ({

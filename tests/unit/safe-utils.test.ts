@@ -2,7 +2,7 @@
  * Unit tests for type-safe helpers from lib/safe.ts
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { date, isRecord, rec, str, num, bool, arr, toDateString, toError, toErrorMessage } from '../../lib/safe';
 
 describe('isRecord', () => {
@@ -122,6 +122,14 @@ describe('toError', () => {
 });
 
 describe('toErrorMessage', () => {
+  beforeEach(() => {
+    // toErrorMessage returns real messages in development only.
+    // Tests run in 'test' env — set to development to exercise the real-message path.
+    vi.stubEnv('NODE_ENV', 'development');
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
   it('should return message from Error', () => {
     expect(toErrorMessage(new Error('test message'))).toBe('test message');
   });

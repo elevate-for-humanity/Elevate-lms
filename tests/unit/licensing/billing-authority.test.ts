@@ -444,10 +444,17 @@ describe('billing-authority', () => {
       expect(result.canMutate).toBe(false);
     });
 
-    it('returns blocked for no license', () => {
-      const result = getLicenseAccessMode(null, 'admin', now);
+    it('returns blocked for no license (non-admin)', () => {
+      const result = getLicenseAccessMode(null, 'student', now);
       expect(result.mode).toBe('blocked');
       expect(result.redirectTo).toContain('reason=missing');
+    });
+
+    it('returns full for admin with no license (admin bypass)', () => {
+      // Admins always get access so they can fix licensing issues.
+      const result = getLicenseAccessMode(null, 'admin', now);
+      expect(result.mode).toBe('full');
+      expect(result.reason).toBe('no_license_admin_bypass');
     });
   });
 });

@@ -22,9 +22,8 @@ describe('WorkOnePartnerPacketPage', () => {
     render(<WorkOnePartnerPacketPage />);
     const video = document.querySelector('video');
     expect(video).toBeTruthy();
-    // Boolean attributes in HTML become empty strings
-    expect(video).toHaveAttribute('autoplay');
-    expect(video).toHaveAttribute('loop');
+    // CanonicalVideo always sets muted and playsInline.
+    // Autoplay is triggered imperatively via video.play() — not an HTML attribute.
     expect(video).toHaveAttribute('playsinline');
   });
 

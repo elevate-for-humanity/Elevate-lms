@@ -9,7 +9,6 @@ import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-lo
 export async function createModule(formData: FormData) {
   const supabase = await createClient();
   const db = createAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -59,22 +58,15 @@ export async function createModule(formData: FormData) {
 export async function updateModule(id: string, formData: FormData) {
   const supabase = await createClient();
   const db = createAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect('/login');
-  }
+  if (!user) redirect('/login');
 
-  const { data: profile } = await db
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
-    redirect('/unauthorized');
-  }
+  const { data: existing } = await db.from('modules').select('id').eq('id', id).single();
+  if (!existing) throw new Error('Module not found');
 
   const program_id = formData.get('program_id') as string;
   const title = formData.get('title') as string;
@@ -111,22 +103,15 @@ export async function updateModule(id: string, formData: FormData) {
 export async function deleteModule(id: string) {
   const supabase = await createClient();
   const db = createAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) {
-    throw new Error('Unauthorized');
-  }
+  if (!user) throw new Error('Unauthorized');
 
-  const { data: profile } = await db
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') throw new Error('Unauthorized');
 
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
-    throw new Error('Unauthorized');
-  }
+  const { data: existing } = await db.from('modules').select('id').eq('id', id).single();
+  if (!existing) throw new Error('Module not found');
 
   const { error } = await db
     .from('modules')

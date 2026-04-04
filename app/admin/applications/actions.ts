@@ -29,8 +29,6 @@ export async function approveApplication(id: string): Promise<void> {
   }
 
   const db = createAdminClient();
-  if (!db) throw new Error('Database unavailable');
-
   const result = await runApprovalPipeline(db, { applicationId: id });
 
   if (!result.success) {
@@ -61,7 +59,16 @@ export async function rejectApplication(id: string): Promise<void> {
   }
 
   const db = createAdminClient();
-  if (!db) throw new Error('Database unavailable');
+
+  // Confirm the application exists and is in a rejectable state before mutating.
+  const { data: record, error: fetchError } = await db
+    .from('applications')
+    .select('id, status')
+    .eq('id', id)
+    .single();
+
+  if (fetchError || !record) throw new Error('Application not found');
+  if (record.status === 'rejected') throw new Error('Application already rejected');
 
   const { error } = await db
     .from('applications')
@@ -69,7 +76,7 @@ export async function rejectApplication(id: string): Promise<void> {
     .eq('id', id);
 
   if (error) {
-    logger.error('[admin/applications/actions] rejectApplication failed', { id, error: error.message });
+    logger.error('[admin/applications/actions] rejectApplication failed', { id });
     throw new Error('Failed to reject application');
   }
 

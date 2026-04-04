@@ -10,7 +10,6 @@ import { logger } from '@/lib/logger';
 export async function createGrantOpportunity(formData: FormData) {
   const supabase = await createClient();
   const db = createAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -59,14 +58,14 @@ export async function createGrantOpportunity(formData: FormData) {
 export async function updateGrantOpportunity(id: string, formData: FormData) {
   const supabase = await createClient();
   const db = createAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
   
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return { error: 'Not authenticated' };
-  }
+  if (!user) return { error: 'Not authenticated' };
   const { data: _p } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!_p || !['admin', 'super_admin'].includes(_p.role)) return { error: 'Forbidden' };
+
+  const { data: existing } = await db.from('grant_opportunities').select('id').eq('id', id).single();
+  if (!existing) return { error: 'Grant not found' };
 
   const focusAreas = (formData.get('focusAreas') as string)
     ?.split(',')
@@ -108,9 +107,14 @@ export async function updateGrantOpportunity(id: string, formData: FormData) {
 export async function deleteGrantOpportunity(id: string) {
   const supabase = await createClient();
   const db = createAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
   const { data: { user } } = await supabase.auth.getUser();
-  
+  if (!user) return { error: 'Not authenticated' };
+  const { data: _p } = await db.from('profiles').select('role').eq('id', user.id).single();
+  if (!_p || !['admin', 'super_admin'].includes(_p.role)) return { error: 'Forbidden' };
+
+  const { data: existing } = await db.from('grant_opportunities').select('id').eq('id', id).single();
+  if (!existing) return { error: 'Grant not found' };
+
   const { error } = await db
     .from('grant_opportunities')
     .delete()
@@ -131,7 +135,6 @@ export async function deleteGrantOpportunity(id: string) {
 export async function createGrantApplication(formData: FormData) {
   const supabase = await createClient();
   const db = createAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -174,8 +177,10 @@ export async function updateGrantApplicationStatus(
 ) {
   const supabase = await createClient();
   const db = createAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
-  
+
+  const { data: existing } = await db.from('grant_applications').select('id').eq('id', id).single();
+  if (!existing) return { error: 'Grant application not found' };
+
   const updateData: Record<string, unknown> = {
     status,
     updated_at: new Date().toISOString(),

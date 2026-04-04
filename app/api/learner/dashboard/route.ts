@@ -45,7 +45,7 @@ async function _GET(request: NextRequest) {
           required_hours,
           rapids_status,
           rapids_id,
-          milady_enrolled,
+          lms_enrolled,
           shop_id,
           created_at,
           programs (
@@ -156,7 +156,7 @@ async function _GET(request: NextRequest) {
         status: enrollment.status,
         rapidsStatus: enrollment.rapids_status || 'pending',
         rapidsId: enrollment.rapids_id,
-        lmsEnrolled: enrollment.milady_enrolled || false, // DB column milady_enrolled = LMS access granted
+        lmsEnrolled: enrollment.lms_enrolled || false, // DB column lms_enrolled = LMS access granted
         startDate: new Date(enrollment.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
         expectedCompletion: 'December 2026',
       } : null,

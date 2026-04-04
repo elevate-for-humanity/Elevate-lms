@@ -214,7 +214,7 @@ async function _POST(req: Request) {
     if (programSlug === 'barber-apprenticeship') {
       await supabase
         .from('program_enrollments')
-        .update({ milady_enrolled: true }) // DB column — marks LMS access granted
+        .update({ lms_enrolled: true }) // DB column — marks LMS access granted
         .eq('id', enrollmentId);
       logger.info('LMS access granted', { userId, enrollmentId });
     }

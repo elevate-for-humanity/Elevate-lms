@@ -36,7 +36,7 @@ const supabase = await createClient();
         required_hours,
         rapids_status,
         rapids_id,
-        milady_enrolled,
+        lms_enrolled,
         shop_id,
         programs (
           name,
@@ -120,7 +120,7 @@ const supabase = await createClient();
     // Get state board readiness
     const { data: stateBoardData } = await supabase
       .from('state_board_readiness')
-      .select('ready_for_exam, milady_completed, practical_skills_verified')
+      .select('ready_for_exam, lms_completed, practical_skills_verified')
       .eq('student_id', user.id)
       .maybeSingle();
 
@@ -155,11 +155,11 @@ const supabase = await createClient();
       rapids_registration_date: rapidsData?.registration_date || null,
       
       // LMS enrollment status (DB columns retain milady_ prefix until migration)
-      milady_enrolled: enrollment?.milady_enrolled || false,
-      milady_completed: stateBoardData?.milady_completed || false,
+      lms_enrolled: enrollment?.lms_enrolled || false,
+      lms_completed: stateBoardData?.lms_completed || false,
       
       // State board readiness
-      ready_for_exam: readyForExam && (stateBoardData?.milady_completed || false),
+      ready_for_exam: readyForExam && (stateBoardData?.lms_completed || false),
       practical_skills_verified: stateBoardData?.practical_skills_verified || false,
       
       // Shop info

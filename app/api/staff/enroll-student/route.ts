@@ -165,7 +165,7 @@ async function _POST(request: NextRequest) {
         program_id: programId || null,
         funding_type: fundingType || 'workforce',
         status: 'active', // Active immediately - Elevate paid
-        milady_enrolled: true, // DB column — marks LMS access granted
+        lms_enrolled: true, // DB column — marks LMS access granted
         enrolled_by: staffId || user.id,
         docs_verified: true, // Staff verified docs during enrollment
         docs_verified_at: new Date().toISOString(),

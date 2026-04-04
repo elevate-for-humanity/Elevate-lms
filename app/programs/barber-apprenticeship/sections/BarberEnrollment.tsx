@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, Phone, Shield, CreditCard, DollarSign, Building2, Scissors } from 'lucide-react';
 import { ProgramTutorCTA } from '@/components/ProgramTutorCTA';
 import { ENROLLMENT_STEPS, ELIGIBILITY } from '../barber-program-data';
-import { BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
+import { ACTIVE_BNPL_PROVIDERS, BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
 
 export function BarberEnrollment() {
   return (
@@ -41,18 +41,19 @@ export function BarberEnrollment() {
             <div className="bg-white rounded-xl p-5 border border-slate-200 text-center">
               <CreditCard className="w-8 h-8 text-brand-blue-600 mx-auto mb-2" />
               <h3 className="font-bold text-slate-900 mb-1">Buy Now, Pay Later</h3>
-              <p className="text-black text-xs mb-3">Klarna &amp; Afterpay available at checkout</p>
+              <p className="text-black text-xs mb-3">Choose your provider at checkout</p>
               <div className="flex flex-col gap-2 mb-3">
-                <span className="inline-block w-full bg-pink-100 text-pink-700 text-xs font-bold px-3 py-2 rounded-lg">Klarna — 4 interest-free installments</span>
-                <span className="inline-block w-full bg-teal-100 text-teal-700 text-xs font-bold px-3 py-2 rounded-lg">Afterpay — 4 interest-free payments</span>
+                {ACTIVE_BNPL_PROVIDERS.map((p) => (
+                  <Link
+                    key={p.id}
+                    href={`/programs/barber-apprenticeship/apply?type=apprentice&payment=${p.id}`}
+                    className={`inline-block w-full ${p.badgeBg} ${p.badgeText} text-xs font-bold px-3 py-2 rounded-lg transition-opacity hover:opacity-80`}
+                  >
+                    {p.name} — {p.description}
+                  </Link>
+                ))}
               </div>
-              <Link
-                href="/programs/barber-apprenticeship/apply?type=apprentice&payment=bnpl"
-                className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors"
-              >
-                Choose at Checkout &rarr;
-              </Link>
-              <p className="text-black text-[10px] mt-2">Subject to provider approval</p>
+              <p className="text-black text-[10px]">Subject to provider approval</p>
             </div>
           </div>
           <p className="mt-4 text-xs text-black text-center max-w-2xl mx-auto">

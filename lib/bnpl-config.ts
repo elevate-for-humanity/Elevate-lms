@@ -53,7 +53,7 @@ export const BNPL_PROVIDERS: BnplProvider[] = [
     minAmount: 35,
     maxAmount: 10000,
     description: '4 interest-free installments',
-    enabled: false, // no checkout API — enable when integrated
+    enabled: true, // via Stripe checkout — activate in Stripe Dashboard → Payment methods
   },
   {
     id: 'afterpay',
@@ -63,7 +63,7 @@ export const BNPL_PROVIDERS: BnplProvider[] = [
     minAmount: 35,
     maxAmount: 2000,
     description: '4 interest-free payments',
-    enabled: false, // no checkout API — enable when integrated
+    enabled: true, // via Stripe checkout — activate in Stripe Dashboard → Payment methods
   },
   {
     id: 'zip',

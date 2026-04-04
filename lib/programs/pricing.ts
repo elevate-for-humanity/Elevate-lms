@@ -91,6 +91,94 @@ export function getWeeklyPaymentExamples() {
   ];
 }
 
+// ─── BOOTH RENTAL PRICING ────────────────────────────────────────────────────
+//
+// Weekly booth/suite rental rates for Elevate's barbershop.
+// Deposit = 1 week's rent, collected once at signup via Stripe before
+// the first weekly charge begins.
+//
+// Late fee policy:
+//   - $25 flat fee on day 1 past due
+//   - $10/day for each additional day (days 2–5)
+//   - Termination initiated at 5 days past due
+//
+// Billing day: Friday (same as apprenticeship program)
+
+export type BoothRentalDiscipline = 'barber' | 'cosmetologist' | 'nail_tech' | 'esthetician';
+
+export interface BoothRentalTier {
+  discipline: BoothRentalDiscipline;
+  label: string;
+  spaceType: 'Booth' | 'Suite';
+  weeklyRateDollars: number;
+  weeklyRateCents: number;
+  depositDollars: number;   // 1 week's rent
+  depositCents: number;
+  stripePriceKey: string;   // key into PRICES for the weekly subscription
+  stripeDepositKey: string; // key into PRICES for the one-time deposit
+}
+
+export const BOOTH_RENTAL_TIERS: Record<BoothRentalDiscipline, BoothRentalTier> = {
+  barber: {
+    discipline: 'barber',
+    label: 'Barber',
+    spaceType: 'Booth',
+    weeklyRateDollars: 150,
+    weeklyRateCents: 15000,
+    depositDollars: 150,
+    depositCents: 15000,
+    stripePriceKey: 'BOOTH_BARBER_WEEKLY',
+    stripeDepositKey: 'BOOTH_BARBER_DEPOSIT',
+  },
+  cosmetologist: {
+    discipline: 'cosmetologist',
+    label: 'Cosmetologist',
+    spaceType: 'Booth',
+    weeklyRateDollars: 150,
+    weeklyRateCents: 15000,
+    depositDollars: 150,
+    depositCents: 15000,
+    stripePriceKey: 'BOOTH_COSMO_WEEKLY',
+    stripeDepositKey: 'BOOTH_COSMO_DEPOSIT',
+  },
+  nail_tech: {
+    discipline: 'nail_tech',
+    label: 'Nail Technician',
+    spaceType: 'Booth',
+    weeklyRateDollars: 150,
+    weeklyRateCents: 15000,
+    depositDollars: 150,
+    depositCents: 15000,
+    stripePriceKey: 'BOOTH_NAIL_WEEKLY',
+    stripeDepositKey: 'BOOTH_NAIL_DEPOSIT',
+  },
+  esthetician: {
+    discipline: 'esthetician',
+    label: 'Esthetician',
+    spaceType: 'Suite',
+    weeklyRateDollars: 160,
+    weeklyRateCents: 16000,
+    depositDollars: 0,    // no deposit for esthetician suite
+    depositCents: 0,
+    stripePriceKey: 'BOOTH_ESTHI_WEEKLY',
+    stripeDepositKey: '',  // no deposit charge
+  },
+};
+
+export const BOOTH_LATE_FEE = {
+  initialFeeDollars: 25,   // charged on day 1 past due
+  dailyFeeDollars: 10,     // charged each additional day (days 2–5)
+  terminationDays: 5,      // access terminated after this many days past due
+} as const;
+
+/**
+ * Get booth rental tier by discipline slug.
+ * Returns null for unknown disciplines.
+ */
+export function getBoothRentalTier(discipline: string): BoothRentalTier | null {
+  return BOOTH_RENTAL_TIERS[discipline as BoothRentalDiscipline] ?? null;
+}
+
 /**
  * Format currency for display
  */

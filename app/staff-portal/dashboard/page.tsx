@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
-import { Users, BookOpen, AlertCircle, Clock, UserPlus, DollarSign, FileText, Timer, CalendarOff, ClipboardList } from 'lucide-react';
+import { Users, BookOpen, AlertCircle, Clock, UserPlus, DollarSign, FileText, Timer, CalendarOff, ClipboardList, Scissors } from 'lucide-react';
 import { safeFormatDate } from '@/lib/format-utils';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -303,6 +303,31 @@ export default async function StaffDashboard() {
                 <p>No recent enrollments</p>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Booth Renters — visible to all staff */}
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold text-black mb-4">Booth &amp; Suite Rentals</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Link href="/staff-portal/booth-renters" className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all">
+              <div className="w-10 h-10 rounded-lg bg-brand-blue-50 flex items-center justify-center flex-shrink-0">
+                <Scissors className="w-5 h-5 text-brand-blue-600" />
+              </div>
+              <div>
+                <div className="font-semibold text-slate-900 text-sm">Manage Renters</div>
+                <div className="text-xs text-slate-500 mt-0.5">View all booth renters, payment status, and MOU</div>
+              </div>
+            </Link>
+            <Link href="/booth-rental/apply" className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all">
+              <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                <UserPlus className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div>
+                <div className="font-semibold text-slate-900 text-sm">Add New Renter</div>
+                <div className="text-xs text-slate-500 mt-0.5">Start the signup and payment flow</div>
+              </div>
+            </Link>
           </div>
         </div>
 

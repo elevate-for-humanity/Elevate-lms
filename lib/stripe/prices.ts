@@ -83,6 +83,18 @@ export const PRICES = {
   CR_GUIDE: getStripePrice('CR_GUIDE'),
   CR_ENTERPRISE: getStripePrice('CR_ENTERPRISE'),
 
+  // Booth rentals — weekly subscriptions
+  BOOTH_BARBER_WEEKLY:    getStripePrice('BOOTH_BARBER_WEEKLY'),
+  BOOTH_COSMO_WEEKLY:     getStripePrice('BOOTH_COSMO_WEEKLY'),
+  BOOTH_NAIL_WEEKLY:      getStripePrice('BOOTH_NAIL_WEEKLY'),
+  BOOTH_ESTHI_WEEKLY:     getStripePrice('BOOTH_ESTHI_WEEKLY'),
+
+  // Booth rental deposits — one-time charges at signup
+  BOOTH_BARBER_DEPOSIT:   getStripePrice('BOOTH_BARBER_DEPOSIT'),
+  BOOTH_COSMO_DEPOSIT:    getStripePrice('BOOTH_COSMO_DEPOSIT'),
+  BOOTH_NAIL_DEPOSIT:     getStripePrice('BOOTH_NAIL_DEPOSIT'),
+  // No esthetician deposit
+
   // Misc
   STUDENT: getStripePrice('STUDENT'),
   CAREER: getStripePrice('CAREER'),

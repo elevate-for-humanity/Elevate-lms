@@ -3,29 +3,28 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { AdminPageShell, AdminCard } from '@/components/admin/AdminPageShell';
-import { BarChart3, Users, GraduationCap, DollarSign, TrendingUp, FileText, Download, HeartHandshake } from 'lucide-react';
+import { Users, GraduationCap, TrendingUp, DollarSign, FileText, HeartHandshake, Download, ChevronRight, ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { robots: { index: false, follow: false }, title: 'Reports | Admin' };
 
-const REPORT_TYPES = [
-  { title: 'Student Roster',         desc: 'All enrolled students with contact info and program',    href: '/admin/reports/students',       icon: Users,          format: 'CSV / PDF' },
-  { title: 'Enrollment Summary',     desc: 'Enrollment counts by program, status, and date range',  href: '/admin/reports/enrollments',    icon: TrendingUp,     format: 'CSV / PDF' },
-  { title: 'Completion Report',      desc: 'Graduates, certificates issued, pass rates',             href: '/admin/reports/completions',    icon: GraduationCap,  format: 'CSV / PDF' },
-  { title: 'WIOA Performance',       desc: 'DOL-required outcomes: employment, earnings, retention', href: '/admin/reports/wioa',           icon: HeartHandshake, format: 'PDF' },
-  { title: 'Revenue & Payments',     desc: 'Payments received, refunds, funding by source',         href: '/admin/reports/revenue',        icon: DollarSign,     format: 'CSV / PDF' },
-  { title: 'Attendance Report',      desc: 'Daily attendance records by program and instructor',    href: '/admin/reports/attendance',     icon: FileText,       format: 'CSV / PDF' },
+const REPORTS = [
+  { title: 'Student Roster',       desc: 'All enrolled students with contact info and program',    href: '/admin/reports/students',     icon: Users,          format: 'CSV / PDF' },
+  { title: 'Enrollment Summary',   desc: 'Enrollment counts by program, status, and date range',  href: '/admin/reports/enrollments',  icon: TrendingUp,     format: 'CSV / PDF' },
+  { title: 'Completion Report',    desc: 'Graduates, certificates issued, pass rates',             href: '/admin/reports/completions',  icon: GraduationCap,  format: 'CSV / PDF' },
+  { title: 'WIOA Performance',     desc: 'DOL-required outcomes: employment, earnings, retention', href: '/admin/reports/wioa',         icon: HeartHandshake, format: 'PDF' },
+  { title: 'Revenue & Payments',   desc: 'Payments received, refunds, funding by source',         href: '/admin/reports/revenue',      icon: DollarSign,     format: 'CSV / PDF' },
+  { title: 'Attendance Report',    desc: 'Daily attendance records by program and instructor',    href: '/admin/reports/attendance',   icon: FileText,       format: 'CSV / PDF' },
 ];
 
 export default async function ReportsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  const db = createAdminClient();
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
-  const db = createAdminClient();
   const [
     { count: totalStudents },
     { count: totalEnrollments },
@@ -37,40 +36,65 @@ export default async function ReportsPage() {
   ]);
 
   return (
-    <AdminPageShell
-      title="Reports"
-      description="Generate and export operational, compliance, and performance reports"
-      breadcrumbs={[{ label: 'Admin', href: '/admin/dashboard' }, { label: 'Reports' }]}
-      stats={[
-        { label: 'Students',     value: totalStudents ?? 0,    icon: Users,          color: 'blue' },
-        { label: 'Enrollments',  value: totalEnrollments ?? 0, icon: TrendingUp,     color: 'green' },
-        { label: 'Certificates', value: totalCerts ?? 0,       icon: GraduationCap,  color: 'amber' },
-      ]}
-    >
-      <AdminCard title="Available Reports">
-        <div className="divide-y divide-slate-100">
-          {REPORT_TYPES.map((r) => {
-            const Icon = r.icon;
+    <div className="min-h-screen bg-slate-50">
+      <div className="bg-white border-b border-slate-200 px-6 py-5">
+        <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
+          <Link href="/admin/dashboard" className="hover:text-slate-700">Admin</Link>
+          <ChevronRight className="w-3 h-3" />
+          <span className="text-slate-900 font-medium">Reports</span>
+        </nav>
+        <h1 className="text-2xl font-bold text-slate-900">Reports</h1>
+        <p className="text-sm text-slate-500 mt-1">Generate and export operational, compliance, and performance reports</p>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+
+        {/* Live counts */}
+        <div className="grid grid-cols-3 gap-4">
+          {[
+            { label: 'Students',     value: totalStudents ?? 0,    icon: Users,         color: 'text-brand-blue-600', bg: 'bg-brand-blue-50' },
+            { label: 'Enrollments',  value: totalEnrollments ?? 0, icon: TrendingUp,    color: 'text-green-600',      bg: 'bg-green-50' },
+            { label: 'Certificates', value: totalCerts ?? 0,       icon: GraduationCap, color: 'text-amber-600',      bg: 'bg-amber-50' },
+          ].map((s) => {
+            const Icon = s.icon;
             return (
-              <Link
-                key={r.href}
-                href={r.href}
-                className="flex items-center gap-4 py-4 px-2 hover:bg-slate-50 rounded-lg transition-colors group"
-              >
-                <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-4 h-4 text-slate-600" />
+              <div key={s.label} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+                <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center mb-3`}>
+                  <Icon className={`w-4 h-4 ${s.color}`} />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-slate-900 text-sm">{r.title}</p>
-                  <p className="text-slate-500 text-xs mt-0.5">{r.desc}</p>
-                </div>
-                <span className="text-xs text-slate-400 font-medium flex-shrink-0">{r.format}</span>
-                <Download className="w-4 h-4 text-slate-400 group-hover:text-brand-blue-600 transition-colors flex-shrink-0" />
-              </Link>
+                <p className="text-2xl font-bold text-slate-900 tabular-nums">{s.value}</p>
+                <p className="text-xs text-slate-500 mt-1 font-medium">{s.label}</p>
+              </div>
             );
           })}
         </div>
-      </AdminCard>
-    </AdminPageShell>
+
+        {/* Report list */}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-100">
+            <h2 className="font-semibold text-slate-900 text-sm">Available Reports</h2>
+          </div>
+          <div className="divide-y divide-slate-100">
+            {REPORTS.map((r) => {
+              const Icon = r.icon;
+              return (
+                <Link key={r.href} href={r.href}
+                  className="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-colors group">
+                  <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-4 h-4 text-slate-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-slate-900 text-sm">{r.title}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{r.desc}</p>
+                  </div>
+                  <span className="text-xs text-slate-400 font-medium flex-shrink-0 hidden sm:block">{r.format}</span>
+                  <Download className="w-4 h-4 text-slate-300 group-hover:text-brand-blue-500 transition-colors flex-shrink-0" />
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

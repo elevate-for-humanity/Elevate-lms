@@ -3,91 +3,139 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { AdminPageShell, AdminCard, AdminEmptyState, StatusBadge } from '@/components/admin/AdminPageShell';
-import { HeartHandshake, FileText, CheckCircle, Clock, AlertTriangle, Plus } from 'lucide-react';
+import { HeartHandshake, CheckCircle, Clock, AlertTriangle, Plus, ChevronRight, ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { robots: { index: false, follow: false }, title: 'WIOA | Admin' };
+
+const STATUS_STYLES: Record<string, string> = {
+  approved: 'bg-emerald-100 text-emerald-800',
+  pending:  'bg-amber-100 text-amber-800',
+  expired:  'bg-red-100 text-red-800',
+  denied:   'bg-red-100 text-red-800',
+  active:   'bg-emerald-100 text-emerald-800',
+};
 
 export default async function WioaPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  const db = createAdminClient();
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
-  const db = createAdminClient();
+  const soon = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
   const [
     { data: participants, count: total },
     { count: approved },
     { count: pending },
-    { count: expiringSoon },
+    { count: expiring },
   ] = await Promise.all([
     db.from('wioa_participants')
       .select('id, status, funding_amount, approved_at, expiration_date, student:profiles(full_name, email), program:programs(title)', { count: 'exact' })
-      .order('created_at', { ascending: false })
-      .limit(50),
+      .order('created_at', { ascending: false }).limit(50),
     db.from('wioa_participants').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
     db.from('wioa_participants').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
     db.from('wioa_participants').select('*', { count: 'exact', head: true })
-      .lte('expiration_date', new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString())
-      .gte('expiration_date', new Date().toISOString()),
+      .lte('expiration_date', soon).gte('expiration_date', new Date().toISOString()),
   ]);
 
   return (
-    <AdminPageShell
-      title="WIOA Participants"
-      description="Workforce Innovation and Opportunity Act funding and participant tracking"
-      breadcrumbs={[{ label: 'Admin', href: '/admin/dashboard' }, { label: 'WIOA' }]}
-      stats={[
-        { label: 'Total Participants', value: total ?? 0,       icon: HeartHandshake, color: 'blue' },
-        { label: 'Approved',           value: approved ?? 0,    icon: CheckCircle,    color: 'green' },
-        { label: 'Pending Review',     value: pending ?? 0,     icon: Clock,          color: 'amber', alert: (pending ?? 0) > 0 },
-        { label: 'Expiring (30 days)', value: expiringSoon ?? 0,icon: AlertTriangle,  color: 'red',   alert: (expiringSoon ?? 0) > 0 },
-      ]}
-      actions={
-        <Link href="/admin/wioa/new" className="flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
-          <Plus className="w-4 h-4" /> Add Participant
-        </Link>
-      }
-    >
-      <AdminCard title="WIOA Participants">
-        {!participants?.length ? (
-          <AdminEmptyState icon={HeartHandshake} title="No WIOA participants" description="Add participants to track WIOA funding and eligibility." action={{ label: 'Add Participant', href: '/admin/wioa/new' }} />
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-slate-100">
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Student</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Program</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Funding</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Expires</th>
-                  <th className="py-3 px-4" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {participants.map((p: any) => (
-                  <tr key={p.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="py-3 px-4">
-                      <p className="font-medium text-slate-900">{p.student?.full_name ?? '—'}</p>
-                      <p className="text-xs text-slate-500">{p.student?.email ?? ''}</p>
-                    </td>
-                    <td className="py-3 px-4 text-slate-600">{p.program?.title ?? '—'}</td>
-                    <td className="py-3 px-4"><StatusBadge status={p.status ?? 'unknown'} /></td>
-                    <td className="py-3 px-4 text-slate-600">{p.funding_amount ? `$${Number(p.funding_amount).toLocaleString()}` : '—'}</td>
-                    <td className="py-3 px-4 text-slate-600">{p.expiration_date ? new Date(p.expiration_date).toLocaleDateString() : '—'}</td>
-                    <td className="py-3 px-4 text-right">
-                      <Link href={`/admin/wioa/${p.id}`} className="text-brand-blue-600 hover:underline text-xs font-medium">View</Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+    <div className="min-h-screen bg-slate-50">
+      <div className="bg-white border-b border-slate-200 px-6 py-5">
+        <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
+          <Link href="/admin/dashboard" className="hover:text-slate-700">Admin</Link>
+          <ChevronRight className="w-3 h-3" />
+          <span className="text-slate-900 font-medium">WIOA</span>
+        </nav>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">WIOA Participants</h1>
+            <p className="text-sm text-slate-500 mt-1">Workforce Innovation and Opportunity Act funding and participant tracking</p>
           </div>
-        )}
-      </AdminCard>
-    </AdminPageShell>
+          <Link href="/admin/wioa/new"
+            className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
+            <Plus className="w-4 h-4" /> Add Participant
+          </Link>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {[
+            { label: 'Total',            value: total ?? 0,    icon: HeartHandshake, color: 'text-brand-blue-600', bg: 'bg-brand-blue-50',  urgent: false },
+            { label: 'Approved',         value: approved ?? 0, icon: CheckCircle,    color: 'text-green-600',      bg: 'bg-green-50',       urgent: false },
+            { label: 'Pending Review',   value: pending ?? 0,  icon: Clock,          color: 'text-amber-600',      bg: 'bg-amber-50',       urgent: (pending ?? 0) > 0 },
+            { label: 'Expiring 30 Days', value: expiring ?? 0, icon: AlertTriangle,  color: 'text-rose-600',       bg: 'bg-rose-50',        urgent: (expiring ?? 0) > 0 },
+          ].map((s) => {
+            const Icon = s.icon;
+            return (
+              <div key={s.label} className={`bg-white rounded-2xl border shadow-sm p-5 ${s.urgent ? 'border-rose-300 ring-1 ring-rose-200' : 'border-slate-200'}`}>
+                <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center mb-3`}>
+                  <Icon className={`w-4 h-4 ${s.color}`} />
+                </div>
+                <p className="text-2xl font-bold text-slate-900 tabular-nums">{s.value}</p>
+                <p className="text-xs text-slate-500 mt-1 font-medium">{s.label}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h2 className="font-semibold text-slate-900 text-sm">All Participants</h2>
+            <span className="text-xs text-slate-400">{total ?? 0} total</span>
+          </div>
+          {!participants?.length ? (
+            <div className="py-16 text-center">
+              <HeartHandshake className="w-8 h-8 text-slate-300 mx-auto mb-3" />
+              <p className="text-sm text-slate-500 font-medium">No WIOA participants yet</p>
+              <Link href="/admin/wioa/new" className="inline-flex items-center gap-1.5 mt-4 text-sm text-brand-blue-600 font-semibold hover:underline">
+                <Plus className="w-3.5 h-3.5" /> Add Participant
+              </Link>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-100 bg-slate-50">
+                    <th className="text-left py-3 px-5 text-[10px] font-bold uppercase tracking-widest text-slate-400">Student</th>
+                    <th className="text-left py-3 px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Program</th>
+                    <th className="text-left py-3 px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Status</th>
+                    <th className="text-left py-3 px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Funding</th>
+                    <th className="text-left py-3 px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Expires</th>
+                    <th className="py-3 px-4" />
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {participants.map((p: any) => (
+                    <tr key={p.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="py-3.5 px-5">
+                        <p className="font-semibold text-slate-900">{p.student?.full_name ?? '—'}</p>
+                        <p className="text-xs text-slate-400">{p.student?.email ?? ''}</p>
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-600">{p.program?.title ?? '—'}</td>
+                      <td className="py-3.5 px-4">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold ${STATUS_STYLES[p.status] ?? 'bg-slate-100 text-slate-600'}`}>
+                          {p.status ?? 'unknown'}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-600">{p.funding_amount ? `$${Number(p.funding_amount).toLocaleString()}` : '—'}</td>
+                      <td className="py-3.5 px-4 text-slate-500 text-xs">{p.expiration_date ? new Date(p.expiration_date).toLocaleDateString() : '—'}</td>
+                      <td className="py-3.5 px-4 text-right">
+                        <Link href={`/admin/wioa/${p.id}`} className="inline-flex items-center gap-1 text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700">
+                          View <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

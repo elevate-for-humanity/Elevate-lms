@@ -43,7 +43,7 @@ export function HowItWorksAndPlatform() {
             <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-brand-orange-300">
               How it works
             </h2>
-            <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-50">
+            <p className="mt-3 text-3xl font-semibold tracking-tight text-white">
               A whole ecosystem around each learner.
             </p>
             <p className="mt-3 text-sm text-slate-600">
@@ -62,7 +62,7 @@ export function HowItWorksAndPlatform() {
                     {step.step}
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-50">
+                    <h3 className="text-sm font-semibold text-white">
                       {step.title}
                     </h3>
                     <p className="mt-1 text-sm text-slate-600">
@@ -79,7 +79,7 @@ export function HowItWorksAndPlatform() {
             <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-brand-orange-300">
               The Elevate platform
             </h3>
-            <p className="mt-2 text-lg font-semibold text-slate-50">
+            <p className="mt-2 text-lg font-semibold text-white">
               People + technology that keep everyone aligned.
             </p>
             <p className="mt-2 text-sm text-slate-600">
@@ -91,10 +91,10 @@ export function HowItWorksAndPlatform() {
             <dl className="mt-6 space-y-4">
               {platform.map((item) => (
                 <div key={item.label} className="space-y-1">
-                  <dt className="text-sm font-semibold text-slate-50">
+                  <dt className="text-sm font-semibold text-white">
                     {item.label}
                   </dt>
-                  <dd className="text-sm text-slate-300">{item.body}</dd>
+                  <dd className="text-sm text-white">{item.body}</dd>
                 </div>
               ))}
             </dl>

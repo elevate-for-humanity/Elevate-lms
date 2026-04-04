@@ -52,11 +52,11 @@ export default function PeerRecoveryApplyPage() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <div className="mx-auto max-w-2xl px-6 py-12">
-        <Link href="/programs/peer-recovery-specialist" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 mb-8">
+        <Link href="/programs/peer-recovery-specialist" className="inline-flex items-center gap-2 text-sm text-black hover:text-slate-900 mb-8">
           ← Back to program
         </Link>
         <h1 className="text-3xl font-bold">Apply — Peer Recovery Specialist</h1>
-        <p className="mt-2 text-slate-600">WIOA and Job Ready Indy funding available for eligible Indiana residents.</p>
+        <p className="mt-2 text-black">WIOA and Job Ready Indy funding available for eligible Indiana residents.</p>
 
         {error && (
           <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error}</div>
@@ -106,7 +106,7 @@ export default function PeerRecoveryApplyPage() {
           >
             {loading ? 'Submitting…' : 'Submit Application'}
           </button>
-          <p className="text-center text-xs text-slate-500">
+          <p className="text-center text-xs text-black">
             By submitting you agree to our{' '}
             <Link href="/legal/privacy" className="underline">Privacy Policy</Link>.
           </p>

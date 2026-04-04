@@ -135,7 +135,7 @@ export default function SupersonicGovernancePage() {
           <div className="space-y-3">
             {highlights.map((item, index) => (
               <div key={index} className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <span className="text-slate-700">{item}</span>
               </div>
             ))}
@@ -154,15 +154,15 @@ export default function SupersonicGovernancePage() {
               >
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
-                    <link.icon className="w-5 h-5 text-slate-600 group-hover:text-emerald-600" />
+                    <link.icon className="w-5 h-5 text-black group-hover:text-emerald-600" />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors">
                       {link.title}
                     </h3>
-                    <p className="text-sm text-slate-600 mt-1">{link.description}</p>
+                    <p className="text-sm text-black mt-1">{link.description}</p>
                   </div>
-                  <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                  <ArrowRight className="w-5 h-5 text-black group-hover:text-emerald-500 transition-colors" />
                 </div>
               </Link>
             ))}
@@ -184,7 +184,7 @@ export default function SupersonicGovernancePage() {
             <li>• Customer support and communications</li>
             <li>• Data handling and security practices</li>
           </ul>
-          <p className="mt-4 text-sm text-slate-600 italic">
+          <p className="mt-4 text-sm text-black italic">
             Supersonic does not maintain separate governance policies. All operations inherit 
             from the canonical Elevate for Humanity governance framework.
           </p>
@@ -224,7 +224,7 @@ export default function SupersonicGovernancePage() {
         {/* Contact */}
         <section className="text-center py-8 border-t border-slate-200">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Questions?</h2>
-          <p className="text-slate-600 mb-6">
+          <p className="text-black mb-6">
             For diligence inquiries or governance questions, contact our team.
           </p>
           <Link

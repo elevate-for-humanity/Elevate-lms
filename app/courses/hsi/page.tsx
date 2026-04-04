@@ -112,9 +112,9 @@ export default async function HsiPage() {
             </div>
             <div>
               <div className="text-4xl font-bold text-brand-orange-600 mb-2 text-2xl md:text-3xl lg:text-4xl">
-                Free
+                $0
               </div>
-              <div className="text-black">WIOA Funded</div>
+              <div className="text-black">For Eligible Students</div>
             </div>
           </div>
         </div>
@@ -242,9 +242,8 @@ export default async function HsiPage() {
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
               Ready to Get Certified?
             </h2>
-            <p className="text-base md:text-lg text-brand-red-100 mb-8">
-              Start your safety training today. All courses are Funded
-              through WIOA funding.
+            <p className="text-base md:text-lg text-white mb-8">
+              Start your safety training today. Eligible students pay $0 through WIOA funding.
             </p>
             <Link
               href="/contact"

@@ -32,7 +32,7 @@ export default async function EnrollmentSuccessPage({
         {/* Success Message */}
         <div className="bg-white rounded-2xl border-2 border-brand-green-500 p-8 shadow-xl text-center">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-green-100 rounded-full mb-6">
-            <span className="text-slate-500 flex-shrink-0">•</span>
+            <span className="text-black flex-shrink-0">•</span>
           </div>
           
           <h1 className="text-4xl font-black text-black mb-4">

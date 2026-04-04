@@ -19,7 +19,7 @@ export function BarberCredentials() {
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Credential Pathway</h2>
-          <p className="text-slate-600 mb-8 max-w-3xl">
+          <p className="text-black mb-8 max-w-3xl">
             Industry-recognized credentials, where applicable, are issued by licensed credential partners. Elevate provides program coordination, competency tracking, and official completion documentation upon successful fulfillment of all training and evaluation requirements.
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -30,7 +30,7 @@ export function BarberCredentials() {
                   <span className="text-xs font-bold uppercase tracking-wider text-brand-red-600">{cred.type}</span>
                 </div>
                 <h3 className="font-bold text-slate-900 mb-1">{cred.name}</h3>
-                <p className="text-slate-500 text-sm">Issued by: {cred.issuer}</p>
+                <p className="text-black text-sm">Issued by: {cred.issuer}</p>
               </div>
             ))}
           </div>
@@ -41,7 +41,7 @@ export function BarberCredentials() {
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">What You&apos;ll Learn</h2>
-          <p className="text-slate-600 mb-10 max-w-3xl">
+          <p className="text-black mb-10 max-w-3xl">
             Hands-on, competency-based training in a real barbershop environment under licensed supervision.
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -52,7 +52,7 @@ export function BarberCredentials() {
                 </div>
                 <div className="p-5">
                   <h3 className="font-bold text-lg text-slate-900 mb-2">{mod.title}</h3>
-                  <p className="text-slate-600 text-sm">{mod.description}</p>
+                  <p className="text-black text-sm">{mod.description}</p>
                 </div>
               </div>
             ))}
@@ -64,7 +64,7 @@ export function BarberCredentials() {
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Workplace Training Component</h2>
-          <p className="text-slate-600 mb-8 max-w-3xl">
+          <p className="text-black mb-8 max-w-3xl">
             Participants receive hands-on training in licensed barbershops under the supervision of licensed barbers. Workplace training includes real client services, shop operations, sanitation practices, and professional skill development.
           </p>
           <div className="grid sm:grid-cols-2 gap-6">
@@ -74,7 +74,7 @@ export function BarberCredentials() {
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-slate-900 mb-2">Supervised Training</h3>
-                <p className="text-slate-600 text-sm">Training in approved employer environments under licensed barber supervisors with at least 2 years of experience. All training sites maintain active shop licensing.</p>
+                <p className="text-black text-sm">Training in approved employer environments under licensed barber supervisors with at least 2 years of experience. All training sites maintain active shop licensing.</p>
               </div>
             </div>
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
@@ -83,7 +83,7 @@ export function BarberCredentials() {
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-slate-900 mb-2">Performance Evaluations</h3>
-                <p className="text-slate-600 text-sm">Monthly competency evaluations by supervising barbers, with tri-party verification (RTI instructor + Employer + Program Oversight) at key milestones.</p>
+                <p className="text-black text-sm">Monthly competency evaluations by supervising barbers, with tri-party verification (RTI instructor + Employer + Program Oversight) at key milestones.</p>
               </div>
             </div>
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
@@ -92,7 +92,7 @@ export function BarberCredentials() {
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-slate-900 mb-2">Employment Structure</h3>
-                <p className="text-slate-600 text-sm">Apprentices are W-2 employees of their host shop. Compensation is set by the employer and must meet or exceed applicable minimum wage laws. All models require licensed supervision and documented OJT hours.</p>
+                <p className="text-black text-sm">Apprentices are W-2 employees of their host shop. Compensation is set by the employer and must meet or exceed applicable minimum wage laws. All models require licensed supervision and documented OJT hours.</p>
               </div>
             </div>
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
@@ -101,7 +101,7 @@ export function BarberCredentials() {
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-slate-900 mb-2">OJT Hour Logging</h3>
-                <p className="text-slate-600 text-sm">All 2,000 apprenticeship hours are documented through digital hour tracking, supervisor verification, and competency progression records maintained in the institutional LMS.</p>
+                <p className="text-black text-sm">All 2,000 apprenticeship hours are documented through digital hour tracking, supervisor verification, and competency progression records maintained in the institutional LMS.</p>
               </div>
             </div>
           </div>

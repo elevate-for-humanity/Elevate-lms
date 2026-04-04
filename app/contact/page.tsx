@@ -81,7 +81,7 @@ function ContactPageInner() {
       <div className="bg-white border-b border-slate-200 py-8 px-6">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900">Contact Us</h1>
-          <p className="text-slate-600 mt-2">Reach our enrollment team, career services, or administrative office.</p>
+          <p className="text-black mt-2">Reach our enrollment team, career services, or administrative office.</p>
         </div>
       </div>
 
@@ -100,7 +100,7 @@ function ContactPageInner() {
               ) : (
                 <p className="text-gray-900 mt-1">{info.value}</p>
               )}
-              <p className="text-sm text-gray-500">{info.subtitle}</p>
+              <p className="text-sm text-black">{info.subtitle}</p>
             </div>
           ))}
         </div>
@@ -111,9 +111,9 @@ function ContactPageInner() {
             
             {formState === 'success' ? (
               <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-8 text-center">
-                <span className="text-slate-500 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Message Sent!</h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-black mb-4">
                   Thank you for contacting us. We&apos;ll get back to you within 24 hours.
                 </p>
                 <button
@@ -258,7 +258,7 @@ function ContactPageInner() {
             {/* Schedule a Meeting */}
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Schedule a Meeting</h2>
             <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-              <p className="text-gray-600 mb-5">
+              <p className="text-black mb-5">
                 Pick a date and time that works for you. Once you submit, you and our team will receive a calendar invite with a Zoom link by email.
               </p>
 
@@ -362,10 +362,10 @@ function ContactPageInner() {
             {/* Zoom for Virtual Meetings */}
             <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
               <h3 className="font-semibold text-gray-900 mb-2">Virtual Meetings via Zoom</h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-black mb-4">
                 All scheduled meetings include a unique Zoom link sent to your email. Use the form above to book a meeting and you will receive your personal Zoom link automatically.
               </p>
-              <p className="text-gray-500 text-sm">
+              <p className="text-black text-sm">
                 Questions? Call <a href="tel:+13173143757" className="text-brand-blue-600 font-medium hover:underline">(317) 314-3757</a>
               </p>
             </div>
@@ -373,9 +373,9 @@ function ContactPageInner() {
             {/* Campus Info */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h3 className="font-semibold text-gray-900 mb-2">Elevate for Humanity</h3>
-              <p className="text-gray-600">8888 Keystone Crossing, Suite 1300</p>
-              <p className="text-gray-600">Indianapolis, IN 46240</p>
-              <p className="text-gray-600 mt-3 text-sm font-medium text-amber-700">⚠️ By appointment only — this is a hybrid training institute, not a walk-in location. Schedule below before visiting.</p>
+              <p className="text-black">8888 Keystone Crossing, Suite 1300</p>
+              <p className="text-black">Indianapolis, IN 46240</p>
+              <p className="text-black mt-3 text-sm font-medium text-amber-700">⚠️ By appointment only — this is a hybrid training institute, not a walk-in location. Schedule below before visiting.</p>
             </div>
           </div>
         </div>
@@ -396,11 +396,11 @@ function ContactPageInner() {
             <details key={i} className="bg-white rounded-xl overflow-hidden group">
               <summary className="p-5 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
                 {faq.q}
-                <svg className="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-black group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
-              <div className="px-5 pb-5 text-slate-600">{faq.a}</div>
+              <div className="px-5 pb-5 text-black">{faq.a}</div>
             </details>
           ))}
         </div>
@@ -421,7 +421,7 @@ function ContactPageInner() {
       {/* Calendly inline widget */}
       <div className="max-w-4xl mx-auto px-4 py-8">
         <h2 className="text-2xl font-bold text-slate-900 mb-2">Schedule a Meeting</h2>
-        <p className="text-slate-500 mb-6">Pick a time that works for you and we'll connect directly.</p>
+        <p className="text-black mb-6">Pick a time that works for you and we'll connect directly.</p>
         <div
           className="calendly-inline-widget"
           data-url="https://calendly.com/elevate4humanityedu"

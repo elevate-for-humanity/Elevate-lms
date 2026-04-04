@@ -269,7 +269,7 @@ function AnnouncementCard({ announcement }: { announcement: Announcement }) {
             <p className="font-semibold text-black">{announcement.authorName}</p>
             <div className="flex items-center gap-2 text-xs text-slate-500">
               <Calendar className="w-3 h-3" />
-              {announcement.publishedAt.toLocaleDateString()}
+              {announcement.publishedAt.toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
             </div>
           </div>
         </div>

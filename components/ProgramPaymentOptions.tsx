@@ -80,7 +80,7 @@ export default function ProgramPaymentOptions({
       {/* Price Display */}
       <div className="text-center mb-8">
         <div className="text-5xl font-bold text-brand-orange-600 mb-2">
-          ${price.toLocaleString()}
+          ${price.toLocaleString('en-US')}
         </div>
         <p className="text-black">One-time payment for {duration}</p>
       </div>
@@ -105,7 +105,7 @@ export default function ProgramPaymentOptions({
                   One-time payment - Start immediately
                 </p>
                 <p className="text-2xl font-bold text-brand-green-600">
-                  ${price.toLocaleString()}
+                  ${price.toLocaleString('en-US')}
                 </p>
               </div>
             </div>
@@ -183,7 +183,7 @@ export default function ProgramPaymentOptions({
         onClick={() => handlePayment(paymentMethod)}
         className="w-full bg-brand-orange-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-brand-orange-700 transition"
       >
-        {paymentMethod === 'full' && `Pay $${price.toLocaleString()} Now`}
+        {paymentMethod === 'full' && `Pay $${price.toLocaleString('en-US')} Now`}
         {paymentMethod === 'stripe' &&
           `Set Up Payment Plan - $${stripeMonthly}/mo`}
         {paymentMethod === 'bnpl' &&

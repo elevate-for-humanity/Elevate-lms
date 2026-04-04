@@ -179,7 +179,7 @@ export function ProgramPageTemplate({
             <div className="text-center p-4">
               <DollarSign className="w-8 h-8 text-purple-600 mx-auto mb-2" />
               <p className="text-sm text-gray-500">Tuition</p>
-              <p className="text-lg font-bold text-gray-900">${price.toLocaleString()}</p>
+              <p className="text-lg font-bold text-gray-900">${price.toLocaleString('en-US')}</p>
             </div>
             <div className="text-center p-4">
               <Award className="w-8 h-8 text-purple-600 mx-auto mb-2" />
@@ -197,7 +197,7 @@ export function ProgramPageTemplate({
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="text-white">
                 <p className="font-bold text-lg">Funding May Be Available</p>
-                <p className="text-brand-green-100">Eligible participants may qualify for {fundingTypes.join(', ')} funding</p>
+                <p className="text-white">Eligible participants may qualify for {fundingTypes.join(', ')} funding</p>
               </div>
               <Link
                 href="/funding"
@@ -322,7 +322,7 @@ export function ProgramPageTemplate({
           
           <div className="border border-slate-200 rounded-2xl p-8">
             <p className="text-slate-500 text-sm uppercase tracking-wide mb-2">Program Tuition</p>
-            <p className="text-5xl font-black mb-4 text-slate-900">${price.toLocaleString()}</p>
+            <p className="text-5xl font-black mb-4 text-slate-900">${price.toLocaleString('en-US')}</p>
             {paymentPlan && (
               <p className="text-slate-600 mb-6">{paymentPlan}</p>
             )}

@@ -99,7 +99,7 @@ export default function EqualOpportunityPage() {
             <span className="text-brand-blue-300 font-medium">Compliance</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Equal Opportunity Employer</h1>
-          <p className="text-xl text-brand-blue-100 max-w-3xl">
+          <p className="text-xl text-white max-w-3xl">
             Elevate for Humanity is committed to providing equal opportunity in employment and 
             education without regard to race, color, religion, sex, national origin, age, 
             disability, genetic information, or any other protected status.
@@ -267,7 +267,7 @@ export default function EqualOpportunityPage() {
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Need Assistance or Have Questions?</h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Contact us for accommodations, to file a complaint, or for more information about our equal opportunity policies.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

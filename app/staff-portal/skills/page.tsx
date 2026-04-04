@@ -166,7 +166,7 @@ export default async function StaffSkillsPage() {
         <div className="bg-brand-blue-700 rounded-xl p-6 text-white text-center">
           <Award className="w-10 h-10 mx-auto mb-3 opacity-80" />
           <h3 className="font-bold text-lg mb-1">Skills Verified by Supervisor?</h3>
-          <p className="text-brand-blue-100 text-sm mb-4">Ask your manager to verify your completed skills in the admin portal.</p>
+          <p className="text-white text-sm mb-4">Ask your manager to verify your completed skills in the admin portal.</p>
           <Link href="/staff-portal/training"
             className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-brand-blue-50">
             View Training Resources <ChevronRight className="w-4 h-4" />

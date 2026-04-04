@@ -49,7 +49,7 @@ export default function EnrollmentCounter() {
 
   // Format number with commas
   const formatNumber = (num: number) => {
-    return Math.round(num).toLocaleString();
+    return Math.round(num).toLocaleString('en-US');
   };
 
   // Time since last update

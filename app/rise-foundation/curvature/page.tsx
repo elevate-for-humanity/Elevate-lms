@@ -63,7 +63,7 @@ export default function CurvaturePage() {
     <div className="min-h-screen bg-white">
 
       {/* Hero — clean image, no overlay */}
-      <section className="relative h-[40vh] min-h-[240px] overflow-hidden">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image
           src="/images/pages/admin-api-keys-hero.jpg"
           alt="CurvatureBody Sculpting non-invasive body contouring Indianapolis"

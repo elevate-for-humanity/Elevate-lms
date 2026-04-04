@@ -109,7 +109,7 @@ export default function ShopWeeklyReportPage() {
             </Link>
             <div>
               <h1 className="text-xl font-bold text-slate-900">Weekly Report</h1>
-              <p className="text-brand-blue-200 text-sm">
+              <p className="text-white text-sm">
                 Week ending {new Date(report.weekEnding).toLocaleDateString()}
               </p>
             </div>
@@ -130,11 +130,11 @@ export default function ShopWeeklyReportPage() {
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
             <p className="text-3xl font-bold text-slate-900">{report.totalHours}</p>
-            <p className="text-brand-blue-200 text-sm">Total Hours</p>
+            <p className="text-white text-sm">Total Hours</p>
           </div>
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
             <p className="text-3xl font-bold text-slate-900">{report.apprenticeCount}</p>
-            <p className="text-brand-blue-200 text-sm">Apprentices</p>
+            <p className="text-white text-sm">Apprentices</p>
           </div>
         </div>
       </header>

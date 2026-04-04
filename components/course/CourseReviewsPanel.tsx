@@ -186,7 +186,7 @@ export function CourseReviewsPanel({
                 <p className="text-[11px] text-black">{r.body}</p>
               )}
               <p className="mt-1 text-[10px] text-slate-500">
-                {new Date(r.created_at).toLocaleDateString()}
+                {new Date(r.created_at).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
               </p>
             </li>
           ))}

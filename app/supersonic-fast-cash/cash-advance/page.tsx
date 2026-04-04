@@ -33,7 +33,7 @@ export default function CashAdvancePage() {
           <h1 className="text-4xl font-semibold text-gray-900 mb-4">
             Tax Refund Cash Advance
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-black max-w-2xl mx-auto">
             Access a portion of your expected refund early. Optional and eligibility-based.
           </p>
         </div>
@@ -45,7 +45,7 @@ export default function CashAdvancePage() {
           <h2 className="text-2xl font-semibold text-gray-900 mb-6">
             What is a Tax Refund Cash Advance?
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-black mb-6">
             A tax refund cash advance allows eligible filers to receive a portion of their 
             expected tax refund before the IRS processes their return. The advance is provided 
             through our banking partners and is repaid automatically when your refund arrives.
@@ -56,7 +56,7 @@ export default function CashAdvancePage() {
               <AlertCircle className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-medium text-gray-900 mb-1">This is not a loan</p>
-                <p className="text-gray-600 text-sm">
+                <p className="text-black text-sm">
                   The advance is based on your expected refund and is repaid from that refund. 
                   You do not make separate payments.
                 </p>
@@ -69,21 +69,21 @@ export default function CashAdvancePage() {
               <DollarSign className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Advance Amounts</h3>
               <p className="text-2xl font-bold text-brand-blue-600 mb-1">$250 – $7,500</p>
-              <p className="text-sm text-gray-500">Based on expected refund</p>
+              <p className="text-sm text-black">Based on expected refund</p>
             </div>
 
             <div className="bg-white rounded-xl p-6 border border-gray-200 text-center">
               <Clock className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Timing</h3>
               <p className="text-2xl font-bold text-brand-blue-600 mb-1">Same Day</p>
-              <p className="text-sm text-gray-500">If approved</p>
+              <p className="text-sm text-black">If approved</p>
             </div>
 
             <div className="bg-white rounded-xl p-6 border border-gray-200 text-center">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <h3 className="font-semibold text-gray-900 mb-2">Repayment</h3>
               <p className="text-2xl font-bold text-brand-blue-600 mb-1">Automatic</p>
-              <p className="text-sm text-gray-500">From your refund</p>
+              <p className="text-sm text-black">From your refund</p>
             </div>
           </div>
         </div>
@@ -103,7 +103,7 @@ export default function CashAdvancePage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900 mb-1">Complete Your Tax Return</h3>
-                <p className="text-gray-600">
+                <p className="text-black">
                   File your tax return with us. The advance option is only available after 
                   your return is prepared and your expected refund is calculated.
                 </p>
@@ -116,7 +116,7 @@ export default function CashAdvancePage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900 mb-1">Choose to Apply (Optional)</h3>
-                <p className="text-gray-600">
+                <p className="text-black">
                   If you want early access to your refund, you can apply for an advance. 
                   This step is completely optional.
                 </p>
@@ -129,7 +129,7 @@ export default function CashAdvancePage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900 mb-1">Bank Reviews Your Application</h3>
-                <p className="text-gray-600">
+                <p className="text-black">
                   Our banking partner reviews your application and determines eligibility. 
                   Approval is not guaranteed.
                 </p>
@@ -142,7 +142,7 @@ export default function CashAdvancePage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900 mb-1">Receive Funds</h3>
-                <p className="text-gray-600">
+                <p className="text-black">
                   If approved, receive your advance same day. When your full refund arrives 
                   from the IRS, the advance is automatically repaid.
                 </p>
@@ -187,24 +187,24 @@ export default function CashAdvancePage() {
 
           <div className="bg-white border border-gray-200 rounded-xl p-6">
             <h3 className="font-semibold text-gray-900 mb-4">Eligibility Factors</h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-black mb-4">
               The bank considers several factors when reviewing advance applications:
             </p>
             <ul className="grid sm:grid-cols-2 gap-2 text-gray-700 text-sm">
               <li className="flex items-center gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 Expected refund amount
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 Tax return accuracy
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 Filing history
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 Identity verification
               </li>
             </ul>
@@ -225,7 +225,7 @@ export default function CashAdvancePage() {
                 <HelpCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-medium text-gray-900 mb-2">Is this a loan?</h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-black text-sm">
                     No. The advance is based on your expected tax refund and is repaid 
                     automatically from that refund. You do not make separate payments.
                   </p>
@@ -238,7 +238,7 @@ export default function CashAdvancePage() {
                 <HelpCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-medium text-gray-900 mb-2">What if my refund is less than expected?</h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-black text-sm">
                     If the IRS adjusts your refund, you may owe the difference. This is why 
                     advance amounts are typically less than your full expected refund.
                   </p>
@@ -251,7 +251,7 @@ export default function CashAdvancePage() {
                 <HelpCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-medium text-gray-900 mb-2">Do I have to take the advance?</h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-black text-sm">
                     No. The advance is completely optional. You can file your taxes and 
                     wait for your refund from the IRS without taking an advance.
                   </p>
@@ -264,7 +264,7 @@ export default function CashAdvancePage() {
                 <HelpCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-medium text-gray-900 mb-2">What are the fees?</h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-black text-sm">
                     Fees vary by advance amount and are determined by the banking partner. 
                     All fees are disclosed before you accept the advance.
                   </p>
@@ -281,7 +281,7 @@ export default function CashAdvancePage() {
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">
             Questions?
           </h2>
-          <p className="text-gray-600 mb-8">
+          <p className="text-black mb-8">
             Contact us to discuss your options and eligibility.
           </p>
           <a
@@ -300,7 +300,7 @@ export default function CashAdvancePage() {
           <h2 className="text-3xl font-semibold text-white mb-4">
             Ready to file your taxes?
           </h2>
-          <p className="text-brand-blue-200 mb-8">
+          <p className="text-white mb-8">
             Start your return first. Advance options are available after filing.
           </p>
           <Link

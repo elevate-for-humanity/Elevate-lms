@@ -132,10 +132,10 @@ function ProgramRow({ p }: { p: Program }) {
           <p className="font-semibold text-slate-900 text-sm leading-snug">{p.title}</p>
           {p.funded && <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Funded</span>}
         </div>
-        <p className="text-slate-500 text-xs mt-0.5 line-clamp-1">{p.desc}</p>
+        <p className="text-black text-xs mt-0.5 line-clamp-1">{p.desc}</p>
       </div>
       <div className="flex-shrink-0 text-right">
-        <div className="flex items-center gap-1 text-xs text-slate-400 justify-end mb-0.5">
+        <div className="flex items-center gap-1 text-xs text-black justify-end mb-0.5">
           <Clock className="w-3 h-3" />{p.duration}
         </div>
         {p.pay && (
@@ -144,7 +144,7 @@ function ProgramRow({ p }: { p: Program }) {
           </div>
         )}
       </div>
-      <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-brand-red-500 transition-colors flex-shrink-0" />
+      <ArrowRight className="w-4 h-4 text-white group-hover:text-brand-red-500 transition-colors flex-shrink-0" />
     </Link>
   );
 }
@@ -153,31 +153,32 @@ export default function ProgramsPage() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* Hero — static image, no video/avatar */}
-      <section className="relative h-[60vh] min-h-[420px] max-h-[600px] overflow-hidden">
-        <Image
-          src="/images/pages/about-career-pathways.jpg"
-          alt="Career training at Elevate for Humanity"
-          fill
-          className="object-cover object-center"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/50 to-transparent" />
-        <div className="absolute inset-0 flex items-center">
-          <div className="max-w-5xl mx-auto px-6 w-full">
-            <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-3">Career Training Programs</p>
-            <h1 className="text-4xl sm:text-5xl font-extrabold text-white leading-tight mb-4 max-w-xl">
-              Start a Career —<br />Not Just a Class
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[55vh] min-h-[360px] max-h-[520px] overflow-hidden">
+          <Image
+            src="/images/pages/about-career-pathways.jpg"
+            alt="Career training at Elevate for Humanity"
+            fill
+            className="object-cover object-center"
+            priority
+            sizes="100vw"
+          />
+        </div>
+        <div className="bg-white py-10 border-t">
+          <div className="max-w-5xl mx-auto px-6 text-center">
+            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Career Training Programs</p>
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 leading-tight mb-4">
+              Start a Career — Not Just a Class
             </h1>
-            <p className="text-slate-200 text-lg max-w-lg mb-8 leading-relaxed">
+            <p className="text-black text-lg max-w-lg mx-auto mb-8 leading-relaxed">
               Short-term training. Real credentials. Most programs available at no cost to eligible Indiana residents.
             </p>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 justify-center">
               <Link href="/apply/student" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-xl transition-colors text-sm">
                 Apply Now
               </Link>
-              <a href="#programs" className="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold px-8 py-3.5 rounded-xl transition-colors text-sm">
+              <a href="#programs" className="bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 font-bold px-8 py-3.5 rounded-xl transition-colors text-sm">
                 Browse Programs
               </a>
             </div>
@@ -189,7 +190,7 @@ export default function ProgramsPage() {
       <section className="bg-slate-900 py-4 px-4">
         <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
           {['WIOA & state funding available', 'DOL Registered Apprenticeship Sponsor', 'ETPL approved provider', 'Job placement assistance'].map((t) => (
-            <span key={t} className="text-slate-300 text-xs font-medium flex items-center gap-2">
+            <span key={t} className="text-white text-xs font-medium flex items-center gap-2">
               <span className="w-1.5 h-1.5 bg-brand-red-500 rounded-full" />{t}
             </span>
           ))}
@@ -242,7 +243,7 @@ export default function ProgramsPage() {
               {/* Program list */}
               <div className="flex-1 min-w-0">
                 <h2 className="text-2xl font-extrabold text-slate-900 mb-1">{section.title}</h2>
-                <p className="text-slate-500 text-sm mb-6">{section.subtitle}</p>
+                <p className="text-black text-sm mb-6">{section.subtitle}</p>
                 <div>
                   {section.programs.map((p) => <ProgramRow key={p.slug} p={p} />)}
                 </div>
@@ -273,7 +274,7 @@ export default function ProgramsPage() {
             </div>
             <div className="flex-1 min-w-0">
               <h2 className="text-2xl font-extrabold text-slate-900 mb-1">Apprenticeships</h2>
-              <p className="text-slate-500 text-sm mb-6">
+              <p className="text-black text-sm mb-6">
                 DOL Registered Apprenticeships — work in a licensed shop and earn wages from day one while completing your training hours.
               </p>
               <div className="grid grid-cols-2 gap-4">
@@ -294,14 +295,14 @@ export default function ProgramsPage() {
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 to-transparent" />
                       <div className="absolute bottom-3 left-3 right-3">
                         <p className="text-white font-bold text-sm leading-tight">{a.title}</p>
-                        <p className="text-slate-300 text-xs mt-0.5">{a.duration} · Paid OJT</p>
+                        <p className="text-white text-xs mt-0.5">{a.duration} · Paid OJT</p>
                         {a.pay && <p className="text-green-300 text-xs font-semibold mt-0.5">{a.pay}</p>}
                       </div>
                     </div>
                   </Link>
                 ))}
               </div>
-              <p className="text-slate-400 text-xs mt-4">All apprenticeships are registered with the U.S. Department of Labor. Participants earn wages during training.</p>
+              <p className="text-black text-xs mt-4">All apprenticeships are registered with the U.S. Department of Labor. Participants earn wages during training.</p>
             </div>
           </div>
         </section>
@@ -314,7 +315,7 @@ export default function ProgramsPage() {
         </div>
         <div className="relative max-w-2xl mx-auto">
           <h2 className="text-3xl font-extrabold text-white mb-3">Your Career Starts Here</h2>
-          <p className="text-slate-300 text-base mb-8 leading-relaxed">
+          <p className="text-white text-base mb-8 leading-relaxed">
             Short-term training. Real credentials. Job placement support.<br />
             Most programs are available at no cost to eligible Indiana residents.
           </p>

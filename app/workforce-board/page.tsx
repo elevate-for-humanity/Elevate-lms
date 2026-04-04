@@ -108,7 +108,7 @@ export default function WorkforceBoardPage() {
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Workforce Board Portal</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Program oversight, performance metrics, and compliance monitoring in one place</p>
+            <p className="text-lg text-white max-w-3xl mx-auto">Program oversight, performance metrics, and compliance monitoring in one place</p>
           </div>
         </div>
       </section>
@@ -119,7 +119,7 @@ export default function WorkforceBoardPage() {
           <h2 className="text-3xl font-bold text-slate-900 mb-4 text-center">
             Portal Features
           </h2>
-          <p className="text-slate-600 text-center mb-12 max-w-2xl mx-auto">
+          <p className="text-black text-center mb-12 max-w-2xl mx-auto">
             Everything you need for effective workforce program oversight
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -135,13 +135,11 @@ export default function WorkforceBoardPage() {
                     alt={feature.title}
                     fill
                     className="object-cover group-hover:scale-105 transition duration-300"
-                   sizes="100vw" />
-                  <h3 className="absolute bottom-4 left-4 text-xl font-bold text-white">
-                    {feature.title}
-                  </h3>
+                    sizes="100vw" />
                 </div>
                 <div className="p-4">
-                  <p className="text-slate-600 text-sm">{feature.description}</p>
+                  <h3 className="text-base font-bold text-slate-900 mb-1">{feature.title}</h3>
+                  <p className="text-black text-sm">{feature.description}</p>
                   <span className="inline-flex items-center gap-1 text-brand-blue-600 font-medium text-sm mt-2 group-hover:gap-2 transition-all">
                     Learn More <ArrowRight className="w-4 h-4" />
                   </span>
@@ -158,7 +156,7 @@ export default function WorkforceBoardPage() {
           <h2 className="text-3xl font-bold text-slate-900 mb-4 text-center">
             Quick Access
           </h2>
-          <p className="text-slate-600 text-center mb-12 max-w-2xl mx-auto">
+          <p className="text-black text-center mb-12 max-w-2xl mx-auto">
             Jump directly to the data you need
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -177,7 +175,7 @@ export default function WorkforceBoardPage() {
                    sizes="100vw" />
                   <div className="absolute bottom-4 left-4 right-4 text-white">
                     <h3 className="text-lg font-bold mb-1">{link.title}</h3>
-                    <p className="text-white/80 text-sm">{link.description}</p>
+                    <p className="text-white text-sm">{link.description}</p>
                   </div>
                 </div>
               </Link>
@@ -192,7 +190,7 @@ export default function WorkforceBoardPage() {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ready to Get Started?
           </h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Access real-time workforce data and performance metrics
           </p>
           <div className="flex flex-wrap justify-center gap-4">

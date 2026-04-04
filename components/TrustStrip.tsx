@@ -24,7 +24,7 @@ interface Props {
 
 function fmt(num: number) {
   if (num >= 1000000) return `$${(num / 1000000).toFixed(1)}M`;
-  if (num >= 1000) return num.toLocaleString();
+  if (num >= 1000) return num.toLocaleString('en-US');
   return num.toString();
 }
 
@@ -36,19 +36,19 @@ export default function TrustStrip({ variant = 'default', className }: Props) {
           <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
             <div className="text-center">
               <div className="text-3xl font-extrabold">{fmt(STATS.studentsEnrolled)}+</div>
-              <div className="text-sm text-brand-red-100 font-medium">Students Trained</div>
+              <div className="text-sm text-white font-medium">Students Trained</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-extrabold">{STATS.jobPlacementRate}%</div>
-              <div className="text-sm text-brand-red-100 font-medium">Job Placement</div>
+              <div className="text-sm text-white font-medium">Job Placement</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-extrabold">$0</div>
-              <div className="text-sm text-brand-red-100 font-medium">Cost to Students</div>
+              <div className="text-sm text-white font-medium">Cost to Students</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-extrabold">100%</div>
-              <div className="text-sm text-brand-red-100 font-medium">Funded Programs</div>
+              <div className="text-sm text-white font-medium">Funded Programs</div>
             </div>
           </div>
         </div>

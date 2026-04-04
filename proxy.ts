@@ -92,7 +92,7 @@ const ADMIN_ONLY_ROUTES: string[] = [];
 const NOINDEX_PREFIXES = [
   '/admin', '/staff-portal', '/instructor', '/partner-portal', '/partner/',
   '/employer-portal', '/employer/', '/program-holder', '/workforce-board',
-  '/student-portal', '/client-portal', '/lms/', '/dashboard', '/settings',
+  '/student-portal', '/client-portal', '/lms', '/dashboard', '/settings',
   '/api/', '/enrollment/', '/onboarding',
 ];
 

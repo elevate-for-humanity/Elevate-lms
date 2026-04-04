@@ -148,7 +148,7 @@ function CheckInContent() {
             </Link>
             <div>
               <h1 className="text-xl font-bold text-white">Checked In</h1>
-              <p className="text-brand-green-100 text-sm">Session active</p>
+              <p className="text-white text-sm">Session active</p>
             </div>
           </div>
         </header>
@@ -160,20 +160,20 @@ function CheckInContent() {
               <span className="text-slate-500 flex-shrink-0">•</span>
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">You're Checked In!</h2>
-            <div className="flex items-center justify-center gap-2 text-brand-green-100 mb-4">
+            <div className="flex items-center justify-center gap-2 text-white mb-4">
               <MapPin className="w-4 h-4" />
               <span>{activeSession.shopName}</span>
             </div>
             
             {/* Timer */}
             <div className="bg-slate-700 rounded-xl p-4 mb-4">
-              <p className="text-brand-green-100 text-sm mb-1">Time Elapsed</p>
+              <p className="text-white text-sm mb-1">Time Elapsed</p>
               <p className="text-4xl font-mono font-bold text-white">
                 {formatElapsedTime(elapsedTime)}
               </p>
             </div>
 
-            <p className="text-brand-green-100 text-sm">
+            <p className="text-white text-sm">
               Checked in at {new Date(activeSession.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </p>
           </div>
@@ -200,7 +200,7 @@ function CheckInContent() {
           {error && (
             <div className="bg-white/10 border border-brand-red-500/30 rounded-xl p-4 flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
-              <p className="text-brand-red-200 text-sm">{error}</p>
+              <p className="text-white text-sm">{error}</p>
             </div>
           )}
 
@@ -235,7 +235,7 @@ function CheckInContent() {
           <div className="bg-white/10 border border-brand-red-500/30 rounded-xl p-4 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-brand-red-200 text-sm">{error}</p>
+              <p className="text-white text-sm">{error}</p>
               <button 
                 onClick={() => { setError(null); setStatus('idle'); }}
                 className="text-brand-red-400 text-sm underline mt-1"

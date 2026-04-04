@@ -76,23 +76,23 @@ export function PointsDisplay({
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Trophy className="w-6 h-6" />
-            <span className="text-2xl font-bold">{totalPoints.toLocaleString()}</span>
+            <span className="text-2xl font-bold">{totalPoints.toLocaleString('en-US')}</span>
           </div>
-          <p className="text-brand-orange-100 text-sm">Total Points</p>
+          <p className="text-white text-sm">Total Points</p>
         </div>
         <div className="text-right">
           <div className="flex items-center gap-2 justify-end mb-1">
             <Star className="w-5 h-5" />
             <span className="text-xl font-bold">Level {level}</span>
           </div>
-          <p className="text-brand-orange-100 text-sm">{levelName}</p>
+          <p className="text-white text-sm">{levelName}</p>
         </div>
       </div>
 
       {/* Progress Bar */}
       <div className="mb-4">
         <div className="flex items-center justify-between text-sm mb-2">
-          <span className="text-brand-orange-100">Progress to Level {level + 1}</span>
+          <span className="text-white">Progress to Level {level + 1}</span>
           <span className="font-semibold">{pointsToNextLevel} points to go</span>
         </div>
         <div className="w-full bg-white rounded-full h-3">
@@ -113,7 +113,7 @@ export function PointsDisplay({
           <div className="space-y-2">
             {recentTransactions.slice(0, 3).map((transaction, index) => (
               <div key={index} className="flex items-center justify-between text-sm">
-                <span className="text-brand-orange-100">{transaction.description}</span>
+                <span className="text-white">{transaction.description}</span>
                 <span className="font-semibold">+{transaction.points}</span>
               </div>
             ))}

@@ -136,7 +136,7 @@ export default async function GradesPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-3">Need Help?</h2>
-            <p className="text-brand-blue-100 mb-6">
+            <p className="text-white mb-6">
               Contact support for questions about grades, assessments, or student progress.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">

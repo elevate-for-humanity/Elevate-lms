@@ -205,7 +205,7 @@ export default function TutoringPage() {
       <section className="py-20">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Need Help With Your Coursework?</h2>
-          <p className="text-lg text-brand-blue-100 mb-8">Log in to the LMS to book a tutoring session, or contact support if you need assistance.</p>
+          <p className="text-lg text-white mb-8">Log in to the LMS to book a tutoring session, or contact support if you need assistance.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/support" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-xl hover:bg-white transition text-lg shadow-lg">
               Go to LMS <ArrowRight className="w-5 h-5" />

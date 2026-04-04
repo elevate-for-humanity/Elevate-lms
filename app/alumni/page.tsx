@@ -61,7 +61,7 @@ export default function AlumniPage() {
             <h1 className="text-4xl sm:text-5xl font-bold mb-6">
               Elevate Alumni Network
             </h1>
-            <p className="text-xl text-brand-blue-100 mb-8">
+            <p className="text-xl text-white mb-8">
               Graduates across Indiana have transformed their careers. Access exclusive job opportunities, networking events, and continued learning resources.
             </p>
             <div className="flex flex-wrap gap-4">
@@ -164,7 +164,7 @@ export default function AlumniPage() {
       <section className="py-16 lg:py-24 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Join Our Network?</h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <p className="text-xl text-white mb-8">
             All Elevate graduates automatically become part of our alumni network. Sign in to access your benefits.
           </p>
           <Link

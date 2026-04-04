@@ -115,7 +115,7 @@ function SignedOutView() {
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <LogoImage alt="Elevate" width={40} height={40} className="mb-3" />
           <h1 className="text-2xl font-bold text-slate-900">Student Portal</h1>
-          <p className="text-brand-blue-200 text-sm mt-1">Sign in to view your program and progress</p>
+          <p className="text-white text-sm mt-1">Sign in to view your program and progress</p>
         </div>
       </div>
       <div className="max-w-md mx-auto px-4 -mt-6 relative z-10 w-full">
@@ -168,7 +168,7 @@ export default async function StudentPWAPage() {
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <LogoImage alt="Elevate" width={36} height={36} className="mb-2" />
           <h1 className="text-xl font-bold text-slate-900">Welcome back, {firstName}</h1>
-          <p className="text-brand-blue-200 text-sm mt-0.5">{user.email}</p>
+          <p className="text-white text-sm mt-0.5">{user.email}</p>
         </div>
       </div>
 

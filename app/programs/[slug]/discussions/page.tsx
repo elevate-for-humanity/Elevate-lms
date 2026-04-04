@@ -173,7 +173,7 @@ export default function ProgramDiscussionsPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Community Discussions</h1>
-              <p className="text-gray-600 mt-1">{program?.title || program?.name}</p>
+              <p className="text-black mt-1">{program?.title || program?.name}</p>
             </div>
             {user && isEnrolled && (
               <button
@@ -276,8 +276,8 @@ export default function ProgramDiscussionsPage() {
                       )}
                       <h3 className="text-lg font-semibold text-gray-900 truncate">{thread.title}</h3>
                     </div>
-                    <p className="text-gray-600 mt-1 line-clamp-2">{thread.content}</p>
-                    <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
+                    <p className="text-black mt-1 line-clamp-2">{thread.content}</p>
+                    <div className="flex items-center gap-4 mt-3 text-sm text-black">
                       <span className="flex items-center gap-1">
                         <User className="w-4 h-4" />
                         {thread.author?.full_name || 'Anonymous'}
@@ -303,7 +303,7 @@ export default function ProgramDiscussionsPage() {
             <div className="bg-white rounded-xl border p-12 text-center">
               <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No discussions yet</h3>
-              <p className="text-gray-500 mb-6">
+              <p className="text-black mb-6">
                 Be the first to start a conversation with fellow learners!
               </p>
               {user && isEnrolled && (

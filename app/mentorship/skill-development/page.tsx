@@ -91,7 +91,7 @@ export default function SkillDevelopmentPage() {
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Start Building Your Skills</h2>
-          <p className="text-xl text-brand-green-100 mb-8">Get matched with a mentor who can help you grow.</p>
+          <p className="text-xl text-white mb-8">Get matched with a mentor who can help you grow.</p>
           <Link href="/start" className="bg-white hover:bg-white text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Apply for Mentorship <ArrowRight className="ml-2 w-5 h-5" />
           </Link>

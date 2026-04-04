@@ -64,7 +64,7 @@ export default async function StudentPortalSchedulePage() {
     <div className="min-h-screen bg-white">
 
       {/* Hero */}
-      <section className="relative h-[260px] sm:h-[340px] overflow-hidden">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image
           src="/images/pages/student-portal-page-10.jpg"
           alt="Class schedule"

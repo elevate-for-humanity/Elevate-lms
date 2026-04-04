@@ -17,7 +17,7 @@ export default function MiladyAppDownload() {
           />
         </div>
         <h3 className="text-lg font-bold mb-2">📱 Learn on the Go</h3>
-        <p className="text-brand-blue-100 text-sm">
+        <p className="text-white text-sm">
           Download the Milady mobile app for iOS or Android
         </p>
       </div>
@@ -48,7 +48,7 @@ export default function MiladyAppDownload() {
           <Smartphone className="w-4 h-4" />
           How to Access:
         </h4>
-        <ol className="text-brand-blue-100 text-xs space-y-1 list-decimal list-inside">
+        <ol className="text-white text-xs space-y-1 list-decimal list-inside">
           <li>Download the Thinkific app</li>
           <li>Open the app and tap "Login"</li>
           <li>
@@ -61,7 +61,7 @@ export default function MiladyAppDownload() {
       </div>
 
       <div className="pt-4 border-t border-white/20">
-        <p className="text-brand-blue-100 text-xs text-center mb-3">
+        <p className="text-white text-xs text-center mb-3">
           Access your courses anywhere, anytime
         </p>
         <a

@@ -96,7 +96,7 @@ export default function ShopCheckInPage() {
         {error ? (
           <div className="bg-white/10 border border-brand-red-500/30 rounded-xl p-6 text-center">
             <AlertCircle className="w-12 h-12 text-brand-red-400 mx-auto mb-4" />
-            <p className="text-brand-red-200 mb-4">{error}</p>
+            <p className="text-white mb-4">{error}</p>
             <button
               onClick={handleRefresh}
               className="bg-brand-red-500 text-white px-6 py-2 rounded-xl font-medium"

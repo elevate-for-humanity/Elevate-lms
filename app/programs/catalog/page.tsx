@@ -89,7 +89,7 @@ export default async function ProgramCatalogPage({
       <div className="bg-white py-10 border-t">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Program Catalog</h1>
-          <p className="text-slate-600 text-sm">
+          <p className="text-black text-sm">
             {count ?? 0} program{(count ?? 0) !== 1 ? 's' : ''} from approved providers
             {wioaOnly ? ' · WIOA eligible' : ''}
             {category ? ` · ${category}` : ''}
@@ -112,8 +112,8 @@ export default async function ProgramCatalogPage({
           <div className="flex-1 min-w-0">
             {(programs ?? []).length === 0 ? (
               <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
-                <BookOpen className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-                <p className="text-slate-500 text-sm">No programs match your filters.</p>
+                <BookOpen className="w-10 h-10 text-white mx-auto mb-3" />
+                <p className="text-black text-sm">No programs match your filters.</p>
                 <Link href="/programs/catalog" className="mt-3 inline-block text-sm text-brand-blue-600 hover:underline">
                   Clear filters
                 </Link>
@@ -137,7 +137,7 @@ export default async function ProgramCatalogPage({
                         Previous
                       </Link>
                     )}
-                    <span className="text-sm text-slate-500">
+                    <span className="text-sm text-black">
                       Page {page} of {totalPages}
                     </span>
                     {page < totalPages && (
@@ -188,7 +188,7 @@ function ProgramCard({ prog }: { prog: ProgramRow }) {
     <div className="bg-white rounded-xl border border-slate-200 flex flex-col hover:shadow-md transition">
       <div className="p-4 flex-1">
         {/* Provider */}
-        <div className="text-xs text-slate-400 mb-1.5 truncate">{prog.provider_name}</div>
+        <div className="text-xs text-black mb-1.5 truncate">{prog.provider_name}</div>
 
         {/* Title */}
         <h3 className="font-bold text-slate-900 text-sm leading-snug mb-2">{prog.title}</h3>
@@ -202,12 +202,12 @@ function ProgramCard({ prog }: { prog: ProgramRow }) {
             <span key={tag} className="text-xs bg-brand-blue-50 text-brand-blue-700 px-2 py-0.5 rounded-full">{tag}</span>
           ))}
           {prog.category && (
-            <span className="text-xs bg-white text-slate-600 px-2 py-0.5 rounded-full">{prog.category}</span>
+            <span className="text-xs bg-white text-black px-2 py-0.5 rounded-full">{prog.category}</span>
           )}
         </div>
 
         {/* Details */}
-        <div className="space-y-1 text-xs text-slate-500">
+        <div className="space-y-1 text-xs text-black">
           {prog.credential_name && (
             <div className="flex items-center gap-1.5">
               <Award className="w-3 h-3 flex-shrink-0" />

@@ -174,7 +174,7 @@ export function AchievementsBadges({ userId }: AchievementsBadgesProps) {
               {isEarned ? (
                 <div className="text-center">
                   <p className="text-xs text-brand-orange-600 font-medium">
-                    Earned {new Date(badge.earned_at!).toLocaleDateString()}
+                    Earned {new Date(badge.earned_at!).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
               ) : badge.progress !== undefined && badge.requirement !== undefined ? (

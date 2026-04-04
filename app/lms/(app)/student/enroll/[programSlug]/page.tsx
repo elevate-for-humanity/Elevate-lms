@@ -142,7 +142,7 @@ export default async function EnrollProgramPage({ params }: Props) {
                     Check Eligibility
                   </Link>
                   <Link
-                    href="/programs"
+                    href="/lms/programs"
                     className="border border-gray-300 text-gray-700 py-3 px-8 rounded-lg font-semibold hover:bg-white transition"
                   >
                     Browse Programs

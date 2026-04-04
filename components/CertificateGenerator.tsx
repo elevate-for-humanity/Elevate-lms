@@ -12,7 +12,7 @@ interface CertificateGeneratorProps {
 export default function CertificateGenerator({
   studentName = 'Student Name',
   courseName = 'Course Name',
-  completionDate = new Date().toLocaleDateString(),
+  completionDate = new Date().toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' }),
   certificateId = 'CERT-' + Date.now(),
 }: CertificateGeneratorProps = {}) {
   const certRef = useRef<HTMLDivElement>(null);

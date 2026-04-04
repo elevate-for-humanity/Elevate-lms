@@ -89,7 +89,7 @@ export default async function PartnerLearningPage({ params }: Props) {
             <div>
               <div className="flex items-center gap-2 text-brand-blue-600 text-sm font-medium mb-2">
                 <Building2 className="w-4 h-4" />
-                Partner Course
+                Short-Term Course
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
                 {course?.title || enrollment.course_name || 'Partner Course'}

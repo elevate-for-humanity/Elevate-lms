@@ -34,13 +34,13 @@ export default async function ApprenticeshipPage() {
         <div className="container mx-auto px-4">
           <Link
             href="/employers"
-            className="inline-flex items-center text-brand-orange-100 hover:text-white mb-6"
+            className="inline-flex items-center text-white hover:text-white mb-6"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Employers
           </Link>
           <h1 className="text-4xl font-bold mb-4">Apprenticeship Programs</h1>
-          <p className="text-xl text-brand-orange-100 max-w-3xl">
+          <p className="text-xl text-white max-w-3xl">
             Build your workforce through DOL-registered apprenticeship programs
             with our comprehensive support and infrastructure.
           </p>

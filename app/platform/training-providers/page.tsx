@@ -54,7 +54,7 @@ export default function TrainingProvidersPage() {
           <Breadcrumbs items={[{ label: 'Platform', href: '/platform' }, { label: 'Training Providers' }]} />
         </div>
       </div>
-      <div class="max-w-6xl mx-auto px-4 pb-2"><p class="text-sm text-slate-600 font-medium">Part of the <a href="/platform" class="text-brand-red-600 hover:underline">Elevate Workforce Operating System</a></p></div>
+      <div class="max-w-6xl mx-auto px-4 pb-2"><p class="text-sm text-black font-medium">Part of the <a href="/platform" class="text-brand-red-600 hover:underline">Elevate Workforce Operating System</a></p></div>
 
       {/* Hero */}
       {/* Hero */}
@@ -65,7 +65,7 @@ export default function TrainingProvidersPage() {
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">For Training Providers</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Grow your training business, reach funded learners, and let the platform handle compliance and reporting.</p>
+            <p className="text-lg text-white max-w-3xl mx-auto">Grow your training business, reach funded learners, and let the platform handle compliance and reporting.</p>
           </div>
         </div>
       </section>
@@ -77,7 +77,7 @@ export default function TrainingProvidersPage() {
             {stats.map((s, i) => (
               <div key={i} className="text-center">
                 <p className="text-3xl md:text-4xl font-bold text-teal-700">{s.value}</p>
-                <p className="text-gray-600 text-sm mt-1">{s.label}</p>
+                <p className="text-black text-sm mt-1">{s.label}</p>
               </div>
             ))}
           </div>
@@ -89,7 +89,7 @@ export default function TrainingProvidersPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Partner With Us</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-black max-w-2xl mx-auto">
               Everything you need to run funded training programs, from enrollment to employment outcomes.
             </p>
           </div>
@@ -101,7 +101,7 @@ export default function TrainingProvidersPage() {
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-900 mb-2">{b.title}</h3>
-                  <p className="text-gray-600 text-sm">{b.description}</p>
+                  <p className="text-black text-sm">{b.description}</p>
                 </div>
               </div>
             ))}
@@ -114,7 +114,7 @@ export default function TrainingProvidersPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
-            <p className="text-lg text-gray-600">Four steps to start receiving funded students.</p>
+            <p className="text-lg text-black">Four steps to start receiving funded students.</p>
           </div>
           <div className="grid md:grid-cols-4 gap-8">
             {howItWorks.map((item, i) => (
@@ -123,7 +123,7 @@ export default function TrainingProvidersPage() {
                   {item.step}
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-600 text-sm">{item.description}</p>
+                <p className="text-black text-sm">{item.description}</p>
               </div>
             ))}
           </div>
@@ -148,7 +148,7 @@ export default function TrainingProvidersPage() {
                   'Dedicated partner success manager',
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     <span className="text-gray-700">{item}</span>
                   </div>
                 ))}

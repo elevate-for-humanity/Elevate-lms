@@ -18,7 +18,7 @@ export default function Page() {
 
       <section className="py-10 sm:py-16">
         <div className="max-w-5xl mx-auto px-6">
-          <Link href="/about/team" className="inline-flex items-center text-sm text-slate-500 hover:text-brand-red-600 mb-8">
+          <Link href="/about/team" className="inline-flex items-center text-sm text-black hover:text-brand-red-600 mb-8">
             <ArrowLeft className="w-4 h-4 mr-1" /> Back to Team
           </Link>
 

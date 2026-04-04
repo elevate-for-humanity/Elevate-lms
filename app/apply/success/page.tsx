@@ -135,7 +135,7 @@ export default async function ApplicationSuccessPage({
             <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
               {config.title}
             </h1>
-            <p className="text-lg text-slate-600">{config.message}</p>
+            <p className="text-lg text-black">{config.message}</p>
             {referenceNumber && (
               <div className="mt-4 inline-block bg-brand-green-50 border border-brand-green-200 rounded-lg px-4 py-2">
                 <span className="text-sm text-brand-green-700">Reference: </span>
@@ -158,7 +158,7 @@ export default async function ApplicationSuccessPage({
                       {step.icon}
                       <h3 className="font-semibold text-slate-900">{step.title}</h3>
                     </div>
-                    <p className="text-slate-600 text-sm leading-relaxed">{step.description}</p>
+                    <p className="text-black text-sm leading-relaxed">{step.description}</p>
                     {'link' in step && step.link && (
                       <Link
                         href={step.link}

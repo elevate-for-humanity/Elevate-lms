@@ -167,12 +167,12 @@ export default function HVACStandardsContent({ lessonMap }: { lessonMap?: Map<nu
               <h1 className="text-3xl font-bold text-gray-900">
                 HVAC Technician Training Program
               </h1>
-              <p className="text-lg text-gray-600 mt-1">
+              <p className="text-lg text-black mt-1">
                 Competency Standards &amp; Performance Requirements
               </p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-6 text-sm text-gray-600 mt-8 border-t pt-6">
+          <div className="flex flex-wrap gap-6 text-sm text-black mt-8 border-t pt-6">
             <span>Document Version: 1.0</span>
             <span>Effective Date: March 2026</span>
             <span>CIP Code: 47.0201</span>
@@ -244,10 +244,10 @@ export default function HVACStandardsContent({ lessonMap }: { lessonMap?: Map<nu
                     <td className="px-4 py-3 text-gray-800">
                       {d.code}: {d.name}
                     </td>
-                    <td className="text-center px-4 py-3 text-gray-600">
+                    <td className="text-center px-4 py-3 text-black">
                       {d.hours.theory}
                     </td>
-                    <td className="text-center px-4 py-3 text-gray-600">
+                    <td className="text-center px-4 py-3 text-black">
                       {d.hours.ojt}
                     </td>
                     <td className="text-center px-4 py-3 font-medium text-gray-800">
@@ -272,7 +272,7 @@ export default function HVACStandardsContent({ lessonMap }: { lessonMap?: Map<nu
               </tfoot>
             </table>
           </div>
-          <p className="text-sm text-gray-500 mt-3">
+          <p className="text-sm text-black mt-3">
             Theory hours are delivered via the Elevate LMS platform. OJT hours
             are completed at approved employer partner sites under qualified
             supervisor observation.
@@ -381,12 +381,12 @@ export default function HVACStandardsContent({ lessonMap }: { lessonMap?: Map<nu
                   className="bg-white rounded-lg border overflow-hidden"
                 >
                   <div className="px-6 py-4 border-b bg-white flex items-center gap-3">
-                    <Icon className="w-5 h-5 text-gray-600" />
+                    <Icon className="w-5 h-5 text-black" />
                     <div>
                       <h3 className="font-bold text-gray-900">
                         {domain.code}: {domain.name}
                       </h3>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-black">
                         {domain.competencies.length} competencies &middot;{" "}
                         {domain.hours.theory}h theory + {domain.hours.ojt}h OJT
                       </p>
@@ -398,12 +398,12 @@ export default function HVACStandardsContent({ lessonMap }: { lessonMap?: Map<nu
                         key={comp.code}
                         className="px-6 py-3 flex items-start gap-4 text-sm"
                       >
-                        <span className="font-mono text-xs bg-white px-2 py-1 rounded text-gray-600 whitespace-nowrap mt-0.5">
+                        <span className="font-mono text-xs bg-white px-2 py-1 rounded text-black whitespace-nowrap mt-0.5">
                           {comp.code}
                         </span>
                         <div className="flex-1">
                           <p className="text-gray-800">{comp.name}</p>
-                          <p className="text-xs text-gray-400 mt-0.5">
+                          <p className="text-xs text-black mt-0.5">
                             Lessons:{' '}
                             {comp.lessons.map((num: number, i: number) => {
                               const ref = lessonMap?.get(num);
@@ -452,7 +452,7 @@ export default function HVACStandardsContent({ lessonMap }: { lessonMap?: Map<nu
                   <CheckCircle2 className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" />
                   <div>
                     <p className="font-medium text-gray-900">{cred.name}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-black">
                       {cred.issuer} &middot; {cred.type}
                     </p>
                   </div>
@@ -506,7 +506,7 @@ export default function HVACStandardsContent({ lessonMap }: { lessonMap?: Map<nu
         </section>
 
         {/* Footer */}
-        <div className="text-center text-xs text-gray-400 pb-8 space-y-1">
+        <div className="text-center text-xs text-black pb-8 space-y-1">
           <p>
             Elevate for Humanity &middot; HVAC Technician Training Program
             &middot; Competency Standards v1.0

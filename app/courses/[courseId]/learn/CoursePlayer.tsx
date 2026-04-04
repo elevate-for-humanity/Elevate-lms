@@ -133,7 +133,7 @@ export default function CoursePlayer({
                   lessonUrls={lessons.map(l => `/courses/${courseId}/learn?lesson=${l.id}`)}
                 />
               </div>
-              <div className="hidden lg:flex items-center gap-1 text-xs text-slate-500">
+              <div className="hidden lg:flex items-center gap-1 text-xs text-black">
                 <kbd className="px-1.5 py-0.5 bg-white rounded text-[10px] font-mono">←</kbd>
                 <kbd className="px-1.5 py-0.5 bg-white rounded text-[10px] font-mono">→</kbd>
                 <span>to navigate</span>

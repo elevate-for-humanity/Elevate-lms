@@ -205,7 +205,7 @@ export default function ThreadDetailPage() {
                 )}
                 <h1 className="text-2xl font-bold text-gray-900">{thread.title}</h1>
               </div>
-              <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+              <div className="flex items-center gap-4 text-sm text-black mb-4">
                 <span>{thread.author?.full_name || 'Anonymous'}</span>
                 <span className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
@@ -221,12 +221,12 @@ export default function ThreadDetailPage() {
                 <button
                   onClick={likeThread}
                   disabled={!user}
-                  className="flex items-center gap-2 text-gray-500 hover:text-brand-blue-600 transition disabled:opacity-50"
+                  className="flex items-center gap-2 text-black hover:text-brand-blue-600 transition disabled:opacity-50"
                 >
                   <ThumbsUp className="w-5 h-5" />
                   <span>{thread.likes || 0}</span>
                 </button>
-                <span className="flex items-center gap-2 text-gray-500">
+                <span className="flex items-center gap-2 text-black">
                   <MessageSquare className="w-5 h-5" />
                   <span>{replies.length} replies</span>
                 </span>
@@ -243,10 +243,10 @@ export default function ThreadDetailPage() {
             <div key={reply.id} className="bg-white rounded-xl border p-6">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center flex-shrink-0">
-                  <User className="w-5 h-5 text-gray-600" />
+                  <User className="w-5 h-5 text-black" />
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-2">
+                  <div className="flex items-center gap-4 text-sm text-black mb-2">
                     <span className="font-medium text-gray-900">{reply.author?.full_name || 'Anonymous'}</span>
                     <span>{new Date(reply.created_at).toLocaleDateString()}</span>
                   </div>
@@ -254,7 +254,7 @@ export default function ThreadDetailPage() {
                   <button
                     onClick={() => likeReply(reply.id, reply.likes || 0)}
                     disabled={!user}
-                    className="flex items-center gap-2 text-gray-500 hover:text-brand-blue-600 transition mt-3 disabled:opacity-50"
+                    className="flex items-center gap-2 text-black hover:text-brand-blue-600 transition mt-3 disabled:opacity-50"
                   >
                     <ThumbsUp className="w-4 h-4" />
                     <span>{reply.likes || 0}</span>
@@ -266,7 +266,7 @@ export default function ThreadDetailPage() {
 
           {replies.length === 0 && (
             <div className="bg-white rounded-xl p-8 text-center">
-              <p className="text-gray-500">No replies yet. Be the first to respond!</p>
+              <p className="text-black">No replies yet. Be the first to respond!</p>
             </div>
           )}
         </div>
@@ -297,11 +297,11 @@ export default function ThreadDetailPage() {
         ) : (
           <div className="bg-white rounded-xl border p-6 text-center">
             {!user ? (
-              <p className="text-gray-600">
+              <p className="text-black">
                 <Link href="/login" className="text-brand-blue-600 font-semibold">Sign in</Link> to reply to this discussion.
               </p>
             ) : (
-              <p className="text-gray-600">
+              <p className="text-black">
                 <Link href={`/enroll/${program?.id}`} className="text-brand-blue-600 font-semibold">Enroll in this program</Link> to participate in discussions.
               </p>
             )}

@@ -325,7 +325,7 @@ export default function WIOACompliancePage() {
       <section className="py-16 bg-brand-green-700 text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-black mb-4">Ready for WIOA Compliance?</h2>
-          <p className="text-brand-green-100 mb-8">
+          <p className="text-white mb-8">
             Schedule a demo to see how our WIOA toolkit can streamline your compliance workflow.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

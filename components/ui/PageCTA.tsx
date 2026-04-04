@@ -20,7 +20,7 @@ export default function PageCTA({
     <section className="bg-brand-blue-700 text-white py-12 mt-12">
       <div className="max-w-4xl mx-auto px-4 text-center">
         <h2 className="text-2xl md:text-3xl font-bold mb-3">{title}</h2>
-        <p className="text-brand-blue-100 mb-6">{description}</p>
+        <p className="text-white mb-6">{description}</p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href={primaryHref}

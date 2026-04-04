@@ -95,9 +95,9 @@ export default function RoleDashboard({ role, userName }: RoleDashboardProps) {
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">{config.title}</h1>
-            <p className="text-xl text-brand-blue-100 mb-8">{config.description}</p>
+            <p className="text-xl text-white mb-8">{config.description}</p>
             {userName && (
-              <p className="text-lg text-brand-blue-200">Welcome back, {userName}!</p>
+              <p className="text-lg text-white">Welcome back, {userName}!</p>
             )}
           </div>
         </div>

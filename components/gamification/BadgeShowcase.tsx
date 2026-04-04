@@ -106,7 +106,7 @@ export function BadgeShowcase({ userId, badges: initialBadges, limit = 6 }: Badg
                 <p className="text-xs text-slate-600 mb-2">{badge.description}</p>
                 {badge.earned_at && (
                   <p className="text-xs text-slate-500">
-                    Earned {new Date(badge.earned_at).toLocaleDateString()}
+                    Earned {new Date(badge.earned_at).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
                 )}
               </div>

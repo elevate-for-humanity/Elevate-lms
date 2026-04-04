@@ -175,7 +175,7 @@ export default function ConsentPage() {
             <CheckCircle className="w-10 h-10 text-green-600" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-3">Agreement Signed</h1>
-          <p className="text-gray-600">Redirecting you to document upload…</p>
+          <p className="text-black">Redirecting you to document upload…</p>
         </div>
       </div>
     );
@@ -191,7 +191,7 @@ export default function ConsentPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold">Client Engagement Agreement</h1>
-            <p className="text-slate-300 text-sm mt-1">
+            <p className="text-white text-sm mt-1">
               SupersonicFastCash · Required before accessing your client portal
             </p>
           </div>
@@ -272,7 +272,7 @@ export default function ConsentPage() {
               className="w-40 border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 tracking-widest font-mono"
               required
             />
-            <p className="text-xs text-gray-500 mt-1">Used for identity verification only. Not stored in plain text.</p>
+            <p className="text-xs text-black mt-1">Used for identity verification only. Not stored in plain text.</p>
           </div>
 
           {/* Typed signature */}
@@ -288,7 +288,7 @@ export default function ConsentPage() {
               className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm italic font-serif text-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
               required
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-black mt-1">
               Typing your name constitutes a legally binding electronic signature under the E-SIGN Act.
             </p>
           </div>
@@ -296,9 +296,9 @@ export default function ConsentPage() {
           {/* Date (auto) */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Date</label>
-            <div className="w-full border border-gray-100 bg-gray-50 rounded-lg px-4 py-2.5 text-sm text-gray-500">
+            <div className="w-full border border-gray-100 bg-gray-50 rounded-lg px-4 py-2.5 text-sm text-black">
               {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-              <span className="ml-2 text-xs text-gray-400">(auto)</span>
+              <span className="ml-2 text-xs text-black">(auto)</span>
             </div>
           </div>
 
@@ -335,13 +335,13 @@ export default function ConsentPage() {
           </button>
 
           {!canSubmit && (
-            <p className="text-xs text-center text-gray-400">
+            <p className="text-xs text-center text-black">
               {!hasScrolled && !agreed ? 'Scroll through the agreement or check the box to continue.' : 'Complete all required fields to continue.'}
             </p>
           )}
         </form>
 
-        <p className="text-center text-xs text-gray-400 mt-6">
+        <p className="text-center text-xs text-black mt-6">
           SupersonicFastCash · 2Exclusive LLC-S · PTIN-credentialed preparers · Indianapolis, IN
         </p>
       </div>

@@ -166,7 +166,7 @@ export default function Page() {
                           <span className="font-bold text-lg text-slate-900">{prog.title}</span>
                           <span className="text-xs font-semibold text-brand-red-600 bg-brand-red-50 px-2 py-1 rounded-full">{prog.duration}</span>
                         </div>
-                        <span className="text-sm text-slate-600 mb-4 flex-1">{prog.desc}</span>
+                        <span className="text-sm text-black mb-4 flex-1">{prog.desc}</span>
                         <span className="text-brand-red-600 font-semibold text-sm group-hover:underline">
                           Learn More →
                         </span>

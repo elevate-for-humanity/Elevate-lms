@@ -64,7 +64,7 @@ export default function PerformanceChart() {
         {/* Chart */}
         <div className="relative" style={{ height: chartHeight + 40 }}>
           {/* Y-axis labels */}
-          <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-gray-500 pr-2">
+          <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-black pr-2">
             <span>100%</span>
             <span>75%</span>
             <span>50%</span>
@@ -93,7 +93,7 @@ export default function PerformanceChart() {
                     title={`Skills: ${item.skillGains}%`}
                   ></div>
                 </div>
-                <span className="text-xs text-gray-600 mt-2">{item.month}</span>
+                <span className="text-xs text-black mt-2">{item.month}</span>
               </div>
             ))}
           </div>

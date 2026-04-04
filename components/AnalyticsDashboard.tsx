@@ -23,7 +23,7 @@ export function AnalyticsDashboard({ data, timeframe = 'month' }: AnalyticsDashb
   const stats = [
     {
       title: 'Total Students',
-      value: data.totalStudents.toLocaleString(),
+      value: data.totalStudents.toLocaleString('en-US'),
       change: '+12%',
       icon: Users,
       color: 'text-brand-orange-600',
@@ -31,7 +31,7 @@ export function AnalyticsDashboard({ data, timeframe = 'month' }: AnalyticsDashb
     },
     {
       title: 'Active Students',
-      value: data.activeStudents.toLocaleString(),
+      value: data.activeStudents.toLocaleString('en-US'),
       change: '+8%',
       icon: TrendingUp,
       color: 'text-brand-green-600',
@@ -55,7 +55,7 @@ export function AnalyticsDashboard({ data, timeframe = 'month' }: AnalyticsDashb
     },
     {
       title: 'Study Hours',
-      value: data.studyHours.toLocaleString(),
+      value: data.studyHours.toLocaleString('en-US'),
       change: '+15%',
       icon: Clock,
       color: 'text-brand-blue-600',
@@ -63,7 +63,7 @@ export function AnalyticsDashboard({ data, timeframe = 'month' }: AnalyticsDashb
     },
     {
       title: 'Courses Completed',
-      value: data.coursesCompleted.toLocaleString(),
+      value: data.coursesCompleted.toLocaleString('en-US'),
       change: '+10%',
       icon: BookOpen,
       color: 'text-indigo-600',
@@ -71,7 +71,7 @@ export function AnalyticsDashboard({ data, timeframe = 'month' }: AnalyticsDashb
     },
     {
       title: 'Certificates Issued',
-      value: data.certificatesIssued.toLocaleString(),
+      value: data.certificatesIssued.toLocaleString('en-US'),
       change: '+7%',
       icon: Target,
       color: 'text-pink-600',
@@ -79,7 +79,7 @@ export function AnalyticsDashboard({ data, timeframe = 'month' }: AnalyticsDashb
     },
     {
       title: 'Revenue',
-      value: `$${data.totalRevenue.toLocaleString()}`,
+      value: `$${data.totalRevenue.toLocaleString('en-US')}`,
       change: '+18%',
       icon: DollarSign,
       color: 'text-brand-orange-600',

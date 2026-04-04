@@ -197,7 +197,7 @@ export default function WrgPage() {
               <p className="text-black mb-2">
                 21 days • $4,325 (FREE with WRG)
               </p>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-black">
                 Start earning $40K-$45K/year
               </p>
             </div>
@@ -207,7 +207,7 @@ export default function WrgPage() {
               <p className="text-black mb-2">
                 60 days • $5,000 (FREE with WRG)
               </p>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-black">
                 Start earning $45K-$60K/year
               </p>
             </div>
@@ -217,7 +217,7 @@ export default function WrgPage() {
               <p className="text-black mb-2">
                 1 day • $575 (FREE with WRG)
               </p>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-black">
                 Required for most healthcare jobs
               </p>
             </div>
@@ -229,7 +229,7 @@ export default function WrgPage() {
               <p className="text-black mb-2">
                 5 weeks • $4,575 (FREE with WRG)
               </p>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-black">
                 Start earning $35K-$50K/year
               </p>
             </div>
@@ -239,7 +239,7 @@ export default function WrgPage() {
               <p className="text-black mb-2">
                 45 days • $4,750 (FREE with WRG)
               </p>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-black">
                 Start earning $35K-$45K/year
               </p>
             </div>
@@ -251,7 +251,7 @@ export default function WrgPage() {
               <p className="text-black mb-2">
                 10 weeks • $4,950 (FREE with WRG)
               </p>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-black">
                 Seasonal income + year-round bookkeeping
               </p>
             </div>

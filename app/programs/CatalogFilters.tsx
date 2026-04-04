@@ -103,10 +103,10 @@ function ProgramCard({ p }: { p: CatalogProgram }) {
       <div className="px-4 py-3">
         <h3 className="font-semibold text-slate-900 text-sm leading-tight mb-1">{p.title}</h3>
         <div className="flex items-center justify-between">
-          <span className="flex items-center gap-1 text-xs text-slate-400">
+          <span className="flex items-center gap-1 text-xs text-black">
             <Clock className="w-3 h-3" />{p.durationWeeks} weeks
           </span>
-          <span className="text-xs text-slate-500">{p.isSelfPay ? 'Self-pay' : 'WIOA / Grant funded'}</span>
+          <span className="text-xs text-black">{p.isSelfPay ? 'Self-pay' : 'WIOA / Grant funded'}</span>
         </div>
       </div>
     </Link>
@@ -162,19 +162,19 @@ export default function CatalogFilters({ programs, sectors }: Props) {
           </div>
           <div className="flex w-full max-w-md gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black pointer-events-none" />
               <input
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search programs, credentials, jobs…"
-                className="h-11 w-full rounded-2xl border border-slate-300 bg-white pl-9 pr-4 text-sm outline-none placeholder:text-slate-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                className="h-11 w-full rounded-2xl border border-slate-300 bg-white pl-9 pr-4 text-sm outline-none placeholder:text-black focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               />
             </div>
             {hasFilters && (
               <button
                 onClick={() => { setQuery(''); setActiveSector(null); setActiveMode(null); setActiveFunding(null); }}
-                className="h-11 rounded-2xl border border-slate-300 px-4 text-sm font-medium text-slate-600 hover:border-slate-400 transition-colors"
+                className="h-11 rounded-2xl border border-slate-300 px-4 text-sm font-medium text-black hover:border-slate-400 transition-colors"
               >
                 Clear
               </button>
@@ -200,7 +200,7 @@ export default function CatalogFilters({ programs, sectors }: Props) {
           ))}
 
           {/* Divider */}
-          <span className="self-center text-slate-600 select-none">|</span>
+          <span className="self-center text-black select-none">|</span>
 
           {/* Mode chips */}
           {MODE_CHIPS.map((c) => (
@@ -218,7 +218,7 @@ export default function CatalogFilters({ programs, sectors }: Props) {
           ))}
 
           {/* Divider */}
-          <span className="self-center text-slate-600 select-none">|</span>
+          <span className="self-center text-black select-none">|</span>
 
           {/* Funding chips */}
           {FUNDING_CHIPS.map((c) => (
@@ -240,7 +240,7 @@ export default function CatalogFilters({ programs, sectors }: Props) {
       {/* Results */}
       {filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
-          <p className="text-slate-500 font-medium">No programs match your filters.</p>
+          <p className="text-black font-medium">No programs match your filters.</p>
           <button
             onClick={() => { setQuery(''); setActiveSector(null); setActiveMode(null); setActiveFunding(null); }}
             className="mt-3 text-sm text-brand-blue-600 hover:underline"
@@ -260,10 +260,10 @@ export default function CatalogFilters({ programs, sectors }: Props) {
             <div key={sector.key}>
               <div className="mb-5">
                 <h2 className="text-xl font-bold text-slate-900">{sector.label}</h2>
-                <p className="text-sm text-slate-500 mt-0.5">{sector.description}</p>
+                <p className="text-sm text-black mt-0.5">{sector.description}</p>
               </div>
               {items.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
+                <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-black">
                   New programs in this sector are in development.{' '}
                   <Link href="/contact" className="text-brand-blue-600 underline">Contact us</Link> to express interest.
                 </div>

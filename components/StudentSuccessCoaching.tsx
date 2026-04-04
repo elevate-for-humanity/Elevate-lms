@@ -77,7 +77,7 @@ export function StudentSuccessCoaching() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2">Success Coaching</h2>
-          <p className="text-brand-red-100">Your personalized path to success</p>
+          <p className="text-white">Your personalized path to success</p>
         </div>
       </div>
 

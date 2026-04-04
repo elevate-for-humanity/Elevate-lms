@@ -47,7 +47,7 @@ export default async function VideosPage() {
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
             Training Videos
           </h1>
-          <p className="text-xl text-brand-orange-100 max-w-3xl mx-auto">
+          <p className="text-xl text-white max-w-3xl mx-auto">
             Watch videos about our free career training programs. Learn what we
             offer and how to get started.
           </p>

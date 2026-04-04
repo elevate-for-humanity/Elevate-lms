@@ -36,7 +36,7 @@ export default async function NewsPage() {
         <div className="absolute inset-x-0 bottom-0 max-w-6xl mx-auto px-4 pb-8">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-300 mb-1">Elevate for Humanity</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">News &amp; Updates</h1>
-          <p className="text-slate-600 mt-1 text-sm max-w-xl">
+          <p className="text-black mt-1 text-sm max-w-xl">
             Program announcements, success stories, and workforce development news from Indianapolis.
           </p>
         </div>
@@ -50,9 +50,9 @@ export default async function NewsPage() {
         {posts.length === 0 ? (
           /* Empty state */
           <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-16 px-8 text-center">
-            <Newspaper className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-            <p className="text-slate-600 font-medium">No articles published yet.</p>
-            <p className="text-slate-500 text-sm mt-1">Follow us on social media for the latest updates.</p>
+            <Newspaper className="w-10 h-10 text-white mx-auto mb-3" />
+            <p className="text-black font-medium">No articles published yet.</p>
+            <p className="text-black text-sm mt-1">Follow us on social media for the latest updates.</p>
             <Link href="/contact" className="mt-4 inline-block text-sm text-brand-blue-600 hover:underline font-medium">
               Contact us
             </Link>
@@ -79,8 +79,8 @@ export default async function NewsPage() {
                         </span>
                       )}
                       <h2 className="text-xl sm:text-2xl font-bold leading-snug">{featured.title}</h2>
-                      {featured.excerpt && <p className="text-slate-600 text-sm mt-1 line-clamp-2">{featured.excerpt}</p>}
-                      <p className="text-slate-500 text-xs mt-2 flex items-center gap-1">
+                      {featured.excerpt && <p className="text-black text-sm mt-1 line-clamp-2">{featured.excerpt}</p>}
+                      <p className="text-black text-xs mt-2 flex items-center gap-1">
                         <Calendar className="w-3 h-3" /> {formatPostDate(featured.published_at)}
                       </p>
                     </div>
@@ -98,7 +98,7 @@ export default async function NewsPage() {
                           <Image src={post.featured_image} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500"  sizes="100vw" />
                         ) : (
                           <div className="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center">
-                            <Newspaper className="w-8 h-8 text-slate-400" />
+                            <Newspaper className="w-8 h-8 text-black" />
                           </div>
                         )}
                       </div>
@@ -109,8 +109,8 @@ export default async function NewsPage() {
                         <h3 className="font-bold text-slate-900 mt-1 leading-snug group-hover:text-brand-blue-700 transition-colors line-clamp-2">
                           {post.title}
                         </h3>
-                        {post.excerpt && <p className="text-sm text-slate-500 mt-1 line-clamp-2">{post.excerpt}</p>}
-                        <p className="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                        {post.excerpt && <p className="text-sm text-black mt-1 line-clamp-2">{post.excerpt}</p>}
+                        <p className="text-xs text-black mt-2 flex items-center gap-1">
                           <Calendar className="w-3 h-3" /> {formatPostDate(post.published_at)}
                         </p>
                       </div>
@@ -137,7 +137,7 @@ export default async function NewsPage() {
 
               <div className="rounded-2xl bg-brand-blue-50 border border-brand-blue-100 p-5">
                 <h3 className="font-bold text-slate-900 mb-2 text-sm">Stay informed</h3>
-                <p className="text-xs text-slate-600 mb-3">Get program updates and workforce news delivered to your inbox.</p>
+                <p className="text-xs text-black mb-3">Get program updates and workforce news delivered to your inbox.</p>
                 <Link href="/contact" className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-blue-700 hover:underline">
                   Subscribe <ArrowRight className="w-3.5 h-3.5" />
                 </Link>

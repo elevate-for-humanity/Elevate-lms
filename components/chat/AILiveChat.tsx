@@ -255,7 +255,7 @@ export default function AILiveChat({
           </div>
           <div>
             <h3 className="font-bold text-sm">AI Assistant</h3>
-            <p className="text-xs text-brand-blue-100">
+            <p className="text-xs text-white">
               {agentConnected ? 'Connected to agent' : 'Online • Instant replies'}
             </p>
           </div>

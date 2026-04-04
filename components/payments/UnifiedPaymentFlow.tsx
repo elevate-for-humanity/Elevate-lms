@@ -174,7 +174,7 @@ export default function UnifiedPaymentFlow({
               Pay in Full
             </h3>
             <p className="text-3xl font-bold text-black mb-2">
-              ${price.toLocaleString()}
+              ${price.toLocaleString('en-US')}
             </p>
             <p className="text-sm text-black">
               One-time payment. Start immediately.
@@ -203,7 +203,7 @@ export default function UnifiedPaymentFlow({
                 Payment Plan
               </h3>
               <p className="text-3xl font-bold text-black mb-2">
-                ${monthlyPayment.toLocaleString()}<span className="text-lg text-black">/mo</span>
+                ${monthlyPayment.toLocaleString('en-US')}<span className="text-lg text-black">/mo</span>
               </p>
               <p className="text-sm text-black">
                 4 monthly payments. Start immediately.
@@ -219,8 +219,8 @@ export default function UnifiedPaymentFlow({
               <div className="text-sm text-brand-blue-900">
                 <p className="font-semibold mb-1">Payment Plan Details:</p>
                 <ul className="list-disc list-inside space-y-1">
-                  <li>4 monthly payments of ${monthlyPayment.toLocaleString()}</li>
-                  <li>Total: ${price.toLocaleString()}</li>
+                  <li>4 monthly payments of ${monthlyPayment.toLocaleString('en-US')}</li>
+                  <li>Total: ${price.toLocaleString('en-US')}</li>
                   <li>No interest or hidden fees</li>
                   <li>Start your program immediately</li>
                 </ul>
@@ -298,7 +298,7 @@ export default function UnifiedPaymentFlow({
             <div className="flex justify-between items-center">
               <span className="text-black">Monthly Payment</span>
               <span className="font-semibold text-black">
-                ${monthlyPayment.toLocaleString()}
+                ${monthlyPayment.toLocaleString('en-US')}
               </span>
             </div>
           )}
@@ -309,7 +309,7 @@ export default function UnifiedPaymentFlow({
                 {paymentType === 'full' ? 'Total Due Today' : 'First Payment'}
               </span>
               <span className="text-2xl font-bold text-brand-blue-600">
-                ${(paymentType === 'full' ? price : monthlyPayment).toLocaleString()}
+                ${(paymentType === 'full' ? price : monthlyPayment).toLocaleString('en-US')}
               </span>
             </div>
           </div>

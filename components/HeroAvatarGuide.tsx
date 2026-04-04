@@ -258,7 +258,7 @@ export default function HeroAvatarGuide({
                     </div>
                     <div>
                       <p className="font-semibold">{avatarName}</p>
-                      <p className="text-xs text-brand-blue-200">Online</p>
+                      <p className="text-xs text-white">Online</p>
                     </div>
                   </div>
                   <button

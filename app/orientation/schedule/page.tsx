@@ -2,28 +2,14 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Calendar, Clock, MapPin, Phone } from 'lucide-react';
+import { Phone } from 'lucide-react';
+import OrientationScheduleClient from './OrientationScheduleClient';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/orientation/schedule' },
-  title: 'Orientation Schedule | Elevate For Humanity',
-  description: 'View upcoming orientation sessions and schedule your program orientation. Required before enrollment in any training program.',
+  title: 'Schedule Orientation | Elevate For Humanity',
+  description: 'Schedule a virtual orientation session or a barbershop walk-through. Sessions are 2 hours apart and added to Google Calendar automatically.',
 };
-
-const SESSIONS = [
-  { day: 'Monday', time: '9:00 AM – 11:00 AM', format: 'In-Person', location: 'Indianapolis Training Center' },
-  { day: 'Wednesday', time: '1:00 PM – 3:00 PM', format: 'Virtual (Zoom)', location: 'Online' },
-  { day: 'Friday', time: '10:00 AM – 12:00 PM', format: 'In-Person', location: 'Indianapolis Training Center' },
-];
-
-const WHAT_TO_EXPECT = [
-  'Overview of available training programs and career pathways',
-  'Eligibility requirements and funding options (WIOA, DOL, Job Ready Indy)',
-  'Document checklist and enrollment process walkthrough',
-  'Meet your enrollment advisor and ask questions',
-  'Tour of training facilities (in-person sessions)',
-  'Next steps and timeline to start your program',
-];
 
 export default function OrientationSchedulePage() {
   return (
@@ -33,89 +19,43 @@ export default function OrientationSchedulePage() {
       </div>
 
       {/* Hero */}
-      {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <Image src="/images/pages/orientation-page-2.jpg" alt="Students attending orientation session" fill className="object-cover" priority sizes="100vw" />
+          <Image
+            src="/images/pages/orientation-page-2.jpg"
+            alt="Orientation session"
+            fill className="object-cover" priority sizes="100vw"
+          />
         </div>
-        <div className="bg-white py-10">
-          <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Orientation Schedule</h1>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Attend an orientation session before enrolling in any training program.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Weekly Sessions */}
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Weekly Sessions</h2>
-          <p className="text-gray-600 mb-8">Orientation is offered multiple times per week. Choose the session that works for you.</p>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {SESSIONS.map((s) => (
-              <div key={s.day} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                <div className="flex items-center gap-3 mb-4">
-                  <Calendar className="w-6 h-6 text-brand-blue-600" />
-                  <h3 className="text-xl font-bold text-gray-900">{s.day}</h3>
-                </div>
-                <div className="space-y-3 text-gray-700">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-gray-400" />
-                    <span>{s.time}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-gray-400" />
-                    <span>{s.location}</span>
-                  </div>
-                  <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                    s.format.includes('Virtual') ? 'bg-brand-blue-50 text-brand-blue-700' : 'bg-brand-green-50 text-brand-green-700'
-                  }`}>
-                    {s.format}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="bg-white border-t py-10 text-center px-4">
+          <h1 className="text-3xl md:text-4xl font-black text-black mb-3">Schedule Your Session</h1>
+          <p className="text-black text-lg max-w-2xl mx-auto">
+            Virtual orientations and barbershop walk-throughs are available by appointment.
+            Pick your session type below — you'll receive a Google Calendar invite with a Zoom link.
+          </p>
         </div>
       </section>
 
-      {/* What to Expect */}
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">What to Expect</h2>
-              <ul className="space-y-4">
-                {WHAT_TO_EXPECT.map((item) => (
-                  <li key={item} className="flex items-start gap-3">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span className="text-gray-700">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="relative h-80 rounded-2xl overflow-hidden shadow-lg">
-              <Image
-                src="/images/pages/orientation-schedule-hero.jpg"
-                alt="Students in orientation session"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </div>
-          </div>
+      {/* Scheduler */}
+      <section className="py-12 px-4">
+        <div className="max-w-2xl mx-auto">
+          <OrientationScheduleClient />
         </div>
       </section>
 
-      {/* What to Bring */}
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">What to Bring</h2>
+      {/* What to bring */}
+      <section className="py-12 px-4 bg-slate-50 border-t border-slate-200">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-black text-black mb-6 text-center">What to Have Ready</h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
-            {['Government-issued photo ID', 'Proof of Indiana residency (utility bill, lease)', 'Proof of income (if applying for WIOA funding)', 'Any prior transcripts or certifications'].map((item) => (
-              <div key={item} className="bg-white border border-gray-200 rounded-lg p-4 text-center">
-                <p className="text-gray-800 font-medium text-sm">{item}</p>
+            {[
+              'Government-issued photo ID',
+              'Proof of Indiana residency (utility bill or lease)',
+              'Proof of income (if applying for WIOA funding)',
+              'Any prior transcripts or certifications',
+            ].map((item) => (
+              <div key={item} className="bg-white border border-slate-200 rounded-xl p-4 text-center">
+                <p className="text-black font-medium text-sm">{item}</p>
               </div>
             ))}
           </div>
@@ -123,28 +63,15 @@ export default function OrientationSchedulePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-700 text-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Attend Orientation?</h2>
-          <p className="text-brand-blue-100 mb-8 text-lg">
-            No registration required for weekly sessions. Walk-ins welcome, or call to confirm your spot.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link
-              href="/contact"
-              className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg"
-            >
-              Contact Us
-            </Link>
-            <a
-              href="tel:+13175551234"
-              className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg inline-flex items-center gap-2"
-            >
-              <Phone className="w-5 h-5" />
-              Call to Schedule
-            </a>
-          </div>
-        </div>
+      <section className="py-14 bg-slate-900 text-center px-4">
+        <h2 className="text-2xl font-black text-white mb-3">Prefer to Call?</h2>
+        <p className="text-white mb-6">Our team can schedule your session over the phone in under 2 minutes.</p>
+        <a
+          href="tel:3173143757"
+          className="inline-flex items-center gap-2 bg-white text-black font-bold px-8 py-4 rounded-xl hover:bg-slate-100 transition-colors text-lg"
+        >
+          <Phone className="w-5 h-5" /> (317) 314-3757
+        </a>
       </section>
     </div>
   );

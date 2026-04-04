@@ -76,14 +76,14 @@ export default function RefundTrackerPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'received':
-        return <Clock className="w-12 h-12 text-brand-blue-200" />;
+        return <Clock className="w-12 h-12 text-white" />;
       case 'processing':
       case 'submitted':
-        return <TrendingUp className="w-12 h-12 text-brand-blue-200" />;
+        return <TrendingUp className="w-12 h-12 text-white" />;
       case 'accepted':
-        return <span className="text-slate-400 flex-shrink-0">•</span>;
+        return <span className="text-black flex-shrink-0">•</span>;
       case 'action_required':
-        return <AlertCircle className="w-12 h-12 text-brand-red-200" />;
+        return <AlertCircle className="w-12 h-12 text-white" />;
       default:
         return <Clock className="w-12 h-12 text-gray-200" />;
     }
@@ -143,7 +143,7 @@ export default function RefundTrackerPage() {
                   maxLength={40}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-green-500 focus:outline-none font-mono"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-black mt-1">
                   Enter the tracking code provided when your return was filed
                 </p>
               </div>
@@ -181,20 +181,20 @@ export default function RefundTrackerPage() {
               <h3 className="font-semibold mb-3">When to Check:</h3>
               <ul className="space-y-2 text-sm text-black">
                 <li className="flex items-start gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <span>
                     <strong>E-filed:</strong> 24 hours after IRS accepts your
                     return
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <span>
                     <strong>Paper filed:</strong> 4 weeks after mailing
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <span>
                     <strong>Amended return:</strong> 3 weeks after filing
                   </span>
@@ -263,7 +263,7 @@ export default function RefundTrackerPage() {
                 <div className="flex gap-4">
                   <div className="flex flex-col items-center">
                     <div className="w-10 h-10 bg-brand-green-600 rounded-full flex items-center justify-center">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-black flex-shrink-0">•</span>
                     </div>
                     <div className="w-0.5 h-full bg-brand-green-600 mt-2"></div>
                   </div>
@@ -286,7 +286,7 @@ export default function RefundTrackerPage() {
                           : 'bg-gray-300'
                       }`}
                     >
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-black flex-shrink-0">•</span>
                     </div>
                     <div
                       className={`w-0.5 h-full mt-2 ${

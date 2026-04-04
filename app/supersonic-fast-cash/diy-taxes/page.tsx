@@ -294,7 +294,7 @@ export default function DIYTaxesPage() {
                     }`}
                   >
                     {currentStep > step.id ? (
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-black flex-shrink-0">•</span>
                     ) : (
                       step.id
                     )}
@@ -540,7 +540,7 @@ export default function DIYTaxesPage() {
                         }`}
                       >
                         {taxReturn.filingStatus === status.value && (
-                          <span className="text-slate-400 flex-shrink-0">•</span>
+                          <span className="text-black flex-shrink-0">•</span>
                         )}
                       </div>
                       <div>
@@ -877,7 +877,7 @@ export default function DIYTaxesPage() {
                       }`}
                     >
                       {taxReturn.deductionType === 'standard' && (
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-black flex-shrink-0">•</span>
                       )}
                     </div>
                     <div>
@@ -911,7 +911,7 @@ export default function DIYTaxesPage() {
                       }`}
                     >
                       {taxReturn.deductionType === 'itemized' && (
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-black flex-shrink-0">•</span>
                       )}
                     </div>
                     <div>

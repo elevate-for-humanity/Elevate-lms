@@ -76,14 +76,14 @@ export default async function PeerRecoverySpecialistPage() {
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 py-12 md:grid-cols-2 md:items-center">
           <div>
-            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-black">
               Workforce Training Program
             </p>
             <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
               {(program as any).hero_headline ?? program.title}
             </h1>
             {(program as any).hero_subheadline && (
-              <p className="mt-4 max-w-2xl text-lg text-slate-600">{(program as any).hero_subheadline}</p>
+              <p className="mt-4 max-w-2xl text-lg text-black">{(program as any).hero_subheadline}</p>
             )}
             <div className="mt-6 flex flex-wrap gap-3">
               {program.program_ctas.map((cta: any) => {
@@ -95,7 +95,7 @@ export default async function PeerRecoverySpecialistPage() {
                 return <Link key={cta.id} href={cta.href} className={variant}>{cta.label}</Link>;
               })}
             </div>
-            <div className="mt-8 flex flex-wrap gap-6 text-sm text-slate-500">
+            <div className="mt-8 flex flex-wrap gap-6 text-sm text-black">
               {program.length_weeks && <span>{program.length_weeks} weeks</span>}
               {program.delivery_model && <span className="capitalize">{program.delivery_model}</span>}
               {program.certificate_title && <span>{program.certificate_title}</span>}
@@ -154,7 +154,7 @@ export default async function PeerRecoverySpecialistPage() {
                       {typeof formatTrackCost === 'function' ? formatTrackCost(track.cost_cents) : track.cost_cents === 0 ? '$0 (Funded)' : `$${(track.cost_cents / 100).toFixed(0)}`}
                     </span>
                   </div>
-                  {track.description && <p className="mt-2 text-sm text-slate-600">{track.description}</p>}
+                  {track.description && <p className="mt-2 text-sm text-black">{track.description}</p>}
                 </div>
               ))}
             </div>
@@ -177,14 +177,14 @@ export default async function PeerRecoverySpecialistPage() {
               <div className="border-b border-slate-200 bg-slate-50 px-6 py-4">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Module {mod.module_number}</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-black">Module {mod.module_number}</p>
                     <h3 className="text-lg font-semibold text-slate-900">{mod.title}</h3>
                   </div>
-                  <div className="text-sm text-slate-500">
+                  <div className="text-sm text-black">
                     {mod.lesson_count} lessons{mod.duration_hours ? ` · ${mod.duration_hours}h` : ''}
                   </div>
                 </div>
-                {mod.description && <p className="mt-2 text-sm text-slate-600">{mod.description}</p>}
+                {mod.description && <p className="mt-2 text-sm text-black">{mod.description}</p>}
               </div>
             </div>
           ))}
@@ -195,7 +195,7 @@ export default async function PeerRecoverySpecialistPage() {
       <section className="border-t border-slate-200 bg-slate-50 py-12">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <h2 className="text-2xl font-bold">Ready to start?</h2>
-          <p className="mt-3 text-slate-600">WIOA and Justice Reinvestment Initiative funding available for eligible Indiana residents.</p>
+          <p className="mt-3 text-black">WIOA and Justice Reinvestment Initiative funding available for eligible Indiana residents.</p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link href="/apply?program=peer-recovery-specialist"
               className="rounded-xl bg-slate-900 px-6 py-3 font-semibold text-white hover:bg-slate-800 transition-colors">

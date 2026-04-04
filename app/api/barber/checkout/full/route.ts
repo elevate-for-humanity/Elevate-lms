@@ -10,7 +10,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
  * POST /api/barber/checkout/full
  * 
  * Pay in full checkout for Barber Apprenticeship.
- * Applies 5% discount for full payment.
+ * Full payment — no discount.
  */
 async function _POST(request: NextRequest) {
   try {
@@ -67,8 +67,7 @@ async function _POST(request: NextRequest) {
     const priceRatio = hoursRemaining / totalHoursRequired;
     const adjustedFullPrice = Math.round(BARBER_PRICING.fullPrice * priceRatio);
     
-    // 5% discount for paying in full
-    const discountedPrice = Math.round(adjustedFullPrice * 0.95);
+    const discountedPrice = adjustedFullPrice;
 
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
     const finalSuccessUrl = success_url || `${baseUrl}/programs/barber-apprenticeship/enrollment-success?session_id={CHECKOUT_SESSION_ID}`;

@@ -50,7 +50,7 @@ export default function CosmetologyApplyPage() {
       <div className="max-w-xl mx-auto">
         <Link
           href="/programs/cosmetology-apprenticeship"
-          className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 mb-8"
+          className="inline-flex items-center gap-2 text-sm text-black hover:text-slate-700 mb-8"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Program
         </Link>
@@ -59,7 +59,7 @@ export default function CosmetologyApplyPage() {
           <div className="mb-6">
             <span className="text-xs font-bold text-brand-green-600 uppercase tracking-wider">DOL Registered Apprenticeship</span>
             <h1 className="text-2xl font-extrabold text-slate-900 mt-1">Cosmetology Apprenticeship Application</h1>
-            <p className="text-slate-500 text-sm mt-2">
+            <p className="text-black text-sm mt-2">
               Earn while you learn. Complete this form to begin your application — our team will contact you within 1 business day.
             </p>
           </div>
@@ -154,7 +154,7 @@ export default function CosmetologyApplyPage() {
               )}
             </button>
 
-            <p className="text-xs text-slate-500 text-center">
+            <p className="text-xs text-black text-center">
               Questions?{' '}
               <a href="tel:3173143757" className="text-brand-blue-600 hover:underline">(317) 314-3757</a>
               {' '}or{' '}

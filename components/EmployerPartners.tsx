@@ -260,7 +260,7 @@ export default function EmployerPartners({
               <div className="text-gray-700 font-semibold">Placement Rate</div>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg text-center">
-              <div className="text-4xl font-bold text-purple-600 mb-2">{stats.graduatesHired.toLocaleString()}+</div>
+              <div className="text-4xl font-bold text-purple-600 mb-2">{stats.graduatesHired.toLocaleString('en-US')}+</div>
               <div className="text-gray-700 font-semibold">Graduates Hired</div>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg text-center">

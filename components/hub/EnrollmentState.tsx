@@ -209,7 +209,7 @@ export default function EnrollmentState({ userId }: { userId?: string }) {
                 <span className="text-sm font-medium">{config.label}</span>
               </div>
               <span className="text-sm text-slate-500">
-                Enrolled {new Date(enrollment.enrolled_at).toLocaleDateString()}
+                Enrolled {new Date(enrollment.enrolled_at).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
             </div>
 

@@ -109,7 +109,7 @@ function SuccessContent() {
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-4xl font-black mb-4">License Activated!</h1>
-          <p className="text-xl text-brand-green-100 max-w-2xl mx-auto">
+          <p className="text-xl text-white max-w-2xl mx-auto">
             Your managed LMS platform is being provisioned. Follow the steps below to get started.
           </p>
         </div>
@@ -232,7 +232,7 @@ function SuccessContent() {
         <div className="bg-brand-blue-600 rounded-2xl p-8 text-white text-center">
           <Settings className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <h2 className="text-2xl font-bold mb-2">Ready to Configure?</h2>
-          <p className="text-brand-blue-100 mb-6">
+          <p className="text-white mb-6">
             Access your admin dashboard to start setting up your platform.
           </p>
           <Link

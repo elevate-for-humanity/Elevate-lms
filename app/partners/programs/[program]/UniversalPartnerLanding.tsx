@@ -24,7 +24,7 @@ export default function UniversalPartnerLanding({ config }: { config: ProgramCon
         </div>
         <div className="relative max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">{config.shortName} Partner Program</h1>
-          <p className="text-xl text-slate-200 mb-8 max-w-2xl mx-auto">{config.description}</p>
+          <p className="text-xl text-white mb-8 max-w-2xl mx-auto">{config.description}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href={`/partners/programs/${config.slug}/apply`}
@@ -51,7 +51,7 @@ export default function UniversalPartnerLanding({ config }: { config: ProgramCon
           {config.registeredApprenticeship && (
             <p className="text-center text-orange-600 font-semibold mb-4">USDOL Registered Apprenticeship</p>
           )}
-          <p className="text-lg text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+          <p className="text-lg text-black text-center mb-12 max-w-2xl mx-auto">
             Your {config.siteLabel} hosts {config.traineeLabelPlural} who complete {config.trainingHours.toLocaleString()} hours of
             on-the-job training under a {config.supervisorTitle.toLowerCase()}.
             {config.theoryProvider && ` ${Cap(config.traineeLabelPlural)} also complete theory coursework through ${config.theoryProvider}.`}
@@ -62,7 +62,7 @@ export default function UniversalPartnerLanding({ config }: { config: ProgramCon
                 <span className="text-orange-600 font-bold text-xl">1</span>
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Apply &amp; Get Approved</h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-black text-sm">
                 Submit your application{config.siteVisitRequired ? ', complete a Zoom site visit,' : ''} and sign the MOU.
                 Approval takes about {config.approvalTimeline}.
               </p>
@@ -72,7 +72,7 @@ export default function UniversalPartnerLanding({ config }: { config: ProgramCon
                 <span className="text-orange-600 font-bold text-xl">2</span>
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Host {Cap(config.traineeLabelPlural)}</h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-black text-sm">
                 We match qualified {config.traineeLabelPlural} to your {config.siteLabel}. They complete {config.trainingHours.toLocaleString()} hours
                 of training under your {config.supervisorTitle.toLowerCase()}.
               </p>
@@ -82,7 +82,7 @@ export default function UniversalPartnerLanding({ config }: { config: ProgramCon
                 <span className="text-orange-600 font-bold text-xl">3</span>
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Grow Your Team</h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-black text-sm">
                 {config.licensingExam
                   ? `${Cap(config.traineeLabelPlural)} sit for the ${config.licensingExam}. You get a trained, credentialed professional.`
                   : `${Cap(config.traineeLabelPlural)} complete the program ready to contribute to your team.`}
@@ -100,7 +100,7 @@ export default function UniversalPartnerLanding({ config }: { config: ProgramCon
             {config.requirements.map((req) => (
               <div key={req.title} className="bg-white p-6 rounded-xl border border-gray-200">
                 <h3 className="font-bold text-gray-900 mb-2">{req.title}</h3>
-                <p className="text-gray-600 text-sm">{req.description}</p>
+                <p className="text-black text-sm">{req.description}</p>
               </div>
             ))}
           </div>
@@ -126,9 +126,9 @@ export default function UniversalPartnerLanding({ config }: { config: ProgramCon
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-1">
                     <h3 className="font-bold text-gray-900">{item.title}</h3>
-                    <span className="text-xs bg-white text-gray-600 px-2 py-0.5 rounded-full">{item.time}</span>
+                    <span className="text-xs bg-white text-black px-2 py-0.5 rounded-full">{item.time}</span>
                   </div>
-                  <p className="text-gray-600 text-sm">{item.desc}</p>
+                  <p className="text-black text-sm">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -146,7 +146,7 @@ export default function UniversalPartnerLanding({ config }: { config: ProgramCon
                 <summary className="px-6 py-4 cursor-pointer font-semibold text-gray-900 hover:bg-white transition-colors">
                   {item.question}
                 </summary>
-                <div className="px-6 pb-4 text-gray-600 text-sm">{item.answer}</div>
+                <div className="px-6 pb-4 text-black text-sm">{item.answer}</div>
               </details>
             ))}
           </div>

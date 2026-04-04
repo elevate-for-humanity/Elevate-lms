@@ -172,7 +172,7 @@ export default function RequiredFormsPage() {
         <div className="bg-white rounded-xl shadow-sm border p-6 mb-8">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-bold text-gray-900">Completion Progress</h2>
-            <span className="text-sm font-medium text-gray-500">{completedCount} of {totalRequired} complete</span>
+            <span className="text-sm font-medium text-black">{completedCount} of {totalRequired} complete</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
             <div
@@ -185,7 +185,7 @@ export default function RequiredFormsPage() {
               <CheckCircle2 className="w-4 h-4" /> All forms complete — you are ready to host apprentices.
             </p>
           ) : (
-            <p className="text-sm text-gray-500 flex items-center gap-1">
+            <p className="text-sm text-black flex items-center gap-1">
               <Clock className="w-4 h-4" /> Complete all required forms to begin hosting apprentices.
             </p>
           )}
@@ -202,7 +202,7 @@ export default function RequiredFormsPage() {
             </div>
             <div className="p-4">
               <p className="font-semibold text-gray-900">Sign MOU</p>
-              <p className="text-sm text-gray-500">Digital signature required</p>
+              <p className="text-sm text-black">Digital signature required</p>
             </div>
           </Link>
           <Link
@@ -214,7 +214,7 @@ export default function RequiredFormsPage() {
             </div>
             <div className="p-4">
               <p className="font-semibold text-gray-900">Partner Handbook</p>
-              <p className="text-sm text-gray-500">Policies & responsibilities</p>
+              <p className="text-sm text-black">Policies & responsibilities</p>
             </div>
           </Link>
           <Link
@@ -226,7 +226,7 @@ export default function RequiredFormsPage() {
             </div>
             <div className="p-4">
               <p className="font-semibold text-gray-900">Policy Forms</p>
-              <p className="text-sm text-gray-500">6 acknowledgments required</p>
+              <p className="text-sm text-black">6 acknowledgments required</p>
             </div>
           </Link>
         </div>
@@ -277,14 +277,14 @@ export default function RequiredFormsPage() {
                       </button>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className={`font-semibold ${isComplete ? 'text-gray-500 line-through' : 'text-gray-900'}`}>
+                          <h4 className={`font-semibold ${isComplete ? 'text-black line-through' : 'text-gray-900'}`}>
                             {form.name}
                           </h4>
                           {form.required && (
                             <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-medium">Required</span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-500 mb-3">{form.description}</p>
+                        <p className="text-sm text-black mb-3">{form.description}</p>
                         <div className="flex flex-wrap gap-2">
                           <Link
                             href={form.href}
@@ -297,7 +297,7 @@ export default function RequiredFormsPage() {
                             <Link
                               href={form.downloadHref}
                               target="_blank"
-                              className="inline-flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-gray-700"
+                              className="inline-flex items-center gap-1 text-sm font-medium text-black hover:text-gray-700"
                             >
                               <Download className="w-3 h-3" />
                               Preview
@@ -332,7 +332,7 @@ export default function RequiredFormsPage() {
         <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <h3 className="font-bold text-gray-900">All forms ready?</h3>
-            <p className="text-sm text-gray-600">Submit your partner application to get started.</p>
+            <p className="text-sm text-black">Submit your partner application to get started.</p>
           </div>
           <Link
             href="/programs/barber-apprenticeship/apply?type=partner_shop"

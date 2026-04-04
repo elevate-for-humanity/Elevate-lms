@@ -123,7 +123,7 @@ export default function HeroVideo({
         {/* Micro-label — bottom-left, 2–4 words max */}
         {microLabel && (
           <div className="absolute bottom-4 left-4 z-10">
-            <span className="text-white/80 text-xs font-semibold tracking-widest uppercase bg-black/30 backdrop-blur-sm px-2.5 py-1 rounded">
+            <span className="text-white text-xs font-semibold tracking-widest uppercase bg-black/30 backdrop-blur-sm px-2.5 py-1 rounded">
               {microLabel}
             </span>
           </div>
@@ -171,7 +171,7 @@ export default function HeroVideo({
                 {trustIndicators && trustIndicators.length > 0 && (
                   <ul className="flex flex-wrap gap-x-6 gap-y-1.5 mt-2">
                     {trustIndicators.map((item) => (
-                      <li key={item} className="flex items-center gap-1.5 text-slate-500 text-sm">
+                      <li key={item} className="flex items-center gap-1.5 text-white text-sm">
                         <span className="w-1 h-1 rounded-full bg-brand-red-400 flex-shrink-0" />
                         {item}
                       </li>
@@ -193,7 +193,7 @@ export default function HeroVideo({
               onClick={() => setTranscriptOpen((o) => !o)}
               aria-expanded={transcriptOpen}
               aria-controls={transcriptId}
-              className="flex items-center gap-2 text-slate-500 text-xs font-semibold hover:text-slate-700 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-red-500 rounded"
+              className="flex items-center gap-2 text-white text-xs font-semibold hover:text-slate-700 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-red-500 rounded"
             >
               <span>{transcriptOpen ? '▲' : '▼'}</span>
               Video transcript

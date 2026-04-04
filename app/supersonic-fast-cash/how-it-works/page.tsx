@@ -111,7 +111,7 @@ export default function HowItWorksPage() {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
             Tax Prep Made Simple
           </h1>
-          <p className="text-xl md:text-2xl text-brand-orange-100 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl text-white mb-8 max-w-3xl mx-auto">
             Get your taxes done in 4 easy steps. Walk in, upload online, or schedule an appointment. 
             Same-day refund advances available.
           </p>
@@ -138,7 +138,7 @@ export default function HowItWorksPage() {
           <h2 className="text-3xl md:text-4xl font-black text-center mb-4">
             4 Simple Steps to Your Refund
           </h2>
-          <p className="text-center text-gray-600 mb-16 max-w-2xl mx-auto">
+          <p className="text-center text-black mb-16 max-w-2xl mx-auto">
             We've streamlined the tax preparation process so you can get your refund faster.
           </p>
 
@@ -161,11 +161,11 @@ export default function HowItWorksPage() {
                       <h3 className="text-2xl font-bold text-gray-900">{step.title}</h3>
                     </div>
                   </div>
-                  <p className="text-gray-600 text-lg mb-6">{step.description}</p>
+                  <p className="text-black text-lg mb-6">{step.description}</p>
                   <ul className="space-y-2">
                     {step.details.map((detail, i) => (
                       <li key={i} className="flex items-center gap-3">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-black flex-shrink-0">•</span>
                         <span className="text-gray-700">{detail}</span>
                       </li>
                     ))}
@@ -174,7 +174,7 @@ export default function HowItWorksPage() {
 
                 {/* Step Number Visual */}
                 <div className="w-48 h-48 bg-slate-700 rounded-3xl flex items-center justify-center shadow-xl">
-                  <span className="text-8xl font-black text-white/30">{step.number}</span>
+                  <span className="text-8xl font-black text-white">{step.number}</span>
                 </div>
               </div>
             ))}
@@ -195,7 +195,7 @@ export default function HowItWorksPage() {
                   <feature.icon className="w-6 h-6 text-brand-orange-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{feature.title}</h3>
-                <p className="text-gray-600 text-sm">{feature.description}</p>
+                <p className="text-black text-sm">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -213,25 +213,25 @@ export default function HowItWorksPage() {
               <h2 className="text-3xl md:text-4xl font-black mb-6">
                 Get Up to $7,000 Today
               </h2>
-              <p className="text-brand-green-100 text-lg mb-6">
+              <p className="text-white text-lg mb-6">
                 Don't wait weeks for the IRS. With our Refund Advance program, you can get 
                 cash in hand the same day you file. No credit check required.
               </p>
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <span>0% APR - No interest charges</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <span>No credit check required</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <span>Funds available same day</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <span>Repaid automatically from your refund</span>
                 </li>
               </ul>
@@ -246,7 +246,7 @@ export default function HowItWorksPage() {
               <div className="inline-block bg-white/10 rounded-3xl p-8">
                 <DollarSign className="w-24 h-24 text-brand-green-300 mx-auto mb-4" />
                 <div className="text-6xl font-black">$7,000</div>
-                <div className="text-brand-green-200 text-xl">Maximum Advance</div>
+                <div className="text-white text-xl">Maximum Advance</div>
               </div>
             </div>
           </div>

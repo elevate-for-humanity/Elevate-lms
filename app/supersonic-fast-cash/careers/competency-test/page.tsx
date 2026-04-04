@@ -488,7 +488,7 @@ export default function CompetencyTest() {
           <div className="bg-white rounded-xl shadow-lg p-8">
             <div className="text-center mb-8">
               {passed ? (
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
               ) : (
                 <XCircle className="w-20 h-20 text-brand-red-600 mx-auto mb-4" />
               )}
@@ -650,7 +650,7 @@ export default function CompetencyTest() {
                     }`}
                   >
                     {answers[currentQuestion] === index && (
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-black flex-shrink-0">•</span>
                     )}
                   </div>
                   <span>{option}</span>

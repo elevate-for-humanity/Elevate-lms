@@ -39,7 +39,7 @@ export default function CatalogFilters({
   return (
     <div className="space-y-5">
       <div>
-        <label className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Search</label>
+        <label className="block text-xs font-semibold text-black mb-1.5 uppercase tracking-wide">Search</label>
         <form onSubmit={e => {
           e.preventDefault();
           const q = (e.currentTarget.elements.namedItem('q') as HTMLInputElement).value;
@@ -67,12 +67,12 @@ export default function CatalogFilters({
       </div>
 
       <div>
-        <label className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Category</label>
+        <label className="block text-xs font-semibold text-black mb-1.5 uppercase tracking-wide">Category</label>
         <div className="space-y-1">
           <button
             onClick={() => go(buildUrl(current, { category: '', page: '1' }))}
             className={`block w-full text-left text-sm px-2 py-1 rounded-lg transition ${
-              !current.category ? 'bg-brand-blue-50 text-brand-blue-700 font-medium' : 'text-slate-600 hover:bg-white'
+              !current.category ? 'bg-brand-blue-50 text-brand-blue-700 font-medium' : 'text-black hover:bg-white'
             }`}
           >
             All Categories
@@ -82,7 +82,7 @@ export default function CatalogFilters({
               key={cat}
               onClick={() => go(buildUrl(current, { category: cat, page: '1' }))}
               className={`block w-full text-left text-sm px-2 py-1 rounded-lg transition ${
-                current.category === cat ? 'bg-brand-blue-50 text-brand-blue-700 font-medium' : 'text-slate-600 hover:bg-white'
+                current.category === cat ? 'bg-brand-blue-50 text-brand-blue-700 font-medium' : 'text-black hover:bg-white'
               }`}
             >
               {cat}
@@ -94,7 +94,7 @@ export default function CatalogFilters({
       {(current.q || current.category || current.wioa || current.provider) && (
         <button
           onClick={() => go('/programs/catalog')}
-          className="text-xs text-slate-400 hover:text-slate-600 transition"
+          className="text-xs text-black hover:text-black transition"
         >
           Clear all filters
         </button>

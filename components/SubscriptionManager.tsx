@@ -172,7 +172,7 @@ export function SubscriptionManager() {
                   <span>Renews on</span>
                 </div>
                 <div className="font-semibold">
-                  {currentSubscription.currentPeriodEnd.toLocaleDateString()}
+                  {currentSubscription.currentPeriodEnd.toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                 </div>
               </div>
             </div>
@@ -186,7 +186,7 @@ export function SubscriptionManager() {
                   </div>
                   <div className="text-sm text-brand-orange-800">
                     Your subscription will end on{' '}
-                    {currentSubscription.currentPeriodEnd.toLocaleDateString()}. You&apos;ll
+                    {currentSubscription.currentPeriodEnd.toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}. You&apos;ll
                     still have access until then.
                   </div>
                 </div>
@@ -295,7 +295,7 @@ export function SubscriptionManager() {
                       ${(invoice.amount / 100).toFixed(2)}
                     </div>
                     <div className="text-sm text-black">
-                      {new Date(invoice.date).toLocaleDateString()}
+                      {new Date(invoice.date).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                     </div>
                   </div>
                 </div>

@@ -61,19 +61,19 @@ export function PaymentDisclosure({
           </div>
           <div className="flex justify-between">
             <span className="text-slate-600">Total Tuition:</span>
-            <span className="font-medium text-slate-900">${tuitionAmount.toLocaleString()}</span>
+            <span className="font-medium text-slate-900">${tuitionAmount.toLocaleString('en-US')}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-slate-600">Deposit Due Today:</span>
-            <span className="font-medium text-slate-900">${depositAmount.toLocaleString()}</span>
+            <span className="font-medium text-slate-900">${depositAmount.toLocaleString('en-US')}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-slate-600">Remaining Balance:</span>
-            <span className="font-medium text-slate-900">${remainingBalance.toLocaleString()}</span>
+            <span className="font-medium text-slate-900">${remainingBalance.toLocaleString('en-US')}</span>
           </div>
           <div className="flex justify-between border-t border-slate-200 pt-2 mt-2">
             <span className="text-slate-600">Monthly Payment:</span>
-            <span className="font-bold text-slate-900">${monthlyPayment.toLocaleString()}/month × {numberOfMonths} months</span>
+            <span className="font-bold text-slate-900">${monthlyPayment.toLocaleString('en-US')}/month × {numberOfMonths} months</span>
           </div>
         </div>
       </div>
@@ -93,9 +93,9 @@ export function PaymentDisclosure({
           <div>
             <p className="font-medium text-slate-900">I understand the total cost</p>
             <p className="text-sm text-slate-600">
-              The total tuition for this program is ${tuitionAmount.toLocaleString()}. 
-              I am paying ${depositAmount.toLocaleString()} today and ${remainingBalance.toLocaleString()} 
-              over {numberOfMonths} monthly payments of ${monthlyPayment.toLocaleString()}.
+              The total tuition for this program is ${tuitionAmount.toLocaleString('en-US')}. 
+              I am paying ${depositAmount.toLocaleString('en-US')} today and ${remainingBalance.toLocaleString('en-US')} 
+              over {numberOfMonths} monthly payments of ${monthlyPayment.toLocaleString('en-US')}.
             </p>
           </div>
         </label>

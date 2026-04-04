@@ -320,7 +320,7 @@ export default function SignMOUPage() {
         <div className="max-w-md w-full bg-white rounded-xl shadow-sm border p-8 text-center">
           <CheckCircle2 className="w-16 h-16 text-brand-green-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">MOU Signed Successfully</h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-black mb-6">
             Your Memorandum of Understanding has been submitted. Our team will countersign
             and send you a fully executed copy within 2 business days.
           </p>
@@ -354,7 +354,7 @@ export default function SignMOUPage() {
 
       {/* Institutional Document Header */}
       <div className="max-w-4xl mx-auto px-4 pt-6">
-        <Link href="/partners/barbershop-apprenticeship" className="inline-flex items-center gap-1 text-gray-600 hover:text-brand-blue-700 text-sm mb-4">
+        <Link href="/partners/barbershop-apprenticeship" className="inline-flex items-center gap-1 text-black hover:text-brand-blue-700 text-sm mb-4">
           <ArrowLeft className="w-4 h-4" /> Back to Partner Page
         </Link>
       </div>
@@ -369,7 +369,7 @@ export default function SignMOUPage() {
               subtitle="Worksite Partner Agreement"
               noDivider
             />
-            <div className="text-sm text-gray-600 border-t border-slate-200 pt-4 mt-2">
+            <div className="text-sm text-black border-t border-slate-200 pt-4 mt-2">
               <p><strong>Between:</strong> 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute (&ldquo;Sponsor&rdquo;)</p>
               <p><strong>And:</strong> Your barbershop (&ldquo;Shop&rdquo;)</p>
             </div>
@@ -378,7 +378,7 @@ export default function SignMOUPage() {
             {MOU_SECTIONS.map((section) => (
               <div key={section.title}>
                 <h3 className="font-bold text-gray-900 mb-1">{section.title}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">{section.content}</p>
+                <p className="text-sm text-black leading-relaxed">{section.content}</p>
               </div>
             ))}
             <div className="pt-4 border-t">
@@ -480,7 +480,7 @@ export default function SignMOUPage() {
                   'Select a compensation model first'
                 }
               />
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-black mt-1">
                 Indiana minimum wage: $7.25/hr. Commission models must average at least minimum wage per pay period. Apprentices keep 100% of tips.
               </p>
             </div>
@@ -493,14 +493,14 @@ export default function SignMOUPage() {
           <div className="grid grid-cols-2 gap-6 mb-6">
             {/* Elevate — pre-signed */}
             <div className="border border-gray-200 rounded-lg p-4">
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Sponsor — Already Signed</p>
+              <p className="text-xs font-bold text-black uppercase tracking-wide mb-3">Sponsor — Already Signed</p>
               <div className="border-b border-gray-400 pb-2 mb-3">
                 <span style={{fontFamily:'Georgia,serif',fontSize:'24px',color:'#1a1a2e',fontStyle:'italic'}}>Elizabeth Greene</span>
               </div>
-              <p className="text-xs text-gray-600"><strong>Name:</strong> Elizabeth Greene</p>
-              <p className="text-xs text-gray-600"><strong>Title:</strong> Founder &amp; CEO</p>
-              <p className="text-xs text-gray-600"><strong>Organization:</strong> 2Exclusive LLC-S DBA Elevate for Humanity Technical and Career Institute</p>
-              <p className="text-xs text-gray-600"><strong>Date:</strong> {new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</p>
+              <p className="text-xs text-black"><strong>Name:</strong> Elizabeth Greene</p>
+              <p className="text-xs text-black"><strong>Title:</strong> Founder &amp; CEO</p>
+              <p className="text-xs text-black"><strong>Organization:</strong> 2Exclusive LLC-S DBA Elevate for Humanity Technical and Career Institute</p>
+              <p className="text-xs text-black"><strong>Date:</strong> {new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</p>
               <div className="mt-3 bg-green-50 border border-green-200 rounded px-3 py-1.5 text-xs text-green-700 font-semibold text-center">✓ Signed by Elevate for Humanity</div>
             </div>
             {/* Adam — needs to sign */}
@@ -509,10 +509,10 @@ export default function SignMOUPage() {
               <div className="border-b border-dashed border-red-400 pb-2 mb-3 min-h-[32px]">
                 <span className="text-sm text-red-400 italic">Draw your signature below</span>
               </div>
-              <p className="text-xs text-gray-600"><strong>Name:</strong> Adam Kriech</p>
-              <p className="text-xs text-gray-600"><strong>Title:</strong> Owner</p>
-              <p className="text-xs text-gray-600"><strong>Organization:</strong> Kountry Kutz Barbershop</p>
-              <p className="text-xs text-gray-600"><strong>Date:</strong> {new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</p>
+              <p className="text-xs text-black"><strong>Name:</strong> Adam Kriech</p>
+              <p className="text-xs text-black"><strong>Title:</strong> Owner</p>
+              <p className="text-xs text-black"><strong>Organization:</strong> Kountry Kutz Barbershop</p>
+              <p className="text-xs text-black"><strong>Date:</strong> {new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</p>
               <div className="mt-3 bg-yellow-50 border border-yellow-300 rounded px-3 py-1.5 text-xs text-yellow-700 font-semibold text-center">⚠ Awaiting your signature</div>
             </div>
           </div>
@@ -525,12 +525,12 @@ export default function SignMOUPage() {
             <button
               type="button"
               onClick={clearSignature}
-              className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+              className="inline-flex items-center gap-1 text-sm text-black hover:text-gray-700"
             >
               <Eraser className="w-4 h-4" /> Clear
             </button>
           </div>
-          <p className="text-sm text-gray-500 mb-3">
+          <p className="text-sm text-black mb-3">
             Draw your signature in the box below using your mouse or finger (on touch devices).
           </p>
           <div className="border-2 border-dashed border-gray-300 rounded-lg overflow-hidden bg-white">
@@ -609,7 +609,7 @@ export default function SignMOUPage() {
           </Link>
         </div>
 
-        <p className="text-xs text-slate-500 mt-4">
+        <p className="text-xs text-black mt-4">
           By submitting, you agree that your electronic signature is legally binding under the
           Indiana Uniform Electronic Transactions Act (IC 26-2-8) and the federal ESIGN Act.
           A copy of the signed MOU will be emailed to you.
@@ -619,7 +619,7 @@ export default function SignMOUPage() {
         <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <h3 className="font-bold text-gray-900">Next: Submit Your Application</h3>
-            <p className="text-sm text-gray-600">After signing the MOU, complete the partner application form.</p>
+            <p className="text-sm text-black">After signing the MOU, complete the partner application form.</p>
           </div>
           <div className="flex gap-3">
             <Link

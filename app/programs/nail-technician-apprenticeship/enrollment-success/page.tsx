@@ -62,7 +62,7 @@ export default async function EnrollmentSuccessPage() {
         {/* Success Icon */}
         <div className="text-center mb-8">
           <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
-            <span className="text-slate-500 flex-shrink-0">•</span>
+            <span className="text-black flex-shrink-0">•</span>
           </div>
           
           <h1 className="text-4xl font-black text-slate-900 mb-2">
@@ -74,12 +74,12 @@ export default async function EnrollmentSuccessPage() {
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden mb-8">
           <div className="p-6 space-y-4">
             <div className="flex justify-between items-center py-3 border-b border-slate-100">
-              <span className="text-slate-600">Program</span>
+              <span className="text-black">Program</span>
               <span className="font-bold text-slate-900">{programName}</span>
             </div>
             
             <div className="flex justify-between items-center py-3 border-b border-slate-100">
-              <span className="text-slate-600">Status</span>
+              <span className="text-black">Status</span>
               <span className="inline-flex items-center gap-1 px-3 py-1 bg-brand-green-100 text-brand-green-700 rounded-full font-bold text-sm">
                 <span className="w-2 h-2 bg-brand-green-500 rounded-full"></span>
                 Active
@@ -87,19 +87,19 @@ export default async function EnrollmentSuccessPage() {
             </div>
             
             <div className="flex justify-between items-center py-3 border-b border-slate-100">
-              <span className="text-slate-600">Start Date</span>
+              <span className="text-black">Start Date</span>
               <span className="font-bold text-slate-900">{formattedStartDate}</span>
             </div>
             
             <div className="flex justify-between items-center py-3">
-              <span className="text-slate-600">Sponsor</span>
+              <span className="text-black">Sponsor</span>
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-brand-blue-600" />
                 <span className="font-bold text-slate-900">Elevate for Humanity</span>
               </div>
             </div>
             
-            <div className="text-xs text-slate-500 text-center pt-2">
+            <div className="text-xs text-black text-center pt-2">
               USDOL Registered Apprenticeship Program
             </div>
           </div>
@@ -113,7 +113,7 @@ export default async function EnrollmentSuccessPage() {
           Go to My Program Dashboard
         </Link>
 
-        <p className="text-slate-500 text-sm text-center mt-4">
+        <p className="text-black text-sm text-center mt-4">
           View your courses, track progress, and start learning.
         </p>
       </div>

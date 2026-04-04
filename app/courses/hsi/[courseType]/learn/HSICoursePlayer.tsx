@@ -162,10 +162,10 @@ export function HSICoursePlayer({
         <div className="bg-brand-blue-700 text-white px-6 py-4 shadow-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-slate-500 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div>
                 <div className="font-semibold">Course Complete!</div>
-                <div className="text-sm text-brand-green-100">
+                <div className="text-sm text-white">
                   Your certificate is being generated and will be emailed to you
                   shortly
                 </div>

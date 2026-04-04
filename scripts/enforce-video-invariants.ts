@@ -31,7 +31,7 @@ const RAW_VIDEO_ALLOWLIST = new Set([
   'components/lms/VideoPlayer.tsx',
   'components/lms/InteractiveVideoPlayer.tsx',
   'components/lms/HvacLessonVideo.tsx',
-  'components/lms/HvacVideoPlayer.tsx',
+
   'components/lms/ContentLibrary.tsx',
   'components/lms/LessonVideoWithSimulation.tsx',
   'components/lms/LessonPlayer.tsx',

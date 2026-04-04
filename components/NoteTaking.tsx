@@ -158,7 +158,7 @@ export function NoteTaking({ courseId, lessonId, videoTimestamp }: NoteTakingPro
                     {note.content}
                   </p>
                   <p className="text-xs text-slate-500 mt-2">
-                    {new Date(note.created_at).toLocaleDateString()}
+                    {new Date(note.created_at).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
                 <button

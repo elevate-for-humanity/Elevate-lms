@@ -124,8 +124,8 @@ export default function CredentialsView({ userId }: { userId?: string }) {
               </div>
 
               <p className="text-sm text-slate-500 mb-3">
-                Issued: {new Date(credential.issueDate).toLocaleDateString()}
-                {credential.expiryDate && ` • Expires: ${new Date(credential.expiryDate).toLocaleDateString()}`}
+                Issued: {new Date(credential.issueDate).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
+                {credential.expiryDate && ` • Expires: ${new Date(credential.expiryDate).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}`}
               </p>
 
               <div className="flex items-center gap-3">

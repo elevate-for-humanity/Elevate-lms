@@ -185,7 +185,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
       <div className="bg-gradient-to-r from-brand-orange-500 to-brand-orange-600 text-white pt-24 pb-16 lg:pt-32">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Frequently Asked Questions</h1>
-          <p className="text-xl text-brand-orange-100 max-w-2xl mb-8">
+          <p className="text-xl text-white max-w-2xl mb-8">
             Find answers to common questions about our programs and services.
           </p>
           <div className="relative max-w-xl">

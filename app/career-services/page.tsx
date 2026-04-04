@@ -55,7 +55,7 @@ export default function CareerServicesPage() {
                 </div>
                 <div className="py-3 pr-3 sm:p-5 flex-1">
                   <h3 className="font-bold text-slate-900 text-sm sm:text-base mb-1">{item.title}</h3>
-                  <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">{item.desc}</p>
+                  <p className="text-black text-xs sm:text-sm leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -79,7 +79,7 @@ export default function CareerServicesPage() {
                 <div className="w-8 h-8 bg-brand-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{item.step}</div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-sm">{item.title}</h3>
-                  <p className="text-slate-600 text-sm">{item.desc}</p>
+                  <p className="text-black text-sm">{item.desc}</p>
                 </div>
               </div>
             ))}

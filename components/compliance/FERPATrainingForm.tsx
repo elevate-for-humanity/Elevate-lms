@@ -275,8 +275,8 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
                 Training Already Completed
               </h1>
               <p className="text-black mb-6">
-                You completed FERPA training on {new Date(existingTraining.completed_at).toLocaleDateString()}.
-                Your certification is valid until {new Date(new Date(existingTraining.completed_at).setFullYear(new Date(existingTraining.completed_at).getFullYear() + 1)).toLocaleDateString()}.
+                You completed FERPA training on {new Date(existingTraining.completed_at).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}.
+                Your certification is valid until {new Date(new Date(existingTraining.completed_at).setFullYear(new Date(existingTraining.completed_at).getFullYear() + 1)).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}.
               </p>
               <div className="flex gap-4 justify-center">
                 <button
@@ -573,7 +573,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
                   </label>
                   <input
                     type="text"
-                    value={new Date().toLocaleDateString()}
+                    value={new Date().toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                     disabled
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg bg-slate-50"
                   />
@@ -677,7 +677,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
                   </label>
                   <input
                     type="text"
-                    value={new Date().toLocaleDateString()}
+                    value={new Date().toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                     disabled
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg bg-slate-50"
                   />

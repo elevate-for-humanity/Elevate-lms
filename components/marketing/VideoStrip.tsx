@@ -33,7 +33,7 @@ export function VideoStrip() {
           <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-brand-orange-300">
             Watch how Elevate works
           </h2>
-          <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-50">
+          <p className="mt-3 text-3xl font-semibold tracking-tight text-white">
             Short videos you can use for learners, employers, and partners.
           </p>
           <p className="mt-3 text-sm text-slate-600">
@@ -61,10 +61,10 @@ export function VideoStrip() {
                   </span>
                 </div>
               </div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white">
                 {video.tag}
               </p>
-              <h3 className="mt-2 text-base font-semibold text-slate-50">
+              <h3 className="mt-2 text-base font-semibold text-white">
                 {video.title}
               </h3>
               <p className="mt-2 text-sm text-slate-600">{video.body}</p>

@@ -115,7 +115,7 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
       {/* Step 1 — Application type */}
       <div className="bg-white border border-slate-200 rounded-lg p-6">
         <h2 className="text-xl font-bold text-black mb-1">What would you like to do?</h2>
-        <p className="text-sm text-slate-500 mb-4">Select an option to get started.</p>
+        <p className="text-sm text-black mb-4">Select an option to get started.</p>
         <select
           required
           value={applicationType}
@@ -174,7 +174,7 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
 
       {/* Only show the rest of the form once a type is selected */}
       {!applicationType && (
-        <div className="text-center py-8 text-slate-400 text-sm">
+        <div className="text-center py-8 text-black text-sm">
           Select an option above to continue.
         </div>
       )}

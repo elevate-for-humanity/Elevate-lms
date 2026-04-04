@@ -79,7 +79,7 @@ export default function Page() {
                         <span className="font-bold text-lg text-slate-900">{p.title}</span>
                         <span className="text-xs font-semibold text-brand-red-600 bg-brand-red-50 px-2 py-1 rounded-full">{p.duration}</span>
                       </div>
-                      <span className="text-sm text-slate-600 mb-4 flex-1">{p.desc}</span>
+                      <span className="text-sm text-black mb-4 flex-1">{p.desc}</span>
                       <Link href={p.href} className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition-colors self-start">
                         Learn More
                       </Link>

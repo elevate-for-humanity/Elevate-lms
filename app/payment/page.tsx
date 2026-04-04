@@ -35,7 +35,7 @@ export default async function PaymentPage() {
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               Payment Options
             </h1>
-            <p className="text-lg text-brand-blue-100">
+            <p className="text-lg text-white">
               Flexible payment solutions to help you invest in your future.
             </p>
           </div>
@@ -113,7 +113,7 @@ export default async function PaymentPage() {
                   <h2 className="text-2xl font-bold mb-2">
                     Barber Apprenticeship Program
                   </h2>
-                  <p className="text-brand-orange-100 mb-4">
+                  <p className="text-white mb-4">
                     Start your career as a licensed barber. USDOL registered apprenticeship with flexible payment options.
                   </p>
                   <ul className="space-y-2 text-sm">

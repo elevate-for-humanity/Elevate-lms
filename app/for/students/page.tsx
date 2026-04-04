@@ -22,7 +22,7 @@ export default function ForStudentsPage() {
     <div className="bg-white">
 
       {/* HERO — image only, no text on frame */}
-      <section className="relative h-[340px] sm:h-[460px] overflow-hidden">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image src="/images/pages/for-students-hero.jpg" alt="Job seekers in workforce training" fill sizes="100vw" className="object-cover object-center" priority />
       </section>
 
@@ -31,7 +31,7 @@ export default function ForStudentsPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">For Job Seekers</p>
           <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 mb-4 leading-tight max-w-2xl">A real career in weeks — not years.</h1>
-          <p className="text-slate-500 text-base sm:text-lg max-w-xl leading-relaxed mb-6">Short-term training in healthcare, trades, CDL, barbering, and technology. Most programs are fully funded for eligible Indiana residents.</p>
+          <p className="text-black text-base sm:text-lg max-w-xl leading-relaxed mb-6">Short-term training in healthcare, trades, CDL, barbering, and technology. Most programs are fully funded for eligible Indiana residents.</p>
           <div className="flex flex-wrap gap-3">
             <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-lg text-sm transition-colors">Apply Now</Link>
             <Link href="/programs" className="border border-slate-300 text-slate-700 font-semibold px-7 py-3 rounded-lg text-sm hover:bg-slate-50 transition-colors">View All Programs</Link>
@@ -49,14 +49,14 @@ export default function ForStudentsPage() {
               { icon: <DollarSign className="w-5 h-5 text-brand-green-600" />, title: 'Most programs are free', desc: 'WIOA, Workforce Ready Grant, and Indiana state funding cover tuition, books, tools, and exam fees for eligible participants.' },
               { icon: <Clock className="w-5 h-5 text-brand-blue-600" />, title: 'Weeks, not years', desc: 'Programs run 4 to 16 weeks. You can be credentialed and job-ready before the end of the quarter.' },
               { icon: <Award className="w-5 h-5 text-brand-red-600" />, title: 'Real credentials', desc: 'Every program ends with a nationally recognized certification — EPA, CompTIA, NCCER, Indiana ISDH, or DOL Registered Apprenticeship.' },
-              { icon: <Briefcase className="w-5 h-5 text-slate-600" />, title: 'Job placement support', desc: 'Resume building, interview prep, and direct introductions to hiring employers. Many students have offers before their last day of class.' },
-              { icon: <MapPin className="w-5 h-5 text-slate-600" />, title: 'Indianapolis-based', desc: 'Training happens at our Indianapolis facility. Employer partners are local — you build a network in the city where you live and work.' },
-              { icon: <GraduationCap className="w-5 h-5 text-slate-600" />, title: 'No prior experience needed', desc: 'Most programs have no prerequisites. If you can commit to showing up and doing the work, we can get you credentialed.' },
+              { icon: <Briefcase className="w-5 h-5 text-black" />, title: 'Job placement support', desc: 'Resume building, interview prep, and direct introductions to hiring employers. Many students have offers before their last day of class.' },
+              { icon: <MapPin className="w-5 h-5 text-black" />, title: 'Indianapolis-based', desc: 'Training happens at our Indianapolis facility. Employer partners are local — you build a network in the city where you live and work.' },
+              { icon: <GraduationCap className="w-5 h-5 text-black" />, title: 'No prior experience needed', desc: 'Most programs have no prerequisites. If you can commit to showing up and doing the work, we can get you credentialed.' },
             ].map(({ icon, title, desc }) => (
               <div key={title} className="bg-white border border-slate-200 rounded-2xl p-5">
                 <div className="mb-3">{icon}</div>
                 <h3 className="font-bold text-slate-900 text-sm mb-2">{title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
+                <p className="text-black text-sm leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>
@@ -81,7 +81,7 @@ export default function ForStudentsPage() {
                   <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100">
                     <div>
                       <p className="text-brand-green-700 font-bold text-sm">{p.salary}</p>
-                      <p className="text-slate-400 text-xs">{p.duration}</p>
+                      <p className="text-black text-xs">{p.duration}</p>
                     </div>
                     <span className="inline-flex items-center gap-1 text-brand-red-600 font-semibold text-sm group-hover:translate-x-1 transition-transform">Learn more <ArrowRight className="w-4 h-4" /></span>
                   </div>
@@ -112,7 +112,7 @@ export default function ForStudentsPage() {
               <div key={s.num} className="bg-white border border-slate-200 rounded-2xl p-5">
                 <p className="text-brand-red-600 font-extrabold text-xs uppercase tracking-widest mb-3">{s.num}</p>
                 <h3 className="font-bold text-slate-900 text-sm mb-2">{s.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{s.desc}</p>
+                <p className="text-black text-sm leading-relaxed">{s.desc}</p>
               </div>
             ))}
           </div>
@@ -126,7 +126,7 @@ export default function ForStudentsPage() {
             <div>
               <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Funding</p>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">You may qualify for free training</h2>
-              <p className="text-slate-600 leading-relaxed mb-6">Federal and Indiana state workforce funding covers tuition, books, tools, and exam fees for eligible participants. The first step is a free appointment with WorkOne.</p>
+              <p className="text-black leading-relaxed mb-6">Federal and Indiana state workforce funding covers tuition, books, tools, and exam fees for eligible participants. The first step is a free appointment with WorkOne.</p>
               <div className="space-y-3 mb-6">
                 {[
                   'WIOA Title I — federal funding for adults, dislocated workers, and youth 16–24',
@@ -136,7 +136,7 @@ export default function ForStudentsPage() {
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-slate-600 text-sm leading-relaxed">{item}</p>
+                    <p className="text-black text-sm leading-relaxed">{item}</p>
                   </div>
                 ))}
               </div>

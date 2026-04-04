@@ -399,7 +399,7 @@ export default function AcademicIntegrityPage() {
         <div className="bg-brand-blue-700 rounded-xl p-4 sm:p-4 sm:p-6 md:p-8 text-white mb-8">
           <h2 className="text-xl sm:text-2xl font-bold mb-4">Academic Integrity Pledge</h2>
           <div className="bg-white/10 rounded-lg p-4 sm:p-6">
-            <p className="text-brand-blue-100 italic mb-4">
+            <p className="text-white italic mb-4">
               "I pledge to uphold the highest standards of academic integrity. I
               will do my own work, give credit where credit is due, and be
               honest in all my academic endeavors. I understand that academic
@@ -407,7 +407,7 @@ export default function AcademicIntegrityPage() {
               credentials. I commit to maintaining these standards throughout my
               time at Elevate for Humanity."
             </p>
-            <p className="text-brand-blue-200 text-sm">
+            <p className="text-white text-sm">
               All students acknowledge this pledge upon enrollment and are
               expected to uphold it throughout their academic career.
             </p>
@@ -466,7 +466,7 @@ export default function AcademicIntegrityPage() {
       <section className="py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>
+          <p className="text-white mb-6">Check your eligibility for funded career training programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"

@@ -60,7 +60,7 @@ export default function FederalProgramsPage() {
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Federal Funding Programs</h1>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Federal workforce development programs that may cover the cost of your career training.</p>
+            <p className="text-lg text-black max-w-3xl mx-auto">Federal workforce development programs that may cover the cost of your career training.</p>
           </div>
         </div>
       </section>
@@ -74,13 +74,13 @@ export default function FederalProgramsPage() {
                 <Building2 className="w-6 h-6 text-brand-blue-600 mt-1 flex-shrink-0" />
                 <div>
                   <h2 className="text-xl font-bold text-slate-900">{p.name}</h2>
-                  <p className="text-sm text-slate-500">{p.agency}</p>
+                  <p className="text-sm text-black">{p.agency}</p>
                 </div>
               </div>
               <p className="text-slate-700 mb-4">{p.desc}</p>
               <div>
                 <h3 className="text-sm font-semibold text-slate-900 mb-1">Who May Be Eligible:</h3>
-                <p className="text-slate-600 text-sm">{p.eligible.join('. ')}.</p>
+                <p className="text-black text-sm">{p.eligible.join('. ')}.</p>
               </div>
             </div>
           ))}
@@ -102,7 +102,7 @@ export default function FederalProgramsPage() {
       <section className="py-16 bg-slate-900">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Find Out If You Qualify</h2>
-          <p className="text-brand-blue-100 mb-8 text-lg">Our enrollment team can help determine which funding sources apply to your situation.</p>
+          <p className="text-white mb-8 text-lg">Our enrollment team can help determine which funding sources apply to your situation.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/workforce-board/eligibility" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg">Check Eligibility</Link>
             <Link href="/contact" className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg">Contact Us</Link>

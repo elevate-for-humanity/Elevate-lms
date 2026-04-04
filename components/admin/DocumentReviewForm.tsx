@@ -141,7 +141,7 @@ export function DocumentReviewForm({ document, adminId }: Props) {
             <div>
               <p className="text-sm text-black">Upload Date</p>
               <p className="font-semibold text-black">
-                {new Date(document.created_at).toLocaleString()}
+                {new Date(document.created_at).toLocaleString('en-US')}
               </p>
             </div>
           </div>
@@ -325,7 +325,7 @@ export function DocumentReviewForm({ document, adminId }: Props) {
               : 'Document Rejected'}
           </h2>
           <p className="text-sm mb-4">
-            Reviewed on {new Date(document.reviewed_at).toLocaleString()}
+            Reviewed on {new Date(document.reviewed_at).toLocaleString('en-US')}
           </p>
           {document.rejection_reason && (
             <div className="p-4 bg-white rounded-lg border">

@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
   Users, Briefcase, Building2, GraduationCap, Shield, Handshake,
-  ArrowRight, Phone, CheckCircle, ChevronRight,
+  ArrowRight, Phone, ChevronRight,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -122,15 +122,18 @@ export default function PartnersIndexPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[40vh] min-h-[260px] overflow-hidden">
-        <Image src="/images/pages/admin-autopilot-hero.jpg" alt="Workforce partnership meeting" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-slate-900/50" />
-        <div className="absolute bottom-0 left-0 right-0 px-6 pb-8 max-w-5xl mx-auto">
-          <p className="text-brand-blue-300 font-bold text-xs uppercase tracking-widest mb-2">Indianapolis, Indiana</p>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-2">Partner With Elevate</h1>
-          <p className="text-white/80 text-base max-w-2xl">
-            We work with workforce agencies, employers, barbershops, training providers, and reentry organizations. Find your type below and apply in minutes.
-          </p>
+      <section className="relative w-full">
+        <div className="relative h-[50vh] sm:h-[55vh] min-h-[300px] overflow-hidden">
+          <Image src="/images/pages/workforce-partnership-hero.jpg" alt="Workforce partnership meeting" fill sizes="100vw" className="object-cover object-center" priority />
+        </div>
+        <div className="bg-white py-10 border-t">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <p className="font-semibold text-sm mb-2 uppercase tracking-wide text-brand-blue-600">Indianapolis, Indiana</p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3">Partner With Elevate</h1>
+            <p className="text-lg text-black max-w-3xl mx-auto">
+              We work with workforce agencies, employers, barbershops, training providers, and reentry organizations. Find your type below and apply in minutes.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -147,7 +150,7 @@ export default function PartnersIndexPage() {
               <div key={s.step} className="flex flex-col items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-brand-blue-600 text-white font-extrabold text-lg flex items-center justify-center flex-shrink-0">{s.step}</div>
                 <h3 className="font-bold text-slate-900">{s.heading}</h3>
-                <p className="text-slate-600 text-sm">{s.body}</p>
+                <p className="text-black text-sm">{s.body}</p>
               </div>
             ))}
           </div>
@@ -162,7 +165,7 @@ export default function PartnersIndexPage() {
             return (
               <div key={type.title} className={`bg-white rounded-2xl border-2 ${c.border} overflow-hidden shadow-sm`}>
                 <div className="grid md:grid-cols-5">
-                  {/* Image */}
+                  {/* Image — no text overlay */}
                   <div className="relative md:col-span-2 h-52 md:h-auto">
                     <Image
                       src={type.image}
@@ -171,14 +174,14 @@ export default function PartnersIndexPage() {
                       sizes="(max-width: 768px) 100vw, 40vw"
                       className="object-cover"
                     />
-                    <div className={`absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${c.badge}`}>
-                      <type.icon className="w-3.5 h-3.5" />
-                      {type.title}
-                    </div>
                   </div>
 
                   {/* Content */}
                   <div className="md:col-span-3 p-6 flex flex-col gap-4">
+                    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold self-start ${c.badge}`}>
+                      <type.icon className="w-3.5 h-3.5" />
+                      {type.title}
+                    </div>
                     <div>
                       <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${c.label}`}>Who this is for</p>
                       <p className="text-slate-700 text-sm leading-relaxed">{type.who}</p>
@@ -192,7 +195,7 @@ export default function PartnersIndexPage() {
                       <ol className="flex flex-col gap-1.5">
                         {type.steps.map((step, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                            <CheckCircle className={`w-4 h-4 mt-0.5 flex-shrink-0 ${c.label}`} />
+                            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 ${c.badge}`}>{i + 1}</span>
                             {step}
                           </li>
                         ))}
@@ -218,7 +221,7 @@ export default function PartnersIndexPage() {
       <section className="py-12 border-t border-slate-100">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-2">Not sure which type fits?</h2>
-          <p className="text-slate-600 mb-6">Call us and we will figure it out together. Most partnerships are set up within a week.</p>
+          <p className="text-black mb-6">Call us and we will figure it out together. Most partnerships are set up within a week.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="tel:317-314-3757" className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-3 rounded-lg font-bold transition-colors">
               <Phone className="w-4 h-4" /> (317) 314-3757

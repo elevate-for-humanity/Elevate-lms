@@ -152,7 +152,7 @@ export default function NotificationBell() {
                           <p className="text-xs text-slate-500">
                             {new Date(
                               notification.created_at
-                            ).toLocaleDateString()}
+                            ).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                           </p>
                         </div>
                         {!notification.read && (

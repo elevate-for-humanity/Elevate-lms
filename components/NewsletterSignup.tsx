@@ -65,7 +65,7 @@ export default function NewsletterSignup() {
   };
 
   return (
-    <div className="bg-white py-12">
+    <div className="bg-slate-900 py-12">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
@@ -74,7 +74,7 @@ export default function NewsletterSignup() {
               Stay Connected
             </h3>
           </div>
-          <p className="text-lg text-brand-blue-100 mb-6">
+          <p className="text-lg text-white mb-6">
             Get updates on new programs, success stories, hiring events, and
             opportunities delivered to your inbox.
           </p>
@@ -117,23 +117,15 @@ export default function NewsletterSignup() {
           </form>
 
           {message && (
-            <div
-              className={`mt-4 flex items-center justify-center gap-2 text-sm ${
-                status === 'success' ? 'text-brand-green-100' : 'text-brand-red-100'
-              }`}
-            >
-              {status === 'success' ? (
-                <span className="text-slate-400 flex-shrink-0">•</span>
-              ) : (
-                <AlertCircle className="w-5 h-5" />
-              )}
+            <div className="mt-4 flex items-center justify-center gap-2 text-sm text-white">
+              {status !== 'success' && <AlertCircle className="w-5 h-5 flex-shrink-0" />}
               <span>{message}</span>
             </div>
           )}
 
-          <p className="text-xs text-brand-blue-200 mt-4">
+          <p className="text-xs text-white mt-4">
             We respect your privacy. Unsubscribe anytime. View our{' '}
-            <a href="/privacy-policy" className="underline hover:text-white">
+            <a href="/privacy-policy" className="underline hover:text-brand-red-300">
               Privacy Policy
             </a>
           </p>

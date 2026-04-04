@@ -28,8 +28,8 @@ export default async function LearnPage({ params }: { params: Promise<{ courseId
           <Link href={`/courses/${courseId}`} className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">← Back to Course</Link>
           <h1 className="text-2xl font-bold text-gray-900 mt-2">{course?.course_name || course?.title || 'Course'}</h1>
           <div className="flex items-center gap-4 mt-2">
-            <span className="text-sm text-gray-500">{lessons?.length || 0} lessons</span>
-            <span className="text-sm text-gray-500">Progress: {enrollment?.progress || 0}%</span>
+            <span className="text-sm text-black">{lessons?.length || 0} lessons</span>
+            <span className="text-sm text-black">Progress: {enrollment?.progress || 0}%</span>
           </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -44,7 +44,7 @@ export default async function LearnPage({ params }: { params: Promise<{ courseId
                       <span className="text-sm">{lesson.title}</span>
                     </div>
                   </Link>
-                )) : <p className="text-sm text-gray-500">No lessons available</p>}
+                )) : <p className="text-sm text-black">No lessons available</p>}
               </div>
             </div>
           </div>
@@ -54,7 +54,7 @@ export default async function LearnPage({ params }: { params: Promise<{ courseId
                 <p className="text-white">Select a lesson to begin</p>
               </div>
               <h2 className="text-xl font-semibold mb-2">Welcome to {course?.course_name || course?.title}</h2>
-              <p className="text-gray-600">{course?.description || 'Start learning by selecting a lesson from the sidebar.'}</p>
+              <p className="text-black">{course?.description || 'Start learning by selecting a lesson from the sidebar.'}</p>
             </div>
           </div>
         </div>

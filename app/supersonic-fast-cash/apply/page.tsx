@@ -57,14 +57,14 @@ export default function RefundApplyPage() {
       <div className="min-h-screen bg-brand-green-50 flex items-center justify-center px-4">
         <div className="max-w-md w-full text-center">
           <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-black flex-shrink-0">•</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Application Received!</h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-black mb-6">
             Thank you for applying. One of our tax professionals will contact you within 15 minutes during business hours to discuss your refund options.
           </p>
           <div className="bg-white rounded-xl border p-6 mb-6">
-            <p className="text-sm text-gray-500 mb-2">Need immediate assistance?</p>
+            <p className="text-sm text-black mb-2">Need immediate assistance?</p>
             <a href="/support" className="text-2xl font-bold text-brand-orange-600 hover:text-brand-orange-700">
               Visit Support Center
             </a>
@@ -85,14 +85,14 @@ export default function RefundApplyPage() {
 {/* Hero */}
       <section className="bg-slate-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
-          <Link href="/supersonic-fast-cash" className="inline-flex items-center gap-2 text-brand-orange-100 hover:text-white mb-4">
+          <Link href="/supersonic-fast-cash" className="inline-flex items-center gap-2 text-white hover:text-white mb-4">
             <ArrowLeft className="w-4 h-4" />
             Back
           </Link>
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             Get Your Tax Refund Today
           </h1>
-          <p className="text-xl text-brand-orange-100">
+          <p className="text-xl text-white">
             Fill out this quick form and get up to $7,500 in as little as 15 minutes.
           </p>
         </div>
@@ -115,7 +115,7 @@ export default function RefundApplyPage() {
               <span className="text-sm font-medium">0% Interest</span>
             </div>
             <div className="flex items-center justify-center gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <span className="text-sm font-medium">PTIN-Credentialed</span>
             </div>
           </div>
@@ -357,19 +357,19 @@ export default function RefundApplyPage() {
               {isSubmitting ? 'Submitting...' : 'Get My Refund Now →'}
             </button>
 
-            <p className="text-center text-sm text-gray-500 mt-4">
+            <p className="text-center text-sm text-black mt-4">
               By submitting, you agree to be contacted about your tax refund.
             </p>
           </form>
 
           {/* Call CTA */}
           <div className="mt-8 bg-brand-orange-50 rounded-xl p-6 text-center">
-            <p className="text-gray-600 mb-2">Prefer to talk to someone now?</p>
+            <p className="text-black mb-2">Prefer to talk to someone now?</p>
             <a href="/support" className="inline-flex items-center gap-2 text-2xl font-bold text-brand-orange-600 hover:text-brand-orange-700">
               <Phone className="w-6 h-6" />
               Visit Support Center
             </a>
-            <p className="text-sm text-gray-500 mt-2">Mon-Fri 9am-8pm, Sat 9am-5pm, Sun 12pm-5pm</p>
+            <p className="text-sm text-black mt-2">Mon-Fri 9am-8pm, Sat 9am-5pm, Sun 12pm-5pm</p>
           </div>
         </div>
       </section>

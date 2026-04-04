@@ -414,7 +414,7 @@ export default async function StudentPortalPage() {
           <h2 className="text-4xl font-black text-white mb-6">
             Questions? Contact Us
           </h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Need help with your enrollment, courses, or funding? We&apos;re here for you.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

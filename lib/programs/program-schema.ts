@@ -288,7 +288,7 @@ export interface ProgramSchema {
     plans: {
       label: string;    // e.g. "Pay in Full"
       amount: string;   // e.g. "$5,000"
-      detail: string;   // e.g. "One-time payment, 5% discount applied"
+      detail: string;   // e.g. "One-time payment"
     }[];
   };
 

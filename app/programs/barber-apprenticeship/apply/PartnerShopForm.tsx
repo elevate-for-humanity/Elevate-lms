@@ -44,7 +44,7 @@ function SignaturePad({
 
       {/* Signer name */}
       <div>
-        <label className="block text-xs font-medium text-slate-600 mb-1">{signerLabel} *</label>
+        <label className="block text-xs font-medium text-black mb-1">{signerLabel} *</label>
         <input
           type="text"
           required
@@ -57,7 +57,7 @@ function SignaturePad({
 
       {/* Canvas */}
       <div>
-        <label className="block text-xs font-medium text-slate-600 mb-1">Draw Signature *</label>
+        <label className="block text-xs font-medium text-black mb-1">Draw Signature *</label>
         <div className="border-2 border-dashed border-slate-300 rounded-lg overflow-hidden bg-white">
           <canvas
             ref={canvasRef}
@@ -77,9 +77,9 @@ function SignaturePad({
               <CheckCircle2 className="w-3.5 h-3.5" /> Signature captured
             </span>
           ) : (
-            <span className="text-xs text-slate-400">Draw your signature above</span>
+            <span className="text-xs text-black">Draw your signature above</span>
           )}
-          <button type="button" onClick={onClear} className="text-xs text-slate-400 hover:text-slate-700 underline">
+          <button type="button" onClick={onClear} className="text-xs text-black hover:text-slate-700 underline">
             Clear
           </button>
         </div>
@@ -87,13 +87,13 @@ function SignaturePad({
 
       {/* Date */}
       {signedAt && (
-        <div className="flex items-center gap-1.5 text-xs text-slate-500">
+        <div className="flex items-center gap-1.5 text-xs text-black">
           <Calendar className="w-3.5 h-3.5" />
           Signed: {new Date(signedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
         </div>
       )}
 
-      <p className="text-xs text-slate-400 leading-relaxed">
+      <p className="text-xs text-black leading-relaxed">
         This electronic signature is legally binding under the Indiana Uniform Electronic Transactions Act (IC 26-2-8) and the federal ESIGN Act.
       </p>
     </div>
@@ -375,7 +375,7 @@ export default function PartnerShopForm() {
           {/* Before You Apply checklist */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mb-8">
             <h2 className="text-lg font-bold text-slate-900 mb-1">Before You Apply</h2>
-            <p className="text-sm text-slate-500 mb-5">Complete these steps first so you&apos;re ready to submit.</p>
+            <p className="text-sm text-black mb-5">Complete these steps first so you&apos;re ready to submit.</p>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {partnerSteps.map((step) => (
                 <Link
@@ -391,7 +391,7 @@ export default function PartnerShopForm() {
                       {step.label}
                       <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                     </span>
-                    <p className="text-xs text-slate-500 mt-0.5">{step.description}</p>
+                    <p className="text-xs text-black mt-0.5">{step.description}</p>
                   </div>
                 </Link>
               ))}
@@ -435,7 +435,7 @@ export default function PartnerShopForm() {
                 {/* EIN */}
                 <div className="md:col-span-2 border-t border-slate-100 pt-4 mt-2">
                   <h3 className="text-sm font-semibold text-slate-800 mb-3">Employer Identification Number (EIN)</h3>
-                  <p className="text-xs text-slate-500 mb-4">
+                  <p className="text-xs text-black mb-4">
                     Required for DOL RAPIDS worksite registration. Enter your EIN and upload your IRS confirmation letter (CP-575 or 147C). The name on the EIN must match your shop legal name above.
                   </p>
                   <div className="grid md:grid-cols-2 gap-4">
@@ -457,8 +457,8 @@ export default function PartnerShopForm() {
                         Upload EIN Paperwork *
                       </label>
                       <label className="flex items-center gap-3 w-full px-4 py-2 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition">
-                        <Upload className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                        <span className="text-sm text-slate-600 truncate">
+                        <Upload className="w-4 h-4 text-black flex-shrink-0" />
+                        <span className="text-sm text-black truncate">
                           {einFileName || 'Choose file (PDF or image)'}
                         </span>
                         <input
@@ -473,7 +473,7 @@ export default function PartnerShopForm() {
                           <CheckCircle2 className="w-3.5 h-3.5" /> {einFileName}
                         </p>
                       )}
-                      <p className="text-xs text-slate-400 mt-1">IRS CP-575 or 147C letter — full document, no crops</p>
+                      <p className="text-xs text-black mt-1">IRS CP-575 or 147C letter — full document, no crops</p>
                     </div>
                   </div>
                   {/* EIN QA notes */}
@@ -494,7 +494,7 @@ export default function PartnerShopForm() {
                   <label className="block text-sm font-medium text-slate-700 mb-1">
                     Shop Physical / Worksite Address *
                   </label>
-                  <p className="text-xs text-slate-500 mb-2">
+                  <p className="text-xs text-black mb-2">
                     The street address where apprentices will perform on-the-job training. This is registered as the worksite in the federal RAPIDS system.
                   </p>
                   <input
@@ -547,7 +547,7 @@ export default function PartnerShopForm() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">State</label>
-                    <input type="text" value="Indiana" disabled className="w-full px-4 py-2 border border-slate-200 rounded-lg bg-white text-slate-600" />
+                    <input type="text" value="Indiana" disabled className="w-full px-4 py-2 border border-slate-200 rounded-lg bg-white text-black" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">ZIP *</label>
@@ -579,7 +579,7 @@ export default function PartnerShopForm() {
             {/* Employment & Compliance */}
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <h2 className="text-xl font-bold text-slate-900 mb-6">Employment & Compliance</h2>
-              <p className="text-sm text-slate-500 mb-6">
+              <p className="text-sm text-black mb-6">
                 As a DOL Registered Apprenticeship, apprentices must be employed by the host shop.
                 Elevate (as the registered sponsor) will register approved apprentices and employer
                 worksites in the federal RAPIDS system after compliance verification.
@@ -590,7 +590,7 @@ export default function PartnerShopForm() {
                   <label className="block text-sm font-medium text-slate-700 mb-2">
                     Will apprentices be added to your payroll as employees? *
                   </label>
-                  <p className="text-xs text-slate-500 mb-2">
+                  <p className="text-xs text-black mb-2">
                     DOL Registered Apprenticeships require the apprentice to be an employee of the host shop,
                     regardless of compensation model (hourly or hybrid). Sole commission is not permitted.
                   </p>
@@ -696,7 +696,7 @@ export default function PartnerShopForm() {
             {/* ── MOU ─────────────────────────────────────────────────────── */}
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <h2 className="text-xl font-bold text-slate-900 mb-2">Memorandum of Understanding (MOU)</h2>
-              <p className="text-sm text-slate-500 mb-4">
+              <p className="text-sm text-black mb-4">
                 Review the MOU before signing. This document governs your responsibilities as a DOL Registered Apprenticeship partner shop.
               </p>
               <div className="p-4 bg-brand-blue-50 border border-brand-blue-200 rounded-lg mb-4">
@@ -735,7 +735,7 @@ export default function PartnerShopForm() {
             {/* ── Employer Acceptance Agreement ────────────────────────────── */}
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <h2 className="text-xl font-bold text-slate-900 mb-2">Employer Acceptance Agreement</h2>
-              <p className="text-sm text-slate-500 mb-4">
+              <p className="text-sm text-black mb-4">
                 As the employing shop, you accept responsibility for the apprentice as an employee, agree to pay at least minimum wage, maintain required insurance, and comply with all DOL Registered Apprenticeship standards for the duration of the apprenticeship.
               </p>
               <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-4 space-y-2 text-sm text-slate-700">
@@ -782,7 +782,7 @@ export default function PartnerShopForm() {
             {/* ── Application Consent ──────────────────────────────────────── */}
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <h2 className="text-xl font-bold text-slate-900 mb-2">Application Consent & Certification</h2>
-              <p className="text-sm text-slate-500 mb-4">
+              <p className="text-sm text-black mb-4">
                 Certify that all information in this application is accurate and consent to contact.
               </p>
               <div className="p-4 bg-white border border-slate-200 rounded-lg mb-4">

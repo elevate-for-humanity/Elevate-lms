@@ -109,7 +109,7 @@ export default function FinancePathwayPage() {
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
             Finance, Bookkeeping &amp; Accounting
           </h1>
-          <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
+          <p className="text-black text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
             A tiered credential pathway preparing participants for entry-level and growth-track roles
             in tax preparation, bookkeeping, payroll support, and small business financial services.
           </p>
@@ -136,16 +136,16 @@ export default function FinancePathwayPage() {
           <div className="max-w-5xl mx-auto px-6">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-wider mb-2">Credential Pathway</p>
             <div className="flex flex-wrap gap-x-8 gap-y-3 mt-6 text-sm">
-              <div><span className="text-slate-500">Structure</span><span className="ml-1.5 font-semibold text-slate-900">3 Tiers (Entry → Intermediate → Advanced)</span></div>
-              <div><span className="text-slate-500">Duration</span><span className="ml-1.5 font-semibold text-slate-900">6–20 weeks depending on tier</span></div>
-              <div><span className="text-slate-500">Funding</span><span className="ml-1.5 font-semibold text-slate-900">WIOA / WRG eligible (ETPL #10004627)</span></div>
-              <div><span className="text-slate-500">Testing</span><span className="ml-1.5 font-semibold text-slate-900">Certiport + WorkKeys on-site</span></div>
+              <div><span className="text-black">Structure</span><span className="ml-1.5 font-semibold text-slate-900">3 Tiers (Entry → Intermediate → Advanced)</span></div>
+              <div><span className="text-black">Duration</span><span className="ml-1.5 font-semibold text-slate-900">6–20 weeks depending on tier</span></div>
+              <div><span className="text-black">Funding</span><span className="ml-1.5 font-semibold text-slate-900">WIOA / WRG eligible (ETPL #10004627)</span></div>
+              <div><span className="text-black">Testing</span><span className="ml-1.5 font-semibold text-slate-900">Certiport + WorkKeys on-site</span></div>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 mt-8">
               <Link href="/apply?program=finance-bookkeeping-accounting" className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-all shadow-lg shadow-brand-red-600/30 text-base">
                 Apply Now <ArrowRight className="w-4 h-4" />
               </Link>
-              <Link href="/wioa-eligibility" className="text-center text-sm text-slate-500 hover:text-brand-red-600 transition-colors py-3.5 px-4">
+              <Link href="/wioa-eligibility" className="text-center text-sm text-black hover:text-brand-red-600 transition-colors py-3.5 px-4">
                 Check funding eligibility →
               </Link>
             </div>
@@ -159,7 +159,7 @@ export default function FinancePathwayPage() {
           <div className="max-w-5xl mx-auto px-6">
             <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Pathway Structure</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Training → Credential → Internship → Employment</h2>
-            <p className="text-slate-600 leading-relaxed mb-8 max-w-3xl">
+            <p className="text-black leading-relaxed mb-8 max-w-3xl">
               Participants complete structured classroom instruction, earn nationally recognized credentials, and may transition into supervised internship placements within partner tax service environments. Paid work-based learning opportunities are available through workforce-aligned models and employer partnerships.
             </p>
             <div className="grid sm:grid-cols-3 gap-6">
@@ -167,7 +167,7 @@ export default function FinancePathwayPage() {
                 <div key={p.phase} className="bg-white rounded-xl p-6 border border-slate-200">
                   <div className="w-10 h-10 bg-brand-red-600 text-white rounded-full flex items-center justify-center text-lg font-bold mb-4">{p.phase}</div>
                   <h3 className="font-bold text-slate-900 mb-2">{p.title}</h3>
-                  <p className="text-sm text-slate-600">{p.desc}</p>
+                  <p className="text-sm text-black">{p.desc}</p>
                 </div>
               ))}
             </div>
@@ -188,12 +188,12 @@ export default function FinancePathwayPage() {
                     <div className="flex flex-wrap items-center gap-3 mb-4">
                       <span className="text-xs font-bold text-white px-3 py-1 rounded-full bg-slate-800">{tier.level}</span>
                       <span className="text-xs font-bold text-brand-red-600 uppercase tracking-wider">{tier.label}</span>
-                      <span className="text-xs text-slate-500 ml-auto">{tier.duration}</span>
+                      <span className="text-xs text-black ml-auto">{tier.duration}</span>
                     </div>
                     <h3 className="text-xl font-bold text-slate-900 mb-4">{tier.title}</h3>
                     <div className="grid md:grid-cols-3 gap-6">
                       <div>
-                        <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Credentials</p>
+                        <p className="text-xs font-bold uppercase tracking-wider text-black mb-2">Credentials</p>
                         <ul className="space-y-1.5">
                           {tier.credentials.map((c) => (
                             <li key={c} className="flex items-start gap-2 text-sm text-slate-700">
@@ -204,7 +204,7 @@ export default function FinancePathwayPage() {
                         </ul>
                       </div>
                       <div>
-                        <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Employment Outcomes</p>
+                        <p className="text-xs font-bold uppercase tracking-wider text-black mb-2">Employment Outcomes</p>
                         <ul className="space-y-1.5">
                           {tier.outcomes.map((o) => (
                             <li key={o} className="flex items-start gap-2 text-sm text-slate-700">
@@ -215,7 +215,7 @@ export default function FinancePathwayPage() {
                         </ul>
                       </div>
                       <div>
-                        <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Employment Tracks</p>
+                        <p className="text-xs font-bold uppercase tracking-wider text-black mb-2">Employment Tracks</p>
                         <ul className="space-y-1.5">
                           {tier.tracks.map((t) => (
                             <li key={t} className="flex items-start gap-2 text-sm text-slate-700">
@@ -245,13 +245,13 @@ export default function FinancePathwayPage() {
           <div className="max-w-5xl mx-auto px-6">
             <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">National Credentials</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Credential &amp; Validation Stack</h2>
-            <p className="text-slate-600 mb-8 max-w-3xl">All credentials are issued by their respective certifying bodies — not by Elevate. Exams are proctored on-site at our authorized testing center where applicable.</p>
+            <p className="text-black mb-8 max-w-3xl">All credentials are issued by their respective certifying bodies — not by Elevate. Exams are proctored on-site at our authorized testing center where applicable.</p>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {credentials.map((cred) => (
                 <div key={cred.name} className="bg-white rounded-lg p-5 border border-slate-200">
                   <h3 className="font-bold text-slate-900 text-sm mb-0.5">{cred.name}</h3>
                   <p className="text-[11px] text-brand-red-600 font-medium mb-2">{cred.issuer}</p>
-                  <p className="text-xs text-slate-600">{cred.desc}</p>
+                  <p className="text-xs text-black">{cred.desc}</p>
                 </div>
               ))}
             </div>
@@ -265,7 +265,7 @@ export default function FinancePathwayPage() {
           <div className="max-w-5xl mx-auto px-6">
             <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Work-Based Learning</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">Structured Internship &amp; Employment Transition</h2>
-            <p className="text-slate-600 leading-relaxed mb-4 max-w-3xl">
+            <p className="text-black leading-relaxed mb-4 max-w-3xl">
               Participants who complete credential requirements may transition into supervised, paid internship placements within partner tax service environments aligned to employment pathways. All internships are time-bound, documented, and evaluated.
             </p>
             <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-8 text-sm text-brand-blue-800">
@@ -275,15 +275,15 @@ export default function FinancePathwayPage() {
             <div className="grid sm:grid-cols-3 gap-6 mb-8">
               <div className="bg-white rounded-lg p-5 border border-slate-200">
                 <h3 className="font-bold text-slate-900 text-sm mb-2">Workforce-Funded Work Experience</h3>
-                <p className="text-xs text-slate-600">WorkOne authorizes paid work experience. Workforce board pays stipend or wage per local policy. Elevate supervises. Hours and learning objectives documented per WIOA guidelines.</p>
+                <p className="text-xs text-black">WorkOne authorizes paid work experience. Workforce board pays stipend or wage per local policy. Elevate supervises. Hours and learning objectives documented per WIOA guidelines.</p>
               </div>
               <div className="bg-white rounded-lg p-5 border border-slate-200">
                 <h3 className="font-bold text-slate-900 text-sm mb-2">OJT Reimbursement Model</h3>
-                <p className="text-xs text-slate-600">Participant hired as W-2 employee. WorkOne reimburses employer 50–75% of wages during defined training period per local board policy. Formal OJT contract and training plan required.</p>
+                <p className="text-xs text-black">Participant hired as W-2 employee. WorkOne reimburses employer 50–75% of wages during defined training period per local board policy. Formal OJT contract and training plan required.</p>
               </div>
               <div className="bg-white rounded-lg p-5 border border-slate-200">
                 <h3 className="font-bold text-slate-900 text-sm mb-2">Employer-Funded Placement</h3>
-                <p className="text-xs text-slate-600">Partner employer pays wages directly. Training plan and evaluation documented. No workforce reimbursement. Still reported to WorkOne for outcome tracking if participant is WIOA-enrolled.</p>
+                <p className="text-xs text-black">Partner employer pays wages directly. Training plan and evaluation documented. No workforce reimbursement. Still reported to WorkOne for outcome tracking if participant is WIOA-enrolled.</p>
               </div>
             </div>
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-5">
@@ -311,7 +311,7 @@ export default function FinancePathwayPage() {
           <div className="max-w-5xl mx-auto px-6">
             <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Outcome Metrics</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">Defined Outcome Ladder</h2>
-            <p className="text-slate-600 mb-8 max-w-3xl">For WIOA/WRG performance reporting through the local workforce development board, this pathway tracks measurable outcomes at each stage. All metrics are reported to the assigned WorkOne career advisor.</p>
+            <p className="text-black mb-8 max-w-3xl">For WIOA/WRG performance reporting through the local workforce development board, this pathway tracks measurable outcomes at each stage. All metrics are reported to the assigned WorkOne career advisor.</p>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
                 { metric: 'Credential Attainment', desc: 'QuickBooks Certified User (Certiport) + IRS PTIN + WorkKeys NCRC. Measurable, third-party validated.', primary: true },
@@ -321,7 +321,7 @@ export default function FinancePathwayPage() {
               ].map((item) => (
                 <div key={item.metric} className={`rounded-lg p-5 border ${item.primary ? 'bg-brand-green-50 border-brand-green-200' : 'bg-white border-slate-200'}`}>
                   <h3 className={`font-bold text-sm mb-2 ${item.primary ? 'text-brand-green-800' : 'text-slate-900'}`}>{item.metric}</h3>
-                  <p className="text-xs text-slate-600">{item.desc}</p>
+                  <p className="text-xs text-black">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -345,8 +345,8 @@ export default function FinancePathwayPage() {
                   <Image src={prog.image} alt={prog.title} width={600} height={400} sizes="(max-width: 640px) 100vw, 33vw" className="w-full aspect-[3/2] object-cover group-hover:scale-105 transition-transform duration-300" />
                   <div className="p-5">
                     <h3 className="font-bold text-slate-900 mb-1">{prog.title}</h3>
-                    <p className="text-xs text-slate-500 mb-2">{prog.duration} · {prog.cost}</p>
-                    <p className="text-sm text-slate-600 mb-3">Credential: {prog.credential}</p>
+                    <p className="text-xs text-black mb-2">{prog.duration} · {prog.cost}</p>
+                    <p className="text-sm text-black mb-3">Credential: {prog.credential}</p>
                     <span className="text-brand-red-600 font-semibold text-sm group-hover:underline">View details →</span>
                   </div>
                 </Link>
@@ -361,7 +361,7 @@ export default function FinancePathwayPage() {
         <section className="py-14 sm:py-20 bg-slate-900">
           <div className="max-w-3xl mx-auto px-6 text-center">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Start This Credential Pathway</h2>
-            <p className="text-slate-300 text-base leading-relaxed mb-8 max-w-xl mx-auto">
+            <p className="text-white text-base leading-relaxed mb-8 max-w-xl mx-auto">
               Apply in minutes. Training may be fully funded for eligible Indiana residents through
               WIOA and state workforce programs.
             </p>
@@ -388,7 +388,7 @@ export default function FinancePathwayPage() {
       {/* ===== TRUST BAR ===== */}
       <section className="py-8 border-t border-slate-100">
         <div className="max-w-5xl mx-auto px-6">
-          <p className="text-center text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Recognized By</p>
+          <p className="text-center text-xs font-semibold text-black uppercase tracking-wider mb-4">Recognized By</p>
           <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 mb-4">
             {[
               { src: '/images/partners/usdol.webp', alt: 'U.S. Department of Labor' },

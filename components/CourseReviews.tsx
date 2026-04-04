@@ -232,7 +232,7 @@ export function CourseReviews({ courseId }: CourseReviewsProps) {
                       ))}
                     </div>
                     <span className="text-sm text-slate-500">
-                      {new Date(review.created_at).toLocaleDateString()}
+                      {new Date(review.created_at).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
                   </div>
                 </div>

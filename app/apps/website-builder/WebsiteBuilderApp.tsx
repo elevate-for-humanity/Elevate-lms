@@ -83,7 +83,7 @@ export function WebsiteBuilderApp({ user, subscription, websites: initialWebsite
             </div>
             <div>
               <h1 className="font-bold">Website Builder</h1>
-              <p className="text-brand-blue-200 text-sm">Build Professional Websites</p>
+              <p className="text-white text-sm">Build Professional Websites</p>
             </div>
           </div>
           <Link href="/apps/website-builder" className="p-2 hover:bg-brand-blue-800 rounded-lg">

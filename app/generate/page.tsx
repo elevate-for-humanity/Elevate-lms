@@ -232,7 +232,7 @@ export default function GenerateSitePage() {
               </div>
 
               {error && (
-                <div className="p-4 bg-white/20 border border-brand-red-500/50 rounded-lg text-brand-red-200">
+                <div className="p-4 bg-white/20 border border-brand-red-500/50 rounded-lg text-white">
                   {error}
                 </div>
               )}
@@ -364,7 +364,7 @@ export default function GenerateSitePage() {
                 >
                   <p className="text-slate-900 font-bold text-lg">Professional</p>
                   <p className="text-3xl font-black text-slate-900 my-2">$299<span className="text-lg">/mo</span></p>
-                  <p className="text-brand-blue-200 text-sm">500 students</p>
+                  <p className="text-white text-sm">500 students</p>
                 </a>
                 
                 <a

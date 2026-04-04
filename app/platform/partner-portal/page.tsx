@@ -47,7 +47,7 @@ export default function PartnerPortalPage() {
           <Breadcrumbs items={[{ label: 'Platform', href: '/platform' }, { label: 'Partner Portal' }]} />
         </div>
       </div>
-      <div class="max-w-6xl mx-auto px-4 pb-2"><p class="text-sm text-slate-600 font-medium">Part of the <a href="/platform" class="text-brand-red-600 hover:underline">Elevate Workforce Operating System</a></p></div>
+      <div class="max-w-6xl mx-auto px-4 pb-2"><p class="text-sm text-black font-medium">Part of the <a href="/platform" class="text-brand-red-600 hover:underline">Elevate Workforce Operating System</a></p></div>
 
       {/* Hero */}
       {/* Hero */}
@@ -58,7 +58,7 @@ export default function PartnerPortalPage() {
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Partner Portal</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Everything you need to manage your training programs, track student outcomes, and stay compliant.</p>
+            <p className="text-lg text-white max-w-3xl mx-auto">Everything you need to manage your training programs, track student outcomes, and stay compliant.</p>
           </div>
         </div>
       </section>
@@ -68,7 +68,7 @@ export default function PartnerPortalPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Portal Features</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-black max-w-2xl mx-auto">
               A single platform to manage every aspect of your workforce training partnership.
             </p>
           </div>
@@ -79,7 +79,7 @@ export default function PartnerPortalPage() {
                   <f.icon className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{f.title}</h3>
-                <p className="text-gray-600 text-sm">{f.description}</p>
+                <p className="text-black text-sm">{f.description}</p>
               </div>
             ))}
           </div>
@@ -91,7 +91,7 @@ export default function PartnerPortalPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Who Uses the Partner Portal</h2>
-            <p className="text-lg text-gray-600">Tailored experiences for every type of workforce partner.</p>
+            <p className="text-lg text-black">Tailored experiences for every type of workforce partner.</p>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
             {partnerTypes.map((p, i) => (
@@ -101,7 +101,7 @@ export default function PartnerPortalPage() {
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1 group-hover:text-brand-blue-600 transition">{p.title}</h3>
-                  <p className="text-gray-600 text-sm">{p.description}</p>
+                  <p className="text-black text-sm">{p.description}</p>
                 </div>
               </Link>
             ))}
@@ -130,7 +130,7 @@ export default function PartnerPortalPage() {
                   'Priority support from our partner success team',
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     <span className="text-gray-700">{item}</span>
                   </div>
                 ))}
@@ -144,7 +144,7 @@ export default function PartnerPortalPage() {
       <section className="py-20 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Become a Partner</h2>
-          <p className="text-brand-blue-100 text-lg mb-8">Join our network of training providers and community organizations.</p>
+          <p className="text-white text-lg mb-8">Join our network of training providers and community organizations.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/partners/join" className="px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-brand-blue-50 transition inline-flex items-center gap-2">
               Apply Now <ArrowRight className="w-5 h-5" />

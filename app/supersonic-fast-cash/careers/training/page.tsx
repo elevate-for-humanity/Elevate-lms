@@ -563,7 +563,7 @@ export default function TrainingPage() {
                   )}
                   <div className="flex items-start justify-between mb-3">
                     <h3 className="font-bold text-lg pr-16">{module.title}</h3>
-                    {isCompleted && <span className="text-slate-400 flex-shrink-0">•</span>}
+                    {isCompleted && <span className="text-black flex-shrink-0">•</span>}
                     {!prerequisiteMet && <Lock className="w-6 h-6" />}
                   </div>
                   <div className="flex items-center gap-4 text-sm">
@@ -790,7 +790,7 @@ export default function TrainingPage() {
                   <ul className="space-y-2">
                     {selectedModuleData.topics.map((topic, index) => (
                       <li key={index} className="flex items-start gap-2">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-black flex-shrink-0">•</span>
                         <span>{topic}</span>
                       </li>
                     ))}

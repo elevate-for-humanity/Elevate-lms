@@ -62,7 +62,7 @@ export default function UniversalPartnerApplyPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Program Not Found</h1>
-          <p className="text-gray-600 mb-6">The program you&apos;re looking for doesn&apos;t exist.</p>
+          <p className="text-black mb-6">The program you&apos;re looking for doesn&apos;t exist.</p>
           <Link href="/partners" className="text-orange-600 hover:text-orange-700 font-medium">
             View All Partner Programs →
           </Link>
@@ -130,7 +130,7 @@ export default function UniversalPartnerApplyPage() {
             <option value="">Select...</option>
             {field.options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
           </select>
-          {field.helpText && <p className="text-xs text-gray-500 mt-1">{field.helpText}</p>}
+          {field.helpText && <p className="text-xs text-black mt-1">{field.helpText}</p>}
         </div>
       );
     }
@@ -159,7 +159,7 @@ export default function UniversalPartnerApplyPage() {
           className={inputClass}
           placeholder={field.placeholder}
         />
-        {field.helpText && <p className="text-xs text-gray-500 mt-1">{field.helpText}</p>}
+        {field.helpText && <p className="text-xs text-black mt-1">{field.helpText}</p>}
       </div>
     );
   };
@@ -178,7 +178,7 @@ export default function UniversalPartnerApplyPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{config.shortName} Partner Application</h1>
-          <p className="text-gray-600">Become a partner {config.siteLabel} for the {config.name} program.</p>
+          <p className="text-black">Become a partner {config.siteLabel} for the {config.name} program.</p>
         </div>
 
         {/* Progress */}
@@ -186,7 +186,7 @@ export default function UniversalPartnerApplyPage() {
           {Array.from({ length: totalSteps }, (_, i) => (
             <div key={i} className="flex items-center gap-2">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                i + 1 <= step ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-500'
+                i + 1 <= step ? 'bg-orange-500 text-white' : 'bg-gray-200 text-black'
               }`}>{i + 1}</div>
               {i < totalSteps - 1 && <div className={`w-12 h-1 rounded ${i + 1 < step ? 'bg-orange-500' : 'bg-gray-200'}`} />}
             </div>
@@ -291,7 +291,7 @@ export default function UniversalPartnerApplyPage() {
               <div className="space-y-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Review &amp; Submit</h2>
 
-                <div className="bg-white rounded-lg p-4 text-sm text-gray-600 space-y-2">
+                <div className="bg-white rounded-lg p-4 text-sm text-black space-y-2">
                   <p><strong>Business:</strong> {formData.businessLegalName} {formData.dba ? `(DBA: ${formData.dba})` : ''}</p>
                   <p><strong>Contact:</strong> {formData.contactName} — {formData.contactEmail} — {formData.contactPhone}</p>
                   <p><strong>Location:</strong> {formData.addressLine1}, {formData.city}, {formData.state} {formData.zip}</p>

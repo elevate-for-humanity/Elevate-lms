@@ -37,7 +37,7 @@ export default async function CreateGroupPage() {
   return (
     <div className="min-h-screen bg-white py-8">
       <div className="max-w-2xl mx-auto px-4">
-        <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
+        <nav className="flex items-center gap-2 text-sm text-black mb-6">
           <Link href="/" className="hover:text-brand-orange-600">Home</Link>
           <ChevronRight className="w-4 h-4" />
           <Link href="/community" className="hover:text-brand-orange-600">Community</Link>
@@ -48,7 +48,7 @@ export default async function CreateGroupPage() {
         </nav>
 
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Study Group</h1>
-        <p className="text-gray-600 mb-8">Start a study group to connect with other learners</p>
+        <p className="text-black mb-8">Start a study group to connect with other learners</p>
 
         <CreateGroupForm 
           userId={user.id}

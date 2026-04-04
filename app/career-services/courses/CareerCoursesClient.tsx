@@ -127,14 +127,14 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                     BEST VALUE - SAVE ${(Number(bundle.original_price) - Number(bundle.price)).toFixed(0)}
                   </span>
                   <h2 className="text-3xl font-bold mb-2">{bundle.title}</h2>
-                  <p className="text-brand-blue-100 mb-6">{bundle.description}</p>
+                  <p className="text-white mb-6">{bundle.description}</p>
                   
                   <div className="mb-6">
-                    <p className="text-sm text-brand-blue-200 mb-2">What&apos;s Included:</p>
+                    <p className="text-sm text-white mb-2">What&apos;s Included:</p>
                     <ul className="space-y-2">
                       {sortedFeatures(bundle.features || []).map((f, i) => (
                         <li key={i} className="flex items-center gap-2">
-                          <span className="text-slate-500 flex-shrink-0">•</span>
+                          <span className="text-black flex-shrink-0">•</span>
                           <span>{f.feature}</span>
                         </li>
                       ))}
@@ -153,7 +153,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                   >
                     {cart.includes(bundle.id) ? (
                       <>
-                        <span className="text-slate-500 flex-shrink-0">•</span>
+                        <span className="text-black flex-shrink-0">•</span>
                         Added to Cart
                       </>
                     ) : (
@@ -183,7 +183,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
           
           {courses.length === 0 ? (
             <div className="bg-white rounded-xl p-12 text-center">
-              <p className="text-gray-600">No courses available at this time. Contact us for more information.</p>
+              <p className="text-black">No courses available at this time. Contact us for more information.</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -210,9 +210,9 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                   <div className="p-6 flex-1 flex flex-col">
                     <h3 className="text-xl font-bold text-gray-900 mb-1">{course.title}</h3>
                     <p className="text-sm text-brand-blue-600 font-medium mb-3">{course.subtitle}</p>
-                    <p className="text-gray-600 text-sm mb-4 flex-1">{course.description}</p>
+                    <p className="text-black text-sm mb-4 flex-1">{course.description}</p>
 
-                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                    <div className="flex items-center gap-4 text-sm text-black mb-4">
                       <span className="flex items-center gap-1">
                         <Clock className="w-4 h-4" />
                         {course.duration_hours} hours
@@ -228,7 +228,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                         <div className="flex items-center gap-2">
                           <span className="text-2xl font-bold text-gray-900">${Number(course.price).toFixed(0)}</span>
                           {course.original_price && (
-                            <span className="text-slate-500 line-through">${Number(course.original_price).toFixed(0)}</span>
+                            <span className="text-black line-through">${Number(course.original_price).toFixed(0)}</span>
                           )}
                         </div>
                       </div>
@@ -247,7 +247,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                         >
                           {cart.includes(course.id) ? (
                             <>
-                              <span className="text-slate-500 flex-shrink-0">•</span>
+                              <span className="text-black flex-shrink-0">•</span>
                               Added
                             </>
                           ) : (

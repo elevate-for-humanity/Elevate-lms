@@ -22,7 +22,7 @@ export default function HvacApplicationSuccessPage() {
             Application Submitted
           </h1>
 
-          <p className="text-slate-600 mb-8">
+          <p className="text-black mb-8">
             Thank you for applying to the HVAC Technician program.
             We&apos;ve received your application and will be in touch soon.
           </p>
@@ -68,7 +68,7 @@ export default function HvacApplicationSuccessPage() {
             </Link>
           </div>
 
-          <p className="mt-6 text-sm text-slate-500">
+          <p className="mt-6 text-sm text-black">
             Questions? Email{' '}
             <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600 font-medium hover:underline">
               info@elevateforhumanity.org

@@ -131,7 +131,7 @@ export default function AICareerCounseling() {
   // Intro Screen
   if (step === 'intro') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-brand-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-gradient-to-br from-brand-blue-50 to-brand-blue-100">
         <div className="max-w-4xl mx-auto px-4 py-16">
           <div className="text-center mb-12">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-6">
@@ -147,7 +147,7 @@ export default function AICareerCounseling() {
 
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <Target className="w-10 h-10 text-indigo-600 mb-4" />
+              <Target className="w-10 h-10 text-brand-blue-600 mb-4" />
               <h3 className="font-bold text-lg mb-2">Personalized Guidance</h3>
               <p className="text-gray-600 text-sm">Get career recommendations tailored to your unique skills and interests.</p>
             </div>
@@ -166,7 +166,7 @@ export default function AICareerCounseling() {
           <div className="text-center">
             <button
               onClick={() => setStep('profile')}
-              className="inline-flex items-center gap-2 bg-indigo-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-indigo-700 transition-all hover:scale-105"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-brand-blue-700 transition-all hover:scale-105"
             >
               Start Career Assessment
               <ChevronRight className="w-5 h-5" />
@@ -181,7 +181,7 @@ export default function AICareerCounseling() {
   // Profile Setup Screen
   if (step === 'profile') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-brand-blue-50 to-indigo-100 py-12">
+      <div className="min-h-screen bg-gradient-to-br from-brand-blue-50 to-brand-blue-100 py-12">
         <div className="max-w-2xl mx-auto px-4">
           <div className="bg-white rounded-2xl shadow-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Tell us about yourself</h2>
@@ -199,7 +199,7 @@ export default function AICareerCounseling() {
                       onClick={() => toggleSkill(skill)}
                       className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                         profile.skills.includes(skill)
-                          ? 'bg-indigo-600 text-white'
+                          ? 'bg-brand-blue-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
@@ -221,7 +221,7 @@ export default function AICareerCounseling() {
                       onClick={() => setProfile(prev => ({ ...prev, level }))}
                       className={`px-4 py-3 rounded-lg text-sm font-medium transition-all ${
                         profile.level === level
-                          ? 'bg-indigo-600 text-white'
+                          ? 'bg-brand-blue-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
@@ -250,7 +250,7 @@ export default function AICareerCounseling() {
                       onClick={() => setProfile(prev => ({ ...prev, goal }))}
                       className={`px-4 py-3 rounded-lg text-sm font-medium text-left transition-all ${
                         profile.goal === goal
-                          ? 'bg-indigo-600 text-white'
+                          ? 'bg-brand-blue-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
@@ -272,7 +272,7 @@ export default function AICareerCounseling() {
                       onClick={() => toggleInterest(interest)}
                       className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                         profile.interests.includes(interest)
-                          ? 'bg-indigo-600 text-white'
+                          ? 'bg-brand-blue-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
@@ -293,7 +293,7 @@ export default function AICareerCounseling() {
               <button
                 onClick={startChat}
                 disabled={profile.skills.length === 0 || !profile.level || !profile.goal}
-                className="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Get My Career Recommendations
               </button>
@@ -319,7 +319,7 @@ export default function AICareerCounseling() {
               <p className="text-xs text-gray-500">Personalized guidance for your career journey</p>
             </div>
           </div>
-          <Link href="/programs" className="text-sm text-indigo-600 hover:underline">
+          <Link href="/programs" className="text-sm text-brand-blue-600 hover:underline">
             View All Programs
           </Link>
         </div>
@@ -331,13 +331,13 @@ export default function AICareerCounseling() {
           {messages.map((message, index) => (
             <div key={index} className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : ''}`}>
               {message.role === 'assistant' && (
-                <div className="bg-indigo-100 rounded-full p-2 h-fit">
-                  <Bot className="w-5 h-5 text-indigo-600" />
+                <div className="bg-brand-blue-100 rounded-full p-2 h-fit">
+                  <Bot className="w-5 h-5 text-brand-blue-600" />
                 </div>
               )}
               <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                 message.role === 'user'
-                  ? 'bg-indigo-600 text-white'
+                  ? 'bg-brand-blue-600 text-white'
                   : 'bg-white shadow-sm border'
               }`}>
                 <p className="text-sm whitespace-pre-line">{message.content}</p>
@@ -351,11 +351,11 @@ export default function AICareerCounseling() {
           ))}
           {isLoading && (
             <div className="flex gap-3">
-              <div className="bg-indigo-100 rounded-full p-2 h-fit">
-                <Bot className="w-5 h-5 text-indigo-600" />
+              <div className="bg-brand-blue-100 rounded-full p-2 h-fit">
+                <Bot className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div className="bg-white rounded-2xl px-4 py-3 shadow-sm border">
-                <Loader2 className="w-5 h-5 animate-spin text-indigo-600" />
+                <Loader2 className="w-5 h-5 animate-spin text-brand-blue-600" />
               </div>
             </div>
           )}
@@ -371,7 +371,7 @@ export default function AICareerCounseling() {
               <button
                 key={index}
                 onClick={() => sendMessage(suggestion)}
-                className="text-sm bg-indigo-50 text-indigo-700 px-4 py-2 rounded-full hover:bg-indigo-100 whitespace-nowrap"
+                className="text-sm bg-brand-blue-50 text-brand-blue-700 px-4 py-2 rounded-full hover:bg-brand-blue-100 whitespace-nowrap"
               >
                 {suggestion}
               </button>
@@ -390,12 +390,12 @@ export default function AICareerCounseling() {
             onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
             placeholder="Ask about careers, salaries, training programs..."
             disabled={isLoading}
-            className="flex-1 px-4 py-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="flex-1 px-4 py-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
           />
           <button
             onClick={() => sendMessage()}
             disabled={!input.trim() || isLoading}
-            className="bg-indigo-600 text-white rounded-full p-3 hover:bg-indigo-700 disabled:opacity-50"
+            className="bg-brand-blue-600 text-white rounded-full p-3 hover:bg-brand-blue-700 disabled:opacity-50"
           >
             {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
           </button>

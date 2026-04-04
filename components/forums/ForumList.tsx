@@ -101,7 +101,7 @@ export function ForumList({ threads, categoryId }: ForumListProps) {
                     {thread.view_count} views
                   </span>
                   <span>
-                    {new Date(thread.last_reply_at || thread.created_at).toLocaleDateString()}
+                    {new Date(thread.last_reply_at || thread.created_at).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                 </div>
               </div>

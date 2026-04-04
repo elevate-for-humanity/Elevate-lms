@@ -40,7 +40,7 @@ export default async function CompliancePage() {
           <h1 className="text-5xl font-black mb-6">
             Enterprise-Grade Compliance
           </h1>
-          <p className="text-xl text-brand-green-100 max-w-3xl mx-auto">
+          <p className="text-xl text-white max-w-3xl mx-auto">
             Built for workforce development with WIOA, FERPA, WCAG AA, and grant reporting compliance out of the box.
           </p>
         </div>

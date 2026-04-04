@@ -230,7 +230,7 @@ export function CalendarWidget({ userId }: CalendarWidgetProps) {
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-black truncate">{event.title}</p>
                   <p className="text-xs text-black">
-                    {new Date(event.date).toLocaleDateString()}
+                    {new Date(event.date).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
               </div>

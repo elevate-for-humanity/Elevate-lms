@@ -162,7 +162,7 @@ export default async function TaxCareersPage() {
               NOW HIRING FOR TAX SEASON 2025
             </div>
             <h1 className="text-5xl font-bold mb-6">Join Our Tax Team</h1>
-            <p className="text-2xl text-brand-green-100 mb-8">
+            <p className="text-2xl text-white mb-8">
               Earn $20-$50/hour as an PTIN-credentialed tax preparer. Work from home
               anywhere in the USA or in our Indianapolis offices.
             </p>
@@ -394,7 +394,7 @@ export default async function TaxCareersPage() {
 
                 <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4">
                   <p className="font-bold text-brand-green-900 mb-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span> Good News!
+                    <span className="text-black flex-shrink-0">•</span> Good News!
                   </p>
                   <p className="text-brand-green-800">
                     You DON'T need your own EFIN to work with us. We provide
@@ -590,7 +590,7 @@ export default async function TaxCareersPage() {
                   <ul className="space-y-2">
                     {position.requirements.map((req, idx) => (
                       <li key={idx} className="flex items-start gap-2">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-black flex-shrink-0">•</span>
                         <span className="text-black">{req}</span>
                       </li>
                     ))}
@@ -646,7 +646,7 @@ export default async function TaxCareersPage() {
                 <tr className="bg-white">
                   <td className="px-6 py-4 font-semibold">Work From Home</td>
                   <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
-                    <span className="text-slate-400 flex-shrink-0">•</span> Yes
+                    <span className="text-black flex-shrink-0">•</span> Yes
                   </td>
                   <td className="px-6 py-4 text-center">
                     <AlertTriangle className="w-5 h-5 inline-block" /> Limited
@@ -661,7 +661,7 @@ export default async function TaxCareersPage() {
                 <tr>
                   <td className="px-6 py-4 font-semibold">Flexible Schedule</td>
                   <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
-                    <span className="text-slate-400 flex-shrink-0">•</span> Yes
+                    <span className="text-black flex-shrink-0">•</span> Yes
                   </td>
                   <td className="px-6 py-4 text-center">
                     <AlertTriangle className="w-5 h-5 inline-block" /> Limited
@@ -678,7 +678,7 @@ export default async function TaxCareersPage() {
                     Performance Bonuses
                   </td>
                   <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
-                    <span className="text-slate-400 flex-shrink-0">•</span> Yes
+                    <span className="text-black flex-shrink-0">•</span> Yes
                   </td>
                   <td className="px-6 py-4 text-center">
                     <AlertTriangle className="w-5 h-5 inline-block" /> Sometimes
@@ -693,7 +693,7 @@ export default async function TaxCareersPage() {
                 <tr>
                   <td className="px-6 py-4 font-semibold">Year-Round Work</td>
                   <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
-                    <span className="text-slate-400 flex-shrink-0">•</span> Available
+                    <span className="text-black flex-shrink-0">•</span> Available
                   </td>
                   <td className="px-6 py-4 text-center">
                     <AlertTriangle className="w-5 h-5 inline-block" /> Limited
@@ -708,16 +708,16 @@ export default async function TaxCareersPage() {
                 <tr className="bg-white">
                   <td className="px-6 py-4 font-semibold">Training Provided</td>
                   <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
-                    <span className="text-slate-400 flex-shrink-0">•</span> Free
+                    <span className="text-black flex-shrink-0">•</span> Free
                   </td>
                   <td className="px-6 py-4 text-center">
-                    <span className="text-slate-400 flex-shrink-0">•</span> Yes
+                    <span className="text-black flex-shrink-0">•</span> Yes
                   </td>
                   <td className="px-6 py-4 text-center">
-                    <span className="text-slate-400 flex-shrink-0">•</span> Yes
+                    <span className="text-black flex-shrink-0">•</span> Yes
                   </td>
                   <td className="px-6 py-4 text-center">
-                    <span className="text-slate-400 flex-shrink-0">•</span> Yes
+                    <span className="text-black flex-shrink-0">•</span> Yes
                   </td>
                 </tr>
               </tbody>

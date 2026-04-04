@@ -73,7 +73,7 @@ export default async function DiscussionsPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Community Discussions</h1>
-            <p className="text-gray-600 mt-1">Connect, share, and learn with fellow students</p>
+            <p className="text-black mt-1">Connect, share, and learn with fellow students</p>
           </div>
           <Link
             href="/community/discussions/new"
@@ -124,7 +124,7 @@ export default async function DiscussionsPage() {
                         <h3 className="font-semibold text-gray-900 hover:text-brand-blue-600">
                           {discussion.title}
                         </h3>
-                        <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                        <div className="flex items-center gap-4 mt-2 text-sm text-black">
                           <span>{discussion.author?.full_name || 'Anonymous'}</span>
                           {discussion.category && (
                             <span className="px-2 py-0.5 bg-white rounded-full text-xs">
@@ -133,7 +133,7 @@ export default async function DiscussionsPage() {
                           )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <div className="flex items-center gap-4 text-sm text-black">
                         <span className="flex items-center gap-1">
                           <MessageSquare className="w-4 h-4" />
                           {discussion.replies_count || 0}
@@ -152,7 +152,7 @@ export default async function DiscussionsPage() {
               <div className="bg-white rounded-xl border p-12 text-center">
                 <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">No discussions yet</h2>
-                <p className="text-gray-600 mb-6">Be the first to start a conversation!</p>
+                <p className="text-black mb-6">Be the first to start a conversation!</p>
                 <Link
                   href="/community/discussions/new"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"

@@ -29,7 +29,7 @@ export default function ContentPageTemplate({
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">{title}</h1>
           {description && (
-            <p className="text-xl text-brand-blue-100 max-w-3xl">{description}</p>
+            <p className="text-xl text-white max-w-3xl">{description}</p>
           )}
         </div>
       </div>

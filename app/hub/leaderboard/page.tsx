@@ -51,11 +51,11 @@ export default async function LeaderboardPage() {
           <div className="bg-brand-blue-700 rounded-2xl p-6 mb-8 text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-brand-green-100 text-sm">Your Rank</p>
+                <p className="text-white text-sm">Your Rank</p>
                 <p className="text-4xl font-bold">#{userRank + 1}</p>
               </div>
               <div className="text-right">
-                <p className="text-brand-green-100 text-sm">Your Points</p>
+                <p className="text-white text-sm">Your Points</p>
                 <p className="text-4xl font-bold">{userProfile?.points || 0}</p>
               </div>
             </div>

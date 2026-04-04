@@ -67,7 +67,7 @@ export default function OnboardingPrompt({ userId, userRole }: OnboardingPromptP
             <h3 className="text-xl font-bold text-white mb-2">
               {primaryFlow.name}
             </h3>
-            <p className="text-brand-blue-100 mb-4">
+            <p className="text-white mb-4">
               Take a quick tour to learn how to make the most of your experience.
               It only takes a few minutes!
             </p>

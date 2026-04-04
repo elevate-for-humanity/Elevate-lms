@@ -67,7 +67,7 @@ export default function AIChatPage() {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
             Your Personal Learning Assistant
           </h1>
-          <p className="text-xl text-brand-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-white mb-8 max-w-2xl mx-auto">
             Get instant help with courses, career questions, and your learning journey. 
             Available 24/7 to support your success.
           </p>
@@ -92,7 +92,7 @@ export default function AIChatPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-slate-900">Elevate AI Assistant</h3>
-                <p className="text-brand-blue-200 text-sm">Always here to help</p>
+                <p className="text-white text-sm">Always here to help</p>
               </div>
             </div>
 
@@ -217,7 +217,7 @@ export default function AIChatPage() {
       <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
-          <p className="text-brand-blue-100 mb-8">
+          <p className="text-white mb-8">
             Your AI learning assistant is ready to help you succeed.
           </p>
           <Link
@@ -236,7 +236,7 @@ export default function AIChatPage() {
       <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>
+          <p className="text-white mb-6">Check your eligibility for funded career training programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"

@@ -183,7 +183,7 @@ export default function EnrollPage({
                   {course.category}
                 </span>
                 <h2 className="text-2xl font-bold mb-2">{course.title}</h2>
-                <p className="text-brand-blue-100 text-sm">
+                <p className="text-white text-sm">
                   Provided by {course.provider.name}
                 </p>
               </div>
@@ -194,7 +194,7 @@ export default function EnrollPage({
                     : `$${course.retail_price}`}
                 </div>
                 {course.retail_price === 0 && (
-                  <div className="text-xs text-brand-blue-100 mt-1">
+                  <div className="text-xs text-white mt-1">
                     Through WIOA funding
                   </div>
                 )}
@@ -238,7 +238,7 @@ export default function EnrollPage({
             {/* What Happens Next */}
             <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 mb-8">
               <h3 className="text-lg font-semibold text-black mb-4 flex items-center gap-2">
-                <span className="text-slate-500 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 What Happens Next
               </h3>
               <ol className="space-y-3 text-black">
@@ -306,7 +306,7 @@ export default function EnrollPage({
             </div>
 
             {/* Fine Print */}
-            <p className="text-xs text-slate-500 mt-6 text-center">
+            <p className="text-xs text-black mt-6 text-center">
               By enrolling, you agree to complete the course and follow the
               partner's terms of service. This course is provided by{' '}
               {course.provider.name}.

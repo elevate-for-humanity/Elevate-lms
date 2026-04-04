@@ -118,18 +118,18 @@ export default async function ProgramHolderDashboardPage() {
 
       <div className="relative h-48 sm:h-56 w-full overflow-hidden">
         <Image src="/images/pages/workforce-training.jpg" alt="Program Holder Portal" fill className="object-cover object-center" priority sizes="100vw" />
-        <div className="absolute inset-0 bg-slate-900/50 flex items-center">
-          <div className="max-w-7xl mx-auto px-6 w-full flex items-center justify-between">
+      </div>
+      <div className="bg-slate-900 px-6 py-6">
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
             <div>
               <p className="text-brand-orange-400 text-xs font-bold uppercase tracking-widest mb-1">Elevate For Humanity</p>
               <h1 className="text-3xl sm:text-4xl font-extrabold text-white">Program Holder Portal</h1>
             </div>
-            <Link href="/program-holder/settings" className="p-2 text-white/70 hover:text-white transition">
+            <Link href="/program-holder/settings" className="p-2 text-white hover:text-brand-orange-400 transition">
               <Settings className="w-6 h-6" />
             </Link>
           </div>
         </div>
-      </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

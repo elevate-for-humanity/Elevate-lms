@@ -47,7 +47,7 @@ export default async function TrainingPage() {
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Program Holder Training & Resources
           </h1>
-          <p className="text-xl text-brand-blue-100">
+          <p className="text-xl text-white">
             Watch our orientation video and access training materials to get
             started
           </p>
@@ -132,7 +132,7 @@ export default async function TrainingPage() {
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
               Need Help?
             </h2>
-            <p className="text-base md:text-lg text-brand-blue-100 mb-8">
+            <p className="text-base md:text-lg text-white mb-8">
               Contact your Elevate coordinator or reach us directly at (317) 314-3757.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">

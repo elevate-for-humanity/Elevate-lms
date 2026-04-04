@@ -55,7 +55,7 @@ export default function RequestInfoForm({ slug, programTitle, applyHref }: Props
       <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center">
         <CheckCircle2 className="w-12 h-12 text-brand-green-600 mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-slate-900 mb-2">We&apos;ll be in touch</h2>
-        <p className="text-slate-600 mb-6">
+        <p className="text-black mb-6">
           Your inquiry about <strong>{programTitle}</strong> has been received. An advisor will contact you within 1 business day.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -126,7 +126,7 @@ export default function RequestInfoForm({ slug, programTitle, applyHref }: Props
 
       <div>
         <label htmlFor="phone" className="block text-sm font-semibold text-slate-700 mb-1">
-          Phone Number <span className="text-slate-400 font-normal">(optional)</span>
+          Phone Number <span className="text-black font-normal">(optional)</span>
         </label>
         <input
           id="phone"
@@ -162,7 +162,7 @@ export default function RequestInfoForm({ slug, programTitle, applyHref }: Props
 
       <div>
         <label htmlFor="message" className="block text-sm font-semibold text-slate-700 mb-1">
-          Questions or comments <span className="text-slate-400 font-normal">(optional)</span>
+          Questions or comments <span className="text-black font-normal">(optional)</span>
         </label>
         <textarea
           id="message"
@@ -192,7 +192,7 @@ export default function RequestInfoForm({ slug, programTitle, applyHref }: Props
         )}
       </button>
 
-      <p className="text-xs text-slate-500 text-center">
+      <p className="text-xs text-black text-center">
         An advisor will respond within 1 business day. No spam, ever.
       </p>
     </form>

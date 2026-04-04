@@ -28,7 +28,7 @@ export default function OjtAndFundingPage() {
     <div className="min-h-screen bg-white">
 
       {/* Video hero */}
-      <section className="relative h-[320px] sm:h-[460px] overflow-hidden">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <LazyVideo src="/videos/training-providers-hero.mp4" poster="/images/pages/ojt-and-funding-page-1.jpg"
           className="absolute inset-0 w-full h-full object-cover" />
       </section>
@@ -38,7 +38,7 @@ export default function OjtAndFundingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">For Employers</p>
           <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 mb-3">OJT & Employer Funding</h1>
-          <p className="text-slate-500 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
+          <p className="text-black text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
             Hire and train workers with up to 50% wage reimbursement, WOTC tax credits, and Registered Apprenticeship sponsorship — all coordinated through Elevate.
           </p>
           <div className="flex flex-wrap gap-3">
@@ -62,12 +62,10 @@ export default function OjtAndFundingPage() {
               <div key={title} className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col">
                 <div className="relative h-40 flex-shrink-0">
                   <Image src={img} alt={title} fill sizes="300px" className="object-cover" />
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-3 py-2">
-                    <h3 className="font-bold text-slate-900 text-sm leading-tight">{title}</h3>
-                  </div>
                 </div>
                 <div className="p-4 flex-1">
-                  <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
+                  <h3 className="font-bold text-slate-900 text-sm leading-tight mb-1">{title}</h3>
+                  <p className="text-black text-sm leading-relaxed">{desc}</p>
                 </div>
               </div>
             ))}
@@ -85,12 +83,10 @@ export default function OjtAndFundingPage() {
               <div key={title} className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col">
                 <div className="relative h-44 flex-shrink-0">
                   <Image src={img} alt={title} fill sizes="400px" className="object-cover" />
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-4 py-2">
-                    <h3 className="font-bold text-slate-900 text-sm leading-tight">{title}</h3>
-                  </div>
                 </div>
                 <div className="p-4 flex-1">
-                  <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
+                  <h3 className="font-bold text-slate-900 text-sm leading-tight mb-1">{title}</h3>
+                  <p className="text-black text-sm leading-relaxed">{desc}</p>
                 </div>
               </div>
             ))}
@@ -104,7 +100,7 @@ export default function OjtAndFundingPage() {
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">Ready to Reduce Your Hiring Costs?</h2>
-              <p className="text-slate-600 text-sm leading-relaxed mb-6">
+              <p className="text-black text-sm leading-relaxed mb-6">
                 Contact us to learn which incentives your business qualifies for and how to set up an OJT or apprenticeship agreement.
               </p>
               <div className="flex flex-wrap gap-3">

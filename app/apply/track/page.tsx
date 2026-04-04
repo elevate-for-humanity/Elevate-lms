@@ -175,7 +175,7 @@ export default function TrackApplicationPage() {
               />
             </div>
 
-            <div className="text-center text-sm text-slate-500 font-semibold">
+            <div className="text-center text-sm text-black font-semibold">
               OR
             </div>
 

@@ -322,7 +322,7 @@ export default function JRIPage() {
           <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Ready to Start Your New Chapter?
           </h2>
-          <p className="text-xl text-brand-green-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Your past does not define your future. Take the first step today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -340,7 +340,7 @@ export default function JRIPage() {
               (317) 314-3757
             </a>
           </div>
-          <p className="text-brand-green-200 text-sm mt-6">
+          <p className="text-white text-sm mt-6">
             <MapPin className="w-4 h-4 inline mr-1" />
             Serving Indianapolis and surrounding Indiana counties
           </p>

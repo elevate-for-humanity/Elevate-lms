@@ -126,7 +126,7 @@ export default async function DrugTestingLandingPage() {
                 </div>
                 <div>
                   <h3 className="font-bold">{feature.title}</h3>
-                  <p className="text-sm text-brand-blue-200">{feature.description}</p>
+                  <p className="text-sm text-white">{feature.description}</p>
                 </div>
               </div>
             ))}
@@ -402,7 +402,7 @@ export default async function DrugTestingLandingPage() {
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Schedule a Drug Test?
           </h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Schedule online for same-day appointments at locations near you.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

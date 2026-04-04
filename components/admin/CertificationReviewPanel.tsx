@@ -129,7 +129,7 @@ export function CertificationReviewPanel({
 
           {/* Date */}
           <div className="text-right text-sm text-slate-500">
-            <div>{new Date(submission.created_at).toLocaleDateString()}</div>
+            <div>{new Date(submission.created_at).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}</div>
             <div className="text-xs">{submission.programs?.name}</div>
           </div>
 
@@ -165,12 +165,12 @@ export function CertificationReviewPanel({
               )}
               {submission.completion_date && (
                 <p className="text-sm text-slate-600">
-                  Completed: {new Date(submission.completion_date).toLocaleDateString()}
+                  Completed: {new Date(submission.completion_date).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
               )}
               {submission.expiration_date && (
                 <p className="text-sm text-slate-600">
-                  Expires: {new Date(submission.expiration_date).toLocaleDateString()}
+                  Expires: {new Date(submission.expiration_date).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
               )}
             </div>

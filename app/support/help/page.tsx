@@ -63,7 +63,7 @@ export default async function HelpCenterPage({
       <section className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <h1 className="text-4xl font-bold mb-4">Help Center</h1>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Find answers to your questions
           </p>
           <form className="max-w-2xl mx-auto relative">

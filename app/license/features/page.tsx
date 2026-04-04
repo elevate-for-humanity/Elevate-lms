@@ -217,7 +217,7 @@ export default async function FeaturesPage() {
           <h2 className="text-3xl font-bold text-white mb-4">
             See It In Action
           </h2>
-          <p className="text-brand-orange-100 mb-8">
+          <p className="text-white mb-8">
             Schedule a personalized demo to explore all features.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

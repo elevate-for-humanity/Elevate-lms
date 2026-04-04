@@ -142,7 +142,7 @@ export default function StoreCoursesPage() {
           <h2 className="text-3xl font-black text-slate-900 mb-4">
             Need Multiple Certifications?
           </h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Contact us for volume pricing on team certifications.
           </p>
           <Link

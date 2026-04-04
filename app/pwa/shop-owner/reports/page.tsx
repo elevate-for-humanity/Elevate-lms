@@ -154,7 +154,7 @@ export default function ShopOwnerReportsPage() {
     <div className="min-h-screen bg-white pb-20">
       <header className="bg-slate-700 px-4 pt-12 pb-6 safe-area-inset-top">
         <h1 className="text-2xl font-bold text-slate-900 mb-2">Reports</h1>
-        <p className="text-brand-blue-200">Hours tracking and compliance reports</p>
+        <p className="text-white">Hours tracking and compliance reports</p>
       </header>
 
       <div className="px-4 py-4">
@@ -322,7 +322,7 @@ export default function ShopOwnerReportsPage() {
                       {apprentice.complianceStatus === 'non-compliant' && (
                         <div className="bg-white/10 border border-brand-red-500/30 rounded-lg p-3 flex items-start gap-3">
                           <AlertTriangle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
-                          <p className="text-brand-red-200 text-sm">
+                          <p className="text-white text-sm">
                             Significantly below minimum hours. Immediate attention required.
                           </p>
                         </div>

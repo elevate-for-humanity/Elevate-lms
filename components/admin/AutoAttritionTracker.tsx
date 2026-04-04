@@ -467,7 +467,7 @@ export function AutoAttritionTracker() {
         </div>
         <div className="flex items-center space-x-4">
           <div className="text-sm text-brand-text-light">
-            Last updated: {lastUpdate.toLocaleTimeString()}
+            Last updated: {lastUpdate.toLocaleTimeString('en-US', { timeZone: 'UTC', hour: 'numeric', minute: '2-digit' })}
           </div>
           <label className="flex items-center">
             <input
@@ -779,7 +779,7 @@ export function AutoAttritionTracker() {
                 <div className="flex justify-between">
                   <span className="text-brand-text-muted">Cost Savings:</span>
                   <span className="font-bold text-brand-info">
-                    ${intervention.costSavings.toLocaleString()}
+                    ${intervention.costSavings.toLocaleString('en-US')}
                   </span>
                 </div>
                 <div className="flex justify-between">

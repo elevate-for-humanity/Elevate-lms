@@ -82,7 +82,7 @@ export default async function CertificateViewPage({ params }: Props) {
           <div className="bg-brand-blue-700 text-white p-8 text-center">
             <Award className="w-16 h-16 mx-auto mb-4 text-yellow-400" />
             <h1 className="text-3xl font-bold mb-2">Certificate of Completion</h1>
-            <p className="text-brand-blue-200">Elevate for Humanity</p>
+            <p className="text-white">Elevate for Humanity</p>
           </div>
 
           {/* Body */}

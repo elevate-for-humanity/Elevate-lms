@@ -16,15 +16,15 @@ export function BarberPartnership() {
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div className="text-white">
               <h2 className="text-3xl md:text-4xl font-black mb-6">Career Pathways</h2>
-              <p className="text-slate-600 mb-8">
+              <p className="text-black mb-8">
                 Graduates enter the workforce with industry-recognized credentials and documented competencies. Career pathways include licensed barber positions, shop management, and business ownership.
               </p>
               <div className="grid grid-cols-2 gap-4">
                 {CAREERS.map((career, i) => (
                   <div key={i} className="bg-white/10 rounded-xl p-4">
                     <h3 className="font-bold text-slate-900">{career.title}</h3>
-                    <p className="text-slate-600 text-sm">{career.salary}/year</p>
-                    {career.demand && <p className="text-slate-500 text-xs mt-1">{career.demand}</p>}
+                    <p className="text-black text-sm">{career.salary}/year</p>
+                    {career.demand && <p className="text-black text-xs mt-1">{career.demand}</p>}
                   </div>
                 ))}
               </div>
@@ -47,7 +47,7 @@ export function BarberPartnership() {
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Progress Tracking &amp; Reporting</h2>
-          <p className="text-slate-600 mb-8 max-w-3xl">
+          <p className="text-black mb-8 max-w-3xl">
             All participant progress is documented and available to workforce partners upon request.
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -72,7 +72,7 @@ export function BarberPartnership() {
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Transfer Hours &amp; Prior Training</h2>
-          <p className="text-slate-600 mb-6 max-w-3xl">
+          <p className="text-black mb-6 max-w-3xl">
             Participants with prior barber training, apprenticeship hours, or documented industry experience may be eligible for transfer hour evaluation.
           </p>
           <div className="grid sm:grid-cols-2 gap-4 max-w-3xl">
@@ -88,7 +88,7 @@ export function BarberPartnership() {
               </div>
             ))}
           </div>
-          <p className="mt-4 text-sm text-slate-500">
+          <p className="mt-4 text-sm text-black">
             Approved transfer hours may be applied toward the 2,000-hour training requirement based on documented verification and program review standards. Final approval is determined through formal evaluation.
           </p>
         </div>
@@ -98,7 +98,7 @@ export function BarberPartnership() {
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Partnership Barbershops &amp; Training Sites</h2>
-          <p className="text-slate-600 mb-8 max-w-3xl">
+          <p className="text-black mb-8 max-w-3xl">
             The Barber Apprenticeship Program is delivered in collaboration with approved licensed barbershop partners that serve as official On-the-Job Training (OJT) sites. Apprentices are W-2 employees of their host shop for the duration of the apprenticeship.
           </p>
           <div className="grid sm:grid-cols-2 gap-8 mb-10">

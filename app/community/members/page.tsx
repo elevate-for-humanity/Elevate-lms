@@ -83,7 +83,7 @@ export default async function MembersPage() {
           <div className="flex items-center justify-between mb-12">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Community Members</h2>
-              <p className="text-gray-600">Ranked by activity and contributions</p>
+              <p className="text-black">Ranked by activity and contributions</p>
             </div>
           </div>
 
@@ -97,18 +97,18 @@ export default async function MembersPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-bold text-gray-900 truncate">{member.full_name || 'Member'}</h3>
-                      <p className="text-gray-600 text-sm">{formatRole(member.role)}</p>
+                      <p className="text-black text-sm">{formatRole(member.role)}</p>
                       {member.bio && (
-                        <p className="text-gray-500 text-sm mt-1 line-clamp-2">{member.bio}</p>
+                        <p className="text-black text-sm mt-1 line-clamp-2">{member.bio}</p>
                       )}
                     </div>
                   </div>
 
                   <div className="mt-4 flex items-center justify-between">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-black">
                       {(member.points || 0).toLocaleString()} points
                     </span>
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs text-black">
                       Joined {new Date(member.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                     </span>
                   </div>
@@ -119,7 +119,7 @@ export default async function MembersPage() {
             <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
               <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2">No members yet</h3>
-              <p className="text-gray-600 mb-6">Be the first to join the community!</p>
+              <p className="text-black mb-6">Be the first to join the community!</p>
               <Link 
                 href="/start" 
                 className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700"
@@ -136,7 +136,7 @@ export default async function MembersPage() {
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Join?</h2>
-          <p className="text-brand-orange-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-white mb-8 max-w-2xl mx-auto">
             Start your journey and connect with others working toward career success.
           </p>
           <Link

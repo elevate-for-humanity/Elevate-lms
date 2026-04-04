@@ -208,7 +208,7 @@ export default function ProgramTemplate() {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Ready to Get Started?
           </h2>
-          <p className="text-slate-300 text-base leading-relaxed mb-8">
+          <p className="text-white text-base leading-relaxed mb-8">
             Apply today and take the first step toward your new career.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

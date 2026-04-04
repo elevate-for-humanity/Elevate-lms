@@ -107,8 +107,8 @@ export default function RefundAdvancePage() {
                 MOST POPULAR
               </div>
               <p className="text-4xl font-bold mb-2">$3,000</p>
-              <p className="text-brand-blue-100 mb-4">Minimum refund: $5,000</p>
-              <p className="text-sm text-brand-blue-100">Best value for most filers</p>
+              <p className="text-white mb-4">Minimum refund: $5,000</p>
+              <p className="text-sm text-white">Best value for most filers</p>
             </div>
 
             <div className="bg-white rounded-xl p-6 text-center border-2 border-gray-200 hover:border-brand-blue-400 transition">
@@ -381,7 +381,7 @@ export default function RefundAdvancePage() {
           <h2 className="text-3xl font-bold mb-6">
             Need Cash Now?
           </h2>
-          <p className="text-xl mb-8 text-brand-blue-100">
+          <p className="text-xl mb-8 text-white">
             Get up to $6,000 today with a refund advance. No credit check required.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

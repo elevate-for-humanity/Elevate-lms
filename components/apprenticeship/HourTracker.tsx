@@ -78,7 +78,7 @@ export function HourTracker({ programName, requiredHours, studentId }: HourTrack
     const newTotalHours = totalHours + sessionHours;
 
     const newSession = {
-      date: now.toLocaleDateString(),
+      date: now.toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' }),
       hours: parseFloat(sessionHours.toFixed(2)),
       activity: 'Training Session',
     };
@@ -232,7 +232,7 @@ export function HourTracker({ programName, requiredHours, studentId }: HourTrack
           <div className="   rounded-xl p-6 text-center text-white">
             <Award className="w-12 h-12 mx-auto mb-3" />
             <div className="text-xl font-bold">Congratulations!</div>
-            <div className="text-sm text-brand-green-100 mt-1">
+            <div className="text-sm text-white mt-1">
               You've completed all required hours for {programName}
             </div>
           </div>

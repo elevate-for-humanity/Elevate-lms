@@ -235,7 +235,7 @@ export default async function MobileAppPage() {
           <h2 className="text-2xl md:text-3xl font-bold mb-6">
             Ready to Get Started?
           </h2>
-          <p className="text-base md:text-lg mb-8 text-brand-blue-100">
+          <p className="text-base md:text-lg mb-8 text-white">
             Install the app now and take your career development journey with
             you wherever you go.
           </p>

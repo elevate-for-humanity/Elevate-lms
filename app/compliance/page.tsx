@@ -30,7 +30,7 @@ export default async function CompliancePage() {
       <section className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-4">Compliance & Credentials</h1>
-          <p className="text-xl text-brand-blue-200">
+          <p className="text-xl text-white">
             Transparency about what we deliver, how credentials are earned, and who issues them.
           </p>
         </div>

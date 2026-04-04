@@ -149,10 +149,10 @@ export default function BarberOrientationClient({ payment }: { payment: BarberPa
       <div className="bg-slate-900 border-b border-slate-800 px-6 py-4">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div>
-            <p className="text-slate-400 text-xs uppercase tracking-widest mb-0.5">Barber Apprenticeship</p>
+            <p className="text-black text-xs uppercase tracking-widest mb-0.5">Barber Apprenticeship</p>
             <h1 className="text-white font-bold text-lg">Program Orientation</h1>
           </div>
-          <div className="flex items-center gap-4 text-slate-400 text-sm">
+          <div className="flex items-center gap-4 text-black text-sm">
             <span className={videoWatched ? 'text-emerald-400' : ''}>
               {videoWatched ? '✓ Video' : '① Video'}
             </span>
@@ -193,7 +193,7 @@ export default function BarberOrientationClient({ payment }: { payment: BarberPa
                   <Play className="w-7 h-7 text-white fill-white ml-1" />
                 </div>
                 <span className="text-white font-semibold text-sm">Watch your orientation video</span>
-                <span className="text-slate-300 text-xs">Covers: program overview · clocking in/out · Milady · payment terms</span>
+                <span className="text-white text-xs">Covers: program overview · clocking in/out · Milady · payment terms</span>
               </button>
             )}
           </div>
@@ -204,7 +204,7 @@ export default function BarberOrientationClient({ payment }: { payment: BarberPa
                 style={{ width: `${videoProgress}%` }}
               />
             </div>
-            <p className="text-slate-500 text-xs text-right">
+            <p className="text-black text-xs text-right">
               {videoWatched
                 ? '✓ Video complete — continue to handbook below'
                 : `Watch at least 80% to unlock the handbook (${Math.round(videoProgress)}%)`}
@@ -233,7 +233,7 @@ export default function BarberOrientationClient({ payment }: { payment: BarberPa
                       ? 'bg-brand-blue-600 text-white'
                       : isRead
                         ? 'bg-emerald-900/50 text-emerald-400 border border-emerald-700/50'
-                        : 'bg-slate-800 text-slate-400 hover:text-white'
+                        : 'bg-slate-800 text-black hover:text-white'
                   }`}
                 >
                   {isRead && !isCurrent ? <CheckCircle className="w-3 h-3" /> : <Icon className="w-3 h-3" />}
@@ -253,7 +253,7 @@ export default function BarberOrientationClient({ payment }: { payment: BarberPa
               {currentSlide.content.map((line, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <span className="w-1.5 h-1.5 rounded-full bg-brand-blue-400 flex-shrink-0 mt-2" />
-                  <span className="text-slate-300 text-sm leading-relaxed">{line}</span>
+                  <span className="text-white text-sm leading-relaxed">{line}</span>
                 </li>
               ))}
             </ul>
@@ -262,31 +262,31 @@ export default function BarberOrientationClient({ payment }: { payment: BarberPa
             {currentSlide.id === 'payment-terms' && (
               <div className="bg-slate-700/50 rounded-xl divide-y divide-slate-600 mt-4">
                 <div className="flex justify-between px-4 py-2.5">
-                  <span className="text-slate-400 text-sm">Program Total</span>
+                  <span className="text-black text-sm">Program Total</span>
                   <span className="text-white font-semibold text-sm">{formatCurrency(BARBER_PRICING.fullPrice)}</span>
                 </div>
                 <div className="flex justify-between px-4 py-2.5">
-                  <span className="text-slate-400 text-sm">Your Down Payment</span>
+                  <span className="text-black text-sm">Your Down Payment</span>
                   <span className="text-white font-semibold text-sm">{formatCurrency(payment.downPayment)}</span>
                 </div>
                 {!payment.fullyPaid ? (
                   <>
                     <div className="flex justify-between px-4 py-2.5">
-                      <span className="text-slate-400 text-sm">Remaining Balance</span>
+                      <span className="text-black text-sm">Remaining Balance</span>
                       <span className="text-white font-semibold text-sm">{formatCurrency(payment.remainingBalance)}</span>
                     </div>
                     <div className="flex justify-between px-4 py-2.5">
-                      <span className="text-slate-400 text-sm">Weekly Auto-Draft</span>
+                      <span className="text-black text-sm">Weekly Auto-Draft</span>
                       <span className="text-brand-blue-400 font-bold text-sm">{formatCurrency(weeklyDollars)} every Friday</span>
                     </div>
                     <div className="flex justify-between px-4 py-2.5">
-                      <span className="text-slate-400 text-sm">Weeks Remaining</span>
+                      <span className="text-black text-sm">Weeks Remaining</span>
                       <span className="text-white font-semibold text-sm">{payment.weeksRemaining} weeks</span>
                     </div>
                   </>
                 ) : (
                   <div className="flex justify-between px-4 py-2.5">
-                    <span className="text-slate-400 text-sm">Status</span>
+                    <span className="text-black text-sm">Status</span>
                     <span className="text-emerald-400 font-semibold text-sm">Paid in full</span>
                   </div>
                 )}
@@ -298,7 +298,7 @@ export default function BarberOrientationClient({ payment }: { payment: BarberPa
               <button
                 onClick={() => goToSlide(Math.max(0, slideIndex - 1))}
                 disabled={slideIndex === 0}
-                className="flex items-center gap-1 text-slate-400 hover:text-white text-sm disabled:opacity-30 transition"
+                className="flex items-center gap-1 text-black hover:text-white text-sm disabled:opacity-30 transition"
               >
                 <ChevronLeft className="w-4 h-4" /> Previous
               </button>
@@ -334,7 +334,7 @@ export default function BarberOrientationClient({ payment }: { payment: BarberPa
               disabled={!allSlidesRead}
               className="w-5 h-5 mt-0.5 rounded border-slate-500 text-brand-blue-600 focus:ring-brand-blue-500 flex-shrink-0"
             />
-            <span className="text-slate-300 text-sm leading-relaxed">
+            <span className="text-white text-sm leading-relaxed">
               I have watched the orientation video and read all sections of the student handbook. I understand the clocking requirements, auto clock-out rules, Milady coursework expectations, payment auto-draft schedule, and the consequences of missed payments or conduct violations. I agree to proceed.
             </span>
           </label>
@@ -346,7 +346,7 @@ export default function BarberOrientationClient({ payment }: { payment: BarberPa
             {submitting ? 'Processing…' : 'Continue to Program Documents →'}
           </button>
           {!allSlidesRead && (
-            <p className="text-slate-500 text-xs text-center">
+            <p className="text-black text-xs text-center">
               Read all {HANDBOOK_SLIDES.length} handbook sections to unlock this step.
             </p>
           )}

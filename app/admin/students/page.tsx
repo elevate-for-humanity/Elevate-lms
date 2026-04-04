@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Users, TrendingUp, Clock, CheckCircle, Mail, Phone, UserPlus } from 'lucide-react';
@@ -16,25 +17,26 @@ export default async function StudentsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  const db = createAdminClient();
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
-  const { data: students, count: totalStudents } = await supabase
+  const { data: students, count: totalStudents } = await db
     .from('profiles')
-    .select('id, full_name, first_name, last_name, email, phone, created_at, role', { count: 'exact' })
+    .select('id, full_name, first_name, last_name, email, phone, created_at, role, enrollment_status', { count: 'exact' })
     .eq('role', 'student')
     .order('created_at', { ascending: false })
     .limit(50);
 
-  const { count: activeEnrollments } = await supabase
+  const { count: activeEnrollments } = await db
     .from('program_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'active');
 
-  const { count: completedEnrollments } = await supabase
+  const { count: completedEnrollments } = await db
     .from('program_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed');
 
   const weekAgo = new Date();
   weekAgo.setDate(weekAgo.getDate() - 7);
-  const { count: recentStudents } = await supabase
+  const { count: recentStudents } = await db
     .from('profiles').select('*', { count: 'exact', head: true })
     .eq('role', 'student').gte('created_at', weekAgo.toISOString());
 

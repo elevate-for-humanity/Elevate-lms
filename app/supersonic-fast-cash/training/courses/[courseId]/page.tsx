@@ -84,7 +84,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
         <div className="max-w-7xl mx-auto px-6">
           <Link
             href="/supersonic-fast-cash/training/courses"
-            className="inline-flex items-center gap-2 text-brand-blue-200 hover:text-white mb-6 transition-colors"
+            className="inline-flex items-center gap-2 text-white hover:text-white mb-6 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to All Courses
@@ -95,7 +95,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
               <h1 className="text-3xl md:text-4xl font-bold mb-4">
                 {course.title}
               </h1>
-              <p className="text-xl text-brand-blue-100 mb-6">
+              <p className="text-xl text-white mb-6">
                 {course.description}
               </p>
               
@@ -118,23 +118,23 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
             {/* Pricing Card */}
             <div className="bg-white rounded-xl p-6 text-gray-900">
               <div className="text-4xl font-bold mb-2">${course.price}</div>
-              <p className="text-gray-600 mb-4">One-time payment</p>
+              <p className="text-black mb-4">One-time payment</p>
               
               <ul className="space-y-2 mb-6">
                 <li className="flex items-center gap-2 text-sm">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <span>Lifetime access</span>
                 </li>
                 <li className="flex items-center gap-2 text-sm">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <span>Certificate of completion</span>
                 </li>
                 <li className="flex items-center gap-2 text-sm">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <span>Practice exercises</span>
                 </li>
                 <li className="flex items-center gap-2 text-sm">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <span>Quiz assessments</span>
                 </li>
               </ul>
@@ -143,7 +143,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
                 Enroll Now
               </button>
               
-              <p className="text-xs text-center text-gray-500">
+              <p className="text-xs text-center text-black">
                 Free for hired tax preparers
               </p>
             </div>
@@ -170,11 +170,11 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm text-gray-500">
+                          <span className="text-sm text-black">
                             Lesson {lesson.lesson_number}
                           </span>
-                          <span className="text-sm text-gray-400">•</span>
-                          <span className="text-sm text-gray-500">
+                          <span className="text-sm text-black">•</span>
+                          <span className="text-sm text-black">
                             {lesson.duration_minutes || 30} min
                           </span>
                         </div>
@@ -186,7 +186,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
                             {lesson.topics.slice(0, 3).map((topic, i) => (
                               <span
                                 key={i}
-                                className="text-xs bg-white text-gray-600 px-2 py-1 rounded"
+                                className="text-xs bg-white text-black px-2 py-1 rounded"
                               >
                                 {topic}
                               </span>
@@ -199,7 +199,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
                 ))}
               </div>
             ) : (
-              <div className="p-8 text-center text-gray-500">
+              <div className="p-8 text-center text-black">
                 <BookOpen className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                 <p>Lesson content is being prepared.</p>
                 <p className="text-sm mt-2">Check back soon!</p>
@@ -214,7 +214,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
         <div className="max-w-4xl mx-auto px-6 text-center">
           <Award className="w-16 h-16 mx-auto mb-4 text-brand-green-600" />
           <h2 className="text-2xl font-bold mb-2">Earn Your Certificate</h2>
-          <p className="text-gray-600 mb-4">
+          <p className="text-black mb-4">
             Complete all lessons and pass the final assessment to earn your
           </p>
           <p className="text-xl font-semibold text-brand-green-700">
@@ -227,7 +227,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
       <section className="py-12">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-2xl font-bold mb-4">Ready to Start Learning?</h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-black mb-6">
             Join our team and get this training for free, or purchase individually.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

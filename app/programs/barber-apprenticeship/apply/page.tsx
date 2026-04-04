@@ -59,7 +59,7 @@ function BarberApplyPageInner() {
           <div className="mt-4">
             <Link
               href="/programs/barber-apprenticeship"
-              className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800 transition"
+              className="inline-flex items-center gap-1 text-sm text-black hover:text-slate-800 transition"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Program
@@ -68,7 +68,7 @@ function BarberApplyPageInner() {
           <h1 className="text-3xl font-bold text-slate-900 mt-4">
             Barber Apprenticeship — Apply
           </h1>
-          <p className="text-slate-600 mt-1">
+          <p className="text-black mt-1">
             Select the application type that applies to you.
           </p>
         </div>
@@ -97,12 +97,12 @@ function BarberApplyPageInner() {
                 </option>
               ))}
             </select>
-            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-black" />
           </div>
 
           {/* Description under selection */}
           {applicantType && (
-            <p className="mt-3 text-sm text-slate-600">
+            <p className="mt-3 text-sm text-black">
               {TYPE_OPTIONS.find((o) => o.value === applicantType)?.desc}
             </p>
           )}
@@ -110,7 +110,7 @@ function BarberApplyPageInner() {
 
         {/* Render the correct form */}
         {applicantType === '' && (
-          <div className="text-center py-16 text-slate-400 text-sm">
+          <div className="text-center py-16 text-black text-sm">
             Select an application type above to continue.
           </div>
         )}

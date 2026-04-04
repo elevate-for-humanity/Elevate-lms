@@ -134,19 +134,19 @@ export default async function TalentPipelinePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
               <div className="text-4xl md:text-5xl font-bold">85%</div>
-              <div className="text-brand-orange-200">Job Placement Rate</div>
+              <div className="text-white">Job Placement Rate</div>
             </div>
             <div>
               <div className="text-4xl md:text-5xl font-bold">Active</div>
-              <div className="text-brand-orange-200">Graduates Placed</div>
+              <div className="text-white">Graduates Placed</div>
             </div>
             <div>
               <div className="text-4xl md:text-5xl font-bold">$0</div>
-              <div className="text-brand-orange-200">Recruitment Cost</div>
+              <div className="text-white">Recruitment Cost</div>
             </div>
             <div>
               <div className="text-4xl md:text-5xl font-bold">90%</div>
-              <div className="text-brand-orange-200">6-Month Retention</div>
+              <div className="text-white">6-Month Retention</div>
             </div>
           </div>
         </div>
@@ -284,7 +284,7 @@ export default async function TalentPipelinePage() {
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Build Your Talent Pipeline?
           </h2>
-          <p className="text-xl text-brand-orange-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Contact us today to discuss your hiring needs and learn how we can help you 
             find qualified candidates for your open positions.
           </p>

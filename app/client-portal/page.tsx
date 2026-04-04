@@ -57,7 +57,7 @@ export default function ClientPortalPage() {
             <h1 className="text-4xl sm:text-5xl font-bold mb-6">
               Client Portal
             </h1>
-            <p className="text-xl text-brand-blue-100 mb-8">
+            <p className="text-xl text-white mb-8">
               Manage your organization's workforce development programs. Track employee progress, access reports, and maximize your training investment.
             </p>
             <div className="flex flex-wrap gap-4">
@@ -134,7 +134,7 @@ export default function ClientPortalPage() {
       <section className="py-16 lg:py-24 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Already Have an Account?</h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Sign in to access your organization's training dashboard and reports.
           </p>
           <Link

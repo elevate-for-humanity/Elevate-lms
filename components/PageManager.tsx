@@ -241,7 +241,7 @@ export default function PageManager() {
                     <div className="flex items-center text-xs text-brand-text-light">
                       <span className="mr-3">v{page.version}</span>
                       <span>
-                        {new Date(page.created_at).toLocaleDateString()}
+                        {new Date(page.created_at).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                       </span>
                     </div>
                   </div>
@@ -314,7 +314,7 @@ export default function PageManager() {
                 {selectedPage.published_at && (
                   <div className="mt-4 text-sm text-brand-text-muted">
                     Published:{' '}
-                    {new Date(selectedPage.published_at).toLocaleString()}
+                    {new Date(selectedPage.published_at).toLocaleString('en-US')}
                   </div>
                 )}
               </div>
@@ -380,7 +380,7 @@ export default function PageManager() {
                             Version {version.version}
                           </span>
                           <span className="text-sm text-brand-text-muted ml-3">
-                            {new Date(version.created_at).toLocaleString()}
+                            {new Date(version.created_at).toLocaleString('en-US')}
                           </span>
                         </div>
                         <button

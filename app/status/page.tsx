@@ -78,7 +78,7 @@ export default function StatusPage() {
           <h1 className="text-3xl font-bold mb-2">
             {allOperational ? 'All Systems Operational' : 'Some Systems Experiencing Issues'}
           </h1>
-          <p className="text-brand-green-100">
+          <p className="text-white">
             Last updated: {lastUpdated}
           </p>
         </div>

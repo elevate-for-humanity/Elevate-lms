@@ -227,7 +227,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Your Career Journey?</h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Join hundreds of students who have transformed their careers through our free training programs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

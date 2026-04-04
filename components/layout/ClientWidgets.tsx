@@ -7,12 +7,6 @@ import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
-// Lazy load chat widget - doesn't block initial render
-const FloatingChatWidget = dynamic(
-  () => import('@/components/FloatingChatWidget'),
-  { ssr: false, loading: () => null }
-);
-
 // Lazy load sticky mobile CTA - shows on program pages
 const StickyMobileCTA = dynamic(
   () => import('@/components/programs/StickyMobileCTA').then(mod => ({ default: mod.StickyMobileCTA })),
@@ -74,7 +68,6 @@ const Toaster = dynamic(
 // This ensures proper positioning under hero banners
 
 export default function ClientWidgets() {
-  const [showChat, setShowChat] = useState(false);
   const [showDeferredWidgets, setShowDeferredWidgets] = useState(false);
   const pathname = usePathname();
 
@@ -94,39 +87,9 @@ export default function ClientWidgets() {
                         pathname?.startsWith('/notifications');
 
   useEffect(() => {
-    // Defer chat widget loading:
-    // 1. After 6 seconds idle, OR
-    // 2. On first scroll, OR
-    // 3. On user interaction
-
-    let loaded = false;
-    const loadChat = () => {
-      if (!loaded) {
-        loaded = true;
-        setShowChat(true);
-      }
-    };
-
-    // Load after 8 seconds idle
-    const timer = setTimeout(loadChat, 8000);
-
-    // Load on scroll
-    const handleScroll = () => loadChat();
-    window.addEventListener('scroll', handleScroll, { once: true, passive: true });
-
-    // Load on any click
-    const handleClick = () => loadChat();
-    window.addEventListener('click', handleClick, { once: true });
-
     // Load deferred widgets after 4 seconds — keeps initial paint fast
     const deferredTimer = setTimeout(() => setShowDeferredWidgets(true), 4000);
-
-    return () => {
-      clearTimeout(timer);
-      clearTimeout(deferredTimer);
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('click', handleClick);
-    };
+    return () => clearTimeout(deferredTimer);
   }, []);
 
   return (
@@ -156,9 +119,6 @@ export default function ClientWidgets() {
       {/* Mobile bottom nav for authenticated pages */}
       {showBottomNav && <BottomNav />}
       
-      {/* AI Chat Widget - deferred load for performance */}
-      {showChat && <FloatingChatWidget />}
-
       {/* Deferred widgets - load after initial paint */}
       {showDeferredWidgets && (
         <>

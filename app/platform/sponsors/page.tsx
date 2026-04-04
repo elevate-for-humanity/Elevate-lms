@@ -27,7 +27,7 @@ export default function SponsorLicensingPage() {
     <div className="bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Platform", href: "/platform" }, { label: "Sponsors" }]} />
-        <p className="text-sm text-slate-600 mt-1">Part of the <a href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</a>. <a href="/store/licensing" className="hover:underline">View pricing →</a></p>
+        <p className="text-sm text-black mt-1">Part of the <a href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</a>. <a href="/store/licensing" className="hover:underline">View pricing →</a></p>
       </div>
 {/* Hero Banner */}
       <ModernLandingHero
@@ -153,19 +153,19 @@ export default function SponsorLicensingPage() {
                   <h3 className="text-2xl font-bold text-slate-900">
                     Professional
                   </h3>
-                  <p className="text-sm text-slate-600">Regional Authority</p>
+                  <p className="text-sm text-black">Regional Authority</p>
                 </div>
               </div>
 
               <div className="mb-6">
                 <div className="text-4xl font-bold text-white mb-2">
-                  $2,500<span className="text-xl text-slate-600">/month</span>
+                  $2,500<span className="text-xl text-black">/month</span>
                 </div>
-                <div className="text-sm text-slate-600">+ $5,000 setup fee</div>
+                <div className="text-sm text-black">+ $5,000 setup fee</div>
               </div>
 
               <div className="mb-6">
-                <p className="text-sm text-white/90 font-medium mb-4">
+                <p className="text-sm text-white font-medium mb-4">
                   Best for: Multi-county regions, workforce boards, large
                   nonprofits
                 </p>
@@ -494,7 +494,7 @@ export default function SponsorLicensingPage() {
       {/* Disclaimer */}
       <section className="py-8 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-black">
             Credentials and instructional partners may be provided by the licensee. 
             Licensing covers platform access, automation infrastructure, and compliance reporting.
           </p>
@@ -507,7 +507,7 @@ export default function SponsorLicensingPage() {
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Ready to License?
           </h2>
-          <p className="text-2xl mb-10 text-white/90">
+          <p className="text-2xl mb-10 text-white">
             Let's discuss which tier fits your organization.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

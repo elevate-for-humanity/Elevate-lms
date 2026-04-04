@@ -35,6 +35,7 @@ import type { NextRequest } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { createEnrollmentCase, submitCaseForSignatures } from '@/lib/workflow/case-management';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { createOrUpdateEnrollment, linkOrphanedEnrollments } from '@/lib/enrollment-service';
@@ -176,6 +177,12 @@ async function flagCertRows(
 }
 
 async function _POST(request: NextRequest) {
+  // Hydrate process.env from app_secrets table before reading any secret.
+  // In production, STRIPE_WEBHOOK_SECRET lives in app_secrets (not Netlify env vars)
+  // because Netlify's Lambda 4KB env var limit prevents injecting all secrets.
+  // This must run before any process.env.STRIPE_* access.
+  await hydrateProcessEnv();
+
   // Resolve per-request — avoids frozen null from module-level cold-start init.
   const supabase = getSupabase();
 

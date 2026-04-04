@@ -80,7 +80,7 @@ export default function CommunityCoursesPage() {
       <div className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Community Courses</h1>
-          <p className="text-brand-blue-100">Learn from peers and industry experts</p>
+          <p className="text-white">Learn from peers and industry experts</p>
         </div>
       </div>
 
@@ -89,7 +89,7 @@ export default function CommunityCoursesPage() {
         <div className="bg-white rounded-lg shadow-sm p-4 mb-8">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-black" />
               <input
                 type="text"
                 placeholder="Search courses..."
@@ -147,9 +147,9 @@ export default function CommunityCoursesPage() {
               </div>
               <div className="p-4">
                 <h3 className="font-bold text-gray-900 mb-2 line-clamp-2">{course.title}</h3>
-                <p className="text-sm text-gray-600 mb-3">by {course.instructor}</p>
+                <p className="text-sm text-black mb-3">by {course.instructor}</p>
                 
-                <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+                <div className="flex items-center gap-4 text-sm text-black mb-3">
                   <span className="flex items-center">
                     <Star className="w-4 h-4 text-yellow-400 fill-current mr-1" />
                     {course.rating} ({course.reviews})
@@ -161,7 +161,7 @@ export default function CommunityCoursesPage() {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center text-sm text-gray-500">
+                  <span className="flex items-center text-sm text-black">
                     <Users className="w-4 h-4 mr-1" />
                     {course.students} students
                   </span>
@@ -186,7 +186,7 @@ export default function CommunityCoursesPage() {
         <div className="mt-12 bg-brand-blue-700 rounded-xl p-8 text-white text-center">
           <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <h2 className="text-2xl font-bold mb-2">Share Your Knowledge</h2>
-          <p className="text-brand-blue-100 mb-6 max-w-xl mx-auto">
+          <p className="text-white mb-6 max-w-xl mx-auto">
             Have expertise to share? Create a course and help others succeed while earning income.
           </p>
           <Link

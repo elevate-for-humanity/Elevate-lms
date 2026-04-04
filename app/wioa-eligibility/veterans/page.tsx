@@ -181,7 +181,7 @@ export default async function VeteransPage() {
         {/* CTA */}
         <div className="bg-white rounded-lg p-8 text-center text-slate-900">
           <h3 className="text-2xl font-bold mb-4">Ready to Get Started?</h3>
-          <p className="text-brand-blue-100 mb-6">
+          <p className="text-white mb-6">
             Apply today and receive priority processing as a veteran.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

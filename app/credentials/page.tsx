@@ -66,7 +66,7 @@ export default function CredentialsPage() {
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
           Credentials at Elevate
         </h1>
-        <p className="text-slate-600 text-lg leading-relaxed max-w-2xl">
+        <p className="text-black text-lg leading-relaxed max-w-2xl">
           Three layers of credentials — completion certificates, industry certifications from national testing bodies, and DOL Registered Apprenticeship credentials backed by employer-verified OJT hours.
         </p>
       </HeroVideo>
@@ -78,28 +78,28 @@ export default function CredentialsPage() {
             <BadgeCheck className="w-8 h-8 text-brand-red-400 flex-shrink-0" />
             <div>
               <p className="text-slate-900 font-bold text-lg leading-none">20+</p>
-              <p className="text-slate-500 text-xs mt-0.5">Credentials offered</p>
+              <p className="text-black text-xs mt-0.5">Credentials offered</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <DollarSign className="w-8 h-8 text-emerald-500 flex-shrink-0" />
             <div>
               <p className="text-slate-900 font-bold text-lg leading-none">$0</p>
-              <p className="text-slate-500 text-xs mt-0.5">For eligible Indiana residents</p>
+              <p className="text-black text-xs mt-0.5">For eligible Indiana residents</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <MapPin className="w-8 h-8 text-amber-500 flex-shrink-0" />
             <div>
               <p className="text-slate-900 font-bold text-sm leading-none">On-site proctoring</p>
-              <p className="text-slate-500 text-xs mt-0.5">EPA 608 · Certiport · CompTIA</p>
+              <p className="text-black text-xs mt-0.5">EPA 608 · Certiport · CompTIA</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <Briefcase className="w-8 h-8 text-brand-blue-500 flex-shrink-0" />
             <div>
               <p className="text-slate-900 font-bold text-sm leading-none">DOL Registered</p>
-              <p className="text-slate-500 text-xs mt-0.5">Apprenticeship Sponsor</p>
+              <p className="text-black text-xs mt-0.5">Apprenticeship Sponsor</p>
             </div>
           </div>
         </div>
@@ -128,7 +128,7 @@ export default function CredentialsPage() {
             <p className="text-brand-blue-600 font-bold text-xs uppercase tracking-widest">Layer 1</p>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">Certificates of Completion</h2>
-          <p className="text-slate-500 text-sm mb-8 max-w-2xl">
+          <p className="text-black text-sm mb-8 max-w-2xl">
             Issued by Elevate for Humanity (2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute). We design the curriculum, deliver training, assess learners, and issue the certificate.
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -139,7 +139,7 @@ export default function CredentialsPage() {
                 </div>
                 <div className="p-4 flex flex-col flex-1">
                   <h3 className="font-bold text-slate-900 text-sm leading-tight mb-2">{cred.name}</h3>
-                  <p className="text-slate-500 text-xs leading-relaxed flex-1">{cred.desc}</p>
+                  <p className="text-black text-xs leading-relaxed flex-1">{cred.desc}</p>
                   <span className="inline-block mt-3 text-[10px] font-bold text-brand-blue-700 bg-brand-blue-50 border border-brand-blue-100 px-2.5 py-1 rounded-full self-start">Elevate-issued</span>
                 </div>
               </div>
@@ -156,7 +156,7 @@ export default function CredentialsPage() {
             <p className="text-emerald-600 font-bold text-xs uppercase tracking-widest">Layer 2</p>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">Industry Certifications</h2>
-          <p className="text-slate-500 text-sm mb-8 max-w-2xl">
+          <p className="text-black text-sm mb-8 max-w-2xl">
             Issued by external certifying bodies. Elevate prepares you for the exam — the credential is awarded by the organization listed. Exam fees may be covered by WIOA or other funding for eligible participants.
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -169,7 +169,7 @@ export default function CredentialsPage() {
                 <div className="p-4 flex flex-col flex-1">
                   <h3 className="font-bold text-slate-900 text-sm leading-tight mb-1">{cred.name}</h3>
                   <p className="text-emerald-700 text-xs font-semibold mb-2">Issued by {cred.issuer}</p>
-                  <p className="text-slate-500 text-xs leading-relaxed flex-1">{cred.desc}</p>
+                  <p className="text-black text-xs leading-relaxed flex-1">{cred.desc}</p>
                   <span className="inline-block mt-3 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full self-start">External credential</span>
                 </div>
               </div>
@@ -186,7 +186,7 @@ export default function CredentialsPage() {
             <p className="text-amber-600 font-bold text-xs uppercase tracking-widest">Layer 3</p>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">Registered Apprenticeship Credentials</h2>
-          <p className="text-slate-500 text-sm mb-8 max-w-2xl">
+          <p className="text-black text-sm mb-8 max-w-2xl">
             The highest-authority credentials. Require documented OJT hours with employer training sites, competency verification by supervising employers, and DOL sponsor oversight. Elevate for Humanity is a DOL Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301).
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -199,20 +199,20 @@ export default function CredentialsPage() {
                 <div className="p-4 flex flex-col flex-1">
                   <h3 className="font-bold text-slate-900 text-sm leading-tight mb-1">{cred.name}</h3>
                   <p className="text-amber-600 text-xs font-semibold mb-2">Issued by {cred.issuer}</p>
-                  <p className="text-slate-500 text-xs leading-relaxed flex-1">{cred.desc}</p>
+                  <p className="text-black text-xs leading-relaxed flex-1">{cred.desc}</p>
                   <span className="inline-block mt-3 text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded-full self-start">DOL Registered</span>
                 </div>
               </div>
             ))}
           </div>
-          <p className="text-slate-400 text-xs mt-6">Additional apprenticeship programs (culinary, diesel) are in development pending employer partner agreements.</p>
+          <p className="text-black text-xs mt-6">Additional apprenticeship programs (culinary, diesel) are in development pending employer partner agreements.</p>
         </div>
       </section>
 
       {/* HVAC resources */}
       <section className="py-8 border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">HVAC Credential Resources</h2>
+          <h2 className="text-xs font-bold text-black uppercase tracking-widest mb-3">HVAC Credential Resources</h2>
           <div className="flex flex-wrap gap-3">
             <Link href="/credentials/checksheets" className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-blue-300 hover:text-brand-blue-700 transition-colors">
               Performance Checksheets <ChevronRight className="w-3.5 h-3.5" />
@@ -237,7 +237,7 @@ export default function CredentialsPage() {
       <section className="py-14">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">Start Earning Credentials</h2>
-          <p className="text-white/80 text-base mb-8">Training may be funded for eligible Indiana residents.</p>
+          <p className="text-white text-base mb-8">Training may be funded for eligible Indiana residents.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/start" className="bg-white text-brand-red-600 px-8 py-3.5 rounded-lg font-bold text-base hover:bg-white transition-colors shadow-lg">
               Apply Now

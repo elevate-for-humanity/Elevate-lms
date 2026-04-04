@@ -34,7 +34,7 @@ export default function HealthcarePage() {
         <Breadcrumbs items={[{ label: "Industries", href: "/industries" }, { label: "Healthcare" }]} />
       </div>
 {/* Hero Section */}
-      <section className="relative h-[450px] md:h-[500px] w-full overflow-hidden">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
         <Image src="/images/pages/industries-page-1.jpg" alt="Healthcare Programs" fill sizes="100vw" className="object-cover" quality={85} loading="lazy" />
       </section>
 

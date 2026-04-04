@@ -97,32 +97,32 @@ export default function SupersonicAdminDashboard() {
           <div className="bg-white rounded-xl p-6 shadow-sm border">
             <Users className="w-8 h-8 text-brand-blue-600 mb-2" />
             <div className="text-2xl font-bold text-gray-900">{stats.totalClients}</div>
-            <div className="text-sm text-gray-600">Total Clients</div>
+            <div className="text-sm text-black">Total Clients</div>
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border">
             <Clock className="w-8 h-8 text-yellow-600 mb-2" />
             <div className="text-2xl font-bold text-gray-900">{stats.pendingReturns}</div>
-            <div className="text-sm text-gray-600">Pending Returns</div>
+            <div className="text-sm text-black">Pending Returns</div>
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border">
             <CheckCircle className="w-8 h-8 text-emerald-600 mb-2" />
             <div className="text-2xl font-bold text-gray-900">{stats.completedReturns}</div>
-            <div className="text-sm text-gray-600">Completed</div>
+            <div className="text-sm text-black">Completed</div>
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border">
             <DollarSign className="w-8 h-8 text-brand-green-600 mb-2" />
             <div className="text-2xl font-bold text-gray-900">${(stats.totalRefunds / 1000).toFixed(0)}K</div>
-            <div className="text-sm text-gray-600">Total Refunds</div>
+            <div className="text-sm text-black">Total Refunds</div>
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border">
             <Calendar className="w-8 h-8 text-brand-blue-600 mb-2" />
             <div className="text-2xl font-bold text-gray-900">{stats.todayAppointments}</div>
-            <div className="text-sm text-gray-600">Today's Appts</div>
+            <div className="text-sm text-black">Today's Appts</div>
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border">
             <TrendingUp className="w-8 h-8 text-brand-orange-600 mb-2" />
             <div className="text-2xl font-bold text-gray-900">${(stats.weeklyRevenue / 1000).toFixed(1)}K</div>
-            <div className="text-sm text-gray-600">Weekly Revenue</div>
+            <div className="text-sm text-black">Weekly Revenue</div>
           </div>
         </div>
 
@@ -139,7 +139,7 @@ export default function SupersonicAdminDashboard() {
                   <Users className="w-5 h-5 text-brand-blue-600" />
                   <span className="font-medium text-gray-900">Client Intake</span>
                 </div>
-                <ArrowRight className="w-4 h-4 text-gray-400" />
+                <ArrowRight className="w-4 h-4 text-black" />
               </Link>
               <Link
                 href="/supersonic-fast-cash/book-appointment"
@@ -149,7 +149,7 @@ export default function SupersonicAdminDashboard() {
                   <Calendar className="w-5 h-5 text-brand-blue-600" />
                   <span className="font-medium text-gray-900">Book Appointment</span>
                 </div>
-                <ArrowRight className="w-4 h-4 text-gray-400" />
+                <ArrowRight className="w-4 h-4 text-black" />
               </Link>
               <Link
                 href="/supersonic-fast-cash/calculator"
@@ -159,7 +159,7 @@ export default function SupersonicAdminDashboard() {
                   <DollarSign className="w-5 h-5 text-brand-green-600" />
                   <span className="font-medium text-gray-900">Refund Calculator</span>
                 </div>
-                <ArrowRight className="w-4 h-4 text-gray-400" />
+                <ArrowRight className="w-4 h-4 text-black" />
               </Link>
               <Link
                 href="/supersonic-fast-cash/upload-documents"
@@ -169,7 +169,7 @@ export default function SupersonicAdminDashboard() {
                   <FileText className="w-5 h-5 text-brand-orange-600" />
                   <span className="font-medium text-gray-900">Upload Documents</span>
                 </div>
-                <ArrowRight className="w-4 h-4 text-gray-400" />
+                <ArrowRight className="w-4 h-4 text-black" />
               </Link>
             </div>
           </div>
@@ -186,16 +186,16 @@ export default function SupersonicAdminDashboard() {
               </Link>
             </div>
             {loading ? (
-              <div className="text-center py-8 text-gray-500">Loading...</div>
+              <div className="text-center py-8 text-black">Loading...</div>
             ) : recentClients.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left py-3 px-2 text-sm font-semibold text-gray-600">Name</th>
-                      <th className="text-left py-3 px-2 text-sm font-semibold text-gray-600">Status</th>
-                      <th className="text-left py-3 px-2 text-sm font-semibold text-gray-600">Date</th>
-                      <th className="text-right py-3 px-2 text-sm font-semibold text-gray-600">Action</th>
+                      <th className="text-left py-3 px-2 text-sm font-semibold text-black">Name</th>
+                      <th className="text-left py-3 px-2 text-sm font-semibold text-black">Status</th>
+                      <th className="text-left py-3 px-2 text-sm font-semibold text-black">Date</th>
+                      <th className="text-right py-3 px-2 text-sm font-semibold text-black">Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -205,7 +205,7 @@ export default function SupersonicAdminDashboard() {
                           <div className="font-medium text-gray-900">
                             {client.first_name} {client.last_name}
                           </div>
-                          <div className="text-sm text-gray-500">{client.email}</div>
+                          <div className="text-sm text-black">{client.email}</div>
                         </td>
                         <td className="py-3 px-2">
                           <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
@@ -216,7 +216,7 @@ export default function SupersonicAdminDashboard() {
                             {client.status}
                           </span>
                         </td>
-                        <td className="py-3 px-2 text-sm text-gray-600">
+                        <td className="py-3 px-2 text-sm text-black">
                           {new Date(client.created_at).toLocaleDateString()}
                         </td>
                         <td className="py-3 px-2 text-right">
@@ -233,7 +233,7 @@ export default function SupersonicAdminDashboard() {
                 </table>
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-black">
                 <Users className="w-12 h-12 mx-auto mb-2 text-gray-300" />
                 <p>No clients yet</p>
               </div>
@@ -251,7 +251,7 @@ export default function SupersonicAdminDashboard() {
             >
               <FileText className="w-8 h-8 text-brand-orange-600 mb-3" />
               <h3 className="font-bold text-gray-900">Tax Tools</h3>
-              <p className="text-sm text-gray-600">W-2, 1099, deduction calculators</p>
+              <p className="text-sm text-black">W-2, 1099, deduction calculators</p>
             </Link>
             <Link
               href="/supersonic-fast-cash/diy-taxes"
@@ -259,7 +259,7 @@ export default function SupersonicAdminDashboard() {
             >
               <DollarSign className="w-8 h-8 text-brand-green-600 mb-3" />
               <h3 className="font-bold text-gray-900">DIY Taxes</h3>
-              <p className="text-sm text-gray-600">Self-service tax filing</p>
+              <p className="text-sm text-black">Self-service tax filing</p>
             </Link>
             <Link
               href="/supersonic-fast-cash/training"
@@ -267,7 +267,7 @@ export default function SupersonicAdminDashboard() {
             >
               <TrendingUp className="w-8 h-8 text-brand-blue-600 mb-3" />
               <h3 className="font-bold text-gray-900">Training</h3>
-              <p className="text-sm text-gray-600">Tax preparer certification</p>
+              <p className="text-sm text-black">Tax preparer certification</p>
             </Link>
             <Link
               href="/supersonic-fast-cash/sub-office-agreement"
@@ -275,7 +275,7 @@ export default function SupersonicAdminDashboard() {
             >
               <Users className="w-8 h-8 text-brand-blue-600 mb-3" />
               <h3 className="font-bold text-gray-900">Sub-Office</h3>
-              <p className="text-sm text-gray-600">Partner with us</p>
+              <p className="text-sm text-black">Partner with us</p>
             </Link>
           </div>
         </div>

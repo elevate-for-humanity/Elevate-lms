@@ -112,27 +112,27 @@ export function FinancialAidCalculator() {
               <div className="space-y-4">
                 <div className="p-4 bg-gray-50 rounded">
                   <p className="text-sm text-black">Total Program Cost</p>
-                  <p className="text-2xl font-bold">${results.totalCost.toLocaleString()}</p>
+                  <p className="text-2xl font-bold">${results.totalCost.toLocaleString('en-US')}</p>
                 </div>
 
                 <div className="p-4 bg-brand-green-50 rounded">
                   <p className="text-sm text-brand-green-700">Grants & Scholarships</p>
                   <p className="text-2xl font-bold text-brand-green-600">
-                    ${results.grants.toLocaleString()}
+                    ${results.grants.toLocaleString('en-US')}
                   </p>
                 </div>
 
                 <div className="p-4 bg-brand-blue-50 rounded">
                   <p className="text-sm text-brand-blue-700">Student Loans</p>
                   <p className="text-2xl font-bold text-brand-blue-600">
-                    ${results.loans.toLocaleString()}
+                    ${results.loans.toLocaleString('en-US')}
                   </p>
                 </div>
 
                 <div className="p-4 bg-brand-orange-50 rounded">
                   <p className="text-sm text-brand-orange-700">Out of Pocket</p>
                   <p className="text-2xl font-bold text-brand-orange-600">
-                    ${results.outOfPocket.toLocaleString()}
+                    ${results.outOfPocket.toLocaleString('en-US')}
                   </p>
                 </div>
 

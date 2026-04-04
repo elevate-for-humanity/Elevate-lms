@@ -67,7 +67,7 @@ export default function TrainingModelPage() {
                 </div>
                 <div className="p-5 flex-1">
                   <h3 className="font-bold text-gray-900 text-lg mb-2">Classroom + Hands-On Lab</h3>
-                  <p className="text-xs text-gray-400 mb-3">Programs: HVAC, Electrical, Welding, Plumbing, CNA, Medical Assistant, Phlebotomy</p>
+                  <p className="text-xs text-black mb-3">Programs: HVAC, Electrical, Welding, Plumbing, CNA, Medical Assistant, Phlebotomy</p>
                   <p className="text-sm text-gray-700 mb-3">
                     You come to a training facility 3–5 days per week. Mornings are typically classroom
                     instruction — theory, code requirements, safety protocols, exam prep. Afternoons are
@@ -93,7 +93,7 @@ export default function TrainingModelPage() {
                 </div>
                 <div className="p-5 flex-1">
                   <h3 className="font-bold text-gray-900 text-lg mb-2">Full-Time In-Person</h3>
-                  <p className="text-xs text-gray-400 mb-3">Programs: CDL, Barber Apprenticeship, CPR/First Aid</p>
+                  <p className="text-xs text-black mb-3">Programs: CDL, Barber Apprenticeship, CPR/First Aid</p>
                   <p className="text-sm text-gray-700 mb-3">
                     CDL students spend 160+ hours in a truck — classroom instruction for permit prep
                     and regulations, then behind-the-wheel training on highways and city streets. You
@@ -119,7 +119,7 @@ export default function TrainingModelPage() {
                 </div>
                 <div className="p-5 flex-1">
                   <h3 className="font-bold text-gray-900 text-lg mb-2">Online with Live Instructors</h3>
-                  <p className="text-xs text-gray-400 mb-3">Programs: IT Support, Cybersecurity</p>
+                  <p className="text-xs text-black mb-3">Programs: IT Support, Cybersecurity</p>
                   <p className="text-sm text-gray-700 mb-3">
                     You work through lessons on our online learning platform with instructor oversight — video
                     lessons, reading materials, hands-on labs, and practice quizzes. Your instructor
@@ -142,7 +142,7 @@ export default function TrainingModelPage() {
       <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">What a Typical Week Looks Like</h2>
-          <p className="text-gray-600 mb-8">
+          <p className="text-black mb-8">
             Here is an example week for an HVAC or Electrical student in a 12-week program.
             Schedules vary by program, but this gives you a realistic picture.
           </p>
@@ -171,7 +171,7 @@ export default function TrainingModelPage() {
       <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">How We Track Your Progress</h2>
-          <p className="text-gray-600 mb-8">
+          <p className="text-black mb-8">
             When you enroll, you get a personal account on our online learning platform. Here is
             what you see when you log in and what your instructors and case managers can see.
           </p>
@@ -240,7 +240,7 @@ export default function TrainingModelPage() {
       <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">Example: 12-Week Skilled Trades Program Timeline</h2>
-          <p className="text-gray-600 mb-6 text-sm">
+          <p className="text-black mb-6 text-sm">
             This is a real example of how a 12-week HVAC, Electrical, or Welding program flows
             from enrollment to employment.
           </p>
@@ -257,7 +257,7 @@ export default function TrainingModelPage() {
               <div key={r.week} className="bg-white rounded-lg border border-gray-200 p-4">
                 <h3 className="font-bold text-gray-900 text-sm mb-1">{r.week}</h3>
                 <p className="text-sm text-gray-700 mb-1"><span className="font-semibold">What you do:</span> {r.activity}</p>
-                <p className="text-sm text-gray-600"><span className="font-semibold">What you walk away with:</span> {r.result}</p>
+                <p className="text-sm text-black"><span className="font-semibold">What you walk away with:</span> {r.result}</p>
               </div>
             ))}
           </div>
@@ -268,7 +268,7 @@ export default function TrainingModelPage() {
       <section className="py-14 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to See It for Yourself?</h2>
-          <p className="text-lg text-brand-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-white mb-8 max-w-2xl mx-auto">
             The best way to understand how training works is to start. Check your eligibility —
             it takes about 5 minutes. If you qualify for funding, your training can be free.
           </p>

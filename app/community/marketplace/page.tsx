@@ -155,7 +155,7 @@ export default async function CommunityMarketplacePage() {
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
                   Community Marketplace
                 </h1>
-                <p className="text-xl text-brand-green-100 mb-8 leading-relaxed">
+                <p className="text-xl text-white mb-8 leading-relaxed">
                   Discover training courses, professional tools, study materials, and resources 
                   created by certified professionals, program owners, and industry experts in our community.
                 </p>
@@ -182,19 +182,19 @@ export default async function CommunityMarketplacePage() {
                   <div className="grid grid-cols-2 gap-6">
                     <div className="text-center p-4 bg-white/10 rounded-xl">
                       <div className="text-4xl font-black">{totalListings}</div>
-                      <div className="text-brand-green-200 text-sm mt-1">Total Listings</div>
+                      <div className="text-white text-sm mt-1">Total Listings</div>
                     </div>
                     <div className="text-center p-4 bg-white/10 rounded-xl">
                       <div className="text-4xl font-black">{totalSellers}</div>
-                      <div className="text-brand-green-200 text-sm mt-1">Verified Sellers</div>
+                      <div className="text-white text-sm mt-1">Verified Sellers</div>
                     </div>
                     <div className="text-center p-4 bg-white/10 rounded-xl">
                       <div className="text-4xl font-black">5</div>
-                      <div className="text-brand-green-200 text-sm mt-1">Categories</div>
+                      <div className="text-white text-sm mt-1">Categories</div>
                     </div>
                     <div className="text-center p-4 bg-white/10 rounded-xl">
                       <div className="text-4xl font-black">4.8</div>
-                      <div className="text-brand-green-200 text-sm mt-1">Avg Rating</div>
+                      <div className="text-white text-sm mt-1">Avg Rating</div>
                     </div>
                   </div>
                 </div>
@@ -208,7 +208,7 @@ export default async function CommunityMarketplacePage() {
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex flex-col md:flex-row gap-4 items-center">
               <div className="flex-1 relative w-full">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-black" />
                 <input
                   type="text"
                   placeholder="Search courses, products, tools..."
@@ -250,7 +250,7 @@ export default async function CommunityMarketplacePage() {
                     <h3 className="font-bold text-slate-900 group-hover:text-brand-green-600 transition">
                       {category.name}
                     </h3>
-                    <p className="text-sm text-slate-600 mt-1 line-clamp-2">
+                    <p className="text-sm text-black mt-1 line-clamp-2">
                       {category.description}
                     </p>
                   </Link>
@@ -266,7 +266,7 @@ export default async function CommunityMarketplacePage() {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-3xl font-black text-slate-900">Featured Courses</h2>
-                <p className="text-slate-600 mt-2">Learn from certified professionals and industry experts</p>
+                <p className="text-black mt-2">Learn from certified professionals and industry experts</p>
               </div>
               <Link 
                 href="/community/marketplace/courses" 
@@ -295,7 +295,7 @@ export default async function CommunityMarketplacePage() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <BookOpen className="w-12 h-12 text-slate-300" />
+                          <BookOpen className="w-12 h-12 text-white" />
                         </div>
                       )}
                     </div>
@@ -311,11 +311,11 @@ export default async function CommunityMarketplacePage() {
                       <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-brand-green-600 transition line-clamp-2">
                         {course.title}
                       </h3>
-                      <p className="text-slate-600 text-sm mb-4 line-clamp-2">
+                      <p className="text-black text-sm mb-4 line-clamp-2">
                         {course.description}
                       </p>
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 text-sm text-slate-500">
+                        <div className="flex items-center gap-4 text-sm text-black">
                           <div className="flex items-center gap-1">
                             <Users className="w-4 h-4" />
                             <span>{course.total_enrollments || 0}</span>
@@ -336,7 +336,7 @@ export default async function CommunityMarketplacePage() {
                         </div>
                       </div>
                       <div className="mt-4 pt-4 border-t border-slate-100">
-                        <p className="text-sm text-slate-600">
+                        <p className="text-sm text-black">
                           by <span className="font-semibold text-slate-900">{course.creator_profiles?.display_name}</span>
                         </p>
                       </div>
@@ -346,9 +346,9 @@ export default async function CommunityMarketplacePage() {
               </div>
             ) : (
               <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center">
-                <BookOpen className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                <BookOpen className="w-16 h-16 text-white mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-slate-900 mb-2">No Courses Yet</h3>
-                <p className="text-slate-600 mb-6">Be the first to create and sell a course in our marketplace!</p>
+                <p className="text-black mb-6">Be the first to create and sell a course in our marketplace!</p>
                 <Link
                   href="/creator/dashboard"
                   className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-green-700 transition"
@@ -366,7 +366,7 @@ export default async function CommunityMarketplacePage() {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-3xl font-black text-slate-900">Shop Products</h2>
-                <p className="text-slate-600 mt-2">Tools, equipment, and resources from community sellers</p>
+                <p className="text-black mt-2">Tools, equipment, and resources from community sellers</p>
               </div>
               <Link 
                 href="/community/marketplace/products" 
@@ -395,7 +395,7 @@ export default async function CommunityMarketplacePage() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Package className="w-12 h-12 text-slate-300" />
+                          <Package className="w-12 h-12 text-white" />
                         </div>
                       )}
                     </div>
@@ -403,7 +403,7 @@ export default async function CommunityMarketplacePage() {
                       <h3 className="font-bold text-slate-900 mb-2 group-hover:text-brand-green-600 transition line-clamp-1">
                         {product.name}
                       </h3>
-                      <p className="text-slate-600 text-sm mb-3 line-clamp-2">
+                      <p className="text-black text-sm mb-3 line-clamp-2">
                         {product.description}
                       </p>
                       <div className="flex items-center justify-between">
@@ -411,13 +411,13 @@ export default async function CommunityMarketplacePage() {
                           ${(product.price / 100).toFixed(2)}
                         </div>
                         {product.compare_at_price && (
-                          <div className="text-sm text-slate-500 line-through">
+                          <div className="text-sm text-black line-through">
                             ${(product.compare_at_price / 100).toFixed(2)}
                           </div>
                         )}
                       </div>
                       <div className="mt-3 pt-3 border-t border-slate-200">
-                        <div className="flex items-center justify-between text-xs text-slate-500">
+                        <div className="flex items-center justify-between text-xs text-black">
                           <span>{product.shop_profiles?.shop_name}</span>
                           {product.shop_profiles?.verified && (
                             <span className="text-brand-blue-600 font-medium">• Verified</span>
@@ -430,9 +430,9 @@ export default async function CommunityMarketplacePage() {
               </div>
             ) : (
               <div className="bg-white rounded-2xl p-16 text-center">
-                <ShoppingBag className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                <ShoppingBag className="w-16 h-16 text-white mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-slate-900 mb-2">No Products Yet</h3>
-                <p className="text-slate-600 mb-6">Start selling your products and tools to the community!</p>
+                <p className="text-black mb-6">Start selling your products and tools to the community!</p>
                 <Link
                   href="/shop/seller/register"
                   className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-green-700 transition"
@@ -454,7 +454,7 @@ export default async function CommunityMarketplacePage() {
             <h2 className="text-4xl md:text-5xl font-black mb-6">
               Turn Your Expertise Into Income
             </h2>
-            <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-black mb-8 max-w-2xl mx-auto">
               Are you a certified professional, program owner, or industry expert? 
               Create courses, sell products, and build your brand in our marketplace.
             </p>
@@ -486,28 +486,28 @@ export default async function CommunityMarketplacePage() {
                   <Award className="w-6 h-6 text-brand-green-600" />
                 </div>
                 <h3 className="font-bold text-slate-900">Verified Sellers</h3>
-                <p className="text-sm text-slate-600 mt-1">All sellers are vetted and verified</p>
+                <p className="text-sm text-black mt-1">All sellers are vetted and verified</p>
               </div>
               <div>
                 <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <Tag className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-slate-900">Best Prices</h3>
-                <p className="text-sm text-slate-600 mt-1">Competitive pricing from the community</p>
+                <p className="text-sm text-black mt-1">Competitive pricing from the community</p>
               </div>
               <div>
                 <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <Star className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-slate-900">Quality Guaranteed</h3>
-                <p className="text-sm text-slate-600 mt-1">Ratings and reviews from real buyers</p>
+                <p className="text-sm text-black mt-1">Ratings and reviews from real buyers</p>
               </div>
               <div>
                 <div className="w-12 h-12 bg-brand-orange-100 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <Users className="w-6 h-6 text-brand-orange-600" />
                 </div>
                 <h3 className="font-bold text-slate-900">Community Support</h3>
-                <p className="text-sm text-slate-600 mt-1">Help from fellow professionals</p>
+                <p className="text-sm text-black mt-1">Help from fellow professionals</p>
               </div>
             </div>
           </div>

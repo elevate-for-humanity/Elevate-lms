@@ -86,7 +86,7 @@ export function StudentAchievementsWidget() {
         {recent.map((a) => {
           const emoji = niceEmojiForCode[a.code] ?? "⭐";
           const date = new Date(a.earned_at);
-          const dateLabel = date.toLocaleDateString();
+          const dateLabel = date.toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' });
 
           return (
             <div

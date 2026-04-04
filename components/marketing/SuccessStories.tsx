@@ -29,7 +29,7 @@ export function SuccessStories() {
           <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-brand-orange-300">
             Success stories
           </h2>
-          <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-50">
+          <p className="mt-3 text-3xl font-semibold tracking-tight text-white">
             Real people, real outcomes.
           </p>
           <p className="mt-3 text-sm text-slate-600">
@@ -48,13 +48,13 @@ export function SuccessStories() {
               <div className="mb-3 flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full bg-white" />
                 <div>
-                  <h3 className="text-sm font-semibold text-slate-50">
+                  <h3 className="text-sm font-semibold text-white">
                     {story.name}
                   </h3>
-                  <p className="text-xs text-slate-500">{story.role}</p>
+                  <p className="text-xs text-white">{story.role}</p>
                 </div>
               </div>
-              <p className="text-sm text-slate-200">&ldquo;{story.quote}&rdquo;</p>
+              <p className="text-sm text-white">&ldquo;{story.quote}&rdquo;</p>
             </article>
           ))}
         </div>

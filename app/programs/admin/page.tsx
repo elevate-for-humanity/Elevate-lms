@@ -69,15 +69,15 @@ export default async function AdminPage() {
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     <span>Free training for eligible participants</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     <span>Industry-standard certifications</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     <span>Career support and job placement</span>
                   </li>
                 </ul>

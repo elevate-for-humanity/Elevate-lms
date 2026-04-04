@@ -16,8 +16,8 @@ export default function CNAApplySuccessPage() {
           </svg>
         </div>
         <h1 className="text-2xl font-bold text-slate-900">Application Submitted</h1>
-        <p className="mt-3 text-slate-600">Thank you for applying to the CNA program. Our team will contact you within 1–2 business days.</p>
-        <p className="mt-2 text-sm text-slate-500">Questions? Call <a href="tel:3173143757" className="underline">317-314-3757</a></p>
+        <p className="mt-3 text-black">Thank you for applying to the CNA program. Our team will contact you within 1–2 business days.</p>
+        <p className="mt-2 text-sm text-black">Questions? Call <a href="tel:3173143757" className="underline">317-314-3757</a></p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link href="/programs/cna" className="rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-900 hover:bg-slate-50 transition-colors">
             Back to program

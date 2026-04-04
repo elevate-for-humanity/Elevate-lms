@@ -111,7 +111,7 @@ export default function LessonSidebar({
                     <div className="flex-shrink-0 mt-0.5">
                       {isCompleted ? (
                         <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                          <span className="text-slate-400 flex-shrink-0">•</span>
+                          <span className="text-black flex-shrink-0">•</span>
                         </div>
                       ) : (
                         <div
@@ -140,7 +140,7 @@ export default function LessonSidebar({
                         {lesson.title}
                       </h3>
                       {lesson.duration && (
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-black">
                           {Math.floor(lesson.duration / 60)} min
                         </p>
                       )}

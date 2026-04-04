@@ -34,7 +34,7 @@ export default async function EnrollmentPWAPage() {
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <LogoImage alt="Elevate" width={40} height={40} className="mb-3" />
           <h1 className="text-2xl font-bold text-slate-900">Enrollment Center</h1>
-          <p className="text-brand-orange-200 text-sm mt-1">Apply, track status, and complete enrollment</p>
+          <p className="text-white text-sm mt-1">Apply, track status, and complete enrollment</p>
         </div>
       </div>
 
@@ -58,7 +58,7 @@ export default async function EnrollmentPWAPage() {
       <div className="px-4 mt-6">
         <Link href="/start" className="block bg-brand-orange-500 text-white rounded-xl p-5 text-center hover:bg-brand-orange-600 transition-colors">
           <div className="text-lg font-bold">Start Your Application →</div>
-          <div className="text-brand-orange-100 text-sm mt-1">{freePrograms.length} programs with funding available</div>
+          <div className="text-white text-sm mt-1">{freePrograms.length} programs with funding available</div>
         </Link>
       </div>
 

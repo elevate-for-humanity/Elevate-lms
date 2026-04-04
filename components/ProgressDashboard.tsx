@@ -162,7 +162,7 @@ export function ProgressDashboard({ userId }: { userId: string }) {
                 <div className="flex-1">
                   <h4 className="font-medium text-black">{course.course_name}</h4>
                   <p className="text-xs text-slate-500 mt-1">
-                    Last accessed: {new Date(course.last_accessed).toLocaleDateString()}
+                    Last accessed: {new Date(course.last_accessed).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
                 <div className="text-right ml-4">

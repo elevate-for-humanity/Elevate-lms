@@ -87,7 +87,7 @@ export default function HoursSummaryWidget({
         {/* Required */}
         <div className="text-center p-4 bg-slate-800/50 rounded-lg">
           <div className="text-3xl font-bold text-white mb-1">
-            {required.toLocaleString()}
+            {required.toLocaleString('en-US')}
           </div>
           <div className="text-xs text-slate-400 uppercase tracking-wide">
             Required
@@ -97,7 +97,7 @@ export default function HoursSummaryWidget({
         {/* Transferred */}
         <div className="text-center p-4 bg-brand-blue-500/10 border border-brand-blue-500/30 rounded-lg">
           <div className="text-3xl font-bold text-brand-blue-400 mb-1">
-            {transferred.toLocaleString()}
+            {transferred.toLocaleString('en-US')}
           </div>
           <div className="text-xs text-slate-400 uppercase tracking-wide">
             Transferred
@@ -112,7 +112,7 @@ export default function HoursSummaryWidget({
         {/* Earned */}
         <div className="text-center p-4 bg-brand-green-500/10 border border-brand-green-500/30 rounded-lg">
           <div className="text-3xl font-bold text-brand-green-400 mb-1">
-            {earned.toLocaleString()}
+            {earned.toLocaleString('en-US')}
           </div>
           <div className="text-xs text-slate-400 uppercase tracking-wide">
             Earned
@@ -127,7 +127,7 @@ export default function HoursSummaryWidget({
         {/* Remaining */}
         <div className="text-center p-4 bg-brand-orange-500/10 border border-brand-orange-500/30 rounded-lg">
           <div className="text-3xl font-bold text-brand-orange-400 mb-1">
-            {remaining.toLocaleString()}
+            {remaining.toLocaleString('en-US')}
           </div>
           <div className="text-xs text-slate-400 uppercase tracking-wide">
             Remaining

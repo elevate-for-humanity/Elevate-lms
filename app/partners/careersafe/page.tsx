@@ -16,7 +16,7 @@ import {
 CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'CareerSafe OSHA Training | Partner Courses | Elevate For Humanity',
+  title: 'CareerSafe OSHA Training | Short-Term Courses | Elevate For Humanity',
   description: 'OSHA 10 & OSHA 30 Safety Certification',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/partners/careersafe',
@@ -50,31 +50,31 @@ export default async function CAREERSAFEPage() {
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">
                 Official OSHA certification cards
               </div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">
                 Required for many construction jobs
               </div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">Self-paced online training</div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">Lifetime access to materials</div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">24/7 customer support</div>
             </div>
           </div>

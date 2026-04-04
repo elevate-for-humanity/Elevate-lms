@@ -4,10 +4,11 @@
 export interface KPICard {
   label: string;
   value: number;
-  delta: number;        // % change vs prior period; 0 if unknown
+  delta: number;
   deltaLabel: string;
   href: string;
   urgent?: boolean;
+  sub?: string;         // context line below the value
 }
 
 export interface EnrollmentTrendPoint {
@@ -52,7 +53,9 @@ export interface RecentApplication {
   program_interest: string | null;
   status: string;
   created_at: string;
-  href: string;         // resolved: /admin/applications/review/[id]
+  age_days: number;
+  urgent: boolean;
+  href: string;
 }
 
 export interface BlockedProgram {

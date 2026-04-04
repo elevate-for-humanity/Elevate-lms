@@ -160,7 +160,7 @@ export default function ModuleProgressList({
               <div className="flex justify-between">
                 <span className="text-slate-400">Last Accessed:</span>
                 <span className="text-white">
-                  {new Date(progress.last_accessed_at).toLocaleDateString()}
+                  {new Date(progress.last_accessed_at).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
               </div>
             )}
@@ -170,7 +170,7 @@ export default function ModuleProgressList({
               <div className="flex justify-between">
                 <span className="text-slate-400">Completed:</span>
                 <span className="text-white">
-                  {new Date(progress.completed_at).toLocaleDateString()}
+                  {new Date(progress.completed_at).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
               </div>
             )}

@@ -239,11 +239,11 @@ export default function ProgramAnalytics() {
                 <CardContent className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Total Funding Used</span>
-                    <span className="text-2xl font-bold">${program.totalFundingUsed.toLocaleString()}</span>
+                    <span className="text-2xl font-bold">${program.totalFundingUsed.toLocaleString('en-US')}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Cost per Completion</span>
-                    <span className="text-2xl font-bold">${program.costPerCompletion.toLocaleString()}</span>
+                    <span className="text-2xl font-bold">${program.costPerCompletion.toLocaleString('en-US')}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">ROI Indicator</span>

@@ -225,7 +225,7 @@ export default function ProviderApplicationForm() {
       <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center">
         <CheckCircle className="w-14 h-14 text-brand-green-600 mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-slate-900 mb-2">Application Submitted</h2>
-        <p className="text-slate-600 mb-6 max-w-md mx-auto">
+        <p className="text-black mb-6 max-w-md mx-auto">
           We received your application and will review it within 5–7 business days.
           You will receive an email at <strong>{form.contactEmail}</strong> when a decision is made.
         </p>
@@ -251,7 +251,7 @@ export default function ProviderApplicationForm() {
                   ? 'bg-brand-blue-600 text-white'
                   : i < stepIndex
                   ? 'bg-brand-green-100 text-brand-green-700'
-                  : 'text-slate-400'
+                  : 'text-black'
               }`}>
                 {i < stepIndex ? <CheckCircle className="w-3 h-3" /> : <span>{i + 1}</span>}
                 <span className="hidden sm:inline">{STEP_LABELS[s]}</span>
@@ -357,13 +357,13 @@ export default function ProviderApplicationForm() {
             <h2 className="text-lg font-bold text-slate-900">Programs & Credentials</h2>
             <div>
               <Label required>Program Types Offered</Label>
-              <p className="text-xs text-slate-500 mb-3">Select all that apply.</p>
+              <p className="text-xs text-black mb-3">Select all that apply.</p>
               <CheckboxGroup options={PROGRAM_TYPES} selected={form.programTypes} onChange={v => set('programTypes', v)} />
               <FieldError msg={errors.programTypes} />
             </div>
             <div>
               <Label>Credential Authorities</Label>
-              <p className="text-xs text-slate-500 mb-3">Which bodies issue credentials for your programs?</p>
+              <p className="text-xs text-black mb-3">Which bodies issue credentials for your programs?</p>
               <CheckboxGroup options={CREDENTIAL_AUTHORITIES} selected={form.credentialAuthorities} onChange={v => set('credentialAuthorities', v)} />
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
@@ -393,7 +393,7 @@ export default function ProviderApplicationForm() {
                 />
                 <div>
                   <span className="text-sm font-medium text-slate-700">WIOA Eligible</span>
-                  <p className="text-xs text-slate-500">Your programs qualify for Workforce Innovation and Opportunity Act Individual Training Accounts.</p>
+                  <p className="text-xs text-black">Your programs qualify for Workforce Innovation and Opportunity Act Individual Training Accounts.</p>
                 </div>
               </label>
               <label className="flex items-start gap-3 cursor-pointer">
@@ -405,7 +405,7 @@ export default function ProviderApplicationForm() {
                 />
                 <div>
                   <span className="text-sm font-medium text-slate-700">ETPL Listed</span>
-                  <p className="text-xs text-slate-500">Your organization is on a state Eligible Training Provider List.</p>
+                  <p className="text-xs text-black">Your organization is on a state Eligible Training Provider List.</p>
                 </div>
               </label>
             </div>
@@ -504,7 +504,7 @@ export default function ProviderApplicationForm() {
             type="button"
             onClick={back}
             disabled={stepIndex === 0}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed transition"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-black hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed transition"
           >
             <ChevronLeft className="w-4 h-4" /> Back
           </button>
@@ -537,7 +537,7 @@ function ReviewSection({ label, children }: { label: string; children: React.Rea
   return (
     <div className="border border-slate-200 rounded-lg overflow-hidden">
       <div className="bg-white px-4 py-2 border-b border-slate-200">
-        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{label}</span>
+        <span className="text-xs font-semibold text-black uppercase tracking-wide">{label}</span>
       </div>
       <div className="px-4 py-3 space-y-1.5">{children}</div>
     </div>
@@ -548,7 +548,7 @@ function ReviewRow({ label, value }: { label: string; value: string }) {
   if (!value) return null;
   return (
     <div className="flex gap-3">
-      <span className="text-slate-500 w-28 flex-shrink-0">{label}</span>
+      <span className="text-black w-28 flex-shrink-0">{label}</span>
       <span className="text-slate-900 font-medium">{value}</span>
     </div>
   );

@@ -236,13 +236,13 @@ export function CertificationTracker({ programId, userId }: CertificationTracker
                     {cert.completedAt && (
                       <p className="text-sm text-brand-green-800 flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
-                        Completed: {new Date(cert.completedAt).toLocaleDateString()}
+                        Completed: {new Date(cert.completedAt).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                       </p>
                     )}
                     {cert.expiresAt && (
                       <p className="text-sm text-brand-green-800 flex items-center gap-2">
                         <Clock className="w-4 h-4" />
-                        Expires: {new Date(cert.expiresAt).toLocaleDateString()}
+                        Expires: {new Date(cert.expiresAt).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
                       </p>
                     )}
                     {cert.credentialNumber && (

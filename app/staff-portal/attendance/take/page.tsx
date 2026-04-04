@@ -77,7 +77,7 @@ export default async function TakeAttendancePage() {
         <div className="max-w-6xl mx-auto px-4 py-12">
           <Link 
             href="/staff-portal/attendance" 
-            className="inline-flex items-center gap-2 text-brand-blue-100 hover:text-white mb-4"
+            className="inline-flex items-center gap-2 text-white hover:text-white mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Attendance
@@ -89,7 +89,7 @@ export default async function TakeAttendancePage() {
               </div>
               <div>
                 <h1 className="text-3xl font-bold">Take Attendance</h1>
-                <p className="text-brand-blue-100 mt-1">{today}</p>
+                <p className="text-white mt-1">{today}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg">

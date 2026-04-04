@@ -67,7 +67,7 @@ export default function RecapDetail({ recapId }: { recapId: string }) {
           <h1 className="text-xl font-bold tracking-tight">{recap.title}</h1>
           <div className="text-xs text-neutral-600">
             {recap.meeting_date
-              ? new Date(recap.meeting_date).toLocaleString()
+              ? new Date(recap.meeting_date).toLocaleString('en-US')
               : 'No meeting date'}
             {recap.attendee_email ? ` • ${recap.attendee_email}` : ''}
           </div>

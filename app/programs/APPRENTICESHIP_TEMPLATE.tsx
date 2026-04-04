@@ -62,17 +62,17 @@ export default function ApprenticeshipPage() {
             <div className="flex flex-col items-center">
               <DollarSign className="w-12 h-12 text-brand-orange-500 mb-3" />
               <div className="text-2xl font-bold mb-1">$12-15/Hour</div>
-              <div className="text-slate-600">Paid Training</div>
+              <div className="text-black">Paid Training</div>
             </div>
             <div className="flex flex-col items-center">
               <Clock className="w-12 h-12 text-brand-orange-500 mb-3" />
               <div className="text-2xl font-bold mb-1">2,000 Hours</div>
-              <div className="text-slate-600">Hands-On Experience</div>
+              <div className="text-black">Hands-On Experience</div>
             </div>
             <div className="flex flex-col items-center">
               <Award className="w-12 h-12 text-brand-orange-500 mb-3" />
               <div className="text-2xl font-bold mb-1">State Licensed</div>
-              <div className="text-slate-600">Indiana Barber License</div>
+              <div className="text-black">Indiana Barber License</div>
             </div>
           </div>
         </div>
@@ -99,7 +99,7 @@ export default function ApprenticeshipPage() {
                   <Target className="w-7 h-7" />
                 </div>
                 <h3 className="text-2xl font-bold mb-3">Apply</h3>
-                <p className="text-white/90 leading-relaxed">
+                <p className="text-white leading-relaxed">
                   Submit your application. No experience required. We'll match
                   you with a licensed shop.
                 </p>
@@ -114,7 +114,7 @@ export default function ApprenticeshipPage() {
                   <Building2 className="w-7 h-7" />
                 </div>
                 <h3 className="text-2xl font-bold mb-3">Get Matched</h3>
-                <p className="text-white/90 leading-relaxed">
+                <p className="text-white leading-relaxed">
                   We connect you with a licensed barber shop in your area for
                   hands-on training.
                 </p>
@@ -129,7 +129,7 @@ export default function ApprenticeshipPage() {
                   <Zap className="w-7 h-7" />
                 </div>
                 <h3 className="text-2xl font-bold mb-3">Train & Earn</h3>
-                <p className="text-white/90 leading-relaxed">
+                <p className="text-white leading-relaxed">
                   Work alongside master barbers. Earn $12-15/hour while you
                   learn the craft.
                 </p>
@@ -144,7 +144,7 @@ export default function ApprenticeshipPage() {
                   <Award className="w-7 h-7" />
                 </div>
                 <h3 className="text-2xl font-bold mb-3">Get Licensed</h3>
-                <p className="text-white/90 leading-relaxed">
+                <p className="text-white leading-relaxed">
                   Complete 2,000 hours, pass your exam, and earn your Indiana
                   barber license.
                 </p>
@@ -233,31 +233,31 @@ export default function ApprenticeshipPage() {
 
                 <div className="space-y-6">
                   <div className="border-b border-white/10 pb-6">
-                    <div className="text-slate-400 text-sm mb-2">Duration</div>
+                    <div className="text-black text-sm mb-2">Duration</div>
                     <div className="text-2xl font-bold">15-24 Months</div>
                   </div>
 
                   <div className="border-b border-white/10 pb-6">
-                    <div className="text-slate-400 text-sm mb-2">
+                    <div className="text-black text-sm mb-2">
                       Training Hours
                     </div>
                     <div className="text-2xl font-bold">2,000 Hours</div>
                   </div>
 
                   <div className="border-b border-white/10 pb-6">
-                    <div className="text-slate-400 text-sm mb-2">
+                    <div className="text-black text-sm mb-2">
                       Hourly Pay
                     </div>
                     <div className="text-2xl font-bold">$12-15/Hour</div>
                   </div>
 
                   <div className="border-b border-white/10 pb-6">
-                    <div className="text-slate-400 text-sm mb-2">Format</div>
+                    <div className="text-black text-sm mb-2">Format</div>
                     <div className="text-2xl font-bold">In-Person</div>
                   </div>
 
                   <div className="border-b border-white/10 pb-6">
-                    <div className="text-slate-400 text-sm mb-2">
+                    <div className="text-black text-sm mb-2">
                       Certification
                     </div>
                     <div className="text-2xl font-bold">
@@ -266,7 +266,7 @@ export default function ApprenticeshipPage() {
                   </div>
 
                   <div>
-                    <div className="text-slate-400 text-sm mb-2">Cost</div>
+                    <div className="text-black text-sm mb-2">Cost</div>
                     <div className="text-2xl font-bold text-brand-orange-500">
                       $0 - You Get Paid!
                     </div>
@@ -382,7 +382,7 @@ export default function ApprenticeshipPage() {
             <h2 className="text-5xl md:text-6xl font-black mb-6">
               Success Stories
             </h2>
-            <p className="text-xl text-slate-300">
+            <p className="text-xl text-white">
               Real apprentices, real success
             </p>
           </div>
@@ -406,7 +406,7 @@ export default function ApprenticeshipPage() {
                 <div className="w-16 h-16 bg-white rounded-full"></div>
                 <div>
                   <div className="font-bold text-lg">James W.</div>
-                  <div className="text-slate-500">Apprentice, 6 months</div>
+                  <div className="text-black">Apprentice, 6 months</div>
                 </div>
               </div>
             </div>
@@ -429,7 +429,7 @@ export default function ApprenticeshipPage() {
                 <div className="w-16 h-16 bg-white rounded-full"></div>
                 <div>
                   <div className="font-bold text-lg">DeAndre Williams</div>
-                  <div className="text-slate-500">
+                  <div className="text-black">
                     Licensed Barber, Graduate 2024
                   </div>
                 </div>
@@ -445,7 +445,7 @@ export default function ApprenticeshipPage() {
           <h2 className="text-5xl md:text-6xl font-black mb-6">
             Start Earning While You Learn
           </h2>
-          <p className="text-2xl mb-12 text-white/90">
+          <p className="text-2xl mb-12 text-white">
             No experience required. No tuition for eligible participants.
             Just your commitment to mastering the craft.
           </p>
@@ -464,7 +464,7 @@ export default function ApprenticeshipPage() {
               Learn More
             </Link>
           </div>
-          <p className="text-white/80 mt-8 text-lg">
+          <p className="text-white mt-8 text-lg">
             Next cohort starts soon • Limited spots available
           </p>
         </div>

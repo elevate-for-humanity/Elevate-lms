@@ -62,7 +62,7 @@ export default async function StudyGroupsPage() {
           </div>
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-gray-900">Study Groups</h1>
-            <p className="text-gray-600">Find study partners and form groups</p>
+            <p className="text-black">Find study partners and form groups</p>
           </div>
           {user && (
             <Link href="/community/groups/create"
@@ -82,7 +82,7 @@ export default async function StudyGroupsPage() {
                     {discussion.author?.avatar_url ? (
                       <Image src={discussion.author.avatar_url} alt="Author avatar" width={40} height={40} className="w-full h-full rounded-full object-cover" />
                     ) : (
-                      <User className="w-5 h-5 text-gray-400" />
+                      <User className="w-5 h-5 text-black" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -90,10 +90,10 @@ export default async function StudyGroupsPage() {
                       {discussion.is_pinned && <Pin className="w-4 h-4 text-brand-orange-500" />}
                       <h3 className="font-medium text-gray-900 truncate">{discussion.title}</h3>
                     </div>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-black mt-1">
                       by {discussion.author?.full_name || 'Anonymous'}
                     </p>
-                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-400">
+                    <div className="flex items-center gap-4 mt-2 text-sm text-black">
                       <span className="flex items-center gap-1">
                         <MessageSquare className="w-4 h-4" />
                         {discussion.replies?.[0]?.count || 0} replies
@@ -115,7 +115,7 @@ export default async function StudyGroupsPage() {
             <div className="p-12 text-center">
               <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
               <p className="font-medium text-gray-900">No study groups yet</p>
-              <p className="text-sm text-gray-500 mb-4">Create a study group to connect with peers</p>
+              <p className="text-sm text-black mb-4">Create a study group to connect with peers</p>
               {user && (
                 <Link href="/community/groups/create"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600">

@@ -22,13 +22,13 @@ export default function ApplyPage() {
               { label: 'Culinary Apprenticeship', href: '/programs/culinary-apprenticeship' },
               { label: 'Apply' },
             ]}
-            className="text-white/80 mb-4"
+            className="text-white mb-4"
           />
           <span className="inline-block px-3 py-1 bg-brand-orange-500 text-white text-sm font-semibold rounded-full mb-3">
             DOL REGISTERED APPRENTICESHIP
           </span>
           <h1 className="text-3xl md:text-4xl font-bold text-white">Apply for Youth Culinary Apprenticeship</h1>
-          <p className="text-slate-600 mt-2 text-base">2,000-Hour Program | Production Cook | Paid OJT</p>
+          <p className="text-black mt-2 text-base">2,000-Hour Program | Production Cook | Paid OJT</p>
         </div>
       </section>
 
@@ -40,21 +40,21 @@ export default function ApplyPage() {
             <div className="flex items-center gap-3">
               <Clock className="w-6 h-6 text-brand-orange-600" />
               <div>
-                <p className="text-sm text-slate-600">Duration</p>
+                <p className="text-sm text-black">Duration</p>
                 <p className="font-bold text-slate-900">2,000 Hours (~1 year)</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Users className="w-6 h-6 text-brand-green-600" />
               <div>
-                <p className="text-sm text-slate-600">Minimum Age</p>
+                <p className="text-sm text-black">Minimum Age</p>
                 <p className="font-bold text-slate-900">16 years old</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Award className="w-6 h-6 text-purple-600" />
               <div>
-                <p className="text-sm text-slate-600">Certifications</p>
+                <p className="text-sm text-black">Certifications</p>
                 <p className="font-bold text-slate-900">DOL + ServSafe</p>
               </div>
             </div>
@@ -122,7 +122,7 @@ export default function ApplyPage() {
               </svg>
             </div>
             <h3 className="text-xl font-bold text-slate-900 mb-2">Get More Information</h3>
-            <p className="text-slate-600 mb-6">
+            <p className="text-black mb-6">
               Have questions? Submit an inquiry and we'll send you detailed program information.
             </p>
             <Link
@@ -139,7 +139,7 @@ export default function ApplyPage() {
               <ArrowRight className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-bold mb-2">Ready to Apply?</h3>
-            <p className="text-brand-orange-100 mb-6">
+            <p className="text-white mb-6">
               Start your application now. We'll review your eligibility and contact you within 2-3 business days.
             </p>
             <Link

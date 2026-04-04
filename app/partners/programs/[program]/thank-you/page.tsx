@@ -43,7 +43,7 @@ export default async function ThankYouPage({ params }: { params: Promise<{ progr
             <span className="text-green-600 text-3xl">✓</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-3">Application Submitted!</h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-black">
             Thank you for applying to the <strong>{config.shortName} Partner Program</strong>.
             We&apos;ve sent a confirmation email with program details and next steps.
           </p>
@@ -52,7 +52,7 @@ export default async function ThankYouPage({ params }: { params: Promise<{ progr
         {config.siteVisitRequired && (
           <div className="bg-orange-50 border border-orange-200 p-8 rounded-xl mb-8 text-center">
             <h3 className="text-xl font-bold text-gray-900 mb-2">Schedule Your Site Visit</h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-black mb-4">
               Book your 15-minute Zoom site visit now. We&apos;ll walk through your {config.siteLabel} and answer any questions.
             </p>
             <a
@@ -71,14 +71,14 @@ export default async function ThankYouPage({ params }: { params: Promise<{ progr
             <Clock className="w-5 h-5 text-brand-blue-600" />
             <span className="font-semibold text-gray-900">Confirmation Email Sent</span>
           </div>
-          <p className="text-gray-600 text-sm">
+          <p className="text-black text-sm">
             Check your inbox for a confirmation email with your application details, program info, and the MOU template.
           </p>
         </div>
 
         <div className="bg-white p-6 rounded-xl border border-gray-200 mb-8">
           <h3 className="font-semibold text-gray-900 mb-3">What Happens Next</h3>
-          <ol className="space-y-2 text-sm text-gray-600">
+          <ol className="space-y-2 text-sm text-black">
             <li className="flex gap-2"><span className="font-bold text-orange-500">1.</span> We verify your credentials (1-3 business days)</li>
             {config.siteVisitRequired && (
               <li className="flex gap-2"><span className="font-bold text-orange-500">2.</span> Video site visit via Zoom (~15 minutes)</li>

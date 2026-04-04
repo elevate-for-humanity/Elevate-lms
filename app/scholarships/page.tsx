@@ -74,30 +74,33 @@ const scholarshipTypes = (dbRows as any[]) || [];
       </div>
 
       {/* Hero */}
-      <section className="relative h-[50vh] min-h-[400px] overflow-hidden">
-        <Image alt="Scholarship opportunities" 
-          src="/images/pages/scholarships-page-1.jpg" 
-          alt="Scholarships and Financial Aid" 
-          fill 
-          className="object-cover" 
-          priority 
-         sizes="100vw" />
-        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
-          <div className="max-w-5xl mx-auto">
+      <section className="relative w-full">
+        <div className="relative h-[50vh] min-h-[360px] overflow-hidden">
+          <Image
+            src="/images/pages/scholarships-page-1.jpg"
+            alt="Scholarships and Financial Aid"
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+          />
+        </div>
+        <div className="bg-white py-10 border-t">
+          <div className="max-w-5xl mx-auto px-6 text-center">
             <div className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
               <GraduationCap className="w-4 h-4" /> Funding Available
             </div>
-            <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-4">
-              Scholarships & Financial Aid
+            <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
+              Scholarships &amp; Financial Aid
             </h1>
-            <p className="text-xl text-white/90 max-w-xl mb-6">
+            <p className="text-lg text-black max-w-xl mx-auto mb-6">
               Don&apos;t let cost stop you. Most students pay $0 for training through WIOA funding, scholarships, and employer sponsorships.
             </p>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4 justify-center">
               <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 bg-brand-green-600 hover:bg-brand-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
                 Check Eligibility <ArrowRight className="w-5 h-5" />
               </Link>
-              <Link href="/start" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold text-lg transition-all border border-white/40">
+              <Link href="/start" className="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-900 px-8 py-4 rounded-full font-bold text-lg transition-all border border-slate-300">
                 Apply Now
               </Link>
             </div>
@@ -111,19 +114,19 @@ const scholarshipTypes = (dbRows as any[]) || [];
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
               <div className="text-3xl font-bold text-brand-green-400">85%</div>
-              <div className="text-slate-400 text-sm">Students Pay $0</div>
+              <div className="text-black text-sm">Students Pay $0</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-brand-blue-400">$5M+</div>
-              <div className="text-slate-400 text-sm">Funding Awarded</div>
+              <div className="text-black text-sm">Funding Awarded</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-yellow-400">1,000+</div>
-              <div className="text-slate-400 text-sm">Students Funded</div>
+              <div className="text-black text-sm">Students Funded</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-brand-blue-400">10+</div>
-              <div className="text-slate-400 text-sm">Funding Sources</div>
+              <div className="text-black text-sm">Funding Sources</div>
             </div>
           </div>
         </div>
@@ -133,7 +136,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-center mb-4">Funding Options</h2>
-          <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
+          <p className="text-center text-black mb-12 max-w-2xl mx-auto">
             Multiple ways to fund your training. Our team helps you find the best option.
           </p>
           
@@ -151,13 +154,13 @@ const scholarshipTypes = (dbRows as any[]) || [];
                     </div>
                   </div>
                 </div>
-                <p className="text-slate-600 mb-4">{option.desc}</p>
+                <p className="text-black mb-4">{option.desc}</p>
                 <div className="border-t pt-4">
                   <p className="text-sm font-semibold text-slate-700 mb-2">Eligibility:</p>
                   <ul className="space-y-1">
                     {option.eligibility.map((item, j) => (
-                      <li key={j} className="flex items-center gap-2 text-sm text-slate-600">
-                        <span className="text-slate-500 flex-shrink-0">•</span>
+                      <li key={j} className="flex items-center gap-2 text-sm text-black">
+                        <span className="text-black flex-shrink-0">•</span>
                         {item}
                       </li>
                     ))}
@@ -178,30 +181,30 @@ const scholarshipTypes = (dbRows as any[]) || [];
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-6">WIOA: Your Best Option</h2>
-              <p className="text-lg text-slate-600 mb-6">
+              <p className="text-lg text-black mb-6">
                 The Workforce Innovation and Opportunity Act (WIOA) is federal funding that pays for 
                 career training for eligible adults. Most of our students qualify.
               </p>
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
-                  <span className="text-slate-500 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <div>
                     <h3 className="font-bold text-slate-900">Covers Everything</h3>
-                    <p className="text-slate-600">Tuition, books, supplies, uniforms, certification exams</p>
+                    <p className="text-black">Tuition, books, supplies, uniforms, certification exams</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <span className="text-slate-500 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <div>
                     <h3 className="font-bold text-slate-900">Support Services</h3>
-                    <p className="text-slate-600">Transportation, childcare, work clothes assistance</p>
+                    <p className="text-black">Transportation, childcare, work clothes assistance</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <span className="text-slate-500 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <div>
                     <h3 className="font-bold text-slate-900">No Repayment</h3>
-                    <p className="text-slate-600">This is a grant, not a loan. Nothing to pay back.</p>
+                    <p className="text-black">This is a grant, not a loan. Nothing to pay back.</p>
                   </div>
                 </div>
               </div>
@@ -211,7 +214,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
             </div>
             <div className="bg-white rounded-2xl p-8 shadow-xl">
               <h3 className="text-xl font-bold text-slate-900 mb-6">Who Qualifies for WIOA?</h3>
-              <p className="text-slate-600 mb-4">You may qualify if you meet ANY of these:</p>
+              <p className="text-black mb-4">You may qualify if you meet ANY of these:</p>
               <ul className="space-y-3">
                 {[
                   'Low income (below 70% of median income)',
@@ -227,7 +230,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3 text-slate-700">
                     <div className="w-6 h-6 bg-brand-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-slate-500 flex-shrink-0">•</span>
+                      <span className="text-black flex-shrink-0">•</span>
                     </div>
                     {item}
                   </li>
@@ -242,7 +245,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-center mb-4">Elevate Scholarships</h2>
-          <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
+          <p className="text-center text-black mb-12 max-w-2xl mx-auto">
             For students who don&apos;t qualify for WIOA, we offer need-based scholarships.
           </p>
           
@@ -252,8 +255,8 @@ const scholarshipTypes = (dbRows as any[]) || [];
                 <Award className="w-10 h-10 text-yellow-500 mx-auto mb-4" />
                 <h3 className="font-bold text-lg text-slate-900 mb-2">{scholarship.name}</h3>
                 <div className="text-2xl font-bold text-brand-green-600 mb-2">{scholarship.amount}</div>
-                <div className="text-sm text-slate-500 mb-4">Deadline: {scholarship.deadline}</div>
-                <p className="text-sm text-slate-600">{scholarship.criteria}</p>
+                <div className="text-sm text-black mb-4">Deadline: {scholarship.deadline}</div>
+                <p className="text-sm text-black">{scholarship.criteria}</p>
               </div>
             ))}
           </div>
@@ -272,7 +275,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
                   {step.num}
                 </div>
                 <h3 className="font-bold text-slate-900 mb-2">{step.title}</h3>
-                <p className="text-slate-600 text-sm">{step.desc}</p>
+                <p className="text-black text-sm">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -305,7 +308,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
             ].map((faq, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
                 <h3 className="font-bold text-lg text-slate-900 mb-2">{faq.q}</h3>
-                <p className="text-slate-600">{faq.a}</p>
+                <p className="text-black">{faq.a}</p>
               </div>
             ))}
           </div>
@@ -318,7 +321,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
           <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">
             Don&apos;t Let Cost Stop You
           </h2>
-          <p className="text-xl text-slate-600 mb-8">
+          <p className="text-xl text-black mb-8">
             85% of our students pay $0 for training. Let us help you find funding.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

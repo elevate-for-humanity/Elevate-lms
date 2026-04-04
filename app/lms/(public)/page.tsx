@@ -58,9 +58,9 @@ export default async function LmsPublicPage() {
             <Image src="/images/Elevate_for_Humanity_logo_81bf0fab.jpg" alt="Elevate for Humanity" width={120} height={32} className="h-8 w-auto" />
           </Link>
           <div className="flex items-center gap-3">
-            <Link href="/programs" className="text-sm text-slate-600 hover:text-slate-900 font-medium hidden sm:block">Browse Programs</Link>
+            <Link href="/lms/programs" className="text-sm text-slate-600 hover:text-slate-900 font-medium hidden sm:block">Browse Programs</Link>
             <Link href="/login" className="text-sm text-slate-600 hover:text-slate-900 font-medium border border-slate-200 px-3 py-1.5 rounded-lg">Sign In</Link>
-            <Link href="/programs" className="text-sm bg-slate-900 text-white font-semibold px-4 py-1.5 rounded-lg hover:bg-slate-700 transition">Enroll Now</Link>
+            <Link href="/lms/programs" className="text-sm bg-slate-900 text-white font-semibold px-4 py-1.5 rounded-lg hover:bg-slate-700 transition">Enroll Now</Link>
           </div>
         </div>
       </nav>
@@ -79,7 +79,7 @@ export default async function LmsPublicPage() {
             <Link href={buildLoginRedirect("/lms/courses")} className="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-700 text-white font-bold px-8 py-4 rounded-xl text-base transition">
               Enter Student Portal <ChevronRight className="w-4 h-4" />
             </Link>
-            <Link href="/programs" className="w-full sm:w-auto flex items-center justify-center gap-2 border-2 border-slate-200 hover:border-slate-400 text-slate-900 font-bold px-8 py-4 rounded-xl text-base transition">
+            <Link href="/lms/programs" className="w-full sm:w-auto flex items-center justify-center gap-2 border-2 border-slate-200 hover:border-slate-400 text-slate-900 font-bold px-8 py-4 rounded-xl text-base transition">
               Browse Programs
             </Link>
           </div>
@@ -119,7 +119,7 @@ export default async function LmsPublicPage() {
             ))}
           </div>
           <div className="text-center mt-8">
-            <Link href="/programs" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 border border-slate-200 px-5 py-2.5 rounded-xl hover:bg-slate-50 transition">
+            <Link href="/lms/programs" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 border border-slate-200 px-5 py-2.5 rounded-xl hover:bg-slate-50 transition">
               View All Programs <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -151,7 +151,7 @@ export default async function LmsPublicPage() {
           </div>
           <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
             <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-slate-700 border border-slate-200 bg-white px-5 py-2.5 rounded-xl hover:bg-slate-50 transition text-center">Indiana Career Connect →</a>
-            <Link href="/programs/federal-funded" className="text-sm font-semibold text-white bg-slate-900 px-5 py-2.5 rounded-xl hover:bg-slate-700 transition text-center">Check My Eligibility</Link>
+            <Link href="/lms/programs" className="text-sm font-semibold text-white bg-slate-900 px-5 py-2.5 rounded-xl hover:bg-slate-700 transition text-center">Check My Eligibility</Link>
           </div>
         </div>
       </section>
@@ -171,7 +171,7 @@ export default async function LmsPublicPage() {
           <p className="text-slate-400 text-base mb-8">Create your account and enroll in minutes.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href={buildLoginRedirect("/lms/courses")} className="w-full sm:w-auto bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl text-base transition">Enter Student Portal</Link>
-            <Link href="/programs" className="w-full sm:w-auto border-2 border-slate-600 hover:border-slate-400 text-white font-bold px-8 py-4 rounded-xl text-base transition">Browse Programs</Link>
+            <Link href="/lms/programs" className="w-full sm:w-auto border-2 border-slate-600 hover:border-slate-400 text-white font-bold px-8 py-4 rounded-xl text-base transition">Browse Programs</Link>
           </div>
         </div>
       </section>

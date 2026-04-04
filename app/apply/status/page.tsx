@@ -98,7 +98,7 @@ export default function ApplicationStatusPage() {
       <div className="max-w-xl mx-auto px-4">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Check Application Status</h1>
-          <p className="text-slate-600">Enter your Application ID and email from your confirmation to check status</p>
+          <p className="text-black">Enter your Application ID and email from your confirmation to check status</p>
         </div>
 
         <form onSubmit={handleSearch} className="bg-white rounded-lg shadow-sm border p-6 mb-6">
@@ -152,11 +152,11 @@ export default function ApplicationStatusPage() {
               <div className="mt-6 w-full bg-white rounded-lg p-4">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-slate-500">Program</span>
+                    <span className="text-black">Program</span>
                     <p className="font-medium">{application.program_id || 'Not specified'}</p>
                   </div>
                   <div>
-                    <span className="text-slate-500">Submitted</span>
+                    <span className="text-black">Submitted</span>
                     <p className="font-medium">
                       {new Date(application.submitted_at).toLocaleDateString()}
                     </p>
@@ -178,11 +178,11 @@ export default function ApplicationStatusPage() {
 
         {searched && !application && !error && (
           <div className="bg-white rounded-lg p-6 text-center">
-            <p className="text-slate-600">No application found. Did you use a different email?</p>
+            <p className="text-black">No application found. Did you use a different email?</p>
           </div>
         )}
 
-        <div className="mt-8 text-center text-slate-600">
+        <div className="mt-8 text-center text-black">
           <p>Need help? Contact us at <a href="tel:317-314-3757" className="text-emerald-600 font-medium">317-314-3757</a></p>
           <p className="mt-2">
             <Link href="/start" className="text-emerald-600 hover:underline">Submit a new application</Link>

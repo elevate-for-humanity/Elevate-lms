@@ -41,13 +41,13 @@ export default function TrainingPage() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
               <h2 className="text-3xl font-black text-slate-900 mb-6">About the Program</h2>
-              <p className="text-lg text-slate-600 mb-5 leading-relaxed">
+              <p className="text-lg text-black mb-5 leading-relaxed">
                 Supersonic Fast Cash offers a complete tax preparer training program for individuals who want to start a career in tax preparation. The program is offered through Elevate for Humanity's workforce training division and is available in-person and online.
               </p>
-              <p className="text-slate-600 mb-5 leading-relaxed">
+              <p className="text-black mb-5 leading-relaxed">
                 No prior tax or accounting experience is required. The program covers everything from basic tax law to IRS e-file procedures and client service. Graduates are prepared to sit for the IRS PTIN registration and begin preparing returns immediately.
               </p>
-              <p className="text-slate-600 mb-8 leading-relaxed">
+              <p className="text-black mb-8 leading-relaxed">
                 Funding may be available for qualifying participants through WIOA, Indiana DWD, and other workforce development programs. Contact us to discuss your eligibility.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -67,7 +67,7 @@ export default function TrainingPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-12">
             <h2 className="text-3xl font-black text-slate-900 mb-4">What You Will Learn</h2>
-            <p className="text-xl text-slate-600 max-w-2xl leading-relaxed">Six modules covering everything you need to prepare individual and small business returns professionally.</p>
+            <p className="text-xl text-black max-w-2xl leading-relaxed">Six modules covering everything you need to prepare individual and small business returns professionally.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {MODULES.map((mod) => (
@@ -77,7 +77,7 @@ export default function TrainingPage() {
                 </div>
                 <div className="p-5 flex-1 bg-white">
                   <h3 className="font-bold text-slate-900 mb-2">{mod.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{mod.desc}</p>
+                  <p className="text-black text-sm leading-relaxed">{mod.desc}</p>
                 </div>
               </div>
             ))}
@@ -90,7 +90,7 @@ export default function TrainingPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-12">
             <h2 className="text-3xl font-black text-slate-900 mb-4">What You Earn</h2>
-            <p className="text-xl text-slate-600 max-w-2xl leading-relaxed">Graduates leave with credentials and network access to start earning immediately.</p>
+            <p className="text-xl text-black max-w-2xl leading-relaxed">Graduates leave with credentials and network access to start earning immediately.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {OUTCOMES.map((item) => (
@@ -100,7 +100,7 @@ export default function TrainingPage() {
                 </div>
                 <div className="p-5 flex-1 bg-white">
                   <h3 className="font-bold text-slate-900 mb-2">{item.label}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                  <p className="text-black text-sm leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -109,15 +109,15 @@ export default function TrainingPage() {
       </section>
 
       {/* CTA */}
-      <section className="relative h-[45vh] min-h-[320px]">
-        <Image src="/images/pages/supersonic-training-hero.jpg" alt="Start your tax career" fill className="object-cover object-center" sizes="100vw" />
-        <div className="absolute inset-0 bg-slate-900/70 flex items-center justify-center">
-          <div className="text-center px-4">
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Start Your Tax Career</h2>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/supersonic-fast-cash/training/courses" className="px-10 py-4 bg-brand-red-600 text-white font-black text-xl rounded-xl hover:bg-brand-red-700 transition-colors">View Courses</Link>
-              <Link href="/supersonic-fast-cash/careers" className="px-10 py-4 bg-white text-slate-900 font-black text-xl rounded-xl hover:bg-slate-100 transition-colors">Join Our Team</Link>
-            </div>
+      <section className="relative w-full">
+        <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
+          <Image src="/images/pages/supersonic-training-hero.jpg" alt="Start your tax career" fill className="object-cover object-center" sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-12 text-center px-4">
+          <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Start Your Tax Career</h2>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/supersonic-fast-cash/training/courses" className="px-10 py-4 bg-brand-red-600 text-white font-black text-xl rounded-xl hover:bg-brand-red-700 transition-colors">View Courses</Link>
+            <Link href="/supersonic-fast-cash/careers" className="px-10 py-4 bg-white text-black font-black text-xl rounded-xl hover:bg-slate-100 transition-colors">Join Our Team</Link>
           </div>
         </div>
       </section>

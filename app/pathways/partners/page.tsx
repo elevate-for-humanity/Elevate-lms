@@ -47,7 +47,7 @@ export default function PartnersPage() {
       <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">How a Custom Cohort Works</h2>
-          <p className="text-gray-600 mb-8">
+          <p className="text-black mb-8">
             This is the process from first conversation to final outcome report. Most cohorts
             are up and running within 2–3 weeks of initial contact.
           </p>
@@ -108,7 +108,7 @@ export default function PartnersPage() {
                   <div className="p-5 flex-1">
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="font-bold text-gray-900">{s.title}</h3>
-                      <span className="text-xs text-gray-400 font-medium whitespace-nowrap ml-3">{s.time}</span>
+                      <span className="text-xs text-black font-medium whitespace-nowrap ml-3">{s.time}</span>
                     </div>
                     <p className="text-sm text-gray-700">{s.desc}</p>
                   </div>
@@ -123,7 +123,7 @@ export default function PartnersPage() {
       <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">What Reports You Receive</h2>
-          <p className="text-gray-600 mb-8">
+          <p className="text-black mb-8">
             Reports are generated from our learning platform — not self-reported. You can request
             reports at any time, and we send them in the format you need (PDF, spreadsheet, or
             direct access to the platform).
@@ -231,7 +231,7 @@ export default function PartnersPage() {
                   </div>
                   <div className="p-5 flex-1">
                     <h3 className="text-lg font-bold text-gray-900 mb-1">{p.type}</h3>
-                    <p className="text-xs text-gray-400 mb-3">Examples: {p.examples}</p>
+                    <p className="text-xs text-black mb-3">Examples: {p.examples}</p>
                     <ul className="space-y-2 text-sm text-gray-700">
                       {p.what.map((item) => (
                         <li key={item} className="flex items-start gap-2">
@@ -251,7 +251,7 @@ export default function PartnersPage() {
       <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">Programs Available for Custom Cohorts</h2>
-          <p className="text-gray-600 mb-6 text-sm">
+          <p className="text-black mb-6 text-sm">
             Any of these programs can be configured as a dedicated cohort for your organization.
             Click any program for full details.
           </p>
@@ -278,9 +278,9 @@ export default function PartnersPage() {
                 ].map((r) => (
                   <tr key={r.name} className="hover:bg-white">
                     <td className="px-4 py-3"><Link href={r.href} className="font-medium text-brand-blue-600 hover:text-brand-blue-700">{r.name}</Link></td>
-                    <td className="px-4 py-3 text-gray-600">{r.duration}</td>
-                    <td className="px-4 py-3 text-gray-600">{r.credential}</td>
-                    <td className="px-4 py-3 text-gray-600 hidden sm:table-cell">{r.funding}</td>
+                    <td className="px-4 py-3 text-black">{r.duration}</td>
+                    <td className="px-4 py-3 text-black">{r.credential}</td>
+                    <td className="px-4 py-3 text-black hidden sm:table-cell">{r.funding}</td>
                   </tr>
                 ))}
               </tbody>
@@ -293,7 +293,7 @@ export default function PartnersPage() {
       <section className="py-14 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Set Up a Cohort?</h2>
-          <p className="text-lg text-brand-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-white mb-8 max-w-2xl mx-auto">
             Tell us about your organization, your participants, and your timeline.
             We typically have a cohort plan ready within one week.
           </p>

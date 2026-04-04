@@ -72,12 +72,12 @@ export default function HairTestsPage() {
 {/* Hero */}
       <section className="relative py-20 bg-brand-blue-700 text-white">
         <div className="max-w-6xl mx-auto px-6">
-          <Link href="/drug-testing" className="inline-flex items-center gap-2 text-brand-blue-200 hover:text-white mb-6 transition">
+          <Link href="/drug-testing" className="inline-flex items-center gap-2 text-white hover:text-white mb-6 transition">
             <ArrowLeft className="w-4 h-4" />
             Back to Drug Testing
           </Link>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Hair Follicle Tests</h1>
-          <p className="text-xl text-brand-blue-100 max-w-2xl">
+          <p className="text-xl text-white max-w-2xl">
             The gold standard for pre-employment screening. Hair testing provides a 90-day detection window 
             and is extremely difficult to cheat.
           </p>
@@ -248,7 +248,7 @@ export default function HairTestsPage() {
       <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready for Thorough Screening?</h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Hair testing gives you the most complete picture of a candidate's drug use history.
           </p>
           <a

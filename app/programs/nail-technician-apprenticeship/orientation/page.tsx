@@ -22,19 +22,19 @@ export default function NailTechOrientationPage() {
           <p>Upon successful completion of this program, you will be eligible to:</p>
           <ul className="space-y-2">
             <li className="flex items-start gap-2">
-              <span className="text-slate-500 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <span>Obtain your {config.licenseTitle} through the {config.licensingBody}</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-slate-500 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <span>Work legally as a licensed nail technician in the state of Indiana</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-slate-500 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <span>Earn {config.salaryRange} annually depending on location and clientele</span>
             </li>
           </ul>
-          <p className="text-sm text-slate-600 mt-4">
+          <p className="text-sm text-black mt-4">
             This is a USDOL Registered Apprenticeship program. Your credential is nationally recognized.
           </p>
         </div>
@@ -56,7 +56,7 @@ export default function NailTechOrientationPage() {
               <p className="text-brand-blue-800 text-sm">{config.rtiDescription}</p>
             </div>
           </div>
-          <p className="text-sm text-slate-600 mt-4">
+          <p className="text-sm text-black mt-4">
             Your hours are logged digitally and verified by your instructor. Track progress in your dashboard.
           </p>
         </div>
@@ -109,7 +109,7 @@ export default function NailTechOrientationPage() {
               <span className="font-bold">{config.tuition.paymentFrequency}</span>
             </div>
           </div>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-black">
             {config.tuition.fundingNote}
           </p>
           <p className="text-sm text-brand-red-600 font-medium">
@@ -126,19 +126,19 @@ export default function NailTechOrientationPage() {
           <p>By continuing, you acknowledge:</p>
           <ul className="space-y-2">
             <li className="flex items-start gap-2">
-              <span className="text-slate-500 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <span>This is a state-regulated apprenticeship program with legal requirements</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-slate-500 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <span>You must complete all required hours and coursework to earn your license</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-slate-500 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <span>Your progress is tracked and reported to regulatory bodies</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-slate-500 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <span>Withdrawal or dismissal does not automatically entitle you to a refund</span>
             </li>
           </ul>
@@ -188,7 +188,7 @@ export default function NailTechOrientationPage() {
       <div className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-slate-600">Orientation Progress</span>
+            <span className="text-sm font-medium text-black">Orientation Progress</span>
             <span className="text-sm font-bold text-slate-900">{currentSection + 1} of {sections.length}</span>
           </div>
           <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
@@ -222,7 +222,7 @@ export default function NailTechOrientationPage() {
                 <span className="text-slate-700">
                   <strong>I understand my responsibilities and agree to proceed.</strong>
                   <br />
-                  <span className="text-sm text-slate-500">By checking this box, I confirm I have read and understood all orientation materials.</span>
+                  <span className="text-sm text-black">By checking this box, I confirm I have read and understood all orientation materials.</span>
                 </span>
               </label>
             </div>
@@ -232,7 +232,7 @@ export default function NailTechOrientationPage() {
             <button
               onClick={handlePrevious}
               disabled={currentSection === 0}
-              className="px-6 py-3 text-slate-600 font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:text-slate-900 transition"
+              className="px-6 py-3 text-black font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:text-slate-900 transition"
             >
               Previous
             </button>
@@ -251,7 +251,7 @@ export default function NailTechOrientationPage() {
             )}
           </div>
         </div>
-        <p className="text-center text-slate-500 text-sm mt-6">Estimated time: {config.estimatedTime}</p>
+        <p className="text-center text-black text-sm mt-6">Estimated time: {config.estimatedTime}</p>
       </div>
     </div>
   );

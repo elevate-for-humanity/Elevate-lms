@@ -177,7 +177,7 @@ export default function ApprenticeshipSponsorPage() {
               <span className="bg-white text-brand-red-600 text-xs font-bold px-2.5 py-1 rounded">2</span>
               <div>
                 <p className="font-bold">Elevate for Humanity Career &amp; Technical Institute — Training Division</p>
-                <p className="text-brand-red-100 text-sm">RTI delivery, curriculum, LMS, workforce enrollment</p>
+                <p className="text-white text-sm">RTI delivery, curriculum, LMS, workforce enrollment</p>
               </div>
             </div>
             <div className="bg-white rounded-xl p-5 flex items-center gap-4">

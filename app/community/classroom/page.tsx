@@ -69,19 +69,19 @@ export default async function ClassroomPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
               <p className="text-3xl font-bold text-gray-900">{totalCourses}</p>
-              <p className="text-gray-600">Courses</p>
+              <p className="text-black">Courses</p>
             </div>
             <div>
               <p className="text-3xl font-bold text-gray-900">{totalCourses * 8}+</p>
-              <p className="text-gray-600">Video Lessons</p>
+              <p className="text-black">Video Lessons</p>
             </div>
             <div>
               <p className="text-3xl font-bold text-gray-900">{totalStudents || 0}</p>
-              <p className="text-gray-600">Students</p>
+              <p className="text-black">Students</p>
             </div>
             <div>
               <p className="text-3xl font-bold text-gray-900">4.8</p>
-              <p className="text-gray-600">Avg Rating</p>
+              <p className="text-black">Avg Rating</p>
             </div>
           </div>
         </div>
@@ -93,7 +93,7 @@ export default async function ClassroomPage() {
           <div className="flex items-center justify-between mb-12">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Available Courses</h2>
-              <p className="text-gray-600">Start learning with our courses</p>
+              <p className="text-black">Start learning with our courses</p>
             </div>
           </div>
 
@@ -101,7 +101,7 @@ export default async function ClassroomPage() {
             <div className="text-center py-16 bg-white rounded-2xl border">
               <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2">No Courses Available</h3>
-              <p className="text-gray-600 mb-6">No courses are published yet. Contact us to learn about upcoming programs.</p>
+              <p className="text-black mb-6">No courses are published yet. Contact us to learn about upcoming programs.</p>
               <Link
                 href="/community"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700"
@@ -127,7 +127,7 @@ export default async function ClassroomPage() {
                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                       ) : (
                         <div className="absolute inset-0 bg-white flex items-center justify-center">
-                          <BookOpen className="w-16 h-16 text-slate-400" />
+                          <BookOpen className="w-16 h-16 text-black" />
                         </div>
                       )}
                       {isFree ? (
@@ -147,9 +147,9 @@ export default async function ClassroomPage() {
                     </div>
                     <div className="p-6">
                       <h3 className="font-bold text-gray-900 mb-2">{course.course_name}</h3>
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">{course.description}</p>
+                      <p className="text-black text-sm mb-4 line-clamp-2">{course.description}</p>
 
-                      <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                      <div className="flex items-center gap-4 text-sm text-black mb-4">
                         <span className="flex items-center gap-1">
                           <Clock className="w-4 h-4" />
                           {course.duration_hours || 2} hours
@@ -186,7 +186,7 @@ export default async function ClassroomPage() {
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Start Learning?</h2>
-          <p className="text-brand-green-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-white mb-8 max-w-2xl mx-auto">
             Join our community to access all free courses and unlock premium content.
           </p>
           <Link

@@ -110,14 +110,14 @@ export default function WOTCSection() {
             {/* Stacking callout */}
             <div className="bg-brand-blue-700 text-white rounded-xl p-6">
               <h4 className="font-bold text-lg mb-2">WOTC + OJT = Maximum Savings</h4>
-              <p className="text-brand-blue-100 text-sm mb-3">
+              <p className="text-white text-sm mb-3">
                 These two programs can be used on the <strong>same hire</strong>. That means you get
                 wage reimbursement from OJT <em>and</em> a federal tax credit from WOTC on the same
                 employee.
               </p>
               <div className="bg-white/10 rounded-lg p-4 text-sm">
                 <div className="font-semibold mb-2">Example: Hiring a veteran CNA graduate</div>
-                <div className="space-y-1 text-brand-blue-100">
+                <div className="space-y-1 text-white">
                   <div className="flex justify-between">
                     <span>OJT reimbursement (75% of wages, 3 months)</span>
                     <span className="font-bold text-white">$6,480</span>
@@ -132,7 +132,7 @@ export default function WOTCSection() {
                   </div>
                 </div>
               </div>
-              <p className="text-xs text-brand-blue-200 mt-3 italic">
+              <p className="text-xs text-white mt-3 italic">
                 Consult your tax advisor for specifics on combining WOTC and OJT for the same employee.
               </p>
             </div>

@@ -20,12 +20,12 @@ export default function InquiryReceivedPage() {
         <h1 className="text-2xl font-bold text-slate-800 mb-3">
           We received your inquiry!
         </h1>
-        <p className="text-slate-600 mb-2 leading-relaxed">
+        <p className="text-black mb-2 leading-relaxed">
           Thank you for your interest in Elevate for Humanity. An advisor will
           follow up with you within <strong>1–2 business days</strong> with program
           details, costs, and next steps.
         </p>
-        <p className="text-slate-500 text-sm mb-8">
+        <p className="text-black text-sm mb-8">
           Check your email for a confirmation. Questions? Call us at{' '}
           <a href="tel:+13173143757" className="text-brand-blue-600 font-semibold">(317) 314-3757</a>{' '}
           or email{' '}

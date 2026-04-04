@@ -71,9 +71,9 @@ export default function SupportPage() {
                   <Image src={item.image} alt={item.label} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 33vw" />
                 </div>
                 <div className="p-5 flex-1 bg-white">
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">{item.label}</p>
+                  <p className="text-xs font-semibold text-black uppercase tracking-wide mb-1">{item.label}</p>
                   <p className="font-bold text-slate-900 group-hover:text-brand-red-600 transition-colors mb-1">{item.value}</p>
-                  <p className="text-sm text-slate-500">{item.desc}</p>
+                  <p className="text-sm text-black">{item.desc}</p>
                 </div>
               </a>
             ))}
@@ -98,7 +98,7 @@ export default function SupportPage() {
                   {cat.questions.map((faq) => (
                     <div key={faq.q} className="bg-white rounded-xl p-6 border border-slate-200">
                       <p className="font-bold text-slate-900 mb-2">{faq.q}</p>
-                      <p className="text-slate-600 text-sm leading-relaxed">{faq.a}</p>
+                      <p className="text-black text-sm leading-relaxed">{faq.a}</p>
                     </div>
                   ))}
                 </div>
@@ -128,15 +128,15 @@ export default function SupportPage() {
       </section>
 
       {/* CTA */}
-      <section className="relative h-[45vh] min-h-[320px]">
-        <Image src="/images/pages/supersonic-page-9.jpg" alt="Start your tax return" fill className="object-cover object-center" sizes="100vw" />
-        <div className="absolute inset-0 bg-slate-900/70 flex items-center justify-center">
-          <div className="text-center px-4">
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Ready to File?</h2>
-            <Link href="/supersonic-fast-cash/start" className="px-10 py-4 bg-brand-red-600 text-white font-black text-xl rounded-xl hover:bg-brand-red-700 transition-colors">
-              Start Tax Preparation
-            </Link>
-          </div>
+      <section className="relative w-full">
+        <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
+          <Image src="/images/pages/supersonic-page-9.jpg" alt="Start your tax return" fill className="object-cover object-center" sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-12 text-center px-4">
+          <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Ready to File?</h2>
+          <Link href="/supersonic-fast-cash/start" className="px-10 py-4 bg-brand-red-600 text-white font-black text-xl rounded-xl hover:bg-brand-red-700 transition-colors">
+            Start Tax Preparation
+          </Link>
         </div>
       </section>
     </div>

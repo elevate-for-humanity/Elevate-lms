@@ -50,7 +50,7 @@ export default function KingdomKonnectPage() {
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Partner With Us</h2>
-          <p className="text-xl text-brand-blue-100 mb-8">Join our network of faith-based organizations making a difference.</p>
+          <p className="text-xl text-white mb-8">Join our network of faith-based organizations making a difference.</p>
           <Link href="/partners" className="bg-white hover:bg-white text-brand-blue-900 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Learn More <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
@@ -60,7 +60,7 @@ export default function KingdomKonnectPage() {
       <section className="py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>
+          <p className="text-white mb-6">Check your eligibility for funded career training programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"

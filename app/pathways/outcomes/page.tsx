@@ -213,13 +213,13 @@ export default function OutcomesPage() {
 
               <div className="p-6 sm:p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-1">{p.name}</h2>
-                <p className="text-sm text-gray-500 mb-6">{p.duration} · {p.credential}</p>
+                <p className="text-sm text-black mb-6">{p.duration} · {p.credential}</p>
 
                 {/* What this credential is */}
                 <div className="mb-6">
                   <h3 className="font-bold text-gray-900 mb-2">What this credential is</h3>
                   <p className="text-sm text-gray-700">{p.whatItMeans}</p>
-                  <p className="text-xs text-gray-500 mt-1">Issued by: {p.issuedBy}</p>
+                  <p className="text-xs text-black mt-1">Issued by: {p.issuedBy}</p>
                 </div>
 
                 {/* What training looks like */}
@@ -281,7 +281,7 @@ export default function OutcomesPage() {
       <section className="py-14 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Which Program Is Right for You?</h2>
-          <p className="text-lg text-brand-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-white mb-8 max-w-2xl mx-auto">
             Not sure where to start? Check your eligibility — it takes about 5 minutes.
             We will help you find the right program and the right funding.
           </p>

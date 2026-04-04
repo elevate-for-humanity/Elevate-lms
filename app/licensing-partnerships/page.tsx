@@ -146,25 +146,26 @@ export default function LicensingPartnershipsPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-64 md:h-96 overflow-hidden">
-        <Image
-          src="/images/pages/workforce-partnership-hero.jpg"
-          alt="Workforce development partnerships — Elevate for Humanity"
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-slate-900/55" />
-        <div className="absolute inset-0 flex items-center">
-          <div className="max-w-6xl mx-auto px-6">
-            <p className="text-brand-red-300 font-bold text-xs uppercase tracking-widest mb-3">
+      <section className="relative w-full">
+        <div className="relative h-64 md:h-96 overflow-hidden">
+          <Image
+            src="/images/pages/workforce-partnership-hero.jpg"
+            alt="Workforce development partnerships — Elevate for Humanity"
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+          />
+        </div>
+        <div className="bg-white py-10 border-t">
+          <div className="max-w-6xl mx-auto px-6 text-center">
+            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">
               Licensing &amp; Partnerships
             </p>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight mb-4 max-w-3xl">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 leading-tight mb-4 max-w-3xl mx-auto">
               Build workforce programs on proven infrastructure.
             </h1>
-            <p className="text-slate-200 text-lg max-w-2xl">
+            <p className="text-black text-lg max-w-2xl mx-auto">
               License the platform, join the network, or partner as a training provider, employer, or community organization.
             </p>
           </div>
@@ -177,7 +178,7 @@ export default function LicensingPartnershipsPage() {
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-3">
             Partnership Opportunities
           </h2>
-          <p className="text-slate-600 text-center mb-12 max-w-2xl mx-auto">
+          <p className="text-black text-center mb-12 max-w-2xl mx-auto">
             Three models. Each is designed for a different type of organization with different goals.
           </p>
 
@@ -198,7 +199,7 @@ export default function LicensingPartnershipsPage() {
                 </div>
                 <div className="p-7 flex flex-col flex-1">
                   <h3 className="text-xl font-bold text-slate-900 mb-3">{type.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed mb-5">{type.description}</p>
+                  <p className="text-black text-sm leading-relaxed mb-5">{type.description}</p>
                   <ul className="space-y-2 mb-7 flex-1">
                     {type.benefits.map((b) => (
                       <li key={b} className="flex items-start gap-2 text-sm text-slate-700">
@@ -231,12 +232,12 @@ export default function LicensingPartnershipsPage() {
               <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">
                 License the Elevate Workforce OS
               </h2>
-              <p className="text-slate-600 leading-relaxed mb-4">
+              <p className="text-black leading-relaxed mb-4">
                 The same platform that runs Elevate&apos;s own programs is available for licensing.
                 Workforce boards, training providers, and nonprofits get a fully branded instance
                 with all portals, compliance tools, and reporting — without building anything.
               </p>
-              <p className="text-slate-600 leading-relaxed mb-6">
+              <p className="text-black leading-relaxed mb-6">
                 You get your own domain, your own branding, and your own data. We handle
                 hosting, security, updates, and compliance patches.
               </p>
@@ -281,7 +282,7 @@ export default function LicensingPartnershipsPage() {
                 </div>
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 text-sm mb-1.5">{f.title}</h3>
-                  <p className="text-slate-600 text-xs leading-relaxed">{f.desc}</p>
+                  <p className="text-black text-xs leading-relaxed">{f.desc}</p>
                 </div>
               </div>
             ))}
@@ -295,7 +296,7 @@ export default function LicensingPartnershipsPage() {
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-3">
             How to Become a Partner
           </h2>
-          <p className="text-slate-600 text-center mb-12 max-w-xl mx-auto">
+          <p className="text-black text-center mb-12 max-w-xl mx-auto">
             From first contact to launch, the process takes 2–4 weeks depending on partnership type.
           </p>
 
@@ -326,7 +327,7 @@ export default function LicensingPartnershipsPage() {
                     Step {step.num}
                   </p>
                   <h3 className="text-xl font-bold text-slate-900 mb-3">{step.title}</h3>
-                  <p className="text-slate-600 leading-relaxed">{step.desc}</p>
+                  <p className="text-black leading-relaxed">{step.desc}</p>
                 </div>
               </div>
             ))}
@@ -346,7 +347,7 @@ export default function LicensingPartnershipsPage() {
             ].map((m) => (
               <div key={m.label}>
                 <div className="text-3xl font-black text-brand-red-600 mb-1">{m.value}</div>
-                <div className="text-sm text-slate-600">{m.label}</div>
+                <div className="text-sm text-black">{m.label}</div>
               </div>
             ))}
           </div>
@@ -359,7 +360,7 @@ export default function LicensingPartnershipsPage() {
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">
             Ready to Partner With Us?
           </h2>
-          <p className="text-slate-600 mb-8 max-w-xl mx-auto">
+          <p className="text-black mb-8 max-w-xl mx-auto">
             Book a Zoom call, apply online, or call us directly. All meetings are held via Zoom —
             a link is sent to your email automatically after booking.
           </p>
@@ -385,7 +386,7 @@ export default function LicensingPartnershipsPage() {
               <Phone className="w-4 h-4" /> (317) 314-3757
             </a>
           </div>
-          <p className="text-slate-400 text-sm mt-6">
+          <p className="text-black text-sm mt-6">
             Zoom link sent automatically after booking. No app download required.
           </p>
         </div>

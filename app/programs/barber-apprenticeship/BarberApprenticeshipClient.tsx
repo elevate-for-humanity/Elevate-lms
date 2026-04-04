@@ -40,7 +40,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
       {/* ═══ PROGRAM IDENTITY CARD (below video) ═══ */}
       <section className="border-b border-slate-200 bg-white">
         <div className="max-w-6xl mx-auto px-4 py-8">
-          <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-4">
+          <nav className="flex items-center gap-1.5 text-xs text-black mb-4">
             <Link href="/programs" className="hover:text-brand-blue-600">Programs</Link>
             <ChevronRight className="w-3 h-3" />
             <span className="text-slate-900 font-medium">Barber Apprenticeship</span>
@@ -49,14 +49,14 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Barber Apprenticeship</h1>
             <span className="flex-shrink-0 text-xs font-bold text-white px-3 py-1 rounded-full bg-brand-blue-600">DOL Registered</span>
           </div>
-          <p className="text-slate-600 text-lg mb-6">{p.subtitle}</p>
+          <p className="text-black text-lg mb-6">{p.subtitle}</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-slate-50 rounded-lg p-4">
             <SpecItem icon={Clock} label="Duration" value="52 weeks" />
             <SpecItem icon={BookOpen} label="Hours/Week" value="15–20 hrs" />
             <SpecItem icon={MapPin} label="Delivery" value="Hybrid" />
             <SpecItem icon={Award} label="Credentials" value={`${p.credentials.length} earned`} />
           </div>
-          <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-600">
+          <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-black">
             <span><strong>Schedule:</strong> {p.schedule}</span>
             <span><strong>Cohort:</strong> {p.cohortSize}</span>
             <span><strong>Tuition:</strong> $4,980. Payment plans available.</span>
@@ -150,8 +150,8 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
               <div className="p-5">
                 <h3 className="font-semibold text-slate-900">{item.cred.name}</h3>
                 <p className="text-xs text-brand-blue-600 font-medium mt-1">Issued by {item.cred.issuer}</p>
-                <p className="text-sm text-slate-600 mt-2">{item.cred.description}</p>
-                {item.cred.validity && <p className="text-xs text-slate-500 mt-2">Valid: {item.cred.validity}</p>}
+                <p className="text-sm text-black mt-2">{item.cred.description}</p>
+                {item.cred.validity && <p className="text-xs text-black mt-2">Valid: {item.cred.validity}</p>}
               </div>
             </div>
           ))}
@@ -162,14 +162,14 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
       <section className="py-12 border-t">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-3">Ready to Start?</h2>
-          <p className="text-slate-500 text-center max-w-2xl mx-auto mb-8">
+          <p className="text-black text-center max-w-2xl mx-auto mb-8">
             Choose the right path for where you are in the process.
           </p>
           <div className="grid sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {/* Inquiry Application */}
             <div className="bg-slate-50 border border-slate-200 rounded-xl p-6">
               <h3 className="text-lg font-bold text-slate-900 mb-2">Inquiry Application</h3>
-              <p className="text-sm text-slate-600 leading-relaxed mb-4">
+              <p className="text-sm text-black leading-relaxed mb-4">
                 Not sure if this program is right for you? Submit an inquiry and a career advisor will
                 contact you to discuss eligibility, funding options, and next steps. No commitment required.
                 {' '}<Link href="/forms/barber-apprenticeship-inquiry" className="underline font-medium text-brand-blue-600">Use the inquiry form →</Link>
@@ -184,7 +184,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
             {/* Enrollment Application */}
             <div className="bg-slate-50 border border-slate-200 rounded-xl p-6">
               <h3 className="text-lg font-bold text-slate-900 mb-2">Enrollment Application</h3>
-              <p className="text-sm text-slate-600 leading-relaxed mb-4">
+              <p className="text-sm text-black leading-relaxed mb-4">
                 Ready to enroll? Complete the full application to begin the admissions process.
                 Includes funding eligibility check, background information, and program agreement.
                 BNPL payment plans available.
@@ -219,23 +219,23 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
             <div className="bg-brand-blue-50 rounded-lg p-6 text-center border border-brand-blue-100">
               <TrendingUp className="w-8 h-8 text-brand-blue-600 mx-auto" />
               <div className="text-3xl font-bold text-slate-900 mt-2">{p.laborMarket.growthRate}</div>
-              <div className="text-sm text-slate-600">Job Growth (10-year)</div>
+              <div className="text-sm text-black">Job Growth (10-year)</div>
             </div>
             <div className="bg-white rounded-lg p-6 text-center border border-slate-200">
-              <Building2 className="w-8 h-8 text-slate-600 mx-auto" />
+              <Building2 className="w-8 h-8 text-black mx-auto" />
               <div className="text-lg font-bold text-slate-900 mt-2">Indiana</div>
-              <div className="text-sm text-slate-600">Program Region</div>
+              <div className="text-sm text-black">Program Region</div>
             </div>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {p.careers.map((c, i) => (
               <div key={i} className="flex items-center justify-between bg-white rounded-lg px-4 py-3 border border-slate-200">
                 <span className="font-medium text-slate-900 text-sm">{c.title}</span>
-                <span className="text-sm text-slate-500 font-medium">{c.salary}</span>
+                <span className="text-sm text-black font-medium">{c.salary}</span>
               </div>
             ))}
           </div>
-          <p className="text-xs text-slate-500 mt-3">
+          <p className="text-xs text-black mt-3">
             Compensation is determined by each participating shop and must comply with applicable wage requirements. Elevate tracks training progress and hours.
           </p>
         </div>
@@ -254,9 +254,9 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
             <details key={i} className="group bg-white border border-slate-200 rounded-lg overflow-hidden">
               <summary className="px-5 py-4 cursor-pointer font-medium text-slate-900 hover:bg-white transition-colors flex items-center justify-between">
                 {faq.question}
-                <ChevronRight className="w-4 h-4 text-slate-400 group-open:rotate-90 transition-transform flex-shrink-0" />
+                <ChevronRight className="w-4 h-4 text-black group-open:rotate-90 transition-transform flex-shrink-0" />
               </summary>
-              <div className="px-5 pb-4 text-sm text-slate-600 leading-relaxed">{faq.answer}</div>
+              <div className="px-5 pb-4 text-sm text-black leading-relaxed">{faq.answer}</div>
             </details>
           ))}
         </div>
@@ -288,7 +288,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
                     <Scissors className="w-8 h-8 text-brand-green-600" />
                   </div>
                   <h3 className="text-lg font-bold text-slate-900 mb-2">You&apos;re on the list!</h3>
-                  <p className="text-sm text-slate-600">We&apos;ll contact you when the next cohort opens or when a host shop spot becomes available.</p>
+                  <p className="text-sm text-black">We&apos;ll contact you when the next cohort opens or when a host shop spot becomes available.</p>
                 </div>
               ) : (
                 <form onSubmit={(e) => { e.preventDefault(); setWaitlistSubmitted(true); }} className="space-y-4">
@@ -332,7 +332,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
       {/* ═══ INSTITUTIONAL FOOTER ═══ */}
       <section className="border-t py-8">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 text-sm text-slate-600">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 text-sm text-black">
             <div>
               <h3 className="font-semibold text-slate-900 text-xs uppercase mb-2">Admission Requirements</h3>
               <ul className="space-y-1">
@@ -350,10 +350,10 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
               <ul className="space-y-1">
                 {p.employerPartners.map((r, i) => <li key={i}>• {r}</li>)}
               </ul>
-              {p.bilingualSupport && <p className="mt-3 text-xs text-slate-500">{p.bilingualSupport}</p>}
+              {p.bilingualSupport && <p className="mt-3 text-xs text-black">{p.bilingualSupport}</p>}
             </div>
           </div>
-          <div className="mt-6 pt-4 border-t border-slate-200 text-xs text-slate-400 space-y-1">
+          <div className="mt-6 pt-4 border-t border-slate-200 text-xs text-black space-y-1">
             <p>Modality: {p.modality}</p>
             <p>Facility: {p.facilityInfo}</p>
             <p>Equipment: {p.equipmentIncluded}</p>
@@ -369,7 +369,7 @@ function SpecItem({ icon: Icon, label, value }: { icon: any; label: string; valu
   return (
     <div className="text-center">
       <Icon className="w-5 h-5 text-brand-blue-600 mx-auto mb-1" />
-      <div className="text-xs text-slate-500 uppercase">{label}</div>
+      <div className="text-xs text-black uppercase">{label}</div>
       <div className="font-semibold text-slate-900 text-sm">{value}</div>
     </div>
   );

@@ -92,19 +92,19 @@ export default async function PricingPage() {
                   <span className="text-4xl font-bold">
                     ${tier.price?.toLocaleString()}
                   </span>
-                  <span className={tier.featured ? 'text-brand-orange-100' : 'text-slate-500'}>
+                  <span className={tier.featured ? 'text-white' : 'text-slate-500'}>
                     /year
                   </span>
                 </div>
                 
-                <p className={`mb-6 ${tier.featured ? 'text-brand-orange-100' : 'text-slate-600'}`}>
+                <p className={`mb-6 ${tier.featured ? 'text-white' : 'text-slate-600'}`}>
                   {tier.description}
                 </p>
                 
                 <ul className="space-y-3 mb-8">
                   {tier.features?.map((feature: string, i: number) => (
                     <li key={i} className="flex items-start gap-2">
-                      <span className={`flex-shrink-0 ${tier.featured ? 'text-brand-orange-200' : 'text-slate-400'}`}>•</span>
+                      <span className={`flex-shrink-0 ${tier.featured ? 'text-white' : 'text-slate-400'}`}>•</span>
                       <span className={tier.featured ? 'text-white' : ''}>{feature}</span>
                     </li>
                   ))}
@@ -170,7 +170,7 @@ export default async function PricingPage() {
           <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Ready to Get Started?
           </h2>
-          <p className="text-brand-orange-100 mb-8">
+          <p className="text-white mb-8">
             Schedule a demo to see the platform in action.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

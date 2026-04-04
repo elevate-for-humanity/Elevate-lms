@@ -64,7 +64,7 @@ export default function CoursesCatalog({
             <h1 className="text-5xl font-bold mb-6 text-3xl md:text-4xl lg:text-5xl">
               Course Catalog
             </h1>
-            <p className="text-xl text-brand-blue-100 mb-8">
+            <p className="text-xl text-white mb-8">
               Explore our complete catalog of workforce development courses. All
               programs are Funded through WIOA funding.
             </p>
@@ -358,7 +358,7 @@ export default function CoursesCatalog({
             <h2 className="text-3xl font-bold mb-4">
               Ready to Start Learning?
             </h2>
-            <p className="text-xl text-brand-blue-100 mb-8">
+            <p className="text-xl text-white mb-8">
               All courses are Funded through WIOA funding. No cost to you.
             </p>
             <Link

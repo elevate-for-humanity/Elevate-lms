@@ -279,7 +279,7 @@ export default async function CertificationPage() {
             ) : (
               <p className="text-sm text-gray-500">No certifications available</p>
             )}
-            <Link href="/programs" className="block text-center text-brand-blue-600 text-sm font-medium mt-4 hover:underline">
+            <Link href="/lms/programs" className="block text-center text-brand-blue-600 text-sm font-medium mt-4 hover:underline">
               View All Programs
             </Link>
           </div>

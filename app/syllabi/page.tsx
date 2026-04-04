@@ -499,7 +499,7 @@ export default function SyllabiPage() {
                 <h2 className="text-2xl md:text-3xl font-bold mb-2">
                   {program.program}
                 </h2>
-                <div className="flex items-center gap-6 text-brand-blue-100">
+                <div className="flex items-center gap-6 text-white">
                   <div className="flex items-center gap-2">
                     <Clock className="w-5 h-5" />
                     <span>{program.totalHours} Total Hours</span>

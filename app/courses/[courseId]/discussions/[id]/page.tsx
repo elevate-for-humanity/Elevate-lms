@@ -21,7 +21,7 @@ export default async function CourseDiscussionDetailPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-6 py-10 space-y-6">
-        <nav className="text-sm text-gray-500">
+        <nav className="text-sm text-black">
           <ol className="flex items-center gap-2">
             <li><Link href={`/lms/courses/${courseId}`} className="hover:text-gray-900">Course</Link></li>
             <li>/</li>
@@ -37,7 +37,7 @@ export default async function CourseDiscussionDetailPage({ params }: Props) {
           )}
           <p className="text-gray-700 whitespace-pre-wrap">{discussion.content}</p>
           {discussion.created_at && (
-            <p className="text-xs text-gray-400 mt-4">
+            <p className="text-xs text-black mt-4">
               Posted {new Date(discussion.created_at).toLocaleDateString()}
             </p>
           )}

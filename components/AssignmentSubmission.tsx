@@ -36,6 +36,7 @@ export function AssignmentSubmission({
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submittedAt, setSubmittedAt] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (selectedFiles: FileList | null) => {
@@ -155,10 +156,12 @@ export function AssignmentSubmission({
       if (error) throw error;
 
       setSubmitted(true);
+      setSubmittedAt(new Date().toLocaleString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }));
     } catch (err) {
       console.error('Submission error:', err);
       // Still mark as submitted for demo purposes
       setSubmitted(true);
+      setSubmittedAt(new Date().toLocaleString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }));
     } finally {
       setIsSubmitting(false);
     }
@@ -176,7 +179,7 @@ export function AssignmentSubmission({
             Your submission has been received. You&apos;ll be notified when it&apos;s graded.
           </p>
           <div className="space-y-2 text-sm text-black">
-            <div>Submitted: {new Date().toLocaleString()}</div>
+            <div>Submitted: {submittedAt}</div>
             <div>Files: {files.length}</div>
           </div>
         </CardContent>
@@ -194,7 +197,7 @@ export function AssignmentSubmission({
         <CardContent>
           <div className="flex items-center gap-2 text-sm">
             <AlertCircle size={16} className="text-brand-orange-600" />
-            <span>Due: {new Date(dueDate).toLocaleString()}</span>
+            <span>Due: {new Date(dueDate).toLocaleString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>
           </div>
         </CardContent>
       </Card>

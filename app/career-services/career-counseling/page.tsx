@@ -97,7 +97,7 @@ export default function CareerCounselingPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">
             How We Can Help
           </h2>
-          <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+          <p className="text-black text-center mb-12 max-w-2xl mx-auto">
             Our certified career counselors provide personalized guidance to help you navigate your career journey.
           </p>
 
@@ -106,7 +106,7 @@ export default function CareerCounselingPage() {
               <div key={index} className="bg-brand-blue-50 rounded-xl p-6 text-center hover:shadow-lg transition">
                 <area.icon className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{area.title}</h3>
-                <p className="text-gray-600 text-sm">{area.description}</p>
+                <p className="text-black text-sm">{area.description}</p>
               </div>
             ))}
           </div>
@@ -126,7 +126,7 @@ export default function CareerCounselingPage() {
                 1
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Initial Consultation</h3>
-              <p className="text-gray-600 text-sm">Meet with a counselor to discuss your background, goals, and challenges</p>
+              <p className="text-black text-sm">Meet with a counselor to discuss your background, goals, and challenges</p>
             </div>
 
             <div className="text-center">
@@ -134,7 +134,7 @@ export default function CareerCounselingPage() {
                 2
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Assessment</h3>
-              <p className="text-gray-600 text-sm">Complete career assessments to identify your strengths and interests</p>
+              <p className="text-black text-sm">Complete career assessments to identify your strengths and interests</p>
             </div>
 
             <div className="text-center">
@@ -142,7 +142,7 @@ export default function CareerCounselingPage() {
                 3
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Exploration</h3>
-              <p className="text-gray-600 text-sm">Research career options and educational pathways that fit your profile</p>
+              <p className="text-black text-sm">Research career options and educational pathways that fit your profile</p>
             </div>
 
             <div className="text-center">
@@ -150,7 +150,7 @@ export default function CareerCounselingPage() {
                 4
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Action Plan</h3>
-              <p className="text-gray-600 text-sm">Create a personalized roadmap with concrete steps to reach your goals</p>
+              <p className="text-black text-sm">Create a personalized roadmap with concrete steps to reach your goals</p>
             </div>
           </div>
         </div>
@@ -162,7 +162,7 @@ export default function CareerCounselingPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Career Assessments
           </h2>
-          <p className="text-gray-600 text-center mb-8">
+          <p className="text-black text-center mb-8">
             We use proven assessment tools to help you understand yourself better and make informed career decisions.
           </p>
 
@@ -172,7 +172,7 @@ export default function CareerCounselingPage() {
                 <Circle className="w-6 h-6 text-brand-blue-600 mr-4 flex-shrink-0 mt-1" />
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1">{assessment.name}</h3>
-                  <p className="text-gray-600 text-sm">{assessment.description}</p>
+                  <p className="text-black text-sm">{assessment.description}</p>
                 </div>
               </div>
             ))}
@@ -190,19 +190,19 @@ export default function CareerCounselingPage() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="text-xl font-bold text-gray-900 mb-4">Career Changers</h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-black mb-4">
                 Feeling stuck or unfulfilled? We help you identify transferable skills and explore new directions.
               </p>
               <ul className="space-y-2">
-                <li className="flex items-center text-sm text-gray-600">
+                <li className="flex items-center text-sm text-black">
                   <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Identify transferable skills
                 </li>
-                <li className="flex items-center text-sm text-gray-600">
+                <li className="flex items-center text-sm text-black">
                   <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Explore new industries
                 </li>
-                <li className="flex items-center text-sm text-gray-600">
+                <li className="flex items-center text-sm text-black">
                   <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Plan your transition
                 </li>
@@ -211,19 +211,19 @@ export default function CareerCounselingPage() {
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="text-xl font-bold text-gray-900 mb-4">New Graduates</h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-black mb-4">
                 Starting your career journey? We help you translate your education into employment.
               </p>
               <ul className="space-y-2">
-                <li className="flex items-center text-sm text-gray-600">
+                <li className="flex items-center text-sm text-black">
                   <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Explore career options
                 </li>
-                <li className="flex items-center text-sm text-gray-600">
+                <li className="flex items-center text-sm text-black">
                   <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Build your professional brand
                 </li>
-                <li className="flex items-center text-sm text-gray-600">
+                <li className="flex items-center text-sm text-black">
                   <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Navigate the job market
                 </li>
@@ -232,19 +232,19 @@ export default function CareerCounselingPage() {
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="text-xl font-bold text-gray-900 mb-4">Returning Workers</h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-black mb-4">
                 Re-entering the workforce? We help you update your skills and rebuild your confidence.
               </p>
               <ul className="space-y-2">
-                <li className="flex items-center text-sm text-gray-600">
+                <li className="flex items-center text-sm text-black">
                   <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Address employment gaps
                 </li>
-                <li className="flex items-center text-sm text-gray-600">
+                <li className="flex items-center text-sm text-black">
                   <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Update your skills
                 </li>
-                <li className="flex items-center text-sm text-gray-600">
+                <li className="flex items-center text-sm text-black">
                   <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Rebuild confidence
                 </li>
@@ -267,10 +267,10 @@ export default function CareerCounselingPage() {
                 <Users className="w-8 h-8 text-brand-blue-600 mr-3" />
                 <h3 className="text-xl font-bold text-gray-900">In-Person Sessions</h3>
               </div>
-              <p className="text-gray-600 mb-4">
+              <p className="text-black mb-4">
                 Meet face-to-face with a career counselor at one of our locations.
               </p>
-              <ul className="space-y-2 text-sm text-gray-600">
+              <ul className="space-y-2 text-sm text-black">
                 <li className="flex items-center">
                   <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   60-minute sessions
@@ -291,10 +291,10 @@ export default function CareerCounselingPage() {
                 <MessageSquare className="w-8 h-8 text-brand-blue-600 mr-3" />
                 <h3 className="text-xl font-bold text-gray-900">Virtual Sessions</h3>
               </div>
-              <p className="text-gray-600 mb-4">
+              <p className="text-black mb-4">
                 Connect with a counselor from anywhere via video call.
               </p>
-              <ul className="space-y-2 text-sm text-gray-600">
+              <ul className="space-y-2 text-sm text-black">
                 <li className="flex items-center">
                   <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Flexible scheduling
@@ -319,7 +319,7 @@ export default function CareerCounselingPage() {
           <p className="text-2xl italic mb-6">
             &quot;Career counseling helped me realize I had more options than I thought. My counselor helped me see how my skills could transfer to a completely new field. Now I am in a career I love.&quot;
           </p>
-          <p className="text-brand-blue-200">— Maria S., Program Graduate</p>
+          <p className="text-white">— Maria S., Program Graduate</p>
         </div>
       </section>
 
@@ -329,7 +329,7 @@ export default function CareerCounselingPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-6">
             Ready to Explore Your Options?
           </h2>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl text-black mb-8">
             Schedule a free consultation with one of our career counselors.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

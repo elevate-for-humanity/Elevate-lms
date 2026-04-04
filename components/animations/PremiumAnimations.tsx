@@ -237,7 +237,7 @@ export function CounterAnimation({ from = 0, to, duration = 2, suffix = '' }: { 
           animate={{ value: to }}
           transition={{ duration, ease: "easeOut" }}
         >
-          {({ value }: { value: number }) => Math.round(value).toLocaleString() + suffix}
+          {({ value }: { value: number }) => Math.round(value).toLocaleString('en-US') + suffix}
         </motion.span>
       )}
     </motion.span>

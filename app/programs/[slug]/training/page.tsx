@@ -249,9 +249,9 @@ export default async function ProgramTrainingPage({
             <div>
               <h1 className="text-2xl font-bold text-slate-900">{program.title}</h1>
               {program.description && (
-                <p className="text-slate-500 mt-1 text-sm max-w-2xl">{program.description}</p>
+                <p className="text-black mt-1 text-sm max-w-2xl">{program.description}</p>
               )}
-              <div className="flex flex-wrap gap-3 mt-3 text-sm text-slate-500">
+              <div className="flex flex-wrap gap-3 mt-3 text-sm text-black">
                 {program.estimated_weeks && (
                   <span className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
@@ -259,7 +259,7 @@ export default async function ProgramTrainingPage({
                   </span>
                 )}
                 {program.category && (
-                  <span className="px-2 py-0.5 bg-white rounded-full text-xs font-medium text-slate-600">
+                  <span className="px-2 py-0.5 bg-white rounded-full text-xs font-medium text-black">
                     {program.category}
                   </span>
                 )}
@@ -285,12 +285,12 @@ export default async function ProgramTrainingPage({
                   </span>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">Progress</p>
+                  <p className="text-xs text-black">Progress</p>
                   <p className="text-lg font-bold text-slate-900">
                     {completedRequired}
-                    <span className="text-slate-500 text-sm font-normal">/{totalRequired}</span>
+                    <span className="text-black text-sm font-normal">/{totalRequired}</span>
                   </p>
-                  <p className="text-xs text-slate-500">required complete</p>
+                  <p className="text-xs text-black">required complete</p>
                 </div>
               </div>
             )}
@@ -302,9 +302,9 @@ export default async function ProgramTrainingPage({
       <div className="max-w-6xl mx-auto px-4 py-8">
         {items.length === 0 ? (
           <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
-            <BookOpen className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-            <p className="text-slate-500 font-medium">No training items yet</p>
-            <p className="text-slate-500 text-sm mt-1">Check back soon or contact your advisor.</p>
+            <BookOpen className="w-10 h-10 text-white mx-auto mb-3" />
+            <p className="text-black font-medium">No training items yet</p>
+            <p className="text-black text-sm mt-1">Check back soon or contact your advisor.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -316,7 +316,7 @@ export default async function ProgramTrainingPage({
           </div>
         )}
 
-        <p className="text-xs text-slate-500 text-center mt-10">
+        <p className="text-xs text-black text-center mt-10">
           Questions about your program?{' '}
           <Link href="/contact" className="text-brand-blue-600 hover:underline">
             Contact your advisor
@@ -373,10 +373,10 @@ function InternalCard({ item, index }: { item: InternalItem; index: number }) {
         </span>
         <h3 className="text-base font-bold text-slate-900 leading-snug line-clamp-2">{label}</h3>
         {c.description && (
-          <p className="text-sm text-slate-500 mt-1 line-clamp-2 flex-1">{c.description}</p>
+          <p className="text-sm text-black mt-1 line-clamp-2 flex-1">{c.description}</p>
         )}
 
-        <div className="flex flex-wrap gap-3 mt-3 text-xs text-slate-400">
+        <div className="flex flex-wrap gap-3 mt-3 text-xs text-black">
           {c.duration_hours && (
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />{c.duration_hours}h
@@ -397,7 +397,7 @@ function InternalCard({ item, index }: { item: InternalItem; index: number }) {
               <ArrowRight className="w-4 h-4" />
             </Link>
           ) : (
-            <div className="flex items-center justify-center gap-2 w-full py-2.5 bg-white text-slate-400 rounded-xl text-sm font-medium cursor-not-allowed">
+            <div className="flex items-center justify-center gap-2 w-full py-2.5 bg-white text-black rounded-xl text-sm font-medium cursor-not-allowed">
               <Lock className="w-4 h-4" /> Not yet available
             </div>
           )}
@@ -446,14 +446,14 @@ function ExternalCard({ item, index }: { item: ExternalItem; index: number }) {
           <span className="text-xs font-semibold uppercase tracking-wide text-teal-700">
             Partner Training
           </span>
-          <span className="text-xs text-slate-500">· {item.partner_name}</span>
+          <span className="text-xs text-black">· {item.partner_name}</span>
         </div>
         <h3 className="text-base font-bold text-slate-900 leading-snug line-clamp-2">{item.title}</h3>
         {item.description && (
-          <p className="text-sm text-slate-500 mt-1 line-clamp-2 flex-1">{item.description}</p>
+          <p className="text-sm text-black mt-1 line-clamp-2 flex-1">{item.description}</p>
         )}
 
-        <div className="flex flex-wrap gap-3 mt-3 text-xs text-slate-400">
+        <div className="flex flex-wrap gap-3 mt-3 text-xs text-black">
           {item.duration_display && (
             <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{item.duration_display}</span>
           )}

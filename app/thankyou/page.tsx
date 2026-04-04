@@ -180,7 +180,7 @@ export default async function ThankyouPage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-4">
             Ready to Learn More?
           </h2>
-          <p className="text-brand-blue-100 mb-8">
+          <p className="text-white mb-8">
             Browse all our programs or return to the homepage.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

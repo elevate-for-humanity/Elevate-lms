@@ -108,14 +108,14 @@ export default function ProvidersPage() {
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 leading-tight">
             Provider Requirements & Governance
           </h1>
-          <p className="text-slate-600 text-lg leading-relaxed max-w-3xl mb-8">
+          <p className="text-black text-lg leading-relaxed max-w-3xl mb-8">
             Organizations delivering training programs inside the Elevate hub operate under a formal governance framework. These requirements protect learners, credential authorities, and workforce funders. They apply to all providers — including Elevate itself.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href="/partners/join" className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-red-700 transition text-sm">
               Apply to Become a Provider <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/contact" className="inline-flex items-center gap-2 border border-slate-600 text-slate-300 px-6 py-3 rounded-lg font-bold hover:border-slate-400 hover:text-white transition text-sm">
+            <Link href="/contact" className="inline-flex items-center gap-2 border border-slate-600 text-white px-6 py-3 rounded-lg font-bold hover:border-slate-400 hover:text-white transition text-sm">
               Ask a Question
             </Link>
           </div>
@@ -128,7 +128,7 @@ export default function ProvidersPage() {
           <div className="mb-10">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Operational Controls</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Four controls applied to every provider</h2>
-            <p className="text-slate-600 text-sm max-w-2xl leading-relaxed">
+            <p className="text-black text-sm max-w-2xl leading-relaxed">
               These are not aspirational standards. They are operational requirements enforced before any program is activated and monitored throughout the provider relationship.
             </p>
           </div>
@@ -162,7 +162,7 @@ export default function ProvidersPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-slate-900 mb-2">{control.title}</h3>
-                    <p className="text-slate-600 text-sm leading-relaxed">{control.desc}</p>
+                    <p className="text-black text-sm leading-relaxed">{control.desc}</p>
                   </div>
                 </div>
               </div>
@@ -177,7 +177,7 @@ export default function ProvidersPage() {
           <div className="mb-8">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Eligibility</p>
             <h2 className="text-2xl font-extrabold text-slate-900 mb-3">Organization eligibility requirements</h2>
-            <p className="text-slate-600 text-sm leading-relaxed">
+            <p className="text-black text-sm leading-relaxed">
               All of the following must be true before a provider application will be reviewed.
             </p>
           </div>
@@ -200,7 +200,7 @@ export default function ProvidersPage() {
           <div className="mb-8">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Program Standards</p>
             <h2 className="text-2xl font-extrabold text-slate-900 mb-3">What every program must define</h2>
-            <p className="text-slate-600 text-sm leading-relaxed">
+            <p className="text-black text-sm leading-relaxed">
               Approval is per-program. Each program submitted by an approved provider is reviewed independently against these standards.
             </p>
           </div>
@@ -208,7 +208,7 @@ export default function ProvidersPage() {
             {programRequirements.map((req) => (
               <div key={req.title} className="border border-slate-200 rounded-xl p-5">
                 <h3 className="font-bold text-slate-900 mb-2 text-sm">{req.title}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">{req.desc}</p>
+                <p className="text-black text-sm leading-relaxed">{req.desc}</p>
               </div>
             ))}
           </div>
@@ -223,7 +223,7 @@ export default function ProvidersPage() {
             <div>
               <p className="text-amber-700 font-bold text-xs uppercase tracking-widest mb-2">Credential Authority Separation</p>
               <h2 className="text-2xl font-extrabold text-slate-900 mb-3">Rules that apply to all providers without exception</h2>
-              <p className="text-slate-600 text-sm leading-relaxed">
+              <p className="text-black text-sm leading-relaxed">
                 These rules protect the integrity of the credential system and the legal standing of the credential authorities. Violations result in immediate program suspension.
               </p>
             </div>
@@ -247,7 +247,7 @@ export default function ProvidersPage() {
           <div className="mb-10">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Onboarding Process</p>
             <h2 className="text-2xl font-extrabold text-slate-900 mb-3">How provider onboarding works</h2>
-            <p className="text-slate-600 text-sm leading-relaxed">
+            <p className="text-black text-sm leading-relaxed">
               From application to first enrolled learner, the process typically takes 2–4 weeks depending on documentation readiness.
             </p>
           </div>
@@ -259,7 +259,7 @@ export default function ProvidersPage() {
                 </div>
                 <div className="border-b border-slate-100 pb-4 flex-1">
                   <h3 className="font-bold text-slate-900 mb-1 text-sm">{step.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{step.desc}</p>
+                  <p className="text-black text-sm leading-relaxed">{step.desc}</p>
                 </div>
               </div>
             ))}
@@ -273,7 +273,7 @@ export default function ProvidersPage() {
           <div className="mb-8">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Ongoing Performance</p>
             <h2 className="text-2xl font-extrabold text-slate-900 mb-3">Minimum performance thresholds</h2>
-            <p className="text-slate-600 text-sm leading-relaxed">
+            <p className="text-black text-sm leading-relaxed">
               Active programs are reviewed quarterly. Programs that fall below these thresholds are placed on a performance improvement plan. Programs that do not recover within one review cycle are suspended.
             </p>
           </div>
@@ -295,7 +295,7 @@ export default function ProvidersPage() {
               </tbody>
             </table>
           </div>
-          <p className="text-slate-500 text-xs mt-3 leading-relaxed">
+          <p className="text-black text-xs mt-3 leading-relaxed">
             Thresholds apply to programs with 10 or more enrolled learners in the review period. Programs in their first cohort are reviewed at 12 months.
           </p>
         </div>
@@ -320,7 +320,7 @@ export default function ProvidersPage() {
                   <item.icon className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <h3 className="font-bold text-slate-900 text-sm mb-1">{item.title}</h3>
-                    <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                    <p className="text-black text-sm leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
               </div>
@@ -333,14 +333,14 @@ export default function ProvidersPage() {
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-2xl font-extrabold text-slate-900 mb-4">Ready to apply?</h2>
-          <p className="text-slate-500 text-sm max-w-xl mx-auto mb-8 leading-relaxed">
+          <p className="text-black text-sm max-w-xl mx-auto mb-8 leading-relaxed">
             If your organization meets the eligibility requirements and has programs that align with the hub&apos;s standards, start the provider application. Questions before applying are welcome.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <Link href="/partners/join" className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-red-700 transition text-sm">
               Start Provider Application <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/contact" className="inline-flex items-center gap-2 border border-slate-600 text-slate-300 px-6 py-3 rounded-lg font-bold hover:border-slate-400 hover:text-white transition text-sm">
+            <Link href="/contact" className="inline-flex items-center gap-2 border border-slate-600 text-white px-6 py-3 rounded-lg font-bold hover:border-slate-400 hover:text-white transition text-sm">
               Contact Us First
             </Link>
           </div>

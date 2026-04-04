@@ -89,7 +89,7 @@ export default function InterviewPrepPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">
             Our Interview Prep Services
           </h2>
-          <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+          <p className="text-black text-center mb-12 max-w-2xl mx-auto">
             From mock interviews to personalized coaching, we provide everything you need to walk into your interview with confidence.
           </p>
 
@@ -98,7 +98,7 @@ export default function InterviewPrepPage() {
               <div key={index} className="bg-white rounded-xl p-6 hover:shadow-lg transition">
                 <type.icon className="w-10 h-10 text-brand-blue-600 mb-4" />
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{type.title}</h3>
-                <p className="text-gray-600 text-sm">{type.description}</p>
+                <p className="text-black text-sm">{type.description}</p>
               </div>
             ))}
           </div>
@@ -118,7 +118,7 @@ export default function InterviewPrepPage() {
                 1
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Schedule</h3>
-              <p className="text-gray-600 text-sm">Book a session with our career coach at a time that works for you</p>
+              <p className="text-black text-sm">Book a session with our career coach at a time that works for you</p>
             </div>
 
             <div className="text-center">
@@ -126,7 +126,7 @@ export default function InterviewPrepPage() {
                 2
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Prepare</h3>
-              <p className="text-gray-600 text-sm">Share the job description and your resume so we can customize</p>
+              <p className="text-black text-sm">Share the job description and your resume so we can customize</p>
             </div>
 
             <div className="text-center">
@@ -134,7 +134,7 @@ export default function InterviewPrepPage() {
                 3
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Practice</h3>
-              <p className="text-gray-600 text-sm">Complete a realistic mock interview with industry-specific questions</p>
+              <p className="text-black text-sm">Complete a realistic mock interview with industry-specific questions</p>
             </div>
 
             <div className="text-center">
@@ -142,7 +142,7 @@ export default function InterviewPrepPage() {
                 4
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Feedback</h3>
-              <p className="text-gray-600 text-sm">Receive detailed feedback and actionable tips for improvement</p>
+              <p className="text-black text-sm">Receive detailed feedback and actionable tips for improvement</p>
             </div>
           </div>
         </div>
@@ -166,7 +166,7 @@ export default function InterviewPrepPage() {
                   <span className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">S</span>
                   <h3 className="text-lg font-bold text-gray-900">Situation</h3>
                 </div>
-                <p className="text-gray-600 text-sm">Describe the context and background. Set the scene for your story.</p>
+                <p className="text-black text-sm">Describe the context and background. Set the scene for your story.</p>
               </div>
 
               <div className="bg-white rounded-lg p-6">
@@ -174,7 +174,7 @@ export default function InterviewPrepPage() {
                   <span className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">T</span>
                   <h3 className="text-lg font-bold text-gray-900">Task</h3>
                 </div>
-                <p className="text-gray-600 text-sm">Explain your responsibility or the challenge you faced.</p>
+                <p className="text-black text-sm">Explain your responsibility or the challenge you faced.</p>
               </div>
 
               <div className="bg-white rounded-lg p-6">
@@ -182,7 +182,7 @@ export default function InterviewPrepPage() {
                   <span className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">A</span>
                   <h3 className="text-lg font-bold text-gray-900">Action</h3>
                 </div>
-                <p className="text-gray-600 text-sm">Describe the specific steps you took to address the situation.</p>
+                <p className="text-black text-sm">Describe the specific steps you took to address the situation.</p>
               </div>
 
               <div className="bg-white rounded-lg p-6">
@@ -190,7 +190,7 @@ export default function InterviewPrepPage() {
                   <span className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">R</span>
                   <h3 className="text-lg font-bold text-gray-900">Result</h3>
                 </div>
-                <p className="text-gray-600 text-sm">Share the outcome and what you learned. Quantify when possible.</p>
+                <p className="text-black text-sm">Share the outcome and what you learned. Quantify when possible.</p>
               </div>
             </div>
           </div>
@@ -226,28 +226,28 @@ export default function InterviewPrepPage() {
           <div className="space-y-4">
             <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">Tell me about yourself.</h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-black text-sm">
                 Focus on your professional background, key achievements, and why you are interested in this role. Keep it to 2-3 minutes.
               </p>
             </div>
 
             <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">Why do you want to work here?</h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-black text-sm">
                 Show you have researched the company. Connect your skills and goals to their mission and the specific role.
               </p>
             </div>
 
             <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">What is your greatest weakness?</h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-black text-sm">
                 Be honest but strategic. Choose a real weakness and explain what you are doing to improve it.
               </p>
             </div>
 
             <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">Where do you see yourself in 5 years?</h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-black text-sm">
                 Show ambition while being realistic. Align your goals with potential growth at the company.
               </p>
             </div>
@@ -261,19 +261,19 @@ export default function InterviewPrepPage() {
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
               <p className="text-4xl font-bold mb-2">Full</p>
-              <p className="text-brand-blue-200">Interview Prep</p>
+              <p className="text-white">Interview Prep</p>
             </div>
             <div>
               <p className="text-4xl font-bold mb-2">1-on-1</p>
-              <p className="text-brand-blue-200">Mock Interviews</p>
+              <p className="text-white">Mock Interviews</p>
             </div>
             <div>
               <p className="text-4xl font-bold mb-2">Expert</p>
-              <p className="text-brand-blue-200">Coaching</p>
+              <p className="text-white">Coaching</p>
             </div>
             <div>
               <p className="text-4xl font-bold mb-2">Free</p>
-              <p className="text-brand-blue-200">For Program Participants</p>
+              <p className="text-white">For Program Participants</p>
             </div>
           </div>
         </div>
@@ -285,7 +285,7 @@ export default function InterviewPrepPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-6">
             Ready to Ace Your Interview?
           </h2>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl text-black mb-8">
             Schedule a mock interview with our career coaches today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

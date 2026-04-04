@@ -214,21 +214,21 @@ function PrintableChecksheet({ sheet }: { sheet: Checksheet }) {
       <div className="border-2 border-gray-900 p-4 mb-0">
         <div className="flex justify-between items-start">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+            <p className="text-xs font-medium uppercase tracking-wide text-black">
               Elevate for Humanity — HVAC Technician Training Program
             </p>
             <h2 className="text-xl font-bold text-gray-900 mt-1">
               Performance Checksheet: {sheet.title}
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-black mt-1">
               Competency {sheet.competencyCode}: {sheet.competencyName}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-black">
               {sheet.domain} &middot; Estimated time: {sheet.estimatedMinutes}{" "}
               minutes
             </p>
           </div>
-          <div className="text-right text-xs text-gray-500">
+          <div className="text-right text-xs text-black">
             <p>Form ID: EFH-CS-{sheet.id.toUpperCase()}</p>
             <p>Version 1.0</p>
           </div>
@@ -238,21 +238,21 @@ function PrintableChecksheet({ sheet }: { sheet: Checksheet }) {
       {/* Student Info */}
       <div className="border-x-2 border-gray-900 p-4 grid grid-cols-2 gap-4 text-sm">
         <div>
-          <label className="text-xs text-gray-500 block">Student Name</label>
+          <label className="text-xs text-black block">Student Name</label>
           <div className="border-b border-gray-400 h-6 mt-1" />
         </div>
         <div>
-          <label className="text-xs text-gray-500 block">Date</label>
+          <label className="text-xs text-black block">Date</label>
           <div className="border-b border-gray-400 h-6 mt-1" />
         </div>
         <div>
-          <label className="text-xs text-gray-500 block">
+          <label className="text-xs text-black block">
             OJT Supervisor Name
           </label>
           <div className="border-b border-gray-400 h-6 mt-1" />
         </div>
         <div>
-          <label className="text-xs text-gray-500 block">
+          <label className="text-xs text-black block">
             Employer Partner
           </label>
           <div className="border-b border-gray-400 h-6 mt-1" />
@@ -261,7 +261,7 @@ function PrintableChecksheet({ sheet }: { sheet: Checksheet }) {
 
       {/* Tools Required */}
       <div className="border-x-2 border-gray-900 p-4 border-t">
-        <h3 className="text-xs font-semibold uppercase text-gray-500 mb-2">
+        <h3 className="text-xs font-semibold uppercase text-black mb-2">
           Required Tools &amp; Materials
         </h3>
         <div className="grid grid-cols-2 gap-1 text-xs text-gray-700">
@@ -307,13 +307,13 @@ function PrintableChecksheet({ sheet }: { sheet: Checksheet }) {
         <tbody>
           {sheet.items.map((item) => (
             <tr key={item.id}>
-              <td className="border border-gray-400 px-2 py-2 text-xs font-mono text-gray-500">
+              <td className="border border-gray-400 px-2 py-2 text-xs font-mono text-black">
                 {item.id}
               </td>
               <td className="border border-gray-400 px-2 py-2 text-gray-800">
                 {item.task}
               </td>
-              <td className="border border-gray-400 px-2 py-2 text-xs text-gray-600">
+              <td className="border border-gray-400 px-2 py-2 text-xs text-black">
                 {item.criteria}
               </td>
               <td className="border border-gray-400 px-2 py-2 text-center">
@@ -331,7 +331,7 @@ function PrintableChecksheet({ sheet }: { sheet: Checksheet }) {
       <div className="border-x-2 border-b-2 border-gray-900 p-4">
         <div className="grid grid-cols-3 gap-6 text-sm mb-6">
           <div>
-            <label className="text-xs text-gray-500 block mb-1">
+            <label className="text-xs text-black block mb-1">
               Overall Result
             </label>
             <div className="flex gap-4">
@@ -340,7 +340,7 @@ function PrintableChecksheet({ sheet }: { sheet: Checksheet }) {
             </div>
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">
+            <label className="text-xs text-black block mb-1">
               Attempts
             </label>
             <div className="flex gap-4">
@@ -350,7 +350,7 @@ function PrintableChecksheet({ sheet }: { sheet: Checksheet }) {
             </div>
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">
+            <label className="text-xs text-black block mb-1">
               Time Taken
             </label>
             <div className="border-b border-gray-400 h-5" />
@@ -358,19 +358,19 @@ function PrintableChecksheet({ sheet }: { sheet: Checksheet }) {
         </div>
         <div className="grid grid-cols-2 gap-6 text-sm">
           <div>
-            <label className="text-xs text-gray-500 block">
+            <label className="text-xs text-black block">
               Supervisor Signature
             </label>
             <div className="border-b border-gray-400 h-8 mt-1" />
           </div>
           <div>
-            <label className="text-xs text-gray-500 block">
+            <label className="text-xs text-black block">
               Student Signature
             </label>
             <div className="border-b border-gray-400 h-8 mt-1" />
           </div>
         </div>
-        <p className="text-xs text-slate-500 mt-4">
+        <p className="text-xs text-black mt-4">
           Supervisor: By signing, you verify that the student performed all
           tasks under your direct observation and met the acceptance criteria
           indicated. Remediation notes should be documented on the reverse side.
@@ -402,7 +402,7 @@ export default function ChecksheetsContent({ lessonMap }: { lessonMap?: Map<numb
               OJT Performance Checksheets
             </h1>
           </div>
-          <p className="text-gray-600 mb-8">
+          <p className="text-black mb-8">
             These checksheets are used by OJT supervisors at employer partner
             sites to verify hands-on competency. Select a checksheet to view and
             print.
@@ -426,13 +426,13 @@ export default function ChecksheetsContent({ lessonMap }: { lessonMap?: Map<numb
                     <h3 className="font-semibold text-gray-900">
                       {sheet.title}
                     </h3>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-black">
                       Competency {sheet.competencyCode} &middot; {sheet.domain}{" "}
                       &middot; {sheet.items.length} tasks &middot;{" "}
                       {sheet.estimatedMinutes} min
                     </p>
                   </div>
-                  <span className="text-xs font-mono text-slate-500">
+                  <span className="text-xs font-mono text-black">
                     EFH-CS-{sheet.id.toUpperCase()}
                   </span>
                 </div>

@@ -26,7 +26,7 @@ export default function JobReadyIndyPage() {
       <div className="bg-white border-b border-slate-200 py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Job Ready Indy</h1>
-          <p className="text-slate-600 mt-2">Indianapolis workforce initiative — funded career training for Marion County residents.</p>
+          <p className="text-black mt-2">Indianapolis workforce initiative — funded career training for Marion County residents.</p>
         </div>
       </div>
 
@@ -92,7 +92,7 @@ export default function JobReadyIndyPage() {
                 <div className="w-10 h-10 rounded-full bg-brand-red-600 text-white text-lg font-bold flex items-center justify-center flex-shrink-0">{s.step}</div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-lg">{s.title}</h3>
-                  <p className="text-slate-600">{s.desc}</p>
+                  <p className="text-black">{s.desc}</p>
                 </div>
               </div>
             ))}
@@ -104,7 +104,7 @@ export default function JobReadyIndyPage() {
       <section className="py-16 sm:py-24 bg-slate-900">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Ready to Get Started?</h2>
-          <p className="text-slate-300 text-base leading-relaxed mb-10">Job Ready Indy funding may be available for your career training. Apply today and our team will confirm your eligibility.</p>
+          <p className="text-white text-base leading-relaxed mb-10">Job Ready Indy funding may be available for your career training. Apply today and our team will confirm your eligibility.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-xl font-bold text-base transition">Apply Now</Link>
             <Link href="/contact" className="border-2 border-slate-600 hover:border-slate-400 text-white px-10 py-4 rounded-xl font-bold text-base transition">Contact Us</Link>

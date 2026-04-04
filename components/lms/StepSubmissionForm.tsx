@@ -110,7 +110,7 @@ export default function StepSubmissionForm({ lessonId, courseId, stepType, lesso
             )}
             {prior.reviewed_at && (
               <p className="text-xs mt-1 opacity-70">
-                Reviewed {new Date(prior.reviewed_at).toLocaleDateString()}
+                Reviewed {new Date(prior.reviewed_at).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
               </p>
             )}
           </div>

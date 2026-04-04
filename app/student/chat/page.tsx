@@ -305,7 +305,7 @@ export default function StudentChatPage() {
                       >
                         <p>{message.text}</p>
                         <p className={`text-xs mt-1 ${
-                          message.sender === 'me' ? 'text-brand-blue-200' : 'text-gray-500'
+                          message.sender === 'me' ? 'text-white' : 'text-gray-500'
                         }`}>
                           {message.timestamp}
                         </p>

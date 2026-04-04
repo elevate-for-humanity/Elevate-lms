@@ -282,7 +282,7 @@ export default function BookkeepingPage() {
           <h2 className="text-4xl font-black text-black mb-4">
             Bookkeeping Services
           </h2>
-          <p className="text-xl text-gray-600 mb-12">
+          <p className="text-xl text-black mb-12">
             Complete financial record management for small businesses
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -295,14 +295,14 @@ export default function BookkeepingPage() {
                 <h3 className="text-xl font-bold text-black mb-2">
                   {service.title}
                 </h3>
-                <p className="text-gray-600 mb-4">{service.description}</p>
+                <p className="text-black mb-4">{service.description}</p>
                 <ul className="space-y-2">
                   {service.features.map((feature, idx) => (
                     <li
                       key={idx}
-                      className="flex items-start gap-2 text-sm text-gray-600"
+                      className="flex items-start gap-2 text-sm text-black"
                     >
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-black flex-shrink-0">•</span>
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -326,7 +326,7 @@ export default function BookkeepingPage() {
                 <h3 className="text-xl font-bold text-black mb-3">
                   {benefit.title}
                 </h3>
-                <p className="text-gray-600">{benefit.description}</p>
+                <p className="text-black">{benefit.description}</p>
               </div>
             ))}
           </div>
@@ -339,7 +339,7 @@ export default function BookkeepingPage() {
           <h2 className="text-4xl font-black text-black mb-4 text-center">
             Transparent Pricing
           </h2>
-          <p className="text-xl text-gray-600 mb-12 text-center">
+          <p className="text-xl text-black mb-12 text-center">
             Choose the plan that fits your business
           </p>
           <div className="grid md:grid-cols-3 gap-8">
@@ -364,14 +364,14 @@ export default function BookkeepingPage() {
                   <span className="text-4xl font-black text-black">
                     {plan.price}
                   </span>
-                  <span className="text-gray-600">{plan.period}</span>
+                  <span className="text-black">{plan.period}</span>
                 </div>
-                <p className="text-gray-600 mb-6">{plan.description}</p>
+                <p className="text-black mb-6">{plan.description}</p>
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
-                      <span className="text-gray-600">{feature}</span>
+                      <span className="text-black flex-shrink-0">•</span>
+                      <span className="text-black">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -395,7 +395,7 @@ export default function BookkeepingPage() {
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-4xl font-black text-black mb-4">How It Works</h2>
-          <p className="text-xl text-gray-600 mb-12">
+          <p className="text-xl text-black mb-12">
             Getting started is simple and straightforward
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -408,7 +408,7 @@ export default function BookkeepingPage() {
                   <h3 className="text-lg font-bold text-black mb-2">
                     {step.title}
                   </h3>
-                  <p className="text-gray-600 text-sm">{step.description}</p>
+                  <p className="text-black text-sm">{step.description}</p>
                 </div>
                 {index < process.length - 1 && (
                   <ArrowRight className="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2 w-8 h-8 text-gray-300" />
@@ -425,7 +425,7 @@ export default function BookkeepingPage() {
           <h2 className="text-4xl font-black text-black mb-4 text-center">
             Industries We Serve
           </h2>
-          <p className="text-xl text-gray-600 mb-12 text-center">
+          <p className="text-xl text-black mb-12 text-center">
             Specialized bookkeeping for your industry
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -456,7 +456,7 @@ export default function BookkeepingPage() {
                 <h3 className="text-xl font-bold text-black mb-3">
                   {faq.question}
                 </h3>
-                <p className="text-gray-600">{faq.answer}</p>
+                <p className="text-black">{faq.answer}</p>
               </div>
             ))}
           </div>
@@ -469,7 +469,7 @@ export default function BookkeepingPage() {
           <h2 className="text-4xl font-black mb-6">
             Ready to Get Your Books in Order?
           </h2>
-          <p className="text-xl text-white/90 mb-8">
+          <p className="text-xl text-white mb-8">
             Schedule a free consultation to discuss your bookkeeping needs
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -498,17 +498,17 @@ export default function BookkeepingPage() {
             <div>
               <Phone className="w-8 h-8 text-brand-orange-600 mx-auto mb-3" />
               <h3 className="font-bold text-black mb-2">Contact Us</h3>
-              <p className="text-gray-600">(317) 653-5046</p>
+              <p className="text-black">(317) 653-5046</p>
             </div>
             <div>
               <Mail className="w-8 h-8 text-brand-orange-600 mx-auto mb-3" />
               <h3 className="font-bold text-black mb-2">Email Us</h3>
-              <p className="text-gray-600">bookkeeping@supersonicfastcash.com</p>
+              <p className="text-black">bookkeeping@supersonicfastcash.com</p>
             </div>
             <div>
               <Clock className="w-8 h-8 text-brand-orange-600 mx-auto mb-3" />
               <h3 className="font-bold text-black mb-2">Business Hours</h3>
-              <p className="text-gray-600">Mon-Fri: 9AM-6PM EST</p>
+              <p className="text-black">Mon-Fri: 9AM-6PM EST</p>
             </div>
           </div>
         </div>

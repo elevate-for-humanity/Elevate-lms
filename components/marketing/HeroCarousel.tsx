@@ -124,7 +124,7 @@ export function HeroCarousel() {
                     {activeSlide.secondaryCtaLabel}
                   </Link>
                 </div>
-                <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-2 text-xs text-zinc-200 ring-1 ring-zinc-700">
+                <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-2 text-xs text-white ring-1 ring-zinc-700">
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand-orange-400 text-[10px] font-bold text-zinc-950">
                     ★
                   </span>
@@ -138,11 +138,11 @@ export function HeroCarousel() {
           </AnimatePresence>
 
           {/* Rotating dot controls */}
-          <div className="mt-6 flex items-center gap-3 text-xs text-zinc-400">
+          <div className="mt-6 flex items-center gap-3 text-xs text-white">
             <button
               type="button"
               onClick={prev}
-              className="rounded-full border border-zinc-700 px-2 py-2 hover:border-brand-orange-300 hover:text-brand-orange-200"
+              className="rounded-full border border-zinc-700 px-2 py-2 hover:border-brand-orange-300 hover:text-white"
             >
               ⟵
             </button>
@@ -164,7 +164,7 @@ export function HeroCarousel() {
             <button
               type="button"
               onClick={next}
-              className="rounded-full border border-zinc-700 px-2 py-2 hover:border-brand-orange-300 hover:text-brand-orange-200"
+              className="rounded-full border border-zinc-700 px-2 py-2 hover:border-brand-orange-300 hover:text-white"
             >
               ⟶
             </button>
@@ -197,11 +197,11 @@ export function HeroCarousel() {
 
             {/* Floating "live feel" strip */}
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-xs text-zinc-200">
+              <div className="flex items-center gap-2 text-xs text-white">
                 <span className="inline-flex h-2 w-2 animate-pulse rounded-full bg-lime-400" />
                 <span>Live cohorts forming now</span>
               </div>
-              <p className="text-[11px] text-zinc-400">
+              <p className="text-[11px] text-white">
                 Use this hero for your QR codes, flyers, and social promos.
               </p>
             </div>

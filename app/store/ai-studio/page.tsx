@@ -276,7 +276,7 @@ export default function AIStudioPage() {
           <h2 className="text-4xl font-black text-slate-900 mb-6">
             Ready to Create with AI?
           </h2>
-          <p className="text-xl text-brand-blue-200 mb-10 max-w-2xl mx-auto">
+          <p className="text-xl text-white mb-10 max-w-2xl mx-auto">
             Start your free trial today. No credit card required.
           </p>
           <Link

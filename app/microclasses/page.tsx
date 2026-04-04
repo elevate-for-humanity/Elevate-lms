@@ -80,7 +80,7 @@ export default function MicroclassesPage() {
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               Microclasses
             </h1>
-            <p className="text-xl text-brand-blue-100 max-w-2xl mx-auto mb-8">
+            <p className="text-xl text-white max-w-2xl mx-auto mb-8">
               Short, focused courses that give you job-ready certifications in hours or days, not months.
             </p>
             <div className="flex flex-wrap justify-center gap-6 text-sm">

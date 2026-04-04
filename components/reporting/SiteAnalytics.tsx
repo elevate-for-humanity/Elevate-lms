@@ -278,7 +278,7 @@ export default function SiteAnalytics() {
 
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Cost/Completion</span>
-                  <span className="font-bold">${site.costPerCompletion.toLocaleString()}</span>
+                  <span className="font-bold">${site.costPerCompletion.toLocaleString('en-US')}</span>
                 </div>
               </div>
             </CardContent>

@@ -128,7 +128,7 @@ export default function SupersonicFastCashPage() {
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-5">
             Supersonic Fast Cash
           </h1>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-10 leading-relaxed">
+          <p className="text-xl text-black max-w-3xl mx-auto mb-10 leading-relaxed">
             Tax software you can use yourself — or let our PTIN-credentialed professionals
             handle it for you. Same-day refund advances up to $7,500, audit protection,
             bookkeeping, and payroll. Serving Indiana, Illinois, Ohio, Tennessee, and Texas.
@@ -163,7 +163,7 @@ export default function SupersonicFastCashPage() {
                 from any device. Or bring your documents to one of our offices and let a
                 PTIN-credentialed professional handle everything while you wait.
               </p>
-              <p className="text-slate-600 mb-8 leading-relaxed">
+              <p className="text-black mb-8 leading-relaxed">
                 Either way, you get the same accuracy, the same maximum refund guarantee,
                 and the same same-day refund advance of up to $7,500 when your return
                 is accepted by the IRS.
@@ -194,7 +194,7 @@ export default function SupersonicFastCashPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-14">
             <h2 className="text-4xl font-black text-slate-900 mb-4">Our Services</h2>
-            <p className="text-xl text-slate-600 max-w-2xl leading-relaxed">
+            <p className="text-xl text-black max-w-2xl leading-relaxed">
               From simple W-2 returns to complex self-employment filings, we handle every
               tax situation with the same level of care and expertise.
             </p>
@@ -218,7 +218,7 @@ export default function SupersonicFastCashPage() {
                   <h3 className="text-xl font-bold text-slate-900 mb-3">
                     {service.title}
                   </h3>
-                  <p className="text-slate-600 text-sm leading-relaxed flex-1">
+                  <p className="text-black text-sm leading-relaxed flex-1">
                     {service.description}
                   </p>
                   <Link
@@ -239,14 +239,14 @@ export default function SupersonicFastCashPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-14">
             <h2 className="text-4xl font-black text-slate-900 mb-4">How It Works</h2>
-            <p className="text-xl text-slate-600 max-w-2xl leading-relaxed">
+            <p className="text-xl text-black max-w-2xl leading-relaxed">
               Whether you use our software or come in to see a pro, the process is the same four steps — and most people are done in under an hour.
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {STEPS.map((step) => (
               <div key={step.number} className="flex flex-col">
-                <div className="relative h-48 w-full rounded-xl overflow-hidden mb-5">
+                <div className="relative h-48 w-full rounded-xl overflow-hidden mb-4">
                   <Image
                     src={step.image}
                     alt={step.title}
@@ -254,12 +254,10 @@ export default function SupersonicFastCashPage() {
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 25vw"
                   />
-                  <div className="absolute top-3 left-3 bg-brand-red-600 text-white text-sm font-black px-3 py-1 rounded-lg">
-                    {step.number}
-                  </div>
                 </div>
+                <div className="w-8 h-8 bg-brand-red-600 text-white text-sm font-black rounded-lg flex items-center justify-center mb-2">{step.number}</div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">{step.title}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">{step.description}</p>
+                <p className="text-black text-sm leading-relaxed">{step.description}</p>
               </div>
             ))}
           </div>
@@ -288,12 +286,12 @@ export default function SupersonicFastCashPage() {
                 advance the same day their return is accepted — with zero interest and no
                 loan fees. Funds are loaded to a prepaid Visa card or sent via direct deposit.
               </p>
-              <p className="text-slate-600 mb-5 leading-relaxed">
+              <p className="text-black mb-5 leading-relaxed">
                 The advance is repaid automatically when your actual IRS refund arrives.
                 There is no out-of-pocket cost to you. Advance amounts range from $500 to
                 $7,500 depending on your expected refund and eligibility.
               </p>
-              <p className="text-slate-500 text-sm mb-8">
+              <p className="text-black text-sm mb-8">
                 Refund advance is a financial product offered by a lending partner.
                 Approval is subject to eligibility requirements. Not available in all states.
               </p>
@@ -314,7 +312,7 @@ export default function SupersonicFastCashPage() {
           <h2 className="text-4xl font-black text-slate-900 mb-4">
             See How the Software Works
           </h2>
-          <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-black mb-10 max-w-2xl mx-auto leading-relaxed">
             Watch a walkthrough of the Supersonic Fast Cash tax software — from entering
             your W-2 to claiming your credits and e-filing directly to the IRS. Most
             returns take under 30 minutes.
@@ -362,7 +360,7 @@ export default function SupersonicFastCashPage() {
                       <Image src={item.image} alt={item.label} fill className="object-cover" sizes="56px" />
                     </div>
                     <div>
-                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">{item.label}</p>
+                      <p className="text-xs font-semibold text-black uppercase tracking-wide mb-1">{item.label}</p>
                       {item.label === 'Phone' ? (
                         <a href="tel:+13173143757" className="text-brand-red-600 font-bold text-lg hover:underline">{item.value}</a>
                       ) : (
@@ -399,7 +397,7 @@ export default function SupersonicFastCashPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-12">
             <h2 className="text-4xl font-black text-slate-900 mb-4">Service Areas</h2>
-            <p className="text-xl text-slate-600 max-w-2xl leading-relaxed">
+            <p className="text-xl text-black max-w-2xl leading-relaxed">
               We prepare federal and state returns for clients in five states. Select your
               state for local tax information, VITA site locations, and state-specific credits.
             </p>
@@ -445,12 +443,12 @@ export default function SupersonicFastCashPage() {
                 covers individual and business returns, IRS e-file procedures, refund
                 products, and client service.
               </p>
-              <p className="text-slate-600 mb-5 leading-relaxed">
+              <p className="text-black mb-5 leading-relaxed">
                 Graduates receive PTIN registration, IRS e-file authorization, and the
                 option to join the Supersonic Fast Cash preparer network. Training is
                 available in-person and online. No prior experience required.
               </p>
-              <p className="text-slate-600 mb-8 leading-relaxed">
+              <p className="text-black mb-8 leading-relaxed">
                 Funding may be available for qualifying participants through WIOA and
                 other workforce programs offered through Elevate for Humanity.
               </p>
@@ -490,7 +488,7 @@ export default function SupersonicFastCashPage() {
             <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
               Ready to Get Your Money?
             </h2>
-            <p className="text-xl text-slate-200 mb-8 leading-relaxed">
+            <p className="text-xl text-white mb-8 leading-relaxed">
               Apply now. Most clients receive their refund advance within 15 minutes
               of IRS acceptance.
             </p>
@@ -509,7 +507,7 @@ export default function SupersonicFastCashPage() {
       {/* DISCLOSURE */}
       <section className="py-6 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <p className="text-xs text-slate-500 leading-relaxed">
+          <p className="text-xs text-black leading-relaxed">
             Electronic filing is subject to IRS validation. Acceptance is not guaranteed.
             Refund advance amounts and availability are subject to eligibility requirements
             and lender approval. All tax preparers are PTIN-credentialed and authorized for

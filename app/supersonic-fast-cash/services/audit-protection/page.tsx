@@ -108,7 +108,7 @@ export default function AuditProtectionPage() {
             <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
               What&apos;s Included
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-black">
               Comprehensive protection when you need it most
             </p>
           </div>
@@ -120,7 +120,7 @@ export default function AuditProtectionPage() {
                   <item.icon className="w-7 h-7 text-brand-red-600" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-600 text-sm">{item.description}</p>
+                <p className="text-black text-sm">{item.description}</p>
               </div>
             ))}
           </div>
@@ -135,13 +135,13 @@ export default function AuditProtectionPage() {
               <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-6">
                 Types of Audits We Cover
               </h2>
-              <p className="text-lg text-gray-600 mb-8">
+              <p className="text-lg text-black mb-8">
                 Our audit protection covers a wide range of tax-related issues, giving you peace of mind no matter what comes your way.
               </p>
               <ul className="space-y-4">
                 {whatsCovered.map((item, idx) => (
                   <li key={idx} className="flex items-center gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     <span className="text-gray-700 font-medium">{item}</span>
                   </li>
                 ))}
@@ -153,7 +153,7 @@ export default function AuditProtectionPage() {
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
                   Add Audit Protection
                 </h3>
-                <p className="text-gray-600 mb-6">
+                <p className="text-black mb-6">
                   Protect yourself for just a small additional fee when you file with us.
                 </p>
                 <Link
@@ -182,7 +182,7 @@ export default function AuditProtectionPage() {
             {faqs.map((faq, idx) => (
               <div key={idx} className="bg-white rounded-xl p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{faq.question}</h3>
-                <p className="text-gray-600">{faq.answer}</p>
+                <p className="text-black">{faq.answer}</p>
               </div>
             ))}
           </div>
@@ -195,7 +195,7 @@ export default function AuditProtectionPage() {
           <h2 className="text-3xl md:text-4xl font-black text-white mb-6">
             Don&apos;t Face the IRS Alone
           </h2>
-          <p className="text-xl text-brand-red-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Add audit protection to your tax return and file with confidence.
           </p>
           <Link

@@ -31,19 +31,19 @@ export default function JobPlacementPage() {
         <div className="grid md:grid-cols-4 gap-8 text-center">
           <div>
             <div className="text-4xl font-black text-brand-orange-600 mb-2">Active</div>
-            <div className="text-gray-600">Employer Network</div>
+            <div className="text-black">Employer Network</div>
           </div>
           <div>
             <div className="text-4xl font-black text-brand-orange-600 mb-2">Included</div>
-            <div className="text-gray-600">Job Placement</div>
+            <div className="text-black">Job Placement</div>
           </div>
           <div>
             <div className="text-4xl font-black text-brand-orange-600 mb-2">Full</div>
-            <div className="text-gray-600">Support Services</div>
+            <div className="text-black">Support Services</div>
           </div>
           <div>
             <div className="text-4xl font-black text-brand-orange-600 mb-2">Free</div>
-            <div className="text-gray-600">For All Graduates</div>
+            <div className="text-black">For All Graduates</div>
           </div>
         </div>
       </section>
@@ -52,7 +52,7 @@ export default function JobPlacementPage() {
         <h2 className="text-4xl font-black text-black mb-4 text-center">
           Comprehensive Job Placement Support
         </h2>
-        <p className="text-xl text-gray-600 text-center mb-12 max-w-3xl mx-auto">
+        <p className="text-xl text-black text-center mb-12 max-w-3xl mx-auto">
           From resume submission to your first day on the job, we're with you every step of the way.
         </p>
 
@@ -63,7 +63,7 @@ export default function JobPlacementPage() {
             </div>
             <div className="p-8">
               <h3 className="text-xl font-bold text-black mb-3">Direct Employer Connections</h3>
-              <p className="text-gray-600">
+              <p className="text-black">
                 We maintain relationships with pre-vetted hiring partners across Central Indiana. Our graduates get access to exclusive job postings and direct referrals to hiring managers — not just online applications. Employers in our network have agreed to interview qualified Elevate graduates as a priority.
               </p>
             </div>
@@ -75,7 +75,7 @@ export default function JobPlacementPage() {
             </div>
             <div className="p-8">
               <h3 className="text-xl font-bold text-black mb-3">Personalized Job Matching</h3>
-              <p className="text-gray-600">
+              <p className="text-black">
                 Your career coach reviews your skills, certifications, location preferences, schedule needs, and long-term career goals. We then match you with open positions that fit — not just any job, but the right job for your situation and ambitions.
               </p>
             </div>
@@ -87,7 +87,7 @@ export default function JobPlacementPage() {
             </div>
             <div className="p-8">
               <h3 className="text-xl font-bold text-black mb-3">Interview Coordination</h3>
-              <p className="text-gray-600">
+              <p className="text-black">
                 We handle interview scheduling with employers, prepare you with company-specific coaching so you know what to expect, and follow up with the employer after your interview. If you need transportation or professional attire, we can help with that too.
               </p>
             </div>
@@ -106,7 +106,7 @@ export default function JobPlacementPage() {
                   <h3 className="text-xl font-bold text-black mb-2">
                     Complete Your Training
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-black">
                     Finish your program, complete your training, and demonstrate job-ready skills.
                   </p>
                 </div>
@@ -119,7 +119,7 @@ export default function JobPlacementPage() {
                   <h3 className="text-xl font-bold text-black mb-2">
                     Career Assessment
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-black">
                     Meet with your career coach to discuss goals, preferences, and target employers.
                   </p>
                 </div>
@@ -132,7 +132,7 @@ export default function JobPlacementPage() {
                   <h3 className="text-xl font-bold text-black mb-2">
                     Job Matching
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-black">
                     We identify opportunities that match your skills, location, and career goals.
                   </p>
                 </div>
@@ -147,7 +147,7 @@ export default function JobPlacementPage() {
                   <h3 className="text-xl font-bold text-black mb-2">
                     Employer Introduction
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-black">
                     We submit your resume and credentials directly to hiring managers.
                   </p>
                 </div>
@@ -160,7 +160,7 @@ export default function JobPlacementPage() {
                   <h3 className="text-xl font-bold text-black mb-2">
                     Interview Support
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-black">
                     Prepare for interviews with company-specific coaching and practice sessions.
                   </p>
                 </div>
@@ -173,7 +173,7 @@ export default function JobPlacementPage() {
                   <h3 className="text-xl font-bold text-black mb-2">
                     Start Your Career
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-black">
                     Accept your offer and begin working with ongoing support from our team.
                   </p>
                 </div>
@@ -188,7 +188,7 @@ export default function JobPlacementPage() {
           <h2 className="text-4xl font-black text-black mb-4 text-center">
             Our Employer Partners
           </h2>
-          <p className="text-xl text-gray-600 text-center mb-12 max-w-3xl mx-auto">
+          <p className="text-xl text-black text-center mb-12 max-w-3xl mx-auto">
             We partner with leading employers across multiple industries who are committed to 
             hiring and developing our graduates.
           </p>
@@ -199,7 +199,7 @@ export default function JobPlacementPage() {
                 <Building2 className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3">Technology</h3>
-              <ul className="space-y-2 text-gray-600 text-sm">
+              <ul className="space-y-2 text-black text-sm">
                 <li>• Software development companies</li>
                 <li>• IT service providers</li>
                 <li>• Tech startups and enterprises</li>
@@ -212,7 +212,7 @@ export default function JobPlacementPage() {
                 <Briefcase className="w-6 h-6 text-brand-green-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3">Business Services</h3>
-              <ul className="space-y-2 text-gray-600 text-sm">
+              <ul className="space-y-2 text-black text-sm">
                 <li>• Accounting and tax firms</li>
                 <li>• Financial services</li>
                 <li>• Consulting companies</li>
@@ -225,7 +225,7 @@ export default function JobPlacementPage() {
                 <Users className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3">Healthcare</h3>
-              <ul className="space-y-2 text-gray-600 text-sm">
+              <ul className="space-y-2 text-black text-sm">
                 <li>• Hospitals and clinics</li>
                 <li>• Healthcare IT companies</li>
                 <li>• Medical billing services</li>
@@ -238,7 +238,7 @@ export default function JobPlacementPage() {
                 <TrendingUp className="w-6 h-6 text-brand-orange-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3">Manufacturing</h3>
-              <ul className="space-y-2 text-gray-600 text-sm">
+              <ul className="space-y-2 text-black text-sm">
                 <li>• Advanced manufacturing</li>
                 <li>• Logistics and supply chain</li>
                 <li>• Quality assurance</li>
@@ -251,7 +251,7 @@ export default function JobPlacementPage() {
                 <Award className="w-6 h-6 text-brand-red-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3">Nonprofit</h3>
-              <ul className="space-y-2 text-gray-600 text-sm">
+              <ul className="space-y-2 text-black text-sm">
                 <li>• Community organizations</li>
                 <li>• Educational institutions</li>
                 <li>• Social services agencies</li>
@@ -264,7 +264,7 @@ export default function JobPlacementPage() {
                 <Search className="w-6 h-6 text-yellow-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3">Government</h3>
-              <ul className="space-y-2 text-gray-600 text-sm">
+              <ul className="space-y-2 text-black text-sm">
                 <li>• Federal agencies</li>
                 <li>• State and local government</li>
                 <li>• Public schools and libraries</li>
@@ -277,7 +277,7 @@ export default function JobPlacementPage() {
             <h3 className="text-2xl font-bold text-black mb-4">
               Interested in Hiring Our Graduates?
             </h3>
-            <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+            <p className="text-black mb-6 max-w-2xl mx-auto">
               Join our employer network and gain access to skilled, motivated candidates 
               ready to contribute to your organization.
             </p>
@@ -300,7 +300,7 @@ export default function JobPlacementPage() {
         <div className="grid md:grid-cols-2 gap-8">
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8">
             <h3 className="text-2xl font-bold text-black mb-4">Employer Relationships</h3>
-            <p className="text-gray-600">
+            <p className="text-black">
               We don&apos;t just post job listings. We build long-term partnerships with employers 
               who understand our training and trust our graduates. Our team meets regularly with 
               hiring managers to understand their needs, workplace culture, and open positions. 
@@ -310,7 +310,7 @@ export default function JobPlacementPage() {
 
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8">
             <h3 className="text-2xl font-bold text-black mb-4">Personalized Matching</h3>
-            <p className="text-gray-600">
+            <p className="text-black">
               Every graduate gets one-on-one career coaching. We assess your skills, interests, 
               transportation situation, schedule constraints, and salary expectations. Then we 
               match you with positions that actually work for your life — not just any open role.
@@ -319,7 +319,7 @@ export default function JobPlacementPage() {
 
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8">
             <h3 className="text-2xl font-bold text-black mb-4">Ongoing Support</h3>
-            <p className="text-gray-600">
+            <p className="text-black">
               Our support doesn&apos;t end when you get hired. We do 90-day check-ins after placement 
               to make sure things are going well. If you need help advancing, switching roles, or 
               negotiating a raise, our career coaches are available to alumni at no cost — for life.
@@ -328,7 +328,7 @@ export default function JobPlacementPage() {
 
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8">
             <h3 className="text-2xl font-bold text-black mb-4">No Cost to You</h3>
-            <p className="text-gray-600">
+            <p className="text-black">
               All job placement services are completely free for our students and alumni. 
               There are no placement fees, no commissions, and no hidden costs. You can use 
               our job search support as many times as you need — whether you are looking for 
@@ -372,7 +372,7 @@ export default function JobPlacementPage() {
         <div className="space-y-6 max-w-4xl mx-auto">
           <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
             <h3 className="text-xl font-bold text-black mb-3">When can I start using job placement services?</h3>
-            <p className="text-gray-600">
+            <p className="text-black">
               Job placement services are available as soon as you complete your program and earn your 
               certification. We recommend connecting with career services during your final weeks of training 
               to prepare for your job search.
@@ -381,7 +381,7 @@ export default function JobPlacementPage() {
 
           <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
             <h3 className="text-xl font-bold text-black mb-3">Do I have to accept the jobs you recommend?</h3>
-            <p className="text-gray-600">
+            <p className="text-black">
               No. We present opportunities that match your criteria, but you have complete control over 
               which positions you pursue. We're here to support your decisions and help you find the right fit.
             </p>
@@ -389,7 +389,7 @@ export default function JobPlacementPage() {
 
           <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
             <h3 className="text-xl font-bold text-black mb-3">What if I don't get hired right away?</h3>
-            <p className="text-gray-600">
+            <p className="text-black">
               We continue working with you until you find the right position. There's no time limit on our 
               support. We'll refine your approach, expand your search, and keep connecting you with opportunities.
             </p>
@@ -397,7 +397,7 @@ export default function JobPlacementPage() {
 
           <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
             <h3 className="text-xl font-bold text-black mb-3">Can I use job placement services if I'm already employed?</h3>
-            <p className="text-gray-600">
+            <p className="text-black">
               Yes! Our services are available to help you advance your career, find better opportunities, 
               or transition to a new role. We support both job seekers and those looking to level up.
             </p>
@@ -405,7 +405,7 @@ export default function JobPlacementPage() {
 
           <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
             <h3 className="text-xl font-bold text-black mb-3">Do you help with remote job opportunities?</h3>
-            <p className="text-gray-600">
+            <p className="text-black">
               Absolutely. Many of our employer partners offer remote and hybrid positions. We can help you 
               find opportunities that match your location preferences, whether that's in-person, remote, or hybrid.
             </p>
@@ -413,7 +413,7 @@ export default function JobPlacementPage() {
 
           <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
             <h3 className="text-xl font-bold text-black mb-3">Is job placement guaranteed?</h3>
-            <p className="text-gray-600">
+            <p className="text-black">
               While we cannot guarantee employment (as hiring decisions are made by employers), we provide 
               ongoing support until you find the right position. We're committed to your success.
             </p>
@@ -459,7 +459,7 @@ export default function JobPlacementPage() {
             <h3 className="text-xl font-bold text-black mb-2">
               Resume Building
             </h3>
-            <p className="text-gray-600">
+            <p className="text-black">
               Professional resume writing and review services
             </p>
           </Link>
@@ -470,7 +470,7 @@ export default function JobPlacementPage() {
             <h3 className="text-xl font-bold text-black mb-2">
               Interview Preparation
             </h3>
-            <p className="text-gray-600">
+            <p className="text-black">
               Mock interviews and coaching to ace your interviews
             </p>
           </Link>
@@ -481,7 +481,7 @@ export default function JobPlacementPage() {
             <h3 className="text-xl font-bold text-black mb-2">
               Career Counseling
             </h3>
-            <p className="text-gray-600">
+            <p className="text-black">
               Long-term career planning and guidance
             </p>
           </Link>

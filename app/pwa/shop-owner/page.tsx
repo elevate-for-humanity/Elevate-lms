@@ -33,7 +33,7 @@ function LandingPage() {
           <Building2 className="w-10 h-10 text-white" />
         </div>
         <h1 className="text-3xl font-black text-slate-900 mb-3">Partner Shop</h1>
-        <p className="text-brand-blue-200 text-lg max-w-xs mx-auto">
+        <p className="text-white text-lg max-w-xs mx-auto">
           Manage apprentices, log hours, and track training progress at your barbershop.
         </p>
       </div>
@@ -125,7 +125,7 @@ function Dashboard({
               <Building2 className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-brand-blue-200 text-sm">Partner Shop</p>
+              <p className="text-white text-sm">Partner Shop</p>
               <h1 className="text-slate-900 font-bold text-lg">{shop.name}</h1>
             </div>
           </div>
@@ -148,15 +148,15 @@ function Dashboard({
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
             <div className="flex items-center gap-2 mb-1">
-              <Users className="w-4 h-4 text-brand-blue-200" />
-              <span className="text-brand-blue-200 text-xs">Active Apprentices</span>
+              <Users className="w-4 h-4 text-white" />
+              <span className="text-white text-xs">Active Apprentices</span>
             </div>
             <p className="text-3xl font-bold text-slate-900">{apprentices.length}</p>
           </div>
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
             <div className="flex items-center gap-2 mb-1">
-              <Clock className="w-4 h-4 text-brand-blue-200" />
-              <span className="text-brand-blue-200 text-xs">Hours This Week</span>
+              <Clock className="w-4 h-4 text-white" />
+              <span className="text-white text-xs">Hours This Week</span>
             </div>
             <p className="text-3xl font-bold text-slate-900">{totalHoursThisWeek}</p>
           </div>

@@ -153,7 +153,7 @@ export default function TypeIIIChillerDiagram({ onComplete }: { onComplete?: () 
       {/* Key difference callout */}
       <div className="bg-brand-blue-700 rounded-2xl p-4 text-white">
         <p className="font-extrabold text-sm mb-1">The Key Difference from Type I and II</p>
-        <p className="text-brand-blue-200 text-sm leading-relaxed">
+        <p className="text-white text-sm leading-relaxed">
           Type III systems operate <span className="text-white font-bold">below atmospheric pressure</span> (in a vacuum).
           Air leaks IN. You test for leaks by pressurizing, not pulling vacuum.
           Recovery requires a very deep vacuum (25 mm Hg absolute).

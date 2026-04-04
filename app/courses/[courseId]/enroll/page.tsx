@@ -77,7 +77,7 @@ export default function CourseEnrollPage({
             <div className="space-y-6">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 w-12 h-12 bg-brand-green-100 rounded-full flex items-center justify-center">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                 </div>
                 <div>
                   <h3 className="font-bold text-black mb-1">
@@ -165,21 +165,21 @@ export default function CourseEnrollPage({
 
             <div className="mt-6 space-y-3 text-sm text-black">
               <div className="flex items-center gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <span>Secure payment via Stripe</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <span>Instant access after payment</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <span>30-day money-back guarantee</span>
               </div>
             </div>
 
             <div className="mt-8 pt-6 border-t border-gray-200">
-              <p className="text-xs text-gray-500 text-center">
+              <p className="text-xs text-black text-center">
                 By enrolling, you agree to our{' '}
                 <a href="/terms-of-service" className="text-brand-blue-600 hover:underline">
                   Terms of Service

@@ -50,7 +50,7 @@ export default function GrantScholarshipApplication() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Grants & Scholarships</h1>
-          <p className="text-brand-red-100">Apply for financial assistance</p>
+          <p className="text-white">Apply for financial assistance</p>
         </div>
       </div>
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -67,7 +67,7 @@ export default function GrantScholarshipApplication() {
                   onClick={() => setSelectedGrant(grant.id)}
                 >
                   <h3 className="font-bold text-lg">{grant.name}</h3>
-                  <p className="text-2xl font-bold text-brand-orange-600">${grant.amount.toLocaleString()}</p>
+                  <p className="text-2xl font-bold text-brand-orange-600">${grant.amount.toLocaleString('en-US')}</p>
                   <p className="text-sm text-black">Deadline: {grant.deadline}</p>
                   <span className={`inline-block mt-2 px-2 py-2 rounded text-xs ${
                     grant.status === 'open' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-gray-100 text-black'

@@ -11,10 +11,10 @@ export function BarberEnrollment() {
       <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 text-center">Tuition &amp; Payment Options</h2>
-          <p className="text-slate-600 text-center mb-2 max-w-2xl mx-auto">
+          <p className="text-black text-center mb-2 max-w-2xl mx-auto">
             Total tuition: <strong>$4,980</strong>. Small down payment, small weekly payments — you pick.
           </p>
-          <p className="text-slate-500 text-center text-sm mb-8 max-w-2xl mx-auto">
+          <p className="text-black text-center text-sm mb-8 max-w-2xl mx-auto">
             Self-pay program. Payment plans and BNPL financing available — pick what works for you.
           </p>
           <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
@@ -22,7 +22,7 @@ export function BarberEnrollment() {
               <DollarSign className="w-8 h-8 text-brand-green-600 mx-auto mb-2" />
               <h3 className="font-bold text-slate-900 mb-1">Pay in Full</h3>
               <p className="text-2xl font-black text-slate-900 mb-1">$4,980</p>
-              <p className="text-slate-500 text-xs mb-3">5% discount applied at checkout</p>
+              <p className="text-black text-xs mb-3">One-time full payment</p>
               <Link href="/programs/barber-apprenticeship/apply?type=apprentice&payment=pay_in_full" className="inline-block text-sm font-semibold text-brand-red-600 hover:text-brand-red-700">
                 Enroll Now &rarr;
               </Link>
@@ -31,9 +31,9 @@ export function BarberEnrollment() {
               <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-orange-600 text-white text-xs font-bold px-3 py-1 rounded-full">POPULAR</span>
               <CreditCard className="w-8 h-8 text-brand-orange-600 mx-auto mb-2" />
               <h3 className="font-bold text-slate-900 mb-1">Payment Plan</h3>
-              <p className="text-2xl font-black text-slate-900 mb-1">from $600 <span className="text-base font-normal text-slate-500">down</span></p>
-              <p className="text-slate-500 text-xs mb-1">You choose your down payment</p>
-              <p className="text-slate-500 text-xs mb-3">Remainder split over 29 weekly payments</p>
+              <p className="text-2xl font-black text-slate-900 mb-1">from $600 <span className="text-base font-normal text-black">down</span></p>
+              <p className="text-black text-xs mb-1">You choose your down payment</p>
+              <p className="text-black text-xs mb-3">Remainder split over 29 weekly payments</p>
               <Link href="/programs/barber-apprenticeship/apply?type=apprentice&payment=payment_plan" className="inline-block bg-brand-orange-600 hover:bg-brand-orange-700 text-white text-sm font-bold px-4 py-2 rounded-lg transition-colors">
                 Choose My Plan &rarr;
               </Link>
@@ -41,7 +41,7 @@ export function BarberEnrollment() {
             <div className="bg-white rounded-xl p-5 border border-slate-200 text-center">
               <CreditCard className="w-8 h-8 text-brand-blue-600 mx-auto mb-2" />
               <h3 className="font-bold text-slate-900 mb-1">Buy Now, Pay Later</h3>
-              <p className="text-slate-500 text-xs mb-3">Choose your provider at checkout</p>
+              <p className="text-black text-xs mb-3">Choose your provider at checkout</p>
               <div className="flex flex-col gap-2 mb-3">
                 {ACTIVE_BNPL_PROVIDERS.map((p) => (
                   <Link
@@ -53,10 +53,10 @@ export function BarberEnrollment() {
                   </Link>
                 ))}
               </div>
-              <p className="text-slate-400 text-[10px]">Subject to provider approval</p>
+              <p className="text-black text-[10px]">Subject to provider approval</p>
             </div>
           </div>
-          <p className="mt-4 text-xs text-slate-500 text-center max-w-2xl mx-auto">
+          <p className="mt-4 text-xs text-black text-center max-w-2xl mx-auto">
             Payment plans start at $600 down. BNPL financing available through {BNPL_PROVIDER_NAMES} — subject to provider approval.
           </p>
         </div>
@@ -71,10 +71,10 @@ export function BarberEnrollment() {
                 <Scissors className="w-7 h-7 text-slate-700" />
                 <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900">Own a Barbershop?</h2>
               </div>
-              <p className="text-slate-600 text-base leading-relaxed mb-4">
+              <p className="text-black text-base leading-relaxed mb-4">
                 Become a partner training site and host apprentices in your shop. We handle the paperwork — you train the next generation.
               </p>
-              <ul className="text-slate-600 text-sm space-y-1.5 mb-6">
+              <ul className="text-black text-sm space-y-1.5 mb-6">
                 {[
                   'Get pre-screened, motivated apprentices',
                   'Zero administrative burden — we handle compliance',
@@ -152,7 +152,7 @@ export function BarberEnrollment() {
                 <strong>Payment Plan:</strong> Start with a $600 down payment, then pay the remaining balance in small weekly installments over 29 weeks. No interest.
               </p>
               <p className="text-sm text-slate-700">
-                <strong>Pay in Full:</strong> Pay the full $4,980 upfront and receive a 5% discount — total $4,731.
+                <strong>Pay in Full:</strong> Pay the full $4,980 upfront.
               </p>
               <p className="text-sm text-slate-700">
                 <strong>BNPL Financing:</strong> Split your tuition into installments through {BNPL_PROVIDER_NAMES}. Select your preferred provider at checkout.
@@ -171,7 +171,7 @@ export function BarberEnrollment() {
                   </div>
                   <div>
                     <h4 className="font-bold text-slate-900 text-sm">{step.title}</h4>
-                    <p className="text-slate-600 text-sm">{step.description}</p>
+                    <p className="text-black text-sm">{step.description}</p>
                   </div>
                 </div>
               ))}
@@ -204,10 +204,10 @@ export function BarberEnrollment() {
           <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">
             Join the Waitlist
           </h2>
-          <p className="text-xl text-slate-600 mb-4">
+          <p className="text-xl text-black mb-4">
             We are finalizing barbershop placement sites now. Submit your application to secure your spot — we will contact you as soon as placements are confirmed.
           </p>
-          <p className="text-slate-500 mb-8">
+          <p className="text-black mb-8">
             Pay in full, use a payment plan, or apply for Buy Now Pay Later with {BNPL_PROVIDER_NAMES}.
           </p>
           <div className="flex flex-wrap gap-4 justify-center mb-6">

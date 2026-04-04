@@ -88,56 +88,56 @@ export function LiveMetrics() {
   const stats = [
     {
       label: 'Total Users',
-      value: metrics.metrics.totalUsers.toLocaleString(),
+      value: metrics.metrics.totalUsers.toLocaleString('en-US'),
       icon: Users,
       color: 'blue',
       description: 'Registered platform users',
     },
     {
       label: 'Active Students',
-      value: metrics.metrics.activeStudents.toLocaleString(),
+      value: metrics.metrics.activeStudents.toLocaleString('en-US'),
       icon: BookOpen,
       color: 'green',
       description: 'Enrolled in last 30 days',
     },
     {
       label: 'Total Enrollments',
-      value: metrics.metrics.totalEnrollments.toLocaleString(),
+      value: metrics.metrics.totalEnrollments.toLocaleString('en-US'),
       icon: TrendingUp,
       color: 'purple',
       description: 'All-time course enrollments',
     },
     {
       label: 'Completed Courses',
-      value: metrics.metrics.completedCourses.toLocaleString(),
+      value: metrics.metrics.completedCourses.toLocaleString('en-US'),
       icon: CheckCircle,
       color: 'green',
       description: 'Successfully completed',
     },
     {
       label: 'Applications',
-      value: metrics.metrics.totalApplications.toLocaleString(),
+      value: metrics.metrics.totalApplications.toLocaleString('en-US'),
       icon: BarChart3,
       color: 'orange',
       description: 'Total program applications',
     },
     {
       label: 'Recent Logins',
-      value: metrics.metrics.recentLogins24h.toLocaleString(),
+      value: metrics.metrics.recentLogins24h.toLocaleString('en-US'),
       icon: Activity,
       color: 'blue',
       description: 'Last 24 hours',
     },
     {
       label: 'Active Courses',
-      value: metrics.metrics.activeCourses.toLocaleString(),
+      value: metrics.metrics.activeCourses.toLocaleString('en-US'),
       icon: BookOpen,
       color: 'indigo',
       description: 'Published and available',
     },
     {
       label: 'Certificates Issued',
-      value: metrics.metrics.totalCertificates.toLocaleString(),
+      value: metrics.metrics.totalCertificates.toLocaleString('en-US'),
       icon: Award,
       color: 'yellow',
       description: 'Total certificates awarded',
@@ -223,8 +223,8 @@ export function LiveMetrics() {
           />
         </div>
         <p className="text-sm text-black mt-2">
-          {metrics.metrics.completedCourses.toLocaleString()} of{' '}
-          {metrics.metrics.totalEnrollments.toLocaleString()} enrollments
+          {metrics.metrics.completedCourses.toLocaleString('en-US')} of{' '}
+          {metrics.metrics.totalEnrollments.toLocaleString('en-US')} enrollments
           completed
         </p>
       </div>
@@ -267,7 +267,7 @@ export function LiveMetrics() {
         <p className="text-xs text-black text-center">
           <strong>Data Source:</strong> {metrics.dataSource} •
           <strong> Updated:</strong>{' '}
-          {new Date(metrics.lastUpdated).toLocaleString()} •
+          {new Date(metrics.lastUpdated).toLocaleString('en-US')} •
           <strong> Verified:</strong> {metrics.verified ? '• Yes' : '✗ No'}
         </p>
       </div>

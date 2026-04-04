@@ -117,7 +117,7 @@ export default function SupersonicOperationalControlsPage() {
           <div className="space-y-3">
             {contentControls.map((item, index) => (
               <div key={index} className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <span className="text-slate-700">{item}</span>
               </div>
             ))}
@@ -135,7 +135,7 @@ export default function SupersonicOperationalControlsPage() {
           <div className="space-y-3">
             {lmsControls.map((item, index) => (
               <div key={index} className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <span className="text-slate-700">{item}</span>
               </div>
             ))}
@@ -153,7 +153,7 @@ export default function SupersonicOperationalControlsPage() {
           <div className="space-y-3">
             {storeControls.map((item, index) => (
               <div key={index} className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <span className="text-slate-700">{item}</span>
               </div>
             ))}
@@ -175,13 +175,13 @@ export default function SupersonicOperationalControlsPage() {
             <div className="grid md:grid-cols-2 gap-3">
               {deploymentChecks.map((item, index) => (
                 <div key={index} className="flex items-center gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <span className="text-sm text-slate-700">{item}</span>
                 </div>
               ))}
             </div>
           </div>
-          <p className="text-slate-600 text-sm mt-4">
+          <p className="text-black text-sm mt-4">
             If any check fails, the deployment is blocked until issues are resolved.
           </p>
         </section>
@@ -192,15 +192,15 @@ export default function SupersonicOperationalControlsPage() {
           <div className="space-y-4">
             <div>
               <p className="font-medium text-slate-900">Weekly</p>
-              <p className="text-slate-600 text-sm">Search Console coverage, index count verification, broken link checks</p>
+              <p className="text-black text-sm">Search Console coverage, index count verification, broken link checks</p>
             </div>
             <div>
               <p className="font-medium text-slate-900">Monthly</p>
-              <p className="text-slate-600 text-sm">Full indexed page inventory, metadata audit, canonical verification</p>
+              <p className="text-black text-sm">Full indexed page inventory, metadata audit, canonical verification</p>
             </div>
             <div>
               <p className="font-medium text-slate-900">Quarterly</p>
-              <p className="text-slate-600 text-sm">LMS course audit, Store product audit, compliance language review</p>
+              <p className="text-black text-sm">LMS course audit, Store product audit, compliance language review</p>
             </div>
           </div>
         </section>
@@ -218,7 +218,7 @@ export default function SupersonicOperationalControlsPage() {
             <li>• Adding new public routes</li>
             <li>• Removing disclosures or compliance language</li>
           </ul>
-          <p className="text-slate-600 text-sm mt-4">
+          <p className="text-black text-sm mt-4">
             Emergency fixes may be deployed but must be reviewed within 24 hours.
           </p>
         </section>

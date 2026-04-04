@@ -100,12 +100,12 @@ function SectionBlock({ section }: { section: RubricSection }) {
       <div className="bg-white rounded-t-xl px-6 py-4 print:bg-white print:rounded-none">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-brand-blue-200 text-xs font-medium uppercase tracking-wider print:text-gray-400">
+            <p className="text-white text-xs font-medium uppercase tracking-wider print:text-gray-400">
               Section {section.section} of 6
             </p>
             <h3 className="text-lg font-bold text-slate-900 mt-1">{section.title}</h3>
           </div>
-          <div className="text-right text-xs text-brand-blue-200 print:text-gray-400">
+          <div className="text-right text-xs text-white print:text-gray-400">
             <p>{section.items.length} competencies</p>
             <p>RTI: {sectionRTI}h | OJT: {sectionOJT}h</p>
           </div>

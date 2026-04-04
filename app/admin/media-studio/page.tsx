@@ -5,10 +5,10 @@ import MediaStudioClient from './MediaStudioClient';
 
 export const dynamic = 'force-dynamic';
 
-export default function Page() {{
+export default function Page() {
   return (
     <AdminClientPage>
       <MediaStudioClient />
     </AdminClientPage>
   );
-}}
+}

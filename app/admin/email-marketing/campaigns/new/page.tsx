@@ -5,10 +5,10 @@ import NewCampaignClient from './NewCampaignClient';
 
 export const dynamic = 'force-dynamic';
 
-export default function Page() {{
+export default function Page() {
   return (
     <AdminClientPage>
       <NewCampaignClient />
     </AdminClientPage>
   );
-}}
+}

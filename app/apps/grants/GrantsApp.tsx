@@ -58,7 +58,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
             </div>
             <div>
               <h1 className="font-bold">Grants Discovery</h1>
-              <p className="text-brand-green-200 text-sm">Find & Manage Funding</p>
+              <p className="text-white text-sm">Find & Manage Funding</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -72,7 +72,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
-              className={`px-4 py-3 text-sm font-medium rounded-t-lg ${activeTab === tab ? 'bg-white text-brand-green-900' : 'text-brand-green-200 hover:bg-brand-green-700'}`}
+              className={`px-4 py-3 text-sm font-medium rounded-t-lg ${activeTab === tab ? 'bg-white text-brand-green-900' : 'text-white hover:bg-brand-green-700'}`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>

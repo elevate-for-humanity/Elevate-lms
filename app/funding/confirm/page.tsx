@@ -56,7 +56,7 @@ export default async function ConfirmFundingPage() {
         <Breadcrumbs items={[{ label: 'Onboarding', href: '/onboarding/learner' }, { label: 'Confirm Funding' }]} />
         <Link href="/onboarding/learner" className="text-sm text-brand-blue-600 flex items-center gap-1 mt-4 mb-4"><ArrowLeft className="w-4 h-4" /> Back to Onboarding</Link>
         <h1 className="text-2xl font-bold text-slate-900 mb-2">Confirm Your Funding</h1>
-        <p className="text-sm text-slate-500 mb-6">Select your funding source. Most students qualify for $0 out-of-pocket through workforce funding.</p>
+        <p className="text-sm text-black mb-6">Select your funding source. Most students qualify for $0 out-of-pocket through workforce funding.</p>
 
         <form action={confirmFunding} className="space-y-4">
           {fundingOptions.map((f, i) => (
@@ -65,8 +65,8 @@ export default async function ConfirmFundingPage() {
                 <input type="radio" name="funding_source" value={f.name} required className="mt-1" />
                 <div>
                   <div className="text-sm font-semibold text-slate-900">{f.name}</div>
-                  <div className="text-xs text-slate-500 mt-1">{f.desc}</div>
-                  <div className="text-[10px] text-slate-400 mt-1">Eligible: {f.eligible}</div>
+                  <div className="text-xs text-black mt-1">{f.desc}</div>
+                  <div className="text-[10px] text-black mt-1">Eligible: {f.eligible}</div>
                 </div>
               </div>
             </label>

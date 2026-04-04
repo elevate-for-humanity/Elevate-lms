@@ -3,47 +3,96 @@
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
-  ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip,
-  PieChart, Pie, Cell, BarChart, Bar,
-} from "recharts";
-import {
-  AlertTriangle, CheckCircle, ArrowRight, Download, ChevronUp, ChevronDown,
-  XCircle, UserX, BookOpen, Shield, BarChart3, Zap, Target, Settings, Users,
+  AlertTriangle, ArrowRight, CheckCircle, Clock, Users,
+  FileText, DollarSign, Award, XCircle, UserX, TrendingUp,
+  RefreshCw, ChevronUp, ChevronDown, Download, ExternalLink,
+  Video, Wand2, Layers, Image, PenTool, Cpu, Zap,
+  MonitorPlay, FlaskConical, BarChart3, BookOpen,
 } from "lucide-react";
-import { KpiGrid } from "./KpiGrid";
+import { RecentApplicationsList } from "./RecentApplicationsList";
 import { BlockedProgramsList } from "./BlockedProgramsList";
 import { InactiveLearnersList } from "./InactiveLearnersList";
-import { RecentApplicationsList } from "./RecentApplicationsList";
 import type { AdminDashboardData, RecentStudent } from "./types";
 
-// ── Chart constants ───────────────────────────────────────────────────────────
-const PIE_COLORS = ["#0f172a","#06b6d4","#94a3b8","#22c55e","#f59e0b","#ef4444"];
-const LINE_COLOR = "#3b82f6";
-const BAR_COLOR  = "#06b6d4";
+// ── Formatters ────────────────────────────────────────────────────────────────
+
+function fmtNumber(n: number) {
+  return new Intl.NumberFormat("en-US").format(n);
+}
+
+function fmtUsd(cents: number) {
+  if (cents === 0) return "$0";
+  return new Intl.NumberFormat("en-US", {
+    style: "currency", currency: "USD", maximumFractionDigits: 0,
+  }).format(cents / 100);
+}
+
+function fmtDate(iso: string) {
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short", day: "numeric", year: "numeric", timeZone: "UTC",
+  });
+}
 
 // ── Status badge ──────────────────────────────────────────────────────────────
-const STATUS_BADGE: Record<string,string> = {
-  pending:"bg-amber-100 text-amber-800", submitted:"bg-amber-100 text-amber-800",
-  in_review:"bg-blue-100 text-blue-800", approved:"bg-emerald-100 text-emerald-800",
-  enrolled:"bg-teal-100 text-teal-800",  rejected:"bg-red-100 text-red-800",
-  waitlisted:"bg-purple-100 text-purple-800", active:"bg-emerald-100 text-emerald-800",
-  at_risk:"bg-red-100 text-red-800",     completed:"bg-gray-100 text-gray-700",
+const STATUS_STYLES: Record<string, string> = {
+  submitted:  "bg-amber-100 text-amber-800",
+  pending:    "bg-amber-100 text-amber-800",
+  in_review:  "bg-blue-100 text-blue-800",
+  approved:   "bg-emerald-100 text-emerald-800",
+  enrolled:   "bg-teal-100 text-teal-800",
+  active:     "bg-emerald-100 text-emerald-800",
+  rejected:   "bg-red-100 text-red-800",
+  waitlisted: "bg-purple-100 text-purple-800",
+  at_risk:    "bg-red-100 text-red-800",
+  completed:  "bg-slate-100 text-slate-600",
+  draft:      "bg-slate-100 text-slate-600",
+  inactive:   "bg-slate-100 text-slate-500",
 };
-const STATUS_LABEL: Record<string,string> = {
-  pending:"Pending", submitted:"Submitted", in_review:"In Review",
-  approved:"Approved", enrolled:"Enrolled", rejected:"Rejected",
-  waitlisted:"Waitlisted", active:"Active", at_risk:"At Risk", completed:"Completed",
+const STATUS_LABELS: Record<string, string> = {
+  submitted: "Submitted", pending: "Pending", in_review: "In Review",
+  approved: "Approved", enrolled: "Enrolled", active: "Active",
+  rejected: "Rejected", waitlisted: "Waitlisted", at_risk: "At Risk",
+  completed: "Completed", draft: "Draft", inactive: "Inactive",
 };
-function Badge({ status }: { status: string }) {
+
+function StatusBadge({ status }: { status: string }) {
   return (
-    <span className={"inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold " + (STATUS_BADGE[status] || "bg-gray-100 text-gray-600")}>
-      {STATUS_LABEL[status] || status}
+    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold ${STATUS_STYLES[status] ?? "bg-slate-100 text-slate-600"}`}>
+      {STATUS_LABELS[status] ?? status}
     </span>
   );
 }
 
+// ── Metric card ───────────────────────────────────────────────────────────────
+function MetricCard({ label, value, sub, href, urgent, icon: Icon }: {
+  label: string; value: string | number; sub: string;
+  href: string; urgent?: boolean; icon: React.ElementType;
+}) {
+  return (
+    <Link href={href} className={`group relative flex flex-col gap-3 rounded-2xl border bg-white p-5 shadow-sm hover:shadow-md transition-all ${urgent ? "border-rose-300 ring-1 ring-rose-200" : "border-slate-200"}`}>
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{label}</p>
+        <div className={`rounded-xl p-2 flex-shrink-0 ${urgent ? "bg-rose-50 text-rose-600" : "bg-slate-100 text-slate-500"}`}>
+          <Icon className="h-4 w-4" />
+        </div>
+      </div>
+      <p className="text-3xl font-bold tracking-tight text-slate-900 tabular-nums">{value}</p>
+      <p className="text-xs text-slate-400 leading-snug">{sub}</p>
+      {urgent && <span className="absolute top-4 right-12 w-2 h-2 rounded-full bg-rose-500 animate-pulse" />}
+      <ArrowRight className="absolute bottom-4 right-4 w-3.5 h-3.5 text-slate-200 group-hover:text-slate-400 transition-colors" />
+    </Link>
+  );
+}
+
+// ── Sort icon ─────────────────────────────────────────────────────────────────
+type SortKey = "full_name" | "enrollment_status" | "created_at";
+function SortIcon({ active, dir }: { active: boolean; dir: "asc" | "desc" }) {
+  if (!active) return null;
+  return dir === "asc" ? <ChevronUp className="w-3 h-3 text-blue-500" /> : <ChevronDown className="w-3 h-3 text-blue-500" />;
+}
+
 // ── CSV export ────────────────────────────────────────────────────────────────
-function exportCSV(rows: Record<string,unknown>[], filename: string) {
+function exportCSV(rows: Record<string, unknown>[], filename: string) {
   if (!rows.length) return;
   const keys = Object.keys(rows[0]);
   const csv = [keys.join(","), ...rows.map(r => keys.map(k => JSON.stringify(r[k] ?? "")).join(","))].join("\n");
@@ -53,45 +102,34 @@ function exportCSV(rows: Record<string,unknown>[], filename: string) {
   a.click();
 }
 
-// ── Sort helpers ──────────────────────────────────────────────────────────────
-type SortKey = "full_name" | "enrollment_status" | "created_at";
-function SortIcon({ active, dir }: { active: boolean; dir: "asc"|"desc" }) {
-  if (!active) return <ChevronDown className="w-3 h-3 text-slate-300"/>;
-  return dir === "asc" ? <ChevronUp className="w-3 h-3 text-blue-500"/> : <ChevronDown className="w-3 h-3 text-blue-500"/>;
-}
-
-// ── Quick actions (static — no DB dependency) ─────────────────────────────────
-const QUICK_ACTIONS = [
-  { label:"Course Builder", sub:"Create or edit programs",  href:"/admin/course-builder",    icon:BookOpen, bg:"bg-blue-50",    color:"text-blue-600"    },
-  { label:"Compliance",     sub:"Documents & audits",       href:"/admin/compliance",         icon:Shield,   bg:"bg-emerald-50", color:"text-emerald-600" },
-  { label:"Reports",        sub:"Analytics & exports",      href:"/admin/reports",            icon:BarChart3,bg:"bg-purple-50",  color:"text-purple-600"  },
-  { label:"HVAC",           sub:"Manage HVAC program",      href:"/admin/hvac-activation",    icon:Zap,      bg:"bg-amber-50",   color:"text-amber-600"   },
-  { label:"Funding",        sub:"WIOA & grants",            href:"/admin/funding",            icon:Target,   bg:"bg-green-50",   color:"text-green-600"   },
-  { label:"Settings",       sub:"System configuration",     href:"/admin/settings",           icon:Settings, bg:"bg-slate-100",  color:"text-slate-600"   },
-];
-
 // ── Main shell ────────────────────────────────────────────────────────────────
 export function DashboardShell({ data }: { data: AdminDashboardData }) {
-
   const [search, setSearch] = useState("");
-  const [sort, setSort] = useState<{ key: SortKey; dir: "asc"|"desc" }>({ key: "created_at", dir: "desc" });
-
-  function toggleSort(key: SortKey) {
-    setSort(p => ({ key, dir: p.key === key && p.dir === "asc" ? "desc" : "asc" }));
-  }
-
-  // Defer time-dependent values to client to avoid SSR/hydration mismatch
+  const [sort, setSort] = useState<{ key: SortKey; dir: "asc" | "desc" }>({ key: "created_at", dir: "desc" });
   const [greeting, setGreeting] = useState("Good morning");
-  const [dateLabel, setDateLabel] = useState("");
+  const [updatedAt, setUpdatedAt] = useState("");
+
   useEffect(() => {
-    const now = new Date();
-    const hour = now.getHours();
-    setGreeting(hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening");
-    setDateLabel(now.toLocaleString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }));
-  }, []);
+    const h = new Date().getHours();
+    setGreeting(h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening");
+    setUpdatedAt(new Date(data.generatedAt).toLocaleString("en-US", {
+      month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
+    }));
+  }, [data.generatedAt]);
+
   const firstName = data.profile?.full_name?.split(" ")[0] || "Admin";
 
-  const trendData = data.enrollmentTrend;
+  const pendingAppsKpi = data.kpis.find(k => k.label === "Pending Applications");
+  const totalPending = pendingAppsKpi?.value ?? 0;
+  const urgentApps = data.recentApplications.filter(a => a.urgent).length;
+  const urgentCount = [totalPending > 0, data.blockedPrograms.length > 0, data.inactiveLearners.length > 0].filter(Boolean).length;
+
+  const revenueKpi = data.kpis.find(k => k.label === "Revenue This Month");
+  const revenueThisMonth = fmtUsd(revenueKpi?.value ?? 0);
+  const revenueAllTime = revenueKpi?.sub ?? "";
+
+  const activeKpi = data.kpis.find(k => k.label === "Active Enrollments");
+  const certsKpi = data.kpis.find(k => k.label === "Certificates Issued");
 
   const filteredStudents = useMemo(() => {
     let list = [...data.recentStudents];
@@ -107,259 +145,277 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
     return list;
   }, [data.recentStudents, search, sort]);
 
-  // Attention blockers — derived from already-resolved data
-  const pendingAppsKpi = data.kpis.find(k => k.label === "Pending Applications");
-  const blockers = [
-    pendingAppsKpi?.urgent && {
-      label: `${pendingAppsKpi.value} application${pendingAppsKpi.value !== 1 ? "s" : ""} need review`,
-      sub: "Learners waiting for a decision",
-      href: "/admin/applications?status=submitted",
-      badge: "Urgent", badgeColor: "bg-red-100 text-red-700", urgent: true,
-    },
-    data.blockedPrograms.length > 0 && {
-      label: `${data.blockedPrograms.length} program${data.blockedPrograms.length !== 1 ? "s" : ""} unpublished`,
-      sub: "Blocking revenue",
-      href: "/admin/programs",
-      badge: "Blocking", badgeColor: "bg-orange-100 text-orange-700", urgent: true,
-    },
-    data.inactiveLearners.length > 0 && {
-      label: `${data.inactiveLearners.length} learner${data.inactiveLearners.length !== 1 ? "s" : ""} inactive 3+ days`,
-      sub: "No activity or falling behind",
-      href: "/admin/at-risk",
-      badge: "At Risk", badgeColor: "bg-red-100 text-red-700", urgent: true,
-    },
-  ].filter(Boolean) as { label: string; sub: string; href: string; badge: string; badgeColor: string; urgent: boolean }[];
+  function toggleSort(key: SortKey) {
+    setSort(p => ({ key, dir: p.key === key && p.dir === "asc" ? "desc" : "asc" }));
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 pb-12">
 
-      {/* Welcome bar */}
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900">{greeting}, {firstName}</h2>
-          <p className="text-sm text-slate-500 mt-0.5">
-            {dateLabel}
-            {blockers.length > 0 && (
-              <span className="ml-2 font-semibold text-rose-600">
-                · {blockers.length} item{blockers.length !== 1 ? "s" : ""} need attention
+      {/* ── Header ── */}
+      <div className="flex items-start justify-between gap-3 flex-wrap pt-2">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 truncate">{greeting}, {firstName}</h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1 flex items-center gap-1.5 flex-wrap">
+            <RefreshCw className="w-3 h-3 flex-shrink-0" />
+            <span>Updated {updatedAt || "—"}</span>
+            {urgentCount > 0 && (
+              <span className="font-semibold text-rose-600">
+                · {urgentCount} item{urgentCount !== 1 ? "s" : ""} need attention
               </span>
             )}
           </p>
         </div>
-        <Link href="/admin/reports" className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 transition-colors">
-          <BarChart3 className="h-4 w-4"/>Reports
-        </Link>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Link href="/admin/reports" className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs sm:text-sm font-semibold px-3 py-2 hover:bg-slate-50 transition-colors shadow-sm">
+            <TrendingUp className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Reports</span>
+          </Link>
+          <Link href="/admin/applications?status=submitted" className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 hover:bg-slate-700 text-white text-xs sm:text-sm font-semibold px-3 py-2 transition-colors shadow-sm">
+            <span className="hidden sm:inline">Review </span>Applications
+            {totalPending > 0 && (
+              <span className="bg-rose-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full">{totalPending}</span>
+            )}
+          </Link>
+        </div>
       </div>
 
-      {/* KPI cards */}
-      <KpiGrid kpis={data.kpis} />
-
-      {/* Enrollment trend */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="mb-4 flex items-center justify-between flex-wrap gap-2">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900">Enrollment Trend</h2>
-            <p className="text-sm text-slate-500">Monthly learner enrollment volume</p>
-          </div>
-          <p className="text-sm text-slate-500">Enrollment trend by month</p>
-        </div>
-        <div className="h-72">
-          {trendData.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={trendData} margin={{ top:4, right:8, left:-20, bottom:0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9"/>
-                <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fontSize:12, fill:"#94a3b8" }}/>
-                <YAxis tickLine={false} axisLine={false} tick={{ fontSize:12, fill:"#94a3b8" }}/>
-                <Tooltip contentStyle={{ fontSize:12, borderRadius:12, border:"1px solid #e2e8f0" }}/>
-                <Line type="monotone" dataKey="enrollments" stroke={LINE_COLOR} strokeWidth={3} dot={{ r:4, fill:LINE_COLOR }} activeDot={{ r:6 }} name="Enrollments"/>
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="h-full flex items-center justify-center text-sm text-slate-400">No enrollment data yet</div>
-          )}
-        </div>
-      </section>
-
-      {/* Status donut + Top programs */}
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900 mb-1">Student Statuses</h2>
-          <p className="text-sm text-slate-500 mb-4">Current distribution by learner status</p>
-          {data.studentStatuses.length > 0 ? (
-            <>
-              <div className="h-48">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={data.studentStatuses} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={3}>
-                      {data.studentStatuses.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]}/>)}
-                    </Pie>
-                    <Tooltip contentStyle={{ fontSize:12, borderRadius:12, border:"1px solid #e2e8f0" }}/>
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="mt-3 space-y-2">
-                {data.studentStatuses.map((item, i) => (
-                  <div key={item.name} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="inline-block h-2.5 w-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }}/>
-                      <span className="text-slate-600">{item.name}</span>
-                    </div>
-                    <span className="font-semibold text-slate-900 tabular-nums">{item.value}</span>
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : (
-            <div className="h-48 flex items-center justify-center text-sm text-slate-400">No status data yet</div>
-          )}
-        </div>
-
-        <div className="xl:col-span-2 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900 mb-1">Top Programs</h2>
-          <p className="text-sm text-slate-500 mb-4">Highest learner volume by program</p>
-          {data.topPrograms.length > 0 ? (
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data.topPrograms} layout="vertical" margin={{ left:8, right:8, top:0, bottom:0 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9"/>
-                  <XAxis type="number" tickLine={false} axisLine={false} tick={{ fontSize:11, fill:"#94a3b8" }}/>
-                  <YAxis type="category" dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize:11, fill:"#64748b" }} width={120}/>
-                  <Tooltip contentStyle={{ fontSize:12, borderRadius:12, border:"1px solid #e2e8f0" }}/>
-                  <Bar dataKey="learners" fill={BAR_COLOR} radius={[0,8,8,0]} name="Learners"/>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="h-64 flex items-center justify-center text-sm text-slate-400">No program data yet</div>
-          )}
+      {/* ── Zone 1: Primary metrics ── */}
+      <section>
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Live Operations</p>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <MetricCard
+            label="Applications Waiting"
+            value={fmtNumber(totalPending)}
+            sub={pendingAppsKpi?.sub ?? "No pending applications"}
+            href="/admin/applications?status=submitted,pending,in_review"
+            urgent={totalPending > 0}
+            icon={FileText}
+          />
+          <MetricCard
+            label="Active Enrollments"
+            value={fmtNumber(activeKpi?.value ?? 0)}
+            sub={activeKpi?.sub ?? ""}
+            href="/admin/students?status=active"
+            urgent={(data.inactiveLearners.length) > 0}
+            icon={Users}
+          />
+          <MetricCard
+            label="Revenue This Month"
+            value={revenueThisMonth}
+            sub={revenueAllTime}
+            href="/admin/enrollments?payment_status=paid"
+            icon={DollarSign}
+          />
+          <MetricCard
+            label="Certificates Issued"
+            value={fmtNumber(certsKpi?.value ?? 0)}
+            sub="All time"
+            href="/admin/certificates"
+            icon={Award}
+          />
         </div>
       </section>
 
-      {/* Program performance */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold text-slate-900">Program Performance Snapshot</h2>
-          <p className="text-sm text-slate-500">Enrollment and completion rate by program</p>
-        </div>
-        <div className="space-y-4">
-          {data.topPrograms.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">
-              No program performance data available yet.
-            </div>
-          ) : data.topPrograms.map(p => (
-            <div key={p.id || p.name}>
-              <div className="mb-1.5 flex items-center justify-between text-sm">
-                <span className="font-medium text-slate-800 truncate max-w-xs">{p.name}</span>
-                <span className="text-slate-500 flex-shrink-0 ml-4">
-                  {p.learners} learners · {p.completed} completed · {p.completionRate}% completion
-                </span>
-              </div>
-              <div className="h-2.5 rounded-full bg-slate-100">
-                <div className="h-2.5 rounded-full bg-cyan-500 transition-all" style={{ width: `${Math.max(0, Math.min(100, p.completionRate))}%` }}/>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* ── Zone 2: Action queues ── */}
+      <section>
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Action Queues</p>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
-      {/* Attention blockers + Recent applications */}
-      <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-rose-500"/>
-            <h2 className="text-sm font-bold text-slate-900">Needs a Decision</h2>
-          </div>
-          <div className="divide-y divide-slate-50">
-            {blockers.length === 0 ? (
-              <div className="px-5 py-8 text-center">
-                <CheckCircle className="w-7 h-7 text-emerald-400 mx-auto mb-2"/>
-                <p className="text-xs text-slate-400">Nothing blocking — all clear</p>
-              </div>
-            ) : blockers.map((b, i) => (
-              <Link key={i} href={b.href} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group">
-                {b.urgent && <span className="w-2 h-2 rounded-full bg-rose-500 flex-shrink-0"/>}
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-slate-800 truncate">{b.label}</div>
-                  <div className="text-xs text-slate-400 mt-0.5">{b.sub}</div>
-                </div>
-                <span className={"text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 " + b.badgeColor}>{b.badge}</span>
-                <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 flex-shrink-0"/>
+          {/* Applications — full width left */}
+          <div className="lg:col-span-2 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <FileText className="w-4 h-4 text-amber-500" />
+                Applications Awaiting Review
+                {totalPending > 0 && (
+                  <span className="text-[10px] font-black bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">{totalPending}</span>
+                )}
+                {urgentApps > 0 && (
+                  <span className="text-[10px] font-black bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded-full">{urgentApps} urgent</span>
+                )}
+              </h2>
+              <Link href="/admin/applications?status=submitted" className="text-xs text-blue-600 font-medium hover:underline flex items-center gap-1">
+                View all <ExternalLink className="w-3 h-3" />
               </Link>
-            ))}
+            </div>
+            <RecentApplicationsList items={data.recentApplications} />
           </div>
-        </div>
 
-        <div className="lg:col-span-2">
-          <RecentApplicationsList items={data.recentApplications} />
+          {/* Right column: blockers */}
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+              <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <XCircle className="w-4 h-4 text-rose-500" />
+                  Blocking Enrollment
+                  {data.blockedPrograms.length > 0 && (
+                    <span className="text-[10px] font-black bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full">{data.blockedPrograms.length}</span>
+                  )}
+                </h2>
+                <Link href="/admin/programs" className="text-xs text-blue-600 font-medium hover:underline">Fix →</Link>
+              </div>
+              {data.blockedPrograms.length === 0 ? (
+                <div className="px-5 py-6 text-center">
+                  <CheckCircle className="w-6 h-6 text-emerald-400 mx-auto mb-1.5" />
+                  <p className="text-xs text-slate-400">All programs published</p>
+                </div>
+              ) : <BlockedProgramsList items={data.blockedPrograms} />}
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+              <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <UserX className="w-4 h-4 text-amber-500" />
+                  Inactive Learners
+                  {data.inactiveLearners.length > 0 && (
+                    <span className="text-[10px] font-black bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">{data.inactiveLearners.length}</span>
+                  )}
+                </h2>
+                <Link href="/admin/at-risk" className="text-xs text-blue-600 font-medium hover:underline">View →</Link>
+              </div>
+              {data.inactiveLearners.length === 0 ? (
+                <div className="px-5 py-6 text-center">
+                  <CheckCircle className="w-6 h-6 text-emerald-400 mx-auto mb-1.5" />
+                  <p className="text-xs text-slate-400">No inactive learners</p>
+                </div>
+              ) : <InactiveLearnersList items={data.inactiveLearners} />}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Blocked programs + Inactive learners */}
-      {(data.blockedPrograms.length > 0 || data.inactiveLearners.length > 0) && (
-        <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <XCircle className="w-4 h-4 text-rose-500"/>Programs Blocking Revenue
-                <span className="text-[10px] font-black bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full">{data.blockedPrograms.length}</span>
-              </h2>
-              <Link href="/admin/programs" className="text-xs text-blue-600 font-medium hover:underline">View all →</Link>
-            </div>
-            <BlockedProgramsList items={data.blockedPrograms} />
-          </div>
+      {/* ── Zone 3: Tools quick-access ── */}
+      <section>
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Tools</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+          {[
+            { label: "Course Builder",   href: "/admin/course-builder",   icon: Layers },
+            { label: "Video Manager",    href: "/admin/video-manager",    icon: Video },
+            { label: "Media Studio",     href: "/admin/media-studio",     icon: Image },
+            { label: "AI Studio",        href: "/admin/ai-studio",        icon: Wand2 },
+            { label: "Quiz Builder",     href: "/admin/quiz-builder",     icon: PenTool },
+            { label: "Curriculum",       href: "/admin/curriculum",       icon: BookOpen },
+            { label: "AI Console",       href: "/admin/ai-console",       icon: Cpu },
+            { label: "Autopilot",        href: "/admin/autopilot",        icon: Zap },
+            { label: "Video Generator",  href: "/admin/video-generator",  icon: MonitorPlay },
+            { label: "Course Generator", href: "/admin/course-generator", icon: FlaskConical },
+            { label: "Analytics",        href: "/admin/analytics",        icon: BarChart3 },
+            { label: "Reports",          href: "/admin/reports",          icon: TrendingUp },
+          ].map((t) => {
+            const Icon = t.icon;
+            return (
+              <Link key={t.href} href={t.href}
+                className="bg-white border border-slate-200 rounded-xl p-3 flex flex-col items-center gap-2 hover:shadow-md hover:border-slate-300 transition-all group text-center">
+                <div className="w-9 h-9 rounded-xl bg-slate-100 group-hover:bg-brand-blue-50 flex items-center justify-center transition-colors">
+                  <Icon className="w-4 h-4 text-slate-500 group-hover:text-brand-blue-600 transition-colors" />
+                </div>
+                <span className="text-[10px] font-semibold text-slate-600 leading-tight">{t.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
 
-          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <UserX className="w-4 h-4 text-amber-500"/>Inactive Learners
-                <span className="text-[10px] font-black bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">{data.inactiveLearners.length}</span>
-              </h2>
-              <Link href="/admin/at-risk" className="text-xs text-blue-600 font-medium hover:underline">View all →</Link>
+      {/* ── Zone 4: Programs by enrollment ── */}
+      {data.topPrograms.length > 0 && (
+        <section>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Programs by Enrollment</p>
+          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
+            <div className="space-y-4">
+              {data.topPrograms.map(p => (
+                <div key={p.id}>
+                  <div className="mb-1.5 flex items-center justify-between text-sm">
+                    <Link href={`/admin/programs/${p.id}`} className="font-medium text-slate-800 hover:text-blue-600 truncate max-w-xs">
+                      {p.name}
+                    </Link>
+                    <span className="text-slate-500 flex-shrink-0 ml-4 text-xs tabular-nums">
+                      {fmtNumber(p.learners)} enrolled · {fmtNumber(p.completed)} completed · {p.completionRate}%
+                    </span>
+                  </div>
+                  <div className="h-2 rounded-full bg-slate-100">
+                    <div className="h-2 rounded-full bg-cyan-500 transition-all" style={{ width: `${Math.max(2, p.completionRate)}%` }} />
+                  </div>
+                </div>
+              ))}
             </div>
-            <InactiveLearnersList items={data.inactiveLearners} />
           </div>
         </section>
       )}
 
-      {/* Students table + Activity + Quick actions */}
-      <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between gap-2 flex-wrap">
+      {/* ── Zone 4: Recent students ── */}
+      <section>
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Recent Students</p>
+        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between gap-2 flex-wrap">
             <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <Users className="w-4 h-4 text-slate-400"/>Recent Students
+              <Users className="w-4 h-4 text-slate-400" /> Students
             </h2>
             <div className="flex items-center gap-2">
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…"
-                className="text-xs px-3 py-1.5 border border-slate-200 rounded-lg w-36 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+              <input
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search…"
+                className="text-xs px-3 py-1.5 border border-slate-200 rounded-lg w-32 sm:w-48 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
               <button
                 onClick={() => exportCSV(
-                  data.recentStudents.map(s => ({ Name: s.full_name||"", Email: s.email||"", Status: s.enrollment_status||"", Program: s.program_name||"", Registered: s.created_at ? new Date(s.created_at).toLocaleDateString() : "" })),
+                  data.recentStudents.map(s => ({
+                    Name: s.full_name || "", Email: s.email || "",
+                    Status: s.enrollment_status || "", Program: s.program_name || "",
+                    Registered: s.created_at ? fmtDate(s.created_at) : "",
+                  })),
                   "students.csv"
                 )}
-                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition" title="Export CSV">
-                <Download className="w-3.5 h-3.5"/>
+                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition"
+                title="Export CSV"
+              >
+                <Download className="w-3.5 h-3.5" />
               </button>
+              <Link href="/admin/students" className="text-xs text-blue-600 font-medium hover:underline flex items-center gap-1">
+                All <ExternalLink className="w-3 h-3" />
+              </Link>
             </div>
           </div>
-          <div className="overflow-x-auto">
+
+          {/* Mobile: card list */}
+          <div className="sm:hidden divide-y divide-slate-50">
+            {filteredStudents.length === 0 ? (
+              <p className="px-4 py-8 text-center text-xs text-slate-400">{search ? "No students match" : "No students yet"}</p>
+            ) : filteredStudents.map(s => (
+              <Link key={s.id} href={s.href} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors">
+                <div className="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600 flex-shrink-0">
+                  {(s.full_name || s.email || "?")[0].toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold text-slate-800 truncate">{s.full_name || "—"}</div>
+                  <div className="text-xs text-slate-400 truncate">{s.program_name || s.email || "—"}</div>
+                </div>
+                <StatusBadge status={s.enrollment_status || "pending"} />
+              </Link>
+            ))}
+          </div>
+
+          {/* Desktop: table */}
+          <div className="hidden sm:block overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50">
-                  {([["full_name","Name"],["enrollment_status","Status"],["created_at","Registered"]] as [SortKey,string][]).map(([key, label]) => (
-                    <th key={key} className="px-5 py-3 text-left font-semibold text-slate-500 cursor-pointer select-none whitespace-nowrap" onClick={() => toggleSort(key)}>
-                      <span className="flex items-center gap-1">{label}<SortIcon active={sort.key === key} dir={sort.dir}/></span>
+                  {([["full_name", "Name"], ["enrollment_status", "Status"], ["created_at", "Registered"]] as [SortKey, string][]).map(([key, label]) => (
+                    <th key={key} className="px-4 py-3 text-left font-semibold text-slate-500 cursor-pointer select-none whitespace-nowrap" onClick={() => toggleSort(key)}>
+                      <span className="flex items-center gap-1">{label}<SortIcon active={sort.key === key} dir={sort.dir} /></span>
                     </th>
                   ))}
-                  <th className="px-5 py-3 text-left font-semibold text-slate-500">Program</th>
-                  <th className="px-5 py-3"/>
+                  <th className="px-4 py-3 text-left font-semibold text-slate-500">Program</th>
+                  <th className="px-4 py-3" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {filteredStudents.length === 0 ? (
-                  <tr><td colSpan={5} className="px-5 py-8 text-center text-slate-400">No students found</td></tr>
+                  <tr><td colSpan={5} className="px-4 py-8 text-center text-slate-400">{search ? "No students match your search" : "No students yet"}</td></tr>
                 ) : filteredStudents.map(s => (
                   <tr key={s.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-5 py-3">
+                    <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-600 flex-shrink-0">
                           {(s.full_name || s.email || "?")[0].toUpperCase()}
@@ -370,59 +426,14 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
                         </div>
                       </div>
                     </td>
-                    <td className="px-5 py-3"><Badge status={s.enrollment_status || "pending"}/></td>
-                    <td className="px-5 py-3 text-slate-500 whitespace-nowrap">
-                      {s.created_at ? new Date(s.created_at).toLocaleDateString("en-US", { month:"short", day:"numeric", year:"2-digit" }) : "—"}
-                    </td>
-                    <td className="px-5 py-3 text-slate-500 truncate max-w-[120px]">{s.program_name || "—"}</td>
-                    <td className="px-5 py-3">
-                      <Link href={s.href} className="text-blue-600 hover:underline font-medium">View</Link>
-                    </td>
+                    <td className="px-4 py-3"><StatusBadge status={s.enrollment_status || "pending"} /></td>
+                    <td className="px-4 py-3 text-slate-500 whitespace-nowrap">{s.created_at ? fmtDate(s.created_at) : "—"}</td>
+                    <td className="px-4 py-3 text-slate-500 truncate max-w-[120px]">{s.program_name || "—"}</td>
+                    <td className="px-4 py-3"><Link href={s.href} className="text-blue-600 hover:underline font-medium">View</Link></td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-            <div className="px-5 py-4 border-b border-slate-100">
-              <h2 className="text-sm font-bold text-slate-900">Recent Activity</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Latest administrative events</p>
-            </div>
-            <div className="divide-y divide-slate-50">
-              {data.recentActivity.length === 0 ? (
-                <div className="px-5 py-8 text-center"><p className="text-xs text-slate-400">No recent activity</p></div>
-              ) : data.recentActivity.map(item => (
-                <div key={item.id} className="flex gap-3 px-5 py-3">
-                  <div className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-cyan-500"/>
-                  <div>
-                    <p className="text-sm font-medium text-slate-800">{item.title}</p>
-                    <p className="mt-0.5 text-xs text-slate-500">{item.timestamp}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-            <div className="px-5 py-4 border-b border-slate-100">
-              <h2 className="text-sm font-bold text-slate-900">Quick Actions</h2>
-            </div>
-            <div className="grid grid-cols-2 gap-px bg-slate-100">
-              {QUICK_ACTIONS.map(a => (
-                <Link key={a.href} href={a.href} className="flex items-center gap-3 px-4 py-3 bg-white hover:bg-slate-50 transition-colors">
-                  <div className={"w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 " + a.bg}>
-                    <a.icon className={"w-4 h-4 " + a.color}/>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-xs font-semibold text-slate-800 truncate">{a.label}</div>
-                    <div className="text-[10px] text-slate-400 truncate">{a.sub}</div>
-                  </div>
-                </Link>
-              ))}
-            </div>
           </div>
         </div>
       </section>

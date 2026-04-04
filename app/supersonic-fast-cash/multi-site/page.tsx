@@ -147,19 +147,19 @@ export default function MultiSitePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
               <div className="text-4xl font-black text-brand-blue-400">15+</div>
-              <div className="text-gray-400">Active Locations</div>
+              <div className="text-black">Active Locations</div>
             </div>
             <div>
               <div className="text-4xl font-black text-brand-blue-400">50K+</div>
-              <div className="text-gray-400">Returns Filed</div>
+              <div className="text-black">Returns Filed</div>
             </div>
             <div>
               <div className="text-4xl font-black text-brand-blue-400">98%</div>
-              <div className="text-gray-400">Partner Retention</div>
+              <div className="text-black">Partner Retention</div>
             </div>
             <div>
               <div className="text-4xl font-black text-brand-blue-400">$75K+</div>
-              <div className="text-gray-400">Avg. Partner Revenue</div>
+              <div className="text-black">Avg. Partner Revenue</div>
             </div>
           </div>
         </div>
@@ -172,7 +172,7 @@ export default function MultiSitePage() {
             <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
               Why Partner With Us?
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-black max-w-2xl mx-auto">
               We provide everything you need to run a successful tax preparation business
             </p>
           </div>
@@ -184,7 +184,7 @@ export default function MultiSitePage() {
                   <benefit.icon className="w-7 h-7 text-brand-blue-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{benefit.title}</h3>
-                <p className="text-gray-600">{benefit.description}</p>
+                <p className="text-black">{benefit.description}</p>
               </div>
             ))}
           </div>
@@ -199,13 +199,13 @@ export default function MultiSitePage() {
               <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-6">
                 Everything You Need to Succeed
               </h2>
-              <p className="text-lg text-gray-600 mb-8">
+              <p className="text-lg text-black mb-8">
                 Our partnership package includes all the tools, training, and support you need to build a thriving tax preparation business.
               </p>
               <ul className="space-y-3">
                 {whatYouGet.map((item, idx) => (
                   <li key={idx} className="flex items-center gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     <span className="text-gray-700">{item}</span>
                   </li>
                 ))}
@@ -217,7 +217,7 @@ export default function MultiSitePage() {
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">
                   Ready to Get Started?
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-black">
                   Join our network of successful tax professionals
                 </p>
               </div>
@@ -239,7 +239,7 @@ export default function MultiSitePage() {
             <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
               How to Become a Partner
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-black">
               Four simple steps to launch your tax business
             </p>
           </div>
@@ -251,7 +251,7 @@ export default function MultiSitePage() {
                   {item.step}
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-600">{item.description}</p>
+                <p className="text-black">{item.description}</p>
               </div>
             ))}
           </div>
@@ -265,7 +265,7 @@ export default function MultiSitePage() {
             <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
               Partnership Requirements
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-black">
               What you need to qualify
             </p>
           </div>
@@ -274,7 +274,7 @@ export default function MultiSitePage() {
             {requirements.map((req, idx) => (
               <div key={idx} className="bg-white rounded-xl p-6 shadow-sm">
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{req.title}</h3>
-                <p className="text-gray-600 text-sm">{req.description}</p>
+                <p className="text-black text-sm">{req.description}</p>
               </div>
             ))}
           </div>
@@ -303,7 +303,7 @@ export default function MultiSitePage() {
                 </p>
                 <div>
                   <div className="font-bold text-gray-900">{testimonial.author}</div>
-                  <div className="text-gray-600 text-sm flex items-center gap-2">
+                  <div className="text-black text-sm flex items-center gap-2">
                     <MapPin className="w-4 h-4" />
                     {testimonial.location} • {testimonial.year}
                   </div>
@@ -320,7 +320,7 @@ export default function MultiSitePage() {
           <h2 className="text-3xl md:text-4xl font-black text-white mb-6">
             Ready to Build Your Tax Business?
           </h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Apply today and join our growing network of successful partners.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

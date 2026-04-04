@@ -64,7 +64,7 @@ export default async function MyCoursesPage() {
       <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-6xl mx-auto px-4">
           <h1 className="text-3xl font-bold mb-2">My Courses</h1>
-          <p className="text-brand-blue-100">Continue learning and advancing your career</p>
+          <p className="text-white">Continue learning and advancing your career</p>
         </div>
       </section>
 
@@ -77,7 +77,7 @@ export default async function MyCoursesPage() {
             <div className="bg-white rounded-xl border p-12 text-center">
               <Lock className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">No courses yet</h3>
-              <p className="text-gray-600 mb-6">Purchase a course to start learning.</p>
+              <p className="text-black mb-6">Purchase a course to start learning.</p>
               <Link
                 href="/career-services/courses"
                 className="inline-flex items-center bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700"
@@ -109,14 +109,14 @@ export default async function MyCoursesPage() {
                   </div>
                   <div className="p-5">
                     <h3 className="font-bold text-gray-900 mb-1">{purchase.course?.title}</h3>
-                    <p className="text-sm text-gray-600 mb-3">{purchase.course?.subtitle}</p>
+                    <p className="text-sm text-black mb-3">{purchase.course?.subtitle}</p>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="flex items-center gap-1 text-gray-500">
+                      <span className="flex items-center gap-1 text-black">
                         <Clock className="w-4 h-4" />
                         {purchase.course?.duration_hours} hours
                       </span>
                       <span className="flex items-center gap-1 text-brand-green-600">
-                        <span className="text-slate-500 flex-shrink-0">•</span>
+                        <span className="text-black flex-shrink-0">•</span>
                         Purchased
                       </span>
                     </div>
@@ -150,9 +150,9 @@ export default async function MyCoursesPage() {
                   </div>
                   <div className="p-5">
                     <h3 className="font-bold text-gray-900 mb-1">{course.title}</h3>
-                    <p className="text-sm text-gray-600 mb-3">{course.subtitle}</p>
+                    <p className="text-sm text-black mb-3">{course.subtitle}</p>
                     <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-1 text-sm text-gray-500">
+                      <span className="flex items-center gap-1 text-sm text-black">
                         <Clock className="w-4 h-4" />
                         {course.duration_hours} hours
                       </span>

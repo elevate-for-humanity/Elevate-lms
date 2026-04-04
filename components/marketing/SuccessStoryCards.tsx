@@ -62,7 +62,7 @@ export default function SuccessStoryCards() {
 
                 <div className="space-y-2 mb-4">
                   <div className="flex items-start gap-2">
-                    <span className="text-slate-500 text-sm">Before:</span>
+                    <span className="text-white text-sm">Before:</span>
                     <span className="text-sm text-black">{story.beforeJob}</span>
                   </div>
                   <div className="flex items-start gap-2">

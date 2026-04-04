@@ -166,7 +166,7 @@ export default async function ServicesPage() {
                       key={idx}
                       className="flex items-start gap-2 text-sm text-black"
                     >
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-black flex-shrink-0">•</span>
                       {feature}
                     </li>
                   ))}

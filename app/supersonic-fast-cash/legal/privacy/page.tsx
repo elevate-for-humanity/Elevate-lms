@@ -19,7 +19,7 @@ export default function PrivacyPolicyPage() {
       </div>
 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-semibold text-gray-900 mb-2">Privacy Policy</h1>
-        <p className="text-sm text-gray-500 mb-8">Last updated: January 2025</p>
+        <p className="text-sm text-black mb-8">Last updated: January 2025</p>
 
         <div className="prose prose-gray max-w-none">
           <section className="mb-8">

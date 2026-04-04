@@ -79,7 +79,7 @@ export default function ApplyStartPage() {
           <>
             <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-3">Free to apply</p>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">Start Your Application</h1>
-            <p className="text-slate-500 text-sm mb-8">
+            <p className="text-black text-sm mb-8">
               Fill in your info below. We&apos;ll reach out within 24 hours to walk you through your options and funding.
             </p>
 
@@ -96,7 +96,7 @@ export default function ApplyStartPage() {
                 <input type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)}
                   placeholder="(317) 000-0000"
                   className="w-full min-h-[48px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent" />
-                <p className="text-xs text-slate-400 mt-1">We may text you — reply STOP to opt out anytime.</p>
+                <p className="text-xs text-black mt-1">We may text you — reply STOP to opt out anytime.</p>
               </div>
 
               <div>
@@ -125,7 +125,7 @@ export default function ApplyStartPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">What are you looking to do? <span className="text-slate-400 font-normal">(optional)</span></label>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">What are you looking to do? <span className="text-black font-normal">(optional)</span></label>
                 <textarea value={goals} onChange={(e) => setGoals(e.target.value)} rows={3}
                   placeholder="e.g. Get a better-paying job, change careers, get certified..."
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent resize-none" />
@@ -139,9 +139,9 @@ export default function ApplyStartPage() {
                 {!submitting && <ArrowRight className="w-5 h-5" />}
               </button>
 
-              <p className="text-center text-xs text-slate-400">
+              <p className="text-center text-xs text-black">
                 We respond within 24 hours. Questions? Call or text{' '}
-                <a href="tel:3173143757" className="text-slate-600 font-semibold">(317) 314-3757</a>
+                <a href="tel:3173143757" className="text-black font-semibold">(317) 314-3757</a>
               </p>
             </form>
           </>
@@ -151,8 +151,8 @@ export default function ApplyStartPage() {
               <CheckCircle className="w-9 h-9 text-green-600" />
             </div>
             <h2 className="text-2xl font-extrabold text-slate-900 mb-3">Application received!</h2>
-            <p className="text-slate-600 mb-2">We&apos;ll reach out within 24 hours to walk you through your funding options and next steps.</p>
-            <p className="text-slate-500 text-sm mb-8">
+            <p className="text-black mb-2">We&apos;ll reach out within 24 hours to walk you through your funding options and next steps.</p>
+            <p className="text-black text-sm mb-8">
               Can&apos;t wait? Call or text us now:{' '}
               <a href="tel:3173143757" className="text-brand-red-600 font-bold">(317) 314-3757</a>
             </p>

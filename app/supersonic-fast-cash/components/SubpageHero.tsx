@@ -21,7 +21,7 @@ export function SubpageHero({ title, description, badge }: SubpageHeroProps) {
             )}
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">{title}</h1>
             {description && (
-              <p className="text-lg text-slate-300 max-w-3xl mx-auto">{description}</p>
+              <p className="text-lg text-white max-w-3xl mx-auto">{description}</p>
             )}
           </div>
         </div>

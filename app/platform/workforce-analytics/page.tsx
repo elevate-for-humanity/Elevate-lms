@@ -56,7 +56,7 @@ export default function WorkforceAnalyticsPage() {
           <Breadcrumbs items={[{ label: 'Platform', href: '/platform' }, { label: 'Workforce Analytics' }]} />
         </div>
       </div>
-      <div class="max-w-6xl mx-auto px-4 pb-2"><p class="text-sm text-slate-600 font-medium">Part of the <a href="/platform" class="text-brand-red-600 hover:underline">Elevate Workforce Operating System</a></p></div>
+      <div class="max-w-6xl mx-auto px-4 pb-2"><p class="text-sm text-black font-medium">Part of the <a href="/platform" class="text-brand-red-600 hover:underline">Elevate Workforce Operating System</a></p></div>
 
       {/* Hero */}
       {/* Hero */}
@@ -67,7 +67,7 @@ export default function WorkforceAnalyticsPage() {
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Workforce Analytics</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Data-driven insights for better workforce outcomes. Track participants from enrollment to employment.</p>
+            <p className="text-lg text-white max-w-3xl mx-auto">Data-driven insights for better workforce outcomes. Track participants from enrollment to employment.</p>
           </div>
         </div>
       </section>
@@ -80,7 +80,7 @@ export default function WorkforceAnalyticsPage() {
             {metrics.map((m, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm border text-center">
                 <p className="text-3xl font-bold text-gray-900">{m.value}</p>
-                <p className="text-gray-600 text-sm mb-2">{m.label}</p>
+                <p className="text-black text-sm mb-2">{m.label}</p>
                 <span className="text-brand-green-600 text-sm font-medium">{m.change} YoY</span>
               </div>
             ))}
@@ -93,7 +93,7 @@ export default function WorkforceAnalyticsPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Analytics Features</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-black max-w-2xl mx-auto">
               Everything you need to measure, report, and improve workforce development outcomes.
             </p>
           </div>
@@ -104,7 +104,7 @@ export default function WorkforceAnalyticsPage() {
                   <f.icon className="w-6 h-6 text-indigo-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{f.title}</h3>
-                <p className="text-gray-600 text-sm">{f.description}</p>
+                <p className="text-black text-sm">{f.description}</p>
               </div>
             ))}
           </div>
@@ -116,16 +116,16 @@ export default function WorkforceAnalyticsPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Built-In Report Types</h2>
-            <p className="text-lg text-gray-600">Pre-configured reports ready for federal and state reporting requirements.</p>
+            <p className="text-lg text-black">Pre-configured reports ready for federal and state reporting requirements.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {reportTypes.map((r, i) => (
               <div key={i} className="bg-white rounded-xl p-6 border">
                 <div className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-1">{r.title}</h3>
-                    <p className="text-gray-600 text-sm">{r.description}</p>
+                    <p className="text-black text-sm">{r.description}</p>
                   </div>
                 </div>
               </div>
@@ -143,7 +143,7 @@ export default function WorkforceAnalyticsPage() {
             </div>
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Integrated With Your Workflow</h2>
-              <p className="text-gray-600 mb-6">
+              <p className="text-black mb-6">
                 Analytics are built into every part of the platform. No separate tools or manual data entry required.
               </p>
               <div className="space-y-3">
@@ -154,7 +154,7 @@ export default function WorkforceAnalyticsPage() {
                   'API access for custom reporting and BI tools',
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-black flex-shrink-0">•</span>
                     <span className="text-gray-700">{item}</span>
                   </div>
                 ))}

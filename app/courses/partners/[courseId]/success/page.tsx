@@ -82,7 +82,7 @@ export default async function EnrollmentSuccessPage({
             <h1 className="text-4xl font-bold mb-4 text-2xl md:text-3xl lg:text-4xl">
               Enrollment Successful!
             </h1>
-            <p className="text-base md:text-lg text-brand-green-100">
+            <p className="text-base md:text-lg text-white">
               You're all set to start learning
             </p>
           </div>

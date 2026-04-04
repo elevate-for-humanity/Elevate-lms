@@ -194,7 +194,7 @@ export default function GrantReportingPage() {
       <section className="py-16 bg-brand-red-600 text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-black mb-4">Simplify Grant Reporting</h2>
-          <p className="text-brand-orange-100 mb-8">Schedule a demo to see how we can save you hours on every report.</p>
+          <p className="text-white mb-8">Schedule a demo to see how we can save you hours on every report.</p>
           <Link href="/store/demos" className="inline-flex items-center gap-2 bg-white text-brand-orange-600 px-8 py-4 rounded-lg font-bold hover:bg-brand-orange-50 transition">
             Schedule Demo
           </Link>

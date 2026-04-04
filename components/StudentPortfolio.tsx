@@ -290,25 +290,25 @@ export function StudentPortfolio() {
             />
             <div className="flex-1 text-center md:text-left">
               <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">{student.name}</h1>
-              <p className="text-xl text-brand-red-100 mb-4">{student.title}</p>
+              <p className="text-xl text-white mb-4">{student.title}</p>
               <p className="text-brand-red-50 max-w-2xl mb-6">{student.bio}</p>
               <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                <a href={`mailto:${student.email}`} className="text-white hover:text-brand-red-100 transition-colors">
+                <a href={`mailto:${student.email}`} className="text-white hover:text-white transition-colors">
                   📧 Email
                 </a>
-                <a href={`tel:${student.phone}`} className="text-white hover:text-brand-red-100 transition-colors">
+                <a href={`tel:${student.phone}`} className="text-white hover:text-white transition-colors">
                   📱 {student.phone}
                 </a>
                 <a href={`https://${student.linkedin}`} target="_blank" rel="noopener noreferrer"
-className="text-white hover:text-brand-red-100 transition-colors">
+className="text-white hover:text-white transition-colors">
                   💼 LinkedIn
                 </a>
                 <a href={`https://${student.github}`} target="_blank" rel="noopener noreferrer"
-className="text-white hover:text-brand-red-100 transition-colors">
+className="text-white hover:text-white transition-colors">
                   🔗 GitHub
                 </a>
                 <a href={`https://${student.portfolio}`} target="_blank" rel="noopener noreferrer"
-className="text-white hover:text-brand-red-100 transition-colors">
+className="text-white hover:text-white transition-colors">
                   🌐 Portfolio
                 </a>
               </div>

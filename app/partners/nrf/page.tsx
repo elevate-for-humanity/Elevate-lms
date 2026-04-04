@@ -14,7 +14,7 @@ import {
 CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'NRF Foundation RISE Up | Partner Courses | Elevate For Humanity',
+  title: 'NRF Foundation RISE Up | Short-Term Courses | Elevate For Humanity',
   description: 'Retail Industry Skills and Employability Training',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/partners/nrf',
@@ -40,33 +40,33 @@ export default function NRFPage() {
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">
                 Industry-backed credential from NRF Foundation
               </div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">
                 Foundational employability skills
               </div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">
                 Applicable to retail and beyond
               </div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">Self-paced online training</div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">
                 Help center support available
               </div>

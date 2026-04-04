@@ -226,7 +226,7 @@ export default async function ForEmployersPage() {
       <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Hire?</h2>
-          <p className="text-brand-blue-100 mb-8 text-lg">
+          <p className="text-white mb-8 text-lg">
             Contact our employer services team to discuss your hiring needs. We&apos;ll match you with trained, certified candidates at no cost.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

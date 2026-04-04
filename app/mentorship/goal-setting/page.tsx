@@ -86,7 +86,7 @@ export default function GoalSettingPage() {
       <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Set Goals That Matter</h2>
-          <p className="text-xl text-brand-orange-100 mb-8">Work with a mentor to create your roadmap to success.</p>
+          <p className="text-xl text-white mb-8">Work with a mentor to create your roadmap to success.</p>
           <Link href="/start" className="bg-white hover:bg-white text-brand-orange-600 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Apply for Mentorship <ArrowRight className="ml-2 w-5 h-5" />
           </Link>

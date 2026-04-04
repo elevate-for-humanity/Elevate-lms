@@ -22,13 +22,13 @@ export default function ApplyPage() {
               { label: 'Sanitation & Infection Control', href: '/programs/sanitation-infection-control' },
               { label: 'Apply' },
             ]}
-            className="text-slate-600 mb-4"
+            className="text-black mb-4"
           />
           <span className="inline-block px-3 py-1 bg-brand-green-500 text-white text-sm font-semibold rounded-full mb-3">
             DOL REGISTERED APPRENTICESHIP
           </span>
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Apply for Sanitation & Infection Control Apprenticeship</h1>
-          <p className="text-slate-600 mt-2 text-base">Exclusive Apprenticeship Program - 32 Weeks with Paid OJT</p>
+          <p className="text-black mt-2 text-base">Exclusive Apprenticeship Program - 32 Weeks with Paid OJT</p>
         </div>
       </section>
 
@@ -40,21 +40,21 @@ export default function ApplyPage() {
             <div className="flex items-center gap-3">
               <Clock className="w-6 h-6 text-brand-blue-600" />
               <div>
-                <p className="text-sm text-slate-600">Duration</p>
+                <p className="text-sm text-black">Duration</p>
                 <p className="font-bold text-slate-900">32 Weeks</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Calendar className="w-6 h-6 text-brand-green-600" />
               <div>
-                <p className="text-sm text-slate-600">Start Dates</p>
+                <p className="text-sm text-black">Start Dates</p>
                 <p className="font-bold text-slate-900">Quarterly</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Award className="w-6 h-6 text-purple-600" />
               <div>
-                <p className="text-sm text-slate-600">Certifications</p>
+                <p className="text-sm text-black">Certifications</p>
                 <p className="font-bold text-slate-900">4 Credentials</p>
               </div>
             </div>
@@ -116,19 +116,19 @@ export default function ApplyPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white rounded-lg p-4 text-center border border-slate-200">
                 <p className="font-bold text-slate-900">January</p>
-                <p className="text-sm text-slate-600">Q1 Start</p>
+                <p className="text-sm text-black">Q1 Start</p>
               </div>
               <div className="bg-white rounded-lg p-4 text-center border border-slate-200">
                 <p className="font-bold text-slate-900">April</p>
-                <p className="text-sm text-slate-600">Q2 Start</p>
+                <p className="text-sm text-black">Q2 Start</p>
               </div>
               <div className="bg-white rounded-lg p-4 text-center border border-slate-200">
                 <p className="font-bold text-slate-900">July</p>
-                <p className="text-sm text-slate-600">Q3 Start</p>
+                <p className="text-sm text-black">Q3 Start</p>
               </div>
               <div className="bg-white rounded-lg p-4 text-center border border-slate-200">
                 <p className="font-bold text-slate-900">October</p>
-                <p className="text-sm text-slate-600">Q4 Start</p>
+                <p className="text-sm text-black">Q4 Start</p>
               </div>
             </div>
           </div>
@@ -144,7 +144,7 @@ export default function ApplyPage() {
               </svg>
             </div>
             <h3 className="text-xl font-bold text-slate-900 mb-2">Get More Information</h3>
-            <p className="text-slate-600 mb-6">
+            <p className="text-black mb-6">
               Have questions? Submit an inquiry and we'll send you detailed program information.
             </p>
             <Link
@@ -161,7 +161,7 @@ export default function ApplyPage() {
               <ArrowRight className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-bold mb-2">Ready to Enroll?</h3>
-            <p className="text-brand-green-100 mb-6">
+            <p className="text-white mb-6">
               Start your enrollment application now. We'll review your eligibility and contact you within 2-3 business days.
             </p>
             <Link

@@ -273,7 +273,7 @@ export default function SupersonicSecurityPage() {
 
         {/* Footer */}
         <div className="mt-12 pt-8 border-t border-slate-200">
-          <p className="text-center text-slate-500 text-sm mb-6">End of Document</p>
+          <p className="text-center text-black text-sm mb-6">End of Document</p>
           <div className="flex justify-center gap-4">
             <Link 
               href="/admin/governance"

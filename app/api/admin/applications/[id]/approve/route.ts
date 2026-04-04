@@ -26,9 +26,7 @@ async function _POST(
   try {
     await requireApiAuth();
     const supabase = await createClient();
-      const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -39,7 +37,7 @@ async function _POST(
       .select('role')
       .eq('id', user.id)
       .single();
-    if (!profile?.role || !['admin', 'super_admin'].includes(profile.role)) {
+    if (!profile?.role || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
       return NextResponse.json(
         { error: 'Forbidden — requires admin or super_admin' },
         { status: 403 },
@@ -59,11 +57,12 @@ async function _POST(
     const body = await req.json().catch(() => ({}));
     const { program_id, funding_type } = body;
 
-    // Single approval pipeline
+    // Single approval pipeline — admin bypasses payment gate (audited above)
     const result = await approveApplication(db, {
       applicationId: id,
       programId: program_id || null,
       fundingType: funding_type || null,
+      bypassPaymentGate: true,
     });
 
     if (!result.success) {
@@ -87,7 +86,7 @@ async function _POST(
 
     // Post-approval actions: program-specific emails, Milady, CRM update (non-blocking)
     try {
-      const { data: app } = await supabase
+      const { data: app } = await db
         .from('applications')
         .select('email, first_name, last_name, phone, program_interest, program_slug')
         .eq('id', id)

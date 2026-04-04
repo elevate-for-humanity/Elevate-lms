@@ -30,7 +30,7 @@ export function SupersonicHeader() {
               <Shield className="w-4 h-4" />
               <span className="hidden sm:inline">Secure Tax Preparation</span>
             </div>
-            <a href="/support" className="flex items-center gap-2 hover:text-brand-blue-200">
+            <a href="/support" className="flex items-center gap-2 hover:text-white">
               <Phone className="w-4 h-4" />
               <span>(317) 314-3757</span>
             </a>

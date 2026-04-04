@@ -46,7 +46,7 @@ function ConfirmContent() {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-10 h-10 text-brand-blue-600 animate-spin mx-auto mb-4" />
-          <p className="text-slate-600">Processing your response...</p>
+          <p className="text-black">Processing your response...</p>
         </div>
       </div>
     );
@@ -91,7 +91,7 @@ function ConfirmContent() {
 
             {status === 'declined' && (
               <div className="bg-white border border-slate-200 rounded-lg p-5 mb-6">
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-black">
                   If you change your mind or have questions about the program, we are here to help.
                   You can reapply at any time.
                 </p>
@@ -100,7 +100,7 @@ function ConfirmContent() {
 
             {/* Contact */}
             <div className="border-t border-slate-200 pt-5">
-              <p className="text-sm text-slate-500 text-center mb-3">Questions? Contact us:</p>
+              <p className="text-sm text-black text-center mb-3">Questions? Contact us:</p>
               <div className="flex justify-center gap-6 text-sm">
                 <a href="tel:+13173143757" className="flex items-center gap-1.5 text-slate-700 hover:text-brand-blue-600">
                   <Phone className="w-4 h-4" /> (317) 314-3757
@@ -117,14 +117,14 @@ function ConfirmContent() {
             <Link href="/programs/barber-apprenticeship" className="text-sm text-brand-blue-600 font-medium hover:underline">
               View Program Details
             </Link>
-            <span className="text-slate-300 mx-3">|</span>
+            <span className="text-white mx-3">|</span>
             <Link href="/" className="text-sm text-brand-blue-600 font-medium hover:underline">
               Back to Home
             </Link>
           </div>
         </div>
 
-        <p className="text-center text-xs text-slate-400 mt-6">
+        <p className="text-center text-xs text-black mt-6">
           Elevate for Humanity Career &amp; Technical Institute
         </p>
       </div>

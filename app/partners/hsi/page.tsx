@@ -14,8 +14,7 @@ import {
 CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title:
-    'Health & Safety Institute (HSI) | Partner Courses | Elevate For Humanity',
+  title: 'Health & Safety Institute (HSI) | Short-Term Courses | Elevate For Humanity',
   description: 'CPR, AED, First Aid, and Emergency Medical Responder Training',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/partners/hsi',
@@ -43,33 +42,33 @@ export default function HSIPage() {
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">
                 Industry-recognized certifications
               </div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">
                 Hands-on training with real equipment
               </div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">Experienced instructors</div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">
                 Small class sizes (max 12 students)
               </div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
               <div className="text-black">
                 Traditional and blended learning options
               </div>

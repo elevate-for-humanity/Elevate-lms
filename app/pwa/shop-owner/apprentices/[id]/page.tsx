@@ -142,7 +142,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
           </Link>
           <div className="flex-1">
             <h1 className="text-xl font-bold text-slate-900">{apprentice.name}</h1>
-            <p className="text-brand-blue-200 text-sm">Apprentice Details</p>
+            <p className="text-white text-sm">Apprentice Details</p>
           </div>
           <ComplianceStatusBadge status={apprentice.complianceStatus} />
         </div>
@@ -151,7 +151,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
           <div className="text-center mb-3">
             <p className="text-4xl font-black text-slate-900">{apprentice.totalHours.toLocaleString()}</p>
-            <p className="text-brand-blue-200">of {apprentice.targetHours.toLocaleString()} hours</p>
+            <p className="text-white">of {apprentice.targetHours.toLocaleString()} hours</p>
           </div>
           
           <div className="h-3 bg-white/20 rounded-full overflow-hidden mb-3">
@@ -164,15 +164,15 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
           <div className="grid grid-cols-3 gap-2 text-center text-sm">
             <div>
               <p className="text-slate-900 font-bold">{apprentice.progress.toFixed(1)}%</p>
-              <p className="text-brand-blue-200 text-xs">Complete</p>
+              <p className="text-white text-xs">Complete</p>
             </div>
             <div>
               <p className="text-slate-900 font-bold">{apprentice.weeklyAvg}</p>
-              <p className="text-brand-blue-200 text-xs">Hrs/Week Avg</p>
+              <p className="text-white text-xs">Hrs/Week Avg</p>
             </div>
             <div>
               <p className="text-slate-900 font-bold">{apprentice.weeklyHours}</p>
-              <p className="text-brand-blue-200 text-xs">This Week</p>
+              <p className="text-white text-xs">This Week</p>
             </div>
           </div>
         </div>
@@ -238,7 +238,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
                     <Award className={`w-5 h-5 ${milestone.achieved ? 'text-white' : 'text-slate-500'}`} />
                   </div>
                   <div className="flex-1">
-                    <p className={`font-medium ${milestone.achieved ? 'text-brand-green-200' : 'text-white'}`}>
+                    <p className={`font-medium ${milestone.achieved ? 'text-white' : 'text-white'}`}>
                       {milestone.title}
                     </p>
                     <p className={`text-sm ${milestone.achieved ? 'text-brand-green-300' : 'text-slate-400'}`}>

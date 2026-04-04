@@ -122,7 +122,7 @@ export function CourseReviewsSection({ courseId }: { courseId: string }) {
               )}
               <p className="mt-1 text-[11px] text-slate-500">
                 {r.user_name || "Student"} ·{" "}
-                {new Date(r.created_at).toLocaleDateString()}
+                {new Date(r.created_at).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })}
               </p>
             </li>
           ))}

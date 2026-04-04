@@ -43,7 +43,7 @@ export default async function RequestInfoPage({ params }: Props) {
         {/* Back link */}
         <Link
           href={programPageHref}
-          className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 mb-6 transition"
+          className="inline-flex items-center gap-2 text-sm text-black hover:text-slate-900 mb-6 transition"
         >
           <ArrowLeft className="w-4 h-4" /> Back to {program.title}
         </Link>
@@ -52,7 +52,7 @@ export default async function RequestInfoPage({ params }: Props) {
         <div className="mb-8">
           <p className="text-brand-blue-600 font-semibold text-sm uppercase tracking-wide mb-1">{program.category}</p>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Request Information</h1>
-          <p className="text-slate-600 text-lg">
+          <p className="text-black text-lg">
             Get answers about the <strong>{program.title}</strong> program — funding, schedule, credentials, and how to enroll.
           </p>
         </div>
@@ -74,22 +74,22 @@ export default async function RequestInfoPage({ params }: Props) {
               <h3 className="font-bold text-slate-900 mb-3 text-sm uppercase tracking-wide">Program Details</h3>
               <dl className="space-y-2 text-sm">
                 <div>
-                  <dt className="text-slate-500">Duration</dt>
+                  <dt className="text-black">Duration</dt>
                   <dd className="font-semibold text-slate-800">{program.durationWeeks} weeks</dd>
                 </div>
                 <div>
-                  <dt className="text-slate-500">Hours/Week</dt>
+                  <dt className="text-black">Hours/Week</dt>
                   <dd className="font-semibold text-slate-800">{program.hoursPerWeekMin}–{program.hoursPerWeekMax} hrs</dd>
                 </div>
                 {program.credentials?.[0] && (
                   <div>
-                    <dt className="text-slate-500">Primary Credential</dt>
+                    <dt className="text-black">Primary Credential</dt>
                     <dd className="font-semibold text-slate-800">{program.credentials[0].name}</dd>
                   </div>
                 )}
                 {program.enrollmentTracks?.[0]?.nextCohortDate && (
                   <div>
-                    <dt className="text-slate-500">Next Start</dt>
+                    <dt className="text-black">Next Start</dt>
                     <dd className="font-semibold text-slate-800">{program.enrollmentTracks[0].nextCohortDate}</dd>
                   </div>
                 )}
@@ -111,7 +111,7 @@ export default async function RequestInfoPage({ params }: Props) {
             {/* Call us */}
             <div className="bg-white rounded-xl border border-slate-200 p-5">
               <div className="flex items-center gap-2 mb-2">
-                <Phone className="w-4 h-4 text-slate-500" />
+                <Phone className="w-4 h-4 text-black" />
                 <h3 className="font-bold text-slate-900 text-sm">Prefer to call?</h3>
               </div>
               <a
@@ -121,8 +121,8 @@ export default async function RequestInfoPage({ params }: Props) {
                 (317) 314-3757
               </a>
               <div className="flex items-center gap-1.5 mt-1">
-                <Clock className="w-3.5 h-3.5 text-slate-400" />
-                <p className="text-xs text-slate-500">Mon–Fri, 9am–5pm ET</p>
+                <Clock className="w-3.5 h-3.5 text-black" />
+                <p className="text-xs text-black">Mon–Fri, 9am–5pm ET</p>
               </div>
             </div>
           </div>

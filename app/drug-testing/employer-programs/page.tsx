@@ -160,7 +160,7 @@ export default function EmployerProgramsPage() {
       <section className="py-16 text-slate-900">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-3xl font-bold mb-8 text-center">Volume Discounts</h2>
-          <p className="text-brand-blue-200 text-center mb-8">
+          <p className="text-white text-center mb-8">
             The more you test, the more you save. All prices are per person.
           </p>
           <div className="bg-white/10 rounded-xl overflow-hidden">
@@ -175,13 +175,13 @@ export default function EmployerProgramsPage() {
                 {volumePricing.map((tier, idx) => (
                   <tr key={tier.volume} className={idx < volumePricing.length - 1 ? 'border-b border-white/10' : ''}>
                     <td className="px-6 py-4">{tier.volume}</td>
-                    <td className="px-6 py-4 text-right font-medium text-brand-blue-200">{tier.discount}</td>
+                    <td className="px-6 py-4 text-right font-medium text-white">{tier.discount}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <p className="text-brand-blue-200 text-center mt-6 text-sm">
+          <p className="text-white text-center mt-6 text-sm">
             Contact us for a custom quote based on your specific needs.
           </p>
         </div>
@@ -287,7 +287,7 @@ export default function EmployerProgramsPage() {
       <section className="py-16 text-slate-900">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Set Up Your Program?</h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Contact us today for a free consultation and custom quote.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

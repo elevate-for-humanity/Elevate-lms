@@ -343,17 +343,17 @@ export default function CapitalReadinessGuidePage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-2xl p-8 lg:p-12 text-slate-900 text-center">
             <h2 className="text-3xl font-bold mb-4">Get the Guide</h2>
-            <p className="text-brand-blue-100 mb-8 max-w-xl mx-auto">
+            <p className="text-white mb-8 max-w-xl mx-auto">
               Start building institutional trust today. Includes the full ebook, integrated workbook, 
               and readiness scoring system.
             </p>
             
             <div className="text-5xl font-bold mb-2">$39</div>
-            <p className="text-brand-blue-200 mb-8">One-time purchase • Lifetime updates</p>
+            <p className="text-white mb-8">One-time purchase • Lifetime updates</p>
             
             <BuyButton productId="capital-readiness-guide" price="$39" variant="white" />
             
-            <p className="text-sm text-brand-blue-200 mt-6">
+            <p className="text-sm text-white mt-6">
               Free inside Elevate programs • Included with enterprise licenses
             </p>
           </div>

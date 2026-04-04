@@ -20,6 +20,11 @@ export interface ApproveApplicationInput {
   fundingType?: string | null;
   /** Role to assign to the created/updated profile. Defaults to 'student'. */
   role?: string;
+  /**
+   * Skip the Stripe/funding payment gate. Set to true for admin-initiated
+   * approvals where the admin is manually overriding payment verification.
+   */
+  bypassPaymentGate?: boolean;
 }
 
 export interface ApproveApplicationResult {
@@ -71,8 +76,10 @@ export async function approveApplication(
   //   2. funding_verified = true on the application (WIOA/WorkOne/EmployIndy confirmed)
   //   3. WorkOne approval on file (has_workone_approval = true)
   //   4. Source is 'stripe_repair' (reconciliation — Stripe session verified separately)
+  //   5. bypassPaymentGate = true (admin manual override — audited separately)
   const isRepair = (input as any).source === 'stripe_repair';
-  if (!isRepair) {
+  const skipGate = isRepair || input.bypassPaymentGate === true;
+  if (!skipGate) {
     const hasFundingVerified = app.funding_verified === true || app.has_workone_approval === true;
 
     if (!hasFundingVerified) {
@@ -284,7 +291,7 @@ export async function approveApplication(
 
   // Update CRM lead to converted (non-fatal)
   try {
-    await supabase
+    await db
       .from('crm_leads')
       .update({
         stage:         'converted',
@@ -295,7 +302,7 @@ export async function approveApplication(
       })
       .eq('application_id', applicationId);
 
-    await supabase
+    await db
       .from('follow_up_reminders')
       .update({ status: 'completed' })
       .eq('application_id', applicationId)

@@ -129,7 +129,7 @@ export default function ShopLogHoursPage() {
           <div className="bg-white/20 border border-brand-green-500/30 rounded-xl p-6 text-center">
             <span className="text-slate-500 flex-shrink-0">•</span>
             <h2 className="text-slate-900 font-bold text-xl mb-2">Hours Logged!</h2>
-            <p className="text-brand-green-200">Training hours have been recorded and submitted.</p>
+            <p className="text-white">Training hours have been recorded and submitted.</p>
           </div>
         ) : apprentices.length === 0 ? (
           <div className="bg-white rounded-xl p-6 text-center">
@@ -140,7 +140,7 @@ export default function ShopLogHoursPage() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="bg-white/20 border border-brand-red-500/30 rounded-xl p-4 text-brand-red-200 text-sm">
+              <div className="bg-white/20 border border-brand-red-500/30 rounded-xl p-4 text-white text-sm">
                 {error}
               </div>
             )}

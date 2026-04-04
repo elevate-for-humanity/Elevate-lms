@@ -55,7 +55,7 @@ export default async function SupportPage() {
       <div className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Student Support Center</h1>
-          <p className="text-xl text-brand-blue-100 max-w-2xl">
+          <p className="text-xl text-white max-w-2xl">
             Need help with enrollment, training programs, or your student account? 
             Our team is here to support your career journey.
           </p>

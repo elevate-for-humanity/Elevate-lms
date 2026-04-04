@@ -110,12 +110,12 @@ export default function CNAEnrollPage() {
 {/* Header */}
       <div className="bg-slate-900 py-8">
         <div className="max-w-4xl mx-auto px-4">
-          <Link href="/programs/cna" className="inline-flex items-center gap-2 text-slate-300 hover:text-white mb-4">
+          <Link href="/programs/cna" className="inline-flex items-center gap-2 text-white hover:text-white mb-4">
             <ArrowLeft className="w-4 h-4" />
             Back to CNA Program
           </Link>
           <h1 className="text-3xl font-bold">Enroll in CNA Certification</h1>
-          <p className="text-slate-300 mt-2">Start your healthcare career in just 4-8 weeks</p>
+          <p className="text-white mt-2">Start your healthcare career in just 4-8 weeks</p>
         </div>
       </div>
 
@@ -128,7 +128,7 @@ export default function CNAEnrollPage() {
               {[1, 2, 3].map((s) => (
                 <div key={s} className="flex items-center">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                    step >= s ? 'bg-brand-blue-600 text-white' : 'bg-slate-200 text-slate-500'
+                    step >= s ? 'bg-brand-blue-600 text-white' : 'bg-slate-200 text-black'
                   }`}>
                     {step > s ? <Check className="w-5 h-5" /> : s}
                   </div>
@@ -345,13 +345,13 @@ export default function CNAEnrollPage() {
                             <span className="font-bold text-lg">Payment Plan</span>
                             <span className="bg-brand-green-100 text-brand-green-700 px-2 py-1 rounded text-sm font-medium">Most Popular</span>
                           </div>
-                          <p className="text-slate-600 mt-1">
+                          <p className="text-black mt-1">
                             <span className="text-2xl font-bold text-slate-900">${PROGRAM_DETAILS.downPayment}</span> down payment
                           </p>
-                          <p className="text-slate-600">
+                          <p className="text-black">
                             + <span className="font-semibold">${PROGRAM_DETAILS.weeklyPayment}/week</span> for {PROGRAM_DETAILS.paymentWeeks} weeks
                           </p>
-                          <p className="text-sm text-slate-500 mt-2">Total: ${PROGRAM_DETAILS.price}</p>
+                          <p className="text-sm text-black mt-2">Total: ${PROGRAM_DETAILS.price}</p>
                         </div>
                       </div>
                     </label>
@@ -379,7 +379,7 @@ export default function CNAEnrollPage() {
                         </div>
                         <div className="flex-1">
                           <span className="font-bold text-lg">Pay in Full</span>
-                          <p className="text-slate-600 mt-1">
+                          <p className="text-black mt-1">
                             <span className="text-2xl font-bold text-slate-900">${PROGRAM_DETAILS.price}</span> one-time payment
                           </p>
                         </div>
@@ -397,7 +397,7 @@ export default function CNAEnrollPage() {
                         required
                         className="mt-1 w-5 h-5 rounded border-slate-300 text-brand-blue-600 focus:ring-brand-blue-500"
                       />
-                      <span className="text-sm text-slate-600">
+                      <span className="text-sm text-black">
                         I agree to the <Link href="/terms-of-service" className="text-brand-blue-600 hover:underline">Terms of Service</Link> and <Link href="/refund-policy" className="text-brand-blue-600 hover:underline">Refund Policy</Link>. I understand that the down payment is non-refundable and weekly payments are due every Monday.
                       </span>
                     </label>
@@ -496,18 +496,18 @@ export default function CNAEnrollPage() {
                   <span>Secure payment via Stripe</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
-                  <span className="text-slate-500 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <span>State-approved program</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
-                  <span className="text-slate-500 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                   <span>Job placement support</span>
                 </div>
               </div>
             </div>
 
             {/* Contact */}
-            <div className="text-center text-sm text-slate-600">
+            <div className="text-center text-sm text-black">
               <p>Questions? Contact us:</p>
               <p className="font-medium">Contact Us</p>
               <p className="font-medium">(317) 314-3757</p>

@@ -93,12 +93,12 @@ export default function MultiSiteApplyPage() {
         <div className="max-w-2xl mx-auto px-4">
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
             <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-black flex-shrink-0">•</span>
             </div>
             <h1 className="text-3xl font-black text-gray-900 mb-4">
               Application Received!
             </h1>
-            <p className="text-lg text-gray-600 mb-8">
+            <p className="text-lg text-black mb-8">
               Thank you for your interest in becoming a Supersonic Fast Cash partner. 
               Our partnership team will review your application and contact you within 2-3 business days.
             </p>
@@ -146,7 +146,7 @@ export default function MultiSiteApplyPage() {
           <h1 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
             Apply to Become a Partner
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-black">
             Complete the form below and our team will contact you to discuss the opportunity.
           </p>
         </div>
@@ -418,7 +418,7 @@ export default function MultiSiteApplyPage() {
             )}
           </button>
 
-          <p className="text-sm text-gray-500 text-center mt-4">
+          <p className="text-sm text-black text-center mt-4">
             By submitting this form, you agree to be contacted by our partnership team.
           </p>
         </form>

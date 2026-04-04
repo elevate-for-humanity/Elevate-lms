@@ -2,13 +2,9 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
-import {
-  ExternalLink,
-  Clock,
-  Award,
-  ShoppingBag,
-CheckCircle, } from 'lucide-react';
+import { ExternalLink, Clock, Award, ShoppingBag } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { OfferingBadge } from '@/components/ui/OfferingBadge';
 
 export const dynamic = 'force-dynamic';
 
@@ -155,12 +151,11 @@ export default async function NrfPage() {
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-slate-500 flex-shrink-0">•</span>
+                <ShoppingBag className="w-8 h-8 text-brand-green-600" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">Funded</h3>
+              <h3 className="text-lg font-semibold mb-2">Direct Purchase</h3>
               <p className="text-black">
-                Included with your program enrollment through WIOA or WRG
-                funding
+                Enroll directly — no funding application required. Login to purchase.
               </p>
             </div>
             <div className="text-center">
@@ -201,9 +196,8 @@ export default async function NrfPage() {
                     <Award className="w-4 h-4" />
                     <span>Certificate: {course.certificate}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm font-semibold text-brand-green-600">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span>{course.price}</span>
+                  <div className="mt-1">
+                    <OfferingBadge kind="short_term_course" />
                   </div>
                 </div>
 
@@ -227,6 +221,7 @@ export default async function NrfPage() {
                 >
                   Enroll Now
                 </Link>
+                <p className="text-xs text-black text-center mt-2">Direct Purchase · Login Required to Enroll</p>
               </div>
             ))}
           </div>

@@ -54,7 +54,7 @@ export default function AboutPage() {
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
             Elevate for Humanity
           </h1>
-          <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed">
+          <p className="text-black text-base sm:text-lg max-w-2xl leading-relaxed">
             Workforce development institute providing funded career training to people facing barriers to employment.
           </p>
         </div>
@@ -109,7 +109,7 @@ export default function AboutPage() {
             employment support, and direct employer placement.
           </p>
           <div className="mt-6">
-            <Link href="/about/mission" className="inline-flex items-center text-slate-600 hover:text-brand-red-600 text-sm font-semibold underline underline-offset-4">
+            <Link href="/about/mission" className="inline-flex items-center text-black hover:text-brand-red-600 text-sm font-semibold underline underline-offset-4">
               Full mission statement &amp; values <ArrowRight className="ml-1 w-4 h-4" />
             </Link>
           </div>
@@ -200,7 +200,7 @@ export default function AboutPage() {
       <section className="py-10 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl font-bold text-slate-900 mb-3">Training Delivery Model</h2>
-          <p className="text-sm text-slate-600 mb-4">
+          <p className="text-sm text-black mb-4">
             Elevate for Humanity is a hybrid workforce training hub and DOL Registered Apprenticeship
             Sponsor (RAPIDS: 2025-IN-132301). We coordinate employer-based hands-on instruction with
             online didactic learning — not a traditional campus model.
@@ -208,19 +208,19 @@ export default function AboutPage() {
           <div className="grid sm:grid-cols-2 gap-4 mb-4">
             <div className="bg-white rounded-lg p-4 border border-slate-200">
               <h3 className="font-semibold text-slate-900 text-sm mb-2">Didactic Instruction</h3>
-              <p className="text-xs text-slate-600">Delivered online via the Elevate LMS platform. Curriculum, assessments, and progress tracking are managed digitally.</p>
+              <p className="text-xs text-black">Delivered online via the Elevate LMS platform. Curriculum, assessments, and progress tracking are managed digitally.</p>
             </div>
             <div className="bg-white rounded-lg p-4 border border-slate-200">
               <h3 className="font-semibold text-slate-900 text-sm mb-2">Hands-On / OJT Training</h3>
-              <p className="text-xs text-slate-600">Conducted at approved employer partner sites, licensed shops, clinical facilities, and OJT placements. Training sites vary by program.</p>
+              <p className="text-xs text-black">Conducted at approved employer partner sites, licensed shops, clinical facilities, and OJT placements. Training sites vary by program.</p>
             </div>
             <div className="bg-white rounded-lg p-4 border border-slate-200">
               <h3 className="font-semibold text-slate-900 text-sm mb-2">Support Services</h3>
-              <p className="text-xs text-slate-600">Career counseling, case management, and advising available virtually and in-person by appointment.</p>
+              <p className="text-xs text-black">Career counseling, case management, and advising available virtually and in-person by appointment.</p>
             </div>
             <div className="bg-white rounded-lg p-4 border border-slate-200">
               <h3 className="font-semibold text-slate-900 text-sm mb-2">Administrative Office</h3>
-              <p className="text-xs text-slate-600">8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240. Administrative and enrollment support — not an instructional facility.</p>
+              <p className="text-xs text-black">8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240. Administrative and enrollment support — not an instructional facility.</p>
             </div>
           </div>
           <div className="text-sm text-slate-700 space-y-2">
@@ -257,21 +257,21 @@ export default function AboutPage() {
           <p className="text-sm text-slate-700 mb-4">
             Elevate for Humanity Career &amp; Technical Institute, a program of 2Exclusive LLC-S, operates as a centralized workforce development and Registered Apprenticeship sponsor organization. The institute provides related technical instruction (RTI), apprenticeship sponsorship, workforce-funded career pathway enrollment, and coordination with licensed employer training sites under a unified governance and compliance structure.
           </p>
-          <p className="text-sm text-slate-600 mb-6">
+          <p className="text-sm text-black mb-6">
             Apprentices receive structured instruction through the institute while completing supervised on-the-job training at sponsor-approved licensed partner locations in accordance with state and federal apprenticeship standards.
           </p>
           <div className="grid sm:grid-cols-3 gap-4">
             <div className="bg-white rounded-lg p-4 border border-slate-200">
               <h3 className="font-semibold text-slate-900 text-sm mb-2">Related Technical Instruction</h3>
-              <p className="text-xs text-slate-600">Delivered by the institute through structured curriculum and learning systems.</p>
+              <p className="text-xs text-black">Delivered by the institute through structured curriculum and learning systems.</p>
             </div>
             <div className="bg-white rounded-lg p-4 border border-slate-200">
               <h3 className="font-semibold text-slate-900 text-sm mb-2">On-the-Job Training</h3>
-              <p className="text-xs text-slate-600">Delivered at licensed employer partner locations operating under formal training agreements.</p>
+              <p className="text-xs text-black">Delivered at licensed employer partner locations operating under formal training agreements.</p>
             </div>
             <div className="bg-white rounded-lg p-4 border border-slate-200">
               <h3 className="font-semibold text-slate-900 text-sm mb-2">Oversight &amp; Compliance</h3>
-              <p className="text-xs text-slate-600">Managed by the Sponsor including standards, hour tracking, apprentice registration, and regulatory reporting.</p>
+              <p className="text-xs text-black">Managed by the Sponsor including standards, hour tracking, apprentice registration, and regulatory reporting.</p>
             </div>
           </div>
           <div className="mt-4">
@@ -325,7 +325,7 @@ export default function AboutPage() {
                 </div>
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
-                  <p className="text-sm text-slate-600">{item.desc}</p>
+                  <p className="text-sm text-black">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -342,7 +342,7 @@ export default function AboutPage() {
       <section className="py-12">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 text-center">Our Credentials</h2>
-          <p className="text-slate-600 text-center mb-8 max-w-2xl mx-auto">
+          <p className="text-black text-center mb-8 max-w-2xl mx-auto">
             These are the government agencies and workforce organizations that have approved,
             registered, or partnered with Elevate for Humanity.
           </p>
@@ -360,7 +360,7 @@ export default function AboutPage() {
                 </div>
                 <h3 className="font-bold text-slate-900 text-sm">{cred.name}</h3>
                 <p className="text-brand-red-600 text-xs font-semibold mb-2">{cred.role}</p>
-                <p className="text-xs text-slate-600">{cred.desc}</p>
+                <p className="text-xs text-black">{cred.desc}</p>
               </div>
             ))}
           </div>
@@ -378,7 +378,7 @@ export default function AboutPage() {
                 </div>
                 <h3 className="font-bold text-slate-900 text-sm">{cred.name}</h3>
                 <p className="text-brand-red-600 text-xs font-semibold mb-2">{cred.role}</p>
-                <p className="text-xs text-slate-600">{cred.desc}</p>
+                <p className="text-xs text-black">{cred.desc}</p>
               </div>
             ))}
           </div>
@@ -437,7 +437,7 @@ export default function AboutPage() {
 
                 {/* Credentials & Authorizations */}
                 <div className="mb-5">
-                  <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Credentials &amp; Authorizations</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-black mb-3">Credentials &amp; Authorizations</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {[
                       { label: 'IRS Enrolled Agent (EA)', detail: 'Authorized to represent taxpayers before the IRS' },
@@ -455,7 +455,7 @@ export default function AboutPage() {
                         <span className="text-brand-red-500 mt-0.5 flex-shrink-0">✓</span>
                         <div>
                           <p className="text-xs font-semibold text-slate-900">{cred.label}</p>
-                          <p className="text-xs text-slate-500 leading-snug">{cred.detail}</p>
+                          <p className="text-xs text-black leading-snug">{cred.detail}</p>
                         </div>
                       </div>
                     ))}
@@ -464,7 +464,7 @@ export default function AboutPage() {
 
                 {/* Workforce Funding Partners */}
                 <div className="mb-5">
-                  <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Workforce Funding &amp; Program Partners</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-black mb-3">Workforce Funding &amp; Program Partners</p>
                   <div className="flex flex-wrap gap-2">
                     {[
                       'Workforce Ready Grant (WRG)',
@@ -483,7 +483,7 @@ export default function AboutPage() {
                     Meet the Full Team <ArrowRight className="ml-1 w-4 h-4" />
                   </Link>
                   {founder.email && (
-                    <a href={`mailto:${founder.email}`} className="text-slate-500 text-sm hover:text-slate-700">
+                    <a href={`mailto:${founder.email}`} className="text-black text-sm hover:text-slate-700">
                       {founder.email}
                     </a>
                   )}
@@ -499,7 +499,7 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-10">
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">Our Team</h2>
-            <p className="text-slate-600">
+            <p className="text-black">
               The people behind the mission — workforce professionals, healthcare specialists,
               financial experts, and community advocates.
             </p>
@@ -521,7 +521,7 @@ export default function AboutPage() {
                   />
                 </div>
                 <h3 className="font-bold text-slate-900 text-sm sm:text-base">{member.name}</h3>
-                <p className="text-slate-500 text-xs sm:text-sm mt-1 leading-snug">{member.title}</p>
+                <p className="text-black text-xs sm:text-sm mt-1 leading-snug">{member.title}</p>
                 <span className="inline-flex items-center gap-1 text-brand-red-600 text-sm font-semibold mt-2 group-hover:gap-2 transition-all">
                   View Bio <ArrowRight className="w-3.5 h-3.5" />
                 </span>
@@ -550,7 +550,7 @@ export default function AboutPage() {
                 </div>
                 <div className="p-4">
                   <h3 className="font-bold text-slate-900 text-sm">{p.name}</h3>
-                  <p className="text-xs text-slate-500">{p.duration}</p>
+                  <p className="text-xs text-black">{p.duration}</p>
                 </div>
               </Link>
             ))}
@@ -574,7 +574,7 @@ export default function AboutPage() {
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Partner With Us</h3>
-                <p className="text-sm text-slate-600 mb-2">Workforce boards, community organizations, and employers — see how custom cohort training works.</p>
+                <p className="text-sm text-black mb-2">Workforce boards, community organizations, and employers — see how custom cohort training works.</p>
                 <span className="text-brand-red-600 text-sm font-semibold inline-flex items-center">
                   Partnership Details <ArrowRight className="ml-1 w-4 h-4" />
                 </span>
@@ -586,7 +586,7 @@ export default function AboutPage() {
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Our Partners</h3>
-                <p className="text-sm text-slate-600 mb-2">Employers, workforce boards, and community organizations we work with across Central Indiana.</p>
+                <p className="text-sm text-black mb-2">Employers, workforce boards, and community organizations we work with across Central Indiana.</p>
                 <span className="text-brand-red-600 text-sm font-semibold inline-flex items-center">
                   View Partners <ArrowRight className="ml-1 w-4 h-4" />
                 </span>
@@ -598,7 +598,7 @@ export default function AboutPage() {
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Career Pathways Framework</h3>
-                <p className="text-sm text-slate-600 mb-2">See our structured 5-stage pathway model: eligibility, training, credentialing, placement, and advancement.</p>
+                <p className="text-sm text-black mb-2">See our structured 5-stage pathway model: eligibility, training, credentialing, placement, and advancement.</p>
                 <span className="text-brand-red-600 text-sm font-semibold inline-flex items-center">
                   View Pathways <ArrowRight className="ml-1 w-4 h-4" />
                 </span>
@@ -612,7 +612,7 @@ export default function AboutPage() {
       <section className="py-12 bg-brand-blue-700">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Get Started?</h2>
-          <p className="text-lg text-brand-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-white mb-8 max-w-2xl mx-auto">
             Check your eligibility in about 5 minutes. If you qualify for funding,
             your entire training can be free — tuition, materials, certifications, and career services.
           </p>

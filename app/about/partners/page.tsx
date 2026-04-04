@@ -52,7 +52,7 @@ export default async function PartnersPage() {
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Our Partners</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">We collaborate with government agencies, employers, and credential providers to deliver funded credential pathway programs.</p>
+            <p className="text-lg text-white max-w-3xl mx-auto">We collaborate with government agencies, employers, and credential providers to deliver funded credential pathway programs.</p>
           </div>
         </div>
       </section>
@@ -81,7 +81,7 @@ export default async function PartnersPage() {
                   )}
                   <h3 className="font-semibold text-slate-900 mb-2">{partner.name}</h3>
                   {partner.description && (
-                    <p className="text-sm text-slate-600">{partner.description}</p>
+                    <p className="text-sm text-black">{partner.description}</p>
                   )}
                 </div>
               ))}
@@ -114,7 +114,7 @@ export default async function PartnersPage() {
                   )}
                   <h3 className="font-semibold text-slate-900 mb-2">{partner.name}</h3>
                   {partner.description && (
-                    <p className="text-sm text-slate-600">{partner.description}</p>
+                    <p className="text-sm text-black">{partner.description}</p>
                   )}
                 </div>
               ))}
@@ -136,7 +136,7 @@ export default async function PartnersPage() {
                 <div key={partner.id} className="bg-white border rounded-xl p-6 shadow-sm">
                   <h3 className="font-semibold text-slate-900 mb-2">{partner.name}</h3>
                   {partner.description && (
-                    <p className="text-sm text-slate-600 mb-3">{partner.description}</p>
+                    <p className="text-sm text-black mb-3">{partner.description}</p>
                   )}
                   {partner.website_url && (
                     <a href={partner.website_url} target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 text-sm hover:underline">
@@ -158,7 +158,7 @@ export default async function PartnersPage() {
               <Briefcase className="w-8 h-8 text-brand-orange-600" />
               <h2 className="text-3xl font-bold text-slate-900">Employer Partners</h2>
             </div>
-            <p className="text-slate-600 mb-8">
+            <p className="text-black mb-8">
               Our graduates are hired by leading employers across healthcare, skilled trades, and professional services.
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -177,7 +177,7 @@ export default async function PartnersPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Handshake className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <h2 className="text-3xl font-bold mb-4">Become a Partner</h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <p className="text-xl text-white mb-8">
             Join our network of employers, credential partners, and workforce organizations.
           </p>
           <Link

@@ -122,9 +122,8 @@ async function _POST(request: NextRequest) {
     const weeksRemaining = BARBER_PRICING.paymentTermWeeks; // fixed 29 weeks
 
     if (payment_type === 'pay_in_full') {
-      // Pay in full with 5% discount
-      checkoutAmount = Math.round(adjustedFullPrice * 0.95);
-      productName = 'Barber Apprenticeship - Full Payment (5% Discount)';
+      checkoutAmount = adjustedFullPrice;
+      productName = 'Barber Apprenticeship - Full Payment';
       productDescription = transferred_hours_verified > 0
         ? `Adjusted tuition with ${transferred_hours_verified} transfer hours credit. No weekly payments.`
         : 'Complete program tuition paid in full. No weekly payments required.';

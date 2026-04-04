@@ -120,7 +120,7 @@ export default async function TeamPage() {
               </div>
               <div className="mt-3 text-center">
                 <h3 className="font-bold text-slate-900 text-sm group-hover:text-brand-red-600 transition">{members[0].name}</h3>
-                <p className="text-xs text-slate-500">{members[0].title}</p>
+                <p className="text-xs text-black">{members[0].title}</p>
                 <p className="text-xs text-brand-red-600 font-semibold mt-1">View Bio →</p>
               </div>
             </Link>
@@ -141,7 +141,7 @@ export default async function TeamPage() {
                 </div>
                 <div className="mt-3 text-center">
                   <h3 className="font-bold text-slate-900 text-sm group-hover:text-brand-red-600 transition">{member.name}</h3>
-                  <p className="text-xs text-slate-500">{member.title}</p>
+                  <p className="text-xs text-black">{member.title}</p>
                   <p className="text-xs text-brand-red-600 font-semibold mt-1">View Bio →</p>
                 </div>
               </Link>
@@ -162,7 +162,7 @@ export default async function TeamPage() {
               </div>
               <div className="mt-3 text-center">
                 <h3 className="font-bold text-slate-900 text-sm group-hover:text-brand-red-600 transition">{members[members.length - 1].name}</h3>
-                <p className="text-xs text-slate-500">{members[members.length - 1].title}</p>
+                <p className="text-xs text-black">{members[members.length - 1].title}</p>
                 <p className="text-xs text-brand-red-600 font-semibold mt-1">View Bio →</p>
               </div>
             </Link>
@@ -176,7 +176,7 @@ export default async function TeamPage() {
           <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Join Our Mission
           </h2>
-          <p className="text-lg text-slate-600 mb-8">
+          <p className="text-lg text-black mb-8">
             We are always looking for passionate individuals to join our team.
           </p>
           <Link

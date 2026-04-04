@@ -60,7 +60,7 @@ export default function ContactPage() {
       <section className="bg-slate-700 text-white py-20">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-5xl font-black mb-6">Contact Us</h1>
-          <p className="text-xl text-white/90 max-w-3xl">
+          <p className="text-xl text-white max-w-3xl">
             Get in touch with Supersonic Fast Cash. We're here to help with your tax preparation needs.
           </p>
         </div>
@@ -77,7 +77,7 @@ export default function ContactPage() {
             <a href="/support" className="text-brand-blue-600 hover:text-brand-blue-800 font-semibold text-lg">
               Visit Support Center
             </a>
-            <p className="text-gray-600 mt-2 text-sm">Contact us for immediate assistance</p>
+            <p className="text-black mt-2 text-sm">Contact us for immediate assistance</p>
           </div>
 
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 text-center hover:border-brand-blue-600 transition">
@@ -88,7 +88,7 @@ export default function ContactPage() {
             <a href="mailto:Supersonicfastcashllc@gmail.com" className="text-brand-blue-600 hover:text-brand-blue-800 font-semibold break-all">
               Supersonicfastcashllc@gmail.com
             </a>
-            <p className="text-gray-600 mt-2 text-sm">Email us anytime</p>
+            <p className="text-black mt-2 text-sm">Email us anytime</p>
           </div>
 
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 text-center hover:border-brand-blue-600 transition">
@@ -97,7 +97,7 @@ export default function ContactPage() {
             </div>
             <h3 className="text-xl font-bold text-black mb-3">Location</h3>
             <p className="text-gray-700 font-semibold">Indianapolis, IN</p>
-            <p className="text-gray-600 mt-2 text-sm">Multiple locations available</p>
+            <p className="text-black mt-2 text-sm">Multiple locations available</p>
           </div>
         </div>
 
@@ -156,10 +156,10 @@ export default function ContactPage() {
             {success ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-black flex-shrink-0">•</span>
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Message Sent!</h3>
-                <p className="text-gray-600 mb-6">We'll get back to you within 24 hours.</p>
+                <p className="text-black mb-6">We'll get back to you within 24 hours.</p>
                 <button
                   onClick={() => {
                     setSuccess(false);

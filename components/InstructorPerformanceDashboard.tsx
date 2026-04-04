@@ -28,7 +28,7 @@ export default function InstructorPerformanceDashboard() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Instructor Performance</h1>
-          <p className="text-brand-red-100">Track your teaching effectiveness</p>
+          <p className="text-white">Track your teaching effectiveness</p>
         </div>
       </div>
 

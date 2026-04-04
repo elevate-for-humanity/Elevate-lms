@@ -120,7 +120,7 @@ export default async function EmployerProgramsPage() {
           <div className="md:flex items-center justify-between">
             <div>
               <h3 className="text-2xl font-bold mb-2">Need Help Choosing a Program?</h3>
-              <p className="text-brand-blue-200">Our team can analyze your hiring needs and recommend the best incentives.</p>
+              <p className="text-white">Our team can analyze your hiring needs and recommend the best incentives.</p>
             </div>
             <Link
               href="/contact"

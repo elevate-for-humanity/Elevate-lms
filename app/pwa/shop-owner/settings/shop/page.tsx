@@ -130,14 +130,14 @@ export default function ShopDetailsPage() {
         {error && (
           <div className="bg-white/10 border border-brand-red-500/30 rounded-xl p-4 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
-            <p className="text-brand-red-200 text-sm">{error}</p>
+            <p className="text-white text-sm">{error}</p>
           </div>
         )}
 
         {success && (
           <div className="bg-white/10 border border-brand-green-500/30 rounded-xl p-4 flex items-start gap-3">
             <span className="text-slate-500 flex-shrink-0">•</span>
-            <p className="text-brand-green-200 text-sm">Changes saved successfully</p>
+            <p className="text-white text-sm">Changes saved successfully</p>
           </div>
         )}
 

@@ -130,7 +130,7 @@ export default function SupersonicSeoIndexingPage() {
           <div className="space-y-3">
             {allowedContent.map((item, index) => (
               <div key={index} className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-black flex-shrink-0">•</span>
                 <span className="text-slate-700">{item}</span>
               </div>
             ))}
@@ -165,7 +165,7 @@ export default function SupersonicSeoIndexingPage() {
                   </div>
                   <h3 className="font-semibold text-slate-900">{method.title}</h3>
                 </div>
-                <p className="text-sm text-slate-600">{method.description}</p>
+                <p className="text-sm text-black">{method.description}</p>
               </div>
             ))}
           </div>
@@ -188,7 +188,7 @@ export default function SupersonicSeoIndexingPage() {
 {`<meta name="robots" content="index, follow">
 <link rel="canonical" href="https://www.elevateforhumanity.org/page-path">`}
             </pre>
-            <p className="text-sm text-slate-600 mt-4">
+            <p className="text-sm text-black mt-4">
               See <code className="bg-slate-200 px-2 py-0.5 rounded">config/seo-index-whitelist.json</code> for 
               the complete list of approved indexed pages.
             </p>

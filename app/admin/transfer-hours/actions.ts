@@ -5,20 +5,12 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
-export async function approveTransferHours(
-  requestId: string,
-  hoursApproved: number,
-  notes?: string
-) {
+async function requireAdminActor() {
   const supabase = await createClient();
-  const db = createAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Unauthorized');
 
-  if (!user) {
-    throw new Error('Unauthorized');
-  }
-
+  const db = createAdminClient();
   const { data: profile } = await db
     .from('profiles')
     .select('role')
@@ -26,7 +18,29 @@ export async function approveTransferHours(
     .single();
 
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
-    throw new Error('Unauthorized');
+    throw new Error('Forbidden');
+  }
+
+  return { user, db };
+}
+
+export async function approveTransferHours(
+  requestId: string,
+  hoursApproved: number,
+  notes?: string
+) {
+  const { user, db } = await requireAdminActor();
+
+  // Confirm the record exists and is in a mutable state before updating.
+  const { data: record, error: fetchError } = await db
+    .from('transfer_hours')
+    .select('id, status')
+    .eq('id', requestId)
+    .single();
+
+  if (fetchError || !record) throw new Error('Transfer hours request not found');
+  if (record.status !== 'pending' && record.status !== 'needs_review') {
+    throw new Error(`Cannot approve a request with status: ${record.status}`);
   }
 
   const { error } = await db
@@ -41,9 +55,7 @@ export async function approveTransferHours(
     })
     .eq('id', requestId);
 
-  if (error) {
-    throw new Error('Operation failed');
-  }
+  if (error) throw new Error('Operation failed');
 
   await logAdminAudit({
     action: AdminAction.HOURS_TRANSFER_PROCESSED,
@@ -57,23 +69,18 @@ export async function approveTransferHours(
 }
 
 export async function denyTransferHours(requestId: string, notes?: string) {
-  const supabase = await createClient();
-  const db = createAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user, db } = await requireAdminActor();
 
-  if (!user) {
-    throw new Error('Unauthorized');
-  }
-
-  const { data: profile } = await db
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
+  // Confirm the record exists and is in a mutable state before updating.
+  const { data: record, error: fetchError } = await db
+    .from('transfer_hours')
+    .select('id, status')
+    .eq('id', requestId)
     .single();
 
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
-    throw new Error('Unauthorized');
+  if (fetchError || !record) throw new Error('Transfer hours request not found');
+  if (record.status !== 'pending' && record.status !== 'needs_review') {
+    throw new Error(`Cannot deny a request with status: ${record.status}`);
   }
 
   const { error } = await db
@@ -87,9 +94,7 @@ export async function denyTransferHours(requestId: string, notes?: string) {
     })
     .eq('id', requestId);
 
-  if (error) {
-    throw new Error('Operation failed');
-  }
+  if (error) throw new Error('Operation failed');
 
   await logAdminAudit({
     action: AdminAction.HOURS_TRANSFER_PROCESSED,

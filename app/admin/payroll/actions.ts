@@ -11,12 +11,22 @@ export async function markPayrollPaid(payrollId: string) {
   if (!user) throw new Error('Not authenticated');
 
   const db = createAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
 
   const { data: profile, error: profileError } = await db
     .from('profiles').select('role').eq('id', user.id).single();
-  if (profileError) throw new Error(`Profile fetch failed: ${profileError.message}`);
+  if (profileError) throw new Error('Profile fetch failed');
   if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) throw new Error('Forbidden');
+
+  // Confirm the record exists before mutating.
+  // Without this, a blind update on a non-existent ID returns success with 0 rows affected.
+  const { data: record, error: fetchError } = await db
+    .from('apprentice_payroll')
+    .select('id, status')
+    .eq('id', payrollId)
+    .single();
+
+  if (fetchError || !record) throw new Error('Payroll record not found');
+  if (record.status === 'paid') return { error: 'Already marked as paid' };
 
   const { error } = await db
     .from('apprentice_payroll')

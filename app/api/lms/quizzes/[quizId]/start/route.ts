@@ -29,20 +29,24 @@ async function _POST(
     return NextResponse.json({ error: 'Quiz not found' }, { status: 404 });
   }
 
+  // A quiz with no course_id is corrupt data — fail closed rather than
+  // skipping enrollment verification and allowing an unscoped write.
+  if (!quiz.course_id) {
+    return NextResponse.json({ error: 'Quiz not found' }, { status: 404 });
+  }
+
   // Verify enrollment before creating any attempt.
   // Without this, any authenticated user can start attempts for any quiz ID.
-  if (quiz.course_id) {
-    const { data: enrollment } = await db
-      .from('program_enrollments')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('course_id', quiz.course_id)
-      .in('status', ['active', 'enrolled', 'in_progress', 'completed', 'confirmed'])
-      .maybeSingle();
+  const { data: enrollment } = await db
+    .from('program_enrollments')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('course_id', quiz.course_id)
+    .in('status', ['active', 'enrolled', 'in_progress', 'completed', 'confirmed'])
+    .maybeSingle();
 
-    if (!enrollment) {
-      return NextResponse.json({ error: 'Not enrolled in this course' }, { status: 403 });
-    }
+  if (!enrollment) {
+    return NextResponse.json({ error: 'Not enrolled in this course' }, { status: 403 });
   }
 
   // Check existing attempts

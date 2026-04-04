@@ -418,19 +418,22 @@ class SezzleClient {
 // Singleton instance
 export const sezzle = new SezzleClient();
 
-// Auto-configure if environment variables are set
-if (process.env.SEZZLE_PUBLIC_KEY && process.env.SEZZLE_PRIVATE_KEY) {
-  sezzle.configure({
-    publicKey: process.env.SEZZLE_PUBLIC_KEY,
-    privateKey: process.env.SEZZLE_PRIVATE_KEY,
-    environment: (process.env.SEZZLE_ENVIRONMENT as 'sandbox' | 'production') || 'production',
-  });
+// Read from consolidated API_KEYS_JSON first, then individual env vars
+let _apiKeys: Record<string, string> = {};
+try {
+  const raw = process.env.API_KEYS_JSON;
+  if (raw) _apiKeys = JSON.parse(raw);
+} catch { /* invalid JSON — fall through */ }
+
+const _sezzlePub = _apiKeys['SEZZLE_PUBLIC_KEY'] || process.env.SEZZLE_PUBLIC_KEY;
+const _sezzlePriv = _apiKeys['SEZZLE_PRIVATE_KEY'] || process.env.SEZZLE_PRIVATE_KEY;
+const _sezzleEnv = process.env.SEZZLE_ENVIRONMENT as 'sandbox' | 'production' || 'production';
+
+if (_sezzlePub && _sezzlePriv) {
+  sezzle.configure({ publicKey: _sezzlePub, privateKey: _sezzlePriv, environment: _sezzleEnv });
 } else {
-  // Log which vars are missing to help diagnose Netlify config issues
-  if (typeof process !== 'undefined' && process.env) {
-    const missing = [];
-    if (!process.env.SEZZLE_PUBLIC_KEY) missing.push('SEZZLE_PUBLIC_KEY');
-    if (!process.env.SEZZLE_PRIVATE_KEY) missing.push('SEZZLE_PRIVATE_KEY');
-    logger.warn(`[Sezzle] Not configured - missing env vars: ${missing.join(', ')}`);
-  }
+  const missing = [];
+  if (!_sezzlePub) missing.push('SEZZLE_PUBLIC_KEY');
+  if (!_sezzlePriv) missing.push('SEZZLE_PRIVATE_KEY');
+  logger.warn(`[Sezzle] Not configured - missing: ${missing.join(', ')}`);
 }

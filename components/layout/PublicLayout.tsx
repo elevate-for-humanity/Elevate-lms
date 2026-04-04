@@ -45,18 +45,19 @@ export default async function PublicLayout({ children }: PublicLayoutProps) {
 
   // x-pathname is set by proxy.ts on every request.
   // Fall back to other runtime headers if missing.
-  // If none resolve, default to NOT rendering the marketing header —
-  // app shells manage their own layout and must never get the public nav.
+  // If none resolve, default to '/' — public layout renders.
+  // App routes are explicitly listed in APP_ROUTE_PREFIXES and will
+  // still be caught by isAppRoute() below.
   const raw =
     headersList.get('x-pathname') ||
     headersList.get('x-invoke-path') ||
     headersList.get('x-forwarded-uri') ||
     headersList.get('x-url') ||
-    null;
+    '/';
 
-  const pathname = raw ? extractPathname(raw) : null;
+  const pathname = extractPathname(raw);
 
-  if (!pathname || isAppRoute(pathname)) {
+  if (isAppRoute(pathname)) {
     return <>{children}</>;
   }
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import LogoImage from '@/components/site/LogoImage';
+import Logo from '@/components/ui/Logo';
 import { Volume2, VolumeX } from 'lucide-react';
 
 export default function OrientationAvatar() {
@@ -71,7 +71,7 @@ export default function OrientationAvatar() {
 
         {/* Brand bug — bottom left */}
         <div className="absolute bottom-3 left-3 bg-white/90 rounded-lg px-2 py-1 flex items-center gap-1.5 shadow-sm pointer-events-none">
-          <LogoImage alt="Elevate" width={16} height={16} />
+          <Logo alt="Elevate" width={16} height={16} />
           <span className="text-xs font-semibold text-slate-800">Elevate</span>
         </div>
       </div>

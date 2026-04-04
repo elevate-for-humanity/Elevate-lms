@@ -353,79 +353,7 @@ export async function enrollCareerSafe(
   }
 }
 
-/**
- * Milady RISE Enrollment Workflow
- * Cosmetology and barbering training
- */
-export async function enrollMiladyRISE(
-  request: EnrollmentRequest
-): Promise<EnrollmentResult> {
-  const supabase = createClient();
-
-  try {
-    const { data: student } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', request.studentId)
-      .single();
-
-    if (!student) {
-      throw new Error('Student not found');
-    }
-
-    const { data: provider } = await supabase
-      .from('partner_lms_providers')
-      .select('*')
-      .eq('id', request.providerId)
-      .single();
-
-    if (!provider) {
-      throw new Error('Provider not found');
-    }
-
-    const { data: enrollment, error: enrollmentError } = await supabase
-      .from('partner_lms_enrollments')
-      .insert({
-        provider_id: request.providerId,
-        student_id: request.studentId,
-        program_id: request.programId,
-        status: 'pending',
-        enrolled_at: new Date().toISOString(),
-        metadata: {
-          provider_type: 'milady',
-          enrollment_method: 'manual',
-          promo_code: provider.promo_code, // efhcti-rise295
-        },
-      })
-      .select()
-      .single();
-
-    if (enrollmentError) {
-      throw enrollmentError;
-    }
-
-    if (request.sendWelcomeEmail) {
-      await supabase.functions.invoke('send-partner-welcome-email', {
-        body: {
-          enrollment_id: enrollment.id,
-          provider_id: request.providerId,
-          student_id: request.studentId,
-        },
-      });
-    }
-
-    return {
-      success: true,
-      enrollmentId: enrollment.id,
-      message: `Milady RISE enrollment created. Use promo code: ${provider.promo_code}`,
-    };
-  } catch (error) { /* Error handled silently */ 
-    return {
-      success: false,
-      error: 'Operation failed',
-    };
-  }
-}
+// enrollMiladyRISE removed — beauty/barber theory delivered via Elevate LMS
 
 /**
  * Universal enrollment function that routes to the correct provider
@@ -459,8 +387,7 @@ export async function enrollStudent(
         return await enrollNRFRiseUp(request);
       case 'careersafe':
         return await enrollCareerSafe(request);
-      case 'milady':
-        return await enrollMiladyRISE(request);
+      // 'milady' case removed — beauty/barber theory via Elevate LMS
       default:
         throw new Error(`Unsupported provider type: ${provider.provider_type}`);
     }

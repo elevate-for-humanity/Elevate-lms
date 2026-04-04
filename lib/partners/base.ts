@@ -4,7 +4,7 @@ export type PartnerType =
   | "hsi"
   | "certiport"
   | "careersafe"
-  | "milady"
+  // "milady" removed — theory delivered via Elevate LMS
   | "jri"
   | "nrf"
   | "nds";

@@ -153,7 +153,7 @@ function calculateExpirationDate(providerType: string): string | null {
     case 'certiport':
     case 'jri':
     case 'nrf_rise':
-    case 'milady':
+    case 'elevate_lms':
       // These certifications typically don't expire
       return null;
 

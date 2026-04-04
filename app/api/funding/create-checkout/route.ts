@@ -72,7 +72,7 @@ async function _POST(req: Request) {
     // Determine price - use env var or program cost
     const amount = program.total_cost
       ? Math.round(Number(program.total_cost) * 100)
-      : 29500; // Default $295 for Milady RISE
+      : 29500; // Default $295
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 

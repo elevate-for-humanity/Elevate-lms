@@ -143,7 +143,7 @@ export default function MOUPage() {
           <p>The Indiana Barbershop Apprenticeship Program is a structured training program that combines:</p>
           <ul>
             <li><strong>2,000 hours</strong> of on-the-job training (OJT) at the worksite</li>
-            <li><strong>Related Technical Instruction (RTI)</strong> coordinated by the Sponsor via Milady RISE</li>
+            <li><strong>Related Technical Instruction (RTI)</strong> coordinated by the Sponsor via Elevate LMS</li>
             <li>Progressive skill development tracked through competency assessments</li>
           </ul>
 
@@ -157,7 +157,7 @@ export default function MOUPage() {
           </ul>
           <h3>Related Instruction</h3>
           <ul>
-            <li>Coordinate and provide access to required online instruction (Milady RISE)</li>
+            <li>Coordinate and provide access to required online instruction (Elevate LMS)</li>
             <li>Track completion of related instruction requirements</li>
             <li>Provide learning materials and resources at no cost to the Shop or apprentice</li>
           </ul>
@@ -200,7 +200,7 @@ export default function MOUPage() {
           <ul>
             <li>Provide structured on-the-job training opportunities</li>
             <li>Allow apprentice to practice and develop required competencies</li>
-            <li>Support apprentice completion of Milady RISE coursework</li>
+            <li>Support apprentice completion of Elevate LMS coursework</li>
           </ul>
           <h3>Hour Verification</h3>
           <ul>

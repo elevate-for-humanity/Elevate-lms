@@ -25,7 +25,7 @@ const REQUIRED_FAQS: FAQItem[] = [
   },
   {
     question: "What does the $4,980 cover?",
-    answer: "Federal apprenticeship sponsorship, compliance reporting, employer coordination, Milady theory instruction, and program completion documentation."
+    answer: "Federal apprenticeship sponsorship, compliance reporting, employer coordination, Elevate LMS theory instruction, and program completion documentation."
   },
   {
     question: "What is a Registered Apprenticeship?",
@@ -37,7 +37,7 @@ const REQUIRED_FAQS: FAQItem[] = [
   },
   {
     question: "What is included in the Related Instruction?",
-    answer: "Related Instruction is provided through the Milady theory curriculum, which covers barbering fundamentals, sanitation, safety, customer service, and state law. This is the classroom/theory component of the apprenticeship."
+    answer: "Related Instruction is provided through the Elevate LMS, which covers barbering fundamentals, sanitation, safety, customer service, and state law. This is the classroom/theory component of the apprenticeship."
   },
   {
     question: "Do I earn money during the apprenticeship?",

@@ -43,7 +43,7 @@ export default function Intro() {
             <div className="p-6">
               <h3 className="text-xl font-bold text-brand-green-900 mb-3">Industry Credentials</h3>
               <p className="text-sm text-black leading-relaxed mb-2">
-                Nationally recognized certifications from Certiport, HSI, CareerSafe, NRF, and Milady.
+                Nationally recognized certifications from Certiport, HSI, CareerSafe, and NRF.
               </p>
               <p className="text-xs text-black">
                 <strong>Real credentials employers recognize.</strong>

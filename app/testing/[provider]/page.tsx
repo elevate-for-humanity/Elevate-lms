@@ -14,7 +14,7 @@ const PROVIDER_HERO: Record<string, string> = {
   workkeys:   '/images/pages/career-services-page-4.jpg',
   servsafe:   '/images/pages/career-services-page-3.jpg',
   careersafe: '/images/pages/apprenticeships-hero.jpg',
-  milady:     '/images/pages/barber-apprenticeship.jpg',
+  lms:     '/images/pages/barber-apprenticeship.jpg',
 };
 
 const PROVIDER_ACCENT: Record<string, string> = {
@@ -25,7 +25,7 @@ const PROVIDER_ACCENT: Record<string, string> = {
   workkeys:   'from-violet-900',
   servsafe:   'from-red-900',
   careersafe: 'from-yellow-900',
-  milady:     'from-pink-900',
+  lms:     'from-pink-900',
 };
 
 const CAPABILITY_LABEL: Record<string, { label: string; icon: typeof MapPin }> = {

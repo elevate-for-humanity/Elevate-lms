@@ -160,16 +160,6 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
       { label: 'OSHA 30-Hour', amount: 185, note: 'Includes course + DOL card' },
     ],
   },
-  milady: {
-    key: 'milady',
-    name: 'Milady (Cosmetology & Esthetics)',
-    capability: 'CENTER_REMOTE_ALLOWED',
-    description: 'Industry-standard assessments for cosmetology, esthetics, nail technology, and barbering programs.',
-    exams: ['Cosmetology Theory', 'Esthetics Theory', 'Nail Technology Theory', 'Barbering Theory'],
-    verifyUrl: 'https://www.miladypro.com/',
-    status: 'available_through_partner',
-    fees: [
-      { label: 'Per assessment', amount: 40, note: 'Includes exam + proctoring' },
     ],
   },
 };

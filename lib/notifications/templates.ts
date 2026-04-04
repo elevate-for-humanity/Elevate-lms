@@ -238,16 +238,14 @@ If you believe this was in error or have questions, please reply to this email o
             <p>Your apprenticeship enrollment has been approved. You now have full access to the student portal and can begin your training.</p>
             
             <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 20px 0;">
-              <h3 style="color: ${BRAND_COLOR}; margin-top: 0;">Start Your Theory Training (Milady RISE)</h3>
-              <p style="margin-bottom: 16px;">Your theory training through Milady RISE is included in your program. This is required coursework for your apprenticeship.</p>
-              <p style="margin-bottom: 8px;"><strong>To access Milady:</strong></p>
+              <h3 style="color: ${BRAND_COLOR}; margin-top: 0;">Start Your Theory Training</h3>
+              <p style="margin-bottom: 16px;">Your theory coursework is in the <strong>Elevate LMS</strong> — included at no extra cost. This is required coursework for your apprenticeship.</p>
+              <p style="margin-bottom: 8px;"><strong>To access your courses:</strong></p>
               <ol style="margin: 0; padding-left: 20px;">
                 <li>Go to your Student Dashboard</li>
-                <li>Click "Open Milady RISE" on the purple card</li>
-                <li>Create your Milady account or sign in</li>
+                <li>Click "My Courses"</li>
                 <li>Begin your theory coursework</li>
               </ol>
-              <p style="margin-top: 16px;"><strong>Direct Milady Login:</strong> <a href="https://www.miladytraining.com/users/sign_in" style="color: ${BRAND_COLOR};">miladytraining.com/users/sign_in</a></p>
             </div>
             
             ${button('Access Student Portal →', data.portal_url)}
@@ -259,16 +257,13 @@ Hi ${data.name || 'there'},
 
 Your apprenticeship enrollment has been approved. You now have full access to the student portal and can begin your training.
 
-START YOUR THEORY TRAINING (MILADY RISE)
-Your theory training through Milady RISE is included in your program. This is required coursework for your apprenticeship.
+START YOUR THEORY TRAINING
+Your theory coursework is in the Elevate LMS — included at no extra cost. This is required coursework for your apprenticeship.
 
-To access Milady:
+To access your courses:
 1. Go to your Student Dashboard
-2. Click "Open Milady RISE" on the purple card
-3. Create your Milady account or sign in
-4. Begin your theory coursework
-
-Direct Milady Login: https://www.miladytraining.com/users/sign_in
+2. Click "My Courses"
+3. Begin your theory coursework
 
 Access portal here: ${data.portal_url}
 

@@ -79,7 +79,7 @@ export function AIInstructorCard(props: {
           onClick={() => props.onOpenChat()}
           className="flex-1 rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm font-bold text-zinc-900 transition hover:bg-zinc-50"
         >
-          Milady Help
+          LMS Help
         </button>
       </div>
 

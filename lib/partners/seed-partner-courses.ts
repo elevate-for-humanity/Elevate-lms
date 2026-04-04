@@ -19,7 +19,6 @@ import {
   NRF_COURSES,
   JRI_COURSES,
   CAREERSAFE_COURSES,
-  MILADY_COURSES,
   type PartnerCourse,
 } from './link-based-integration';
 
@@ -67,14 +66,7 @@ const PROVIDERS: ProviderDef[] = [
     supportEmail: 'support@careersafeonline.com',
     courses: CAREERSAFE_COURSES,
   },
-  {
-    slug: 'milady',
-    name: 'Milady/Cengage',
-    type: 'curriculum_provider',
-    websiteUrl: 'https://www.milady.com',
-    supportEmail: 'support@milady.com',
-    courses: MILADY_COURSES,
-  },
+  // Beauty/barber theory delivered via Elevate LMS — no external partner seeded
 ];
 
 // ── Micro-course IDs (short certifications, not full partner programs) ────────

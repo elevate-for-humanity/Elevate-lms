@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import LogoImage from '@/components/site/LogoImage';
+import Logo from '@/components/ui/Logo';
 import Link from 'next/link';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
 
@@ -113,7 +113,7 @@ function SignedOutView() {
       <div className="relative h-56 sm:h-64 overflow-hidden">
         <Image src="/images/pages/lms-page-12.jpg" alt="Students in classroom" fill className="object-cover" priority  sizes="100vw" />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
-          <LogoImage alt="Elevate" width={40} height={40} className="mb-3" />
+          <Logo alt="Elevate" width={40} height={40} className="mb-3" />
           <h1 className="text-2xl font-bold text-slate-900">Student Portal</h1>
           <p className="text-white text-sm mt-1">Sign in to view your program and progress</p>
         </div>
@@ -166,7 +166,7 @@ export default async function StudentPWAPage() {
       <div className="relative h-44 sm:h-52 overflow-hidden">
         <Image src="/images/pages/admin-accreditation-report-hero.jpg" alt="Students in classroom" fill className="object-cover" priority  sizes="100vw" />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
-          <LogoImage alt="Elevate" width={36} height={36} className="mb-2" />
+          <Logo alt="Elevate" width={36} height={36} className="mb-2" />
           <h1 className="text-xl font-bold text-slate-900">Welcome back, {firstName}</h1>
           <p className="text-white text-sm mt-0.5">{user.email}</p>
         </div>

@@ -186,7 +186,7 @@ export default function FounderPage() {
                   'Job Ready Indy Partner',
                   'HSI (Health & Safety Institute) Affiliate',
                   'CareerSafe OSHA Training Provider',
-                  'Milady Curriculum Partner',
+                  'Elevate LMS Curriculum Partner',
                   'NRF Rise Up Provider',
                   'Certiport Authorized Testing Center (CATC)',
 

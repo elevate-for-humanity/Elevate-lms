@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import LogoImage from '@/components/site/LogoImage';
+import Logo from '@/components/ui/Logo';
 import Link from 'next/link';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import { Heart, MapPin, ArrowRight, Clock, Menu, X, Phone, Mail, BookOpen, Users, Award, CheckCircle } from 'lucide-react';
@@ -87,7 +87,7 @@ export default function EducationLandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             <Link href="/education" className="flex items-center gap-2.5">
-              <LogoImage alt="Elevate for Humanity" width={140} height={40} className="h-9 w-auto" priority />
+              <Logo alt="Elevate for Humanity" width={140} height={40} className="h-9 w-auto" priority />
               <span className="hidden sm:inline text-xs font-bold text-brand-red-600 bg-brand-red-50 px-2.5 py-1 rounded-full border border-brand-red-200">Education</span>
             </Link>
             <nav className="hidden lg:flex items-center gap-1">
@@ -231,7 +231,7 @@ export default function EducationLandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8 mb-8">
             <div>
-              <LogoImage alt="Elevate for Humanity" width={120} height={36} className="h-8 w-auto brightness-0 invert mb-3" />
+              <Logo alt="Elevate for Humanity" width={120} height={36} className="h-8 w-auto brightness-0 invert mb-3" />
               <div className="text-sm">8888 Keystone Crossing, Suite 1300</div>
               <div className="text-sm">Indianapolis, IN 46240</div>
               <div className="flex items-center gap-2 mt-3 text-sm"><Phone className="w-4 h-4" /><a href="tel:+13173550500" className="hover:text-slate-900">(317) 355-0500</a></div>

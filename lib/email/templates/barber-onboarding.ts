@@ -56,8 +56,8 @@ export function barberOnboardingEmail(data: BarberOnboardingData) {
       </div>
 
       <div>
-        <p style="margin: 0; font-weight: 600; color: #1e293b;">Step 4: Begin Theory Training (Milady RISE)</p>
-        <p style="margin: 4px 0 0; font-size: 14px; color: #64748b;">Your online theory coursework through Milady is included at no cost. We will set up your access after enrollment is complete.</p>
+        <p style="margin: 0; font-weight: 600; color: #1e293b;">Step 4: Begin Theory Training (Elevate LMS)</p>
+        <p style="margin: 4px 0 0; font-size: 14px; color: #64748b;">Your online theory coursework is in the Elevate LMS — included at no cost. Access unlocks after enrollment is complete.</p>
       </div>
     </div>
 

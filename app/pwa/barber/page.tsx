@@ -57,7 +57,7 @@ function LandingPage() {
           </div>
           <div>
             <h3 className="text-white font-semibold">Training Materials</h3>
-            <p className="text-slate-400 text-sm">Access Milady curriculum and instructional videos.</p>
+            <p className="text-slate-400 text-sm">Access Elevate LMS curriculum and instructional videos.</p>
           </div>
         </div>
 
@@ -259,7 +259,7 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
             </div>
             <div className="flex-1">
               <p className="text-white font-medium">Training Materials</p>
-              <p className="text-slate-500 text-sm">Milady curriculum & videos</p>
+              <p className="text-slate-500 text-sm">Elevate LMS curriculum & videos</p>
             </div>
             <ChevronRight className="w-5 h-5 text-slate-500" />
           </Link>

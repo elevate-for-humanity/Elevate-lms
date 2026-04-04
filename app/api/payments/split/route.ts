@@ -20,8 +20,8 @@ export const maxDuration = 60;
 // Program-specific vendor costs
 const VENDOR_COSTS: Record<string, { vendor: string; cost: number }> = {
   'barber-apprenticeship': {
-    vendor: 'milady',
-    cost: 295,
+    vendor: 'none',
+    cost: 0,
   },
   'direct-support-professional': {
     vendor: 'none',
@@ -97,7 +97,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Process payment split:
-    // 1. Pay vendor for enrollment (e.g., Milady $295)
+    // 1. Pay vendor for enrollment (if applicable)
     // 2. Remaining balance goes to Stripe account automatically
     if (vendorAmount > 0 && vendorConfig.vendor !== 'none') {
       await processVendorPayment({
@@ -156,38 +156,12 @@ async function processVendorPayment(params: {
   const supabase = await createClient();
 
   try {
-    if (params.vendorName === 'milady') {
-      // Trigger Milady auto-enrollment
-      const siteUrl =
-        process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-
-      const response = await fetch(`${siteUrl}/api/milady/auto-enroll`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          studentId: params.studentId,
-          programId: params.programId,
-          amount: params.amount,
-        }),
-      });
-
-      if (response.ok) {
-        // Update split record with vendor payment confirmation
-        await supabase
-          .from('payment_splits')
-          .update({
-            vendor_paid_at: new Date().toISOString(),
-            vendor_payment_id: `MILADY-${Date.now()}`,
-          })
-          .eq('id', params.splitId);
-
-        logger.info(
-          `✅ Vendor payment processed: ${params.vendorName} - $${params.amount}`
-        );
-      } else {
-        // Error logged
-      }
-    }
+    // No external vendor integrations active — LMS access is handled by the enrollment pipeline
+    logger.info(`Vendor payment skipped (vendor=${params.vendorName}, amount=${params.amount})`);
+    await supabase
+      .from('payment_splits')
+      .update({ vendor_paid_at: new Date().toISOString() })
+      .eq('id', params.splitId);
   } catch (error) {
       logger.error("Unhandled error", error instanceof Error ? error : undefined);
   }

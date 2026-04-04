@@ -2,7 +2,7 @@
 
 export type CredentialingPartner =
   | "Choice Medical Institute"
-  | "Milady"
+  | "Elevate LMS"
   | "Certiport / IT"
   | "CDL Partner"
   | "HVAC / Trades Partner"
@@ -221,7 +221,7 @@ export const COURSE_DEFINITIONS: CourseDefinition[] = [
     subtitle:
       "State-approved apprenticeship where you train in a real barbershop while earning hours toward licensure.",
     category: "Skilled Trades",
-    partner: "Milady",
+    partner: "Elevate LMS",
     estimatedDurationWeeks: 52,
     modality: "In-Person",
     workforceTags: ["Apprenticeship", "WIOA", "Re-Entry Friendly"],
@@ -264,7 +264,7 @@ export const COURSE_DEFINITIONS: CourseDefinition[] = [
         id: "ba-02",
         title: "Sanitation & Safety",
         description:
-          "Sanitation, disinfection, and safety requirements per state and Milady standards.",
+          "Sanitation, disinfection, and safety requirements per state and Elevate LMS standards.",
         lessons: [
           {
             id: "ba-02-01",

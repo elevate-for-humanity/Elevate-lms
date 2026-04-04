@@ -156,7 +156,7 @@ async function _GET(request: NextRequest) {
         status: enrollment.status,
         rapidsStatus: enrollment.rapids_status || 'pending',
         rapidsId: enrollment.rapids_id,
-        miladyEnrolled: enrollment.milady_enrolled || false,
+        lmsEnrolled: enrollment.milady_enrolled || false, // DB column milady_enrolled = LMS access granted
         startDate: new Date(enrollment.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
         expectedCompletion: 'December 2026',
       } : null,
@@ -191,7 +191,7 @@ async function _GET(request: NextRequest) {
         hours: Math.round((log.minutes || 0) / 60 * 10) / 10,
         type: log.hour_type as 'OJT' | 'RTI',
         description: log.description || '',
-        location: log.hour_type === 'RTI' ? 'Online - Milady Platform' : 'Training Location',
+        location: log.hour_type === 'RTI' ? 'Online - Elevate LMS' : 'Training Location',
         supervisor: log.verified_by || 'Pending',
         status: log.status,
         verified: log.status === 'APPROVED',

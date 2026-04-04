@@ -74,7 +74,7 @@ export default function OnboardingPage() {
         {
           id: '4',
           title: 'Start Training Modules',
-          description: 'Begin the Milady curriculum',
+          description: 'Begin the Elevate LMS curriculum',
           icon: 'book',
           completed: false,
           actionUrl: '/pwa/barber/training',

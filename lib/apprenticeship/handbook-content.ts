@@ -53,7 +53,7 @@ DBA Elevate for Humanity Career & Technical Institute
 
 ## What This Program Provides
 - DOL Registered Apprenticeship sponsorship and oversight
-- Related Technical Instruction (RTI) via Milady curriculum
+- Related Technical Instruction (RTI) via Elevate LMS
 - Compliance reporting and RAPIDS registration
 - Employer coordination and OJT verification
 - Hour logging and progress tracking
@@ -92,7 +92,7 @@ As a registered apprentice, you have specific responsibilities that you must ful
 - No cell phone use during client services
 
 ## Training Requirements
-- Complete all assigned Milady theory modules
+- Complete all assigned Elevate LMS theory modules
 - Practice skills as directed by your supervisor
 - Ask questions when you don't understand something
 - Accept constructive feedback professionally
@@ -170,13 +170,13 @@ Your sponsoring barbershop has agreed to provide the following as part of your a
 ## Indiana IPLA Requirements
 To be eligible for the Indiana barber license examination, you must complete:
 - **Total Hours:** 1,500 hours minimum
-- **RTI (Theory):** Approximately 150 hours via Milady
+- **RTI (Theory):** Approximately 150 hours via Elevate LMS
 - **OJT (Hands-on):** Approximately 1,350 hours at your shop
 
 ## Hour Types
 
 ### Related Technical Instruction (RTI)
-- Milady theory coursework (online)
+- Elevate LMS theory coursework (online)
 - Safety and sanitation training
 - Business and professional development
 - State board exam preparation
@@ -191,7 +191,7 @@ To be eligible for the Indiana barber license examination, you must complete:
 ## Logging Requirements
 - Log hours weekly through the student portal
 - Include date, start time, end time, and activity type
-- RTI hours: Reference the Milady module completed
+- RTI hours: Reference the Elevate LMS module completed
 - OJT hours: Brief description of activities performed
 - Hours must be verified by your supervisor
 
@@ -223,7 +223,7 @@ To successfully complete this apprenticeship program, you must:
    - All hours logged and approved
    - Proper mix of RTI and OJT
 
-2. **Complete Milady Theory**
+2. **Complete LMS Theory**
    - All required modules completed
    - Passing scores on assessments
 
@@ -404,7 +404,7 @@ This fee is the same regardless of:
 ## What's Included
 - DOL Registered Apprenticeship sponsorship
 - RAPIDS registration and compliance
-- Milady theory curriculum access
+- Elevate LMS theory curriculum access
 - Hour logging and tracking system
 - Program monitoring and support
 - Indiana IPLA exam fee ($50)
@@ -484,7 +484,7 @@ This agreement begins on the date of signature and continues until:
 
 ## Program Sponsor Agrees To:
 1. Register apprentice with DOL RAPIDS
-2. Provide access to RTI curriculum (Milady)
+2. Provide access to RTI curriculum (Elevate LMS)
 3. Monitor apprentice progress
 4. Maintain required records
 5. Coordinate with employer/shop

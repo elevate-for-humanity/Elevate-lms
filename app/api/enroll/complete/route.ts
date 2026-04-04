@@ -210,17 +210,16 @@ async function _POST(req: Request) {
       })
       .eq('id', applicationId);
 
-    // Step 9: Mark Milady access granted (link-based, no API)
-    // Student will receive Milady signup link in welcome email
+    // Step 9: Mark LMS access granted
     if (programSlug === 'barber-apprenticeship') {
       await supabase
         .from('program_enrollments')
-        .update({ milady_enrolled: true })
+        .update({ milady_enrolled: true }) // DB column — marks LMS access granted
         .eq('id', enrollmentId);
-      logger.info('Milady access granted (link-based)', { userId, enrollmentId });
+      logger.info('LMS access granted', { userId, enrollmentId });
     }
 
-    // Step 10: Send welcome email with Milady link
+    // Step 10: Send welcome email with LMS access
     try {
       const { sendWelcomeEmail } = await import('@/lib/email/sendgrid');
       const isBarberProgram = programSlug === 'barber-apprenticeship' || 
@@ -232,9 +231,9 @@ async function _POST(req: Request) {
         name: `${firstName} ${lastName}`,
         programName: program.name,
         dashboardUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/lms`,
-        includesMilady: isBarberProgram, // Include Milady signup link for barber programs
+        includesMilady: isBarberProgram, // param kept for compat — LMS section shown for barber
       });
-      logger.info('Welcome email sent with Milady link', { email: emailLower, includesMilady: isBarberProgram });
+      logger.info('Welcome email sent with LMS access', { email: emailLower, isBarberProgram });
     } catch (emailError) {
       logger.warn('Welcome email failed', emailError);
       // Don't fail enrollment if email fails

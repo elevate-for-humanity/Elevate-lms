@@ -203,7 +203,7 @@ export default function HostShopsPage() {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="font-bold text-xl">•</span>
-                  <span className="text-lg">Related instruction (Milady curriculum)</span>
+                  <span className="text-lg">Related instruction (Elevate LMS curriculum)</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="font-bold text-xl">•</span>

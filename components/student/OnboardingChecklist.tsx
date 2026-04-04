@@ -3,11 +3,11 @@ import Link from 'next/link';
 
 interface OnboardingData {
   handbook_reviewed: boolean;
-  milady_orientation_completed: boolean;
+  lms_orientation_completed: boolean;
   ai_instructor_met: boolean;
   shop_placed: boolean;
   handbook_reviewed_at?: string;
-  milady_orientation_completed_at?: string;
+  lms_orientation_completed_at?: string;
   ai_instructor_met_at?: string;
   shop_placed_at?: string;
 }
@@ -59,13 +59,13 @@ function OnboardingItem({
 export function OnboardingChecklist({ onboarding }: OnboardingChecklistProps) {
   const allComplete =
     onboarding.handbook_reviewed &&
-    onboarding.milady_orientation_completed &&
+    onboarding.lms_orientation_completed &&
     onboarding.ai_instructor_met &&
     onboarding.shop_placed;
 
   const completedCount = [
     onboarding.handbook_reviewed,
-    onboarding.milady_orientation_completed,
+    onboarding.lms_orientation_completed,
     onboarding.ai_instructor_met,
     onboarding.shop_placed,
   ].filter(Boolean).length;
@@ -113,8 +113,8 @@ export function OnboardingChecklist({ onboarding }: OnboardingChecklistProps) {
               href="/student/handbook"
             />
             <OnboardingItem
-              done={onboarding.milady_orientation_completed}
-              label="Complete Milady Orientation"
+              done={onboarding.lms_orientation_completed}
+              label="Complete LMS Orientation"
               action="Start"
               href="/lms/dashboard"
             />

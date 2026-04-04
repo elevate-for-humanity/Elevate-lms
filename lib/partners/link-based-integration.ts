@@ -1,6 +1,6 @@
 // lib/partners/link-based-integration.ts
 // Link-based partner integration system (no API keys needed)
-// Partners: HSI, NRF, JRI, CareerSafe, Milady
+// Partners: HSI, NRF, JRI, CareerSafe
 
 export interface PartnerCourse {
   id: string;
@@ -271,62 +271,13 @@ export const CAREERSAFE_COURSES: PartnerCourse[] = [
   },
 ];
 
-// Milady/Cengage Courses
-export const MILADY_COURSES: PartnerCourse[] = [
-  {
-    id: 'milady-cosmetology',
-    partnerId: 'milady',
-    partnerName: 'Milady/Cengage',
-    title: 'Milady Standard Cosmetology',
-    description: 'Comprehensive cosmetology theory and practice',
-    category: 'Beauty',
-    duration: '1500 hours',
-    price: 0,
-    enrollmentUrl: 'https://www.milady.com/cosmetology',
-    loginUrl: 'https://login.cengagebrain.com',
-    supportUrl: 'https://www.milady.com/support',
-    certificationType: 'Cosmetology Certificate',
-    isActive: true,
-  },
-  {
-    id: 'milady-barbering',
-    partnerId: 'milady',
-    partnerName: 'Milady/Cengage',
-    title: 'Milady Standard Barbering',
-    description: 'Professional barbering theory and techniques',
-    category: 'Beauty',
-    duration: '1500 hours',
-    price: 0,
-    enrollmentUrl: 'https://www.milady.com/barbering',
-    loginUrl: 'https://login.cengagebrain.com',
-    supportUrl: 'https://www.milady.com/support',
-    certificationType: 'Barbering Certificate',
-    isActive: true,
-  },
-  {
-    id: 'milady-esthetics',
-    partnerId: 'milady',
-    partnerName: 'Milady/Cengage',
-    title: 'Milady Standard Esthetics',
-    description: 'Skin care and esthetics training',
-    category: 'Beauty',
-    duration: '600 hours',
-    price: 0,
-    enrollmentUrl: 'https://www.milady.com/esthetics',
-    loginUrl: 'https://login.cengagebrain.com',
-    supportUrl: 'https://www.milady.com/support',
-    certificationType: 'Esthetics Certificate',
-    isActive: true,
-  },
-];
-
 // All partner courses combined
+// Beauty/barber theory is delivered via Elevate LMS — no external partner courses
 export const ALL_PARTNER_COURSES: PartnerCourse[] = [
   ...HSI_COURSES,
   ...NRF_COURSES,
   ...JRI_COURSES,
   ...CAREERSAFE_COURSES,
-  ...MILADY_COURSES,
 ];
 
 // Helper functions

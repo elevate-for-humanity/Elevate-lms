@@ -39,7 +39,7 @@ const PARTNER_LINKS: Record<string, string> = {
   'NRF Foundation': 'https://nrffoundation.org/riseup',
   'Certiport': 'https://certiport.pearsonvue.com',
   'IRS': 'https://www.irs.gov/individuals/link-learn-taxes',
-  'Milady/Cengage': 'https://www.milady.cengage.com',
+  'Elevate LMS': '/lms/courses',
   'National Drug Screening': 'https://www.mydrugtraining.com',
   'EmployIndy': '/lms/courses/jri',
 };

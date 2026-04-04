@@ -58,7 +58,7 @@ export const homepageVisuals: PageVisualConfig = {
       title: "Programs Built Around Real Careers",
       bullets: [
         "CNA, Barber Apprenticeship, CDL, HVAC/Building Tech, Customer Service, IT Support, Entrepreneurship, and more.",
-        "Every pathway is tied to credential partners like Milady, HSI, CareerSafe, Certiport, Rise, National Drug, and JRI.",
+        "Every pathway is tied to credential partners like HSI, CareerSafe, Certiport, Rise, National Drug, and JRI.",
         "Short, focused training that leads into employer connections, WEX, and OJT opportunities."
       ],
       imageSrc: "/images/pages/comp-home-hero-programs.jpg",
@@ -157,7 +157,7 @@ export const barberVisuals: PageVisualConfig = {
       eyebrow: "Barber Apprenticeship",
       title: "Train in the Shop, Build Your Skills, and Get Paid While You Learn.",
       subtitle:
-        "Milady barber theory, shop mentorship, and structured apprenticeship hours that move you toward licensure.",
+        "Elevate LMS barber theory, shop mentorship, and structured apprenticeship hours that move you toward licensure.",
       ctaLabel: "Start Barber Apprenticeship",
       ctaHref: "/programs/barber-apprenticeship",
     },
@@ -178,7 +178,7 @@ export const barberVisuals: PageVisualConfig = {
       id: "barber-training-overview",
       title: "What Your Barber Apprenticeship Includes",
       bullets: [
-        "Milady barber theory curriculum to cover all core concepts required for licensure.",
+        "Elevate LMS barber theory curriculum to cover all core concepts required for licensure.",
         "In-shop apprenticeship experience with licensed barbers supervising your hours.",
         "Drug-free workplace and professionalism training tailored to barber/beauty environments."
       ],

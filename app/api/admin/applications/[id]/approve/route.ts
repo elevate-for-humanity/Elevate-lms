@@ -84,7 +84,7 @@ async function _POST(
       req,
     });
 
-    // Post-approval actions: program-specific emails, Milady, CRM update (non-blocking)
+    // Post-approval actions: program-specific emails, LMS access, CRM update (non-blocking)
     try {
       const { data: app } = await db
         .from('applications')

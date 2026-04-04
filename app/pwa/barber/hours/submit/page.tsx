@@ -24,7 +24,7 @@ interface HourSubmission {
 
 const CATEGORIES: { value: HourCategory; label: string; description: string }[] = [
   { value: 'practical', label: 'Practical Training', description: 'Hands-on cutting, styling, shaving' },
-  { value: 'theory', label: 'Theory/Classroom', description: 'Milady curriculum, state board prep' },
+  { value: 'theory', label: 'Theory/Classroom', description: 'Elevate LMS curriculum, state board prep' },
   { value: 'sanitation', label: 'Sanitation', description: 'Cleaning, sterilization, safety' },
   { value: 'customer_service', label: 'Customer Service', description: 'Client interaction, consultation' },
 ];

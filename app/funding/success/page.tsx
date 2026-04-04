@@ -66,7 +66,7 @@ export default async function FundingSuccessPage() {
               </div>
               <div>
                 <p className="font-semibold text-black">
-                  Milady RISE Access
+                  Elevate LMS Access
                 </p>
                 <p className="text-black text-sm">
                   Student has been auto-enrolled in required courses

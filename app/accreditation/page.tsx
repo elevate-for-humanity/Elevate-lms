@@ -120,7 +120,7 @@ export default function AccreditationPage() {
               {[
                 { label: 'EPA 608 Certified Proctor', detail: 'Authorized to proctor EPA Section 608 refrigerant handling certification exams.' },
                 { label: 'ACT WorkKeys — Authorized Testing Site (Realm: 1317721865)', detail: 'Authorized ACT WorkKeys testing site. Administers Applied Math, Workplace Documents, and Business Writing assessments for the National Career Readiness Certificate (NCRC).' },
-                { label: 'Milady RISE — Proctor & Curriculum Partner', detail: 'Authorized proctor and curriculum delivery partner for Milady RISE cosmetology and barbering coursework.' },
+                { label: 'Elevate LMS — Proctor & Curriculum Partner', detail: 'Authorized proctor and curriculum delivery partner for Elevate LMS cosmetology and barbering coursework.' },
                 { label: 'Black Certified — Partner', detail: 'Certified partner for Black Certified credentialing and professional development programs.' },
               ].map((cred) => (
                 <div key={cred.label} className="flex gap-3 p-4 rounded-xl border border-slate-100 bg-slate-50">

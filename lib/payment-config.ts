@@ -16,7 +16,7 @@
  * - Compliance and RAPIDS reporting
  * - Employer (barbershop) coordination and OJT verification
  * - Program monitoring and completion documentation
- * - Related Instruction: Milady theory curriculum
+ * - Related Instruction: Elevate LMS theory curriculum
  * - Indiana IPLA State Board Exam Fee ($50)
  * 
  * THE $4,980 FEE DOES NOT COVER:
@@ -92,15 +92,15 @@ export const PROGRAM_PAYMENTS: ProgramPaymentConfig[] = [
     slug: 'barber-apprenticeship',
     price: 4980,
     isFlatFee: true,
-    vendorName: 'milady',
+    vendorName: 'none',
     vendorCost: 386,
-    description: 'Registered Barber Apprenticeship Sponsorship, Oversight & Related Instruction (Milady Theory). This program provides federal apprenticeship sponsorship, employer coordination, compliance reporting, and related instruction. Practical skills training and licensure-required instructional hours are provided by a licensed barber school. This program does not grant barber licensure or clock hours toward state exams.',
+    description: 'Registered Barber Apprenticeship Sponsorship, Oversight & Related Instruction (Elevate LMS Theory). This program provides federal apprenticeship sponsorship, employer coordination, compliance reporting, and related instruction. Practical skills training and licensure-required instructional hours are provided by a licensed barber school. This program does not grant barber licensure or clock hours toward state exams.',
     features: [
       'DOL Registered Apprenticeship sponsorship',
       'Compliance and RAPIDS reporting',
       'Employer (barbershop) coordination and OJT verification',
       'Program monitoring and completion documentation',
-      'Related Instruction: Milady theory curriculum',
+      'Related Instruction: Elevate LMS theory curriculum',
       'Indiana IPLA State Board Exam Fee included',
       'Indiana IPLA State Board Exam Fee included ($50)',
       'AI instructor support 24/7',
@@ -124,15 +124,15 @@ export const PROGRAM_PAYMENTS: ProgramPaymentConfig[] = [
     slug: 'nail-technician-apprenticeship',
     price: 2980,
     isFlatFee: true,
-    vendorName: 'milady',
+    vendorName: 'none',
     vendorCost: 200,
-    description: 'Registered Nail Technician Apprenticeship Sponsorship, Oversight & Related Instruction (Milady Theory). This program provides federal apprenticeship sponsorship, employer coordination, compliance reporting, and related instruction. Practical skills training and licensure-required instructional hours are provided by a licensed nail technician school. This program does not grant nail technician licensure or clock hours toward state exams.',
+    description: 'Registered Nail Technician Apprenticeship Sponsorship, Oversight & Related Instruction (Elevate LMS Theory). This program provides federal apprenticeship sponsorship, employer coordination, compliance reporting, and related instruction. Practical skills training and licensure-required instructional hours are provided by a licensed nail technician school. This program does not grant nail technician licensure or clock hours toward state exams.',
     features: [
       'DOL Registered Apprenticeship sponsorship',
       'Compliance and RAPIDS reporting',
       'Employer (salon) coordination and OJT verification',
       'Program monitoring and completion documentation',
-      'Related Instruction: Milady theory curriculum',
+      'Related Instruction: Elevate LMS theory curriculum',
       'Indiana IPLA State Board Exam Fee included',
       'AI instructor support 24/7',
     ],
@@ -154,15 +154,15 @@ export const PROGRAM_PAYMENTS: ProgramPaymentConfig[] = [
     slug: 'esthetician-apprenticeship',
     price: 3480,
     isFlatFee: true,
-    vendorName: 'milady',
+    vendorName: 'none',
     vendorCost: 250,
-    description: 'Registered Esthetician Apprenticeship Sponsorship, Oversight & Related Instruction (Milady Theory). This program provides federal apprenticeship sponsorship, employer coordination, compliance reporting, and related instruction. Practical skills training and licensure-required instructional hours are provided by a licensed esthetician school. This program does not grant esthetician licensure or clock hours toward state exams.',
+    description: 'Registered Esthetician Apprenticeship Sponsorship, Oversight & Related Instruction (Elevate LMS Theory). This program provides federal apprenticeship sponsorship, employer coordination, compliance reporting, and related instruction. Practical skills training and licensure-required instructional hours are provided by a licensed esthetician school. This program does not grant esthetician licensure or clock hours toward state exams.',
     features: [
       'DOL Registered Apprenticeship sponsorship',
       'Compliance and RAPIDS reporting',
       'Employer (spa/salon) coordination and OJT verification',
       'Program monitoring and completion documentation',
-      'Related Instruction: Milady theory curriculum',
+      'Related Instruction: Elevate LMS theory curriculum',
       'Indiana IPLA State Board Exam Fee included',
       'AI instructor support 24/7',
     ],
@@ -184,15 +184,15 @@ export const PROGRAM_PAYMENTS: ProgramPaymentConfig[] = [
     slug: 'cosmetology-apprenticeship',
     price: 4980,
     isFlatFee: true,
-    vendorName: 'milady',
+    vendorName: 'none',
     vendorCost: 386,
-    description: 'Registered Cosmetology Apprenticeship Sponsorship, Oversight & Related Instruction (Milady Theory). This program provides federal apprenticeship sponsorship, employer coordination, compliance reporting, and related instruction. Practical skills training and licensure-required instructional hours are provided by a licensed cosmetology school. This program does not grant cosmetology licensure or clock hours toward state exams.',
+    description: 'Registered Cosmetology Apprenticeship Sponsorship, Oversight & Related Instruction (Elevate LMS Theory). This program provides federal apprenticeship sponsorship, employer coordination, compliance reporting, and related instruction. Practical skills training and licensure-required instructional hours are provided by a licensed cosmetology school. This program does not grant cosmetology licensure or clock hours toward state exams.',
     features: [
       'DOL Registered Apprenticeship sponsorship',
       'Compliance and RAPIDS reporting',
       'Employer (salon) coordination and OJT verification',
       'Program monitoring and completion documentation',
-      'Related Instruction: Milady theory curriculum',
+      'Related Instruction: Elevate LMS theory curriculum',
       'Indiana IPLA State Board Exam Fee included',
       'AI instructor support 24/7',
     ],

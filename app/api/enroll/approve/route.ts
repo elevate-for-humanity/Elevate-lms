@@ -158,7 +158,7 @@ async function _POST(req: NextRequest) {
       .from('program_enrollments')
       .update({
         status: 'active',
-        milady_enrolled: true, // Grant Milady access on approval
+        milady_enrolled: true, // DB column — marks LMS access granted on approval
         updated_at: new Date().toISOString(),
       })
       .eq('id', enrollment_id);

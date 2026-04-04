@@ -21,7 +21,7 @@ const BARBER_FAQ: Record<string, string> = {
   // Program basics
   'hours': `The Barber Apprenticeship requires **2,000 hours** of training:
 • On-the-job training (OJT) at a licensed barbershop
-• Related instruction (Milady theory curriculum)
+• Related instruction (Elevate LMS theory curriculum)
 
 At 40 hours/week, this takes about 50 weeks (12-15 months).
 At 30 hours/week, it takes about 67 weeks (15-18 months).`,

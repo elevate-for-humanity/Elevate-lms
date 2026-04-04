@@ -230,7 +230,7 @@ export function ShopReportForm({ placements: initialPlacements }: { placements: 
               onChange={(e) => setHoursRelated(e.target.value)}
             />
             <p className="mt-1 text-xs text-black">
-              Milady RISE coursework hours
+              Elevate LMS coursework hours
             </p>
           </div>
         </div>

@@ -4,7 +4,7 @@
  * Programs   = funded ETPL / workforce pathways (WIOA, WRG, WorkOne eligible)
  * Short-Term Courses = direct-purchase, standalone courses (NRF, CareerSafe, HSI)
  * Certification / Testing = exam issuers only (Certiport)
- * Curriculum Partner = content/platform partners (Milady)
+ * Curriculum Partner = content/platform partners
  *
  * provider_type values come from partner_lms_providers.provider_type in Supabase.
  */
@@ -24,7 +24,7 @@ const PROVIDER_TYPE_MAP: Record<string, OfferingKind> = {
   // Credential / testing infrastructure
   certiport:   'credential_partner',
   // Curriculum / content partners
-  milady:      'curriculum_partner',
+  // milady removed — theory delivered via Elevate LMS
   // Funded workforce pathways — default
   etpl:        'program',
   wioa:        'program',

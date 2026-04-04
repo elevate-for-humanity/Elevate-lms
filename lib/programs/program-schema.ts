@@ -112,7 +112,7 @@ export interface CredentialPipeline {
 /**
  * How Elevate delivers this program's training content.
  *   internal  — Elevate owns and delivers the full curriculum via the LMS
- *   partner   — Training is delivered by a third-party partner (Milady, HSI, etc.)
+ *   partner   — Training is delivered by a third-party partner (HSI, etc.)
  *   hybrid    — Mix of internal LMS content and partner-delivered components
  */
 export type ProgramDeliveryModel = 'internal' | 'partner' | 'hybrid';
@@ -319,7 +319,7 @@ export interface ProgramSchema {
    * Primary partner provider for partner/hybrid programs.
    * Only set when verified — do not guess.
    */
-  partnerProvider?: 'hsi' | 'careersafe' | 'milady' | 'jri' | 'employindy' | 'nrf' | null;
+  partnerProvider?: 'hsi' | 'careersafe' | 'elevate-lms' | 'jri' | 'employindy' | 'nrf' | null;
 
   /**
    * Funding sources actually available for this program.

@@ -61,24 +61,15 @@ export function getBarberWelcomeEmail(data: BarberWelcomeEmailData): {
 
       <!-- RISE Certification -->
       <div style="border: 1px solid #e2e8f0; border-radius: 6px; padding: 20px; margin: 20px 0;">
-        <h2 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 700;">Required: Milady RISE Certification</h2>
+        <h2 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 700;">Start Your Theory Coursework</h2>
         <p style="margin: 0 0 12px 0; font-size: 14px; color: #334155;">
-          Complete the Milady RISE Client Well-Being and Safety Certification. This is normally $29.95 but is provided at no cost to enrolled apprentices.
+          Your theory coursework is available in the Elevate LMS — log in to your student portal to access your lessons, quizzes, and checkpoints.
         </p>
 
         <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; font-size: 14px; color: #334155;">
-          <tr><td style="padding: 6px 0; font-weight: 600;">Step 1</td><td style="padding: 6px 0;">Visit <a href="https://www.miladytraining.com/bundles/client-well-being-safety-certification" style="color: #1e40af;">miladytraining.com enrollment page</a></td></tr>
-          <tr><td style="padding: 6px 0; font-weight: 600;">Step 2</td><td style="padding: 6px 0;">Click "Enroll Now" and create an account with ${studentEmail}</td></tr>
-          <tr><td style="padding: 6px 0; font-weight: 600;">Step 3</td><td style="padding: 6px 0;">Enter promo code at checkout:</td></tr>
-        </table>
-
-        <div style="background: #f8fafc; border: 1px dashed #cbd5e1; padding: 10px; text-align: center; border-radius: 4px; margin: 8px 0 12px 0;">
-          <code style="font-size: 18px; font-weight: bold; color: #1e293b; letter-spacing: 1px;">efhcti-rise295</code>
-        </div>
-
-        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; font-size: 14px; color: #334155;">
-          <tr><td style="padding: 6px 0; font-weight: 600;">Step 4</td><td style="padding: 6px 0;">Complete all three courses: Domestic Violence Awareness, Human Trafficking Awareness, Infection Control</td></tr>
-          <tr><td style="padding: 6px 0; font-weight: 600;">Step 5</td><td style="padding: 6px 0;">Download your certificate upon completion</td></tr>
+          <tr><td style="padding: 6px 0; font-weight: 600;">Step 1</td><td style="padding: 6px 0;">Log in to your student dashboard at <a href="${dashboardUrl}" style="color: #1e40af;">${dashboardUrl}</a></td></tr>
+          <tr><td style="padding: 6px 0; font-weight: 600;">Step 2</td><td style="padding: 6px 0;">Navigate to "My Courses" to begin your theory coursework</td></tr>
+          <tr><td style="padding: 6px 0; font-weight: 600;">Step 3</td><td style="padding: 6px 0;">Complete lessons and checkpoints at your own pace</td></tr>
         </table>
       </div>
 
@@ -87,7 +78,7 @@ export function getBarberWelcomeEmail(data: BarberWelcomeEmailData): {
         <h2 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 700;">Next Steps</h2>
         <ol style="margin: 0; padding-left: 20px; font-size: 14px; color: #334155; line-height: 1.8;">
           <li>Log in to your student dashboard</li>
-          <li>Complete the RISE certification (required before OJT placement)</li>
+          <li>Begin your theory coursework in the Elevate LMS</li>
           <li>Download the mobile app for on-the-go access (optional)</li>
           <li>Begin your apprenticeship training modules</li>
         </ol>
@@ -123,18 +114,16 @@ STUDENT DASHBOARD
 Login: ${dashboardUrl}
 Email: ${studentEmail}
 
-REQUIRED: MILADY RISE CERTIFICATION
-Complete the Milady RISE Client Well-Being and Safety Certification (provided at no cost).
+START YOUR THEORY COURSEWORK
+Your theory coursework is in the Elevate LMS — log in to your student portal to access lessons, quizzes, and checkpoints.
 
-1. Visit: https://www.miladytraining.com/bundles/client-well-being-safety-certification
-2. Click "Enroll Now" and create an account with ${studentEmail}
-3. Enter promo code at checkout: efhcti-rise295
-4. Complete all three courses: Domestic Violence Awareness, Human Trafficking Awareness, Infection Control
-5. Download your certificate upon completion
+1. Log in at ${dashboardUrl}
+2. Navigate to "My Courses"
+3. Complete lessons and checkpoints at your own pace
 
 NEXT STEPS
 1. Log in to your student dashboard
-2. Complete the RISE certification (required before OJT placement)
+2. Begin your theory coursework in the Elevate LMS
 3. Download the mobile app for on-the-go access (optional)
 4. Begin your apprenticeship training modules
 

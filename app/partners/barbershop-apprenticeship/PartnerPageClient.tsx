@@ -76,7 +76,7 @@ export default function PartnerPageClient() {
                 <span className="text-orange-600 font-bold text-xl">3</span>
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Grow Your Team</h3>
-              <p className="text-black text-sm">Apprentices complete theory through Milady RISE, then sit for the Indiana State Board exam. You get a trained, licensed barber.</p>
+              <p className="text-black text-sm">Apprentices complete theory through Elevate LMS, then sit for the Indiana State Board exam. You get a trained, licensed barber.</p>
             </div>
           </div>
         </div>

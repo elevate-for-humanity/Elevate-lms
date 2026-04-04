@@ -87,7 +87,7 @@ async function _POST(req: NextRequest, { params }: Params) {
     return NextResponse.json(
       {
         error:
-          'All required partner modules (e.g., Milady RISE) are not approved yet.',
+          'All required LMS modules are not approved yet.',
         code: 'EXTERNAL_INCOMPLETE',
         pending_modules: pendingModules,
       },

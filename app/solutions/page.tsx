@@ -131,7 +131,7 @@ const products = [
     href: '/partners/nrf',
   },
   {
-    name: 'Milady RISE',
+    name: 'Elevate LMS',
     description: 'Cosmetology & barber training',
     logo: '✂️',
     href: '/programs/barber-apprenticeship',

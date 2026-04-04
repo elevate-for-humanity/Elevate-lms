@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import LogoImage from '@/components/site/LogoImage';
+import Logo from '@/components/ui/Logo';
 import ApplyHeroVideo from './ApplyHeroVideo';
 
 
@@ -168,7 +168,7 @@ export default async function ApplyPage({
             <div className="bg-white p-5">
               <div className="flex items-center gap-2 mb-2">
                 <h2 className="text-lg font-bold text-slate-900">Employer Partnership</h2>
-                <LogoImage alt="Elevate" width={18} height={18} className="opacity-30" />
+                <Logo alt="Elevate" width={18} height={18} className="opacity-30" />
               </div>
               <p className="text-black text-sm leading-relaxed mb-2">
                 Partner with Elevate to access pre-screened, trained candidates ready to work.

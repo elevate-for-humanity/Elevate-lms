@@ -24,7 +24,7 @@ type Entry = {
   hour_type: 'RTI' | 'OJT';
   funding_phase: 'PRE_WIOA' | 'WIOA' | 'POST_CERT';
   status: 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'LOCKED';
-  milady_module_ref?: string | null;
+  lms_module_ref?: string | null;
   activity_note?: string | null;
   location_note?: string | null;
   submitted_at?: string | null;
@@ -331,12 +331,12 @@ export default async function MentorApprovalsPage({
                   </div>
 
                   <div className="col-span-2">
-                    {e.milady_module_ref ? (
+                    {e.lms_module_ref ? (
                       <div className="text-xs mb-1">
                         <span className="font-semibold text-black">
-                          Milady:
+                          Elevate LMS:
                         </span>{' '}
-                        {e.milady_module_ref}
+                        {e.lms_module_ref}
                       </div>
                     ) : null}
                     {e.activity_note ? (
@@ -344,7 +344,7 @@ export default async function MentorApprovalsPage({
                         {e.activity_note}
                       </div>
                     ) : null}
-                    {!e.milady_module_ref && !e.activity_note ? (
+                    {!e.lms_module_ref && !e.activity_note ? (
                       <div className="text-xs text-slate-400">—</div>
                     ) : null}
                   </div>

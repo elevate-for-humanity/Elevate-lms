@@ -112,7 +112,7 @@ export default function ShopOwnerRegisterPage() {
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-slate-500 flex-shrink-0">•</span>
-                Access to Milady curriculum
+                Access to Elevate LMS curriculum
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-slate-500 flex-shrink-0">•</span>

@@ -74,7 +74,7 @@ export function BeautyEnrollmentAcknowledgment({
         <p className="text-sm text-slate-700 leading-relaxed">
           <strong>Program Scope:</strong> This program provides apprenticeship sponsorship, oversight, and related instruction only. 
           It includes DOL Registered Apprenticeship sponsorship, compliance and RAPIDS reporting, employer coordination, 
-          program monitoring, and Milady theory curriculum.
+          program monitoring, and Elevate LMS theory curriculum.
         </p>
         <p className="text-sm text-slate-700 leading-relaxed mt-3">
           <strong>What This Program Does NOT Provide:</strong> This program does not replace {schoolName}, 

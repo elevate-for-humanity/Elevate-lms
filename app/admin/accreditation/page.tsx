@@ -173,7 +173,7 @@ export default async function AccreditationPage() {
           link: '/admin/welcome-packets',
         },
         {
-          name: 'Milady SSO Access',
+          name: 'Elevate LMS SSO Access',
           status: 'warning',
           link: '/admin/integrations',
         },
@@ -365,14 +365,14 @@ export default async function AccreditationPage() {
                 </h3>
                 <ul className="space-y-2 text-brand-orange-800">
                   <li>
-                    • Complete ECR integration with Milady for automated
+                    • Complete ECR integration with Elevate LMS for automated
                     reporting
                   </li>
                   <li>
-                    • Build unified hour tracking dashboard (Milady + Internal)
+                    • Build unified hour tracking dashboard (Elevate LMS + Internal)
                   </li>
                   <li>• Automate welcome packet delivery system</li>
-                  <li>• Implement Milady SSO access for students</li>
+                  <li>• Implement Elevate LMS SSO access for students</li>
                 </ul>
                 <div className="mt-4">
                   <Link

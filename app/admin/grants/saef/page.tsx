@@ -87,7 +87,7 @@ All costs align with allowable uses as defined in the RFA.`,
   organizationalCapacity: `2Exclusive LLC (DBA: Elevate for Humanity Technical and Career Institute) is a DOL Registered Apprenticeship Sponsor, ETPL provider, WRG/WIOA/Job Ready Indy approved organization with active partnerships across Indiana's workforce ecosystem. Key credentials include:
 - SAM.gov registered (CAGE: 0QH19, UEI: VX2GK5S8SZH8), active federal government contractor, active through June 29, 2026
 - ByBlack certified
-- CareerSafe OSHA provider, Milady partner, NRF Rise Up provider, Certiport CATC
+- CareerSafe OSHA provider, curriculum partner, NRF Rise Up provider, Certiport CATC
 - WorkOne partner, EmployIndy partner, Job Ready Indy partner, HSI affiliate
 - Led by Elizabeth Greene: U.S. Army veteran, IRS Enrolled Agent, licensed barber, Indiana substitute teacher, EPA 608 Certified Proctor
 - Financial oversight by Dr. Carlina Wilkes: 24+ years federal experience with DFAS, DoD Financial Management Certification Level II

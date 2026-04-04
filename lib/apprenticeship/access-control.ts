@@ -4,7 +4,7 @@
  * Enforces the enrollment state model:
  * - applied: No access to anything
  * - enrolled_pending_approval: Payment received, waiting for approval
- * - active: Full access to portal, hours, Milady
+ * - active: Full access to portal, hours, LMS
  * - paused: Access suspended (payment failed, compliance issue)
  * 
  * CRITICAL: Stripe payment does NOT grant training access.
@@ -24,7 +24,7 @@ export type EnrollmentStatus =
 export interface EnrollmentAccess {
   canAccessPortal: boolean;
   canTrackHours: boolean;
-  canAccessMilady: boolean;
+  canAccessLms: boolean;
   canViewProgress: boolean;
   canMessageAdvisor: boolean;
   canUploadDocuments: boolean;
@@ -60,7 +60,7 @@ export async function checkEnrollmentAccess(
     return {
       canAccessPortal: false,
       canTrackHours: false,
-      canAccessMilady: false,
+      canAccessLms: false,
       canViewProgress: false,
       canMessageAdvisor: false,
       canUploadDocuments: false,
@@ -77,7 +77,7 @@ export async function checkEnrollmentAccess(
       return {
         canAccessPortal: false,
         canTrackHours: false,
-        canAccessMilady: false,
+        canAccessLms: false,
         canViewProgress: false,
         canMessageAdvisor: true,
         canUploadDocuments: true,
@@ -89,7 +89,7 @@ export async function checkEnrollmentAccess(
       return {
         canAccessPortal: false,
         canTrackHours: false,
-        canAccessMilady: false,
+        canAccessLms: false,
         canViewProgress: true, // Can see their status
         canMessageAdvisor: true,
         canUploadDocuments: true,
@@ -98,11 +98,11 @@ export async function checkEnrollmentAccess(
       };
 
     case 'active':
-      // Full access - but Milady requires agreement
+      // Full access — LMS requires signed agreement
       return {
         canAccessPortal: true,
         canTrackHours: true,
-        canAccessMilady: enrollment.agreement_signed === true,
+        canAccessLms: enrollment.agreement_signed === true,
         canViewProgress: true,
         canMessageAdvisor: true,
         canUploadDocuments: true,
@@ -116,7 +116,7 @@ export async function checkEnrollmentAccess(
       return {
         canAccessPortal: false,
         canTrackHours: false,
-        canAccessMilady: false,
+        canAccessLms: false,
         canViewProgress: true,
         canMessageAdvisor: true,
         canUploadDocuments: false,
@@ -129,7 +129,7 @@ export async function checkEnrollmentAccess(
       return {
         canAccessPortal: false,
         canTrackHours: false,
-        canAccessMilady: false,
+        canAccessLms: false,
         canViewProgress: true, // Can view historical progress
         canMessageAdvisor: false,
         canUploadDocuments: false,
@@ -143,7 +143,7 @@ export async function checkEnrollmentAccess(
       return {
         canAccessPortal: false,
         canTrackHours: false,
-        canAccessMilady: false,
+        canAccessLms: false,
         canViewProgress: false,
         canMessageAdvisor: false,
         canUploadDocuments: false,
@@ -196,15 +196,15 @@ export async function requireHoursAccess(
 }
 
 /**
- * Require Milady access - throws if not allowed
+ * Require LMS access — throws if not allowed
  */
-export async function requireMiladyAccess(
+export async function requireLmsAccess(
   userId: string,
   programSlug?: string
 ): Promise<void> {
   const access = await checkEnrollmentAccess(userId, programSlug);
   
-  if (!access.canAccessMilady) {
+  if (!access.canAccessLms) {
     throw new Error(access.message);
   }
 }

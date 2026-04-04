@@ -19,8 +19,8 @@ interface HourSummary {
   wioa_ojl_hours: number;
   rapids_status: string;
   rapids_id: string | null;
-  milady_enrolled: boolean;
-  milady_completed: boolean;
+  lms_enrolled: boolean;
+  lms_completed: boolean;
   ready_for_exam: boolean;
   practical_skills_verified: boolean;
 }
@@ -52,8 +52,8 @@ export function ApprenticeProgressWidget({
     wioa_ojl_hours: 0,
     rapids_status: 'pending',
     rapids_id: null,
-    milady_enrolled: false,
-    milady_completed: false,
+    lms_enrolled: false,
+    lms_completed: false,
     ready_for_exam: false,
     practical_skills_verified: false,
   });
@@ -138,7 +138,7 @@ export function ApprenticeProgressWidget({
 
         {/* Hour Breakdown */}
         <div className="grid grid-cols-2 gap-3">
-          {/* RTI Hours (Theory/Milady) */}
+          {/* RTI Hours (Theory/LMS) */}
           <div className="bg-brand-blue-50 rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
               <BookOpen className="w-4 h-4 text-brand-blue-600" />
@@ -147,7 +147,7 @@ export function ApprenticeProgressWidget({
             <div className="text-xl font-bold text-brand-blue-600">
               {summary.total_rti_hours.toFixed(1)}
             </div>
-            <div className="text-xs text-brand-blue-600">Milady coursework</div>
+            <div className="text-xs text-brand-blue-600">Elevate LMS coursework</div>
           </div>
 
           {/* OJL Hours (On-the-Job Learning) */}
@@ -203,17 +203,17 @@ export function ApprenticeProgressWidget({
             Log Hours
           </Link>
           <a
-            href="https://www.miladytraining.com"
+            href="/lms/courses"
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
           >
             <BookOpen className="w-4 h-4" />
-            Milady
+            Elevate LMS
           </a>
         </div>
 
-        {/* RAPIDS & Milady Status */}
+        {/* RAPIDS & LMS Status */}
         <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-200">
           <div className="text-center p-2">
             <div className={`text-xs font-semibold ${
@@ -229,13 +229,13 @@ export function ApprenticeProgressWidget({
           </div>
           <div className="text-center p-2">
             <div className={`text-xs font-semibold ${
-              summary.milady_completed 
+              summary.lms_completed 
                 ? 'text-brand-green-600' 
-                : summary.milady_enrolled 
+                : summary.lms_enrolled 
                   ? 'text-brand-blue-600' 
                   : 'text-amber-600'
             }`}>
-              Milady: {summary.milady_completed ? 'COMPLETE' : summary.milady_enrolled ? 'IN PROGRESS' : 'NOT STARTED'}
+              LMS: {summary.lms_completed ? 'COMPLETE' : summary.lms_enrolled ? 'IN PROGRESS' : 'NOT STARTED'}
             </div>
           </div>
         </div>
@@ -254,7 +254,7 @@ export function ApprenticeProgressWidget({
             <Award className="w-8 h-8 mx-auto mb-2" />
             <div className="font-bold">Hours Complete!</div>
             <div className="text-sm text-amber-100">
-              Complete Milady theory to unlock state board exam
+              Complete LMS theory to unlock state board exam
             </div>
           </div>
         ) : null}

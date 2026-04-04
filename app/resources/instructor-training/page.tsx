@@ -47,7 +47,7 @@ const certifications = [
   { name: 'CPR/First Aid (current)', required: true },
   { name: 'Active Indiana license in teaching field', required: true },
   { name: 'CPI (Crisis Prevention Intervention)', required: false },
-  { name: 'Milady Educator Certification', required: false },
+  { name: 'Elevate LMS Educator Certification', required: false },
 ];
 
 export default function InstructorTrainingPage() {

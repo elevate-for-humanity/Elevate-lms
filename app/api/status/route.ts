@@ -15,7 +15,7 @@ return NextResponse.json({
     systems: {
       database: 'connected',
       google_classroom: 'active',
-      milady_rise: 'active',
+      elevate_lms: 'active',
       api_routes: 95,
       components: 178,
       autopilots: 107,

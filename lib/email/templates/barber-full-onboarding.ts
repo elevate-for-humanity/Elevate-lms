@@ -55,7 +55,7 @@ export function barberFullOnboardingEmail(data: BarberFullOnboardingData) {
         <tr style="background:#f1f5f9;"><td style="padding:8px;font-weight:600;">Duration</td><td style="padding:8px;">12 months (52 weeks)</td></tr>
         <tr><td style="padding:8px 0;font-weight:600;">Total Hours Required</td><td style="padding:8px 0;">2,000 hours (Indiana requirement)</td></tr>
         <tr style="background:#f1f5f9;"><td style="padding:8px;font-weight:600;">On-the-Job Training (OJT)</td><td style="padding:8px;">1,500 hours at a licensed barbershop</td></tr>
-        <tr><td style="padding:8px 0;font-weight:600;">Related Technical Instruction (RTI)</td><td style="padding:8px 0;">500 hours (online via Milady RISE)</td></tr>
+        <tr><td style="padding:8px 0;font-weight:600;">Related Technical Instruction (RTI)</td><td style="padding:8px 0;">500 hours (online via Elevate LMS)</td></tr>
         <tr style="background:#f1f5f9;"><td style="padding:8px;font-weight:600;">Schedule</td><td style="padding:8px;">15–20 hours/week (flexible with shop)</td></tr>
         <tr><td style="padding:8px 0;font-weight:600;">Delivery</td><td style="padding:8px 0;">Hybrid — OJT at shop + theory online</td></tr>
         <tr style="background:#f1f5f9;"><td style="padding:8px;font-weight:600;">Location</td><td style="padding:8px;">Indianapolis / Marion County area</td></tr>
@@ -68,7 +68,7 @@ export function barberFullOnboardingEmail(data: BarberFullOnboardingData) {
       <ul style="margin:0;padding-left:20px;font-size:14px;color:#334155;line-height:2;">
         <li><strong>Indiana Barber License</strong> — issued by the Indiana Professional Licensing Agency (IPLA) after completing 2,000 hours and passing the state exam</li>
         <li><strong>DOL Registered Apprenticeship Certificate</strong> — nationally recognized, portable to all 50 states</li>
-        <li><strong>Milady RISE Certification</strong> — Client Well-Being &amp; Safety (Domestic Violence Awareness, Human Trafficking Awareness, Infection Control)</li>
+        <li><strong>Elevate LMS Certification</strong> — Client Well-Being &amp; Safety (Domestic Violence Awareness, Human Trafficking Awareness, Infection Control)</li>
         <li><strong>Barbershop Business Management Certificate</strong> — from Elevate for Humanity</li>
         <li><strong>CPR / First Aid / AED</strong> — American Heart Association</li>
       </ul>
@@ -80,7 +80,7 @@ export function barberFullOnboardingEmail(data: BarberFullOnboardingData) {
       <ol style="margin:0;padding-left:20px;font-size:14px;color:#334155;line-height:2;">
         <li><strong>You will be matched with a licensed partner barbershop</strong> where you complete your OJT hours under a licensed barber supervisor.</li>
         <li><strong>You will be a W-2 employee of the shop</strong> during your apprenticeship — you earn wages while you train.</li>
-        <li><strong>Theory coursework is completed online</strong> through Milady RISE at your own pace (included at no extra cost).</li>
+        <li><strong>Theory coursework is completed online</strong> through the Elevate LMS at your own pace (included at no extra cost).</li>
         <li><strong>Monthly evaluations</strong> — your supervisor, Elevate staff, and you will review your progress using a rubric-based scoring system.</li>
         <li><strong>You will build a client portfolio</strong> of 50+ documented services by program completion.</li>
         <li><strong>At the end of the program</strong>, you sit for the Indiana State Board written and practical exams to earn your barber license.</li>
@@ -105,7 +105,7 @@ export function barberFullOnboardingEmail(data: BarberFullOnboardingData) {
         <tr style="background:#fef3c7;"><td style="padding:8px;font-weight:600;">Down Payment</td><td style="padding:8px;">$500 (required to secure your spot)</td></tr>
         <tr><td style="padding:8px 0;font-weight:600;">Payment Plans Available</td><td style="padding:8px 0;">Yes — BNPL (Buy Now, Pay Later) financing</td></tr>
         <tr style="background:#fef3c7;"><td style="padding:8px;font-weight:600;">Employer-Sponsored Option</td><td style="padding:8px;">If your host shop sponsors you, tuition may be covered</td></tr>
-        <tr><td style="padding:8px 0;font-weight:600;">What's Included</td><td style="padding:8px 0;">Milady RISE access, training materials, RISE certification, monthly evaluations, career placement support</td></tr>
+        <tr><td style="padding:8px 0;font-weight:600;">What's Included</td><td style="padding:8px 0;">Elevate LMS access, training materials, certification, monthly evaluations, career placement support</td></tr>
       </table>
       <p style="margin:12px 0 0;font-size:13px;color:#92400e;">
         <strong>Note:</strong> Your down payment is required before we can assign you to a partner shop and begin your apprenticeship.
@@ -168,7 +168,7 @@ export function barberFullOnboardingEmail(data: BarberFullOnboardingData) {
 
       <div>
         <p style="margin:0;font-weight:700;color:#1e293b;font-size:14px;">Step 6: Begin Training</p>
-        <p style="margin:4px 0 0;font-size:13px;color:#475569;">Start your OJT hours at the shop and begin Milady RISE theory coursework online.</p>
+        <p style="margin:4px 0 0;font-size:13px;color:#475569;">Start your OJT hours at the shop and begin theory coursework in the Elevate LMS.</p>
       </div>
     </div>
 

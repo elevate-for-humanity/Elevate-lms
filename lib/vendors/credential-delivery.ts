@@ -9,7 +9,7 @@
  * - Certiport: Provision via Certiport Compass API, send login URL
  * - HSI: Queue enrollment, send HSI class sign-up link
  * - CareerSafe: Send enrollment link with access code
- * - Milady: Handled by existing milady-purchase.ts
+ * - LMS: Theory credentials issued via Elevate LMS completion
  * - NRF: Send RISE Up enrollment link
  * - NDS: Send enrollment link
  * - JRI: Send enrollment link
@@ -52,7 +52,7 @@ const PARTNER_ENROLLMENT_URLS: Record<string, string> = {
   nrf: 'https://riseup.nrf.com',
   nds: 'https://www.nationaldrugscreening.com',
   jri: 'https://www.jri.org',
-  milady: 'https://www.milady.com',
+  elevate_lms: '/lms/courses',
 };
 
 /**

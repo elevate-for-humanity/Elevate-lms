@@ -23,7 +23,7 @@ export interface ProgramEnrollment {
   status: 'active' | 'completed' | 'paused';
   rapidsStatus: string;
   rapidsId: string | null;
-  miladyEnrolled: boolean;
+  lmsEnrolled: boolean;
   startDate: string;
   expectedCompletion: string;
 }
@@ -155,7 +155,7 @@ export function getLearnerDashboardData(userId?: string): LearnerDashboardData {
       status: 'active',
       rapidsStatus: 'registered',
       rapidsId: '2025-IN-132301-0042',
-      miladyEnrolled: true,
+      lmsEnrolled: true,
       startDate: startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
       expectedCompletion: expectedCompletion.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
     },
@@ -229,7 +229,7 @@ export function getLearnerDashboardData(userId?: string): LearnerDashboardData {
         hours: 2,
         type: 'RTI',
         description: 'Theory Module 7: Sanitation & Safety',
-        location: 'Online - Milady Platform',
+        location: 'Online - Elevate LMS',
         supervisor: 'System Verified',
         status: 'APPROVED',
         verified: true,

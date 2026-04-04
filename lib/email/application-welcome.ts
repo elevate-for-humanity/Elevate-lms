@@ -32,7 +32,7 @@ const PROGRAMS: Record<string, ProgramInfo> = {
   },
   'barber-apprenticeship': {
     name: 'Barber Apprenticeship',
-    description: 'USDOL Registered Apprenticeship — 2,000 hours of on-the-job training at an approved barbershop plus online theory through Milady RISE to earn your Indiana barber license.',
+    description: 'USDOL Registered Apprenticeship — 2,000 hours of on-the-job training at an approved barbershop plus online theory through the Elevate LMS to earn your Indiana barber license.',
     credentials: 'Indiana Barber License',
     careerOutlook: 'Licensed barbers earn $30,000-$60,000+/year. Shop owners earn more.',
     duration: '12-18 Months',

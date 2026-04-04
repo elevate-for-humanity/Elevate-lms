@@ -4,7 +4,7 @@ import React from 'react';
 /**
  * External Module Launcher
  *
- * For modules hosted on partner platforms (Milady, Choice Medical, etc.)
+ * For modules hosted on partner platforms (Choice Medical, etc.)
  * Provides launch button and certificate upload
  */
 import { useState } from 'react';

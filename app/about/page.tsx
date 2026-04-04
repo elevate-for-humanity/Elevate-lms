@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import LogoImage from '@/components/site/LogoImage';
+import Logo from '@/components/ui/Logo';
 import { ArrowRight, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { TEAM } from '@/data/team';
@@ -64,7 +64,7 @@ export default function AboutPage() {
       <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-4 mb-6">
-            <LogoImage alt="Elevate for Humanity logo" width={64} height={64} />
+            <Logo alt="Elevate for Humanity logo" width={64} height={64} />
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Who We Are</h2>
           </div>
           <div className="text-slate-700 space-y-4">
@@ -447,7 +447,7 @@ export default function AboutPage() {
                       { label: 'VITA Site', detail: 'IRS-authorized Volunteer Income Tax Assistance site' },
                       { label: 'EPA 608 Certified Proctor', detail: 'Authorized to proctor EPA Section 608 refrigerant handling certification exams' },
                       { label: 'ACT WorkKeys Authorized Testing Site (Realm: 1317721865)', detail: 'Authorized to administer ACT WorkKeys assessments and issue the National Career Readiness Certificate (NCRC)' },
-                      { label: 'Milady RISE — Proctor & Partner', detail: 'Authorized proctor and curriculum partner for Milady RISE cosmetology and barbering coursework' },
+                      { label: 'Elevate LMS — Proctor & Partner', detail: 'Authorized proctor and curriculum partner for Elevate LMS cosmetology and barbering coursework' },
                       { label: 'Black Certified', detail: 'Certified partner for Black Certified credentialing programs' },
                       { label: 'U.S. Army Veteran', detail: 'Unit Supply Specialist — honorably served' },
                     ].map((cred) => (

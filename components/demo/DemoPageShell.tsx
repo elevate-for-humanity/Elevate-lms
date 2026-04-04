@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import LogoImage from '@/components/site/LogoImage';
+import Logo from '@/components/ui/Logo';
 import {
   Home, Users, GraduationCap, FileText, Building2,
   Shield, BarChart3, ClipboardList, DollarSign, ScrollText,
@@ -84,7 +84,7 @@ export function DemoPageShell({ title, description, portal = 'admin', children }
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
             <Link href="/" className="flex items-center gap-2.5 group">
-              <LogoImage alt="Elevate" width={30} height={30} className="rounded" />
+              <Logo alt="Elevate" width={30} height={30} className="rounded" />
               <span className="font-extrabold text-sm tracking-tight group-hover:text-brand-red-400 transition">
                 Elevate
               </span>

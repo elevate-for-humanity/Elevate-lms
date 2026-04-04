@@ -47,7 +47,7 @@ const syllabi = [
         ],
         requiredMaterials: [
           'Professional barber kit (provided)',
-          'Textbook: "Milady Standard Barbering"',
+          'Textbook: "Elevate LMS Standard Barbering"',
           'Safety equipment (provided)',
           'Practice mannequin head',
         ],

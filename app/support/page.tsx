@@ -155,7 +155,7 @@ export default async function SupportPage() {
                 </svg>
               </summary>
               <div className="px-5 pb-5 text-gray-600">
-                Once enrolled, log into your student dashboard. Click on your program to access course materials, videos, and assignments. Some programs use external platforms like Milady - check your email for access instructions.
+                Once enrolled, log into your student dashboard. Click on your program to access course materials, videos, and assignments. Some programs use external platforms like Elevate LMS - check your email for access instructions.
               </div>
             </details>
             

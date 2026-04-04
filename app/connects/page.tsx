@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import LogoImage from '@/components/site/LogoImage';
+import Logo from '@/components/ui/Logo';
 import Link from 'next/link';
 import { ArrowRight, Menu, X, Phone, Mail, BookOpen, Users, TrendingUp, Clock, DollarSign, Shield, CheckCircle, BarChart2 } from 'lucide-react';
 
@@ -100,7 +100,7 @@ export default function ConnectsLandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             <Link href="/connects" className="flex items-center gap-2.5">
-              <LogoImage alt="Elevate Connects" width={140} height={40} className="h-9 w-auto brightness-0 invert" priority />
+              <Logo alt="Elevate Connects" width={140} height={40} className="h-9 w-auto brightness-0 invert" priority />
               <span className="hidden sm:inline text-xs font-bold text-cyan-400 bg-cyan-950 px-2.5 py-1 rounded-full border border-cyan-800">Connects</span>
             </Link>
             <nav className="hidden lg:flex items-center gap-1">
@@ -217,7 +217,7 @@ export default function ConnectsLandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8 mb-8">
             <div>
-              <LogoImage alt="Elevate for Humanity" width={120} height={36} className="h-8 w-auto brightness-0 invert mb-3" />
+              <Logo alt="Elevate for Humanity" width={120} height={36} className="h-8 w-auto brightness-0 invert mb-3" />
               <div className="text-sm">8888 Keystone Crossing, Suite 1300</div>
               <div className="text-sm">Indianapolis, IN 46240</div>
               <div className="flex items-center gap-2 mt-3 text-sm"><Phone className="w-4 h-4" /><a href="tel:+13173550500" className="hover:text-slate-900">(317) 355-0500</a></div>

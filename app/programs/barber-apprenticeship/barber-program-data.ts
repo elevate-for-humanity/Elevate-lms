@@ -62,7 +62,7 @@ export const CAREERS = [
 export const ENROLLMENT_STEPS = [
   { title: 'Complete Intake', description: 'Submit the funding and eligibility intake form online. Answer questions about your background, work history, and payment preferences. No documents needed at this stage.' },
   { title: 'Get Matched', description: 'Our team pairs you with a licensed barber instructor at a partner barbershop near you. Meet your instructor, tour the shop, and agree on a training schedule and employment model.' },
-  { title: 'Earn While You Learn', description: 'Complete 2,000 apprenticeship hours total — 1,500 OJT hours at your host shop and 500 RTI hours via Milady online coursework. You are a W-2 employee of your host shop throughout the apprenticeship — compensation is set by your employer and must meet or exceed applicable minimum wage laws.' },
+  { title: 'Earn While You Learn', description: 'Complete 2,000 apprenticeship hours total — 1,500 OJT hours at your host shop and 500 RTI hours via Elevate LMS online coursework. You are a W-2 employee of your host shop throughout the apprenticeship — compensation is set by your employer and must meet or exceed applicable minimum wage laws.' },
   { title: 'Get Licensed', description: 'After completing all required hours and coursework, sit for the Indiana State Board barber exam. We provide exam prep materials and practice tests. Pass and receive your Indiana barber license.' },
 ];
 

@@ -225,8 +225,8 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
   // ── APPRENTICESHIP ENROLLMENT (SELF-PAY) ──────────────────────────────────
   // Delegates to runBarberPostPayment which handles: application status update,
   // program_enrollments upsert, CRM reminder, student welcome email, and
-  // Milady provisioning queue. The old inline upsert here was missing all of
-  // those steps — that was the root cause of deposit-paid-but-no-Milady bugs.
+  // The old inline upsert here was missing enrollment emails and LMS access —
+  // that was the root cause of deposit-paid-but-no-access bugs.
   if (kind === 'apprenticeship_enrollment') {
     try {
       const applicationId = session.metadata?.application_id;

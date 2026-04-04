@@ -50,8 +50,8 @@ async function _POST(req: Request) {
       );
     }
 
-    // Update exam readiness if Milady RISE
-    if (provider === 'Milady RISE') {
+    // Update exam readiness on LMS theory completion
+    if (provider === 'Milady RISE' || provider === 'Elevate LMS') {
       await supabase.from('exam_readiness').upsert({
         student_id: user.id,
         theory_complete: true,

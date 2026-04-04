@@ -47,12 +47,6 @@ export function getPartnerConfig(partner: PartnerType): PartnerConfig {
       config.orgId = process.env.CAREERSAFE_ORGANIZATION_ID;
       break;
 
-    case "milady":
-      config.baseUrl = process.env.MILADY_API_BASE_URL || "";
-      config.apiKey = process.env.MILADY_API_KEY;
-      config.apiSecret = process.env.MILADY_API_SECRET;
-      config.orgId = process.env.MILADY_ORGANIZATION_ID;
-      break;
 
     case "jri":
       config.baseUrl = process.env.JRI_API_BASE_URL || "";

@@ -107,22 +107,16 @@ export async function sendWelcomeEmail(params: {
   name: string;
   programName: string;
   dashboardUrl: string;
-  includesMilady?: boolean;
+  includesMilady?: boolean; // kept for call-site compatibility — ignored
 }) {
-  const miladySection = params.includesMilady !== false ? `
-            <div style="background: #f9fafb; border: 1px solid #e5e7eb; color: #374151; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <h3 style="margin-top: 0; color: white;">Start Your Theory Training (Milady RISE)</h3>
-              <p style="margin-bottom: 15px;">Your theory training through Milady RISE is included in your program. This is required coursework.</p>
-              <p style="margin-bottom: 10px;"><strong>To get started:</strong></p>
-              <ol style="margin: 0 0 15px 0; padding-left: 20px;">
-                <li>Click the button below to go to Milady</li>
-                <li>Create your Milady account (use this email: ${params.email})</li>
-                <li>Begin your theory coursework</li>
-              </ol>
+  const lmsSection = `
+            <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="margin-top: 0; color: #1e40af;">Start Your Theory Training</h3>
+              <p style="margin-bottom: 15px;">Your theory coursework is available in the <strong>Elevate LMS</strong> — all lessons, quizzes, and checkpoints are in your student portal.</p>
               <p style="text-align: center; margin-bottom: 0;">
-                <a href="https://www.miladytraining.com/users/sign_in" style="display: inline-block; padding: 12px 30px; background: white; color: #7c3aed; text-decoration: none; border-radius: 6px; font-weight: bold;">Sign Up for Milady RISE &rarr;</a>
+                <a href="${params.dashboardUrl}" style="display: inline-block; padding: 12px 30px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Go to My Courses &rarr;</a>
               </p>
-            </div>` : '';
+            </div>`;
 
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"></head>
     <body style="font-family:Arial,sans-serif;line-height:1.6;color:#333">
@@ -131,7 +125,7 @@ export async function sendWelcomeEmail(params: {
         <div style="padding:30px;background:#f9fafb">
           <h2>Hi ${params.name},</h2>
           <p>Congratulations! You've successfully enrolled in <strong>${params.programName}</strong>.</p>
-          ${miladySection}
+          ${lmsSection}
           <p><strong>To get started:</strong></p>
           <ol><li>Click the button below to log in to your student portal</li><li>Complete the required orientation (about 10 minutes)</li><li>Once orientation is done, your courses will be unlocked</li></ol>
           <p style="text-align:center"><a href="${params.dashboardUrl}" style="display:inline-block;padding:12px 30px;background:#f97316;color:white;text-decoration:none;border-radius:6px;margin:20px 0">Log In to Student Portal</a></p>

@@ -257,7 +257,7 @@ export async function runBarberPostPayment(
     steps['student_email'] = 'failed';
   }
 
-  // ── Step 6: Send internal Milady fulfillment notification ─────────────────
+  // ── Step 6: Send internal admin notification ───────────────────────────────
   try {
     const { sendEmail } = await import('@/lib/email/sendgrid');
     const adminUrl = `${siteUrl}/admin/applications`;

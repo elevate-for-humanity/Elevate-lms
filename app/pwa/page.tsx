@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import LogoImage from '@/components/site/LogoImage';
+import Logo from '@/components/ui/Logo';
 
 export const metadata: Metadata = {
   title: 'Elevate Apps | Elevate for Humanity',
@@ -73,7 +73,7 @@ export default function PWAIndexPage() {
     <div className="min-h-screen bg-white flex flex-col">
       <header className="bg-slate-800 px-6 pt-16 pb-8 text-center">
         <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg overflow-hidden">
-          <LogoImage alt="Elevate" width={48} height={48} />
+          <Logo alt="Elevate" width={48} height={48} />
         </div>
         <h1 className="text-3xl font-bold text-slate-900 mb-2">Elevate Apps</h1>
         <p className="text-slate-500">Choose your app to get started</p>

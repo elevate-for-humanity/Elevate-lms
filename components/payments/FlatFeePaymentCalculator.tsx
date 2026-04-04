@@ -302,7 +302,7 @@ export function FlatFeePaymentCalculator({
             <li>Compliance and RAPIDS reporting</li>
             <li>Employer coordination and OJT verification</li>
             <li>Program monitoring and completion documentation</li>
-            <li>Related Instruction: Milady theory curriculum</li>
+            <li>Related Instruction: Elevate LMS theory curriculum</li>
           </ul>
           <p className="mt-2 text-amber-600 font-medium">
             Does NOT include: Barber school, practical training, or state licensure hours.

@@ -8,7 +8,7 @@ export const demoPrograms = [
   {
     id: 'barber-apprenticeship',
     name: 'USDOL Registered Barber Apprenticeship',
-    description: 'Fee-based barber training within a USDOL Registered Apprenticeship framework. Combines Milady theory instruction with supervised practical training at approved partner shops.',
+    description: 'Fee-based barber training within a USDOL Registered Apprenticeship framework. Combines Elevate LMS theory instruction with supervised practical training at approved partner shops.',
     duration: '15-18 months',
     format: 'Hybrid (Online Theory + Shop Training)',
     modules: 12,
@@ -93,7 +93,7 @@ export const demoLearner = {
     { date: 'Jan 13', hours: 8, type: 'OJT', location: 'Elite Cuts Barbershop', verified: true },
     { date: 'Jan 12', hours: 6, type: 'OJT', location: 'Elite Cuts Barbershop', verified: true },
     { date: 'Jan 11', hours: 8, type: 'OJT', location: 'Elite Cuts Barbershop', verified: true },
-    { date: 'Jan 10', hours: 2, type: 'RTI', location: 'Online - Milady Module 7', verified: true },
+    { date: 'Jan 10', hours: 2, type: 'RTI', location: 'Online - Elevate LMS Module 7', verified: true },
   ],
 };
 

@@ -340,7 +340,7 @@ async function _POST(req: Request) {
 
           <div class="section">
             <h3>About the Program</h3>
-            <p>The Indiana Barber Apprenticeship is a <strong>USDOL Registered Apprenticeship</strong> program. As a partner shop, you will host apprentices who complete <strong>2,000 hours</strong> of on-the-job training under a licensed supervising barber in your shop. Apprentices also complete theory coursework through Milady RISE.</p>
+            <p>The Indiana Barber Apprenticeship is a <strong>USDOL Registered Apprenticeship</strong> program. As a partner shop, you will host apprentices who complete <strong>2,000 hours</strong> of on-the-job training under a licensed supervising barber in your shop. Apprentices also complete theory coursework through the Elevate LMS.</p>
             <p>Once an apprentice finishes the program, they are eligible to sit for the <strong>Indiana State Board barber license exam</strong>.</p>
           </div>
 

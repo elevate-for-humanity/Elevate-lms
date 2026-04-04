@@ -51,7 +51,7 @@ const credentialPartners = [
     type: 'Certification Provider',
   },
   {
-    name: 'Milady',
+    name: 'Elevate LMS',
     description: 'Industry-standard curriculum and certification for cosmetology and beauty professionals.',
     type: 'Curriculum Partner',
   },

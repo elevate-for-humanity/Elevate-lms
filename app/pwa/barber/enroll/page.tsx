@@ -115,7 +115,7 @@ export default function BarberEnrollPage() {
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-slate-500 flex-shrink-0">•</span>
-                Milady curriculum included
+                Elevate LMS curriculum included
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-slate-500 flex-shrink-0">•</span>
@@ -278,7 +278,7 @@ export default function BarberEnrollPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Curriculum</span>
-                <span className="text-white">Milady Standard</span>
+                <span className="text-white">Elevate LMS Standard</span>
               </div>
             </div>
           </div>

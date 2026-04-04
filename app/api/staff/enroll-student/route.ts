@@ -10,11 +10,11 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const MILADY_LOGIN_URL = 'https://www.miladytraining.com/users/sign_in';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+const LMS_URL = `${SITE_URL}/lms/courses`;
 
 /**
- * Staff enrollment endpoint - enrolls student and sends Milady access email immediately.
+ * Staff enrollment endpoint — enrolls student and sends LMS access email immediately.
  * Used when Elevate pays on behalf of student (workforce funding, etc.)
  */
 async function _POST(request: NextRequest) {
@@ -165,7 +165,7 @@ async function _POST(request: NextRequest) {
         program_id: programId || null,
         funding_type: fundingType || 'workforce',
         status: 'active', // Active immediately - Elevate paid
-        milady_enrolled: true, // Grant Milady access
+        milady_enrolled: true, // DB column — marks LMS access granted
         enrolled_by: staffId || user.id,
         docs_verified: true, // Staff verified docs during enrollment
         docs_verified_at: new Date().toISOString(),
@@ -217,7 +217,7 @@ async function _POST(request: NextRequest) {
       metadata: { enrollment_id: enrollment.id },
     });
 
-    // Send welcome email with Milady link
+    // Send welcome email with LMS access
     await enqueueNotification({
       toEmail: email,
       templateKey: 'apprentice_decision',
@@ -225,7 +225,7 @@ async function _POST(request: NextRequest) {
         name: firstName,
         approved: true,
         portal_url: portalUrl || `${SITE_URL}/lms`,
-        milady_url: MILADY_LOGIN_URL,
+        lms_url: LMS_URL,
       },
       entityType: 'enrollment',
       entityId: enrollment.id,
@@ -237,7 +237,7 @@ async function _POST(request: NextRequest) {
         id: enrollment.id,
         status: 'active',
       },
-      message: `Student enrolled successfully. Welcome email with Milady access sent to ${email}`,
+      message: `Student enrolled successfully. Welcome email with LMS access sent to ${email}`,
     });
   } catch (error: any) {
     logger.error('Staff enrollment error:', error);

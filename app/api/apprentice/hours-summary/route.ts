@@ -154,7 +154,7 @@ const supabase = await createClient();
       rapids_id: rapidsData?.rapids_id || enrollment?.rapids_id || null,
       rapids_registration_date: rapidsData?.registration_date || null,
       
-      // Milady info
+      // LMS enrollment status (DB columns retain milady_ prefix until migration)
       milady_enrolled: enrollment?.milady_enrolled || false,
       milady_completed: stateBoardData?.milady_completed || false,
       

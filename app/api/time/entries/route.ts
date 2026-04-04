@@ -71,7 +71,7 @@ async function _POST(req: Request) {
     (body.entry_date as string) ?? start_at.toISOString().slice(0, 10);
   const hour_type = body.hour_type as HourType;
   const funding_phase = body.funding_phase as FundingPhase;
-  const milady_module_ref = (body.milady_module_ref as string) ?? null;
+  const lms_module_ref = (body.milady_module_ref as string) ?? (body.lms_module_ref as string) ?? null;
   const activity_note = (body.activity_note as string) ?? null;
   const location_note = (body.location_note as string) ?? null;
   const program_holder_id = body.program_holder_id ?? null;
@@ -220,7 +220,7 @@ async function _POST(req: Request) {
       work_date: entry_date,
       hours_claimed: newHours,
       entered_by_email: user.email || '',
-      notes: [activity_note, location_note, milady_module_ref ? `Milady: ${milady_module_ref}` : null].filter(Boolean).join(' | ') || null,
+      notes: [activity_note, location_note, lms_module_ref ? `LMS: ${lms_module_ref}` : null].filter(Boolean).join(' | ') || null,
       status: 'pending',
     })
     .select('*')

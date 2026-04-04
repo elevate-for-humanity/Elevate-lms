@@ -35,7 +35,7 @@ export const ORG_PROFILE = {
   etpl: 'ETPL listed provider',
   funding: 'WRG, WIOA, and JRI approved',
   partners: 'WorkOne partner, EmployIndy partner, Job Ready Indy partner, HSI affiliate',
-  certifications: 'CareerSafe OSHA provider, Milady partner, NRF Rise Up provider, Certiport CATC',
+  certifications: 'CareerSafe OSHA provider, NRF Rise Up provider, Certiport CATC',
   federal: 'SAM.gov registered (CAGE: 0QH19, UEI: VX2GK5S8SZH8), active federal government contractor',
   byblack: 'ByBlack certified (U.S. Black Chambers / NAACP)',
   samStatus: 'Active — registered bidder with the State of Indiana',

@@ -56,9 +56,9 @@ export default async function StateBoardExamPage() {
 
   // Check readiness
   const hoursComplete = totalHours >= requiredHours;
-  const miladyComplete = enrollment?.milady_completed || false;
+  const lmsComplete = enrollment?.lms_completed || false;
   const skillsVerified = enrollment?.practical_skills_verified || false;
-  const isReady = hoursComplete && miladyComplete;
+  const isReady = hoursComplete && lmsComplete;
 
   // Determine program type for exam info
   const programSlug = enrollment?.program_slug || 'barber-apprenticeship';
@@ -152,22 +152,22 @@ export default async function StateBoardExamPage() {
               )}
             </div>
 
-            {/* Milady Theory */}
+            {/* Elevate LMS Theory */}
             <div className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                {miladyComplete ? (
+                {lmsComplete ? (
                   <span className="text-slate-500 flex-shrink-0">•</span>
                 ) : (
                   <Clock className="w-6 h-6 text-amber-500" />
                 )}
                 <div>
-                  <div className="font-semibold text-black">Complete Milady Theory</div>
+                  <div className="font-semibold text-black">Complete Elevate LMS Theory</div>
                   <div className="text-sm text-slate-500">
                     Related Technical Instruction (RTI)
                   </div>
                 </div>
               </div>
-              {miladyComplete ? (
+              {lmsComplete ? (
                 <span className="px-3 py-2 bg-brand-green-100 text-brand-green-700 text-sm font-semibold rounded-full">
                   Complete
                 </span>
@@ -176,7 +176,7 @@ export default async function StateBoardExamPage() {
                   href="/lms/progress"
                   className="px-3 py-2 bg-brand-blue-100 text-brand-blue-700 text-sm font-semibold rounded-full hover:bg-brand-blue-200"
                 >
-                  Access Milady →
+                  Access Elevate LMS →
                 </Link>
               )}
             </div>

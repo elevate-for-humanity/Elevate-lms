@@ -87,7 +87,7 @@ export function AIChatPanel(props: {
           <div>
             <div className="font-bold text-zinc-900">AI Instructor Chat</div>
             <div className="text-xs text-zinc-500">
-              Ask questions about onboarding, Milady, and program requirements.
+              Ask questions about onboarding, coursework, and program requirements.
             </div>
           </div>
           <button
@@ -105,7 +105,7 @@ export function AIChatPanel(props: {
       <div className="p-4 h-[360px] overflow-auto space-y-3">
         {messages.length === 0 && (
           <div className="text-sm text-zinc-600">
-            Ask me anything. Example: "What do I do first in Milady?" or "What's required this week?"
+            Ask me anything. Example: "What do I do first?" or "What's required this week?"
           </div>
         )}
 

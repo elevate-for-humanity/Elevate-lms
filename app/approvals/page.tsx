@@ -258,13 +258,13 @@ export default function ApprovalsPage() {
               </div>
             </div>
 
-            {/* Milady RISE */}
+            {/* Elevate LMS */}
             <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-orange-600">
               <div className="flex items-start gap-4">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <h3 className="text-lg md:text-lg font-bold mb-3">
-                    Milady RISE Partner School – Client Well-Being & Safety
+                    Elevate LMS Partner School – Client Well-Being & Safety
                     Certification
                   </h3>
                   <p className="text-lg text-black mb-3">

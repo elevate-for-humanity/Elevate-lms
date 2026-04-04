@@ -8,8 +8,8 @@ import { BARBER_PRICING, calculateWeeklyPayment } from '@/lib/programs/pricing';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { runBarberPostPayment } from '@/lib/enrollment/barber-post-payment';
 
-const MILADY_LOGIN_URL =
-  process.env.MILADY_LOGIN_URL || 'https://milady.cengage.com/';
+const LMS_URL =
+  (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org') + '/lms/courses';
 
 /**
  * Schedule weekly invoices for a customer
@@ -86,7 +86,7 @@ function getWebhookSecret() {
  * 2. Create/upsert apprentice record
  * 3. Generate magic link for dashboard access
  * 4. Send welcome email (idempotent)
- * 5. Send Milady email (idempotent)
+ * 5. Send LMS access email (idempotent)
  */
 async function _POST(request: NextRequest) {
   const body = await request.text();
@@ -293,7 +293,7 @@ async function _POST(request: NextRequest) {
             }
           }
 
-          // Run post-payment pipeline (enrollment, Milady queue, emails)
+          // Run post-payment pipeline (enrollment, emails)
           if (applicationId) {
             const adminDb = createAdminClient();
             if (adminDb) {
@@ -341,7 +341,7 @@ async function _POST(request: NextRequest) {
   <li><strong>Complete your application</strong> — submit your apprentice application so we can verify eligibility and match you with a host shop.<br>
   <a href="${siteUrl}/programs/barber-apprenticeship/apply?type=apprentice" style="color:#1d4ed8">Complete Application →</a></li>
   <li><strong>Complete orientation</strong> — a short online module covering program expectations, hour logging, and your host shop assignment. Available after your application is submitted.</li>
-  <li><strong>Access your dashboard</strong> — log hours, track progress, and access your Milady coursework once orientation is complete.</li>
+  <li><strong>Access your dashboard</strong> — log hours, track progress, and access your coursework in the Elevate LMS once orientation is complete.</li>
 </ol>
 
 ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive every Friday starting next week.</p>` : ''}
@@ -355,7 +355,7 @@ ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive ev
             logger.error('Failed to send welcome email:', emailErr);
           }
 
-          // Send Milady notification
+          // Admin notification
           try {
             const { sendEmail } = await import('@/lib/email/sendgrid');
             await sendEmail({
@@ -368,11 +368,10 @@ ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive ev
 • Phone: ${customerPhone}<br>
 • Transfer Hours: ${transferredHours}<br>
 • Payment: ${fullyPaid ? 'Paid in full' : 'Payment plan'}</p>
-<p>Please create Milady account and send credentials.</p>
               `,
             });
           } catch (emailErr) {
-            logger.error('Failed to send Milady notification:', emailErr);
+            logger.error('Failed to send admin notification:', emailErr);
           }
           } // end else (no applicationId — legacy email path)
 
@@ -502,7 +501,7 @@ ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive ev
   <a href="${siteUrl2}/signup?role=apprentice&redirect=/programs/barber-apprenticeship/apply?type=apprentice" style="color:#1d4ed8">Create Account →</a></li>
   <li><strong>Complete your application</strong> — submit your apprentice application so we can verify eligibility and match you with a host shop.</li>
   <li><strong>Complete orientation</strong> — a short online module covering program expectations, hour logging, and your host shop assignment.</li>
-  <li><strong>Access your dashboard</strong> — log hours, track progress, and access your Milady coursework once orientation is complete.</li>
+  <li><strong>Access your dashboard</strong> — log hours, track progress, and access your coursework in the Elevate LMS once orientation is complete.</li>
 </ol>
 
 ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive every Friday starting next week.</p>` : ''}
@@ -526,7 +525,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
             logger.error('Enrollment email error:', emailErr);
           }
 
-          // Run post-payment pipeline (enrollment, Milady queue, onboarding + admin emails)
+          // Run post-payment pipeline (enrollment, onboarding + admin emails)
           if (applicationId) {
             const adminDb = createAdminClient();
             if (adminDb) {
@@ -540,68 +539,27 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
             }
           }
 
-          // Legacy Milady email path (no application_id — kept for backward compat)
+          // No application_id — send LMS access email (legacy public checkout path)
           if (!applicationId) { try {
             const { sendEmail } = await import('@/lib/email/sendgrid');
+            const siteUrl3 = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
             await sendEmail({
               to: customerEmail,
-              subject: 'Your Milady Access — Barber Apprenticeship',
+              subject: 'Your Coursework Access — Barber Apprenticeship',
               html: `
 <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1a1a1a">
 <p>Hi ${customerName || 'there'},</p>
-
-<p>As part of your Barber Apprenticeship enrollment, your related instruction is provided through <strong>Milady</strong>.</p>
-
-<p><strong>What to expect:</strong></p>
-<p>• Milady will send you a separate email with your login credentials<br>
-• This email may take up to 24 hours to arrive — check your spam folder<br>
-• Once active, you can log in at <a href="${MILADY_LOGIN_URL}">${MILADY_LOGIN_URL}</a></p>
-
-<p>If you do not receive access within 24 hours, call us at (317) 314-3757.</p>
-
+<p>Your related instruction is available in the <strong>Elevate LMS</strong>. Log in to your student portal to access your courses.</p>
+<p style="text-align:center;margin:24px 0;">
+  <a href="${LMS_URL}" style="display:inline-block;padding:12px 24px;background:#2563eb;color:white;text-decoration:none;border-radius:8px;font-weight:bold;">Go to My Courses →</a>
+</p>
+<p>Questions? Call <a href="tel:3173143757">(317) 314-3757</a>.</p>
 <p>— Elevate for Humanity</p>
 </div>
               `,
             });
-
-            // Admin notification to manually provision Milady account
-            await sendEmail({
-              to: 'elevate4humanityedu@gmail.com',
-              subject: `Milady Provisioning Required — ${customerName || customerEmail}`,
-              html: `<p>Please create a Milady account for this new barber apprentice:</p>
-<p>• Name: ${customerName}<br>• Email: ${customerEmail}<br>• Phone: ${customerPhone}</p>
-<p>Payment received: $${(amountPaidCents / 100).toFixed(2)}</p>`,
-            });
-          } catch (miladyEmailErr) {
-            logger.error('[barber/webhook] Milady email failed (non-fatal):', miladyEmailErr);
-          }
-
-          // Queue Milady provisioning — idempotent: skip if a non-failed row already exists
-          const { data: existingQueue } = await supabase
-            .from('milady_provisioning_queue')
-            .select('id')
-            .eq('student_email', customerEmail)
-            .eq('program_slug', 'barber-apprenticeship')
-            .in('status', ['pending', 'processing', 'complete'])
-            .limit(1)
-            .maybeSingle();
-
-          if (!existingQueue) {
-            const { error: queueErr } = await supabase
-              .from('milady_provisioning_queue')
-              .insert({
-                student_email: customerEmail,
-                student_name: customerName || null,
-                program_slug: 'barber-apprenticeship',
-                status: 'pending',
-              });
-            if (queueErr) {
-              logger.error('[barber/webhook] milady_provisioning_queue insert failed', {
-                error: queueErr.message,
-                student_email: customerEmail,
-              });
-              throw queueErr;
-            }
+          } catch (lmsEmailErr) {
+            logger.error('[barber/webhook] LMS access email failed (non-fatal):', lmsEmailErr);
           }
           } // end if (!applicationId) — legacy path
 
@@ -701,7 +659,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
         // === NEW: Send emails (idempotent - check if already sent) ===
         const { data: subRecord } = await supabase
           .from('barber_subscriptions')
-          .select('welcome_email_sent_at, milady_email_sent_at')
+          .select('welcome_email_sent_at')
           .eq('stripe_subscription_id', subscriptionId)
           .single();
 
@@ -756,7 +714,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
 <p>• This link is secure and time-limited. If it expires, you can request a new one from the login page.<br>
 • You may be required to complete onboarding steps before accessing all features.</p>
 
-<p>Related instruction through Milady is handled separately. You will receive additional information about Milady access in a separate email.</p>
+<p>Your related instruction is available in the <a href="${LMS_URL}">Elevate LMS</a> — log in to your student portal to access your courses.</p>
 
 <p>If you have questions or need assistance, contact support at (317) 314-3757.</p>
 
@@ -800,65 +758,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
           }
         }
 
-        // Send Milady Email (if not already sent)
-        if (!subRecord?.milady_email_sent_at && customerEmail) {
-          try {
-            const { sendEmail } = await import('@/lib/email/sendgrid');
-            await sendEmail({
-              to: customerEmail,
-              subject: 'Your Milady Access - Barber Apprenticeship',
-              html: `
-<p>Hello,</p>
-
-<p>As part of your Barber Apprenticeship enrollment, your related instruction is provided through Milady.</p>
-
-<p><strong>Here's what to expect:</strong></p>
-<p>• Milady access is issued after successful enrollment<br>
-• Milady will send you a separate email with login instructions<br>
-• This email may take several hours to arrive</p>
-
-<p>You can also access Milady using the link below once your account is active:</p>
-
-<p><a href="${MILADY_LOGIN_URL}" style="display:inline-block;padding:12px 24px;background:#2563eb;color:white;text-decoration:none;border-radius:8px;font-weight:bold;">Access Milady</a></p>
-
-<p><strong>If you do not receive an email from Milady:</strong></p>
-<p>• Check your spam or junk folder<br>
-• Allow up to 24 hours after enrollment<br>
-• Contact support at (317) 314-3757 if access is still unavailable</p>
-
-<p>Your Elevate for Humanity dashboard is separate from Milady and is used to track hours, progress, and compliance.</p>
-
-<p>— Elevate for Humanity</p>
-              `,
-            });
-            
-            // Mark Milady email as sent
-            await supabase
-              .from('barber_subscriptions')
-              .update({ milady_email_sent_at: new Date().toISOString() })
-              .eq('stripe_subscription_id', subscriptionId);
-
-            // Queue Milady provisioning so admins have an in-app record.
-            // Email alone is fragile — if missed, student waits with no visibility.
-            const miladyQueueResult = await supabase
-              .from('milady_provisioning_queue')
-              .insert({
-                student_id: userId || null,
-                student_email: customerEmail,
-                student_name: customerName || null,
-                program_slug: 'barber-apprenticeship',
-                status: 'pending',
-              });
-            if (miladyQueueResult?.error) {
-              logger.error('milady_provisioning_queue insert failed:', miladyQueueResult.error);
-            }
-
-            logger.info(`Milady email sent to ${customerEmail}`);
-          } catch (emailErr) {
-            logger.error('Milady email failed:', emailErr);
-            // Don't fail webhook - email can be retried
-          }
-        }
+        // LMS access is included in the welcome email above — no separate email needed.
 
         // Admin SMS alert via email-to-SMS gateway (non-blocking)
         const adminSmsGateway = process.env.ADMIN_SMS_GATEWAY;
@@ -1107,7 +1007,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
 
 <p><strong>What's next:</strong></p>
 <p>• Continue logging your apprenticeship hours<br>
-• Complete your Milady coursework<br>
+• Complete your coursework in the Elevate LMS<br>
 • Prepare for your state board exam</p>
 
 <p>Your dashboard remains active for hour tracking and progress monitoring.</p>

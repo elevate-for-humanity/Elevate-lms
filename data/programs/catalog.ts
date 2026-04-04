@@ -1,5 +1,6 @@
 import type { ProgramSchema } from '@/lib/programs/program-schema';
-// HVAC_TECHNICIAN removed — hvac-technician is now DB-driven (lib/programs/getProgramBySlug.ts)
+import { CNA } from './cna';
+import { HVAC_TECHNICIAN } from './hvac-technician';
 import { PHARMACY_TECHNICIAN } from './pharmacy-technician';
 import { BARBER_APPRENTICESHIP } from './barber-apprenticeship';
 import { IT_HELP_DESK } from './it-help-desk';
@@ -45,13 +46,13 @@ export const ALL_PROGRAMS: ProgramSchema[] = [
   MEDICAL_ASSISTANT,
   PHLEBOTOMY,
   PHARMACY_TECHNICIAN,
-  PEER_RECOVERY,
+  // PEER_RECOVERY — DB-driven, no static file (lib/programs/get-program.ts)
   CPR_FIRST_AID,
   SANITATION,
   EMERGENCY_HEALTH_SAFETY,
   HOME_HEALTH_AIDE,
   // Skilled Trades
-  // HVAC_TECHNICIAN removed — DB-driven via lib/programs/getProgramBySlug.ts
+  HVAC_TECHNICIAN,
   ELECTRICAL,
   WELDING,
   PLUMBING,

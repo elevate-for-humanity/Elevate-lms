@@ -249,6 +249,55 @@ export default function HostShopsPage() {
         </div>
       </section>
 
+      {/* Approved Partner Shops */}
+      <section className="py-16 px-6 bg-slate-50 border-t">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-3 text-black">Approved Partner Shops</h2>
+          <p className="text-center text-black mb-10">
+            These barbershops are approved Elevate training sites. Apprentices may be placed at any of these locations.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-6">
+
+            {/* Elevate — primary site */}
+            <div className="bg-white rounded-2xl border-2 border-brand-blue-600 p-6 shadow-sm">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <span className="text-xs font-bold text-brand-blue-600 uppercase tracking-wider">Primary Training Site</span>
+                  <h3 className="text-lg font-black text-slate-900 mt-1">Elevate for Humanity</h3>
+                </div>
+                <Shield className="w-6 h-6 text-brand-blue-600 flex-shrink-0" />
+              </div>
+              <p className="text-sm text-slate-600">8888 Keystone Crossing, Suite 1300</p>
+              <p className="text-sm text-slate-600">Indianapolis, IN 46240</p>
+              <a href="tel:3173143757" className="text-sm text-brand-blue-600 font-semibold mt-2 block hover:underline">(317) 314-3757</a>
+            </div>
+
+            {/* Kountry Kutz */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <span className="text-xs font-bold text-brand-green-600 uppercase tracking-wider">Sponsored Partner Shop</span>
+                  <h3 className="text-lg font-black text-slate-900 mt-1">Kountry Kutz Barbershop</h3>
+                </div>
+                <Award className="w-6 h-6 text-brand-green-600 flex-shrink-0" />
+              </div>
+              <p className="text-sm text-slate-600">56 W Main St</p>
+              <p className="text-sm text-slate-600">New Palestine, IN 46163</p>
+              <a href="tel:4637106199" className="text-sm text-brand-blue-600 font-semibold mt-2 block hover:underline">+1 (463) 710-6199</a>
+              <a
+                href="https://maps.google.com/?q=56+W+Main+St,+New+Palestine,+IN+46163"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-slate-400 hover:text-slate-600 mt-1 block"
+              >
+                View on Google Maps →
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       {/* Bottom CTA */}
       <section className="py-16 px-6 border-t">
         <div className="max-w-3xl mx-auto text-center">

@@ -25,12 +25,7 @@ export default async function FundingPage() {
 
   const soon = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-  const [
-    { data: records, count: total },
-    { count: approved },
-    { count: pending },
-    { count: expiring },
-  ] = await Promise.all([
+  const [recordsRes, approvedRes, pendingRes, expiringRes] = await Promise.all([
     db.from('funding_records')
       .select('id, source, amount, status, approved_at, expiration_date, student:profiles(full_name, email), program:programs(title)', { count: 'exact' })
       .order('created_at', { ascending: false }).limit(50),
@@ -39,6 +34,17 @@ export default async function FundingPage() {
     db.from('funding_records').select('*', { count: 'exact', head: true })
       .lte('expiration_date', soon).gte('expiration_date', new Date().toISOString()),
   ]);
+
+  if (recordsRes.error)   throw new Error(`funding_records query failed: ${recordsRes.error.message}`);
+  if (approvedRes.error)  throw new Error(`funding_records approved count failed: ${approvedRes.error.message}`);
+  if (pendingRes.error)   throw new Error(`funding_records pending count failed: ${pendingRes.error.message}`);
+  if (expiringRes.error)  throw new Error(`funding_records expiring count failed: ${expiringRes.error.message}`);
+
+  const records  = recordsRes.data;
+  const total    = recordsRes.count;
+  const approved = approvedRes.count;
+  const pending  = pendingRes.count;
+  const expiring = expiringRes.count;
 
   const QUICK_LINKS = [
     { label: 'WIOA Participants',    href: '/admin/wioa' },

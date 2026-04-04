@@ -36,7 +36,7 @@ export default async function AdminDocumentReviewPage() {
   }
 
   // Get all documents with user info
-  const { data: documents } = await supabase
+  const { data: documents, error: documentsError } = await supabase
     .from('documents')
     .select(
       `
@@ -50,6 +50,7 @@ export default async function AdminDocumentReviewPage() {
     `
     )
     .order('created_at', { ascending: false });
+  if (documentsError) throw new Error(`documents query failed: ${documentsError.message}`);
 
   // Document viewing is handled on-demand via SecureDocumentLink,
   // which routes through /api/admin/documents/signed-url with audit logging.

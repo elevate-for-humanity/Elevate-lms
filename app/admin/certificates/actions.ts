@@ -7,7 +7,8 @@ import { generateCertificateNumber } from '@/lib/partner-workflows/certificates'
 
 export async function issueCertificate(formData: FormData) {
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
@@ -69,7 +70,8 @@ export async function issueCertificate(formData: FormData) {
 
 export async function revokeCertificate(formData: FormData) {
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');

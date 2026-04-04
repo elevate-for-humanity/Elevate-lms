@@ -8,7 +8,8 @@ import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-lo
 
 export async function createProgram(formData: FormData) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -63,7 +64,8 @@ export async function createProgram(formData: FormData) {
 
 export async function updateProgram(id: string, formData: FormData) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -120,7 +122,8 @@ export async function updateProgram(id: string, formData: FormData) {
 
 export async function deleteProgram(id: string) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {

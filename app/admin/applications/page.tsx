@@ -52,8 +52,11 @@ export default async function ApplicationsPage({
   if (search) query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%,full_name.ilike.%${search}%`);
   query = query.range(offset, offset + pageSize - 1);
 
-  const { data: applications, count: totalCount, error } = await query;
-  const { data: allApps } = await adminDb.from('applications').select('status');
+  const { data: applications, count: totalCount, error: applicationsError } = await query;
+  if (applicationsError) throw new Error(`applications query failed: ${applicationsError.message}`);
+
+  const { data: allApps, error: allAppsError } = await adminDb.from('applications').select('status');
+  if (allAppsError) throw new Error(`applications status counts failed: ${allAppsError.message}`);
 
   const statusCounts: Record<string, number> = {};
   let totalApplications = 0;
@@ -115,9 +118,7 @@ export default async function ApplicationsPage({
 
       {/* Table */}
       <AdminCard>
-        {error ? (
-          <div className="p-8 text-center text-brand-red-600 text-sm">Error loading applications.</div>
-        ) : applications && applications.length > 0 ? (
+        {applications && applications.length > 0 ? (
           <>
             <ApplicationsTableClient applications={applications as ApplicationRow[]} />
             <AdminPagination page={page} totalPages={totalPages} baseHref={baseHref} />

@@ -12,7 +12,8 @@ export async function PATCH(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return safeError('Unauthorized', 401);
 
-  const db = createAdminClient() || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
 
   // Verify caller is a partner user
   const { data: partnerUser } = await db

@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
-import { requireAdmin } from '@/lib/authGuards';
+import { requireAdmin } from '@/lib/auth';
 import { getAdminDashboardData } from '@/lib/admin/get-admin-dashboard-data';
 import { DashboardShell } from '@/components/admin/dashboard/DashboardShell';
 import { BuiltCoursesPanel } from './BuiltCoursesPanel';
-import { AdminAIAssistant } from '@/components/admin/AdminAIAssistant';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -22,8 +22,6 @@ export default async function AdminDashboardPage() {
       <div className="max-w-7xl mx-auto px-4 pb-8">
         <BuiltCoursesPanel />
       </div>
-      {/* Admin-only AI assistant — completely separate from marketing chat bubble */}
-      <AdminAIAssistant />
     </>
   );
 }

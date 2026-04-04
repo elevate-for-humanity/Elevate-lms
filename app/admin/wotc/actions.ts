@@ -10,7 +10,8 @@ import { logger } from '@/lib/logger';
 
 export async function createWOTCApplication(formData: FormData) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -71,7 +72,8 @@ export async function createWOTCApplication(formData: FormData) {
 
 export async function updateWOTCApplication(id: string, formData: FormData) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -127,7 +129,8 @@ export async function updateWOTCApplication(id: string, formData: FormData) {
 
 export async function submitWOTCApplication(id: string) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   
   const { error } = await db
     .from('wotc_applications')
@@ -148,7 +151,8 @@ export async function submitWOTCApplication(id: string) {
 
 export async function updateWOTCStatus(id: string, status: string, notes?: string) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   
   const updateData: Record<string, unknown> = {
     status,
@@ -179,7 +183,8 @@ export async function updateWOTCStatus(id: string, status: string, notes?: strin
 
 export async function deleteWOTCApplication(id: string) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   
   const { data: { user } } = await supabase.auth.getUser();
 

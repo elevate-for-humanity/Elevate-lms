@@ -85,7 +85,8 @@ async function _POST(request: NextRequest) {
     }
 
     const userId = session.user.id;
-    const db = createAdminClient() || supabase;
+    const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
 
     // Fetch profile + most recent application + enrollment in parallel
     const [profileResult, appResult, enrollmentResult] = await Promise.all([

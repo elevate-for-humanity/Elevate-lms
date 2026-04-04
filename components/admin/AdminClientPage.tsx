@@ -14,7 +14,7 @@
  * component is ever sent to the browser. Unauthorized users are redirected
  * at the route boundary — the client component never renders.
  */
-import { requireAdmin } from '@/lib/authGuards';
+import { requireAdmin } from '@/lib/auth';
 
 interface AdminClientPageProps {
   children: React.ReactNode;

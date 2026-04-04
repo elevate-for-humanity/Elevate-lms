@@ -62,7 +62,8 @@ export default async function EmployerLayout({
   }
 
   const _admin = createAdminClient();
-  const db = _admin || supabase;
+  const db = _admin;
+  if (!db) throw new Error('Admin client failed to initialize');
 
   const { data: profile } = await db
     .from('profiles')

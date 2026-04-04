@@ -26,7 +26,8 @@ export default async function PartnerPortalLayout({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/partner/login');
 
-  const db = createAdminClient() || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   const isAdmin = ['admin', 'super_admin'].includes(profile?.role || '');
 

@@ -20,7 +20,8 @@ function fmtDate(d: string) {
 
 async function _PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

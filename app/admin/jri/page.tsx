@@ -22,14 +22,7 @@ export default async function JRIPage() {
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
-  const [
-    { count: totalParticipants },
-    { count: activeParticipants },
-    { count: completedParticipants },
-    { count: placedParticipants },
-    { data: recentParticipants },
-    { data: programBreakdown },
-  ] = await Promise.all([
+  const [totalRes, activeRes, completedRes, placedRes, recentRes, breakdownRes] = await Promise.all([
     supabase.from('jri_participants').select('id', { count: 'exact', head: true }),
     supabase.from('jri_participants').select('id', { count: 'exact', head: true }).eq('status', 'active'),
     supabase.from('jri_participants').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
@@ -38,8 +31,22 @@ export default async function JRIPage() {
     supabase.from('jri_participants').select('program, status').limit(500),
   ]);
 
+  if (totalRes.error)     throw new Error(`jri_participants total count failed: ${totalRes.error.message}`);
+  if (activeRes.error)    throw new Error(`jri_participants active count failed: ${activeRes.error.message}`);
+  if (completedRes.error) throw new Error(`jri_participants completed count failed: ${completedRes.error.message}`);
+  if (placedRes.error)    throw new Error(`jri_participants placed count failed: ${placedRes.error.message}`);
+  if (recentRes.error)    throw new Error(`jri_participants recent query failed: ${recentRes.error.message}`);
+  if (breakdownRes.error) throw new Error(`jri_participants breakdown query failed: ${breakdownRes.error.message}`);
+
+  const totalParticipants     = totalRes.count;
+  const activeParticipants    = activeRes.count;
+  const completedParticipants = completedRes.count;
+  const placedParticipants    = placedRes.count;
+  const recentParticipants    = recentRes.data;
+  const programBreakdown      = breakdownRes.data;
+
   const byProgram: Record<string, number> = {};
-  for (const p of (programBreakdown || [])) {
+  for (const p of programBreakdown) {
     const prog = (p as any).program || 'Unassigned';
     byProgram[prog] = (byProgram[prog] || 0) + 1;
   }

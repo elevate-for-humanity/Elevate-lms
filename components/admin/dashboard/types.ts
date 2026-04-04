@@ -76,7 +76,17 @@ export interface InactiveLearner {
   href: string;         // resolved: /admin/students/[userId]
 }
 
+// Raw counts — typed source of truth for KPI rendering.
+// DashboardShell reads from here, not from kpis[].value by label string.
+export interface DashboardCounts {
+  pendingApplications: number;
+  activeEnrollments: number;
+  revenueThisMonthCents: number;
+  certificatesIssued: number;
+}
+
 export interface AdminDashboardData {
+  counts: DashboardCounts;
   kpis: KPICard[];
   enrollmentTrend: EnrollmentTrendPoint[];
   studentStatuses: StatusPoint[];

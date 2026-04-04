@@ -36,7 +36,8 @@ export async function POST(
     const requestId = randomUUID();
 
     const supabase = await createClient();
-    const db = createAdminClient() || supabase;
+    const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
 
     if (!supabase) return safeError('Database not configured', 503);
 

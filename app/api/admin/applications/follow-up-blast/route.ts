@@ -116,7 +116,8 @@ export async function POST(request: Request) {
   if (auth.error) return auth.error;
 
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
 
   // Optional: filter by status or program from request body
   const body = await request.json().catch(() => ({}));

@@ -34,7 +34,7 @@ export default async function AdminVerificationReviewPage() {
     redirect('/unauthorized');
   }
 
-  const { data: verifications } = await supabase
+  const { data: verifications, error: verificationsError } = await supabase
     .from('id_verifications')
     .select(
       `
@@ -48,13 +48,11 @@ export default async function AdminVerificationReviewPage() {
     `
     )
     .order('created_at', { ascending: false });
+  if (verificationsError) throw new Error(`id_verifications query failed: ${verificationsError.message}`);
 
-  const pendingVerifications =
-    verifications?.filter((v) => v.status === 'pending') || [];
-  const approvedVerifications =
-    verifications?.filter((v) => v.status === 'approved') || [];
-  const rejectedVerifications =
-    verifications?.filter((v) => v.status === 'rejected') || [];
+  const pendingVerifications  = verifications.filter((v) => v.status === 'pending');
+  const approvedVerifications = verifications.filter((v) => v.status === 'approved');
+  const rejectedVerifications = verifications.filter((v) => v.status === 'rejected');
 
   const getStatusIcon = (status: string) => {
     switch (status) {

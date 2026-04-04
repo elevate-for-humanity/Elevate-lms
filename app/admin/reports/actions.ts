@@ -5,7 +5,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 
 export async function generateEnrollmentReport(dateRange: string = '30') {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   
   const daysAgo = parseInt(dateRange);
   const startDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
@@ -51,7 +52,8 @@ export async function generateEnrollmentReport(dateRange: string = '30') {
 
 export async function generateLeadReport(dateRange: string = '30') {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   
   const daysAgo = parseInt(dateRange);
   const startDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
@@ -100,7 +102,8 @@ export async function generateLeadReport(dateRange: string = '30') {
 
 export async function generateFinancialReport(dateRange: string = '30') {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   
   const daysAgo = parseInt(dateRange);
   const startDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
@@ -137,7 +140,8 @@ export async function generateFinancialReport(dateRange: string = '30') {
 
 export async function generateUserActivityReport(dateRange: string = '30') {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   
   const daysAgo = parseInt(dateRange);
   const startDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
@@ -180,7 +184,8 @@ export async function generateUserActivityReport(dateRange: string = '30') {
 
 export async function exportEnrollmentCSV(): Promise<string> {
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
 
   const { data: enrollments } = await db
     .from('training_enrollments')
@@ -204,7 +209,8 @@ export async function exportEnrollmentCSV(): Promise<string> {
 
 export async function exportLeadsCSV(): Promise<string> {
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
 
   const { data: leads } = await db
     .from('leads')

@@ -9,7 +9,8 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 async function _POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    const db = createAdminClient() || supabase;
+    const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
 
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
@@ -111,7 +112,8 @@ async function _POST(request: NextRequest) {
 async function _GET(request: NextRequest) {
   try {
     const supabase = await createClient();
-    const db = createAdminClient() || supabase;
+    const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
 
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {

@@ -18,10 +18,7 @@ export default async function CertificatesPage() {
 
   const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
 
-  const [
-    { data: certs, count: total },
-    { count: thisMonth },
-  ] = await Promise.all([
+  const [certsRes, thisMonthRes] = await Promise.all([
     db.from('program_completion_certificates')
       .select('id, issued_at, certificate_number, student:profiles(full_name, email), program:programs(title)', { count: 'exact' })
       .order('issued_at', { ascending: false })
@@ -30,6 +27,13 @@ export default async function CertificatesPage() {
       .select('*', { count: 'exact', head: true })
       .gte('issued_at', monthStart),
   ]);
+
+  if (certsRes.error)      throw new Error(`program_completion_certificates query failed: ${certsRes.error.message}`);
+  if (thisMonthRes.error)  throw new Error(`program_completion_certificates this-month count failed: ${thisMonthRes.error.message}`);
+
+  const certs      = certsRes.data;
+  const total      = certsRes.count;
+  const thisMonth  = thisMonthRes.count;
 
   return (
     <div className="min-h-screen bg-slate-50">

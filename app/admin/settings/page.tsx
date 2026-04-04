@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { requireAdmin } from '@/lib/authGuards';
+import { requireAdmin } from '@/lib/auth';
 import Link from 'next/link';
 import { Settings, Bell, Shield, CreditCard, Globe, Mail, Webhook, ChevronRight, ArrowRight } from 'lucide-react';
 

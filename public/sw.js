@@ -1,6 +1,6 @@
 // Service Worker for Elevate for Humanity PWA
 // Version 3.0 - Fixed routing for SPA navigation
-const CACHE_VERSION = 'v5';
+const CACHE_VERSION = 'v6';
 const STATIC_CACHE = `elevate-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `elevate-dynamic-${CACHE_VERSION}`;
 const COURSE_CACHE = `elevate-courses-${CACHE_VERSION}`;
@@ -17,6 +17,17 @@ const PRECACHE_ASSETS = [
 
 // Patterns for different caching strategies
 const CACHE_STRATEGIES = {
+  // Never cache — always hit the network
+  noCache: [
+    /\/admin(\/|$)/,      // All admin routes — auth-gated, must never serve stale
+    /\/api\//,            // All API routes
+    /\/login/,            // Auth pages
+    /\/logout/,
+    /\/unauthorized/,
+    /supabase/,
+    /analytics/,
+    /gtag/,
+  ],
   // Cache-first for static assets
   static: [
     /\.(js|css|woff2?|ttf|eot)$/,
@@ -33,15 +44,6 @@ const CACHE_STRATEGIES = {
   // Stale-while-revalidate for API data
   staleWhileRevalidate: [
     /\/api\/public\//,
-  ],
-  // Never cache
-  noCache: [
-    /\/api\/auth\//,
-    /\/api\/enroll\//,
-    /\/api\/payment\//,
-    /supabase/,
-    /analytics/,
-    /gtag/,
   ],
 };
 

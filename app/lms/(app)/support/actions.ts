@@ -1,17 +1,14 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 
 export async function submitSupportRequest(formData: FormData) {
+  // Use session client — RLS enforces row ownership on support_tickets.
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { error: 'Not authenticated' };
-  }
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) throw new Error(`Auth failed: ${authError.message}`);
+  if (!user) return { error: 'Not authenticated' };
 
   const subject = formData.get('subject') as string;
   const category = formData.get('category') as string;
@@ -22,7 +19,7 @@ export async function submitSupportRequest(formData: FormData) {
     return { error: 'Subject and message are required' };
   }
 
-  const { error } = await db
+  const { error } = await supabase
     .from('support_tickets')
     .insert({
       user_id: user.id,
@@ -35,9 +32,7 @@ export async function submitSupportRequest(formData: FormData) {
     });
 
   if (error) {
-    // If table doesn't exist, just log and return success for now
-    // Support tickets table not available — returning success fallback
-    return { success: true, message: 'Your request has been submitted. We will contact you soon.' };
+    return { error: `Support ticket creation failed: ${error.message}` };
   }
 
   revalidatePath('/lms/support');

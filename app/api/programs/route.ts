@@ -20,7 +20,8 @@ async function _GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const db = createAdminClient() || createClient(supabaseUrl, supabaseKey);
+    const db = createAdminClient();
+    if (!db) throw new Error('Admin client failed to initialize');
 
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');

@@ -21,16 +21,18 @@ export default async function AdminEnrollmentsPage() {
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
-  const { data: enrollments } = await supabase
+  const { data: enrollments, error: enrollmentsError } = await supabase
     .from('program_enrollments')
     .select('*, student:profiles(id, full_name, email), course:courses(id, title)')
     .order('enrolled_at', { ascending: false });
+  if (enrollmentsError) throw new Error(`program_enrollments query failed: ${enrollmentsError.message}`);
 
+  // Supporting data — degrade gracefully if unavailable
   const { data: users } = await supabase.from('profiles').select('id, full_name, email').order('full_name');
   const { data: coursesRaw } = await supabase.from('courses').select('id, title').eq('is_active', true).order('title');
   const { data: cohortsRaw } = await supabase.from('cohorts').select('id, name, code, status').eq('status', 'active').order('name');
 
-  const allEnrollments = enrollments || [];
+  const allEnrollments = enrollments;
   const stats = {
     total:     allEnrollments.length,
     active:    allEnrollments.filter((e: any) => e.status === 'active').length,

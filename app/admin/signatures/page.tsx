@@ -21,12 +21,13 @@ export default async function SignaturesPage() {
   await requireAdmin();
   const db = createAdminClient();
 
-  const { data: signatures, error } = await db
+  const { data: signatures, error: signaturesError } = await db
     .from('signatures')
     .select('id, user_id, document_type, document_id, signed_at, status, created_at')
     .order('created_at', { ascending: false });
+  if (signaturesError) throw new Error(`signatures query failed: ${signaturesError.message}`);
 
-  const rows = signatures ?? [];
+  const rows = signatures;
   const totalSignatures = rows.length;
   const pendingSignatures = rows.filter((s: any) => s.status === 'pending').length;
   const completedSignatures = rows.filter((s: any) => s.status === 'completed' || s.signed_at).length;

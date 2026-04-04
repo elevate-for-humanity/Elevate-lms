@@ -10,7 +10,8 @@ export const dynamic = 'force-dynamic';
 
 export default async function LmsAppLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
 
   // Preserve the requested path through login so the user lands back here after auth.
   // x-pathname is set by proxy.ts when it runs as middleware.

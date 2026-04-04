@@ -1,24 +1,21 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 
 export async function updateProfile(formData: FormData) {
+  // Use session client — RLS enforces row ownership on profiles.
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { error: 'Not authenticated' };
-  }
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) throw new Error(`Auth failed: ${authError.message}`);
+  if (!user) return { error: 'Not authenticated' };
 
   const firstName = formData.get('first_name') as string;
   const lastName = formData.get('last_name') as string;
   const phone = formData.get('phone') as string;
   const bio = formData.get('bio') as string;
 
-  const { error } = await db
+  const { error } = await supabase
     .from('profiles')
     .update({
       first_name: firstName,
@@ -39,12 +36,9 @@ export async function updateProfile(formData: FormData) {
 
 export async function updateProfilePhoto(formData: FormData) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { error: 'Not authenticated' };
-  }
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) throw new Error(`Auth failed: ${authError.message}`);
+  if (!user) return { error: 'Not authenticated' };
 
   const file = formData.get('photo') as File;
   if (!file || file.size === 0) {
@@ -66,7 +60,7 @@ export async function updateProfilePhoto(formData: FormData) {
     .from('avatars')
     .getPublicUrl(fileName);
 
-  const { error: updateError } = await db
+  const { error: updateError } = await supabase
     .from('profiles')
     .update({ avatar_url: publicUrl })
     .eq('id', user.id);

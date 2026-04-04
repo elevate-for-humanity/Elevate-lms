@@ -10,7 +10,8 @@ const ALLOWED_ROLES = ['admin', 'super_admin', 'staff', 'instructor'];
 async function getProctor() {
   const supabase = await createClient();
   if (!supabase) return null;
-  const db = createAdminClient() || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;

@@ -27,10 +27,10 @@ export default async function WioaPage() {
   const soon = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
   const [
-    { data: participants, count: total },
-    { count: approved },
-    { count: pending },
-    { count: expiring },
+    participantsRes,
+    approvedRes,
+    pendingRes,
+    expiringRes,
   ] = await Promise.all([
     db.from('wioa_participants')
       .select('id, status, funding_amount, approved_at, expiration_date, student:profiles(full_name, email), program:programs(title)', { count: 'exact' })
@@ -40,6 +40,17 @@ export default async function WioaPage() {
     db.from('wioa_participants').select('*', { count: 'exact', head: true })
       .lte('expiration_date', soon).gte('expiration_date', new Date().toISOString()),
   ]);
+
+  if (participantsRes.error) throw new Error(`wioa_participants query failed: ${participantsRes.error.message}`);
+  if (approvedRes.error)     throw new Error(`wioa_participants approved count failed: ${approvedRes.error.message}`);
+  if (pendingRes.error)      throw new Error(`wioa_participants pending count failed: ${pendingRes.error.message}`);
+  if (expiringRes.error)     throw new Error(`wioa_participants expiring count failed: ${expiringRes.error.message}`);
+
+  const participants = participantsRes.data;
+  const total        = participantsRes.count;
+  const approved     = approvedRes.count;
+  const pending      = pendingRes.count;
+  const expiring     = expiringRes.count;
 
   return (
     <div className="min-h-screen bg-slate-50">

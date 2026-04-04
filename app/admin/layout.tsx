@@ -7,9 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { AdminLicenseWrapper } from '@/components/licensing/AdminLicenseWrapper';
 import { getLicenseAccessMode } from '@/lib/licensing/billing-authority';
 import { reconcileTrialOnboarding } from '@/lib/trial/reconcile-onboarding';
-import AdminHeader from '@/components/admin/AdminHeader';
-import AdminSidebar from '@/components/admin/AdminSidebar';
-import AdminMobileNav from '@/components/admin/AdminMobileNav';
+import AdminShellClient from '@/components/admin/AdminShellClient';
 import { DemoTourProvider } from '@/components/demo/DemoTourProvider';
 import { IdleTimeoutGuard } from '@/components/auth/IdleTimeoutGuard';
 import AdminPWAInit from '@/components/admin/AdminPWAInit';
@@ -39,41 +37,41 @@ export const metadata: Metadata = {
 };
 
 async function getLicenseContext() {
-  try {
-    const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (!supabase) return null;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize in getLicenseContext');
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return null;
+  const supabase = await createClient();
 
-    // Get user profile with role and tenant
-    const { data: profile } = await db
-      .from('profiles')
-      .select('role, tenant_id')
-      .eq('id', user.id)
-      .single();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw new Error(`Auth user fetch failed in getLicenseContext: ${userError.message}`);
+  if (!user) return null;
 
-    if (!profile?.tenant_id) return null;
+  const { data: profile, error: profileError } = await db
+    .from('profiles')
+    .select('role, tenant_id')
+    .eq('id', user.id)
+    .single();
+  if (profileError) throw new Error(`Profile fetch failed in getLicenseContext: ${profileError.message}`);
+  if (!profile?.tenant_id) return null;
 
-    // Get license for tenant
-    const { data: license } = await db
-      .from('licenses')
-      .select('id, tier, status, expires_at, current_period_end, stripe_subscription_id, stripe_customer_id, canceled_at, suspended_at')
-      .eq('tenant_id', profile.tenant_id)
-      .eq('status', 'active')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
-
-    return {
-      license,
-      userRole: profile.role,
-      tenantId: profile.tenant_id,
-    };
-  } catch {
-    return null;
+  const { data: license, error: licenseError } = await db
+    .from('licenses')
+    .select('id, tier, status, expires_at, current_period_end, stripe_subscription_id, stripe_customer_id, canceled_at, suspended_at')
+    .eq('tenant_id', profile.tenant_id)
+    .eq('status', 'active')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+  if (licenseError && licenseError.code !== 'PGRST116') {
+    // PGRST116 = no rows — tenant has no active license, not a query failure
+    throw new Error(`License fetch failed in getLicenseContext: ${licenseError.message}`);
   }
+
+  return {
+    license: license ?? null,
+    userRole: profile.role,
+    tenantId: profile.tenant_id,
+  };
 }
 
 export default async function AdminLayout({
@@ -87,6 +85,7 @@ export default async function AdminLayout({
   // Fetch user + notifications + license context in parallel — single round-trip
   const supabase = await createClient();
   const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize in AdminLayout');
 
   const [context, headerData] = await Promise.all([
     getLicenseContext(),
@@ -100,6 +99,9 @@ export default async function AdminLayout({
           db.from('applications').select('id', { count: 'exact', head: true }).in('status', ['submitted', 'in_review']),
           db.from('documents').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
         ]);
+        // Header notification counts are non-critical — log failures but don't throw
+        if (appsRes.error) console.error('[AdminLayout] applications count failed:', appsRes.error.message);
+        if (docsRes.error) console.error('[AdminLayout] documents count failed:', docsRes.error.message);
 
         const name = profileRes.data?.first_name || profileRes.data?.full_name?.split(' ')[0] || 'Admin';
         const notifs: import('@/components/admin/AdminHeader').AdminHeaderNotif[] = [];
@@ -127,16 +129,16 @@ export default async function AdminLayout({
     reconcileTrialOnboarding(supabase, context.tenantId).catch(() => {});
   }
 
-  // Check if user should be blocked (non-admin with expired license)
+  // License access enforcement — fail closed
   if (context?.license) {
     const accessResult = getLicenseAccessMode(context.license, context.userRole);
-    
-    if (accessResult.mode === 'blocked' && accessResult.redirectTo) {
-      redirect(accessResult.redirectTo);
+
+    if (accessResult.mode === 'blocked') {
+      redirect(accessResult.redirectTo ?? '/admin/license-required');
     }
-    
-    if (accessResult.mode === 'blocked_billing_issue' && accessResult.redirectTo) {
-      redirect(accessResult.redirectTo);
+
+    if (accessResult.mode === 'blocked_billing_issue') {
+      redirect(accessResult.redirectTo ?? '/admin/billing-issue');
     }
   }
 
@@ -144,16 +146,13 @@ export default async function AdminLayout({
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <AdminPWAInit />
       <IdleTimeoutGuard />
-      <AdminSidebar />
-      {/* Desktop: offset by sidebar. Mobile: full width, bottom nav handles navigation */}
-      <div className="lg:pl-64">
-        <AdminHeader userName={headerData.userName} userInitial={headerData.userInitial} notifs={headerData.notifs} />
-        {/* pt-20 = fixed header. pb-24 on mobile = space above bottom nav */}
-        <main id="main-content" className="min-h-screen px-3 pb-24 pt-20 sm:px-6 lg:px-8 lg:pb-8">
-          {children}
-        </main>
-      </div>
-      <AdminMobileNav />
+      <AdminShellClient
+        userName={headerData.userName}
+        userInitial={headerData.userInitial}
+        notifs={headerData.notifs}
+      >
+        {children}
+      </AdminShellClient>
     </div>
   );
 

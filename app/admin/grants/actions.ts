@@ -9,7 +9,8 @@ import { logger } from '@/lib/logger';
 
 export async function createGrantOpportunity(formData: FormData) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -57,7 +58,8 @@ export async function createGrantOpportunity(formData: FormData) {
 
 export async function updateGrantOpportunity(id: string, formData: FormData) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -105,7 +107,8 @@ export async function updateGrantOpportunity(id: string, formData: FormData) {
 
 export async function deleteGrantOpportunity(id: string) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   const { data: { user } } = await supabase.auth.getUser();
   
   const { error } = await db
@@ -127,7 +130,8 @@ export async function deleteGrantOpportunity(id: string) {
 
 export async function createGrantApplication(formData: FormData) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -169,7 +173,8 @@ export async function updateGrantApplicationStatus(
   reviewerNotes?: string
 ) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   
   const updateData: Record<string, unknown> = {
     status,

@@ -76,7 +76,8 @@ function StatusPill({ verified, pending }: { verified: number; pending: number }
 export default async function ApprenticeCompetenciesPage() {
   const supabase = await createClient();
   const _admin = createAdminClient();
-  const db = _admin || supabase;
+  const db = _admin;
+  if (!db) throw new Error('Admin client failed to initialize');
 
   if (!supabase) redirect('/login?redirect=/apprentice/competencies');
 

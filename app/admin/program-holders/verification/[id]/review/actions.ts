@@ -11,10 +11,17 @@ export async function submitVerificationDecision(
   notes?: string
 ) {
   const supabase = await createClient();
-  const db = createAdminClient() || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) throw new Error(`Auth failed: ${authError.message}`);
   if (!user) return { error: 'Not authenticated' };
+
+  const { data: actorProfile, error: actorError } = await db
+    .from('profiles').select('role').eq('id', user.id).single();
+  if (actorError) throw new Error(`Actor profile fetch failed: ${actorError.message}`);
+  if (!['admin', 'super_admin'].includes(actorProfile?.role ?? '')) return { error: 'Forbidden' };
 
   // Update program holder status
   const { error: holderError } = await db

@@ -24,10 +24,7 @@ export default async function AtRiskPage() {
 
   const inactive14 = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
 
-  const [
-    { data: flagged, count: flaggedCount },
-    { data: inactive, count: inactiveCount },
-  ] = await Promise.all([
+  const [flaggedRes, inactiveRes] = await Promise.all([
     db.from('at_risk_students')
       .select('id, risk_level, reason, flagged_at, student:profiles(id, full_name, email)', { count: 'exact' })
       .order('flagged_at', { ascending: false })
@@ -39,6 +36,14 @@ export default async function AtRiskPage() {
       .order('last_activity_at', { ascending: true })
       .limit(50),
   ]);
+
+  if (flaggedRes.error)  throw new Error(`at_risk_students query failed: ${flaggedRes.error.message}`);
+  if (inactiveRes.error) throw new Error(`program_enrollments inactive query failed: ${inactiveRes.error.message}`);
+
+  const flagged      = flaggedRes.data;
+  const flaggedCount = flaggedRes.count;
+  const inactive     = inactiveRes.data;
+  const inactiveCount = inactiveRes.count;
 
   return (
     <div className="min-h-screen bg-slate-50">

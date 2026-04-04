@@ -47,7 +47,8 @@ async function _GET(req: NextRequest) {
   }
 
   // Legacy: return flat completed list for user (no courseId)
-  const db = createAdminClient() || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   const { data: legacyProgress } = await db
     .from('lesson_progress')
     .select('id, completed_at, lesson:course_lessons(title, course_id)')

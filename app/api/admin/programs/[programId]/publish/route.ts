@@ -83,7 +83,7 @@ export async function POST(
       .update({ published: true, updated_at: new Date().toISOString() })
       .eq('id', programId);
 
-    if (error) return safeError(`Publish failed: ${error.message}`, 500);
+    if (error) return safeInternalError(error, 'program-publish: DB update failed');
 
     // Audit
     await db.from('audit_logs').insert({

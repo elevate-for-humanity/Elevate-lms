@@ -22,12 +22,7 @@ export default async function OutcomesPage() {
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
-  const [
-    { data: outcomes },
-    { count: totalEnrollments },
-    { count: totalCerts },
-    { data: recentOutcomes },
-  ] = await Promise.all([
+  const [outcomesRes, enrollmentsRes, certsRes, recentOutcomesRes] = await Promise.all([
     supabase.from('employment_outcomes').select('employment_status, wage_at_placement, wage_at_followup, employer_name, start_date, user_id').limit(1000),
     supabase.from('program_enrollments').select('id', { count: 'exact', head: true }),
     supabase.from('certificates').select('id', { count: 'exact', head: true }),
@@ -37,13 +32,23 @@ export default async function OutcomesPage() {
       .limit(15),
   ]);
 
-  const total = outcomes?.length || 0;
-  const employed = (outcomes || []).filter((o: any) => o.employment_status === 'employed').length;
-  const employmentRate = total > 0 ? Math.round((employed / total) * 100) : 0;
-  const credentialRate = (totalEnrollments || 0) > 0
-    ? Math.round(((totalCerts || 0) / (totalEnrollments || 1)) * 100) : 0;
+  if (outcomesRes.error)       throw new Error(`employment_outcomes query failed: ${outcomesRes.error.message}`);
+  if (enrollmentsRes.error)    throw new Error(`program_enrollments count failed: ${enrollmentsRes.error.message}`);
+  if (certsRes.error)          throw new Error(`certificates count failed: ${certsRes.error.message}`);
+  if (recentOutcomesRes.error) throw new Error(`employment_outcomes recent query failed: ${recentOutcomesRes.error.message}`);
 
-  const wageGains = (outcomes || [])
+  const outcomes       = outcomesRes.data;
+  const totalEnrollments = enrollmentsRes.count;
+  const totalCerts     = certsRes.count;
+  const recentOutcomes = recentOutcomesRes.data;
+
+  const total = outcomes.length;
+  const employed = outcomes.filter((o: any) => o.employment_status === 'employed').length;
+  const employmentRate = total > 0 ? Math.round((employed / total) * 100) : 0;
+  const credentialRate = (totalEnrollments ?? 0) > 0
+    ? Math.round(((totalCerts ?? 0) / (totalEnrollments ?? 1)) * 100) : 0;
+
+  const wageGains = outcomes
     .filter((o: any) => o.wage_at_placement && o.wage_at_followup)
     .map((o: any) => Number(o.wage_at_followup) - Number(o.wage_at_placement));
   const avgWageGain = wageGains.length > 0

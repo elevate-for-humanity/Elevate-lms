@@ -31,27 +31,35 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const db = createAdminClient();
 
   let adminProfile: { full_name: string | null; role: string } | null = null;
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data } = await db.from('profiles').select('full_name, role').eq('id', user.id).maybeSingle();
-      adminProfile = data ?? null;
+  // Auth is critical — throw if it fails. Profile name resolution is non-critical
+  // (greeting degrades to "Admin") but we log the failure so it's not invisible.
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) throw new Error(`Auth user fetch failed in getAdminDashboardData: ${authError.message}`);
+  if (user) {
+    const { data: profileData, error: profileError } = await db
+      .from('profiles')
+      .select('full_name, role')
+      .eq('id', user.id)
+      .maybeSingle();
+    if (profileError) {
+      console.error('[getAdminDashboardData] profile fetch failed:', profileError.message);
+    } else {
+      adminProfile = profileData ?? null;
     }
-  } catch { /* non-fatal */ }
+  }
 
   const thisMonthStart = monthStart();
 
+  // ── Critical queries — throw immediately on failure ───────────────────────
+  // These drive the 4 KPI cards. A DB error here must surface, not silently
+  // return zeros that make a broken backend look operational.
   const [
     pendingAppsRes,
     allPendingAppsRes,
     activeEnrollmentsRes,
-    inactiveLearnersRes,
     revenueAllTimeRes,
     revenueThisMonthRes,
     certsRes,
-    unpublishedProgramsRes,
-    recentStudentsRes,
-    enrollmentsByProgramRes,
   ] = await Promise.all([
     db.from('applications')
       .select('id, first_name, last_name, full_name, email, program_interest, program_slug, status, created_at, submitted_at, next_step_due_date, funding_type')
@@ -68,13 +76,6 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       .eq('status', 'active'),
 
     db.from('program_enrollments')
-      .select('id, user_id, enrolled_at, updated_at, profiles:user_id(id, full_name, email)')
-      .eq('status', 'active')
-      .lt('updated_at', new Date(Date.now() - 3 * 86400000).toISOString())
-      .order('updated_at', { ascending: true })
-      .limit(8),
-
-    db.from('program_enrollments')
       .select('amount_paid_cents')
       .eq('payment_status', 'paid'),
 
@@ -85,6 +86,31 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
 
     db.from('certificates')
       .select('id', { count: 'exact', head: true }),
+  ]);
+
+  // Hard fail — error boundary in app/admin/dashboard/error.tsx catches this
+  if (pendingAppsRes.error)      throw new Error(`applications query failed: ${pendingAppsRes.error.message}`);
+  if (allPendingAppsRes.error)   throw new Error(`applications count failed: ${allPendingAppsRes.error.message}`);
+  if (activeEnrollmentsRes.error) throw new Error(`program_enrollments active count failed: ${activeEnrollmentsRes.error.message}`);
+  if (revenueAllTimeRes.error)   throw new Error(`program_enrollments revenue (all time) failed: ${revenueAllTimeRes.error.message}`);
+  if (revenueThisMonthRes.error) throw new Error(`program_enrollments revenue (this month) failed: ${revenueThisMonthRes.error.message}`);
+  if (certsRes.error)            throw new Error(`certificates count failed: ${certsRes.error.message}`);
+
+  // ── Non-critical queries — degrade gracefully on failure ──────────────────
+  // Sidebar panels and supplemental lists. A failure here should not crash
+  // the whole dashboard — it should just render an empty section.
+  const [
+    inactiveLearnersRes,
+    unpublishedProgramsRes,
+    recentStudentsRes,
+    enrollmentsByProgramRes,
+  ] = await Promise.all([
+    db.from('program_enrollments')
+      .select('id, user_id, enrolled_at, updated_at, profiles:user_id(id, full_name, email)')
+      .eq('status', 'active')
+      .lt('updated_at', new Date(Date.now() - 3 * 86400000).toISOString())
+      .order('updated_at', { ascending: true })
+      .limit(8),
 
     db.from('programs')
       .select('id, title, slug, status, updated_at')
@@ -232,6 +258,12 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     .slice(0, 8);
 
   return {
+    counts: {
+      pendingApplications:    allPendingAppsRes.count ?? 0,
+      activeEnrollments:      activeEnrollmentsRes.count ?? 0,
+      revenueThisMonthCents:  revenueThisMonthCents,
+      certificatesIssued:     certsRes.count ?? 0,
+    },
     kpis,
     enrollmentTrend: [],
     studentStatuses: [],

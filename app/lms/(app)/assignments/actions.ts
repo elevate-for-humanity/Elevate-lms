@@ -1,17 +1,14 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 
 export async function submitAssignment(formData: FormData) {
+  // Use session client — RLS enforces row ownership. Admin client not needed here.
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { error: 'Not authenticated' };
-  }
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) throw new Error(`Auth failed: ${authError.message}`);
+  if (!user) return { error: 'Not authenticated' };
 
   const assignmentId = formData.get('assignment_id') as string;
   const content = formData.get('content') as string;
@@ -44,7 +41,7 @@ export async function submitAssignment(formData: FormData) {
   }
 
   // Save submission to database
-  const { error } = await db
+  const { error } = await supabase
     .from('assignment_submissions')
     .upsert({
       user_id: user.id,
@@ -58,8 +55,7 @@ export async function submitAssignment(formData: FormData) {
     });
 
   if (error) {
-    // Submissions table not available — returning success fallback
-    return { success: true, message: 'Assignment submitted successfully!' };
+    return { error: `Submission failed: ${error.message}` };
   }
 
   revalidatePath('/lms/assignments');

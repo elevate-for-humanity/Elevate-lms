@@ -6,7 +6,8 @@ import { redirect } from 'next/navigation';
 
 export async function createPlacement(formData: FormData) {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
 
   // Get authenticated user
   const { data: { user } } = await supabase.auth.getUser();

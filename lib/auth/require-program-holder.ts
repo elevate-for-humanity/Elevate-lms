@@ -28,7 +28,8 @@ export interface ProgramHolderContext {
 export async function requireProgramHolder(): Promise<ProgramHolderContext> {
   const supabase = await createClient();
   const _admin = createAdminClient();
-  const db = _admin || supabase;
+  const db = _admin;
+  if (!db) throw new Error('Admin client failed to initialize');
 
   const {
     data: { user },

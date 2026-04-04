@@ -23,17 +23,22 @@ export default async function GrantsPage() {
   const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
-  const [
-    { data: grants, count: total },
-    { count: active },
-    { count: pending },
-  ] = await Promise.all([
+  const [grantsRes, activeRes, pendingRes] = await Promise.all([
     db.from('grants')
       .select('id, name, funder, amount, status, start_date, end_date, created_at', { count: 'exact' })
       .order('created_at', { ascending: false }).limit(50),
     db.from('grants').select('*', { count: 'exact', head: true }).eq('status', 'active'),
     db.from('grants').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
   ]);
+
+  if (grantsRes.error)  throw new Error(`grants query failed: ${grantsRes.error.message}`);
+  if (activeRes.error)  throw new Error(`grants active count failed: ${activeRes.error.message}`);
+  if (pendingRes.error) throw new Error(`grants pending count failed: ${pendingRes.error.message}`);
+
+  const grants  = grantsRes.data;
+  const total   = grantsRes.count;
+  const active  = activeRes.count;
+  const pending = pendingRes.count;
 
   return (
     <div className="min-h-screen bg-slate-50">

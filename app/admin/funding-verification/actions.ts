@@ -22,7 +22,8 @@ async function requireAdmin() {
   }
 
   // Admin client bypasses RLS on program_enrollments
-  const db = createAdminClient() || supabase;
+  const db = createAdminClient();
+  if (!db) throw new Error('Admin client failed to initialize');
   return { supabase, db, adminId: user.id };
 }
 

@@ -28,36 +28,47 @@ function isAppRoute(pathname: string): boolean {
   );
 }
 
+function extractPathname(value: string): string {
+  try {
+    if (value.startsWith('http')) return new URL(value).pathname;
+    if (value.startsWith('/')) return value.split('?')[0];
+  } catch { /* ignore */ }
+  return '';
+}
+
 interface PublicLayoutProps {
   children: React.ReactNode;
 }
 
 export default async function PublicLayout({ children }: PublicLayoutProps) {
   const headersList = await headers();
-  // x-pathname is set by proxy.ts (middleware) on every request.
-  const pathname = headersList.get('x-pathname') || '/';
 
-  if (isAppRoute(pathname)) {
-    // App routes manage their own layout — render children only.
+  // x-pathname is set by proxy.ts on every request.
+  // Fall back to other runtime headers if missing.
+  // If none resolve, default to NOT rendering the marketing header —
+  // app shells manage their own layout and must never get the public nav.
+  const raw =
+    headersList.get('x-pathname') ||
+    headersList.get('x-invoke-path') ||
+    headersList.get('x-forwarded-uri') ||
+    headersList.get('x-url') ||
+    null;
+
+  const pathname = raw ? extractPathname(raw) : null;
+
+  if (!pathname || isAppRoute(pathname)) {
     return <>{children}</>;
   }
 
   return (
     <>
-      {/* Server-rendered header - always visible on public pages */}
       <Header />
-
-      {/* Main content */}
       <Suspense>
         <main id="main-content" className="pt-[70px]" role="main" tabIndex={-1}>
           {children}
         </main>
       </Suspense>
-
-      {/* Server-rendered footer - always visible on public pages */}
       <ServerFooter />
-
-      {/* Client-only widgets (chat, analytics, etc.) */}
       <ClientWidgets />
     </>
   );

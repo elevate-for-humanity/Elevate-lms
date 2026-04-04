@@ -34,7 +34,7 @@ export function AdminInstallPrompt() {
   if (!deferredPrompt || dismissed) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 rounded-2xl border border-slate-200 bg-white p-4 shadow-lg md:left-auto md:right-4 md:w-80">
+    <div className="fixed bottom-20 left-4 right-4 z-50 rounded-2xl border border-slate-200 bg-white p-4 shadow-lg lg:bottom-4 lg:left-auto lg:right-4 lg:w-80">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-slate-900">Install Admin App</p>

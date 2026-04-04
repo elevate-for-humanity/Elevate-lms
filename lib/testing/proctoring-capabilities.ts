@@ -114,13 +114,15 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
     ],
     verifyUrl: 'https://www.nhanow.com/',
     status: 'active',
+    // Exam fees = NHA exam cost + $25 Elevate proctoring surcharge.
+    // NHA exam costs confirmed from April 2026 proposals (account 412957).
     fees: [
-      { label: 'CPT — Phlebotomy', amount: 160 },
-      { label: 'CCMA — Medical Assistant', amount: 180 },
-      { label: 'CET — EKG Technician', amount: 175 },
-      { label: 'CPCT/A — Patient Care Tech', amount: 175 },
-      { label: 'CMAA — Medical Admin Assistant', amount: 165 },
-      { label: 'ExCPT — Pharmacy Technician', amount: 175 },
+      { label: 'CPT — Phlebotomy',             amount: 154, note: '$129 NHA exam + $25 proctoring' },
+      { label: 'CCMA — Medical Assistant',      amount: 190, note: '$165 NHA exam + $25 proctoring' },
+      { label: 'CET — EKG Technician',          amount: 154, note: '$129 NHA exam + $25 proctoring' },
+      { label: 'ExCPT — Pharmacy Technician',   amount: 154, note: '$129 NHA exam + $25 proctoring (includes free retake)' },
+      { label: 'CPCT/A — Patient Care Tech',    amount: 154, note: '$129 NHA exam + $25 proctoring' },
+      { label: 'CMAA — Medical Admin Assistant', amount: 154, note: '$129 NHA exam + $25 proctoring' },
     ],
     groupDiscount: 'Groups of 5+ — contact us for cohort pricing',
   },

@@ -1,8 +1,12 @@
 /**
  * Program pricing configuration — single source of truth for all programs.
- * 
+ *
  * Programs with fundingEligible=true can be enrolled at $0 through WIOA/WRG.
  * Self-pay students see the fullPrice and payment plan options.
+ *
+ * NHA exam fees and per-learner material costs: see lib/nha/pricing.ts.
+ * The fullPrice here is the tuition charged to the student, which may or may
+ * not include NHA materials depending on the program structure.
  */
 
 export interface ProgramPricing {
@@ -18,6 +22,13 @@ export interface ProgramPricing {
   credentialCount: number;
   /** Funding sources that cover this program */
   fundingSources: string[];
+  /**
+   * NHA per-learner cost (materials + exam) passed through to student.
+   * Sourced from lib/nha/pricing.ts. Null if not an NHA program.
+   */
+  nhaCostPerLearner?: number;
+  /** NHA exam fee only (subset of nhaCostPerLearner). */
+  nhaExamFee?: number;
 }
 
 export const PROGRAM_PRICING: Record<string, ProgramPricing> = {

@@ -34,7 +34,7 @@ const CREDENTIAL_PARTNERS = [
     credentialIssuer: 'NHA (National Healthcareer Association)',
     licenseStatus: 'Self-Pay · Not ETPL Listed',
     instructorReq: 'Phlebotomist with 2+ years clinical experience; CPT or equivalent credential',
-    notes: 'Program is not currently on the WorkOne/ETPL funded list. Self-pay with BNPL options. NHA exam fee ~$135. Exam administered on-site through Elevate as an NHA Authorized Testing Center.',
+    notes: 'Program is not currently on the WorkOne/ETPL funded list. Self-pay with BNPL options. NHA CPT exam fee $129. Exam administered on-site through Elevate as an NHA Authorized Testing Center.',
   },
   {
     program: 'Medical Assistant',
@@ -46,7 +46,7 @@ const CREDENTIAL_PARTNERS = [
     credentialIssuer: 'NHA (National Healthcareer Association)',
     licenseStatus: 'WIOA / WRG Eligible',
     instructorReq: 'Credentialed Medical Assistant or RN with clinical teaching experience',
-    notes: 'NHA exam fee ~$155. Exam administered on-site through Elevate as an NHA Authorized Testing Center.',
+    notes: 'NHA CCMA exam fee $165. Exam administered on-site through Elevate as an NHA Authorized Testing Center.',
   },
   {
     program: 'CNA — Certified Nursing Assistant',

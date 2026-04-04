@@ -42,6 +42,7 @@ function resolveInitialPayment(param: string | null): PaymentOption {
   if (param === 'affirm') return 'affirm';
   if (param === 'sezzle') return 'sezzle';
   // Legacy or unsupported BNPL provider IDs → default to affirm tab
+  // Stripe-native BNPL (Klarna/Afterpay) — handled in the payment section below
   if (param === 'bnpl' || param === 'klarna' || param === 'afterpay' || param === 'zip') return 'affirm';
   return 'weekly';
 }

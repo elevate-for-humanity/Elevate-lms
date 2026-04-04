@@ -137,6 +137,32 @@ function NoOperationalData() {
 }
 
 // ── Main export ───────────────────────────────────────────────────────────────
+const DEGRADED_SECTION_LABELS: Record<string, string> = {
+  inactive_learners:      'Inactive learners (3+ days)',
+  unpublished_programs:   'Unpublished programs list',
+  recent_students:        'Recent students',
+  enrollments_by_program: 'Enrollment breakdown by program',
+};
+
+function DegradedBanner({ sections }: { sections: string[] }) {
+  const labels = sections.map(s => DEGRADED_SECTION_LABELS[s] ?? s);
+
+  return (
+    <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+      <div>
+        <span className="font-medium">Some sections are temporarily unavailable.</span>
+        {' '}KPI counts are accurate.
+        <ul className="mt-1 list-disc list-inside text-amber-700">
+          {labels.map(label => (
+            <li key={label}>{label} could not be loaded</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 export function DashboardShell({ data }: { data: AdminDashboardData }) {
   if (isOperationallyEmpty(data)) return <NoOperationalData />;
   const greeting    = getGreeting();
@@ -159,13 +185,7 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 pb-16 pt-4">
       {data.degradedSections.length > 0 && (
-        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-          <span>
-            Some dashboard sections could not be loaded ({data.degradedSections.join(', ')}).
-            KPI counts are accurate. Supplemental lists may be incomplete.
-          </span>
-        </div>
+        <DegradedBanner sections={data.degradedSections} />
       )}
 
       {/* Hero */}

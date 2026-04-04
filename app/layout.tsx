@@ -10,6 +10,7 @@ import { DMCATrackingPixel } from '@/components/InvisibleWatermark';
 import { Inter } from 'next/font/google';
 import { GoogleAnalytics } from '@/components/analytics/google-analytics';
 import RootWidgets from './RootWidgets';
+import AdminPWAInit from '@/components/admin/AdminPWAInit';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -216,6 +217,7 @@ export default function RootLayout({
       >
         <SkipToContent />
         <GoogleAnalytics />
+        <AdminPWAInit />
         <PublicLayout>{children}</PublicLayout>
         <CookieConsent />
         <DMCATrackingPixel />

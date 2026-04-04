@@ -8,7 +8,9 @@ import {
   Bell, Settings, Menu, X, ChevronRight, BookOpen, Shield,
   CreditCard, BarChart3, Wrench, Globe, HeartHandshake,
   DollarSign, AlertTriangle, UserCheck, Award, ClipboardList,
-  Building2, TrendingUp, Inbox, Download,
+  Building2, TrendingUp, Inbox, Download, Video, Wand2,
+  Cpu, Image, Layers, FlaskConical, Zap, MonitorPlay,
+  PenTool, Database, Activity,
 } from "lucide-react";
 
 // ── PWA install button ────────────────────────────────────────────────────────
@@ -79,7 +81,6 @@ const navSections: NavSection[] = [
     title: "Programs",
     items: [
       { label: "Programs",     href: "/admin/programs",     icon: GraduationCap },
-      { label: "Curriculum",   href: "/admin/curriculum",   icon: BookOpen },
       { label: "Courses",      href: "/admin/courses",      icon: ClipboardList },
       { label: "Instructors",  href: "/admin/instructors",  icon: UserCheck },
       { label: "Certificates", href: "/admin/certificates", icon: Award },
@@ -111,12 +112,34 @@ const navSections: NavSection[] = [
     ],
   },
   {
+    title: "Content Tools",
+    items: [
+      { label: "Course Builder",    href: "/admin/course-builder",    icon: Layers },
+      { label: "Video Manager",     href: "/admin/video-manager",     icon: Video },
+      { label: "Media Studio",      href: "/admin/media-studio",      icon: Image },
+      { label: "AI Studio",         href: "/admin/ai-studio",         icon: Wand2 },
+      { label: "Quiz Builder",      href: "/admin/quiz-builder",      icon: PenTool },
+      { label: "Curriculum",        href: "/admin/curriculum",        icon: BookOpen },
+    ],
+  },
+  {
+    title: "Automation & AI",
+    items: [
+      { label: "AI Console",        href: "/admin/ai-console",        icon: Cpu },
+      { label: "Autopilot",         href: "/admin/autopilot",         icon: Zap },
+      { label: "Workflows",         href: "/admin/workflows",         icon: Activity },
+      { label: "Course Generator",  href: "/admin/course-generator",  icon: FlaskConical },
+      { label: "Video Generator",   href: "/admin/video-generator",   icon: MonitorPlay },
+    ],
+  },
+  {
     title: "System",
     items: [
-      { label: "Reports",      href: "/admin/reports",      icon: BarChart3 },
-      { label: "Notifications",href: "/admin/notifications",icon: Bell },
-      { label: "Settings",     href: "/admin/settings",     icon: Settings },
-      { label: "Tools",        href: "/admin/advanced-tools",icon: Wrench },
+      { label: "Analytics",    href: "/admin/analytics",     icon: BarChart3 },
+      { label: "Reports",      href: "/admin/reports",       icon: Database },
+      { label: "Notifications",href: "/admin/notifications", icon: Bell },
+      { label: "Settings",     href: "/admin/settings",      icon: Settings },
+      { label: "Advanced Tools",href: "/admin/advanced-tools",icon: Wrench },
     ],
   },
 ];

@@ -6,6 +6,8 @@ import {
   AlertTriangle, ArrowRight, CheckCircle, Clock, Users,
   FileText, DollarSign, Award, XCircle, UserX, TrendingUp,
   RefreshCw, ChevronUp, ChevronDown, Download, ExternalLink,
+  Video, Wand2, Layers, Image, PenTool, Cpu, Zap,
+  MonitorPlay, FlaskConical, BarChart3, BookOpen,
 } from "lucide-react";
 import { RecentApplicationsList } from "./RecentApplicationsList";
 import { BlockedProgramsList } from "./BlockedProgramsList";
@@ -283,7 +285,39 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
         </div>
       </section>
 
-      {/* ── Zone 3: Programs by enrollment ── */}
+      {/* ── Zone 3: Tools quick-access ── */}
+      <section>
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Tools</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+          {[
+            { label: "Course Builder",   href: "/admin/course-builder",   icon: Layers },
+            { label: "Video Manager",    href: "/admin/video-manager",    icon: Video },
+            { label: "Media Studio",     href: "/admin/media-studio",     icon: Image },
+            { label: "AI Studio",        href: "/admin/ai-studio",        icon: Wand2 },
+            { label: "Quiz Builder",     href: "/admin/quiz-builder",     icon: PenTool },
+            { label: "Curriculum",       href: "/admin/curriculum",       icon: BookOpen },
+            { label: "AI Console",       href: "/admin/ai-console",       icon: Cpu },
+            { label: "Autopilot",        href: "/admin/autopilot",        icon: Zap },
+            { label: "Video Generator",  href: "/admin/video-generator",  icon: MonitorPlay },
+            { label: "Course Generator", href: "/admin/course-generator", icon: FlaskConical },
+            { label: "Analytics",        href: "/admin/analytics",        icon: BarChart3 },
+            { label: "Reports",          href: "/admin/reports",          icon: TrendingUp },
+          ].map((t) => {
+            const Icon = t.icon;
+            return (
+              <Link key={t.href} href={t.href}
+                className="bg-white border border-slate-200 rounded-xl p-3 flex flex-col items-center gap-2 hover:shadow-md hover:border-slate-300 transition-all group text-center">
+                <div className="w-9 h-9 rounded-xl bg-slate-100 group-hover:bg-brand-blue-50 flex items-center justify-center transition-colors">
+                  <Icon className="w-4 h-4 text-slate-500 group-hover:text-brand-blue-600 transition-colors" />
+                </div>
+                <span className="text-[10px] font-semibold text-slate-600 leading-tight">{t.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ── Zone 4: Programs by enrollment ── */}
       {data.topPrograms.length > 0 && (
         <section>
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Programs by Enrollment</p>

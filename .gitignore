@@ -188,3 +188,4 @@ audit_artifacts/
 playwright-report/
 .github/workflows-disabled-all/
 scripts/archive/
+next-env.d.ts

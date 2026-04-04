@@ -6,7 +6,6 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { BNPL_DESCRIPTION } from '@/lib/bnpl-config';
 import { ArrowRight } from 'lucide-react';
 
-export const dynamic = 'force-static';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 

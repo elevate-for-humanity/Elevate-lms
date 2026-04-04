@@ -160,8 +160,6 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
       { label: 'OSHA 30-Hour', amount: 185, note: 'Includes course + DOL card' },
     ],
   },
-    ],
-  },
 };
 
 /**

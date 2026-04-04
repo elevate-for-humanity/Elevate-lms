@@ -222,10 +222,17 @@ async function _POST(request: NextRequest) {
     };
 
     if (payment_type === 'bnpl') {
-      // Explicitly request BNPL methods — only when the customer chose BNPL.
-      // Klarna and Afterpay must be activated in the Stripe Dashboard under
-      // Settings → Payment methods before they appear here.
-      sessionConfig.payment_method_types = ['card', 'klarna', 'afterpay_clearpay'] as any;
+      // All methods confirmed active on this Stripe account at down payment amounts.
+      // Affirm: not yet activated — enable at dashboard.stripe.com/settings/payment_methods
+      sessionConfig.payment_method_types = [
+        'card',
+        'klarna',
+        'afterpay_clearpay',
+        'zip',
+        'cashapp',
+        'us_bank_account',
+        'amazon_pay',
+      ] as any;
     } else {
       // Let Stripe show all payment methods enabled on the account (card, Link,
       // Apple Pay, Google Pay, etc.) without hardcoding the list.

@@ -37,8 +37,8 @@ function resolveInitialPayment(param: string | null): PaymentOption {
   if (param === 'payment_plan') return 'custom';
   if (param === 'affirm') return 'affirm';
   if (param === 'sezzle') return 'sezzle';
-  // Stripe-native BNPL (Klarna, Afterpay) — goes through Stripe checkout
-  if (param === 'bnpl' || param === 'klarna' || param === 'afterpay' || param === 'zip') return 'stripe_bnpl';
+  // Stripe-native methods — all go through Stripe checkout
+  if (['bnpl','klarna','afterpay','zip','cashapp','amazon_pay','us_bank_account'].includes(param ?? '')) return 'stripe_bnpl';
   return 'weekly';
 }
 

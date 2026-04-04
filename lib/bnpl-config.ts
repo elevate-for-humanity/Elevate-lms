@@ -24,27 +24,7 @@ export interface BnplProvider {
 }
 
 export const BNPL_PROVIDERS: BnplProvider[] = [
-  {
-    id: 'affirm',
-    name: 'Affirm',
-    badgeBg: 'bg-brand-blue-100',
-    badgeText: 'text-brand-blue-700',
-    minAmount: 50,
-    maxAmount: 30000,
-    description: 'Pay over 3–36 months',
-    enabled: true,
-  },
-  {
-    id: 'sezzle',
-    name: 'Sezzle',
-    badgeBg: 'bg-purple-100',
-    badgeText: 'text-purple-700',
-    minAmount: 35,
-    // Max $2,500 — cannot finance the full $4,980 program. Use for setup fee only.
-    maxAmount: 2500,
-    description: '4 interest-free payments',
-    enabled: true,
-  },
+  // --- Stripe-native (confirmed active on account) ---
   {
     id: 'klarna',
     name: 'Klarna',
@@ -52,8 +32,8 @@ export const BNPL_PROVIDERS: BnplProvider[] = [
     badgeText: 'text-pink-700',
     minAmount: 35,
     maxAmount: 10000,
-    description: '4 interest-free installments',
-    enabled: true, // via Stripe checkout — activate in Stripe Dashboard → Payment methods
+    description: 'Pay over time',
+    enabled: true,
   },
   {
     id: 'afterpay',
@@ -63,7 +43,7 @@ export const BNPL_PROVIDERS: BnplProvider[] = [
     minAmount: 35,
     maxAmount: 2000,
     description: '4 interest-free payments',
-    enabled: true, // via Stripe checkout — activate in Stripe Dashboard → Payment methods
+    enabled: true,
   },
   {
     id: 'zip',
@@ -71,9 +51,60 @@ export const BNPL_PROVIDERS: BnplProvider[] = [
     badgeBg: 'bg-indigo-100',
     badgeText: 'text-indigo-700',
     minAmount: 35,
-    maxAmount: 5000,
-    description: 'Pay in 4 or finance longer',
-    enabled: false, // no checkout API — enable when integrated
+    maxAmount: 1500,
+    description: 'Pay in 4 installments',
+    enabled: true,
+  },
+  {
+    id: 'cashapp',
+    name: 'Cash App Pay',
+    badgeBg: 'bg-green-100',
+    badgeText: 'text-green-700',
+    minAmount: 35,
+    maxAmount: 0,
+    description: 'Pay with Cash App',
+    enabled: true,
+  },
+  {
+    id: 'amazon_pay',
+    name: 'Amazon Pay',
+    badgeBg: 'bg-orange-100',
+    badgeText: 'text-orange-700',
+    minAmount: 35,
+    maxAmount: 0,
+    description: 'Pay with Amazon',
+    enabled: true,
+  },
+  {
+    id: 'us_bank_account',
+    name: 'Bank Transfer (ACH)',
+    badgeBg: 'bg-blue-100',
+    badgeText: 'text-blue-700',
+    minAmount: 35,
+    maxAmount: 0,
+    description: 'Direct bank transfer',
+    enabled: true,
+  },
+  // --- Separate SDK flows ---
+  {
+    id: 'affirm',
+    name: 'Affirm',
+    badgeBg: 'bg-brand-blue-100',
+    badgeText: 'text-brand-blue-700',
+    minAmount: 50,
+    maxAmount: 30000,
+    description: 'Pay over 3–36 months',
+    enabled: true, // uses /api/affirm/checkout SDK flow
+  },
+  {
+    id: 'sezzle',
+    name: 'Sezzle',
+    badgeBg: 'bg-purple-100',
+    badgeText: 'text-purple-700',
+    minAmount: 35,
+    maxAmount: 2500,
+    description: '4 interest-free payments',
+    enabled: true, // uses /api/sezzle/checkout SDK flow
   },
 ];
 

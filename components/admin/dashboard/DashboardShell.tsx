@@ -184,8 +184,8 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 pb-16 pt-4">
-      {data.degradedSections.length > 0 && (
-        <DegradedBanner sections={data.degradedSections} />
+      {(data.degradedSections ?? []).length > 0 && (
+        <DegradedBanner sections={data.degradedSections ?? []} />
       )}
 
       {/* Hero */}

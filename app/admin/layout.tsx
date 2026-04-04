@@ -143,17 +143,15 @@ export default async function AdminLayout({
   }
 
   const content = (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <AdminShellClient
+      userName={headerData.userName}
+      userInitial={headerData.userInitial}
+      notifs={headerData.notifs}
+    >
       <AdminPWAInit />
       <IdleTimeoutGuard />
-      <AdminShellClient
-        userName={headerData.userName}
-        userInitial={headerData.userInitial}
-        notifs={headerData.notifs}
-      >
-        {children}
-      </AdminShellClient>
-    </div>
+      {children}
+    </AdminShellClient>
   );
 
   if (!context) {

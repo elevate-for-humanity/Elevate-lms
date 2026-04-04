@@ -25,8 +25,8 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'payment');
     if (rateLimited) return rateLimited;
 
-    const { apiRequireAdmin } = await import('@/lib/authGuards');
-    const auth = await apiRequireAdmin();
+    const { apiRequireAdmin } = await import('@/lib/admin/guards');
+    const auth = await apiRequireAdmin(request);
     if (auth.error) return auth.error;
 
     // Lazy config re-check

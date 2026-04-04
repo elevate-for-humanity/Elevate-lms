@@ -356,6 +356,15 @@
   status = 200
   force = true
 
+# API routes — must come before the catch-all so Stripe webhooks and other
+# API calls reach the correct path on elevateforhumanity.org.
+# Without this, the catch-all below prepends /supersonic-fast-cash/ and 404s.
+[[redirects]]
+  from = "https://www.supersonicfastermoney.com/api/*"
+  to = "https://www.elevateforhumanity.org/api/:splat"
+  status = 200
+  force = true
+
 # Root and all other paths → Supersonic homepage
 [[redirects]]
   from = "https://www.supersonicfastermoney.com/*"

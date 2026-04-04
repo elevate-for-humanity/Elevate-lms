@@ -34,9 +34,8 @@ async function _POST(request: NextRequest) {
     const authHeader = request.headers.get('authorization');
     const isInternalCall = cronSecret && authHeader === `Bearer ${cronSecret}`;
     if (!isInternalCall) {
-      const { apiRequireAdmin } = await import('@/lib/authGuards');
-      const auth = await apiRequireAdmin();
-      if (auth.error) return auth.error;
+      const { apiRequireAdmin } = await import('@/lib/admin/guards');
+      try { await apiRequireAdmin(request); } catch (e) { return e instanceof Response ? e : NextResponse.json({ error: 'Unauthorized' }, { status: 401 }); }
     }
 
     const body = await parseBody<Record<string, any>>(request);

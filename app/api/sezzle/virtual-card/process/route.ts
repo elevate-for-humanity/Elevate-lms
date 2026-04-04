@@ -16,9 +16,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sezzle } from '@/lib/sezzle/client';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { createEnrollmentFromPayment } from '@/lib/enrollment/create-enrollment';
 
 interface VirtualCardProcessRequest {
   // Session info from Sezzle
@@ -201,28 +203,39 @@ async function _POST(request: NextRequest) {
         // Don't fail the request - payment was successful
       }
 
-      // Create enrollment if we have the necessary info
+      // Create enrollment via the shared factory — handles user lookup/creation
+      // and writes to program_enrollments with the correct schema (program_id, user_id).
       if (programSlug && holder?.email) {
-        const { error: enrollmentError } = await supabase
-          .from('program_enrollments')
-          .insert({
-            program_slug: programSlug,
-            email: holder.email,
-            first_name: holder.firstName,
-            last_name: holder.lastName,
-            phone: holder.phone,
-            payment_provider: 'sezzle_virtual_card',
-            payment_reference: referenceId,
-            payment_amount_cents: amountInCents,
-            status: 'active',
-            application_id: applicationId,
-            created_at: new Date().toISOString(),
-          })
-          .select('id')
-          .single();
+        const adminDb = createAdminClient();
+        let programId: string | undefined;
+        if (adminDb) {
+          const { data: prog } = await adminDb
+            .from('programs')
+            .select('id')
+            .eq('slug', programSlug)
+            .maybeSingle();
+          programId = prog?.id;
+        }
 
-        if (enrollmentError) {
-          logger.warn('Failed to create enrollment', { error: enrollmentError });
+        if (programId) {
+          const result = await createEnrollmentFromPayment({
+            programId,
+            programSlug,
+            email: holder.email,
+            firstName: holder.firstName,
+            lastName: holder.lastName,
+            phone: holder.phone,
+            applicationId,
+            paymentProvider: 'sezzle_virtual_card',
+            paymentReference: referenceId,
+            paymentAmountCents: amountInCents,
+            fundingSource: 'self_pay',
+          });
+          if (!result.success) {
+            logger.warn('Failed to create enrollment from virtual card', { error: result.error });
+          }
+        } else {
+          logger.warn('Sezzle virtual card: program not found for slug', { programSlug });
         }
       }
     }

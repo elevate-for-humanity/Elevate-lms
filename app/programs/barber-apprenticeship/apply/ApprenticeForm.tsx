@@ -170,18 +170,29 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
           return;
         }
 
-        // Load Affirm JS SDK dynamically
+        // Load Affirm JS SDK dynamically.
+        // _affirm_config MUST be set before the script tag is injected —
+        // the SDK reads it synchronously during initialization.
         try {
           const affirmJsUrl = affirmData.affirmJsUrl || 'https://cdn1.affirm.com/js/v2/affirm.js';
-          
-          // Set up Affirm config on window before loading SDK
+
+          // Always update config before (re-)opening — handles repeat attempts.
           (window as any)._affirm_config = {
             public_api_key: affirmData.publicKey,
             script: affirmJsUrl,
           };
 
-          // Load the SDK if not already loaded
-          if (!(window as any).affirm) {
+          // Only inject the script tag once. If window.affirm already exists as
+          // the real SDK (has .checkout.open), skip loading.
+          const existingSdk = (window as any).affirm;
+          const sdkReady = typeof existingSdk?.checkout?.open === 'function';
+
+          if (!sdkReady) {
+            // Remove any previous failed/stub script tag before re-injecting.
+            const prev = document.querySelector(`script[src="${affirmJsUrl}"]`);
+            if (prev) prev.remove();
+            delete (window as any).affirm;
+
             await new Promise<void>((resolve, reject) => {
               const script = document.createElement('script');
               script.src = affirmJsUrl;
@@ -192,13 +203,19 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
             });
           }
 
-          // Open Affirm checkout modal
+          // Affirm v2: set checkout config, then open the modal.
           const affirmSdk = (window as any).affirm;
-          if (affirmSdk?.checkout) {
+          if (typeof affirmSdk?.checkout === 'function') {
             affirmSdk.checkout(affirmData.checkoutConfig);
-            affirmSdk.checkout.open();
+            affirmSdk.checkout.open({
+              onFail: () => {
+                setError('Affirm checkout was canceled or declined. Please select another payment option.');
+                setErrorSeverity('info');
+                setLoading(false);
+              },
+            });
           } else {
-            throw new Error('Affirm SDK not available after loading');
+            throw new Error('Affirm SDK did not initialize correctly');
           }
         } catch (sdkError) {
           console.error('Affirm SDK error:', sdkError);

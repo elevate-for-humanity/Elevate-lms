@@ -250,9 +250,13 @@ export function getAffirmCheckoutConfig(options: {
   successUrl: string;
   cancelUrl: string;
 }) {
+  // Read from the singleton instance so tryLateConfig() is reflected here.
+  const publicKey = affirm.getPublicKey()
+    ?? process.env.AFFIRM_PUBLIC_KEY
+    ?? process.env.NEXT_PUBLIC_AFFIRM_PUBLIC_KEY;
   return {
     merchant: {
-      public_api_key: AFFIRM_CONFIG.publicKey,
+      public_api_key: publicKey,
       user_confirmation_url: options.successUrl,
       user_cancel_url: options.cancelUrl,
       user_confirmation_url_action: 'GET',

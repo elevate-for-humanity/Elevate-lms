@@ -142,8 +142,11 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     recentStudentsRes,
     enrollmentsByProgramRes,
   ] = await Promise.all([
+    // inactive_learners: program_enrollments.user_id FK → auth.users, not profiles.
+    // Supabase cannot auto-join through auth.users to profiles, so fetch user_ids
+    // only and resolve names in a second query below.
     db.from('program_enrollments')
-      .select('id, user_id, enrolled_at, updated_at, profiles:user_id(id, full_name, email)')
+      .select('id, user_id, enrolled_at, updated_at')
       .eq('status', 'active')
       .lt('updated_at', new Date(Date.now() - 3 * 86400000).toISOString())
       .order('updated_at', { ascending: true })
@@ -156,16 +159,20 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       .order('updated_at', { ascending: false })
       .limit(10),
 
+    // recent_students: select from profiles without the broken nested join.
+    // program_enrollments.program_id FK → apprenticeship_programs, not programs,
+    // so the nested join programs(name,title) fails. Resolve program names separately.
     db.from('profiles')
-      .select('id, full_name, email, enrollment_status, created_at, program_enrollments(program_id, programs(name, title))')
+      .select('id, full_name, email, created_at')
       .eq('role', 'student')
       .order('created_at', { ascending: false })
       .limit(10),
 
+    // enrollments_by_program: no join — FK points to wrong table (see above).
     db.from('program_enrollments')
-      .select('program_id, status, programs:program_id(id, name, title)')
+      .select('program_id, status')
       .not('program_id', 'is', null)
-      .limit(1000),
+      .limit(2000),
   ]);
 
   // ── Non-critical supplemental sections ───────────────────────────────────
@@ -259,51 +266,111 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   }));
 
   // ── Inactive learners ─────────────────────────────────────────────────────
+  // Resolve profile names for inactive learner user_ids in a single IN query.
+  const inactiveUserIds = inactiveLearnersData.map((e: any) => e.user_id).filter(Boolean);
+  const inactiveProfileMap: Record<string, { full_name: string | null; email: string | null }> = {};
+  if (inactiveUserIds.length > 0) {
+    const { data: inactiveProfiles } = await db
+      .from('profiles')
+      .select('id, full_name, email')
+      .in('id', inactiveUserIds);
+    for (const p of inactiveProfiles ?? []) {
+      inactiveProfileMap[p.id] = { full_name: (p as any).full_name ?? null, email: (p as any).email ?? null };
+    }
+  }
   const inactiveLearners = inactiveLearnersData.map((e: any) => ({
     enrollmentId: e.id,
     userId: e.user_id,
     enrolledAt: e.enrolled_at ?? '',
-    fullName: (e.profiles as any)?.full_name ?? null,
-    email: (e.profiles as any)?.email ?? null,
+    fullName: inactiveProfileMap[e.user_id]?.full_name ?? null,
+    email: inactiveProfileMap[e.user_id]?.email ?? null,
     href: `/admin/students/${e.user_id}`,
   }));
 
   // ── Recent students ───────────────────────────────────────────────────────
-  const recentStudents = recentStudentsData.map((s: any) => {
-    const enrollment = Array.isArray(s.program_enrollments) ? s.program_enrollments[0] : null;
-    const program = enrollment?.programs;
-    return {
-      id: s.id,
-      full_name: s.full_name ?? null,
-      email: s.email ?? null,
-      enrollment_status: s.enrollment_status ?? null,
-      created_at: s.created_at ?? null,
-      program_name: (program as any)?.name ?? (program as any)?.title ?? null,
-      href: `/admin/students/${s.id}`,
-    };
-  });
+  // Resolve each student's most recent enrollment + program name via separate queries.
+  const recentStudentIds = recentStudentsData.map((s: any) => s.id).filter(Boolean);
+  const studentProgramMap: Record<string, string | null> = {};
+  if (recentStudentIds.length > 0) {
+    const { data: enrollmentRows } = await db
+      .from('program_enrollments')
+      .select('user_id, program_id')
+      .in('user_id', recentStudentIds)
+      .order('created_at', { ascending: false });
+
+    // Collect unique program_ids to look up names
+    const seenUsers = new Set<string>();
+    const programIdByUser: Record<string, string> = {};
+    for (const row of enrollmentRows ?? []) {
+      const uid = (row as any).user_id;
+      if (uid && !seenUsers.has(uid)) {
+        seenUsers.add(uid);
+        programIdByUser[uid] = (row as any).program_id;
+      }
+    }
+    const uniqueProgramIds = [...new Set(Object.values(programIdByUser))].filter(Boolean);
+    if (uniqueProgramIds.length > 0) {
+      const { data: programNameRows } = await db
+        .from('programs')
+        .select('id, name, title')
+        .in('id', uniqueProgramIds);
+      const nameById: Record<string, string> = {};
+      for (const p of programNameRows ?? []) {
+        nameById[p.id] = (p as any).name || (p as any).title || p.id.slice(0, 8);
+      }
+      for (const [uid, pid] of Object.entries(programIdByUser)) {
+        studentProgramMap[uid] = nameById[pid] ?? null;
+      }
+    }
+  }
+  const recentStudents = recentStudentsData.map((s: any) => ({
+    id: s.id,
+    full_name: s.full_name ?? null,
+    email: s.email ?? null,
+    enrollment_status: null,   // not on profiles directly; omit rather than error
+    created_at: s.created_at ?? null,
+    program_name: studentProgramMap[s.id] ?? null,
+    href: `/admin/students/${s.id}`,
+  }));
 
   // ── Programs by enrollment ────────────────────────────────────────────────
-  const programTotals: Record<string, { name: string; total: number; completed: number }> = {};
+  // First pass: aggregate counts by program_id (no join — FK points to wrong table).
+  const programTotals: Record<string, { total: number; completed: number }> = {};
   for (const e of enrollmentsByProgramData) {
-    const pid = e.program_id;
+    const pid = (e as any).program_id as string | null;
     if (!pid) continue;
-    const prog = e.programs as { name?: string; title?: string } | null;
-    const name = prog?.name || prog?.title || pid.slice(0, 8);
-    if (!programTotals[pid]) programTotals[pid] = { name, total: 0, completed: 0 };
+    if (!programTotals[pid]) programTotals[pid] = { total: 0, completed: 0 };
     programTotals[pid].total += 1;
-    if (e.status === 'completed') programTotals[pid].completed += 1;
+    if ((e as any).status === 'completed') programTotals[pid].completed += 1;
   }
-  const topPrograms = Object.entries(programTotals)
-    .map(([id, p]) => ({
+
+  // Second pass: fetch program names for the top program IDs only.
+  const topProgramIds = Object.entries(programTotals)
+    .sort((a, b) => b[1].total - a[1].total)
+    .slice(0, 8)
+    .map(([id]) => id);
+
+  const programNamesMap: Record<string, string> = {};
+  if (topProgramIds.length > 0) {
+    const { data: programRows } = await db
+      .from('programs')
+      .select('id, name, title')
+      .in('id', topProgramIds);
+    for (const p of programRows ?? []) {
+      programNamesMap[p.id] = (p as any).name || (p as any).title || p.id.slice(0, 8);
+    }
+  }
+
+  const topPrograms = topProgramIds.map(id => {
+    const p = programTotals[id];
+    return {
       id,
-      name: p.name,
+      name: programNamesMap[id] ?? id.slice(0, 8),
       learners: toSafeNumber(p.total),
       completed: toSafeNumber(p.completed),
       completionRate: p.total > 0 ? clampPercent((p.completed / p.total) * 100) : 0,
-    }))
-    .sort((a, b) => b.learners - a.learners)
-    .slice(0, 8);
+    };
+  });
 
   return {
     counts: {

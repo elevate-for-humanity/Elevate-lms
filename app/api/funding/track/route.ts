@@ -15,9 +15,8 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const { apiAuthGuard } = await import('@/lib/authGuards');
-    const auth = await apiAuthGuard({ roles: ['admin', 'super_admin', 'staff'] });
-    if (auth.error) return auth.error;
+    const { apiRequireAdmin } = await import('@/lib/admin/guards');
+    try { await apiRequireAdmin(request); } catch (e) { return e instanceof Response ? e : NextResponse.json({ error: 'Unauthorized' }, { status: 401 }); }
 
   const body = await parseBody<Record<string, any>>(request);
   const supabase = await createServerSupabaseClient();

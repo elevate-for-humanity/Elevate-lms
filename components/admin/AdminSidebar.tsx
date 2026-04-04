@@ -197,34 +197,40 @@ function SidebarSection({ section, pathname, onNav }: {
   section: NavSection; pathname: string; onNav: () => void;
 }) {
   const hasActive = section.items.some(i => isActive(pathname, i.href));
-  const [open, setOpen] = useState(hasActive || section.title === "Overview");
-  useEffect(() => { if (hasActive) setOpen(true); }, [hasActive]);
+  // Always start closed so server and client render identical HTML.
+  // useEffect opens the active section and Overview after hydration.
+  const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+    if (hasActive || section.title === "Overview") setOpen(true);
+  }, [hasActive, section.title]);
 
   return (
     <div>
       <button type="button" onClick={() => setOpen(v => !v)}
         className="flex w-full items-center justify-between px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-300 transition-colors">
         {section.title}
-        <ChevronDown className={`h-3 w-3 transition-transform duration-150 ${open ? "rotate-180" : ""}`} />
+        {/* suppressHydrationWarning: rotation class depends on post-mount state */}
+        <ChevronDown suppressHydrationWarning className={`h-3 w-3 transition-transform duration-150 ${open ? "rotate-180" : ""}`} />
       </button>
-      {open && (
-        <div className="mt-0.5 mb-2 space-y-0.5">
-          {section.items.map(item => {
-            const active = isActive(pathname, item.href);
-            const Icon = item.icon;
-            return (
-              <Link key={item.href} href={item.href} onClick={onNav}
-                className={[
-                  "flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium transition-colors",
-                  active ? "bg-brand-blue-600 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white",
-                ].join(" ")}>
-                <Icon className={`h-4 w-4 flex-shrink-0 ${active ? "text-white" : "text-slate-400"}`} />
-                <span className="truncate">{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      )}
+      {/* Always render items in DOM; toggle visibility after mount to avoid hydration mismatch */}
+      <div suppressHydrationWarning className={`mt-0.5 mb-2 space-y-0.5 ${mounted && !open ? "hidden" : ""}`}>
+        {section.items.map(item => {
+          const active = isActive(pathname, item.href);
+          const Icon = item.icon;
+          return (
+            <Link key={item.href} href={item.href} onClick={onNav}
+              className={[
+                "flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium transition-colors",
+                active ? "bg-brand-blue-600 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white",
+              ].join(" ")}>
+              <Icon className={`h-4 w-4 flex-shrink-0 ${active ? "text-white" : "text-slate-400"}`} />
+              <span className="truncate">{item.label}</span>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }

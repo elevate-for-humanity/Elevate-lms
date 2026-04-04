@@ -47,12 +47,15 @@ export default async function StaffPortalLayout({
     redirect('/unauthorized');
   }
 
+  const isAdmin = ['admin', 'super_admin'].includes(profile.role);
+
   const staffNavItems = [
     { href: '/staff-portal/dashboard', label: 'Dashboard' },
     { href: '/staff-portal/students', label: 'Students' },
     { href: '/staff-portal/cases', label: 'Cases' },
     { href: '/staff-portal/attendance/record', label: 'Attendance' },
     { href: '/staff-portal/reports', label: 'Reports' },
+    ...(isAdmin ? [{ href: '/admin/hr/employees', label: 'HR & Payroll' }] : []),
   ];
 
   return (

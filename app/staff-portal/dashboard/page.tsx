@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
-import { Users, BookOpen, AlertCircle, Clock } from 'lucide-react';
+import { Users, BookOpen, AlertCircle, Clock, UserPlus, DollarSign, FileText, Timer, CalendarOff, ClipboardList } from 'lucide-react';
 import { safeFormatDate } from '@/lib/format-utils';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -319,6 +319,92 @@ export default async function StaffDashboard() {
             <Link href="/staff-portal/training" aria-label="Link" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Training</Link>
           </div>
         </div>
+
+        {/* HR, Hiring & Payroll — admin/super_admin only */}
+        {['admin', 'super_admin'].includes(profile?.role ?? '') && (
+          <div className="mt-8">
+            <h3 className="text-lg font-semibold text-black mb-4">HR, Hiring &amp; Payroll</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+              {/* Hiring */}
+              <Link href="/apply/staff" className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all">
+                <div className="w-10 h-10 rounded-lg bg-brand-blue-50 flex items-center justify-center flex-shrink-0">
+                  <UserPlus className="w-5 h-5 text-brand-blue-600" />
+                </div>
+                <div>
+                  <div className="font-semibold text-slate-900 text-sm">Staff Application</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Public hiring form — share with candidates</div>
+                </div>
+              </Link>
+
+              <Link href="/admin/applicants" className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all">
+                <div className="w-10 h-10 rounded-lg bg-brand-blue-50 flex items-center justify-center flex-shrink-0">
+                  <ClipboardList className="w-5 h-5 text-brand-blue-600" />
+                </div>
+                <div>
+                  <div className="font-semibold text-slate-900 text-sm">Applicant Review</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Review and process incoming applications</div>
+                </div>
+              </Link>
+
+              {/* Employees */}
+              <Link href="/admin/hr/employees" className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all">
+                <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                  <Users className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <div className="font-semibold text-slate-900 text-sm">Employee Directory</div>
+                  <div className="text-xs text-slate-500 mt-0.5">View and manage all staff records</div>
+                </div>
+              </Link>
+
+              {/* Payroll */}
+              <Link href="/admin/hr/payroll" className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all">
+                <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                  <DollarSign className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <div className="font-semibold text-slate-900 text-sm">Payroll</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Run payroll and view pay history</div>
+                </div>
+              </Link>
+
+              {/* Time tracking */}
+              <Link href="/admin/hr/time" className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all">
+                <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                  <Timer className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <div className="font-semibold text-slate-900 text-sm">Time Tracking</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Review staff hours and timesheets</div>
+                </div>
+              </Link>
+
+              {/* Leave */}
+              <Link href="/admin/hr/leave" className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all">
+                <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                  <CalendarOff className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <div className="font-semibold text-slate-900 text-sm">Leave Requests</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Approve or deny time-off requests</div>
+                </div>
+              </Link>
+
+              {/* Onboarding */}
+              <Link href="/onboarding/staff" className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all">
+                <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
+                  <FileText className="w-5 h-5 text-purple-600" />
+                </div>
+                <div>
+                  <div className="font-semibold text-slate-900 text-sm">Staff Onboarding</div>
+                  <div className="text-xs text-slate-500 mt-0.5">New hire onboarding checklist and docs</div>
+                </div>
+              </Link>
+
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

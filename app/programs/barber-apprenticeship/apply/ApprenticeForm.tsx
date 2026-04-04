@@ -30,20 +30,15 @@ function getNextFriday(): string {
   return nextFriday.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 }
 
-type PaymentOption = 'weekly' | 'full' | 'custom' | 'sezzle' | 'affirm';
+type PaymentOption = 'weekly' | 'full' | 'custom' | 'sezzle' | 'affirm' | 'stripe_bnpl';
 
-// Map URL ?payment= values to internal option names.
-// Any BNPL provider ID that has no dedicated checkout (klarna, afterpay, zip)
-// maps to 'affirm' — the user will see the BNPL section pre-selected and can
-// choose their actual provider there.
 function resolveInitialPayment(param: string | null): PaymentOption {
   if (param === 'pay_in_full') return 'full';
   if (param === 'payment_plan') return 'custom';
   if (param === 'affirm') return 'affirm';
   if (param === 'sezzle') return 'sezzle';
-  // Legacy or unsupported BNPL provider IDs → default to affirm tab
-  // Stripe-native BNPL (Klarna/Afterpay) — handled in the payment section below
-  if (param === 'bnpl' || param === 'klarna' || param === 'afterpay' || param === 'zip') return 'affirm';
+  // Stripe-native BNPL (Klarna, Afterpay) — goes through Stripe checkout
+  if (param === 'bnpl' || param === 'klarna' || param === 'afterpay' || param === 'zip') return 'stripe_bnpl';
   return 'weekly';
 }
 
@@ -248,6 +243,16 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
           setLoading(false);
         }
         return;
+      } else if (paymentOption === 'stripe_bnpl') {
+        // Stripe-native BNPL (Klarna, Afterpay) — Stripe shows available methods at checkout
+        checkoutResponse = await fetch('/api/barber/checkout/public', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...basePayload,
+            payment_type: 'bnpl',
+          }),
+        });
       } else if (paymentOption === 'full') {
         // Pay in full - one-time payment
         checkoutResponse = await fetch('/api/barber/checkout/public', {
@@ -820,6 +825,35 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                       </div>
                       <p className="text-sm text-black mt-2">
                         Sezzle will check your eligibility - 4 payments of ${Math.round((customAmount || 0) / 4).toLocaleString()} every 2 weeks
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Option: Klarna / Afterpay via Stripe */}
+                  <button
+                    type="button"
+                    onClick={() => setPaymentOption('stripe_bnpl')}
+                    className={`w-full p-4 rounded-xl border-2 mb-3 text-left transition ${
+                      paymentOption === 'stripe_bnpl'
+                        ? 'border-pink-500 bg-pink-50'
+                        : 'border-slate-300 bg-white hover:border-slate-400'
+                    }`}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="font-bold text-black text-lg">Klarna / Afterpay</p>
+                        <p className="text-black text-sm">4 interest-free installments via Stripe</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-pink-600 text-lg">Split it</p>
+                        <p className="text-xs text-black">chosen at checkout</p>
+                      </div>
+                    </div>
+                  </button>
+                  {paymentOption === 'stripe_bnpl' && (
+                    <div className="bg-pink-50 rounded-xl p-4 mb-3 border-2 border-pink-200">
+                      <p className="text-sm text-black">
+                        You'll choose between <strong>Klarna</strong> and <strong>Afterpay</strong> on the next screen. Both split your payment into 4 interest-free installments. Subject to provider approval.
                       </p>
                     </div>
                   )}

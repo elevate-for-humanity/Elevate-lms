@@ -303,7 +303,7 @@ export default async function LearnerDashboardPage() {
     { name: 'CPR, AED & First Aid', id: '#10004674', duration: '1 day', cost: '$575', credentials: ['CPR Certification'], href: '/programs/cpr-aed' },
     { name: 'Emergency Health & Safety Technician', id: '#10004621', duration: '4 weeks', cost: '$4,950', credentials: ['CPR', 'EMR', 'OSHA 10'], href: '/programs/emergency-health' },
     { name: 'Home Health Aide', id: '#10004626', duration: '4 weeks', cost: '$4,700', credentials: ['HHA License', 'CCHW', 'CPR', 'Rise Up Certificate'], href: '/programs/home-health-aide' },
-    { name: 'HVAC Technician', id: '#10004322', duration: '20 weeks', cost: '$5,000', credentials: ['Residential HVAC Cert 1 & 2', 'EPA 608', 'OSHA 30', 'CPR', 'Rise Up Certificate'], href: '/programs/hvac-technician' },
+    { name: 'HVAC Technician', id: '#10004322', duration: '12 weeks', cost: '$5,000', credentials: ['Residential HVAC Cert 1 & 2', 'EPA 608', 'OSHA 30', 'CPR', 'Rise Up Certificate'], href: '/programs/hvac-technician' },
     { name: 'Medical Assistant', id: '#10004639', duration: '21 days', cost: '$4,325', credentials: ['CCHW', 'CPR', 'Rise Up Certificate'], href: '/programs/medical-assistant' },
     { name: 'Professional Esthetician & Client Services', id: '#10004628', duration: '5 weeks', cost: '$4,575', credentials: ['OSHA 10', 'Business of Retail Certified Specialist'], href: '/programs/esthetician' },
     { name: 'Public Safety Reentry Specialist', id: '#10004666', duration: '45 days', cost: '$4,750', credentials: ['CPRC', 'CPSP', 'CCHW', 'CPR', 'Rise Up Certificate'], href: '/programs/reentry-specialist' },

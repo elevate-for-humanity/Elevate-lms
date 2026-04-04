@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import LogoImage from '@/components/site/LogoImage';
+import Logo from '@/components/ui/Logo';
 import { usePathname } from 'next/navigation';
 import { NotificationBell } from './NotificationBell';
 import {

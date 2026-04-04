@@ -32,7 +32,12 @@ export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
   if (!user) {
     // Preserve the requested path so login can return the user here
     const headersList = await headers();
-    const rawUrl = headersList.get('x-url') || headersList.get('x-invoke-path') || '';
+    const rawUrl =
+      headersList.get('x-pathname') ||
+      headersList.get('x-url') ||
+      headersList.get('x-invoke-path') ||
+      headersList.get('referer') ||
+      '';
     let returnPath = '/learner/dashboard';
     if (rawUrl) {
       try {

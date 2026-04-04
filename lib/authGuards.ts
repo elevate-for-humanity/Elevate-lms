@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 // =====================================================
@@ -54,7 +55,31 @@ export async function authGuard(options: AuthGuardOptions = {}): Promise<AuthGua
 
   // Check if authentication is required
   if (requireAuth && (!user || error)) {
-    redirect(redirectTo);
+    // Preserve the current path so login can return the user here.
+    // Only append ?redirect= when redirectTo is the login page and no path
+    // is already encoded in it (avoids double-encoding on custom redirectTo values).
+    let destination = redirectTo;
+    if (redirectTo === '/login') {
+      try {
+        const headersList = await headers();
+        const rawUrl =
+          headersList.get('x-pathname') ||
+          headersList.get('x-url') ||
+          headersList.get('x-invoke-path') ||
+          headersList.get('referer') ||
+          '';
+        if (rawUrl) {
+          const u = new URL(rawUrl, 'http://localhost');
+          const returnPath = u.pathname + (u.search || '');
+          if (returnPath && returnPath !== '/login') {
+            destination = `/login?redirect=${encodeURIComponent(returnPath)}`;
+          }
+        }
+      } catch {
+        // headers() not available in this context (e.g. API route) — use plain /login
+      }
+    }
+    redirect(destination);
   }
 
   if (!user) {

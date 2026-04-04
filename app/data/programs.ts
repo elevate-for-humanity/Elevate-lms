@@ -1606,7 +1606,7 @@ export const programs: Program[] = [
     heroImage: '/images/pages/barber-apprenticeship.jpg',
     heroImageAlt: 'Cosmetology Apprenticeship training at Elevate for Humanity',
     heroVideo: '/videos/cosmetology-salon.mp4',
-    duration: '52 weeks',
+    duration: '12–18 months',
     clockHours: 1500,
     schedule: '1500 hours',
     delivery: 'hybrid',
@@ -1617,7 +1617,7 @@ export const programs: Program[] = [
       'Payment Plans'
     ],
     highlights: [
-      '52 weeks program',
+      '12–18 months program',
       '1500 training hours',
       'Earn: Indiana Cosmetology License',
       'Salary range: $28,000-$55,000/year',

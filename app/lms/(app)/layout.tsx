@@ -13,9 +13,16 @@ export default async function LmsAppLayout({ children }: { children: ReactNode }
   const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Preserve the requested path through login so the user lands back here after auth.
-  // next/headers exposes the raw request headers; Next.js sets x-url on internal requests.
+  // x-pathname is set by proxy.ts when it runs as middleware.
+  // x-url / x-invoke-path are Next.js internal headers (unreliable in App Router).
+  // referer is the browser-supplied previous URL — usable as a fallback.
   const headersList = await headers();
-  const rawUrl = headersList.get('x-url') || headersList.get('x-invoke-path') || '';
+  const rawUrl =
+    headersList.get('x-pathname') ||
+    headersList.get('x-url') ||
+    headersList.get('x-invoke-path') ||
+    headersList.get('referer') ||
+    '';
   let returnPath = '/lms/courses';
   if (rawUrl) {
     try {

@@ -36,7 +36,7 @@ export default async function TuitionFeesPage() {
     { name: 'CPR / AED / First Aid', duration: '1 day', tuition: 575, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA Eligible' },
     { name: 'Emergency Health & Safety Technician', duration: '4 weeks', tuition: 4950, examFees: 0, examFeesNote: 'CPR + EMR + OSHA 10 included', materials: 0, fundingType: 'WIOA Eligible — most students pay $0' },
     { name: 'Home Health Aide', duration: '4 weeks', tuition: 4700, examFees: 0, examFeesNote: 'HHA licensure + CPR + CCHW included', materials: 0, fundingType: 'WIOA Eligible — most students pay $0' },
-    { name: 'HVAC Technician', duration: '20 weeks', tuition: 5000, examFees: 0, examFeesNote: 'EPA 608 + OSHA 30 + CPR + Rise Up included', materials: 0, fundingType: 'WIOA / WRG Eligible — most students pay $0' },
+    { name: 'HVAC Technician', duration: '12 weeks', tuition: 5000, examFees: 0, examFeesNote: 'EPA 608 + OSHA 30 + CPR + Rise Up included', materials: 0, fundingType: 'WIOA / WRG Eligible — most students pay $0' },
     { name: 'Medical Assistant', duration: '21 days', tuition: 4325, examFees: 0, examFeesNote: 'CCHW + CPR + Rise Up included', materials: 0, fundingType: 'WIOA Eligible — most students pay $0' },
     { name: 'Professional Esthetician & Client Services', duration: '5 weeks', tuition: 4575, examFees: 0, examFeesNote: 'OSHA 10 + certifications included', materials: 0, fundingType: 'WIOA Eligible — most students pay $0' },
     { name: 'Public Safety Reentry Specialist', duration: '45 days', tuition: 4750, examFees: 0, examFeesNote: 'CPRC + CPSP + CCHW + CPR included', materials: 0, fundingType: 'WIOA Eligible — most students pay $0' },

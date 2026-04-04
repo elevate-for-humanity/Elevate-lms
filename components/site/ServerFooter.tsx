@@ -3,7 +3,8 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import LogoImage from '@/components/site/LogoImage';
+import Logo from '@/components/ui/Logo';
+import Copyright from '@/components/ui/Copyright';
 import { Facebook, Instagram, Linkedin, Youtube } from 'lucide-react';
 
 // GOVERNMENT-GRADE FOOTER STRUCTURE
@@ -91,7 +92,7 @@ export default function ServerFooter() {
         {/* Institutional Identity */}
         <div className="mb-10 pb-8 border-b border-slate-800">
           <div className="flex items-center gap-3 mb-3">
-            <LogoImage alt="Elevate for Humanity" width={32} height={48} className="w-auto h-8" />
+            <Logo alt="Elevate for Humanity" width={32} height={48} className="w-auto h-8" />
             <span className="text-lg font-bold text-white">Elevate for Humanity</span>
           </div>
           <p className="text-sm text-white max-w-2xl leading-relaxed">
@@ -213,7 +214,7 @@ export default function ServerFooter() {
                 className="w-auto h-7"
               />
               <p className="text-white text-sm">
-                © {new Date().getFullYear()} 2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Technical Institute.
+                <Copyright entity="2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute" />
               </p>
             </div>
             

@@ -18,6 +18,7 @@ import {
   linkOrphanedEnrollments,
   normalizeFundingSource,
 } from '@/lib/enrollment-service';
+import { runBarberPostPayment } from '@/lib/enrollment/barber-post-payment';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { logger } from '@/lib/logger';
 import * as Sentry from '@sentry/nextjs';
@@ -222,86 +223,59 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
   }
 
   // ── APPRENTICESHIP ENROLLMENT (SELF-PAY) ──────────────────────────────────
+  // Delegates to runBarberPostPayment which handles: application status update,
+  // program_enrollments upsert, CRM reminder, student welcome email, and
+  // Milady provisioning queue. The old inline upsert here was missing all of
+  // those steps — that was the root cause of deposit-paid-but-no-Milady bugs.
   if (kind === 'apprenticeship_enrollment') {
     try {
-      const studentId = session.metadata?.student_id;
       const applicationId = session.metadata?.application_id;
-      const program = session.metadata?.program;
-      const paymentOption = session.metadata?.payment_option;
-      const amountPaid = (session.amount_total ?? 0) / 100;
+      const amountPaidCents = session.amount_total ?? 0;
+      const paymentIntentId = typeof session.payment_intent === 'string'
+        ? session.payment_intent
+        : null;
 
-      if (!studentId || !applicationId) {
-        logger.error('[webhook/checkout] apprenticeship_enrollment missing required metadata', {
-          studentId,
-          applicationId,
-          program,
-          paymentOption,
+      if (!applicationId) {
+        logger.error('[webhook/checkout] apprenticeship_enrollment missing application_id', {
+          sessionId: session.id,
+          metadata: session.metadata,
         });
         return;
       }
 
-      const { error: appError } = await supabase
-        .from('applications')
-        .update({
-          status: 'payment_received',
-          payment_status: 'paid',
-          payment_intent_id: session.payment_intent as string ?? null,
-          payment_received_at: new Date().toISOString(),
-        })
-        .eq('id', applicationId);
+      const result = await runBarberPostPayment({
+        db: supabase,
+        applicationId,
+        stripeSessionId: session.id,
+        stripePaymentIntentId: paymentIntentId,
+        amountPaidCents,
+      });
 
-      if (appError) {
-        logger.error('[webhook/checkout] Failed to update application', appError);
-      }
-
-      const { data: enrollment, error: enrollError } = await supabase
-        .from('program_enrollments')
-        .upsert(
-          {
-            user_id: studentId,
-            application_id: applicationId,
-            program_slug:
-              program === 'barber_apprenticeship' ? 'barber-apprenticeship' : program,
-            status: 'enrolled_pending_approval',
-            payment_status: 'paid',
-            payment_option: paymentOption,
-            amount_paid: amountPaid,
-            stripe_checkout_session_id: session.id,
-            enrolled_at: new Date().toISOString(),
-          },
-          { onConflict: 'application_id' },
-        )
-        .select('id')
-        .single();
-
-      if (enrollError) {
-        logger.error('[webhook/checkout] Failed to create apprenticeship enrollment', enrollError);
+      if (!result.success) {
+        logger.error('[webhook/checkout] runBarberPostPayment failed', {
+          applicationId,
+          error: result.error,
+          steps: result.steps,
+        });
+        Sentry.captureException(new Error(`runBarberPostPayment failed: ${result.error}`), {
+          tags: { subsystem: 'stripe_webhook', kind },
+          extra: { applicationId, steps: result.steps },
+        });
       } else {
-        await auditLog({
-          action: AuditAction.ENROLLMENT_CREATED,
-          entity: AuditEntity.ENROLLMENT,
-          entityId: enrollment?.id,
-          userId: studentId,
-          metadata: {
-            program,
-            payment_option: paymentOption,
-            amount_paid: amountPaid,
-            checkout_session_id: session.id,
-            enrollment_flow: 'apprenticeship_self_pay',
-            status: 'enrolled_pending_approval',
-          },
+        logger.info('[webhook/checkout] apprenticeship_enrollment pipeline complete', {
+          applicationId,
+          enrollmentId: result.enrollmentId,
+          steps: result.steps,
         });
       }
 
+      // Mark payment_logs completed regardless of pipeline outcome
       await supabase
         .from('payment_logs')
         .update({ status: 'completed', completed_at: new Date().toISOString() })
         .eq('stripe_session_id', session.id);
 
-      logger.info(`[webhook/checkout] Apprenticeship enrollment created (pending approval): ${program} for ${studentId}`);
-
-      const customerEmail =
-        session.customer_email ?? session.customer_details?.email;
+      const customerEmail = session.customer_email ?? session.customer_details?.email;
       if (customerEmail) {
         await linkOrphanedEnrollments(supabase, customerEmail).catch(() => {});
       }

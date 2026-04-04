@@ -7,7 +7,8 @@ import { BNPL_DESCRIPTION } from '@/lib/bnpl-config';
 import { ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-static';
-export const revalidate = 86400;
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 // EligibilityScreener is a client component — imported via a client wrapper
 // so ssr:false is valid (not allowed directly in Server Components).

@@ -93,7 +93,7 @@ async function completeOrientation() {
 
 // Per-program credential and duration data from INTraining
 const PROGRAM_META: Record<string, { duration: string; hours: string; credentials: string[]; hasOJT: boolean }> = {
-  'hvac-technician':          { duration: '20 weeks', hours: '240 hours', credentials: ['EPA 608 Universal', 'OSHA 30', 'CPR', 'Rise Up Certificate', 'Residential HVAC Cert 1 & 2'], hasOJT: true },
+  'hvac-technician':          { duration: '12 weeks', hours: '240 hours', credentials: ['EPA 608 Universal', 'OSHA 30', 'CPR', 'Rise Up Certificate', 'Residential HVAC Cert 1 & 2'], hasOJT: true },
   'barber-apprenticeship':    { duration: '15 months', hours: '2,000 hours', credentials: ['Indiana Registered Barber License', 'Rise Up Certificate'], hasOJT: true },
   'beauty-educator':          { duration: '84 days', hours: '336 hours', credentials: ['CPR', 'OSHA 10', 'Rise Up Certificate'], hasOJT: false },
   'bookkeeping':              { duration: '8 weeks', hours: '80 hours', credentials: ['QuickBooks Certified User', 'Microsoft Office Specialist Associate'], hasOJT: false },

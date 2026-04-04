@@ -57,8 +57,8 @@ const BUSINESS = [
 ];
 
 const APPRENTICESHIPS = [
-  { title: 'Barber Apprenticeship', duration: '52 weeks', pay: '$28–$52k/yr', slug: 'barber-apprenticeship', image: '/images/pages/barber-hero-main.jpg' },
-  { title: 'Cosmetology Apprenticeship', duration: '52 weeks', pay: null, slug: 'cosmetology-apprenticeship', image: '/images/pages/cosmetology.jpg' },
+  { title: 'Barber Apprenticeship', duration: '15–24 months', pay: '$28–$52k/yr', slug: 'barber-apprenticeship', image: '/images/pages/barber-hero-main.jpg' },
+  { title: 'Cosmetology Apprenticeship', duration: '12–18 months', pay: null, slug: 'cosmetology-apprenticeship', image: '/images/pages/cosmetology.jpg' },
   { title: 'Nail Technician Apprenticeship', duration: '20 weeks', pay: null, slug: 'nail-technician-apprenticeship', image: '/images/pages/nail-technician.jpg' },
   { title: 'Culinary Apprenticeship', duration: '26 weeks', pay: null, slug: 'culinary-apprenticeship', image: '/images/pages/culinary.jpg' },
 ];

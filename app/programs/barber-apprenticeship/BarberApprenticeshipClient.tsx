@@ -51,8 +51,8 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
           </div>
           <p className="text-black text-lg mb-6">{p.subtitle}</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-slate-50 rounded-lg p-4">
-            <SpecItem icon={Clock} label="Duration" value="52 weeks" />
-            <SpecItem icon={BookOpen} label="Hours/Week" value="15–20 hrs" />
+            <SpecItem icon={Clock} label="Duration" value="15–24 months" />
+            <SpecItem icon={BookOpen} label="Total Hours" value="2,000 hrs" />
             <SpecItem icon={MapPin} label="Delivery" value="Hybrid" />
             <SpecItem icon={Award} label="Credentials" value={`${p.credentials.length} earned`} />
           </div>

@@ -1,128 +1,33 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { CalendarDays, DollarSign } from 'lucide-react';
+import { CalendarDays, DollarSign, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { CERT_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
+import { ACTIVE_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
 
 export const metadata: Metadata = {
   title: 'Testing & Credential Exams | Elevate for Humanity',
   description:
-    'Workforce credential exams and proctor-supervised certification testing. Certiport, EPA 608, ACT WorkKeys/NCRC, OSHA, Rise Up, and CareerSafe exams available through authorized testing partnerships.',
+    'Workforce credential exams and proctor-supervised certification testing. Certiport, EPA 608, ACT WorkKeys/NCRC, NHA, and NRF Rise Up exams available through authorized testing partnerships.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/testing',
   },
 };
 
-const examCategories = [
-  {
-    id: 'certiport',
-    name: 'Certiport Authorized Testing',
-    provider: 'Certiport',
-    image: '/images/pages/testing-page-1.jpg',
-    description: 'Proctor-supervised exams administered on-site through our Certiport Authorized Testing Center designation.',
-    exams: [
-      'Microsoft Office Specialist (Word, Excel, PowerPoint, Outlook, Access)',
-      'IC3 Digital Literacy (Computing Fundamentals, Key Applications, Living Online)',
-      'Entrepreneurship and Small Business (ESB)',
-      'IT Specialist (Python, Java, HTML/CSS, JavaScript, Networking, Cybersecurity)',
-      'Intuit QuickBooks Certified User (Desktop, Online)',
-    ],
-    access: 'On-site proctored',
-    bookable: true,
-  },
-  {
-    id: 'epa-608',
-    name: 'EPA Section 608 Certification',
-    provider: 'ESCO Group (ID: 358010) & Mainstream Engineering',
-    image: '/images/pages/hvac-technician.jpg',
-    description: 'Elevate for Humanity is an authorized EPA 608 proctor testing site through both the ESCO Group and Mainstream Engineering — both EPA-approved certifying organizations. Universal certification covering Core, Type I, II, and III refrigerant handling — required by federal law for HVAC technicians. All sections available on-site.',
-    exams: [
-      'EPA 608 Core',
-      'EPA 608 Type I — Small Appliances',
-      'EPA 608 Type II — High-Pressure Systems',
-      'EPA 608 Type III — Low-Pressure Systems',
-      'EPA 608 Universal (all types)',
-    ],
-    access: 'Proctored on-site — ESCO & Mainstream Authorized',
-    bookable: true,
-  },
-  {
-    id: 'osha',
-    name: 'OSHA Safety Certifications',
-    provider: 'CareerSafe / OSHA',
-    image: '/images/pages/apprenticeships-hero.jpg',
-    description: 'OSHA-authorized safety training and certification through our CareerSafe partnership.',
-    exams: [
-      'OSHA 10-Hour General Industry',
-      'OSHA 10-Hour Construction',
-      'OSHA 30-Hour General Industry',
-      'OSHA 30-Hour Construction',
-    ],
-    access: 'Online with proctor verification',
-    bookable: false,
-  },
-  {
-    id: 'rise-up',
-    name: 'Rise Up — National Retail Federation',
-    provider: 'NRF Foundation',
-    image: '/images/pages/apply-employer-hero.jpg',
-    description: 'Workforce credentials in customer service, retail, and business fundamentals. Stackable credentials recognized by national employers.',
-    exams: [
-      'Customer Service & Sales Credential',
-      'Business of Retail Credential',
-      'Retail Industry Fundamentals',
-    ],
-    access: 'Hybrid coursework with proctored assessment',
-    bookable: true,
-  },
-  {
-    id: 'careersafe',
-    name: 'CareerSafe Safety Training',
-    provider: 'CareerSafe',
-    image: '/images/pages/career-services-page-3.jpg',
-    description: 'Online safety training courses with certification upon completion. Accepted by employers in construction, manufacturing, and general industry.',
-    exams: [
-      'Bloodborne Pathogens',
-      'Hazard Communication',
-      'Personal Protective Equipment',
-      'Fire Safety',
-    ],
-    access: 'Online self-paced with assessment',
-    bookable: false,
-  },
-  {
-    id: 'nha',
-    name: 'NHA — National Healthcareer Association',
-    provider: 'NHA — Authorized Testing Center',
-    image: '/images/pages/medical-assistant.jpg',
-    description: 'Elevate for Humanity is an NHA Authorized Testing Center. We administer NHA certification exams on-site for healthcare program graduates and external candidates.',
-    exams: [
-      'Certified Phlebotomy Technician (CPT)',
-      'Certified Clinical Medical Assistant (CCMA)',
-      'Certified Billing and Coding Specialist (CBCS)',
-      'Certified EKG Technician (CET)',
-      'Certified Patient Care Technician/Assistant (CPCT/A)',
-    ],
-    access: 'Proctored on-site — by appointment',
-    bookable: true,
-  },
-  {
-    id: 'workkeys',
-    name: 'ACT WorkKeys / NCRC',
-    provider: 'ACT — Authorized Testing Site (Realm: 1317721865)',
-    image: '/images/pages/career-services-page-4.jpg',
-    description: 'Elevate for Humanity is an authorized ACT WorkKeys testing site. The National Career Readiness Certificate (NCRC) is a portable, employer-recognized credential that proves workplace skills. Required by many Indiana workforce programs and accepted by WorkOne as evidence of career readiness.',
-    exams: [
-      'Applied Math',
-      'Workplace Documents',
-      'Business Writing',
-      'NCRC — Bronze, Silver, Gold, Platinum',
-    ],
-    access: 'Proctored on-site — by appointment',
-    bookable: true,
-  },
-];
+const PROVIDER_IMAGES: Record<string, string> = {
+  esco: '/images/pages/hvac-technician.jpg',
+  nrf: '/images/pages/apply-employer-hero.jpg',
+  certiport: '/images/pages/testing-page-1.jpg',
+  nha: '/images/pages/medical-assistant.jpg',
+  workkeys: '/images/pages/career-services-page-4.jpg',
+  servsafe: '/images/pages/career-services-page-3.jpg',
+};
+
+const CAPABILITY_LABELS: Record<string, string> = {
+  IN_PERSON_ONLY: 'In-person only',
+  IN_PERSON_OR_PROVIDER_REMOTE: 'In-person or remote',
+  CENTER_REMOTE_ALLOWED: 'In-person or live online',
+};
 
 export default function TestingPage() {
   return (
@@ -134,7 +39,7 @@ export default function TestingPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
+      <section className="relative h-48 md:h-64 flex items-center overflow-hidden">
         <Image
           src="/images/pages/career-services-page-1.jpg"
           alt="Workforce credential testing"
@@ -142,59 +47,123 @@ export default function TestingPage() {
           className="object-cover"
           priority
         />
+        <div className="absolute inset-0 bg-black/40" />
+        <div className="relative z-10 max-w-5xl mx-auto px-4 w-full">
+          <h1 className="text-3xl md:text-4xl font-black text-white mb-2">Testing &amp; Credential Exams</h1>
+          <p className="text-white/90 text-lg">Authorized testing center for workforce certifications</p>
+        </div>
       </section>
 
-      {/* Disclosure */}
-      <section className="py-8 border-b">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="bg-white border border-slate-200 rounded-xl p-5">
-            <p className="text-sm text-slate-700 leading-relaxed">
-              <strong>Credential Disclosure:</strong> Credentials and licenses are issued by external credential bodies, exam providers, and state agencies — not by Elevate for Humanity. Elevate coordinates instruction through licensed credential partners, provides exam preparation support, and facilitates access to authorized testing. The credentialing authority makes the final determination.
-              {' '}<Link href="/compliance" className="text-brand-blue-600 hover:underline font-medium">View full compliance disclosure &rarr;</Link>
-            </p>
+      {/* DISCLAIMER BANNER */}
+      <section className="bg-amber-50 border-b border-amber-200">
+        <div className="max-w-5xl mx-auto px-4 py-5">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-amber-900 leading-relaxed space-y-2">
+              <p>
+                <strong>Important Notice:</strong> Elevate for Humanity is an authorized testing and proctoring site — we do not issue credentials. All certifications and credentials are issued solely by the respective credentialing authority (NHA, ACT, Certiport, EPA/ESCO, NRF, etc.) upon passing their exam.
+              </p>
+              <p>
+                Exam fees listed are candidate-pay rates and are subject to change without notice. Fees are collected at time of booking and are <strong>non-refundable</strong> unless the exam is canceled by Elevate. Workforce-funded candidates (WIOA, WorkOne) may have fees covered — contact us before booking.
+              </p>
+              <p>
+                Passing an exam does not guarantee employment. Credential requirements vary by employer and state. Some credentials require additional state licensure.{' '}
+                <Link href="/compliance" className="underline font-medium hover:text-amber-700">View full compliance disclosure →</Link>
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Exam Categories */}
+      {/* PROVIDER CARDS — driven from CERT_PROVIDERS config */}
       <section className="py-14">
         <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-3xl font-black text-slate-900 mb-10">Available Credential Exams</h2>
-          <div className="space-y-8">
-            {examCategories.map((cat) => (
-              <div key={cat.name} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+          <h2 className="text-3xl font-black text-slate-900 mb-2">Available Credential Exams</h2>
+          <p className="text-slate-500 mb-10 text-sm">All exams are proctor-supervised. Government-issued photo ID required. By appointment only.</p>
+
+          <div className="space-y-10">
+            {ACTIVE_PROVIDERS.map((provider) => (
+              <div key={provider.key} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
                 <div className="grid lg:grid-cols-3">
-                  <div className="relative h-48 lg:h-auto overflow-hidden">
-                    <Image src={cat.image} alt={cat.name} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 33vw" />
+                  <div className="relative h-52 lg:h-auto overflow-hidden">
+                    <Image
+                      src={PROVIDER_IMAGES[provider.key] || '/images/pages/career-services-page-1.jpg'}
+                      alt={provider.name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 33vw"
+                    />
                   </div>
                   <div className="lg:col-span-2 p-6">
-                    <div className="flex items-start justify-between gap-4 mb-3">
-                      <div>
-                        <h3 className="text-xl font-bold text-slate-900">{cat.name}</h3>
-                        <p className="text-sm text-slate-500">Provider: {cat.provider}</p>
-                      </div>
-                      <span className="text-xs font-medium bg-white text-slate-600 px-3 py-1 rounded-full whitespace-nowrap">
-                        {cat.access}
+                    <div className="flex items-start justify-between gap-4 mb-2">
+                      <h3 className="text-xl font-bold text-slate-900">{provider.name}</h3>
+                      <span className="text-xs font-medium bg-slate-100 text-slate-600 px-3 py-1 rounded-full whitespace-nowrap flex-shrink-0">
+                        {CAPABILITY_LABELS[provider.capability]}
                       </span>
                     </div>
-                    <p className="text-slate-600 text-sm mb-4">{cat.description}</p>
-                    <div className="space-y-1 mb-5">
-                      {cat.exams.map((exam) => (
-                        <div key={exam} className="flex items-start gap-2 text-sm text-slate-700">
-                          <span className="w-1.5 h-1.5 bg-brand-red-600 rounded-full flex-shrink-0 mt-1.5" />
-                          {exam}
-                        </div>
-                      ))}
+                    <p className="text-slate-600 text-sm mb-5 leading-relaxed">{provider.description}</p>
+
+                    {/* Exams */}
+                    <div className="mb-5">
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Exams Available</p>
+                      <div className="grid sm:grid-cols-2 gap-x-4 gap-y-1.5">
+                        {provider.exams.map((exam) => (
+                          <div key={exam} className="flex items-start gap-2 text-sm text-slate-700">
+                            <CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                            {exam}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                    {cat.bookable && (
-                      <Link
-                        href={`/testing/book?exam=${cat.id}`}
-                        className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
-                      >
-                        <CalendarDays className="w-4 h-4" />
-                        Book a Seat
-                      </Link>
+
+                    {/* Fees */}
+                    {provider.fees && provider.fees.length > 0 ? (
+                      <div className="mb-5">
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Exam Fees</p>
+                        <div className="bg-slate-50 rounded-xl divide-y divide-slate-100 border border-slate-100">
+                          {provider.fees.map((fee) => (
+                            <div key={fee.label} className="flex items-center justify-between gap-4 px-4 py-2.5">
+                              <div>
+                                <p className="text-sm font-medium text-slate-800">{fee.label}</p>
+                                {fee.note && <p className="text-xs text-slate-400 mt-0.5">{fee.note}</p>}
+                              </div>
+                              <span className="text-brand-red-600 font-black text-lg shrink-0">${fee.amount}</span>
+                            </div>
+                          ))}
+                        </div>
+                        {provider.groupDiscount && (
+                          <div className="flex items-start gap-2 mt-2 bg-brand-blue-50 rounded-lg px-3 py-2">
+                            <Info className="w-3.5 h-3.5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                            <p className="text-xs text-brand-blue-700">{provider.groupDiscount}</p>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-slate-500 italic mb-4">Contact us for pricing.</p>
                     )}
+
+                    {/* Actions */}
+                    <div className="flex flex-wrap gap-3">
+                      {provider.status === 'active' && (
+                        <Link
+                          href={`/testing/book?exam=${provider.key}`}
+                          className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white text-sm font-bold px-5 py-2.5 rounded-lg transition-colors"
+                        >
+                          <CalendarDays className="w-4 h-4" />
+                          Book a Seat
+                        </Link>
+                      )}
+                      {provider.verifyUrl && (
+                        <a
+                          href={provider.verifyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 hover:border-slate-400 text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
+                        >
+                          Provider Site →
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -203,207 +172,89 @@ export default function TestingPage() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-14">
+      {/* FEE SUMMARY TABLE */}
+      <section className="py-14 bg-slate-50 border-t border-slate-100">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="flex items-center gap-3 mb-3">
+            <DollarSign className="w-7 h-7 text-brand-red-600" />
+            <h2 className="text-3xl font-black text-slate-900">Fee Summary</h2>
+          </div>
+          <p className="text-slate-500 mb-8 text-sm max-w-2xl">
+            All fees include the exam and proctoring. Workforce-funded candidates may have fees covered — contact us before booking.
+          </p>
+          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-200">
+                  <th className="text-left px-5 py-3 font-semibold text-slate-700">Provider</th>
+                  <th className="text-left px-5 py-3 font-semibold text-slate-700">Exam</th>
+                  <th className="text-right px-5 py-3 font-semibold text-slate-700">Fee</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {ACTIVE_PROVIDERS
+                  .filter(p => p.fees && p.fees.length > 0)
+                  .flatMap(p =>
+                    p.fees!.map((fee, i) => (
+                      <tr key={`${p.key}-${i}`} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-5 py-3 text-slate-400 text-xs align-top pt-3.5">{i === 0 ? p.name : ''}</td>
+                        <td className="px-5 py-3 text-slate-800 font-medium">
+                          {fee.label}
+                          {fee.note && <span className="block text-xs text-slate-400 font-normal">{fee.note}</span>}
+                        </td>
+                        <td className="px-5 py-3 text-right font-black text-brand-red-600 text-base">${fee.amount}</td>
+                      </tr>
+                    ))
+                  )}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-slate-400 mt-4">
+            * NHA exam fees are candidate-pay retail rates. Enrolled Elevate students may qualify for institution-pay rates — contact your program coordinator.
+          </p>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="py-14 border-t border-slate-100">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-black text-slate-900 mb-8 text-center">How Testing Works</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { step: '1', title: 'Complete Training', desc: 'Finish your program coursework and exam preparation modules.' },
-              { step: '2', title: 'Schedule Exam', desc: 'Your program coordinator schedules your exam at an authorized testing site.' },
-              { step: '3', title: 'Take Exam', desc: 'Exams are proctor-supervised. Bring valid photo ID and any required materials.' },
-              { step: '4', title: 'Receive Credential', desc: 'Credentials are issued by the certifying body upon passing. Results are recorded in your student record.' },
+              { step: '1', title: 'Book Your Seat', desc: 'Select your exam and preferred date. Pay the exam fee at booking. No walk-ins accepted.' },
+              { step: '2', title: 'Bring Valid ID', desc: 'Government-issued photo ID required. No ID, no exam — no exceptions.' },
+              { step: '3', title: 'Take the Exam', desc: 'Proctor-supervised on-site. No phones or outside materials unless permitted by the provider.' },
+              { step: '4', title: 'Receive Your Credential', desc: 'Results and credentials issued directly by the certifying body. Elevate records your outcome.' },
             ].map((s) => (
               <div key={s.step} className="bg-white rounded-xl p-5 border border-slate-200">
                 <div className="w-8 h-8 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold text-sm mb-3">{s.step}</div>
                 <h3 className="font-bold text-slate-900 mb-1 text-sm">{s.title}</h3>
-                <p className="text-slate-600 text-xs">{s.desc}</p>
+                <p className="text-slate-600 text-xs leading-relaxed">{s.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* For Workforce Partners */}
-      <section className="py-14">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl font-black text-slate-900 mb-4">For Workforce Partners</h2>
-          <p className="text-slate-600 mb-6">
-            Credential exam results are documented and available for workforce partner reporting. All testing follows authorized proctoring protocols.
-          </p>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="bg-white rounded-xl p-5 border border-slate-200">
-              <h3 className="font-bold text-slate-900 mb-2">Reporting</h3>
-              <ul className="space-y-1 text-sm text-slate-700">
-                <li>Exam pass/fail results per participant</li>
-                <li>Credential attainment dates</li>
-                <li>Cohort-level credential rates</li>
-                <li>PIRL-compatible outcome data</li>
-              </ul>
-            </div>
-            <div className="bg-white rounded-xl p-5 border border-slate-200">
-              <h3 className="font-bold text-slate-900 mb-2">Testing Protocols</h3>
-              <ul className="space-y-1 text-sm text-slate-700">
-                <li>Photo ID verification required</li>
-                <li>Proctor-supervised environment</li>
-                <li>Authorized testing center or approved proctoring</li>
-                <li>Results issued by credentialing authority</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* EPA 608 Proctor Information */}
-      <section className="py-14 border-t border-slate-100">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-white rounded-2xl p-8 sm:p-10">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-slate-900 mb-1">EPA 608 Authorized Proctor Site</h2>
-                <p className="text-slate-500 text-sm">ESCO Group (Proctor ID: 358010) &amp; Mainstream Engineering — both EPA-approved certifying organizations</p>
-              </div>
-            </div>
-            <p className="text-slate-600 leading-relaxed mb-6">
-              Elevate for Humanity is an authorized EPA Section 608 proctor testing site through both the <strong>ESCO Group</strong> and <strong>Mainstream Engineering</strong>. We administer EPA 608 Universal certification exams on-site for HVAC technicians and students. The EPA 608 credential is required by federal law to purchase and handle refrigerants.
-            </p>
-
-            {/* Two provider cards */}
-            <div className="grid sm:grid-cols-2 gap-4 mb-8">
-              {/* ESCO */}
-              <div className="border border-slate-200 rounded-xl p-5">
-                <div className="mb-3">
-                  {/* Logo placeholder — upload via /public/images/logos/esco-logo.png */}
-                  <div className="h-10 w-32 bg-slate-100 rounded flex items-center justify-center text-xs text-slate-400 mb-3">ESCO Logo</div>
-                  <h3 className="font-bold text-slate-900">ESCO Group</h3>
-                  <p className="text-xs text-slate-500">Proctor ID: 358010</p>
-                </div>
-                <ul className="text-sm text-slate-600 space-y-1 mb-4">
-                  <li>Paper &amp; online exams available</li>
-                  <li>Free study kit (guide + software)</li>
-                  <li>Weekly instructor PowerPoint course</li>
-                  <li>200+ page Reference Manual available</li>
-                </ul>
-                <a
-                  href="https://escogroup.org"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors"
-                >
-                  escogroup.org →
-                </a>
-              </div>
-
-              {/* Mainstream */}
-              <div className="border border-slate-200 rounded-xl p-5">
-                <div className="mb-3">
-                  {/* Logo placeholder — upload via /public/images/logos/mainstream-logo.png */}
-                  <div className="h-10 w-32 bg-slate-100 rounded flex items-center justify-center text-xs text-slate-400 mb-3">Mainstream Logo</div>
-                  <h3 className="font-bold text-slate-900">Mainstream Engineering</h3>
-                  <p className="text-xs text-slate-500">EPATest.com</p>
-                </div>
-                <ul className="text-sm text-slate-600 space-y-1 mb-4">
-                  <li>Paper &amp; online exams available</li>
-                  <li>Free study kit (guide + software)</li>
-                  <li>Also offers R-410A, PM Tech, IAQ, Green, 609 &amp; HC/HFO certs</li>
-                </ul>
-                <a
-                  href="https://ww2.epatest.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-brand-blue-700 hover:bg-brand-blue-800 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors"
-                >
-                  epatest.com →
-                </a>
-              </div>
-            </div>
-            <div className="border-t border-white/10 pt-6">
-              <h3 className="font-bold text-slate-900 mb-3">What We Proctor</h3>
-              <div className="grid sm:grid-cols-2 gap-2">
-                {[
-                  'EPA 608 Core',
-                  'EPA 608 Type I — Small Appliances',
-                  'EPA 608 Type II — High-Pressure Systems',
-                  'EPA 608 Type III — Low-Pressure Systems',
-                  'EPA 608 Universal (all types)',
-                  'Retesting for any section',
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-2 text-sm text-slate-300">
-                    <span className="w-1.5 h-1.5 bg-brand-red-500 rounded-full flex-shrink-0" />
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Table */}
-      <section className="py-14 border-t border-slate-100">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="flex items-center gap-3 mb-8">
-            <DollarSign className="w-7 h-7 text-brand-red-600" />
-            <h2 className="text-3xl font-black text-slate-900">Testing Fees</h2>
-          </div>
-          <p className="text-slate-500 mb-8 max-w-2xl">
-            All fees include the exam and proctoring. No hidden charges. Group and workforce agency discounts available — see notes below or <Link href="/testing/book" className="text-brand-blue-600 hover:underline font-medium">contact us</Link>.
-          </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.values(CERT_PROVIDERS)
-              .filter(p => p.fees && p.fees.length > 0)
-              .map(provider => (
-                <div key={provider.key} className="bg-white border border-slate-200 rounded-xl p-5">
-                  <h3 className="font-bold text-slate-900 mb-3 text-sm">{provider.name}</h3>
-                  <div className="space-y-2 mb-3">
-                    {provider.fees!.map(fee => (
-                      <div key={fee.label} className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="text-sm text-slate-700 font-medium leading-snug">{fee.label}</p>
-                          {fee.note && <p className="text-xs text-slate-400 mt-0.5">{fee.note}</p>}
-                        </div>
-                        <span className="text-brand-red-600 font-black text-lg shrink-0">${fee.amount}</span>
-                      </div>
-                    ))}
-                  </div>
-                  {provider.groupDiscount && (
-                    <p className="text-xs text-brand-blue-700 bg-brand-blue-50 rounded-lg px-3 py-2 mt-2">
-                      {provider.groupDiscount}
-                    </p>
-                  )}
-                  {provider.status === 'active' && (
-                    <Link
-                      href={`/testing/book?exam=${provider.key}`}
-                      className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-red-600 hover:text-brand-red-700"
-                    >
-                      <CalendarDays className="w-3.5 h-3.5" />
-                      Book a seat
-                    </Link>
-                  )}
-                </div>
-              ))}
-          </div>
-          <p className="text-xs text-slate-400 mt-6">
-            Fees subject to change. Workforce agency and WorkOne-referred candidates may qualify for reduced rates. Payment due at time of booking.
-          </p>
-        </div>
-      </section>
-
       {/* CTA */}
-      <section className="py-14">
+      <section className="py-16 border-t border-slate-100">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-black text-slate-900 mb-4">Ready to Earn Your Credential?</h2>
-          <p className="text-slate-600 mb-8">Enroll in a training program to access exam preparation and proctored testing.</p>
+          <h2 className="text-3xl font-black text-slate-900 mb-4">Ready to Get Certified?</h2>
+          <p className="text-slate-600 mb-8">Book your exam seat online or call us to schedule. All testing is by appointment only.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/programs" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-colors">
-              View Programs
-            </Link>
-            <Link href="/testing/book" className="border border-slate-300 text-slate-700 px-8 py-4 rounded-full font-bold text-lg hover:bg-slate-50 transition-colors">
+            <Link
+              href="/testing/book"
+              className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-colors"
+            >
+              <CalendarDays className="w-5 h-5" />
               Book a Testing Session
             </Link>
+            <a
+              href="tel:3173143757"
+              className="inline-flex items-center gap-2 border-2 border-slate-300 hover:border-slate-400 text-slate-700 px-8 py-4 rounded-full font-bold text-lg transition-colors"
+            >
+              (317) 314-3757
+            </a>
           </div>
         </div>
       </section>

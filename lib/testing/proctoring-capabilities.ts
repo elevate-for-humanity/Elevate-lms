@@ -36,6 +36,8 @@ export interface CertProvider {
   verifyUrl?: string;
   /** Whether Elevate is currently an active authorized site */
   status: 'active' | 'available_through_partner';
+  /** Hide from public-facing pages (e.g. not yet offered, internal only) */
+  publicVisible?: boolean;
   /**
    * Fees charged to test-takers. Multiple entries for different exam types.
    * If empty, pricing is quoted on request.
@@ -161,6 +163,7 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
     exams: ['OSHA 10-Hour General Industry', 'OSHA 10-Hour Construction', 'OSHA 30-Hour General Industry', 'OSHA 30-Hour Construction'],
     verifyUrl: 'https://www.osha.gov/training/outreach',
     status: 'active',
+    publicVisible: false, // not yet offered publicly — internal/partner use only
     fees: [
       { label: 'OSHA 10-Hour', amount: 65, note: 'Includes course + DOL card' },
       { label: 'OSHA 30-Hour', amount: 185, note: 'Includes course + DOL card' },
@@ -230,7 +233,7 @@ export function getProvidersByCapability(): Record<ProctoringCapability, CertPro
 
 /** Active providers only — for public-facing pages */
 export const ACTIVE_PROVIDERS = Object.values(CERT_PROVIDERS).filter(
-  (p) => p.status === 'active'
+  (p) => p.status === 'active' && p.publicVisible !== false
 );
 
 /** All providers — for admin/scheduling views */

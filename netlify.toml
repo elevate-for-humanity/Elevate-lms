@@ -25,6 +25,9 @@
   NETLIFY_USE_PNPM = "true"
   # Disable secret scanning - NEXT_PUBLIC_* vars are intentionally public
   SECRETS_SCAN_ENABLED = "false"
+  # NHA account — non-secret, safe to store here
+  NHA_ACCOUNT_NUMBER = "412957"
+  NHA_PORTAL_URL = "https://www.nhanow.com/"
   SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXTAUTH_URL"
   # Admin dev tools - enabled for all builds, production guards handle access
   ENABLE_ADMIN_DEVTOOLS = "true"

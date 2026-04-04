@@ -1,36 +1,50 @@
 import { Metadata } from 'next';
-import { requireAdmin } from '@/lib/auth';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import SettingsForm from './SettingsForm';
+import { requireAdmin } from '@/lib/authGuards';
+import { AdminPageShell } from '@/components/admin/AdminPageShell';
+import { Settings, Bell, Shield, CreditCard, Globe, Mail, Webhook } from 'lucide-react';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { robots: { index: false, follow: false }, title: 'Settings | Admin' };
 
-export const metadata: Metadata = {
-  title: 'Settings | Admin',
-};
+const SETTING_SECTIONS = [
+  { title: 'Platform Settings',    desc: 'Site name, timezone, feature flags, maintenance mode',  href: '/admin/settings/platform',      icon: Globe },
+  { title: 'Notifications',        desc: 'Email templates, SMS alerts, admin notification rules', href: '/admin/settings/notifications',  icon: Bell },
+  { title: 'Security & Access',    desc: 'Roles, permissions, session timeout, 2FA policy',       href: '/admin/settings/security',       icon: Shield },
+  { title: 'Payments & Billing',   desc: 'Stripe keys, payment methods, refund policy',           href: '/admin/settings/payments',       icon: CreditCard },
+  { title: 'Email Configuration',  desc: 'SMTP settings, sender domain, email logs',              href: '/admin/settings/email',          icon: Mail },
+  { title: 'Webhooks',             desc: 'Stripe webhooks, Zoom, Google Calendar integrations',   href: '/admin/settings/webhooks',       icon: Webhook },
+];
 
 export default async function AdminSettingsPage() {
   await requireAdmin();
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-        <Breadcrumbs items={[
-          { label: 'Admin', href: '/admin/dashboard' },
-          { label: 'Settings' },
-        ]} />
-
-        <div className="mt-6 mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">Platform Settings</h1>
-          <p className="text-slate-500 text-sm mt-1">
-            Changes are saved to the database and take effect immediately.
-          </p>
-        </div>
-
-        <div className="bg-white rounded-xl border border-slate-200 p-6">
-          <SettingsForm />
-        </div>
+    <AdminPageShell
+      title="Settings"
+      description="Platform configuration, integrations, and access control"
+      breadcrumbs={[{ label: 'Admin', href: '/admin/dashboard' }, { label: 'Settings' }]}
+    >
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {SETTING_SECTIONS.map((s) => {
+          const Icon = s.icon;
+          return (
+            <Link
+              key={s.href}
+              href={s.href}
+              className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-md transition-shadow flex flex-col gap-3"
+            >
+              <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+                <Icon className="w-5 h-5 text-slate-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 text-base">{s.title}</h3>
+                <p className="text-slate-500 text-sm mt-0.5">{s.desc}</p>
+              </div>
+            </Link>
+          );
+        })}
       </div>
-    </div>
+    </AdminPageShell>
   );
 }

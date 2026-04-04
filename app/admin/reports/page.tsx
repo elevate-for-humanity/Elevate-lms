@@ -1,177 +1,76 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { BarChart3, Users, GraduationCap, DollarSign, TrendingUp, FileText, Eye } from 'lucide-react';
+import { AdminPageShell, AdminCard } from '@/components/admin/AdminPageShell';
+import { BarChart3, Users, GraduationCap, DollarSign, TrendingUp, FileText, Download, HeartHandshake } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { robots: { index: false, follow: false }, title: 'Reports | Admin' };
 
-export const metadata: Metadata = {
-  robots: { index: false, follow: false },
-  title: 'Reports | Admin',
-  description: 'Generate and view system reports',
-};
+const REPORT_TYPES = [
+  { title: 'Student Roster',         desc: 'All enrolled students with contact info and program',    href: '/admin/reports/students',       icon: Users,          format: 'CSV / PDF' },
+  { title: 'Enrollment Summary',     desc: 'Enrollment counts by program, status, and date range',  href: '/admin/reports/enrollments',    icon: TrendingUp,     format: 'CSV / PDF' },
+  { title: 'Completion Report',      desc: 'Graduates, certificates issued, pass rates',             href: '/admin/reports/completions',    icon: GraduationCap,  format: 'CSV / PDF' },
+  { title: 'WIOA Performance',       desc: 'DOL-required outcomes: employment, earnings, retention', href: '/admin/reports/wioa',           icon: HeartHandshake, format: 'PDF' },
+  { title: 'Revenue & Payments',     desc: 'Payments received, refunds, funding by source',         href: '/admin/reports/revenue',        icon: DollarSign,     format: 'CSV / PDF' },
+  { title: 'Attendance Report',      desc: 'Daily attendance records by program and instructor',    href: '/admin/reports/attendance',     icon: FileText,       format: 'CSV / PDF' },
+];
 
 export default async function ReportsPage() {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
-  // Fetch data for reports
+  const db = createAdminClient();
   const [
-    { count: totalUsers },
-    { count: totalCourses },
-    { count: totalLeads },
+    { count: totalStudents },
     { count: totalEnrollments },
+    { count: totalCerts },
   ] = await Promise.all([
-    supabase.from('profiles').select('*', { count: 'exact', head: true }),
-    supabase.from('courses').select('*', { count: 'exact', head: true }),
-    supabase.from('leads').select('*', { count: 'exact', head: true }),
-    supabase.from('program_enrollments').select('*', { count: 'exact', head: true }),
+    db.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
+    db.from('program_enrollments').select('*', { count: 'exact', head: true }),
+    db.from('program_completion_certificates').select('*', { count: 'exact', head: true }),
   ]);
 
-  // Get recent activity
-  const { data: recentLeads } = await supabase
-    .from('leads')
-    .select('created_at')
-    .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
-
-  const { data: recentEnrollments } = await supabase
-    .from('program_enrollments')
-    .select('created_at')
-    .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
-
-  const stats = [
-    { label: 'Total Users', value: totalUsers || 0, icon: Users, color: 'text-brand-blue-600', bgColor: 'bg-brand-blue-100' },
-    { label: 'Active Courses', value: totalCourses || 0, icon: GraduationCap, color: 'text-brand-green-600', bgColor: 'bg-brand-green-100' },
-    { label: 'Total Leads', value: totalLeads || 0, icon: TrendingUp, color: 'text-brand-blue-600', bgColor: 'bg-brand-blue-100' },
-    { label: 'Enrollments', value: totalEnrollments || 0, icon: FileText, color: 'text-brand-orange-600', bgColor: 'bg-brand-orange-100' },
-  ];
-
-  const reportTypes = [
-    {
-      title: 'Enrollment Report',
-      description: 'Student enrollment trends, completion rates, and program performance',
-      icon: GraduationCap,
-      color: 'bg-brand-blue-500',
-      href: '/admin/reports/enrollment',
-      metrics: [`${recentEnrollments?.length || 0} new this month`],
-    },
-    {
-      title: 'Lead Generation Report',
-      description: 'Lead sources, conversion rates, and pipeline analysis',
-      icon: TrendingUp,
-      color: 'bg-brand-green-500',
-      href: '/admin/reports/leads',
-      metrics: [`${recentLeads?.length || 0} new leads this month`],
-    },
-    {
-      title: 'Financial Report',
-      description: 'WOTC credits, grants awarded, and funding overview',
-      icon: DollarSign,
-      color: 'bg-brand-blue-500',
-      href: '/admin/reports/financial',
-      metrics: ['WOTC tracking', 'Grant utilization'],
-    },
-    {
-      title: 'User Activity Report',
-      description: 'User registrations, roles, and platform engagement',
-      icon: Users,
-      color: 'bg-brand-orange-500',
-      href: '/admin/reports/users',
-      metrics: [`${totalUsers || 0} total users`],
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Image */}
-
-      <div className="max-w-7xl mx-auto p-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Reports & Analytics</h1>
-            <p className="text-gray-600">Generate reports and view platform analytics</p>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => (
-            <div key={index} className="bg-white rounded-xl shadow-sm p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
+    <AdminPageShell
+      title="Reports"
+      description="Generate and export operational, compliance, and performance reports"
+      breadcrumbs={[{ label: 'Admin', href: '/admin/dashboard' }, { label: 'Reports' }]}
+      stats={[
+        { label: 'Students',     value: totalStudents ?? 0,    icon: Users,          color: 'blue' },
+        { label: 'Enrollments',  value: totalEnrollments ?? 0, icon: TrendingUp,     color: 'green' },
+        { label: 'Certificates', value: totalCerts ?? 0,       icon: GraduationCap,  color: 'amber' },
+      ]}
+    >
+      <AdminCard title="Available Reports">
+        <div className="divide-y divide-slate-100">
+          {REPORT_TYPES.map((r) => {
+            const Icon = r.icon;
+            return (
+              <Link
+                key={r.href}
+                href={r.href}
+                className="flex items-center gap-4 py-4 px-2 hover:bg-slate-50 rounded-lg transition-colors group"
+              >
+                <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+                  <Icon className="w-4 h-4 text-slate-600" />
                 </div>
-              </div>
-              <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-              <p className="text-sm text-gray-600">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {reportTypes.map((report, index) => (
-            <div key={index} className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition">
-              <div className="flex items-start gap-4">
-                <div className={`p-3 rounded-lg ${report.color}`}>
-                  <report.icon className="w-6 h-6 text-white" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-slate-900 text-sm">{r.title}</p>
+                  <p className="text-slate-500 text-xs mt-0.5">{r.desc}</p>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">{report.title}</h3>
-                  <p className="text-sm text-gray-600 mb-3">{report.description}</p>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {report.metrics.map((metric, i) => (
-                      <span key={i} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
-                        {metric}
-                      </span>
-                    ))}
-                  </div>
-                  <Link
-                    href={report.href}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-brand-blue-600 text-white rounded hover:bg-brand-blue-700 transition"
-                  >
-                    <Eye className="w-3 h-3" />
-                    View Report
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
+                <span className="text-xs text-slate-400 font-medium flex-shrink-0">{r.format}</span>
+                <Download className="w-4 h-4 text-slate-400 group-hover:text-brand-blue-600 transition-colors flex-shrink-0" />
+              </Link>
+            );
+          })}
         </div>
-
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">Quick Stats Overview</h2>
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <BarChart3 className="w-5 h-5 text-brand-blue-600" />
-                <span className="font-medium text-gray-900">Lead Conversion</span>
-              </div>
-              <p className="text-2xl font-bold text-gray-900">
-                {totalLeads && totalEnrollments ? ((totalEnrollments / totalLeads) * 100).toFixed(1) : 0}%
-              </p>
-              <p className="text-sm text-gray-600">Leads to enrollments</p>
-            </div>
-            
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="w-5 h-5 text-brand-green-600" />
-                <span className="font-medium text-gray-900">Monthly Growth</span>
-              </div>
-              <p className="text-2xl font-bold text-gray-900">{recentLeads?.length || 0}</p>
-              <p className="text-sm text-gray-600">New leads this month</p>
-            </div>
-            
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <GraduationCap className="w-5 h-5 text-brand-blue-600" />
-                <span className="font-medium text-gray-900">Active Programs</span>
-              </div>
-              <p className="text-2xl font-bold text-gray-900">{totalCourses || 0}</p>
-              <p className="text-sm text-gray-600">Available courses</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      </AdminCard>
+    </AdminPageShell>
   );
 }

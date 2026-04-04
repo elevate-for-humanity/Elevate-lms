@@ -5,10 +5,10 @@ import LiveChatClient from './LiveChatClient';
 
 export const dynamic = 'force-dynamic';
 
-export default function Page() {{
+export default function Page() {
   return (
     <AdminClientPage>
       <LiveChatClient />
     </AdminClientPage>
   );
-}}
+}

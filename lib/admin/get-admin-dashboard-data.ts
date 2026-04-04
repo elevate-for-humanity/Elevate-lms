@@ -5,7 +5,8 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import type { AdminDashboardData } from '@/components/admin/dashboard/types';
+import { logger } from '@/lib/logger';
+import type { AdminDashboardData, DegradedSection } from '@/components/admin/dashboard/types';
 
 function toSafeNumber(value: unknown): number {
   const n = Number(value ?? 0);
@@ -19,6 +20,37 @@ function clampPercent(value: number): number {
 
 function sumCents(rows: Array<{ amount_paid_cents?: number | null }>): number {
   return rows.reduce((sum, r) => sum + (r.amount_paid_cents ?? 0), 0);
+}
+
+/**
+ * Asserts a critical count query succeeded.
+ * Throws — callers must not coerce this to 0 on failure.
+ */
+function requireCount(
+  result: { count: number | null; error: { message: string } | null },
+  label: string
+): number {
+  if (result.error) throw new Error(`${label} query failed: ${result.error.message}`);
+  if (result.count == null) throw new Error(`${label} count missing`);
+  return result.count;
+}
+
+/**
+ * Handles a non-critical rows query.
+ * On failure: logs server-side, returns empty array, records the degraded section.
+ * Never coerces failure into a normal-looking empty result silently.
+ */
+function optionalRows<T>(
+  result: { data: T[] | null; error: { message: string } | null },
+  section: DegradedSection,
+  degraded: DegradedSection[]
+): T[] {
+  if (result.error) {
+    logger.error(`[dashboard] ${section} query failed`, { message: result.error.message });
+    degraded.push(section);
+    return [];
+  }
+  return result.data ?? [];
 }
 
 function monthStart() {
@@ -88,13 +120,18 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       .select('id', { count: 'exact', head: true }),
   ]);
 
-  // Hard fail — error boundary in app/admin/dashboard/error.tsx catches this
-  if (pendingAppsRes.error)      throw new Error(`applications query failed: ${pendingAppsRes.error.message}`);
-  if (allPendingAppsRes.error)   throw new Error(`applications count failed: ${allPendingAppsRes.error.message}`);
-  if (activeEnrollmentsRes.error) throw new Error(`program_enrollments active count failed: ${activeEnrollmentsRes.error.message}`);
-  if (revenueAllTimeRes.error)   throw new Error(`program_enrollments revenue (all time) failed: ${revenueAllTimeRes.error.message}`);
-  if (revenueThisMonthRes.error) throw new Error(`program_enrollments revenue (this month) failed: ${revenueThisMonthRes.error.message}`);
-  if (certsRes.error)            throw new Error(`certificates count failed: ${certsRes.error.message}`);
+  // Hard fail on critical KPI queries — error boundary in error.tsx catches this.
+  // These drive the 4 top-line cards. A broken backend must not look operational.
+  if (pendingAppsRes.error)       throw new Error(`applications query failed`);
+  if (revenueAllTimeRes.error)    throw new Error(`revenue (all time) query failed`);
+  if (revenueThisMonthRes.error)  throw new Error(`revenue (this month) query failed`);
+
+  const totalPendingCount  = requireCount(allPendingAppsRes,    'applications count');
+  const activeEnrollCount  = requireCount(activeEnrollmentsRes, 'active enrollments');
+  const certsCount         = requireCount(certsRes,             'certificates');
+
+  // Track which non-critical sections failed — UI renders a partial-failure notice.
+  const degradedSections: DegradedSection[] = [];
 
   // ── Non-critical queries — degrade gracefully on failure ──────────────────
   // Sidebar panels and supplemental lists. A failure here should not crash
@@ -131,6 +168,12 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       .limit(1000),
   ]);
 
+  // ── Non-critical supplemental sections ───────────────────────────────────
+  const inactiveLearnersData    = optionalRows(inactiveLearnersRes,    'inactive_learners',      degradedSections);
+  const unpublishedProgramsData = optionalRows(unpublishedProgramsRes, 'unpublished_programs',   degradedSections);
+  const recentStudentsData      = optionalRows(recentStudentsRes,      'recent_students',        degradedSections);
+  const enrollmentsByProgramData = optionalRows(enrollmentsByProgramRes, 'enrollments_by_program', degradedSections);
+
   // ── Applications with aging ───────────────────────────────────────────────
   const now = Date.now();
   const pendingApps = (pendingAppsRes.data ?? []).map((app: any) => {
@@ -150,11 +193,12 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     };
   });
 
-  const totalPending = allPendingAppsRes.count ?? 0;
+  const totalPending = totalPendingCount;
   const urgentApps = pendingApps.filter(a => a.urgent).length;
   const oldestApp = pendingApps[0] ?? null;
 
   // ── Revenue ───────────────────────────────────────────────────────────────
+  // revenueAllTimeRes.error already threw above — .data is safe here.
   const revenueAllTimeCents = sumCents(revenueAllTimeRes.data ?? []);
   const revenueThisMonthCents = sumCents(revenueThisMonthRes.data ?? []);
 
@@ -173,12 +217,16 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     },
     {
       label: 'Active Enrollments',
-      value: activeEnrollmentsRes.count ?? 0,
+      value: activeEnrollCount,
       delta: 0,
-      deltaLabel: `${(inactiveLearnersRes.data ?? []).length} inactive 3+ days`,
+      deltaLabel: degradedSections.includes('inactive_learners')
+        ? 'Inactive learner data unavailable'
+        : `${inactiveLearnersData.length} inactive 3+ days`,
       href: '/admin/students?status=active',
-      urgent: (inactiveLearnersRes.data ?? []).length > 0,
-      sub: `${(inactiveLearnersRes.data ?? []).length} with no activity in 3+ days`,
+      urgent: !degradedSections.includes('inactive_learners') && inactiveLearnersData.length > 0,
+      sub: degradedSections.includes('inactive_learners')
+        ? 'Could not load inactive learner data'
+        : `${inactiveLearnersData.length} with no activity in 3+ days`,
     },
     {
       label: 'Revenue This Month',
@@ -191,7 +239,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     },
     {
       label: 'Certificates Issued',
-      value: certsRes.count ?? 0,
+      value: certsCount,
       delta: 0,
       deltaLabel: 'All time',
       href: '/admin/certificates',
@@ -201,7 +249,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   ];
 
   // ── Blocked programs ──────────────────────────────────────────────────────
-  const blockedPrograms = (unpublishedProgramsRes.data ?? []).map((p: any) => ({
+  const blockedPrograms = unpublishedProgramsData.map((p: any) => ({
     id: p.id,
     title: p.title ?? 'Untitled',
     slug: p.slug ?? '',
@@ -211,7 +259,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   }));
 
   // ── Inactive learners ─────────────────────────────────────────────────────
-  const inactiveLearners = (inactiveLearnersRes.data ?? []).map((e: any) => ({
+  const inactiveLearners = inactiveLearnersData.map((e: any) => ({
     enrollmentId: e.id,
     userId: e.user_id,
     enrolledAt: e.enrolled_at ?? '',
@@ -221,7 +269,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   }));
 
   // ── Recent students ───────────────────────────────────────────────────────
-  const recentStudents = (recentStudentsRes.data ?? []).map((s: any) => {
+  const recentStudents = recentStudentsData.map((s: any) => {
     const enrollment = Array.isArray(s.program_enrollments) ? s.program_enrollments[0] : null;
     const program = enrollment?.programs;
     return {
@@ -237,7 +285,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
 
   // ── Programs by enrollment ────────────────────────────────────────────────
   const programTotals: Record<string, { name: string; total: number; completed: number }> = {};
-  for (const e of (enrollmentsByProgramRes.data ?? [])) {
+  for (const e of enrollmentsByProgramData) {
     const pid = e.program_id;
     if (!pid) continue;
     const prog = e.programs as { name?: string; title?: string } | null;
@@ -259,10 +307,10 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
 
   return {
     counts: {
-      pendingApplications:    allPendingAppsRes.count ?? 0,
-      activeEnrollments:      activeEnrollmentsRes.count ?? 0,
-      revenueThisMonthCents:  revenueThisMonthCents,
-      certificatesIssued:     certsRes.count ?? 0,
+      pendingApplications:   totalPendingCount,
+      activeEnrollments:     activeEnrollCount,
+      revenueThisMonthCents: revenueThisMonthCents,
+      certificatesIssued:    certsCount,
     },
     kpis,
     enrollmentTrend: [],
@@ -275,5 +323,6 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     inactiveLearners,
     profile: adminProfile,
     generatedAt: new Date().toISOString(),
+    degradedSections,
   };
 }

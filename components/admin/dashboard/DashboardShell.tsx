@@ -158,6 +158,15 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 pb-16 pt-4">
+      {data.degradedSections.length > 0 && (
+        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+          <span>
+            Some dashboard sections could not be loaded ({data.degradedSections.join(', ')}).
+            KPI counts are accurate. Supplemental lists may be incomplete.
+          </span>
+        </div>
+      )}
 
       {/* Hero */}
       <div className="rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 px-6 py-8 text-white shadow-lg">

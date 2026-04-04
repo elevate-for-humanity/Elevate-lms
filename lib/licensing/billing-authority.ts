@@ -445,7 +445,17 @@ export function getLicenseAccessMode(
     };
   }
 
-  // No license at all — super_admin always gets full access regardless
+  // No license at all — admin roles get full access as an explicit policy bypass.
+  //
+  // POLICY DECISION (not a bug): Admins must be able to access the system to
+  // purchase or configure a license even when none exists. Blocking them would
+  // create a chicken-and-egg lockout. Non-admins are blocked and redirected.
+  //
+  // The distinguishing reason 'no_license_admin_bypass' (not 'full') lets callers
+  // detect this case if they need to treat it differently (e.g. audit logging).
+  //
+  // If this function is ever called outside the admin layout context, verify that
+  // the caller's role check is tight before relying on this bypass.
   if (!license || accessResult.reason === 'no_license') {
     if (isAdmin) {
       return {

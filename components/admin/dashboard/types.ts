@@ -85,6 +85,15 @@ export interface DashboardCounts {
   certificatesIssued: number;
 }
 
+// Sections that failed to load due to non-critical query errors.
+// UI must render an explicit partial-failure notice when this is non-empty.
+// An empty array means all sections loaded successfully.
+export type DegradedSection =
+  | 'inactive_learners'
+  | 'unpublished_programs'
+  | 'recent_students'
+  | 'enrollments_by_program';
+
 export interface AdminDashboardData {
   counts: DashboardCounts;
   kpis: KPICard[];
@@ -98,4 +107,6 @@ export interface AdminDashboardData {
   inactiveLearners: InactiveLearner[];
   profile: { full_name: string | null } | null;
   generatedAt: string;
+  /** Non-empty when one or more non-critical sections failed to load. */
+  degradedSections: DegradedSection[];
 }

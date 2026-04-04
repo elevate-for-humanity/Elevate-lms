@@ -17,12 +17,24 @@
 
 import { logger } from '@/lib/logger';
 
+// Read from consolidated API_KEYS_JSON first (saves Netlify env var slots),
+// then fall back to individual env vars.
+let _apiKeys: Record<string, string> = {};
+try {
+  const raw = process.env.API_KEYS_JSON;
+  if (raw) _apiKeys = JSON.parse(raw);
+} catch { /* invalid JSON — fall through */ }
+
+function apiKey(key: string, fallback?: string): string | undefined {
+  return _apiKeys[key] || process.env[key] || fallback;
+}
+
 // Affirm API configuration
 const AFFIRM_CONFIG = {
-  transactionsUrl: process.env.AFFIRM_API_URL || 'https://api.affirm.com/api/v1/transactions',
-  baseUrl: process.env.AFFIRM_BASE_URL || 'https://api.affirm.com',
-  publicKey: process.env.AFFIRM_PUBLIC_KEY || process.env.NEXT_PUBLIC_AFFIRM_PUBLIC_KEY,
-  privateKey: process.env.AFFIRM_PRIVATE_KEY || process.env.AFFIRM_PRIVATE_API_KEY,
+  transactionsUrl: 'https://api.affirm.com/api/v1/transactions',
+  baseUrl: 'https://api.affirm.com',
+  publicKey: apiKey('AFFIRM_PUBLIC_KEY') || apiKey('NEXT_PUBLIC_AFFIRM_PUBLIC_KEY'),
+  privateKey: apiKey('AFFIRM_PRIVATE_KEY') || apiKey('AFFIRM_PRIVATE_API_KEY'),
   environment: process.env.AFFIRM_ENVIRONMENT || 'production',
 };
 

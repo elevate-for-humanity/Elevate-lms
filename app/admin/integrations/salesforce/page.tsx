@@ -56,7 +56,7 @@ export default function SalesforceIntegrationPage() {
     { label: 'Salesforce Instance URL', placeholder: 'https://yourorg.my.salesforce.com', type: 'url' },
     { label: 'Client ID', placeholder: 'Connected App Consumer Key', type: 'text' },
     { label: 'Client Secret', placeholder: '••••••••', type: 'password' },
-    { label: 'Callback URL', placeholder: `${typeof window !== 'undefined' ? window.location.origin : ''}/api/integrations/salesforce/callback`, type: 'text' },
+    { label: 'Callback URL', placeholder: '/api/integrations/salesforce/callback', type: 'text' },
   ];
 
   return (

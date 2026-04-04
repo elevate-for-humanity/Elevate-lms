@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import LogoImage from '@/components/site/LogoImage';
 
 export default function ApplyAvatarGuide() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -56,7 +57,7 @@ export default function ApplyAvatarGuide() {
           </video>
           {/* Elevate logo — covers third-party branding */}
           <div className="absolute bottom-2 right-2 bg-white/90 rounded-lg px-2 py-1 flex items-center gap-1.5 shadow-sm pointer-events-none">
-            <Image src="/logo.png" alt="Elevate" width={20} height={20} />
+            <LogoImage alt="Elevate" width={20} height={20} />
             <span className="text-xs font-semibold text-slate-800">Elevate</span>
           </div>
           {/* Tap to unmute — only shows if browser forced mute */}

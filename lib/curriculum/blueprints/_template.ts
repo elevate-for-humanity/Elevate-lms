@@ -81,6 +81,7 @@ import type { CredentialBlueprint, BlueprintVideoConfig } from './types';
 // The video generator reads this — do not change after videos are produced.
 
 const PROGRAM_VIDEO_CONFIG: BlueprintVideoConfig = {
+  videoGenerator: 'runway', // all new programs use Runway Gen4.5
   template:           'elevate-slide',
   instructorName:     'Marcus Johnson',           // Change per program
   instructorTitle:    'Lead Instructor',          // Change per program

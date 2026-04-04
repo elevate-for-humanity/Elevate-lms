@@ -3,6 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import LogoImage from '@/components/site/LogoImage';
 import HeaderMobileMenu from './HeaderMobileMenu.client';
 import HeaderDesktopNav from './HeaderDesktopNav';
 
@@ -74,6 +75,23 @@ export const NAV_ITEMS = [
     ],
   },
   {
+    name: 'Testing',
+    href: '/testing',
+    subItems: [
+      { name: '— Certification Exams —', href: '/testing', isHeader: true },
+      { name: 'Certiport (Microsoft, CompTIA, IC3)', href: '/testing/certiport' },
+      { name: 'NHA Healthcare Exams', href: '/testing/nha' },
+      { name: 'EPA Section 608 (HVAC)', href: '/testing/esco' },
+      { name: 'ACT WorkKeys / NCRC', href: '/testing/workkeys' },
+      { name: 'NRF Rise Up (Retail)', href: '/testing/nrf' },
+      { name: 'CareerSafe / OSHA', href: '/testing/careersafe' },
+      { name: 'ServSafe (Food Safety)', href: '/testing/servsafe' },
+      { name: '— Book & Info —', href: '/testing', isHeader: true },
+      { name: 'Book a Testing Session', href: '/testing/book' },
+      { name: 'All Testing Options', href: '/testing' },
+    ],
+  },
+  {
     name: 'About',
     href: '/about',
     subItems: [
@@ -141,8 +159,7 @@ export default function Header() {
       <div className="max-w-7xl mx-auto w-full h-full flex items-center justify-between px-4 sm:px-6">
         {/* Logo - Always visible */}
         <Link href="/" className="flex items-center gap-2 flex-shrink-0" aria-label="Elevate for Humanity home">
-          <Image
-            src="/logo.png"
+          <LogoImage
             alt="Elevate"
             width={40}
             height={60}

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import LogoImage from '@/components/site/LogoImage';
 import Link from 'next/link';
 import { createAdminClient } from '@/lib/supabase/admin';
 
@@ -29,7 +30,7 @@ export default async function StorePWAPage() {
       <div className="relative h-48 sm:h-56 overflow-hidden">
         <Image src="/images/pages/demo-page-5.jpg" alt="Elevate Store" fill className="object-cover" priority  sizes="100vw" />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
-          <Image src="/logo.png" alt="Elevate" width={40} height={40} className="mb-3" />
+          <LogoImage alt="Elevate" width={40} height={40} className="mb-3" />
           <h1 className="text-2xl font-bold text-white">Elevate Store</h1>
           <p className="text-brand-red-200 text-sm mt-1">{products.length} products · Training materials, toolkits, and licenses</p>
         </div>

@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import LogoImage from '@/components/site/LogoImage';
 import { usePathname } from 'next/navigation';
 import { NotificationBell } from './NotificationBell';
 import {
@@ -119,8 +120,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
             className="flex items-center gap-3 group"
           >
             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform p-1">
-              <Image
-                src="/logo.png"
+              <LogoImage
                 alt="Elevate for Humanity"
                 width={32}
                 height={32}

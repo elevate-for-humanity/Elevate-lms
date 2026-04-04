@@ -1,4 +1,21 @@
-import type { CredentialBlueprint } from './types';
+import type { CredentialBlueprint, BlueprintVideoConfig } from './types';
+
+const BARBER_VIDEO_CONFIG: BlueprintVideoConfig = {
+  videoGenerator:      'runway',
+  template:            'elevate-slide',
+  instructorName:      'Brandon Williams',
+  instructorTitle:     'Master Barber · 12 yrs',
+  instructorImagePath: '/images/team/instructors/instructor-barber.jpg',
+  topBarColor:         '#ea580c',
+  accentColor:         '#0f172a',
+  backgroundColor:     '#ffffff',
+  ttsVoice:            'onyx',
+  ttsSpeed:            0.88,
+  slideCount:          5,
+  segments:            ['intro', 'concept', 'visual', 'application', 'wrapup'],
+  generateDalleImage:  true,
+  dalleImageStyle:     'natural',
+};
 
 export const barberApprenticeshipBlueprint: CredentialBlueprint = {
   id: 'barber-apprenticeship-v1',
@@ -1721,6 +1738,25 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           ],
         },
       ],
+    },
+  ],
+
+  videoConfig: BARBER_VIDEO_CONFIG,
+
+  assessmentRules: [
+    {
+      assessmentType:   'module',
+      scope:            'all',
+      minQuestions:     5,
+      maxQuestions:     10,
+      passingThreshold: 0.70,
+    },
+    {
+      assessmentType:   'final',
+      scope:            'all',
+      minQuestions:     25,
+      maxQuestions:     50,
+      passingThreshold: 0.70,
     },
   ],
 };

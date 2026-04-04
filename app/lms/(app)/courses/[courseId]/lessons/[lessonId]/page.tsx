@@ -55,6 +55,14 @@ function hvacDefIdFromSlug(slug: string): string | undefined {
 }
 import { transformLessonContent, isAiJsonBlob } from '@/lib/lms/transformLessonContent';
 import { HVAC_COURSE_ID } from '@/lib/courses/hvac-uuids';
+
+// Barber lesson video resolver — slug barber-lesson-N → /videos/barber-lessons/barber-lesson-N.mp4
+function barberVideoUrl(slug: string | null | undefined): string | null {
+  if (!slug) return null;
+  const match = slug.match(/^barber-lesson-(\d+)$/);
+  if (!match) return null;
+  return `/videos/barber-lessons/barber-lesson-${match[1]}.mp4`;
+}
 import dynamic from 'next/dynamic';
 import { lessonUuidToSimulationKey } from '@/lib/lms/hvac-simulations';
 import { HVAC_QUICK_CHECKS } from '@/lib/courses/hvac-quick-checks';
@@ -104,6 +112,8 @@ export default function LessonPage() {
   const lessonId = params.lessonId as string;
 
   const isHvacCourse = courseId === HVAC_COURSE_ID;
+  // Barber lessons are identified by slug — course ID is dynamic (seeded per environment)
+  const isBarberLesson = !!barberVideoUrl(lesson?.slug);
 
   // ── All state declarations first — no hooks may reference these before this block ──
   const [lesson, setLesson] = useState<any>(null);
@@ -1037,6 +1047,25 @@ export default function LessonPage() {
               </div>
             )}
           </div>
+        ) : isBarberLesson ? (
+          /* Barber: MP4s live in /public/videos/barber-lessons/ — video_url is NULL in DB */
+          <div className="max-w-4xl mx-auto p-4 md:p-8">
+            <InteractiveVideoPlayer
+              videoUrl={barberVideoUrl(lesson.slug)!}
+              title={lesson.title}
+              onComplete={() => {
+                if (!isCompleted) { setIsCompleted(true); markComplete(); }
+              }}
+            />
+            {lesson.content && (
+              <div className="mt-6 bg-white rounded-xl p-8 shadow-sm">
+                <div
+                  className="prose max-w-none"
+                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }}
+                />
+              </div>
+            )}
+          </div>
         ) : lesson.video_url && lessonUuidToSimulationKey[lessonId] ? (
           <div className="max-w-4xl mx-auto p-4 md:p-8">
             {/* Video + 3D simulation lesson */}
@@ -1251,7 +1280,13 @@ export default function LessonPage() {
                   {/* VIDEO */}
                   {activeActivity === 'video' && (
                     <div>
-                      {lesson.video_url ? (
+                      {isBarberLesson ? (
+                        <InteractiveVideoPlayer
+                          videoUrl={barberVideoUrl(lesson.slug)!}
+                          title={lesson.title}
+                          onComplete={() => { markAttempted('video'); if (!isCompleted) markComplete(); }}
+                        />
+                      ) : lesson.video_url ? (
                         isHvacCourse ? (
                           <HvacLessonVideo
                             lessonId={lessonId}

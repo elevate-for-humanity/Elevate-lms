@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import LogoImage from '@/components/site/LogoImage';
 import { ArrowRight, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { TEAM } from '@/data/team';
@@ -63,7 +64,7 @@ export default function AboutPage() {
       <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-4 mb-6">
-            <Image src="/logo.png" alt="Elevate for Humanity logo" width={64} height={64} />
+            <LogoImage alt="Elevate for Humanity logo" width={64} height={64} />
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Who We Are</h2>
           </div>
           <div className="text-slate-700 space-y-4">

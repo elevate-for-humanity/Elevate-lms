@@ -13,9 +13,11 @@ export const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep
 export function AnimatedCounter({ target, duration = 1200 }: { target: number; duration?: number }) {
   const mounted = useMounted();
   const [count, setCount] = useState(target);
-  const prefersReduced = typeof window !== 'undefined'
-    ? window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
-    : false;
+  const [prefersReduced, setPrefersReduced] = useState(false);
+
+  useEffect(() => {
+    setPrefersReduced(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false);
+  }, []);
 
   useEffect(() => {
     if (prefersReduced) { setCount(target); return; }

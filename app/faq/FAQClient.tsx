@@ -119,7 +119,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
   };
 
   // Share functions
-  const shareUrl = (faqId: string) => `${typeof window !== 'undefined' ? window.location.origin : ''}/faq#${faqId}`;
+  const shareUrl = (faqId: string) => `${typeof window !== 'undefined' ? window.location.origin : 'https://www.elevateforhumanity.org'}/faq#${faqId}`;
   
   const copyLink = async (faqId: string) => {
     await navigator.clipboard.writeText(shareUrl(faqId));

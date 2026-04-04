@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import LogoImage from '@/components/site/LogoImage';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -21,8 +22,7 @@ export function LogoStamp() {
       aria-label="Elevate for Humanity - Go to homepage"
     >
       <div className="w-14 h-14 lg:w-16 lg:h-16 bg-white rounded-xl shadow-lg border border-slate-200 p-2 group-hover:shadow-xl group-hover:scale-105 transition-all">
-        <Image
-          src="/logo.png"
+        <LogoImage
           alt="Elevate for Humanity"
           width={56}
           height={56}

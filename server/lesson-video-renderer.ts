@@ -10,9 +10,86 @@
  */
 
 import fs from 'fs/promises';
+import fssync from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import { execSync } from 'child_process';
 import type { LessonSlide } from '../lib/autopilot/lesson-script-generator';
+
+// ── Image fetching ────────────────────────────────────────────────────────────
+// Cache dir: public/videos/slide-image-cache/
+const IMAGE_CACHE_DIR = path.join(process.cwd(), 'public', 'videos', 'slide-image-cache');
+
+/**
+ * Fetch a relevant photo for a slide.
+ * Order: disk cache → Pexels → DALL-E → null (no image).
+ * Returns a local file path or null.
+ */
+async function fetchSlideImage(prompt: string | undefined): Promise<string | null> {
+  if (!prompt) return null;
+
+  const cacheKey = crypto.createHash('md5').update(prompt).digest('hex');
+  const cachePath = path.join(IMAGE_CACHE_DIR, `${cacheKey}.jpg`);
+
+  // Cache hit
+  if (fssync.existsSync(cachePath)) return cachePath;
+
+  await fs.mkdir(IMAGE_CACHE_DIR, { recursive: true });
+
+  // Try Pexels
+  const pexelsKey = process.env.PEXELS_API_KEY;
+  if (pexelsKey) {
+    try {
+      const res = await fetch(
+        `https://api.pexels.com/v1/search?query=${encodeURIComponent(prompt)}&per_page=1&orientation=landscape`,
+        { headers: { Authorization: pexelsKey } },
+      );
+      if (res.ok) {
+        const data = await res.json() as { photos: { src: { large: string } }[] };
+        const url = data.photos?.[0]?.src?.large;
+        if (url) {
+          const img = await fetch(url);
+          if (img.ok) {
+            await fs.writeFile(cachePath, Buffer.from(await img.arrayBuffer()));
+            return cachePath;
+          }
+        }
+      }
+    } catch { /* fall through to DALL-E */ }
+  }
+
+  // Try DALL-E 3
+  const openaiKey = process.env.OPENAI_API_KEY;
+  if (openaiKey) {
+    try {
+      const res = await fetch('https://api.openai.com/v1/images/generations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${openaiKey}` },
+        body: JSON.stringify({
+          model: 'dall-e-3',
+          prompt: `Photorealistic, professional training photo: ${prompt}. Clean, well-lit, no text.`,
+          n: 1,
+          size: '1792x1024',
+          quality: 'standard',
+          style: 'natural',
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json() as { data: { url: string }[] };
+        const url = data.data?.[0]?.url;
+        if (url) {
+          const img = await fetch(url);
+          if (img.ok) {
+            await fs.writeFile(cachePath, Buffer.from(await img.arrayBuffer()));
+            return cachePath;
+          }
+        }
+      }
+    } catch { /* no image */ }
+  }
+
+  return null;
+}
 
 // Lazy-load native deps
 let _createCanvas: any = null;
@@ -82,42 +159,56 @@ interface RenderOptions {
 
 /**
  * Render a single slide frame to PNG.
+ * imagePath — optional local file path for the right-panel photo.
  */
 async function renderSlideFrame(
   slide: LessonSlide,
   slideIndex: number,
   totalSlides: number,
   opts: RenderOptions,
+  imagePath: string | null = null,
 ): Promise<Buffer> {
   await ensureDeps();
   const canvas = _createCanvas(WIDTH, HEIGHT);
   const ctx = canvas.getContext('2d');
 
-  // Background
-  ctx.fillStyle = '#0f172a';
+  // Background — clean white
+  ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
+  // Subtle grid pattern for depth
+  ctx.strokeStyle = 'rgba(0,0,0,0.03)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < WIDTH; x += 40) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,HEIGHT); ctx.stroke(); }
+  for (let y = 0; y < HEIGHT; y += 40) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(WIDTH,y); ctx.stroke(); }
+
   // Accent color based on segment
-  let accent = SEGMENT_COLORS[slide.segment] || '#3b82f6';
+  let accent = SEGMENT_COLORS[slide.segment] || '#ea580c';
   if (slide.segment === 'concept') {
     accent = CONCEPT_ACCENTS[slideIndex % CONCEPT_ACCENTS.length];
   }
 
-  // Top bar — module/lesson indicator
-  ctx.fillStyle = 'rgba(30, 41, 59, 0.8)';
-  ctx.fillRect(0, 0, WIDTH, 50);
+  // Top bar — white with bottom border
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, WIDTH, 54);
   ctx.fillStyle = '#64748b';
-  ctx.font = '18px Arial';
+  ctx.font = '17px Arial';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
   ctx.fillText(
-    `Module ${opts.moduleNumber}: ${opts.moduleName}  |  Lesson ${opts.lessonNumber}  |  Slide ${slideIndex + 1}/${totalSlides}`,
-    20, 25
+    `Module ${opts.moduleNumber}: ${opts.moduleName}  ·  Lesson ${opts.lessonNumber}  ·  Slide ${slideIndex + 1} of ${totalSlides}`,
+    20, 27
   );
+
+  // Elevate logo text top right
+  ctx.fillStyle = accent;
+  ctx.font = 'bold 17px Arial';
+  ctx.textAlign = 'right';
+  ctx.fillText('Elevate for Humanity', WIDTH - 20, 27);
 
   // Accent bar under top
   ctx.fillStyle = accent;
-  ctx.fillRect(0, 50, WIDTH, 4);
+  ctx.fillRect(0, 54, WIDTH, 4);
 
   // Slide content area — left 65%
   const contentX = 60;
@@ -126,11 +217,11 @@ async function renderSlideFrame(
 
   // Slide title
   ctx.fillStyle = accent;
-  ctx.font = 'bold 56px Arial';
+  ctx.font = 'bold 52px Arial';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
-  ctx.shadowColor = 'rgba(0,0,0,0.5)';
-  ctx.shadowBlur = 6;
+  ctx.shadowColor = 'rgba(0,0,0,0.08)';
+  ctx.shadowBlur = 4;
   ctx.shadowOffsetX = 1;
   ctx.shadowOffsetY = 1;
 
@@ -177,63 +268,73 @@ async function renderSlideFrame(
     if (currentY > HEIGHT - 200) break;
   }
 
-  // Instructor block — right side, vertically centered
-  const instrBlockW = Math.round(WIDTH * 0.28);
-  const instrBlockX = WIDTH - instrBlockW - 30;
-  const instrBlockY = 80;
-  const instrBlockH = HEIGHT - 140;
+  // Right panel — slide photo or instructor fallback
+  const panelW = Math.round(WIDTH * 0.28);
+  const panelX = WIDTH - panelW - 30;
+  const panelY = 80;
+  const panelH = HEIGHT - 140;
+  const panelRadius = 16;
 
-  // Card background
-  ctx.fillStyle = 'rgba(30, 41, 59, 0.6)';
   ctx.shadowBlur = 0;
-  roundRect(ctx, instrBlockX, instrBlockY, instrBlockW, instrBlockH, 16);
-  ctx.fill();
 
-  // Instructor photo — circular
-  try {
-    const img = await _loadImage(opts.instructorImagePath);
-    const circleRadius = Math.round(instrBlockW * 0.3);
-    const circleCX = instrBlockX + instrBlockW / 2;
-    const circleCY = instrBlockY + instrBlockH / 2 - 40;
+  if (imagePath) {
+    try {
+      const img = await _loadImage(imagePath);
 
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(circleCX, circleCY, circleRadius, 0, Math.PI * 2);
-    ctx.closePath();
-    ctx.clip();
+      // Clip to rounded rect, then cover-fit the photo
+      ctx.save();
+      roundRect(ctx, panelX, panelY, panelW, panelH, panelRadius);
+      ctx.clip();
 
-    const imgSize = circleRadius * 2;
-    const imgAspect = img.width / img.height;
-    let drawW: number, drawH: number;
-    if (imgAspect > 1) { drawH = imgSize; drawW = imgSize * imgAspect; }
-    else { drawW = imgSize; drawH = imgSize / imgAspect; }
-    ctx.drawImage(img, circleCX - drawW / 2, circleCY - drawH / 2, drawW, drawH);
-    ctx.restore();
+      const imgAspect = img.width / img.height;
+      const panelAspect = panelW / panelH;
+      let drawW: number, drawH: number, drawX: number, drawY: number;
+      if (imgAspect > panelAspect) {
+        // Image is wider — fit height, crop sides
+        drawH = panelH;
+        drawW = panelH * imgAspect;
+        drawX = panelX - (drawW - panelW) / 2;
+        drawY = panelY;
+      } else {
+        // Image is taller — fit width, crop top/bottom
+        drawW = panelW;
+        drawH = panelW / imgAspect;
+        drawX = panelX;
+        drawY = panelY - (drawH - panelH) / 2;
+      }
+      ctx.drawImage(img, drawX, drawY, drawW, drawH);
 
-    // Circle border
-    ctx.strokeStyle = accent;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.arc(circleCX, circleCY, circleRadius, 0, Math.PI * 2);
-    ctx.stroke();
+      // Subtle dark gradient at the bottom for the instructor name tag
+      const grad = ctx.createLinearGradient(panelX, panelY + panelH - 80, panelX, panelY + panelH);
+      grad.addColorStop(0, 'rgba(0,0,0,0)');
+      grad.addColorStop(1, 'rgba(0,0,0,0.55)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(panelX, panelY + panelH - 80, panelW, 80);
 
-    // Name
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 22px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    ctx.fillText(opts.instructorName, circleCX, circleCY + circleRadius + 16);
+      ctx.restore();
 
-    // Title
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '17px Arial';
-    ctx.fillText(opts.instructorTitle, circleCX, circleCY + circleRadius + 44);
-  } catch {
-    // Fallback — just show name
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 22px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText(opts.instructorName, instrBlockX + instrBlockW / 2, instrBlockY + instrBlockH / 2);
+      // Accent border around the panel
+      ctx.strokeStyle = accent;
+      ctx.lineWidth = 3;
+      roundRect(ctx, panelX, panelY, panelW, panelH, panelRadius);
+      ctx.stroke();
+
+      // Instructor name tag over the gradient
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 18px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText(opts.instructorName, panelX + panelW / 2, panelY + panelH - 28);
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.font = '14px Arial';
+      ctx.fillText(opts.instructorTitle, panelX + panelW / 2, panelY + panelH - 10);
+    } catch {
+      // Image load failed — fall back to card
+      drawInstructorCard(ctx, panelX, panelY, panelW, panelH, panelRadius, accent, opts);
+    }
+  } else {
+    // No image — draw the instructor card
+    drawInstructorCard(ctx, panelX, panelY, panelW, panelH, panelRadius, accent, opts);
   }
 
   // Bottom bar
@@ -258,6 +359,19 @@ async function renderSlideFrame(
   ctx.fill();
 
   return canvas.toBuffer('image/png');
+}
+
+/**
+ * Render a single slide to PNG — used by the admin preview API.
+ */
+export async function renderSlideFrameForPreview(
+  slide: LessonSlide,
+  slideIndex: number,
+  totalSlides: number,
+  opts: RenderOptions,
+): Promise<Buffer> {
+  const imagePath = await fetchSlideImage(slide.imagePrompt).catch(() => null);
+  return renderSlideFrame(slide, slideIndex, totalSlides, opts, imagePath);
 }
 
 /**
@@ -321,10 +435,15 @@ export async function renderLessonVideo(
     slideDurations[longestIdx] += diff;
   }
 
+  // Pre-fetch slide images in parallel (cached after first run)
+  const slideImages = await Promise.all(
+    slides.map(slide => fetchSlideImage(slide.imagePrompt).catch(() => null)),
+  );
+
   // Render each slide frame
   const framePaths: string[] = [];
   for (let i = 0; i < slides.length; i++) {
-    const buf = await renderSlideFrame(slides[i], i, slides.length, opts);
+    const buf = await renderSlideFrame(slides[i], i, slides.length, opts, slideImages[i]);
     const framePath = path.join(tempDir, `slide-${i}.png`);
     await fs.writeFile(framePath, buf);
     framePaths.push(framePath);
@@ -413,6 +532,26 @@ export async function renderLessonVideo(
 }
 
 // --- Helpers ---
+
+function drawInstructorCard(
+  ctx: any,
+  x: number, y: number, w: number, h: number, r: number,
+  accent: string,
+  opts: RenderOptions,
+) {
+  ctx.fillStyle = 'rgba(30, 41, 59, 0.6)';
+  roundRect(ctx, x, y, w, h, r);
+  ctx.fill();
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 22px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(opts.instructorName, x + w / 2, y + h / 2 - 14);
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '17px Arial';
+  ctx.fillText(opts.instructorTitle, x + w / 2, y + h / 2 + 14);
+}
 
 function wrapText(ctx: any, text: string, maxWidth: number, fontSize: number): string[] {
   const words = text.split(' ');

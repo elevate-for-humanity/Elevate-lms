@@ -3,6 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import LogoImage from '@/components/site/LogoImage';
 import { Facebook, Instagram, Linkedin, Youtube } from 'lucide-react';
 
 // GOVERNMENT-GRADE FOOTER STRUCTURE
@@ -90,7 +91,7 @@ export default function ServerFooter() {
         {/* Institutional Identity */}
         <div className="mb-10 pb-8 border-b border-slate-800">
           <div className="flex items-center gap-3 mb-3">
-            <Image src="/logo.png" alt="Elevate for Humanity" width={32} height={48} className="w-auto h-8" />
+            <LogoImage alt="Elevate for Humanity" width={32} height={48} className="w-auto h-8" />
             <span className="text-lg font-bold text-white">Elevate for Humanity</span>
           </div>
           <p className="text-sm text-slate-500 max-w-2xl leading-relaxed">
@@ -205,8 +206,7 @@ export default function ServerFooter() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             {/* Logo and Copyright */}
             <div className="flex items-center gap-3">
-              <Image
-                src="/logo.png"
+              <LogoImage
                 alt="Elevate"
                 width={28}
                 height={42}
@@ -271,7 +271,7 @@ export default function ServerFooter() {
             {/* Legal Disclaimer */}
             <div className="mt-6 pt-6 border-t border-slate-800">
               <p className="text-[10px] leading-relaxed text-slate-500 max-w-4xl mx-auto text-center">
-                Elevate for Humanity Career &amp; Technical Institute is a workforce training provider operating under 2Exclusive LLC-S. Programs are industry-aligned and designed to lead to employment outcomes. Certifications are issued by the respective certifying organizations upon successful completion of required examinations. Training may be fully funded for eligible participants through workforce programs such as WIOA, JRI, and approved funding partners. Eligibility and funding determinations are subject to program and agency guidelines. Elevate for Humanity Career &amp; Technical Institute is not currently approved as a postsecondary institution through the Indiana Department of Education.
+                Elevate for Humanity Career &amp; Technical Institute is a DOL Registered Apprenticeship Sponsor, Indiana ETPL-listed workforce training provider, and Certiport Authorized Testing Center operating under 2Exclusive LLC-S. Industry certifications are issued by the respective credentialing bodies (CompTIA, NHA, EPA, NCCCO, etc.) upon passing the required exams — these are the same credentials employers hire for. Training may be fully funded for eligible participants through WIOA, Workforce Ready Grant, JRI, and approved workforce partners; eligibility is determined by the applicable agency. Elevate for Humanity Career &amp; Technical Institute is a workforce training organization, not a degree-granting postsecondary institution under the Indiana Department of Education — our programs lead to industry certifications and employment, not academic degrees.
               </p>
             </div>
           </div>

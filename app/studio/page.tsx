@@ -930,7 +930,7 @@ export default function StudioPage() {
             {rightPanel === 'ports' && (
               <PortForwarding
                 detectedPorts={detectedPorts}
-                baseUrl={typeof window !== 'undefined' ? window.location.origin : ''}
+                baseUrl={typeof window !== 'undefined' ? window.location.origin : 'https://www.elevateforhumanity.org'}
               />
             )}
 

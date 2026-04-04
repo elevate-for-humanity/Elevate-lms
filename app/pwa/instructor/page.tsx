@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import LogoImage from '@/components/site/LogoImage';
 import Link from 'next/link';
 import { createAdminClient } from '@/lib/supabase/admin';
 
@@ -27,7 +28,7 @@ export default async function InstructorPWAPage() {
       <div className="relative h-48 sm:h-56 overflow-hidden">
         <Image src="/images/pages/demo-page-4.jpg" alt="Instructor in classroom" fill className="object-cover" priority  sizes="100vw" />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
-          <Image src="/logo.png" alt="Elevate" width={40} height={40} className="mb-3" />
+          <LogoImage alt="Elevate" width={40} height={40} className="mb-3" />
           <h1 className="text-2xl font-bold text-slate-900">Instructor Dashboard</h1>
           <p className="text-purple-200 text-sm mt-1">Manage courses, students, and grading</p>
         </div>

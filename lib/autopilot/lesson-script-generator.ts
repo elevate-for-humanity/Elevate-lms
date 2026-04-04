@@ -26,6 +26,8 @@ export interface LessonSlide {
   title: string;
   bullets: string[];
   segment: 'intro' | 'concept' | 'visual' | 'application' | 'wrapup';
+  /** Short Pexels/DALL-E search phrase describing a relevant real-world image for this slide */
+  imagePrompt?: string;
 }
 
 export interface LessonScript {
@@ -166,23 +168,23 @@ Return ONLY valid JSON (no markdown fences):
 {
   "narration": "Full narration text, all 5 segments combined as one continuous script. Use natural spoken language. Do not include segment labels in the narration.",
   "slides": [
-    { "title": "Slide Title", "bullets": ["bullet 1", "bullet 2", "bullet 3"], "segment": "intro" },
-    { "title": "Subtopic 1", "bullets": ["...", "..."], "segment": "concept" },
-    { "title": "Subtopic 2", "bullets": ["...", "..."], "segment": "concept" },
-    { "title": "Subtopic 3", "bullets": ["...", "..."], "segment": "concept" },
-    { "title": "Process Overview", "bullets": ["Step 1...", "Step 2..."], "segment": "visual" },
-    { "title": "On the Job", "bullets": ["...", "..."], "segment": "application" },
-    { "title": "Lesson Summary", "bullets": ["...", "..."], "segment": "wrapup" }
+    { "title": "Slide Title", "bullets": ["bullet 1", "bullet 2", "bullet 3"], "segment": "intro", "imagePrompt": "2-5 word Pexels search phrase for a real photo matching this slide topic" },
+    { "title": "Subtopic 1", "bullets": ["...", "..."], "segment": "concept", "imagePrompt": "..." },
+    { "title": "Subtopic 2", "bullets": ["...", "..."], "segment": "concept", "imagePrompt": "..." },
+    { "title": "Subtopic 3", "bullets": ["...", "..."], "segment": "concept", "imagePrompt": "..." },
+    { "title": "Process Overview", "bullets": ["Step 1...", "Step 2..."], "segment": "visual", "imagePrompt": "..." },
+    { "title": "On the Job", "bullets": ["...", "..."], "segment": "application", "imagePrompt": "..." },
+    { "title": "Lesson Summary", "bullets": ["...", "..."], "segment": "wrapup", "imagePrompt": "..." }
   ]
 }
 
 CRITICAL RULES:
-- Max 5 bullets per slide
-- Short phrases, not sentences
+- Max 5 bullets per slide, short phrases not sentences
 - 6-8 slides total
 - **NARRATION MUST BE BETWEEN 950 AND 1,050 WORDS.** The TTS voice speaks at ~144 WPM, so 1,000 words = ~7 minutes. Under 900 words = video too short. Over 1,100 = too long.
 - Each concept subtopic should be 150-200 words of narration with examples
-- Narration should explain the bullets, not repeat them verbatim`;
+- Narration should explain the bullets, not repeat them verbatim
+- imagePrompt: 2-5 word Pexels search phrase (e.g. "bookkeeper reviewing spreadsheet", "small business owner laptop", "accountant office desk"). Must be a real-world photo subject, no abstract terms.`;
 }
 
 function buildFullGenerationPrompt(input: LessonInput): string {
@@ -211,11 +213,11 @@ Return ONLY valid JSON (no markdown fences):
 {
   "narration": "Full narration text, all 5 segments combined. Natural spoken language. No segment labels.",
   "slides": [
-    { "title": "Slide Title", "bullets": ["bullet 1", "bullet 2"], "segment": "intro" },
-    { "title": "Subtopic", "bullets": ["...", "..."], "segment": "concept" },
-    { "title": "Process Overview", "bullets": ["Step 1", "Step 2"], "segment": "visual" },
-    { "title": "On the Job", "bullets": ["...", "..."], "segment": "application" },
-    { "title": "Summary", "bullets": ["...", "..."], "segment": "wrapup" }
+    { "title": "Slide Title", "bullets": ["bullet 1", "bullet 2"], "segment": "intro", "imagePrompt": "2-5 word Pexels search phrase for a real photo matching this slide topic" },
+    { "title": "Subtopic", "bullets": ["...", "..."], "segment": "concept", "imagePrompt": "..." },
+    { "title": "Process Overview", "bullets": ["Step 1", "Step 2"], "segment": "visual", "imagePrompt": "..." },
+    { "title": "On the Job", "bullets": ["...", "..."], "segment": "application", "imagePrompt": "..." },
+    { "title": "Summary", "bullets": ["...", "..."], "segment": "wrapup", "imagePrompt": "..." }
   ]
 }
 
@@ -225,5 +227,6 @@ CRITICAL RULES:
 - **NARRATION MUST BE BETWEEN 950 AND 1,050 WORDS.** The TTS voice speaks at ~144 WPM, so 1,000 words = ~7 minutes. Under 900 = too short, over 1,100 = too long.
 - Each concept subtopic should be 150-200 words with examples
 - Narration explains bullets, does not repeat them verbatim
-- Include real QuickBooks Online screen references and bookkeeping terminology`;
+- Include real QuickBooks Online screen references and bookkeeping terminology
+- imagePrompt: 2-5 word Pexels search phrase (e.g. "bookkeeper reviewing spreadsheet", "small business owner laptop"). Must be a real-world photo subject, no abstract terms.`;
 }

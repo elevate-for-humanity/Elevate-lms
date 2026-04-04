@@ -187,6 +187,19 @@ export type BlueprintGenerationRules = {
 
 export type BlueprintVideoConfig = {
   /**
+   * Video generation backend.
+   *
+   * Policy: ALL new programs must use 'runway'. The course generator
+   * (seed-course-from-blueprint) reads this field and calls lib/video/runway.ts.
+   * 'canvas-slides' is legacy-only (HVAC) and must not be used for new programs.
+   *
+   *   'runway'       — Runway Gen4.5 text-to-video + OpenAI TTS narration (default for new)
+   *   'canvas-slides'— Canvas-rendered slide deck + TTS (HVAC legacy only)
+   *   'manual'       — Pre-existing MP4s in public/videos/, no generation
+   */
+  videoGenerator: 'runway' | 'canvas-slides' | 'manual';
+
+  /**
    * Layout template to use for all lesson videos in this program.
    * 'elevate-slide' = dark navy + orange top bar + DALL-E image bottom-left
    *                   + bullet points + instructor name. Matches HVAC template.

@@ -19,61 +19,81 @@ export interface TTSOptions {
 // OpenAI TTS voices
 const VALID_VOICES = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
 
+const CHUNK_SIZE = 4000; // chars — safely under the 4096 API limit
+
+/** Split text on sentence boundaries into chunks under CHUNK_SIZE chars */
+function chunkText(text: string): string[] {
+  const sentences = text.match(/[^.!?]+[.!?]+/g) ?? [text];
+  const chunks: string[] = [];
+  let current = '';
+  for (const sentence of sentences) {
+    if ((current + sentence).length > CHUNK_SIZE && current) {
+      chunks.push(current.trim());
+      current = sentence;
+    } else {
+      current += sentence;
+    }
+  }
+  if (current.trim()) chunks.push(current.trim());
+  return chunks;
+}
+
+/** Call OpenAI TTS for a single chunk (must be under 4096 chars) */
+async function ttsChunk(
+  text: string,
+  voice: string,
+  speed: number,
+  apiKey: string,
+): Promise<Buffer> {
+  const response = await fetch('https://api.openai.com/v1/audio/speech', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'tts-1-hd',
+      input: text,
+      voice,
+      speed,
+      response_format: 'mp3',
+    }),
+  });
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`OpenAI TTS API error: ${error}`);
+  }
+  return Buffer.from(await response.arrayBuffer());
+}
+
 /**
- * Generate speech from text using OpenAI TTS API
+ * Generate speech from text using OpenAI TTS API.
+ * Automatically chunks long text and concatenates the MP3 buffers.
  */
 export async function generateTextToSpeech(
   text: string,
   voice: string = 'alloy',
   speed: number = 1.0
 ): Promise<Buffer> {
-  try {
-    if (!text || text.trim().length === 0) {
-      throw new Error('Text is required for TTS generation');
-    }
-
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error('OPENAI_API_KEY not configured');
-    }
-
-    // Validate voice
-    const selectedVoice = VALID_VOICES.includes(voice) ? voice : 'alloy';
-
-    // Validate speed (0.25 to 4.0)
-    const selectedSpeed = Math.max(0.25, Math.min(4.0, speed));
-
-    // Call OpenAI TTS API
-    const response = await fetch('https://api.openai.com/v1/audio/speech', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'tts-1',
-        input: text.substring(0, 4096), // Max 4096 chars
-        voice: selectedVoice,
-        speed: selectedSpeed,
-        response_format: 'mp3',
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`OpenAI TTS API error: ${error}`);
-    }
-
-    // Get audio buffer
-    const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    return buffer;
-  } catch (error) {
-    throw new Error(
-      `Failed to generate speech: ${error instanceof Error ? error.message : 'Unknown error'}`
-    );
+  if (!text || text.trim().length === 0) {
+    throw new Error('Text is required for TTS generation');
   }
+
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error('OPENAI_API_KEY not configured');
+
+  const selectedVoice = VALID_VOICES.includes(voice) ? voice : 'alloy';
+  const selectedSpeed = Math.max(0.25, Math.min(4.0, speed));
+
+  const chunks = chunkText(text);
+  const buffers: Buffer[] = [];
+
+  for (const chunk of chunks) {
+    const buf = await ttsChunk(chunk, selectedVoice, selectedSpeed, apiKey);
+    buffers.push(buf);
+  }
+
+  return Buffer.concat(buffers);
 }
 
 /**

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
+import LogoImage from '@/components/site/LogoImage';
 import {
   Users,
   BookOpen,
@@ -48,8 +49,7 @@ export default async function ParentPortalPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl">
             <div className="mb-8">
-              <Image
-                src="/logo.png"
+              <LogoImage
                 alt="Elevate for Humanity"
                 width={200}
                 height={80}

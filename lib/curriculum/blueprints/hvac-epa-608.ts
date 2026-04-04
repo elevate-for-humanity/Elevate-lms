@@ -20,6 +20,7 @@ import type { CredentialBlueprint, BlueprintVideoConfig } from './types';
 // Locked video format — matches the 6 produced HVAC lesson videos exactly.
 // Do not change without regenerating all lesson videos.
 const HVAC_VIDEO_CONFIG: BlueprintVideoConfig = {
+  videoGenerator: 'canvas-slides', // legacy — do not copy for new programs
   template:            'elevate-slide',
   instructorName:      'Marcus Johnson',
   instructorTitle:     'Master HVAC Technician',

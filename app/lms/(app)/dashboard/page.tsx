@@ -13,7 +13,7 @@ import Link from 'next/link';
 import {
   Play, ArrowRight, Award, Clock, BookOpen,
   CheckCircle, AlertCircle, ChevronRight, Flame,
-  GraduationCap, Target, Users, HelpCircle,
+  GraduationCap, Target, Users, HelpCircle, BarChart2,
 } from 'lucide-react';
 import { NotificationBell } from '@/components/lms/NotificationBell';
 import { GlobalSearch } from '@/components/lms/GlobalSearch';
@@ -31,6 +31,7 @@ export default async function StudentDashboard() {
     courseEnrollmentsRes,
     certificationsRes,
     workoneAppRes,
+    quizAttemptsRes,
   ] = await Promise.all([
     supabase
       .from('program_enrollments')
@@ -55,6 +56,13 @@ export default async function StudentDashboard() {
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle(),
+    supabase
+      .from('quiz_attempts')
+      .select('id, score, passed, completed_at, quiz_id, quizzes(title)')
+      .eq('user_id', user.id)
+      .not('completed_at', 'is', null)
+      .order('completed_at', { ascending: false })
+      .limit(5),
   ]);
 
   const programEnrollments = programEnrollmentsRes.data ?? [];
@@ -62,6 +70,7 @@ export default async function StudentDashboard() {
   const certifications = certificationsRes.data ?? [];
   const workoneApp = workoneAppRes.data;
   const isPendingWorkone = !!workoneApp;
+  const recentQuizAttempts = quizAttemptsRes.data ?? [];
 
   // ── Active enrollment + resume point ────────────────────────────────────
   const activeEnrollment =
@@ -396,6 +405,54 @@ export default async function StudentDashboard() {
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Practice & exam scores */}
+            {recentQuizAttempts.length > 0 && (
+              <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                  <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <BarChart2 className="w-4 h-4 text-slate-400" /> Recent Practice Scores
+                  </h2>
+                  <Link href="/lms/quizzes" className="text-xs text-brand-blue-600 font-medium hover:underline">View all →</Link>
+                </div>
+                <div className="divide-y divide-slate-50">
+                  {recentQuizAttempts.map((attempt: any) => {
+                    const score = attempt.score ?? 0;
+                    const passed = attempt.passed ?? false;
+                    const quizTitle = attempt.quizzes?.title ?? 'Practice Assessment';
+                    const date = attempt.completed_at
+                      ? new Date(attempt.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                      : null;
+                    return (
+                      <div key={attempt.id} className="px-5 py-3.5 flex items-center gap-4">
+                        {/* Score ring */}
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 font-black text-sm tabular-nums ${
+                          passed ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'
+                        }`}>
+                          {score}%
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-slate-900 truncate">{quizTitle}</p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className={`text-xs font-bold ${passed ? 'text-emerald-600' : 'text-red-500'}`}>
+                              {passed ? 'Passed' : 'Not passed'}
+                            </span>
+                            {date && <span className="text-xs text-slate-400">· {date}</span>}
+                          </div>
+                        </div>
+                        {/* Score bar */}
+                        <div className="w-20 h-1.5 bg-slate-100 rounded-full overflow-hidden flex-shrink-0">
+                          <div
+                            className={`h-full rounded-full ${passed ? 'bg-emerald-500' : 'bg-red-400'}`}
+                            style={{ width: `${score}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}

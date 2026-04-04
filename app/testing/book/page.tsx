@@ -249,6 +249,27 @@ function BookingForm() {
             </div>
           </div>
 
+          {/* NHA accommodation deadline notice */}
+          {selectedProvider?.key === 'nha' && (
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold text-amber-900 text-sm">Testing Accommodations — 30-Day Deadline</p>
+                <p className="text-amber-800 text-xs mt-1 leading-relaxed">
+                  If you require testing accommodations (extended time, screen reader, etc.), NHA requires requests to be submitted <strong>at least 30 days before your exam date</strong>. Submit your request early to avoid delays or missed testing opportunities.
+                </p>
+                <a
+                  href="https://knowledge.nhanow.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 hover:text-amber-900 mt-2"
+                >
+                  NHA Accommodations FAQ →
+                </a>
+              </div>
+            </div>
+          )}
+
           {/* Fee summary — shown immediately after provider selection */}
           {selectedProvider && selectedProvider.fees && selectedProvider.fees.length > 0 && (
             <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-2xl p-5">

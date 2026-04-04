@@ -45,8 +45,9 @@ export async function requireApiRole(
 
   // Use admin client for profile lookup to bypass RLS on profiles table,
   // then hand the RLS-respecting client to the caller for data queries.
+  // createAdminClient() throws if SUPABASE_SERVICE_ROLE_KEY is missing — no fallback.
   const admin = createAdminClient();
-  const profileDb = admin || supabase;
+  const profileDb = admin;
 
   const { data: profile } = await profileDb
     .from('profiles')

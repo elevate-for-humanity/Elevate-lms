@@ -17,15 +17,32 @@ async function _POST(
   const { user, db } = auth;
   const { quizId } = await params;
 
-  // Check if quiz exists
+  // Check if quiz exists and resolve course_id for enrollment check.
+  // quizzes.course_id is the direct link — no multi-join needed.
   const { data: quiz, error: quizError } = await db
     .from('quizzes')
-    .select('id, max_attempts, requires_proctoring')
+    .select('id, course_id, max_attempts, requires_proctoring')
     .eq('id', quizId)
     .single();
 
   if (quizError || !quiz) {
     return NextResponse.json({ error: 'Quiz not found' }, { status: 404 });
+  }
+
+  // Verify enrollment before creating any attempt.
+  // Without this, any authenticated user can start attempts for any quiz ID.
+  if (quiz.course_id) {
+    const { data: enrollment } = await db
+      .from('program_enrollments')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('course_id', quiz.course_id)
+      .in('status', ['active', 'enrolled', 'in_progress', 'completed', 'confirmed'])
+      .maybeSingle();
+
+    if (!enrollment) {
+      return NextResponse.json({ error: 'Not enrolled in this course' }, { status: 403 });
+    }
   }
 
   // Check existing attempts

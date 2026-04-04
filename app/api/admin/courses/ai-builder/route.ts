@@ -148,10 +148,7 @@ async function _POST(request: NextRequest) {
 
     if (courseErr || !course) {
       logger.error('[AI Course Builder] Course insert failed', courseErr);
-      return NextResponse.json(
-        { error: 'Failed to save course', detail: courseErr?.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to save course' }, { status: 500 });
     }
 
     logger.info('[AI Course Builder] Course saved', { courseId: course.id });
@@ -186,7 +183,7 @@ async function _POST(request: NextRequest) {
 
       if (lessonErr || !lesson) {
         logger.error('[AI Course Builder] Lesson insert failed', { lessonNumber, error: lessonErr });
-        lessonErrors.push(`Lesson ${lessonNumber}: ${lessonErr?.message || 'unknown error'}`);
+        lessonErrors.push(`Lesson ${lessonNumber}: save failed`);
         continue;
       }
 
@@ -277,8 +274,7 @@ async function _POST(request: NextRequest) {
 
   } catch (error) {
     logger.error('[AI Course Builder] Unhandled error', error);
-    const message = error instanceof Error ? error.message : 'Generation failed';
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: 'Course generation failed' }, { status: 500 });
   }
 }
 

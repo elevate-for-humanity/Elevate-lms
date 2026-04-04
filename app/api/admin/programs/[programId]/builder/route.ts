@@ -73,7 +73,7 @@ export async function PATCH(
       updated_at:      new Date().toISOString(),
     }).eq('id', programId);
 
-    if (programErr) return safeError(`Program update failed: ${programErr.message}`, 500);
+    if (programErr) return safeInternalError(programErr, 'program-builder: program update failed');
 
     // ── 2. Outcomes — delete-and-reinsert (simple, ordered) ────────────────
     if (Array.isArray(body.outcomes)) {
@@ -85,7 +85,7 @@ export async function PATCH(
           outcome_order: i,
         }));
         const { error } = await db.from('program_outcomes').insert(rows);
-        if (error) return safeError(`Outcomes save failed: ${error.message}`, 500);
+        if (error) return safeInternalError(error, 'program-builder: outcomes save failed');
       }
     }
 
@@ -100,7 +100,7 @@ export async function PATCH(
           sort_order:    i,
         }));
         const { error } = await db.from('program_credentials').insert(rows);
-        if (error) return safeError(`Credentials save failed: ${error.message}`, 500);
+        if (error) return safeInternalError(error, 'program-builder: credentials save failed');
       }
     }
 
@@ -196,7 +196,7 @@ export async function PATCH(
           sort_order:    i,
         }));
         const { error } = await db.from('program_ctas').insert(rows);
-        if (error) return safeError(`CTAs save failed: ${error.message}`, 500);
+        if (error) return safeInternalError(error, 'program-builder: CTAs save failed');
       }
     }
 
@@ -214,7 +214,7 @@ export async function PATCH(
           sort_order:   i,
         }));
         const { error } = await db.from('program_tracks').insert(rows);
-        if (error) return safeError(`Tracks save failed: ${error.message}`, 500);
+        if (error) return safeInternalError(error, 'program-builder: tracks save failed');
       }
     }
 

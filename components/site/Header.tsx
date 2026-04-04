@@ -4,6 +4,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import Logo from '@/components/ui/Logo';
+import LogoImage from '@/components/site/LogoImage';
 import HeaderMobileMenu from './HeaderMobileMenu.client';
 import HeaderDesktopNav from './HeaderDesktopNav';
 

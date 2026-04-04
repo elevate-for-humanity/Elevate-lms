@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Logo from '@/components/ui/Logo';
+import LogoImage from '@/components/site/LogoImage';
 import { usePathname } from 'next/navigation';
 import { NotificationBell } from './NotificationBell';
 import {

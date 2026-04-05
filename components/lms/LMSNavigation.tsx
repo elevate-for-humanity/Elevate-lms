@@ -75,13 +75,21 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
   }, [user?.id, supabase]);
 
   const navItems = [
-    { href: '/lms/dashboard', label: 'Dashboard', desc: 'Your home base', icon: LayoutDashboard },
-    { href: '/lms/courses', label: 'My Courses', desc: 'Lessons & modules', icon: BookOpen, badge: courseCount > 0 ? courseCount : undefined },
-    { href: '/lms/progress', label: 'Progress', desc: 'Track completion', icon: TrendingUp },
-    { href: '/lms/quizzes', label: 'Quizzes', desc: 'Tests & exams', icon: ClipboardCheck },
-    { href: '/lms/schedule', label: 'Schedule', desc: 'Dates & deadlines', icon: Calendar },
-    { href: '/lms/messages', label: 'Messages', desc: 'Inbox & chat', icon: MessageSquare, badge: unreadMessages > 0 ? unreadMessages : undefined },
-    { href: '/lms/certificates', label: 'Certificates', desc: 'Your credentials', icon: Award },
+    { href: '/lms/dashboard',     label: 'Dashboard',    desc: 'Your home base',       icon: LayoutDashboard },
+    { href: '/lms/courses',       label: 'My Courses',   desc: 'Lessons & modules',    icon: BookOpen, badge: courseCount > 0 ? courseCount : undefined },
+    { href: '/lms/assignments',   label: 'Assignments',  desc: 'Tasks & submissions',  icon: ClipboardCheck },
+    { href: '/lms/progress',      label: 'Progress',     desc: 'Track completion',     icon: TrendingUp },
+    { href: '/lms/quizzes',       label: 'Quizzes',      desc: 'Tests & exams',        icon: ClipboardCheck },
+    { href: '/lms/calendar',      label: 'Schedule',     desc: 'Dates & deadlines',    icon: Calendar },
+    { href: '/lms/attendance',    label: 'Attendance',   desc: 'Class attendance',     icon: BookMarked },
+    { href: '/lms/messages',      label: 'Messages',     desc: 'Inbox & chat',         icon: MessageSquare, badge: unreadMessages > 0 ? unreadMessages : undefined },
+    { href: '/lms/certificates',  label: 'Certificates', desc: 'Your credentials',     icon: Award },
+    { href: '/lms/ai-tutor',      label: 'AI Tutor',     desc: 'Get help from AI',     icon: BookOpen },
+    { href: '/lms/library',       label: 'Library',      desc: 'Resources & reading',  icon: BookMarked },
+    { href: '/lms/social',        label: 'Community',    desc: 'Groups & connections', icon: ChevronDown },
+    { href: '/lms/alumni',        label: 'Alumni',       desc: 'Alumni network',       icon: Award },
+    { href: '/lms/payments',      label: 'Payments',     desc: 'Billing & invoices',   icon: Award },
+    { href: '/lms/settings',      label: 'Settings',     desc: 'Account settings',     icon: Settings },
   ];
 
   // Resources available to learners inside the LMS — not surfaced on the marketing site.

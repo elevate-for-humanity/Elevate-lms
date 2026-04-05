@@ -26,15 +26,22 @@ interface LMSSidebarProps {
 }
 
 const navItems = [
-  { href: '/lms/dashboard',    label: 'Dashboard',    icon: LayoutDashboard },
-  { href: '/lms/courses',      label: 'My Courses',   icon: BookOpen },
-  { href: '/lms/assignments',  label: 'Assignments',  icon: Target },
-  { href: '/lms/progress',     label: 'Progress',     icon: TrendingUp },
-  { href: '/lms/quizzes',      label: 'Quizzes',      icon: ClipboardCheck },
-  { href: '/lms/calendar',     label: 'Schedule',     icon: Calendar },
-  { href: '/lms/messages',     label: 'Messages',     icon: MessageSquare },
-  { href: '/lms/certificates', label: 'Certificates', icon: Award },
-  { href: '/lms/social',       label: 'Community',    icon: Users },
+  { href: '/lms/dashboard',        label: 'Dashboard',      icon: LayoutDashboard },
+  { href: '/lms/courses',          label: 'My Courses',     icon: BookOpen },
+  { href: '/lms/assignments',      label: 'Assignments',    icon: Target },
+  { href: '/lms/progress',         label: 'Progress',       icon: TrendingUp },
+  { href: '/lms/quizzes',          label: 'Quizzes',        icon: ClipboardCheck },
+  { href: '/lms/calendar',         label: 'Schedule',       icon: Calendar },
+  { href: '/lms/attendance',       label: 'Attendance',     icon: ClipboardCheck },
+  { href: '/lms/messages',         label: 'Messages',       icon: MessageSquare },
+  { href: '/lms/chat',             label: 'Chat',           icon: MessageSquare },
+  { href: '/lms/certificates',     label: 'Certificates',   icon: Award },
+  { href: '/lms/certification',    label: 'Certification',  icon: Award },
+  { href: '/lms/ai-tutor',         label: 'AI Tutor',       icon: BookOpen },
+  { href: '/lms/library',          label: 'Library',        icon: BookOpen },
+  { href: '/lms/social',           label: 'Community',      icon: Users },
+  { href: '/lms/alumni',           label: 'Alumni',         icon: Users },
+  { href: '/lms/payments',         label: 'Payments',       icon: Award },
 ];
 
 const bottomItems = [

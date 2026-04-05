@@ -1,4 +1,3 @@
-import { requireAdmin } from '@/lib/auth';
 "use client";
 import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';

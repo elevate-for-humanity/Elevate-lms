@@ -1,4 +1,3 @@
-import { requireAdmin } from '@/lib/auth';
 'use client';
 
 import Link from "next/link";

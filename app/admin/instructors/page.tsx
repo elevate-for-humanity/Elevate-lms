@@ -1,6 +1,6 @@
-import { requireAdmin } from '@/lib/auth';
-
 'use client';
+
+
 
 import React from 'react';
 

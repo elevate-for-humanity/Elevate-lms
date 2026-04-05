@@ -85,7 +85,7 @@ export const NAV_ITEMS = [
       { name: 'EPA Section 608 (HVAC)', href: '/testing/esco' },
       { name: 'ACT WorkKeys / NCRC', href: '/testing/workkeys' },
       { name: 'NRF Rise Up (Retail)', href: '/testing/nrf' },
-      { name: 'CareerSafe / OSHA', href: '/testing/careersafe' },
+
       { name: 'ServSafe (Food Safety)', href: '/testing/servsafe' },
       { name: '— Book & Info —', href: '/testing', isHeader: true },
       { name: 'Book a Testing Session', href: '/testing/book' },
@@ -120,26 +120,7 @@ export const NAV_ITEMS = [
       { name: 'Contact Us', href: '/contact' },
     ],
   },
-  {
-    name: 'Testing',
-    href: '/testing',
-    subItems: [
-      { name: '— Credential Exams —', href: '/testing', isHeader: true },
-      { name: 'All Testing & Exams', href: '/testing' },
-      { name: 'Book an Exam', href: '/testing/book' },
-      { name: '— By Exam Type —', href: '/testing', isHeader: true },
-      { name: 'Certiport (Microsoft, IC3, IT)', href: '/testing#certiport' },
-      { name: 'EPA Section 608 (HVAC)', href: '/testing#epa-608' },
-      { name: 'NHA Healthcare Exams', href: '/testing#nha' },
-      { name: 'ACT WorkKeys / NCRC', href: '/workkeys' },
-      { name: 'OSHA Safety Certification', href: '/testing#osha' },
-      { name: 'NRF Rise Up (Retail)', href: '/testing#nrf' },
-      { name: 'CareerSafe Online', href: '/testing#careersafe' },
-      { name: '— Credentials —', href: '/credentials', isHeader: true },
-      { name: 'Credential Verification', href: '/verify-credentials' },
-      { name: 'Certification Programs', href: '/training/certifications' },
-    ],
-  },
+
   {
     name: 'Platform',
     subItems: [

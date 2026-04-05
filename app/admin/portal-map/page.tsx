@@ -919,7 +919,7 @@ export default function AdminPortalMapPage() {
         </div>
 
         {/* Code Reference */}
-        <div className="mt-8 bg-slate-800 rounded-lg p-6 text-white">
+        <div className="mt-8 bg-white rounded-lg p-6 text-white">
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Code className="w-5 h-5" />
             Code Reference

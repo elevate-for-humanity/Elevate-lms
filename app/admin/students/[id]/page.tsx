@@ -131,7 +131,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
         <Link href="/admin/students" className="mt-1 p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
           <ArrowLeft className="w-4 h-4" />
         </Link>
-        <div className="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
+        <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
           {initials}
         </div>
         <div className="flex-1 min-w-0">
@@ -150,7 +150,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
               <Mail className="w-3.5 h-3.5" /> Email
             </a>
           )}
-          <Link href={`/admin/applications?search=${encodeURIComponent(student.email || '')}`} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-700 transition-colors">
+          <Link href={`/admin/applications?search=${encodeURIComponent(student.email || '')}`} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white text-slate-900 text-sm font-semibold hover:bg-slate-700 transition-colors">
             <FileText className="w-3.5 h-3.5" /> View Applications
           </Link>
         </div>

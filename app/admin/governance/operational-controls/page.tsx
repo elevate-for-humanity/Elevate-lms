@@ -63,7 +63,7 @@ export default function OperationalControlsPage() {
         ]}
       />
       {/* Header */}
-      <div className="bg-slate-900 text-white py-12">
+      <div className="bg-white text-slate-900 py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
             <Settings className="w-8 h-8 text-brand-blue-400" />

@@ -54,7 +54,7 @@ export default async function GrantsPage() {
             <p className="text-sm text-slate-500 mt-1">Federal, state, and private grant tracking</p>
           </div>
           <Link href="/admin/grants/new"
-            className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
+            className="flex items-center gap-2 bg-white hover:bg-white text-slate-900 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
             <Plus className="w-4 h-4" /> Add Grant
           </Link>
         </div>

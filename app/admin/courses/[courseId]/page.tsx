@@ -359,7 +359,7 @@ export default async function CourseBuilderPage({
                   {!lesson.locked && (
                     <button
                       type="submit"
-                      className="rounded-lg bg-slate-900 hover:bg-slate-700 text-white px-4 py-1.5 text-xs font-semibold"
+                      className="rounded-lg bg-white hover:bg-slate-700 text-white px-4 py-1.5 text-xs font-semibold"
                     >
                       Save
                     </button>

@@ -69,7 +69,7 @@ export default function SeoIndexingPage() {
         ]}
       />
       {/* Header */}
-      <div className="bg-slate-900 text-white py-12">
+      <div className="bg-white text-slate-900 py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
             <Search className="w-8 h-8 text-brand-blue-400" />
@@ -154,13 +154,13 @@ export default function SeoIndexingPage() {
             <p>
               <strong>Default robots directive:</strong>
             </p>
-            <pre className="bg-slate-800 text-slate-100 p-4 rounded-lg text-sm overflow-x-auto">
+            <pre className="bg-white text-slate-100 p-4 rounded-lg text-sm overflow-x-auto">
 {`<meta name="robots" content="noindex, follow">`}
             </pre>
             <p>
               <strong>Indexed page directive:</strong>
             </p>
-            <pre className="bg-slate-800 text-slate-100 p-4 rounded-lg text-sm overflow-x-auto">
+            <pre className="bg-white text-slate-100 p-4 rounded-lg text-sm overflow-x-auto">
 {`<meta name="robots" content="index, follow">
 <link rel="canonical" href="https://www.elevateforhumanity.org/page-path">`}
             </pre>

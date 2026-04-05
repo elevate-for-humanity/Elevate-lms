@@ -33,7 +33,7 @@ export default function CompliancePage() {
       </div>
 
       {/* Header */}
-      <div className="bg-slate-900 text-white py-12">
+      <div className="bg-white text-slate-900 py-12">
         <div className="max-w-4xl mx-auto px-4">
           <Link 
             href="/admin/governance" 
@@ -250,7 +250,7 @@ export default function CompliancePage() {
             </Link>
             <Link 
               href="/admin/governance/contact"
-              className="px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors"
+              className="px-6 py-3 bg-white text-slate-900 rounded-lg font-medium hover:bg-white transition-colors"
             >
               Contact Compliance
             </Link>

@@ -42,7 +42,7 @@ const documents = (dbRows as any[]) || [];
         ]}
       />
       {/* Header */}
-      <div className="bg-slate-900 text-white py-12">
+      <div className="bg-white text-slate-900 py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             Authoritative Documentation Index
@@ -141,7 +141,7 @@ const documents = (dbRows as any[]) || [];
           </p>
           <Link
             href="/admin/governance/contact"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 rounded-lg font-medium hover:bg-white transition-colors"
           >
             <Download className="w-5 h-5" />
             Request Documents

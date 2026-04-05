@@ -66,7 +66,7 @@ export default async function WioaPage() {
             <p className="text-sm text-slate-500 mt-1">Workforce Innovation and Opportunity Act funding and participant tracking</p>
           </div>
           <Link href="/admin/wioa/new"
-            className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
+            className="flex items-center gap-2 bg-white hover:bg-white text-slate-900 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
             <Plus className="w-4 h-4" /> Add Participant
           </Link>
         </div>

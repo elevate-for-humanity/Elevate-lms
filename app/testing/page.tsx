@@ -209,9 +209,7 @@ export default function TestingPage() {
               </tbody>
             </table>
           </div>
-          <p className="text-xs text-slate-400 mt-4">
-            * NHA exam fees are candidate-pay retail rates. Enrolled Elevate students may qualify for institution-pay rates — contact your program coordinator.
-          </p>
+
         </div>
       </section>
 

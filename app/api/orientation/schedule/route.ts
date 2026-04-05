@@ -4,6 +4,7 @@ import { createZoomMeeting } from '@/lib/integrations/zoom';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -11,6 +12,9 @@ export const dynamic = 'force-dynamic';
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
 async function _POST(request: Request) {
+  const rateLimited = await applyRateLimit(request as any, 'contact');
+  if (rateLimited) return rateLimited;
+
   try {
     const { name, email, date, time, sessionType } = await request.json();
 

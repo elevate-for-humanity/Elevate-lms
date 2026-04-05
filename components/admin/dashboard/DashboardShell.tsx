@@ -177,88 +177,67 @@ function DegradedBanner({ sections }: { sections: string[] }) {
 
 export function DashboardShell({ data }: { data: AdminDashboardData }) {
   if (isOperationallyEmpty(data)) return <NoOperationalData />;
-  const greeting    = getGreeting();
+
   const updatedAt   = new Date(data.generatedAt).toLocaleString("en-US", {
     month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
   });
   const firstName   = data.profile?.full_name?.split(" ")[0] ?? "Admin";
 
   const { pendingApplications, activeEnrollments, revenueThisMonthCents, certificatesIssued } = data.counts;
-
-  // kpis[] is still used for sub-labels (context lines) — not for values
   const pendingKpi  = data.kpis.find(k => k.label === "Pending Applications");
   const activeKpi   = data.kpis.find(k => k.label === "Active Enrollments");
   const revenueKpi  = data.kpis.find(k => k.label === "Revenue This Month");
-  const certsKpi    = data.kpis.find(k => k.label === "Certificates Issued");
-
   const totalPending   = pendingApplications;
   const maxEnrollments = Math.max(...data.topPrograms.map(p => p.learners), 1);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 pb-16 pt-4">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 pb-16 pt-4">
       {(data.degradedSections ?? []).length > 0 && (
         <DegradedBanner sections={data.degradedSections ?? []} />
       )}
 
-      {/* Hero */}
-      <div className="rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 px-6 py-8 text-white shadow-lg">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <p className="text-slate-400 text-sm font-medium">{greeting}, {firstName}</p>
-            <h1 className="text-2xl font-black tracking-tight mt-0.5">Admin Dashboard</h1>
-            <p className="text-slate-400 text-xs mt-1 flex items-center gap-1.5">
-              <RefreshCw className="w-3 h-3" /> Updated {updatedAt}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/admin/applications?status=submitted"
-              className="inline-flex items-center gap-2 rounded-xl bg-white text-slate-900 px-4 py-2.5 text-sm font-bold hover:bg-slate-100 transition-colors shadow-sm">
-              <FileText className="w-4 h-4" />
-              Applications
-              {totalPending > 0 && (
-                <span className="bg-rose-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full">{totalPending}</span>
-              )}
-            </Link>
-            <Link href="/admin/students"
-              className="inline-flex items-center gap-2 rounded-xl bg-slate-700 text-white px-4 py-2.5 text-sm font-bold hover:bg-slate-600 transition-colors">
-              <Users className="w-4 h-4" /> Students
-            </Link>
-            <Link href="/admin/analytics"
-              className="inline-flex items-center gap-2 rounded-xl bg-slate-700 text-white px-4 py-2.5 text-sm font-bold hover:bg-slate-600 transition-colors">
-              <BarChart3 className="w-4 h-4" /> Analytics
-            </Link>
-          </div>
+      {/* Page header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200">
+        <div>
+          <p className="text-xs text-slate-400 font-medium">{getGreeting()}, {firstName}</p>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Operations Dashboard</h1>
+          <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
+            <RefreshCw className="w-3 h-3" /> {updatedAt}
+          </p>
         </div>
-
-        {/* Inline KPI strip */}
-        <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {[
-            { label: "Pending",          value: fmtNum(totalPending),              urgent: totalPending > 0 },
-            { label: "Active Learners",  value: fmtNum(activeEnrollments),         urgent: false },
-            { label: "Revenue",          value: fmtUsd(revenueThisMonthCents),     urgent: false },
-            { label: "Certificates",     value: fmtNum(certificatesIssued),        urgent: false },
-          ].map(k => (
-            <div key={k.label} className={`rounded-xl px-4 py-3 ${k.urgent ? "bg-rose-500/20 border border-rose-400/30" : "bg-white/10"}`}>
-              <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">{k.label}</p>
-              <p className={`text-xl font-black tabular-nums mt-0.5 ${k.urgent ? "text-rose-300" : "text-white"}`}>{k.value}</p>
-            </div>
-          ))}
+        <div className="flex flex-wrap gap-2">
+          <Link href="/admin/applications?status=submitted"
+            className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 hover:bg-brand-red-700 text-white px-4 py-2 text-sm font-bold transition-colors shadow-sm">
+            <FileText className="w-4 h-4" />
+            Applications
+            {totalPending > 0 && (
+              <span className="bg-white text-brand-red-600 text-[10px] font-black px-1.5 py-0.5 rounded-full">{totalPending}</span>
+            )}
+          </Link>
+          <Link href="/admin/students"
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 text-sm font-semibold transition-colors">
+            <Users className="w-4 h-4" /> Students
+          </Link>
+          <Link href="/admin/analytics"
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 text-sm font-semibold transition-colors">
+            <BarChart3 className="w-4 h-4" /> Analytics
+          </Link>
         </div>
       </div>
 
-      {/* KPI cards */}
-      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+      {/* KPI cards — single row, no duplication */}
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         <KpiCard label="Applications Waiting" value={fmtNum(totalPending)}
           sub={pendingKpi?.sub ?? "No pending applications"}
-          href="/admin/applications?status=submitted" urgent={totalPending > 0} icon={FileText} />
+          href="/admin/applications?status=submitted" urgent={totalPending > 0} icon={FileText} index={0} />
         <KpiCard label="Active Enrollments" value={fmtNum(activeEnrollments)}
           sub={activeKpi?.sub ?? ""}
-          href="/admin/enrollments?status=active" urgent={data.inactiveLearners.length > 0} icon={Users} />
+          href="/admin/enrollments?status=active" urgent={data.inactiveLearners.length > 0} icon={Users} index={1} />
         <KpiCard label="Revenue This Month" value={fmtUsd(revenueThisMonthCents)}
           sub={revenueKpi?.sub ?? ""}
-          href="/admin/enrollments?payment_status=paid" icon={DollarSign} />
+          href="/admin/enrollments?payment_status=paid" icon={DollarSign} index={2} />
         <KpiCard label="Certificates Issued" value={fmtNum(certificatesIssued)}
-          sub="All time" href="/admin/certificates" icon={Award} />
+          sub="All time" href="/admin/certificates" icon={Award} index={3} />
       </div>
 
       {/* Applications + At-Risk */}

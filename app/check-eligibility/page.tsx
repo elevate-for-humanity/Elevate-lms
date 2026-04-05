@@ -34,10 +34,10 @@ function getRecommendedPrograms(q1: YesNo, q2: YesNo, employment: string): Recom
   // All ETPL-eligible programs (WIOA/Workforce Ready Grant funded for Indiana residents)
   const allPrograms: RecommendedProgram[] = [
     { name: 'CNA — Certified Nursing Assistant', slug: 'cna', duration: '4–6 weeks', outcome: 'Avg. $16–$20/hr starting wage', funded: true, fundedLabel: 'WIOA / Workforce Ready Grant' },
-    { name: 'Phlebotomy Technician (CPT)', slug: 'phlebotomy', duration: '4–6 weeks', outcome: 'NHA certification included', funded: true, fundedLabel: 'WIOA / Workforce Ready Grant' },
+    { name: 'Phlebotomy Technician (CPT)', slug: 'phlebotomy', duration: '4–6 weeks', outcome: 'CPT certification included', funded: true, fundedLabel: 'WIOA / Workforce Ready Grant' },
     { name: 'HVAC Technician', slug: 'hvac-technician', duration: '10–16 weeks', outcome: 'EPA 608 certification included', funded: true, fundedLabel: 'WIOA / Workforce Ready Grant' },
     { name: 'IT Support Specialist', slug: 'it-support', duration: '8–12 weeks', outcome: 'CompTIA A+ via Certiport', funded: true, fundedLabel: 'WIOA / Workforce Ready Grant' },
-    { name: 'Medical Assistant (CCMA)', slug: 'medical-assistant', duration: '8–12 weeks', outcome: 'NHA certification included', funded: true, fundedLabel: 'WIOA / Workforce Ready Grant' },
+    { name: 'Medical Assistant (CCMA)', slug: 'medical-assistant', duration: '8–12 weeks', outcome: 'CCMA certification included', funded: true, fundedLabel: 'WIOA / Workforce Ready Grant' },
     { name: 'Pharmacy Technician', slug: 'pharmacy-tech', duration: '8–10 weeks', outcome: 'PTCB exam prep included', funded: true, fundedLabel: 'WIOA / Workforce Ready Grant' },
     { name: 'Barber Apprenticeship', slug: 'barber-apprenticeship', duration: '2 years (USDOL registered)', outcome: 'Indiana barber license pathway', funded: false },
     { name: 'CDL Class A', slug: 'cdl', duration: '4–8 weeks', outcome: 'Avg. $55,000–$75,000/yr', funded: true, fundedLabel: 'WIOA eligible' },

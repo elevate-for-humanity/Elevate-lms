@@ -115,7 +115,7 @@ We maintain an incident response plan that is reviewed annually.`,
     content: `We share participant data only as necessary and only with parties who have agreed to appropriate data protection terms:
 
 **Funding agencies:** Indiana DWD, U.S. DOL (required for WIOA reporting)
-**Credentialing bodies:** NHA, ACT, Certiport, EPA, OSHA (for credential issuance and verification)
+**Credentialing bodies:** ACT, Certiport, EPA, OSHA (for credential issuance and verification)
 **Payment processors:** Stripe (for tuition payments — PCI DSS compliant)
 **Platform infrastructure:** Supabase, Netlify (SOC 2 Type II certified)
 

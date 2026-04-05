@@ -111,7 +111,7 @@ const healthcarePrograms = [
   {
     title: 'Phlebotomy Technician',
     duration: '8–10 weeks',
-    desc: 'Venipuncture, specimen handling, and lab safety. NHA CPT certification included. Self-pay — BNPL available. Not currently on WorkOne ETPL funded list.',
+    desc: 'Venipuncture, specimen handling, and lab safety. CPT certification included. Self-pay — BNPL available. Not currently on WorkOne ETPL funded list.',
     href: '/programs/phlebotomy',
     image: '/images/pages/certifications-page-1.jpg',
   },

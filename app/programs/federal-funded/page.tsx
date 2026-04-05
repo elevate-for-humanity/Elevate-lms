@@ -51,8 +51,8 @@ const config: ProgramPageConfig = {
   ],
   credentials: [
     'CNA Certification (state-issued — IN Dept. of Health)',
-    'CCMA (NHA exam)',
-    'CPT Phlebotomy (NHA exam)',
+    'CCMA certification',
+    'CPT Phlebotomy certification',
     'EPA 608 (EPA-approved testing org)',
     'OSHA 10/30 Safety (DOL card)',
     'CDL Class A License (Indiana BMV)',

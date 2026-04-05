@@ -73,7 +73,6 @@ export default function CertificationTestingPage() {
           </div>
           <p className="text-slate-700 text-sm leading-relaxed">
             <strong className="text-slate-900">Authorized Testing Center — NHA Account #412957.</strong>{' '}
-            This exam is administered through an authorized testing partner of the National Healthcareer Association.
             All candidates receive secure proctoring, verified testing conditions, and full support throughout the process.
           </p>
         </div>

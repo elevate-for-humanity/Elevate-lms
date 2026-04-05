@@ -31,7 +31,7 @@ export default function ProgramOwnerCampaignsPage() {
       .then((data) => setTemplates(data.templates || []));
 
     // Load my program students
-    fetch('/api/program-owner/my-students')
+    fetch('/api/program-holder/students')
       .then((res) => res.json())
       .then((data) => setMyStudents(data.students || []));
   }, []);
@@ -70,7 +70,7 @@ export default function ProgramOwnerCampaignsPage() {
     setFeedback(null);
 
     try {
-      const response = await fetch('/api/program-owner/campaigns/send', {
+      const response = await fetch('/api/program-holder/campaigns/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

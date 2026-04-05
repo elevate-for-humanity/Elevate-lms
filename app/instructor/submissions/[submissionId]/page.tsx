@@ -85,35 +85,24 @@ export default function SubmissionReviewPage() {
     setError(null);
     setSuccess(null);
 
-    const { data: { user } } = await supabase.auth.getUser();
-    const now = new Date().toISOString();
-
-    // Map submission status to instructor_status (approved/rejected only; others stay pending)
-    const instructorStatus: 'approved' | 'rejected' | 'pending' =
-      newStatus === 'approved' ? 'approved' :
-      newStatus === 'rejected' ? 'rejected' : 'pending';
-
-    const { error: updateError } = await supabase
-      .from('step_submissions')
-      .update({
-        status: newStatus,
-        instructor_note: note || null,
-        instructor_id: user?.id ?? null,
-        instructor_status: instructorStatus,
-        instructor_feedback: note || null,
-        reviewed_by: user?.id ?? null,
-        reviewed_at: now,
-        updated_at: now,
-      })
-      .eq('id', submission.id);
-
-    if (updateError) {
-      setError('Failed to save decision. Please try again.');
-    } else {
-      setSubmission(prev => prev ? { ...prev, status: newStatus, instructor_note: note } : prev);
-      setSuccess(`Marked as "${STATUS_LABELS[newStatus]}".`);
+    try {
+      const res = await fetch('/api/lms/submissions/review', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ submission_id: submission.id, status: newStatus, note }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? 'Failed to save decision. Please try again.');
+      } else {
+        setSubmission(prev => prev ? { ...prev, status: newStatus, instructor_note: note } : prev);
+        setSuccess(`Marked as "${STATUS_LABELS[newStatus]}".`);
+      }
+    } catch {
+      setError('Network error. Please try again.');
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   }
 
   if (loading) {

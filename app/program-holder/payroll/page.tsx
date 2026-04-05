@@ -221,9 +221,14 @@ export default async function ProgramHolderPayrollPage() {
                         <p className="text-xs text-slate-500">Net</p>
                         <p className="font-bold text-brand-green-700">{fmt(stub.net_pay)}</p>
                       </div>
-                      <button title="Download" className="p-2 text-slate-400 hover:text-brand-blue-600 rounded-lg hover:bg-brand-blue-50 transition">
+                      <a
+                        href={`/api/program-holder/payroll/stub/${stub.id}/download`}
+                        title="Download pay stub PDF"
+                        className="p-2 text-slate-400 hover:text-brand-blue-600 rounded-lg hover:bg-brand-blue-50 transition inline-flex"
+                        download
+                      >
                         <Download className="w-4 h-4" />
-                      </button>
+                      </a>
                     </div>
                   </div>
                 );

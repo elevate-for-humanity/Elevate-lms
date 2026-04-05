@@ -71,13 +71,13 @@ export default function CreateCoursePage() {
         const fileName = `${user.id}/scorm_${Date.now()}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
-          .from('scorm-packages')
+          .from('scorm_packages')
           .upload(fileName, scormFile);
 
         if (uploadError) throw uploadError;
 
         const { data: { publicUrl } } = supabase.storage
-          .from('scorm-packages')
+          .from('scorm_packages')
           .getPublicUrl(fileName);
 
         scormUrl = publicUrl;

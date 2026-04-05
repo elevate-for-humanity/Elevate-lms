@@ -136,7 +136,7 @@ async function _POST(req: NextRequest) {
         entry.async('uint8array').then(async (bytes) => {
           const dest = `scorm/${packageId}/${relativePath}`;
           const { error: uploadErr } = await supabase.storage
-            .from('course-content')
+            .from('course_content')
             .upload(dest, bytes, { upsert: true });
           if (uploadErr) {
             logger.error(`Failed to upload ${dest}:`, uploadErr);
@@ -163,7 +163,7 @@ async function _POST(req: NextRequest) {
 
     // Also store the original ZIP for re-extraction if needed
     await supabase.storage
-      .from('course-content')
+      .from('course_content')
       .upload(`scorm/${packageId}/_original.zip`, new Uint8Array(zipBuffer), {
         upsert: true,
       });

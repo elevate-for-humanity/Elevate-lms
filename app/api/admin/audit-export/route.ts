@@ -66,7 +66,7 @@ async function _POST(request: Request) {
     });
 
     const { error: uploadError } = await supabase.storage
-      .from('audit-archive')
+      .from('audit_archive')
       .upload(storagePath, blob, {
         contentType: 'application/jsonl',
         upsert: false,

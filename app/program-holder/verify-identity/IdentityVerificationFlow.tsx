@@ -89,7 +89,7 @@ export default function IdentityVerificationFlow({
       const idExt = uploadedDocs.id.name.split('.').pop();
       const idPath = `${userId}/id_${Date.now()}.${idExt}`;
       const { error: idUploadError } = await supabase.storage
-        .from('program-holder-documents')
+        .from('program_holder_documents')
         .upload(idPath, uploadedDocs.id);
 
       if (idUploadError) throw idUploadError;
@@ -98,7 +98,7 @@ export default function IdentityVerificationFlow({
       const ssnExt = uploadedDocs.ssn.name.split('.').pop();
       const ssnPath = `${userId}/ssn_${Date.now()}.${ssnExt}`;
       const { error: ssnUploadError } = await supabase.storage
-        .from('program-holder-documents')
+        .from('program_holder_documents')
         .upload(ssnPath, uploadedDocs.ssn);
 
       if (ssnUploadError) throw ssnUploadError;

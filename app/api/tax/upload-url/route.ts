@@ -48,7 +48,7 @@ async function _POST(req: Request) {
 
     // Generate signed upload URL (valid for 1 hour)
     const { data, error }: any = await supabase.storage
-      .from('tax-documents')
+      .from('tax_documents')
       .createSignedUploadUrl(path);
 
     if (error) {

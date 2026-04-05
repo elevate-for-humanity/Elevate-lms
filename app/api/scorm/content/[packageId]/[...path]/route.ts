@@ -57,7 +57,7 @@ const { packageId, path } = await ctx.params;
   const filePath = `scorm/${packageId}/${(path || []).join('/')}`;
 
   const { data, error } = await supabase.storage
-    .from('course-content')
+    .from('course_content')
     .download(filePath);
 
   if (error || !data) {

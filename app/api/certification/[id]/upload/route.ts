@@ -46,7 +46,7 @@ export async function POST(
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const { error: uploadErr } = await db.storage
-      .from('credential-uploads')
+      .from('credential_uploads')
       .upload(storagePath, buffer, {
         contentType: file.type,
         upsert: false,

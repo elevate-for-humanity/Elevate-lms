@@ -54,7 +54,7 @@ async function _POST(req: Request) {
     const path = `shop_${shopId}/${documentType}_${Date.now()}.pdf`;
 
     const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('shop-onboarding')
+      .from('shop_onboarding')
       .upload(path, file, { upsert: true });
 
     if (uploadError) {

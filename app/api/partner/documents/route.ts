@@ -141,7 +141,7 @@ async function _POST(request: NextRequest) {
     // Upload to Supabase Storage
     const fileName = `${partnerUser.partner_id}/${documentType}_${Date.now()}_${file.name}`;
     const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
-      .from('partner-documents')
+      .from('partner_documents')
       .upload(fileName, file, {
         contentType: file.type,
         upsert: false,
@@ -154,7 +154,7 @@ async function _POST(request: NextRequest) {
 
     // Get public URL
     const { data: urlData } = supabaseAdmin.storage
-      .from('partner-documents')
+      .from('partner_documents')
       .getPublicUrl(fileName);
 
     // Delete any existing document of this type

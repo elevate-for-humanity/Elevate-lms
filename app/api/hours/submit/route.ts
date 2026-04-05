@@ -45,7 +45,7 @@ async function _POST(request: NextRequest) {
         const fileName = `hours-proof/${apprentice.id}/${Date.now()}.jpg`;
         
         const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('apprentice-uploads')
+          .from('apprentice_uploads')
           .upload(fileName, buffer, {
             contentType: 'image/jpeg',
             upsert: false,
@@ -53,7 +53,7 @@ async function _POST(request: NextRequest) {
 
         if (!uploadError && uploadData) {
           const { data: { publicUrl } } = supabase.storage
-            .from('apprentice-uploads')
+            .from('apprentice_uploads')
             .getPublicUrl(fileName);
           photoUrl = publicUrl;
         }

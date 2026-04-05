@@ -44,7 +44,7 @@ const { id } = await params;
 
     // Delete from storage
     const { error: storageError } = await supabase.storage
-      .from('tax-documents')
+      .from('tax_documents')
       .remove([document.file_path]);
 
     if (storageError) {

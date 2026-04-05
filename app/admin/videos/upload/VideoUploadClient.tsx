@@ -41,7 +41,7 @@ export default function VideoUploadClient() {
     const path = `uploads/${timestamp}-${safeName}`;
 
     const { data, error: uploadError } = await supabase.storage
-      .from('course-videos')
+      .from('course_videos')
       .upload(path, file, {
         cacheControl: '3600',
         upsert: false,
@@ -54,7 +54,7 @@ export default function VideoUploadClient() {
     }
 
     const { data: { publicUrl } } = supabase.storage
-      .from('course-videos')
+      .from('course_videos')
       .getPublicUrl(data.path);
 
     setUploaded(prev => [...prev, { name: file.name, url: publicUrl, size: file.size }]);

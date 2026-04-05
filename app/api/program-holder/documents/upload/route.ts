@@ -78,7 +78,7 @@ async function _POST(req: Request) {
     const path = `${user.id}/${documentType}/${Date.now()}.${fileExt}`;
 
     const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('program-holder-documents')
+      .from('program_holder_documents')
       .upload(path, file, {
         upsert: false,
         contentType: file.type,
@@ -95,7 +95,7 @@ async function _POST(req: Request) {
     const {
       data: { publicUrl },
     } = supabase.storage
-      .from('program-holder-documents')
+      .from('program_holder_documents')
       .getPublicUrl(uploadData.path);
 
     // Save document record to database
@@ -119,7 +119,7 @@ async function _POST(req: Request) {
     if (dbError) {
       // Clean up uploaded file
       await supabase.storage
-        .from('program-holder-documents')
+        .from('program_holder_documents')
         .remove([uploadData.path]);
 
       return NextResponse.json(

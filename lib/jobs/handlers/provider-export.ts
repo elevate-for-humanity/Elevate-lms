@@ -115,7 +115,7 @@ export async function handleProviderDataExport(payload: Record<string, any>): Pr
 
   // Upload to Supabase Storage bucket 'provider-exports'
   const { error: uploadErr } = await db.storage
-    .from('provider-exports')
+    .from('provider_exports')
     .upload(filename, buffer, {
       contentType: 'text/csv',
       upsert: false,
@@ -128,7 +128,7 @@ export async function handleProviderDataExport(payload: Record<string, any>): Pr
 
   // Generate signed URL valid for 1 hour
   const { data: signedData, error: signErr } = await db.storage
-    .from('provider-exports')
+    .from('provider_exports')
     .createSignedUrl(filename, 3600);
 
   if (signErr || !signedData?.signedUrl) {

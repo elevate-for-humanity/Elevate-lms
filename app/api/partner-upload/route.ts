@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer)
 
     const { error: uploadError } = await supabase.storage
-      .from('partner-documents')
+      .from('partner_documents')
       .upload(path, buffer, {
         contentType: file.type || 'application/octet-stream',
         upsert: true,

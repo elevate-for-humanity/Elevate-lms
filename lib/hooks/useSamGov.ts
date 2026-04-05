@@ -231,14 +231,14 @@ export function useSamGov() {
       // Upload to storage
       const fileName = `${currentEntity.id}/${Date.now()}-${file.name}`;
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('sam-documents')
+        .from('sam_documents')
         .upload(fileName, file);
 
       if (uploadError) throw uploadError;
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
-        .from('sam-documents')
+        .from('sam_documents')
         .getPublicUrl(fileName);
 
       // Create document record

@@ -40,7 +40,7 @@ export default function ExternalModuleLauncher({
       const fileExt = file.name.split('.').pop();
       const fileName = `${enrollmentId}/${module.id}/${Date.now()}.${fileExt}`;
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('module-certificates')
+        .from('module_certificates')
         .upload(fileName, file);
       if (uploadError) {
         throw uploadError;
@@ -48,7 +48,7 @@ export default function ExternalModuleLauncher({
       // Get public URL
       const {
         data: { publicUrl },
-      } = supabase.storage.from('module-certificates').getPublicUrl(fileName);
+      } = supabase.storage.from('module_certificates').getPublicUrl(fileName);
       // Update module progress
       const { error: updateError } = await supabase
         .from('enrollment_module_progress')

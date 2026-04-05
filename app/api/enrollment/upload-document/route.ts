@@ -32,7 +32,7 @@ async function _POST(req: Request) {
 
     // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('enrollment-documents')
+      .from('enrollment_documents')
       .upload(fileName, file, {
         cacheControl: '3600',
         upsert: false,
@@ -45,7 +45,7 @@ async function _POST(req: Request) {
 
     // Get public URL
     const { data: urlData } = supabase.storage
-      .from('enrollment-documents')
+      .from('enrollment_documents')
       .getPublicUrl(fileName);
 
     // Create document record in database

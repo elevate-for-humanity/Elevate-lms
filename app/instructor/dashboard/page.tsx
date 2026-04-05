@@ -71,7 +71,7 @@ export default async function ProgramHolderDashboard() {
   const { count: pendingSubmissions } = await pendingQuery;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">

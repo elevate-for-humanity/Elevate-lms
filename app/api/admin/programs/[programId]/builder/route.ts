@@ -270,9 +270,9 @@ async function upsertLessons(db: any, moduleId: string, lessons: any[]) {
   }
 }
 
-// program_lessons CHECK: ('lesson','quiz','lab','exam','orientation')
-// checkpoint is not in the constraint yet — map it to lesson until migration applied
+// program_lessons CHECK: ('lesson','quiz','lab','exam','orientation','checkpoint','assignment')
+// migration 20260609000001 added checkpoint and assignment to the constraint
 function normalizeLessonType(type: string): string {
-  const valid = ['lesson', 'quiz', 'lab', 'exam', 'orientation'];
+  const valid = ['lesson', 'quiz', 'lab', 'exam', 'orientation', 'checkpoint', 'assignment'];
   return valid.includes(type) ? type : 'lesson';
 }

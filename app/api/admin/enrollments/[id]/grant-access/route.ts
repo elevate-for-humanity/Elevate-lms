@@ -54,10 +54,14 @@ export async function POST(
   if (fetchError || !enrollment) return safeError('Enrollment not found', 404);
   if (enrollment.access_granted_at) return safeError('Access already granted', 409);
 
-  // Grant access
+  // Grant access — move to active and record who granted it and when
   const { error: updateError } = await db
     .from('program_enrollments')
-    .update({ access_granted_at: now, updated_at: now })
+    .update({
+      status: 'active',
+      access_granted_at: now,
+      updated_at: now,
+    })
     .eq('id', enrollmentId);
 
   if (updateError) return safeInternalError(updateError, 'Failed to grant access');

@@ -1,3 +1,4 @@
+import { safeInternalError } from '@/lib/api/safe-error';
 import { NextResponse } from 'next/server';
 
 import {

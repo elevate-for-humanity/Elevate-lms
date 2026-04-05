@@ -49,7 +49,7 @@ const config: ProgramPageConfig = {
     'Job placement assistance through our employer network',
     'Scrubs, textbooks, and supplies provided with WIOA funding',
   ],
-  overviewImage: '/images/pages/comp-program-template.jpg',
+  overviewImage: '/images/pages/healthcare-hero.jpg',
   overviewImageAlt: 'Healthcare students in clinical training',
 
   salaryNumber: 42000,

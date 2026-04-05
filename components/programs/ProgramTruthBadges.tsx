@@ -54,7 +54,7 @@ const FUNDING_COPY: Record<FundingType, { label: string; detail: string }> = {
   wioa:          { label: 'WIOA Eligible', detail: 'Workforce Innovation and Opportunity Act — covers tuition for eligible Indiana residents through WorkOne.' },
   wrg:           { label: 'Workforce Ready Grant', detail: 'Indiana state grant covering tuition for high-demand programs. Eligibility determined through WorkOne.' },
   employer_paid: { label: 'Employer-Sponsored', detail: 'Earn wages while you train. Employer covers tuition through the apprenticeship agreement.' },
-  self_pay:      { label: 'Self-Pay Available', detail: 'Flexible payment plans, BNPL options (Affirm, Sezzle), and income-share available.' },
+  self_pay:      { label: 'Self-Pay Available', detail: 'Flexible payment plans, BNPL options (Klarna, Afterpay, Zip), and income-share available.' },
   unknown:       { label: 'Funding Details Pending', detail: 'Funding options are being confirmed. Contact us for current availability.' },
 };
 

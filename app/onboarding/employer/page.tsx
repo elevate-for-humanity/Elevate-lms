@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -34,6 +35,7 @@ export default async function EmployerOnboardingPage() {
   // Try auto-activation before rendering (in case all docs are already uploaded)
   try {
     const { tryAutoActivate } = await import('@/lib/employer/check-onboarding-complete');
+    const db = createAdminClient();
     const activated = await tryAutoActivate(db, user.id);
     if (activated) {
       redirect('/employer/dashboard');

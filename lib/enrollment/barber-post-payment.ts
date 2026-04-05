@@ -110,7 +110,8 @@ export async function runBarberPostPayment(
               email:                       studentEmail,
               full_name:                   studentName,
               phone:                       app.phone ?? null,
-              status:                      'active',
+              // Payment received — hold at pending_review until admin grants access.
+              status:                      'pending_review',
               enrollment_state:            'enrolled',
               funding_source:              'self_pay',
               amount_paid_cents:           amountPaidCents,

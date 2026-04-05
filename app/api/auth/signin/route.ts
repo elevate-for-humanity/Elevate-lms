@@ -1,3 +1,4 @@
+import { safeInternalError } from '@/lib/api/safe-error';
 /**
  * Auth API - Sign In
  * Authenticates user with email and password

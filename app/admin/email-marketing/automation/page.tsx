@@ -21,12 +21,12 @@ export default async function EmailAutomationPage() {
   await requireAdmin();
   const db = createAdminClient();
 
-  const { data: automations } = await db
+  const { data: automations, error: automationsError } = await db
     .from('email_automations')
     .select('*')
     .order('updated_at', { ascending: false });
 
-  const rows = automations ?? [];
+  const rows = automationsError ? [] : (automations ?? []);
   const active = rows.filter((r: any) => r.is_active).length;
   const totalRecipients = rows.reduce((sum: number, r: any) => sum + (r.total_recipients ?? 0), 0);
 

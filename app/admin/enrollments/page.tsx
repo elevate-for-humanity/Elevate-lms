@@ -24,12 +24,12 @@ export default async function AdminEnrollmentsPage() {
 
   const db = createAdminClient();
 
-  // Students who completed onboarding but haven't been granted LMS access yet
+  // Students who paid but haven't been granted LMS access yet (pending admin review)
   const { data: pendingAccess } = await db
     .from('program_enrollments')
     .select('id, user_id, program_slug, enrolled_at, payment_status, amount_paid_cents')
     .is('access_granted_at', null)
-    .eq('payment_status', 'paid')
+    .eq('status', 'pending_review')
     .order('enrolled_at', { ascending: true });
 
   // Enrich with profile data
@@ -59,7 +59,7 @@ export default async function AdminEnrollmentsPage() {
     active:    allEnrollments.filter((e: any) => e.status === 'active').length,
     completed: allEnrollments.filter((e: any) => e.status === 'completed').length,
     atRisk:    allEnrollments.filter((e: any) => e.at_risk).length,
-    pending:   allEnrollments.filter((e: any) => ['pending', 'pending_approval'].includes(e.status)).length,
+    pending:   allEnrollments.filter((e: any) => ['pending', 'pending_approval', 'pending_review'].includes(e.status)).length,
   };
 
   return (

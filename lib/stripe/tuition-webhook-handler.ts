@@ -291,17 +291,18 @@ async function sendAdminEnrollmentNotification(
           </div>
           
           <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0;">
-            <h4 style="margin-top: 0; color: #92400e;">Action Required</h4>
+            <h4 style="margin-top: 0; color: #92400e;">Action Required — LMS Access NOT yet granted</h4>
             <ul style="margin: 0; padding-left: 20px;">
-              <li>Student needs to complete onboarding (documents, agreements)</li>
-              <li>RAPIDS registration pending - will be submitted after onboarding complete</li>
+              <li><strong>Go to Admin → Enrollments and click "Grant Access"</strong> once you have reviewed documents and onboarding</li>
+              <li>Student cannot enter the LMS until you grant access</li>
+              <li>RAPIDS registration pending — submit after onboarding complete</li>
               <li>Assign to training site/mentor when ready</li>
             </ul>
           </div>
-          
+
           <div style="text-align: center; margin: 20px 0;">
-            <a href="https://www.elevateforhumanity.org/admin/students/${studentId}" style="background-color: #1e40af; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">View Student</a>
-            <a href="https://www.elevateforhumanity.org/admin/enrollments" style="background-color: #6b7280; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin-left: 10px;">All Enrollments</a>
+            <a href="https://www.elevateforhumanity.org/admin/enrollments" style="background-color: #dc2626; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Grant LMS Access →</a>
+            <a href="https://www.elevateforhumanity.org/admin/learner/${studentId}" style="background-color: #6b7280; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; display: inline-block; margin-left: 10px;">View Student</a>
           </div>
           
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
@@ -468,13 +469,19 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session): Promis
   
   // Handle based on payment option
   if (paymentOption === 'pay_in_full' || paymentOption === 'bnpl') {
-    // Full payment received - grant full access
-    await grantCourseAccess(studentId, programId, 'full');
-    await updateEnrollmentStatus(studentId, programId, 'active', 'paid_in_full');
-    
-    // Send welcome letter email
+    // Full payment received — enrollment moves to pending_review.
+    // Admin must grant access via /admin/enrollments before learner can enter LMS.
+    await updateEnrollmentStatus(studentId, programId, 'pending_review', 'paid_in_full');
+
+    // Notify student (payment confirmed) and admin (action required: grant access)
     await sendWelcomeLetterEmail(studentId, programId);
-    
+    // sendWelcomeLetterEmail already fetches student+program — reuse via separate admin call
+    await sendAdminEnrollmentNotification(studentId, programId,
+      session.customer_details?.name || metadata.student_name || '',
+      session.customer_details?.email || metadata.student_email || '',
+      metadata.program_name || '',
+    ).catch(() => {});
+
   } else if (paymentOption === 'installment_plan' && metadata.create_subscription === 'true') {
     // Deposit paid - create subscription for remaining balance (weekly or monthly)
     const customerId = session.customer as string;
@@ -498,9 +505,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session): Promis
     });
     
     if (result.success) {
-      // Grant access after deposit
-      await grantCourseAccess(studentId, programId, 'active');
-      await updateEnrollmentStatus(studentId, programId, 'active', 'installment_plan');
+      // Deposit paid — hold at pending_review until admin grants access.
+      await updateEnrollmentStatus(studentId, programId, 'pending_review', 'installment_plan');
       
       // Store subscription ID
       await supabase.from('tuition_subscriptions').insert({
@@ -514,13 +520,21 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session): Promis
         created_at: new Date().toISOString(),
       });
       
-      // Send welcome letter email
       await sendWelcomeLetterEmail(studentId, programId);
+      await sendAdminEnrollmentNotification(studentId, programId,
+        session.customer_details?.name || metadata.student_name || '',
+        session.customer_details?.email || metadata.student_email || '',
+        metadata.program_name || '',
+      ).catch(() => {});
     } else {
       logger.error('Failed to create subscription:', result.error);
-      // Still grant access since deposit was paid, but flag for manual review
-      await grantCourseAccess(studentId, programId, 'active');
-      await updateEnrollmentStatus(studentId, programId, 'active', 'subscription_failed');
+      // Deposit paid but subscription setup failed — pending_review for admin.
+      await updateEnrollmentStatus(studentId, programId, 'pending_review', 'subscription_failed');
+      await sendAdminEnrollmentNotification(studentId, programId,
+        session.customer_details?.name || metadata.student_name || '',
+        session.customer_details?.email || metadata.student_email || '',
+        metadata.program_name || '',
+      ).catch(() => {});
     }
   }
 }

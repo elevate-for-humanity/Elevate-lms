@@ -153,19 +153,21 @@ export async function createEnrollmentFromPayment(
     let isNewEnrollment = false;
 
     if (!existing) {
-      // Create new enrollment
+      // Create new enrollment — payment received but access requires admin approval.
+      // Admin grants access via /admin/enrollments → sets access_granted_at.
       const { data: newEnrollment, error: enrollError } = await supabaseAdmin
         .from('program_enrollments')
         .insert({
           student_id: finalStudentId,
           program_id: programId,
-          status: 'active',
+          status: 'pending_review',
           payment_status: 'paid',
           payment_provider: paymentProvider,
           payment_reference: paymentReference,
           payment_amount_cents: paymentAmountCents,
           funding_source: fundingSource,
           enrolled_at: new Date().toISOString(),
+          access_granted_at: null,
         })
         .select('id')
         .single();
@@ -184,17 +186,18 @@ export async function createEnrollmentFromPayment(
         enrollmentId,
         paymentProvider,
       });
-    } else if (existing.status !== 'active') {
-      // Activate existing enrollment
+    } else if (existing.status !== 'active' && existing.status !== 'pending_review') {
+      // Payment received on a non-active enrollment — move to pending_review for admin.
       await supabaseAdmin
         .from('program_enrollments')
         .update({
-          status: 'active',
+          status: 'pending_review',
           payment_status: 'paid',
           payment_provider: paymentProvider,
           payment_reference: paymentReference,
           payment_amount_cents: paymentAmountCents,
           enrolled_at: new Date().toISOString(),
+          access_granted_at: null,
         })
         .eq('id', existing.id);
 

@@ -1,3 +1,4 @@
+import { safeInternalError } from '@/lib/api/safe-error';
 // GET /api/cron/expire-credentials
 // Netlify scheduled function — runs daily when pg_cron is not available.
 // Calls expire_stale_credentials() RPC and reports results.

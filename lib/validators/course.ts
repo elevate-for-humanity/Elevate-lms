@@ -11,7 +11,6 @@ export const CourseCreateSchema = z.object({
   is_published: z.boolean().default(false),
   status: z.enum(['draft', 'review', 'published', 'archived']).default('draft'),
   skill_level: z.enum(['beginner', 'intermediate', 'advanced']).default('beginner'),
-  category: z.string().optional().nullable(),
   certificate_enabled: z.boolean().default(false),
   certificate_title: z.string().optional().nullable(),
   passing_score: z.number().int().min(0).max(100).default(70),

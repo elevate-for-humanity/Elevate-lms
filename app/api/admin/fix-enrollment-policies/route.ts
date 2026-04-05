@@ -1,3 +1,4 @@
+import { safeInternalError } from '@/lib/api/safe-error';
 import { requireAdmin } from '@/lib/auth';
 
 import { NextRequest, NextResponse } from 'next/server';

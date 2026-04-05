@@ -58,9 +58,10 @@ export default function BarberApplySuccessPage() {
             <div className="space-y-3">
               {[
                 'Create your account above using the same email you used at checkout.',
-                'Complete orientation — takes about 10 minutes.',
-                'Upload your ID to verify your identity.',
-                'Weekly payments (if applicable) will begin the following Friday.',
+                'Complete orientation and upload your ID — takes about 10 minutes.',
+                'Our team reviews your documents — usually within 1 business day.',
+                'Once approved, you\'ll receive an email and your LMS access will be activated.',
+                'Weekly payments (if applicable) begin the following Friday.',
               ].map((step, i) => (
                 <div key={i} className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-brand-blue-100 text-brand-blue-700 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5">

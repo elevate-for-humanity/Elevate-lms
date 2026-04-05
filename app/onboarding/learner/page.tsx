@@ -99,7 +99,12 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
   },
 ];
 
-export default async function LearnerOnboardingPage() {
+export default async function LearnerOnboardingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ checkout?: string }>;
+}) {
+  const { checkout } = await searchParams;
   const supabase = await createClient();
 
 
@@ -267,6 +272,21 @@ export default async function LearnerOnboardingPage() {
   return (
     <div className="min-h-screen bg-white">
       <Breadcrumbs items={[{ label: 'Onboarding', href: '/onboarding' }, { label: 'Student Onboarding' }]} />
+
+      {/* Payment confirmation banner — shown after Stripe checkout redirect */}
+      {checkout === 'success' && (
+        <div className="bg-green-600 text-white px-4 py-4">
+          <div className="max-w-6xl mx-auto flex items-start gap-3">
+            <span className="text-2xl leading-none">✅</span>
+            <div>
+              <p className="font-bold text-lg leading-tight">Payment received — thank you!</p>
+              <p className="text-green-100 text-sm mt-0.5">
+                Your enrollment is confirmed. Complete the steps below, then our team will review your documents and grant your LMS access — usually within 1 business day.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* VIDEO HERO — full bleed, no text on top */}
       <div className="relative w-full overflow-hidden" style={{ height: '55vh', minHeight: 280, maxHeight: 500 }}>

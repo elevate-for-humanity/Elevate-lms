@@ -1,3 +1,4 @@
+import { safeInternalError } from '@/lib/api/safe-error';
 
 import { createAdminClient } from '@/lib/supabase/admin';
 

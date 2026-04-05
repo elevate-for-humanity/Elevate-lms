@@ -1,3 +1,4 @@
+import { safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';

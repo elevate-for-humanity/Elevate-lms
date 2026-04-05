@@ -1,3 +1,4 @@
+import { safeInternalError } from '@/lib/api/safe-error';
 /**
  * Auth API - Sign Up
  * Creates a new user account with Supabase

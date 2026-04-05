@@ -22,12 +22,13 @@ export default async function WorkflowsPage() {
   await requireAdmin();
   const db = createAdminClient();
 
-  const { data: workflows } = await db
+  const { data: workflows, error: workflowsError } = await db
     .from('workflows')
     .select('*')
     .order('updated_at', { ascending: false });
 
-  const rows = workflows ?? [];
+  // Table may not exist yet — show empty state instead of crashing
+  const rows = workflowsError ? [] : (workflows ?? []);
   const active = rows.filter((r: any) => r.status === 'active').length;
   const totalRuns = rows.reduce((sum: number, r: any) => sum + (r.run_count ?? 0), 0);
 

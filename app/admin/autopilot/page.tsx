@@ -24,10 +24,8 @@ export default async function AutopilotPage() {
   await requireAdmin();
   const db = createAdminClient();
 
-  const [
-    { data: workflows, count: workflowCount },
-    { data: automations, count: automationCount },
-  ] = await Promise.all([
+  // workflows and automation_rules tables may not exist yet — use empty fallback
+  const [workflowsResult, automationsResult] = await Promise.all([
     db.from('workflows')
       .select('id, name, status, category, run_count, last_run_at', { count: 'exact' })
       .order('updated_at', { ascending: false })
@@ -38,8 +36,10 @@ export default async function AutopilotPage() {
       .limit(20),
   ]);
 
-  const wRows = workflows ?? [];
-  const aRows = automations ?? [];
+  const wRows = workflowsResult.error ? [] : (workflowsResult.data ?? []);
+  const aRows = automationsResult.error ? [] : (automationsResult.data ?? []);
+  const workflowCount = workflowsResult.error ? 0 : (workflowsResult.count ?? 0);
+  const automationCount = automationsResult.error ? 0 : (automationsResult.count ?? 0);
   const activeWorkflows = wRows.filter((r: any) => r.status === 'active').length;
   const activeAutomations = aRows.filter((r: any) => r.status === 'active').length;
   const totalRuns = wRows.reduce((s: number, r: any) => s + (r.run_count ?? 0), 0)

@@ -51,8 +51,8 @@ export default async function PartnersPage() {
         </div>
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Our Partners</h1>
-            <p className="text-lg text-white max-w-3xl mx-auto">We collaborate with government agencies, employers, and credential providers to deliver funded credential pathway programs.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Our Partners</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">We collaborate with government agencies, employers, and credential providers to deliver funded credential pathway programs.</p>
           </div>
         </div>
       </section>

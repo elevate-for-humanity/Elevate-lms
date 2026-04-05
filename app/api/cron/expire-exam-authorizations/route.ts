@@ -1,3 +1,4 @@
+import { safeInternalError } from '@/lib/api/safe-error';
 // GET /api/cron/expire-exam-authorizations
 // Fallback for environments where pg_cron is unavailable (local dev, Netlify).
 // The pg_cron job runs this same logic nightly at 2am UTC in production.

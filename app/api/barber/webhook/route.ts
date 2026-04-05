@@ -355,20 +355,34 @@ ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive ev
             logger.error('Failed to send welcome email:', emailErr);
           }
 
-          // Admin notification
+          // Admin notification — action required to grant LMS access
           try {
             const { sendEmail } = await import('@/lib/email/sendgrid');
+            const siteUrlAdmin = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
             await sendEmail({
               to: 'elevate4humanityedu@gmail.com',
-              subject: `New Barber Apprentice - ${customerName || customerEmail}`,
+              subject: `⚠️ ACTION REQUIRED — New Barber Apprentice Payment: ${customerName || customerEmail}`,
               html: `
-<p>New barber apprentice enrolled:</p>
-<p>• Name: ${customerName}<br>
-• Email: ${customerEmail}<br>
-• Phone: ${customerPhone}<br>
-• Transfer Hours: ${transferredHours}<br>
-• Payment: ${fullyPaid ? 'Paid in full' : 'Payment plan'}</p>
-              `,
+<div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1a1a1a">
+<div style="background:#dc2626;color:white;padding:16px;border-radius:8px;margin-bottom:20px">
+  <h2 style="margin:0">LMS Access NOT Yet Granted</h2>
+  <p style="margin:8px 0 0">Payment received — you must manually grant access after reviewing documents.</p>
+</div>
+<p><strong>Student:</strong> ${customerName}<br>
+<strong>Email:</strong> ${customerEmail}<br>
+<strong>Phone:</strong> ${customerPhone}<br>
+<strong>Transfer Hours:</strong> ${transferredHours}<br>
+<strong>Payment:</strong> ${fullyPaid ? 'Paid in full' : `Deposit paid — payment plan active`}</p>
+<div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:16px;margin:20px 0">
+  <strong>Steps required before granting access:</strong>
+  <ol style="margin:8px 0 0;padding-left:20px">
+    <li>Review submitted documents and application</li>
+    <li>Verify host shop assignment</li>
+    <li>Go to Admin → Enrollments → click <strong>Grant Access</strong></li>
+  </ol>
+</div>
+<a href="${siteUrlAdmin}/admin/enrollments" style="background:#dc2626;color:white;padding:14px 28px;text-decoration:none;border-radius:6px;display:inline-block;font-weight:bold">Grant LMS Access →</a>
+</div>`,
             });
           } catch (emailErr) {
             logger.error('Failed to send admin notification:', emailErr);
@@ -465,7 +479,8 @@ ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive ev
             isDeposit: !fullyPaid,
             email: normalizedEmail,
             fullName: customerName,
-            status: fullyPaid ? 'active' : 'deposit_paid',
+            // Payment received — hold at pending_review until admin grants access.
+            status: 'pending_review',
             paymentStatus: fullyPaid ? 'paid_in_full' : 'setup_fee_paid',
           });
           if (enrollResult.error) {
@@ -603,12 +618,12 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
           onConflict: 'stripe_subscription_id',
         }).select().single();
 
-        // Update enrollment status if enrollment_id provided
+        // Record subscription ID on enrollment — status stays pending_review until admin grants access.
         if (enrollmentId) {
           await supabase
             .from('program_enrollments')
-            .update({ 
-              payment_status: 'active',
+            .update({
+              payment_status: 'setup_fee_paid',
               stripe_subscription_id: subscriptionId,
             })
             .eq('id', enrollmentId);

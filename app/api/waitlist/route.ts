@@ -84,7 +84,7 @@ async function _POST(request: NextRequest) {
           body: JSON.stringify({
             personalizations: [{ to: [{ email: email.toLowerCase(), name: fullName }] }],
             from: { email: 'noreply@elevateforhumanity.org', name: 'Elevate for Humanity' },
-            reply_to: { email: 'info@elevateforhumanity.org', name: 'Elevate for Humanity' },
+            reply_to: { email: 'elevate4humanityedu@gmail.com', name: 'Elevate for Humanity' },
             subject: `You're on the waitlist — ${programLabel}`,
             content: [{ type: 'text/html', value: `
 <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1a1a1a;">

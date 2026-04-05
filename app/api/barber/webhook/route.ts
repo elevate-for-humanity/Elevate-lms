@@ -285,7 +285,7 @@ async function _POST(request: NextRequest) {
               try {
                 const { sendEmail } = await import('@/lib/email/sendgrid');
                 await sendEmail({
-                  to: 'info@elevateforhumanity.org',
+                  to: 'elevate4humanityedu@gmail.com',
                   subject: '⚠️ Weekly billing setup failed — manual action required',
                   html: `<p>Student: ${customerEmail}<br>Customer ID: ${customerId}<br>Weekly amount: $${(weeklyPaymentCents / 100).toFixed(2)}<br>Weeks: ${invoiceWeeks}</p><p>Stripe subscription was not created. Set up manually in Stripe dashboard.</p>`,
                 });
@@ -897,7 +897,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
         try {
           const { sendEmail } = await import('@/lib/email/sendgrid');
           await sendEmail({
-            to: 'info@elevateforhumanity.org',
+            to: 'elevate4humanityedu@gmail.com',
             subject: `Payment failed — ${studentEmail}`,
             html: `<p>Student: ${studentEmail}<br>Customer ID: ${failedCustomerId}<br>Subscription ID: ${sub.id}<br>Suspension deadline: 7 days from now.</p>`,
           });

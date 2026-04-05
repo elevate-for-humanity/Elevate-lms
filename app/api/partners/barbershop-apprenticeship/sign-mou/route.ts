@@ -201,7 +201,7 @@ async function _POST(req: NextRequest) {
             body: JSON.stringify({
               personalizations: [{ to: [{ email: partnerEmail }] }],
               from: { email: 'noreply@elevateforhumanity.org', name: 'Elevate for Humanity' },
-              reply_to: { email: 'info@elevateforhumanity.org' },
+              reply_to: { email: 'elevate4humanityedu@gmail.com' },
               subject: `Your Signed MOU — ${shop_name} | Elevate for Humanity Barber Apprenticeship`,
               content: [{
                 type: 'text/html',
@@ -292,7 +292,7 @@ async function _POST(req: NextRequest) {
           body: JSON.stringify({
             personalizations: [{ to: [{ email: ADMIN_EMAIL }] }],
             from: { email: 'noreply@elevateforhumanity.org', name: 'Elevate for Humanity' },
-            reply_to: { email: 'info@elevateforhumanity.org' },
+            reply_to: { email: 'elevate4humanityedu@gmail.com' },
             subject: `[MOU SIGNED] ${shop_name.trim()} — Barber Apprenticeship Partnership`,
             content: [{
               type: 'text/html',

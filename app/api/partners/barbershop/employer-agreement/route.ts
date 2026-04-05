@@ -109,7 +109,7 @@ async function _POST(request: NextRequest) {
       body: JSON.stringify({
         personalizations: [{ to: [{ email: contact_email }] }],
         from: { email: 'noreply@elevateforhumanity.org', name: 'Elevate for Humanity' },
-        reply_to: { email: 'info@elevateforhumanity.org' },
+        reply_to: { email: 'elevate4humanityedu@gmail.com' },
         subject: 'Employer Agreement Received — Barber Apprenticeship | Elevate for Humanity',
         content: [{
           type: 'text/html',

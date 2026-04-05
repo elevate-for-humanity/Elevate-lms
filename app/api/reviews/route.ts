@@ -133,7 +133,7 @@ async function _POST(request: Request) {
 
     // Notify admin of new review
     await supabase.from('email_queue').insert({
-      to_email: 'info@elevateforhumanity.org',
+      to_email: 'elevate4humanityedu@gmail.com',
       from_email: 'noreply@elevateforhumanity.org',
       subject: 'New Review Submitted - Pending Moderation',
       template_name: 'new_review_notification',

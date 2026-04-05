@@ -30,19 +30,19 @@ export default function HomePage() {
     <main className="min-h-screen bg-white">
 
       {/* ── HERO ── */}
-      <section className="grid lg:grid-cols-2 gap-0">
-        <div className="relative h-72 sm:h-96 lg:h-auto min-h-[560px] overflow-hidden bg-slate-700">
+      <section className="flex flex-col lg:grid lg:grid-cols-2 gap-0">
+        <div className="relative h-64 sm:h-80 lg:h-auto lg:min-h-[560px] overflow-hidden bg-slate-700">
           <HeroVideoBg
             src="/videos/homepage-hero-new.mp4"
             audioSrc="/videos/homepage-hero-new.mp3"
           />
         </div>
         <div className="bg-slate-700 flex items-center">
-          <div className="px-8 py-12 lg:px-14 lg:py-16 max-w-xl w-full">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
+          <div className="px-5 py-10 sm:px-8 sm:py-12 lg:px-14 lg:py-16 w-full">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5 break-words">
               Get Certified.<br />Get Funded.<br />Get Hired — In Weeks.
             </h1>
-            <p className="text-white text-base leading-relaxed mb-6">
+            <p className="text-white text-sm sm:text-base leading-relaxed mb-6">
               Free and low-cost career training programs in Indiana. Earn industry-recognized certifications and start working fast.
             </p>
             {/* Proof bullets */}
@@ -54,15 +54,16 @@ export default function HomePage() {
                 'DOL Registered Apprenticeship Sponsor · ETPL listed',
               ].map((b) => (
                 <li key={b} className="flex items-start gap-2 text-sm text-white">
-                  <span className="text-brand-red-400 font-bold flex-shrink-0">✔</span> {b}
+                  <span className="text-brand-red-400 font-bold flex-shrink-0">✔</span>
+                  <span>{b}</span>
                 </li>
               ))}
             </ul>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/funding" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-base">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+              <Link href="/funding" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3.5 rounded-lg transition-colors text-sm sm:text-base text-center">
                 Check My Eligibility
               </Link>
-              <Link href="/licensing-partnerships" className="border-2 border-white text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors text-base">
+              <Link href="/licensing-partnerships" className="border-2 border-white text-white font-bold px-6 py-3.5 rounded-lg hover:bg-white/10 transition-colors text-sm sm:text-base text-center">
                 License the Platform
               </Link>
             </div>
@@ -86,20 +87,20 @@ export default function HomePage() {
       <MarqueeBanner />
 
       {/* ── FUNDING — near top, very prominent ── */}
-      <section className="bg-brand-red-700 py-14 sm:py-16 px-6">
+      <section className="bg-brand-red-700 py-14 sm:py-16 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-            <div className="max-w-2xl">
+            <div className="w-full lg:max-w-2xl">
               <p className="text-white font-bold text-xs uppercase tracking-widest mb-3">Funding</p>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">You May Qualify for Free Training</h2>
-              <p className="text-white text-base leading-relaxed mb-6">
+              <p className="text-white text-sm sm:text-base leading-relaxed mb-6">
                 Many students pay $0 through state and workforce funding programs. We help you find and apply for the funding you qualify for.
               </p>
-              <div className="grid sm:grid-cols-3 gap-3 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
                 {[
                   { label: 'WIOA', tag: 'Federal', desc: 'For adults, dislocated workers, and youth 16–24.' },
                   { label: 'Workforce Ready Grant', tag: 'Indiana State', desc: 'Covers high-demand certification programs.' },
-                  { label: 'Job Ready Indy / Employer-Sponsored', tag: 'Indiana State', desc: 'For justice-involved individuals and employer OJT.' },
+                  { label: 'Job Ready Indy', tag: 'Indiana State', desc: 'For justice-involved individuals and employer OJT.' },
                 ].map((f) => (
                   <div key={f.label} className="bg-white rounded-xl p-4 shadow-sm">
                     <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>
@@ -108,7 +109,7 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-              <Link href="/check-eligibility" className="inline-block bg-white text-brand-red-700 font-bold px-8 py-3.5 rounded-lg hover:bg-brand-red-50 transition-colors">
+              <Link href="/check-eligibility" className="inline-block bg-white text-brand-red-700 font-bold px-6 sm:px-8 py-3.5 rounded-lg hover:bg-brand-red-50 transition-colors text-sm sm:text-base">
                 Check My Eligibility
               </Link>
             </div>

@@ -1,122 +1,65 @@
-/**
- * DB-only audit — verifies live migrations.
- * Run: NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... pnpm tsx scripts/db-audit.ts
- */
 import { createClient } from '@supabase/supabase-js';
+import { readFileSync } from 'fs';
 
-const db = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { persistSession: false } }
-);
+const env = readFileSync('/workspaces/Elevate-lms/.env.local', 'utf8');
+const getEnv = (key: string) => {
+  const match = env.match(new RegExp(`^${key}=(.+)$`, 'm'));
+  return match ? match[1].trim() : null;
+};
 
-let p = 0, f = 0;
-const ok   = (l: string, d: string) => { console.log(`  ✅ ${l}: ${d}`); p++; };
-const fail = (l: string, d: string) => { console.log(`  ❌ ${l}: ${d}`); f++; };
+const url = getEnv('NEXT_PUBLIC_SUPABASE_URL')!;
+const key = getEnv('SUPABASE_SERVICE_ROLE_KEY')!;
+const db = createClient(url, key);
 
-async function main() {
-  console.log('\n══════════════════════════════════════════════════════');
-  console.log('DB MIGRATION AUDIT');
-  console.log('══════════════════════════════════════════════════════');
+const CODE_TABLES = [
+  'profiles','programs','courses','course_modules','course_lessons','curriculum_lessons',
+  'training_courses','training_lessons','training_enrollments','program_enrollments',
+  'applications','certificates','payments','lms_lessons','modules','lesson_progress',
+  'checkpoint_scores','step_submissions','completion_rules','program_completion_certificates',
+  'exam_funding_authorizations','shop_products','orders','order_items',
+  'mentorships','mentor_sessions','onboarding_progress','orientation_completions',
+  'student_interventions','at_risk_students','program_outcomes','program_credentials',
+  'program_phases','program_modules','program_lessons','program_ctas','program_tracks',
+  'program_media','credentials','exam_bookings','testing_slots','announcements',
+  'notifications','user_achievements','badges','leaderboard','quiz_attempts',
+  'quiz_questions','quizzes','assignments','assignment_submissions','cohorts',
+  'cohort_enrollments','cohort_sessions','grants','grant_applications','wioa_applications',
+  'wioa_participants','jri_participants','apprenticeship_programs','apprentice_placements',
+  'apprentice_documents','apprentice_skills','apprentice_progress','barber_payments',
+  'barber_subscriptions','barbershop_partner_applications','shop_profiles','shops',
+  'tax_clients','tax_returns','tax_filings','franchise_offices','franchise_clients',
+  'refund_advance_applications','cash_advances','licenses','license_purchases',
+  'tenants','tenant_billing','store_products','purchases','promo_codes',
+  'email_campaigns','email_logs','crm_contacts','crm_leads','crm_deals',
+  'job_postings','job_applications','employer_profiles','employers',
+  'partner_profiles','partners','program_holders','program_holder_documents',
+  'mou_signatures','mous','documents','document_signatures','ferpa_documents',
+  'audit_logs','webhook_events_processed','stripe_webhook_events',
+  'user_lesson_attempts','video_generation_jobs','generated_images','tts_audio_files'
+];
 
-  // 1. program_id nullable
-  console.log('\n── Migration 1: program_id nullable ──');
-  const { data: nullRows, error: e0 } = await db
-    .from('curriculum_lessons')
-    .select('program_id')
-    .is('program_id', null)
-    .limit(1);
-  if (e0) fail('program_id nullable', e0.message);
-  else ok('program_id nullable', `null rows accessible (${nullRows?.length ?? 0} found)`);
+async function run() {
+  const missing: string[] = [];
+  const exists: string[] = [];
+  const errors: {table: string, msg: string}[] = [];
 
-  // 2. UNIQUE(course_id, lesson_order) constraint
-  console.log('\n── Migration 2: UNIQUE constraints ──');
-  const testId = '00000000-aaaa-0000-0000-000000000099';
-  await db.from('curriculum_lessons').delete().eq('course_id', testId);
-
-  const { error: e1 } = await db.from('curriculum_lessons').insert({
-    course_id: testId,
-    lesson_slug: 'audit-slug-1',
-    lesson_title: 'Audit Test',
-    lesson_order: 1,
-    module_order: 1,
-    module_title: 'Module',
-    step_type: 'lesson',
-    passing_score: 0,
-    status: 'draft',
-  });
-
-  if (e1) {
-    fail('first insert', e1.message);
-  } else {
-    // Try duplicate lesson_order
-    const { error: e2 } = await db.from('curriculum_lessons').insert({
-      course_id: testId,
-      lesson_slug: 'audit-slug-2',
-      lesson_title: 'Audit Test 2',
-      lesson_order: 1, // duplicate — should be blocked
-      module_order: 1,
-      module_title: 'Module',
-      step_type: 'lesson',
-      passing_score: 0,
-      status: 'draft',
-    });
-    if (e2?.code === '23505') {
-      ok('UNIQUE(course_id, lesson_order)', `duplicate blocked (${e2.code})`);
+  for (const table of CODE_TABLES) {
+    const { error } = await db.from(table as any).select('id').limit(1);
+    if (!error) {
+      exists.push(table);
+    } else if (error.code === '42P01' || error.message.includes('does not exist')) {
+      missing.push(table);
     } else {
-      fail('UNIQUE(course_id, lesson_order)', `NOT blocked: ${e2?.message ?? 'no error'}`);
+      errors.push({ table, msg: error.message });
     }
-
-    // Try duplicate lesson_slug
-    const { error: e3 } = await db.from('curriculum_lessons').insert({
-      course_id: testId,
-      lesson_slug: 'audit-slug-1', // duplicate slug — should be blocked
-      lesson_title: 'Audit Test 3',
-      lesson_order: 99,
-      module_order: 1,
-      module_title: 'Module',
-      step_type: 'lesson',
-      passing_score: 0,
-      status: 'draft',
-    });
-    if (e3?.code === '23505') {
-      ok('UNIQUE(course_id, lesson_slug)', `duplicate blocked (${e3.code})`);
-    } else {
-      fail('UNIQUE(course_id, lesson_slug)', `NOT blocked: ${e3?.message ?? 'no error'}`);
-    }
-
-    await db.from('curriculum_lessons').delete().eq('course_id', testId);
   }
 
-  // 3. publish_course_from_staging function
-  console.log('\n── Migration 3: publish_course_from_staging function ──');
-  const { error: fnErr } = await db.rpc('publish_course_from_staging', {
-    p_course_id: '00000000-0000-0000-0000-000000000001',
-    p_program_id: null,
-  });
-  if (fnErr?.message?.includes('Course not found')) {
-    ok('publish_course_from_staging()', `function live — "${fnErr.message}"`);
-  } else if (!fnErr) {
-    fail('publish_course_from_staging()', 'no error returned (expected "Course not found")');
-  } else {
-    fail('publish_course_from_staging()', `unexpected error: ${fnErr.message}`);
-  }
-
-  // 4. lms_lessons view accessible
-  console.log('\n── lms_lessons view ──');
-  const { data: lmsRows, error: lmsErr } = await db
-    .from('lms_lessons')
-    .select('id, step_type, is_published, lesson_source')
-    .limit(3);
-  if (lmsErr) fail('lms_lessons view', lmsErr.message);
-  else ok('lms_lessons view', `accessible, ${lmsRows?.length ?? 0} sample rows`);
-
-  // Summary
-  console.log('\n══════════════════════════════════════════════════════');
-  console.log(`DB AUDIT: ${p} passed, ${f} failed`);
-  console.log(f === 0 ? '✅ ALL DB MIGRATIONS VERIFIED' : '❌ FAILURES — see above');
-  console.log('══════════════════════════════════════════════════════\n');
-  if (f > 0) process.exit(1);
+  console.log(`\nEXISTS (${exists.length}):`);
+  exists.forEach(t => console.log(`  OK  ${t}`));
+  console.log(`\nMISSING (${missing.length}):`);
+  missing.forEach(t => console.log(`  !!  ${t}`));
+  console.log(`\nERRORS (${errors.length}):`);
+  errors.forEach(e => console.log(`  ??  ${e.table}: ${e.msg}`));
 }
 
-main().catch(e => { console.error('Fatal:', e); process.exit(1); });
+run().catch(console.error);

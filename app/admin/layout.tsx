@@ -7,10 +7,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { AdminLicenseWrapper } from '@/components/licensing/AdminLicenseWrapper';
 import { getLicenseAccessMode } from '@/lib/licensing/billing-authority';
 import { reconcileTrialOnboarding } from '@/lib/trial/reconcile-onboarding';
-import AdminShellClient from '@/components/admin/AdminShellClient';
+import AdminNav from '@/components/admin/AdminNav';
 import { DemoTourProvider } from '@/components/demo/DemoTourProvider';
 import { IdleTimeoutGuard } from '@/components/auth/IdleTimeoutGuard';
-import AdminPWAInit from '@/components/admin/AdminPWAInit';
 
 
 export const dynamic = 'force-dynamic';
@@ -51,8 +50,8 @@ async function getLicenseContext() {
     .select('role, tenant_id')
     .eq('id', user.id)
     .single();
-  if (profileError) throw new Error(`Profile fetch failed in getLicenseContext: ${profileError.message}`);
-  if (!profile?.tenant_id) return null;
+  // Degrade gracefully — profile missing or RLS block should not lock out the admin portal
+  if (profileError || !profile?.tenant_id) return null;
 
   const { data: license, error: licenseError } = await db
     .from('licenses')
@@ -104,7 +103,8 @@ export default async function AdminLayout({
         if (docsRes.error) console.error('[AdminLayout] documents count failed:', docsRes.error.message);
 
         const name = profileRes.data?.first_name || profileRes.data?.full_name?.split(' ')[0] || 'Admin';
-        const notifs: import('@/components/admin/AdminHeader').AdminHeaderNotif[] = [];
+        const notifs: import('@/components/admin/AdminNav').AdminNavNotif[] = [];
+
 
         if ((appsRes.count ?? 0) > 0) {
           notifs.push({ id: 'apps', unread: true, href: '/admin/applications?status=submitted',
@@ -143,14 +143,13 @@ export default async function AdminLayout({
   }
 
   const content = (
-    <AdminShellClient
-      userName={headerData.userName}
-      notifs={headerData.notifs}
-    >
-      <AdminPWAInit />
+    <div className="min-h-screen bg-white text-slate-900">
+      <AdminNav userName={headerData.userName} notifs={headerData.notifs} />
       <IdleTimeoutGuard />
-      {children}
-    </AdminShellClient>
+      <main id="main-content" className="pt-16">
+        {children}
+      </main>
+    </div>
   );
 
   if (!context) {

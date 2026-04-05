@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth';
 'use client';
 
 import React, { useState } from 'react';

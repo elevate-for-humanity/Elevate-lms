@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth';
 
 'use client';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -23,7 +24,7 @@ interface Tenant {
   active: boolean;
 }
 
-export default function LicensingPage() {
+export default async function LicensingPage() {
   const [licenses, setLicenses] = useState<License[]>([]);
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [loading, setLoading] = useState(true);

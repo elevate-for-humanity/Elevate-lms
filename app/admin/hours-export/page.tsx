@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth';
 "use client";
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import React from 'react';
@@ -9,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 
 
-export default function HoursExportPage() {
+export default async function HoursExportPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 

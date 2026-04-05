@@ -3,10 +3,11 @@ import Link from 'next/link';
 import { requireAdmin } from '@/lib/auth';
 import { getAdminDashboardData } from '@/lib/admin/get-admin-dashboard-data';
 import {
-  BarChart3, Users, BookOpen, Award, AlertTriangle,
+  BarChart3, Users, BookOpen, AlertTriangle,
   Settings, Brain, DollarSign, Shield,
   Briefcase, Megaphone, Wrench, ChevronRight,
 } from 'lucide-react';
+import { AdminGreeting } from '@/components/admin/AdminGreeting';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -21,10 +22,7 @@ function fmtDate(iso: string | null) {
   if (!iso) return '—';
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
-function getGreeting() {
-  const h = new Date().getHours();
-  return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
-}
+
 
 const NAV_SECTIONS = [
   { label: 'Operations', href: '/admin/dashboard',      icon: BarChart3,  description: 'Dashboard, analytics, monitoring',    color: 'bg-blue-50 text-blue-700' },
@@ -43,7 +41,6 @@ export default async function AdminLandingPage() {
   await requireAdmin();
   const data = await getAdminDashboardData();
 
-  const greeting = getGreeting();
   const firstName = data.profile?.full_name?.split(' ')[0] ?? 'Admin';
   const pendingApps = data.counts.pendingApplications;
 

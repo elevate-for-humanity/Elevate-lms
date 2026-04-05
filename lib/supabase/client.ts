@@ -70,19 +70,15 @@ const noOpClient = {
 let warnedOnce = false;
 
 export function createBrowserClient(): SupabaseClient<any> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    if (!warnedOnce) {
-      logger.warn(
-        '[Supabase Client] Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY. ' +
-        'Using no-op client. Add these to your .env.local to enable database features.'
-      );
-      warnedOnce = true;
-    }
-    return noOpClient;
-  }
+  // process.env.NEXT_PUBLIC_* is inlined by Next.js at build time.
+  // Fallback literals ensure the client works even when Turbopack
+  // fails to inline env vars in dev (known issue with some env setups).
+  const supabaseUrl =
+    process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    'https://cuxzzpsyufcewtmicszk.supabase.co';
+  const supabaseAnonKey =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1eHp6cHN5dWZjZXd0bWljc3prIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNjEwNDcsImV4cCI6MjA3MzczNzA0N30.DyFtzoKha_tuhKiSIPoQlKonIpaoSYrlhzntCUvLUnA';
 
   return createSupabaseBrowserClient(supabaseUrl, supabaseAnonKey);
 }

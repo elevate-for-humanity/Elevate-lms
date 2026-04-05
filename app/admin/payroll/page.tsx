@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth';
 
 'use client';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -10,7 +11,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 
-export default function AdminPayroll() {
+export default async function AdminPayroll() {
   const router = useRouter();
 
   const supabase = createClient();

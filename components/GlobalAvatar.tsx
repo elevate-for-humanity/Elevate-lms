@@ -80,7 +80,18 @@ export default function GlobalAvatar() {
     return () => observer.disconnect();
   }, [pathname, isExcluded, config, hasPlayed]);
 
-  if (isExcluded || !config || videoFailed) return null;
+  // Only show on authenticated portals — never on public marketing pages
+  const isPublicPage = !pathname.startsWith('/admin') &&
+    !pathname.startsWith('/lms') &&
+    !pathname.startsWith('/learner') &&
+    !pathname.startsWith('/student-portal') &&
+    !pathname.startsWith('/instructor') &&
+    !pathname.startsWith('/staff-portal') &&
+    !pathname.startsWith('/partner-portal') &&
+    !pathname.startsWith('/program-holder') &&
+    !pathname.startsWith('/employer');
+
+  if (isExcluded || !config || videoFailed || isPublicPage) return null;
 
   return (
     <section ref={containerRef} className="relative w-full bg-slate-100 py-8">

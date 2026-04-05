@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth';
 "use client";
 import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -656,7 +657,7 @@ const adminRoutes: AdminRoute[] = [
 
 
 
-export default function AdminPortalMapPage() {
+export default async function AdminPortalMapPage() {
   const [dbRows, setDbRows] = useState<any[]>([]);
   useEffect(() => {
     const supabase = createBrowserClient(

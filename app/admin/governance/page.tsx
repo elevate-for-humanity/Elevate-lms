@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -69,7 +70,7 @@ const highlights = [
   'Clear change management and review processes',
 ];
 
-export default function GovernancePage() {
+export default async function GovernancePage() {
 
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',

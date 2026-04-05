@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';

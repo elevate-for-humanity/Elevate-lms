@@ -43,11 +43,6 @@ interface PublicLayoutProps {
 export default async function PublicLayout({ children }: PublicLayoutProps) {
   const headersList = await headers();
 
-  // x-pathname is set by proxy.ts on every request.
-  // Fall back to other runtime headers if missing.
-  // If none resolve, default to '/' — public layout renders.
-  // App routes are explicitly listed in APP_ROUTE_PREFIXES and will
-  // still be caught by isAppRoute() below.
   const raw =
     headersList.get('x-pathname') ||
     headersList.get('x-invoke-path') ||
@@ -65,7 +60,7 @@ export default async function PublicLayout({ children }: PublicLayoutProps) {
     <>
       <Header />
       <Suspense>
-        <main id="main-content" className="pt-[70px]" role="main" tabIndex={-1}>
+        <main id="main-content" className="pt-[70px] overflow-x-hidden" role="main" tabIndex={-1}>
           {children}
         </main>
       </Suspense>

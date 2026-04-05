@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
@@ -150,7 +151,7 @@ const categoryLabels: Record<string, string> = {
   learning: 'Learning',
 };
 
-export default function AdminIntegrationsPage() {
+export default async function AdminIntegrationsPage() {
   const integrations = INTEGRATIONS.map((i) => ({
     ...i,
     status: i.envVars.length > 0 ? getStatus(i.envVars) : i.status,

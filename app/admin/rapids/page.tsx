@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth';
 'use client';
 import { useState, useEffect } from 'react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';

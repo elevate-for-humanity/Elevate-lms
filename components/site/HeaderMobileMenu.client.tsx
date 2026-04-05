@@ -20,7 +20,6 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
-  const supabase = createClient();
   const pathname = usePathname();
 
   // Close menu on any route change
@@ -50,6 +49,7 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
   useEffect(() => {
     async function loadProfile() {
       if (!isOpen) return;
+      const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data } = await supabase
@@ -61,7 +61,7 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
       }
     }
     loadProfile();
-  }, [isOpen, supabase]);
+  }, [isOpen]);
 
   return (
     <>
@@ -85,9 +85,8 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
 
       {/* Mobile Menu Panel */}
       <div
-        className={`fixed top-[70px] right-0 bottom-0 w-full max-w-[300px] bg-white z-[9999] md:hidden transform transition-transform duration-300 overflow-y-auto ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
+        className="fixed top-[70px] right-0 bottom-0 w-[85vw] max-w-[320px] bg-white z-[9999] md:hidden transform transition-transform duration-300 overflow-y-auto"
+        style={{ transform: isOpen ? 'translateX(0)' : 'translateX(100%)' }}
       >
         <nav className="p-4" aria-label="Mobile navigation">
           {items.map((item) => (

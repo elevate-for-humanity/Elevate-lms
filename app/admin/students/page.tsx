@@ -60,56 +60,58 @@ export default async function StudentsPage() {
     >
       <AdminCard>
         {students && students.length > 0 ? (
-          <div className="divide-y divide-slate-100">
-            {/* Table header */}
-            <div className="grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-              <div className="col-span-4">Student</div>
-              <div className="col-span-3">Contact</div>
-              <div className="col-span-2">Joined</div>
-              <div className="col-span-2">Status</div>
-              <div className="col-span-1"></div>
-            </div>
-            {students.map((student: any) => (
-              <div key={student.id} className="grid grid-cols-12 gap-4 px-5 py-4 items-center hover:bg-slate-50 transition-colors">
-                <div className="col-span-4 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-brand-blue-100 flex items-center justify-center flex-shrink-0">
-                    <span className="text-brand-blue-700 font-bold text-xs">
-                      {(student.full_name || student.first_name || '?').charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900 leading-tight">
-                      {student.full_name || `${student.first_name || ''} ${student.last_name || ''}`.trim() || 'Unnamed'}
-                    </p>
-                    <p className="text-xs text-slate-400">{student.id.slice(0, 8)}…</p>
-                  </div>
-                </div>
-                <div className="col-span-3 space-y-0.5">
-                  {student.email && (
-                    <p className="text-xs text-slate-600 flex items-center gap-1 truncate">
-                      <Mail className="w-3 h-3 flex-shrink-0" />{student.email}
-                    </p>
-                  )}
-                  {student.phone && (
-                    <p className="text-xs text-slate-500 flex items-center gap-1">
-                      <Phone className="w-3 h-3 flex-shrink-0" />{student.phone}
-                    </p>
-                  )}
-                </div>
-                <div className="col-span-2">
-                  <p className="text-xs text-slate-500">{new Date(student.created_at).toLocaleDateString()}</p>
-                </div>
-                <div className="col-span-2">
-                  <StatusBadge status="active" />
-                </div>
-                <div className="col-span-1 text-right">
-                  <Link href={`/admin/students/${student.id}`}
-                    className="text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700">
-                    View →
-                  </Link>
-                </div>
+          <div className="overflow-x-auto">
+            <div className="min-w-[600px]">
+              {/* Table header */}
+              <div className="grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                <div className="col-span-4">Student</div>
+                <div className="col-span-3">Contact</div>
+                <div className="col-span-2">Joined</div>
+                <div className="col-span-2">Status</div>
+                <div className="col-span-1"></div>
               </div>
-            ))}
+              {students.map((student: any) => (
+                <div key={student.id} className="grid grid-cols-12 gap-4 px-5 py-4 items-center hover:bg-slate-50 transition-colors border-t border-slate-100">
+                  <div className="col-span-4 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-brand-blue-100 flex items-center justify-center flex-shrink-0">
+                      <span className="text-brand-blue-700 font-bold text-xs">
+                        {(student.full_name || student.first_name || '?').charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-slate-900 leading-tight truncate">
+                        {student.full_name || `${student.first_name || ''} ${student.last_name || ''}`.trim() || 'Unnamed'}
+                      </p>
+                      <p className="text-xs text-slate-400">{student.id.slice(0, 8)}…</p>
+                    </div>
+                  </div>
+                  <div className="col-span-3 space-y-0.5 min-w-0">
+                    {student.email && (
+                      <p className="text-xs text-slate-600 flex items-center gap-1 truncate">
+                        <Mail className="w-3 h-3 flex-shrink-0" />{student.email}
+                      </p>
+                    )}
+                    {student.phone && (
+                      <p className="text-xs text-slate-500 flex items-center gap-1">
+                        <Phone className="w-3 h-3 flex-shrink-0" />{student.phone}
+                      </p>
+                    )}
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-xs text-slate-500">{new Date(student.created_at).toLocaleDateString()}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <StatusBadge status="active" />
+                  </div>
+                  <div className="col-span-1 text-right">
+                    <Link href={`/admin/students/${student.id}`}
+                      className="text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700">
+                      View →
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         ) : (
           <AdminEmptyState message="No students registered yet." />

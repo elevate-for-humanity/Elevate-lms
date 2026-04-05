@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth';
 
 'use client';
 
@@ -10,7 +11,7 @@ import Image from 'next/image';
 import { Users, Award, BookOpen, Star } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-export default function InstructorsPage() {
+export default async function InstructorsPage() {
   const supabase = createClient();
   const [instructors, setInstructors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

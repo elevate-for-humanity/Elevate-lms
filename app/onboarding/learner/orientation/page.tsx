@@ -37,6 +37,14 @@ async function completeOrientation() {
       completed_at: now,
       orientation_type: 'learner',
     }, { onConflict: 'user_id', ignoreDuplicates: true }),
+    // Write to onboarding_progress (canonical step tracker)
+    supabase.from('onboarding_progress').upsert({
+      user_id: user.id,
+      step: 'orientation',
+      completed: true,
+      completed_at: now,
+      updated_at: now,
+    }, { onConflict: 'user_id,step' }),
   ]);
 
   // Send "you're ready to start" email — non-blocking

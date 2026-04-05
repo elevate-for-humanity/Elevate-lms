@@ -268,9 +268,19 @@ export default function DocumentsPage() {
               <h2 className="text-lg font-bold text-slate-900 mb-1">All Required Documents Uploaded</h2>
               <p className="text-slate-500 text-sm">Your documents are pending review. You can continue with onboarding.</p>
             </div>
-            <Link href="/onboarding/learner" className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 flex-shrink-0">
+            <button
+              onClick={async () => {
+                await fetch('/api/onboarding/complete-step', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ step: 'documents' }),
+                });
+                router.push('/onboarding/learner');
+              }}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 flex-shrink-0"
+            >
               Continue <ArrowLeft className="w-4 h-4 rotate-180" />
-            </Link>
+            </button>
           </div>
         )}
 

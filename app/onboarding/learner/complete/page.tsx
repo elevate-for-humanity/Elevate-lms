@@ -166,7 +166,7 @@ export default async function OrientationCompletePage() {
             (317) 314-3757
           </a>{' '}
           or email{' '}
-          <a href="mailto:info@elevateforhumanity.org" className="underline">
+          <a href="mailto:elevate4humanityedu@gmail.com" className="underline">
             info@elevateforhumanity.org
           </a>
         </p>

@@ -220,7 +220,16 @@ export default function AgreementsPage() {
                 documentVersion={AGREEMENT.version}
                 documentUrl={AGREEMENT.documentUrl}
                 acceptanceContext="learner-onboarding"
-                onSuccess={() => { setSigned(true); router.push('/onboarding/learner'); }}
+                onSuccess={async () => {
+                  setSigned(true);
+                  // Mark agreements step complete in onboarding_progress
+                  await fetch('/api/onboarding/complete-step', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ step: 'agreements' }),
+                  });
+                  router.push('/onboarding/learner');
+                }}
               />
             </div>
           </div>

@@ -28,12 +28,12 @@ interface AdminPageShellProps {
 }
 
 const COLOR_MAP = {
-  red:    { icon: 'text-brand-red-400',   bg: 'bg-brand-red-500/10',   border: 'border-brand-red-500/20',   val: 'text-brand-red-300' },
-  blue:   { icon: 'text-brand-blue-400',  bg: 'bg-brand-blue-500/10',  border: 'border-brand-blue-500/20',  val: 'text-brand-blue-300' },
-  green:  { icon: 'text-green-400',       bg: 'bg-green-500/10',       border: 'border-green-500/20',       val: 'text-green-300' },
-  amber:  { icon: 'text-amber-400',       bg: 'bg-amber-500/10',       border: 'border-amber-500/20',       val: 'text-amber-300' },
-  purple: { icon: 'text-purple-400',      bg: 'bg-purple-500/10',      border: 'border-purple-500/20',      val: 'text-purple-300' },
-  slate:  { icon: 'text-slate-400',       bg: 'bg-slate-700',          border: 'border-slate-600',          val: 'text-white' },
+  red:    { icon: 'text-brand-red-600',   bg: 'bg-brand-red-50',   border: 'border-brand-red-200',   val: 'text-brand-red-700',   bar: 'bg-brand-red-600'   },
+  blue:   { icon: 'text-brand-blue-600',  bg: 'bg-brand-blue-50',  border: 'border-brand-blue-200',  val: 'text-brand-blue-700',  bar: 'bg-brand-blue-600'  },
+  green:  { icon: 'text-emerald-600',     bg: 'bg-emerald-50',     border: 'border-emerald-200',     val: 'text-emerald-700',     bar: 'bg-emerald-500'     },
+  amber:  { icon: 'text-amber-600',       bg: 'bg-amber-50',       border: 'border-amber-200',       val: 'text-amber-700',       bar: 'bg-amber-500'       },
+  purple: { icon: 'text-violet-600',      bg: 'bg-violet-50',      border: 'border-violet-200',      val: 'text-violet-700',      bar: 'bg-violet-500'      },
+  slate:  { icon: 'text-slate-600',       bg: 'bg-slate-50',       border: 'border-slate-200',       val: 'text-slate-900',       bar: 'bg-slate-400'       },
 };
 
 export function AdminPageShell({
@@ -47,22 +47,22 @@ export function AdminPageShell({
   return (
     <div className="min-h-screen bg-slate-50">
 
-      {/* Hero banner */}
-      <div className="bg-slate-900 border-b border-slate-800">
+      {/* Page header — white, matches marketing site */}
+      <div className="bg-white border-b border-slate-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
           {/* Breadcrumbs */}
           {breadcrumbs && breadcrumbs.length > 0 && (
-            <nav className="flex items-center gap-1.5 pt-4 pb-2">
+            <nav className="flex items-center gap-1.5 pt-4 pb-1">
               {breadcrumbs.map((crumb, i) => (
                 <React.Fragment key={i}>
-                  {i > 0 && <ChevronRight className="w-3 h-3 text-slate-600" />}
+                  {i > 0 && <ChevronRight className="w-3 h-3 text-slate-300" />}
                   {crumb.href ? (
-                    <Link href={crumb.href} className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
+                    <Link href={crumb.href} className="text-xs text-slate-400 hover:text-brand-blue-600 transition-colors">
                       {crumb.label}
                     </Link>
                   ) : (
-                    <span className="text-xs text-slate-400">{crumb.label}</span>
+                    <span className="text-xs text-slate-500 font-medium">{crumb.label}</span>
                   )}
                 </React.Fragment>
               ))}
@@ -70,32 +70,35 @@ export function AdminPageShell({
           )}
 
           {/* Title row */}
-          <div className="flex items-start justify-between gap-4 py-5">
+          <div className="flex items-start justify-between gap-4 py-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">{title}</h1>
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">{title}</h1>
               {description && (
-                <p className="text-sm text-slate-400 mt-1 max-w-2xl">{description}</p>
+                <p className="text-sm text-slate-500 mt-1 max-w-2xl leading-relaxed">{description}</p>
               )}
             </div>
             {actions && (
-              <div className="flex items-center gap-2 flex-shrink-0">{actions}</div>
+              <div className="flex items-center gap-2 flex-shrink-0 mt-1">{actions}</div>
             )}
           </div>
 
           {/* Stat cards */}
           {stats && stats.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pb-5">
               {stats.map(({ label, value, sub, icon: Icon, color = 'slate', href, alert }) => {
                 const c = COLOR_MAP[color];
                 const card = (
-                  <div className={`rounded-xl border ${c.bg} ${c.border} p-4 ${href ? 'hover:brightness-110 transition-all cursor-pointer' : ''} ${alert ? 'ring-1 ring-brand-red-500/50' : ''}`}>
-                    <div className="flex items-start justify-between mb-2">
-                      <Icon className={`w-4 h-4 ${c.icon}`} />
-                      {alert && <span className="w-2 h-2 rounded-full bg-brand-red-400 animate-pulse" />}
+                  <div className={`group rounded-2xl border ${c.bg} ${c.border} overflow-hidden shadow-sm ${href ? 'hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer' : ''} ${alert ? 'ring-2 ring-brand-red-400' : ''}`}>
+                    <div className={`h-1 ${c.bar}`} />
+                    <div className="p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <Icon className={`w-4 h-4 ${c.icon}`} />
+                        {alert && <span className="w-2 h-2 rounded-full bg-brand-red-500 animate-pulse" />}
+                      </div>
+                      <p className={`text-2xl font-black tabular-nums ${c.val} leading-none`}>{value}</p>
+                      <p className="text-xs text-slate-500 font-semibold mt-1.5 uppercase tracking-wide">{label}</p>
+                      {sub && <p className="text-[10px] text-slate-400 mt-0.5">{sub}</p>}
                     </div>
-                    <p className={`text-2xl font-extrabold ${c.val} leading-none`}>{value}</p>
-                    <p className="text-xs text-slate-500 font-medium mt-1">{label}</p>
-                    {sub && <p className="text-[10px] text-slate-600 mt-0.5">{sub}</p>}
                   </div>
                 );
                 return href ? <Link key={label} href={href}>{card}</Link> : <div key={label}>{card}</div>;

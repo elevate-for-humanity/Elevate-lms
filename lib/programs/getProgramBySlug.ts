@@ -159,7 +159,7 @@ export async function getPublishedProgramBySlug(slug: string): Promise<ProgramRe
   }
 
   // Normalise missing relations to empty arrays — page renders a controlled
-  // "coming soon" state rather than 404ing or showing empty sections.
+  // unavailable state rather than 404ing or showing empty sections.
   data.program_media   = data.program_media   ?? [];
   data.program_ctas    = data.program_ctas    ?? [];
   data.program_tracks  = data.program_tracks  ?? [];

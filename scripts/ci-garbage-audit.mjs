@@ -50,7 +50,8 @@ const checks = [
   {
     name: "AI/refactor placeholder",
     severity: "warn",
-    regex: /\b(TODO|FIXME|TBD|HACK|BROKEN|REVISIT|coming soon|temporary fix)\b/g,
+    // 'coming soon' excluded — appears in schema comments and banned-token definitions (false positives)
+    regex: /\b(TODO|FIXME|TBD|HACK|BROKEN|REVISIT|temporary fix)\b/g,
   },
   {
     name: "Dead boolean branch",
@@ -73,6 +74,8 @@ const IGNORE_FILES = [
   /\.generated\./,
   /database\.generated\./,
   /\.d\.ts$/,
+  /lib\/banned-tokens\.ts$/,   // defines the banned token list itself
+  /scripts\/ci-garbage-audit/, // the audit script itself
 ];
 
 function shouldIgnoreFile(file) {

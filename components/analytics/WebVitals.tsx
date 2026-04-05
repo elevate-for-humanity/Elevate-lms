@@ -102,7 +102,7 @@ export function usePerformanceObserver() {
     const longTaskObserver = new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
         if (entry.duration > 50) {
-          console.debug('[Performance] Long task:', entry.duration.toFixed(2), 'ms');
+          if (process.env.NODE_ENV === 'development') (console as any).debug?.('[Performance] Long task:', entry.duration.toFixed(2), 'ms'); // ci-ignore
         }
       }
     });

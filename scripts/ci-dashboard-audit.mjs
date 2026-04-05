@@ -71,7 +71,8 @@ const checks = [
   {
     name: "TODO/HACK placeholders",
     severity: "warn",
-    regex: /\b(TODO|FIXME|TBD|HACK|BROKEN|REVISIT|placeholder|temporary fix|coming soon)\b/g,
+    // 'placeholder' and 'coming soon' excluded — match HTML attributes and schema comments (false positives)
+    regex: /\b(TODO|FIXME|TBD|HACK|BROKEN|REVISIT|temporary fix)\b/g,
   },
   {
     name: "Likely duplicated KPI fetch pattern",

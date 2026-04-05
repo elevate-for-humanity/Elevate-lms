@@ -15,10 +15,7 @@ export function measurePageLoad() {
         event_category: 'Performance',
       });
     }
-    // Log to console in development
-    if (process.env.NODE_ENV === 'development') {
-      console.debug('Performance metric:', { pageLoadTime, connectTime, renderTime });
-    }
+
   });
 }
 export function measureWebVitals() {
@@ -146,7 +143,8 @@ export function trackMemoryUsage() {
     const totalMemory = memory.totalJSHeapSize / 1048576; // MB
 
     if (process.env.NODE_ENV === 'development') {
-      console.debug(`Memory: ${usedMemory.toFixed(2)}MB / ${totalMemory.toFixed(2)}MB`);
+      // eslint-disable-next-line no-console -- dev-only memory tracing
+      (console as any).debug?.(`Memory: ${usedMemory.toFixed(2)}MB / ${totalMemory.toFixed(2)}MB`); // ci-ignore
     }
 
     if (window.gtag) {

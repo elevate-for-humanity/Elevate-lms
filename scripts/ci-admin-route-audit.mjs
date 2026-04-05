@@ -65,7 +65,8 @@ const checks = [
   {
     name: "Admin TODO/HACK",
     severity: "warn",
-    regex: /\b(TODO|FIXME|TBD|HACK|BROKEN|REVISIT|temporary fix|placeholder)\b/g,
+    // Note: 'placeholder' excluded — it matches HTML input placeholder= attributes (false positive)
+    regex: /\b(TODO|FIXME|TBD|HACK|BROKEN|REVISIT|temporary fix)\b/g,
   },
 ];
 

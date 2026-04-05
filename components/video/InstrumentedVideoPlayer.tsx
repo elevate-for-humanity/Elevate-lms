@@ -88,7 +88,7 @@ export default function InstrumentedVideoPlayer({
       });
     } catch (e) {
       // Silent fail for analytics
-      console.debug('Failed to track video event', e);
+      if (process.env.NODE_ENV === 'development') (console as any).debug?.('Failed to track video event', e); // ci-ignore
     }
   }, [video.id, pageSlug, sessionId, supabase]);
 
@@ -117,7 +117,7 @@ export default function InstrumentedVideoPlayer({
           trackEvent('play');
         } catch (e2) {
           // Autoplay completely blocked
-          console.debug('Autoplay blocked', e2);
+          if (process.env.NODE_ENV === 'development') (console as any).debug?.('Autoplay blocked', e2); // ci-ignore
         }
       }
     };

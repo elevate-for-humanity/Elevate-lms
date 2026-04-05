@@ -242,7 +242,7 @@ export interface ProgramSchema {
       cost: string;            // e.g. "$5,000"
       description: string;
       applyHref: string;
-      available: boolean;      // false = coming soon
+      available: boolean;      // false = not yet available for enrollment
       comingSoonMessage?: string;
     };
   };

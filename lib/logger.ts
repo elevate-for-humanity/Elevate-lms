@@ -64,7 +64,7 @@ class Logger {
     switch (level) {
       case 'debug':
         if (this.isDevelopment) {
-          console.debug(formatted);
+          console.info(formatted);
         }
         break;
       case 'info':

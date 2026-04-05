@@ -9,14 +9,12 @@ import AdminMobileNav from "./AdminMobileNav";
 interface AdminShellClientProps {
   children: React.ReactNode;
   userName?: string;
-  userInitial?: string;
   notifs?: import("./AdminHeader").AdminHeaderNotif[];
 }
 
 export default function AdminShellClient({
   children,
   userName,
-  userInitial,
   notifs,
 }: AdminShellClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -59,7 +57,6 @@ export default function AdminShellClient({
         {/* Header */}
         <AdminHeader
           userName={userName}
-          userInitial={userInitial}
           notifs={notifs}
           onMenuClick={() => setSidebarOpen(true)}
           darkMode={darkMode}

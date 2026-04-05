@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { Bell, ChevronDown, Search, Settings, LogOut, ExternalLink, Menu, Moon, Sun } from "lucide-react";
+import { Bell, ChevronDown, Search, Settings, LogOut, Menu, Moon, Sun } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 export interface AdminHeaderNotif {
@@ -16,7 +16,6 @@ export interface AdminHeaderNotif {
 
 export interface AdminHeaderProps {
   userName?: string;
-  userInitial?: string;
   notifs?: AdminHeaderNotif[];
   onMenuClick?: () => void;
   darkMode?: boolean;
@@ -27,7 +26,7 @@ function toTitleCase(s: string) {
   return s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export default function AdminHeader({ userName = "Admin", userInitial = "A", notifs = [], onMenuClick, darkMode = false, onToggleDark }: AdminHeaderProps) {
+export default function AdminHeader({ userName = "Admin", notifs = [], onMenuClick, darkMode = false, onToggleDark }: AdminHeaderProps) {
   const pathname = usePathname();
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -158,11 +157,9 @@ export default function AdminHeader({ userName = "Admin", userInitial = "A", not
           {/* Profile */}
           <div className="relative" ref={profileRef}>
             <button type="button" onClick={() => { setProfileOpen((v) => !v); setNotifOpen(false); }}
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 hover:bg-slate-50 transition-colors">
-              <div className="h-7 w-7 rounded-full bg-brand-red-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                {userInitial}
-              </div>
-              <span className="hidden sm:block text-sm font-semibold text-slate-800">{userName}</span>
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 hover:bg-slate-50 transition-colors">
+              <span className="text-sm font-semibold text-slate-800">{userName}</span>
+              <span className="hidden sm:inline-flex text-[10px] font-bold bg-brand-blue-100 text-brand-blue-700 px-2 py-0.5 rounded-full">Admin</span>
               <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
             </button>
             {profileOpen && (
@@ -175,10 +172,7 @@ export default function AdminHeader({ userName = "Admin", userInitial = "A", not
                   className="flex items-center gap-3 px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
                   <Settings className="h-4 w-4 text-slate-400" /> Settings
                 </Link>
-                <Link href="/" onClick={() => setProfileOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                  <ExternalLink className="h-4 w-4 text-slate-400" /> View public site
-                </Link>
+
                 <div className="border-t border-slate-100" />
                 <button type="button" onClick={signOut}
                   className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-brand-red-600 hover:bg-brand-red-50 transition-colors">

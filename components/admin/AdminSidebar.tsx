@@ -270,10 +270,8 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
             <SidebarSection key={section.title} section={section} pathname={pathname} onNav={onClose} />
           ))}
         </nav>
-        <div className="border-t border-slate-800 px-4 py-4 flex-shrink-0">
-          <Link href="/" className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-300 transition-colors">
-            <Globe className="h-4 w-4" /> View public site
-          </Link>
+        <div className="border-t border-slate-800 px-4 py-3 flex-shrink-0">
+          <p className="text-[10px] text-slate-600 font-medium uppercase tracking-widest">Elevate for Humanity Admin</p>
         </div>
       </aside>
     </>

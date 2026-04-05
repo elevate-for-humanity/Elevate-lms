@@ -42,32 +42,44 @@ const STATUS_PILL: Record<string, string> = {
 };
 function StatusPill({ status }: { status: string }) {
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold ${STATUS_PILL[status] ?? "bg-slate-100 text-slate-600"}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${STATUS_PILL[status] ?? "bg-slate-100 text-slate-600"}`}>
       {status.replace(/_/g, " ")}
     </span>
   );
 }
 
 // ── KPI card ──────────────────────────────────────────────────────────────────
-function KpiCard({ label, value, sub, href, urgent, icon: Icon }: {
+const KPI_THEMES = [
+  { gradient: "from-rose-500 to-orange-400",   bg: "bg-rose-50",    icon: "text-rose-600"    },
+  { gradient: "from-blue-500 to-cyan-400",     bg: "bg-blue-50",    icon: "text-blue-600"    },
+  { gradient: "from-emerald-500 to-teal-400",  bg: "bg-emerald-50", icon: "text-emerald-600" },
+  { gradient: "from-violet-500 to-purple-400", bg: "bg-violet-50",  icon: "text-violet-600"  },
+];
+
+function KpiCard({ label, value, sub, href, urgent, icon: Icon, index = 0 }: {
   label: string; value: string; sub: string;
-  href: string; urgent?: boolean; icon: React.ElementType;
+  href: string; urgent?: boolean; icon: React.ElementType; index?: number;
 }) {
+  const theme = urgent ? KPI_THEMES[0] : KPI_THEMES[index % KPI_THEMES.length];
   return (
     <Link href={href} className={[
-      "group relative flex flex-col gap-2 rounded-2xl border bg-white p-5 shadow-sm hover:shadow-md transition-all",
-      urgent ? "border-rose-300 ring-1 ring-rose-200" : "border-slate-200",
+      "group relative flex flex-col rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200",
+      urgent ? "ring-2 ring-rose-400" : "",
     ].join(" ")}>
-      <div className="flex items-start justify-between gap-2">
-        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{label}</p>
-        <div className={`rounded-xl p-2 flex-shrink-0 ${urgent ? "bg-rose-50 text-rose-600" : "bg-slate-100 text-slate-500"}`}>
-          <Icon className="h-4 w-4" />
+      {/* Gradient top bar */}
+      <div className={`h-1.5 bg-gradient-to-r ${theme.gradient}`} />
+      <div className="flex-1 bg-white p-5">
+        <div className="flex items-start justify-between gap-2 mb-3">
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest leading-tight">{label}</p>
+          <div className={`rounded-xl p-2 flex-shrink-0 ${theme.bg} ${theme.icon}`}>
+            <Icon className="h-4 w-4" />
+          </div>
         </div>
+        <p className="text-3xl font-black tracking-tight text-slate-900 tabular-nums">{value}</p>
+        <p className="text-xs text-slate-400 leading-snug mt-1.5">{sub}</p>
+        {urgent && <span className="absolute top-5 right-14 w-2 h-2 rounded-full bg-rose-500 animate-pulse" />}
+        <ArrowRight className="absolute bottom-4 right-4 w-3.5 h-3.5 text-slate-200 group-hover:text-slate-500 transition-colors" />
       </div>
-      <p className="text-3xl font-black tracking-tight text-slate-900 tabular-nums">{value}</p>
-      <p className="text-xs text-slate-400 leading-snug">{sub}</p>
-      {urgent && <span className="absolute top-4 right-12 w-2 h-2 rounded-full bg-rose-500" />}
-      <ArrowRight className="absolute bottom-4 right-4 w-3.5 h-3.5 text-slate-200 group-hover:text-slate-400 transition-colors" />
     </Link>
   );
 }
@@ -264,9 +276,7 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
                 return (
                   <Link key={app.id} href={app.href}
                     className={`flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors ${app.urgent ? "bg-rose-50/40" : ""}`}>
-                    <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600 flex-shrink-0">
-                      {name[0]?.toUpperCase() ?? "?"}
-                    </div>
+                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${app.urgent ? "bg-rose-500" : "bg-slate-300"}`} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-slate-900 truncate">{name}</p>
                       <p className="text-xs text-slate-400 truncate">{app.program_interest ?? "No program"}</p>
@@ -293,9 +303,7 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
               {data.inactiveLearners.map(l => (
                 <Link key={l.enrollmentId} href={l.href}
                   className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                    <UserX className="w-4 h-4 text-amber-600" />
-                  </div>
+                  <div className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-slate-900 truncate">{l.fullName ?? "Unknown"}</p>
                     <p className="text-xs text-slate-400 truncate">{l.email ?? "No email"}</p>
@@ -358,9 +366,7 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
               {data.recentStudents.map(s => (
                 <Link key={s.id} href={s.href}
                   className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-brand-blue-100 flex items-center justify-center text-xs font-bold text-brand-blue-700 flex-shrink-0">
-                    {(s.full_name?.[0] ?? s.email?.[0] ?? "?").toUpperCase()}
-                  </div>
+                  <div className="w-2 h-2 rounded-full bg-brand-blue-400 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-slate-900 truncate">{s.full_name ?? s.email ?? "Unknown"}</p>
                     <p className="text-xs text-slate-400 truncate">{s.program_name ?? "No program"}</p>
@@ -384,9 +390,7 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
               {data.blockedPrograms.map(p => (
                 <Link key={p.id} href={p.href}
                   className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
-                    <XCircle className="w-4 h-4 text-slate-400" />
-                  </div>
+                  <div className="w-2 h-2 rounded-full bg-slate-300 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-slate-900 truncate">{p.title}</p>
                     <p className="text-xs text-slate-400">Updated {fmtDate(p.updatedAt)}</p>

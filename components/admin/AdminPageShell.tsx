@@ -47,7 +47,7 @@ export function AdminPageShell({
   return (
     <div className="min-h-screen bg-slate-50">
 
-      {/* Page header — white, matches marketing site */}
+      {/* Page header */}
       <div className="bg-white border-b border-slate-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
 

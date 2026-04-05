@@ -92,7 +92,7 @@ export default async function AdminLayout({
     (async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return { userName: 'Admin', userInitial: 'A', notifs: [] };
+        if (!user) return { userName: 'Admin', notifs: [] };
 
         const [profileRes, appsRes, docsRes] = await Promise.all([
           db.from('profiles').select('full_name, first_name').eq('id', user.id).maybeSingle(),
@@ -117,9 +117,9 @@ export default async function AdminLayout({
             time: 'Compliance required' });
         }
 
-        return { userName: name, userInitial: name[0].toUpperCase(), notifs };
+        return { userName: name, notifs };
       } catch {
-        return { userName: 'Admin', userInitial: 'A', notifs: [] };
+        return { userName: 'Admin', notifs: [] };
       }
     })(),
   ]);
@@ -145,7 +145,6 @@ export default async function AdminLayout({
   const content = (
     <AdminShellClient
       userName={headerData.userName}
-      userInitial={headerData.userInitial}
       notifs={headerData.notifs}
     >
       <AdminPWAInit />

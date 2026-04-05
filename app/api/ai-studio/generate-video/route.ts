@@ -103,7 +103,7 @@ async function handleCourseVideo(body: any) {
       const errorMsg = result.error || 'Generation failed';
       if (job?.id) await supabase.from('video_generation_jobs').update({ status: 'failed', error_message: errorMsg }).eq('id', job.id);
       if (task?.id) await supabase.from('ai_generation_tasks').update({ status: 'failed', error_message: errorMsg, completed_at: new Date().toISOString() }).eq('id', task.id);
-      return NextResponse.json({ error: errorMsg }, { status: 500 });
+      return NextResponse.json({ error: 'Video generation failed. Check job status for details.' }, { status: 500 });
     }
 
     // 3. Update job as completed

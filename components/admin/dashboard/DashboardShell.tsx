@@ -2,6 +2,7 @@
 // All values computed at render time on the server — zero hydration mismatch.
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   FileText, Users, DollarSign, Award, AlertTriangle, ArrowRight,
   RefreshCw, TrendingUp, BarChart3, Zap, ChevronRight,
@@ -196,32 +197,48 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
         <DegradedBanner sections={data.degradedSections ?? []} />
       )}
 
-      {/* Page header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200">
-        <div>
-          <p className="text-xs text-slate-400 font-medium">{getGreeting()}, {firstName}</p>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Operations Dashboard</h1>
-          <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
-            <RefreshCw className="w-3 h-3" /> {updatedAt}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/admin/applications?status=submitted"
-            className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 hover:bg-brand-red-700 text-white px-4 py-2 text-sm font-bold transition-colors shadow-sm">
-            <FileText className="w-4 h-4" />
-            Applications
+      {/* Hero banner */}
+      <div className="relative rounded-2xl overflow-hidden h-48 sm:h-56 shadow-md">
+        <Image
+          src="/images/pages/admin-dashboard-hero.jpg"
+          alt="Admin dashboard"
+          fill
+          className="object-cover"
+          priority
+          sizes="(max-width: 1280px) 100vw, 1280px"
+        />
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/50 to-transparent" />
+        {/* Content */}
+        <div className="absolute inset-0 flex flex-col justify-between p-6 sm:p-8">
+          <div>
+            <p className="text-slate-300 text-xs font-semibold uppercase tracking-widest mb-1">{getGreeting()}, {firstName} · {updatedAt}</p>
+            <h1 className="text-2xl sm:text-3xl font-black text-white leading-tight">Operations Dashboard</h1>
             {totalPending > 0 && (
-              <span className="bg-white text-brand-red-600 text-[10px] font-black px-1.5 py-0.5 rounded-full">{totalPending}</span>
+              <p className="text-rose-300 text-sm font-bold mt-1 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse inline-block" />
+                {totalPending} application{totalPending !== 1 ? 's' : ''} waiting for review
+              </p>
             )}
-          </Link>
-          <Link href="/admin/students"
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 text-sm font-semibold transition-colors">
-            <Users className="w-4 h-4" /> Students
-          </Link>
-          <Link href="/admin/analytics"
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 text-sm font-semibold transition-colors">
-            <BarChart3 className="w-4 h-4" /> Analytics
-          </Link>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/admin/applications?status=submitted"
+              className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 hover:bg-brand-red-700 text-white px-4 py-2 text-sm font-bold transition-colors shadow-sm">
+              <FileText className="w-4 h-4" />
+              Applications
+              {totalPending > 0 && (
+                <span className="bg-white text-brand-red-600 text-[10px] font-black px-1.5 py-0.5 rounded-full">{totalPending}</span>
+              )}
+            </Link>
+            <Link href="/admin/students"
+              className="inline-flex items-center gap-2 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border border-white/20 px-4 py-2 text-sm font-semibold transition-colors">
+              <Users className="w-4 h-4" /> Students
+            </Link>
+            <Link href="/admin/analytics"
+              className="inline-flex items-center gap-2 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border border-white/20 px-4 py-2 text-sm font-semibold transition-colors">
+              <BarChart3 className="w-4 h-4" /> Analytics
+            </Link>
+          </div>
         </div>
       </div>
 

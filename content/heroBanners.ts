@@ -418,6 +418,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'hvac-technician': programBanner('hvac-technician', {
     pageKey: 'hvac-technician',
     videoSrcDesktop: '/videos/hvac-hero-final.mp4',
+    posterImage: '/hero-images/skilled-trades-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
     microLabel: 'EPA 608 Universal',
     credentialLabel: 'EPA 608 Universal',
     durationLabel: '20 weeks',
@@ -434,6 +436,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'cdl-training': programBanner('cdl-training', {
     pageKey: 'cdl-training',
     videoSrcDesktop: '/videos/cdl-hero.mp4',
+    posterImage: '/hero-images/cdl-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/cdl.mp3',
     microLabel: 'CDL Class A',
     credentialLabel: 'CDL Class A',
     durationLabel: '3 to 6 weeks',
@@ -450,6 +454,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'electrical': programBanner('electrical', {
     pageKey: 'electrical',
     videoSrcDesktop: '/videos/electrician-trades.mp4',
+    posterImage: '/hero-images/electrical-hero.jpg',
+    voiceoverSrc: '/audio/heroes/electrical.mp3',
     microLabel: 'NCCER Core Curriculum',
     credentialLabel: 'NCCER Core Curriculum',
     durationLabel: '12 weeks',
@@ -466,6 +472,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'welding': programBanner('welding', {
     pageKey: 'welding',
     videoSrcDesktop: '/videos/welding-trades.mp4',
+    posterImage: '/hero-images/skilled-trades-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/welding.mp3',
     microLabel: 'AWS D1.1 Certification',
     credentialLabel: 'AWS D1.1',
     durationLabel: '10 weeks',
@@ -482,6 +490,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'plumbing': programBanner('plumbing', {
     pageKey: 'plumbing',
     videoSrcDesktop: '/videos/welding-trades.mp4',
+    posterImage: '/hero-images/skilled-trades-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
     microLabel: 'NCCER Core Curriculum',
     credentialLabel: 'NCCER Core Curriculum',
     durationLabel: '10 weeks',
@@ -498,6 +508,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'diesel-mechanic': programBanner('diesel-mechanic', {
     pageKey: 'diesel-mechanic',
     videoSrcDesktop: '/videos/welding-trades.mp4',
+    posterImage: '/hero-images/skilled-trades-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
     microLabel: 'ASE Exam Prep',
     credentialLabel: 'ASE exam preparation',
     durationLabel: '12 weeks',
@@ -514,6 +526,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'construction-trades-certification': programBanner('construction-trades-certification', {
     pageKey: 'construction-trades-certification',
     videoSrcDesktop: '/videos/electrician-trades.mp4',
+    posterImage: '/hero-images/skilled-trades-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
     microLabel: 'OSHA 30 + Forklift',
     credentialLabel: 'OSHA 30 Construction',
     durationLabel: '8 weeks',
@@ -530,6 +544,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'forklift': programBanner('forklift', {
     pageKey: 'forklift',
     videoSrcDesktop: '/videos/electrician-trades.mp4',
+    posterImage: '/hero-images/skilled-trades-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
     microLabel: 'OSHA Forklift Cert',
     credentialLabel: 'OSHA 29 CFR 1910.178',
     durationLabel: '1 week',
@@ -547,6 +563,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'cna': programBanner('cna', {
     pageKey: 'cna',
     videoSrcDesktop: '/videos/cna-hero.mp4',
+    posterImage: '/hero-images/healthcare-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/cna.mp3',
     microLabel: 'Indiana CNA Certification',
     credentialLabel: 'Indiana CNA certification',
     durationLabel: '6 weeks',
@@ -563,6 +581,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'medical-assistant': programBanner('medical-assistant', {
     pageKey: 'medical-assistant',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
+    posterImage: '/hero-images/healthcare-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/medical-assistant.mp3',
     microLabel: 'NHA CCMA Certification',
     credentialLabel: 'NHA CCMA',
     durationLabel: '12 weeks',
@@ -579,6 +599,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'pharmacy-technician': programBanner('pharmacy-technician', {
     pageKey: 'pharmacy-technician',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
+    posterImage: '/hero-images/healthcare-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/healthcare.mp3',
     microLabel: 'PTCB CPhT Prep',
     credentialLabel: 'PTCB CPhT',
     durationLabel: '10 weeks',
@@ -595,6 +617,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'phlebotomy': programBanner('phlebotomy', {
     pageKey: 'phlebotomy',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
+    posterImage: '/hero-images/healthcare-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/healthcare.mp3',
     microLabel: 'NHA CPT Certification',
     credentialLabel: 'NHA CPT',
     durationLabel: '4 weeks',
@@ -611,6 +635,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'home-health-aide': programBanner('home-health-aide', {
     pageKey: 'home-health-aide',
     videoSrcDesktop: '/videos/cna-hero.mp4',
+    posterImage: '/hero-images/healthcare-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/healthcare.mp3',
     microLabel: 'Indiana HHA Certification',
     credentialLabel: 'Indiana HHA certification',
     durationLabel: '4 weeks',
@@ -627,6 +653,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'emergency-health-safety': programBanner('emergency-health-safety', {
     pageKey: 'emergency-health-safety',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
+    posterImage: '/hero-images/healthcare-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/cpr.mp3',
     microLabel: 'NREMT EMR Certification',
     credentialLabel: 'NREMT Emergency Medical Responder',
     durationLabel: '4 weeks',
@@ -643,6 +671,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'cpr-first-aid': programBanner('cpr-first-aid', {
     pageKey: 'cpr-first-aid',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
+    posterImage: '/hero-images/healthcare-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/cpr.mp3',
     microLabel: 'HSI Certified',
     credentialLabel: 'HSI-certified CPR, AED, and First Aid',
     durationLabel: '1 day',
@@ -660,6 +690,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'sanitation-infection-control': programBanner('sanitation-infection-control', {
     pageKey: 'sanitation-infection-control',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
+    posterImage: '/hero-images/healthcare-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/healthcare.mp3',
     microLabel: 'ServSafe + Bloodborne',
     credentialLabel: 'ServSafe Food Handler',
     durationLabel: '2 weeks',
@@ -677,6 +709,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'barber-apprenticeship': programBanner('barber-apprenticeship', {
     pageKey: 'barber-apprenticeship',
     videoSrcDesktop: '/videos/barber-hero-final.mp4',
+    posterImage: '/hero-images/barber-hero.jpg',
+    voiceoverSrc: '/audio/heroes/barber.mp3',
     microLabel: 'DOL Registered Apprenticeship',
     credentialLabel: 'Indiana Barber License',
     durationLabel: '2,000 hours',
@@ -693,6 +727,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'cosmetology-apprenticeship': programBanner('cosmetology-apprenticeship', {
     pageKey: 'cosmetology-apprenticeship',
     videoSrcDesktop: '/videos/beauty-cosmetology.mp4',
+    posterImage: '/hero-images/barber-beauty-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/cosmetology.mp3',
     microLabel: 'DOL Registered Apprenticeship',
     credentialLabel: 'Indiana Cosmetology License',
     durationLabel: '2,000 hours',
@@ -709,6 +745,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'nail-technician-apprenticeship': programBanner('nail-technician-apprenticeship', {
     pageKey: 'nail-technician-apprenticeship',
     videoSrcDesktop: '/videos/nail-tech.mp4',
+    posterImage: '/hero-images/barber-beauty-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/nail-tech.mp3',
     microLabel: 'DOL Registered Apprenticeship',
     credentialLabel: 'Indiana Nail Technician License',
     durationLabel: '600 hours',
@@ -725,6 +763,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'culinary-apprenticeship': programBanner('culinary-apprenticeship', {
     pageKey: 'culinary-apprenticeship',
     videoSrcDesktop: '/videos/beauty-cosmetology.mp4',
+    posterImage: '/hero-images/barber-beauty-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/barber.mp3',
     microLabel: 'DOL Registered Apprenticeship',
     credentialLabel: 'ServSafe Manager',
     durationLabel: '2,000 hours',
@@ -741,6 +781,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'esthetician': programBanner('esthetician', {
     pageKey: 'esthetician',
     videoSrcDesktop: '/videos/beauty-cosmetology.mp4',
+    posterImage: '/hero-images/barber-beauty-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/cosmetology.mp3',
     microLabel: 'Esthetician Certificate',
     credentialLabel: 'Esthetician Certificate',
     durationLabel: '5 weeks',
@@ -757,6 +799,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'beauty-career-educator': programBanner('beauty-career-educator', {
     pageKey: 'beauty-career-educator',
     videoSrcDesktop: '/videos/beauty-cosmetology.mp4',
+    posterImage: '/hero-images/barber-beauty-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/cosmetology.mp3',
     microLabel: 'Certiport ESB',
     credentialLabel: 'Certiport ESB',
     durationLabel: '12 weeks',
@@ -773,6 +817,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'apprenticeships': {
     pageKey: 'apprenticeships',
     videoSrcDesktop: '/videos/barber-hero-final.mp4',
+    posterImage: '/hero-images/apprenticeships-hero.jpg',
+    voiceoverSrc: '/audio/heroes/barber.mp3',
     microLabel: 'Earn While You Learn',
     belowHeroHeadline: 'Apprenticeships — get paid to train.',
     belowHeroSubheadline: 'DOL-registered apprenticeships in Barber, Cosmetology, Nail Technician, and Culinary. Earn wages from day one while working toward your license.',
@@ -788,6 +834,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'it-help-desk': programBanner('it-help-desk', {
     pageKey: 'it-help-desk',
     videoSrcDesktop: '/videos/it-technology.mp4',
+    posterImage: '/hero-images/technology-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/technology.mp3',
     microLabel: 'CompTIA A+ Prep',
     credentialLabel: 'CompTIA A+',
     durationLabel: '8 weeks',
@@ -804,6 +852,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'cybersecurity-analyst': programBanner('cybersecurity-analyst', {
     pageKey: 'cybersecurity-analyst',
     videoSrcDesktop: '/videos/it-technology.mp4',
+    posterImage: '/hero-images/technology-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/technology.mp3',
     microLabel: 'CompTIA Security+ Prep',
     credentialLabel: 'CompTIA Security+',
     durationLabel: '12 weeks',
@@ -820,6 +870,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'network-administration': programBanner('network-administration', {
     pageKey: 'network-administration',
     videoSrcDesktop: '/videos/it-technology.mp4',
+    posterImage: '/hero-images/technology-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/technology.mp3',
     microLabel: 'CompTIA Network+ Prep',
     credentialLabel: 'CompTIA Network+',
     durationLabel: '10 weeks',
@@ -836,6 +888,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'network-support-technician': programBanner('network-support-technician', {
     pageKey: 'network-support-technician',
     videoSrcDesktop: '/videos/it-technology.mp4',
+    posterImage: '/hero-images/technology-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/technology.mp3',
     microLabel: 'IT Specialist Networking',
     credentialLabel: 'Certiport IT Specialist Networking',
     durationLabel: '6 weeks',
@@ -852,6 +906,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'software-development': programBanner('software-development', {
     pageKey: 'software-development',
     videoSrcDesktop: '/videos/it-technology.mp4',
+    posterImage: '/hero-images/technology-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/technology.mp3',
     microLabel: 'IT Specialist Python',
     credentialLabel: 'Certiport IT Specialist Python',
     durationLabel: '12 weeks',
@@ -868,6 +924,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'web-development': programBanner('web-development', {
     pageKey: 'web-development',
     videoSrcDesktop: '/videos/it-technology.mp4',
+    posterImage: '/hero-images/technology-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/technology.mp3',
     microLabel: 'Meta Front-End Cert',
     credentialLabel: 'Meta Front-End Developer Professional Certificate',
     durationLabel: '12 weeks',
@@ -884,6 +942,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'graphic-design': programBanner('graphic-design', {
     pageKey: 'graphic-design',
     videoSrcDesktop: '/videos/it-technology.mp4',
+    posterImage: '/hero-images/technology-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/technology.mp3',
     microLabel: 'Adobe Certified Professional',
     credentialLabel: 'Adobe Certified Professional',
     durationLabel: '10 weeks',
@@ -900,6 +960,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'cad-drafting': programBanner('cad-drafting', {
     pageKey: 'cad-drafting',
     videoSrcDesktop: '/videos/it-technology.mp4',
+    posterImage: '/hero-images/technology-cat-new.jpg',
+    voiceoverSrc: '/audio/heroes/technology.mp3',
     microLabel: 'Autodesk Certified User',
     credentialLabel: 'Autodesk Certified User',
     durationLabel: '10 weeks',
@@ -918,6 +980,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'tax-preparation': programBanner('tax-preparation', {
     pageKey: 'tax-preparation',
     videoSrcDesktop: '/videos/tax-career-paths.mp4',
+    posterImage: '/hero-images/tax-hero.jpg',
+    voiceoverSrc: '/audio/heroes/tax.mp3',
     microLabel: 'IRS PTIN + AFSP',
     credentialLabel: 'IRS PTIN and AFSP',
     durationLabel: '8 weeks',
@@ -934,6 +998,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'bookkeeping': programBanner('bookkeeping', {
     pageKey: 'bookkeeping',
     videoSrcDesktop: '/videos/business-finance.mp4',
+    posterImage: '/hero-images/business-hero.jpg',
+    voiceoverSrc: '/audio/heroes/business.mp3',
     microLabel: 'QuickBooks Certified User',
     credentialLabel: 'QuickBooks Certified User',
     durationLabel: '5 weeks',
@@ -950,6 +1016,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'office-administration': programBanner('office-administration', {
     pageKey: 'office-administration',
     videoSrcDesktop: '/videos/business-finance.mp4',
+    posterImage: '/hero-images/business-hero.jpg',
+    voiceoverSrc: '/audio/heroes/business.mp3',
     microLabel: 'Microsoft Office Specialist',
     credentialLabel: 'Microsoft Office Specialist',
     durationLabel: '6 weeks',
@@ -966,6 +1034,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'entrepreneurship': programBanner('entrepreneurship', {
     pageKey: 'entrepreneurship',
     videoSrcDesktop: '/videos/business-finance.mp4',
+    posterImage: '/hero-images/business-hero.jpg',
+    voiceoverSrc: '/audio/heroes/business.mp3',
     microLabel: 'Certiport ESB Certification',
     credentialLabel: 'Certiport ESB',
     durationLabel: '6 weeks',
@@ -982,6 +1052,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'business-administration': programBanner('business-administration', {
     pageKey: 'business-administration',
     videoSrcDesktop: '/videos/business-finance.mp4',
+    posterImage: '/hero-images/business-hero.jpg',
+    voiceoverSrc: '/audio/heroes/business.mp3',
     microLabel: 'MOS + Certiport ESB',
     credentialLabel: 'Microsoft Office Specialist',
     durationLabel: '8 weeks',
@@ -998,6 +1070,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'project-management': programBanner('project-management', {
     pageKey: 'project-management',
     videoSrcDesktop: '/videos/business-finance.mp4',
+    posterImage: '/hero-images/business-hero.jpg',
+    voiceoverSrc: '/audio/heroes/business.mp3',
     microLabel: 'Certiport PM Certification',
     credentialLabel: 'Certiport Project Management',
     durationLabel: '6 weeks',
@@ -1014,6 +1088,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'finance-bookkeeping-accounting': programBanner('finance-bookkeeping-accounting', {
     pageKey: 'finance-bookkeeping-accounting',
     videoSrcDesktop: '/videos/tax-career-paths.mp4',
+    posterImage: '/hero-images/business-hero.jpg',
+    voiceoverSrc: '/audio/heroes/business.mp3',
     microLabel: 'IRS PTIN + QuickBooks',
     credentialLabel: 'IRS PTIN',
     durationLabel: '12 weeks',
@@ -1032,6 +1108,8 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'peer-recovery-specialist': programBanner('peer-recovery-specialist', {
     pageKey: 'peer-recovery-specialist',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
+    posterImage: '/hero-images/dsp-hero.jpg',
+    voiceoverSrc: '/audio/heroes/dsp.mp3',
     microLabel: 'Indiana CPRS Credential',
     credentialLabel: 'Indiana CPRS',
     durationLabel: '8 weeks',

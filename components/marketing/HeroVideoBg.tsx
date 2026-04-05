@@ -70,7 +70,7 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
       />
 
       {audioSrc && (
-        <audio ref={audioRef} src={audioSrc} preload="none" aria-hidden="true" />
+        <audio ref={audioRef} src={audioSrc} preload="none" aria-hidden="true" className="hidden" />
       )}
 
       <button

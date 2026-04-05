@@ -12,6 +12,7 @@
  */
 
 import { useEffect, useRef, useState, useId } from 'react';
+import { Volume2, VolumeX } from 'lucide-react';
 import CanonicalVideo from '@/components/video/CanonicalVideo';
 
 /* ------------------------------------------------------------------ */
@@ -31,6 +32,8 @@ export interface HeroVideoProps {
   videoSrcMobile?: string;
   /** Poster image shown while video loads — optional */
   posterImage?: string;
+  /** Voiceover audio track — starts on first user interaction */
+  voiceoverSrc?: string;
   /** 2–4 word micro-label rendered in bottom-left corner of video */
   microLabel?: string;
   /** Show small brand bug in top-left corner */
@@ -61,6 +64,7 @@ export default function HeroVideo({
   videoSrcDesktop,
   videoSrcMobile,
   posterImage,
+  voiceoverSrc,
   microLabel,
   showBrandBug = false,
   belowHeroHeadline,
@@ -73,7 +77,9 @@ export default function HeroVideo({
   children,
 }: HeroVideoProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const [transcriptOpen, setTranscriptOpen] = useState(false);
+  const [muted, setMuted] = useState(true);
   const transcriptId = useId();
 
   // Track whether we're mounted on the client (avoids SSR/client hydration mismatch)
@@ -87,6 +93,38 @@ export default function HeroVideo({
       ? videoSrcMobile
       : videoSrcDesktop;
 
+  // Start voiceover on first user interaction (browser autoplay policy)
+  useEffect(() => {
+    if (!voiceoverSrc) return;
+    const tryPlay = () => {
+      const a = audioRef.current;
+      if (!a) return;
+      a.play().catch(() => {});
+      setMuted(false);
+    };
+    window.addEventListener('click',      tryPlay, { once: true });
+    window.addEventListener('scroll',     tryPlay, { once: true, passive: true });
+    window.addEventListener('touchstart', tryPlay, { once: true, passive: true });
+    return () => {
+      window.removeEventListener('click',      tryPlay);
+      window.removeEventListener('scroll',     tryPlay);
+      window.removeEventListener('touchstart', tryPlay);
+    };
+  }, [voiceoverSrc]);
+
+  function toggleMute() {
+    const a = audioRef.current;
+    if (!a) return;
+    if (muted) {
+      a.play().catch(() => {});
+      setMuted(false);
+    } else {
+      a.pause();
+      a.currentTime = 0;
+      setMuted(true);
+    }
+  }
+
   return (
     <div ref={wrapperRef} className={`w-full ${className}`}>
       {/* ── VIDEO FRAME ── */}
@@ -96,16 +134,21 @@ export default function HeroVideo({
         style={{ height: 'clamp(400px, 56vw, 780px)' }}
         aria-label={analyticsName ? `${analyticsName} hero video` : 'Hero video'}
       >
-        {/* autoPlayOnMount — hero is above the fold, play immediately.
-            preloadFull is intentionally omitted: preload="metadata" lets the
-            poster show instantly while the video streams in, avoiding a
-            full-file download blocking page load. */}
+        {/* autoPlayOnMount + preloadFull — hero is always above the fold.
+            preloadFull buffers the video immediately so the first frame
+            appears without waiting for the IntersectionObserver tick. */}
         <CanonicalVideo
           src={videoSrc}
           poster={posterImage}
           className="absolute inset-0 w-full h-full object-cover object-center"
           autoPlayOnMount
+          preloadFull
         />
+
+        {/* Hidden audio element for voiceover */}
+        {voiceoverSrc && (
+          <audio ref={audioRef} src={voiceoverSrc} preload="none" aria-hidden="true" className="hidden" />
+        )}
 
 
 
@@ -131,6 +174,22 @@ export default function HeroVideo({
           </div>
         )}
 
+        {/* Sound toggle — bottom-right, only when voiceover is present */}
+        {voiceoverSrc && (
+          <div className="absolute bottom-4 right-4 z-10">
+            <button
+              onClick={toggleMute}
+              aria-label={muted ? 'Unmute voiceover' : 'Mute voiceover'}
+              className="flex items-center gap-2 bg-black/60 hover:bg-black/80 text-white text-xs font-semibold px-3 py-2 rounded-full transition-colors backdrop-blur-sm border border-white/20"
+            >
+              {muted ? (
+                <><VolumeX className="w-4 h-4 flex-shrink-0" /><span className="hidden sm:inline">Tap to hear</span></>
+              ) : (
+                <><Volume2 className="w-4 h-4 flex-shrink-0 text-brand-red-400" /><span className="hidden sm:inline">Mute</span></>
+              )}
+            </button>
+          </div>
+        )}
 
       </section>
 

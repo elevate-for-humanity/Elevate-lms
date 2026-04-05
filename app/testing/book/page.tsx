@@ -315,12 +315,10 @@ function BookingForm() {
                   If you require testing accommodations (extended time, screen reader, etc.), NHA requires requests to be submitted <strong>at least 30 days before your exam date</strong>. Submit your request early to avoid delays or missed testing opportunities.
                 </p>
                 <a
-                  href="https://knowledge.nhanow.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/testing/accommodations"
                   className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 hover:text-amber-900 mt-2"
                 >
-                  NHA Accommodations FAQ →
+                  Accommodations Request Info →
                 </a>
               </div>
             </div>

@@ -18,7 +18,6 @@ export async function POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
 
   try {
     const { program_id, pathway_id, check_only } = await request.json();
@@ -26,11 +25,11 @@ export async function POST(request: NextRequest) {
 
     // check_only=true returns readiness without initiating — used by student dashboard
     if (check_only) {
-      const readiness = await checkCertificationReadiness(auth.user.id, program_id);
+      const readiness = await checkCertificationReadiness(auth.id, program_id);
       return NextResponse.json(readiness);
     }
 
-    const result = await initiateCertification(auth.user.id, program_id, pathway_id ?? undefined);
+    const result = await initiateCertification(auth.id, program_id, pathway_id ?? undefined);
     if (!result.ok) return safeError(result.error ?? 'Initiation failed', 400);
 
     return NextResponse.json(result.result, { status: 201 });

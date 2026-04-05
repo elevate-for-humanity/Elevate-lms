@@ -44,7 +44,7 @@ export default function SupersonicFastCashDownloadPage() {
       description: 'Professional tax preparation software',
       size: '2.5 GB',
       downloadUrl:
-        'https://www.supersonicfastcash.com/downloads/tax/2024/SupersonicFastCashSetup.exe',
+        '/supersonic-fast-cash/contact?request=software-download&product=tax-software',
       requirements: 'Windows 10/11, 8GB RAM, 10GB disk space',
       features: [
         'All IRS forms and schedules',
@@ -60,7 +60,7 @@ export default function SupersonicFastCashDownloadPage() {
       version: '2024',
       description: 'Cloud-based document management',
       size: 'Web-based',
-      downloadUrl: 'https://cloud.supersonicfastcash.com',
+      downloadUrl: '/supersonic-fast-cash/contact?request=software-download&product=cloud-portal',
       requirements: 'Any modern web browser',
       features: [
         'Secure document storage',
@@ -76,7 +76,7 @@ export default function SupersonicFastCashDownloadPage() {
       description: 'Document scanning and OCR',
       size: '150 MB',
       downloadUrl:
-        'https://www.supersonicfastcash.com/downloads/gruntworks/SupersonicToolsSetup.exe',
+        '/supersonic-fast-cash/contact?request=software-download&product=gruntworks',
       requirements: 'Windows 10/11, Scanner compatible',
       features: [
         'W-2 scanning and OCR',
@@ -165,7 +165,7 @@ export default function SupersonicFastCashDownloadPage() {
               </p>
               <div className="space-y-2 text-sm">
                 <div>📧 Email: <a href="mailto:supersonicfastcashllc@gmail.com" className="text-white hover:underline">supersonicfastcashllc@gmail.com</a></div>
-                <div>📞 Phone: <a href="/support" className="text-white hover:underline">Visit Support Center</a></div>
+                <div>📞 Phone: <a href="tel:+13173143757" className="text-white hover:underline">(317) 314-3757</a></div>
               </div>
             </div>
           </div>
@@ -296,7 +296,7 @@ export default function SupersonicFastCashDownloadPage() {
         {/* Support Resources */}
         <div className="grid md:grid-cols-3 gap-6">
           <a
-            href="https://www.supersonicfastcash.com/support"
+            href="/supersonic-fast-cash/support"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition"
@@ -312,7 +312,7 @@ export default function SupersonicFastCashDownloadPage() {
           </a>
 
           <a
-            href="https://www.supersonicfastcash.com/training"
+            href="/supersonic-fast-cash/training"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition"

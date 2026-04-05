@@ -114,7 +114,6 @@ export async function POST(request: Request) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
 
   const supabase = await createClient();
   const db = createAdminClient();

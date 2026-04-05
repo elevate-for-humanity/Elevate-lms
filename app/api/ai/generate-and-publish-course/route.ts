@@ -61,7 +61,6 @@ export async function POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
 
   let body: GenerateAndPublishRequest;
   try {
@@ -229,7 +228,7 @@ export async function POST(request: NextRequest) {
 
   await logAdminAudit({
     action:     AdminAction.BULK_CONTENT_GENERATED,
-    actorId:    auth.userId ?? '00000000-0000-0000-0000-000000000000',
+    actorId:    auth.id ?? '00000000-0000-0000-0000-000000000000',
     entityType: 'courses',
     entityId:   courseId,
     metadata:   {

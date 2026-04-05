@@ -66,7 +66,7 @@ const { id } = await params;
 
     await logAdminAudit({
       action,
-      actorId:    auth.user.id,
+      actorId:    auth.id,
       entityType: 'course_lessons',
       entityId:   id,
       metadata:   { fields_changed: Object.keys(parsed.data) },
@@ -91,7 +91,7 @@ const { id } = await params;
     const data = await deleteLesson(id);
     await logAdminAudit({
       action:     AdminAction.LESSON_DELETED,
-      actorId:    auth.user.id,
+      actorId:    auth.id,
       entityType: 'course_lessons',
       entityId:   id,
       metadata:   { title: (existing as any)?.title ?? 'unknown' },

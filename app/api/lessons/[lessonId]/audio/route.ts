@@ -283,7 +283,6 @@ async function _GET(
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
 
   const ctx = findLesson(lessonId);
   if (!ctx) {

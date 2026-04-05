@@ -40,7 +40,6 @@ export async function POST(req: NextRequest) {
     requireAuth: true,
     allowedRoles: ['provider_admin', 'admin', 'super_admin'],
   });
-  if (!auth.authorized) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -76,7 +75,7 @@ export async function POST(req: NextRequest) {
     payload: {
       export_type: exportType,
       tenant_id: tenantId,
-      requested_by: auth.user.id,
+      requested_by: auth.id,
       requested_at: new Date().toISOString(),
       format: 'csv',
     },
@@ -84,7 +83,7 @@ export async function POST(req: NextRequest) {
   });
 
   await logAuditEvent({
-    actor_user_id: auth.user.id,
+    actor_user_id: auth.id,
     actor_role: auth.role ?? 'provider_admin',
     action: AuditActions.CREATE,
     entity: 'provider_export_job',

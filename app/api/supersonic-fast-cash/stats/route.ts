@@ -13,6 +13,12 @@ async function _GET(request: Request) {
 
     const supabase = await createClient();
 
+    // Auth required — business stats are internal only
+    const { data: { user }, error: authErr } = await supabase.auth.getUser();
+    if (authErr || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     // Get client counts
     const { count: totalClients } = await supabase
       .from('tax_clients')

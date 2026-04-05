@@ -14,7 +14,6 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(request: NextRequest) {
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
   const { user } = auth;
 
   let body: {

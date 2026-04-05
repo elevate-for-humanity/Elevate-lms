@@ -21,10 +21,9 @@ export const maxDuration = 60;
 
 async function _POST(req: NextRequest) {
   try {
-    const rateLimited = await applyRateLimit(request, 'api');
+    const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
   const auth = await apiRequireAdmin(req);
-  if (auth.error) return auth.error;
 
 
     const body = await req.json();

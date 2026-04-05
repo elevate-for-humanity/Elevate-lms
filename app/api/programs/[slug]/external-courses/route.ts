@@ -10,7 +10,6 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
 
   const { slug } = await params;
   const db = await createClient();

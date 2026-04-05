@@ -185,7 +185,7 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
 
     const updateData = { ...parsed.data };
     if (updateData.status === 'approved' || updateData.status === 'rejected') {
-      updateData.reviewer_id = auth.user.id;
+      updateData.reviewer_id = auth.id;
     }
 
     const data = await updateApplication(id, updateData);
@@ -284,7 +284,7 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
 
           // Audit log
           await auth.supabase.from('audit_logs').insert({
-            actor_id: auth.user.id,
+            actor_id: auth.id,
             actor_role: auth.profile.role,
             action: 'create',
             resource_type: 'enrollment',
@@ -313,7 +313,7 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
                    'status_change';
 
     await auth.supabase.from('audit_logs').insert({
-      actor_id: auth.user.id,
+      actor_id: auth.id,
       actor_role: auth.profile.role,
       action,
       resource_type: 'application',
@@ -345,7 +345,7 @@ async function _DELETE(request: Request, { params }: { params: Promise<{ id: str
     const data = await deleteApplication(id);
 
     await auth.supabase.from('audit_logs').insert({
-      actor_id: auth.user.id,
+      actor_id: auth.id,
       actor_role: auth.profile.role,
       action: 'delete',
       resource_type: 'application',

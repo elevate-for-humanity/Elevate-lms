@@ -17,7 +17,6 @@ export async function GET(req: NextRequest) {
     requireAuth: true,
     allowedRoles: ['admin', 'super_admin', 'staff', 'case_manager', 'provider_admin'],
   });
-  if (!auth.authorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const db = createAdminClient();
   if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
@@ -59,7 +58,7 @@ export async function GET(req: NextRequest) {
     const { data: assignments } = await db
       .from('case_manager_assignments')
       .select('learner_id')
-      .eq('case_manager_id', auth.user.id);
+      .eq('case_manager_id', auth.id);
     const ids = (assignments ?? []).map((a: any) => a.learner_id);
     if (ids.length === 0) return NextResponse.json({ placements: [], total: 0, page, per_page: perPage });
     query = query.in('learner_id', ids);
@@ -79,7 +78,6 @@ export async function POST(req: NextRequest) {
     requireAuth: true,
     allowedRoles: ['admin', 'super_admin', 'staff', 'case_manager'],
   });
-  if (!auth.authorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await req.json().catch(() => null);
   if (!body?.learner_id || !body?.hire_date || !body?.job_title) {
@@ -119,7 +117,7 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: 'Failed to create placement record' }, { status: 500 });
 
   await logAuditEvent({
-    actor_user_id: auth.user.id,
+    actor_user_id: auth.id,
     actor_role: auth.role ?? 'staff',
     action: AuditActions.CREATE,
     entity: 'placement_record',

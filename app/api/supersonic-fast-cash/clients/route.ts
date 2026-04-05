@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@supabase/supabase-js';
+import { createClient as createServerClient } from '@/lib/supabase/server';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditPiiAccess } from '@/lib/auditLog';
@@ -17,6 +18,12 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
  */
 export async function GET(request: NextRequest) {
   try {
+  // Auth required — Supersonic client data is PII
+  const serverSupabase = await createServerClient();
+  const { data: { user: authUser }, error: authErr } = await serverSupabase.auth.getUser();
+  if (authErr || !authUser) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 

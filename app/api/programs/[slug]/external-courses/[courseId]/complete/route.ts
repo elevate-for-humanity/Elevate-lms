@@ -16,7 +16,6 @@ export async function POST(
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
 
   const { slug, courseId } = await params;
 
@@ -68,7 +67,7 @@ export async function POST(
     }
 
     const ext = file.name.split('.').pop()?.toLowerCase() ?? 'bin';
-    const storagePath = `external-course-certs/${auth.user.id}/${courseId}/${Date.now()}.${ext}`;
+    const storagePath = `external-course-certs/${auth.id}/${courseId}/${Date.now()}.${ext}`;
 
     const { data: upload, error: uploadErr } = await db.storage
       .from('documents')
@@ -84,7 +83,7 @@ export async function POST(
     .from('external_course_completions')
     .upsert(
       {
-        user_id: auth.user.id,
+        user_id: auth.id,
         external_course_id: courseId,
         program_id: programId,
         completed_at: new Date().toISOString(),

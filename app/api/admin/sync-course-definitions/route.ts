@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { COURSE_DEFINITIONS } from '@/lib/courses/definitions';
 import { HVAC_QUIZ_MAP, getUniversalExam } from '@/lib/courses/hvac-quizzes';
 import { logger } from '@/lib/logger';
@@ -30,6 +31,7 @@ const { data: { user } } = await supabase.auth.getUser();
   if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
     return { error: 'Forbidden', status: 403 };
   }
+  const db = createAdminClient();
   return { user, supabase, db };
 }
 
@@ -211,7 +213,7 @@ async function _POST(request: NextRequest) {
     const totalLessons = results.reduce((sum, r) => sum + r.lessonsUpserted, 0);
     const errors = results.filter((r) => r.error);
 
-    await logAdminAudit({ action: AdminAction.COURSE_DEFINITIONS_SYNCED, actorId: auth.user.id, entityType: 'course_definitions', entityId: BULK_ENTITY_ID, metadata: { courses_synced: results.length, total_lessons: totalLessons, errors: errors.length }, req: request });
+    await logAdminAudit({ action: AdminAction.COURSE_DEFINITIONS_SYNCED, actorId: auth.id, entityType: 'course_definitions', entityId: BULK_ENTITY_ID, metadata: { courses_synced: results.length, total_lessons: totalLessons, errors: errors.length }, req: request });
 
     return NextResponse.json({
       success: errors.length === 0,

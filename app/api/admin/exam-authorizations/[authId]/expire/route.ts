@@ -18,7 +18,6 @@ export async function POST(
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
 
   const { authId } = await params;
   const body = await request.json().catch(() => ({}));
@@ -44,7 +43,7 @@ export async function POST(
     .update({
       status:     'expired',
       updated_at: new Date().toISOString(),
-      notes:      `Manually expired by staff (${auth.user.id}) on ${new Date().toISOString().slice(0, 10)}${reason ? ': ' + reason : ''}.`,
+      notes:      `Manually expired by staff (${auth.id}) on ${new Date().toISOString().slice(0, 10)}${reason ? ': ' + reason : ''}.`,
     })
     .eq('id', authId);
 

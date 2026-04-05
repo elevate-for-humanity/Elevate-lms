@@ -9,5 +9,6 @@
 export * from './credentials';
 export * from './programs';
 export * from './courses';
+export * from './courses';
 export * from './certificates';
 export * from './reports';

@@ -28,7 +28,6 @@ async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
   const auth = await apiRequireAdmin(req);
-  if (auth.error) return auth.error;
   const supabaseAdmin = createAdminClient();
 
 

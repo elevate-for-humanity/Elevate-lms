@@ -12,7 +12,6 @@ interface Params {
 // GET /api/page-builder/pages/[id] — fetch one page with sections
 export async function GET(request: NextRequest, { params }: Params) {
   const auth = await apiAuthGuard({ requireAuth: true, allowedRoles: ["admin", "super_admin"] });
-  if (!auth.authorized) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
 
@@ -45,7 +44,6 @@ export async function PUT(request: NextRequest, { params }: Params) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard({ requireAuth: true, allowedRoles: ["admin", "super_admin"] });
-  if (!auth.authorized) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
 
@@ -75,7 +73,6 @@ export async function DELETE(request: NextRequest, { params }: Params) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard({ requireAuth: true, allowedRoles: ["admin", "super_admin"] });
-  if (!auth.authorized) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
 

@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createBackup, exportBackupToJSON, listBackups } from '@/lib/backup';
-import { requireAdmin } from '@/lib/admin/guards';
+
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -10,9 +10,12 @@ export const maxDuration = 60;
 
 const _POST = withAuth(
   async (request: NextRequest, user) => {
+    if (!user?.role || !['admin','super_admin','staff'].includes(user.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
   try {
-    await apiRequireAdmin();
+
 
     const { tables } = await request.json();
     const result = await createBackup(tables);
@@ -44,9 +47,12 @@ const _POST = withAuth(
 
 const _GET = withAuth(
   async (request: NextRequest, user) => {
+    if (!user?.role || !['admin','super_admin','staff'].includes(user.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
   try {
-    await apiRequireAdmin();
+
 
     const backups = await listBackups();
 

@@ -37,20 +37,18 @@ export default async function EtplAlignmentPage() {
     redirect('/unauthorized');
   }
 
+  // Remove duplicate auth check — already checked above
   const { data: items, count: totalItems } = await supabase
-    .from('profiles')
-    .select('*', { count: 'exact' })
+    .from('programs')
+    .select('id, title, slug, status, published, is_active, created_at', { count: 'exact' })
     .order('created_at', { ascending: false })
     .limit(50);
 
   const { count: activeItems } = await supabase
-    .from('profiles')
+    .from('programs')
     .select('*', { count: 'exact', head: true })
-    .eq('status', 'active');
-
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
-    redirect('/unauthorized');
-  }
+    .eq('status', 'active')
+    .eq('is_active', true);
 
   return (
     <div className="min-h-screen bg-white">

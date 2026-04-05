@@ -44,7 +44,7 @@ export default function WOTCPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <DollarSign className="w-16 h-16 mx-auto mb-4 text-brand-green-400" />
           <h1 className="text-4xl font-bold mb-4">Work Opportunity Tax Credit</h1>
-          <p className="text-xl text-slate-600">
+          <p className="text-xl text-blue-100">
             Earn $2,400–$9,600 per eligible hire while building your workforce.
           </p>
         </div>
@@ -54,12 +54,12 @@ export default function WOTCPage() {
 
         <section className="mb-16">
           <h2 className="text-2xl font-bold text-slate-900 mb-4">What is WOTC?</h2>
-          <p className="text-slate-600 mb-4">
+          <p className="text-blue-100 mb-4">
             The Work Opportunity Tax Credit (WOTC) is a federal tax credit available to employers
             who hire individuals from certain target groups that face barriers to employment.
             The credit is calculated as a percentage of first-year wages paid to qualifying employees.
           </p>
-          <p className="text-slate-600">
+          <p className="text-blue-100">
             Many Elevate for Humanity graduates qualify under one or more WOTC target groups.
             When you hire our graduates, you may be eligible for tax credits while gaining
             skilled, trained workers.
@@ -90,7 +90,7 @@ export default function WOTCPage() {
                   {i + 1}
                 </div>
                 <h3 className="font-semibold text-slate-900 mb-2">{step.title}</h3>
-                <p className="text-sm text-slate-600">{step.description}</p>
+                <p className="text-sm text-blue-100">{step.description}</p>
               </div>
             ))}
           </div>
@@ -137,7 +137,7 @@ export default function WOTCPage() {
         {/* CTA */}
         <section className="bg-brand-blue-700 text-white rounded-xl p-8 text-center">
           <h2 className="text-2xl font-bold mb-3">Hire Elevate Graduates &amp; Earn Tax Credits</h2>
-          <p className="text-slate-600 mb-6 max-w-2xl mx-auto">
+          <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
             Our workforce development programs train candidates who may qualify for WOTC.
             We can help you identify eligible hires and navigate the certification process.
           </p>

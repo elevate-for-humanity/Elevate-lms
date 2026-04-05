@@ -39,7 +39,6 @@ export async function POST(req: NextRequest) {
     requireAuth: true,
     allowedRoles: ['admin', 'super_admin'],
   });
-  if (!auth.authorized) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -71,13 +70,13 @@ export async function POST(req: NextRequest) {
   }
 
   // Cannot impersonate yourself
-  if (target_user_id === auth.user.id) {
+  if (target_user_id === auth.id) {
     return NextResponse.json({ error: 'Cannot impersonate yourself' }, { status: 400 });
   }
 
   const session = {
-    real_user_id: auth.user.id,
-    real_user_email: auth.user.email,
+    real_user_id: auth.id,
+    real_user_email: auth.email,
     target_user_id,
     target_user_name: target.full_name,
     target_user_email: target.email,
@@ -88,7 +87,7 @@ export async function POST(req: NextRequest) {
 
   // Write immutable audit entry
   await logAuditEvent({
-    actor_user_id: auth.user.id,
+    actor_user_id: auth.id,
     actor_role: auth.role ?? 'admin',
     action: AuditActions.CREATE,
     entity: 'impersonation_session',
@@ -123,7 +122,6 @@ export async function DELETE(req: NextRequest) {
   if (ipBlocked) return ipBlocked;
 
   const auth = await apiAuthGuard({ requireAuth: true, allowedRoles: ['admin', 'super_admin'] });
-  if (!auth.authorized) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -134,7 +132,7 @@ export async function DELETE(req: NextRequest) {
     try {
       const session = JSON.parse(raw);
       await logAuditEvent({
-        actor_user_id: auth.user.id,
+        actor_user_id: auth.id,
         actor_role: auth.role ?? 'admin',
         action: AuditActions.DELETE,
         entity: 'impersonation_session',

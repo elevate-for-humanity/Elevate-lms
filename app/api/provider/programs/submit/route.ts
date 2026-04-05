@@ -15,7 +15,6 @@ export async function POST(req: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard({ requireAuth: true, allowedRoles: ['provider_admin', 'admin', 'super_admin'] });
-  if (!auth.authorized) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -55,7 +54,7 @@ export async function POST(req: NextRequest) {
       tenant_id: program.tenant_id,
       program_id,
       status: 'submitted',
-      submitted_by: auth.user.id,
+      submitted_by: auth.id,
       submitted_at: new Date().toISOString(),
       reviewed_by: null,
       reviewed_at: null,
@@ -70,7 +69,7 @@ export async function POST(req: NextRequest) {
   }
 
   await logAuditEvent({
-    actor_user_id: auth.user.id,
+    actor_user_id: auth.id,
     actor_role: auth.role ?? 'provider_admin',
     action: AuditActions.CREATE,
     entity: 'provider_program_approval',

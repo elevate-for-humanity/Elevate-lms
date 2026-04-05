@@ -1,273 +1,238 @@
-import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
-import { 
-  ClipboardCheck, Users, Calendar, Clock, 
-  CheckCircle, XCircle, AlertCircle, ArrowLeft, Save
-} from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createClient } from '@/lib/supabase/client';
+import { CheckCircle, XCircle, Clock, Save, ArrowLeft } from 'lucide-react';
 
-export const metadata: Metadata = {
-  title: 'Take Attendance | Staff Portal | Elevate For Humanity',
-  description: 'Record daily attendance for students.',
-  robots: { index: false, follow: false },
-};
+type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused';
 
-export const dynamic = 'force-dynamic';
+interface Student {
+  id: string;
+  full_name: string;
+  avatar_url: string | null;
+}
 
-export default async function TakeAttendancePage() {
-  const supabase = await createClient();
-  
+interface Cohort {
+  id: string;
+  name: string;
+}
 
-  const { data: { user } } = await supabase.auth.getUser();
-  
-  if (!user) {
-    redirect('/login?redirect=/staff-portal/attendance/take');
+export default function TakeAttendancePage() {
+  const router = useRouter();
+  const [cohorts, setCohorts] = useState<Cohort[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [selectedCohort, setSelectedCohort] = useState('');
+  const [attendance, setAttendance] = useState<Record<string, AttendanceStatus>>({});
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const today = new Date().toLocaleDateString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+  });
+
+  useEffect(() => {
+    async function load() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push('/login'); return; }
+
+      const { data: cohortData } = await supabase
+        .from('cohorts')
+        .select('id, name')
+        .eq('status', 'active')
+        .order('name');
+      setCohorts(cohortData || []);
+
+      const { data: studentData } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .eq('role', 'student')
+        .order('full_name')
+        .limit(100);
+      setStudents(studentData || []);
+      setLoading(false);
+    }
+    load();
+  }, [router]);
+
+  const setStatus = (studentId: string, status: AttendanceStatus) => {
+    setAttendance(prev => ({ ...prev, [studentId]: status }));
+  };
+
+  const markAll = (status: AttendanceStatus) => {
+    const all: Record<string, AttendanceStatus> = {};
+    students.forEach(s => { all[s.id] = status; });
+    setAttendance(all);
+  };
+
+  const handleSave = async (draft = false) => {
+    if (!selectedCohort && !draft) {
+      setError('Please select a cohort before submitting.');
+      return;
+    }
+    setSaving(true);
+    setError(null);
+
+    const records = students.map(s => ({
+      user_id: s.id,
+      status: attendance[s.id] || 'absent',
+      minutes_attended: attendance[s.id] === 'present' ? 390 : attendance[s.id] === 'late' ? 300 : 0,
+    }));
+
+    const cohortId = selectedCohort || 'draft';
+    const res = await fetch(`/api/admin/cohorts/${cohortId}/attendance`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ records, date: new Date().toISOString().split('T')[0], draft }),
+    });
+
+    if (!res.ok) {
+      const d = await res.json();
+      setError(d.error || 'Failed to save attendance.');
+      setSaving(false);
+      return;
+    }
+
+    setSaved(true);
+    setSaving(false);
+    if (!draft) setTimeout(() => router.push('/staff-portal/attendance'), 1500);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-blue-600" />
+      </div>
+    );
   }
 
-  // Fetch active cohorts
-  const { data: cohorts } = await supabase
-    .from('cohorts')
-    .select('id, name, start_date, end_date')
-    .eq('status', 'active')
-    .order('name');
+  const statusColors: Record<AttendanceStatus, string> = {
+    present: 'bg-green-100 text-green-700 border-green-300',
+    absent: 'bg-red-100 text-red-700 border-red-300',
+    late: 'bg-amber-100 text-amber-700 border-amber-300',
+    excused: 'bg-slate-100 text-slate-600 border-slate-300',
+  };
 
-  const cohortList = cohorts || [];
-
-  // Fetch students (apprentices) for attendance
-  const { data: students } = await supabase
-    .from('apprentices')
-    .select(`
-      id,
-      profiles (
-        id,
-        full_name,
-        avatar_url
-      )
-    `)
-    .eq('status', 'active')
-    .limit(20);
-
-  const studentList = students || [];
-
-  const today = new Date().toLocaleDateString('en-US', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  });
+  const presentCount = Object.values(attendance).filter(s => s === 'present').length;
+  const absentCount = Object.values(attendance).filter(s => s === 'absent').length;
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Breadcrumbs */}
       <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
+        <div className="max-w-5xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Staff Portal', href: '/staff-portal' },
             { label: 'Attendance', href: '/staff-portal/attendance' },
-            { label: 'Take Attendance' }
+            { label: 'Take Attendance' },
           ]} />
         </div>
       </div>
 
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-brand-blue-600 to-indigo-600 text-white">
-        <div className="max-w-6xl mx-auto px-4 py-12">
-          <Link 
-            href="/staff-portal/attendance" 
-            className="inline-flex items-center gap-2 text-white hover:text-white mb-4"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Attendance
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        <div className="flex items-center gap-4 mb-6">
+          <Link href="/staff-portal/attendance" className="text-slate-500 hover:text-slate-700">
+            <ArrowLeft className="w-5 h-5" />
           </Link>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
-                <ClipboardCheck className="w-8 h-8" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold">Take Attendance</h1>
-                <p className="text-white mt-1">{today}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg">
-              <Clock className="w-5 h-5" />
-              <span className="font-medium">
-                {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Cohort Selection */}
-        <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">Select Cohort</h2>
-              <p className="text-sm text-gray-600">Choose the class or program to take attendance for</p>
-            </div>
-            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 min-w-[250px]">
-              <option value="">Select a cohort...</option>
-              {cohortList.map((cohort: any) => (
-                <option key={cohort.id} value={cohort.id}>{cohort.name}</option>
-              ))}
-              {cohortList.length === 0 && (
-                <option disabled>No active cohorts</option>
-              )}
-            </select>
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">Take Attendance</h1>
+            <p className="text-slate-500 text-sm">{today}</p>
           </div>
         </div>
 
-        {/* Attendance Form */}
-        <div className="bg-white rounded-xl shadow-sm border">
-          <div className="p-6 border-b flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">Student Roster</h2>
-              <p className="text-sm text-gray-600">{studentList.length} students enrolled</p>
-            </div>
-            <div className="flex gap-2">
-              <button className="px-4 py-2 text-sm bg-brand-green-100 text-brand-green-700 rounded-lg hover:bg-brand-green-200">
-                Mark All Present
-              </button>
-              <button className="px-4 py-2 text-sm bg-white text-gray-700 rounded-lg hover:bg-gray-200">
-                Clear All
-              </button>
-            </div>
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">{error}</div>
+        )}
+        {saved && (
+          <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm">
+            Attendance saved successfully!
           </div>
+        )}
 
-          {studentList.length > 0 ? (
-            <div className="divide-y">
-              {studentList.map((student: any, index: number) => (
-                <div key={student.id} className="p-4 hover:bg-white">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                        {student.profiles?.avatar_url ? (
-                          <Image alt="Student photo" 
-                            src={student.profiles.avatar_url} 
-                            alt="Student photo"
-                            width={40}
-                            height={40}
-                            className="w-full h-full rounded-full object-cover" 
-                          />
-                        ) : (
-                          <Users className="w-5 h-5 text-gray-400" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="font-medium text-gray-900">
-                          {student.profiles?.full_name || `Student ${index + 1}`}
-                        </div>
-                        <div className="text-sm text-gray-500">ID: {student.id.slice(0, 8)}</div>
-                      </div>
+        {/* Cohort selector */}
+        <div className="mb-6 bg-white border border-slate-200 rounded-2xl p-5">
+          <label className="block text-sm font-medium text-slate-700 mb-2">Select Cohort</label>
+          <select
+            value={selectedCohort}
+            onChange={e => setSelectedCohort(e.target.value)}
+            className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-brand-blue-500"
+          >
+            <option value="">— Select cohort —</option>
+            {cohorts.map(c => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Quick actions */}
+        <div className="flex gap-3 mb-4">
+          <button onClick={() => markAll('present')} className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 font-medium">
+            Mark All Present
+          </button>
+          <button onClick={() => markAll('absent')} className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 font-medium">
+            Mark All Absent
+          </button>
+          <span className="ml-auto text-sm text-slate-500 self-center">
+            {presentCount} present · {absentCount} absent · {students.length - presentCount - absentCount} unmarked
+          </span>
+        </div>
+
+        {/* Student list */}
+        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden mb-6">
+          {students.length === 0 ? (
+            <div className="p-8 text-center text-slate-400">No active students found.</div>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {students.map(student => (
+                <div key={student.id} className="flex items-center justify-between px-5 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-brand-blue-100 flex items-center justify-center text-brand-blue-700 font-semibold text-sm">
+                      {student.full_name?.charAt(0) || '?'}
                     </div>
-                    
-                    <div className="flex items-center gap-3">
-                      {/* Status Buttons */}
-                      <div className="flex gap-2">
-                        <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-brand-green-300 bg-brand-green-50 text-brand-green-700 hover:bg-brand-green-100">
-                          <CheckCircle className="w-4 h-4" />
-                          Present
-                        </button>
-                        <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white">
-                          <XCircle className="w-4 h-4" />
-                          Absent
-                        </button>
-                        <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white">
-                          <AlertCircle className="w-4 h-4" />
-                          Late
-                        </button>
-                        <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white">
-                          <Calendar className="w-4 h-4" />
-                          Excused
-                        </button>
-                      </div>
-                      
-                      {/* Hours Input */}
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="number"
-                          min="0"
-                          max="12"
-                          step="0.5"
-                          defaultValue="8"
-                          className="w-20 px-3 py-2 border rounded-lg text-center focus:ring-2 focus:ring-brand-blue-500"
-                        />
-                        <span className="text-sm text-gray-500">hrs</span>
-                      </div>
-                    </div>
+                    <span className="font-medium text-slate-900">{student.full_name}</span>
                   </div>
-                  
-                  {/* Notes */}
-                  <div className="mt-3 ml-14">
-                    <input
-                      type="text"
-                      placeholder="Add notes (optional)..."
-                      className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
-                    />
+                  <div className="flex gap-2">
+                    {(['present', 'late', 'excused', 'absent'] as AttendanceStatus[]).map(status => (
+                      <button
+                        key={status}
+                        onClick={() => setStatus(student.id, status)}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-lg border capitalize transition-all ${
+                          attendance[student.id] === status
+                            ? statusColors[status] + ' ring-2 ring-offset-1 ring-current'
+                            : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+                        }`}
+                      >
+                        {status}
+                      </button>
+                    ))}
                   </div>
                 </div>
               ))}
             </div>
-          ) : (
-            <div className="p-12 text-center">
-              <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Students Found</h3>
-              <p className="text-gray-600 mb-4">
-                Select a cohort above to view enrolled students, or there may be no active students.
-              </p>
-              <Link
-                href="/staff-portal/students/add"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
-              >
-                Add Students
-              </Link>
-            </div>
-          )}
-
-          {/* Submit */}
-          {studentList.length > 0 && (
-            <div className="p-6 border-t bg-white flex items-center justify-between">
-              <div className="text-sm text-gray-600">
-                <span className="font-medium text-gray-900">{studentList.length}</span> students • 
-                <span className="text-brand-green-600 ml-2">0 present</span> • 
-                <span className="text-brand-red-600 ml-2">0 absent</span> • 
-                <span className="text-yellow-600 ml-2">0 late</span>
-              </div>
-              <div className="flex gap-4">
-                <button className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-white text-gray-700">
-                  Save as Draft
-                </button>
-                <button className="flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 font-medium">
-                  <Save className="w-5 h-5" />
-                  Submit Attendance
-                </button>
-              </div>
-            </div>
           )}
         </div>
 
-        {/* Quick Tips */}
-        <div className="mt-6 bg-brand-blue-50 rounded-xl p-6">
-          <h3 className="font-semibold text-gray-900 mb-3">Quick Tips</h3>
-          <div className="grid md:grid-cols-3 gap-4 text-sm text-gray-700">
-            <div className="flex items-start gap-2">
-              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
-              <span>Use &quot;Mark All Present&quot; for quick entry, then adjust individual records</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
-              <span>Add notes for absences to track reasons and patterns</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
-              <span>Save as draft if you need to complete attendance later</span>
-            </div>
-          </div>
+        {/* Save buttons */}
+        <div className="flex gap-4">
+          <button
+            onClick={() => handleSave(false)}
+            disabled={saving || !selectedCohort}
+            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-semibold hover:bg-brand-blue-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-colors"
+          >
+            <Save className="w-4 h-4" />
+            {saving ? 'Saving...' : 'Submit Attendance'}
+          </button>
+          <button
+            onClick={() => handleSave(true)}
+            disabled={saving}
+            className="px-6 py-3 border border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors"
+          >
+            Save as Draft
+          </button>
         </div>
       </div>
     </div>

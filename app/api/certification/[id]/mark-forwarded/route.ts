@@ -20,10 +20,9 @@ export async function POST(
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
 
   try {
-    const result = await markForwarded(params.id, auth.user.id);
+    const result = await markForwarded(params.id, auth.id);
     if (!result.ok) return safeError(result.error ?? 'Failed to mark forwarded', 400);
     return NextResponse.json({ success: true });
   } catch (err) {

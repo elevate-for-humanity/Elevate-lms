@@ -29,6 +29,7 @@ export default async function MentorSessionsPage() {
       scheduled_at,
       topic,
       session_type,
+      meeting_url,
       mentee_id,
       profiles!mentor_sessions_mentee_id_fkey(full_name)
     `)
@@ -47,6 +48,7 @@ export default async function MentorSessionsPage() {
         time: date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
         type: s.session_type || 'video',
         topic: s.topic || 'Mentoring Session',
+        meeting_url: s.meeting_url || null,
       };
     });
   }
@@ -94,9 +96,9 @@ export default async function MentorSessionsPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Mentoring Sessions</h1>
-          <button className="flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">
+          <Link href="/mentor/sessions/new" className="flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">
             <Plus className="w-5 h-5" /> Schedule Session
-          </button>
+          </Link>
         </div>
         <div className="mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Upcoming Sessions</h2>
@@ -116,8 +118,8 @@ export default async function MentorSessionsPage() {
                     <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {session.time}</span>
                   </div>
                   <div className="mt-4 flex gap-2">
-                    <button className="flex-1 bg-brand-blue-600 text-white py-2 rounded-lg hover:bg-brand-blue-700">Join</button>
-                    <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-white">Reschedule</button>
+                    <Link href={session.meeting_url || '/mentor/sessions'} target="_blank" className="flex-1 text-center bg-brand-blue-600 text-white py-2 rounded-lg hover:bg-brand-blue-700">Join</Link>
+                    <Link href={`/mentor/sessions/${session.id}/reschedule`} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-slate-50 text-slate-700">Reschedule</Link>
                   </div>
                 </div>
               ))}

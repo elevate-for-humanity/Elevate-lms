@@ -17,7 +17,6 @@ export async function POST(
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
 
   const stripe = getStripe();
   if (!stripe) return safeError('Payment system not configured', 503);
@@ -52,7 +51,7 @@ export async function POST(
   const { data: enrollment } = await adminDb
     .from('student_enrollments')
     .select('id, funding_source')
-    .eq('student_id', auth.user.id)
+    .eq('student_id', auth.id)
     .eq('program_id', program.id)
     .in('status', ['active', 'pending'])
     .maybeSingle();
@@ -95,7 +94,7 @@ export async function POST(
       .from('external_course_completions')
       .upsert(
         {
-          user_id: auth.user.id,
+          user_id: auth.id,
           external_course_id: courseId,
           program_id: program.id,
           completed_at: null,           // not complete yet — just purchased
@@ -117,10 +116,10 @@ export async function POST(
   const { data: profile } = await db
     .from('profiles')
     .select('email, full_name')
-    .eq('id', auth.user.id)
+    .eq('id', auth.id)
     .maybeSingle();
 
-  const customerEmail = profile?.email ?? auth.user.email ?? '';
+  const customerEmail = profile?.email ?? auth.email ?? '';
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
 
   // Use pre-created Stripe price if available, otherwise build ad-hoc
@@ -152,7 +151,7 @@ export async function POST(
         program_id: program.id,
         program_slug: program.slug,
         external_course_id: courseId,
-        student_id: auth.user.id,
+        student_id: auth.id,
         student_email: customerEmail,
         partner_name: course.partner_name,
         course_title: course.title,

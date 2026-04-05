@@ -17,7 +17,6 @@ export async function GET(req: NextRequest) {
     requireAuth: true,
     allowedRoles: ['provider_admin', 'admin', 'super_admin', 'staff'],
   });
-  if (!auth.authorized) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

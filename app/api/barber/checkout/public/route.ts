@@ -172,9 +172,14 @@ async function _POST(request: NextRequest) {
       success_url: finalSuccessUrl,
       cancel_url: finalCancelUrl,
       metadata: {
-        program: 'barber-apprenticeship',
-        programSlug: 'barber-apprenticeship',
+        // Webhook handler reads kind + student_id + program_id + program_slug
+        kind: 'program_enrollment',
+        program_slug: 'barber-apprenticeship',
         program_id: '5ff21fcb-1968-41fd-99d3-37d69a31bd5c',
+        student_id: application_id || '',
+        application_id: application_id || '',
+        // Legacy fields kept for reference
+        program: 'barber-apprenticeship',
         checkout_type: 'barber_enrollment',
         payment_type: payment_type,
         checkout_amount_cents: (checkoutAmount * 100).toString(),

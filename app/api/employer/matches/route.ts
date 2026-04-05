@@ -27,7 +27,6 @@ export async function GET(req: NextRequest) {
     requireAuth: true,
     allowedRoles: ['admin', 'super_admin', 'staff', 'employer', 'case_manager', 'provider_admin'],
   });
-  if (!auth.authorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const db = createAdminClient();
   if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
@@ -41,7 +40,7 @@ export async function GET(req: NextRequest) {
     if (!learner_id) return NextResponse.json({ error: 'learner_id required' }, { status: 400 });
 
     // Learners can only query their own matches
-    if (auth.role === 'student' && auth.user.id !== learner_id) {
+    if (auth.role === 'student' && auth.id !== learner_id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -127,7 +126,7 @@ export async function GET(req: NextRequest) {
       const { data: emp } = await db
         .from('employers')
         .select('id')
-        .eq('owner_user_id', auth.user.id)
+        .eq('owner_user_id', auth.id)
         .single();
       if (!emp || emp.id !== job.employer_id) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@supabase/supabase-js';
+import { createClient as createServerClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -58,6 +59,12 @@ function sanitizeTaxReturnForStorage(data: Record<string, unknown>): Record<stri
 
 async function _POST(request: NextRequest) {
   try {
+  // Auth required — Supersonic client data is PII
+  const serverSupabase = await createServerClient();
+  const { data: { user: authUser }, error: authErr } = await serverSupabase.auth.getUser();
+  if (authErr || !authUser) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 

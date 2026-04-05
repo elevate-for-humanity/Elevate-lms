@@ -10,10 +10,10 @@ export const metadata: Metadata = {
 
 export default function MentorResourcesPage() {
   const resources = [
-    { id: '1', title: 'Mentoring Best Practices Guide', type: 'pdf', category: 'Training', downloads: 234 },
+    { id: '1', title: 'Mentoring Best Practices Guide', type: 'pdf', category: 'Training', url: '/documents/mentor-best-practices.pdf' },
     { id: '2', title: 'Effective Communication Workshop', type: 'video', category: 'Training', views: 567 },
-    { id: '3', title: 'Goal Setting Templates', type: 'pdf', category: 'Tools', downloads: 189 },
-    { id: '4', title: 'Session Planning Worksheet', type: 'pdf', category: 'Tools', downloads: 312 },
+    { id: '3', title: 'Goal Setting Templates', type: 'pdf', category: 'Tools', url: '/contact?resource=3' },
+    { id: '4', title: 'Session Planning Worksheet', type: 'pdf', category: 'Tools', url: '/contact?resource=4' },
   ];
 
   return (
@@ -42,9 +42,9 @@ export default function MentorResourcesPage() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900 mb-1">{resource.title}</h3>
                   <p className="text-sm text-gray-500 mb-3">{resource.category}</p>
-                  <button className="flex items-center gap-1 text-brand-blue-600 hover:text-brand-blue-700 text-sm">
+                  <a href={resource.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-brand-blue-600 hover:text-brand-blue-700 text-sm">
                     {resource.type === 'video' ? <>Watch <ExternalLink className="w-4 h-4" /></> : <>Download <Download className="w-4 h-4" /></>}
-                  </button>
+                  </a>
                 </div>
               </div>
             </div>

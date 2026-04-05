@@ -152,8 +152,9 @@ async function _POST(request: NextRequest) {
           cancel_url: `${SITE_URL}/programs/${program.slug}?checkout=cancelled`,
           customer_email: user.email || undefined,
           metadata: {
+            kind: 'program_enrollment',
             user_id: user.id,
-            checkout_type: 'program_enrollment',
+            student_id: user.id,
             program_id: programId,
             program_slug: program.slug,
           },
@@ -198,8 +199,8 @@ async function _POST(request: NextRequest) {
             price_data: {
               currency: 'usd',
               product_data: {
-                name: course.course_name,
-                description: `Access to ${course.course_name}`,
+                name: course.title,
+                description: `Access to ${course.title}`,
               },
               unit_amount: courseAmount,
             },
@@ -209,8 +210,9 @@ async function _POST(request: NextRequest) {
           cancel_url: `${SITE_URL}/courses/${course.slug}?checkout=cancelled`,
           customer_email: user.email || undefined,
           metadata: {
+            kind: 'course_purchase',
             user_id: user.id,
-            checkout_type: 'course_purchase',
+            student_id: user.id,
             course_id: courseId,
             course_slug: course.slug,
           },

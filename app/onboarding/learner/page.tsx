@@ -232,11 +232,26 @@ export default async function LearnerOnboardingPage() {
       const firstName = profile?.first_name || profile?.full_name?.split(' ')[0] || 'Student';
       const resolvedProgramName = enrollmentProgramName || 'your training program';
       const siteUrlInner = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
-      const logoUrl = `${siteUrlInner}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
 
-      // Emails suppressed — admin will trigger manually when ready
-      // TODO: re-enable student + admin notification emails when approved
-      void emailAddr; void logoUrl; void siteUrlInner; void resolvedProgramName; void firstName;
+      // Send student confirmation email
+      if (emailAddr) {
+        const { sendWelcomeEmail } = await import('@/lib/email/resend');
+        await sendWelcomeEmail({
+          email: emailAddr,
+          name: firstName,
+          programName: resolvedProgramName,
+          dashboardUrl: `${siteUrlInner}/learner/dashboard`,
+        }).catch((err: Error) => logger.warn('[onboarding] Welcome email failed (non-fatal)', err));
+      }
+
+      // Notify admin of new completed onboarding
+      const adminEmail = process.env.ADMIN_EMAIL || 'admin@elevateforhumanity.org';
+      const { sendEmail } = await import('@/lib/email/resend');
+      await sendEmail({
+        to: adminEmail,
+        subject: `New student onboarding complete — ${firstName}`,
+        html: `<p><strong>${firstName}</strong> (${emailAddr}) has completed all onboarding steps for <strong>${resolvedProgramName}</strong> and is awaiting LMS access.</p><p><a href="${siteUrlInner}/admin/enrollments">Review in Admin →</a></p>`,
+      }).catch((err: Error) => logger.warn('[onboarding] Admin notification failed (non-fatal)', err));
     } catch (err) {
       logger.error('[onboarding] Completion failed', err as Error);
     }

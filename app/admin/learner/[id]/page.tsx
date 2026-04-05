@@ -66,7 +66,7 @@ export default async function LearnerDetailPage({ params }: Props) {
     .from('program_enrollments')
     .select(`
       *,
-      courses (id, title, thumbnail_url)
+      programs (id, title, slug, thumbnail_url)
     `)
     .eq('user_id', id)
     .order('enrolled_at', { ascending: false });
@@ -216,7 +216,7 @@ export default async function LearnerDetailPage({ params }: Props) {
                       </div>
                       <div>
                         <p className="font-medium text-slate-900">
-                          {enrollment.courses?.title || 'Unknown Course'}
+                          {enrollment.programs?.title || 'Unknown Program'}
                         </p>
                         <p className="text-sm text-slate-600">
                           Enrolled {new Date(enrollment.enrolled_at).toLocaleDateString()}

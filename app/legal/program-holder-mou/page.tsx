@@ -1,13 +1,21 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { DocumentPage, DocumentSection, DocumentSignatureBlock } from '@/components/documents';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+
 
 export const metadata: Metadata = {
   title: 'Program Holder MOU | Elevate for Humanity',
   robots: { index: false, follow: false },
 };
 
-export default function ProgramHolderMOUPage() {
+export default async function ProgramHolderMOUPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
+
+
   return (
     <>
       <div className="max-w-4xl mx-auto px-4 py-4">

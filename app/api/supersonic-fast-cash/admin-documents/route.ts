@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
 
   const admin = createAdminClient();
   if (!admin) return safeInternalError(new Error('Admin client unavailable'), 'Service unavailable');
@@ -43,7 +42,6 @@ export async function PATCH(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
 
   let body: { id?: string; status?: string };
   try { body = await request.json(); } catch { return safeError('Invalid request body', 400); }
@@ -57,7 +55,7 @@ export async function PATCH(request: NextRequest) {
 
   const { error } = await admin
     .from('tax_documents')
-    .update({ status, reviewed_at: new Date().toISOString(), reviewed_by: auth.user.id })
+    .update({ status, reviewed_at: new Date().toISOString(), reviewed_by: auth.id })
     .eq('id', id);
 
   if (error) return safeInternalError(error, 'Failed to update document');

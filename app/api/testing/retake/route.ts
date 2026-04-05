@@ -26,7 +26,6 @@ const RETAKE_FEE_CENTS = 5000; // $50
 
 export async function POST(req: NextRequest) {
   const auth = await apiRequireAdmin(req);
-  if (auth.error) return auth.error;
 
   const db = createAdminClient();
   if (!db) return safeError('Database unavailable', 500);

@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard();
-  if (!auth.authorized || !auth.user) return safeError(auth.error ?? 'Unauthorized', 401);
+  
   const { user } = auth;
 
   let body: {
@@ -113,7 +113,7 @@ export async function GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard();
-  if (!auth.authorized || !auth.user) return safeError(auth.error ?? 'Unauthorized', 401);
+  
   const { user } = auth;
 
   const { searchParams } = new URL(request.url);

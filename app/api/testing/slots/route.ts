@@ -14,7 +14,6 @@ export const runtime = 'nodejs';
 
 export async function GET(req: NextRequest) {
   const auth = await apiRequireAdmin(req);
-  if (auth.error) return auth.error;
 
   const db = createAdminClient();
   if (!db) return safeError('Database unavailable', 500);
@@ -32,7 +31,6 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const auth = await apiRequireAdmin(req);
-  if (auth.error) return auth.error;
 
   const db = createAdminClient();
   if (!db) return safeError('Database unavailable', 500);
@@ -72,7 +70,6 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const auth = await apiRequireAdmin(req);
-  if (auth.error) return auth.error;
 
   const db = createAdminClient();
   if (!db) return safeError('Database unavailable', 500);

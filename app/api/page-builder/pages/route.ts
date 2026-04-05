@@ -7,7 +7,6 @@ import { getAllPages, upsertPage, upsertSections } from '@/lib/data/pages';
 // GET /api/page-builder/pages — list all pages
 export async function GET(request: NextRequest) {
   const auth = await apiAuthGuard({ requireAuth: true, allowedRoles: ['admin', 'super_admin'] });
-  if (!auth.authorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const pages = await getAllPages();
@@ -23,7 +22,6 @@ export async function POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard({ requireAuth: true, allowedRoles: ['admin', 'super_admin'] });
-  if (!auth.authorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const body = await request.json();

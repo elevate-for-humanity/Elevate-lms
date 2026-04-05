@@ -26,7 +26,6 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
 
 
     const body = await request.json();

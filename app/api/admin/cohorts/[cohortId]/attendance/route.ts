@@ -59,8 +59,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ coh
     status: r.status || 'present',
     minutes_attended: r.minutes_attended || null,
     notes: r.notes || null,
-    created_by: auth.user.id,
-    updated_by: auth.user.id,
+    created_by: auth.id,
+    updated_by: auth.id,
   }));
 
   const { data, error } = await auth.db

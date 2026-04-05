@@ -1,12 +1,11 @@
-import { Metadata } from 'next';
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 
 
-export const metadata: Metadata = {
-  title: 'Supersonic Fast Cash Diy Interview | Elevate For Humanity',
-  description: 'Elevate For Humanity - Supersonic Fast Cash Diy Interview page',
-};
 
 import Link from 'next/link';
 
@@ -39,7 +38,7 @@ export default async function DIYInterviewPage() {
             </div>
           </div>
 
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <h3 className="text-lg font-semibold mb-4">Personal Information</h3>
               <div className="grid md:grid-cols-2 gap-4">
@@ -48,7 +47,7 @@ export default async function DIYInterviewPage() {
                     First Name *
                   </label>
                   <input
-                    type="text"
+                    type="text" name="first_name"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
                     required
                   />
@@ -118,9 +117,10 @@ export default async function DIYInterviewPage() {
               </Link>
               <button
                 type="submit"
-                className="px-8 py-3 bg-brand-orange-600 hover:bg-brand-orange-700 text-white rounded-lg font-semibold transition-colors"
+                disabled={submitting}
+                className="px-8 py-3 bg-brand-orange-600 hover:bg-brand-orange-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50"
               >
-                Continue
+                {submitting ? "Saving..." : "Continue"}
               </button>
             </div>
           </form>

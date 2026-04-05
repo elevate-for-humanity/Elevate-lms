@@ -11,7 +11,7 @@ import {
   bulkSendNotifications,
   bulkExportData,
 } from '@/lib/bulkOperations';
-import { requireAdmin } from '@/lib/admin/guards';
+
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -20,8 +20,12 @@ export const maxDuration = 60;
 const _POST = withAuth(
   async (request: NextRequest, { user }) => {
 
+  if (!user?.role || !['admin', 'super_admin', 'staff'].includes(user.role)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
   try {
-    await apiRequireAdmin();
+
     const { operation, ...params } = await request.json();
 
     let result;

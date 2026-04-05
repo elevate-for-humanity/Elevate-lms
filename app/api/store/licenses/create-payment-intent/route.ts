@@ -28,8 +28,6 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const auth = await apiAuthGuard({ requireAuth: true });
-    if (!auth.authorized) {
-      return NextResponse.json({ error: auth.error || 'Unauthorized' }, { status: 401 });
     }
 
     const body = await parseBody<z.infer<typeof licensePaymentSchema>>(request);

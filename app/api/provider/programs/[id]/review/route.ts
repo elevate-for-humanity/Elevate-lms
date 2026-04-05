@@ -21,7 +21,6 @@ export async function POST(
     requireAuth: true,
     allowedRoles: ['admin', 'super_admin', 'staff'],
   });
-  if (!auth.authorized) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -59,7 +58,7 @@ export async function POST(
     .from('provider_program_approvals')
     .update({
       status: decision,
-      reviewed_by: auth.user.id,
+      reviewed_by: auth.id,
       reviewed_at: new Date().toISOString(),
       review_notes: review_notes ?? null,
     })
@@ -84,7 +83,7 @@ export async function POST(
   }
 
   await logAuditEvent({
-    actor_user_id: auth.user.id,
+    actor_user_id: auth.id,
     actor_role: auth.role ?? 'admin',
     action: AuditActions.UPDATE,
     entity: 'provider_program_approval',

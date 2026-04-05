@@ -37,7 +37,7 @@ async function _POST(request: NextRequest) {
     const { data: actorProfile } = await db
       .from('profiles')
       .select('tenant_id')
-      .eq('id', auth.user.id)
+      .eq('id', auth.id)
       .maybeSingle();
     const tenantId = actorProfile?.tenant_id ?? null;
 
@@ -46,7 +46,7 @@ async function _POST(request: NextRequest) {
       const objectId = st?.object?.id || null;
       const objectType = st?.object?.objectType || 'Activity';
       // Use authenticated user id — never trust actor from request body
-      const learnerId = auth.user.id;
+      const learnerId = auth.id;
 
       return {
         tenant_id: tenantId,

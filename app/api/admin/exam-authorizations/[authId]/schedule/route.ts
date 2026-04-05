@@ -17,7 +17,6 @@ export async function POST(
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
 
   const { authId } = await params;
   const body = await request.json().catch(() => ({}));

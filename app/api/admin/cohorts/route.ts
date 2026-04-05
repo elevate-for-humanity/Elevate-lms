@@ -108,7 +108,7 @@ async function _POST(request: Request) {
 
     // Log audit
     await auth.supabase.from('audit_logs').insert({
-      actor_id: auth.user.id,
+      actor_id: auth.id,
       actor_role: auth.profile.role,
       action: 'create',
       resource_type: 'cohort',
@@ -160,7 +160,7 @@ const auth = await requireAdmin();
 
     // Log audit
     await auth.supabase.from('audit_logs').insert({
-      actor_id: auth.user.id,
+      actor_id: auth.id,
       actor_role: auth.profile.role,
       action: 'update',
       resource_type: 'cohort',
@@ -209,7 +209,7 @@ const auth = await requireAdmin();
 
     // Log audit
     await auth.supabase.from('audit_logs').insert({
-      actor_id: auth.user.id,
+      actor_id: auth.id,
       actor_role: auth.profile.role,
       action: 'delete',
       resource_type: 'cohort',

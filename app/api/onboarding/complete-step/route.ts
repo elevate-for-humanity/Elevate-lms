@@ -56,6 +56,15 @@ export async function POST(req: Request) {
     if (step === 'handbook') {
       profileUpdates.handbook_acknowledged_at = now;
     }
+    if (step === 'funding') {
+      profileUpdates.funding_confirmed = true;
+      profileUpdates.funding_source = stepData.funding_source || 'self_pay';
+    }
+    if (step === 'schedule') {
+      profileUpdates.schedule_selected = true;
+      profileUpdates.cohort_start_date = stepData.cohort_start_date || null;
+      profileUpdates.schedule_preference = stepData.schedule_preference || null;
+    }
 
     if (Object.keys(profileUpdates).length > 1) {
       const { error: profileError } = await supabase

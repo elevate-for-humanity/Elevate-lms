@@ -17,7 +17,7 @@ async function _POST(req: NextRequest) {
     const { apiRequireAdmin } = await import('@/lib/admin/guards');
     try { await apiRequireAdmin(req); } catch (e) { return e instanceof Response ? e : NextResponse.json({ error: 'Unauthorized' }, { status: 401 }); }
 
-  const userId = auth.user.id;
+  const userId = auth.id;
 
   try {
     const { provider, repo, branch, project_id, token } = await req.json();

@@ -148,7 +148,7 @@ export async function POST(req: Request) {
     .from('sos_source_links')
     .insert({
       organization_id,
-      submitted_by: auth.user.id,
+      submitted_by: auth.id,
       original_url: url,
       source_domain: parsedUrl.hostname,
       fetch_status: 'pending',
@@ -230,7 +230,7 @@ export async function POST(req: Request) {
       questions_deadline: extracted.questions_deadline,
       estimated_value: extracted.estimated_value,
       scope_summary: extracted.scope_summary,
-      profiled_by: auth.user.id,
+      profiled_by: auth.id,
       profiled_at: new Date().toISOString(),
     })
     .select()

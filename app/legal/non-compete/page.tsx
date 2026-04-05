@@ -2,6 +2,9 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { ShieldAlert, Ban } from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+
 
 export const metadata: Metadata = {
   title: 'Non-Compete Agreement | Elevate For Humanity',
@@ -11,7 +14,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function NonCompetePage() {
+export default async function NonCompetePage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
+
+
   return (
     <div className="min-h-screen bg-white py-12">
       <div className="max-w-7xl mx-auto px-4 py-4">

@@ -52,7 +52,7 @@ async function _POST(request: Request) {
     const data = await createLesson(parsed.data);
     await logAdminAudit({
       action:     AdminAction.LESSON_CREATED,
-      actorId:    auth.user.id,
+      actorId:    auth.id,
       entityType: 'course_lessons',
       entityId:   (data as any)?.id ?? 'unknown',
       metadata:   { course_id: parsed.data.course_id, title: parsed.data.title },

@@ -18,7 +18,6 @@ export async function POST(
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
 
   const { authId } = await params;
   const body = await request.json().catch(() => ({}));
@@ -57,7 +56,7 @@ export async function POST(
     score:              score ? parseFloat(score) : null,
     exam_date,
     certificate_number: certificate_number || null,
-    recorded_by:        auth.user.id,
+    recorded_by:        auth.id,
     issued_at:          passedBool ? new Date().toISOString() : null,
   });
 

@@ -68,7 +68,7 @@ async function confirmSchedule(formData: FormData) {
     selected_cohort: scheduleType,
   }).eq('id', user.id);
 
-  // Ensure training_enrollments row exists
+  // Ensure training_enrollments row exists — look up course from program_enrollments
   const { data: existing } = await supabase
     .from('training_enrollments')
     .select('id')
@@ -77,12 +77,32 @@ async function confirmSchedule(formData: FormData) {
     .maybeSingle();
 
   if (!existing) {
-    await supabase.from('training_enrollments').insert({
-      user_id: user.id,
-      course_id: '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0',
-      status: 'pending_approval',
-      enrolled_at: new Date().toISOString(),
-    });
+    // Resolve course_id from the user's active program enrollment
+    const { data: enrollment } = await supabase
+      .from('program_enrollments')
+      .select('program_id')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const { data: course } = enrollment?.program_id
+      ? await supabase
+          .from('training_courses')
+          .select('id')
+          .eq('program_id', enrollment.program_id)
+          .limit(1)
+          .maybeSingle()
+      : { data: null };
+
+    if (course?.id) {
+      await supabase.from('training_enrollments').insert({
+        user_id: user.id,
+        course_id: course.id,
+        status: 'pending_approval',
+        enrolled_at: new Date().toISOString(),
+      });
+    }
   }
 
   redirect('/onboarding/learner');

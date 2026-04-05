@@ -21,7 +21,6 @@ export async function POST(
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
 
   try {
     const { approved, rejection_reason } = await request.json();
@@ -30,7 +29,7 @@ export async function POST(
 
     const result = await verifyUploadAndIssueCertificate(
       params.id,
-      auth.user.id,
+      auth.id,
       approved,
       rejection_reason
     );

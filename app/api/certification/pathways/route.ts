@@ -18,7 +18,6 @@ export async function GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
 
   const programId = request.nextUrl.searchParams.get('program_id');
   if (!programId) return safeError('program_id required', 400);
@@ -68,7 +67,7 @@ export async function GET(request: NextRequest) {
     const { data: existingRequest } = await db
       .from('certification_requests')
       .select('id, status, pathway_id, credential_name')
-      .eq('user_id', auth.user.id)
+      .eq('user_id', auth.id)
       .eq('program_id', programId)
       .maybeSingle();
 

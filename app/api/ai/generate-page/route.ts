@@ -13,7 +13,6 @@ async function _GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
 
 const openaiKey = process.env.OPENAI_API_KEY;
   if (!openaiKey) {

@@ -24,7 +24,6 @@ export async function POST(
   { params }: { params: Promise<{ courseId: string }> },
 ) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
 
   const { courseId } = await params;
   const db = createAdminClient();

@@ -27,7 +27,6 @@ export async function POST(
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
 
   try {
     const formData = await request.formData();
@@ -42,7 +41,7 @@ export async function POST(
     // Sanitize filename
     const ext = file.name.split('.').pop()?.toLowerCase() ?? 'pdf';
     const safeName = `exam-result-${Date.now()}.${ext}`;
-    const storagePath = `${auth.user.id}/${params.id}/${safeName}`;
+    const storagePath = `${auth.id}/${params.id}/${safeName}`;
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const { error: uploadErr } = await db.storage
@@ -56,7 +55,7 @@ export async function POST(
       return safeError('File upload failed — try again', 500);
     }
 
-    const result = await recordUpload(params.id, auth.user.id, storagePath, file.name);
+    const result = await recordUpload(params.id, auth.id, storagePath, file.name);
     if (!result.ok) return safeError(result.error ?? 'Failed to record upload', 400);
 
     return NextResponse.json({ success: true, uploadId: result.uploadId }, { status: 201 });

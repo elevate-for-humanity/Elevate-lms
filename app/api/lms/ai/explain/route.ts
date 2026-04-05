@@ -25,7 +25,6 @@ export async function POST(req: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(req);
-  if (auth.error) return auth.error;
 
   let body: { content: string };
   try {

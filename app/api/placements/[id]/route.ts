@@ -20,7 +20,6 @@ export async function GET(
     requireAuth: true,
     allowedRoles: ['admin', 'super_admin', 'staff', 'case_manager', 'provider_admin'],
   });
-  if (!auth.authorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { id } = await params;
   const db = createAdminClient();
@@ -53,7 +52,6 @@ export async function PATCH(
     requireAuth: true,
     allowedRoles: ['admin', 'super_admin', 'staff', 'case_manager'],
   });
-  if (!auth.authorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { id } = await params;
   const body = await req.json().catch(() => null);
@@ -83,7 +81,7 @@ export async function PATCH(
   // Auto-set verified_by and verified_at on status → verified
   if (updates.status === 'verified' && !updates.verified_at) {
     updates.verified_at = new Date().toISOString();
-    updates.verified_by = auth.user.id;
+    updates.verified_by = auth.id;
   }
 
   const { data: updated, error } = await db
@@ -96,7 +94,7 @@ export async function PATCH(
   if (error) return NextResponse.json({ error: 'Failed to update placement' }, { status: 500 });
 
   await logAuditEvent({
-    actor_user_id: auth.user.id,
+    actor_user_id: auth.id,
     actor_role: auth.role ?? 'staff',
     action: AuditActions.UPDATE,
     entity: 'placement_record',

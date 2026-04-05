@@ -20,7 +20,6 @@ export async function POST(
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
 
   const { authId } = await params;
 
@@ -48,7 +47,7 @@ export async function POST(
   const { data: result, error: rpcErr } = await db.rpc('reauthorize_exam_if_ready', {
     p_user_id:    existing.user_id,
     p_program_id: existing.program_id,
-    p_staff_id:   auth.user.id,
+    p_staff_id:   auth.id,
   });
 
   if (rpcErr) {
@@ -63,7 +62,7 @@ export async function POST(
       userId:    existing.user_id,
       programId: existing.program_id,
       reason:    row?.reason,
-      staffId:   auth.user.id,
+      staffId:   auth.id,
     });
     return safeError(row?.reason ?? 'Learner does not meet readiness requirements', 422);
   }
@@ -73,7 +72,7 @@ export async function POST(
     newAuthId:       row.authorization_id,
     userId:          existing.user_id,
     programId:       existing.program_id,
-    staffId:         auth.user.id,
+    staffId:         auth.id,
   });
 
   return NextResponse.json({

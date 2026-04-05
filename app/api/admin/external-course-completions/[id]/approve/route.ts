@@ -40,7 +40,6 @@ export async function POST(
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
 
   const { id } = await params;
   const body = await request.json().catch(() => ({})) as {
@@ -121,7 +120,7 @@ export async function POST(
       .from('external_course_completions')
       .update({
         approved_at:  new Date().toISOString(),
-        approved_by:  auth.user.id,
+        approved_by:  auth.id,
         completed_at: new Date().toISOString(),
         rejection_reason: null,
       })

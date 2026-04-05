@@ -70,7 +70,7 @@ export default async function AdminLandingPage() {
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6">
         <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Admin Portal</p>
         <h1 className="text-4xl sm:text-6xl font-black text-slate-900 leading-none">
-          {greeting}, {firstName}.
+          <AdminGreeting name={firstName} />
         </h1>
         {pendingApps > 0 && (
           <Link

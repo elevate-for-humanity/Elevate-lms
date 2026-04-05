@@ -230,7 +230,7 @@ export default async function AccreditationPage() {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Readiness Score */}
-        <div className="bg-white rounded-lg p-8 text-white mb-8">
+        <div className="bg-slate-900 rounded-lg p-8 text-white mb-8">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold mb-2">

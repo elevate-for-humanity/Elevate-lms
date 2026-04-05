@@ -243,7 +243,7 @@ export default async function SubmissionsOSPage() {
         </div>
 
         {/* Build order reminder */}
-        <div className="mt-8 bg-white rounded-xl p-5 text-slate-300 text-xs leading-relaxed">
+        <div className="mt-8 bg-slate-900 rounded-xl p-5 text-slate-300 text-xs leading-relaxed">
           <p className="font-semibold text-white mb-2">System Rule</p>
           <p>
             Only fill and submit information traceable to approved organizational facts, approved attachments, or approved content blocks.

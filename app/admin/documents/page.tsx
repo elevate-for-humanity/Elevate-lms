@@ -52,7 +52,7 @@ export default async function DocumentsPage() {
             Templates
           </Link>
           <Link href="/admin/documents/upload"
-            className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 transition-colors">
+            className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 transition-colors">
             <Upload className="w-4 h-4" /> Upload
           </Link>
         </div>
@@ -63,9 +63,9 @@ export default async function DocumentsPage() {
           <div className="py-16 text-center">
             <FileText className="w-8 h-8 text-slate-300 mx-auto mb-3" />
             <p className="text-sm font-semibold text-slate-700">No documents yet</p>
-            <p className="text-xs text-slate-500 mt-1">Upload documents to get started</p>
+            <p className="text-xs text-slate-400 mt-1">Upload documents to get started</p>
             <Link href="/admin/documents/upload"
-              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 transition-colors">
+              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 transition-colors">
               <Upload className="w-4 h-4" /> Upload first document
             </Link>
           </div>

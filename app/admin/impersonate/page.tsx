@@ -39,7 +39,7 @@ export default async function ImpersonatePage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="bg-white text-slate-900 px-6 py-6">
+      <div className="bg-slate-900 text-white px-6 py-6">
         <div className="max-w-4xl mx-auto">
           <Breadcrumbs
             items={[{ label: 'Admin', href: '/admin/dashboard' }, { label: 'Impersonate User' }]}

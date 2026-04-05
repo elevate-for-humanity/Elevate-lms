@@ -322,7 +322,7 @@ export default function AdminIntakePage() {
                       <button
                         onClick={() => setSelectedIntake(intake)}
                         disabled={!scriptAcknowledged}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-white text-slate-900 rounded-lg text-sm font-medium hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Process
                         <ChevronRight className="w-4 h-4" />

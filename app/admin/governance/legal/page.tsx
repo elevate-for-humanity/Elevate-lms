@@ -21,7 +21,7 @@ export default function LegalGovernancePage() {
         </div>
       </div>
 
-      <div className="bg-white text-slate-900 py-12">
+      <div className="bg-slate-900 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <Link
             href="/admin/governance"

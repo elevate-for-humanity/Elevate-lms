@@ -21,7 +21,7 @@ import {
 const CodeEditor = dynamic(() => import('@/components/dev-studio/CodeEditor'), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-full bg-white text-slate-900">
+    <div className="flex items-center justify-center h-full bg-slate-900 text-white">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-500 mx-auto mb-4" />
         <div>Loading Dev Studio...</div>
@@ -238,10 +238,10 @@ export default function DevStudioPage() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-white">
+    <div className="h-screen flex flex-col bg-slate-900">
 
       {/* Hero Image */}
-      <div className="bg-white px-4 py-2">
+      <div className="bg-slate-800 px-4 py-2">
         <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Dev Studio' }]} />
       </div>
       {/* Hero Section */}
@@ -259,7 +259,7 @@ export default function DevStudioPage() {
       </section>
 
       {/* Header */}
-      <div className="bg-white text-slate-900 px-4 py-3 flex items-center justify-between border-b border-slate-200">
+      <div className="bg-slate-800 text-white px-4 py-3 flex items-center justify-between border-b border-slate-700">
         <div className="flex items-center gap-4">
           <h1 className="text-xl font-bold">
             <Rocket className="w-5 h-5 inline-block" /> Elevate Dev Studio
@@ -337,7 +337,7 @@ export default function DevStudioPage() {
       {/* Main Layout */}
       <div className="flex-1 flex overflow-hidden">
         {/* File Tree */}
-        <div className="w-64 border-r border-slate-200">
+        <div className="w-64 border-r border-slate-700">
           <FileTree
             files={files}
             onFileSelect={openFile}
@@ -357,7 +357,7 @@ export default function DevStudioPage() {
                 filePath={selectedFile}
               />
             ) : (
-              <div className="flex items-center justify-center h-full bg-white text-slate-400">
+              <div className="flex items-center justify-center h-full bg-slate-900 text-slate-400">
                 <div className="text-center">
                   <p className="text-lg mb-2">No file selected</p>
                   <p className="text-sm">
@@ -369,7 +369,7 @@ export default function DevStudioPage() {
           </div>
 
           {/* Terminal */}
-          <div className="h-48 border-t border-slate-200">
+          <div className="h-48 border-t border-slate-700">
             <Terminal
               output={terminalOutput}
               onClear={() => setTerminalOutput([])}
@@ -378,16 +378,16 @@ export default function DevStudioPage() {
         </div>
 
         {/* Preview Panel */}
-        <div className="w-96 border-l border-slate-200">
+        <div className="w-96 border-l border-slate-700">
           <PreviewPanel url={process.env.NEXT_PUBLIC_SITE_URL || ''} filePath={selectedFile} />
         </div>
       </div>
 
       {/* CTA Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-slate-800">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-slate-900">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white">
               Content Development Studio
             </h2>
             <p className="text-base md:text-lg mb-8 text-slate-300">

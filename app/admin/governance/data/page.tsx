@@ -39,7 +39,7 @@ export default function DataGovernancePage() {
 
       {/* Hero Image */}
       {/* Header */}
-      <section className="bg-white text-slate-900 py-12">
+      <section className="bg-slate-900 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <Breadcrumbs 
             items={[
@@ -259,7 +259,7 @@ export default function DataGovernancePage() {
           </p>
           <Link 
             href="/admin/governance/contact" 
-            className="inline-flex items-center gap-2 bg-white text-slate-900 px-6 py-2 rounded-lg font-medium hover:bg-white transition"
+            className="inline-flex items-center gap-2 bg-slate-900 text-white px-6 py-2 rounded-lg font-medium hover:bg-slate-800 transition"
           >
             Contact Governance Team
           </Link>

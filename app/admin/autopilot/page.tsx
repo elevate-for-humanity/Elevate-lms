@@ -116,7 +116,7 @@ export default async function AutopilotPage() {
             <Activity className="w-4 h-4 text-slate-400" /> Workflows
           </h2>
           <Link href="/admin/workflows/new"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700 transition-colors">
+            className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700 transition-colors">
             + New
           </Link>
         </div>

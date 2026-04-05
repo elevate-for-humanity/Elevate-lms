@@ -89,7 +89,7 @@ export default function GovernancePage() {
       </div>
 
       {/* Header */}
-      <div className="bg-white text-slate-900 py-16">
+      <div className="bg-slate-900 text-white py-16">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
             <Building2 className="w-8 h-8 text-brand-blue-400" />
@@ -207,7 +207,7 @@ export default function GovernancePage() {
           </p>
           <Link
             href="/admin/governance/contact"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 rounded-lg font-medium hover:bg-white transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors"
           >
             <Mail className="w-5 h-5" />
             Contact Governance Team

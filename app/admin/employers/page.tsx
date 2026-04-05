@@ -49,7 +49,7 @@ export default async function EmployersPage() {
             <p className="text-sm text-slate-500 mt-1">Partner employers, job postings, and OJT placements</p>
           </div>
           <Link href="/admin/employers/new"
-            className="flex items-center gap-2 bg-white hover:bg-white text-slate-900 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
+            className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
             <Plus className="w-4 h-4" /> Add Employer
           </Link>
         </div>
@@ -87,7 +87,7 @@ export default async function EmployersPage() {
             <div className="py-16 text-center">
               <Building2 className="w-8 h-8 text-slate-300 mx-auto mb-3" />
               <p className="text-sm text-slate-500 font-medium">No employers yet</p>
-              <p className="text-xs text-slate-500 mt-1">Add your first employer partner to get started</p>
+              <p className="text-xs text-slate-400 mt-1">Add your first employer partner to get started</p>
               <Link href="/admin/employers/new" className="inline-flex items-center gap-1.5 mt-4 text-sm text-brand-blue-600 font-semibold hover:underline">
                 <Plus className="w-3.5 h-3.5" /> Add Employer
               </Link>

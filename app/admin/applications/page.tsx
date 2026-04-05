@@ -107,7 +107,7 @@ export default async function ApplicationsPage({
             <input type="text" name="search" defaultValue={search || ''} placeholder="Name or email…"
               className="px-3 py-2 text-sm border border-slate-200 rounded-lg w-56 focus:ring-2 focus:ring-brand-blue-500 focus:outline-none" />
           </div>
-          <button type="submit" className="px-4 py-2 bg-white text-slate-900 text-sm font-semibold rounded-lg hover:bg-white transition-colors">
+          <button type="submit" className="px-4 py-2 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors">
             Filter
           </button>
           <Link href="/admin/applications" className="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-200 transition-colors">

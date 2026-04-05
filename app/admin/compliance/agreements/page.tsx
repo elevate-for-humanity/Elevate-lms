@@ -325,7 +325,7 @@ export default function AdminAgreementsPage() {
         </div>
 
         {/* SQL Query Helper */}
-        <div className="mt-8 bg-white rounded-xl p-6">
+        <div className="mt-8 bg-slate-800 rounded-xl p-6">
           <h3 className="text-white font-semibold mb-4">Audit Query</h3>
           <pre className="text-brand-green-400 text-sm overflow-x-auto">
 {`SELECT agreement_type, document_version, COUNT(*)

@@ -117,7 +117,7 @@ A certificate of completion tells them you showed up. A national credential tell
 Elevate is an authorized testing center for multiple national certifying bodies. Every program culminates in a credential issued by the certifying organization — not by Elevate.
 
 - **CNA** — Indiana State Department of Health (ISDH) registry
-- **Medical Assistant** — CCMA (Certified Clinical Medical Assistant)
+- **Medical Assistant** — NHA CCMA (National Healthcareer Association)
 - **HVAC** — EPA 608 Universal (Mainstream Engineering / EPA)
 - **CDL** — Indiana Bureau of Motor Vehicles (BMV)
 - **Barber** — Indiana Professional Licensing Agency (IPLA)

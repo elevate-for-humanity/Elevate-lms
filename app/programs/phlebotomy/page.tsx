@@ -40,7 +40,7 @@ export default function PhlebotomyPage() {
           <div className="text-center mb-8">
             <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Can You Work as a Phlebotomist in Your State?</h2>
             <p className="text-black text-base max-w-xl mx-auto">
-              Most states accept national CPT certification without additional state licensure.
+              Most states accept national certification (NHA CPT) without additional state licensure.
               A few states require their own license. Check yours below.
             </p>
           </div>

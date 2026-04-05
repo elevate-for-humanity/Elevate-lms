@@ -17,7 +17,7 @@ const CREDENTIAL_MAP: Record<string, { credential: string; issuer: string; icon:
   'electrical': { credential: 'OSHA 10-Hour Construction Safety', issuer: 'Occupational Safety & Health Administration', icon: Shield },
   'cna': { credential: 'Certified Nursing Assistant (CNA)', issuer: 'Indiana State Department of Health', icon: Award },
   'cdl': { credential: 'Commercial Driver License (CDL) Class A', issuer: 'Indiana Bureau of Motor Vehicles', icon: FileText },
-  'phlebotomy': { credential: 'Certified Phlebotomy Technician (CPT)', issuer: 'Authorized Testing Center', icon: Award },
+  'phlebotomy': { credential: 'Certified Phlebotomy Technician (CPT)', issuer: 'National Healthcareer Association', icon: Award },
   'cybersecurity': { credential: 'CompTIA Security+', issuer: 'CompTIA / Certiport', icon: Shield },
   'it': { credential: 'CompTIA A+ Certification', issuer: 'CompTIA / Certiport', icon: Shield },
   'tax': { credential: 'IRS Annual Filing Season Program (AFSP)', issuer: 'Internal Revenue Service', icon: FileText },

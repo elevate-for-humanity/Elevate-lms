@@ -33,7 +33,7 @@ async function _GET(request: NextRequest) {
       );
     }
 
-    let query = db
+    let query = supabase
       .from('applications')
       .select(
         'id, first_name, last_name, email, phone, program_id, status, submitted_at, notes'

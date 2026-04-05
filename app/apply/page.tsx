@@ -38,9 +38,6 @@ export default async function ApplyPage({
     }
   }
 
-  // Default: go straight to student application
-  redirect('/apply/student');
-
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}

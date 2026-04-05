@@ -554,7 +554,7 @@ async function insertApplication(payload: {
     return { success: true, status: 'email_only' as const, applicationId: `email-${referenceNumber}`, referenceNumber };
   } catch (emailError) {
     logger.error(`[Application] Email send failed for ${payload.email}`, emailError as Error);
-    return { success: false, error: 'We could not process your application. Please email us directly at info@elevateforhumanity.org with your name, phone number, and program interest.' };
+    return { success: false, error: 'We could not process your application. Please email us directly at elevate4humanityedu@gmail.com with your name, phone number, and program interest.' };
   }
 }
 

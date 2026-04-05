@@ -52,7 +52,7 @@ export function StateAwareDashboard({
   children,
 }: StateAwareDashboardProps) {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* DOMINANT ACTION BANNER - Cannot Be Missed */}
       <section className="bg-brand-blue-700   text-white py-8 shadow-lg">
         <div className="max-w-7xl mx-auto px-4">

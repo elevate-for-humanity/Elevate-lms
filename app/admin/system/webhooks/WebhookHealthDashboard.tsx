@@ -362,7 +362,7 @@ export default function WebhookHealthDashboard() {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Breadcrumbs items={[
           { label: 'Admin', href: '/admin' },
@@ -514,7 +514,7 @@ export default function WebhookHealthDashboard() {
                   className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                   aria-label="From date"
                 />
-                <span className="text-gray-400 text-sm">→</span>
+                <span className="text-gray-500 text-sm">→</span>
                 <input
                   type="datetime-local"
                   value={filters.to}

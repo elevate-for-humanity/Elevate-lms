@@ -38,7 +38,7 @@ export default async function UsersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <div className="bg-slate-50 border-b">

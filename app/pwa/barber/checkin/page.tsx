@@ -289,7 +289,7 @@ function CheckInContent() {
             {showManualEntry && (
               <div className="bg-slate-800 rounded-xl p-4 space-y-4">
                 <div>
-                  <label className="text-slate-400 text-sm mb-2 block">Check-In Code</label>
+                  <label className="text-slate-500 text-sm mb-2 block">Check-In Code</label>
                   <input
                     ref={inputRef}
                     type="text"
@@ -329,7 +329,7 @@ function CheckInContent() {
             {/* Instructions */}
             <div className="bg-slate-700 rounded-xl p-4">
               <h3 className="text-white font-medium mb-2">How to check in</h3>
-              <ol className="text-slate-400 text-sm space-y-2">
+              <ol className="text-slate-500 text-sm space-y-2">
                 <li className="flex gap-2">
                   <span className="text-brand-blue-400">1.</span>
                   Ask your supervisor to show the shop's QR code

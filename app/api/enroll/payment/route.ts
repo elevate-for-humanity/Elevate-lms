@@ -69,7 +69,7 @@ async function _POST(req: Request) {
     const parsed = enrollPaymentSchema.safeParse(rawBody);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Invalid request', details: parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`) },
+        { error: 'Invalid request', fields: parsed.error.issues.map(i => i.path.join('.')) },
         { status: 400 }
       );
     }

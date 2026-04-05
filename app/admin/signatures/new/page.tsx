@@ -19,7 +19,7 @@ export default async function NewSignaturePage() {
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <div className="max-w-3xl mx-auto px-4 py-8">
@@ -32,7 +32,7 @@ export default async function NewSignaturePage() {
           <form className="space-y-6">
             <div><label className="block text-sm font-medium text-gray-700 mb-2">Document Title *</label><input type="text" className="w-full border rounded-lg px-3 py-2" placeholder="Enter document title" required /></div>
             <div><label className="block text-sm font-medium text-gray-700 mb-2">Upload Document *</label>
-              <div className="border-2 border-dashed rounded-lg p-6 text-center"><p className="text-gray-500">Drag and drop or click to upload</p><p className="text-sm text-gray-400 mt-1">PDF, DOCX up to 10MB</p></div>
+              <div className="border-2 border-dashed rounded-lg p-6 text-center"><p className="text-gray-500">Drag and drop or click to upload</p><p className="text-sm text-gray-500 mt-1">PDF, DOCX up to 10MB</p></div>
             </div>
             <div><label className="block text-sm font-medium text-gray-700 mb-2">Signer Email *</label><input type="email" className="w-full border rounded-lg px-3 py-2" placeholder="signer@email.com" required /></div>
             <div><label className="block text-sm font-medium text-gray-700 mb-2">Message (optional)</label><textarea className="w-full border rounded-lg px-3 py-2" rows={3} placeholder="Add a message for the signer" /></div>

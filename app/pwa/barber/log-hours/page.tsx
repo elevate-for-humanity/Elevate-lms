@@ -67,7 +67,7 @@ export default function LogHoursPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Date */}
             <div>
-              <label className="block text-slate-400 text-sm mb-2">Date</label>
+              <label className="block text-slate-500 text-sm mb-2">Date</label>
               <div className="relative">
                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <input
@@ -82,7 +82,7 @@ export default function LogHoursPage() {
 
             {/* Hours */}
             <div>
-              <label className="block text-slate-400 text-sm mb-2">Hours Worked</label>
+              <label className="block text-slate-500 text-sm mb-2">Hours Worked</label>
               <div className="relative">
                 <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <input
@@ -120,7 +120,7 @@ export default function LogHoursPage() {
 
             {/* Notes */}
             <div>
-              <label className="block text-slate-400 text-sm mb-2">Notes (optional)</label>
+              <label className="block text-slate-500 text-sm mb-2">Notes (optional)</label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}

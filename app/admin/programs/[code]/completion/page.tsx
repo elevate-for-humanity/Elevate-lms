@@ -46,7 +46,7 @@ export default async function ProgramCompletionPage({ params }: { params: Promis
             <ClipboardCheck className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">Default completion rules</h3>
             <p className="text-gray-500 mb-4">This program uses the default rule: all required lessons must be completed.</p>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-500">
               To configure custom rules, update the <code className="bg-gray-100 px-1 rounded">completion_criteria</code> field
               in the programs table via the Supabase Dashboard.
             </p>

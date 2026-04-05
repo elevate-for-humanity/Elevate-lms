@@ -118,7 +118,7 @@ export default function SubmissionReviewPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center text-slate-500 text-sm">
+      <div className="min-h-screen bg-white flex items-center justify-center text-slate-500 text-sm">
         Loading submission…
       </div>
     );
@@ -126,7 +126,7 @@ export default function SubmissionReviewPage() {
 
   if (!submission) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <p className="text-slate-600 font-medium">Submission not found.</p>
           <Link href="/instructor/submissions" className="mt-3 inline-block text-sm text-brand-blue-600 hover:underline">
@@ -142,7 +142,7 @@ export default function SubmissionReviewPage() {
   const isResolved = submission.status === 'approved' || submission.status === 'rejected';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Top bar */}
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">

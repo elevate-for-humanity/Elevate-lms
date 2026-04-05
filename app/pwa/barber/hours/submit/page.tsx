@@ -168,7 +168,7 @@ export default function SubmitHoursPage() {
 
         {/* Date Selection */}
         <div className="bg-slate-800 rounded-xl p-4">
-          <label className="flex items-center gap-3 text-slate-400 text-sm mb-3">
+          <label className="flex items-center gap-3 text-slate-500 text-sm mb-3">
             <Calendar className="w-4 h-4" />
             Date
           </label>
@@ -183,7 +183,7 @@ export default function SubmitHoursPage() {
 
         {/* Time Entry */}
         <div className="bg-slate-800 rounded-xl p-4">
-          <label className="flex items-center gap-3 text-slate-400 text-sm mb-3">
+          <label className="flex items-center gap-3 text-slate-500 text-sm mb-3">
             <Clock className="w-4 h-4" />
             Time Worked
           </label>
@@ -220,7 +220,7 @@ export default function SubmitHoursPage() {
 
         {/* Category Selection */}
         <div className="bg-slate-800 rounded-xl p-4">
-          <label className="text-slate-400 text-sm mb-3 block">Category</label>
+          <label className="text-slate-500 text-sm mb-3 block">Category</label>
           <div className="space-y-2">
             {CATEGORIES.map((cat) => (
               <button
@@ -243,7 +243,7 @@ export default function SubmitHoursPage() {
 
         {/* Location */}
         <div className="bg-slate-800 rounded-xl p-4">
-          <label className="flex items-center gap-3 text-slate-400 text-sm mb-3">
+          <label className="flex items-center gap-3 text-slate-500 text-sm mb-3">
             <MapPin className="w-4 h-4" />
             Location (Optional)
           </label>
@@ -258,7 +258,7 @@ export default function SubmitHoursPage() {
 
         {/* Description */}
         <div className="bg-slate-800 rounded-xl p-4">
-          <label className="flex items-center gap-3 text-slate-400 text-sm mb-3">
+          <label className="flex items-center gap-3 text-slate-500 text-sm mb-3">
             <FileText className="w-4 h-4" />
             Description (Optional)
           </label>
@@ -273,7 +273,7 @@ export default function SubmitHoursPage() {
 
         {/* Photo Proof */}
         <div className="bg-slate-800 rounded-xl p-4">
-          <label className="flex items-center gap-3 text-slate-400 text-sm mb-3">
+          <label className="flex items-center gap-3 text-slate-500 text-sm mb-3">
             <Camera className="w-4 h-4" />
             Photo Proof (Optional)
           </label>

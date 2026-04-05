@@ -20,7 +20,7 @@ export function DashboardArchetype({
   const content = getDashboardContent(role);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <QualityHero
         title={content.title}
         description={content.description}

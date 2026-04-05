@@ -74,7 +74,7 @@ export default async function AnalyticsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Page header */}
       <div className="bg-white border-b border-slate-200 px-6 py-5">
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
@@ -112,7 +112,7 @@ export default async function AnalyticsPage() {
             <Link href="/admin/programs" className="text-xs text-brand-blue-600 hover:underline font-medium">View all →</Link>
           </div>
           {ranked.length === 0 ? (
-            <p className="text-sm text-slate-400 py-4 text-center">No enrollment data yet</p>
+            <p className="text-sm text-slate-500 py-4 text-center">No enrollment data yet</p>
           ) : (
             <div className="space-y-3">
               {ranked.map((p) => (

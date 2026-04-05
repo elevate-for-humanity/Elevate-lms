@@ -38,7 +38,7 @@ export default function CnaWaitlistPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-white">
       <div className="bg-white border-b border-slate-100 py-8 px-4">
         <div className="max-w-2xl mx-auto">
           <Link href="/programs/cna" className="text-brand-blue-600 text-sm font-semibold hover:underline mb-4 inline-block">

@@ -89,7 +89,7 @@ export default function RoleDashboard({ role, userName }: RoleDashboardProps) {
   const config = roleConfig[role];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="   text-white py-16">
         <div className="container mx-auto px-4">

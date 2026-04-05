@@ -42,17 +42,17 @@ export default function CertificationsPage() {
             <div>
               <Clock className="w-6 h-6 text-brand-blue-400 mx-auto mb-2" />
               <p className="text-2xl font-bold text-white">2-12</p>
-              <p className="text-sm text-slate-400">Weeks to certify</p>
+              <p className="text-sm text-slate-500">Weeks to certify</p>
             </div>
             <div>
               <DollarSign className="w-6 h-6 text-brand-green-400 mx-auto mb-2" />
               <p className="text-2xl font-bold text-white">$0</p>
-              <p className="text-sm text-slate-400">With WIOA/WRG funding</p>
+              <p className="text-sm text-slate-500">With WIOA/WRG funding</p>
             </div>
             <div>
               <MapPin className="w-6 h-6 text-brand-orange-400 mx-auto mb-2" />
               <p className="text-2xl font-bold text-white">Indianapolis</p>
-              <p className="text-sm text-slate-400">In-person training</p>
+              <p className="text-sm text-slate-500">In-person training</p>
             </div>
           </div>
         </div>

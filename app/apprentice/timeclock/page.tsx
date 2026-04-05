@@ -647,7 +647,7 @@ export default function TimeclockPage() {
                 <Loader2 className="w-4 h-4 animate-spin mr-2" /> Loading…
               </div>
             ) : recentShifts.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-6">No shifts recorded yet.</p>
+              <p className="text-sm text-gray-500 text-center py-6">No shifts recorded yet.</p>
             ) : (
               <div className="space-y-2">
                 {recentShifts.map((s) => {

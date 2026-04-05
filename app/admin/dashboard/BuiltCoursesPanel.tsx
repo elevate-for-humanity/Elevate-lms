@@ -24,7 +24,7 @@ export async function BuiltCoursesPanel() {
       </div>
 
       {built.length === 0 ? (
-        <p className="text-slate-400 text-sm py-10">No courses with lesson content yet.</p>
+        <p className="text-slate-500 text-sm py-10">No courses with lesson content yet.</p>
       ) : (
         <div className="divide-y divide-slate-100">
           {built.map(course => {

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 export default function InquiryReceivedPage() {
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-16">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-16">
       <div className="bg-white rounded-2xl shadow-lg max-w-lg w-full p-8 text-center">
 
         <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">

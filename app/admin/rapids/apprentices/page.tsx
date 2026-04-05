@@ -124,7 +124,7 @@ export default function RAPIDSApprenticesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-white p-6">
 
       {/* Hero Image */}
             <div className="max-w-7xl mx-auto px-4 py-4">
@@ -353,7 +353,7 @@ export default function RAPIDSApprenticesPage() {
             <div className="p-8 text-center">
               <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-600">No apprentices found</p>
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-gray-500 mt-1">
                 Apprentices will appear here once enrolled in RAPIDS-registered programs
               </p>
             </div>
@@ -404,7 +404,7 @@ export default function RAPIDSApprenticesPage() {
                         {apprentice.rapidsId ? (
                           <span className="font-mono text-sm text-gray-900">{apprentice.rapidsId}</span>
                         ) : (
-                          <span className="text-sm text-gray-400">Not assigned</span>
+                          <span className="text-sm text-gray-500">Not assigned</span>
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -427,7 +427,7 @@ export default function RAPIDSApprenticesPage() {
                         {apprentice.employerName ? (
                           <div className="text-sm text-gray-900">{apprentice.employerName}</div>
                         ) : (
-                          <span className="text-sm text-gray-400">Not assigned</span>
+                          <span className="text-sm text-gray-500">Not assigned</span>
                         )}
                       </td>
                     </tr>

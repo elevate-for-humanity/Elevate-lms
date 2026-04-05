@@ -75,7 +75,7 @@ export default function OperationalControlsPage() {
             This page summarizes how quality, integrity, and risk controls are enforced 
             across the platform.
           </p>
-          <div className="mt-6 text-sm text-slate-400">
+          <div className="mt-6 text-sm text-slate-500">
             Last reviewed: {currentDate} • Owner: Platform Governance
           </div>
         </div>

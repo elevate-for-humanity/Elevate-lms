@@ -21,7 +21,7 @@ export default async function DonatePage() {
     .order('created_at', { ascending: false });
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <section className="bg-zinc-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <Heart className="h-16 w-16 mx-auto mb-4" />

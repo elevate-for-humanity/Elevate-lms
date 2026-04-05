@@ -1301,7 +1301,7 @@ export default function LessonPage() {
                       ) : (
                         <div className="bg-slate-900 rounded-xl aspect-video flex flex-col items-center justify-center text-white gap-3">
                           <Video className="w-12 h-12 text-slate-500" />
-                          <p className="text-slate-400 text-sm">Video will be published with the next content update.</p>
+                          <p className="text-slate-500 text-sm">Video will be published with the next content update.</p>
                           <p className="text-slate-500 text-xs">Read the lesson content below in the meantime.</p>
                         </div>
                       )}

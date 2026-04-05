@@ -34,7 +34,7 @@ export default async function AdminPage() {
     .single();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Programs', href: '/programs' },

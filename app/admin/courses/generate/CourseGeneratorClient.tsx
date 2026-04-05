@@ -189,7 +189,7 @@ export default function CourseGeneratorClient({ programs }: { programs: Program[
       <div className="flex flex-col items-center justify-center py-32 gap-4">
         <div className="w-10 h-10 border-4 border-brand-blue-600 border-t-transparent rounded-full animate-spin" />
         <p className="text-slate-600 font-medium">Generating course structure…</p>
-        <p className="text-slate-400 text-sm">This takes 20–40 seconds</p>
+        <p className="text-slate-500 text-sm">This takes 20–40 seconds</p>
       </div>
     );
   }
@@ -275,7 +275,7 @@ export default function CourseGeneratorClient({ programs }: { programs: Program[
           ) : (
             <>
               <p className="text-slate-500 font-medium">Click to upload PDF or DOCX</p>
-              <p className="text-slate-400 text-sm mt-1">Max 10MB</p>
+              <p className="text-slate-500 text-sm mt-1">Max 10MB</p>
             </>
           )}
         </div>

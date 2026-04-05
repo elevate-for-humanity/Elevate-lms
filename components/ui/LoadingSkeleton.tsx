@@ -1,6 +1,6 @@
 export function PageLoadingSkeleton() {
   return (
-    <div className="min-h-screen bg-slate-50 animate-pulse" role="status" aria-label="Loading page content">
+    <div className="min-h-screen bg-white animate-pulse" role="status" aria-label="Loading page content">
       <div className="bg-white border-b border-slate-200 h-16" />
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="h-8 w-64 bg-slate-200 rounded mb-6" />
@@ -22,7 +22,7 @@ export function PageLoadingSkeleton() {
 
 export function DashboardLoadingSkeleton() {
   return (
-    <div className="min-h-screen bg-slate-50 animate-pulse" role="status" aria-label="Loading dashboard">
+    <div className="min-h-screen bg-white animate-pulse" role="status" aria-label="Loading dashboard">
       <div className="flex">
         <aside className="hidden lg:block w-64 bg-white border-r border-slate-200 min-h-screen">
           <div className="p-4 space-y-4">

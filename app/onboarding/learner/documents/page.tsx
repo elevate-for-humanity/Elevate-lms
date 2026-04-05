@@ -287,7 +287,7 @@ export default function DocumentsPage() {
         {error && (
           <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-3 mb-4 flex items-center gap-2 text-brand-red-700 text-sm">
             <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
-            <button onClick={() => setError('')} className="ml-auto"><X className="w-4 h-4" /></button>
+            <button onClick={() => setError('')} aria-label="Dismiss error" className="ml-auto"><X className="w-4 h-4" /></button>
           </div>
         )}
 

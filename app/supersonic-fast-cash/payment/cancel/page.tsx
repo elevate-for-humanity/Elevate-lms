@@ -3,7 +3,7 @@ import { XCircle, ArrowLeft, Phone } from 'lucide-react';
 
 export default function PaymentCancelPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 text-center">
           <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">

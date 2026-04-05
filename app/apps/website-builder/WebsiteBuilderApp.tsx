@@ -177,7 +177,7 @@ export function WebsiteBuilderApp({ user, subscription, websites: initialWebsite
           <div className="bg-white rounded-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold">Create New Website</h3>
-              <button onClick={() => setShowNewModal(false)}><X className="w-5 h-5" /></button>
+              <button onClick={() => setShowNewModal(false)} aria-label="Close"><X className="w-5 h-5" /></button>
             </div>
             
             <form onSubmit={(e) => {

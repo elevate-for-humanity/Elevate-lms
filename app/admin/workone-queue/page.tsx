@@ -47,7 +47,7 @@ export default async function WorkOneQueuePage() {
   const pending = apps ?? [];
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b px-6 py-3">
         <Breadcrumbs items={[
           { label: 'Admin', href: '/admin/dashboard' },

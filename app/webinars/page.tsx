@@ -138,7 +138,7 @@ export default async function WebinarsPage() {
                         <Play className="w-4 h-4" /> Watch Recording
                       </a>
                     ) : (
-                      <span className="block w-full text-center text-slate-400 text-sm py-2.5">Recording not available</span>
+                      <span className="block w-full text-center text-slate-500 text-sm py-2.5">Recording not available</span>
                     )}
                   </div>
                 </div>

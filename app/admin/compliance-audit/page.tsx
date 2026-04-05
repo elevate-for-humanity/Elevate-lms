@@ -139,9 +139,9 @@ export default function ComplianceAuditPage() {
             <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide">Audit History</h2>
 
             {loading ? (
-              <div className="text-center py-8 text-sm text-gray-400">Loading...</div>
+              <div className="text-center py-8 text-sm text-gray-500">Loading...</div>
             ) : audits.length === 0 ? (
-              <div className="text-center py-8 text-sm text-gray-400">
+              <div className="text-center py-8 text-sm text-gray-500">
                 No audits found. Generate one to get started.
               </div>
             ) : (
@@ -271,7 +271,7 @@ export default function ComplianceAuditPage() {
 
               </div>
             ) : (
-              <div className="border border-gray-200 rounded-lg p-16 text-center text-sm text-gray-400">
+              <div className="border border-gray-200 rounded-lg p-16 text-center text-sm text-gray-500">
                 Select an audit to view details
               </div>
             )}

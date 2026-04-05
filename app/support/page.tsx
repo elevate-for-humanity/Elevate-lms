@@ -203,15 +203,15 @@ export default async function SupportPage() {
           <p className="text-slate-400 mb-6">Our support team is available Monday-Friday, 9am-5pm EST</p>
           <div className="flex flex-wrap gap-6 justify-center">
             <div className="text-white">
-              <p className="text-sm text-slate-400">Live Chat</p>
+              <p className="text-sm text-slate-500">Live Chat</p>
               <a href="/support/chat" className="text-lg font-semibold hover:text-brand-blue-400">Chat With Us</a>
             </div>
             <div className="text-white">
-              <p className="text-sm text-slate-400">Email</p>
+              <p className="text-sm text-slate-500">Email</p>
               <a href="/contact" className="text-lg font-semibold hover:text-brand-blue-400">Contact Us</a>
             </div>
             <div className="text-white">
-              <p className="text-sm text-slate-400">Submit a Ticket</p>
+              <p className="text-sm text-slate-500">Submit a Ticket</p>
               <a href="/support/ticket" className="text-lg font-semibold hover:text-brand-blue-400">Open a Ticket</a>
             </div>
           </div>

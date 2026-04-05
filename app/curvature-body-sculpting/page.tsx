@@ -305,15 +305,15 @@ export default function CurvatureBodySculptingPage() {
               <div className="space-y-4">
                 <div className="p-4 bg-white/5 rounded-lg">
                   <h4 className="font-bold">Body Sculpting Technician</h4>
-                  <p className="text-slate-400 text-sm">Full-time • Indianapolis, IN</p>
+                  <p className="text-slate-500 text-sm">Full-time • Indianapolis, IN</p>
                 </div>
                 <div className="p-4 bg-white/5 rounded-lg">
                   <h4 className="font-bold">Esthetician</h4>
-                  <p className="text-slate-400 text-sm">Full-time • Indianapolis, IN</p>
+                  <p className="text-slate-500 text-sm">Full-time • Indianapolis, IN</p>
                 </div>
                 <div className="p-4 bg-white/5 rounded-lg">
                   <h4 className="font-bold">Wellness Consultant</h4>
-                  <p className="text-slate-400 text-sm">Part-time • Indianapolis, IN</p>
+                  <p className="text-slate-500 text-sm">Part-time • Indianapolis, IN</p>
                 </div>
               </div>
             </div>

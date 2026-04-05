@@ -103,7 +103,7 @@ export default function VideoGeneratorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-white p-8">
 
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">

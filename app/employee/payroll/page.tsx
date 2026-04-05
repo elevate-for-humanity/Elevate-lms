@@ -157,7 +157,7 @@ export default async function EmployeePayrollPage() {
         <div className="bg-white rounded-xl border overflow-hidden mb-8">
           <div className="px-6 py-4 border-b flex items-center justify-between">
             <h2 className="text-lg font-semibold text-slate-900">Pay Stubs</h2>
-            <span className="text-sm text-slate-400">{payStubs.length} records</span>
+            <span className="text-sm text-slate-500">{payStubs.length} records</span>
           </div>
           {payStubs.length === 0 ? (
             <div className="px-6 py-12 text-center text-slate-400">

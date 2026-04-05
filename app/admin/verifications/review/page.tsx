@@ -80,7 +80,7 @@ export default async function AdminVerificationReviewPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="border-b py-8">

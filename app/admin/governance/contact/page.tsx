@@ -75,7 +75,7 @@ export default function GovernanceContactPage() {
             For governance, compliance, security, or diligence inquiries, use the appropriate 
             contact channel below.
           </p>
-          <div className="mt-6 text-sm text-slate-400">
+          <div className="mt-6 text-sm text-slate-500">
             Last reviewed: {currentDate} • Owner: Platform Governance
           </div>
         </div>

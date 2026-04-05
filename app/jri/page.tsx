@@ -150,7 +150,7 @@ export default function JRIPage() {
                 <div key={index} className="text-center">
                   <IconComponent className="w-8 h-8 text-brand-green-500 mx-auto mb-2" />
                   <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-                  <div className="text-gray-400 text-sm">{stat.label}</div>
+                  <div className="text-gray-500 text-sm">{stat.label}</div>
                 </div>
               );
             })}

@@ -220,7 +220,7 @@ export default function AdminImportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       {/* Header */}
@@ -317,7 +317,7 @@ export default function AdminImportPage() {
                     className="hidden"
                   />
                 </label>
-                <p className="text-sm text-gray-400 mt-4">Supports CSV files up to 10MB</p>
+                <p className="text-sm text-gray-500 mt-4">Supports CSV files up to 10MB</p>
               </div>
             )}
 

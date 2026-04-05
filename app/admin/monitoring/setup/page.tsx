@@ -51,7 +51,7 @@ export default function MonitoringSetupPage() {
 
   if (checking) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-brand-blue-600 mx-auto mb-4" />
           <p className="text-black">Verifying monitoring setup...</p>
@@ -61,7 +61,7 @@ export default function MonitoringSetupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-white p-6">
 
       {/* Hero Image */}
             <div className="max-w-7xl mx-auto px-4 py-4">

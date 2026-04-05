@@ -26,7 +26,7 @@ export default async function TemplatesPage() {
     : { data: null, error: null };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-5xl mx-auto px-4 py-8">
         <Link href="/admin/submissions" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 mb-6 transition">
           <ArrowLeft className="w-4 h-4" /> Submissions OS

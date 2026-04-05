@@ -22,7 +22,7 @@ export default async function AssessmentBankPage() {
   if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-8">

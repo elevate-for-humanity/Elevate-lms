@@ -40,7 +40,7 @@ export async function PATCH(
 
   const parsed = PatchSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues.map(i => i.message).join('; ') }, { status: 422 });
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 422 });
   }
 
   const db = createAdminClient();

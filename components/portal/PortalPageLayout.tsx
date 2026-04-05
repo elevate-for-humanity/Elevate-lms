@@ -43,7 +43,7 @@ export function PortalPageLayout({
   children,
 }: PortalPageLayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Hero — video frame only */}
       <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <CanonicalVideo

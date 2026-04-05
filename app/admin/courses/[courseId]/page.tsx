@@ -92,7 +92,7 @@ export default async function CourseBuilderPage({
   const allApproved   = lessons.length > 0 && approvedCount === lessons.length;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
 
       {/* ── Header ── */}
       <div className="bg-brand-blue-700 text-white py-6 px-4">
@@ -240,7 +240,7 @@ export default async function CourseBuilderPage({
           </div>
 
           {lessons.length === 0 && (
-            <div className="bg-white rounded-xl border p-8 text-center text-sm text-slate-400">
+            <div className="bg-white rounded-xl border p-8 text-center text-sm text-slate-500">
               {isGenerating
                 ? 'Lessons are being generated…'
                 : 'No lessons yet. Use the generator above or add lessons manually.'}

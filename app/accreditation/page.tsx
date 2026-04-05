@@ -174,7 +174,7 @@ export default function AccreditationPage() {
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
             <h2 className="text-xl font-bold text-white mb-2">Partnership &amp; Compliance Inquiries</h2>
-            <p className="text-slate-400 text-sm">For funding, partnership, or compliance questions, contact our team directly.</p>
+            <p className="text-slate-500 text-sm">For funding, partnership, or compliance questions, contact our team directly.</p>
           </div>
           <Link href="mailto:support@elevateforhumanity.org" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors whitespace-nowrap">
             <Mail className="w-4 h-4" />Contact Us

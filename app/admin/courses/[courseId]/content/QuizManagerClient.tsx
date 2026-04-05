@@ -181,7 +181,7 @@ export default function QuizManagerClient({
 
           {/* Questions */}
           {questions.length === 0 && (
-            <p className="text-sm text-gray-400 text-center py-4 border border-dashed rounded-lg">
+            <p className="text-sm text-gray-500 text-center py-4 border border-dashed rounded-lg">
               No questions yet. Add your first question below.
             </p>
           )}

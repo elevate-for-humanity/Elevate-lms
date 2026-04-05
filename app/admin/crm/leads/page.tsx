@@ -73,7 +73,7 @@ export default async function LeadsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       {/* Header */}
@@ -165,7 +165,7 @@ export default async function LeadsPage() {
                       <div>
                         <p className="font-medium text-gray-900">{lead.name}</p>
                         <p className="text-gray-500 text-sm">{lead.contact}</p>
-                        <p className="text-gray-400 text-sm">{lead.email}</p>
+                        <p className="text-gray-500 text-sm">{lead.email}</p>
                       </div>
                     </td>
                     <td className="px-6 py-4">

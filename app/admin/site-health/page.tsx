@@ -37,7 +37,7 @@ export default async function SiteHealthPage() {
   const banner = overallBanner(health.overallStatus);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Site Health' }]} />
         <div className="mt-4 mb-6">
@@ -64,7 +64,7 @@ export default async function SiteHealthPage() {
                 <div className="flex items-center gap-4 flex-shrink-0">
                   <span className="text-sm text-slate-500 hidden sm:block">{svc.detail}</span>
                   {svc.latencyMs !== null && (
-                    <span className="text-sm text-slate-400">{svc.latencyMs} ms</span>
+                    <span className="text-sm text-slate-500">{svc.latencyMs} ms</span>
                   )}
                   <span className={`px-2 py-0.5 rounded text-xs font-medium ${statusBadge(svc.status)}`}>
                     {svc.status}

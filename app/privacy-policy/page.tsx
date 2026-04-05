@@ -64,7 +64,7 @@ export default function PrivacyPolicyPage() {
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-3xl sm:text-4xl font-bold mb-3">Privacy Policy</h1>
           <p className="text-slate-300 text-lg mb-1">{ORG_NAME}</p>
-          <p className="text-slate-400 text-sm">Effective Date: {EFFECTIVE_DATE}</p>
+          <p className="text-slate-500 text-sm">Effective Date: {EFFECTIVE_DATE}</p>
         </div>
       </section>
 

@@ -41,7 +41,7 @@ async function _POST(req: NextRequest) {
     const parsed = checkoutSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Invalid request', details: parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`) },
+        { error: 'Invalid request', fields: parsed.error.issues.map(i => i.path.join('.')) },
         { status: 400 }
       );
     }

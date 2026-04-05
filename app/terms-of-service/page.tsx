@@ -27,7 +27,7 @@ export default function TermsOfServicePage() {
           <p className="text-xl text-slate-300">
             Please read these terms carefully before using our services.
           </p>
-          <p className="text-sm text-slate-400 mt-4">Last updated: February 22, 2026</p>
+          <p className="text-sm text-slate-500 mt-4">Last updated: February 22, 2026</p>
         </div>
       </section>
 

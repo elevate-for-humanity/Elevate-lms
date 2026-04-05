@@ -170,7 +170,7 @@ export default function DocumentsClient() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <RefreshCw className="w-8 h-8 animate-spin text-brand-blue-600 mx-auto mb-3" />
           <p className="text-slate-500 text-sm">Loading documents…</p>
@@ -180,7 +180,7 @@ export default function DocumentsClient() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <Breadcrumbs items={[

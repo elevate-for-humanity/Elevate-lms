@@ -32,7 +32,7 @@ export default async function PayrollPage() {
     .limit(50);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-slate-900 px-6 py-5">
         <h1 className="text-2xl font-bold text-white">Payroll Management</h1>
       </div>

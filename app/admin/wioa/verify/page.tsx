@@ -38,7 +38,7 @@ export default async function WIOAVerifyPage({
       .limit(50);
 
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="min-h-screen bg-white p-8">
         <div className="max-w-5xl mx-auto">
           <Link href="/admin/wioa/eligibility" className="flex items-center gap-2 text-gray-600 hover:text-brand-blue-600 mb-6">
             <ArrowLeft className="w-4 h-4" />
@@ -92,7 +92,7 @@ export default async function WIOAVerifyPage({
 
   if (!participant) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="min-h-screen bg-white p-8">
         <div className="max-w-5xl mx-auto text-center py-12">
           <p className="text-gray-500">Participant not found.</p>
           <Link href="/admin/wioa/verify" className="text-brand-blue-600 hover:underline mt-2 inline-block">
@@ -128,7 +128,7 @@ export default async function WIOAVerifyPage({
   const missingDocs = docs.filter(d => d.status === 'missing' || !d.file_url);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-white p-8">
 
       {/* Hero Image */}
       <div className="max-w-5xl mx-auto">

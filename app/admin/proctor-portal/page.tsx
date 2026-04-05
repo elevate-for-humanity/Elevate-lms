@@ -103,7 +103,7 @@ export default function ProctorPortalPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs items={[
         { label: 'Admin', href: '/admin' },
         { label: 'Proctor Portal' },

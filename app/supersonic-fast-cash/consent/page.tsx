@@ -182,7 +182,7 @@ export default function ConsentPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-slate-800 text-white py-8 px-4">
         <div className="max-w-3xl mx-auto flex items-center gap-4">

@@ -4,7 +4,7 @@ function Pulse({ className }: { className: string }) {
 
 export default function DashboardLoading() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Hero skeleton */}
       <div className="h-48 md:h-56 bg-gray-300 animate-pulse" />
 

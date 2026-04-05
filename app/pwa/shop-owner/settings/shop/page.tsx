@@ -143,13 +143,13 @@ export default function ShopDetailsPage() {
 
         {/* Basic Info */}
         <div className="bg-white rounded-xl p-4 space-y-4">
-          <div className="flex items-center gap-3 text-slate-400 text-sm mb-2">
+          <div className="flex items-center gap-3 text-slate-500 text-sm mb-2">
             <Building2 className="w-4 h-4" />
             Basic Information
           </div>
           
           <div>
-            <label className="text-slate-400 text-sm mb-1 block">Shop Name</label>
+            <label className="text-slate-500 text-sm mb-1 block">Shop Name</label>
             <input
               type="text"
               value={shop.name}
@@ -159,7 +159,7 @@ export default function ShopDetailsPage() {
           </div>
 
           <div>
-            <label className="text-slate-400 text-sm mb-1 block">Owner Name</label>
+            <label className="text-slate-500 text-sm mb-1 block">Owner Name</label>
             <input
               type="text"
               value={shop.ownerName}
@@ -169,7 +169,7 @@ export default function ShopDetailsPage() {
           </div>
 
           <div>
-            <label className="text-slate-400 text-sm mb-1 block">License Number</label>
+            <label className="text-slate-500 text-sm mb-1 block">License Number</label>
             <input
               type="text"
               value={shop.licenseNumber}
@@ -181,13 +181,13 @@ export default function ShopDetailsPage() {
 
         {/* Address */}
         <div className="bg-white rounded-xl p-4 space-y-4">
-          <div className="flex items-center gap-3 text-slate-400 text-sm mb-2">
+          <div className="flex items-center gap-3 text-slate-500 text-sm mb-2">
             <MapPin className="w-4 h-4" />
             Address
           </div>
           
           <div>
-            <label className="text-slate-400 text-sm mb-1 block">Street Address</label>
+            <label className="text-slate-500 text-sm mb-1 block">Street Address</label>
             <input
               type="text"
               value={shop.address}
@@ -198,7 +198,7 @@ export default function ShopDetailsPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-slate-400 text-sm mb-1 block">City</label>
+              <label className="text-slate-500 text-sm mb-1 block">City</label>
               <input
                 type="text"
                 value={shop.city}
@@ -207,7 +207,7 @@ export default function ShopDetailsPage() {
               />
             </div>
             <div>
-              <label className="text-slate-400 text-sm mb-1 block">State</label>
+              <label className="text-slate-500 text-sm mb-1 block">State</label>
               <select
                 value={shop.state}
                 onChange={(e) => setShop(prev => ({ ...prev, state: e.target.value }))}
@@ -222,7 +222,7 @@ export default function ShopDetailsPage() {
           </div>
 
           <div>
-            <label className="text-slate-400 text-sm mb-1 block">ZIP Code</label>
+            <label className="text-slate-500 text-sm mb-1 block">ZIP Code</label>
             <input
               type="text"
               value={shop.zip}
@@ -235,13 +235,13 @@ export default function ShopDetailsPage() {
 
         {/* Contact */}
         <div className="bg-white rounded-xl p-4 space-y-4">
-          <div className="flex items-center gap-3 text-slate-400 text-sm mb-2">
+          <div className="flex items-center gap-3 text-slate-500 text-sm mb-2">
             <Phone className="w-4 h-4" />
             Contact Information
           </div>
           
           <div>
-            <label className="text-slate-400 text-sm mb-1 block">Phone Number</label>
+            <label className="text-slate-500 text-sm mb-1 block">Phone Number</label>
             <input
               type="tel"
               value={shop.phone}
@@ -252,7 +252,7 @@ export default function ShopDetailsPage() {
           </div>
 
           <div>
-            <label className="text-slate-400 text-sm mb-1 block">Email Address</label>
+            <label className="text-slate-500 text-sm mb-1 block">Email Address</label>
             <input
               type="email"
               value={shop.email}

@@ -188,7 +188,7 @@ export default function CheckEligibilityPage() {
   const confirm = confirmations[path];
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-white">
       <div className="bg-slate-900 px-6 py-4 flex items-center justify-between">
         <Link href="/" className="text-white font-bold text-sm hover:text-brand-red-300 transition-colors">
           ← Elevate for Humanity
@@ -419,7 +419,7 @@ export default function CheckEligibilityPage() {
               </Link>
               <Link
                 href={confirm.secondaryHref}
-                className="text-slate-400 text-sm hover:text-slate-600 transition-colors"
+                className="text-slate-500 text-sm hover:text-slate-600 transition-colors"
               >
                 {confirm.secondaryLabel}
               </Link>

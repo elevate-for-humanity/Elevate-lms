@@ -164,7 +164,7 @@ export default function EnterpriseCapitalReadinessPage() {
                     {pathway.threshold}
                   </span>
                 </div>
-                <p className="text-gray-400 text-sm mb-4">{pathway.description}</p>
+                <p className="text-gray-500 text-sm mb-4">{pathway.description}</p>
                 <h4 className="text-sm font-medium text-slate-900 mb-2">Key Steps:</h4>
                 <ul className="space-y-2">
                   {pathway.steps.map((step, j) => (
@@ -417,7 +417,7 @@ export default function EnterpriseCapitalReadinessPage() {
                   </div>
                   <div>
                     <h3 className="text-slate-900 font-medium mb-1">{item.risk}</h3>
-                    <p className="text-gray-400 text-sm">{item.mitigation}</p>
+                    <p className="text-gray-500 text-sm">{item.mitigation}</p>
                   </div>
                 </div>
               ))}
@@ -471,7 +471,7 @@ export default function EnterpriseCapitalReadinessPage() {
               <div key={i} className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">{pricing.model}</h3>
                 <p className="text-2xl font-bold text-emerald-400 mb-2">{pricing.price}</p>
-                <p className="text-sm text-gray-400 mb-4">Best for: {pricing.best}</p>
+                <p className="text-sm text-gray-500 mb-4">Best for: {pricing.best}</p>
                 <h4 className="text-sm font-medium text-slate-900 mb-2">Includes:</h4>
                 <ul className="space-y-2">
                   {pricing.includes.map((item, j) => (

@@ -35,7 +35,7 @@ export function LoadingTimeout({
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
+    <div className="flex items-center justify-center min-h-screen bg-white px-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
         <AlertCircle className="h-16 w-16 text-yellow-600 mx-auto mb-6" />
 

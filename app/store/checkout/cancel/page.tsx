@@ -62,7 +62,7 @@ function CancelContent() {
           </div>
 
           <div className="mt-8 pt-6 border-t border-white/10">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-500">
               Having trouble? Contact us at{" "}
               <a
                 href="/contact"

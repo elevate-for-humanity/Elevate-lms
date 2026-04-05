@@ -47,7 +47,7 @@ function LandingPage() {
           </div>
           <div>
             <h3 className="text-white font-semibold">Track Your Hours</h3>
-            <p className="text-slate-400 text-sm">Log training hours and see your progress toward 2,000 hours.</p>
+            <p className="text-slate-500 text-sm">Log training hours and see your progress toward 2,000 hours.</p>
           </div>
         </div>
 
@@ -57,7 +57,7 @@ function LandingPage() {
           </div>
           <div>
             <h3 className="text-white font-semibold">Training Materials</h3>
-            <p className="text-slate-400 text-sm">Access Elevate LMS curriculum and instructional videos.</p>
+            <p className="text-slate-500 text-sm">Access Elevate LMS curriculum and instructional videos.</p>
           </div>
         </div>
 
@@ -67,7 +67,7 @@ function LandingPage() {
           </div>
           <div>
             <h3 className="text-white font-semibold">Earn Milestones</h3>
-            <p className="text-slate-400 text-sm">Unlock achievements as you progress through your apprenticeship.</p>
+            <p className="text-slate-500 text-sm">Unlock achievements as you progress through your apprenticeship.</p>
           </div>
         </div>
       </div>
@@ -111,7 +111,7 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
   const hoursRemaining = TARGET_HOURS - totalHours;
 
   return (
-    <div className="min-h-screen bg-slate-100 pb-20">
+    <div className="min-h-screen bg-white pb-20">
       {/* Header */}
       <header className="bg-brand-blue-700 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center justify-between mb-4">
@@ -171,14 +171,14 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
           <div className="bg-slate-800 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <Clock className="w-5 h-5 text-brand-blue-400" />
-              <span className="text-slate-400 text-sm">This Week</span>
+              <span className="text-slate-500 text-sm">This Week</span>
             </div>
             <p className="text-2xl font-bold text-white">{apprentice.weeklyHours || 0} hrs</p>
           </div>
           <div className="bg-slate-800 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-5 h-5 text-emerald-400" />
-              <span className="text-slate-400 text-sm">Remaining</span>
+              <span className="text-slate-500 text-sm">Remaining</span>
             </div>
             <p className="text-2xl font-bold text-white">{formatHours(hoursRemaining)} hrs</p>
           </div>
@@ -226,7 +226,7 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
             </div>
             <div className="flex-1">
               <p className="text-white font-medium">Submit Hours</p>
-              <p className="text-slate-400 text-sm">End of day — log hours with photo proof for official records</p>
+              <p className="text-slate-500 text-sm">End of day — log hours with photo proof for official records</p>
             </div>
             <ChevronRight className="w-5 h-5 text-slate-500" />
           </Link>
@@ -237,7 +237,7 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
             </div>
             <div className="flex-1">
               <p className="text-white font-medium">Quick Log</p>
-              <p className="text-slate-400 text-sm">Missed a day? Add past hours manually</p>
+              <p className="text-slate-500 text-sm">Missed a day? Add past hours manually</p>
             </div>
             <ChevronRight className="w-5 h-5 text-slate-500" />
           </Link>
@@ -313,11 +313,11 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
         <div className="bg-slate-800 rounded-xl p-4">
           <div className="flex items-center gap-3 mb-3">
             <Scissors className="w-5 h-5 text-brand-blue-400" />
-            <span className="text-slate-400 text-sm">Training Location</span>
+            <span className="text-slate-500 text-sm">Training Location</span>
           </div>
           <p className="text-white font-medium">{apprentice.shopName}</p>
           {apprentice.startDate && (
-            <p className="text-slate-400 text-sm mt-1">
+            <p className="text-slate-500 text-sm mt-1">
               Started {new Date(apprentice.startDate).toLocaleDateString()}
             </p>
           )}
@@ -403,7 +403,7 @@ export default function BarberPWAHome() {
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-brand-blue-400 mx-auto mb-4 animate-spin" />
-          <p className="text-slate-400">Loading your dashboard...</p>
+          <p className="text-slate-500">Loading your dashboard...</p>
         </div>
       </div>
     );

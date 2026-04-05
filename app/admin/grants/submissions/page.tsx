@@ -119,7 +119,7 @@ export default async function GrantSubmissionsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -260,7 +260,7 @@ export default async function GrantSubmissionsPage() {
                           {submission.confirmation_number}
                         </p>
                       ) : (
-                        <p className="text-sm text-slate-400">N/A</p>
+                        <p className="text-sm text-slate-500">N/A</p>
                       )}
                     </td>
                     <td className="px-6 py-4">

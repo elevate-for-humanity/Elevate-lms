@@ -16,7 +16,7 @@ import { APP_STORE_PRODUCTS } from '@/lib/stripe/app-store-products';
  */
 export function AppPricingScreen() {
   return (
-    <div className="min-h-screen bg-slate-50 p-4">
+    <div className="min-h-screen bg-white p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">

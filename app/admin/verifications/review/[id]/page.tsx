@@ -59,7 +59,7 @@ export default async function ReviewVerificationPage({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="border-b py-8">

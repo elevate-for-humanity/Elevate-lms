@@ -197,7 +197,7 @@ function SignMouInner() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center space-y-3">
           <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
           <p className="font-bold text-slate-900">Agreement signed. Redirecting…</p>
@@ -207,7 +207,7 @@ function SignMouInner() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
           <Link href="/booth-rental/apply" className="text-slate-500 hover:text-slate-800">
@@ -314,7 +314,7 @@ function SignMouInner() {
 
 export default function SignMouPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-slate-400" /></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-slate-400" /></div>}>
       <SignMouInner />
     </Suspense>
   );

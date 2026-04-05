@@ -269,7 +269,7 @@ export default function TestingAdminClient({ bookings: initial, slots: initialSl
           <div>
             <h2 className="font-bold text-slate-900 mb-4">Upcoming Slots ({slots.length})</h2>
             {slots.length === 0 ? (
-              <div className="bg-white rounded-2xl border p-8 text-center text-slate-400 text-sm">
+              <div className="bg-white rounded-2xl border p-8 text-center text-slate-500 text-sm">
                 No upcoming slots. Create one to start accepting bookings.
               </div>
             ) : (
@@ -408,7 +408,7 @@ export default function TestingAdminClient({ bookings: initial, slots: initialSl
                 <h2 className="font-bold text-slate-900">Booking {selected.confirmation_code}</h2>
                 <p className="text-xs text-slate-400">{selected.first_name} {selected.last_name}</p>
               </div>
-              <button onClick={() => setSelected(null)} className="text-slate-400 hover:text-slate-700">
+              <button onClick={() => setSelected(null)} aria-label="Close" className="text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
               </button>
             </div>

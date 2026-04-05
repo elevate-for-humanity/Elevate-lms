@@ -92,7 +92,7 @@ export default function BarberCheckoutPage() {
   const weeklyPayment = (weeklyAmount / BARBER_PRICING.paymentTermWeeks).toFixed(2);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-lg mx-auto px-4 py-10">
 
         {/* Back link */}

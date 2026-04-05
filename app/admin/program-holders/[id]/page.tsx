@@ -312,7 +312,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="mb-4">
           <Breadcrumbs items={[

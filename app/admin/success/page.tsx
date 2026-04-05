@@ -21,7 +21,7 @@ export default async function SuccessPage() {
   const { data: stories, count } = await supabase.from('success_stories').select('*', { count: 'exact' }).order('created_at', { ascending: false }).limit(10);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-8">

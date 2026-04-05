@@ -459,7 +459,7 @@ export default function ProgramManagerClient({
 
         {/* Attached list */}
         {internalLinks.length === 0 ? (
-          <div className="border border-dashed border-slate-200 rounded-xl p-8 text-center text-slate-400 text-sm">
+          <div className="border border-dashed border-slate-200 rounded-xl p-8 text-center text-slate-500 text-sm">
             No internal courses attached yet. Select one above.
           </div>
         ) : (
@@ -559,7 +559,7 @@ export default function ProgramManagerClient({
         )}
 
         {externalItems.length === 0 && !showExternalForm ? (
-          <div className="border border-dashed border-slate-200 rounded-xl p-8 text-center text-slate-400 text-sm">
+          <div className="border border-dashed border-slate-200 rounded-xl p-8 text-center text-slate-500 text-sm">
             No partner training attached yet. Click "Add Partner Training" above.
           </div>
         ) : (

@@ -50,7 +50,7 @@ export default async function InspectCoursePage({
   const published = lessons.filter((l: any) => l.is_published).length;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-brand-blue-700 text-white py-6 px-4">
         <div className="max-w-5xl mx-auto flex items-start justify-between gap-4">
           <div>

@@ -95,7 +95,7 @@ export default async function ProgramDashboardPage({ params }: { params: Promise
               <section.icon className="w-5 h-5 text-brand-blue-600" />
               <h3 className="font-semibold text-gray-900 group-hover:text-brand-blue-600">{section.name}</h3>
               {section.count !== null && (
-                <span className="ml-auto text-sm text-gray-400">{section.count}</span>
+                <span className="ml-auto text-sm text-gray-500">{section.count}</span>
               )}
             </div>
             <p className="text-sm text-gray-500">{section.desc}</p>

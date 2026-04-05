@@ -43,7 +43,7 @@ export default function OutcomesMethodologyPage() {
               <p className="text-slate-300 text-sm mt-1">How we measure and report student outcomes</p>
             </div>
           </div>
-          <div className="mt-4 flex flex-wrap gap-4 text-sm text-slate-400">
+          <div className="mt-4 flex flex-wrap gap-4 text-sm text-slate-500">
             <span>Last Updated: February 2026</span>
             <span>•</span>
             <span>Reporting Period: July 2024 &ndash; January 2026</span>

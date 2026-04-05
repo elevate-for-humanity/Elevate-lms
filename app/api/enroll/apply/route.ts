@@ -39,7 +39,7 @@ async function _POST(req: Request) {
     const parsed = enrollApplySchema.safeParse(rawBody);
     if (!parsed.success) {
       return NextResponse.json(
-        { message: `Validation failed: ${parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', ')}` },
+        { message: 'Validation failed', fields: parsed.error.issues.map(i => i.path.join('.')) },
         { status: 400 }
       );
     }

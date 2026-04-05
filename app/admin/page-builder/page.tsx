@@ -146,7 +146,7 @@ export default function PageBuilderPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-white flex">
 
       {/* Sidebar — page list */}
       <aside className="w-64 bg-white border-r border-slate-200 flex flex-col">
@@ -164,7 +164,7 @@ export default function PageBuilderPage() {
         </div>
         <div className="flex-1 overflow-y-auto">
           {pages.length === 0 && (
-            <p className="p-4 text-sm text-slate-400">No pages yet. Create one.</p>
+            <p className="p-4 text-sm text-slate-500">No pages yet. Create one.</p>
           )}
           {pages.map((p) => (
             <button
@@ -301,7 +301,7 @@ export default function PageBuilderPage() {
           {/* Section list */}
           <div className="flex-1 flex flex-col gap-3">
             {sections.length === 0 && (
-              <div className="flex items-center justify-center h-48 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 text-sm">
+              <div className="flex items-center justify-center h-48 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 text-sm">
                 Add a section from the left panel
               </div>
             )}

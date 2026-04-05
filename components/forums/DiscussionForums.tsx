@@ -282,7 +282,7 @@ export default function DiscussionForums() {
   // Categories View
   if (activeView === 'categories') {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Error Message */}
           {error && (
@@ -418,7 +418,7 @@ export default function DiscussionForums() {
   // Threads View
   if (activeView === 'threads') {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="mb-6">
@@ -612,7 +612,7 @@ export default function DiscussionForums() {
 
   // Thread View (Individual Discussion)
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <button

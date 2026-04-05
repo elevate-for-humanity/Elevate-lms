@@ -127,7 +127,7 @@ export default function ShopOwnerRegisterPage() {
 
           <div className="bg-white rounded-xl p-4">
             <h3 className="text-slate-900 font-semibold mb-3">Requirements</h3>
-            <ul className="space-y-2 text-sm text-slate-400">
+            <ul className="space-y-2 text-sm text-slate-500">
               <li>• Valid state barbershop license</li>
               <li>• At least one licensed barber on staff</li>
               <li>• Commitment to apprentice training</li>
@@ -169,7 +169,7 @@ export default function ShopOwnerRegisterPage() {
         <main className="px-4 py-6 space-y-4">
           <div className="space-y-4">
             <div>
-              <label className="block text-slate-400 text-sm mb-2">Shop Name *</label>
+              <label className="block text-slate-500 text-sm mb-2">Shop Name *</label>
               <input
                 type="text"
                 value={shopData.name}
@@ -180,7 +180,7 @@ export default function ShopOwnerRegisterPage() {
             </div>
 
             <div>
-              <label className="block text-slate-400 text-sm mb-2">Owner Name *</label>
+              <label className="block text-slate-500 text-sm mb-2">Owner Name *</label>
               <input
                 type="text"
                 value={shopData.ownerName}
@@ -191,7 +191,7 @@ export default function ShopOwnerRegisterPage() {
             </div>
 
             <div>
-              <label className="block text-slate-400 text-sm mb-2">Street Address *</label>
+              <label className="block text-slate-500 text-sm mb-2">Street Address *</label>
               <input
                 type="text"
                 value={shopData.address}
@@ -203,7 +203,7 @@ export default function ShopOwnerRegisterPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-slate-400 text-sm mb-2">City *</label>
+                <label className="block text-slate-500 text-sm mb-2">City *</label>
                 <input
                   type="text"
                   value={shopData.city}
@@ -213,7 +213,7 @@ export default function ShopOwnerRegisterPage() {
                 />
               </div>
               <div>
-                <label className="block text-slate-400 text-sm mb-2">State *</label>
+                <label className="block text-slate-500 text-sm mb-2">State *</label>
                 <select
                   value={shopData.state}
                   onChange={(e) => updateField('state', e.target.value)}
@@ -228,7 +228,7 @@ export default function ShopOwnerRegisterPage() {
             </div>
 
             <div>
-              <label className="block text-slate-400 text-sm mb-2">ZIP Code *</label>
+              <label className="block text-slate-500 text-sm mb-2">ZIP Code *</label>
               <input
                 type="text"
                 value={shopData.zip}
@@ -240,7 +240,7 @@ export default function ShopOwnerRegisterPage() {
             </div>
 
             <div>
-              <label className="block text-slate-400 text-sm mb-2">Phone *</label>
+              <label className="block text-slate-500 text-sm mb-2">Phone *</label>
               <input
                 type="tel"
                 value={shopData.phone}
@@ -251,7 +251,7 @@ export default function ShopOwnerRegisterPage() {
             </div>
 
             <div>
-              <label className="block text-slate-400 text-sm mb-2">Email *</label>
+              <label className="block text-slate-500 text-sm mb-2">Email *</label>
               <input
                 type="email"
                 value={shopData.email}
@@ -262,7 +262,7 @@ export default function ShopOwnerRegisterPage() {
             </div>
 
             <div>
-              <label className="block text-slate-400 text-sm mb-2">Barbershop License # *</label>
+              <label className="block text-slate-500 text-sm mb-2">Barbershop License # *</label>
               <input
                 type="text"
                 value={shopData.licenseNumber}

@@ -90,7 +90,7 @@ export default async function AdminDocumentReviewPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       {/* Header */}
@@ -263,7 +263,7 @@ export default async function AdminDocumentReviewPage() {
                     {doc.file_path ? (
                       <SecureDocumentLink documentId={doc.id} />
                     ) : (
-                      <span className="text-slate-400 text-sm">No file</span>
+                      <span className="text-slate-500 text-sm">No file</span>
                     )}
                     <Link
                       href={`/admin/documents/review/${doc.id}`}

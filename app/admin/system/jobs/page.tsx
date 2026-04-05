@@ -156,7 +156,7 @@ export default async function SystemJobsPage() {
           <Clock className="w-4 h-4" /> Pending &amp; Processing
         </h2>
         {pending.length === 0 ? (
-          <p className="text-sm text-slate-400 py-4">No pending jobs.</p>
+          <p className="text-sm text-slate-500 py-4">No pending jobs.</p>
         ) : (
           <div className="border border-slate-200 rounded-xl overflow-hidden">
             <table className="w-full text-sm">
@@ -196,7 +196,7 @@ export default async function SystemJobsPage() {
           <CheckCircle className="w-4 h-4 text-green-600" /> Recently Completed
         </h2>
         {recent.length === 0 ? (
-          <p className="text-sm text-slate-400 py-4">No completed jobs yet.</p>
+          <p className="text-sm text-slate-500 py-4">No completed jobs yet.</p>
         ) : (
           <div className="border border-slate-200 rounded-xl overflow-hidden">
             <table className="w-full text-sm">

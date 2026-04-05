@@ -72,7 +72,7 @@ export default async function AdminMarketingPage() {
     .slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       {/* Breadcrumbs */}

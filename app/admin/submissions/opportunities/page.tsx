@@ -275,7 +275,7 @@ export default function OpportunitiesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
 
         {/* Header */}
@@ -333,7 +333,7 @@ export default function OpportunitiesPage() {
           <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
             <DollarSign className="w-10 h-10 text-slate-200 mx-auto mb-3" />
             <p className="text-slate-500 font-medium">No opportunities yet</p>
-            <p className="text-sm text-slate-400 mt-1">
+            <p className="text-sm text-slate-500 mt-1">
               Click <strong>Add from URL</strong> to ingest an RFP, grant notice, or bid posting.
             </p>
           </div>

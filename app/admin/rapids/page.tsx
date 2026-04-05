@@ -27,7 +27,7 @@ export default function RapidsAdminPage() {
   const procurementStatement = `Elevate for Humanity Career & Technical Institute is a DBA of 2Exclusive LLC-S, the USDOL Registered Apprenticeship Sponsor of Record for the Barber program in Indiana. Registration documentation is available upon request for procurement, compliance, or partner onboarding purposes. This program is fee-based and not state-funded. Employment and wages, if applicable, are governed by host sites and applicable labor laws and are not administered through Elevate.`;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-white p-6">
 
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">

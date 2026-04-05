@@ -61,7 +61,7 @@ export function DemoPageShell({ title, description, portal = 'admin', children }
   const meta = PORTAL_META[portal];
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
 
       {/* Demo notice */}
       <div className="bg-brand-red-600 text-white text-center py-2 px-4 text-xs font-semibold flex items-center justify-center gap-3">

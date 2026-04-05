@@ -110,7 +110,7 @@ function CheckoutForm({
   const btnHover = `hover:bg-${accentColor}-700`;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href={backHref} className="text-sm text-gray-500 hover:text-gray-700">
@@ -364,7 +364,7 @@ export default function AddOnCheckout(props: AddOnCheckoutProps) {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-white flex items-center justify-center">
           <Loader2 className="w-10 h-10 text-gray-400 animate-spin" />
         </div>
       }

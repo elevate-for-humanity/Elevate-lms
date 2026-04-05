@@ -226,7 +226,7 @@ export default function ExportReportsPage() {
 
         {/* Format Selection */}
         <div className="bg-slate-800 rounded-xl p-4">
-          <label className="text-slate-400 text-sm mb-3 block">Export Format</label>
+          <label className="text-slate-500 text-sm mb-3 block">Export Format</label>
           <div className="space-y-2">
             {FORMAT_OPTIONS.map((format) => (
               <button
@@ -259,7 +259,7 @@ export default function ExportReportsPage() {
 
         {/* Date Range */}
         <div className="bg-slate-800 rounded-xl p-4">
-          <label className="flex items-center gap-3 text-slate-400 text-sm mb-3">
+          <label className="flex items-center gap-3 text-slate-500 text-sm mb-3">
             <Calendar className="w-4 h-4" />
             Date Range
           </label>
@@ -306,7 +306,7 @@ export default function ExportReportsPage() {
 
         {/* Options */}
         <div className="bg-slate-800 rounded-xl p-4">
-          <label className="text-slate-400 text-sm mb-3 block">Report Options</label>
+          <label className="text-slate-500 text-sm mb-3 block">Report Options</label>
           <div className="space-y-3">
             <label className="flex items-center justify-between p-3 bg-slate-700 rounded-xl cursor-pointer">
               <span className="text-slate-600">Group by category</span>

@@ -39,7 +39,7 @@ export default async function JRIReportsPage() {
   const completionRate = (total || 0) > 0 ? Math.round(((completed || 0) / (total || 1)) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Job Ready Indy', href: '/admin/jri' }, { label: 'Reports' }]} />

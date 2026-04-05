@@ -109,7 +109,7 @@ export default function AuditLogsPage() {
         {/* Page header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <Link href="/admin/dashboard" className="text-sm text-gray-400 hover:text-gray-600 mb-3 inline-block">
+            <Link href="/admin/dashboard" className="text-sm text-gray-500 hover:text-gray-600 mb-3 inline-block">
               ← Back to Dashboard
             </Link>
             <div className="flex items-center gap-3">
@@ -198,7 +198,7 @@ export default function AuditLogsPage() {
           {filteredLogs.length === 0 ? (
             <div className="text-center py-16">
               <Shield className="w-10 h-10 text-gray-200 mx-auto mb-3" />
-              <p className="text-sm text-gray-400">No audit logs found</p>
+              <p className="text-sm text-gray-500">No audit logs found</p>
             </div>
           ) : (
             <div className="overflow-x-auto">

@@ -188,7 +188,7 @@ export default function ShopCheckInPage() {
             {/* Instructions */}
             <div className="bg-white/50 rounded-xl p-4">
               <h3 className="text-slate-900 font-medium mb-2">How it works</h3>
-              <ol className="text-slate-400 text-sm space-y-2">
+              <ol className="text-slate-500 text-sm space-y-2">
                 <li className="flex gap-2">
                   <span className="text-brand-blue-400">1.</span>
                   Display this QR code at your shop entrance

@@ -19,7 +19,7 @@ export default function PlatformOverviewPage() {
 {/* Document Header */}
       <div className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
+          <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
             <Link href="/" className="hover:text-white">Home</Link>
             <ChevronRight className="w-4 h-4" />
             <Link href="/legal" className="hover:text-white">Legal</Link>

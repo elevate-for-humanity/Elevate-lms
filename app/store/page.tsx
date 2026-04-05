@@ -101,7 +101,7 @@ export default function StorePage() {
             ].map(d => (
               <Link key={d.href} href={d.href} className="group bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-6 transition">
                 <h3 className="text-white font-bold mb-1">{d.label}</h3>
-                <p className="text-slate-400 text-sm mb-4">{d.desc}</p>
+                <p className="text-slate-500 text-sm mb-4">{d.desc}</p>
                 <span className="text-brand-red-400 text-sm font-semibold inline-flex items-center gap-1">
                   Open Live Demo <ArrowRight className="w-3 h-3" />
                 </span>

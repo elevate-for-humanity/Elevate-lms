@@ -17,7 +17,7 @@ export default async function NewCredentialPage() {
   if (!profile || !['admin','super_admin','org_admin','staff'].includes(profile.role)) redirect('/unauthorized');
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <Breadcrumbs items={[
           { label: 'Admin', href: '/admin' },

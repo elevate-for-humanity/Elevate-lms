@@ -67,7 +67,7 @@ export default function BarberPreviewPage() {
 
         {ended && idx < LESSONS.length - 1 && (
           <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center gap-4">
-            <p className="text-slate-400 text-sm uppercase tracking-widest">Up next</p>
+            <p className="text-slate-500 text-sm uppercase tracking-widest">Up next</p>
             <p className="text-white text-xl font-bold">{LESSONS[idx + 1].title}</p>
             <button
               onClick={next}

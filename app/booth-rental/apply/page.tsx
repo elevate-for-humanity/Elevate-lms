@@ -74,7 +74,7 @@ function BoothRentalApplyInner() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white border-b">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">
@@ -287,7 +287,7 @@ function BoothRentalApplyInner() {
 
 export default function BoothRentalApplyPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-slate-400" /></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-slate-400" /></div>}>
       <BoothRentalApplyInner />
     </Suspense>
   );

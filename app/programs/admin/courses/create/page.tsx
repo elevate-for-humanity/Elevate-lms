@@ -46,7 +46,7 @@ export default async function CreatePage() {
     .limit(20);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image

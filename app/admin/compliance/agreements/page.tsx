@@ -122,7 +122,7 @@ export default function AdminAgreementsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 text-brand-blue-600 animate-spin mx-auto mb-4" />
           <p className="text-slate-600">Loading agreement data...</p>
@@ -133,7 +133,7 @@ export default function AdminAgreementsPage() {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="w-12 h-12 text-brand-red-600 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-slate-900 mb-2">Access Denied</h1>
@@ -144,7 +144,7 @@ export default function AdminAgreementsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
 
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4">

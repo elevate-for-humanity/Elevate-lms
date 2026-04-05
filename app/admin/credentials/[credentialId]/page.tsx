@@ -52,7 +52,7 @@ export default async function EditCredentialPage({
     .eq('credential_id', credentialId);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <Breadcrumbs items={[
           { label: 'Admin', href: '/admin' },

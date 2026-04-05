@@ -91,7 +91,7 @@ export default function ShopOwnerSettingsPage() {
 
         {/* Shop Management */}
         <div>
-          <h2 className="text-slate-400 text-sm font-medium mb-3 px-1">SHOP MANAGEMENT</h2>
+          <h2 className="text-slate-500 text-sm font-medium mb-3 px-1">SHOP MANAGEMENT</h2>
           <div className="bg-white rounded-xl overflow-hidden divide-y divide-slate-700">
             <Link href="/pwa/shop-owner/checkin" className="flex items-center justify-between p-4 active:bg-slate-700">
               <div className="flex items-center gap-4">
@@ -118,7 +118,7 @@ export default function ShopOwnerSettingsPage() {
 
         {/* Notifications */}
         <div>
-          <h2 className="text-slate-400 text-sm font-medium mb-3 px-1">NOTIFICATIONS</h2>
+          <h2 className="text-slate-500 text-sm font-medium mb-3 px-1">NOTIFICATIONS</h2>
           <div className="bg-white rounded-xl overflow-hidden">
             {supported ? (
               <button
@@ -156,7 +156,7 @@ export default function ShopOwnerSettingsPage() {
                 )}
               </button>
             ) : (
-              <div className="p-4 text-slate-400 text-sm">
+              <div className="p-4 text-slate-500 text-sm">
                 Push notifications are not supported on this device
               </div>
             )}
@@ -165,7 +165,7 @@ export default function ShopOwnerSettingsPage() {
 
         {/* Appearance */}
         <div>
-          <h2 className="text-slate-400 text-sm font-medium mb-3 px-1">APPEARANCE</h2>
+          <h2 className="text-slate-500 text-sm font-medium mb-3 px-1">APPEARANCE</h2>
           <div className="bg-white rounded-xl overflow-hidden">
             <button
               onClick={() => setDarkMode(!darkMode)}
@@ -195,7 +195,7 @@ export default function ShopOwnerSettingsPage() {
 
         {/* Support */}
         <div>
-          <h2 className="text-slate-400 text-sm font-medium mb-3 px-1">SUPPORT</h2>
+          <h2 className="text-slate-500 text-sm font-medium mb-3 px-1">SUPPORT</h2>
           <div className="bg-white rounded-xl overflow-hidden divide-y divide-slate-700">
             <Link href="/support/help" className="flex items-center justify-between p-4 active:bg-slate-700">
               <div className="flex items-center gap-4">

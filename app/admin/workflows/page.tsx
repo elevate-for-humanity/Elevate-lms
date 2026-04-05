@@ -32,7 +32,7 @@ export default async function WorkflowsPage() {
   const totalRuns = rows.reduce((sum: number, r: any) => sum + (r.run_count ?? 0), 0);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Workflows' }]} />
 

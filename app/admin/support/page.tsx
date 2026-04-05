@@ -94,7 +94,7 @@ export default function AdminSupportPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-white p-6">
 
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">

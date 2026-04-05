@@ -161,7 +161,7 @@ export default function GuidesPage() {
                         <div className="text-right">
                           <div className="text-2xl font-black text-brand-blue-600">{guide.price}</div>
                           {guide.originalPrice && (
-                            <div className="text-sm text-slate-400 line-through">{guide.originalPrice}</div>
+                            <div className="text-sm text-slate-500 line-through">{guide.originalPrice}</div>
                           )}
                         </div>
                       </div>

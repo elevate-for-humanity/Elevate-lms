@@ -124,7 +124,7 @@ export default async function CaseManagerDashboardPage() {
             Workforce Hub
           </p>
           <h1 className="text-2xl font-extrabold mb-1">Case Manager Dashboard</h1>
-          <p className="text-slate-400 text-sm">
+          <p className="text-slate-500 text-sm">
             Participant outcomes, enrollment status, and placement verification
           </p>
         </div>

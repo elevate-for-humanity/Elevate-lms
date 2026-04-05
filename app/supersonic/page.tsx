@@ -73,7 +73,7 @@ export default function SupersonicPage() {
                 <feature.icon className="w-7 h-7 text-brand-blue-400" />
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
-              <p className="text-gray-400 text-sm">{feature.description}</p>
+              <p className="text-gray-500 text-sm">{feature.description}</p>
             </div>
           ))}
         </div>
@@ -90,7 +90,7 @@ export default function SupersonicPage() {
                 </div>
                 <span className="text-2xl font-bold text-brand-red-500">{program.price}</span>
               </div>
-              <div className="flex items-center gap-2 text-gray-400 text-sm mb-4">
+              <div className="flex items-center gap-2 text-gray-500 text-sm mb-4">
                 <TrendingUp className="w-4 h-4" />
                 <span>Regular program: {program.regular}</span>
               </div>

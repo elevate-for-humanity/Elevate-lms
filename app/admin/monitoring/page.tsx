@@ -146,7 +146,7 @@ export default function MonitoringDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
 
       {/* Hero Image */}
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -161,7 +161,7 @@ export default function MonitoringDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-white p-6">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Monitoring" }]} />
         </div>

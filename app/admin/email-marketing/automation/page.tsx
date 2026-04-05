@@ -31,7 +31,7 @@ export default async function EmailAutomationPage() {
   const totalRecipients = rows.reduce((sum: number, r: any) => sum + (r.total_recipients ?? 0), 0);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Email Marketing', href: '/admin/email-marketing' }, { label: 'Automations' }]} />
 

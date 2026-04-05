@@ -246,7 +246,7 @@ export default function InstructorProgramAnnouncementsPage() {
               <div key={announcement.id} className="bg-white rounded-xl border p-6">
                 <h3 className="text-lg font-semibold text-gray-900">{announcement.title}</h3>
                 <p className="text-gray-600 mt-2 whitespace-pre-wrap">{announcement.content}</p>
-                <div className="flex items-center gap-2 mt-4 text-sm text-gray-400">
+                <div className="flex items-center gap-2 mt-4 text-sm text-gray-500">
                   <span>Posted by {announcement.author?.full_name || 'Instructor'}</span>
                   <span>•</span>
                   <span>

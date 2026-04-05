@@ -62,7 +62,7 @@ export default async function AdminProgramHoldersPage() {
   const active = items.filter((h: any) => h.status === 'active').length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-4">
           <Breadcrumbs items={[
@@ -170,7 +170,7 @@ export default async function AdminProgramHoldersPage() {
             <div className="text-center py-16">
               <Building2 className="w-12 h-12 text-gray-300 mx-auto mb-3" />
               <p className="text-gray-500 font-medium">No program holders yet</p>
-              <p className="text-sm text-gray-400 mt-1">Program holder applications will appear here when submitted.</p>
+              <p className="text-sm text-gray-500 mt-1">Program holder applications will appear here when submitted.</p>
             </div>
           )}
         </div>

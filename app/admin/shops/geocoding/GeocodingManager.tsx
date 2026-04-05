@@ -189,7 +189,7 @@ export default function GeocodingManager({ shops }: Props) {
                   ) : currentShop === shop.id ? (
                     <Loader2 className="w-4 h-4 animate-spin text-brand-blue-600" />
                   ) : (
-                    <span className="text-gray-400 text-sm">Pending</span>
+                    <span className="text-gray-500 text-sm">Pending</span>
                   )}
                 </td>
                 <td className="px-4 py-3 text-right">

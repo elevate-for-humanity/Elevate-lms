@@ -62,7 +62,7 @@ export default function ApplyStartPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-slate-900 px-6 py-4 flex items-center justify-between">
         <Link href="/" className="text-white font-bold text-sm hover:text-brand-red-300 transition-colors">

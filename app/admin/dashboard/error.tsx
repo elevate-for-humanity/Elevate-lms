@@ -10,7 +10,7 @@ export default function DashboardError({
   reset: () => void;
 }) {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
+    <div className="min-h-screen bg-white flex items-center justify-center p-8">
       <div className="max-w-md w-full bg-white rounded-xl border border-brand-red-200 p-8 text-center">
         <div className="w-12 h-12 bg-brand-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
           <AlertTriangle className="w-6 h-6 text-brand-red-600" />

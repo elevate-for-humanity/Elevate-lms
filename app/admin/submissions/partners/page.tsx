@@ -27,7 +27,7 @@ export default async function PartnerEntitiesPage() {
   const approved = (partners ?? []).filter((p: any) => p.approved_for_use).length;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-5xl mx-auto px-4 py-8">
         <Link href="/admin/submissions" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 mb-6 transition">
           <ArrowLeft className="w-4 h-4" /> Submissions OS
@@ -96,7 +96,7 @@ export default async function PartnerEntitiesPage() {
                     <td className="px-4 py-3 text-xs text-slate-500">{p.relationship_type}</td>
                     <td className="px-4 py-3 text-xs text-slate-500">
                       {p.contact_name && <p>{p.contact_name}</p>}
-                      {p.contact_email && <p className="text-slate-400">{p.contact_email}</p>}
+                      {p.contact_email && <p className="text-slate-500">{p.contact_email}</p>}
                     </td>
                     <td className="px-4 py-3">
                       {p.approved_for_use

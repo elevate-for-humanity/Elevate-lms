@@ -39,7 +39,7 @@ export default function TestingPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-48 md:h-64 flex items-center overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/pages/career-services-page-1.jpg"
           alt="Workforce credential testing"
@@ -47,10 +47,13 @@ export default function TestingPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-black/40" />
-        <div className="relative z-10 max-w-5xl mx-auto px-4 w-full">
-          <h1 className="text-3xl md:text-4xl font-black text-white mb-2">Testing &amp; Credential Exams</h1>
-          <p className="text-white/90 text-lg">Authorized testing center for workforce certifications</p>
+      </section>
+
+      {/* Hero text — below image, never overlaid */}
+      <section className="bg-white border-b border-gray-100 py-8">
+        <div className="max-w-5xl mx-auto px-4">
+          <h1 className="text-3xl md:text-4xl font-black text-gray-900 mb-2">Testing &amp; Credential Exams</h1>
+          <p className="text-gray-600 text-lg">Authorized testing center for workforce certifications</p>
         </div>
       </section>
 

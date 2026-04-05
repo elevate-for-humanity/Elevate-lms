@@ -262,7 +262,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
           <div className="bg-white rounded-xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold">New Entity</h3>
-              <button onClick={() => setShowNewModal(false)}><X className="w-5 h-5" /></button>
+              <button onClick={() => setShowNewModal(false)} aria-label="Close"><X className="w-5 h-5" /></button>
             </div>
             <form onSubmit={(e) => { e.preventDefault(); const name = (e.target as any).legalName.value; createEntity(name); }}>
               <div className="mb-4">

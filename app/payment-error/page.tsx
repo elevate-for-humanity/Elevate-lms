@@ -53,7 +53,7 @@ function PaymentErrorContent() {
           </Link>
           <Link
             href="/"
-            className="text-sm text-gray-400 hover:text-gray-600 transition"
+            className="text-sm text-gray-500 hover:text-gray-600 transition"
           >
             Return to Home
           </Link>

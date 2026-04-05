@@ -266,7 +266,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
 
   if (existingTraining && new Date(existingTraining.completed_at) > new Date(Date.now() - 365 * 24 * 60 * 60 * 1000)) {
     return (
-      <div className="min-h-screen bg-slate-50 py-12">
+      <div className="min-h-screen bg-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
             <div className="text-center">
@@ -300,7 +300,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12">
+    <div className="min-h-screen bg-white py-12">
       <div className="max-w-4xl mx-auto px-4">
         {/* Progress Bar */}
         <div className="mb-8">

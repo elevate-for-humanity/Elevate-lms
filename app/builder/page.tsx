@@ -337,7 +337,7 @@ export default function BuildPage() {
                   <Loader2 className="w-5 h-5 text-brand-blue-400 animate-spin" />
                   <span className="text-white">Building your platform...</span>
                 </div>
-                <div className="space-y-2 text-sm text-slate-400">
+                <div className="space-y-2 text-sm text-slate-500">
                   <p className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-brand-green-400" /> Analyzing your requirements
                   </p>

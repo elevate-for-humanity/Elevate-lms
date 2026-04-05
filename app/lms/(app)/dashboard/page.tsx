@@ -214,7 +214,7 @@ export default async function StudentDashboard() {
               </h1>
 
               {/* Behavioral sub-copy */}
-              <p className="text-slate-400 text-sm mb-6 max-w-xl">
+              <p className="text-slate-500 text-sm mb-6 max-w-xl">
                 {isComplete
                   ? 'You finished all lessons. Your certification pathway is now open.'
                   : isFirstVisit

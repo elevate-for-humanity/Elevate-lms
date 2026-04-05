@@ -324,7 +324,7 @@ export default function EmployersPage() {
             Whether you need one hire or twenty, Elevate can connect you with trained candidates
             and help you access every dollar of workforce funding you are entitled to.
           </p>
-          <p className="text-sm text-slate-400 mb-8 max-w-xl mx-auto">
+          <p className="text-sm text-slate-500 mb-8 max-w-xl mx-auto">
             No contracts. No fees. No obligation. Just a conversation about what you need
             and what programs are available for your business.
           </p>

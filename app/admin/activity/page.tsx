@@ -91,7 +91,7 @@ export default async function ActivityLogPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       {/* Header */}

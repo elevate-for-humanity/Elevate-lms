@@ -37,7 +37,7 @@ export default async function NewModulePage() {
     .order('name');
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-white p-8">
 
       {/* Hero Image */}
       <div className="max-w-4xl mx-auto">

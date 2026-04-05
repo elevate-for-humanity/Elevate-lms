@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { approveApplication } from '@/lib/enrollment/approve';
 import { logger } from '@/lib/logger';
+import { safeInternalError } from '@/lib/api/safe-error';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -166,7 +167,7 @@ export async function POST(req: NextRequest) {
     if (updateError) {
       logger.error('[process] status update failed', updateError);
       return NextResponse.json(
-        { error: 'Failed to update application status', completed_steps: steps },
+        { error: 'Status update failed', completed_steps: steps },
         { status: 500 },
       );
     }
@@ -189,7 +190,7 @@ export async function POST(req: NextRequest) {
     if (auditError) {
       logger.error('[process] audit log failed', auditError);
       return NextResponse.json(
-        { error: 'Failed to record audit log', completed_steps: steps },
+        { error: 'Audit log failed', completed_steps: steps },
         { status: 500 },
       );
     }

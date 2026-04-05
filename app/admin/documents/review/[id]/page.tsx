@@ -74,7 +74,7 @@ export default async function ReviewDocumentPage({
   const documentWithUrl = { ...document, file_url: viewUrl };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="border-b py-8">

@@ -26,7 +26,7 @@ export default async function BlogAdminPage() {
   const archivedCount = posts?.filter(p => p.status === 'archived').length || 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Hero Image */}
 
       <div className="container mx-auto px-4 py-8">

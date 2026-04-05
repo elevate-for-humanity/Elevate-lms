@@ -76,7 +76,7 @@ export default function BarberSettingsPage() {
 
         {/* Notifications */}
         <div>
-          <h2 className="text-slate-400 text-sm font-medium mb-3 px-1">NOTIFICATIONS</h2>
+          <h2 className="text-slate-500 text-sm font-medium mb-3 px-1">NOTIFICATIONS</h2>
           <div className="bg-slate-800 rounded-xl overflow-hidden">
             {supported ? (
               <button
@@ -114,7 +114,7 @@ export default function BarberSettingsPage() {
                 )}
               </button>
             ) : (
-              <div className="p-4 text-slate-400 text-sm">
+              <div className="p-4 text-slate-500 text-sm">
                 Push notifications are not supported on this device
               </div>
             )}
@@ -123,7 +123,7 @@ export default function BarberSettingsPage() {
 
         {/* Appearance */}
         <div>
-          <h2 className="text-slate-400 text-sm font-medium mb-3 px-1">APPEARANCE</h2>
+          <h2 className="text-slate-500 text-sm font-medium mb-3 px-1">APPEARANCE</h2>
           <div className="bg-slate-800 rounded-xl overflow-hidden">
             <button
               onClick={() => setDarkMode(!darkMode)}
@@ -153,7 +153,7 @@ export default function BarberSettingsPage() {
 
         {/* Support */}
         <div>
-          <h2 className="text-slate-400 text-sm font-medium mb-3 px-1">SUPPORT</h2>
+          <h2 className="text-slate-500 text-sm font-medium mb-3 px-1">SUPPORT</h2>
           <div className="bg-slate-800 rounded-xl overflow-hidden divide-y divide-slate-700">
             <Link href="/support/help" className="flex items-center justify-between p-4 active:bg-slate-700">
               <div className="flex items-center gap-4">

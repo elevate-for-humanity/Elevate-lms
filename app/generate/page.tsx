@@ -93,7 +93,7 @@ export default function GenerateSitePage() {
             <Sparkles className="w-6 h-6 text-brand-blue-400" />
             <span className="font-bold text-lg">Elevate LMS Generator</span>
           </div>
-          <div className="text-sm text-slate-400">
+          <div className="text-sm text-slate-500">
             {step === 'info' && 'Step 1 of 3'}
             {step === 'details' && 'Step 2 of 3'}
             {step === 'generating' && 'Generating...'}
@@ -268,7 +268,7 @@ export default function GenerateSitePage() {
             <p className="text-slate-600">
               AI is generating your custom LMS configuration
             </p>
-            <div className="mt-8 space-y-2 text-sm text-slate-400">
+            <div className="mt-8 space-y-2 text-sm text-slate-500">
               <p>• Analyzing your organization type</p>
               <p>• Generating brand colors and styling</p>
               <p>• Creating homepage content</p>

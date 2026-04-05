@@ -25,7 +25,7 @@ const navLinks = [
 
 export default async function AboutPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <UniversalNav
         links={navLinks}
         ctaText="Donate"

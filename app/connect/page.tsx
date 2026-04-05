@@ -320,7 +320,7 @@ export default function ConnectPage() {
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-slate-400 text-sm mb-1">Site ID</label>
+                  <label className="block text-slate-500 text-sm mb-1">Site ID</label>
                   <div className="flex">
                     <code className="flex-1 px-4 py-2 bg-slate-700 rounded-l-lg text-cyan-400 font-mono text-sm">
                       {integration.siteId}
@@ -334,7 +334,7 @@ export default function ConnectPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-slate-400 text-sm mb-1">API Key</label>
+                  <label className="block text-slate-500 text-sm mb-1">API Key</label>
                   <div className="flex">
                     <code className="flex-1 px-4 py-2 bg-slate-700 rounded-l-lg text-cyan-400 font-mono text-sm truncate">
                       {integration.apiKey}

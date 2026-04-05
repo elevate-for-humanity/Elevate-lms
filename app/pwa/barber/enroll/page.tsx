@@ -130,7 +130,7 @@ export default function BarberEnrollPage() {
 
           <div className="bg-slate-800 rounded-xl p-4">
             <h3 className="text-white font-semibold mb-3">Requirements</h3>
-            <ul className="space-y-2 text-sm text-slate-400">
+            <ul className="space-y-2 text-sm text-slate-500">
               <li>• Must be at least 16 years old</li>
               <li>• High school diploma or GED (or currently enrolled)</li>
               <li>• Commitment to complete 2,000 hours</li>
@@ -251,7 +251,7 @@ export default function BarberEnrollPage() {
           )}
 
           <div className="bg-slate-800 rounded-xl p-4">
-            <h3 className="text-slate-400 text-sm mb-3">Training Location</h3>
+            <h3 className="text-slate-500 text-sm mb-3">Training Location</h3>
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
                 <Scissors className="w-6 h-6 text-brand-blue-400" />
@@ -266,7 +266,7 @@ export default function BarberEnrollPage() {
           </div>
 
           <div className="bg-slate-800 rounded-xl p-4">
-            <h3 className="text-slate-400 text-sm mb-3">Program Details</h3>
+            <h3 className="text-slate-500 text-sm mb-3">Program Details</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-slate-500">Program</span>

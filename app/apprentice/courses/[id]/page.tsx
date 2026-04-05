@@ -166,7 +166,7 @@ export default async function ApprenticeCourseDetailPage({
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <div className="flex items-center gap-4 mt-3 text-sm text-slate-400">
+            <div className="flex items-center gap-4 mt-3 text-sm text-slate-500">
               <span className="flex items-center gap-1">
                 <BookOpen className="w-4 h-4" />
                 {moduleData.length} modules

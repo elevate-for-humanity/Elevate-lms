@@ -156,7 +156,7 @@ export default function ExamAuthWorkQueue({
       </div>
 
       {filtered.length === 0 ? (
-        <div className="px-6 py-12 text-center text-gray-400 text-sm">
+        <div className="px-6 py-12 text-center text-gray-500 text-sm">
           No items in this view.
         </div>
       ) : (

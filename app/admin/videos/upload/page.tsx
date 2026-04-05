@@ -21,7 +21,7 @@ export default async function UploadVideosPage() {
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
         <Image src="/images/pages/admin-videos-upload-hero.jpg" alt="Upload videos" fill sizes="100vw" className="object-cover" priority />
       </section>

@@ -36,7 +36,7 @@ export default async function AdminMarketplacePage() {
   await requireAdmin();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-5xl mx-auto px-4 py-8">
         <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Marketplace' }]} />
         <h1 className="text-2xl font-bold text-gray-900 mt-4 mb-6">Marketplace</h1>

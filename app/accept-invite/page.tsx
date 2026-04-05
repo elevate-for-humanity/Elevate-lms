@@ -44,7 +44,7 @@ export default async function AcceptInvitePage({ searchParams }: Props) {
   const { data: { user } } = await supabase.auth.getUser();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 max-w-md w-full">
         <div className="mb-6 text-center">
           <h1 className="text-xl font-semibold text-gray-900">Organization Invitation</h1>

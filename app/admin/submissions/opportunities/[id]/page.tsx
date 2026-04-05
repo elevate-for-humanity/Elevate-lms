@@ -129,7 +129,7 @@ export default function OpportunityProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
       </div>
     );
@@ -137,7 +137,7 @@ export default function OpportunityProfilePage() {
 
   if (!opp) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center gap-4">
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4">
         <p className="text-slate-500">Opportunity not found.</p>
         <Link href="/admin/submissions/opportunities" className="text-brand-blue-600 hover:underline text-sm">
           ← Back to Opportunities
@@ -150,7 +150,7 @@ export default function OpportunityProfilePage() {
     setOpp(prev => prev ? { ...prev, [key]: e.target.value } : prev);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
 
         {/* Header */}
@@ -330,7 +330,7 @@ export default function OpportunityProfilePage() {
             )}
 
             {reqs.length === 0 ? (
-              <p className="text-sm text-slate-400 text-center py-6">No requirements mapped yet.</p>
+              <p className="text-sm text-slate-500 text-center py-6">No requirements mapped yet.</p>
             ) : (
               <div className="space-y-2">
                 {reqs.map(req => (

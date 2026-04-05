@@ -21,7 +21,7 @@ export default async function InstructorPerformancePage() {
   const { data: instructors } = await supabase.from('profiles').select('*').eq('role', 'instructor').limit(10);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-8">

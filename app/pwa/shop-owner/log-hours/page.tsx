@@ -147,7 +147,7 @@ export default function ShopLogHoursPage() {
 
             {/* Apprentice Selection */}
             <div>
-              <label className="block text-slate-400 text-sm mb-2">Select Apprentice</label>
+              <label className="block text-slate-500 text-sm mb-2">Select Apprentice</label>
               <div className="space-y-2">
                 {apprentices.map((apprentice) => (
                   <button
@@ -178,7 +178,7 @@ export default function ShopLogHoursPage() {
 
             {/* Week Ending Date */}
             <div>
-              <label className="block text-slate-400 text-sm mb-2">Week Ending (Friday)</label>
+              <label className="block text-slate-500 text-sm mb-2">Week Ending (Friday)</label>
               <div className="relative">
                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <input
@@ -193,7 +193,7 @@ export default function ShopLogHoursPage() {
 
             {/* Hours */}
             <div>
-              <label className="block text-slate-400 text-sm mb-2">Hours Worked This Week</label>
+              <label className="block text-slate-500 text-sm mb-2">Hours Worked This Week</label>
               <div className="relative">
                 <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <input
@@ -230,7 +230,7 @@ export default function ShopLogHoursPage() {
 
             {/* Notes */}
             <div>
-              <label className="block text-slate-400 text-sm mb-2">Notes (optional)</label>
+              <label className="block text-slate-500 text-sm mb-2">Notes (optional)</label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}

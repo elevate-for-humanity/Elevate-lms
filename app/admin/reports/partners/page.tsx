@@ -51,7 +51,7 @@ export default async function PartnerReportsPage() {
   const inquiries = recentInquiries || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -107,7 +107,7 @@ export default async function PartnerReportsPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-400 text-sm py-4 text-center">No partners found.</p>
+              <p className="text-gray-500 text-sm py-4 text-center">No partners found.</p>
             )}
           </div>
 
@@ -144,7 +144,7 @@ export default async function PartnerReportsPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-400 text-sm py-4 text-center">No inquiries yet.</p>
+              <p className="text-gray-500 text-sm py-4 text-center">No inquiries yet.</p>
             )}
           </div>
         </div>

@@ -197,7 +197,7 @@ function SessionRow({ session }: { session: ExamSession }) {
             {session.exam_name} &middot; {providerLabel} &middot; {date} at {time}
           </p>
         </div>
-        <div className="flex items-center gap-3 text-sm text-slate-400">
+        <div className="flex items-center gap-3 text-sm text-slate-500">
           {session.id_verified && (
             <span className="inline-flex items-center gap-1 text-brand-green-600">
               <CheckCircle2 className="w-3.5 h-3.5" /> ID

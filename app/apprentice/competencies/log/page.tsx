@@ -139,7 +139,7 @@ function LogCompetencyForm() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-10 text-center max-w-sm w-full">
           <CheckCircle2 className="w-14 h-14 text-green-500 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-slate-900 mb-2">Entry Saved</h2>
@@ -160,7 +160,7 @@ function LogCompetencyForm() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-2xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
@@ -215,7 +215,7 @@ function LogCompetencyForm() {
                 Competency / Service <span className="text-red-500">*</span>
               </label>
               {loadingSkills ? (
-                <div className="w-full px-4 py-3 border border-slate-200 rounded-lg bg-slate-50 text-slate-400 text-sm">
+                <div className="w-full px-4 py-3 border border-slate-200 rounded-lg bg-slate-50 text-slate-500 text-sm">
                   Loading competencies…
                 </div>
               ) : (

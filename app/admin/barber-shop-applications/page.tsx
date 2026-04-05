@@ -127,7 +127,7 @@ export default async function BarberShopApplicationsPage() {
   const denied = rows.filter(r => r.status === 'denied');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Barber Shop Applications' }]} />
       </div>

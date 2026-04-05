@@ -203,7 +203,7 @@ export default async function AlumniDirectoryPage() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
             <GraduationCap className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500">No alumni profiles available yet</p>
-            <p className="text-sm text-gray-400 mt-1">Complete a program to join the alumni network</p>
+            <p className="text-sm text-gray-500 mt-1">Complete a program to join the alumni network</p>
           </div>
         )}
 

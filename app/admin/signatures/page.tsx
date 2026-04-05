@@ -33,7 +33,7 @@ export default async function SignaturesPage() {
   const completedSignatures = rows.filter((s: any) => s.status === 'completed' || s.signed_at).length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
         <div className="max-w-7xl mx-auto px-4 py-4">

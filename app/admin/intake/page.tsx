@@ -77,7 +77,7 @@ export default function AdminIntakePage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-white p-6">
 
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
@@ -442,7 +442,7 @@ function IntakeDetailModal({
             <h2 className="text-xl font-bold text-gray-900">Process Intake</h2>
             <p className="text-sm text-gray-600">{intake.user_name} - {intake.program_name}</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} aria-label="Close" className="text-gray-400 hover:text-gray-600">
             <XCircle className="w-6 h-6" />
           </button>
         </div>

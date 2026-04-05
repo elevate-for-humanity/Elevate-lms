@@ -245,7 +245,7 @@ export default function HvacCourseLicensePage() {
                   <Check className="w-4 h-4 text-brand-green-400 flex-shrink-0 mt-0.5" />
                   <h3 className="font-bold text-white text-sm">{item.title}</h3>
                 </div>
-                <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
+                <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>

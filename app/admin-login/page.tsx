@@ -68,7 +68,7 @@ export default function AdminLoginPage() {
             <Shield className="w-10 h-10 text-cyan-400" />
             <div>
               <div className="text-2xl font-bold text-white">Admin Dashboard</div>
-              <div className="text-sm text-gray-400">Elevate for Humanity</div>
+              <div className="text-sm text-gray-500">Elevate for Humanity</div>
             </div>
           </div>
           <p className="text-gray-300 text-lg max-w-md">
@@ -97,7 +97,7 @@ export default function AdminLoginPage() {
 
           <div className="hidden lg:block mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">Sign In</h1>
-            <p className="text-gray-400">Enter your administrator credentials</p>
+            <p className="text-gray-500">Enter your administrator credentials</p>
           </div>
 
           {error && (

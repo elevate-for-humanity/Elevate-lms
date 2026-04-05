@@ -171,7 +171,7 @@ export default async function FerpaDocumentationPage() {
                           Download
                         </a>
                       ) : (
-                        <span className="text-sm text-gray-400">No file</span>
+                        <span className="text-sm text-gray-500">No file</span>
                       )}
                     </div>
                   ))}

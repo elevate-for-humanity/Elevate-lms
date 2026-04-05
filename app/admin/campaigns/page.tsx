@@ -87,7 +87,7 @@ export default async function AdminCampaignsPage() {
   const clickRate = totalOpened > 0 ? ((totalClicked / totalOpened) * 100).toFixed(1) : '0';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       {/* Breadcrumbs */}

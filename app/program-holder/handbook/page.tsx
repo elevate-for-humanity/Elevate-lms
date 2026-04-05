@@ -47,7 +47,7 @@ export default async function ProgramHolderHandbookPage() {
               <p className="text-slate-300 mt-2">Elevate for Humanity — Required Reading Before You Begin</p>
             </div>
           </div>
-          <p className="text-slate-400 text-sm mt-4 max-w-2xl">
+          <p className="text-slate-500 text-sm mt-4 max-w-2xl">
             This handbook explains how the Training Network operates, what is expected of you, how you get paid,
             and what your rights are — including your right to exit. Every section is non-negotiable.
             Read it fully before acknowledging.

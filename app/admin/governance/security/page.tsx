@@ -43,7 +43,7 @@ export default function SecurityDocumentPage() {
               <Shield className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-slate-400 text-sm">Document 2 of 7</p>
+              <p className="text-slate-500 text-sm">Document 2 of 7</p>
               <h1 className="text-2xl md:text-3xl font-bold">
                 Security & Data Protection Statement
               </h1>
@@ -52,7 +52,7 @@ export default function SecurityDocumentPage() {
           <p className="text-slate-300">
             2Exclusive LLC-S (d/b/a Elevate for Humanity Career &amp; Technical Institute)
           </p>
-          <div className="mt-4 flex flex-wrap gap-4 text-sm text-slate-400">
+          <div className="mt-4 flex flex-wrap gap-4 text-sm text-slate-500">
             <span>Version: 1.0</span>
             <span>•</span>
             <span>Last Reviewed: {currentDate}</span>

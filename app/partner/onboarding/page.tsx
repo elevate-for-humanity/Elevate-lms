@@ -352,7 +352,7 @@ export default function PartnerOnboardingPage() {
                           {uploaded && <p className="text-sm text-brand-green-600">{uploaded.name}</p>}
                         </div>
                         {uploaded ? (
-                          <button onClick={() => removeFile(docType)} className="text-brand-red-500 hover:text-brand-red-700">
+                          <button onClick={() => removeFile(docType)} aria-label="Remove file" className="text-brand-red-500 hover:text-brand-red-700">
                             <X className="w-5 h-5" />
                           </button>
                         ) : (

@@ -21,7 +21,7 @@ export default async function LeavePage() {
   const { data: requests } = await supabase.from('leave_requests').select('*, profiles!inner(full_name)').eq('status', 'pending').order('created_at', { ascending: false });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-8">

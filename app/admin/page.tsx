@@ -157,7 +157,7 @@ export default async function AdminLandingPage() {
                   <p className="font-semibold text-slate-900 truncate">
                     {app.full_name ?? `${app.first_name ?? ''} ${app.last_name ?? ''}`.trim() || 'Unknown applicant'}
                   </p>
-                  <p className="text-sm text-slate-400 truncate">{app.program_interest ?? 'No program specified'}</p>
+                  <p className="text-sm text-slate-500 truncate">{app.program_interest ?? 'No program specified'}</p>
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0 ml-4">
                   <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${app.urgent ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'}`}>
@@ -192,7 +192,7 @@ export default async function AdminLandingPage() {
               >
                 <div className="min-w-0">
                   <p className="font-semibold text-slate-900 truncate">{learner.fullName ?? 'Unknown learner'}</p>
-                  <p className="text-sm text-slate-400 truncate">{learner.email ?? '—'}</p>
+                  <p className="text-sm text-slate-500 truncate">{learner.email ?? '—'}</p>
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0 ml-4">
                   <span className="text-xs text-slate-400">Enrolled {fmtDate(learner.enrolledAt)}</span>
@@ -225,7 +225,7 @@ export default async function AdminLandingPage() {
               >
                 <div className="min-w-0">
                   <p className="font-semibold text-slate-900 truncate">{student.full_name ?? 'Unknown student'}</p>
-                  <p className="text-sm text-slate-400 truncate">{student.program_name ?? student.email ?? '—'}</p>
+                  <p className="text-sm text-slate-500 truncate">{student.program_name ?? student.email ?? '—'}</p>
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0 ml-4">
                   <span className="text-xs text-slate-400">{fmtDate(student.created_at)}</span>

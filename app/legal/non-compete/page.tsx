@@ -32,7 +32,7 @@ export default function NonCompetePage() {
               <p className="text-slate-300 mt-1">Elevate for Humanity — Effective upon execution of any partnership, MOU, or Program Holder agreement</p>
             </div>
           </div>
-          <p className="text-slate-400 text-sm mt-3">
+          <p className="text-slate-500 text-sm mt-3">
             Last Updated: January 2025 · Governed by Indiana law · Incorporated by reference into all Elevate partner agreements
           </p>
         </div>

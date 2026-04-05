@@ -222,7 +222,7 @@ export default function ImportSitePage() {
             <p className="text-slate-600 mb-8">
               {url}
             </p>
-            <div className="space-y-3 text-sm text-slate-400 max-w-xs mx-auto text-left">
+            <div className="space-y-3 text-sm text-slate-500 max-w-xs mx-auto text-left">
               <p className="flex items-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 Fetching pages...
@@ -317,7 +317,7 @@ export default function ImportSitePage() {
               
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-slate-400 text-sm mb-1">Site Name</label>
+                  <label className="block text-slate-500 text-sm mb-1">Site Name</label>
                   <input
                     type="text"
                     value={config.branding.logoText}
@@ -326,7 +326,7 @@ export default function ImportSitePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 text-sm mb-1">Tagline</label>
+                  <label className="block text-slate-500 text-sm mb-1">Tagline</label>
                   <input
                     type="text"
                     value={config.branding.tagline}
@@ -338,7 +338,7 @@ export default function ImportSitePage() {
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-slate-400 text-sm mb-1">Primary Color</label>
+                  <label className="block text-slate-500 text-sm mb-1">Primary Color</label>
                   <div className="flex gap-2">
                     <input
                       type="color"
@@ -355,7 +355,7 @@ export default function ImportSitePage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-slate-400 text-sm mb-1">Secondary</label>
+                  <label className="block text-slate-500 text-sm mb-1">Secondary</label>
                   <div className="flex gap-2">
                     <input
                       type="color"
@@ -372,7 +372,7 @@ export default function ImportSitePage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-slate-400 text-sm mb-1">Accent</label>
+                  <label className="block text-slate-500 text-sm mb-1">Accent</label>
                   <div className="flex gap-2">
                     <input
                       type="color"

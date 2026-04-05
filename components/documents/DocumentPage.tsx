@@ -34,7 +34,7 @@ export function DocumentPage({
   children,
 }: Props) {
   return (
-    <div className="min-h-screen bg-slate-50 print:bg-white">
+    <div className="min-h-screen bg-white print:bg-white">
       <div className="max-w-4xl mx-auto px-6 py-8 bg-white print:shadow-none shadow-sm border border-slate-200 print:border-0 my-8 print:my-0">
         <InstitutionalHeader
           documentType={documentType}

@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function BoothRentalSuccessPage() {
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="max-w-lg w-full space-y-6">
 
         <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-4">
@@ -49,7 +49,7 @@ export default function BoothRentalSuccessPage() {
 
         <div className="text-center space-y-2">
           <p className="text-sm text-slate-500">Questions? Call or text <a href="tel:3173143757" className="font-semibold text-brand-blue-600">(317) 314-3757</a></p>
-          <Link href="/" className="text-sm text-slate-400 hover:text-slate-600">← Back to home</Link>
+          <Link href="/" className="text-sm text-slate-500 hover:text-slate-600">← Back to home</Link>
         </div>
 
       </div>

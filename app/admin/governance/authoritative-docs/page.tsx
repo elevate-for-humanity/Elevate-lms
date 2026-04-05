@@ -51,7 +51,7 @@ const documents = (dbRows as any[]) || [];
             These seven documents define how the platform operates. They are designed to 
             stand alone during buyer review, regulatory review, or payment processor review.
           </p>
-          <div className="mt-6 text-sm text-slate-400">
+          <div className="mt-6 text-sm text-slate-500">
             Version: 1.0 • Last reviewed: {currentDate} • Owner: Platform Governance
           </div>
         </div>

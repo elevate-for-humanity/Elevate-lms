@@ -526,7 +526,7 @@ export default async function LearnerDashboardPage() {
                   <div className="p-10 text-center">
                     <BookOpen className="w-10 h-10 text-gray-300 mx-auto mb-3" />
                     <h3 className="text-base font-medium text-gray-900 mb-1">No active programs yet</h3>
-                    <p className="text-sm text-gray-400">Once you enroll, your programs will appear here. See the WIOA-Funded Programs section below to get started.</p>
+                    <p className="text-sm text-gray-500">Once you enroll, your programs will appear here. See the WIOA-Funded Programs section below to get started.</p>
                   </div>
                 )}
               </div>

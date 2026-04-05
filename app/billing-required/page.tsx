@@ -30,7 +30,7 @@ function BillingRequiredContent() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="max-w-lg w-full">
 
         {updated ? (
@@ -124,7 +124,7 @@ function BillingRequiredContent() {
 export default function BillingRequiredPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
       </div>
     }>

@@ -62,7 +62,7 @@ export default async function CompliancePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       {/* Breadcrumbs */}
@@ -236,7 +236,7 @@ export default async function CompliancePage() {
                       {shouldAutoEnforce(g) ? (
                         <span className="text-brand-green-600 text-sm font-medium">Yes</span>
                       ) : (
-                        <span className="text-gray-400 text-sm">Manual</span>
+                        <span className="text-gray-500 text-sm">Manual</span>
                       )}
                     </td>
                     <td className="px-6 py-3 text-sm text-gray-700 capitalize">{g.enforcementAction.replace(/_/g, ' ')}</td>

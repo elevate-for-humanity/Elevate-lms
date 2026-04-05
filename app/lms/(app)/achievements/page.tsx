@@ -392,7 +392,7 @@ export default async function AchievementsPage() {
                     </div>
                     <h3 className="font-bold text-slate-700 mb-1">{milestone.title}</h3>
                     <p className="text-sm text-slate-500 mb-2">{milestone.description}</p>
-                    <div className="flex items-center justify-center gap-1 text-slate-400 text-sm">
+                    <div className="flex items-center justify-center gap-1 text-slate-500 text-sm">
                       <Star className="w-4 h-4" />
                       {milestone.points} pts
                     </div>

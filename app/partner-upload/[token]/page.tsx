@@ -14,10 +14,10 @@ export default async function PartnerUploadPage({ params }: { params: { token: s
   if (!partner) notFound()
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-[#1E293B] py-4 px-6">
         <p className="text-white font-bold text-lg">Elevate for Humanity</p>
-        <p className="text-slate-400 text-sm">Partner Document Upload</p>
+        <p className="text-slate-500 text-sm">Partner Document Upload</p>
       </div>
       <div className="max-w-xl mx-auto px-4 py-10">
         <div className="bg-white rounded-xl border border-gray-200 p-8">

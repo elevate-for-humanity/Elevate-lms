@@ -97,7 +97,7 @@ export default async function LinkAccountsPage() {
   const noMatch = results.filter(r => !r.matchedUserId);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
@@ -128,7 +128,7 @@ export default async function LinkAccountsPage() {
           <div className="bg-white rounded-xl border border-slate-200 p-10 text-center">
             <CheckCircle2 className="w-10 h-10 text-green-500 mx-auto mb-3" />
             <p className="font-semibold text-slate-700">All apprentice records are linked</p>
-            <p className="text-sm text-slate-400 mt-1">No missing <code className="text-xs bg-slate-100 px-1 rounded">user_id</code> values found.</p>
+            <p className="text-sm text-slate-500 mt-1">No missing <code className="text-xs bg-slate-100 px-1 rounded">user_id</code> values found.</p>
           </div>
         ) : (
           <div className="space-y-6">

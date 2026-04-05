@@ -223,7 +223,7 @@ export default function StateBoardPrepPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <h3 className="font-bold text-white">{test.title}</h3>
-                      <div className="flex items-center gap-4 mt-2 text-sm text-slate-400">
+                      <div className="flex items-center gap-4 mt-2 text-sm text-slate-500">
                         <span className="flex items-center gap-1">
                           <FileText className="w-4 h-4" />
                           {test.question_count} questions

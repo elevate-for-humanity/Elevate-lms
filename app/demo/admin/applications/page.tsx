@@ -94,7 +94,7 @@ export default function DemoApplicationsPage() {
       {/* Applications list */}
       <div className="space-y-3">
         {filtered.length === 0 && (
-          <div className="text-center py-12 text-gray-400 text-sm">No applications match your search.</div>
+          <div className="text-center py-12 text-gray-500 text-sm">No applications match your search.</div>
         )}
         {filtered.map((s: any) => (
           <div key={s.id} className="bg-white rounded-xl border overflow-hidden hover:shadow-sm transition">

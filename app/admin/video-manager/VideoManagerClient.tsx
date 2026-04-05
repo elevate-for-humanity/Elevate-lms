@@ -63,7 +63,7 @@ export default function VideoManagerPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-white p-6">
 
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto">

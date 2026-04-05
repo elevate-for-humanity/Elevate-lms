@@ -103,7 +103,7 @@ export default async function GovernancePage() {
             This page provides a clear overview of how the platform is governed, documented, 
             and controlled across the public site, LMS, Store, and affiliated services.
           </p>
-          <div className="mt-6 text-sm text-slate-400">
+          <div className="mt-6 text-sm text-slate-500">
             Last reviewed: {currentDate} • Owner: Platform Governance
           </div>
         </div>

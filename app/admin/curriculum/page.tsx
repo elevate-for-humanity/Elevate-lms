@@ -87,7 +87,7 @@ export default async function CurriculumPage() {
   const totalLessons = courses.reduce((sum, c) => sum + c.total, 0);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
@@ -137,7 +137,7 @@ export default async function CurriculumPage() {
           <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
             <Layers className="w-10 h-10 text-slate-300 mx-auto mb-3" />
             <p className="text-slate-500 font-medium">No course lessons found.</p>
-            <p className="text-sm text-slate-400 mt-1">
+            <p className="text-sm text-slate-500 mt-1">
               Run the curriculum generator or AI builder to seed lessons.
             </p>
             <Link

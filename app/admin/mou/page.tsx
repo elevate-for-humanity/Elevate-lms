@@ -21,7 +21,7 @@ export default async function MOUPage() {
   const { data: mous, count } = await supabase.from('partner_mous').select('*, partners:partner_id(name)', { count: 'exact' }).order('created_at', { ascending: false }).limit(20);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-8">

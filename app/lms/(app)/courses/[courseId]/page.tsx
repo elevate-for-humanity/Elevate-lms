@@ -195,7 +195,7 @@ export default async function CoursePage({ params }: { params: Params }) {
   // ── Enrolled learner view — completely different hierarchy ───────────
   if (isEnrolled) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-white">
 
         {/* ENROLLED HERO — compact, action-first */}
         <div className="relative h-[180px] sm:h-[220px] w-full overflow-hidden bg-slate-900">
@@ -421,7 +421,7 @@ export default async function CoursePage({ params }: { params: Params }) {
 
   // ── Unenrolled / marketing view ───────────────────────────────────────
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
 
       {/* HERO */}
       <div className="relative h-[340px] sm:h-[440px] w-full overflow-hidden bg-slate-900">

@@ -34,7 +34,7 @@ export default async function EtplDashboard() {
   const wotc = await getWotcMetrics();
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8 px-4">
+    <div className="min-h-screen bg-white py-8 px-4">
 
       {/* Hero Image */}
             <div className="max-w-7xl mx-auto px-4 py-4">

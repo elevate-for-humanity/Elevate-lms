@@ -63,7 +63,7 @@ export default async function AdminFerpaPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       {/* Breadcrumbs */}

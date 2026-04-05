@@ -46,7 +46,7 @@ export default async function ReportsPage() {
     .limit(20);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Programs', href: '/programs' },

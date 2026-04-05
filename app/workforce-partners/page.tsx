@@ -41,7 +41,7 @@ export default function WorkforcePartnersPage() {
               Refer a Program or Cohort
             </a>
           </div>
-          <p className="mt-6 text-slate-400 text-sm">
+          <p className="mt-6 text-slate-500 text-sm">
             Call or text: <a href="tel:3173143757" className="text-white font-semibold hover:text-brand-red-300">(317) 314-3757</a>
           </p>
         </div>

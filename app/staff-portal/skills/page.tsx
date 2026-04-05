@@ -101,7 +101,7 @@ export default async function StaffSkillsPage() {
       <div className="bg-brand-blue-700 text-white py-10">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-2xl font-bold mb-1">Staff Skills Checklist</h1>
-          <p className="text-slate-400 text-sm mb-6">Track your professional development and competencies</p>
+          <p className="text-slate-500 text-sm mb-6">Track your professional development and competencies</p>
           <div className="flex items-center gap-4">
             <div className="flex-1 bg-white rounded-full h-3">
               <div className="bg-white h-3 rounded-full transition-all" style={{ width: `${pct}%` }} />

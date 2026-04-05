@@ -25,7 +25,7 @@ export default async function QuizQuestionsPage({ params }: { params: Promise<{ 
   const { data: questions } = await supabase.from('quiz_questions').select('*').eq('quiz_id', quizId).order('order_index');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <div className="max-w-4xl mx-auto px-4 py-8">

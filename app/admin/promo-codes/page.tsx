@@ -152,7 +152,7 @@ export default function PromoCodesAdminPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
 
       {/* Hero Image */}
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -164,7 +164,7 @@ export default function PromoCodesAdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Promo Codes" }]} />
         </div>
@@ -417,7 +417,7 @@ export default function PromoCodesAdminPage() {
                             {new Date(promo.valid_until).toLocaleDateString()}
                           </span>
                         ) : (
-                          <span className="text-sm text-gray-400">Never</span>
+                          <span className="text-sm text-gray-500">Never</span>
                         )}
                       </td>
                       <td className="px-6 py-4">

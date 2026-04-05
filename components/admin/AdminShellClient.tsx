@@ -20,7 +20,23 @@ export default function AdminShellClient({
   notifs,
 }: AdminShellClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
   const pathname = usePathname();
+
+  // Initialise dark mode from localStorage only — never auto-apply OS preference
+  useEffect(() => {
+    const stored = localStorage.getItem("admin-dark-mode");
+    const enabled = stored === "true"; // default is always light
+    setDarkMode(enabled);
+    document.documentElement.classList.toggle("dark", enabled);
+  }, []);
+
+  function toggleDark() {
+    const next = !darkMode;
+    setDarkMode(next);
+    localStorage.setItem("admin-dark-mode", String(next));
+    document.documentElement.classList.toggle("dark", next);
+  }
 
   // Close sidebar on route change
   useEffect(() => {
@@ -34,21 +50,23 @@ export default function AdminShellClient({
   }, [sidebarOpen]);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      {/* Sidebar — receives open state */}
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+      {/* Sidebar */}
       <AdminSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Main area — offset on desktop by sidebar width */}
+      {/* Main area */}
       <div className="lg:pl-64 flex flex-col min-h-screen">
-        {/* Header — passes hamburger trigger down */}
+        {/* Header */}
         <AdminHeader
           userName={userName}
           userInitial={userInitial}
           notifs={notifs}
           onMenuClick={() => setSidebarOpen(true)}
+          darkMode={darkMode}
+          onToggleDark={toggleDark}
         />
 
-        {/* Content — pt-16 matches header height, pb-20 clears mobile bottom nav */}
+        {/* Content */}
         <main
           id="main-content"
           className="flex-1 pt-16 pb-20 lg:pb-8 px-4 sm:px-6 lg:px-8"

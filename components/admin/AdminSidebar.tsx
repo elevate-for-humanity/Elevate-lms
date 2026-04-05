@@ -222,11 +222,18 @@ function SidebarSection({ section, pathname, onNav }: {
           return (
             <Link key={item.href} href={item.href} onClick={onNav}
               className={[
-                "flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium transition-colors",
-                active ? "bg-brand-blue-600 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white",
+                "group flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium",
+                "transition-all duration-150 ease-out",
+                active
+                  ? "bg-brand-blue-600 text-white shadow-sm shadow-brand-blue-900/40"
+                  : "text-slate-300 hover:bg-slate-800 hover:text-white hover:translate-x-0.5",
               ].join(" ")}>
-              <Icon className={`h-4 w-4 flex-shrink-0 ${active ? "text-white" : "text-slate-400"}`} />
+              <Icon className={[
+                "h-4 w-4 flex-shrink-0 transition-transform duration-150",
+                active ? "text-white" : "text-slate-400 group-hover:text-white group-hover:scale-110",
+              ].join(" ")} />
               <span className="truncate">{item.label}</span>
+              {active && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-white/60 flex-shrink-0" />}
             </Link>
           );
         })}

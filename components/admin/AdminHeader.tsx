@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { Bell, ChevronDown, Search, Settings, LogOut, ExternalLink, Menu } from "lucide-react";
+import { Bell, ChevronDown, Search, Settings, LogOut, ExternalLink, Menu, Moon, Sun } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 export interface AdminHeaderNotif {
@@ -19,13 +19,15 @@ export interface AdminHeaderProps {
   userInitial?: string;
   notifs?: AdminHeaderNotif[];
   onMenuClick?: () => void;
+  darkMode?: boolean;
+  onToggleDark?: () => void;
 }
 
 function toTitleCase(s: string) {
   return s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export default function AdminHeader({ userName = "Admin", userInitial = "A", notifs = [], onMenuClick }: AdminHeaderProps) {
+export default function AdminHeader({ userName = "Admin", userInitial = "A", notifs = [], onMenuClick, darkMode = false, onToggleDark }: AdminHeaderProps) {
   const pathname = usePathname();
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -67,7 +69,7 @@ export default function AdminHeader({ userName = "Admin", userInitial = "A", not
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 lg:left-64 z-30 h-16 bg-white border-b border-slate-200 shadow-sm">
+    <header className="fixed top-0 left-0 right-0 lg:left-64 z-30 h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-sm transition-colors duration-200">
       <div className="flex h-full items-center gap-3 px-4 sm:px-6">
 
         {/* Hamburger — mobile only */}
@@ -102,12 +104,24 @@ export default function AdminHeader({ userName = "Admin", userInitial = "A", not
         <div className="flex items-center gap-2 flex-shrink-0">
 
           {/* Search — desktop */}
-          <form onSubmit={handleSearch} className="hidden md:flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 focus-within:border-brand-blue-400 focus-within:ring-2 focus-within:ring-brand-blue-100 transition-all">
+          <form onSubmit={handleSearch} className="hidden md:flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 focus-within:border-brand-blue-400 focus-within:ring-2 focus-within:ring-brand-blue-100 transition-all">
             <Search className="h-4 w-4 text-slate-400 flex-shrink-0" />
             <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
               placeholder="Search students…"
-              className="w-36 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400" />
+              className="w-36 bg-transparent text-sm text-slate-700 dark:text-slate-200 outline-none placeholder:text-slate-400" />
           </form>
+
+          {/* Dark mode toggle */}
+          {onToggleDark && (
+            <button
+              type="button"
+              onClick={onToggleDark}
+              aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              {darkMode ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
+            </button>
+          )}
 
           {/* Notifications */}
           <div className="relative" ref={notifRef}>

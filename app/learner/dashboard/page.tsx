@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
@@ -32,11 +33,77 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default async function LearnerDashboardPage() {
+type Props = { searchParams: Promise<{ access?: string }> };
+
+export default async function LearnerDashboardPage({ searchParams }: Props) {
   // Require student role (admins can view for support)
   const { user, profile } = await requireRole(['student', 'admin', 'super_admin']);
 
   const supabase = await createClient();
+  const sp = await searchParams;
+
+  // Check if student has completed onboarding but not yet been granted access
+  if (profile?.role === 'student') {
+    const { data: enrollment } = await supabase
+      .from('program_enrollments')
+      .select('id, access_granted_at, program_id, program_slug')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const onboardingDone = profile?.onboarding_completed;
+    const accessGranted = !!enrollment?.access_granted_at;
+
+    if (onboardingDone && !accessGranted) {
+      // Fetch program name for display
+      let programName = enrollment?.program_slug?.replace(/-/g, ' ') || 'your program';
+      if (enrollment?.program_id) {
+        const { data: ap } = await supabase
+          .from('apprenticeship_programs')
+          .select('name')
+          .eq('id', enrollment.program_id)
+          .maybeSingle();
+        if (ap?.name) programName = ap.name;
+      }
+
+      return (
+        <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4">
+          <div className="max-w-lg w-full text-center">
+            <div className="w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-6">
+              <Clock className="w-10 h-10 text-amber-600" />
+            </div>
+            <h1 className="text-2xl font-black text-gray-900 mb-3">
+              Thank you for completing onboarding!
+            </h1>
+            <p className="text-gray-600 mb-2">
+              Your application for <strong>{programName}</strong> is under review.
+            </p>
+            <p className="text-gray-500 text-sm mb-8">
+              Access to your courses will be granted once your full application is approved by our admissions team. You'll receive an email at <strong>{user.email}</strong> as soon as access is granted — typically within 1 business day.
+            </p>
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 text-left mb-8">
+              <p className="text-sm font-semibold text-amber-800 mb-2">What happens next</p>
+              <ol className="text-sm text-amber-700 space-y-1 list-decimal list-inside">
+                <li>Our team reviews your documents and application</li>
+                <li>You receive an email confirming access is granted</li>
+                <li>Log back in to access your courses and start training</li>
+              </ol>
+            </div>
+            <p className="text-sm text-gray-500">
+              Questions? Call <a href="tel:3173143757" className="text-gray-900 font-semibold">(317) 314-3757</a> or email{' '}
+              <a href="mailto:info@elevateforhumanity.org" className="text-gray-900 font-semibold">info@elevateforhumanity.org</a>
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    // Force onboarding if not completed and no access yet
+    if (!onboardingDone && !accessGranted) {
+      redirect('/onboarding/learner');
+    }
+  }
 
   // Fetch enrollments from both tables (legacy enrollments + training_enrollments)
   const { data: legacyEnrollments } = await supabase

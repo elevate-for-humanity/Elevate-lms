@@ -56,7 +56,22 @@ export default async function LmsAppLayout({ children }: { children: ReactNode }
     redirect(getUnauthorizedRedirect(profile.role));
   }
 
-  // Onboarding is separate from LMS access — students can use courses without completing onboarding.
+  // Gate LMS access — students must have admin-granted access before entering the LMS.
+  // access_granted_at is set by admin via /admin/enrollments grant-access action.
+  if (profile?.role === 'student') {
+    const { data: enrollment } = await db
+      .from('program_enrollments')
+      .select('access_granted_at, onboarding_completed_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!enrollment?.access_granted_at) {
+      // Not yet granted — send to student portal with pending state
+      redirect('/learner/dashboard?access=pending');
+    }
+  }
 
   // Serialize user/profile for client component
   const serializedUser = {

@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { BookOpen, FileText, CreditCard, Calendar, User, ArrowRight, Phone, Mail, HelpCircle, ClipboardCheck } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import CanonicalVideo from '@/components/video/CanonicalVideo';
-import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 
 export const metadata: Metadata = {
@@ -214,108 +213,32 @@ export default async function LearnerOnboardingPage() {
 
   const isOnboardingComplete = allComplete || profile?.onboarding_completed;
 
-  // When all steps are complete and enrollment is not yet active, run the
-  // approval + enrollment pipeline directly (server component, db already in scope).
-  let justEnrolled = false;
-  if (allComplete && profile?.enrollment_status !== 'active') {
+  // When all steps are complete, mark onboarding done and notify admin.
+  // Do NOT auto-grant LMS access — admin reviews and grants access manually.
+  let justCompleted = false;
+  if (allComplete && !profile?.onboarding_completed) {
     try {
-      const { approveApplication } = await import('@/lib/enrollment/approve');
-      const { sendEmail } = await import('@/lib/email');
+      // sendEmail suppressed — admin triggers manually
 
-      // Mark onboarding complete
+      // Mark onboarding complete — does NOT grant LMS access
       await supabase.from('profiles').update({
         onboarding_completed: true,
         onboarding_completed_at: new Date().toISOString(),
       }).eq('id', user.id);
 
-      // Find pending application
-      const { data: pendingApp } = await supabase
-        .from('applications')
-        .select('id, status, program_id, program_interest')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      justCompleted = true;
 
-      const programId = enrollment?.program_id || pendingApp?.program_id || null;
-
-      if (pendingApp?.id && pendingApp.status !== 'approved') {
-        await approveApplication(db, {
-          applicationId: pendingApp.id,
-          programId,
-          fundingType: null,
-          role: 'student',
-        });
-      } else if (enrollment && enrollment.enrollment_state !== 'active') {
-        await supabase.from('program_enrollments')
-          .update({ enrollment_state: 'active', status: 'active' })
-          .eq('id', enrollment.id);
-      }
-
-      justEnrolled = true;
-
-      // Send enrollment confirmation email (non-blocking)
       const emailAddr = profile?.email || user.email || '';
       const firstName = profile?.first_name || profile?.full_name?.split(' ')[0] || 'Student';
-      const resolvedProgramName = enrollmentProgramName ||
-        pendingApp?.program_interest?.replace(/-/g, ' ') ||
-        'your training program';
+      const resolvedProgramName = enrollmentProgramName || 'your training program';
       const siteUrlInner = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
       const logoUrl = `${siteUrlInner}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
 
-      if (emailAddr) {
-        sendEmail({
-          to: emailAddr,
-          subject: `You're enrolled in ${resolvedProgramName} — Elevate for Humanity`,
-          html: `
-            <div style="max-width:600px;margin:0 auto;font-family:Georgia,serif;color:#1a1a1a;background:#ffffff">
-              <div style="text-align:center;padding:32px 24px 24px">
-                <img src="${logoUrl}" alt="Elevate for Humanity" width="160" style="max-width:160px;height:auto" />
-              </div>
-              <div style="padding:0 32px 32px">
-                <h2 style="font-weight:normal;font-size:22px;margin:0 0 20px">Hi ${firstName}, you're enrolled!</h2>
-                <p style="font-size:15px;line-height:1.7;margin:0 0 16px">
-                  You've completed onboarding and your enrollment in <strong>${resolvedProgramName}</strong> is now active.
-                  Your courses are unlocked and ready to start.
-                </p>
-                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:20px;margin:24px 0">
-                  <p style="margin:0;font-size:15px;font-weight:bold;color:#15803d">✅ Enrollment confirmed — ${resolvedProgramName}</p>
-                </div>
-                <h3 style="font-size:16px;font-weight:bold;margin:0 0 12px">What happens next</h3>
-                <ol style="margin:0 0 24px;padding-left:20px;font-size:14px;color:#333;line-height:1.9">
-                  <li>Log in to your student dashboard to access your courses</li>
-                  <li>Complete your first lesson — it takes about 15 minutes</li>
-                  <li>Track your progress and earn your first badge</li>
-                  <li>Your advisor will reach out within 1 business day to confirm your schedule</li>
-                  <li>Attend your first in-person session on your confirmed start date</li>
-                </ol>
-                <div style="text-align:center;margin:28px 0">
-                  <a href="${siteUrlInner}/learner/dashboard"
-                     style="display:inline-block;padding:14px 40px;background:#1a1a1a;color:#ffffff;text-decoration:none;border-radius:6px;font-family:Arial,sans-serif;font-weight:bold;font-size:15px">
-                    Go to My Dashboard
-                  </a>
-                </div>
-                <div style="border-top:1px solid #e0e0e0;margin-top:12px;padding-top:16px;font-family:Arial,sans-serif;font-size:13px;color:#555">
-                  <p style="margin:0 0 4px">📞 <a href="tel:3173143757" style="color:#555">(317) 314-3757</a></p>
-                  <p style="margin:0">✉️ <a href="mailto:info@elevateforhumanity.org" style="color:#555">info@elevateforhumanity.org</a></p>
-                </div>
-                <div style="border-top:1px solid #e0e0e0;margin-top:32px;padding-top:20px;text-align:center;font-family:Arial,sans-serif;font-size:12px;color:#999">
-                  <p style="margin:0 0 4px">Elevate for Humanity Career &amp; Technical Institute</p>
-                  <p style="margin:0 0 4px">8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240</p>
-                  <p style="margin:0"><a href="${siteUrlInner}" style="color:#999;text-decoration:underline">www.elevateforhumanity.org</a> &nbsp;|&nbsp; (317) 314-3757</p>
-                </div>
-              </div>
-            </div>`,
-        }).catch(() => {});
-
-        sendEmail({
-          to: 'info@elevateforhumanity.org',
-          subject: `[ENROLLED] ${profile?.full_name || firstName} — ${resolvedProgramName}`,
-          html: `<p><strong>${profile?.full_name || firstName}</strong> completed onboarding and is now enrolled in <strong>${resolvedProgramName}</strong>.</p><p>Email: <a href="mailto:${emailAddr}">${emailAddr}</a></p><p><a href="${siteUrlInner}/admin/enrollments">View in Admin</a></p>`,
-        }).catch(() => {});
-      }
-    } catch (enrollErr) {
-      logger.error('[onboarding] Auto-enrollment failed', enrollErr as Error);
+      // Emails suppressed — admin will trigger manually when ready
+      // TODO: re-enable student + admin notification emails when approved
+      void emailAddr; void logoUrl; void siteUrlInner; void resolvedProgramName; void firstName;
+    } catch (err) {
+      logger.error('[onboarding] Completion failed', err as Error);
     }
   }
 
@@ -389,18 +312,34 @@ export default async function LearnerOnboardingPage() {
           </div>
         )}
 
-        {/* All steps done — enrollment just activated */}
-        {justEnrolled && (
-          <div className="bg-white border border-brand-green-200 rounded-2xl p-6 sm:p-8 mb-10 flex flex-col sm:flex-row items-center gap-6">
-            <div className="w-16 h-16 rounded-2xl bg-brand-green-100 flex items-center justify-center flex-shrink-0">
-              <ClipboardCheck className="w-8 h-8 text-brand-green-600" />
+        {/* All steps just completed — pending admin review */}
+        {justCompleted && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 sm:p-8 mb-10 flex flex-col sm:flex-row items-center gap-6">
+            <div className="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+              <ClipboardCheck className="w-8 h-8 text-amber-600" />
             </div>
             <div className="flex-1 text-center sm:text-left">
-              <h2 className="text-xl font-black text-slate-900 mb-1">Enrollment Activated!</h2>
-              <p className="text-slate-500 text-sm">All steps complete. Check your email for confirmation, then head to your dashboard to start your courses.</p>
+              <h2 className="text-xl font-black text-slate-900 mb-1">Onboarding Complete — Pending Review</h2>
+              <p className="text-slate-500 text-sm">All steps are done. Our team is reviewing your documents and will grant access within 1 business day. Check your email for confirmation.</p>
             </div>
-            <Link href="/learner/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-bold hover:bg-brand-blue-700 transition flex-shrink-0">
-              Go to Dashboard <ArrowRight className="w-4 h-4" />
+            <Link href="/learner/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-700 transition flex-shrink-0">
+              View Dashboard <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        )}
+
+        {/* Already completed — still waiting for access */}
+        {!justCompleted && isOnboardingComplete && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 sm:p-8 mb-10 flex flex-col sm:flex-row items-center gap-6">
+            <div className="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+              <ClipboardCheck className="w-8 h-8 text-amber-600" />
+            </div>
+            <div className="flex-1 text-center sm:text-left">
+              <h2 className="text-xl font-black text-slate-900 mb-1">Onboarding Complete</h2>
+              <p className="text-slate-500 text-sm">Your documents are under review. You'll receive an email once access is granted. Questions? Call (317) 314-3757.</p>
+            </div>
+            <Link href="/learner/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-700 transition flex-shrink-0">
+              View Dashboard <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         )}

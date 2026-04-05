@@ -6,6 +6,7 @@ import { TrendingUp, Users, CheckCircle, AlertTriangle, Clock } from 'lucide-rea
 import { AdminPageShell } from '@/components/admin/AdminPageShell';
 import EnrollmentManagementClient from './EnrollmentManagementClient';
 import AutomatedEnrollmentWorkflow from '@/components/AutomatedEnrollmentWorkflow';
+import PendingAccessPanel from './PendingAccessPanel';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -20,6 +21,26 @@ export default async function AdminEnrollmentsPage() {
 
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
+
+  const db = createAdminClient();
+
+  // Students who completed onboarding but haven't been granted LMS access yet
+  const { data: pendingAccess } = await db
+    .from('program_enrollments')
+    .select('id, user_id, program_slug, enrolled_at, payment_status, amount_paid_cents')
+    .is('access_granted_at', null)
+    .eq('payment_status', 'paid')
+    .order('enrolled_at', { ascending: true });
+
+  // Enrich with profile data
+  const pendingWithProfiles = await Promise.all(
+    (pendingAccess || []).map(async (e: any) => {
+      const { data: p } = await db.from('profiles')
+        .select('full_name, email, onboarding_completed')
+        .eq('id', e.user_id).single();
+      return { ...e, profile: p };
+    })
+  );
 
   const { data: enrollments, error: enrollmentsError } = await supabase
     .from('program_enrollments')
@@ -54,6 +75,13 @@ export default async function AdminEnrollmentsPage() {
         { label: 'At Risk',   value: stats.atRisk,    icon: AlertTriangle, color: 'red',   alert: stats.atRisk > 0 },
       ]}
     >
+      {/* Pending access — students who paid + completed onboarding, waiting for admin grant */}
+      {pendingWithProfiles.length > 0 && (
+        <div className="mb-8">
+          <PendingAccessPanel enrollments={pendingWithProfiles} />
+        </div>
+      )}
+
       <div className="mb-6">
         <AutomatedEnrollmentWorkflow showStats={false} />
       </div>

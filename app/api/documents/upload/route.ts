@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { withErrorHandling, APIErrors } from '@/lib/api';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { NextRequest, NextResponse } from 'next/server';
@@ -14,6 +15,9 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  // Admin client used for storage operations and employer activation check
+  // (bypasses RLS on storage bucket policies)
+  const db = createAdminClient();
 
   // Check authentication
   const {

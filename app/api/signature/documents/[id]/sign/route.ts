@@ -18,7 +18,19 @@ async function _POST(
 
   const { id } = await params;
   const supabase = await createClient();
+
+  // Auth required — must be logged in to sign
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { signerName, signerEmail, role } = await request.json();
+
+  // Enforce that the signer email matches the authenticated user
+  if (signerEmail && signerEmail.toLowerCase() !== user.email?.toLowerCase()) {
+    return NextResponse.json({ error: 'Signer email must match your account email' }, { status: 403 });
+  }
 
   if (!signerName || !signerEmail) {
     return NextResponse.json(

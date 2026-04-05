@@ -1,44 +1,145 @@
-import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-export const dynamic = 'force-dynamic';
+const DOC_TYPES = [
+  { value: 'enrollment_agreement', label: 'Enrollment Agreement' },
+  { value: 'nda', label: 'Non-Disclosure Agreement' },
+  { value: 'mou', label: 'Memorandum of Understanding' },
+  { value: 'policy', label: 'Policy Acknowledgment' },
+  { value: 'other', label: 'Other' },
+];
 
-export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/admin/signatures/new' },
-  title: 'Request Signature | Elevate For Humanity',
-  description: 'Create a new signature request.',
-};
+export default function NewSignaturePage() {
+  const router = useRouter();
 
-export default async function NewSignaturePage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
+  const [title, setTitle] = useState('');
+  const [type, setType] = useState('enrollment_agreement');
+  const [body, setBody] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim() || !body.trim()) return;
+
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/signature/documents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: title.trim(), type, body: body.trim() }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Failed to create document');
+        setSubmitting(false);
+        return;
+      }
+
+      // Redirect to signatures list — admin can copy the sign link from there
+      router.push(`/admin/signatures?created=${data.document.id}`);
+    } catch {
+      setError('Network error. Please try again.');
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white">
-
-      {/* Hero Image */}
       <div className="max-w-3xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/admin" className="hover:text-primary">Admin</Link></li><li>/</li><li><Link href="/admin/signatures" className="hover:text-primary">Signatures</Link></li><li>/</li><li className="text-gray-900 font-medium">New</li></ol></nav>
-          <h1 className="text-3xl font-bold text-gray-900">Request Signature</h1>
-          <p className="text-gray-600 mt-2">Send a document for electronic signature</p>
+        <Breadcrumbs
+          items={[
+            { label: 'Admin', href: '/admin' },
+            { label: 'Signatures', href: '/admin/signatures' },
+            { label: 'New Document' },
+          ]}
+        />
+
+        <div className="mt-6 mb-8">
+          <h1 className="text-3xl font-bold text-slate-900">Create Signature Document</h1>
+          <p className="text-slate-500 mt-2">
+            Create a document and share the signing link with the recipient.
+          </p>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <form className="space-y-6">
-            <div><label className="block text-sm font-medium text-gray-700 mb-2">Document Title *</label><input type="text" className="w-full border rounded-lg px-3 py-2" placeholder="Enter document title" required /></div>
-            <div><label className="block text-sm font-medium text-gray-700 mb-2">Upload Document *</label>
-              <div className="border-2 border-dashed rounded-lg p-6 text-center"><p className="text-gray-500">Drag and drop or click to upload</p><p className="text-sm text-gray-500 mt-1">PDF, DOCX up to 10MB</p></div>
+
+        <div className="bg-white rounded-2xl border border-slate-200 p-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+                {error}
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Document Title <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                placeholder="e.g. Enrollment Agreement — Spring 2025"
+                required
+              />
             </div>
-            <div><label className="block text-sm font-medium text-gray-700 mb-2">Signer Email *</label><input type="email" className="w-full border rounded-lg px-3 py-2" placeholder="signer@email.com" required /></div>
-            <div><label className="block text-sm font-medium text-gray-700 mb-2">Message (optional)</label><textarea className="w-full border rounded-lg px-3 py-2" rows={3} placeholder="Add a message for the signer" /></div>
-            <div className="flex gap-4 pt-4 border-t">
-              <button type="submit" className="flex-1 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Send for Signature</button>
-              <Link href="/admin/signatures" className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</Link>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Document Type <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+              >
+                {DOC_TYPES.map((t) => (
+                  <option key={t.value} value={t.value}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Document Content <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                rows={12}
+                className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 font-mono text-sm"
+                placeholder="Paste or type the full document text here. HTML is supported."
+                required
+              />
+              <p className="text-xs text-slate-400 mt-1">
+                Plain text or HTML. The signer will see this content before signing.
+              </p>
+            </div>
+
+            <div className="flex gap-4 pt-2 border-t border-slate-100">
+              <button
+                type="submit"
+                disabled={submitting || !title.trim() || !body.trim()}
+                className="flex-1 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-brand-blue-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-colors"
+              >
+                {submitting ? 'Creating...' : 'Create Document'}
+              </button>
+              <Link
+                href="/admin/signatures"
+                className="px-6 py-3 border border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </Link>
             </div>
           </form>
         </div>

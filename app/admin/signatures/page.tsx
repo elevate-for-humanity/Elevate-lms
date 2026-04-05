@@ -4,7 +4,8 @@ import { requireAdmin } from '@/lib/authGuards';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FileSignature, Clock, XCircle } from 'lucide-react';
+import { FileSignature, Clock, XCircle, Plus } from 'lucide-react';
+import { SignatureLinkCopier } from './SignatureLinkCopier';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,16 +22,26 @@ export default async function SignaturesPage() {
   await requireAdmin();
   const db = createAdminClient();
 
-  const { data: signatures, error: signaturesError } = await db
-    .from('signatures')
-    .select('id, user_id, document_type, document_id, signed_at, status, created_at')
-    .order('created_at', { ascending: false });
-  if (signaturesError) throw new Error(`signatures query failed: ${signaturesError.message}`);
+  const [signaturesResult, docsResult] = await Promise.all([
+    db
+      .from('signatures')
+      .select('id, document_id, signer_name, signer_email, role, status, created_at, signature_documents(title)')
+      .order('created_at', { ascending: false }),
+    db
+      .from('signature_documents')
+      .select('id, title, type, created_at')
+      .order('created_at', { ascending: false })
+      .limit(20),
+  ]);
 
-  const rows = signatures;
+  if (signaturesResult.error) throw new Error(`signatures query failed: ${signaturesResult.error.message}`);
+  const signatures = signaturesResult.data;
+  const signatureDocs = docsResult.data ?? [];
+
+  const rows = signatures ?? [];
   const totalSignatures = rows.length;
-  const pendingSignatures = rows.filter((s: any) => s.status === 'pending').length;
-  const completedSignatures = rows.filter((s: any) => s.status === 'completed' || s.signed_at).length;
+  const pendingSignatures = rows.filter((s: any) => !s.status || s.status === 'pending').length;
+  const completedSignatures = rows.filter((s: any) => s.status === 'completed').length;
 
   return (
     <div className="min-h-screen bg-white">
@@ -92,12 +103,49 @@ export default async function SignaturesPage() {
               </div>
             </div>
 
+            {/* Signature Documents — admin-created docs with shareable sign links */}
+            <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold">Signature Documents</h2>
+                <Link
+                  href="/admin/signatures/new"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-brand-blue-700 transition-colors"
+                >
+                  <Plus className="h-4 w-4" />
+                  New Document
+                </Link>
+              </div>
+              {signatureDocs.length > 0 ? (
+                <div className="space-y-3">
+                  {signatureDocs.map((doc: any) => (
+                    <div key={doc.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div>
+                        <p className="font-semibold text-slate-900">{doc.title}</p>
+                        <p className="text-sm text-slate-500">
+                          {doc.type?.replace(/_/g, ' ')} · Created {new Date(doc.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <SignatureLinkCopier documentId={doc.id} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-slate-400 text-center py-6">
+                  No documents yet.{' '}
+                  <Link href="/admin/signatures/new" className="text-brand-blue-600 hover:underline">
+                    Create one
+                  </Link>{' '}
+                  to send for signature.
+                </p>
+              )}
+            </div>
+
             {/* Signatures List */}
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h2 className="text-2xl font-bold mb-4">Recent Signatures</h2>
-              {signatures && signatures.length > 0 ? (
+              {rows.length > 0 ? (
                 <div className="space-y-4">
-                  {signatures.map((signature) => (
+                  {rows.map((signature: any) => (
                     <div
                       key={signature.id}
                       className="p-4 border rounded-lg hover:bg-gray-50"
@@ -105,26 +153,22 @@ export default async function SignaturesPage() {
                       <div className="flex justify-between items-start">
                         <div>
                           <h3 className="font-semibold">
-                            {signature.document_name || 'Untitled Document'}
+                            {signature.signature_documents?.title || 'Untitled Document'}
                           </h3>
                           <p className="text-sm text-black mt-1">
                             Signer:{' '}
-                            {signature.signer?.full_name ||
-                              signature.signer?.email ||
-                              'Unknown'}
+                            {signature.signer_name || signature.signer_email || 'Unknown'}
                           </p>
                           <p className="text-sm text-black">
-                            Requested:{' '}
-                            {new Date(
-                              signature.created_at
-                            ).toLocaleDateString()}
+                            Signed:{' '}
+                            {new Date(signature.created_at).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
-                          {signature.status === 'completed' && (
+                          {(!signature.status || signature.status === 'completed') && (
                             <span className="flex items-center gap-1 text-brand-green-600 text-sm font-medium bg-brand-green-100 px-3 py-2 rounded-full">
-                              <span className="text-slate-400 flex-shrink-0">•</span>
-                              Completed
+                              <span className="text-brand-green-600 flex-shrink-0">✓</span>
+                              Signed
                             </span>
                           )}
                           {signature.status === 'pending' && (
@@ -134,7 +178,7 @@ export default async function SignaturesPage() {
                             </span>
                           )}
                           {signature.status === 'declined' && (
-                            <span className="flex items-center gap-1 text-brand-orange-600 text-sm font-medium bg-brand-red-100 px-3 py-2 rounded-full">
+                            <span className="flex items-center gap-1 text-red-600 text-sm font-medium bg-red-100 px-3 py-2 rounded-full">
                               <XCircle className="h-4 w-4" />
                               Declined
                             </span>

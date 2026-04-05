@@ -198,9 +198,9 @@ export default function DocumentsPage() {
               {REQUIRED_DOCUMENTS.filter(d => d.required && uploadedTypes.has(d.type)).length} of {REQUIRED_DOCUMENTS.filter(d => d.required).length}
             </span>
           </div>
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-white rounded-full transition-all duration-500"
+              className="h-full bg-brand-blue-600 rounded-full transition-all duration-500"
               style={{ width: `${(REQUIRED_DOCUMENTS.filter(d => d.required && uploadedTypes.has(d.type)).length / REQUIRED_DOCUMENTS.filter(d => d.required).length) * 100}%` }}
             />
           </div>

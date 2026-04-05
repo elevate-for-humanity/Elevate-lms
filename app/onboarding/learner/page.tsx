@@ -284,9 +284,9 @@ export default async function LearnerOnboardingPage() {
                 <span className="text-slate-500">{completedSteps.length} of {ONBOARDING_STEPS.length} steps complete</span>
                 <span className="font-bold text-slate-700">{progress}%</span>
               </div>
-              <div className="h-2 bg-white rounded-full overflow-hidden">
+              <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-white rounded-full transition-all duration-500"
+                  className="h-full bg-brand-blue-600 rounded-full transition-all duration-500"
                   style={{ width: `${progress}%` }}
                 />
               </div>

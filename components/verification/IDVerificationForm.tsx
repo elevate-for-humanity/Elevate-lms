@@ -97,7 +97,7 @@ export function IDVerificationForm() {
 
       setSuccess(true);
       setTimeout(() => {
-        router.push('/dashboard?verification=submitted');
+        router.push('/onboarding/learner?step=verification&status=submitted');
       }, 2000);
     } catch (err: any) {
       setError('Failed to submit verification');

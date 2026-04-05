@@ -134,7 +134,7 @@ async function _POST(req: NextRequest) {
           part: i,
           talkId: '',
           status: 'error',
-          error: err instanceof Error ? err.message : String(err),
+          error: 'Video generation failed',
         });
       }
     }

@@ -9,6 +9,13 @@ export const maxDuration = 60;
 
 async function _POST(req: NextRequest) {
   try {
+    // Internal-only — must be called from server-side code with the shared secret
+    const secret = process.env.CRON_SECRET;
+    const provided = req.headers.get('x-internal-secret');
+    if (!secret || provided !== secret) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 

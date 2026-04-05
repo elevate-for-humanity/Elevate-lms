@@ -9,6 +9,10 @@ import {
   BookOpen, XCircle, UserX,
 } from "lucide-react";
 import type { AdminDashboardData } from "./types";
+import { KpiGrid } from "./KpiGrid";
+import { RecentApplicationsList } from "./RecentApplicationsList";
+import { BlockedProgramsList } from "./BlockedProgramsList";
+import { InactiveLearnersList } from "./InactiveLearnersList";
 
 // ── Formatters ────────────────────────────────────────────────────────────────
 function fmtUsd(cents: number) {
@@ -242,76 +246,70 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
         </div>
       </div>
 
-      {/* KPI cards — single row, no duplication */}
-      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <KpiCard label="Applications Waiting" value={fmtNum(totalPending)}
-          sub={pendingKpi?.sub ?? "No pending applications"}
-          href="/admin/applications?status=submitted" urgent={totalPending > 0} icon={FileText} index={0} />
-        <KpiCard label="Active Enrollments" value={fmtNum(activeEnrollments)}
-          sub={activeKpi?.sub ?? ""}
-          href="/admin/enrollments?status=active" urgent={data.inactiveLearners.length > 0} icon={Users} index={1} />
-        <KpiCard label="Revenue This Month" value={fmtUsd(revenueThisMonthCents)}
-          sub={revenueKpi?.sub ?? ""}
-          href="/admin/enrollments?payment_status=paid" icon={DollarSign} index={2} />
-        <KpiCard label="Certificates Issued" value={fmtNum(certificatesIssued)}
-          sub="All time" href="/admin/certificates" icon={Award} index={3} />
-      </div>
+      {/* KPI cards — delta labels from real month-over-month queries */}
+      <KpiGrid kpis={data.kpis} />
+
+      {/* Enrollment trend + student status breakdown */}
+      {(data.enrollmentTrend.length > 0 || data.studentStatuses.length > 0) && (
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Enrollment trend — bar chart rendered as CSS bars (no recharts dep) */}
+          {data.enrollmentTrend.length > 0 && (
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+              <p className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-brand-blue-500" /> Enrollment Trend (12 months)
+              </p>
+              <div className="flex items-end gap-1.5 h-28">
+                {(() => {
+                  const max = Math.max(...data.enrollmentTrend.map(t => t.enrollments), 1);
+                  return data.enrollmentTrend.map(t => (
+                    <div key={t.month} className="flex-1 flex flex-col items-center gap-1">
+                      <div className="w-full rounded-t bg-brand-blue-500 transition-all"
+                        style={{ height: `${Math.round((t.enrollments / max) * 96)}px`, minHeight: t.enrollments > 0 ? '4px' : '0' }} />
+                      <span className="text-[9px] text-slate-400 font-medium">{t.month}</span>
+                    </div>
+                  ));
+                })()}
+              </div>
+            </div>
+          )}
+
+          {/* Student status breakdown */}
+          {data.studentStatuses.length > 0 && (
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+              <p className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-emerald-500" /> Students by Status
+              </p>
+              <div className="space-y-3">
+                {(() => {
+                  const total = data.studentStatuses.reduce((s, r) => s + r.value, 0) || 1;
+                  const COLORS: Record<string, string> = {
+                    Active: 'bg-emerald-500', Completed: 'bg-blue-500',
+                    Pending: 'bg-amber-500', Inactive: 'bg-slate-300',
+                    Withdrawn: 'bg-rose-400',
+                  };
+                  return data.studentStatuses.map(s => (
+                    <div key={s.name}>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="font-medium text-slate-700">{s.name}</span>
+                        <span className="text-slate-500 tabular-nums">{s.value} ({Math.round((s.value / total) * 100)}%)</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-slate-100">
+                        <div className={`h-2 rounded-full ${COLORS[s.name] ?? 'bg-slate-400'}`}
+                          style={{ width: `${Math.round((s.value / total) * 100)}%` }} />
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Applications + At-Risk */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <Section title="Applications Awaiting Review"
-          href="/admin/applications?status=submitted" linkLabel="All applications"
-          count={totalPending} urgent={totalPending > 0}>
-          {data.recentApplications.length === 0 ? (
-            <EmptyRow message="No pending applications" />
-          ) : (
-            <div className="divide-y divide-slate-50">
-              {data.recentApplications.slice(0, 8).map(app => {
-                const name = app.full_name ||
-                  [app.first_name, app.last_name].filter(Boolean).join(" ") || "Unnamed";
-                return (
-                  <Link key={app.id} href={app.href}
-                    className={`flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors ${app.urgent ? "bg-rose-50/40" : ""}`}>
-                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${app.urgent ? "bg-rose-500" : "bg-slate-300"}`} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-slate-900 truncate">{name}</p>
-                      <p className="text-xs text-slate-400 truncate">{app.program_interest ?? "No program"}</p>
-                    </div>
-                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                      <StatusPill status={app.status} />
-                      <span className={`text-[10px] font-semibold ${app.urgent ? "text-rose-600" : "text-slate-400"}`}>
-                        {fmtAge(app.age_days)}{app.urgent ? " ⚠️" : ""}
-                      </span>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-        </Section>
-
-        <Section title="At-Risk Learners" href="/admin/at-risk" linkLabel="View all"
-          count={data.inactiveLearners.length} urgent={data.inactiveLearners.length > 0}>
-          {data.inactiveLearners.length === 0 ? (
-            <EmptyRow message="All students are engaged" />
-          ) : (
-            <div className="divide-y divide-slate-50">
-              {data.inactiveLearners.map(l => (
-                <Link key={l.enrollmentId} href={l.href}
-                  className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors">
-                  <div className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-slate-900 truncate">{l.fullName ?? "Unknown"}</p>
-                    <p className="text-xs text-slate-400 truncate">{l.email ?? "No email"}</p>
-                  </div>
-                  <span className="text-xs text-amber-600 font-semibold flex-shrink-0">
-                    Since {fmtDate(l.enrolledAt)}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </Section>
+        <RecentApplicationsList items={data.recentApplications} />
+        <InactiveLearnersList items={data.inactiveLearners} />
       </div>
 
       {/* Programs by enrollment */}
@@ -352,6 +350,23 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
         )}
       </Section>
 
+      {/* Recent activity feed */}
+      {data.recentActivity.length > 0 && (
+        <Section title="Recent Activity" href="/admin/students" linkLabel="All students">
+          <div className="divide-y divide-slate-50">
+            {data.recentActivity.slice(0, 10).map(item => (
+              <div key={item.id} className="flex items-center gap-3 px-5 py-3">
+                <div className="w-2 h-2 rounded-full bg-brand-blue-400 flex-shrink-0" />
+                <p className="flex-1 text-sm text-slate-700 truncate">{item.title}</p>
+                <span className="text-[10px] text-slate-400 flex-shrink-0 tabular-nums">
+                  {new Date(item.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
+
       {/* Recent students + Unpublished programs */}
       <div className="grid gap-6 lg:grid-cols-2">
         <Section title="Recent Students" href="/admin/students" linkLabel="All students">
@@ -377,26 +392,7 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
           )}
         </Section>
 
-        <Section title="Unpublished Programs" href="/admin/programs?status=draft"
-          linkLabel="All programs" count={data.blockedPrograms.length} urgent={data.blockedPrograms.length > 0}>
-          {data.blockedPrograms.length === 0 ? (
-            <EmptyRow message="All programs are published" />
-          ) : (
-            <div className="divide-y divide-slate-50">
-              {data.blockedPrograms.map(p => (
-                <Link key={p.id} href={p.href}
-                  className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors">
-                  <div className="w-2 h-2 rounded-full bg-slate-300 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-slate-900 truncate">{p.title}</p>
-                    <p className="text-xs text-slate-400">Updated {fmtDate(p.updatedAt)}</p>
-                  </div>
-                  <StatusPill status={p.status} />
-                </Link>
-              ))}
-            </div>
-          )}
-        </Section>
+        <BlockedProgramsList items={data.blockedPrograms} />
       </div>
 
       {/* Quick actions */}

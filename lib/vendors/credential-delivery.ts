@@ -231,7 +231,10 @@ async function sendCredentialEmail(
   try {
     await fetch(`${siteUrl}/api/email/send`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-internal-secret': process.env.CRON_SECRET ?? '',
+      },
       body: JSON.stringify({
         to: request.studentEmail,
         subject: `Your ${request.courseName} Course Access — Elevate for Humanity`,

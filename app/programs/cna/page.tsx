@@ -76,7 +76,7 @@ export default function CNAPage() {
           {OUTCOMES.map(({ icon: Icon, label, value }) => (
             <div key={label}>
               <Icon className="w-5 h-5 text-brand-blue-400 mx-auto mb-2" />
-              <p className="text-xs text-black uppercase tracking-widest mb-1">{label}</p>
+              <p className="text-xs text-slate-400 uppercase tracking-widest mb-1">{label}</p>
               <p className="text-white font-bold text-sm leading-tight">{value}</p>
             </div>
           ))}
@@ -122,6 +122,7 @@ export default function CNAPage() {
               alt="CNA student in clinical training"
               fill
               className="object-cover"
+              style={{ objectPosition: 'center 20%' }}
               sizes="(max-width: 1024px) 100vw, 50vw"
             />
           </div>
@@ -185,13 +186,13 @@ export default function CNAPage() {
           <h2 className="text-2xl font-extrabold text-slate-900 mb-8">Inside the CNA Program</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
-              { src: '/images/pages/cna-patient-care.jpg', alt: 'CNA patient care' },
-              { src: '/images/pages/cna-vitals.jpg',       alt: 'CNA taking vitals' },
-              { src: '/images/pages/cna-nursing-real.jpg', alt: 'CNA nursing skills' },
-              { src: '/images/pages/cna-nursing.jpg',      alt: 'CNA clinical training' },
+              { src: '/images/pages/cna-patient-care.jpg', alt: 'CNA patient care',     pos: 'center 30%' },
+              { src: '/images/pages/cna-vitals.jpg',       alt: 'CNA taking vitals',    pos: 'center 20%' },
+              { src: '/images/pages/cna-nursing-real.jpg', alt: 'CNA nursing skills',   pos: 'center 25%' },
+              { src: '/images/pages/cna-nursing.jpg',      alt: 'CNA clinical training',pos: 'center 20%' },
             ].map((img) => (
-              <div key={img.src} className="relative rounded-xl overflow-hidden aspect-[4/3]" style={{ aspectRatio: '3/2' }}>
-                <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="25vw" />
+              <div key={img.src} className="relative rounded-xl overflow-hidden aspect-[3/2]">
+                <Image src={img.src} alt={img.alt} fill className="object-cover" style={{ objectPosition: img.pos }} sizes="(max-width: 640px) 50vw, 25vw" />
               </div>
             ))}
           </div>

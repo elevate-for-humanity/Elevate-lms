@@ -34,15 +34,36 @@ export async function POST(req: NextRequest) {
   const {
     examType, examName, bookingType, firstName, lastName, email, phone,
     organization, participantCount, preferredDate, preferredTime,
-    alternateDate, notes,
+    alternateDate, notes, addOn, slotId, paymentStatus, stripeSessionId,
   } = body;
 
-  if (!examType || !firstName || !lastName || !email || !preferredDate || !preferredTime) {
+  if (!examType || !firstName || !lastName || !email) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   }
 
   const db = createAdminClient();
   const confirmationCode = generateCode();
+  const hasAddOn = addOn === true;
+  const isPaid = paymentStatus === 'paid';
+
+  // If a slot was selected, verify it still has capacity before booking
+  if (slotId) {
+    const { data: slot, error: slotErr } = await db
+      .from('testing_slots')
+      .select('id, capacity, booked_count, is_cancelled')
+      .eq('id', slotId)
+      .single();
+
+    if (slotErr || !slot) {
+      return NextResponse.json({ error: 'Selected slot not found' }, { status: 400 });
+    }
+    if (slot.is_cancelled) {
+      return NextResponse.json({ error: 'Selected slot has been cancelled' }, { status: 400 });
+    }
+    if (slot.booked_count >= slot.capacity) {
+      return NextResponse.json({ error: 'Selected slot is now full — please choose another time' }, { status: 409 });
+    }
+  }
 
   const { error: insertErr } = await db.from('exam_bookings').insert({
     exam_type: examType,
@@ -54,13 +75,26 @@ export async function POST(req: NextRequest) {
     phone: phone || null,
     organization: organization || null,
     participant_count: participantCount || 1,
-    preferred_date: preferredDate,
-    preferred_time: preferredTime,
+    preferred_date: preferredDate || null,
+    preferred_time: preferredTime || null,
     alternate_date: alternateDate || null,
     notes: notes || null,
     status: 'pending',
     confirmation_code: confirmationCode,
+    add_on: hasAddOn,
+    add_on_paid: isPaid && hasAddOn,
+    payment_status: isPaid ? 'paid' : 'unpaid',
+    payment_intent_id: stripeSessionId || null,
+    slot_id: slotId || null,
   });
+
+  // Increment booked_count on the slot atomically
+  if (!insertErr && slotId) {
+    await db.rpc('increment_slot_booked_count', { slot_id: slotId }).catch(() => {
+      // Non-fatal — admin can reconcile manually
+      logger.warn('[testing/book] Failed to increment slot booked_count', { slotId });
+    });
+  }
 
   if (insertErr) {
     logger.error('[Testing Book] Insert failed:', insertErr);
@@ -131,10 +165,48 @@ export async function POST(req: NextRequest) {
   <p style="margin-top:20px"><a href="${BASE_URL}/admin/testing" style="background:#1E3A5F;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:bold">Manage in Admin →</a></p>
 </body></html>`;
 
-  await Promise.allSettled([
+  // ── Add-on delivery email ────────────────────────────────────────────────
+  const addOnHtml = hasAddOn ? `<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#fffbeb;font-family:Arial,sans-serif">
+<div style="max-width:600px;margin:24px auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+  <div style="background:#1E3A5F;padding:28px 32px;text-align:center">
+    <img src="${BASE_URL}/images/Elevate_for_Humanity_logo_81bf0fab.jpg" alt="Elevate for Humanity" height="60" style="display:block;margin:0 auto 12px"/>
+    <p style="color:#94a3b8;font-size:13px;margin:0">Certification Success Package</p>
+  </div>
+  <div style="padding:32px;color:#1E293B;font-size:15px;line-height:1.7">
+    <h2 style="color:#1E3A5F;margin-top:0">Your Prep Materials Are Ready</h2>
+    <p>Hi ${firstName},</p>
+    <p>You added the <strong>Certification Success Package</strong> to your exam booking. Here's what's included and how to access it:</p>
+    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:20px;margin:20px 0">
+      <table style="width:100%;border-collapse:collapse;font-size:14px">
+        <tr style="border-bottom:1px solid #fef3c7"><td style="padding:8px 0;color:#92400e;width:200px">Full-length practice test</td><td style="padding:8px 0"><a href="${BASE_URL}/lms" style="color:#1E3A5F;font-weight:600">Access in your LMS account →</a></td></tr>
+        <tr style="border-bottom:1px solid #fef3c7"><td style="padding:8px 0;color:#92400e">Study guide</td><td style="padding:8px 0"><a href="${BASE_URL}/lms" style="color:#1E3A5F;font-weight:600">Access in your LMS account →</a></td></tr>
+        <tr style="border-bottom:1px solid #fef3c7"><td style="padding:8px 0;color:#92400e">Retake strategy</td><td style="padding:8px 0">Included in your study guide</td></tr>
+        <tr><td style="padding:8px 0;color:#92400e">Email support</td><td style="padding:8px 0"><a href="mailto:testing@elevateforhumanity.org" style="color:#1E3A5F;font-weight:600">testing@elevateforhumanity.org</a></td></tr>
+      </table>
+    </div>
+    <p>If you don't have an LMS account yet, reply to this email and we'll get you set up before your exam date.</p>
+    <p style="margin-bottom:0">Good luck,<br><strong>Alberta Davis</strong><br>Testing Center Coordinator<br>Elevate for Humanity</p>
+  </div>
+  <div style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:20px 32px;text-align:center;color:#64748b;font-size:12px">
+    <p style="margin:0">8888 Keystone Crossing Suite 1300 · Indianapolis, IN 46240 · (317) 314-3757</p>
+  </div>
+</div>
+</body></html>` : null;
+
+  const emailJobs: Promise<unknown>[] = [
     sendEmail({ to: email, from: FROM, subject: `Exam Booking Confirmed — ${confirmationCode} | Elevate Testing Center`, html: candidateHtml }),
     sendEmail({ to: ADMIN_EMAIL, from: FROM, replyTo: email, subject: `New Exam Booking: ${examLabel} — ${firstName} ${lastName} (${confirmationCode})`, html: adminHtml }),
-  ]);
+  ];
 
-  return NextResponse.json({ success: true, confirmationCode });
+  if (addOnHtml) {
+    emailJobs.push(
+      sendEmail({ to: email, from: FROM, subject: `Your Certification Success Package — ${examLabel} | Elevate Testing Center`, html: addOnHtml })
+    );
+  }
+
+  await Promise.allSettled(emailJobs);
+
+  return NextResponse.json({ success: true, confirmationCode, addOn: hasAddOn });
 }

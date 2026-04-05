@@ -1,18 +1,21 @@
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { apiRequireAdmin } from '@/lib/admin/guards';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
-/**
- * GET /api/workspace/[id] — get a single workspace
- * DELETE /api/workspace/[id] — delete a workspace
- */
 export async function GET(
-  _request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  try { await apiRequireAdmin(request); }
+  catch (e) { if (e instanceof Response) return e; return NextResponse.json({ error: 'Unauthorized' }, { status: 401 }); }
   const { id } = await params;
   try {
     const supabase = createAdminClient();
@@ -33,9 +36,14 @@ export async function GET(
 }
 
 export async function DELETE(
-  _request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  try { await apiRequireAdmin(request); }
+  catch (e) { if (e instanceof Response) return e; return NextResponse.json({ error: 'Unauthorized' }, { status: 401 }); }
   const { id } = await params;
   try {
     const supabase = createAdminClient();

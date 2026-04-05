@@ -265,6 +265,12 @@
 [functions."cron-poll-mef-acks"]
   schedule = "*/5 * * * *"
 
+# Exam booking lead follow-up — hourly.
+# Sends 24hr and 48hr reminder emails to leads that captured email but never booked.
+# Requires CRON_SECRET env var.
+[functions."cron-testing-lead-followup"]
+  schedule = "0 * * * *"
+
 # ============================================
 # ADMIN DOMAIN (www.elevateconnectsdirectory.org)
 # Rewrites admin domain to /admin dashboard

@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { sendApplicationWelcomeEmail } from '@/lib/email/application-welcome';
+import { sendOnboardingEmail } from '@/lib/email/send-onboarding';
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -64,7 +66,7 @@ export async function POST(req: NextRequest) {
   // Fetch application
   const { data: application, error: fetchError } = await db
     .from('applications')
-    .select('id, status, user_id, program_slug, email, funding_verified, payment_received_at, eligibility_status, has_workone_approval')
+    .select('id, status, user_id, program_slug, program_interest, email, first_name, last_name, full_name, funding_verified, payment_received_at, eligibility_status, has_workone_approval')
     .eq('id', application_id)
     .single();
 
@@ -125,7 +127,7 @@ export async function POST(req: NextRequest) {
 
   if (updateError) {
     logger.error('[transition] status update failed', updateError);
-    return NextResponse.json({ error: updateError.message }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to update application status' }, { status: 500 });
   }
 
   // Idempotent enrollment on enrolled
@@ -157,7 +159,7 @@ export async function POST(req: NextRequest) {
           .from('applications')
           .update({ status: currentStatus })
           .eq('id', application_id);
-        return NextResponse.json({ error: enrollError.message }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to create enrollment' }, { status: 500 });
       }
       enrollment_id = enrolled?.id ?? null;
     } else {
@@ -199,7 +201,26 @@ export async function POST(req: NextRequest) {
 
   if (auditError) {
     logger.error('[transition] audit log failed', auditError);
-    return NextResponse.json({ error: auditError.message }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to record audit log' }, { status: 500 });
+  }
+
+  // Send welcome + onboarding emails when application moves to in_review.
+  // This is the correct trigger — application has been seen by staff,
+  // not just submitted by the applicant.
+  if (next_status === 'in_review' && application.email) {
+    const firstName = application.first_name || application.full_name?.split(' ')[0] || '';
+    Promise.allSettled([
+      sendApplicationWelcomeEmail({
+        to: application.email,
+        firstName,
+        programSlug: application.program_slug ?? application.program_interest ?? '',
+      }),
+      sendOnboardingEmail({
+        email: application.email,
+        name: application.full_name || `${application.first_name ?? ''} ${application.last_name ?? ''}`.trim(),
+        program: application.program_slug ?? application.program_interest ?? '',
+      }),
+    ]).catch(err => logger.warn('[transition] welcome email failed', { err }));
   }
 
   return NextResponse.json({

@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     return safeError('Invalid JSON', 400);
   }
 
-  const { examType, examName, feeCents, bookingType, participantCount, email, name, pendingBookingId } = body;
+  const { examType, examName, feeCents, bookingType, participantCount, email, name, pendingBookingId, addOn, slotId } = body;
 
   if (!examType || !feeCents || feeCents <= 0) {
     return safeError('examType and feeCents are required', 400);
@@ -77,7 +77,10 @@ export async function POST(req: NextRequest) {
   try {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
-      payment_method_types: ['card'],
+      // automatic_payment_methods lets Stripe show card + BNPL (Klarna, Afterpay,
+      // CashApp) based on what's enabled in the Stripe Dashboard — no extra
+      // redirect pages, no hardcoded list to maintain.
+      automatic_payment_methods: { enabled: true },
       customer_email: email ?? undefined,
       line_items: [
         {
@@ -99,9 +102,12 @@ export async function POST(req: NextRequest) {
         booking_type: bookingType ?? 'individual',
         participant_count: String(qty),
         pending_booking_id: pendingBookingId ?? '',
+        add_on: addOn === true ? 'true' : 'false',
+        slot_id: slotId ?? '',
       },
+
       success_url: `${SITE_URL}/testing/book/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${SITE_URL}/testing/book?exam=${examType}&cancelled=1`,
+      cancel_url: `${SITE_URL}/certification-testing?cancelled=1`,
     });
 
     return NextResponse.json({ url: session.url, sessionId: session.id });

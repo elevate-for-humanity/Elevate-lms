@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
+import { sendEnrollmentApprovalEmail } from './actions';
 
 interface Enrollment {
   id: string;
@@ -253,30 +254,14 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
         .update({ enrollment_status: 'active' })
         .eq('id', enrollment.user_id);
 
-      // Send approval email to student
+      // Send approval email via server action — never call /api/email/send directly from client
       try {
-        const studentName = enrollment.student?.full_name || 'Student';
         const studentEmail = enrollment.student?.email;
-        const courseName = enrollment.course?.course_name || enrollment.course?.title || 'your program';
         if (studentEmail) {
-          await fetch('/api/email/send', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              to: studentEmail,
-              subject: `You're Approved! Start ${courseName} — Elevate for Humanity`,
-              html: [
-                `<h2 style="font-weight:normal;font-size:22px;margin:0 0 20px;color:#1a1a1a">Hi ${studentName},</h2>`,
-                `<p style="font-size:15px;line-height:1.6;color:#334155">Your enrollment in <strong>${courseName}</strong> has been approved. You can now access your coursework.</p>`,
-                `<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:16px;margin:16px 0">`,
-                `<p style="margin:0 0 8px;font-weight:bold;color:#166534">You're ready to start</p>`,
-                `<p style="margin:0;color:#15803d;font-size:14px">Log in to your student portal to begin your first lesson. Your courses are now unlocked.</p>`,
-                `</div>`,
-                `<p style="text-align:center;margin:24px 0"><a href="${window.location.origin}/learner/dashboard" style="display:inline-block;padding:12px 24px;background:#f97316;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold">Go to Student Portal</a></p>`,
-                `<p style="font-size:14px;color:#475569">Questions? Reply to this email or call <strong>(317) 314-3757</strong>.</p>`,
-                `<p style="font-size:14px;color:#64748b;margin-top:24px">— Elevate for Humanity</p>`,
-              ].join(''),
-            }),
+          await sendEnrollmentApprovalEmail({
+            to: studentEmail,
+            studentName: enrollment.student?.full_name || 'Student',
+            courseName: enrollment.course?.course_name || enrollment.course?.title || 'your program',
           });
         }
       } catch {

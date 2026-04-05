@@ -1,10 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-
 import { createClient } from '@supabase/supabase-js';
-import { requireAdmin } from '@/lib/auth';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
-import { toErrorMessage } from '@/lib/safe';
+import { safeInternalError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -24,13 +23,20 @@ function getSupabaseAdmin() {
   );
 }
 
-export async function POST(req: Request) {
-    const rateLimited = await applyRateLimit(req, 'api');
-    if (rateLimited) return rateLimited;
+export async function POST(req: NextRequest) {
+  const rateLimited = await applyRateLimit(req, 'api');
+  if (rateLimited) return rateLimited;
+
+  let auth;
+  try {
+    auth = await apiRequireAdmin(req);
+  } catch (e) {
+    if (e instanceof Response) return e;
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
   const supabase = getSupabaseAdmin();
   try {
-    const { session } = await requireAdmin();
     const { creatorId } = await req.json();
     const { ipAddress } = getRequestMetadata(req);
 
@@ -67,7 +73,7 @@ export async function POST(req: Request) {
 
     // Audit log
     await logAuditEvent({
-      userId: session.user.id,
+      userId: auth!.id,
       action: AuditActions.MARKETPLACE_PAYOUT_PROCESSED,
       resourceType: 'marketplace_creator',
       resourceId: creatorId,
@@ -82,8 +88,7 @@ export async function POST(req: Request) {
       success: true,
       salesUpdated: data?.length || 0,
     });
-  } catch (err: any) {
-    // Error: $1
-    return NextResponse.json({ err: toErrorMessage(err) }, { status: 500 });
+  } catch (err) {
+    return safeInternalError(err, 'Failed to process payout');
   }
 }

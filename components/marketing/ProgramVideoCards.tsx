@@ -5,11 +5,13 @@ const PROGRAMS = [
   {
     tag: 'Healthcare',
     full: 'Certified Nursing Assistant',
-    duration: '4–8 weeks',
-    salary: '$28–$42K/yr',
-    funding: 'Fee-Based',
-    fundingColor: 'text-white',
-    image: '/images/pages/card-cna.jpg',
+    duration: '6 weeks',
+    salary: '$30–$42K/yr',
+    funding: 'WIOA / WRG Eligible',
+    fundingColor: 'text-green-400',
+    image: '/images/pages/programs-cna-hero.jpg',
+    // subject is centered — keep top of frame
+    objectPosition: 'center 20%',
     href: '/programs/cna',
   },
   {
@@ -19,7 +21,8 @@ const PROGRAMS = [
     salary: '$40–$80K/yr',
     funding: 'WIOA / WRG Eligible',
     fundingColor: 'text-green-400',
-    image: '/images/pages/card-hvac.jpg',
+    image: '/images/pages/programs-hvac-hero.jpg',
+    objectPosition: 'center center',
     href: '/programs/hvac-technician',
   },
   {
@@ -29,7 +32,8 @@ const PROGRAMS = [
     salary: '$50–$80K/yr',
     funding: 'WIOA / WRG Eligible',
     fundingColor: 'text-green-400',
-    image: '/images/pages/card-cdl.jpg',
+    image: '/images/pages/programs-cdl-hero.jpg',
+    objectPosition: 'center center',
     href: '/programs/cdl-training',
   },
   {
@@ -38,8 +42,9 @@ const PROGRAMS = [
     duration: '15–17 months',
     salary: '$35–$65K+/yr',
     funding: 'Fee-Based · $4,980',
-    fundingColor: 'text-white',
-    image: '/images/pages/barber-apprenticeship.jpg',
+    fundingColor: 'text-yellow-300',
+    image: '/images/pages/programs-barber-hero-new.jpg',
+    objectPosition: 'center 15%',
     href: '/programs/barber-apprenticeship',
   },
 ];
@@ -51,8 +56,10 @@ function ProgramCard({ prog }: { prog: typeof PROGRAMS[number] }) {
         src={prog.image}
         alt={prog.full}
         fill
-        className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+        className="object-cover transition-transform duration-500 group-hover:scale-105"
+        style={{ objectPosition: prog.objectPosition }}
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+        priority
       />
       <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/50 to-transparent" />
 

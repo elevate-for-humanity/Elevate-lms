@@ -166,7 +166,7 @@ export async function POST(req: NextRequest) {
     if (updateError) {
       logger.error('[process] status update failed', updateError);
       return NextResponse.json(
-        { error: updateError.message, completed_steps: steps },
+        { error: 'Failed to update application status', completed_steps: steps },
         { status: 500 },
       );
     }
@@ -189,7 +189,7 @@ export async function POST(req: NextRequest) {
     if (auditError) {
       logger.error('[process] audit log failed', auditError);
       return NextResponse.json(
-        { error: auditError.message, completed_steps: steps },
+        { error: 'Failed to record audit log', completed_steps: steps },
         { status: 500 },
       );
     }

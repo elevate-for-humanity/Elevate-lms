@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { apiRequireAdmin } from '@/lib/admin/guards';
+import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -170,7 +171,9 @@ export async function POST(request: Request) {
 
       sent++;
     } catch (err: any) {
-      errors.push(`${app.email}: ${err.message}`);
+      // Log full error server-side, return only a safe count to the caller
+      logger.warn('[follow-up-blast] email failed', { appId: app.id, err: err?.message });
+      errors.push(`Failed to send to recipient ${skipped + 1}`);
       skipped++;
     }
   }

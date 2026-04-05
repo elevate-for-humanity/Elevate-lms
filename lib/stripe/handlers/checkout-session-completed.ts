@@ -114,7 +114,10 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
 
           await fetch(`${siteUrl}/api/email/send`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+        'Content-Type': 'application/json',
+        'x-internal-secret': process.env.CRON_SECRET ?? '',
+      },
             body: JSON.stringify({
               to: customerEmail,
               subject: `Enrollment confirmed — ${programTitle}`,

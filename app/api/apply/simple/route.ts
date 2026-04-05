@@ -53,23 +53,8 @@ async function _POST(req: Request) {
 
     if (error) throw error;
 
-    // Send detailed welcome email (non-blocking)
-    const applicantName = (data.get("name") as string) || '';
-    const applicantEmail = (data.get("email") as string) || '';
-    if (applicantEmail) {
-      sendApplicationWelcomeEmail({
-        to: applicantEmail,
-        firstName: applicantName.split(' ')[0] || applicantName,
-        programSlug: program,
-      }).catch(() => {});
-
-      // Send onboarding email with Calendly link and next steps (BCC admin)
-      sendOnboardingEmail({
-        email: applicantEmail,
-        name: applicantName,
-        program,
-      }).catch(() => {});
-    }
+    // Welcome and onboarding emails fire when application moves to 'in_review'
+    // via the transition route — not on submission.
 
     return NextResponse.redirect(
       new URL("/apply/success", req.url),

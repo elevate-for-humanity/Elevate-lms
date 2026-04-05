@@ -1,7 +1,6 @@
-import { requireAdmin } from '@/lib/auth';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { barberFullOnboardingEmail } from '@/lib/email/templates/barber-full-onboarding';
 import { logger } from '@/lib/logger';
@@ -23,6 +22,13 @@ const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
  *   dryRun=true → returns the list without sending
  */
 export async function POST(request: NextRequest) {
+  try {
+    await apiRequireAdmin(request);
+  } catch (e) {
+    if (e instanceof Response) return e;
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const body = await request.json().catch(() => ({}));
     const dryRun = body.dryRun === true;

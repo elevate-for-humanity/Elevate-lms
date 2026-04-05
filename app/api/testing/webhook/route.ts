@@ -84,6 +84,8 @@ export async function POST(req: NextRequest) {
       chars[Math.floor(Math.random() * chars.length)]
     ).join('');
 
+    const hasAddOn = meta.add_on === 'true';
+
     const { error: insertErr } = await db.from('exam_bookings').insert({
       exam_type:          meta.exam_type,
       exam_name:          meta.exam_name,
@@ -97,6 +99,8 @@ export async function POST(req: NextRequest) {
       payment_intent_id:  paymentIntentId,
       fee_cents:          session.amount_total,
       confirmation_code:  confirmationCode,
+      add_on:             hasAddOn,
+      add_on_paid:        hasAddOn, // payment confirmed — flip immediately
     });
 
     if (insertErr) {
@@ -104,16 +108,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true }); // don't 500 — Stripe will retry
     }
 
-    logger.info('[testing/webhook] Booking created after payment', { confirmationCode });
+    logger.info('[testing/webhook] Booking created after payment', { confirmationCode, hasAddOn });
 
-    // Send confirmation email
     if (customerEmail) {
-      const siteUrl = SITE_URL;
-      await sendEmail({
-        to: customerEmail,
-        from: FROM,
-        subject: `Exam Booking Confirmed — ${confirmationCode} | Elevate Testing Center`,
-        html: `<!DOCTYPE html>
+      const emailJobs: Promise<unknown>[] = [];
+
+      // Booking confirmation
+      emailJobs.push(
+        sendEmail({
+          to: customerEmail,
+          from: FROM,
+          subject: `Exam Booking Confirmed — ${confirmationCode} | Elevate Testing Center`,
+          html: `<!DOCTYPE html>
 <html><body style="font-family:Arial,sans-serif;padding:24px;color:#1E293B;max-width:600px;margin:0 auto">
   <div style="background:#1E3A5F;padding:24px;border-radius:8px 8px 0 0;text-align:center">
     <h1 style="color:#fff;margin:0;font-size:20px">Exam Booking Confirmed</h1>
@@ -129,7 +135,39 @@ export async function POST(req: NextRequest) {
     <p>Questions? Call <strong>(317) 314-3757</strong>.</p>
   </div>
 </body></html>`,
-      }).catch(err => logger.warn('[testing/webhook] Confirmation email failed', { err }));
+        }).catch(err => logger.warn('[testing/webhook] Confirmation email failed', { err }))
+      );
+
+      // Add-on delivery — only when purchased and paid
+      if (hasAddOn) {
+        emailJobs.push(
+          sendEmail({
+            to: customerEmail,
+            from: FROM,
+            subject: `Your Certification Success Package — ${meta.exam_name} | Elevate Testing Center`,
+            html: `<!DOCTYPE html>
+<html><body style="font-family:Arial,sans-serif;padding:24px;color:#1E293B;max-width:600px;margin:0 auto">
+  <div style="background:#1E3A5F;padding:24px;border-radius:8px 8px 0 0;text-align:center">
+    <h1 style="color:#fff;margin:0;font-size:20px">Your Prep Materials Are Ready</h1>
+  </div>
+  <div style="background:#fff;border:1px solid #e2e8f0;border-top:none;padding:24px;border-radius:0 0 8px 8px">
+    <p>Hi ${firstName || 'there'},</p>
+    <p>You added the <strong>Certification Success Package</strong> to your booking. Here's what's included:</p>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;margin:16px 0">
+      <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b;width:200px">Full-length practice test</td><td style="padding:8px 0"><a href="${SITE_URL}/lms" style="color:#1E3A5F;font-weight:600">Access in your LMS account →</a></td></tr>
+      <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b">Study guide</td><td style="padding:8px 0"><a href="${SITE_URL}/lms" style="color:#1E3A5F;font-weight:600">Access in your LMS account →</a></td></tr>
+      <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b">Retake strategy</td><td style="padding:8px 0">Included in your study guide</td></tr>
+      <tr><td style="padding:8px 0;color:#64748b">Email support</td><td style="padding:8px 0"><a href="mailto:testing@elevateforhumanity.org" style="color:#1E3A5F;font-weight:600">testing@elevateforhumanity.org</a></td></tr>
+    </table>
+    <p>Don't have an LMS account yet? Reply to this email and we'll get you set up before your exam date.</p>
+    <p>Good luck,<br><strong>Alberta Davis</strong><br>Testing Center Coordinator</p>
+  </div>
+</body></html>`,
+          }).catch(err => logger.warn('[testing/webhook] Add-on email failed', { err }))
+        );
+      }
+
+      await Promise.allSettled(emailJobs);
     }
 
     return NextResponse.json({ received: true });

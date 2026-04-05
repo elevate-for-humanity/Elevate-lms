@@ -300,7 +300,10 @@ async function sendEnrollmentWelcomeEmail(params: {
 
     await fetch(`${siteUrl}/api/email/send`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-internal-secret': process.env.CRON_SECRET ?? '',
+      },
       body: JSON.stringify({
         to: email,
         subject: `Welcome to ${programDetails?.name || 'Your Program'} - Your Access is Ready!`,

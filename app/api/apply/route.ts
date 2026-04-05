@@ -130,23 +130,9 @@ export const POST = withRateLimit(
         }
       }
 
-      // Send detailed welcome email with program info, funding (WIOA/Job Ready Indy), and Indiana Career Connect steps
-      await sendApplicationWelcomeEmail({
-        to: email,
-        firstName,
-        programSlug: program,
-      }).catch((err) => {
-        logger.error('[apply] Welcome email failed (non-blocking):', err);
-      });
-
-      // Send onboarding email with Calendly scheduling link and next steps (BCC admin)
-      sendOnboardingEmail({
-        email,
-        name: `${firstName} ${lastName}`.trim(),
-        program,
-      }).catch((err) => {
-        logger.error('[apply] Onboarding email failed (non-blocking):', err);
-      });
+      // Welcome and onboarding emails are sent when the application moves to
+      // 'in_review' via the transition route — not on submission.
+      // Sending them here would email applicants before any review has occurred.
 
       // Send notification email to admin
       await sendEmail({

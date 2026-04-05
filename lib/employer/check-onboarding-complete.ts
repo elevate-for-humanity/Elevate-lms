@@ -221,7 +221,10 @@ export async function tryAutoActivate(
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
     await fetch(`${siteUrl}/api/email/send`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-internal-secret': process.env.CRON_SECRET ?? '',
+      },
       body: JSON.stringify({
         to: onboarding.contact_email,
         subject: template.subject,

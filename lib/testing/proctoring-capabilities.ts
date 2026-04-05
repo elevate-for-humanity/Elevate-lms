@@ -45,6 +45,16 @@ export interface CertProvider {
   fees?: ExamFee[];
   /** Group/bulk discount note */
   groupDiscount?: string;
+  /**
+   * Optional upsell add-on available at checkout.
+   * When present, the booking flow offers this as a checkbox.
+   */
+  addOn?: {
+    label: string;
+    description: string;
+    amountCents: number;
+    includes: string[];
+  };
 }
 
 export interface ProctoringOptions {
@@ -105,7 +115,7 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
     key: 'nha',
     name: 'NHA — National Healthcareer Association',
     capability: 'IN_PERSON_ONLY',
-    description: 'NHA Authorized Testing Center. Healthcare certification exams for phlebotomy, medical assisting, billing & coding, and more.',
+    description: 'NHA Authorized Testing Center (account #412957). Healthcare certification exams for phlebotomy, medical assisting, EKG, pharmacy tech, and more.',
     exams: [
       'Certified Phlebotomy Technician (CPT)',
       'Certified Clinical Medical Assistant (CCMA)',
@@ -116,17 +126,28 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
     ],
     verifyUrl: 'https://www.nhanow.com/',
     status: 'active',
-    // Exam fees = NHA exam cost + $25 Elevate proctoring surcharge.
-    // NHA exam costs confirmed from April 2026 proposals (account 412957).
+    // All NHA exams: $149 exam voucher (pass-through) + $94 testing & administration = $243 total.
+    // Pricing locked per owner decision — do not modify without approval.
     fees: [
-      { label: 'CPT — Phlebotomy',             amount: 154, note: '$129 NHA exam + $25 proctoring' },
-      { label: 'CCMA — Medical Assistant',      amount: 190, note: '$165 NHA exam + $25 proctoring' },
-      { label: 'CET — EKG Technician',          amount: 154, note: '$129 NHA exam + $25 proctoring' },
-      { label: 'ExCPT — Pharmacy Technician',   amount: 154, note: '$129 NHA exam + $25 proctoring (includes free retake)' },
-      { label: 'CPCT/A — Patient Care Tech',    amount: 154, note: '$129 NHA exam + $25 proctoring' },
-      { label: 'CMAA — Medical Admin Assistant', amount: 154, note: '$129 NHA exam + $25 proctoring' },
+      { label: 'CPT — Phlebotomy',              amount: 243, note: '$149 NHA exam + $94 testing & administration' },
+      { label: 'CCMA — Medical Assistant',       amount: 243, note: '$149 NHA exam + $94 testing & administration' },
+      { label: 'CET — EKG Technician',           amount: 243, note: '$149 NHA exam + $94 testing & administration' },
+      { label: 'ExCPT — Pharmacy Technician',    amount: 243, note: '$149 NHA exam + $94 testing & administration' },
+      { label: 'CPCT/A — Patient Care Tech',     amount: 243, note: '$149 NHA exam + $94 testing & administration' },
+      { label: 'CMAA — Medical Admin Assistant', amount: 243, note: '$149 NHA exam + $94 testing & administration' },
     ],
     groupDiscount: 'Groups of 5+ — contact us for cohort pricing',
+    addOn: {
+      label: 'Certification Success Package',
+      description: 'Boost your pass rate with targeted prep materials.',
+      amountCents: 5900,
+      includes: [
+        'Full-length NHA practice test',
+        'Study guide with exam blueprint breakdown',
+        'Retake strategy session (if needed)',
+        'Email support from our prep team',
+      ],
+    },
   },
   workkeys: {
     key: 'workkeys',

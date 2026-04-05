@@ -45,7 +45,10 @@ export async function sendWelcomeSequence(enrollmentId: string) {
   setTimeout(async () => {
     await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-internal-secret': process.env.CRON_SECRET ?? '',
+      },
       body: JSON.stringify({
         to: profile.email,
         subject: `Getting Started with ${program.name}`,
@@ -62,7 +65,10 @@ export async function sendWelcomeSequence(enrollmentId: string) {
   setTimeout(async () => {
     await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-internal-secret': process.env.CRON_SECRET ?? '',
+      },
       body: JSON.stringify({
         to: profile.email,
         subject: 'How are you doing?',
@@ -114,7 +120,10 @@ export async function sendInactivityReminders() {
     try {
       await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+        'Content-Type': 'application/json',
+        'x-internal-secret': process.env.CRON_SECRET ?? '',
+      },
         body: JSON.stringify({
           to: profile.email,
           subject: `We miss you in ${course.title}!`,
@@ -170,7 +179,10 @@ export async function sendCompletionNudges() {
     try {
       await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+        'Content-Type': 'application/json',
+        'x-internal-secret': process.env.CRON_SECRET ?? '',
+      },
         body: JSON.stringify({
           to: profile.email,
           subject: `You're almost done with ${course.title}! 🎉`,

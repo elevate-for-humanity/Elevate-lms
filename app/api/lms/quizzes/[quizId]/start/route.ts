@@ -21,7 +21,7 @@ async function _POST(
   // quizzes.course_id is the direct link — no multi-join needed.
   const { data: quiz, error: quizError } = await db
     .from('quizzes')
-    .select('id, course_id, max_attempts, requires_proctoring')
+    .select('id, course_id, lesson_id, max_attempts, requires_proctoring')
     .eq('id', quizId)
     .single();
 
@@ -29,24 +29,90 @@ async function _POST(
     return NextResponse.json({ error: 'Quiz not found' }, { status: 404 });
   }
 
-  // A quiz with no course_id is corrupt data — fail closed rather than
-  // skipping enrollment verification and allowing an unscoped write.
-  if (!quiz.course_id) {
-    return NextResponse.json({ error: 'Quiz not found' }, { status: 404 });
-  }
+  // Enrollment verification — two-path check to handle the current DB state
+  // where quizzes.course_id is often null but program_enrollments.course_id
+  // and program_enrollments.program_id are populated.
+  //
+  // Path 1: quiz has course_id → check program_enrollments.course_id directly
+  // Path 2: quiz has lesson_id → resolve course via curriculum_lessons → course_modules → courses → program_id
+  // Path 3: admin/super_admin bypass (they can start any quiz)
+  //
+  // If no ownership can be resolved, fail closed.
 
-  // Verify enrollment before creating any attempt.
-  // Without this, any authenticated user can start attempts for any quiz ID.
-  const { data: enrollment } = await db
-    .from('program_enrollments')
-    .select('id')
-    .eq('user_id', user.id)
-    .eq('course_id', quiz.course_id)
-    .in('status', ['active', 'enrolled', 'in_progress', 'completed', 'confirmed'])
-    .maybeSingle();
+  const isAdmin = auth.profile.role === 'admin' || auth.profile.role === 'super_admin';
+  let enrolled = isAdmin; // admins bypass enrollment check
 
-  if (!enrollment) {
-    return NextResponse.json({ error: 'Not enrolled in this course' }, { status: 403 });
+  if (!enrolled) {
+    if (quiz.course_id) {
+      // Path 1 — direct course_id match
+      const { data: e1 } = await db
+        .from('program_enrollments')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('course_id', quiz.course_id)
+        .in('status', ['active', 'enrolled', 'in_progress', 'completed', 'confirmed'])
+        .maybeSingle();
+      if (e1) enrolled = true;
+    }
+
+    if (!enrolled && quiz.lesson_id) {
+      // Path 2 — resolve program_id via lesson → module → course chain
+      const { data: lessonRow } = await db
+        .from('curriculum_lessons')
+        .select('module_id')
+        .eq('id', quiz.lesson_id)
+        .maybeSingle();
+
+      if (lessonRow?.module_id) {
+        const { data: moduleRow } = await db
+          .from('course_modules')
+          .select('course_id')
+          .eq('id', lessonRow.module_id)
+          .maybeSingle();
+
+        if (moduleRow?.course_id) {
+          const { data: courseRow } = await db
+            .from('courses')
+            .select('id, program_id')
+            .eq('id', moduleRow.course_id)
+            .maybeSingle();
+
+          if (courseRow) {
+            // Check by course_id
+            const { data: e2 } = await db
+              .from('program_enrollments')
+              .select('id')
+              .eq('user_id', user.id)
+              .eq('course_id', courseRow.id)
+              .in('status', ['active', 'enrolled', 'in_progress', 'completed', 'confirmed'])
+              .maybeSingle();
+            if (e2) enrolled = true;
+
+            // Check by program_id if course check failed
+            if (!enrolled && courseRow.program_id) {
+              const { data: e3 } = await db
+                .from('program_enrollments')
+                .select('id')
+                .eq('user_id', user.id)
+                .eq('program_id', courseRow.program_id)
+                .in('status', ['active', 'enrolled', 'in_progress', 'completed', 'confirmed'])
+                .maybeSingle();
+              if (e3) enrolled = true;
+            }
+          }
+        }
+      }
+    }
+
+    // If quiz has neither course_id nor lesson_id the ownership chain is broken.
+    // Fail closed — do not allow unscoped quiz attempts.
+    if (!enrolled && !quiz.course_id && !quiz.lesson_id) {
+      return NextResponse.json({ error: 'Quiz not found' }, { status: 404 });
+    }
+
+    if (!enrolled) {
+      return NextResponse.json({ error: 'Not enrolled in this course' }, { status: 403 });
+    }
   }
 
   // Check existing attempts

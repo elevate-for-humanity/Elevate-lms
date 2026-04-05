@@ -39,6 +39,11 @@ function BookingForm() {
   const [phone, setPhone] = useState('');
   const [preferredDate, setPreferredDate] = useState('');
   const [notes, setNotes] = useState('');
+  const [addOnSelected, setAddOnSelected] = useState(false);
+  const [leadCaptured, setLeadCaptured] = useState(false);
+  const [slots, setSlots] = useState<{ id: string; examType: string; startTime: string; endTime: string; location: string; spotsRemaining: number }[]>([]);
+  const [selectedSlotId, setSelectedSlotId] = useState('');
+  const [slotsLoading, setSlotsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [enforcementHold, setEnforcementHold] = useState<{
@@ -46,6 +51,27 @@ function BookingForm() {
   } | null>(null);
   const [checkingHold, setCheckingHold] = useState(false);
   const [payingFee, setPayingFee] = useState(false);
+
+  // Capture lead as soon as email is entered — fires follow-up sequence if they abandon
+  const captureLead = async (emailVal: string) => {
+    if (!emailVal || !emailVal.includes('@') || leadCaptured) return;
+    try {
+      await fetch('/api/testing/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: emailVal,
+          examType: selectedProvider?.key ?? 'nha',
+          firstName: name.trim().split(' ')[0] || undefined,
+          phone: phone || undefined,
+          source: 'booking_form',
+        }),
+      });
+      setLeadCaptured(true);
+    } catch {
+      // non-blocking — never interrupt the booking flow
+    }
+  };
 
   // Check for no-show/retake hold when email is entered
   const checkEnforcementHold = async (emailVal: string) => {
@@ -89,9 +115,19 @@ function BookingForm() {
     if (typeParam === 'group-testing')    setOrgType('Employer / Company');
   }, [typeParam]);
 
-  // Reset proctoring mode when provider changes
+  // Reset proctoring mode, add-on, and slot when provider changes
   useEffect(() => {
     setProctoringMode('');
+    setAddOnSelected(false);
+    setSelectedSlotId('');
+    setSlots([]);
+    if (!selectedProvider) return;
+    setSlotsLoading(true);
+    fetch(`/api/testing/slots/public?examType=${encodeURIComponent(selectedProvider.key)}`)
+      .then(r => r.json())
+      .then(data => setSlots(data.slots ?? []))
+      .catch(() => setSlots([]))
+      .finally(() => setSlotsLoading(false));
   }, [selectedProvider]);
 
   const proctoringOptions = selectedProvider
@@ -119,21 +155,32 @@ function BookingForm() {
       // For individual bookings with a fee — go to Stripe first, booking created on success
       const fee = selectedProvider.fees?.[0];
       if (fee && !isOrg) {
+        const addOnCents = addOnSelected ? (selectedProvider.addOn?.amountCents ?? 0) : 0;
+        const totalCents = fee.amount * 100 + addOnCents;
         const res = await fetch('/api/testing/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             examType: selectedProvider.key,
             examName: selectedProvider.name,
-            feeCents: fee.amount * 100,
+            feeCents: totalCents,
             bookingType: 'individual',
             participantCount: 1,
             email,
             name,
+            addOn: addOnSelected,
+            addOnCents,
+            slotId: selectedSlotId || null,
           }),
         });
         const data = await res.json();
         if (data.url) {
+          // Mark lead converted — they're going to Stripe, follow-ups not needed
+          fetch('/api/testing/leads', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, examType: selectedProvider.key }),
+          }).catch(() => {});
           // Save booking intent to session storage so success page can complete it
           sessionStorage.setItem('pendingBooking', JSON.stringify({
             examType: selectedProvider.key,
@@ -142,7 +189,9 @@ function BookingForm() {
             firstName, lastName, email, phone,
             organization: org, participantCount: 1,
             preferredDate, preferredTime: '',
+            slotId: selectedSlotId || null,
             notes,
+            addOn: addOnSelected,
           }));
           window.location.href = data.url;
           return;
@@ -163,11 +212,18 @@ function BookingForm() {
           participantCount: qty,
           preferredDate,
           preferredTime: '',
+          slotId: selectedSlotId || null,
           notes: notes || null,
         }),
       });
       const data = await res.json();
       if (data.success) {
+        // Mark lead converted so follow-up emails don't fire
+        fetch('/api/testing/leads', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, examType: selectedProvider.key }),
+        }).catch(() => {});
         setSubmitted(true);
       } else {
         alert(data.error ?? 'Booking failed. Please call (317) 314-3757.');
@@ -296,6 +352,71 @@ function BookingForm() {
             </div>
           )}
 
+          {/* Add-on upsell — NHA only, shown for individual or unset org type */}
+          {selectedProvider?.addOn && (orgType === 'Individual' || orgType === '') && (
+            <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-5">
+              <p className="text-amber-700 text-xs font-semibold uppercase tracking-widest mb-3">
+                Recommended for first-time test takers
+              </p>
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={addOnSelected}
+                  onChange={e => setAddOnSelected(e.target.checked)}
+                  className="mt-1 w-4 h-4 accent-amber-600 flex-shrink-0"
+                />
+                <div>
+                  <p className="font-bold text-slate-900 text-sm">
+                    {selectedProvider.addOn.label}{' '}
+                    <span className="text-amber-700">+${(selectedProvider.addOn.amountCents / 100).toFixed(0)}</span>
+                  </p>
+                  <p className="text-slate-500 text-xs mt-0.5">{selectedProvider.addOn.description}</p>
+                  <ul className="mt-2 space-y-1">
+                    {selectedProvider.addOn.includes.map(item => (
+                      <li key={item} className="flex items-start gap-1.5 text-xs text-slate-600">
+                        <span className="text-amber-500 font-bold mt-0.5">✓</span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </label>
+            </div>
+          )}
+
+          {/* Dynamic price summary — shown for individual or unset org type */}
+          {selectedProvider?.fees && selectedProvider.fees.length > 0 && (orgType === 'Individual' || orgType === '') && (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Order Summary</p>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between text-slate-700">
+                  <span>NHA Certification Exam</span>
+                  <span className="font-semibold">$149</span>
+                </div>
+                <div className="flex justify-between text-slate-700">
+                  <span>Testing &amp; Administration</span>
+                  <span className="font-semibold">$94</span>
+                </div>
+                {addOnSelected && selectedProvider.addOn && (
+                  <div className="flex justify-between text-amber-700">
+                    <span>{selectedProvider.addOn.label}</span>
+                    <span className="font-semibold">+${(selectedProvider.addOn.amountCents / 100).toFixed(0)}</span>
+                  </div>
+                )}
+                <div className="border-t border-slate-200 pt-2 flex justify-between font-extrabold text-slate-900 text-base">
+                  <span>Total</span>
+                  <span>
+                    ${(
+                      (selectedProvider.fees[0].amount) +
+                      (addOnSelected && selectedProvider.addOn ? selectedProvider.addOn.amountCents / 100 : 0)
+                    ).toFixed(0)}
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs text-slate-400 mt-3">Secure checkout · Instant confirmation · No hidden fees</p>
+            </div>
+          )}
+
           {/* Step 2 — Proctoring mode (driven by capability) */}
           {selectedProvider && availableModes.length > 0 && (
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
@@ -362,7 +483,7 @@ function BookingForm() {
                   <label className="block text-xs font-semibold text-slate-600 mb-1">Email *</label>
                   <input required type="email" value={email}
                     onChange={e => { setEmail(e.target.value); setEnforcementHold(null); }}
-                    onBlur={e => checkEnforcementHold(e.target.value)}
+                    onBlur={e => { checkEnforcementHold(e.target.value); captureLead(e.target.value); }}
                     className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                     placeholder="you@example.com" />
                 </div>
@@ -391,11 +512,62 @@ function BookingForm() {
                 </div>
               </div>
 
+              {/* Slot picker — pulls live availability from DB */}
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">Preferred date(s)</label>
-                <input type="text" value={preferredDate} onChange={e => setPreferredDate(e.target.value)}
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
-                  placeholder="e.g. Any Tuesday in March, or specific date" />
+                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                  Select a testing date &amp; time *
+                </label>
+                {slotsLoading ? (
+                  <p className="text-xs text-slate-400 py-2">Loading available slots...</p>
+                ) : slots.length === 0 ? (
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+                    <p className="text-xs text-amber-800 font-medium">No slots currently available online.</p>
+                    <p className="text-xs text-amber-700 mt-0.5">
+                      Call <a href="tel:3173143757" className="font-semibold underline">(317) 314-3757</a> to schedule directly.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {slots.map(slot => {
+                      const start = new Date(slot.startTime);
+                      const end   = new Date(slot.endTime);
+                      const dateLabel = start.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+                      const timeLabel = `${start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} – ${end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+                      const selected  = selectedSlotId === slot.id;
+                      const almostFull = slot.spotsRemaining <= 2;
+                      return (
+                        <label
+                          key={slot.id}
+                          className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                            selected ? 'border-brand-blue-500 bg-brand-blue-50' : 'border-slate-200 hover:border-slate-300'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="slotId"
+                            value={slot.id}
+                            checked={selected}
+                            onChange={() => {
+                              setSelectedSlotId(slot.id);
+                              setPreferredDate(start.toISOString().split('T')[0]);
+                            }}
+                            className="mt-0.5 flex-shrink-0"
+                            required
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-slate-900">{dateLabel}</p>
+                            <p className="text-xs text-slate-500">{timeLabel}</p>
+                          </div>
+                          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
+                            almostFull ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+                          }`}>
+                            {slot.spotsRemaining} spot{slot.spotsRemaining !== 1 ? 's' : ''} left
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               <div>
@@ -446,7 +618,10 @@ function BookingForm() {
                 {submitting
                   ? 'Processing...'
                   : selectedProvider?.fees?.length && orgType === 'Individual'
-                  ? `Pay & Book — $${selectedProvider.fees[0].amount}`
+                  ? `Pay & Book — $${
+                      selectedProvider.fees[0].amount +
+                      (addOnSelected && selectedProvider.addOn ? selectedProvider.addOn.amountCents / 100 : 0)
+                    }`
                   : 'Submit Booking Request'}
               </button>
 

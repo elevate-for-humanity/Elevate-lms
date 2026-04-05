@@ -10,10 +10,19 @@ export const maxDuration = 60;
 /**
  * POST /api/email/send
  * Internal endpoint called by server actions to send transactional emails.
- * No auth required — callers are trusted server-side code.
- * Rate-limited to prevent abuse.
+ * Requires x-internal-secret header matching CRON_SECRET — not publicly callable.
+ * Rate-limited as a secondary defence.
  */
 async function _POST(req: Request) {
+  // Verify internal caller — reject any request without the shared secret.
+  // This prevents the route from being used as an open email relay.
+  const secret = process.env.CRON_SECRET;
+  const provided = (req as any).headers?.get?.('x-internal-secret') ??
+    (req as Request).headers.get('x-internal-secret');
+  if (!secret || provided !== secret) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
 

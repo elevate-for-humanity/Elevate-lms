@@ -62,6 +62,14 @@ async function callGemini(
 }
 
 export async function POST(req: NextRequest) {
+  // Require authenticated session — prevents open AI quota drain
+  const { createClient } = await import('@/lib/supabase/server');
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
 

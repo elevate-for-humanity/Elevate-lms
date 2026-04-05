@@ -28,18 +28,17 @@ const IMPERSONATION_COOKIE = 'elevate_impersonation';
 const MAX_IMPERSONATION_MINUTES = 60;
 
 export async function POST(req: NextRequest) {
-  // IP guard — admin routes only
   const ipBlocked = checkAdminIP(req);
   if (ipBlocked) return ipBlocked;
 
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiAuthGuard({
-    requireAuth: true,
-    allowedRoles: ['admin', 'super_admin'],
-  });
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await apiAuthGuard();
+
+  // Require admin or super_admin
+  if (!auth.role || !['admin', 'super_admin'].includes(auth.role)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const body = await req.json().catch(() => null);
@@ -63,13 +62,9 @@ export async function POST(req: NextRequest) {
   }
 
   if (['admin', 'super_admin'].includes(target.role)) {
-    return NextResponse.json(
-      { error: 'Cannot impersonate admin users' },
-      { status: 403 }
-    );
+    return NextResponse.json({ error: 'Cannot impersonate admin users' }, { status: 403 });
   }
 
-  // Cannot impersonate yourself
   if (target_user_id === auth.id) {
     return NextResponse.json({ error: 'Cannot impersonate yourself' }, { status: 400 });
   }
@@ -85,7 +80,6 @@ export async function POST(req: NextRequest) {
     reason: reason ?? null,
   };
 
-  // Write immutable audit entry
   await logAuditEvent({
     actor_user_id: auth.id,
     actor_role: auth.role ?? 'admin',
@@ -96,7 +90,6 @@ export async function POST(req: NextRequest) {
     req,
   });
 
-  // Set signed session cookie (httpOnly, secure, sameSite strict)
   const cookieStore = await cookies();
   cookieStore.set(IMPERSONATION_COOKIE, JSON.stringify(session), {
     httpOnly: true,
@@ -121,8 +114,10 @@ export async function DELETE(req: NextRequest) {
   const ipBlocked = checkAdminIP(req);
   if (ipBlocked) return ipBlocked;
 
-  const auth = await apiAuthGuard({ requireAuth: true, allowedRoles: ['admin', 'super_admin'] });
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await apiAuthGuard();
+
+  if (!auth.role || !['admin', 'super_admin'].includes(auth.role)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const cookieStore = await cookies();

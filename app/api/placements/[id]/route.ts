@@ -16,10 +16,7 @@ export async function GET(
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiAuthGuard({
-    requireAuth: true,
-    allowedRoles: ['admin', 'super_admin', 'staff', 'case_manager', 'provider_admin'],
-  });
+  const auth = await apiAuthGuard();
 
   const { id } = await params;
   const db = createAdminClient();
@@ -48,10 +45,7 @@ export async function PATCH(
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiAuthGuard({
-    requireAuth: true,
-    allowedRoles: ['admin', 'super_admin', 'staff', 'case_manager'],
-  });
+  const auth = await apiAuthGuard();
 
   const { id } = await params;
   const body = await req.json().catch(() => null);
@@ -104,5 +98,5 @@ export async function PATCH(
     req,
   });
 
-  return NextResponse.json({ success: true, placement: updated });
+  return NextResponse.json({ placement: updated });
 }

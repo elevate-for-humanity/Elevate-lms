@@ -1,5 +1,4 @@
 "use client";
-import { createAdminClient } from '@/lib/supabase/admin';
 
 import React from 'react';
 

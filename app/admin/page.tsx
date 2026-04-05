@@ -155,7 +155,7 @@ export default async function AdminLandingPage() {
               >
                 <div className="min-w-0">
                   <p className="font-semibold text-slate-900 truncate">
-                    {app.full_name ?? `${app.first_name ?? ''} ${app.last_name ?? ''}`.trim() || 'Unknown applicant'}
+                    {(app.full_name ?? `${app.first_name ?? ''} ${app.last_name ?? ''}`.trim()) || 'Unknown applicant'}
                   </p>
                   <p className="text-sm text-slate-500 truncate">{app.program_interest ?? 'No program specified'}</p>
                 </div>

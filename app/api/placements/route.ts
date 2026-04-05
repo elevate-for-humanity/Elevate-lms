@@ -13,10 +13,7 @@ export async function GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiAuthGuard({
-    requireAuth: true,
-    allowedRoles: ['admin', 'super_admin', 'staff', 'case_manager', 'provider_admin'],
-  });
+  const auth = await apiAuthGuard();
 
   const db = createAdminClient();
   if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
@@ -50,7 +47,7 @@ export async function GET(req: NextRequest) {
 
   // Scope provider_admin to their tenant
   if (auth.role === 'provider_admin') {
-    query = query.eq('tenant_id', auth.profile?.tenant_id);
+    query = query.eq('tenant_id', (auth as any).profile?.tenant_id);
   }
 
   // Scope case_manager to assigned learners
@@ -74,10 +71,7 @@ export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiAuthGuard({
-    requireAuth: true,
-    allowedRoles: ['admin', 'super_admin', 'staff', 'case_manager'],
-  });
+  const auth = await apiAuthGuard();
 
   const body = await req.json().catch(() => null);
   if (!body?.learner_id || !body?.hire_date || !body?.job_title) {
@@ -126,5 +120,5 @@ export async function POST(req: NextRequest) {
     req,
   });
 
-  return NextResponse.json({ success: true, placement: record }, { status: 201 });
+  return NextResponse.json({ placement: record }, { status: 201 });
 }

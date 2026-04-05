@@ -386,10 +386,10 @@ Elevate for Humanity Career & Technical Institute
  * GET endpoint to check tracking status
  */
 async function _GET(request: NextRequest) {
-  
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
-// Only allow from authorized domains
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  // Only allow from authorized domains
   const origin = request.headers.get('origin') || '';
   const officialDomains = getOfficialDomains();
   const isAuthorized = officialDomains.some((d) => origin.includes(d));

@@ -27,8 +27,7 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
 
-    const auth = await apiAuthGuard({ requireAuth: true });
-    }
+    const auth = await apiAuthGuard();
 
     const body = await parseBody<z.infer<typeof licensePaymentSchema>>(request);
     const parsed = licensePaymentSchema.safeParse(body);
@@ -38,6 +37,7 @@ async function _POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
     const { productId, customerInfo } = parsed.data;
 
     // Get product details from DB (with hardcoded fallback during migration)
@@ -125,19 +125,13 @@ async function _POST(request: NextRequest) {
       amount: product.price,
       status: 'pending',
     });
-
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,
-      paymentIntentId: paymentIntent.id,
+      customerId: customer.id,
+      amount: product.price,
     });
   } catch (err: unknown) {
-    return NextResponse.json(
-      {
-        error:
-          'Internal server error',
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 export const POST = withApiAudit('/api/store/licenses/create-payment-intent', _POST);

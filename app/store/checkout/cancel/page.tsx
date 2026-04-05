@@ -1,6 +1,5 @@
 "use client";
 import Image from 'next/image';
-import { createAdminClient } from '@/lib/supabase/admin';
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from "next/navigation";

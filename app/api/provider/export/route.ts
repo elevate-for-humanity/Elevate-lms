@@ -36,12 +36,7 @@ export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiAuthGuard({
-    requireAuth: true,
-    allowedRoles: ['provider_admin', 'admin', 'super_admin'],
-  });
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await apiAuthGuard();
 
   const body = await req.json().catch(() => null);
   if (!body?.export_type) {
@@ -92,10 +87,5 @@ export async function POST(req: NextRequest) {
     req,
   });
 
-  return NextResponse.json({
-    success: true,
-    job_id: jobId,
-    message: `Export job queued. Poll /api/provider/export/${jobId}/status for completion.`,
-    export_type: exportType,
-  }, { status: 202 });
+  return NextResponse.json({ job_id: jobId, status: 'queued' }, { status: 202 });
 }

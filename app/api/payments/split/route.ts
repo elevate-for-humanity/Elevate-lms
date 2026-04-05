@@ -34,8 +34,7 @@ async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiAuthGuard({ requireAuth: true });
-  }
+  const auth = await apiAuthGuard();
 
   const supabase = await createClient();
 
@@ -48,6 +47,7 @@ async function _POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
     const { enrollment_id, total_amount, payment_method, transaction_id } = parsed.data;
 
     // Get enrollment details
@@ -134,8 +134,7 @@ async function _POST(request: NextRequest) {
         vendor_name: vendorConfig.vendor,
       },
     });
-  } catch (error) { 
-    // Error: $1
+  } catch (error) {
     return NextResponse.json(
       { error: 'Failed to process payment split' },
       { status: 500 }

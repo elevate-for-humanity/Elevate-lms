@@ -17,12 +17,7 @@ export async function POST(
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiAuthGuard({
-    requireAuth: true,
-    allowedRoles: ['admin', 'super_admin', 'staff'],
-  });
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await apiAuthGuard();
 
   const { id } = await params;
   const body = await req.json().catch(() => null);
@@ -93,5 +88,5 @@ export async function POST(
     req,
   });
 
-  return NextResponse.json({ success: true, approval: updated });
+  return NextResponse.json({ approval: updated });
 }

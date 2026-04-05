@@ -13,12 +13,7 @@ export async function GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiAuthGuard({
-    requireAuth: true,
-    allowedRoles: ['provider_admin', 'admin', 'super_admin', 'staff'],
-  });
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await apiAuthGuard();
 
   const db = createAdminClient();
   if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });

@@ -22,13 +22,13 @@ function escapeHtml(text: string): string {
 }
 
 async function _GET(req: NextRequest) {
-  
-    const rateLimited = await applyRateLimit(req, 'api');
-    if (rateLimited) return rateLimited;
+  const rateLimited = await applyRateLimit(req, 'api');
+  if (rateLimited) return rateLimited;
 
-    const auth = await requireAuth(req);
-    if (auth.error) return auth.error;
-const { searchParams } = new URL(req.url);
+  const auth = await requireAuth(req);
+  if (auth.error) return auth.error;
+
+  const { searchParams } = new URL(req.url);
   const repo = searchParams.get('repo');
   const ref = searchParams.get('ref') || 'main';
   const path = searchParams.get('path') || 'README.md';

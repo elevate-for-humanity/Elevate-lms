@@ -17,10 +17,9 @@ function csvEscape(v: any) {
 }
 
 async function _GET(req: Request) {
-  
-    const rateLimited = await applyRateLimit(req, 'api');
-    if (rateLimited) return rateLimited;
-const supabase = await createClient();
+  const rateLimited = await applyRateLimit(req, 'api');
+  if (rateLimited) return rateLimited;
+  const supabase = await createClient();
   const {
     data: { user },
     error: authErr,

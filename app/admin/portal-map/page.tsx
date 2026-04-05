@@ -1,5 +1,4 @@
 "use client";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import React from 'react';
 

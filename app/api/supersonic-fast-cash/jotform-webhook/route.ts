@@ -419,10 +419,9 @@ async function _POST(request: NextRequest) {
 
 /** Health check — returns 200 with no details */
 async function _GET(request: Request) {
-  
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
-return NextResponse.json({ ok: true });
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+  return NextResponse.json({ ok: true });
 }
 export const GET = withApiAudit('/api/supersonic-fast-cash/jotform-webhook', _GET, { actor_type: 'webhook' });
 export const POST = withApiAudit('/api/supersonic-fast-cash/jotform-webhook', _POST, { actor_type: 'webhook' });

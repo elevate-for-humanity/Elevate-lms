@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';

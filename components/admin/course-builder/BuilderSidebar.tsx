@@ -1,6 +1,5 @@
 'use client';
 
-'use client';
 
 import type { ElementType } from 'react';
 import Link from 'next/link';

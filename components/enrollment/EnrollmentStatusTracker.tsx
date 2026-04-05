@@ -1,12 +1,3 @@
-/**
- * EnrollmentStatusTracker Component
- * 
- * Addresses soft hold #8:
- * - Shows clear progress: Applied → Eligible → Funded → Enrolled → Start Date
- * - Eliminates "site not finished" perception
- * - Provides transparency into the enrollment process
- */
-
 'use client';
 
 import { Clock, Circle, AlertCircle } from 'lucide-react';

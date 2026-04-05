@@ -61,7 +61,7 @@ export default async function EmployerDashboardOrchestrated() {
   // Employer account exists but not yet approved — show pending state
   if (profile.role === 'employer' && !profile.verified) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
           <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Building2 className="w-8 h-8 text-brand-blue-600" />

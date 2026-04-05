@@ -113,13 +113,13 @@ export default async function ProgramHolderDashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs items={[{ label: 'Program Holder Dashboard' }]} />
 
       <div className="relative h-48 sm:h-56 w-full overflow-hidden">
         <Image src="/images/pages/workforce-training.jpg" alt="Program Holder Portal" fill className="object-cover object-center" priority sizes="100vw" />
       </div>
-      <div className="bg-slate-900 px-6 py-6">
+      <div className="bg-brand-blue-700 px-6 py-6">
         <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
             <div>
               <p className="text-brand-orange-400 text-xs font-bold uppercase tracking-widest mb-1">Elevate For Humanity</p>

@@ -171,7 +171,7 @@ export default async function StudentDashboard() {
     : 1;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
 
       {/* ── Top bar ──────────────────────────────────────────────────────── */}
       <div className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
@@ -189,7 +189,7 @@ export default async function StudentDashboard() {
 
         {/* ── COMMAND CENTER — above the fold ──────────────────────────── */}
         {activeEnrollment && !isPendingApproval ? (
-          <div className="bg-slate-900 rounded-2xl overflow-hidden">
+          <div className="bg-brand-blue-700 rounded-2xl overflow-hidden">
             <div className="px-6 sm:px-8 py-6 sm:py-8">
               {/* Identity line */}
               <div className="flex items-center gap-2 mb-4">
@@ -515,7 +515,7 @@ export default async function StudentDashboard() {
             )}
 
             {/* Credential pathway */}
-            <div className="bg-slate-900 rounded-xl p-5">
+            <div className="bg-brand-blue-700 rounded-xl p-5">
               <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Credential Pathway</h3>
               <div className="space-y-3">
                 {[

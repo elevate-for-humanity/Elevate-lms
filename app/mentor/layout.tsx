@@ -19,6 +19,7 @@ const ALLOWED_ROLES = ['mentor', 'admin', 'super_admin'];
 const NAV_ITEMS = [
   { href: '/mentor/dashboard', label: 'Dashboard' },
   { href: '/mentor/mentees',   label: 'Mentees' },
+  { href: '/mentor/approvals', label: 'Approvals' },
   { href: '/mentor/sessions',  label: 'Sessions' },
   { href: '/mentor/messages',  label: 'Messages' },
   { href: '/mentor/resources', label: 'Resources' },

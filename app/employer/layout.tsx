@@ -88,24 +88,44 @@ export default async function EmployerLayout({
   const isActive = onboarding?.status === 'active';
   const isApprovedOnboarding = onboarding?.status === 'approved';
 
+  const navLinks = [
+    { href: '/employer/dashboard',       label: 'Dashboard' },
+    { href: '/employer/candidates',      label: 'Candidates' },
+    { href: '/employer/jobs',            label: 'Jobs' },
+    { href: '/employer/post-job',        label: 'Post a Job' },
+    { href: '/employer/apprenticeships', label: 'Apprenticeships' },
+    { href: '/employer/placements',      label: 'Placements' },
+    { href: '/employer/hours',           label: 'Hours' },
+    { href: '/employer/shop',            label: 'Shop' },
+    { href: '/employer/compliance',      label: 'Compliance' },
+    { href: '/employer/analytics',       label: 'Analytics' },
+    { href: '/employer/reports',         label: 'Reports' },
+    { href: '/employer/settings',        label: 'Settings' },
+  ];
+
+  const shell = (content: React.ReactNode) => (
+    <div className="min-h-screen bg-white">
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-40">
+        <div className="max-w-screen-xl mx-auto px-4 flex items-center gap-6 h-14 overflow-x-auto">
+          <a href="/employer/dashboard" className="font-black text-brand-blue-700 whitespace-nowrap shrink-0">Employer Portal</a>
+          {navLinks.map(l => (
+            <a key={l.href} href={l.href} className="text-sm text-gray-600 hover:text-brand-blue-700 whitespace-nowrap transition-colors">{l.label}</a>
+          ))}
+          <a href="/api/auth/signout" className="ml-auto text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap shrink-0">Sign out</a>
+        </div>
+      </nav>
+      <main>{content}</main>
+    </div>
+  );
+
   // If employer is fully active, allow everything
-  if (isActive) {
-    return <>{children}</>;
-  }
+  if (isActive) return shell(children);
 
-  // If approved but still onboarding, allow document upload routes
-  // so they can complete their onboarding requirements
-  if (isApprovedOnboarding) {
-    // Check if current path is in the allowed list
-    // Since we can't access pathname in a layout server component,
-    // we allow children but the dashboard page itself will check
-    return <>{children}</>;
-  }
+  // If approved but still onboarding
+  if (isApprovedOnboarding) return shell(children);
 
-  // No onboarding row = application pending admin review — don't redirect
-  if (!onboarding) {
-    return <>{children}</>;
-  }
+  // No onboarding row = application pending admin review
+  if (!onboarding) return <>{children}</>;
 
   // Has an onboarding row but not active/approved → redirect to onboarding
   redirect('/onboarding/employer');

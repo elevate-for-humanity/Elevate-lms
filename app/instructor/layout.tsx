@@ -16,13 +16,16 @@ export const metadata: Metadata = {
 };
 
 const navItems = [
-  { href: '/instructor', icon: Home, label: 'Dashboard' },
-  { href: '/instructor/courses', icon: BookOpen, label: 'Courses' },
-  { href: '/instructor/students', icon: Users, label: 'Students' },
+  { href: '/instructor/dashboard', icon: Home,          label: 'Dashboard' },
+  { href: '/instructor/courses',   icon: BookOpen,      label: 'Courses' },
+  { href: '/instructor/students',  icon: Users,         label: 'Students' },
+  { href: '/instructor/gradebook', icon: ClipboardList, label: 'Gradebook' },
   { href: '/instructor/submissions', icon: ClipboardList, label: 'Submissions' },
-  { href: '/instructor/analytics', icon: BarChart, label: 'Analytics' },
+  { href: '/instructor/attendance', icon: ClipboardList, label: 'Attendance' },
+  { href: '/instructor/announcements', icon: MessageSquare, label: 'Announcements' },
   { href: '/instructor/campaigns', icon: MessageSquare, label: 'Campaigns' },
-  { href: '/instructor/settings', icon: Settings, label: 'Settings' },
+  { href: '/instructor/analytics', icon: BarChart,      label: 'Analytics' },
+  { href: '/instructor/settings',  icon: Settings,      label: 'Settings' },
 ];
 
 export default async function InstructorLayout({

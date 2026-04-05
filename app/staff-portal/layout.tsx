@@ -50,12 +50,14 @@ export default async function StaffPortalLayout({
   const isAdmin = ['admin', 'super_admin'].includes(profile.role);
 
   const staffNavItems = [
-    { href: '/staff-portal/dashboard', label: 'Dashboard' },
-    { href: '/staff-portal/students', label: 'Students' },
-    { href: '/staff-portal/cases', label: 'Cases' },
+    { href: '/staff-portal/dashboard',        label: 'Dashboard' },
+    { href: '/staff-portal/students',          label: 'Students' },
+    { href: '/staff-portal/cases',             label: 'Cases' },
     { href: '/staff-portal/attendance/record', label: 'Attendance' },
-    { href: '/staff-portal/booth-renters', label: 'Booth Renters' },
-    { href: '/staff-portal/reports', label: 'Reports' },
+    { href: '/staff-portal/courses',           label: 'Courses' },
+    { href: '/staff-portal/campaigns',         label: 'Campaigns' },
+    { href: '/staff-portal/booth-renters',     label: 'Booth Renters' },
+    { href: '/staff-portal/reports',           label: 'Reports' },
     ...(isAdmin ? [{ href: '/admin/hr/employees', label: 'HR & Payroll' }] : []),
   ];
 

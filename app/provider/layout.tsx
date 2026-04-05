@@ -49,7 +49,7 @@ export default async function ProviderLayout({
           <h1 className="text-xl font-bold text-slate-900 mb-2">Account Suspended</h1>
           <p className="text-slate-600 text-sm">
             Your provider account has been suspended. Contact{' '}
-            <a href="mailto:support@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">
+            <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:underline">
               support@elevateforhumanity.org
             </a>{' '}
             for assistance.

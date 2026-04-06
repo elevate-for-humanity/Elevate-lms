@@ -93,21 +93,68 @@ async function _POST(req: Request) {
       }
     }
 
-    // In production, you would:
-    // 1. Call Amazon Rekognition or Azure Face API to verify face
-    // 2. Compare against stored user photo
-    // 3. Check for liveness detection
+    // Verify the meeting exists and the user is enrolled in its cohort
+    if (!meetingId) {
+      return NextResponse.json(
+        { verified: false, reason: "Missing meetingId" },
+        { status: 400 }
+      );
+    }
 
-    // Log the attendance attempt
+    const { data: meeting, error: meetingError } = await supabase
+      .from("cohort_sessions")
+      .select("id, cohort_id")
+      .eq("id", meetingId)
+      .maybeSingle();
+
+    if (meetingError || !meeting) {
+      return NextResponse.json(
+        { verified: false, reason: "Meeting not found" },
+        { status: 404 }
+      );
+    }
+
+    // Verify the user is enrolled in this cohort
+    const { data: enrollment } = await supabase
+      .from("training_enrollments")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("cohort_id", meeting.cohort_id)
+      .maybeSingle();
+
+    if (!enrollment) {
+      return NextResponse.json(
+        { verified: false, reason: "Not enrolled in this session" },
+        { status: 403 }
+      );
+    }
+
+    // Prevent duplicate check-in for the same meeting
+    const { data: existing } = await supabase
+      .from("attendance_records")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("meeting_id", meetingId)
+      .maybeSingle();
+
+    if (existing) {
+      return NextResponse.json({
+        verified: true,
+        reason: "Already checked in",
+        timestamp: now.toISOString(),
+      });
+    }
+
+    // Record attendance — verified=false until face verification is implemented
     const { error: insertError } = await supabase
       .from("attendance_records")
       .insert({
         user_id: user.id,
         meeting_id: meetingId,
-        verified: true,
-        verification_method: "photo_time_location",
-        latitude,
-        longitude,
+        verified: false,
+        verification_method: "photo_time_location_pending",
+        latitude: latitude ?? null,
+        longitude: longitude ?? null,
         checked_in_at: now.toISOString(),
       });
 
@@ -123,8 +170,8 @@ async function _POST(req: Request) {
     }
 
     return NextResponse.json({
-      verified: true,
-      reason: "Basic checks passed (image + time window + location).",
+      verified: false,
+      reason: "Check-in recorded. Pending instructor verification.",
       timestamp: now.toISOString(),
     });
   } catch (error) { 

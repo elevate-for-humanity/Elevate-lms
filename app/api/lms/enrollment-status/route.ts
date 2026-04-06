@@ -97,11 +97,46 @@ export async function GET(req: NextRequest) {
   const approved = !!enrollment && !isPendingFunding
     && !['pending_approval', 'pending'].includes(enrollment?.status ?? '');
 
+  if (enrollment) {
+    return NextResponse.json({
+      enrolled:         true,
+      status:           effectiveStatus,
+      enrollment_state: enrollment?.enrollment_state ?? null,
+      progress:         enrollment?.progress_percent ?? 0,
+      approved,
+    });
+  }
+
+  // Fallback: HVAC and other legacy students enrolled via training_enrollments
+  // (pre-dates program_enrollments). Check by user_id — no course_id join needed
+  // because training_enrollments.course_id maps to training_courses, not courses.
+  const { data: legacyEnrollment } = await db
+    .from('training_enrollments')
+    .select('status, approved_at, progress')
+    .eq('user_id', user.id)
+    .order('enrolled_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (legacyEnrollment) {
+    const legacyActive =
+      !!legacyEnrollment.approved_at ||
+      legacyEnrollment.status === 'active';
+
+    return NextResponse.json({
+      enrolled:         legacyActive,
+      status:           legacyEnrollment.status ?? 'active',
+      enrollment_state: null,
+      progress:         legacyEnrollment.progress ?? 0,
+      approved:         legacyActive,
+    });
+  }
+
   return NextResponse.json({
-    enrolled:         !!enrollment,
-    status:           effectiveStatus,
-    enrollment_state: enrollment?.enrollment_state ?? null,
-    progress:         enrollment?.progress_percent ?? 0,
-    approved,
+    enrolled:         false,
+    status:           null,
+    enrollment_state: null,
+    progress:         0,
+    approved:         false,
   });
 }

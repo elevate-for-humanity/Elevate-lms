@@ -68,8 +68,24 @@ export default async function LmsAppLayout({ children }: { children: ReactNode }
       .maybeSingle();
 
     if (!enrollment?.access_granted_at) {
-      // Not yet granted — send to student portal with pending state
-      redirect('/learner/dashboard?access=pending');
+      // Fallback: HVAC and other legacy students are enrolled via training_enrollments
+      // (pre-dates program_enrollments). approved_at serves the same gate role.
+      const { data: legacyEnrollment } = await db
+        .from('training_enrollments')
+        .select('approved_at, status')
+        .eq('user_id', user.id)
+        .order('enrolled_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const legacyActive =
+        !!legacyEnrollment?.approved_at ||
+        legacyEnrollment?.status === 'active';
+
+      if (!legacyActive) {
+        // Not yet granted — send to student portal with pending state
+        redirect('/learner/dashboard?access=pending');
+      }
     }
   }
 

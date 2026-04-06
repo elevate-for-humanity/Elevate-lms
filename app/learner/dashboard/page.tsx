@@ -54,7 +54,23 @@ export default async function LearnerDashboardPage({ searchParams }: Props) {
       .maybeSingle();
 
     const onboardingDone = profile?.onboarding_completed;
-    const accessGranted = !!enrollment?.access_granted_at;
+    let accessGranted = !!enrollment?.access_granted_at;
+
+    // Fallback: HVAC and other legacy students enrolled via training_enrollments
+    // (pre-dates program_enrollments). approved_at or status='active' grants access.
+    if (!accessGranted) {
+      const { data: legacyEnrollment } = await supabase
+        .from('training_enrollments')
+        .select('approved_at, status')
+        .eq('user_id', user.id)
+        .order('enrolled_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (legacyEnrollment?.approved_at || legacyEnrollment?.status === 'active') {
+        accessGranted = true;
+      }
+    }
 
     if (onboardingDone && !accessGranted) {
       // Fetch program name for display

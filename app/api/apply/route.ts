@@ -1,7 +1,7 @@
 import { logger } from '@/lib/logger';
 
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { withRateLimit } from '@/lib/api/with-rate-limit';
 import { contactRateLimit } from '@/lib/rate-limit';
 import { applicationSchema } from '@/lib/api/validation-schemas';

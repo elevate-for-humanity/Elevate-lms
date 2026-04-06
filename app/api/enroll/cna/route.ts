@@ -77,7 +77,7 @@ async function _POST(request: NextRequest) {
     return success({ enrollmentId: enrollment.id });
 
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Failed to process enrollment';
+    const message = 'Failed to process enrollment';
     logger.error('CNA enrollment error:', err);
     return failure(message);
   }

@@ -95,8 +95,7 @@ export async function GET(request: Request) {
           results.still_suspended++;
         }
       } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        results.errors.push(`sub ${sub.id}: ${msg}`);
+        results.errors.push(`sub ${sub.id}: reinstate check failed`);
         logger.error('[barber-reinstate cron] check failed', { id: sub.id, err });
       }
     }

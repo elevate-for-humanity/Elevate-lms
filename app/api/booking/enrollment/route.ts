@@ -61,7 +61,7 @@ async function _POST(req: Request) {
 
     return success({ id: booking.id });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Failed to process booking';
+    const message = 'Failed to process booking';
     logger.error('Booking enrollment error:', err);
     return failure(message);
   }

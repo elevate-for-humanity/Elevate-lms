@@ -75,7 +75,7 @@ async function _POST(request: Request) {
 
     return success({ id: record.id });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Failed to process request';
+    const message = 'Failed to process request';
     logger.error('Advising request error:', err);
     return failure(message);
   }

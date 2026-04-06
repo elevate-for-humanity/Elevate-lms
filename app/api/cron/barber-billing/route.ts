@@ -100,8 +100,7 @@ export async function GET(request: Request) {
         results.suspended++;
         logger.info('[barber-billing cron] suspended', { id: sub.id, email: sub.customer_email });
       } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        results.errors.push(`sub ${sub.id}: ${msg}`);
+        results.errors.push(`sub ${sub.id}: suspension failed`);
         logger.error('[barber-billing cron] suspension failed', { id: sub.id, err });
       }
     }

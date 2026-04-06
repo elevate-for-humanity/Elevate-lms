@@ -12,6 +12,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -110,9 +111,9 @@ export async function GET(
       },
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
+    logger.error('[program-proof] unexpected error', { slug, err });
     return NextResponse.json(
-      { error: message, slug, queried_at: new Date().toISOString(), query_ms: Date.now() - startMs },
+      { error: 'Internal server error', slug, queried_at: new Date().toISOString(), query_ms: Date.now() - startMs },
       { status: 500 }
     );
   }

@@ -117,7 +117,7 @@ async function _POST(req: Request) {
 
     return success({ appointment });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Internal server error';
+    const message = 'Internal server error';
     logger.error('Tax book-appointment error:', err);
     return failure(message);
   }

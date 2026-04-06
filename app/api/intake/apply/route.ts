@@ -13,6 +13,8 @@ interface IntakePayload {
   program_interest?: string;
   funding_interest?: string;
   state?: string;
+  is_indiana_resident?: boolean;
+  // Legacy fields — kept for backwards compat with any existing callers
   has_indiana_career_connect?: boolean;
   has_workone_appointment?: boolean;
 }
@@ -21,10 +23,13 @@ function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-/** Determine initial pipeline stage based on funding prerequisites */
+/**
+ * Determine initial pipeline stage.
+ * Indiana residents go to advisor_review — they qualify for WIOA/WRG funding.
+ * Out-of-state leads go to self_pay_path — no workforce funding available.
+ */
 function determineStage(payload: IntakePayload): string {
-  if (!payload.has_indiana_career_connect) return 'needs_icc';
-  if (!payload.has_workone_appointment) return 'needs_workone';
+  if (payload.is_indiana_resident === false) return 'self_pay_path';
   return 'advisor_review';
 }
 
@@ -86,8 +91,7 @@ export async function POST(request: NextRequest) {
         eligibility_data: {
           lead_id: lead.id,
           state: body.state || null,
-          has_indiana_career_connect: !!body.has_indiana_career_connect,
-          has_workone_appointment: !!body.has_workone_appointment,
+          is_indiana_resident: !!body.is_indiana_resident,
           intake_stage: stage,
         },
       })
@@ -129,8 +133,7 @@ export async function POST(request: NextRequest) {
         program_interest: body.program_interest || 'Not specified',
         funding_interest: body.funding_interest || 'Not specified',
         stage,
-        has_icc: body.has_indiana_career_connect ? 'Yes' : 'No',
-        has_workone: body.has_workone_appointment ? 'Yes' : 'No',
+        is_indiana_resident: body.is_indiana_resident ? 'Yes' : 'No',
         application_id: application.id,
       },
       status: 'queued',
@@ -139,17 +142,17 @@ export async function POST(request: NextRequest) {
       entity_id: application.id,
     });
 
-    // Stage-specific follow-up (delayed 1 hour)
-    if (stage === 'needs_icc' || stage === 'needs_workone') {
+    // Out-of-state follow-up — direct to self-pay options (delayed 1 hour)
+    if (stage === 'self_pay_path') {
       notifications.push({
         to_email: normalizedEmail,
-        template_key: stage === 'needs_icc' ? 'intake_needs_icc' : 'intake_needs_workone',
+        template_key: 'intake_self_pay_options',
         template_data: {
           full_name: body.full_name.trim(),
           status_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/status/application?token=${application.public_status_token}`,
         },
         status: 'queued',
-        scheduled_for: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // 1 hour delay
+        scheduled_for: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
         entity_type: 'application',
         entity_id: application.id,
       });

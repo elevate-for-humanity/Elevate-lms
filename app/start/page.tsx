@@ -71,7 +71,7 @@ export default function StartPage() {
             <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
               Start here. We&apos;ll guide you through funding and enrollment.
             </h1>
-            <p className="mt-5 text-lg text-slate-600">
+            <p className="mt-5 text-lg text-blue-100">
               One intake form. We figure out your eligibility, connect you with
               the right program, and move you toward enrollment — no runaround.
             </p>
@@ -168,24 +168,24 @@ export default function StartPage() {
       </section>
 
       {/* Bottom CTA */}
-      <section className="py-12">
+      <section className="bg-brand-blue-700 py-12">
         <div className="mx-auto max-w-4xl px-4 text-center">
-          <h2 className="text-2xl font-bold text-slate-900 md:text-3xl">
+          <h2 className="text-2xl font-bold text-white md:text-3xl">
             Ready to change your career?
           </h2>
-          <p className="mt-3 text-white">
+          <p className="mt-3 text-blue-100">
             Fill out the form above or call us directly.
           </p>
           <div className="mt-6 flex flex-col justify-center gap-4 sm:flex-row">
             <a
-              href="#top"
-              className="inline-flex items-center justify-center rounded-lg bg-white px-8 py-4 font-bold text-brand-red-600 transition hover:bg-white"
+              href="#main-content"
+              className="inline-flex items-center justify-center rounded-lg bg-white px-8 py-4 font-bold text-brand-blue-700 transition hover:bg-blue-50"
             >
-              Apply Now
+              Check Eligibility
             </a>
             <a
               href="tel:+13173143757"
-              className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-white px-8 py-4 font-bold text-white transition hover:bg-brand-red-700"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-white px-8 py-4 font-bold text-white transition hover:bg-brand-blue-600"
             >
               <Phone className="h-5 w-5" />
               (317) 314-3757

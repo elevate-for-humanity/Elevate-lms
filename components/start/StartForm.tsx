@@ -52,17 +52,18 @@ export default function StartForm() {
 
     const formData = new FormData(e.currentTarget);
 
+    const isIndianaResident = String(formData.get('is_indiana_resident') || '') === 'yes';
     const payload = {
       full_name: String(formData.get('full_name') || '').trim(),
       email: String(formData.get('email') || '').trim(),
       phone: String(formData.get('phone') || '').trim(),
       program_interest: String(formData.get('program_interest') || '').trim(),
       funding_interest: String(formData.get('funding_interest') || '').trim(),
-      state: String(formData.get('state') || '').trim(),
-      has_indiana_career_connect:
-        String(formData.get('has_indiana_career_connect') || '') === 'yes',
-      has_workone_appointment:
-        String(formData.get('has_workone_appointment') || '') === 'yes',
+      state: isIndianaResident ? 'Indiana' : String(formData.get('state') || '').trim(),
+      is_indiana_resident: isIndianaResident,
+      // Legacy fields — derived from residency for pipeline routing
+      has_indiana_career_connect: false,
+      has_workone_appointment: false,
     };
 
     try {
@@ -210,56 +211,23 @@ export default function StartForm() {
         </div>
 
         <div>
-          <label htmlFor="state" className="mb-1 block text-sm font-medium text-gray-700">
-            State
+          <label
+            htmlFor="is_indiana_resident"
+            className="mb-1 block text-sm font-medium text-gray-700"
+          >
+            Are you an Indiana resident?
+            <span className="ml-1 text-slate-500 font-normal">(affects funding options)</span>
           </label>
-          <input
-            id="state"
-            name="state"
-            defaultValue="Indiana"
-            autoComplete="address-level1"
-            className={inputClass}
-          />
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label
-              htmlFor="has_indiana_career_connect"
-              className="mb-1 block text-sm font-medium text-gray-700"
-            >
-              Indiana Career Connect account?
-            </label>
-            <select
-              id="has_indiana_career_connect"
-              name="has_indiana_career_connect"
-              required
-              className={selectClass}
-            >
-              <option value="">Choose</option>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-          </div>
-
-          <div>
-            <label
-              htmlFor="has_workone_appointment"
-              className="mb-1 block text-sm font-medium text-gray-700"
-            >
-              WorkOne appointment scheduled?
-            </label>
-            <select
-              id="has_workone_appointment"
-              name="has_workone_appointment"
-              required
-              className={selectClass}
-            >
-              <option value="">Choose</option>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-          </div>
+          <select
+            id="is_indiana_resident"
+            name="is_indiana_resident"
+            required
+            className={selectClass}
+          >
+            <option value="">Choose one</option>
+            <option value="yes">Yes — I live in Indiana</option>
+            <option value="no">No — I live in another state</option>
+          </select>
         </div>
 
         {submitState.type === 'error' && (

@@ -322,7 +322,7 @@ export async function loadLearnerDashboard() {
       .maybeSingle();
     if (stripeSession) {
       // Paid session exists but no active enrollment — log only, do not block render
-      console.warn('[dashboard-loader] Paid session found but no active enrollment', {
+      logger.warn('[dashboard-loader] Paid session found but no active enrollment', {
         userId: user.id,
         appId: paidApp.id,
       });

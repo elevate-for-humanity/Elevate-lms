@@ -11,6 +11,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -137,7 +138,7 @@ export async function POST(req: NextRequest) {
 
     if (!response.ok) {
       const err = await response.text();
-      console.error('OpenAI error:', err);
+      logger.error('OpenAI error:', err instanceof Error ? err : undefined);
       return safeError('AI service error', 502);
     }
 

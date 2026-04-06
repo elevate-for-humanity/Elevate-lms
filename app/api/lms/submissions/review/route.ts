@@ -3,6 +3,7 @@ import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError, safeDbError } from '@/lib/api/safe-error';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -98,7 +99,7 @@ export async function PATCH(request: NextRequest) {
       .then(({ error }) => {
         if (error) {
           // Non-fatal — log but don't fail the response
-          console.error('[submissions/review] lesson_progress upsert failed:', error.message);
+          logger.error('[submissions/review] lesson_progress upsert failed:', error);
         }
       });
   }

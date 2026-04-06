@@ -7,6 +7,8 @@
  * Never import this in client components.
  */
 
+import { logger } from '@/lib/logger';
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 
 export async function sendInternalEmail(payload: {
@@ -18,7 +20,7 @@ export async function sendInternalEmail(payload: {
   const secret = process.env.CRON_SECRET;
   if (!secret) {
     // In local dev without CRON_SECRET set, skip silently rather than crashing
-    console.warn('[sendInternalEmail] CRON_SECRET not set — email skipped');
+    logger.warn('[sendInternalEmail] CRON_SECRET not set — email skipped');
     return { ok: false, error: 'CRON_SECRET not configured' };
   }
 

@@ -87,7 +87,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       .eq('id', user.id)
       .maybeSingle();
     if (profileError) {
-      console.error('[getAdminDashboardData] profile fetch failed:', profileError.message);
+      logger.error('[getAdminDashboardData] profile fetch failed:', profileError);
     } else {
       adminProfile = profileData ?? null;
     }

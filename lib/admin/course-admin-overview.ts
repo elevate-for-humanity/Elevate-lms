@@ -2,6 +2,7 @@ import 'server-only';
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getAllBlueprints } from '@/lib/curriculum/blueprints';
+import { logger } from '@/lib/logger';
 
 export type AdminCourseStatus = 'complete' | 'partial' | 'structured' | 'empty';
 
@@ -61,7 +62,7 @@ export async function getAdminCoursesOverview(): Promise<AdminCourseOverview[]> 
 
   if (error) {
     // Log but don't throw — a broken courses panel must not crash the dashboard
-    console.error(`[getAdminCoursesOverview] query failed: ${error.message} (code: ${error.code})`);
+    logger.error('[getAdminCoursesOverview] query failed', error instanceof Error ? error : undefined);
     return [];
   }
 

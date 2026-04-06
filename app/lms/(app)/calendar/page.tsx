@@ -88,7 +88,9 @@ export default async function CalendarPage() {
       upcomingAssignments = assignments;
     }
   } catch (error) {
-    // Tables may not exist
+    // Non-fatal — calendar renders empty if data unavailable
+    // Log so we know when this happens in production
+    console.error('[calendar] data load error:', error instanceof Error ? error.message : String(error));
   }
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);

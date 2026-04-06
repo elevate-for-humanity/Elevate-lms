@@ -34,8 +34,27 @@ export const POST = withAuth(
         return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
       }
 
-      // Build update object based on status
       const db = createAdminClient();
+      if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
+
+      // Pre-read — verify record exists before mutating
+      const { data: existing, error: fetchError } = await db
+        .from('external_partner_progress')
+        .select('id, status')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (fetchError || !existing) {
+        await writeApiAuditEvent({ ...auditBase, result: 'failure', status_code: 404, params: { id }, error_summary: 'Record not found' });
+        return NextResponse.json({ error: 'Record not found' }, { status: 404 });
+      }
+
+      // State machine — prevent re-approving already approved records
+      if (existing.status === 'approved' && status === 'approved') {
+        return NextResponse.json({ error: 'Already approved' }, { status: 409 });
+      }
+
+      // Build update object based on status
       if (status === 'approved') {
         const { error } = await db
           .from('external_partner_progress')

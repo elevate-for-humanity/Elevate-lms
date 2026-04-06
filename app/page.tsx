@@ -9,7 +9,7 @@ import { ProgramVideoCards } from '@/components/marketing/ProgramVideoCards';
 import HomeClientShell from './HomeClientShell';
 
 export const dynamic = 'force-static';
-export const revalidate = 3600;
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'Elevate for Humanity | Workforce Training — Indianapolis, Indiana',

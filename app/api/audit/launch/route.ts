@@ -1,6 +1,4 @@
 
-
-import React from 'react';
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -16,10 +14,7 @@ export const maxDuration = 60;
  * Mode: GET or POST with options
  */
 
-const AUDIT_SECRET = process.env.AUDIT_SECRET;
-if (!AUDIT_SECRET) {
-  throw new Error('AUDIT_SECRET env var is not set — audit endpoint is disabled');
-}
+
 
 interface AuditOptions {
   mode: 'quick' | 'full';
@@ -72,13 +67,21 @@ async function _POST(request: NextRequest) {
 }
 
 async function handleAudit(request: NextRequest, options: AuditOptions) {
-  // Auth check
+  const AUDIT_SECRET = process.env.AUDIT_SECRET;
+
+  if (!AUDIT_SECRET) {
+    return NextResponse.json(
+      { error: 'Audit endpoint disabled' },
+      { status: 503 }
+    );
+  }
+
   const headersList = await headers();
   const auditSecret = headersList.get('x-audit-secret');
 
   if (!auditSecret || auditSecret !== AUDIT_SECRET) {
     return NextResponse.json(
-      { error: 'Unauthorized', message: 'Missing or invalid x-audit-secret header' },
+      { error: 'Unauthorized' },
       { status: 401 }
     );
   }

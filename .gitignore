@@ -165,7 +165,7 @@ scripts/live-schema-snapshot.json
 audit_artifacts/
 
 # Build artifacts / audit reports
-audit/
+/audit/
 # audits/ — removed: docs/audits/ is tracked source documentation
 lighthouse-*.json
 marketing-audit-report.json

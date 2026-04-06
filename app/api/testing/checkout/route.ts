@@ -55,19 +55,23 @@ export async function POST(req: NextRequest) {
     return safeError('Invalid JSON', 400);
   }
 
-  const { examType, examName, feeCents, bookingType, participantCount, email, name, pendingBookingId, addOn, slotId } = body;
+  const { examType, examName, bookingType, participantCount, email, name, pendingBookingId, addOn, slotId } = body;
 
-  if (!examType || !feeCents || feeCents <= 0) {
-    return safeError('examType and feeCents are required', 400);
+  if (!examType) {
+    return safeError('examType is required', 400);
   }
 
-  // Validate fee against our published rates — prevent client-side tampering
+  // Fee comes from server-side CERT_PROVIDERS — never trust client-supplied feeCents
   const provider = CERT_PROVIDERS[examType as keyof typeof CERT_PROVIDERS];
   if (!provider) return safeError('Unknown exam type', 400);
 
-  const minFee = provider.fees ? Math.min(...provider.fees.map(f => f.amount * 100)) : 0;
-  if (feeCents < minFee) {
-    return safeError('Fee amount is below the minimum for this exam', 400);
+  // Use the lowest published fee as the canonical amount
+  const feeCents = provider.fees && provider.fees.length > 0
+    ? Math.min(...provider.fees.map(f => f.amount * 100))
+    : 0;
+
+  if (feeCents <= 0) {
+    return safeError('No fee configured for this exam type', 400);
   }
 
   const stripe = new Stripe(stripeKey);

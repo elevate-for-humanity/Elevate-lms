@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { stripe } from '@/lib/stripe/client';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -36,13 +37,36 @@ async function _POST(req: Request) {
   }
 
   try {
-    const { productId, creatorId, priceCents, productTitle } = await req.json();
+    const { productId, creatorId } = await req.json();
 
-    if (!productId || !creatorId || !priceCents) {
+    if (!productId || !creatorId) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
+    }
+
+    // Price must come from DB — never trust client-supplied priceCents
+    const db = createAdminClient();
+    if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
+
+    const { data: product, error: productError } = await db
+      .from('marketplace_products')
+      .select('id, title, price_cents, creator_id, is_published')
+      .eq('id', productId)
+      .eq('creator_id', creatorId)
+      .maybeSingle();
+
+    if (productError || !product) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    }
+
+    if (!product.is_published) {
+      return NextResponse.json({ error: 'Product not available' }, { status: 403 });
+    }
+
+    if (!product.price_cents || product.price_cents <= 0) {
+      return NextResponse.json({ error: 'Invalid product price' }, { status: 400 });
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -51,9 +75,9 @@ async function _POST(req: Request) {
         {
           price_data: {
             currency: 'usd',
-            unit_amount: priceCents,
+            unit_amount: product.price_cents,
             product_data: {
-              name: productTitle || 'Digital Product',
+              name: product.title || 'Digital Product',
             },
           },
           quantity: 1,

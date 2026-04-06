@@ -61,7 +61,7 @@ async function _POST(request: NextRequest) {
 
   try {
     const body: CheckoutRequest = await request.json();
-    const { type, tier, programId, courseId, priceId, amount } = body;
+    const { type, tier, programId, courseId, priceId } = body;
 
     let sessionConfig: Stripe.Checkout.SessionCreateParams;
 
@@ -126,7 +126,8 @@ async function _POST(request: NextRequest) {
           );
         }
 
-        const programAmount = amount || (program.total_cost ? Math.round(Number(program.total_cost) * 100) : 0);
+        // Price must come from DB — never trust client-supplied amount
+        const programAmount = program.total_cost ? Math.round(Number(program.total_cost) * 100) : 0;
 
         if (programAmount <= 0) {
           return NextResponse.json(
@@ -184,7 +185,8 @@ async function _POST(request: NextRequest) {
           );
         }
 
-        const courseAmount = amount || (course.price ? Math.round(Number(course.price) * 100) : 0);
+        // Price must come from DB — never trust client-supplied amount
+        const courseAmount = course.price ? Math.round(Number(course.price) * 100) : 0;
 
         if (courseAmount <= 0) {
           return NextResponse.json(

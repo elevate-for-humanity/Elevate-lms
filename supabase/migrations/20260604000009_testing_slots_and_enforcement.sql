@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS public.testing_slots (
   notes           text,
   is_cancelled    boolean NOT NULL DEFAULT false,
   created_at      timestamptz NOT NULL DEFAULT now(),
-  updated_at      timestamptz NOT NULL DEFAULT now(),
+  updated_at      timestamptz NOT NULL DEFAULT now()
   CONSTRAINT slots_capacity_positive CHECK (capacity > 0),
   CONSTRAINT slots_booked_lte_capacity CHECK (booked_count <= capacity),
   CONSTRAINT slots_end_after_start CHECK (end_time > start_time)

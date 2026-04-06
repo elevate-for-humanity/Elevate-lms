@@ -361,7 +361,7 @@ CREATE TABLE IF NOT EXISTS public.onboarding_progress (
   data            jsonb DEFAULT '{}',
   completed_at    timestamptz,
   created_at      timestamptz DEFAULT now(),
-  updated_at      timestamptz DEFAULT now(),
+  updated_at      timestamptz DEFAULT now()
   UNIQUE(user_id, step)
 );
 

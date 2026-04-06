@@ -81,6 +81,7 @@ export default async function HVACTechnicianPage() {
         <HeroVideo
           videoSrcDesktop={banner.videoSrcDesktop}
           posterImage={banner.posterImage}
+        voiceoverSrc={banner.voiceoverSrc}
           microLabel={banner.microLabel}
           analyticsName={banner.analyticsName}
         />
@@ -206,6 +207,7 @@ export default async function HVACTechnicianPage() {
       <HeroVideo
         videoSrcDesktop={banner.videoSrcDesktop}
         posterImage={banner.posterImage}
+        voiceoverSrc={banner.voiceoverSrc}
 
         microLabel={banner.microLabel}
         analyticsName={banner.analyticsName}

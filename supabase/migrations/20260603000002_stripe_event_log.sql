@@ -13,9 +13,8 @@ create table if not exists public.stripe_event_log (
   id               bigserial primary key,
   stripe_event_id  text        not null,
   stripe_event_type text       not null,
-  processed_at     timestamptz not null default now(),
-
-  constraint stripe_event_log_event_id_unique unique (stripe_event_id)
+  processed_at     timestamptz not null default now()
+  , constraint stripe_event_log_event_id_unique unique (stripe_event_id)
 );
 
 -- Index for fast duplicate lookups

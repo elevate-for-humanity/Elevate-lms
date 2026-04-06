@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS public.billing_events (
   id                      UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   barber_subscription_id  UUID        REFERENCES public.barber_subscriptions(id) ON DELETE CASCADE,
   user_id                 UUID        REFERENCES auth.users(id),
-  event_type              TEXT        NOT NULL
+  event_type              TEXT        NOT NULL,
     CHECK (event_type IN ('charge_attempted', 'charge_succeeded', 'charge_failed',
                           'suspended', 'reinstated', 'cancelled', 'paid_in_full')),
   amount_cents            INTEGER,

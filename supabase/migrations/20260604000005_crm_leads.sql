@@ -37,9 +37,8 @@ CREATE TABLE IF NOT EXISTS public.crm_leads (
   enrollment_id      uuid        REFERENCES public.program_enrollments(id) ON DELETE SET NULL,
   owner_user_id      uuid        REFERENCES public.profiles(id)            ON DELETE SET NULL,
 
-  notes              text,
-
-  UNIQUE (email)
+  notes              text
+  , UNIQUE (email)
 );
 
 CREATE INDEX IF NOT EXISTS idx_crm_leads_stage    ON public.crm_leads(stage);

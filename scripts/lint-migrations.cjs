@@ -95,7 +95,7 @@ for (const file of files) {
       if (j === i) continue;
       if (depth === 0 && trimmed.startsWith(')')) break;
       if (depthBefore === 1 && trimmed &&
-          !/^(CONSTRAINT|PRIMARY\s+KEY|UNIQUE|CHECK|FOREIGN\s+KEY|EXCLUDE)\b/i.test(trimmed)) {
+          !/^,?\s*(CONSTRAINT|PRIMARY\s+KEY|UNIQUE|CHECK|FOREIGN\s+KEY|EXCLUDE)\b/i.test(trimmed)) {
         let colDepth = depth, endIdx = j;
         if (colDepth > 1) {
           for (let k = j + 1; k <= blockEnd; k++) {

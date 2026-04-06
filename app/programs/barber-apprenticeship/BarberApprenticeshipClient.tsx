@@ -31,6 +31,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
           <HeroVideo
             videoSrcDesktop={b.videoSrcDesktop}
             posterImage={b.posterImage}
+        voiceoverSrc={b.voiceoverSrc}
             microLabel={b.microLabel}
             analyticsName={b.analyticsName}
           />

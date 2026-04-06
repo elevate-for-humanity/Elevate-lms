@@ -12,7 +12,7 @@ export const PHLEBOTOMY: ProgramSchema = {
   sector: 'healthcare',
   category: 'Healthcare',
 
-  heroImage: '/images/pages/phlebotomy.jpg',
+  heroImage: '/images/pages/phlebotomy-real.jpg',
   heroImageAlt: 'Phlebotomy student practicing venipuncture technique',
 
   deliveryMode: 'hybrid',

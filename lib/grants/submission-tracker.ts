@@ -3,7 +3,12 @@
  * Tracks submission status, timeline, and confirmations
  */
 
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { setAuditContext } from '@/lib/audit-context';
+
+const supabaseAdmin = createAdminClient();
+// Set audit context once at module init — all writes attributed to grants system
+setAuditContext(supabaseAdmin, { systemActor: 'grants_submission_tracker' }).catch(() => {});
 import { notifyGrantSubmitted } from './notification-system';
 
 import { logAuditEvent } from '@/lib/audit';

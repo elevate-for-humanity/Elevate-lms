@@ -135,6 +135,10 @@
     "pg"
   ]
 
+[functions."run-migrations"]
+  node_bundler = "esbuild"
+  external_node_modules = []
+
 # Externalize heavy deps from the Next.js SSR handler to stay under 250MB zip limit
 [functions."___netlify-server-handler"]
   external_node_modules = [

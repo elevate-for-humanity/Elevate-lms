@@ -2833,21 +2833,10 @@ ALTER TABLE public.program_lessons
 ];
 
 export const handler: Handler = async (event) => {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
-  }
-
+  if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
   let secret: string | undefined;
-  try {
-    const body = JSON.parse(event.body || "{}");
-    secret = body.secret;
-  } catch {
-    return { statusCode: 400, body: "Bad JSON" };
-  }
-
-  if (secret !== SECRET) {
-    return { statusCode: 403, body: "Forbidden" };
-  }
+  try { secret = JSON.parse(event.body || "{}").secret; } catch { return { statusCode: 400, body: "Bad JSON" }; }
+  if (secret !== SECRET) return { statusCode: 403, body: "Forbidden" };
 
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -2856,7 +2845,6 @@ export const handler: Handler = async (event) => {
   });
 
   const results: { file: string; ok: boolean; error?: string }[] = [];
-
   for (const { file, sql } of MIGRATIONS) {
     try {
       await pool.query(sql);
@@ -2868,7 +2856,6 @@ export const handler: Handler = async (event) => {
   }
 
   await pool.end();
-
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },

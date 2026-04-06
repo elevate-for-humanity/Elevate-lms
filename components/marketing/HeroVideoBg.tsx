@@ -5,7 +5,7 @@ import { Volume2, VolumeX } from 'lucide-react';
 
 interface HeroVideoBgProps {
   src: string;
-  poster?: string; // kept for API compatibility — not rendered
+  poster?: string;
   audioSrc?: string;
 }
 
@@ -13,12 +13,23 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [muted, setMuted] = useState(true);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
+  // Detect reduced-motion preference after mount
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  // Autoplay video (muted — required by browsers)
   useEffect(() => {
     const v = videoRef.current;
-    if (!v) return;
+    if (!v || reducedMotion) return;
     v.play().catch(() => {});
-  }, []);
+  }, [reducedMotion]);
 
   // Start audio on first genuine user gesture (click or touch).
   // scroll is intentionally excluded — browsers do not treat scroll as a
@@ -54,16 +65,31 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
     }
   }
 
+  // Reduced-motion: show poster image only, no video
+  if (reducedMotion) {
+    return poster ? (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={poster}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ zIndex: 10 }}
+      />
+    ) : null;
+  }
+
   return (
     <>
-      {/* Video — no poster, dark bg shows until first frame loads */}
       <video
         ref={videoRef}
         src={src}
+        poster={poster}
         muted
         loop
         playsInline
         autoPlay
+        preload="metadata"
         aria-hidden="true"
         className="absolute inset-0 w-full h-full object-cover"
         style={{ zIndex: 10 }}

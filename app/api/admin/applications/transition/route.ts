@@ -5,6 +5,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
+import { sendEmail } from '@/lib/email/sendgrid';
+import { barberOnboardingEmail } from '@/lib/email/templates/barber-onboarding';
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -65,7 +67,7 @@ export async function POST(req: NextRequest) {
   // Fetch application
   const { data: application, error: fetchError } = await db
     .from('applications')
-    .select('id, status, user_id, program_slug, email, funding_verified, payment_received_at, eligibility_status, has_workone_approval')
+    .select('id, status, user_id, program_slug, program_interest, email, first_name, last_name, full_name, funding_verified, payment_received_at, eligibility_status, has_workone_approval')
     .eq('id', application_id)
     .single();
 
@@ -74,6 +76,9 @@ export async function POST(req: NextRequest) {
   }
 
   const currentStatus = application.status;
+  const previousStatus = currentStatus; // alias for reversal logic below
+  const firstName = application.first_name || application.full_name?.split(' ')[0] || 'there';
+  const isBarber = (application.program_slug ?? application.program_interest ?? '').includes('barber');
 
   // Validate transition
   if (!VALID_TRANSITIONS[currentStatus]?.includes(next_status)) {
@@ -166,8 +171,27 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // Email triggers — fire after DB update, non-blocking
+  if (application.email) {
+    try {
+      if (next_status === 'in_review' && isBarber) {
+        // Barber applicants: send onboarding steps email
+        const tpl = barberOnboardingEmail({
+          firstName,
+          programName: 'Barber Apprenticeship',
+          applicantEmail: application.email,
+        });
+        await sendEmail({ to: application.email, subject: tpl.subject, html: tpl.html });
+        await db.from('applications').update({ onboarding_sent_at: new Date().toISOString() }).eq('id', application_id);
+      }
+    } catch (emailErr) {
+      // Email failure must not roll back the status change
+      logger.error('[transition] email send failed', emailErr as Error, { application_id, next_status });
+    }
+  }
+
   // Reversal: if moving backward from enrolled, void the enrollment rows
-  if (previous_status === 'enrolled' && ['approved', 'rejected'].includes(next_status)) {
+  if (previousStatus === 'enrolled' && ['approved', 'rejected'].includes(next_status)) {
     // Void LMS enrollment
     await db
       .from('program_enrollments')

@@ -499,6 +499,41 @@ export function getPrimaryCTA(p: ProgramSchema): PrimaryCTA | null {
 //  HELPERS
 // ═══════════════════════════════════════════════════════════════════════
 
+/**
+ * Derive enrollment tracks for a program.
+ * Returns explicit tracks if defined, otherwise builds defaults from fundingOptions.
+ * Every program gets a decision-ready tracks object — no silent empty sections.
+ */
+export function getEnrollmentTracks(p: ProgramSchema): NonNullable<ProgramSchema['enrollmentTracks']> {
+  if (p.enrollmentTracks) return p.enrollmentTracks;
+
+  const hasWIOA = p.fundingOptions?.some(f => f === 'wioa' || f === 'wrg') ?? false;
+  const hasEmployer = p.fundingOptions?.includes('employer_paid') ?? false;
+  const applyHref = p.cta.applyHref || `/programs/${p.slug}/apply`;
+
+  return {
+    funded: {
+      label: hasEmployer ? 'Apprenticeship / Employer-Sponsored' : 'Workforce-Funded Training',
+      requirement: hasEmployer ? 'Requires employer sponsor agreement' : 'Must reside in Indiana',
+      description: hasEmployer
+        ? 'Train while earning wages at a partner employer. Your employer covers tuition through the apprenticeship agreement. No out-of-pocket cost.'
+        : hasWIOA
+        ? 'Federal and Indiana state workforce funding may cover 100% of tuition, books, and exam fees for eligible Indiana residents. We help you apply for every option you qualify for.'
+        : 'Funding assistance may be available through workforce development programs. Contact an advisor to check your eligibility.',
+      applyHref,
+      available: true as const,
+    },
+    selfPay: {
+      label: 'Self-Pay — All States',
+      cost: p.selfPayCost,
+      description: 'Enroll immediately without waiting for funding approval. Payment plans, BNPL (Klarna, Afterpay, Zip), and income-share options available.',
+      applyHref,
+      available: p.enrollmentType !== 'waitlist',
+      comingSoonMessage: 'Self-pay enrollment is opening soon. Join the waitlist to be notified.',
+    },
+  };
+}
+
 /** Compute total hours range string from schema */
 export function getTotalHoursRange(p: ProgramSchema): string {
   const min = p.durationWeeks * p.hoursPerWeekMin;

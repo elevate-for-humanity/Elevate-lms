@@ -18,7 +18,7 @@ import {
   Award, ExternalLink, CheckCircle2, Layers,
 } from 'lucide-react';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
-import { validateProgram, getTotalHoursRange, getTotalHoursFromBreakdown, getPrimaryCTA } from '@/lib/programs/program-schema';
+import { validateProgram, getTotalHoursRange, getTotalHoursFromBreakdown, getPrimaryCTA, getEnrollmentTracks } from '@/lib/programs/program-schema';
 import { DeliveryBadge, FundingSection } from './ProgramTruthBadges';
 import { ICC_URL, ICC_INSTRUCTION } from '@/lib/page-design-tokens';
 
@@ -42,6 +42,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
   const totalHours = getTotalHoursFromBreakdown(p);
   const hoursRange = getTotalHoursRange(p);
   const primaryCTA = getPrimaryCTA(p);
+  const enrollmentTracks = getEnrollmentTracks(p);
 
 
 
@@ -365,128 +366,120 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
       )}
 
       {/* ═══ ENROLLMENT TRACKS ══════════════════════════════════════ */}
-      {p.enrollmentTracks && (
-        <section className="py-14 border-y border-slate-100">
-          <div className="max-w-5xl mx-auto px-4">
-            <div className="text-center mb-10">
-              <h2 className="text-2xl font-extrabold text-slate-900 mb-2">How to Enroll</h2>
-              <p className="text-slate-500 text-base max-w-2xl mx-auto">
-                {p.fundingOptions && p.fundingOptions.some(f => f === 'wioa' || f === 'wrg')
-                  ? 'Workforce funding is available for eligible Indiana residents. Students from other states can enroll through the self-pay option.'
-                  : p.fundingOptions?.includes('employer_paid')
-                  ? 'This is a paid apprenticeship — you earn wages while you train. A self-pay option is available for those without an employer sponsor.'
-                  : 'Choose the enrollment option that works for you.'}
+      <section className="py-14 border-y border-slate-100">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-green-600 mb-3">How You Can Start</p>
+            <h2 className="text-2xl font-extrabold text-slate-900 mb-3">Choose the path that fits your situation.</h2>
+            <p className="text-slate-500 text-base max-w-2xl mx-auto">
+              There&apos;s a path to enrollment whether you qualify for funding or not. We&apos;ll help you figure out which one.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-6">
+
+            {/* Track 1: Funded */}
+            <div className="bg-white rounded-2xl border-2 border-brand-green-500 shadow-sm p-7 flex flex-col">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="bg-brand-green-100 text-brand-green-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                  Lowest Cost Path
+                </span>
+              </div>
+              <h3 className="text-lg font-extrabold text-slate-900 mb-1">{enrollmentTracks.funded.label}</h3>
+              <p className="text-xs font-semibold text-brand-green-700 mb-3">
+                {enrollmentTracks.funded.requirement}
               </p>
-            </div>
-
-            <div className="grid sm:grid-cols-2 gap-6">
-
-              {/* Track 1: Indiana funded */}
-              <div className="bg-white rounded-2xl border-2 border-brand-green-500 shadow-sm p-7 flex flex-col">
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="bg-brand-green-100 text-brand-green-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                    Workforce Funded
-                  </span>
-                </div>
-                <h3 className="text-lg font-extrabold text-slate-900 mb-1">{p.enrollmentTracks.funded.label}</h3>
-                <p className="text-xs font-semibold text-brand-green-700 mb-3">
-                  Requirement: {p.enrollmentTracks.funded.requirement}
-                </p>
-                <p className="text-slate-600 text-sm leading-relaxed mb-6 flex-1">
-                  {p.enrollmentTracks.funded.description}
-                </p>
-                <div className="space-y-2">
-                  <p className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Eligible programs include</p>
+              <p className="text-slate-600 text-sm leading-relaxed mb-6 flex-1">
+                {enrollmentTracks.funded.description}
+              </p>
+              <div className="space-y-2">
+                {p.fundingOptions?.some(f => f === 'wioa' || f === 'wrg') && (
                   <div className="flex flex-wrap gap-2 mb-4">
                     {['WorkOne', 'WIOA', 'Trade Act', 'SNAP E&T', 'JRI'].map(prog => (
                       <span key={prog} className="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-lg">{prog}</span>
                     ))}
                   </div>
-                  <Link
-                    href={p.enrollmentTracks.funded.applyHref}
-                    className="block w-full text-center bg-brand-green-600 hover:bg-brand-green-700 text-white font-bold py-3.5 rounded-xl transition-colors text-sm"
-                  >
-                    Apply — Check My Eligibility
-                  </Link>
-                  <p className="text-center text-xs text-slate-500 mt-1">Free to apply · eligibility verified before enrollment</p>
-                </div>
-              </div>
-
-              {/* Track 2: Self-pay national */}
-              <div className={`bg-white rounded-2xl border-2 shadow-sm p-7 flex flex-col ${p.enrollmentTracks.selfPay.available ? 'border-brand-blue-400' : 'border-slate-200'}`}>
-                <div className="flex items-center gap-2 mb-4">
-                  <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${p.enrollmentTracks.selfPay.available ? 'bg-brand-blue-100 text-brand-blue-700' : 'bg-slate-100 text-slate-500'}`}>
-                    {p.enrollmentTracks.selfPay.available ? 'Self-Pay' : 'Enrollment Pending'}
-                  </span>
-                </div>
-                <h3 className="text-lg font-extrabold text-slate-900 mb-1">{p.enrollmentTracks.selfPay.label}</h3>
-                <p className="text-2xl font-extrabold text-slate-900 mb-3">
-                  {p.enrollmentTracks.selfPay.cost}
-                  <span className="text-sm font-normal text-slate-500 ml-1">tuition</span>
-                </p>
-                <p className="text-slate-600 text-sm leading-relaxed mb-4 flex-1">
-                  {p.enrollmentTracks.selfPay.description}
-                </p>
-                <div className="bg-slate-50 rounded-xl p-4 mb-5 text-sm text-slate-600 space-y-1.5">
-                  <p className="font-semibold text-slate-700 text-xs uppercase tracking-wider mb-2">What you get</p>
-                  {[
-                    'Full online training curriculum',
-                    'Industry certification exam preparation',
-                    'OSHA 10-Hour included',
-                    'Exam proctored on-site at Elevate (Indianapolis)',
-                  ].map((item) => (
-                    <div key={item} className="flex items-start gap-2">
-                      <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-slate-400 mt-1.5" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-                {p.enrollmentTracks.selfPay.available ? (
-                  <Link
-                    href={p.enrollmentTracks.selfPay.applyHref}
-                    className="block w-full text-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-3.5 rounded-xl transition-colors text-sm"
-                  >
-                    Enroll — Self-Pay
-                  </Link>
-                ) : (
-                  <div>
-                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-3 text-sm text-amber-800">
-                      {p.enrollmentTracks.selfPay.comingSoonMessage}
-                    </div>
-                    <Link
-                      href="/contact?subject=hvac-self-pay-waitlist"
-                      className="block w-full text-center border-2 border-slate-300 hover:border-brand-blue-400 text-slate-700 hover:text-brand-blue-700 font-bold py-3.5 rounded-xl transition-colors text-sm"
-                    >
-                      Join the Waitlist
-                    </Link>
-                  </div>
                 )}
+                <Link
+                  href={enrollmentTracks.funded.applyHref}
+                  className="block w-full text-center bg-brand-green-600 hover:bg-brand-green-700 text-white font-bold py-3.5 rounded-xl transition-colors text-sm"
+                >
+                  See What I Qualify For
+                </Link>
+                <p className="text-center text-xs text-slate-500 mt-1">Free to apply · takes 2 minutes</p>
               </div>
-
             </div>
 
-            {/* Expansion note */}
-            <p className="text-center text-slate-500 text-sm mt-8">
-              Workforce-funded training currently available for Indiana residents.
-              Additional states will be added as partnerships develop.
-            </p>
+            {/* Track 2: Self-pay */}
+            <div className={`bg-white rounded-2xl border-2 shadow-sm p-7 flex flex-col ${enrollmentTracks.selfPay.available ? 'border-brand-blue-400' : 'border-slate-200'}`}>
+              <div className="flex items-center gap-2 mb-4">
+                <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${enrollmentTracks.selfPay.available ? 'bg-brand-blue-100 text-brand-blue-700' : 'bg-slate-100 text-slate-500'}`}>
+                  {enrollmentTracks.selfPay.available ? 'Start Immediately' : 'Enrollment Pending'}
+                </span>
+              </div>
+              <h3 className="text-lg font-extrabold text-slate-900 mb-1">{enrollmentTracks.selfPay.label}</h3>
+              <p className="text-2xl font-extrabold text-slate-900 mb-3">
+                {enrollmentTracks.selfPay.cost}
+                <span className="text-sm font-normal text-slate-500 ml-1">tuition</span>
+              </p>
+              <p className="text-slate-600 text-sm leading-relaxed mb-4 flex-1">
+                {enrollmentTracks.selfPay.description}
+              </p>
+              <div className="bg-slate-50 rounded-xl p-4 mb-5 text-sm text-slate-600 space-y-1.5">
+                <p className="font-semibold text-slate-700 text-xs uppercase tracking-wider mb-2">Payment options</p>
+                {['Debit / Credit card', 'ACH bank transfer', 'Payment plan (split over time)', 'BNPL — Klarna, Afterpay, Zip'].map((item) => (
+                  <div key={item} className="flex items-start gap-2">
+                    <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-slate-400 mt-1.5" />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+              {enrollmentTracks.selfPay.available ? (
+                <Link
+                  href={enrollmentTracks.selfPay.applyHref}
+                  className="block w-full text-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-3.5 rounded-xl transition-colors text-sm"
+                >
+                  Find My Best Path
+                </Link>
+              ) : (
+                <div>
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-3 text-sm text-amber-800">
+                    {enrollmentTracks.selfPay.comingSoonMessage}
+                  </div>
+                  <Link
+                    href={`/contact?subject=${p.slug}-waitlist`}
+                    className="block w-full text-center border-2 border-slate-300 hover:border-brand-blue-400 text-slate-700 hover:text-brand-blue-700 font-bold py-3.5 rounded-xl transition-colors text-sm"
+                  >
+                    Join the Waitlist
+                  </Link>
+                </div>
+              )}
+            </div>
 
-            {/* Indiana Career Connect */}
-            <div className="mt-8 bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
-              <p className="text-brand-blue-900 font-semibold text-sm mb-1">Indiana Career Connect</p>
-              <p className="text-brand-blue-800 text-sm leading-relaxed mb-4">{ICC_INSTRUCTION}</p>
-              <a
-                href={ICC_URL}
-                target="_blank"
+          </div>
+
+          {/* Reassurance line */}
+          <p className="text-center text-slate-500 text-sm mt-8">
+            Not sure which path is right? <Link href="/contact" className="text-brand-blue-600 hover:underline font-medium">Talk to an advisor</Link> — it&apos;s free and takes 10 minutes.
+          </p>
+
+          {/* Indiana Career Connect */}
+          {p.fundingOptions?.some(f => f === 'wioa' || f === 'wrg') && (
+          <div className="mt-8 bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
+            <p className="text-brand-blue-900 font-semibold text-sm mb-1">Indiana Career Connect</p>
+            <p className="text-brand-blue-800 text-sm leading-relaxed mb-4">{ICC_INSTRUCTION}</p>
+            <a
+              href={ICC_URL}
+              target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-2.5 rounded-lg transition-colors text-sm"
               >
                 Go to Indiana Career Connect
               </a>
             </div>
-          </div>
-        </section>
-      )}
+          )}
+        </div>{/* max-w-5xl */}
+      </section>
 
       {/* ═══ CTA ════════════════════════════════════════════════════ */}
       <section className="py-16 bg-slate-900">

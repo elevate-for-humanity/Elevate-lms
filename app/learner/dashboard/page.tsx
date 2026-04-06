@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
+import { loadLearnerDashboard } from '@/lib/learner/dashboard-loader';
 import WorkOneChecklistSection from '@/components/workone/WorkOneChecklist';
 import {
   Clock,
@@ -105,259 +106,33 @@ export default async function LearnerDashboardPage({ searchParams }: Props) {
     }
   }
 
-  // Fetch enrollments from both tables (legacy enrollments + training_enrollments)
-  const { data: legacyEnrollments } = await supabase
-    .from('program_enrollments')
-    .select(`
-      id,
-      course_id,
-      program_id,
-      program_slug,
-      status,
-      progress,
-      enrolled_at,
-      courses (
-        id,
-        title,
-        description,
-        duration_hours
-      )
-    `)
-    .eq('user_id', user.id)
-    .order('enrolled_at', { ascending: false });
+  // Load all dashboard data via the canonical loader
+  const data = await loadLearnerDashboard();
 
-  // For program_enrollments with no course_id (e.g. barber apprenticeship),
-  // pull program name from apprenticeship_programs
-  const programIds = (legacyEnrollments || [])
-    .filter((e: any) => !e.course_id && e.program_id)
-    .map((e: any) => e.program_id);
-
-  const { data: apprenticeshipPrograms } = programIds.length > 0
-    ? await supabase
-        .from('apprenticeship_programs')
-        .select('id, name, slug, description')
-        .in('id', programIds)
-    : { data: [] };
-
-  const { data: trainingEnrollments } = await supabase
-    .from('training_enrollments')
-    .select(`
-      id,
-      course_id,
-      status,
-      progress,
-      enrolled_at,
-      training_courses (
-        id,
-        course_name,
-        description,
-        duration_hours
-      )
-    `)
-    .eq('user_id', user.id)
-    .order('enrolled_at', { ascending: false });
-
-  // Normalize training_enrollments to match legacy shape
-  const normalizedTraining = (trainingEnrollments || []).map((te: any) => ({
-    ...te,
-    courses: te.training_courses
-      ? { id: te.training_courses.id, title: te.training_courses.course_name, description: te.training_courses.description, duration_hours: te.training_courses.duration_hours }
-      : null,
-  }));
-
-  // For program_enrollments with no course_id, inject apprenticeship program name as the course
-  const apMap = new Map((apprenticeshipPrograms || []).map((p: any) => [p.id, p]));
-  const normalizedLegacy = (legacyEnrollments || []).map((e: any) => {
-    if (!e.courses && !e.course_id && e.program_id && apMap.has(e.program_id)) {
-      const ap = apMap.get(e.program_id);
-      return {
-        ...e,
-        courses: {
-          id: ap.id,
-          title: ap.name,
-          description: ap.description || 'Registered Apprenticeship Program',
-          duration_hours: null,
-        },
-        _isApprenticeship: true,
-      };
-    }
-    return e;
-  });
-
-  // Merge, dedup by course_id
-  const seen = new Set<string>();
-  const enrollments = [...normalizedLegacy, ...normalizedTraining].filter((e: any) => {
-    const key = e.course_id || e.id;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-
-  // Fetch external (non-LMS) enrollments — rendered as admin-managed program cards
-  const { data: externalEnrollments } = await supabase
-    .from('external_program_enrollments')
-    .select('id, program_slug, enrollment_state, start_date, notes, created_at')
-    .eq('user_id', user.id)
-    .eq('enrollment_state', 'active')
-    .order('created_at', { ascending: false });
-
-  // Fetch achievements
-  const { data: achievements } = await supabase
-    .from('user_achievements')
-    .select(`
-      id,
-      earned_at,
-      achievements (
-        id,
-        name,
-        description,
-        icon
-      )
-    `)
-    .eq('user_id', user.id)
-    .order('earned_at', { ascending: false })
-    .limit(5);
-
-  // Fetch notifications
-  const { data: notifications } = await supabase
-    .from('notifications')
-    .select('*')
-    .eq('user_id', user.id)
-    .eq('read', false)
-    .order('created_at', { ascending: false })
-    .limit(5);
-
-  // Fetch certificates
-  const { data: certificates } = await supabase
-    .from('certificates')
-    .select('id, certificate_number, course_title, issued_at, verification_code')
-    .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
-    .order('issued_at', { ascending: false })
-    .limit(5);
-
-  // Fetch active certification requests for the pipeline section
-  const { data: certRequests } = await supabase
-    .from('certification_requests')
-    .select(`
-      id, status, authorization_code, authorization_expires_at,
-      certificate_issued_at, created_at,
-      programs ( title ),
-      credential_registry ( name, abbreviation ),
-      program_certification_pathways (
-        credential_name, credential_abbreviation,
-        eligibility_review_required, application_url,
-        fee_payer, exam_fee_cents,
-        certification_bodies ( name, website )
-      )
-    `)
-    .eq('user_id', user.id)
-    .neq('status', 'pending_completion')
-    .order('created_at', { ascending: false })
-    .limit(5);
-
-  // Fetch attendance hours
-  const { data: attendanceData } = await supabase
-    .from('attendance_hours')
-    .select('hours_logged, date, type')
-    .eq('enrollment_id', enrollments?.[0]?.id || '00000000-0000-0000-0000-000000000000')
-    .order('date', { ascending: false })
-    .limit(30);
-
-  // Fetch training hours from consolidated hour_entries
-  const { data: hoursData } = await supabase
-    .from('hour_entries')
-    .select('hours_claimed')
-    .eq('user_id', user.id);
-
-  const attendanceHours = attendanceData?.reduce((sum, a) => sum + (a.hours_logged || 0), 0) || 0;
-  const trainingHours = hoursData?.reduce((sum, h) => sum + (Number(h.hours_claimed) || 0), 0) || 0;
-  const totalHours = attendanceHours || trainingHours;
-
-  // Fetch lesson progress for all enrolled courses
-  const courseIds = enrollments?.map(e => e.course_id).filter(Boolean) || [];
-  const { data: lessonProgress } = courseIds.length > 0
-    ? await supabase
-        .from('lesson_progress')
-        .select('course_id, lesson_id, completed')
-        .eq('user_id', user.id)
-        .in('course_id', courseIds)
-    : { data: null };
-
-  // Check for pending onboarding (program_enrollments in pre-active state)
-  const { data: pendingOnboarding } = await supabase
-    .from('program_enrollments')
-    .select('id, enrollment_state, next_required_action, full_name, program_id')
-    .eq('user_id', user.id)
-    .in('enrollment_state', ['applied', 'approved', 'confirmed', 'orientation_complete', 'documents_complete'])
-    .order('enrolled_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  // Auto-repair: if user has no active enrollment but has a paid Stripe session,
-  // trigger reconciliation server-side. Fire-and-forget — never blocks render.
-  const hasActiveEnrollment = (legacyEnrollments ?? []).some((e: any) => e.status === 'active');
-  if (!hasActiveEnrollment) {
-    const { data: paidApp } = await supabase
-      .from('applications')
-      .select('id')
-      .eq('user_id', user.id)
-      .in('status', ['enrolled', 'ready_to_enroll', 'approved', 'in_review'])
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (paidApp) {
-      const { data: stripeSession } = await supabase
-        .from('stripe_sessions_staging')
-        .select('session_id')
-        .eq('application_id', paidApp.id)
-        .eq('payment_status', 'paid')
-        .limit(1)
-        .maybeSingle();
-
-      if (stripeSession) {
-        // Paid session exists but no active enrollment — log only, do not block render
-        logger.info('[dashboard] Paid session found but no active enrollment', { userId: user.id, appId: paidApp.id });
-      }
-    }
-  }
-
-  // Fetch recent messages (unread)
-  const { data: recentMessages } = await supabase
-    .from('messages')
-    .select('id, subject, body, created_at, sender_id, read')
-    .eq('recipient_id', user.id)
-    .eq('read', false)
-    .order('created_at', { ascending: false })
-    .limit(3);
-
-  // Fetch upcoming schedule (cohort sessions, appointments)
-  const now = new Date().toISOString();
-  const { data: upcomingSchedule } = await supabase
-    .from('cohort_sessions')
-    .select('id, title, session_date, start_time, end_time, location, session_type')
-    .gte('session_date', now.split('T')[0])
-    .order('session_date', { ascending: true })
-    .limit(3);
-
-  // Check whether the learner has a pending_workone application — gates WorkOne checklist
-  const { data: workoneApp } = await supabase
-    .from('applications')
-    .select('id, status, requested_funding_source')
-    .eq('user_id', user.id)
-    .eq('status', 'pending_workone')
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const {
+    user,
+    profile,
+    enrollments,
+    activeEnrollments,
+    completedEnrollments,
+    averageProgress,
+    lessonProgress,
+    certificates,
+    notifications,
+    achievements,
+    certRequests,
+    totalHours,
+    recentMessages,
+    upcomingSchedule,
+    workoneApp,
+    externalEnrollments,
+    pendingOnboarding,
+    applications,
+    attendanceData,
+    attendanceHours,
+  } = data;
 
   const isPendingWorkone = !!workoneApp;
-
-  // Calculate stats
-  const activeEnrollments = enrollments?.filter(e => e.status === 'active') || [];
-  const completedEnrollments = enrollments?.filter(e => e.status === 'completed') || [];
-  const averageProgress = activeEnrollments.length > 0
-    ? Math.round(activeEnrollments.reduce((sum, e) => sum + (e.progress || 0), 0) / activeEnrollments.length)
-    : 0;
 
   const userName = profile?.full_name || user.email?.split('@')[0] || 'Learner';
 

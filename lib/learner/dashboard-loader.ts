@@ -265,15 +265,17 @@ export async function loadLearnerDashboard() {
         .limit(3)
     : { data: [] };
 
-  // ── 14. WORKONE APPLICATION (optional) ────────────────────────────
-  const { data: workoneApp } = await supabase
+  // ── 14. APPLICATIONS (for gate checks and diagnostic) ─────────────
+  const { data: applications } = await supabase
     .from('applications')
-    .select('id, status, requested_funding_source')
+    .select('id, status, payment_status, program_id, requested_funding_source')
     .eq('user_id', user.id)
-    .eq('status', 'pending_workone')
     .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(10);
+
+  const workoneApp = (applications ?? []).find(
+    (a: any) => a.status === 'pending_workone'
+  ) ?? null;
 
   // ── 15. EXTERNAL ENROLLMENTS (optional) ───────────────────────────
   const { data: externalEnrollments } = await supabase
@@ -306,6 +308,27 @@ export async function loadLearnerDashboard() {
         )
       : 0;
 
+  // Diagnostic: check for paid Stripe session without active enrollment (log only)
+  const paidApp = (applications ?? []).find(
+    (a) => a.payment_status === 'paid' && a.status !== 'enrolled'
+  );
+  if (paidApp) {
+    const { data: stripeSession } = await db
+      .from('stripe_sessions_staging')
+      .select('session_id')
+      .eq('application_id', paidApp.id)
+      .eq('payment_status', 'paid')
+      .limit(1)
+      .maybeSingle();
+    if (stripeSession) {
+      // Paid session exists but no active enrollment — log only, do not block render
+      console.warn('[dashboard-loader] Paid session found but no active enrollment', {
+        userId: user.id,
+        appId: paidApp.id,
+      });
+    }
+  }
+
   return {
     user,
     profile,
@@ -324,9 +347,12 @@ export async function loadLearnerDashboard() {
     workoneApp,
     externalEnrollments: externalEnrollments ?? [],
     pendingOnboarding,
+    applications: applications ?? [],
+    attendanceData: attendanceData ?? [],
+    attendanceHours,
     // Onboarding gate flags
     onboardingDone: !!profile?.onboarding_completed,
-    accessGranted: !!(programEnrollments ?? []).find((e) => e.access_granted_at),
+    accessGranted: !!(programEnrollments ?? []).find((e: any) => e.access_granted_at),
     latestEnrollment: (programEnrollments ?? [])[0] ?? null,
   };
 }

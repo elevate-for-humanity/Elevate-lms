@@ -3,6 +3,7 @@ import { requireApiRole } from '@/lib/auth/require-api-role';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { updateProgressAfterQuiz } from '@/lib/lms/update-program-progress';
 
 interface SubmitRequest {
   attemptId: string;
@@ -135,6 +136,9 @@ async function _POST(
     logger.error('Error updating attempt:', updateError);
     return NextResponse.json({ error: 'Failed to save results' }, { status: 500 });
   }
+
+  // Update durable progress summary — best-effort, must not block response
+  await updateProgressAfterQuiz(user.id, quizId);
 
   return NextResponse.json({
     success: true,

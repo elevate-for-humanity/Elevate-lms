@@ -25,7 +25,30 @@ export const POST = withAuth(
       return new Response('Missing id', { status: 400 });
     }
 
-    const updates: any = {};
+    // Allowlists — reject unknown values before they reach the DB
+    const VALID_STATUSES = ['pending', 'submitted', 'under_review', 'approved', 'rejected', 'suspended'];
+    const VALID_MOU_STATUSES = ['pending', 'sent', 'signed', 'countersigned', 'expired'];
+
+    if (status && !VALID_STATUSES.includes(status)) {
+      return new Response('Invalid status value', { status: 400 });
+    }
+    if (mou_status && !VALID_MOU_STATUSES.includes(mou_status)) {
+      return new Response('Invalid mou_status value', { status: 400 });
+    }
+
+    // Pre-read — verify holder exists before mutating
+    const { data: existing, error: fetchError } = await supabase
+      .from('program_holders')
+      .select('id, status, mou_status')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !existing) {
+      await writeApiAuditEvent({ ...auditBase, result: 'failure', status_code: 404, error_summary: 'Not found' });
+      return new Response('Program holder not found', { status: 404 });
+    }
+
+    const updates: Record<string, unknown> = {};
 
     if (status) {
       updates.status = status;

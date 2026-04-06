@@ -69,16 +69,22 @@ export async function POST(request: NextRequest) {
     return safeError('This lesson does not accept submissions', 400);
   }
 
-  // Verify learner is enrolled
+  // Verify learner is enrolled — check program_enrollments (canonical)
+  const ACCESS_STATES = ['active', 'in_progress', 'enrolled', 'confirmed', 'pending_funding_verification'];
+
   const { data: enrollment } = await db
-    .from('training_enrollments')
-    .select('id')
+    .from('program_enrollments')
+    .select('id, status, enrollment_state')
     .eq('user_id', user.id)
     .eq('course_id', course_id)
-    .eq('status', 'active')
     .maybeSingle();
 
-  if (!enrollment) {
+  const hasAccess =
+    enrollment &&
+    (ACCESS_STATES.includes(enrollment.status ?? '') ||
+      ACCESS_STATES.includes(enrollment.enrollment_state ?? ''));
+
+  if (!hasAccess) {
     return safeError('Not enrolled in this course', 403);
   }
 

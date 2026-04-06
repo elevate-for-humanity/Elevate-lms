@@ -111,7 +111,7 @@ async function _POST(req: Request) {
         mime_type: file.type,
         description: description || null,
         uploaded_by: user.id,
-        approved: false,
+        approved: null, // null = pending review; false = rejected; true = approved
       })
       .select()
       .single();
@@ -139,9 +139,9 @@ async function _POST(req: Request) {
         created_at: document.created_at,
       },
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return NextResponse.json(
-      { err: toErrorMessage(err) || 'Upload failed' },
+      { error: toErrorMessage(err) || 'Upload failed' },
       { status: 500 }
     );
   }

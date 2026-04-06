@@ -1,5 +1,5 @@
 import type { Handler } from "@netlify/functions";
-import { Pool } from "pg";
+import postgres from "postgres";
 
 const SECRET = "run-mig-efh-2026";
 
@@ -2838,16 +2838,12 @@ export const handler: Handler = async (event) => {
   try { secret = JSON.parse(event.body || "{}").secret; } catch { return { statusCode: 400, body: "Bad JSON" }; }
   if (secret !== SECRET) return { statusCode: 403, body: "Forbidden" };
 
-  const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
-    connectionTimeoutMillis: 15000,
-  });
-
+  const sql = postgres(process.env.DATABASE_URL!, { ssl: "require", max: 1 });
   const results: { file: string; ok: boolean; error?: string }[] = [];
-  for (const { file, sql } of MIGRATIONS) {
+
+  for (const { file, sql: query } of MIGRATIONS) {
     try {
-      await pool.query(sql);
+      await sql.unsafe(query);
       results.push({ file, ok: true });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -2855,7 +2851,7 @@ export const handler: Handler = async (event) => {
     }
   }
 
-  await pool.end();
+  await sql.end();
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },

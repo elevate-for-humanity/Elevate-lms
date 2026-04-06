@@ -103,6 +103,7 @@
     "pdf-parse": "^2.4.5",
     "pdfkit": "0.17.2",
     "playwright": "^1.57.0",
+    "postgres": "^3.4.9",
     "qrcode": "1.5.4",
     "react": "19.2.1",
     "react-dom": "19.2.1",

@@ -2838,18 +2838,20 @@ export const handler: Handler = async (event) => {
   try { secret = JSON.parse(event.body || "{}").secret; } catch { return { statusCode: 400, body: "Bad JSON" }; }
   if (secret !== SECRET) return { statusCode: 403, body: "Forbidden" };
 
-  const sql = postgres(process.env.DATABASE_URL!, { ssl: "require", max: 1 });
-  const results: { file: string; ok: boolean; error?: string }[] = [];
+  const sql = postgres(process.env.DATABASE_URL!, { ssl: "require", max: 5 });
 
-  for (const { file, sql: query } of MIGRATIONS) {
-    try {
-      await sql.unsafe(query);
-      results.push({ file, ok: true });
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      results.push({ file, ok: false, error: msg.slice(0, 400) });
-    }
-  }
+  // Run all migrations in parallel — each is idempotent (IF NOT EXISTS guards)
+  const results = await Promise.all(
+    MIGRATIONS.map(async ({ file, sql: query }) => {
+      try {
+        await sql.unsafe(query);
+        return { file, ok: true };
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        return { file, ok: false, error: msg.slice(0, 400) };
+      }
+    })
+  );
 
   await sql.end();
   return {

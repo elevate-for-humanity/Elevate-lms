@@ -137,6 +137,7 @@
 
 [functions."run-migrations"]
   node_bundler = "esbuild"
+  timeout = 300
 
 # Externalize heavy deps from the Next.js SSR handler to stay under 250MB zip limit
 [functions."___netlify-server-handler"]

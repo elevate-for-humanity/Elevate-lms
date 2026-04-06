@@ -1,67 +1,69 @@
 import { NextResponse } from 'next/server';
-
 import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 import { auditLog } from '@/lib/auditLog';
 import { updateTenantLicense } from '@/lib/licenseGuard';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
-
 export const dynamic = 'force-dynamic';
 
-export async function POST(req: Request) {
-  try {
-    const rateLimited = await applyRateLimit(req, 'api');
-    if (rateLimited) return rateLimited;
+const ADMIN_ROLES = ['admin', 'super_admin'];
 
+async function requireSuperAdmin() {
+  const supabase = await createClient();
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error || !user) return { user: null, db: null, error: 'Unauthorized' as const };
+
+  const db = createAdminClient();
+  if (!db) return { user: null, db: null, error: 'Service unavailable' as const };
+
+  const { data: profile } = await db
+    .from('profiles').select('role').eq('id', user.id).single();
+
+  if (!profile || !ADMIN_ROLES.includes(profile.role ?? '')) {
+    return { user: null, db: null, error: 'Forbidden' as const };
+  }
+  return { user, db, error: null };
+}
+
+export async function POST(req: Request) {
+  const rateLimited = await applyRateLimit(req, 'strict');
+  if (rateLimited) return rateLimited;
+
+  const { user, db, error: authError } = await requireSuperAdmin();
+  if (authError || !user || !db) {
+    return NextResponse.json({ error: authError }, { status: authError === 'Unauthorized' ? 401 : 403 });
+  }
+
+  try {
     const body = await req.json();
     const { name, state, plan = 'starter', branding } = body;
 
     if (!name || !state) {
-      return NextResponse.json(
-        { error: 'name and state are required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'name and state are required' }, { status: 400 });
     }
 
-    const supabase = createAdminClient();
-
-    if (!supabase) {
-      return NextResponse.json(
-        { error: 'Service temporarily unavailable.' },
-        { status: 503 }
-      );
-    }
-
-    // Create tenant
-    const { data: tenant, error: tenantError } = await supabase
+    const { data: tenant, error: tenantError } = await db
       .from('tenants')
-      .insert({
-        name,
-        state: state.toUpperCase(),
-        branding: branding || {},
-        enabled: true,
-      })
+      .insert({ name, state: state.toUpperCase(), branding: branding || {}, enabled: true })
       .select()
       .single();
 
     if (tenantError) {
+      logger.error('[tenants/create] insert failed', tenantError);
       return NextResponse.json({ error: 'Tenant creation failed' }, { status: 400 });
     }
 
-    // Create license
     const license = await updateTenantLicense(tenant.id, plan);
-
     if (!license) {
-      return NextResponse.json(
-        { error: 'Failed to create license' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to create license' }, { status: 500 });
     }
 
-    // Log tenant creation
     await auditLog({
-      actor_user_id: req.headers.get('x-user-id') || undefined,
+      actor_user_id: user.id,
       actor_role: 'admin',
       action: 'CREATE',
       entity: 'employer',
@@ -71,40 +73,36 @@ export async function POST(req: Request) {
       metadata: { tenant_type: 'new', plan },
     });
 
-    return NextResponse.json({
-      success: true,
-      tenant,
-      license,
-    });
-  } catch (error) { 
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: true, tenant, license });
+  } catch (err: unknown) {
+    logger.error('[tenants/create] unexpected error', err instanceof Error ? err : undefined);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function GET(request: Request) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  const { user, db, error: authError } = await requireSuperAdmin();
+  if (authError || !user || !db) {
+    return NextResponse.json({ error: authError }, { status: authError === 'Unauthorized' ? 401 : 403 });
+  }
+
   try {
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
-
-    const supabase = createAdminClient();
-
-    const { data, error }: any = await supabase
+    const { data, error } = await db
       .from('tenants')
       .select('*, tenant_licenses(*)')
       .order('created_at', { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: 'Internal server error' }, { status: 400 });
+      logger.error('[tenants/create] select failed', error);
+      return NextResponse.json({ error: 'Failed to fetch tenants' }, { status: 500 });
     }
 
-    return NextResponse.json({ tenants: data || [] });
-  } catch (error) { 
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ tenants: data ?? [] });
+  } catch (err: unknown) {
+    logger.error('[tenants/create] unexpected error', err instanceof Error ? err : undefined);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

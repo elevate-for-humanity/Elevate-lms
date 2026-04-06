@@ -1,10 +1,7 @@
-
 import { createAdminClient } from '@/lib/supabase/admin';
 
 // app/api/partner-launch/[enrollmentId]/route.ts
 import { NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 import { getPartnerClient, PartnerType } from '@/lib/partners';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -12,21 +9,6 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
-
-async function createAdminClient() {
-  const cookieStore = await cookies();
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-      },
-    }
-  );
-}
 
 interface Params {
   params: Promise<{ enrollmentId: string }>;
@@ -36,7 +18,7 @@ async function _GET(_req: Request, { params }: Params) {
   const rateLimited = await applyRateLimit(_req, 'api');
   if (rateLimited) return rateLimited;
 
-  const supabase = await createAdminClient();
+  const supabase = createAdminClient();
   const { enrollmentId } = await params;
 
   const { data: enrollment, error } = await supabase

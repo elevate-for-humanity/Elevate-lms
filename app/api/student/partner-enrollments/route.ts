@@ -1,10 +1,7 @@
-
 import { createAdminClient } from '@/lib/supabase/admin';
 
 // app/api/student/partner-enrollments/route.ts
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { createServerClient } from '@supabase/ssr';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -13,26 +10,11 @@ export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
-async function createAdminClient() {
-  const cookieStore = await cookies();
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-      },
-    }
-  );
-}
-
 async function _GET(request: Request) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const supabase = await createAdminClient();
+  const supabase = createAdminClient();
 
   const {
     data: { user },

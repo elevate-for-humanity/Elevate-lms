@@ -126,8 +126,6 @@ export default async function LearnerDashboardPage({ searchParams }: Props) {
   const data = await loadLearnerDashboard();
 
   const {
-    user,
-    profile,
     enrollments,
     activeEnrollments,
     completedEnrollments,

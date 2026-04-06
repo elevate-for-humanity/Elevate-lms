@@ -14,67 +14,59 @@ import { Facebook, Instagram, Linkedin, Youtube } from 'lucide-react';
 // Principle: If a first-time visitor or government reviewer wouldn't expect to see it, remove it
 
 const footerLinks = {
+  // Column 1 — Training areas + credentials + testing
   programs: [
     { name: 'All Programs', href: '/programs' },
-    { name: 'Healthcare', href: '/programs/cna' },
-    { name: 'Skilled Trades', href: '/programs/hvac-technician' },
+    { name: 'Healthcare', href: '/programs/healthcare' },
+    { name: 'Skilled Trades', href: '/programs/skilled-trades' },
+    { name: 'HVAC Technician', href: '/programs/hvac-technician' },
     { name: 'Technology', href: '/programs/it-help-desk' },
-    { name: 'Business & Finance', href: '/programs/bookkeeping' },
-    { name: 'Apprenticeships', href: '/programs/barber-apprenticeship' },
+    { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
+    { name: 'Business & Finance', href: '/programs/finance-bookkeeping-accounting' },
+    { name: 'Peer Recovery', href: '/programs/peer-recovery-specialist' },
     { name: 'Certifications', href: '/training/certifications' },
     { name: 'Testing & Exams', href: '/testing' },
-    { name: 'Micro-Classes', href: '/micro-classes' },
-    { name: 'Academic Calendar', href: '/academic-calendar' },
-    { name: 'Credentials', href: '/credentials' },
+    { name: 'Credential Verification', href: '/verify-credentials' },
   ],
-  students: [
-    { name: 'Apply Now', href: '/apply/student' },
-    { name: 'Check Eligibility', href: '/eligibility/quiz' },
-    { name: 'Enrollment', href: '/enrollment' },
+  // Column 2 — Student path: apply → fund → enroll → portal
+  getStarted: [
+    { name: 'Check My Eligibility', href: '/start' },
+    { name: 'Apply for Training', href: '/apply/student' },
+    { name: 'How Funding Works', href: '/funding/how-it-works' },
+    { name: 'WIOA Funding', href: '/wioa-eligibility' },
+    { name: 'Workforce Ready Grant', href: '/funding/wrg' },
+    { name: 'JRI / Job Ready Indy', href: '/funding/jri' },
+    { name: 'DOL Apprenticeship', href: '/funding/dol' },
     { name: 'Tuition & Fees', href: '/tuition' },
-    { name: 'Scholarships', href: '/scholarships' },
     { name: 'Student Portal', href: '/learner' },
-    { name: 'Career Counseling', href: '/career-counseling' },
-    { name: 'Orientation', href: '/orientation' },
-    { name: 'Transcript', href: '/transcript' },
-    { name: 'Parent Portal', href: '/parent-portal' },
+    { name: 'Schedule Orientation', href: '/orientation' },
     { name: 'Consumer Education', href: '/consumer-education' },
   ],
-  funding: [
-    { name: 'Funding Overview', href: '/funding' },
-    { name: 'How Funding Works', href: '/funding/how-it-works' },
-    { name: 'WIOA — Low Income', href: '/wioa-eligibility/low-income' },
-    { name: 'WIOA — Veterans', href: '/wioa-eligibility/veterans' },
-    { name: 'Workforce Ready Grant', href: '/funding/wrg' },
-    { name: 'JRI Funding', href: '/funding/jri' },
-    { name: 'Job Ready Indy', href: '/funding/job-ready-indy' },
-    { name: 'DOL Apprenticeship', href: '/funding/dol' },
-    { name: 'Donate', href: '/donate' },
-    { name: 'Philanthropy', href: '/philanthropy' },
-  ],
+  // Column 3 — Employers and all partner types
   partners: [
-    { name: 'Workforce Partners', href: '/workforce-partners' },
-    { name: 'Government', href: '/government' },
-    { name: 'Agencies', href: '/agencies' },
-    { name: 'Industries', href: '/industries' },
-    { name: 'Training Providers', href: '/training-providers' },
-    { name: 'Solutions', href: '/solutions' },
-    { name: 'Partner Directory', href: '/directory' },
-    { name: 'Become a Partner', href: '/partnerships' },
-    { name: 'Platform Licensing', href: '/store/licensing' },
+    { name: 'Hire Our Graduates', href: '/for-employers' },
+    { name: 'OJT Partnerships', href: '/partnerships' },
+    { name: 'Post a Job', href: '/employer/post-job' },
+    { name: 'Employer Portal', href: '/employer/dashboard' },
+    { name: 'Workforce Agencies', href: '/partners/workforce' },
+    { name: 'Barbershop Partners', href: '/partners/barbershop-apprenticeship' },
+    { name: 'Training Providers', href: '/partners/training-provider' },
+    { name: 'Reentry Organizations', href: '/partners/reentry' },
+    { name: 'Program Holders', href: '/program-holder' },
+    { name: 'Become a Partner', href: '/partners/join' },
   ],
+  // Column 4 — Organization, platform, compliance, contact
   organization: [
     { name: 'About Elevate', href: '/about' },
-    { name: 'Our Mission', href: '/about/mission' },
-    { name: 'Our Team', href: '/team' },
-    { name: 'Founder', href: '/founder' },
+    { name: 'Our Team', href: '/about/team' },
+    { name: 'Outcomes', href: '/outcomes/indiana' },
     { name: 'Accreditation', href: '/accreditation' },
-    { name: 'Governance', href: '/governance' },
     { name: 'Compliance', href: '/compliance' },
-    { name: 'Transparency', href: '/transparency' },
-    { name: 'Tax Services', href: 'https://www.supersonicfastermoney.com' },
-    { name: 'Resources', href: '/resources' },
-    { name: 'Contact', href: '/contact' },
+    { name: 'Platform Licensing', href: '/store/licensing' },
+    { name: 'Rise Foundation', href: '/rise-foundation' },
+    { name: 'Donate', href: '/donate' },
+    { name: 'Careers', href: '/careers' },
+    { name: 'Contact Us', href: '/contact' },
     { name: 'Site Map', href: '/site-map' },
   ],
   legal: [
@@ -110,15 +102,15 @@ export default function ServerFooter() {
           </div>
         </div>
 
-        {/* 5-Column Footer — matches 9-door nav architecture */}
-        <nav aria-label="Footer navigation" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-12">
+        {/* 4-Column Footer — mirrors nav hierarchy */}
+        <nav aria-label="Footer navigation" className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
           {/* Column 1: Programs */}
           <div>
             <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Programs</h3>
             <ul className="space-y-3">
               {footerLinks.programs.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href} className="text-white hover:text-white text-sm">
+                  <Link href={link.href} className="text-slate-400 hover:text-white text-sm transition-colors">
                     {link.name}
                   </Link>
                 </li>
@@ -126,13 +118,13 @@ export default function ServerFooter() {
             </ul>
           </div>
 
-          {/* Column 2: Students */}
+          {/* Column 2: Get Started */}
           <div>
-            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Students</h3>
+            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Get Started</h3>
             <ul className="space-y-3">
-              {footerLinks.students.map((link) => (
+              {footerLinks.getStarted.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href} className="text-white hover:text-white text-sm">
+                  <Link href={link.href} className="text-slate-400 hover:text-white text-sm transition-colors">
                     {link.name}
                   </Link>
                 </li>
@@ -140,27 +132,13 @@ export default function ServerFooter() {
             </ul>
           </div>
 
-          {/* Column 3: Funding */}
+          {/* Column 3: Employers & Partners */}
           <div>
-            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Funding</h3>
-            <ul className="space-y-3">
-              {footerLinks.funding.map((link) => (
-                <li key={link.name}>
-                  <Link href={link.href} className="text-white hover:text-white text-sm">
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Column 4: Partners */}
-          <div>
-            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Partners</h3>
+            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Employers & Partners</h3>
             <ul className="space-y-3">
               {footerLinks.partners.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href} className="text-white hover:text-white text-sm">
+                  <Link href={link.href} className="text-slate-400 hover:text-white text-sm transition-colors">
                     {link.name}
                   </Link>
                 </li>
@@ -168,13 +146,13 @@ export default function ServerFooter() {
             </ul>
           </div>
 
-          {/* Column 5: Organization */}
+          {/* Column 4: Organization */}
           <div>
             <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Organization</h3>
             <ul className="space-y-3">
               {footerLinks.organization.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href} className="text-white hover:text-white text-sm">
+                  <Link href={link.href} className="text-slate-400 hover:text-white text-sm transition-colors">
                     {link.name}
                   </Link>
                 </li>

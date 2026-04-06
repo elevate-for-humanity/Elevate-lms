@@ -29,17 +29,11 @@ export const NAV_ITEMS = [
       { name: 'Business & Finance', href: '/programs/finance-bookkeeping-accounting' },
       { name: 'Peer Recovery', href: '/programs/peer-recovery-specialist' },
       { name: 'All Programs →', href: '/programs' },
-      { name: '— Credentials —', href: '/credentials', isHeader: true },
-      { name: 'Certifications', href: '/training/certifications' },
-      { name: 'Apprenticeships', href: '/programs/apprenticeships' },
+      { name: '— Testing & Credentials —', href: '/testing', isHeader: true },
+      { name: 'Certification Exams', href: '/testing' },
+      { name: 'Book a Testing Session', href: '/testing/book' },
       { name: 'Credential Verification', href: '/verify-credentials' },
-      { name: '— Funding —', href: '/funding', isHeader: true },
-      { name: 'How Funding Works', href: '/funding/how-it-works' },
-      { name: 'WIOA Eligibility', href: '/wioa-eligibility' },
-      { name: 'Workforce Ready Grant', href: '/funding/wrg' },
-      { name: 'JRI Funding', href: '/funding/jri' },
-      { name: 'Job Ready Indy', href: '/funding/job-ready-indy' },
-      { name: 'Apply Now →', href: '/apply' },
+      { name: 'Apprenticeships', href: '/programs/apprenticeships' },
     ],
   },
   {
@@ -47,14 +41,12 @@ export const NAV_ITEMS = [
     href: '/employer',
     subItems: [
       { name: '— Hire Graduates —', href: '/employer', isHeader: true },
-      { name: 'Employer Overview', href: '/employer' },
       { name: 'Hire Our Graduates', href: '/for-employers' },
       { name: 'OJT Partnerships', href: '/partnerships' },
       { name: 'Post a Job', href: '/employer/post-job' },
       { name: '— Get Started —', href: '/apply/employer', isHeader: true },
       { name: 'Employer Application', href: '/apply/employer' },
-      { name: 'Employer Portal Login', href: '/login?redirect=/employer/dashboard' },
-      { name: 'Employer Dashboard', href: '/employer/dashboard' },
+      { name: 'Employer Portal', href: '/login?redirect=/employer/dashboard' },
     ],
   },
   {
@@ -62,34 +54,12 @@ export const NAV_ITEMS = [
     href: '/partners',
     subItems: [
       { name: '— Partner Types —', href: '/partners', isHeader: true },
-      { name: 'All Partners', href: '/partners' },
       { name: 'Workforce Agencies', href: '/partners/workforce' },
       { name: 'Barbershop Partners', href: '/partners/barbershop-apprenticeship' },
       { name: 'Training Providers', href: '/partners/training-provider' },
       { name: 'Reentry Organizations', href: '/partners/reentry' },
-      { name: 'Technology Partners', href: '/partners/technology' },
-      { name: '— Program Holders —', href: '/program-holder', isHeader: true },
-      { name: 'Program Holder Overview', href: '/program-holder' },
-      { name: 'Apply as Program Holder', href: '/apply/program-holder' },
-      { name: 'Program Holder Portal', href: '/login?redirect=/program-holder/dashboard' },
+      { name: 'Program Holders', href: '/program-holder' },
       { name: 'Become a Partner →', href: '/partners/join' },
-    ],
-  },
-  {
-    name: 'Testing',
-    href: '/testing',
-    subItems: [
-      { name: '— Certification Exams —', href: '/testing', isHeader: true },
-      { name: 'Certiport (Microsoft, CompTIA, IC3)', href: '/testing/certiport' },
-      { name: 'NHA Healthcare Exams', href: '/testing/nha' },
-      { name: 'EPA Section 608 (HVAC)', href: '/testing/esco' },
-      { name: 'ACT WorkKeys / NCRC', href: '/testing/workkeys' },
-      { name: 'NRF Rise Up (Retail)', href: '/testing/nrf' },
-
-      { name: 'ServSafe (Food Safety)', href: '/testing/servsafe' },
-      { name: '— Book & Info —', href: '/testing', isHeader: true },
-      { name: 'Book a Testing Session', href: '/testing/book' },
-      { name: 'All Testing Options', href: '/testing' },
     ],
   },
   {
@@ -98,76 +68,15 @@ export const NAV_ITEMS = [
     subItems: [
       { name: '— Organization —', href: '/about', isHeader: true },
       { name: 'About Us', href: '/about' },
-      { name: 'Our Mission', href: '/mission' },
-      { name: 'Founder', href: '/founder' },
       { name: 'Our Team', href: '/about/team' },
-      { name: 'Governance', href: '/governance' },
+      { name: 'Outcomes', href: '/outcomes/indiana' },
       { name: 'Accreditation', href: '/accreditation' },
-      { name: '— Outcomes —', href: '/outcomes/indiana', isHeader: true },
-      { name: 'Indiana Outcomes', href: '/outcomes/indiana' },
-      { name: 'Success Stories', href: '/testimonials' },
-      { name: 'Impact', href: '/impact' },
-      { name: 'Compliance & Security', href: '/compliance' },
-      { name: '— Funding Programs —', href: '/funding', isHeader: true },
-      { name: 'Federal Programs (WIOA)', href: '/funding/federal-programs' },
-      { name: 'State Programs', href: '/funding/state-programs' },
-      { name: 'DOL Apprenticeship', href: '/funding/dol' },
-      { name: 'Grant Programs', href: '/funding/grant-programs' },
-      { name: '— Get Involved —', href: '/about', isHeader: true },
+      { name: 'Compliance', href: '/compliance' },
+      { name: '— More —', href: '/about', isHeader: true },
+      { name: 'Platform Licensing', href: '/store/licensing' },
+      { name: 'Rise Foundation', href: '/rise-foundation' },
       { name: 'Careers', href: '/careers' },
-      { name: 'Volunteer', href: '/volunteer' },
-      { name: 'Donate', href: '/donate' },
       { name: 'Contact Us', href: '/contact' },
-    ],
-  },
-
-  {
-    name: 'Platform',
-    subItems: [
-      { name: 'Platform Overview', href: '/platform' },
-      { name: 'License the Platform', href: '/store/licensing' },
-      { name: 'Compliance & Security', href: '/compliance' },
-      { name: 'Demos', href: '/store/demos' },
-      { name: 'Add-Ons & Tools', href: '/store/add-ons' },
-    ],
-  },
-  {
-    name: 'Rise Foundation',
-    subItems: [
-      { name: 'Mental Wellness', href: '/rise-foundation/trauma-recovery' },
-      { name: 'Young Adult Wellness', href: '/rise-foundation/young-adult-wellness' },
-      { name: 'CurvatureBody Sculpting', href: '/rise-foundation/curvature' },
-      { name: 'Meri-Go-Round Products', href: '/rise-foundation#products' },
-      { name: 'Free VITA Tax Prep', href: 'https://www.supersonicfastermoney.com/tax/rise-up-foundation' },
-      { name: 'Events', href: '/rise-foundation/events' },
-      { name: 'Donate to Rise', href: '/rise-foundation/donate' },
-      { name: 'Get Involved', href: '/rise-foundation/get-involved' },
-    ],
-  },
-  {
-    name: 'Portals',
-    href: '/portals',
-    subItems: [
-      { name: '— Student & Family —', href: '/portals', isHeader: true },
-      { name: 'Student Portal', href: '/learner/dashboard' },
-      { name: 'Parent & Guardian Portal', href: '/parent-portal' },
-      { name: '— Staff & Partners —', href: '/portals', isHeader: true },
-      { name: 'Employer Portal', href: '/employer/dashboard' },
-      { name: 'Partner Portal', href: '/partner/dashboard' },
-      { name: 'Program Holder Portal', href: '/program-holder/dashboard' },
-      { name: 'Staff Portal', href: '/staff-portal/dashboard' },
-      { name: 'Instructor Portal', href: '/instructor/dashboard' },
-      { name: '— All Portals —', href: '/portals', isHeader: true },
-      { name: 'View All Portals →', href: '/portals' },
-    ],
-  },
-  {
-    name: 'Contact',
-    href: '/contact',
-    subItems: [
-      { name: 'Contact Us', href: '/contact' },
-      { name: 'FAQ', href: '/faq' },
-      { name: 'Help Center', href: '/support/help' },
     ],
   },
 ];
@@ -195,17 +104,23 @@ export default function Header() {
 
         {/* CTA Buttons - Always visible */}
         <div className="hidden md:flex items-center gap-3">
+          {/* Portal login — icon only to save space */}
           <Link
-            href="/login"
-            className="text-slate-700 hover:text-slate-900 font-medium text-sm"
+            href="/portals"
+            className="text-slate-500 hover:text-slate-900 transition-colors"
+            aria-label="Sign in to your portal"
+            title="Sign in"
           >
-            Sign In
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="8" r="4" />
+              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+            </svg>
           </Link>
           <Link
-            href="/apply/student"
+            href="/start"
             className="bg-brand-red-600 text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-brand-red-700 transition-colors"
           >
-            Apply Now
+            Check Eligibility
           </Link>
         </div>
 

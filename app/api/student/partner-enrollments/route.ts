@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 
 // app/api/student/partner-enrollments/route.ts
 import { NextResponse } from 'next/server';
@@ -14,11 +15,9 @@ async function _GET(request: Request) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
+  const serverClient = await createClient();
+  const { data: { user } } = await serverClient.auth.getUser();
   const supabase = createAdminClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   if (!user) {
     return NextResponse.json({ enrollments: [] }, { status: 200 });

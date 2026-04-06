@@ -36,6 +36,14 @@ export async function GET(request: NextRequest) {
   const blocked = checkAdminIP(request);
   if (blocked) return blocked;
 
+  // Require either IP allowlist OR a valid internal secret header
+  // Prevents open access when ADMIN_IP_ALLOWLIST is not configured
+  const cronSecret = process.env.CRON_SECRET;
+  const providedSecret = request.headers.get('x-internal-secret') ?? request.nextUrl.searchParams.get('secret');
+  if (cronSecret && providedSecret !== cronSecret) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
   // Rate limit
   const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;

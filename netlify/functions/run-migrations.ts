@@ -3,8 +3,7 @@ import postgres from "postgres";
 
 const SECRET = "run-mig-efh-2026";
 
-const MIGRATIONS: { file: string; sql: string }[] = [
-  { file: "20260322000006_seed_credential_registry.sql", sql: `-- =============================================================================
+const ALL_SQL = `-- =============================================================================
 -- Seed credential_registry — workforce credentials for Elevate programs
 --
 -- Targets credential_registry (the real workforce table), NOT credentials
@@ -187,8 +186,9 @@ ON CONFLICT (id) DO UPDATE SET
   is_active             = EXCLUDED.is_active,
   is_published          = EXCLUDED.is_published,
   updated_at            = now();
-` },
-  { file: "20260402000010_fix_limbo_approved_applications.sql", sql: `-- Fix 53 applications auto-approved without funding/payment verification.
+
+
+-- Fix 53 applications auto-approved without funding/payment verification.
 --
 -- Root cause: insertApplication() called approveApplication() on every submission.
 -- approveApplication() returned PAYMENT_NOT_VERIFIED but the caller treated it as
@@ -261,8 +261,9 @@ WHERE
   AND funding_verified  = false
   AND has_workone_approval = false
   AND user_id IS NULL;
-` },
-  { file: "20260402000011_admin_real_data.sql", sql: `-- Admin real data tables: replaces all hardcoded fake data in admin pages.
+
+
+-- Admin real data tables: replaces all hardcoded fake data in admin pages.
 -- Covers: financial assurance, email automations, social campaigns, workflows, MOU documents.
 
 -- 1) Financial assurance records
@@ -484,8 +485,9 @@ select
                      and expiration_date <= current_date + interval '30 days')::int     as expiring_soon_records,
   coalesce(sum(coverage_amount) filter (where status = 'active'), 0)::numeric(12,2)    as active_coverage_total
 from public.financial_assurance_records;
-` },
-  { file: "20260404000001_checkout_contexts_price_columns.sql", sql: `-- Add server-authoritative price resolution columns to checkout_contexts.
+
+
+-- Add server-authoritative price resolution columns to checkout_contexts.
 -- These are written by the checkout API and read by the capture/webhook handlers
 -- to verify the amount Affirm/Sezzle authorized matches what was required.
 
@@ -499,8 +501,9 @@ ALTER TABLE public.checkout_contexts
 ALTER TABLE public.checkout_contexts
   ALTER COLUMN expires_at TYPE TIMESTAMPTZ
   USING expires_at::TIMESTAMPTZ;
-` },
-  { file: "20260404000001_rls_assignment_submissions_support_tickets.sql", sql: `-- RLS for assignment_submissions and support_tickets.
+
+
+-- RLS for assignment_submissions and support_tickets.
 -- These tables had no policies. Both are learner-write surfaces.
 -- Apply in Supabase Dashboard → SQL Editor.
 
@@ -561,8 +564,9 @@ CREATE POLICY "support_tickets_admin" ON public.support_tickets
       WHERE role IN ('admin', 'super_admin', 'staff')
     )
   );
-` },
-  { file: "20260404000002_bnpl_missing_columns.sql", sql: `-- Add missing columns required by Affirm and Sezzle webhook handlers.
+
+
+-- Add missing columns required by Affirm and Sezzle webhook handlers.
 -- All columns use IF NOT EXISTS — safe to re-run.
 
 -- ── payments ─────────────────────────────────────────────────────────────────
@@ -601,8 +605,9 @@ ALTER TABLE public.applications
   ADD COLUMN IF NOT EXISTS payment_completed_at  TIMESTAMPTZ,
   ADD COLUMN IF NOT EXISTS refund_amount         NUMERIC,
   ADD COLUMN IF NOT EXISTS refunded_at           TIMESTAMPTZ;
-` },
-  { file: "20260406000001_profiles_onboarding_columns.sql", sql: `-- Add missing onboarding tracking columns to profiles
+
+
+-- Add missing onboarding tracking columns to profiles
 ALTER TABLE public.profiles
   ADD COLUMN IF NOT EXISTS agreements_signed_at timestamptz,
   ADD COLUMN IF NOT EXISTS documents_submitted_at timestamptz,
@@ -614,8 +619,9 @@ ALTER TABLE public.profiles
   ADD COLUMN IF NOT EXISTS selected_cohort text,
   ADD COLUMN IF NOT EXISTS cohort_start_date date,
   ADD COLUMN IF NOT EXISTS schedule_preference text;
-` },
-  { file: "20260602000001_forward_schema_reconciliation.sql", sql: `-- Forward schema reconciliation for 3 tables where live DB is missing columns
+
+
+-- Forward schema reconciliation for 3 tables where live DB is missing columns
 -- that app code actively references.
 --
 -- Determined by: live DB introspection + grep of .ts/.tsx column references.
@@ -737,8 +743,9 @@ ALTER TABLE public.program_modules
 UPDATE public.program_modules
 SET order_index = sort_order
 WHERE order_index IS NULL AND sort_order IS NOT NULL;
-` },
-  { file: "20260602000002_messages_additive_columns.sql", sql: `-- messages: add columns from later definition without dropping existing ones.
+
+
+-- messages: add columns from later definition without dropping existing ones.
 --
 -- Live has: id, sender_id, recipient_id, subject, body, read, read_at,
 --           created_at, conversation_id, deleted_by, read_by
@@ -759,8 +766,9 @@ ALTER TABLE public.messages
 UPDATE public.messages
 SET is_read = COALESCE(read, false)
 WHERE is_read = false AND read IS NOT NULL;
-` },
-  { file: "20260602000003_tax_clients_column_aliases.sql", sql: `-- tax_clients: add missing columns referenced by app code.
+
+
+-- tax_clients: add missing columns referenced by app code.
 --
 -- Live has: id, first_name, last_name, email, phone, ssn_last4, preparer_id,
 --           tenant_id, created_at, ssn_hash, user_id, office_id, ssn_last_four,
@@ -786,8 +794,9 @@ ALTER TABLE public.tax_clients
 UPDATE public.tax_clients
 SET date_of_birth = dob
 WHERE date_of_birth IS NULL AND dob IS NOT NULL;
-` },
-  { file: "20260602000004_page_sections_canonical.sql", sql: `-- page_sections: establish canonical schema.
+
+
+-- page_sections: establish canonical schema.
 --
 -- The table was temporarily given three extra columns (section_type, content,
 -- is_visible) during schema reconciliation. No code path ever wrote those
@@ -807,8 +816,9 @@ ALTER TABLE public.page_sections
   DROP COLUMN IF EXISTS section_type,
   DROP COLUMN IF EXISTS content,
   DROP COLUMN IF EXISTS is_visible;
-` },
-  { file: "20260602000005_direct_messages_canonical.sql", sql: `-- direct_messages: canonicalize sender identity column.
+
+
+-- direct_messages: canonicalize sender identity column.
 --
 -- The table had both user_id (original) and sender_id (added during
 -- schema reconciliation). All app code (MessagesClient.tsx) exclusively
@@ -823,8 +833,9 @@ WHERE sender_id IS NULL AND user_id IS NOT NULL;
 
 ALTER TABLE public.direct_messages
   DROP COLUMN IF EXISTS user_id;
-` },
-  { file: "20260602000006_rls_forms_webinars_provider.sql", sql: `-- RLS policies for forms, form_submissions, webinars, webinar_registrations,
+
+
+-- RLS policies for forms, form_submissions, webinars, webinar_registrations,
 -- and provider_* tables. These tables existed without policies, causing
 -- authenticated non-service-role reads to return empty results.
 --
@@ -1090,8 +1101,9 @@ CREATE POLICY "provider_program_approvals_admin_delete"
   ON public.provider_program_approvals
   FOR DELETE
   USING (public.is_admin_role());
-` },
-  { file: "20260602000007_fix_rls_and_conversations.sql", sql: `-- Three fixes identified during RLS policy alignment audit:
+
+
+-- Three fixes identified during RLS policy alignment audit:
 --
 -- 1. direct_message_conversations: live table has columns 'add' and
 --    'elevateforhumanity' from a malformed migration. App expects
@@ -1246,8 +1258,9 @@ CREATE POLICY "direct_message_conversations_admin_delete"
   ON public.direct_message_conversations
   FOR DELETE
   USING (public.is_admin_role());
-` },
-  { file: "20260603000001_normalize_funding_source.sql", sql: `-- Normalise program_enrollments.funding_source values.
+
+
+-- Normalise program_enrollments.funding_source values.
 --
 -- Fixes the drift introduced by 10 separate routes writing different
 -- string representations of the same concept.
@@ -1292,8 +1305,9 @@ commit;
 -- Verify: run this after applying to confirm no unexpected values remain.
 -- select funding_source, count(*) from public.program_enrollments
 -- group by funding_source order by count desc;
-` },
-  { file: "20260603000002_stripe_event_log.sql", sql: `-- Stripe event idempotency log.
+
+
+-- Stripe event idempotency log.
 --
 -- Prevents duplicate processing when Stripe retries a webhook or when
 -- multiple webhook endpoints are accidentally registered for the same account.
@@ -1326,8 +1340,9 @@ comment on table public.stripe_event_log is
   'Secondary idempotency guard for Stripe webhook handlers. '
   'Primary guard is stripe_webhook_events. '
   'Insert stripe_event_id before processing; unique constraint rejects duplicates.';
-` },
-  { file: "20260603000003_publish_hvac_program.sql", sql: `-- Ensure the HVAC Technician program row exists and is published.
+
+
+-- Ensure the HVAC Technician program row exists and is published.
 --
 -- The program page at /programs/hvac-technician calls getPublishedProgramBySlug
 -- which requires published = true and is_active = true. Without this the page
@@ -1379,8 +1394,9 @@ SET
   updated_at = now()
 WHERE slug = 'hvac-technician'
   AND (published = false OR is_active = false OR status != 'published');
-` },
-  { file: "20260604000001_course_generation_control.sql", sql: `-- Course generation control fields
+
+
+-- Course generation control fields
 -- Adds draft/generating/review/published lifecycle to courses
 -- and queued/generating/generated/approved lifecycle to course_lessons.
 -- Enables incremental generation with per-lesson lock and approve controls.
@@ -1408,8 +1424,9 @@ ALTER TABLE public.course_lessons
 -- Index for fast lookup of unlocked/unapproved lessons during generation
 CREATE INDEX IF NOT EXISTS idx_course_lessons_generation
   ON public.course_lessons (course_id, generation_status, locked, approved);
-` },
-  { file: "20260604000002_barber_billing_schema.sql", sql: `-- Barber billing schema additions
+
+
+-- Barber billing schema additions
 --
 -- Adds columns the webhook already writes but that don't exist in the DB:
 --   barber_subscriptions: payment_status, failed_payment_at, suspension_deadline
@@ -1487,8 +1504,9 @@ CREATE INDEX IF NOT EXISTS idx_billing_events_user
 CREATE UNIQUE INDEX IF NOT EXISTS idx_billing_events_invoice_unique
   ON public.billing_events (stripe_invoice_id)
   WHERE stripe_invoice_id IS NOT NULL;
-` },
-  { file: "20260604000003_schema_drift_waiver_columns.sql", sql: `-- Resolves expired column-mismatch waivers W005–W015.
+
+
+-- Resolves expired column-mismatch waivers W005–W015.
 -- Each statement adds the column the admin UI already queries for.
 -- All columns are nullable so existing rows are unaffected.
 
@@ -1524,8 +1542,9 @@ ALTER TABLE public.grades
 -- W015: attendance_records.enrollment_id
 ALTER TABLE public.attendance_records
   ADD COLUMN IF NOT EXISTS enrollment_id uuid REFERENCES public.program_enrollments(id) ON DELETE SET NULL;
-` },
-  { file: "20260604000004_applications_payment_columns.sql", sql: `-- Add payment tracking columns to applications table.
+
+
+-- Add payment tracking columns to applications table.
 -- These allow the approval pipeline to gate on payment_status
 -- without querying stripe_sessions_staging as a side-channel.
 
@@ -1545,8 +1564,9 @@ FROM   public.stripe_sessions_staging s
 WHERE  s.application_id = a.id
   AND  s.payment_status = 'paid'
   AND  a.payment_status = 'unpaid';
-` },
-  { file: "20260604000005_crm_leads.sql", sql: `-- CRM leads table — student/applicant pipeline.
+
+
+-- CRM leads table — student/applicant pipeline.
 -- Separate from the existing \`leads\` table which is enterprise/licensing-oriented.
 -- Every eligibility submission, application, and payment creates or advances a row here.
 
@@ -1617,8 +1637,9 @@ CREATE INDEX IF NOT EXISTS idx_fur_status     ON public.follow_up_reminders(stat
 CREATE INDEX IF NOT EXISTS idx_fur_due_at     ON public.follow_up_reminders(due_at);
 CREATE INDEX IF NOT EXISTS idx_fur_lead_id    ON public.follow_up_reminders(lead_id);
 CREATE INDEX IF NOT EXISTS idx_fur_app_id     ON public.follow_up_reminders(application_id);
-` },
-  { file: "20260604000006_barber_post_payment_schema.sql", sql: `-- Post-payment barber enrollment schema.
+
+
+-- Post-payment barber enrollment schema.
 -- Adds columns to applications and creates external_course_access for
 -- provider credential tracking (Milady and future integrations).
 
@@ -1651,8 +1672,9 @@ CREATE TABLE IF NOT EXISTS public.external_course_access (
 CREATE INDEX IF NOT EXISTS idx_eca_student     ON public.external_course_access(student_id);
 CREATE INDEX IF NOT EXISTS idx_eca_application ON public.external_course_access(application_id);
 CREATE INDEX IF NOT EXISTS idx_eca_provider    ON public.external_course_access(provider);
-` },
-  { file: "20260604000007_course_discussions_schema.sql", sql: `-- Add course_id and user_id to course_discussions if missing.
+
+
+-- Add course_id and user_id to course_discussions if missing.
 -- The discussions page already uses these columns in insert/select;
 -- this migration ensures they exist in the live schema.
 
@@ -1666,8 +1688,9 @@ create index if not exists idx_course_discussions_course_id
 
 create index if not exists idx_course_discussions_user_id
   on public.course_discussions(user_id);
-` },
-  { file: "20260604000008_exam_bookings_payment_gate.sql", sql: `-- Add payment gate, no-show enforcement, and retake tracking to exam_bookings.
+
+
+-- Add payment gate, no-show enforcement, and retake tracking to exam_bookings.
 --
 -- Apply in Supabase Dashboard → SQL Editor before deploying the booking API changes.
 
@@ -1698,8 +1721,9 @@ CREATE INDEX IF NOT EXISTS idx_exam_bookings_user_id
 CREATE INDEX IF NOT EXISTS idx_exam_bookings_no_show_check
   ON public.exam_bookings (preferred_date, status, exam_result)
   WHERE status = 'confirmed' AND exam_result IS NULL;
-` },
-  { file: "20260604000009_testing_slots_and_enforcement.sql", sql: `-- Testing center slot system and enforcement tables.
+
+
+-- Testing center slot system and enforcement tables.
 -- Apply in Supabase Dashboard → SQL Editor.
 
 -- ── Availability slots (admin-created) ──────────────────────────────────────
@@ -1771,8 +1795,9 @@ DROP TRIGGER IF EXISTS trg_decrement_slot_on_cancel ON public.exam_bookings;
 CREATE TRIGGER trg_decrement_slot_on_cancel
   AFTER UPDATE ON public.exam_bookings
   FOR EACH ROW EXECUTE FUNCTION public.decrement_slot_on_cancel();
-` },
-  { file: "20260605000001_sync_hvac_course_lessons_from_curriculum.sql", sql: `-- Migration: 20260605000001
+
+
+-- Migration: 20260605000001
 --
 -- Syncs HVAC course_lessons from curriculum_lessons.
 -- Copies quiz_questions, passing_score, video_url, and lesson_type
@@ -1796,8 +1821,9 @@ SET
 FROM curriculum_lessons cur
 WHERE cl.slug = cur.lesson_slug
   AND cl.slug LIKE 'hvac-lesson-%';
-` },
-  { file: "20260605000002_fix_lms_lessons_step_type.sql", sql: `-- Migration: 20260605000002
+
+
+-- Migration: 20260605000002
 --
 -- Fixes lms_lessons view:
 --   1. step_type: course_lessons uses lesson_type (enum), not step_type.
@@ -1891,8 +1917,9 @@ WHERE NOT EXISTS (
 );
 
 GRANT SELECT ON public.lms_lessons TO authenticated, anon, service_role;
-` },
-  { file: "20260606000001_backfill_hvac_quiz_questions.sql", sql: `-- Migration: 20260606000001_backfill_hvac_quiz_questions
+
+
+-- Migration: 20260606000001_backfill_hvac_quiz_questions
 -- Backfills quiz_questions for 37 HVAC course_lessons rows that were seeded
 -- without questions. Questions sourced from HVAC_QUIZ_MAP (hvac-quizzes.ts).
 -- Only updates rows where quiz_questions IS NULL — safe to re-run.
@@ -2125,8 +2152,9 @@ FROM public.course_lessons
 WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
   AND quiz_questions IS NULL
   AND lesson_type = 'lesson';
-` },
-  { file: "20260606000002_stripe_webhook_secret_app_secrets.sql", sql: `-- Ensure STRIPE_WEBHOOK_SECRET exists in app_secrets so the webhook handler
+
+
+-- Ensure STRIPE_WEBHOOK_SECRET exists in app_secrets so the webhook handler
 -- can load it via hydrateProcessEnv() at runtime.
 --
 -- The canonical Stripe webhook handler (app/api/webhooks/stripe/route.ts) reads
@@ -2165,8 +2193,9 @@ ON CONFLICT (key) DO UPDATE
     updated_at = now()
   -- Only update description/scope — do NOT overwrite an existing real secret value
   WHERE app_secrets.value = '' OR app_secrets.value IS NULL OR app_secrets.value = 'REPLACE_WITH_REAL_WHSEC_FROM_STRIPE_DASHBOARD';
-` },
-  { file: "20260607000001_booth_rental_tables.sql", sql: `-- Booth rental subscriptions
+
+
+-- Booth rental subscriptions
 -- Tracks active Stripe subscriptions for booth/suite renters.
 
 CREATE TABLE IF NOT EXISTS public.booth_rental_subscriptions (
@@ -2254,8 +2283,9 @@ CREATE POLICY "Service role full access booth_rental_agreements"
   ON public.booth_rental_agreements FOR ALL
   USING (auth.role() = 'service_role')
   WITH CHECK (auth.role() = 'service_role');
-` },
-  { file: "20260608000001_exam_bookings_add_on.sql", sql: `-- Add add-on tracking columns to exam_bookings.
+
+
+-- Add add-on tracking columns to exam_bookings.
 -- add_on: candidate selected the Certification Success Package at checkout
 -- add_on_paid: payment confirmed (set by webhook after Stripe success)
 
@@ -2265,8 +2295,9 @@ ALTER TABLE public.exam_bookings
 
 COMMENT ON COLUMN public.exam_bookings.add_on      IS 'True when candidate selected the Certification Success Package ($59) at checkout';
 COMMENT ON COLUMN public.exam_bookings.add_on_paid IS 'True after Stripe payment confirmed the add-on charge';
-` },
-  { file: "20260608000001_fix_hyphenated_tables_missing_tables_rls_indexes.sql", sql: `-- =============================================================================
+
+
+-- =============================================================================
 -- Migration: fix hyphenated table names, create missing tables, fill RLS gaps,
 --            add missing indexes
 -- Apply in: Supabase Dashboard → SQL Editor
@@ -2777,8 +2808,9 @@ CREATE INDEX IF NOT EXISTS idx_lesson_progress_lesson_id ON public.lesson_progre
 CREATE INDEX IF NOT EXISTS idx_profiles_email ON public.profiles(email);
 CREATE INDEX IF NOT EXISTS idx_profiles_role ON public.profiles(role);
 CREATE INDEX IF NOT EXISTS idx_certificates_user_id ON public.certificates(user_id);
-` },
-  { file: "20260608000002_exam_booking_leads.sql", sql: `-- Captures partial booking intent before the full form is completed.
+
+
+-- Captures partial booking intent before the full form is completed.
 -- Used to trigger 24hr and 48hr follow-up emails when a lead doesn't convert.
 -- Upserts on (lower(email), exam_type) — re-submitting refreshes the lead instead of erroring.
 
@@ -2819,8 +2851,9 @@ CREATE OR REPLACE TRIGGER exam_booking_leads_updated_at
   FOR EACH ROW EXECUTE FUNCTION public.set_exam_booking_leads_updated_at();
 
 COMMENT ON TABLE public.exam_booking_leads IS 'Partial booking intent captured before checkout. Drives 24hr/48hr follow-up email sequence. Upserts on (email, exam_type).';
-` },
-  { file: "20260609000001_program_lessons_add_checkpoint_type.sql", sql: `-- Add 'checkpoint' to program_lessons.lesson_type CHECK constraint.
+
+
+-- Add 'checkpoint' to program_lessons.lesson_type CHECK constraint.
 -- The builder route was mapping checkpoint → lesson as a workaround; this removes that need.
 
 ALTER TABLE public.program_lessons
@@ -2829,8 +2862,7 @@ ALTER TABLE public.program_lessons
 ALTER TABLE public.program_lessons
   ADD CONSTRAINT program_lessons_lesson_type_check
   CHECK (lesson_type IN ('lesson', 'quiz', 'lab', 'exam', 'orientation', 'checkpoint', 'assignment'));
-` },
-];
+`;
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
@@ -2838,25 +2870,22 @@ export const handler: Handler = async (event) => {
   try { secret = JSON.parse(event.body || "{}").secret; } catch { return { statusCode: 400, body: "Bad JSON" }; }
   if (secret !== SECRET) return { statusCode: 403, body: "Forbidden" };
 
-  const sql = postgres(process.env.DATABASE_URL!, { ssl: "require", max: 5 });
-
-  // Run all migrations in parallel — each is idempotent (IF NOT EXISTS guards)
-  const results = await Promise.all(
-    MIGRATIONS.map(async ({ file, sql: query }) => {
-      try {
-        await sql.unsafe(query);
-        return { file, ok: true };
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : String(err);
-        return { file, ok: false, error: msg.slice(0, 400) };
-      }
-    })
-  );
-
-  await sql.end();
-  return {
-    statusCode: 200,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ results }, null, 2),
-  };
+  const sql = postgres(process.env.DATABASE_URL!, { ssl: "require", max: 1 });
+  try {
+    await sql.unsafe(ALL_SQL);
+    await sql.end();
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ok: true, message: "All 35 migrations executed" }),
+    };
+  } catch (err: unknown) {
+    await sql.end();
+    const msg = err instanceof Error ? err.message : String(err);
+    return {
+      statusCode: 500,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ok: false, error: msg.slice(0, 1000) }),
+    };
+  }
 };

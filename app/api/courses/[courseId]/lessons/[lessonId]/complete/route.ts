@@ -1,3 +1,4 @@
+// AUTH: Enforced inside handler — delegates to /api/lessons/[lessonId]/complete which requires auth
 /**
  * Legacy lesson completion endpoint.
  * Delegates to the gated /api/lessons/[lessonId]/complete which enforces

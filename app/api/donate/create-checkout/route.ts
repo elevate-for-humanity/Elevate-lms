@@ -1,3 +1,4 @@
+// AUTH: Intentionally public — no authentication required
 import { NextRequest, NextResponse } from 'next/server';
 
 

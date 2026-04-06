@@ -1,3 +1,4 @@
+// AUTH: Intentionally public — no authentication required
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

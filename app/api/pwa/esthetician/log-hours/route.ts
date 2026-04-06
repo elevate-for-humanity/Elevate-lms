@@ -1,3 +1,4 @@
+// AUTH: Enforced inside handler (createClient + getUser check)
 import { NextRequest } from 'next/server';
 import { handleLogHours } from '@/lib/api/apprentice-hours-handler';
 

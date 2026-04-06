@@ -1,3 +1,4 @@
+// AUTH: Intentionally public — no authentication required
 import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';

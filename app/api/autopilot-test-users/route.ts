@@ -1,3 +1,4 @@
+// AUTH: Intentionally public — no authentication required
 import { NextResponse } from 'next/server';
 
 // Disabled — this endpoint was empty and should not be publicly accessible.

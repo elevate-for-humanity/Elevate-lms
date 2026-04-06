@@ -48,7 +48,7 @@ export async function GET(req: Request) {
       text: ':rotating_light: *Funding escalation cron FAILED*',
       color: '#CC0000',
       fields: [
-        { title: 'Error', value: error.message, short: false },
+        { title: 'Error', value: 'Funding escalation cron failed — check server logs', short: false },
         { title: 'Time', value: timestamp, short: true },
         {
           title: 'Action required',

@@ -4,11 +4,15 @@ import { calculateForm1040, getStandardDeduction } from '@/lib/tax-software/form
 import { TaxReturn } from '@/lib/tax-software/types';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditPiiAccess } from '@/lib/auditLog';
+import { apiAuthGuard } from '@/lib/admin/guards';
 
 export async function POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
+
+    const auth = await apiAuthGuard(request);
+    if (auth.error) return auth.error;
 
     await auditPiiAccess({ action: 'PII_ACCESS', entity: 'pii', req: request, metadata: { route: '/api/tax/calculate' } });
 

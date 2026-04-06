@@ -1,3 +1,4 @@
+// AUTH: Intentionally public — no authentication required
 import { NextResponse } from "next/server";
 import { getRuntimeReadiness } from "@/lib/tax-software/config/runtime-readiness";
 

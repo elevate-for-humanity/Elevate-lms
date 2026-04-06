@@ -23,6 +23,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { apiAuthGuard } from '@/lib/admin/guards';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { CERT_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
 
@@ -37,6 +38,9 @@ export async function POST(req: NextRequest) {
 
   const rateLimited = await applyRateLimit(req, 'payment');
   if (rateLimited) return rateLimited;
+
+  const auth = await apiAuthGuard(req);
+  if (auth.error) return auth.error;
 
   let body: {
     examType: string;

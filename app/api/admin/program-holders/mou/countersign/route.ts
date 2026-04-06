@@ -35,10 +35,19 @@ const _POST = withAuth(
     const base64 = matches[1];
     const buffer = Buffer.from(base64, 'base64');
 
-    const serviceClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const serviceClient = createAdminClient();
+    if (!serviceClient) return new Response('Service unavailable', { status: 503 });
+
+    // Pre-read — verify holder exists before mutating
+    const { data: holder, error: holderError } = await serviceClient
+      .from('program_holders')
+      .select('id, mou_status')
+      .eq('id', programHolderId)
+      .maybeSingle();
+
+    if (holderError || !holder) {
+      return new Response('Program holder not found', { status: 404 });
+    }
 
     const path = `program_holders/${programHolderId}/admin_signature.png`;
     const { error: uploadError } = await serviceClient.storage

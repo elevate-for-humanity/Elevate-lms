@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { createClient } from '@supabase/supabase-js';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
 import { safeInternalError } from '@/lib/api/safe-error';
@@ -9,19 +8,6 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
-
-function getSupabaseAdmin() {
-  if (
-    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    !process.env.SUPABASE_SERVICE_ROLE_KEY
-  ) {
-    throw new Error('Supabase credentials not configured');
-  }
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-  );
-}
 
 export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
@@ -35,28 +21,44 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = getSupabaseAdmin();
+  const supabase = createAdminClient();
+  if (!supabase) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
+
   try {
     const { creatorId } = await req.json();
     const { ipAddress } = getRequestMetadata(req);
 
     if (!creatorId) {
-      return NextResponse.json(
-        { error: 'Creator ID required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Creator ID required' }, { status: 400 });
     }
 
-    // Get total amount being paid out
-    const { data: salesData } = await supabase
+    // Verify creator exists before mutating
+    const { data: creator, error: creatorError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', creatorId)
+      .maybeSingle();
+
+    if (creatorError || !creator) {
+      return NextResponse.json({ error: 'Creator not found' }, { status: 404 });
+    }
+
+    // Get total amount being paid out — fail loudly if query fails
+    const { data: salesData, error: salesError } = await supabase
       .from('marketplace_sales')
       .select('creator_earnings_cents')
       .eq('creator_id', creatorId)
       .eq('paid_out', false);
 
-    const totalAmount =
-      salesData?.reduce((sum, sale) => sum + sale.creator_earnings_cents, 0) ||
-      0;
+    if (salesError) {
+      return safeInternalError(salesError, 'Failed to fetch unpaid sales');
+    }
+
+    if (!salesData || salesData.length === 0) {
+      return NextResponse.json({ error: 'No unpaid sales found for this creator' }, { status: 404 });
+    }
+
+    const totalAmount = salesData.reduce((sum, sale) => sum + (sale.creator_earnings_cents ?? 0), 0);
 
     // Mark all unpaid sales for this creator as paid
     const { data, error }: any = await supabase

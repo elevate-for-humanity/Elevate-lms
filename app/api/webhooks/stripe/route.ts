@@ -183,8 +183,9 @@ async function _POST(request: NextRequest) {
   // This must run before any process.env.STRIPE_* access.
   await hydrateProcessEnv();
 
-  // Resolve per-request — avoids frozen null from module-level cold-start init.
+  // Resolve per-request AFTER hydration — secrets are now in process.env.
   const supabase = getSupabase();
+  const stripeClient = getStripe();
 
   // Read secret at request time — module-level init would freeze a missing value permanently.
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -195,7 +196,7 @@ async function _POST(request: NextRequest) {
     hasWebhookSecret: !!webhookSecret,
     hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
     hasSupabaseKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-    stripeInitialized: !!stripe,
+    stripeInitialized: !!stripeClient,
     supabaseInitialized: !!supabase,
   });
 
@@ -209,8 +210,8 @@ async function _POST(request: NextRequest) {
     return NextResponse.json({ received: true, warning: 'misconfigured' }, { status: 200 });
   }
 
-  if (!stripe) {
-    logger.error('[webhook] Stripe client not initialized — STRIPE_SECRET_KEY missing');
+  if (!stripeClient) {
+    logger.error('[webhook] Stripe client not initialized — STRIPE_SECRET_KEY missing after hydration');
     Sentry.captureException(new Error('Stripe client not initialized in webhook handler'), {
       tags: { subsystem: 'stripe_webhook', failure: 'missing_stripe_client' },
     });
@@ -240,7 +241,7 @@ async function _POST(request: NextRequest) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    event = stripeClient.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
     logger.error('[webhook] Signature verification failed:', err);
     Sentry.captureException(err, {
@@ -397,7 +398,7 @@ async function _POST(request: NextRequest) {
       // Dispatched to lib/stripe/handlers/checkout-session-completed.ts
       // All checkout.session.completed business logic lives there.
       try {
-        await handleCheckoutSessionCompleted(event, { stripe, supabase });
+        await handleCheckoutSessionCompleted(event, { stripe: stripeClient, supabase });
       } catch (err) {
         Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook', event_type: 'checkout.session.completed' } });
         logger.error('[webhook] checkout.session.completed handler error:', err);
@@ -728,7 +729,7 @@ async function _POST(request: NextRequest) {
           break;
         }
 
-        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+        const paymentIntent = await stripeClient.paymentIntents.retrieve(paymentIntentId);
         const userId = paymentIntent.metadata?.user_id;
         const productId = paymentIntent.metadata?.product_id;
         const enrollmentId = paymentIntent.metadata?.enrollment_id;

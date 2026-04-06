@@ -20,7 +20,9 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
     v.play().catch(() => {});
   }, []);
 
-  // Start audio on first user interaction
+  // Start audio on first genuine user gesture (click or touch).
+  // scroll is intentionally excluded — browsers do not treat scroll as a
+  // user gesture for audio autoplay and the play() call silently fails.
   useEffect(() => {
     if (!audioSrc) return;
     const tryPlay = () => {
@@ -31,13 +33,11 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
       a.play().catch(() => {});
       setMuted(false);
     };
-    window.addEventListener('touchstart', tryPlay, { once: true, passive: true });
-    window.addEventListener('scroll',     tryPlay, { once: true, passive: true });
     window.addEventListener('click',      tryPlay, { once: true });
+    window.addEventListener('touchstart', tryPlay, { once: true, passive: true });
     return () => {
-      window.removeEventListener('touchstart', tryPlay);
-      window.removeEventListener('scroll',     tryPlay);
       window.removeEventListener('click',      tryPlay);
+      window.removeEventListener('touchstart', tryPlay);
     };
   }, [audioSrc]);
 
@@ -77,7 +77,7 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
         <button
           onClick={toggleMute}
           aria-label={muted ? 'Unmute voiceover' : 'Mute voiceover'}
-          className="absolute bottom-4 right-4 z-20 flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-3 py-2 rounded-full transition-colors backdrop-blur-sm border border-white/30"
+          className="absolute bottom-4 right-4 z-20 flex items-center gap-2 bg-black/40 hover:bg-black/60 text-white text-xs font-semibold px-3 py-2 rounded-full transition-colors border border-white/30"
         >
           {muted ? (
             <><VolumeX className="w-4 h-4 flex-shrink-0" /><span className="hidden sm:inline">Tap to hear</span></>

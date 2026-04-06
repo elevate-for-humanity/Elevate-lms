@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -13,6 +14,7 @@ function getWebhookSecret() {
 }
 
 async function _POST(req: Request) {
+  await hydrateProcessEnv();
   const body = await req.text();
   const headersList = await headers();
   const signature = headersList.get('stripe-signature');

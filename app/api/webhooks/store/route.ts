@@ -1,5 +1,6 @@
 /* eslint-disable no-empty */
 import { getStripe } from '@/lib/stripe/client';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
@@ -8,7 +9,8 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_STORE || '';
+// Read at request time after hydrateProcessEnv() — not at module load
+let webhookSecret = '';
 
 /**
  * Grant LMS course access to user via training_enrollments.
@@ -122,14 +124,16 @@ async function recordPurchase(
 }
 
 async function _POST(req: NextRequest) {
+  await hydrateProcessEnv();
+  webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_STORE || '';
+
   const stripe = getStripe();
-  
   if (!stripe) {
-    return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 });
+    return NextResponse.json({ received: true, warning: 'stripe_not_configured' }, { status: 200 });
   }
 
   if (!webhookSecret) {
-    return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 503 });
+    return NextResponse.json({ received: true, warning: 'misconfigured' }, { status: 200 });
   }
 
   const body = await req.text();
@@ -300,7 +304,7 @@ async function _POST(req: NextRequest) {
 
       // Flag certificates as funding-invalid (credential was earned, but payment reversed)
       try {
-        const paymentIntent = await getStripe().paymentIntents.retrieve(paymentIntentId);
+        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
         const userId = paymentIntent.metadata?.user_id;
         if (userId) {
           const programId = paymentIntent.metadata?.program_id;

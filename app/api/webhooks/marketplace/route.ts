@@ -2,6 +2,7 @@
 
 import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { randomBytes } from 'node:crypto';
@@ -14,6 +15,7 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
+  await hydrateProcessEnv();
   const supabase = createAdminClient();
 
     if (!supabase) {

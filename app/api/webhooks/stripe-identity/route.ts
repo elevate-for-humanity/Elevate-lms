@@ -3,7 +3,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { stripe } from '@/lib/stripe/client';
+import { getStripe } from '@/lib/stripe/client';
+import { hydrateProcessEnv } from '@/lib/secrets';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -21,26 +22,29 @@ const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SE
   : null;
 
 async function _POST(request: NextRequest) {
-  if (!stripe || !supabase) { /* Condition handled */ }
+  await hydrateProcessEnv();
+
+  const stripeClient = getStripe();
+  if (!stripeClient) {
+    return NextResponse.json({ received: true, warning: 'stripe_not_configured' }, { status: 200 });
+  }
+
+  const webhookSecret = process.env.STRIPE_IDENTITY_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    return NextResponse.json({ received: true, warning: 'misconfigured' }, { status: 200 });
+  }
 
   const body = await request.text();
   const signature = request.headers.get('stripe-signature');
 
   if (!signature) {
-    return NextResponse.json(
-      { error: 'No signature provided' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'No signature provided' }, { status: 400 });
   }
 
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_IDENTITY_WEBHOOK_SECRET!
-    );
+    event = stripeClient.webhooks.constructEvent(body, signature, webhookSecret);
   } catch { /* non-fatal */ }
 
   // Idempotency check

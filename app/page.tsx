@@ -5,7 +5,7 @@ import type { Metadata } from 'next';
 import MarqueeBanner from '@/components/MarqueeBanner';
 import { BlurIn } from '@/components/animations/PremiumAnimations';
 import { ProgramVideoCards } from '@/components/marketing/ProgramVideoCards';
-import { HeroVideoBg } from '@/components/marketing/HeroVideoBg';
+
 import HomeClientShell from './HomeClientShell';
 
 export const dynamic = 'force-static';
@@ -31,11 +31,25 @@ export default function HomePage() {
 
       {/* ── HERO ── */}
       <section className="flex flex-col lg:grid lg:grid-cols-2 gap-0">
-        <div className="relative h-64 sm:h-80 lg:h-auto lg:min-h-[560px] overflow-hidden bg-slate-700">
-          <HeroVideoBg
-            src="/videos/homepage-hero-new.mp4"
-            audioSrc="/audio/heroes/cna.mp3"
-          />
+        <div className="grid grid-cols-3 grid-rows-2 h-64 sm:h-80 lg:h-auto lg:min-h-[560px]">
+          {[
+            { src: '/images/pages/cna-hero.jpg',               alt: 'CNA Training' },
+            { src: '/images/pages/hvac-hero.jpg',              alt: 'HVAC Training' },
+            { src: '/images/pages/barber-hero-main.jpg',       alt: 'Barber Apprenticeship' },
+            { src: '/images/pages/cdl-hero.jpg',               alt: 'CDL Training' },
+            { src: '/images/pages/medical-assistant-hero.jpg', alt: 'Medical Assistant' },
+            { src: '/images/pages/programs-hero-vibrant.jpg',  alt: 'Workforce Training' },
+          ].map((img) => (
+            <div key={img.src} className="relative overflow-hidden">
+              <Image
+                src={img.src}
+                alt={img.alt}
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 33vw, 17vw"
+              />
+            </div>
+          ))}
         </div>
         <div className="bg-slate-700 flex items-center">
           <div className="px-5 py-10 sm:px-8 sm:py-12 lg:px-14 lg:py-16 w-full">

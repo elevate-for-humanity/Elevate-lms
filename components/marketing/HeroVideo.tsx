@@ -168,7 +168,7 @@ export default function HeroVideo({
         {/* Micro-label — bottom-left, 2–4 words max */}
         {microLabel && (
           <div className="absolute bottom-4 left-4 z-10">
-            <span className="text-white text-xs font-semibold tracking-widest uppercase bg-black/30 backdrop-blur-sm px-2.5 py-1 rounded">
+            <span className="text-white text-xs font-semibold tracking-widest uppercase bg-black/40 px-2.5 py-1 rounded">
               {microLabel}
             </span>
           </div>
@@ -180,7 +180,7 @@ export default function HeroVideo({
             <button
               onClick={toggleMute}
               aria-label={muted ? 'Unmute voiceover' : 'Mute voiceover'}
-              className="flex items-center gap-2 bg-black/60 hover:bg-black/80 text-white text-xs font-semibold px-3 py-2 rounded-full transition-colors backdrop-blur-sm border border-white/20"
+              className="flex items-center gap-2 bg-black/60 hover:bg-black/80 text-white text-xs font-semibold px-3 py-2 rounded-full transition-colors border border-white/20"
             >
               {muted ? (
                 <><VolumeX className="w-4 h-4 flex-shrink-0" /><span className="hidden sm:inline">Tap to hear</span></>

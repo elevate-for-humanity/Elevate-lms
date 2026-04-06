@@ -34,7 +34,7 @@ export default function HomePage() {
         <div className="relative h-64 sm:h-80 lg:h-auto lg:min-h-[560px] overflow-hidden bg-slate-700">
           <HeroVideoBg
             src="/videos/homepage-hero-new.mp4"
-            audioSrc="/videos/homepage-hero-new.mp3"
+            audioSrc="/audio/heroes/cna.mp3"
           />
         </div>
         <div className="bg-slate-700 flex items-center">

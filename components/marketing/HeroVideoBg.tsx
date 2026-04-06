@@ -73,17 +73,19 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
         <audio ref={audioRef} src={audioSrc} preload="none" aria-hidden="true" className="hidden" />
       )}
 
-      <button
-        onClick={toggleMute}
-        aria-label={muted ? 'Unmute voiceover' : 'Mute voiceover'}
-        className="absolute bottom-4 right-4 z-20 flex items-center gap-2 bg-black/60 hover:bg-black/80 text-white text-xs font-semibold px-3 py-2 rounded-full transition-colors backdrop-blur-sm border border-white/20"
-      >
-        {muted ? (
-          <><VolumeX className="w-4 h-4 flex-shrink-0" /><span className="hidden sm:inline">Tap to hear</span></>
-        ) : (
-          <><Volume2 className="w-4 h-4 flex-shrink-0 text-brand-red-400" /><span className="hidden sm:inline">Mute</span></>
-        )}
-      </button>
+      {audioSrc && (
+        <button
+          onClick={toggleMute}
+          aria-label={muted ? 'Unmute voiceover' : 'Mute voiceover'}
+          className="absolute bottom-4 right-4 z-20 flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-3 py-2 rounded-full transition-colors backdrop-blur-sm border border-white/30"
+        >
+          {muted ? (
+            <><VolumeX className="w-4 h-4 flex-shrink-0" /><span className="hidden sm:inline">Tap to hear</span></>
+          ) : (
+            <><Volume2 className="w-4 h-4 flex-shrink-0 text-brand-red-400" /><span className="hidden sm:inline">Mute</span></>
+          )}
+        </button>
+      )}
     </>
   );
 }

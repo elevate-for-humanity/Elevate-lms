@@ -94,9 +94,14 @@ export default function FinancePathwayPage() {
           <HeroVideo
             videoSrcDesktop={b.videoSrcDesktop}
             posterImage={b.posterImage}
-        voiceoverSrc={b.voiceoverSrc}
+            voiceoverSrc={b.voiceoverSrc}
             microLabel={b.microLabel}
             analyticsName={b.analyticsName}
+            belowHeroHeadline={b.belowHeroHeadline}
+            belowHeroSubheadline={b.belowHeroSubheadline}
+            ctas={[b.primaryCta, ...(b.secondaryCta ? [b.secondaryCta] : [])]}
+            trustIndicators={b.trustIndicators}
+            transcript={b.transcript}
           />
         );
       })()}

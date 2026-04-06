@@ -71,6 +71,11 @@ export default async function PeerRecoverySpecialistPage() {
         voiceoverSrc={banner.voiceoverSrc}
         microLabel={banner.microLabel}
         analyticsName={banner.analyticsName}
+        belowHeroHeadline={banner.belowHeroHeadline}
+        belowHeroSubheadline={banner.belowHeroSubheadline}
+        ctas={[banner.primaryCta, ...(banner.secondaryCta ? [banner.secondaryCta] : [])]}
+        trustIndicators={banner.trustIndicators}
+        transcript={banner.transcript}
       />
 
       {/* Program identity + CTAs */}

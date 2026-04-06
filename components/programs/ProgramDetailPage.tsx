@@ -52,6 +52,10 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
         {heroOverride ?? (() => {
           const banner = heroBanners[p.slug];
           if (banner) {
+            const bannerCtas = [
+              banner.primaryCta,
+              ...(banner.secondaryCta ? [banner.secondaryCta] : []),
+            ];
             return (
               <HeroVideo
                 videoSrcDesktop={banner.videoSrcDesktop}
@@ -59,6 +63,11 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                 voiceoverSrc={banner.voiceoverSrc}
                 microLabel={banner.microLabel}
                 analyticsName={banner.analyticsName}
+                belowHeroHeadline={banner.belowHeroHeadline}
+                belowHeroSubheadline={banner.belowHeroSubheadline}
+                ctas={bannerCtas}
+                trustIndicators={banner.trustIndicators}
+                transcript={banner.transcript}
               />
             );
           }

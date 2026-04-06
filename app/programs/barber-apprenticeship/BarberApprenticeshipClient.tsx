@@ -27,13 +27,19 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
       {/* ═══ HERO ═══ */}
       {(() => {
         const b = heroBanners['barber-apprenticeship'];
+        const ctas = [b.primaryCta, ...(b.secondaryCta ? [b.secondaryCta] : [])];
         return (
           <HeroVideo
             videoSrcDesktop={b.videoSrcDesktop}
             posterImage={b.posterImage}
-        voiceoverSrc={b.voiceoverSrc}
+            voiceoverSrc={b.voiceoverSrc}
             microLabel={b.microLabel}
             analyticsName={b.analyticsName}
+            belowHeroHeadline={b.belowHeroHeadline}
+            belowHeroSubheadline={b.belowHeroSubheadline}
+            ctas={ctas}
+            trustIndicators={b.trustIndicators}
+            transcript={b.transcript}
           />
         );
       })()}

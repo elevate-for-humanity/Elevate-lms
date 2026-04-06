@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withAuth } from '@/lib/api/withAuth';
 import { safeInternalError } from '@/lib/api/safe-error';
+
+const ADMIN_ROLES = ['admin', 'super_admin', 'staff'];
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -14,6 +17,20 @@ export const GET = withAuth(async (req: NextRequest) => {
 
   try {
     const supabase = await createClient();
+
+    // Role check — analytics data is admin-only
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const db = createAdminClient();
+    if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
+
+    const { data: profile } = await db
+      .from('profiles').select('role').eq('id', user.id).single();
+
+    if (!profile || !ADMIN_ROLES.includes(profile.role ?? '')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     const { searchParams } = new URL(req.url);
     const days = parseInt(searchParams.get('days') || '30', 10);
     const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();

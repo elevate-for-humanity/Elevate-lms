@@ -1,103 +1,102 @@
 import { NextResponse } from 'next/server';
-
 import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 import { auditLog } from '@/lib/auditLog';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
-
 export const dynamic = 'force-dynamic';
 
-export async function POST(req: Request) {
-  try {
-    const rateLimited = await applyRateLimit(req, 'api');
-    if (rateLimited) return rateLimited;
+const ADMIN_ROLES = ['admin', 'super_admin', 'staff'];
 
-    const body = await req.json();
-    const { control_id, evidence, implemented } = body;
+async function requireAdmin() {
+  const supabase = await createClient();
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error || !user) return { user: null, db: null, error: 'Unauthorized' as const };
 
-    if (!control_id) {
-      return NextResponse.json(
-        { error: 'control_id is required' },
-        { status: 400 }
-      );
-    }
+  const db = createAdminClient();
+  if (!db) return { user: null, db: null, error: 'Service unavailable' as const };
 
-    const supabase = createAdminClient();
+  const { data: profile } = await db
+    .from('profiles').select('role').eq('id', user.id).single();
 
-    if (!supabase) {
-      return NextResponse.json(
-        { error: 'Service temporarily unavailable.' },
-        { status: 503 }
-      );
-    }
-
-    const { data, error }: any = await supabase
-      .from('soc_controls')
-      .upsert({
-        control_id,
-        implemented: implemented ?? true,
-        evidence,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      return NextResponse.json({ error: 'Internal server error' }, { status: 400 });
-    }
-
-    // Log the control update
-    await auditLog({
-      actor_user_id: req.headers.get('x-user-id') || undefined,
-      actor_role: 'admin',
-      action: 'UPDATE',
-      entity: 'audit_snapshot',
-      entity_id: control_id,
-      after: data,
-      req,
-      metadata: { control_type: 'SOC-2' },
-    });
-
-    return NextResponse.json({ success: true, data });
-  } catch (error) { 
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+  if (!profile || !ADMIN_ROLES.includes(profile.role ?? '')) {
+    return { user: null, db: null, error: 'Forbidden' as const };
   }
+  return { user, db, error: null };
+}
+
+export async function POST(req: Request) {
+  const rateLimited = await applyRateLimit(req, 'api');
+  if (rateLimited) return rateLimited;
+
+  const { user, db, error: authError } = await requireAdmin();
+  if (authError || !user || !db) {
+    return NextResponse.json({ error: authError }, { status: authError === 'Unauthorized' ? 401 : 403 });
+  }
+
+  const body = await req.json();
+  const { control_id, evidence, implemented } = body;
+
+  if (!control_id) {
+    return NextResponse.json({ error: 'control_id is required' }, { status: 400 });
+  }
+
+  const { data, error } = await db
+    .from('soc_controls')
+    .upsert({ control_id, implemented: implemented ?? true, evidence })
+    .select()
+    .single();
+
+  if (error) {
+    logger.error('[soc/mark] upsert failed', error);
+    return NextResponse.json({ error: 'Failed to update control' }, { status: 500 });
+  }
+
+  await auditLog({
+    actor_user_id: user.id,
+    actor_role: 'admin',
+    action: 'UPDATE',
+    entity: 'soc_controls',
+    entity_id: control_id,
+    after: data,
+    req,
+    metadata: { control_type: 'SOC-2' },
+  });
+
+  return NextResponse.json({ success: true, data });
 }
 
 export async function GET(request: Request) {
-  try {
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
 
-    const supabase = createAdminClient();
-
-    const { data, error }: any = await supabase
-      .from('soc_controls')
-      .select('*')
-      .order('control_id');
-
-    if (error) {
-      return NextResponse.json({ error: 'Internal server error' }, { status: 400 });
-    }
-
-    const implemented = data?.filter((c) => c.implemented).length || 0;
-    const total = data?.length || 0;
-
-    return NextResponse.json({
-      controls: data || [],
-      summary: {
-        total,
-        implemented,
-        percentage: total > 0 ? Math.round((implemented / total) * 100) : 0,
-      },
-    });
-  } catch (error) { 
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+  const { user, db, error: authError } = await requireAdmin();
+  if (authError || !user || !db) {
+    return NextResponse.json({ error: authError }, { status: authError === 'Unauthorized' ? 401 : 403 });
   }
+
+  const { data, error } = await db
+    .from('soc_controls')
+    .select('*')
+    .order('control_id');
+
+  if (error) {
+    logger.error('[soc/mark] select failed', error);
+    return NextResponse.json({ error: 'Failed to fetch controls' }, { status: 500 });
+  }
+
+  const implemented = (data ?? []).filter((c) => c.implemented).length;
+  const total = (data ?? []).length;
+
+  return NextResponse.json({
+    controls: data ?? [],
+    summary: {
+      total,
+      implemented,
+      percentage: total > 0 ? Math.round((implemented / total) * 100) : 0,
+    },
+  });
 }

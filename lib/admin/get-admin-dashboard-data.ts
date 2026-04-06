@@ -7,6 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import type { AdminDashboardData, DegradedSection } from '@/components/admin/dashboard/types';
+import { getSystemHealth } from './dashboard/get-system-health';
 
 function toSafeNumber(value: unknown): number {
   const n = Number(value ?? 0);
@@ -575,5 +576,14 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     profile: adminProfile,
     generatedAt: new Date().toISOString(),
     degradedSections,
+    systemHealth: await getSystemHealth(db).catch(() => ({
+      stripeWebhookOk: false,
+      buildEnvOk: false,
+      staleJobs: 0,
+      degraded: true,
+      missingDocuments: 0,
+      unresolvedFlags: 0,
+      alerts: [{ code: 'health_check_failed', severity: 'warning' as const, message: 'System health check failed to load.' }],
+    })),
   };
 }

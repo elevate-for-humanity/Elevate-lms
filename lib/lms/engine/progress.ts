@@ -12,6 +12,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import type {
   LearnerProgress, LessonProgress, CheckpointScore, StepSubmission,
 } from './types';
+import { calcProgressPercent, isCourseComplete } from '@/lib/lms/progress-calc';
 
 export async function getLearnerProgress(
   userId: string,
@@ -94,10 +95,8 @@ export async function getLearnerProgress(
     }
   }
 
-  const totalLessons = allLessons?.length ?? 0;
-  const progressPercent = totalLessons > 0
-    ? Math.round((completedLessonIds.size / totalLessons) * 100)
-    : 0;
+  const totalLessons    = allLessons?.length ?? 0;
+  const progressPercent = calcProgressPercent(completedLessonIds.size, totalLessons);
 
   return {
     userId,
@@ -106,7 +105,7 @@ export async function getLearnerProgress(
     checkpointScores,
     stepSubmissions,
     progressPercent,
-    courseCompleted: progressPercent === 100 && totalLessons > 0,
+    courseCompleted: isCourseComplete(progressPercent, totalLessons),
     certificateNumber: certRow?.certificate_number ?? null,
   };
 }

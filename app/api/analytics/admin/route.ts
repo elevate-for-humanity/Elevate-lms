@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { calcProgressPercent } from '@/lib/lms/progress-calc';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -114,7 +115,7 @@ async function _GET(request: NextRequest) {
           .eq("completed", true);
 
         const completedLessons = progress?.length || 0;
-        const progressPercent = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
+        const progressPercent = calcProgressPercent(completedLessons, totalLessons);
 
         if (progressPercent > 0 && progressPercent < 50) {
           atRiskCount++;

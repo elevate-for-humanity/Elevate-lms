@@ -85,6 +85,23 @@ export interface DashboardCounts {
   certificatesIssued: number;
 }
 
+export interface SystemHealthAlert {
+  code: string;
+  severity: 'info' | 'warning' | 'critical';
+  message: string;
+}
+
+export interface SystemHealth {
+  stripeWebhookOk: boolean;
+  buildEnvOk: boolean;
+  staleJobs: number;
+  degraded: boolean;
+  missingDocuments: number;
+  missingCertifications: number;
+  unresolvedFlags: number;
+  alerts: SystemHealthAlert[];
+}
+
 // Sections that failed to load due to non-critical query errors.
 // UI must render an explicit partial-failure notice when this is non-empty.
 // An empty array means all sections loaded successfully.
@@ -109,4 +126,5 @@ export interface AdminDashboardData {
   generatedAt: string;
   /** Non-empty when one or more non-critical sections failed to load. */
   degradedSections: DegradedSection[];
+  systemHealth: SystemHealth;
 }

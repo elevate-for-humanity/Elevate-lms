@@ -95,7 +95,8 @@ async function _GET(request: NextRequest) {
         const completedLessonIds = new Set(progress?.map((p) => p.lesson_id) || []);
         const completedCount = lessons?.filter((l) => completedLessonIds.has(l.id)).length || 0;
 
-        const progressPercent = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
+        const { calcProgressPercent } = await import('@/lib/lms/progress-calc');
+        const progressPercent = calcProgressPercent(completedCount, totalLessons);
 
         // Get next lesson
         const nextLesson = lessons?.find((l) => !completedLessonIds.has(l.id));

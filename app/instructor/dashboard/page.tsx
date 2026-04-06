@@ -5,8 +5,6 @@ import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { safeFormatDate } from '@/lib/format-utils';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import InstructorPerformanceDashboard from '@/components/InstructorPerformanceDashboard';
-
 import {
   Users,
   BookOpen,
@@ -69,6 +67,29 @@ export default async function ProgramHolderDashboard() {
     .in('status', ['submitted', 'under_review']);
   if (!isAdmin) pendingQuery = pendingQuery.eq('instructor_id', user.id);
   const { count: pendingSubmissions } = await pendingQuery;
+
+  // Course-level performance — aggregate from program_enrollments
+  const { data: enrollmentRows } = await supabase
+    .from('program_enrollments')
+    .select('program_id, status, programs(title)')
+    .limit(200);
+
+  const programMap: Record<string, { name: string; students: number; completed: number }> = {};
+  for (const e of enrollmentRows ?? []) {
+    const pid = e.program_id as string;
+    const title = (e.programs as any)?.title ?? 'Unknown Program';
+    if (!programMap[pid]) programMap[pid] = { name: title, students: 0, completed: 0 };
+    programMap[pid].students++;
+    if (e.status === 'completed') programMap[pid].completed++;
+  }
+  const coursePerformance = Object.values(programMap)
+    .sort((a, b) => b.students - a.students)
+    .slice(0, 5)
+    .map(p => ({
+      name: p.name.length > 35 ? p.name.slice(0, 32) + '…' : p.name,
+      students: p.students,
+      completionRate: p.students > 0 ? Math.round((p.completed / p.students) * 100) : 0,
+    }));
 
   return (
     <div className="min-h-screen bg-white">
@@ -325,10 +346,25 @@ export default async function ProgramHolderDashboard() {
               </div>
             </div>
 
-            {/* Instructor Performance */}
-            <div className="mt-8">
-              <InstructorPerformanceDashboard />
-            </div>
+            {/* Course Performance */}
+            {coursePerformance.length > 0 && (
+              <div className="mt-8 bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                <h3 className="font-bold text-black mb-4">Course Performance</h3>
+                <div className="space-y-4">
+                  {coursePerformance.map((c, i) => (
+                    <div key={i}>
+                      <div className="flex items-baseline justify-between mb-1">
+                        <span className="text-sm font-medium text-slate-800 truncate max-w-[60%]">{c.name}</span>
+                        <span className="text-xs text-slate-500 flex-shrink-0 ml-2">{c.students} enrolled · {c.completionRate}%</span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                        <div className="h-full rounded-full bg-brand-blue-500" style={{ width: `${c.completionRate}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

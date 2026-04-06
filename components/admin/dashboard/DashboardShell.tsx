@@ -6,8 +6,9 @@ import { AdminGreeting } from "@/components/admin/AdminGreeting";
 import {
   FileText, Users, DollarSign, Award, AlertTriangle,
   ArrowRight, BookOpen, TrendingUp, BarChart3,
+  CheckCircle2, XCircle, Clock, ShieldAlert,
 } from "lucide-react";
-import type { AdminDashboardData } from "./types";
+import type { AdminDashboardData, SystemHealth } from "./types";
 
 // ── Formatters ────────────────────────────────────────────────────────────────
 function fmtUsd(cents: number) {
@@ -94,6 +95,98 @@ function DegradedBanner({ sections }: { sections: string[] }) {
         {sections.map(s => DEGRADED_LABELS[s] ?? s).join(", ")} could not be loaded.
       </div>
     </div>
+  );
+}
+
+// ── System Health Panel ───────────────────────────────────────────────────────
+const SEVERITY_STYLES = {
+  critical: { row: "border-rose-200 bg-rose-50", icon: "text-rose-500", text: "text-rose-800" },
+  warning:  { row: "border-amber-200 bg-amber-50", icon: "text-amber-500", text: "text-amber-800" },
+  info:     { row: "border-blue-200 bg-blue-50", icon: "text-blue-500", text: "text-blue-800" },
+};
+
+function SystemHealthPanel({ health }: { health: SystemHealth }) {
+  const hasCritical = health.alerts.some(a => a.severity === "critical");
+  const hasWarning  = health.alerts.some(a => a.severity === "warning");
+  const allClear    = health.alerts.length === 0;
+
+  return (
+    <section className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 sm:mb-28">
+      <div className="flex items-end justify-between mb-8 sm:mb-12">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Infrastructure</p>
+          <h2 className="text-3xl sm:text-5xl font-black text-slate-900 leading-none flex items-center gap-4">
+            System Health
+            {hasCritical && <XCircle className="w-8 h-8 text-rose-500" />}
+            {!hasCritical && hasWarning && <AlertTriangle className="w-8 h-8 text-amber-500" />}
+            {allClear && <CheckCircle2 className="w-8 h-8 text-emerald-500" />}
+          </h2>
+        </div>
+        <Link href="/admin/settings" className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1.5">
+          Settings <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      </div>
+
+      {/* Status indicators */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
+        {[
+          { label: "Stripe Webhook",    ok: health.stripeWebhookOk },
+          { label: "Build Env Vars",    ok: health.buildEnvOk },
+          { label: "Stale Jobs",        ok: health.staleJobs === 0,        badge: health.staleJobs > 0 ? String(health.staleJobs) : null },
+          { label: "Unresolved Flags",  ok: health.unresolvedFlags === 0,  badge: health.unresolvedFlags > 0 ? String(health.unresolvedFlags) : null },
+        ].map(({ label, ok, badge }) => (
+          <div key={label} className={`rounded-xl border px-4 py-4 flex items-center gap-3 ${ok ? "border-emerald-200 bg-emerald-50" : "border-rose-200 bg-rose-50"}`}>
+            {ok
+              ? <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+              : <XCircle className="w-5 h-5 text-rose-500 flex-shrink-0" />}
+            <div className="min-w-0">
+              <p className={`text-xs font-semibold truncate ${ok ? "text-emerald-800" : "text-rose-800"}`}>{label}</p>
+              {badge && <p className="text-lg font-black tabular-nums text-rose-600">{badge}</p>}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Missing documents row */}
+      {health.missingDocuments > 0 && (
+        <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 mb-4">
+          <ShieldAlert className="w-5 h-5 text-amber-500 flex-shrink-0" />
+          <p className="text-sm font-semibold text-amber-800">
+            {health.missingDocuments} active enrollment{health.missingDocuments !== 1 ? "s" : ""} missing required documents
+          </p>
+          <Link href="/admin/enrollments?docs_verified=false" className="ml-auto text-xs font-bold text-amber-700 hover:text-amber-900 flex items-center gap-1">
+            Review <ArrowRight className="w-3 h-3" />
+          </Link>
+        </div>
+      )}
+
+      {/* Alert list */}
+      {health.alerts.length === 0 ? (
+        <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4">
+          <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+          <p className="text-sm font-semibold text-emerald-800">All systems operational</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {health.alerts.map((alert, i) => {
+            const s = SEVERITY_STYLES[alert.severity] ?? SEVERITY_STYLES.info;
+            return (
+              <div key={`${alert.code}-${i}`} className={`flex items-start gap-3 rounded-xl border px-5 py-4 ${s.row}`}>
+                {alert.severity === "critical"
+                  ? <XCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${s.icon}`} />
+                  : alert.severity === "warning"
+                  ? <AlertTriangle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${s.icon}`} />
+                  : <Clock className={`w-5 h-5 flex-shrink-0 mt-0.5 ${s.icon}`} />}
+                <div>
+                  <p className={`text-sm font-semibold ${s.text}`}>{alert.message}</p>
+                  <p className={`text-xs mt-0.5 font-mono opacity-60 ${s.text}`}>{alert.code}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -407,6 +500,11 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
           </div>
         </section>
       )}
+
+      {/* ══════════════════════════════════════════════════════════
+          SYSTEM HEALTH
+      ══════════════════════════════════════════════════════════ */}
+      <SystemHealthPanel health={data.systemHealth} />
 
     </div>
   );

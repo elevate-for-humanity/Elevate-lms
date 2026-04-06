@@ -16,6 +16,7 @@ import { setAuditContext } from '@/lib/audit-context';
 import type { StepCompletionResult, CheckpointAttemptResult } from './types';
 import { issueCertificateIfEligible } from './certificate';
 import { isCheckpointGateError, CheckpointGateError } from './gate';
+import { calcProgressPercent, isCourseComplete } from '@/lib/lms/progress-calc';
 
 // ─── recordStepCompletion ─────────────────────────────────────────────────────
 
@@ -71,10 +72,8 @@ export async function recordStepCompletion(
 
   const totalLessons    = allLessons?.length ?? 0;
   const completedCount  = completedLessons?.length ?? 0;
-  const progressPercent = totalLessons > 0
-    ? Math.round((completedCount / totalLessons) * 100)
-    : 0;
-  const courseCompleted = progressPercent === 100 && totalLessons > 0;
+  const progressPercent = calcProgressPercent(completedCount, totalLessons);
+  const courseCompleted = isCourseComplete(progressPercent, totalLessons);
 
   // Persist progress % — canonical table: program_enrollments
   // Try by course_id first (direct enrollment), then by program_id (program-level enrollment).
@@ -152,9 +151,7 @@ export async function recordStepUncompletion(
 
   const totalLessons    = allLessons?.length ?? 0;
   const completedCount  = completedLessons?.length ?? 0;
-  const progressPercent = totalLessons > 0
-    ? Math.round((completedCount / totalLessons) * 100)
-    : 0;
+  const progressPercent = calcProgressPercent(completedCount, totalLessons);
 
   // Persist progress % — canonical table: program_enrollments
   const { error: directUpdateError } = await db

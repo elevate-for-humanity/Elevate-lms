@@ -1,3 +1,5 @@
+// AUTH: Intentionally public — orientation booking is open to prospective students
+// before they have an account. Rate-limited to 3 req/min via 'contact' tier.
 
 import { NextResponse } from 'next/server';
 import { createZoomMeeting } from '@/lib/integrations/zoom';
@@ -11,6 +13,11 @@ export const dynamic = 'force-dynamic';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
+// Strip characters that could be used for email header injection
+function sanitize(value: string): string {
+  return value.replace(/[\r\n\t]/g, ' ').trim().slice(0, 200);
+}
+
 async function _POST(request: Request) {
   const rateLimited = await applyRateLimit(request as any, 'contact');
   if (rateLimited) return rateLimited;
@@ -22,14 +29,22 @@ async function _POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    // Basic email format check
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: 'Invalid email address' }, { status: 400 });
+    }
+
+    const safeName = sanitize(String(name));
+    const safeEmail = sanitize(String(email));
+
     const isBarbershop = sessionType === 'barbershop';
     const topic = isBarbershop
-      ? `Elevate for Humanity — Barbershop Walk-Through: ${name}`
-      : `Elevate for Humanity — Orientation: ${name}`;
+      ? `Elevate for Humanity — Barbershop Walk-Through: ${safeName}`
+      : `Elevate for Humanity — Orientation: ${safeName}`;
     const duration = isBarbershop ? 60 : 45;
     const agenda = isBarbershop
-      ? `Barbershop walk-through / site visit for ${name} (${email}). Covers apprenticeship hosting requirements, OJT structure, and next steps.`
-      : `Virtual orientation session for ${name} (${email}). Covers programs, funding, enrollment process, and Q&A.`;
+      ? `Barbershop walk-through / site visit for ${safeName} (${safeEmail}). Covers apprenticeship hosting requirements, OJT structure, and next steps.`
+      : `Virtual orientation session for ${safeName} (${safeEmail}). Covers programs, funding, enrollment process, and Q&A.`;
 
     const meeting = await createZoomMeeting({
       topic,
@@ -44,18 +59,18 @@ async function _POST(request: Request) {
       },
     });
 
-    logger.info('[Orientation] Zoom meeting created', { meetingId: meeting.id, email });
+    logger.info('[Orientation] Zoom meeting created', { meetingId: meeting.id, email: safeEmail });
 
     const dateFormatted = new Date(date + 'T12:00:00').toLocaleDateString('en-US', {
       weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
     });
 
     const sessionLabel = isBarbershop ? 'Barbershop Walk-Through' : 'Virtual Orientation';
-    const firstName = name.split(' ')[0];
+    const firstName = safeName.split(' ')[0];
 
     // Confirmation email to student/partner
     await sendEmail({
-      to: email,
+      to: safeEmail,
       subject: `${sessionLabel} Confirmed — ${dateFormatted} at ${time}`,
       html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
 <img src="https://www.elevateforhumanity.org/logo.png" alt="Elevate for Humanity" width="120" style="margin-bottom:20px"/>
@@ -83,10 +98,10 @@ async function _POST(request: Request) {
     // Notify admin
     await sendEmail({
       to: ADMIN_EMAIL,
-      subject: `[${sessionLabel.toUpperCase()}] ${name} — ${dateFormatted} ${time}`,
+      subject: `[${sessionLabel.toUpperCase()}] ${safeName} — ${dateFormatted} ${time}`,
       html: `<div style="font-family:Arial,sans-serif;padding:20px">
 <h2>New ${sessionLabel} Scheduled</h2>
-<p><strong>Name:</strong> ${name}<br/><strong>Email:</strong> ${email}<br/><strong>Date:</strong> ${dateFormatted} at ${time} Eastern<br/><strong>Duration:</strong> ${duration} min</p>
+<p><strong>Name:</strong> ${safeName}<br/><strong>Email:</strong> ${safeEmail}<br/><strong>Date:</strong> ${dateFormatted} at ${time} Eastern<br/><strong>Duration:</strong> ${duration} min</p>
 <p><a href="${meeting.join_url}">Join Zoom Meeting</a> &mdash; ID: ${meeting.id}</p>
 </div>`,
     }).catch((err) => {

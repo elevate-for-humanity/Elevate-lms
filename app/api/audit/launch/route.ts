@@ -16,7 +16,10 @@ export const maxDuration = 60;
  * Mode: GET or POST with options
  */
 
-const AUDIT_SECRET = process.env.AUDIT_SECRET || 'change-me-in-production';
+const AUDIT_SECRET = process.env.AUDIT_SECRET;
+if (!AUDIT_SECRET) {
+  throw new Error('AUDIT_SECRET env var is not set — audit endpoint is disabled');
+}
 
 interface AuditOptions {
   mode: 'quick' | 'full';

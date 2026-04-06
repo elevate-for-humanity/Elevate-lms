@@ -22,28 +22,24 @@ async function _GET(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    // Require super_admin for monitoring access
-    // In development, allow without auth
-    if (process.env.NODE_ENV === 'production') {
-      // Get org ID from query parameter or session
-      const url = new URL(req.url);
-      const orgId = url.searchParams.get('orgId');
+    // Require super_admin for monitoring access — no environment bypass
+    const url = new URL(req.url);
+    const orgId = url.searchParams.get('orgId');
 
-      if (!orgId) {
-        return NextResponse.json(
-          { error: 'Organization ID required' },
-          { status: 400 }
-        );
-      }
+    if (!orgId) {
+      return NextResponse.json(
+        { error: 'Organization ID required' },
+        { status: 400 }
+      );
+    }
 
-      const { role } = await requireOrgAdmin(req, orgId);
+    const { role } = await requireOrgAdmin(req, orgId);
 
-      if (role !== 'super_admin') {
-        return NextResponse.json(
-          { error: 'Super admin access required' },
-          { status: 403 }
-        );
-      }
+    if (role !== 'super_admin') {
+      return NextResponse.json(
+        { error: 'Super admin access required' },
+        { status: 403 }
+      );
     }
 
     const url = new URL(req.url);

@@ -10,7 +10,8 @@ set -euo pipefail
 
 # Extract all process.env.VAR_NAME references from source
 grep -rh "process\.env\." app/ lib/ --include="*.ts" --include="*.tsx" 2>/dev/null \
-  | grep -oP "process\.env\.[A-Z_]+" \
+  | grep -v "^\s*//" \
+  | grep -oP "process\.env\.[A-Z][A-Z0-9_]+" \
   | sed 's/process\.env\.//' \
   | grep -vE "^NODE_ENV$|^NEXT_PUBLIC_" \
   | sort -u > /tmp/_code_env.txt

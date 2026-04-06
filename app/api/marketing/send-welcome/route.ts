@@ -5,11 +5,15 @@ import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 export const maxDuration = 60;
 
 async function _POST(req: NextRequest) {
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
+
   try {
-    const rateLimited = await applyRateLimit(request, 'strict');
+    const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
 
     const body = await req.json();

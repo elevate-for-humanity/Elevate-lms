@@ -5,7 +5,7 @@
  */
 
 import { getEntityByUEI, checkExclusions } from '@/lib/integrations/sam-gov';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 export interface EligibilityCheck {
   entityId: string;

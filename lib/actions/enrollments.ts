@@ -1,4 +1,4 @@
-import { logger } from '@/lib/logger';
+'use server';
 
 /**
  * Enrollment Actions - Server-side functions for creating and managing enrollments
@@ -9,10 +9,12 @@ import { logger } from '@/lib/logger';
  * - Applying transfer hours
  * - Updating funding amounts
  */
-'use server';
-import { supabaseAdmin } from '../supabaseAdmin';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { logAuditEvent } from '@/lib/audit';
+import { logger } from '@/lib/logger';
+
+const supabaseAdmin = createAdminClient();
 
 // ============================================================================
 // TYPES

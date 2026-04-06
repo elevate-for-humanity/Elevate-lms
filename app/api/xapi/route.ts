@@ -1,9 +1,8 @@
-import { createAdminClient } from '@/lib/supabase/admin';
 
 // app/api/xapi/route.ts
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
-import { createSupabaseClient } from "@/lib/supabase-api";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -16,7 +15,7 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = createSupabaseClient();
+  const supabase = createAdminClient();
   // xAPI endpoint for receiving learning activity statements
   const body = await parseBody<Record<string, any>>(request);
 
@@ -52,7 +51,7 @@ async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const supabase = createSupabaseClient();
+const supabase = createAdminClient();
   // xAPI GET endpoint for retrieving statements
   const { searchParams } = new URL(request.url);
   const actor = searchParams.get('agent');

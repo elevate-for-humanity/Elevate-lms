@@ -1,4 +1,4 @@
-import { createSupabaseClient } from '@/lib/supabase-api';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 
 /**
@@ -57,7 +57,7 @@ export interface EnqueueJobParams {
  * Returns immediately - job processed by worker
  */
 export async function enqueueJob(params: EnqueueJobParams): Promise<string> {
-  const supabase = createSupabaseClient();
+  const supabase = createAdminClient();
   
   const { data, error } = await supabase
     .from('provisioning_jobs')
@@ -103,7 +103,7 @@ export async function enqueueJob(params: EnqueueJobParams): Promise<string> {
  * Uses SELECT FOR UPDATE SKIP LOCKED to prevent double-processing
  */
 export async function claimJobs(limit: number = 25): Promise<ProvisioningJob[]> {
-  const supabase = createSupabaseClient();
+  const supabase = createAdminClient();
   
   const { data, error } = await supabase.rpc('claim_provisioning_jobs', {
     p_limit: limit,
@@ -121,7 +121,7 @@ export async function claimJobs(limit: number = 25): Promise<ProvisioningJob[]> 
  * Mark job as completed
  */
 export async function completeJob(jobId: string): Promise<void> {
-  const supabase = createSupabaseClient();
+  const supabase = createAdminClient();
   
   const { error } = await supabase.rpc('complete_provisioning_job', {
     p_job_id: jobId,
@@ -138,7 +138,7 @@ export async function completeJob(jobId: string): Promise<void> {
  * Mark job as failed (will retry or go to dead letter)
  */
 export async function failJob(jobId: string, errorMessage: string): Promise<void> {
-  const supabase = createSupabaseClient();
+  const supabase = createAdminClient();
   
   const { error } = await supabase.rpc('complete_provisioning_job', {
     p_job_id: jobId,
@@ -156,7 +156,7 @@ export async function failJob(jobId: string, errorMessage: string): Promise<void
  * Get dead letter jobs for admin review
  */
 export async function getDeadLetterJobs(): Promise<ProvisioningJob[]> {
-  const supabase = createSupabaseClient();
+  const supabase = createAdminClient();
   
   const { data, error } = await supabase
     .from('provisioning_jobs')
@@ -179,7 +179,7 @@ export async function retryDeadLetterJob(
   jobId: string, 
   adminUserId: string
 ): Promise<boolean> {
-  const supabase = createSupabaseClient();
+  const supabase = createAdminClient();
   
   const { data, error } = await supabase.rpc('retry_dead_letter_job', {
     p_job_id: jobId,

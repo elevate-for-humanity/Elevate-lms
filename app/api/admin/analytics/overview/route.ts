@@ -1,10 +1,9 @@
 import { requireAdmin } from '@/lib/auth';
-import { createAdminClient } from '@/lib/supabase/admin';
 
 // app/api/admin/analytics/overview/route.ts
 // Real-time analytics overview
 import { NextRequest, NextResponse } from 'next/server';
-import { createSupabaseClient } from "@/lib/supabase-api";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { withAuth } from '@/lib/with-auth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -15,7 +14,7 @@ export const dynamic = 'force-dynamic';
 const _GET = withAuth(
   async (req: NextRequest, user) => {
 
-  const supabase = createSupabaseClient();
+  const supabase = createAdminClient();
   const db = supabase;
   const tenantId = req.headers.get('x-tenant-id');
 

@@ -3,7 +3,7 @@
  * Creates submission-ready packages with PDF, Word, and ZIP exports
  */
 
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { Document, Packer, Paragraph, HeadingLevel } from 'docx';
 import JSZip from 'jszip';
 

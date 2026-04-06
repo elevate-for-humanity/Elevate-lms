@@ -1,6 +1,4 @@
-
-import { createAdminClient } from '@/lib/supabase/admin';
-import { supabaseServer } from "@/lib/supabaseServer";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 import { NextResponse } from "next/server";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -15,7 +13,7 @@ async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = supabaseServer();
+    const supabase = createAdminClient();
     const body = await req.json();
 
     const { data, error }: any = await supabase

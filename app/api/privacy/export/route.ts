@@ -1,9 +1,8 @@
-import { createAdminClient } from '@/lib/supabase/admin';
 
 // app/api/privacy/export/route.ts
 // GDPR/CCPA: Data export endpoint
 import { NextRequest, NextResponse } from 'next/server';
-import { createSupabaseClient } from "@/lib/supabase-api";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
@@ -23,7 +22,7 @@ export async function POST(req: NextRequest) {
     }
 
 
-  const supabase = createSupabaseClient();
+  const supabase = createAdminClient();
   const { email } = await req.json();
 
   if (!email) {

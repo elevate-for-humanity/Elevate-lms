@@ -3,7 +3,7 @@
  * Multi-channel notifications: Dashboard + Email + SMS
  */
 
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { EmailService } from '@/lib/notifications/email';
 import { SMSService } from '@/lib/notifications/sms';
 

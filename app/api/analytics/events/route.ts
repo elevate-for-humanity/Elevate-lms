@@ -1,9 +1,8 @@
-import { createAdminClient } from '@/lib/supabase/admin';
 
 // app/api/analytics/events/route.ts
 // Track user activity events
 import { NextRequest, NextResponse } from 'next/server';
-import { createSupabaseClient } from "@/lib/supabase-api";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -15,7 +14,7 @@ async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = createSupabaseClient();
+  const supabase = createAdminClient();
   const { tenantId, userId, eventType, payload, path } = await req.json();
 
   if (!eventType || !tenantId) {

@@ -1,11 +1,13 @@
 
 // app/api/cm/learners/[id]/notes/route.ts - Add case manager notes
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabaseClients";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getAuthUser } from "@/lib/auth";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+
+const supabaseAdmin = createAdminClient();
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -17,13 +19,6 @@ async function _POST(
 ) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
-
-  if (!supabaseAdmin) {
-    return NextResponse.json(
-      { error: "Database not configured" },
-      { status: 503 }
-    );
-  }
 
   try {
     const { id } = await params;

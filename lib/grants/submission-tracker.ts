@@ -3,7 +3,7 @@
  * Tracks submission status, timeline, and confirmations
  */
 
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { notifyGrantSubmitted } from './notification-system';
 
 import { logAuditEvent } from '@/lib/audit';

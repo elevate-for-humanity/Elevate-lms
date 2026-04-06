@@ -1,5 +1,5 @@
 
-import { createSupabaseServerClient } from './supabaseServer';
+import { createServerClient } from '@/lib/supabase/server';
 import integrations from '../config/integrations.json';
 
 export type ApiProviderType = 'supabase' | 'external-rest';
@@ -48,7 +48,7 @@ function getApiProviderType(): ApiProviderType {
  */
 const supabaseApiAdapter: ApiAdapter = {
   async listPrograms() {
-    const supabase = createSupabaseServerClient();
+    const supabase = createServerClient();
     const { data, error }: any = await supabase
       .from('programs')
       .select('*')
@@ -62,7 +62,7 @@ const supabaseApiAdapter: ApiAdapter = {
   },
 
   async getProgramBySlug(slug: string) {
-    const supabase = createSupabaseServerClient();
+    const supabase = createServerClient();
     const { data, error }: any = await supabase
       .from('programs')
       .select('*')

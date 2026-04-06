@@ -1,8 +1,6 @@
 
-import { createAdminClient } from '@/lib/supabase/admin';
-
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -18,7 +16,7 @@ async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const supabase = getSupabaseServerClient();
+const supabase = createAdminClient();
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -55,7 +53,7 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = getSupabaseServerClient();
+  const supabase = createAdminClient();
 
   const { data: { user } } = await supabase.auth.getUser();
 

@@ -1,10 +1,8 @@
 
-import { createAdminClient } from '@/lib/supabase/admin';
-
 // app/api/live/zoom/route.ts
 // API endpoint for instructors to schedule Zoom live sessions
 import { NextRequest, NextResponse } from 'next/server';
-import { createSupabaseClient } from "@/lib/supabase-api";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createZoomMeeting } from '@/lib/integrations/zoom';
 import { logAuditEvent, getRequestMetadata } from '@/lib/audit';
 import { logger } from '@/lib/logger';
@@ -20,7 +18,7 @@ export async function POST(request: NextRequest) {
 
   // Resolve authenticated user for audit attribution
   const db = createAdminClient();
-  const supabase = createSupabaseClient();
+  const supabase = createAdminClient();
   let sessionUserId: string | null = null;
   try {
     const { data: { user } } = await supabase.auth.getUser();

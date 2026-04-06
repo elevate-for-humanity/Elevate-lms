@@ -1,9 +1,8 @@
-import { createAdminClient } from '@/lib/supabase/admin';
 
 // app/api/programs/featured/route.ts
 // Cached featured programs endpoint
 import { NextRequest, NextResponse } from 'next/server';
-import { createSupabaseClient } from "@/lib/supabase-api";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheGet, cacheSet } from '@/lib/cache';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -17,7 +16,7 @@ async function _GET(_req: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const supabase = createSupabaseClient();
+const supabase = createAdminClient();
   const cacheKey = 'programs:featured';
 
   // Try cache first

@@ -13,7 +13,7 @@ export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
-async function getSupabaseServerClient() {
+async function createAdminClient() {
   const cookieStore = await cookies();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -32,7 +32,7 @@ async function _GET(request: Request) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const supabase = await getSupabaseServerClient();
+  const supabase = await createAdminClient();
 
   const {
     data: { user },

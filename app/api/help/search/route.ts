@@ -1,8 +1,7 @@
-import { createAdminClient } from '@/lib/supabase/admin';
 
 // app/api/help/search/route.ts
 import { NextResponse } from 'next/server';
-import { createSupabaseClient } from "@/lib/supabase-api";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { sanitizeSearchInput } from '@/lib/utils';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -15,7 +14,7 @@ async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const supabase = createSupabaseClient();
+const supabase = createAdminClient();
   const { searchParams } = new URL(request.url);
   const q = searchParams.get('q') || '';
 

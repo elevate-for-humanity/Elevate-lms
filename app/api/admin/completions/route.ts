@@ -13,7 +13,7 @@ export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
-async function getSupabaseServerClient() {
+async function createAdminClient() {
   const cookieStore = await cookies();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -47,7 +47,7 @@ const _GET = withAuth(
     const since = new Date();
     since.setDate(since.getDate() - (isNaN(days) ? 7 : days));
 
-    const supabase = await getSupabaseServerClient();
+    const supabase = await createAdminClient();
   const db = supabase;
 
     const { data, error }: any = await db

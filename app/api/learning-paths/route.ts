@@ -1,8 +1,6 @@
 
-import { createAdminClient } from '@/lib/supabase/admin';
-
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -19,7 +17,7 @@ async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const supabase = getSupabaseServerClient();
+const supabase = createAdminClient();
 
   const { data, error }: any = await supabase
     .from("learning_paths")
@@ -38,7 +36,7 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = getSupabaseServerClient();
+  const supabase = createAdminClient();
 
   const { data: { user } } = await supabase.auth.getUser();
 

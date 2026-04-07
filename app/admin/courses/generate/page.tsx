@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default async function CourseGeneratorPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/admin/login');
+  if (!user) redirect('/login?redirect=/admin/courses/generate');
 
   const db = createAdminClient();
   const { data: programs } = await supabase

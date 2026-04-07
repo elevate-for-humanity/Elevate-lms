@@ -1,6 +1,7 @@
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, User, Mail, Phone, Building, MapPin } from 'lucide-react';
 
@@ -13,6 +14,11 @@ export const metadata: Metadata = {
 
 export default async function NewContactPage() {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login?redirect=/admin/crm/contacts/new');
+  }
 
   return (
     <div className="min-h-screen bg-white">

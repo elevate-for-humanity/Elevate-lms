@@ -1,6 +1,7 @@
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Plus, Users, Calendar, Send, Eye, MousePointer } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -31,6 +32,11 @@ const typeIcons: Record<string, typeof Mail> = {
 
 export default async function AdminCampaignsPage() {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login?redirect=/admin/campaigns');
+  }
 
   // Fetch campaigns from database
   let campaigns: any[] | null = null;

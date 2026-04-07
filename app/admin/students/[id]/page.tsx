@@ -61,6 +61,8 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
   const { id } = await params;
 
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
 
   const db = createAdminClient();
   const { data: adminProfile } = await db.from('profiles').select('role').eq('id', user.id).single();

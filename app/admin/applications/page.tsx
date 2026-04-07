@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Inbox, Clock, CheckCircle, XCircle, Eye, Users } from 'lucide-react';
 import { AdminPageShell, AdminFilterBar, AdminCard, AdminEmptyState, AdminPagination, StatusBadge } from '@/components/admin/AdminPageShell';
@@ -23,6 +24,10 @@ export default async function ApplicationsPage({
 
   // Auth check via session client
   const sessionClient = await createClient();
+  const { data: { user } } = await sessionClient.auth.getUser();
+  if (!user) redirect('/login');
+  const { data: profile } = await sessionClient.from('profiles').select('role').eq('id', user.id).single();
+  if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
   const rawStatus = params.status;
   const search = params.search;

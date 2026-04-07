@@ -16,6 +16,8 @@ export const metadata: Metadata = {
 
 export default async function WebhookHealthPage() {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/signin');
 
   const adminDb = createAdminClient();
   if (adminDb) {

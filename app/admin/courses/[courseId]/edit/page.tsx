@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { notFound } from 'next/navigation';
+import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { EditCourseForm } from './EditCourseForm';
 
@@ -19,7 +19,20 @@ export default async function EditCoursePage({
   const supabase = await createClient();
 
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (!['admin', 'super_admin', 'instructor'].includes(profile?.role || '')) {
+    redirect('/unauthorized');
+  }
 
   const { data: course } = await supabase
     .from('training_courses')

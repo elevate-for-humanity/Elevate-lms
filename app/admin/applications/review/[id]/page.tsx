@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { notFound } from 'next/navigation';
+import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import ApplicationActions from './ApplicationActions';
 
@@ -43,7 +43,21 @@ export default async function ReviewApplicationPage({
   const supabase = await createClient();
 
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
+  if (!user) redirect('/login');
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
+    redirect('/unauthorized');
+  }
 
   // Use admin client — applications table RLS restricts session-based reads.
   // Auth check above already confirmed the caller is admin/super_admin.

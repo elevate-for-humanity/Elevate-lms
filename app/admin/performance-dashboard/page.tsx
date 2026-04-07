@@ -2,6 +2,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { 
 
@@ -20,6 +21,11 @@ export const metadata: Metadata = {
 
 export default async function AdminPerformanceDashboardPage() {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login?redirect=/admin/performance-dashboard');
+  }
 
   // Fetch real data from database
   const { count: totalLeads } = await supabase

@@ -28,6 +28,8 @@ export default async function AutomationLogPage() {
   const supabase = await createClient();
   
 
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/admin/automation');
 
   // Check admin role
   const { data: profile } = await supabase

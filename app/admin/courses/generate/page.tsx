@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 import { createAdminClient } from '@/lib/supabase/admin';
 import CourseGeneratorClient from './CourseGeneratorClient';
 
@@ -12,6 +13,8 @@ export const metadata: Metadata = {
 
 export default async function CourseGeneratorPage() {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/admin/courses/generate');
 
   const db = createAdminClient();
   const { data: programs } = await supabase

@@ -18,7 +18,25 @@ export default async function ReviewVerificationPage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect('/login');
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (
+    !profile ||
+    (profile.role !== 'admin' && profile.role !== 'super_admin')
+  ) {
+    redirect('/unauthorized');
+  }
 
   const { data: verification } = await supabase
     .from('id_verifications')

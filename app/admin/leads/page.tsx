@@ -1,6 +1,7 @@
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Users, Plus, Phone, Mail, Calendar, Search } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -36,6 +37,11 @@ const statusLabels: Record<string, string> = {
 
 export default async function AdminLeadsPage() {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login?redirect=/admin/leads');
+  }
 
   // Fetch leads from database
   let leads: any[] | null = null;

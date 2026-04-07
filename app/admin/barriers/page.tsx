@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import LearningBarrierAnalyzer from '@/components/admin/LearningBarrierAnalyzer';
 
@@ -17,23 +16,7 @@ export const metadata: Metadata = {
 export default async function BarriersPage() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect('/login');
-  }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
-    redirect('/unauthorized');
-  }
 
   // Fetch barriers data
   const { data: barriers, count: totalBarriers } = await supabase

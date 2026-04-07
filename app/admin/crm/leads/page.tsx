@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { 
   Target, Search, Filter, Plus, Mail, Phone, Calendar,
@@ -19,11 +18,6 @@ export default async function LeadsPage() {
   const supabase = await createClient();
 
 
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login?redirect=/admin/crm/leads');
-  }
 
   // Fetch real leads from CRM
   const { data: leadData } = await supabase

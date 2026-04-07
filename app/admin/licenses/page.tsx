@@ -6,7 +6,6 @@ export const metadata: Metadata = {
 };
 
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -16,11 +15,6 @@ export const dynamic = 'force-dynamic';
 export default async function AdminLicensesPage() {
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login');
-  }
 
   return (
     <div className="min-h-screen bg-white">

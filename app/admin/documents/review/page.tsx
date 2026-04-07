@@ -1,7 +1,6 @@
 import { SecureDocumentLink } from '@/components/admin/SecureDocumentLink';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, XCircle, Clock, Eye } from 'lucide-react';
 
@@ -16,24 +15,7 @@ export const metadata: Metadata = {
 export default async function AdminDocumentReviewPage() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
-  if (!user) redirect('/login');
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (
-    !profile ||
-    (profile.role !== 'admin' && profile.role !== 'super_admin')
-  ) {
-    redirect('/unauthorized');
-  }
 
   // Get all documents with user info
   const { data: documents, error: documentsError } = await supabase

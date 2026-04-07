@@ -1,7 +1,6 @@
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Plus, FileQuestion, CheckSquare, Clock, Search } from 'lucide-react';
 
@@ -14,12 +13,7 @@ export const metadata: Metadata = {
 
 export default async function AssessmentBankPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) redirect('/login?redirect=/admin/course-builder/assessments');
-
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-  if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
   return (
     <div className="min-h-screen bg-white">

@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Users, DollarSign, TrendingUp, UserPlus, Search, Filter, MoreVertical } from 'lucide-react';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,10 +44,6 @@ async function getAffiliateData() {
 
 export default async function AffiliatesPage() {
   const auth = await createClient();
-  const { data: { user } } = await auth.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/affiliates');
-  const { data: profile } = await auth.from('profiles').select('role').eq('id', user.id).single();
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 
   const { affiliates: dbAffiliates, stats: dbStats } = await getAffiliateData();
 

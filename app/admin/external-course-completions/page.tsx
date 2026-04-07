@@ -15,8 +15,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function ExternalCourseApprovalsPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/external-course-completions');
 
   const db = createAdminClient();
   const { data: profile } = await supabase

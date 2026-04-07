@@ -100,8 +100,6 @@ export default async function SubmissionsOSPage() {
   const supabase = await createClient();
   const db = createAdminClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/submissions');
 
   const { data: profile } = await db
     .from('profiles')

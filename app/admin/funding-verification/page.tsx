@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import FundingVerificationTable from './FundingVerificationTable';
 
@@ -13,20 +12,7 @@ export const metadata: Metadata = {
 export default async function FundingVerificationPage() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/funding-verification');
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
-    redirect('/learner/dashboard');
-  }
 
   // v_funding_verification_queue is defined in migration 20260503000013.
   // Columns: enrollment_id, user_id, email, full_name, phone, program_slug,

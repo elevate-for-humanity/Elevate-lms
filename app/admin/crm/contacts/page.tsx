@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
@@ -20,11 +19,6 @@ export default async function ContactsPage() {
   const supabase = await createClient();
 
 
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login?redirect=/admin/crm/contacts');
-  }
 
   // Fetch real contacts from CRM
   const { data: contactData } = await supabase

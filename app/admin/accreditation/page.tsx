@@ -26,8 +26,6 @@ export const metadata: Metadata = {
 export default async function AccreditationPage() {
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/accreditation');
 
   const { data: profile } = await supabase
     .from('profiles')

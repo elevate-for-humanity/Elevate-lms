@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
@@ -21,11 +20,6 @@ export default async function ActivityLogPage() {
   const supabase = await createClient();
 
 
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login?redirect=/admin/activity');
-  }
 
   // Fetch real activity from audit log
   const { data: activityData } = await supabase

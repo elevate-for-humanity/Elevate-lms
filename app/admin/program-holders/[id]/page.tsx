@@ -60,21 +60,14 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
   const { error: pageError, success: pageSuccess } = await searchParams;
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
 
-  const { data: adminProfile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
+  // Layout already enforces requireAdmin(). Fetch caller's role for approval authority check.
+  const { data: { user: caller } } = await supabase.auth.getUser();
+  const { data: adminProfile } = caller
+    ? await supabase.from('profiles').select('role').eq('id', caller.id).single()
+    : { data: null };
 
-  const viewRoles: AdminRole[] = ['admin', 'super_admin', 'staff'];
-  if (!adminProfile || !viewRoles.includes(adminProfile.role as AdminRole)) {
-    redirect('/unauthorized');
-  }
-
-  const adminRole = adminProfile.role as AdminRole;
+  const adminRole = (adminProfile?.role ?? 'staff') as AdminRole;
   const hasApprovalAuthority = canApprove(adminRole);
 
   // Fetch program holder

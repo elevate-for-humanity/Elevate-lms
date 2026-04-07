@@ -19,8 +19,6 @@ export const metadata: Metadata = {
 export default async function CurriculumPage() {
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/curriculum');
 
   const { data: profile } = await supabase
     .from('profiles')

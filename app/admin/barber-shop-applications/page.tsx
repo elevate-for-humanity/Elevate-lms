@@ -90,8 +90,6 @@ export default async function BarberShopApplicationsPage() {
   const supabase = await createClient();
 
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/barber-shop-applications');
 
   const { data: profile } = await supabase
     .from('profiles')

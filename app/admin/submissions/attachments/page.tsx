@@ -22,8 +22,6 @@ const TYPE_LABELS: Record<string, string> = {
 export default async function AttachmentLibraryPage() {
   const supabase = await createClient();
   const db = createAdminClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/submissions/attachments');
 
   const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/admin');

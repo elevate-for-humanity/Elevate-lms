@@ -1,6 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { Clock, XCircle, Eye, CheckCircle, } from 'lucide-react';
@@ -13,10 +12,6 @@ export const metadata = {
 
 export default async function EmployerOnboardingReview() {
   const auth = await createClient();
-  const { data: { user } } = await auth.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/employers/onboarding');
-  const { data: profile } = await auth.from('profiles').select('role').eq('id', user.id).single();
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 
   const supabase = createAdminClient();
   

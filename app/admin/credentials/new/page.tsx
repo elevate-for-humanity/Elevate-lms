@@ -11,8 +11,6 @@ export const metadata: Metadata = { title: 'New Credential | Admin' };
 export default async function NewCredentialPage() {
   const supabase = await createClient();
   const db = createAdminClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin','super_admin','org_admin','staff'].includes(profile.role)) redirect('/unauthorized');
 

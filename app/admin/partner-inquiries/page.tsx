@@ -3,6 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
+// Auth is enforced by app/admin/layout.tsx (requireAdmin). No per-page check needed.
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export const dynamic = 'force-dynamic';
@@ -15,23 +16,6 @@ export const metadata: Metadata = {
 export default async function PartnerInquiriesAdminPage() {
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
-    return (
-      <div className="mx-auto max-w-3xl px-4 py-12">
-        <h1 className="text-2xl font-bold">Access denied</h1>
-        <p className="mt-2 text-zinc-700">Admin only.</p>
-      </div>
-    );
-  }
 
   let rows: any[] = [];
   try {

@@ -1,7 +1,6 @@
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Mail, MessageSquare, Users, Calendar } from 'lucide-react';
 
@@ -14,11 +13,6 @@ export const metadata: Metadata = {
 
 export default async function NewCampaignPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login?redirect=/admin/campaigns/new');
-  }
 
   return (
     <div className="min-h-screen bg-white">

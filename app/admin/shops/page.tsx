@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -7,7 +8,6 @@ export const metadata: Metadata = {
 };
 
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
 
@@ -19,26 +19,11 @@ import {
 CheckCircle, } from 'lucide-react';
 
 export default async function AdminShopsPage() {
+  await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login?redirect=/admin/shops');
-  }
 
   // Check if user is admin
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (profile?.role !== 'admin') {
-    redirect('/');
-  }
 
   // Get all shops with their onboarding status
   const { data: shops } = await supabase

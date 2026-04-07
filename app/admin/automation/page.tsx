@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { 
   Zap, 
@@ -25,22 +25,12 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function AutomationLogPage() {
+  await requireRole(['admin', 'super_admin', 'staff']);
   const supabase = await createClient();
   
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/automation');
 
   // Check admin role
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (profile?.role !== 'admin' && profile?.role !== 'staff') {
-    redirect('/');
-  }
 
   // Fetch delivery logs (emails/SMS sent)
   const { data: deliveryLogs } = await supabase

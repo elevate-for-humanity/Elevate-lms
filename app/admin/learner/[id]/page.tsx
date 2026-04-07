@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
-import { redirect, notFound } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -32,23 +33,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function LearnerDetailPage({ params }: Props) {
+export default async function LearnerDetailPage({
+  await requireRole(['admin', 'super_admin']); params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
 
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
 
-  const { data: adminProfile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (adminProfile?.role !== 'admin' && adminProfile?.role !== 'super_admin') {
-    redirect('/unauthorized');
-  }
 
   // Fetch learner profile
   const { data: learner, error } = await supabase

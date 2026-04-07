@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { BarChart3, TrendingUp, PieChart, Target } from 'lucide-react';
 
@@ -13,11 +13,8 @@ export const metadata: Metadata = {
 };
 
 export default async function ChartsPage() {
+  await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   const [enrollments, completions, programs, applications] = await Promise.all([
     supabase.from('enrollments').select('id', { count: 'exact', head: true }),

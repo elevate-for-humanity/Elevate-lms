@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -42,23 +42,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function DocumentCategoryPage({ params }: Props) {
+export default async function DocumentCategoryPage({
+  await requireRole(['admin', 'super_admin']); params }: Props) {
   const { category } = await params;
   const supabase = await createClient();
 
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
 
-  const { data: adminProfile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (adminProfile?.role !== 'admin' && adminProfile?.role !== 'super_admin') {
-    redirect('/unauthorized');
-  }
 
   // Fetch documents in this category
   const { data: documents, error } = await supabase

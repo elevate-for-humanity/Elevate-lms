@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
@@ -24,18 +24,10 @@ export const metadata: Metadata = {
 };
 
 export default async function AccreditationPage() {
+  await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/accreditation');
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/dashboard');
 
   const { data: programs } = await supabase
     .from('programs')

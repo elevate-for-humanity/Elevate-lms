@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Users, CheckCircle, Briefcase, FileText, User, ArrowRight, Shield } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -14,13 +14,10 @@ export const metadata: Metadata = {
 };
 
 export default async function JRIPage() {
+  await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/jri');
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   const [totalRes, activeRes, completedRes, placedRes, recentRes, breakdownRes] = await Promise.all([
     supabase.from('jri_participants').select('id', { count: 'exact', head: true }),

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { 
@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminFerpaPage() {
+  await requireRole(['admin', 'super_admin', 'staff']);
   const supabase = await createClient();
 
   // Query real counts from documents table (consent forms are documents)
@@ -45,22 +46,8 @@ export default async function AdminFerpaPage() {
   }));
 
 
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login?redirect=/admin/ferpa');
-  }
 
   // Check admin role
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (profile?.role !== 'admin' && profile?.role !== 'staff') {
-    redirect('/dashboard');
-  }
 
   return (
     <div className="min-h-screen bg-white">

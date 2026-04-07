@@ -1,9 +1,9 @@
 // app/admin/tax-filing/page.tsx
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Image from 'next/image';
 
 export const dynamic = 'force-dynamic';
@@ -18,25 +18,10 @@ export const metadata: Metadata = {
 };
 
 export default async function TaxFilingAdminPage() {
+  await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect('/login');
-  }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
-    redirect('/unauthorized');
-  }
 
   const { data: items, count: totalItems } = await supabase
     .from('profiles')

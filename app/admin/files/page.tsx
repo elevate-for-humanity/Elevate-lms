@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import AdvancedVideoUploader from '@/components/admin/AdvancedVideoUploader';
 
@@ -13,11 +13,8 @@ export const metadata: Metadata = {
 };
 
 export default async function FilesPage() {
+  await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   return (
     <div className="min-h-screen bg-white">

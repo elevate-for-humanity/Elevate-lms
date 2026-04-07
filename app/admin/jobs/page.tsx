@@ -41,10 +41,6 @@ async function getJobsData() {
 
 export default async function JobsPage() {
   const auth = await createClient();
-  const { data: { user } } = await auth.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/jobs');
-  const { data: profile } = await auth.from('profiles').select('role').eq('id', user.id).single();
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 
   const { jobs: dbJobs, stats: dbStats } = await getJobsData();
 

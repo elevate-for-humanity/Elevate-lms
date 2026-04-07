@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
@@ -12,12 +13,11 @@ export const metadata: Metadata = {
 };
 
 export default async function PartnerEnrollmentsPage() {
+  await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect(\'/login\');
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
 
   const { data: profile } = await supabase
     .from('profiles')

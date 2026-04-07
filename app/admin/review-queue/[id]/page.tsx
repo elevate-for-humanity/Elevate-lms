@@ -31,9 +31,9 @@ export default async function ReviewDetailPage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
-
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
+  if (!user) redirect(\'/login\');
+
 
   // Check admin role
   const { data: profile } = await supabase

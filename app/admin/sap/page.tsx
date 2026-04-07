@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
 
@@ -22,26 +22,11 @@ export const metadata: Metadata = {
 };
 
 export default async function SAPMonitoringPage() {
+  await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login?redirect=/admin/sap');
-  }
 
   // Check admin role
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
-    redirect('/dashboard');
-  }
 
   // Get all active enrollments with student and program data
   const { data: enrollments } = await supabase

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import LessonManagerClient from './LessonManagerClient';
 import QuizManagerClient from './QuizManagerClient';
@@ -12,15 +12,12 @@ export const metadata: Metadata = {
   description: 'Manage course content, lessons, and materials.',
 };
 
-export default async function CourseContentPage({ params }: { params: Promise<{ courseId: string }> }) {
+export default async function CourseContentPage({
+  await requireRole(['admin', 'super_admin']); params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = await params;
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   const { data: rawCourse } = await supabase.from('training_courses').select('*').eq('id', courseId).single();
   const course = rawCourse ? { ...rawCourse, title: rawCourse.course_name || rawCourse.title } : null;

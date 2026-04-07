@@ -10,9 +10,9 @@ export const dynamic = 'force-dynamic';
 
 export default async function PastPerformancePage() {
   const supabase = await createClient();
-  const db = createAdminClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/submissions/past-performance');
+  if (!user) redirect(\'/login\');
+  const db = createAdminClient();
   const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin','super_admin','staff'].includes(profile.role)) redirect('/admin');
 

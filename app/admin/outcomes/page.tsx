@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Briefcase, Award, TrendingUp, Clock, CheckCircle, XCircle, User } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -14,13 +14,10 @@ export const metadata: Metadata = {
 };
 
 export default async function OutcomesPage() {
+  await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/outcomes');
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   const [outcomesRes, enrollmentsRes, certsRes, recentOutcomesRes] = await Promise.all([
     supabase.from('employment_outcomes').select('employment_status, wage_at_placement, wage_at_followup, employer_name, start_date, user_id').limit(1000),

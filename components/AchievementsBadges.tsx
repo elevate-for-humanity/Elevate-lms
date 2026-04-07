@@ -90,7 +90,7 @@ export function AchievementsBadges({ userId }: AchievementsBadgesProps) {
         </div>
         <div className="h-3 bg-slate-200 rounded-full overflow-hidden">
           <div
-            className="h-full    transition-all duration-500"
+            className="h-full bg-brand-orange-500 transition-all duration-500"
             style={{ width: `${completionPercentage}%` }}
           />
         </div>
@@ -201,8 +201,8 @@ export function AchievementsBadges({ userId }: AchievementsBadgesProps) {
               {/* Earned Badge Indicator */}
               {isEarned && (
                 <div className="absolute top-2 right-2">
-                  <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                    <Star className="w-4 h-4 text-white fill-white" />
+                  <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
+                    <Star className="w-3 h-3 text-white fill-white" />
                   </div>
                 </div>
               )}

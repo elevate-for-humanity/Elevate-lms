@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import QuizManagerClient from './QuizManagerClient';
 
@@ -11,15 +11,12 @@ export const metadata: Metadata = {
   description: 'Manage quizzes and assessments for this course.',
 };
 
-export default async function CourseQuizzesPage({ params }: { params: Promise<{ courseId: string }> }) {
+export default async function CourseQuizzesPage({
+  await requireRole(['admin', 'super_admin']); params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = await params;
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   const { data: course } = await supabase.from('training_courses').select('*').eq('id', courseId).single();
   const { data: quizzes } = await supabase.from('quizzes').select('*').eq('course_id', courseId).order('created_at', { ascending: false });

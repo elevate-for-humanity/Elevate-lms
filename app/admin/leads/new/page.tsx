@@ -1,7 +1,6 @@
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
@@ -14,11 +13,6 @@ export const metadata: Metadata = {
 
 export default async function NewLeadPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login?redirect=/admin/leads/new');
-  }
 
   return (
     <div className="min-h-screen bg-white">

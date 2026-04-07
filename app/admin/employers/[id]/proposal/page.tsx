@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -10,12 +10,9 @@ export const metadata: Metadata = {
   description: 'View and manage employer partnership proposals.',
 };
 
-export default async function EmployerProposalPage({ params }: { params: { id: string } }) {
+export default async function EmployerProposalPage({
+  await requireRole(['admin', 'super_admin']); params }: { params: { id: string } }) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   const { data: employer } = await supabase.from('employers').select('*').eq('id', params.id).single();
 

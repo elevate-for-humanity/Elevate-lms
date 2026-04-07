@@ -24,10 +24,6 @@ export default async function ApplicationsPage({
 
   // Auth check via session client
   const sessionClient = await createClient();
-  const { data: { user } } = await sessionClient.auth.getUser();
-  if (!user) redirect('/login');
-  const { data: profile } = await sessionClient.from('profiles').select('role').eq('id', user.id).single();
-  if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
   const rawStatus = params.status;
   const search = params.search;

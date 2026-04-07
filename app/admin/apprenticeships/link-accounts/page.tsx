@@ -27,11 +27,11 @@ export const dynamic = 'force-dynamic';
 
 export default async function LinkAccountsPage() {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect(\'/login\');
   const adminDb = createAdminClient();
 
   // Auth + role check
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/apprenticeships/link-accounts');
 
   const { data: profile } = await supabase
     .from('profiles')

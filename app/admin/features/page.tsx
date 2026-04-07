@@ -62,7 +62,7 @@ function FeatureRow({ f }: { f: FeatureDefinition }) {
 export default async function FeatureRegistryPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/features');
+  if (!user) redirect(\'/login\');
 
   const { data: profile } = await supabase
     .from('profiles')

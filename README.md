@@ -10,7 +10,6 @@
 
 **Production:** [elevateforhumanity.org](https://www.elevateforhumanity.org)
 **Status:** Live and Operational — Indianapolis, Indiana
-**Updated:** June 2025
 **Branch:** `main` — single consolidated branch
 
 ---
@@ -22,8 +21,8 @@ Elevate for Humanity operates a vertically integrated **Workforce Operating Syst
 - **Training delivery** — cohort scheduling, video lessons, quizzes, attendance, progress tracking
 - **Enrollment and funding** — WIOA, Workforce Ready Grant, JRI, and employer-sponsored intake workflows
 - **Compliance and reporting** — DOL apprenticeship (RAPIDS), WIOA performance metrics, RTI hour logs, audit trails
-- **Credentialing** — EPA 608, OSHA 10, WorkKeys NCRC, Certiport, AWS, Indiana ISDH, Indiana BMV
-- **Stakeholder portals** — student, admin, program holder, employer, staff, workforce board, delegate
+- **Credentialing** — EPA 608, OSHA 10/30, CompTIA A+/Security+, PTCB CPhT, Microsoft Office Specialist, WorkKeys NCRC, Certiport, Indiana ISDH, Indiana BMV
+- **Stakeholder portals** — learner, admin, instructor, employer, program holder, partner, mentor, staff, parent/guardian
 - **Employer pipeline** — job postings, OJT agreements, placement tracking, 6- and 12-month outcome reporting
 
 Programs run 4–18 weeks. Most are fully funded at no cost to eligible participants through federal and Indiana state workforce programs.
@@ -39,6 +38,29 @@ Programs run 4–18 weeks. Most are fully funded at no cost to eligible particip
 | **Employers** | Hiring partners, OJT sponsors, apprenticeship co-sponsors |
 | **Program holders** | Community organizations delivering training under Elevate's infrastructure |
 | **Government** | DOL Office of Apprenticeship, WIOA Title I administrators |
+| **Parents / Guardians** | Monitoring progress of enrolled youth participants |
+
+---
+
+## Training Programs
+
+| Program | Credential | Funding |
+|---------|-----------|---------|
+| HVAC Technician | EPA Section 608 Universal | WIOA · WRG |
+| Certified Nursing Assistant | Indiana ISDH CNA | WIOA · WRG |
+| Peer Recovery Support Specialist | CPRC Pathway | WIOA · JRI |
+| Barber Apprenticeship | Indiana Barber License | DOL Apprenticeship |
+| Hair Stylist Apprenticeship | Indiana Cosmetology License | DOL Apprenticeship |
+| Esthetician Apprenticeship | Indiana Esthetician License | DOL Apprenticeship |
+| CDL Training | Commercial Driver's License | WIOA · EmployIndy |
+| IT Help Desk | CompTIA A+ | WIOA · WRG |
+| Cybersecurity | CompTIA Security+ | WIOA · WRG |
+| Pharmacy Technician | PTCB CPhT | WIOA · WRG |
+| Microsoft Office Specialist | MOS Certification | WIOA · WRG |
+| Business & Finance | Bookkeeping / Accounting | WIOA |
+| Youth Culinary | ServSafe + Culinary Skills | DOL Apprenticeship |
+
+Programs are delivered directly by Elevate for Humanity or through approved training providers and are aligned with applicable credentialing body requirements.
 
 ---
 
@@ -57,29 +79,39 @@ See [docs/access-model.md](docs/access-model.md) for full terms.
 ## Core Capabilities
 
 ### Learning Management
-- 1,439 app pages across student, admin, employer, and program holder surfaces
-- 5 fully built course definitions with lesson-level content (Barber: 260 RTI hrs, HVAC: 432 hrs, CDL, Medical Assistant, Workforce Readiness)
-- Video lessons with per-lesson progress, quiz engine with pass thresholds, certificate generation and verification
-- AI tutoring, adaptive learning, attendance clock-in, instructor records
+- Blueprint-driven course engine — programs defined in code, rendered automatically with no per-program logic
+- Video lessons, quiz engine with pass thresholds, checkpoint gating, lab/assignment instructor sign-off
+- AI tutoring, adaptive flashcards, spaced repetition review, notes, downloadable resources
+- Certificate generation, public credential verification at `/verify/[certificateId]`
+- Attendance clock-in, instructor records, cohort scheduling
 
 ### Enrollment and Funding
 - Multi-step application with funding eligibility screening
 - WIOA, Workforce Ready Grant, JRI, and Next Level Jobs workflow integration
 - Stripe payments (cards, ACH, Apple Pay, Google Pay) and Affirm BNPL
 - Approval workflows, waitlist management, enrollment status tracking
+- Parent/guardian portal for monitoring youth participant progress
 
 ### Compliance and Reporting
 - DOL Registered Apprenticeship (RAPIDS 2025-IN-132301) — RTI hour logs, OJT tracking, competency rubrics
 - WIOA performance reporting — enrollment, completion, credential attainment, employment outcomes
 - Audit logging on all critical actions, RLS on all database tables
+- FERPA-compliant student records management
 - Monthly compliance summaries for referring agencies
 
 ### Stakeholder Portals
-- **Admin panel** — 289 sections covering enrollment, compliance, analytics, content, users, programs, and operations
-- **Student portal** — dashboard, courses, certificates, attendance, career services
+- **Admin panel** — enrollment, compliance, analytics, content, users, programs, and operations
+- **Learner portal** — dashboard, courses, certificates, attendance, career services
+- **Instructor portal** — student management, submission review, sign-off queue
 - **Program Holder** — cohort management, revenue share reporting, participant tracking
 - **Employer portal** — job postings, OJT agreements, hiring pipeline
-- **Workforce Board** — aggregate reporting, outcome data, funding utilization
+- **Partner portal** — workforce agency reporting, referral tracking
+- **Parent/Guardian portal** — linked student progress, enrollment status, certificates
+
+### Testing Infrastructure
+- Certiport Authorized Testing Center
+- EPA Section 608 authorized testing (ESCO Group, Mainstream Engineering)
+- Online exam booking, proctor scheduling, score reporting
 
 ---
 
@@ -91,16 +123,17 @@ See [docs/access-model.md](docs/access-model.md) for full terms.
 | **DBA** | Elevate for Humanity Career & Training Institute |
 | **EIN** | 88-2609728 |
 | **RAPIDS Program** | 2025-IN-132301 |
-| **DOL Registration** | Registered (OA) — U.S. Department of Labor, Office of Apprenticeship |
+| **DOL Registration** | Registered — U.S. Department of Labor, Office of Apprenticeship |
+| **ETPL Status** | Indiana Eligible Training Provider List — listed |
 | **Location** | 7009 E 56th St, Indianapolis, IN 46226 (Marion County) |
 | **Sponsor Type** | Single Employer |
-| **EPA Authorization** | Section 608 Universal — authorized testing center (ESCO Group, Mainstream Engineering) |
+| **EPA Authorization** | Section 608 Universal — authorized testing center |
 
 ### Registered Apprenticeship Occupations
 
-| Occupation | RTI Hours | Provider | Method |
-|------------|-----------|----------|--------|
-| Building Services Technician | 432 | 2Exclusive LLC-S (206251) | Classroom / Shop / Web-Based |
+| Occupation | RTI Hours | Sponsor | Method |
+|------------|-----------|---------|--------|
+| Building Services Technician (HVAC) | 432 | 2Exclusive LLC-S (206251) | Classroom / Shop / Web-Based |
 | Hair Stylist | 154 | 2Exclusive LLC-S (206251) | Classroom / Shop / Web-Based |
 | Barber | 260 | Elevate for Humanity (208029) | Classroom / Web-Based |
 | Esthetician | 300 | Elevate for Humanity (208029) | Classroom / Web-Based |
@@ -128,7 +161,7 @@ See [docs/compliance-overview.md](docs/compliance-overview.md) for full complian
 | Package Manager | pnpm | 10.28.2 |
 | Node.js | — | 20.x |
 
-**Integrations:** Stripe, Affirm, Resend, OpenAI, Supabase, Sentry, Netlify, JotForm.
+**Integrations:** Stripe, Affirm, Resend, OpenAI, Supabase, Sentry, Netlify, JotForm, Certiport, D-ID.
 
 ---
 
@@ -136,18 +169,16 @@ See [docs/compliance-overview.md](docs/compliance-overview.md) for full complian
 
 This public repository contains the application codebase for transparency and evaluation purposes. It does not include production secrets, live student records, proprietary AI assets, or the full video library.
 
-**Verified codebase counts (June 2025):**
+**Verified codebase counts:**
 
 | Artifact | Count |
 |----------|-------|
-| App pages | 1,439 |
-| API routes | 1,020 |
-| React components | 857 |
-| Library modules | 732 |
-| SQL migrations | 225 |
-| Static images | 1,197 |
-| Video files | 737 |
-| Admin sections | 289 |
+| App pages | 1,550 |
+| API routes | 1,157 |
+| React components | 930 |
+| Library modules | 861 |
+| SQL migrations | 430 |
+| Admin sections | 289+ |
 | Netlify serverless functions | 7 |
 
 See [docs/repository-scope.md](docs/repository-scope.md) for full scope details.
@@ -170,7 +201,7 @@ cd Elevate-lms
 pnpm install
 cp .env.example .env.local
 # Fill in .env.local with your credentials
-pnpm dev
+pnpm next dev --turbopack
 ```
 
 Visit `http://localhost:3000`
@@ -193,9 +224,12 @@ Full variable reference in `.env.example`.
 ### Common Commands
 
 ```bash
-pnpm dev          # Development server (Turbopack)
-pnpm build        # Production build
-pnpm lint         # ESLint
+pnpm next dev --turbopack              # Development server
+pnpm next build                        # Production build (must complete with zero errors)
+pnpm lint                              # ESLint
+bash scripts/audit-auth-gaps.sh        # Auth gap audit
+bash scripts/audit-schema-refs.sh      # Schema reference audit
+bash scripts/audit-env-vars.sh         # Env var audit
 ```
 
 ---
@@ -204,19 +238,34 @@ pnpm lint         # ESLint
 
 ```
 Elevate-lms/
-├── app/                    # Next.js App Router (1,439 pages + 1,020 API routes)
-│   ├── admin/              # Admin panel (289 sections)
-│   ├── api/                # API routes
-│   ├── lms/                # LMS application
-│   ├── programs/           # Training program pages
+├── app/                        # Next.js App Router (1,550 pages + 1,157 API routes)
+│   ├── admin/                  # Admin panel
+│   ├── api/                    # API routes
+│   ├── lms/                    # LMS application (learner-facing)
+│   ├── instructor/             # Instructor portal
+│   ├── employer/               # Employer portal
+│   ├── partner/                # Partner portal
+│   ├── parent-portal/          # Parent/Guardian portal
+│   ├── program-holder/         # Program Holder portal
+│   ├── programs/               # Public program pages
 │   └── ...
-├── components/             # React components (857 files)
-├── lib/                    # Business logic and utilities (732 modules)
-├── supabase/migrations/    # SQL migrations (225 files)
-├── netlify/functions/      # Serverless functions (7)
-├── public/                 # Static assets
-├── docs/                   # Platform documentation
-└── data/                   # Static data (team, programs)
+├── components/                 # React components (930 files)
+│   ├── admin/dashboard/        # Admin dashboard shell + panels
+│   ├── lms/                    # LMS UI components
+│   └── marketing/              # Public-facing marketing components
+├── lib/                        # Business logic and utilities (861 modules)
+│   ├── lms/engine/             # Course engine — completion, progress, gating, certificates
+│   ├── lms/progress-calc.ts    # Canonical progress calculation (single source of truth)
+│   ├── admin/                  # Admin data loaders
+│   ├── curriculum/blueprints/  # Blueprint-driven course definitions
+│   ├── supabase/               # Canonical Supabase clients
+│   └── api/                    # Auth guards, rate limiting, error helpers
+├── supabase/migrations/        # SQL migrations (430 files)
+├── netlify/functions/          # Serverless functions (7)
+├── scripts/                    # Audit and seeding scripts
+├── public/                     # Static assets
+├── docs/                       # Platform documentation
+└── data/                       # Static data (team, programs)
 ```
 
 ---

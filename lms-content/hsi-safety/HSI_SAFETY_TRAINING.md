@@ -460,7 +460,7 @@ Week 1 of your program
 
 WHERE:
 Elevate for Humanity Training Center
-7009 E 56th St Ste F, Indianapolis, IN 46226
+8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240
 
 COST:
 [Included in tuition / $XX separate fee]

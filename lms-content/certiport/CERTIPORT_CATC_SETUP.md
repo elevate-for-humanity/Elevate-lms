@@ -22,7 +22,7 @@ You can now offer industry-recognized certification exams including:
 **Status:** ✅ Registered as Certiport CATC
 **Contact Email:** elizabethpowell6262@gmail.com
 **Organization:** Elevate for Humanity Career and Technical Institute
-**Address:** 7009 E 56th St Ste F, Indianapolis, IN 46226
+**Address:** 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240
 
 **Contract:** Attached to welcome email (save for records)
 

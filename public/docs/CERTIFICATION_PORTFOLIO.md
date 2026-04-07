@@ -87,7 +87,7 @@ Together, we maintain comprehensive federal and state certifications, positionin
 - **System:** ITAP / Professional Services Contracting System (PSCS)
 - **Status:** APPROVED
 - **Primary Contact:** Elizabeth Greene
-- **Address:** 7009 East 56th St Suite EE1, Indianapolis, IN 46226
+- **Address:** 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240
 - **Eligible For:**
   - INDOT Request for Proposals (RFPs)
   - Letters of Interest (LOI)
@@ -336,8 +336,8 @@ Email: elevateforhumanity@gmail.com
 Phone: 317-314-3757
 
 **Business Address:**  
-7009 East 56th St Suite EE1  
-Indianapolis, IN 46226
+8888 Keystone Crossing, Suite 1300  
+Indianapolis, IN 46240
 
 **Website:**  
 www.elevateforhumanity.org

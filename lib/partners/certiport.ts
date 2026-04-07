@@ -7,7 +7,7 @@
 // vouchers are purchased by admin, and results are recorded by proctors.
 //
 // Elevate for Humanity is a registered CATC (Certiport Authorized Testing Center).
-// Location: 7009 E 56th St Ste F, Indianapolis, IN 46226
+// Location: 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240
 //
 // Actual flow:
 //   1. Admin purchases exam vouchers via Certiport portal

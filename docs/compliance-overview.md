@@ -65,7 +65,7 @@ Elevate for Humanity is an authorized EPA Section 608 testing center:
 
 - **Certification level:** Universal (all refrigerant types)
 - **Authorized providers:** ESCO Group, Mainstream Engineering
-- Proctored exams conducted on-site at 7009 E 56th St, Indianapolis, IN 46226
+- Proctored exams conducted on-site at 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240
 
 ## Audit Logging
 

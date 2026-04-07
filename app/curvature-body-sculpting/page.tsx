@@ -121,7 +121,7 @@ export default function CurvatureBodySculptingPage() {
             </span>
             <span className="flex items-center gap-2">
               <MapPin className="w-4 h-4" />
-              7009 E 56th St, Suite EE1, Indianapolis, IN 46226
+              8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240
             </span>
             <span className="flex items-center gap-2">
               <Clock className="w-4 h-4" />

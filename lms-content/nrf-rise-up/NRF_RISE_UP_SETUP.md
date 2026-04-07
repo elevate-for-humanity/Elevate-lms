@@ -71,7 +71,7 @@ Before purchasing, you can sample courses for FREE:
 1. Click registration link: [Provided by Jessica]
 2. Fill out organization information:
    - Organization: Elevate for Humanity Career and Technical Institute
-   - Address: 7009 E 56th St Ste F, Indianapolis, IN 46226
+   - Address: 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240
    - Contact: Elizabeth Greene
    - Email: Elizabethpowell6262@gmail.com
    - Phone: (317) 760-7908

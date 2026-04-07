@@ -125,7 +125,7 @@ See [docs/access-model.md](docs/access-model.md) for full terms.
 | **RAPIDS Program** | 2025-IN-132301 |
 | **DOL Registration** | Registered — U.S. Department of Labor, Office of Apprenticeship |
 | **ETPL Status** | Indiana Eligible Training Provider List — listed |
-| **Location** | 7009 E 56th St, Indianapolis, IN 46226 (Marion County) |
+| **Location** | 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240 |
 | **Sponsor Type** | Single Employer |
 | **EPA Authorization** | Section 608 Universal — authorized testing center |
 

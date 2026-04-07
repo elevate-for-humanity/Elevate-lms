@@ -30,6 +30,19 @@ export async function PATCH(
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
 
+  const db = createAdminClient();
+
+  // Pre-read: verify credential exists before updating
+  const { data: existing, error: fetchError } = await db
+    .from('credential_registry')
+    .select('id')
+    .eq('id', credentialId)
+    .single();
+
+  if (fetchError || !existing) {
+    return NextResponse.json({ error: 'Credential not found' }, { status: 404 });
+  }
+
   // Re-derive protected flag if proctor_authority changed
   if (body.proctor_authority !== undefined) {
     body.metadata = {
@@ -39,7 +52,6 @@ export async function PATCH(
     };
   }
 
-  const db = createAdminClient();
   const { data, error } = await db
     .from('credential_registry')
     .update({ ...body, updated_at: new Date().toISOString() })
@@ -63,12 +75,24 @@ export async function DELETE(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const db = createAdminClient();
+
+  // Pre-read: verify credential exists before soft-deleting
+  const { data: existing, error: fetchError } = await db
+    .from('credential_registry')
+    .select('id, is_active')
+    .eq('id', credentialId)
+    .single();
+
+  if (fetchError || !existing) {
+    return NextResponse.json({ error: 'Credential not found' }, { status: 404 });
+  }
+
   const { error } = await db
     .from('credential_registry')
     .update({ is_active: false, updated_at: new Date().toISOString() })
     .eq('id', credentialId);
 
-  if (error) return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   logger.info('Credential deactivated', { credentialId, userId: user.id });
   return NextResponse.json({ ok: true });
 }

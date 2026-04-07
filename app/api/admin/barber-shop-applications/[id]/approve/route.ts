@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
@@ -102,6 +103,15 @@ export async function POST(
   }
 
   logger.info('Barbershop application approved', { id, approvedBy: user.id });
+
+  await logAdminAudit({
+    action: AdminAction.APPLICATION_APPROVED,
+    actorId: user.id,
+    entityType: 'barbershop_partner_applications',
+    entityId: id,
+    metadata: { shop_name: application.shop_legal_name, contact_email: application.contact_email },
+    req: request,
+  }).catch(e => logger.warn('[barber-approve] Audit log failed', e));
 
   return NextResponse.json({ success: true, status: 'approved' });
 }

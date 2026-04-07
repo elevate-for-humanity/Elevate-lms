@@ -23,9 +23,10 @@ export default async function AdminPerformanceDashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect('/login?redirect=/admin/performance-dashboard');
-  }
+  if (!user) redirect('/login?redirect=/admin/performance-dashboard');
+
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 
   // Fetch real data from database
   const { count: totalLeads } = await supabase

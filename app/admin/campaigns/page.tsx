@@ -34,9 +34,10 @@ export default async function AdminCampaignsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect('/login?redirect=/admin/campaigns');
-  }
+  if (!user) redirect('/login?redirect=/admin/campaigns');
+
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 
   // Fetch campaigns from database
   let campaigns: any[] | null = null;

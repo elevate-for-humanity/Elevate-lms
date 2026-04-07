@@ -207,6 +207,7 @@ async function _POST(req: NextRequest) {
     }
 
     // Generate certificate with competency evidence
+    let certIssued = true;
     try {
       const { issueCertificate } = await import('@/lib/certificates/issue-certificate');
       await issueCertificate({
@@ -233,6 +234,7 @@ async function _POST(req: NextRequest) {
       });
     } catch (certError) {
       logger.error("Certificate generation failed", certError instanceof Error ? certError : undefined);
+      certIssued = false;
     }
 
     // ── CREDENTIAL PIPELINE TRIGGER ─────────────────────────────────
@@ -278,6 +280,7 @@ async function _POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      certificateIssued: certIssued,
       ...(credentialAttemptId && {
         credentialAttemptId,
         fundingDecision,

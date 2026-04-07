@@ -6,6 +6,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeDbError } from '@/lib/api/safe-error';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -72,6 +74,21 @@ export async function POST(
     .eq('id', authId);
 
   if (updateErr) return safeDbError(updateErr, 'Failed to update authorization status');
+
+  await logAdminAudit({
+    action: passedBool ? AdminAction.EXAM_RESULT_PASSED : AdminAction.EXAM_RESULT_FAILED,
+    actorId: auth.id,
+    entityType: 'exam_authorizations',
+    entityId: authId,
+    metadata: {
+      passed: passedBool,
+      score: score ?? null,
+      exam_date,
+      user_id: existing.user_id,
+      program_id: existing.program_id,
+    },
+    req: request,
+  }).catch(e => logger.warn('[exam-result] Audit log failed', e));
 
   return NextResponse.json({
     success: true,

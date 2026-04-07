@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 };
 
 import { requireAdmin } from '@/lib/auth';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import MarkPaidButton from './MarkPaidButton';
 
 export const dynamic = 'force-dynamic';

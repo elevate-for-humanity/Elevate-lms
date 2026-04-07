@@ -62,9 +62,9 @@ export default function CreatorCoursesPage() {
             <h1 className="text-3xl font-bold text-gray-900">My Courses</h1>
             <p className="text-gray-600">Manage and create your course content</p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600">
+          <Link href="/creator/courses/new" className="flex items-center gap-2 px-4 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600">
             <Plus className="w-4 h-4" /> Create Course
-          </button>
+          </Link>
         </div>
 
         <div className="grid md:grid-cols-4 gap-4 mb-8">

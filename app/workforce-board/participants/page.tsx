@@ -46,8 +46,8 @@ export default function ParticipantsPage() {
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold mb-6">Participants</h2>
                 <p className="text-black mb-6">
-                  View and manage program participants.
-                  workforce training and career success.
+                  Workforce board participants receive funded training, industry certifications,
+                  and career placement support through our WIOA-aligned programs.
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start">
@@ -99,26 +99,26 @@ export default function ParticipantsPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16">
+      <section className="py-16 bg-brand-blue-700">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Need Help?
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-white">
+              Ready to Get Started?
             </h2>
-            <p className="text-base md:text-lg text-white mb-8">
-              Contact support if you have questions about workforce
-              services or need assistance.
+            <p className="text-base md:text-lg text-white/90 mb-8">
+              Apply for workforce training programs or browse available
+              courses to begin your career journey.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
-                href="/support"
-                className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg"
+                href="/apply"
+                className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-slate-100 text-lg"
               >
                 Apply Now
               </Link>
               <Link
-                href="/workforce-board/dashboard"
-                className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg"
+                href="/programs"
+                className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-900 border-2 border-white text-lg"
               >
                 Browse Programs
               </Link>

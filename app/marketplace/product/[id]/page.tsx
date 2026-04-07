@@ -10,7 +10,7 @@ export const metadata: Metadata = generateMetadata({
 
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import ProductCheckoutButton from './ProductCheckoutButton';
 
 export const dynamic = 'force-dynamic';

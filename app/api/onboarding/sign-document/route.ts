@@ -2,7 +2,7 @@ import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import * as crypto from 'node:crypto';
 import { checkPartnerApproval } from '@/lib/automation/partner-approval';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

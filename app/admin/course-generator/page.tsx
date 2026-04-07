@@ -1,12 +1,6 @@
-import AdminClientPage from '@/components/admin/AdminClientPage';
-import CourseGeneratorClient from './CourseGeneratorClient';
+import { redirect } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
-
-export default function Page() {
-  return (
-    <AdminClientPage>
-      <CourseGeneratorClient />
-    </AdminClientPage>
-  );
+// Superseded by /admin/courses/generate — redirect permanently
+export default function CourseGeneratorRedirect() {
+  redirect('/admin/courses/generate');
 }

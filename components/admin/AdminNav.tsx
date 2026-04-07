@@ -102,7 +102,7 @@ const NAV = [
     href: "/admin/course-builder",
     items: [
       { label: "Course Builder",      href: "/admin/course-builder" },
-      { label: "Course Generator",    href: "/admin/course-generator" },
+      { label: "Course Generator",    href: "/admin/courses/generate" },
       { label: "Course Templates",    href: "/admin/course-templates" },
       { label: "Course Import",       href: "/admin/course-import" },
       { label: "Program Generator",   href: "/admin/program-generator" },

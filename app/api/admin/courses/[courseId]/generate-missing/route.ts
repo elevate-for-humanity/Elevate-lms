@@ -23,7 +23,8 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ courseId: string }> },
 ) {
-  const auth = await apiRequireAdmin(request);
+  try { await apiRequireAdmin(request); }
+  catch (e) { if (e instanceof Response) return e; return NextResponse.json({ error: 'Unauthorized' }, { status: 401 }); }
 
   const { courseId } = await params;
   const db = createAdminClient();

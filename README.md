@@ -253,6 +253,16 @@ Static and ISR pages for SEO, program discovery, and participant intake. No auth
 **6. Platform Services** (`lib/email/`, `lib/ai/`, `lib/storage/`, `lib/secrets.ts`)
 Cross-cutting infrastructure. Email via Resend, AI via OpenAI, file storage via Supabase Storage + R2, secrets hydrated at request time from `app_secrets` table (not baked into env at build time).
 
+### Mental Model
+
+```
+LMS (training delivery)
++ Compliance engine (WIOA · DOL · FERPA)
++ Funding system (government programs + Stripe payments)
++ Employment pipeline (OJT · placement · outcome tracking)
+= Workforce Operating System
+```
+
 ### Why 1,550 Pages and 1,157 API Routes
 
 The page count is high by design — not bloat:

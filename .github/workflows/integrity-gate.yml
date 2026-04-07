@@ -37,6 +37,13 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
 
+      # Pre-auth registry check — runs before build, no secrets needed.
+      # Fails if any public-write route inserts into a table not declared in
+      # lib/pre-auth-tables.ts. Blocks merge on unregistered pre-auth tables.
+      # To fix: register the table or add // pre-auth-registry: exempt — <reason>
+      - name: Pre-auth registry check
+        run: node scripts/check-pre-auth-registry.cjs
+
       # Migration lint — runs before any other check, no secrets needed
       - name: Migration lint
         run: node scripts/lint-migrations.cjs
@@ -83,4 +90,5 @@ jobs:
             reports/media_report.json
             reports/lms_integrity_report.json
             reports/store_integrity_report.json
+            reports/pre_auth_registry_report.json
           retention-days: 30

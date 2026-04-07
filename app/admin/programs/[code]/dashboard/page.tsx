@@ -14,7 +14,7 @@ export default async function ProgramDashboardPage({ params }: { params: Promise
   const { code } = await params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(\'/login\');
+  if (!user) redirect('/login');
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 

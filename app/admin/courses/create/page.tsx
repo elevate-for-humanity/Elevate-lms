@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default async function CreateCoursePage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(\'/login\');
+  if (!user) redirect('/login');
 
 
 

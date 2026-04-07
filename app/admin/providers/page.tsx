@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default async function AdminProvidersPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(\'/login\');
+  if (!user) redirect('/login');
 
   const db = createAdminClient();
   if (!db) return <div className="p-8 text-red-600">Database unavailable</div>;

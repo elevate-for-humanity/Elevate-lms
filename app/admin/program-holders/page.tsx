@@ -24,7 +24,7 @@ const STATUS_STYLES: Record<string, string> = {
 export default async function AdminProgramHoldersPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(\'/login\');
+  if (!user) redirect('/login');
 
 
   const { data: profile } = await supabase

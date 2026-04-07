@@ -21,7 +21,7 @@ export const metadata = {
 export default async function CRMHubPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(\'/login\');
+  if (!user) redirect('/login');
 
 
   // Check admin access

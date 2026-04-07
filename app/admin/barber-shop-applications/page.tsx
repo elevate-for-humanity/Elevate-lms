@@ -89,7 +89,7 @@ function ComplianceFlag({ ok, label }: { ok: boolean; label: string }) {
 export default async function BarberShopApplicationsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(\'/login\');
+  if (!user) redirect('/login');
 
 
 

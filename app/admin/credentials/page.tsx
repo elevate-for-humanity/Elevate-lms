@@ -27,7 +27,7 @@ const STACK_LABELS: Record<string, string> = {
 export default async function CredentialRegistryPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(\'/login\');
+  if (!user) redirect('/login');
   const db = createAdminClient();
 
 

@@ -40,7 +40,7 @@ function formatDate(iso: string | null): string {
 export default async function SystemJobsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(\'/login\');
+  if (!user) redirect('/login');
 
   const db = createAdminClient();
   const { data: profile } = await supabase

@@ -19,7 +19,7 @@ const STATUS_STYLES: Record<string, string> = {
 export default async function FactsVaultPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(\'/login\');
+  if (!user) redirect('/login');
   const db = createAdminClient();
 
   const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();

@@ -41,7 +41,7 @@ export default async function ReviewQueuePage({
   const { queue_type, status: statusParam } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(\'/login\');
+  if (!user) redirect('/login');
 
 
   // Check admin role

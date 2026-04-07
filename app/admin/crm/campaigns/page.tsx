@@ -13,7 +13,7 @@ export const metadata = {
 export default async function CampaignsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(\'/login\');
+  if (!user) redirect('/login');
 
 
   const { data: profile } = await supabase

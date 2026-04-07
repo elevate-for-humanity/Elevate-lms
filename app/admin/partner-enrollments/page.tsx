@@ -16,7 +16,7 @@ export default async function PartnerEnrollmentsPage() {
   await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(\'/login\');
+  if (!user) redirect('/login');
 
 
   const { data: profile } = await supabase

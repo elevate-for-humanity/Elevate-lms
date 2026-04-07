@@ -527,6 +527,7 @@ This integrated approach reduces administrative burden for workforce agencies wh
 
 | Document | Purpose |
 |----------|---------|
+| [docs/capability-statement.md](docs/capability-statement.md) | Funder / partner capability statement — WIOA, DOL, NAICS, credentials |
 | [docs/architecture-overview.md](docs/architecture-overview.md) | System map — all stakeholder layers and data flows |
 | [docs/access-model.md](docs/access-model.md) | Managed access, enterprise source-use, public boundaries |
 | [docs/compliance-overview.md](docs/compliance-overview.md) | DOL, WIOA, FERPA, audit, RLS posture |

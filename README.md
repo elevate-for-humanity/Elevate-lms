@@ -185,7 +185,87 @@ See [docs/repository-scope.md](docs/repository-scope.md) for full scope details.
 
 ---
 
-## Quick Start
+## System Architecture
+
+### How to Think About This Codebase
+
+The platform is organized into six domains. Each domain owns its data, its API surface, and its UI layer. They communicate through shared lib modules — never through direct cross-domain imports.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        PUBLIC SURFACE                           │
+│  /programs  /apply  /funding  /verify  /testing  /partners      │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+┌────────────────────────────▼────────────────────────────────────┐
+│                      STAKEHOLDER PORTALS                        │
+│                                                                 │
+│  /learner          /instructor       /employer                  │
+│  /admin            /program-holder   /partner                   │
+│  /parent-portal    /staff-portal     /mentor                    │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+         ┌───────────────────┼───────────────────┐
+         │                   │                   │
+┌────────▼────────┐ ┌────────▼────────┐ ┌────────▼────────┐
+│   LMS ENGINE    │ │   ENROLLMENT    │ │   COMPLIANCE    │
+│                 │ │   & FUNDING     │ │   & REPORTING   │
+│ lib/lms/engine/ │ │ lib/apply/      │ │ lib/compliance/ │
+│ - completion    │ │ lib/funding/    │ │ lib/audit/      │
+│ - progress-calc │ │ lib/payments/   │ │ lib/wioa/       │
+│ - gating        │ │                 │ │ lib/apprentice/ │
+│ - certificates  │ │ Stripe · Affirm │ │                 │
+│ - blueprints    │ │ WIOA · WRG · JRI│ │ RAPIDS · FERPA  │
+└────────┬────────┘ └────────┬────────┘ └────────┬────────┘
+         │                   │                   │
+         └───────────────────┼───────────────────┘
+                             │
+┌────────────────────────────▼────────────────────────────────────┐
+│                       DATA LAYER                                │
+│                                                                 │
+│  lib/supabase/          — canonical DB clients (server/admin)   │
+│  supabase/migrations/   — 430 SQL migrations, all applied       │
+│  lib/api/               — auth guards, rate limiting, errors    │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### The Six Domains
+
+**1. LMS Engine** (`lib/lms/engine/`)
+The course delivery core. Stateless functions that read and write learner progress. Nothing outside this module writes to `lesson_progress`, `checkpoint_scores`, `step_submissions`, or `program_completion_certificates`.
+- `completion.ts` — the only write path for step completion and uncompletion
+- `progress-calc.ts` — single source of truth for `progress_percent` calculation
+- `gate.ts` — checkpoint gating logic; blocks module access until prior checkpoint passes
+- `certificate.ts` — auto-issues certificates when all lessons complete and all checkpoints pass
+
+**2. Enrollment & Funding** (`lib/apply/`, `lib/funding/`, `lib/payments/`)
+Handles the intake pipeline from eligibility screening through enrollment activation. Integrates with Stripe (payments), Affirm (BNPL), and funding agency workflows (WIOA, WRG, JRI). Canonical enrollment table: `program_enrollments`.
+
+**3. Compliance & Reporting** (`lib/compliance/`, `lib/audit/`, `lib/apprenticeship/`)
+DOL RAPIDS reporting, WIOA performance metrics, RTI hour logs, OJT tracking, and audit trails. Every critical write in the system calls `lib/audit-context.ts` before committing. RLS is enforced on all tables.
+
+**4. Stakeholder Portals** (`app/admin/`, `app/learner/`, `app/instructor/`, etc.)
+Role-segmented UI surfaces. Each portal is a Next.js App Router subtree with its own layout and auth guard. Auth is enforced per-route via `lib/admin/guards.ts` — there is no root middleware. Every route that reads or writes user data calls `apiAuthGuard` or `apiRequireAdmin` before any DB access.
+
+**5. Public Surface** (`app/programs/`, `app/apply/`, `app/(marketing)/`)
+Static and ISR pages for SEO, program discovery, and participant intake. No auth required. Revalidates on a 60-second cycle in production.
+
+**6. Platform Services** (`lib/email/`, `lib/ai/`, `lib/storage/`, `lib/secrets.ts`)
+Cross-cutting infrastructure. Email via Resend, AI via OpenAI, file storage via Supabase Storage + R2, secrets hydrated at request time from `app_secrets` table (not baked into env at build time).
+
+### Why 1,550 Pages and 1,157 API Routes
+
+The page count is high by design — not bloat:
+- **Role-segmented portals** — each stakeholder role has its own subtree (`/admin/`, `/learner/`, `/instructor/`, `/employer/`, `/partner/`, `/program-holder/`, `/staff-portal/`, `/mentor/`, `/parent-portal/`)
+- **Geographic SEO pages** — program pages are duplicated per state (`/career-training-indiana/`, `/career-training-illinois/`, etc.) for organic search coverage
+- **Program-instance pages** — each credential pathway has its own public page, funding page, and application flow
+- **Compliance and legal pages** — FERPA, WIOA, consumer education, grievance, satisfactory academic progress, etc. are required by DOL and state agencies
+
+The API route count follows the same pattern — one route per resource per role, not one monolithic handler. This keeps auth boundaries explicit and auditable.
+
+---
+
+
 
 ### Prerequisites
 - Node.js 20+ (< 25)

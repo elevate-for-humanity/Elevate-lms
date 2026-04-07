@@ -253,6 +253,73 @@ Static and ISR pages for SEO, program discovery, and participant intake. No auth
 **6. Platform Services** (`lib/email/`, `lib/ai/`, `lib/storage/`, `lib/secrets.ts`)
 Cross-cutting infrastructure. Email via Resend, AI via OpenAI, file storage via Supabase Storage + R2, secrets hydrated at request time from `app_secrets` table (not baked into env at build time).
 
+### Visual Overview
+
+```
+                   ┌──────────────────────────────────┐
+                   │        External Integrations      │
+                   │  Stripe · Supabase · OpenAI       │
+                   │  Resend · D-ID · Certiport · Sentry│
+                   └────────────────┬─────────────────┘
+                                    │
+                   ┌────────────────▼─────────────────┐
+                   │         API Layer (Next.js)       │
+                   │      app/api/*  (1,157 routes)    │
+                   │   Workflow-driven · Auth-gated    │
+                   └────────────────┬─────────────────┘
+                                    │
+        ┌───────────────────────────┼───────────────────────────┐
+        │                           │                           │
+┌───────▼────────┐       ┌──────────▼──────────┐     ┌─────────▼──────────┐
+│  LMS Engine    │       │ Enrollment &        │     │ Compliance &       │
+│                │       │ Funding             │     │ Reporting          │
+│ Courses        │       │                     │     │                    │
+│ Quizzes        │       │ Applications        │     │ RAPIDS · WIOA      │
+│ Progress       │       │ Eligibility         │     │ Audit logs         │
+│ Certificates   │       │ Stripe · Affirm     │     │ RTI · OJT metrics  │
+│ Checkpoints    │       │ WIOA · WRG · JRI    │     │ FERPA compliance   │
+└───────┬────────┘       └──────────┬──────────┘     └─────────┬──────────┘
+        │                           │                           │
+        └─────────────┬─────────────┴─────────────┬────────────┘
+                      │                           │
+           ┌──────────▼──────────┐     ┌──────────▼──────────┐
+           │ Employment Pipeline │     │ Stakeholder Portals │
+           │                     │     │                     │
+           │ Job postings        │     │ Learner · Admin     │
+           │ OJT agreements      │     │ Instructor · Employer│
+           │ Placement tracking  │     │ Partner · Mentor    │
+           │ Outcome reporting   │     │ Program Holder      │
+           └──────────┬──────────┘     │ Parent / Guardian   │
+                      │                └──────────┬──────────┘
+                      │                           │
+               ┌──────▼───────────────────────────▼──────┐
+               │       Data Layer (Supabase / Postgres)   │
+               │   RLS · Auth · 430 migrations · Audit    │
+               └─────────────────────────────────────────┘
+```
+
+**Request flow:**
+```
+User → App Router (UI) → API route (auth-gated) → Supabase (RLS enforced) → Response
+       app/                app/api/                lib/supabase/
+       components/         lib/                    supabase/migrations/
+```
+
+### Executive Summary
+
+Elevate operates a unified Workforce Operating System that integrates four traditionally separate systems into a single platform:
+
+| System | What It Does |
+|--------|-------------|
+| **Learning (LMS)** | Delivers structured training, tracks progress, issues credentials |
+| **Funding & Enrollment** | Manages eligibility, government funding workflows (WIOA, WRG, JRI), and payments |
+| **Compliance & Reporting** | DOL RAPIDS, WIOA performance reporting, RTI hour logs, audit trails |
+| **Employment Pipeline** | Connects participants to employers, manages OJT agreements, tracks placement outcomes |
+
+These systems are delivered through role-based portals for learners, administrators, instructors, employers, workforce agencies, program partners, and parent/guardians. All data is centralized in a PostgreSQL database with row-level security enforcing strict separation between users, programs, and stakeholders.
+
+The platform qualifies participants for funding, delivers training, ensures regulatory compliance, and tracks employment outcomes — end to end.
+
 ### Mental Model
 
 ```

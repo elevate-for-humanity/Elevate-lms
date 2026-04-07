@@ -386,7 +386,7 @@ ON CONFLICT (name, program_completed) DO NOTHING;
 -- SEED DATA - LOCATIONS
 -- ============================================================================
 INSERT INTO locations (name, location_type, address_line1, city, state, zip_code, phone, email, is_main_office, is_active) VALUES
-('Indianapolis Main Office', 'office', '3737 N Meridian St', 'Indianapolis', 'IN', '46208', '(317) 555-0100', 'info@elevateforhumanity.org', true, true),
+('Indianapolis Main Office', 'office', '8888 Keystone Crossing Suite 1300', 'Indianapolis', 'IN', '46240', '(317) 314-3757', 'info@elevateforhumanity.org', true, true),
 ('East Side Training Center', 'training', '8902 E 38th St', 'Indianapolis', 'IN', '46226', '(317) 555-0200', 'eastside@elevateforhumanity.org', false, true),
 ('Supersonic Fast Cash - Main', 'tax_office', '5550 E 82nd St', 'Indianapolis', 'IN', '46250', '(317) 555-0300', 'taxes@supersonicfastcash.com', false, true)
 ON CONFLICT (name, location_type) DO NOTHING;

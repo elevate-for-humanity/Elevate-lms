@@ -8,10 +8,10 @@
   "email": "Elevate4humanityedu@gmail.com",
   "address": {
     "@type": "PostalAddress",
-    "streetAddress": "7009 East 56th Street, Suite EE1",
+    "streetAddress": "8888 Keystone Crossing, Suite 1300",
     "addressLocality": "Indianapolis",
     "addressRegion": "IN",
-    "postalCode": "46226",
+    "postalCode": "46240",
     "addressCountry": "US"
   },
   "geo": {

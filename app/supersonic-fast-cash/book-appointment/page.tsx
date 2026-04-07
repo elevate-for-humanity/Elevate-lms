@@ -139,7 +139,7 @@ export default function BookAppointment() {
       available: appointmentData.appointmentType === 'in-person',
     },
     {
-      id: '56th',
+      id: 'keystone',
       name: '8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240',
       available: appointmentData.appointmentType === 'in-person',
     },

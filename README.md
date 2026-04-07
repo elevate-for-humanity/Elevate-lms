@@ -452,6 +452,77 @@ Elevate-lms/
 
 ---
 
+## Workforce & Funding Alignment
+
+Elevate for Humanity operates a fully integrated Workforce Development Operating System designed to align with federal, state, and local workforce funding frameworks — including WIOA Title I, DOL Registered Apprenticeship (RAPIDS), Workforce Ready Grant, and Job Ready Indy.
+
+### End-to-End Participant Lifecycle
+
+**1. Recruitment & Intake**
+- Multi-step application and eligibility screening aligned with WIOA criteria (adult, dislocated worker, youth 16–24)
+- Referral intake from workforce agencies (WorkOne, EmployIndy, reentry organizations)
+- Funding eligibility determination built into the application workflow
+
+**2. Training & Credential Attainment**
+- Structured programs with defined RTI hours and measurable skill progression
+- Industry-recognized credentials: EPA 608, OSHA 10/30, CompTIA A+/Security+, PTCB CPhT, Indiana ISDH CNA, Indiana barber/cosmetology licensure
+- Attendance tracking, quiz pass thresholds, checkpoint gating, and instructor sign-off
+
+**3. Case Management & Support Services**
+- Participant tracking across enrollment, attendance, and completion
+- Staff and instructor oversight through role-based dashboards
+- Integration points for supportive services (transportation, stipends, wraparound support)
+
+**4. Compliance & Performance Reporting**
+
+WIOA performance indicators tracked:
+
+| Indicator | Implementation |
+|-----------|---------------|
+| Measurable Skill Gains (MSG) | Lesson-level progress, quiz scores, checkpoint passage |
+| Credential Attainment | Certificate issuance tied to program completion + exam passage |
+| Employment Rate (Q2 / Q4) | Placement tracking with 6- and 12-month outcome records |
+
+DOL RAPIDS tracking:
+
+| Requirement | Implementation |
+|-------------|---------------|
+| RTI hours | Per-lesson attendance and completion logs |
+| On-the-Job Training (OJT) | OJT agreement management, hour tracking |
+| Competency progression | Checkpoint-gated module advancement |
+
+**5. Employment & Outcome Tracking**
+- Employer partnerships and job placement pipelines
+- OJT agreements and apprenticeship pathways
+- 6-month and 12-month employment outcome tracking per participant
+
+### Multi-Stakeholder Access
+
+| Role | Access |
+|------|--------|
+| Participants | Training, progress tracking, credentials, career services |
+| Workforce Agencies | Enrollment tracking, funding oversight, outcome reporting |
+| Employers | Hiring pipeline, OJT management, job postings |
+| Program Providers | Cohort delivery, revenue share reporting, participant tracking |
+| Administrators | Compliance, analytics, system operations |
+| Parent / Guardians | Youth participant progress monitoring |
+
+### Data Integrity & Compliance
+
+- PostgreSQL with Row-Level Security (RLS) — strict separation between users, programs, and stakeholders
+- Full audit logging on all participant and administrative actions
+- Data models aligned with WIOA and DOL reporting requirements
+- Participant records handled in accordance with FERPA-aligned practices
+- All migrations version-controlled and applied sequentially (`supabase/migrations/`)
+
+### Why This Matters for Funders
+
+Unlike traditional training platforms, Elevate tracks and reports real workforce outcomes — not just course completion. Credential attainment is tied to specific programs, employment placement is tracked at 6 and 12 months, and employer engagement is recorded per participant.
+
+This integrated approach reduces administrative burden for workforce agencies while improving participant accountability and outcome visibility. Elevate functions as infrastructure for workforce development — aligning training delivery with funding eligibility, embedding compliance into daily operations, and connecting participants directly to employment pathways.
+
+---
+
 ## Documentation
 
 | Document | Purpose |

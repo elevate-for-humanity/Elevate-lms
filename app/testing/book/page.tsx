@@ -29,6 +29,7 @@ const PROCTORING_MODE_LABELS: Record<string, string> = {
 function BookingForm() {
   const searchParams = useSearchParams();
   const typeParam = searchParams.get('type') ?? '';
+  const examParam = searchParams.get('exam') ?? '';
 
   const [selectedProvider, setSelectedProvider] = useState<CertProvider | null>(null);
   const [proctoringMode, setProctoringMode] = useState('');
@@ -138,6 +139,13 @@ function BookingForm() {
     if (typeParam === 'individual-testing') setOrgType('Individual');
     if (typeParam === 'group-testing')    setOrgType('Employer / Company');
   }, [typeParam]);
+
+  // Pre-select provider from ?exam= param (set by /testing/[provider] Book button)
+  useEffect(() => {
+    if (!examParam) return;
+    const match = ALL_PROVIDERS.find(p => p.key === examParam);
+    if (match && match.status !== 'coming_soon') setSelectedProvider(match);
+  }, [examParam]);
 
   // Reset proctoring mode, add-on, and slot when provider changes
   useEffect(() => {

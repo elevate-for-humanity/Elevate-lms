@@ -34,11 +34,8 @@ export const TESTING_CENTER = {
 export const CALENDLY_CONFIG = {
   userUri:      'https://api.calendly.com/users/8c7a5621-62c0-4193-ad08-0952e24485f9',
   schedulingUrl: 'https://calendly.com/elevate4humanityedu',
-  // Event configured as "Testing Appointment" with in-person location.
-  // Slug and duration require Calendly UI to change (API limitation).
-  // Once slug is updated to /testing, set NEXT_PUBLIC_CALENDLY_TESTING_URL=https://calendly.com/elevate4humanityedu/testing
   testingUrl:   process.env.NEXT_PUBLIC_CALENDLY_TESTING_URL
-                  ?? 'https://calendly.com/elevate4humanityedu/30min',
+                  ?? 'https://calendly.com/elevate4humanityedu/60min',
 } as const;
 
 export const TESTING_EMAIL = {

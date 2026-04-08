@@ -33,23 +33,25 @@ const supabase = await createRouteHandlerClient({ cookies });
     return Response.json(null);
   }
 
-  // Get program holder details with application
+  // Get program holder details — all contact info lives on program_holders directly
   const { data: holder, error } = await supabase
     .from('program_holders')
     .select(
       `
       id,
       name,
+      organization_name,
       status,
       payout_share,
       mou_status,
+      mou_signed,
       mou_signed_at,
-      application:program_holder_applications(
-        contact_name,
-        contact_email,
-        phone,
-        site_address
-      )
+      mou_holder_name,
+      mou_holder_signed_at,
+      mou_holder_sig_url,
+      contact_name,
+      contact_email,
+      contact_phone
     `
     )
     .eq('id', prof.program_holder_id)
@@ -61,15 +63,17 @@ const supabase = await createRouteHandlerClient({ cookies });
 
   return Response.json({
     program_holder_id: holder.id,
-    program_holder_name: holder.name,
+    program_holder_name: holder.name || holder.organization_name,
     status: holder.status,
     payout_share: holder.payout_share,
     mou_status: holder.mou_status,
+    mou_signed: holder.mou_signed,
     mou_signed_at: holder.mou_signed_at,
-    contact_name: holder.application?.[0]?.contact_name,
-    contact_email: holder.application?.[0]?.contact_email,
-    phone: holder.application?.[0]?.phone,
-    site_address: holder.application?.[0]?.site_address,
+    mou_holder_name: holder.mou_holder_name,
+    mou_holder_signed_at: holder.mou_holder_signed_at,
+    contact_name: holder.contact_name,
+    contact_email: holder.contact_email,
+    phone: holder.contact_phone,
   });
 }
 export const GET = withApiAudit('/api/program-holder/mou-data', _GET);

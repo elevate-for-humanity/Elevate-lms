@@ -3,7 +3,7 @@
  * Update here — every component that imports from this file picks up the change automatically.
  */
 export const SOCIAL_LINKS = {
-  facebook:  'https://www.facebook.com/elevateforhumanity',
+  facebook:  'https://www.facebook.com/share/1BUqvUAnCo/',
   instagram: 'https://www.instagram.com/elevateforhumanity',
   linkedin:  'https://www.linkedin.com/company/elevate-for-humanity',
   youtube:   'https://www.youtube.com/@elevateforhumanity',

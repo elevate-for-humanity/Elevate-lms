@@ -26,6 +26,7 @@ export const NAV_ITEMS = [
       { name: 'HVAC Technician', href: '/programs/hvac-technician' },
       { name: 'Technology', href: '/programs/technology' },
       { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
+      { name: 'Cosmetology Apprenticeship', href: '/programs/cosmetology-apprenticeship' },
       { name: 'Business & Finance', href: '/programs/finance-bookkeeping-accounting' },
       { name: 'Peer Recovery', href: '/programs/peer-recovery-specialist' },
       { name: 'Apprenticeships', href: '/programs/apprenticeships' },

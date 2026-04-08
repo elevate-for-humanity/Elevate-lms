@@ -419,7 +419,7 @@ export class SocialMediaAutomation {
   getSocialMediaLinks() {
     return {
       facebook: {
-        page: 'https://www.facebook.com/elevateforhumanity',
+        page: 'https://www.facebook.com/share/1BUqvUAnCo/',
         personal: 'https://www.facebook.com/elevate.founder',
       },
       linkedin: {

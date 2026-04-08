@@ -37,7 +37,7 @@ export const organizationSchema: WithContext<Organization> = {
     email: 'info@www.elevateforhumanity.org',
   },
   sameAs: [
-    'https://www.facebook.com/elevateforhumanity',
+    'https://www.facebook.com/share/1BUqvUAnCo/',
     'https://www.linkedin.com/company/elevateforhumanity',
     'https://www.instagram.com/elevateforhumanity',
   ],

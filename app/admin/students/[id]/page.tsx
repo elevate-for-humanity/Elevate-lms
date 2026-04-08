@@ -8,6 +8,7 @@ import {
   BookOpen, CreditCard, FileText, Clock, CheckCircle,
   AlertTriangle, ExternalLink,
 } from 'lucide-react';
+import EnrollmentVoucherPanel from '@/components/admin/EnrollmentVoucherPanel';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -81,7 +82,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
   // Load enrollments, applications, lesson progress in parallel
   const [enrollmentsRes, applicationsRes, progressRes] = await Promise.all([
     db.from('program_enrollments')
-      .select('id, status, enrolled_at, payment_status, amount_paid_cents, program_id, updated_at')
+      .select('id, status, enrolled_at, payment_status, amount_paid_cents, program_id, updated_at, program_slug, partner_id, student_start_date, voucher_issued_date, voucher_paid_date, payout_due_date, payout_status, payout_paid_date, payout_sent_date, payout_amount, payout_notes')
       .eq('user_id', id)
       .order('enrolled_at', { ascending: false }),
 
@@ -248,6 +249,28 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
               </div>
             )}
           </div>
+
+          {/* Voucher & Payout Tracking — one panel per enrollment that has voucher activity */}
+          {enrollments.filter(e => e.voucher_paid_date || e.voucher_issued_date || e.student_start_date).map(e => (
+            <EnrollmentVoucherPanel
+              key={e.id}
+              data={{
+                enrollment_id:       e.id,
+                student_name:        profile?.full_name ?? '—',
+                program_name:        programNames[e.program_id] || e.program_slug || e.id.slice(0, 8),
+                partner_name:        null,
+                student_start_date:  e.student_start_date,
+                voucher_issued_date: e.voucher_issued_date,
+                voucher_paid_date:   e.voucher_paid_date,
+                payout_due_date:     e.payout_due_date,
+                payout_status:       e.payout_status ?? 'not_triggered',
+                payout_paid_date:    e.payout_paid_date,
+                payout_paid_by_name: null,
+                payout_notes:        e.payout_notes,
+                audit_log:           [],
+              }}
+            />
+          ))}
 
           {/* Applications */}
           <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">

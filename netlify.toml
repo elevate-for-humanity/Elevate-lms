@@ -282,6 +282,9 @@
 [functions."cron-testing-lead-followup"]
   schedule = "0 * * * *"
 
+[functions."cron-payout-deadline-alert"]
+  schedule = "0 9 * * *"
+
 # ============================================
 # ADMIN DOMAIN (www.elevateconnectsdirectory.org)
 # Rewrites admin domain to /admin dashboard

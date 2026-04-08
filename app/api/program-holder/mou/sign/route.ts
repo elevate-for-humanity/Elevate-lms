@@ -35,11 +35,17 @@ async function _POST(req: NextRequest) {
     return new Response('Missing name or signature', { status: 400 });
   }
 
-  // Get user's program holder ID
-  const { data: prof } = await supabase
-    .from('user_profiles')
+  // Use admin client for all DB + storage writes (bypasses RLS)
+  const adminClient = createAdminClient();
+  if (!adminClient) {
+    return new Response('Server error', { status: 500 });
+  }
+
+  // Get program_holder_id from profiles (canonical source)
+  const { data: prof } = await adminClient
+    .from('profiles')
     .select('program_holder_id')
-    .eq('user_id', user.id)
+    .eq('id', user.id)
     .single();
 
   if (!prof?.program_holder_id) {
@@ -57,36 +63,30 @@ async function _POST(req: NextRequest) {
   const base64 = matches[1];
   const buffer = Buffer.from(base64, 'base64');
 
-  // Use service client for Storage (server-side)
-  const serviceClient = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
   const path = `program_holders/${phId}/holder_signature.png`;
-  const { error: uploadError } = await serviceClient.storage
+  const { error: uploadError } = await adminClient.storage
     .from('agreements')
     .upload(path, buffer, { contentType: 'image/png', upsert: true });
 
   if (uploadError) {
-    logger.error('Upload error:', uploadError);
-    logger.error('MOU upload failed', undefined, { detail: uploadError.message }); return new Response('Upload failed', { status: 500 });
+    logger.error('MOU upload failed', undefined, { detail: uploadError.message });
+    return new Response('Upload failed', { status: 500 });
   }
 
-  const sigUrl = path; // store path; you can build public URL when needed
-
   const now = new Date().toISOString();
-  const { data: updated, error } = await supabase
+  const { data: updated, error } = await adminClient
     .from('program_holders')
     .update({
+      mou_signed: true,
+      mou_signed_at: now,
       mou_status: 'signed_by_holder',
       mou_holder_name: name,
       mou_holder_signed_at: now,
-      mou_holder_sig_url: sigUrl,
+      mou_holder_sig_url: path,
     })
     .eq('id', phId)
     .select(
-      'id, name, payout_share, mou_status, mou_holder_name, mou_holder_signed_at'
+      'id, name, payout_share, mou_status, mou_signed, mou_holder_name, mou_holder_signed_at'
     )
     .single();
 

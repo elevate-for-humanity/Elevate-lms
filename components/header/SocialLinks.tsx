@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Linkedin } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Youtube } from 'lucide-react';
 import { SOCIAL_LINKS } from '@/config/social-links';
 
 export function SocialLinks() {
@@ -30,6 +30,15 @@ export function SocialLinks() {
         aria-label="LinkedIn"
       >
         <Linkedin className="w-5 h-5" />
+      </a>
+      <a
+        href={SOCIAL_LINKS.youtube}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-gray-600 hover:text-brand-blue-600 transition"
+        aria-label="YouTube"
+      >
+        <Youtube className="w-5 h-5" />
       </a>
     </div>
   );

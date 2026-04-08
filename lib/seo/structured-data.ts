@@ -22,7 +22,7 @@ export const organizationSchema = {
     email: 'info@www.elevateforhumanity.org',
   },
   sameAs: [
-    'https://www.facebook.com/elevateforhumanity',
+    'https://www.facebook.com/share/1BUqvUAnCo/',
     'https://www.linkedin.com/company/elevate-for-humanity',
     'https://twitter.com/elevate4humanity',
   ],

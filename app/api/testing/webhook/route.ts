@@ -17,7 +17,8 @@ import Stripe from 'stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
-import { TESTING_CENTER, TESTING_EMAIL } from '@/lib/testing/testing-config';
+import { TESTING_CENTER, TESTING_EMAIL, CALENDLY_CONFIG } from '@/lib/testing/testing-config';
+import { createSchedulingLink, getEventTypes } from '@/lib/testing/calendly';
 import { hydrateProcessEnv } from '@/lib/secrets';
 
 export const dynamic = 'force-dynamic';
@@ -89,21 +90,38 @@ export async function POST(req: NextRequest) {
 
     const hasAddOn = meta.add_on === 'true';
 
+    // Generate a single-use Calendly scheduling link so the test-taker can
+    // self-schedule immediately after payment without waiting for a coordinator.
+    // Falls back to the public testing URL if the Calendly API is unavailable.
+    let calendlySchedulingUrl = CALENDLY_CONFIG.testingUrl;
+    try {
+      const eventTypes = await getEventTypes();
+      // Prefer the dedicated "testing" event type; fall back to the first active one
+      const testingEvent = eventTypes.find(e => e.slug === 'testing' || e.slug === '60min')
+        ?? eventTypes[0];
+      if (testingEvent) {
+        calendlySchedulingUrl = await createSchedulingLink({ eventTypeUri: testingEvent.uri });
+      }
+    } catch (err) {
+      logger.warn('[testing/webhook] Could not generate Calendly link — using public URL', { err });
+    }
+
     const { error: insertErr } = await db.from('exam_bookings').insert({
-      exam_type:          meta.exam_type,
-      exam_name:          meta.exam_name,
-      booking_type:       meta.booking_type ?? 'individual',
-      first_name:         firstName || 'Customer',
-      last_name:          lastName,
-      email:              customerEmail,
-      participant_count:  parseInt(meta.participant_count ?? '1', 10),
-      status:             'pending',
-      payment_status:     'paid',
-      payment_intent_id:  paymentIntentId,
-      fee_cents:          session.amount_total,
-      confirmation_code:  confirmationCode,
-      add_on:             hasAddOn,
-      add_on_paid:        hasAddOn, // payment confirmed — flip immediately
+      exam_type:               meta.exam_type,
+      exam_name:               meta.exam_name,
+      booking_type:            meta.booking_type ?? 'individual',
+      first_name:              firstName || 'Customer',
+      last_name:               lastName,
+      email:                   customerEmail,
+      participant_count:       parseInt(meta.participant_count ?? '1', 10),
+      status:                  'pending',
+      payment_status:          'paid',
+      payment_intent_id:       paymentIntentId,
+      fee_cents:               session.amount_total,
+      confirmation_code:       confirmationCode,
+      add_on:                  hasAddOn,
+      add_on_paid:             hasAddOn, // payment confirmed — flip immediately
+      calendly_scheduling_url: calendlySchedulingUrl,
     });
 
     if (insertErr) {
@@ -111,12 +129,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true }); // don't 500 — Stripe will retry
     }
 
-    logger.info('[testing/webhook] Booking created after payment', { confirmationCode, hasAddOn });
+    logger.info('[testing/webhook] Booking created after payment', { confirmationCode, hasAddOn, calendlySchedulingUrl });
 
     if (customerEmail) {
       const emailJobs: Promise<unknown>[] = [];
 
-      // Booking confirmation
+      // Booking confirmation — includes the Calendly self-scheduling link
       emailJobs.push(
         sendEmail({
           to: customerEmail,
@@ -132,7 +150,12 @@ export async function POST(req: NextRequest) {
     <p>Your payment was received. Your confirmation code is:</p>
     <p style="font-size:28px;font-weight:900;letter-spacing:4px;color:#1E3A5F;text-align:center;margin:16px 0">${confirmationCode}</p>
     <p>Exam: <strong>${meta.exam_name}</strong></p>
-    <p>Our testing coordinator will contact you within 1 business day to confirm your date and time.</p>
+    <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:20px;margin:20px 0;text-align:center">
+      <p style="margin:0 0 12px;font-weight:bold;color:#0c4a6e">Next Step: Schedule Your Exam Date</p>
+      <p style="margin:0 0 16px;font-size:14px;color:#0369a1">Use the link below to pick a date and time that works for you.</p>
+      <a href="${calendlySchedulingUrl}" style="background:#1E3A5F;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;display:inline-block">Schedule Your Exam →</a>
+      <p style="margin:12px 0 0;font-size:12px;color:#64748b">This is a single-use link — do not share it.</p>
+    </div>
     <p><strong>Exam Day:</strong> Bring a valid government-issued photo ID. Arrive 15 minutes early.<br>
     <strong>Location:</strong> ${TESTING_CENTER.address}</p>
     <p>Questions? Call <strong>${TESTING_CENTER.phone}</strong>.</p>

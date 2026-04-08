@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 
 import { createClient } from '@supabase/supabase-js';
 import { resend } from '@/lib/resend';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -18,6 +19,7 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 async function _POST(req: Request) {
   try {
+  await hydrateProcessEnv();
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
 

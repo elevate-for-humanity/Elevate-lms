@@ -5,6 +5,7 @@ import { jotFormIntegration } from '@/lib/integrations/jotform';
 import { supersonicTaxEngine } from '@/lib/integrations/supersonic-tax';
 
 import { resend } from '@/lib/resend';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { auditPiiAccess } from '@/lib/auditLog';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -43,6 +44,7 @@ function isAllowedIP(ip: string): boolean {
  * Secured by IP allowlist and optional shared secret.
  */
 async function _POST(request: NextRequest) {
+  await hydrateProcessEnv();
   let submissionId: string | undefined;
   try {
     const rateLimited = await applyRateLimit(request, 'api');

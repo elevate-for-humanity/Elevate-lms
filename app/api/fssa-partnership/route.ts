@@ -7,12 +7,15 @@ import { resend } from '@/lib/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-export const maxDuration = 60;
+import { hydrateProcessEnv } from '@/lib/secrets';
 
+export const maxDuration = 60;
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   try {
+    await hydrateProcessEnv();
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
 

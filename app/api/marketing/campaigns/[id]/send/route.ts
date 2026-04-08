@@ -14,6 +14,7 @@ async function _POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  await hydrateProcessEnv();
     const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
 

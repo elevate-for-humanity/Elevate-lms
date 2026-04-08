@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { trySendEmail } from '@/lib/email/resend';
+import { hydrateProcessEnv } from '@/lib/secrets';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -12,6 +13,7 @@ export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
   try {
+  await hydrateProcessEnv();
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
 

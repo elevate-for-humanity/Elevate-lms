@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/resend';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { logger } from '@/lib/logger';
 import { getProgramConfig } from '@/lib/partners/program-config';
 export const runtime = 'nodejs';
@@ -16,6 +17,7 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ program: string }> }
 ) {
+  await hydrateProcessEnv();
   try {
     const { program } = await params;
 

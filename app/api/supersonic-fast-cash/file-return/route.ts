@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { supersonicTaxEngine } from '@/lib/integrations/supersonic-tax';
 import { resend } from '@/lib/resend';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditPiiAccess } from '@/lib/auditLog';
@@ -78,6 +79,7 @@ interface TaxReturnBody {
 
 export async function POST(request: NextRequest) {
   try {
+  await hydrateProcessEnv();
   // Auth required — Supersonic client data is PII
   const serverSupabase = await createServerClient();
   const { data: { user: authUser }, error: authErr } = await serverSupabase.auth.getUser();

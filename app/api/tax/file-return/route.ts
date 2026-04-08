@@ -13,6 +13,7 @@ import { createTransmitter } from '@/lib/tax-software/mef/transmission';
 import { TaxReturn } from '@/lib/tax-software/types';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
 import { resend } from '@/lib/resend';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditPiiAccess } from '@/lib/auditLog';
 
@@ -28,6 +29,7 @@ const SOFTWARE_ID = process.env.IRS_SOFTWARE_ID || 'PENDING_APPROVAL';
 const EFIN = '358459';
 
 export async function POST(request: NextRequest) {
+  await hydrateProcessEnv();
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
 

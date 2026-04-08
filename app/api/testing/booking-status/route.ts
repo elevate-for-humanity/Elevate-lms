@@ -15,18 +15,16 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError } from '@/lib/api/safe-error';
 import { CALENDLY_CONFIG } from '@/lib/testing/testing-config';
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { withRuntime } from '@/lib/api/withRuntime';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-export async function GET(req: NextRequest) {
-  await hydrateProcessEnv();
-  const rateLimited = await applyRateLimit(req, 'public');
-  if (rateLimited) return rateLimited;
+export const GET = withRuntime(
+  { secrets: ['STRIPE_SECRET_KEY'], rateLimit: 'public' },
+  async (req, ctx) => {
 
   const sessionId = req.nextUrl.searchParams.get('session_id');
   if (!sessionId) return safeError('session_id is required', 400);
@@ -34,8 +32,7 @@ export async function GET(req: NextRequest) {
   // Resolve the Stripe session to a payment_intent_id, then look up the booking.
   // We never store the raw session_id — only the payment_intent_id — so we need
   // to call Stripe to get the mapping.
-  const stripeKey = process.env.STRIPE_SECRET_KEY;
-  if (!stripeKey) return safeError('Stripe not configured', 503);
+  const stripeKey = ctx.env.STRIPE_SECRET_KEY;
 
   let paymentIntentId: string | null = null;
   try {
@@ -72,4 +69,5 @@ export async function GET(req: NextRequest) {
     examName:               booking.exam_name,
     calendlySchedulingUrl:  booking.calendly_scheduling_url ?? CALENDLY_CONFIG.testingUrl,
   });
-}
+  }
+);

@@ -12,10 +12,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { apiRequireAdmin } from '@/lib/admin/guards';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
+import { withRuntime } from '@/lib/api/withRuntime';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -26,7 +26,7 @@ import { CERTIPORT_DEFAULT_RETAKE_FEE, getCertiportRetakePrice } from '@/lib/tes
 import { WORKKEYS_PRICING } from '@/lib/testing/providers/workkeys-pricing';
 import { NRF_RISEUP_PRICING } from '@/lib/testing/providers/nrf-riseup';
 import { EPA608_PRICING } from '@/lib/testing/providers/epa608-pricing';
-import { hydrateProcessEnv } from '@/lib/secrets';
+
 
 const FROM     = TESTING_EMAIL.from;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
@@ -57,11 +57,9 @@ function getRetakeFeeCents(examType: string | null | undefined): number {
   return CERTIPORT_DEFAULT_RETAKE_FEE * 100;
 }
 
-export async function POST(req: NextRequest) {
-  await hydrateProcessEnv();
-  const auth = await apiRequireAdmin(req);
-  if (auth.error) return auth.error;
-
+export const POST = withRuntime(
+  { auth: 'admin' },
+  async (req) => {
   const db = createAdminClient();
   if (!db) return safeError('Database unavailable', 500);
 
@@ -141,4 +139,5 @@ export async function POST(req: NextRequest) {
   }).catch(err => logger.warn('[testing/retake] Email failed', { email, err }));
 
   return NextResponse.json({ success: true, holdId: hold.id });
-}
+  }
+);

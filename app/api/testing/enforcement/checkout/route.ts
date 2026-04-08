@@ -9,11 +9,12 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import Stripe from 'stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { withRuntime } from '@/lib/api/withRuntime';
+import { ENV } from '@/lib/api/env-groups';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -24,20 +25,29 @@ const FEE_LABELS: Record<string, string> = {
   reschedule: 'Late Reschedule Fee',
 };
 
-export async function POST(req: NextRequest) {
-  await hydrateProcessEnv();
-  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
-  const stripeKey = process.env.STRIPE_SECRET_KEY;
-  if (!stripeKey) return safeError('Stripe not configured', 500);
+const EnforcementCheckoutSchema = z.object({
+  enforcementId: z.string().min(1),
+  email:         z.string().email(),
+});
 
-  const rateLimited = await applyRateLimit(req, 'payment');
-  if (rateLimited) return rateLimited;
+export const POST = withRuntime(
+  { secrets: [...ENV.STRIPE], rateLimit: 'payment' },
+  async (req, ctx) => {
+    const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
+    const stripeKey = ctx.env.STRIPE_SECRET_KEY;
 
-  let body: { enforcementId: string; email: string };
-  try { body = await req.json(); } catch { return safeError('Invalid JSON', 400); }
+    let raw: unknown;
+    try { raw = await req.json(); } catch { return safeError('Invalid JSON', 400); }
 
-  const { enforcementId, email } = body;
-  if (!enforcementId || !email) return safeError('enforcementId and email are required', 400);
+    const parsed = EnforcementCheckoutSchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid request', details: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const { enforcementId, email } = parsed.data;
 
   const db = createAdminClient();
   if (!db) return safeError('Database unavailable', 500);
@@ -87,4 +97,5 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     return safeInternalError(err, 'Failed to create fee checkout session');
   }
-}
+  }
+);

@@ -20,10 +20,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { resend } from '@/lib/resend';
 import { sendSMS } from '@/lib/notifications/sms';
-import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { TESTING_CENTER } from '@/lib/testing/testing-config';
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { withRuntime } from '@/lib/api/withRuntime';
+import { ENV } from '@/lib/api/env-groups';
 import crypto from 'crypto';
 
 export const runtime = 'nodejs';
@@ -127,16 +127,23 @@ function cancellationEmailHtml(name: string, startTime: string): string {
 
 // ─── Handler ──────────────────────────────────────────────────────────────────
 
-export async function POST(req: NextRequest) {
-  await hydrateProcessEnv();
-  const rateLimited = await applyRateLimit(req, 'api');
-  if (rateLimited) return rateLimited;
+export const POST = withRuntime(
+  { secrets: [...ENV.CALENDLY], rateLimit: 'api' },
+  async (req) => {
 
   const rawBody = await req.text();
   const signature = req.headers.get('calendly-webhook-signature');
 
   if (!verifyCalendlySignature(rawBody, signature)) {
-    logger.warn('Calendly webhook signature verification failed');
+    // Log enough to detect probing — timestamp is implicit in the log entry
+    logger.warn('[calendly-webhook] Signature rejected', {
+      ip:             req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'unknown',
+      signaturePresent: signature !== null,
+      secretConfigured: !!process.env.CALENDLY_WEBHOOK_SECRET,
+      payloadBytes:   rawBody.length,
+      // Parse event type without trusting the payload — best-effort only
+      eventType:      (() => { try { return JSON.parse(rawBody)?.event ?? 'unknown'; } catch { return 'unparseable'; } })(),
+    });
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 
@@ -300,4 +307,5 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ ok: true, skipped: `unhandled event: ${eventType}` });
-}
+  }
+);

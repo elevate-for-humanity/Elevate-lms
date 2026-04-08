@@ -39,12 +39,14 @@ export async function GET(request: Request) {
   const results = { reinstated: 0, still_suspended: 0, errors: [] as string[] };
 
   try {
-    // Find all suspended subscriptions that have a Stripe subscription ID
+    // Find subscriptions suspended for payment reasons only.
+    // Excludes manually_disabled records — those require admin action to reinstate.
     const { data: suspended, error } = await db
       .from('barber_subscriptions')
-      .select('id, user_id, customer_email, customer_name, stripe_subscription_id')
+      .select('id, user_id, customer_email, customer_name, stripe_subscription_id, suspension_reason')
       .in('payment_status', ['past_due', 'suspended'])
-      .not('stripe_subscription_id', 'is', null);
+      .not('stripe_subscription_id', 'is', null)
+      .not('suspension_reason', 'eq', 'manually_disabled');
 
     if (error) {
       logger.error('[barber-reinstate cron] fetch error', error);
@@ -55,7 +57,9 @@ export async function GET(request: Request) {
       try {
         const stripeSub = await stripe.subscriptions.retrieve(sub.stripe_subscription_id!);
 
-        if (stripeSub.status === 'active') {
+        // Only reinstate for payment-collectible statuses.
+        // 'canceled' or 'unpaid' means the subscription is gone — do not reinstate.
+        if (['active', 'trialing'].includes(stripeSub.status)) {
           // Stripe says active — reinstate
           await db
             .from('barber_subscriptions')

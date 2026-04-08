@@ -119,10 +119,10 @@ export async function GET(request: Request) {
 function suspensionEmailHtml({ name, updateUrl }: { name: string; updateUrl: string }) {
   return `
     <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-      <h2 style="color:#dc2626">Access Suspended — Payment Required</h2>
+      <h2 style="color:#dc2626">Account Suspended — Payment Required</h2>
       <p>Hi ${name},</p>
-      <p>Your barber apprenticeship access has been suspended because a weekly tuition payment could not be processed and the 7-day grace period has passed.</p>
-      <p><strong>Your hours and progress are saved.</strong> Access is restored immediately once payment is updated.</p>
+      <p>Your barber apprenticeship account has been suspended because a weekly tuition payment could not be processed and the 7-day grace period has passed.</p>
+      <p>You can continue coursework, but <strong>hours cannot be logged</strong> until your billing is resolved. Your recorded hours and progress are saved. Hour logging resumes immediately once payment is updated.</p>
       <p style="margin:24px 0">
         <a href="${updateUrl}"
            style="background:#ea580c;color:#fff;padding:12px 24px;text-decoration:none;border-radius:6px;display:inline-block;font-weight:600">

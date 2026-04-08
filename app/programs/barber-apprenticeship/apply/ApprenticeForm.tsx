@@ -7,13 +7,20 @@ import { ArrowLeft, Loader2, CreditCard, Calculator, Info } from 'lucide-react';
 import LazyVideo from '@/components/ui/LazyVideo';
 import { ACTIVE_BNPL_PROVIDERS } from '@/lib/bnpl-config';
 import { BARBER_PRICING, calculateWeeklyPayment as calcWeekly } from '@/lib/programs/pricing';
+import { loadStripe } from '@stripe/stripe-js';
+import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe-js';
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 // Single source of truth — do not duplicate pricing constants here.
 const PRICING = BARBER_PRICING;
 
-function calculateWeeklyPayment(downPayment: number) {
-  // hoursPerWeek=40, transferredHours=0 — standard full-program calculation
-  const result = calcWeekly(40, 0, downPayment);
+function calculateWeeklyPayment(
+  downPayment: number,
+  hoursPerWeek: number = 40,
+  transferredHours: number = 0,
+) {
+  const result = calcWeekly(hoursPerWeek, transferredHours, downPayment);
   return {
     weeklyDollars: result.weeklyPaymentDollars,
     weeks: result.weeksRemaining,
@@ -47,7 +54,10 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
   const [error, setError] = useState('');
   const [errorSeverity, setErrorSeverity] = useState<'info' | 'critical'>('info');
   const [nextFriday, setNextFriday] = useState('Friday');
-  
+
+  // Embedded Stripe checkout (BNPL — Klarna / Afterpay)
+  const [embeddedClientSecret, setEmbeddedClientSecret] = useState<string | null>(null);
+
   // Payment calculator state
   const [transferHours, setTransferHours] = useState(0);
   const [hoursPerWeek, setHoursPerWeek] = useState(40);
@@ -75,13 +85,17 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
   });
   const [smsConsent, setSmsConsent] = useState(false);
 
+
+
   // Calculate next Friday on client only to avoid hydration mismatch
   useEffect(() => {
     setNextFriday(getNextFriday());
   }, []);
 
   const { weeklyDollars, weeks, hoursRemaining } = calculateWeeklyPayment(
-    paymentOption === 'custom' ? customAmount : PRICING.defaultDownPayment
+    paymentOption === 'custom' ? customAmount : PRICING.defaultDownPayment,
+    hoursPerWeek,
+    transferHours,
   );
 
   const updateField = (field: string, value: string) => {
@@ -125,7 +139,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
         customer_phone: formData.phone,
         sms_consent: smsConsent,
         application_id: applicationId,
-        transferred_hours: transferHours,
+        // transferred_hours is metadata only — does not affect price (progress credit only).
         transferred_hours_verified: transferHours,
         has_host_shop: formData.hasHostShop,
         host_shop_name: formData.hostShopName,
@@ -261,15 +275,32 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
         }
         return;
       } else if (paymentOption === 'stripe_bnpl') {
-        // Stripe-native BNPL (Klarna, Afterpay) — Stripe shows available methods at checkout
-        checkoutResponse = await fetch('/api/barber/checkout/public', {
+        // Klarna / Afterpay — open embedded checkout inline (no redirect)
+        const embeddedRes = await fetch('/api/barber/checkout/embedded', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            ...basePayload,
-            payment_type: 'bnpl',
+            customer_email: formData.email,
+            customer_name: `${formData.firstName} ${formData.lastName}`,
+            customer_phone: formData.phone,
+            sms_consent: smsConsent,
+            application_id: applicationId,
+            transferred_hours_verified: transferHours,
+            hours_per_week: hoursPerWeek,
+            has_host_shop: formData.hasHostShop,
+            host_shop_name: formData.hostShopName,
           }),
         });
+        const embeddedData = await embeddedRes.json();
+        if (!embeddedRes.ok || !embeddedData.clientSecret) {
+          setError(embeddedData.error || 'Unable to start checkout. Please try another payment option.');
+          setErrorSeverity('info');
+          setLoading(false);
+          return;
+        }
+        setEmbeddedClientSecret(embeddedData.clientSecret);
+        setLoading(false);
+        return;
       } else if (paymentOption === 'full') {
         // Pay in full - one-time payment
         checkoutResponse = await fetch('/api/barber/checkout/public', {
@@ -661,7 +692,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                         <p className="text-black text-sm">Small down payment, small weekly payments</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-brand-orange-600 text-xl">from $600</p>
+                        <p className="font-bold text-brand-orange-600 text-xl">from ${PRICING.minDownPayment.toLocaleString()}</p>
                         <p className="text-xs text-black">down today</p>
                       </div>
                     </div>
@@ -673,7 +704,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                       <label className="block text-sm font-bold text-black mb-1">
                         How much can you put down today?
                       </label>
-                      <p className="text-xs text-black mb-3">Minimum $600 — the more you put down, the lower your weekly payment.</p>
+                      <p className="text-xs text-black mb-3">Minimum ${PRICING.minDownPayment.toLocaleString()} — the more you put down, the lower your weekly payment.</p>
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-2xl font-bold text-black">$</span>
                         <input
@@ -704,8 +735,8 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                         className="w-full accent-brand-orange-600 mb-1"
                       />
                       <div className="flex justify-between text-xs text-black mb-4">
-                        <span>$600 min</span>
-                        <span>$4,980 full</span>
+                        <span>${PRICING.minDownPayment.toLocaleString()} min</span>
+                        <span>${PRICING.fullPrice.toLocaleString()} full</span>
                       </div>
 
                       {/* Live estimate — uses customAmount directly; shows dashes while field is empty */}
@@ -713,7 +744,7 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                         const isTyping = customAmountStr === '' || customAmount < PRICING.minDownPayment;
                         const displayDown = isTyping ? null : customAmount;
                         const displayRemaining = displayDown !== null ? Math.max(0, PRICING.fullPrice - displayDown) : null;
-                        const displayWeekly = displayDown !== null ? calculateWeeklyPayment(displayDown).weeklyDollars : null;
+                        const displayWeekly = displayDown !== null ? calculateWeeklyPayment(displayDown, hoursPerWeek, transferHours).weeklyDollars : null;
                         return (
                           <div className="bg-white rounded-lg p-4 border border-brand-orange-200">
                             <p className="text-xs text-black uppercase font-semibold mb-2">Your Payment Estimate</p>
@@ -901,28 +932,54 @@ export default function ApprenticeForm({ initialPayment }: { initialPayment?: st
                   </div>
                 </div>
 
-                {/* Pay Button */}
-                <button
-                  onClick={handlePayNow}
-                  disabled={loading || !formData.email || !formData.firstName || !formData.lastName || !formData.phone}
-                  className="w-full py-4 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:bg-slate-300 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 text-lg"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="w-5 h-5" />
-                      Continue to Payment
-                    </>
-                  )}
-                </button>
+                {/* Embedded Stripe Checkout — Klarna / Afterpay */}
+                {embeddedClientSecret && (
+                  <div className="mt-4 border-2 border-pink-200 rounded-xl overflow-hidden">
+                    <div className="bg-pink-50 px-4 py-3 flex items-center justify-between">
+                      <p className="text-sm font-semibold text-pink-900">Klarna / Afterpay Checkout</p>
+                      <button
+                        type="button"
+                        onClick={() => setEmbeddedClientSecret(null)}
+                        className="text-xs text-pink-700 hover:underline"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                    <EmbeddedCheckoutProvider
+                      stripe={stripePromise}
+                      options={{ clientSecret: embeddedClientSecret }}
+                    >
+                      <EmbeddedCheckout />
+                    </EmbeddedCheckoutProvider>
+                  </div>
+                )}
 
-                <p className="text-center text-sm text-black mt-4">
-                  Secure payment via Stripe. Card, Apple Pay, Google Pay, PayPal, Venmo, Cash App accepted.
-                </p>
+                {/* Pay Button — hidden while embedded checkout is open */}
+                {!embeddedClientSecret && (
+                  <>
+                    <button
+                      onClick={handlePayNow}
+                      disabled={loading || !formData.email || !formData.firstName || !formData.lastName || !formData.phone}
+                      className="w-full py-4 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:bg-slate-300 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 text-lg"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="w-5 h-5" />
+                          {paymentOption === 'stripe_bnpl' ? 'Open Klarna / Afterpay' : 'Continue to Payment'}
+                        </>
+                      )}
+                    </button>
+
+                    <p className="text-center text-sm text-black mt-4">
+                      Secure payment via Stripe. Card, Apple Pay, Google Pay, PayPal, Venmo, Cash App accepted.
+                    </p>
+                  </>
+                )}
               </div>
             </div>
 

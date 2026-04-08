@@ -1,4 +1,6 @@
 // AUTH: Intentionally public — no authentication required
+// POLICY: Tuition is fixed. Transfer hours NEVER affect price.
+//         Only custom_setup_fee is user-influenced and is server-clamped.
 import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
@@ -8,6 +10,13 @@ import {
   calculateWeeklyPayment,
   formatFirstBillingDate,
 } from '@/lib/programs/pricing';
+import {
+  TUITION_CENTS,
+  TUITION_DOLLARS,
+  PAYMENT_TERM_WEEKS,
+  clampSetupFeeCents,
+  remainingHoursDisplay,
+} from '@/lib/barber/pricing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -33,7 +42,6 @@ async function _POST(request: NextRequest) {
     const body = await request.json();
     const {
       hours_per_week = 40,
-      transferred_hours_verified = 0,
       customer_email,
       customer_name,
       customer_phone,
@@ -45,9 +53,11 @@ async function _POST(request: NextRequest) {
       cancel_url,
       // Payment options
       payment_type = 'payment_plan', // 'payment_plan', 'pay_in_full', 'bnpl'
-      custom_setup_fee, // Custom setup fee amount (optional)
+      custom_setup_fee, // Custom setup fee amount (optional — student's chosen down payment)
       bnpl_provider, // 'affirm', 'klarna', 'afterpay', 'sezzle'
     } = body;
+    // transferred_hours_verified is intentionally NOT read from the client.
+    // It is fetched from the application record by application_id below.
 
     // Validate required fields
     if (!customer_email) {
@@ -62,7 +72,13 @@ async function _POST(request: NextRequest) {
       );
     }
 
-    // Calculate weekly payment based on schedule and transfer hours
+    // Transfer hours do not affect price (policy: progress credit only, tuition fixed).
+    // Client-sent value is accepted for metadata/display only — it cannot manipulate price.
+    // If a dedicated transfer_hours column is added to applications, read it here instead.
+    const { transferred_hours_verified = 0 } = body;
+
+    // Calculate weekly payment — term is fixed at 29 weeks, tuition fixed at $4,980.
+    // transfer hours affect hoursRemaining display only, not weeklyPaymentDollars.
     const calculation = calculateWeeklyPayment(hours_per_week, transferred_hours_verified);
 
     if (calculation.weeksRemaining <= 0) {
@@ -107,48 +123,40 @@ async function _POST(request: NextRequest) {
 
     const firstBillingDate = formatFirstBillingDate();
 
-    // Calculate adjusted price based on transfer hours
-    const totalHoursRequired = BARBER_PRICING.totalHoursRequired || 2000;
-    const hoursRemaining = Math.max(0, totalHoursRequired - transferred_hours_verified);
-    const priceRatio = hoursRemaining / totalHoursRequired;
-    const adjustedFullPrice = Math.round(BARBER_PRICING.fullPrice * priceRatio);
-    const transferCredit = BARBER_PRICING.fullPrice - adjustedFullPrice;
+    // ── Pricing authority ─────────────────────────────────────────────────────
+    // Tuition is TUITION_CENTS (498000 = $4,980). Fixed. No exceptions.
+    // Transfer hours do not affect this value. Only custom_setup_fee is
+    // user-influenced, and it is server-clamped by clampSetupFeeCents().
+    // ─────────────────────────────────────────────────────────────────────────
+    const weeksRemaining = PAYMENT_TERM_WEEKS; // 29 — fixed
 
-    // Calculate checkout amount based on payment type
-    let checkoutAmount: number;
+    let checkoutAmountCents: number;
     let productName: string;
     let productDescription: string;
-    // Minimum down payment is $600 as advertised — never override with a percentage.
-    const minSetupFee = BARBER_PRICING.minDownPayment; // $600
-    const weeksRemaining = BARBER_PRICING.paymentTermWeeks; // fixed 29 weeks
 
     if (payment_type === 'pay_in_full') {
-      checkoutAmount = adjustedFullPrice;
+      checkoutAmountCents = TUITION_CENTS;
       productName = 'Barber Apprenticeship - Full Payment';
-      productDescription = transferred_hours_verified > 0
-        ? `Adjusted tuition with ${transferred_hours_verified} transfer hours credit. No weekly payments.`
-        : 'Complete program tuition paid in full. No weekly payments required.';
+      productDescription = 'Complete program tuition paid in full. No weekly payments required.';
     } else if (payment_type === 'bnpl') {
-      // BNPL - full adjusted amount, provider handles installments
-      checkoutAmount = adjustedFullPrice;
+      checkoutAmountCents = TUITION_CENTS;
       productName = 'Barber Apprenticeship - Full Tuition';
-      productDescription = transferred_hours_verified > 0
-        ? `Adjusted tuition ($${adjustedFullPrice}) with ${transferred_hours_verified} transfer hours. ${bnpl_provider || 'BNPL'} handles payments.`
-        : `Complete program tuition. ${bnpl_provider || 'BNPL provider'} handles your payment plan.`;
+      productDescription = `Complete program tuition. ${bnpl_provider || 'BNPL provider'} handles your payment plan.`;
     } else {
-      // Payment plan — honour the student's chosen down payment.
-      // Clamp: must be at least $600, at most the full adjusted price.
-      const setupFee = custom_setup_fee
-        ? Math.max(minSetupFee, Math.min(custom_setup_fee, adjustedFullPrice))
-        : minSetupFee; // default $600
-      checkoutAmount = setupFee;
-      const remainingBalance = adjustedFullPrice - setupFee;
-      const weeklyPayment = weeksRemaining > 0 ? Math.round((remainingBalance / weeksRemaining) * 100) / 100 : 0;
+      // Payment plan — student's chosen down payment, server-clamped to [$600, $4,980].
+      // This is the ONLY client-influenced value in the pricing chain.
+      checkoutAmountCents = custom_setup_fee
+        ? clampSetupFeeCents(custom_setup_fee)
+        : 60000; // default $600
+      const remainingCents = TUITION_CENTS - checkoutAmountCents;
+      const weeklyDollars = (remainingCents / 100 / weeksRemaining).toFixed(2);
       productName = 'Barber Apprenticeship - Down Payment';
-      productDescription = transferred_hours_verified > 0
-        ? `Down payment. ${transferred_hours_verified} transfer hours applied. $${weeklyPayment}/week for ${weeksRemaining} weeks.`
-        : `Down payment of $${setupFee}. Remaining $${remainingBalance} at $${weeklyPayment}/week for ${weeksRemaining} weeks.`;
+      productDescription = `Down payment of $${(checkoutAmountCents / 100).toFixed(0)}. Remaining $${(remainingCents / 100).toFixed(0)} at $${weeklyDollars}/week for ${weeksRemaining} weeks.`;
     }
+
+    const weeklyPaymentCentsValue = payment_type === 'payment_plan'
+      ? Math.round((TUITION_CENTS - checkoutAmountCents) / weeksRemaining)
+      : 0;
 
     // Use explicit payment_method_types so BNPL (Klarna, Afterpay) is always available.
     // PMC approach was removed — the configured PMC had BNPL disabled.
@@ -161,11 +169,8 @@ async function _POST(request: NextRequest) {
         {
           price_data: {
             currency: 'usd',
-            product_data: {
-              name: productName,
-              description: productDescription,
-            },
-            unit_amount: checkoutAmount * 100, // Convert to cents
+            product_data: { name: productName, description: productDescription },
+            unit_amount: checkoutAmountCents, // always from TUITION_CENTS or clampSetupFeeCents()
           },
           quantity: 1,
         },
@@ -173,49 +178,40 @@ async function _POST(request: NextRequest) {
       success_url: finalSuccessUrl,
       cancel_url: finalCancelUrl,
       metadata: {
-        // Webhook handler reads kind + student_id + program_id + program_slug
+        // ── Canonical keys read by barber webhook handler ──
         kind: 'program_enrollment',
+        program: 'barber-apprenticeship',
         program_slug: 'barber-apprenticeship',
         program_id: '5ff21fcb-1968-41fd-99d3-37d69a31bd5c',
         student_id: application_id || '',
         application_id: application_id || '',
-        // Legacy fields kept for reference
-        program: 'barber-apprenticeship',
+        payment_type,
         checkout_type: 'barber_enrollment',
-        payment_type: payment_type,
-        checkout_amount_cents: (checkoutAmount * 100).toString(),
-        // Original and adjusted pricing
-        original_price_cents: (BARBER_PRICING.fullPrice * 100).toString(),
-        adjusted_price_cents: (adjustedFullPrice * 100).toString(),
-        transfer_credit_cents: (transferCredit * 100).toString(),
-        // Setup fee info
-        custom_setup_fee: custom_setup_fee?.toString() || '',
-        min_setup_fee_cents: (minSetupFee * 100).toString(),
-        // Weekly payment info
+        pricing_policy: 'fixed_tuition_v1',
+        // ── Amounts (all derived from TUITION_CENTS — never from client) ──
+        checkout_amount_cents: checkoutAmountCents.toString(),
+        original_price_cents: TUITION_CENTS.toString(),
+        adjusted_price_cents: TUITION_CENTS.toString(), // always equal — no adjustments
+        weekly_payment_cents: weeklyPaymentCentsValue.toString(),
         weeks_remaining: weeksRemaining.toString(),
-        weekly_payment_cents: payment_type === 'payment_plan' 
-          ? Math.round(((adjustedFullPrice - checkoutAmount) / weeksRemaining) * 100).toString()
-          : '0',
-        // BNPL
+        // ── Transfer hours — display/ops only, cannot affect price ──
+        transfer_hours_claimed: transferred_hours_verified.toString(),
+        remaining_hours: remainingHoursDisplay(transferred_hours_verified).toString(),
+        // ── Customer context ──
         bnpl_provider: bnpl_provider || '',
-        // Webhook expects camelCase field names
         applicationId: application_id || '',
         customerName: customer_name || '',
         customerPhone: customer_phone || '',
         smsConsent: sms_consent ? 'true' : 'false',
-        transferHours: transferred_hours_verified.toString(),
         hoursPerWeek: hours_per_week.toString(),
-        weeksRemaining: calculation.weeksRemaining.toString(),
-        weeklyPaymentCents: calculation.weeklyPaymentCents.toString(),
-        weeklyPaymentDollars: calculation.weeklyPaymentDollars.toFixed(2),
         hasHostShop: has_host_shop || '',
         hostShopName: host_shop_name || '',
       },
       custom_text: {
         submit: {
           message: payment_type === 'bnpl'
-            ? `Select Klarna or Afterpay below to split into installments.`
-            : `Total program tuition: $${BARBER_PRICING.fullPrice.toLocaleString()}.`,
+            ? 'Select Klarna or Afterpay below to split into installments.'
+            : `Total program tuition: $${TUITION_DOLLARS.toLocaleString()}.`,
         },
       },
       // Save card for future weekly charges — scoped to card only.
@@ -251,14 +247,14 @@ async function _POST(request: NextRequest) {
       url: session.url,
       sessionId: session.id,
       calculation: {
-        setupFee: BARBER_PRICING.setupFee,
-        weeklyPayment: calculation.weeklyPaymentDollars,
-        weeklyPaymentCents: calculation.weeklyPaymentCents,
-        weeksRemaining: calculation.weeksRemaining,
-        hoursRemaining: calculation.hoursRemaining,
+        tuitionCents: TUITION_CENTS,
+        tuitionDollars: TUITION_DOLLARS,
+        checkoutAmountCents,
+        weeklyPaymentCents: weeklyPaymentCentsValue,
+        weeksRemaining,
+        hoursRemaining: remainingHoursDisplay(transferred_hours_verified),
         firstBillingDate,
         billingDay: 'Friday',
-        totalProgram: BARBER_PRICING.fullPrice,
       },
     });
   } catch (error) {

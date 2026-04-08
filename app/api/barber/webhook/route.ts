@@ -862,8 +862,12 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
           break;
         }
 
-        // Idempotent — only update if not already past_due or suspended
-        if (!['past_due', 'suspended', 'cancelled'].includes(sub.payment_status ?? '')) {
+        // Idempotent — only act on first failure for this subscription.
+        // failed_payment_at being null means we haven't processed a failure yet.
+        const isFirstFailure = !sub.failed_payment_at &&
+          !['past_due', 'suspended', 'cancelled'].includes(sub.payment_status ?? '');
+
+        if (isFirstFailure) {
           await db
             .from('barber_subscriptions')
             .update({
@@ -872,11 +876,20 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
               suspension_deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
             })
             .eq('id', sub.id);
+
+          // Log to billing_events for audit trail
+          const invoiceId = 'id' in failedObj ? failedObj.id : undefined;
+          await db.from('billing_events').insert({
+            barber_subscription_id: sub.id,
+            event_type: 'payment_failed',
+            stripe_invoice_id: invoiceId || null,
+            metadata: { stripe_customer_id: failedCustomerId, event_id: event.id },
+          }).catch(() => {});
         }
 
-        // 2. Send immediate email with update-card link
+        // 2. Send immediate email — only on first failure to avoid duplicate alerts on retries
         const studentEmail = failedEmail || sub.customer_email;
-        if (studentEmail) {
+        if (studentEmail && isFirstFailure) {
           try {
             const { sendEmail } = await import('@/lib/email/sendgrid');
             const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
@@ -893,12 +906,12 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
   <li>Stripe will automatically retry the charge once your card is updated.</li>
 </ol>
 <p style="margin:24px 0">
-  <a href="${siteUrl}/apprentice/billing" style="background:#1d4ed8;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block">
+  <a href="${siteUrl}/billing-required" style="background:#1d4ed8;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block">
     Update Payment Method →
   </a>
 </p>
-<p style="color:#dc2626;font-weight:bold">Important: If this is not resolved within 7 days, your program access will be suspended.</p>
-<p>Suspended students cannot log hours or access coursework. Suspended hours do not count toward your apprenticeship total.</p>
+<p style="color:#dc2626;font-weight:bold">Important: If this is not resolved within 7 days, your account will be suspended from logging hours. You can continue coursework, but hours cannot be recorded until your billing is resolved.</p>
+<p>Hours logged while suspended do not count toward your apprenticeship total.</p>
 <p>Call us at <a href="tel:3173143757">(317) 314-3757</a> if you need help — we can work with you before suspension occurs.</p>
 <p>— Elevate for Humanity</p>
 </div>`,
@@ -908,17 +921,19 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
           }
         }
 
-        // 3. Alert admin
-        try {
-          const { sendEmail } = await import('@/lib/email/sendgrid');
-          await sendEmail({
-            to: 'elevate4humanityedu@gmail.com',
-            subject: `Payment failed — ${studentEmail}`,
-            html: `<p>Student: ${studentEmail}<br>Customer ID: ${failedCustomerId}<br>Subscription ID: ${sub.id}<br>Suspension deadline: 7 days from now.</p>`,
-          });
-        } catch { /* non-fatal */ }
+        // 3. Alert admin — only on first failure
+        if (isFirstFailure) {
+          try {
+            const { sendEmail } = await import('@/lib/email/sendgrid');
+            await sendEmail({
+              to: 'elevate4humanityedu@gmail.com',
+              subject: `Payment failed — ${studentEmail}`,
+              html: `<p>Student: ${studentEmail}<br>Customer ID: ${failedCustomerId}<br>Subscription ID: ${sub.id}<br>Suspension deadline: 7 days from now.</p>`,
+            });
+          } catch { /* non-fatal */ }
+        }
 
-        logger.info('[Barber Webhook] Payment failed — marked past_due', { failedCustomerId, studentEmail });
+        logger.info('[Barber Webhook] Payment failed', { failedCustomerId, studentEmail, isFirstFailure });
         break;
       }
 
@@ -935,16 +950,16 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
           break;
         }
 
-        // Record payment
-        await supabase.from('barber_payments').insert({
+        // Record payment — upsert on stripe_invoice_id so Stripe retries are idempotent
+        await supabase.from('barber_payments').upsert({
           user_id: subscription.metadata?.user_id,
           stripe_subscription_id: subscriptionId,
           stripe_invoice_id: invoice.id,
           amount_paid: (invoice.amount_paid || 0) / 100,
           payment_date: new Date().toISOString(),
           invoice_url: invoice.hosted_invoice_url,
-        }).catch(() => {
-          // Table may not exist
+        }, { onConflict: 'stripe_invoice_id', ignoreDuplicates: true }).catch(() => {
+          // Table may not exist yet — non-fatal
         });
 
         // Reinstate if previously suspended or past_due

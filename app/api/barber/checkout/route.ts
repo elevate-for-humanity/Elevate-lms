@@ -1,3 +1,5 @@
+// POLICY: Tuition is fixed. Transfer hours NEVER affect price.
+//         Only custom_setup_fee is user-influenced and is server-clamped.
 import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
@@ -8,8 +10,12 @@ import {
   getBillingCycleAnchor,
   formatFirstBillingDate,
 } from '@/lib/programs/pricing';
+import {
+  TUITION_CENTS,
+  PAYMENT_TERM_WEEKS,
+  remainingHoursDisplay,
+} from '@/lib/barber/pricing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -74,9 +80,13 @@ async function _POST(request: NextRequest) {
       );
     }
 
-    // Calculate weekly payment based on schedule and transfer hours
+    // ── Pricing authority ─────────────────────────────────────────────────────
+    // Tuition is TUITION_CENTS (498000 = $4,980). Fixed. No exceptions.
+    // Transfer hours do not affect price — they only affect hoursRemaining display.
+    // weekly_payment_cents = (TUITION_CENTS - setup_fee_cents) / PAYMENT_TERM_WEEKS
+    // ─────────────────────────────────────────────────────────────────────────
     const calculation = calculateWeeklyPayment(hours_per_week, transferred_hours_verified);
-    
+
     if (calculation.weeksRemaining <= 0) {
       return NextResponse.json(
         { error: 'Invalid calculation: no weeks remaining' },
@@ -160,33 +170,49 @@ async function _POST(request: NextRequest) {
       subscription_data: {
         billing_cycle_anchor: billingCycleAnchor,
         metadata: {
+          // ── Canonical keys ──
+          kind: 'program_enrollment',
+          program: 'barber-apprenticeship',
+          program_slug: 'barber-apprenticeship',
+          program_id: '5ff21fcb-1968-41fd-99d3-37d69a31bd5c',
+          pricing_policy: 'fixed_tuition_v1',
           user_id: user.id,
           enrollment_id: enrollment_id || '',
-          program: 'barber-apprenticeship',
-          hours_per_week: hours_per_week.toString(),
-          transferred_hours_verified: transferred_hours_verified.toString(),
-          hours_remaining: calculation.hoursRemaining.toString(),
-          weeks_remaining: calculation.weeksRemaining.toString(),
+          // ── Amounts (all from TUITION_CENTS — never client-derived) ──
+          original_price_cents: TUITION_CENTS.toString(),
+          setup_fee_cents: (BARBER_PRICING.setupFee * 100).toString(),
           weekly_payment_cents: calculation.weeklyPaymentCents.toString(),
-          weekly_payment_dollars: calculation.weeklyPaymentDollars.toFixed(2),
-          full_price: BARBER_PRICING.fullPrice.toString(),
-          setup_fee: BARBER_PRICING.setupFee.toString(),
-          remaining_balance: BARBER_PRICING.remainingBalance.toString(),
+          weeks_remaining: PAYMENT_TERM_WEEKS.toString(),
           first_billing_date: firstBillingDateFormatted,
+          // ── Transfer hours — display/ops only, cannot affect price ──
+          transfer_hours_claimed: transferred_hours_verified.toString(),
+          remaining_hours: remainingHoursDisplay(transferred_hours_verified).toString(),
+          hours_per_week: hours_per_week.toString(),
         },
       },
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/programs/barber-apprenticeship/apply/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/programs/barber-apprenticeship?canceled=true`,
       metadata: {
+        // ── Session-level metadata (webhook reads these) ──
+        kind: 'program_enrollment',
+        program: 'barber-apprenticeship',
+        program_slug: 'barber-apprenticeship',
+        program_id: '5ff21fcb-1968-41fd-99d3-37d69a31bd5c',
+        pricing_policy: 'fixed_tuition_v1',
         user_id: user.id,
         enrollment_id: enrollment_id || '',
-        program: 'barber-apprenticeship',
         checkout_type: 'barber_enrollment',
+        payment_type: 'payment_plan',
+        checkout_amount_cents: (BARBER_PRICING.setupFee * 100).toString(),
+        original_price_cents: TUITION_CENTS.toString(),
+        weekly_payment_cents: calculation.weeklyPaymentCents.toString(),
+        weeks_remaining: PAYMENT_TERM_WEEKS.toString(),
+        transfer_hours_claimed: transferred_hours_verified.toString(),
+        remaining_hours: remainingHoursDisplay(transferred_hours_verified).toString(),
       },
-      // Custom text for clarity
       custom_text: {
         submit: {
-          message: `Setup fee ($1,743) due today. Weekly payments ($${calculation.weeklyPaymentDollars.toFixed(2)}/week) begin ${firstBillingDateFormatted}.`,
+          message: `Setup fee ($${BARBER_PRICING.setupFee.toLocaleString()}) due today. Weekly payments ($${calculation.weeklyPaymentDollars.toFixed(2)}/week) begin ${firstBillingDateFormatted}.`,
         },
       },
     });

@@ -53,10 +53,12 @@ export interface RuntimeOptions {
    */
   auth?: AuthMode;
   /**
-   * Cron route — validates x-cron-secret header against CRON_SECRET env var.
+   * Cron route — validates cron secret header against CRON_SECRET env var.
    * Automatically adds 'CRON_SECRET' to required secrets.
+   *   'x-header'  — checks x-cron-secret header (Netlify scheduled functions)
+   *   'bearer'    — checks Authorization: Bearer <secret> header (Vercel/manual cron)
    */
-  cron?: boolean;
+  cron?: 'x-header' | 'bearer';
 }
 
 export interface RuntimeContext {
@@ -83,6 +85,7 @@ export function withRuntime(options: RuntimeOptions, handler: Handler) {
       ...(options.cron ? ['CRON_SECRET'] : []),
     ];
 
+
     const env: Record<string, string> = {};
     const missing: string[] = [];
 
@@ -108,10 +111,14 @@ export function withRuntime(options: RuntimeOptions, handler: Handler) {
 
     // 3. Cron secret validation
     if (options.cron) {
-      const provided = req.headers.get('x-cron-secret');
-      if (provided !== env['CRON_SECRET']) {
+      const cronSecret = env['CRON_SECRET'];
+      const provided = options.cron === 'bearer'
+        ? req.headers.get('authorization')?.replace(/^Bearer\s+/, '')
+        : req.headers.get('x-cron-secret');
+      if (provided !== cronSecret) {
         logger.warn('[withRuntime] Cron secret mismatch', {
           route: req.nextUrl.pathname,
+          mode: options.cron,
           ip: req.headers.get('x-forwarded-for') ?? 'unknown',
         });
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

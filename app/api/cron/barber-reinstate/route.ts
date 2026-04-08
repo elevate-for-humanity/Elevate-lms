@@ -16,18 +16,16 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { getStripe } from '@/lib/stripe/client';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
+import { withRuntime } from '@/lib/api/withRuntime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
-
-export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export const GET = withRuntime(
+  { cron: 'bearer' },
+  async () => {
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
   const db = createAdminClient();
   if (!db) {
@@ -109,7 +107,8 @@ export async function GET(request: Request) {
     logger.error('[barber-reinstate cron] fatal', err);
     return NextResponse.json({ error: 'Cron failed', details: String(err) }, { status: 500 });
   }
-}
+  }
+);
 
 function reinstateEmailHtml({ name, dashboardUrl }: { name: string; dashboardUrl: string }) {
   return `

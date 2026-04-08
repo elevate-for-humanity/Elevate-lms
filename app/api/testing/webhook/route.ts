@@ -19,30 +19,38 @@ import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
 import { TESTING_CENTER, TESTING_EMAIL, CALENDLY_CONFIG } from '@/lib/testing/testing-config';
 import { createSchedulingLink, getEventTypes } from '@/lib/testing/calendly';
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { withRuntime } from '@/lib/api/withRuntime';
+import { ENV } from '@/lib/api/env-groups';
+import { TestingSessionMeta, parseWebhookMeta } from '@/lib/stripe/webhook-schemas';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 const FROM = TESTING_EMAIL.from;
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
 
-export async function POST(req: NextRequest) {
-  await hydrateProcessEnv();
-  const stripeKey = process.env.STRIPE_SECRET_KEY;
-  const webhookSecret = process.env.STRIPE_TESTING_WEBHOOK_SECRET ?? process.env.STRIPE_WEBHOOK_SECRET;
-  if (!stripeKey || !webhookSecret) {
-    return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
-  }
+export const POST = withRuntime(
+  { secrets: [...ENV.STRIPE_TESTING_WEBHOOK] },
+  async (req, ctx) => {
+  const stripeKey = ctx.env.STRIPE_SECRET_KEY;
+  const webhookSecret = ctx.env.STRIPE_TESTING_WEBHOOK_SECRET;
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
 
   const body = await req.text();
   const sig = req.headers.get('stripe-signature');
-  if (!sig) return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
+  if (!sig) {
+    logger.warn('[testing/webhook] Missing stripe-signature header', {
+      ip: req.headers.get('x-forwarded-for') ?? 'unknown',
+    });
+    return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
+  }
 
   let event: Stripe.Event;
   try {
     event = new Stripe(stripeKey).webhooks.constructEvent(body, sig, webhookSecret);
   } catch {
+    logger.warn('[testing/webhook] Signature verification failed', {
+      ip: req.headers.get('x-forwarded-for') ?? 'unknown',
+    });
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
@@ -51,12 +59,14 @@ export async function POST(req: NextRequest) {
   }
 
   const session = event.data.object as Stripe.Checkout.Session;
-  const meta = session.metadata ?? {};
   const db = createAdminClient();
   if (!db) return NextResponse.json({ error: 'DB unavailable' }, { status: 500 });
 
   // ── Exam booking fee paid ────────────────────────────────────────────────
-  if (meta.payment_type === 'testing_fee') {
+  if (session.metadata?.payment_type === 'testing_fee') {
+    // Validate metadata contract before any business logic
+    const meta = parseWebhookMeta(TestingSessionMeta, session.metadata, event.id, logger);
+    if (!meta) return NextResponse.json({ received: true }); // ack, skip malformed
     const paymentIntentId = session.payment_intent as string ?? null;
 
     // Idempotency — skip if already processed for this payment intent
@@ -109,11 +119,11 @@ export async function POST(req: NextRequest) {
     const { error: insertErr } = await db.from('exam_bookings').insert({
       exam_type:               meta.exam_type,
       exam_name:               meta.exam_name,
-      booking_type:            meta.booking_type ?? 'individual',
+      booking_type:            meta.booking_type,
       first_name:              firstName || 'Customer',
       last_name:               lastName,
       email:                   customerEmail,
-      participant_count:       parseInt(meta.participant_count ?? '1', 10),
+      participant_count:       meta.participant_count,
       status:                  'pending',
       payment_status:          'paid',
       payment_intent_id:       paymentIntentId,
@@ -250,4 +260,5 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ received: true });
-}
+  }
+);

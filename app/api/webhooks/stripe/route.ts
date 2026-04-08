@@ -50,6 +50,12 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tracker';
 import { flagCertificatesOnRefund } from '@/lib/certificates/flag-on-refund';
 import * as Sentry from '@sentry/nextjs';
+import {
+  ProgramEnrollmentMeta,
+  LmsSubscriptionMeta,
+  BarberInvoiceMeta,
+  parseWebhookMeta,
+} from '@/lib/stripe/webhook-schemas';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -419,10 +425,12 @@ async function _POST(request: NextRequest) {
       // Instead, directly handle the two enrollment paths:
 
       if (asyncSession.metadata?.kind === 'program_enrollment') {
-        const studentId = asyncSession.metadata.student_id;
-        const programId = asyncSession.metadata.program_id;
-        const programSlug = asyncSession.metadata.program_slug;
-        const fundingSource = asyncSession.metadata.funding_source || 'self_pay';
+        const enrollMeta = parseWebhookMeta(ProgramEnrollmentMeta, asyncSession.metadata, event.id, logger);
+        if (!enrollMeta) break;
+        const studentId = enrollMeta.student_id;
+        const programId = enrollMeta.program_id;
+        const programSlug = enrollMeta.program_slug;
+        const fundingSource = enrollMeta.funding_source;
         const amountPaid = (asyncSession.amount_total || 0) / 100;
 
         if (studentId && programId) {
@@ -526,8 +534,10 @@ async function _POST(request: NextRequest) {
 
       // Only handle store subscriptions
       if (subscription.metadata?.user_id) {
+        const lmsMeta = parseWebhookMeta(LmsSubscriptionMeta, subscription.metadata, event.id, logger);
+        if (!lmsMeta) break;
         try {
-          const userId = subscription.metadata.user_id;
+          const userId = lmsMeta.user_id;
           const priceId = subscription.items.data[0]?.price.id;
 
           if (!priceId) {
@@ -674,9 +684,11 @@ async function _POST(request: NextRequest) {
       // Handle failed apprenticeship installment payment
       // Pause enrollment and lock portal access
       if (invoice.metadata?.kind === 'apprenticeship_enrollment') {
+        const invoiceMeta = parseWebhookMeta(BarberInvoiceMeta, invoice.metadata, event.id, logger);
+        if (!invoiceMeta) break;
         try {
-          const applicationId = invoice.metadata.application_id;
-          const studentId = invoice.metadata.student_id;
+          const applicationId = invoiceMeta.application_id;
+          const studentId = invoiceMeta.student_id;
 
           logger.info('[webhook] Apprenticeship payment failed, pausing enrollment', {
             applicationId, studentId

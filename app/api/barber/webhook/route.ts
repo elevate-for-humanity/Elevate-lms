@@ -7,6 +7,12 @@ import Stripe from 'stripe';
 import { BARBER_PRICING, calculateWeeklyPayment } from '@/lib/programs/pricing';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { runBarberPostPayment } from '@/lib/enrollment/barber-post-payment';
+import {
+  BarberEnrollmentMeta,
+  BarberSubscriptionMeta,
+  BarberInvoiceMeta,
+  parseWebhookMeta,
+} from '@/lib/stripe/webhook-schemas';
 
 const LMS_URL =
   (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org') + '/lms/courses';
@@ -121,21 +127,24 @@ async function _POST(request: NextRequest) {
           break;
         }
 
+        // Validate metadata contract before any business logic
+        const meta = parseWebhookMeta(BarberEnrollmentMeta, session.metadata, event.id, logger);
+        if (!meta) break; // ack to Stripe, skip malformed event
+
         const customerId = session.customer as string;
         const customerEmail = session.customer_details?.email || session.customer_email || '';
-        const customerName = session.customer_details?.name || session.metadata?.customer_name || '';
-        // Public checkout stores as customerPhone; auth checkout as customer_phone
-        const customerPhone = session.metadata?.customerPhone || session.metadata?.customer_phone || '';
-        const applicationId = session.metadata?.application_id || session.metadata?.applicationId;
-        const checkoutType = session.metadata?.checkout_type;
+        const customerName = session.customer_details?.name || meta.customer_name || '';
+        const customerPhone = meta.customer_phone || '';
+        const applicationId = meta.application_id || undefined;
+        const checkoutType = meta.checkout_type;
 
         // Handle full tuition payment (with BNPL support)
         if (checkoutType === 'barber_full_tuition') {
-          const fullTuitionCents = parseInt(session.metadata?.full_tuition_cents || '498000');
+          const fullTuitionCents = meta.original_price_cents;
           const amountPaidCents = session.amount_total || 0;
-          const weeksRemaining = parseInt(session.metadata?.weeks_remaining || '50');
-          const hoursPerWeek = parseInt(session.metadata?.hours_per_week || '40');
-          const transferredHours = parseInt(session.metadata?.transferHours || '0');
+          const weeksRemaining = meta.weeks_remaining;
+          const hoursPerWeek = meta.hours_per_week;
+          const transferredHours = meta.transfer_hours_claimed;
           
           // Check payment method used
           const paymentIntent = session.payment_intent as string;
@@ -395,13 +404,14 @@ ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive ev
 
         // Public (unauthenticated) enrollment — payment_plan or pay_in_full
         if (checkoutType === 'barber_enrollment') {
-          const paymentType = session.metadata?.payment_type || 'payment_plan';
+          // meta already validated above — use typed fields directly
+          const paymentType = meta.payment_type;
           const amountPaidCents = session.amount_total || 0;
-          const weeksRemaining = parseInt(session.metadata?.weeks_remaining || '50');
-          const hoursPerWeek = parseInt(session.metadata?.hours_per_week || '40');
-          const transferredHours = parseInt(session.metadata?.transferHours || session.metadata?.transferredHours || '0');
-          const weeklyPaymentCents = parseInt(session.metadata?.weekly_payment_cents || '0');
-          const adjustedPriceCents = parseInt(session.metadata?.adjusted_price_cents || '498000');
+          const weeksRemaining = meta.weeks_remaining;
+          const hoursPerWeek = meta.hours_per_week;
+          const transferredHours = meta.transfer_hours_claimed;
+          const weeklyPaymentCents = meta.weekly_payment_cents;
+          const adjustedPriceCents = meta.adjusted_price_cents;
           const fullyPaid = paymentType === 'pay_in_full' || amountPaidCents >= adjustedPriceCents;
           const remainingBalanceCents = Math.max(0, adjustedPriceCents - amountPaidCents);
 
@@ -950,9 +960,13 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
           break;
         }
 
+        // Validate subscription metadata contract
+        const subMeta = parseWebhookMeta(BarberSubscriptionMeta, subscription.metadata, event.id, logger);
+        if (!subMeta) break;
+
         // Record payment — upsert on stripe_invoice_id so Stripe retries are idempotent
         await supabase.from('barber_payments').upsert({
-          user_id: subscription.metadata?.user_id,
+          user_id: subMeta.user_id || null,
           stripe_subscription_id: subscriptionId,
           stripe_invoice_id: invoice.id,
           amount_paid: (invoice.amount_paid || 0) / 100,

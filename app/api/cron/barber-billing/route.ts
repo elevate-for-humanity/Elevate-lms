@@ -19,19 +19,18 @@ import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
+import { withRuntime } from '@/lib/api/withRuntime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
-export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export const GET = withRuntime(
+  { cron: 'bearer' },
+  async () => {
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
   const db = createAdminClient();
   if (!db) {
@@ -114,7 +113,8 @@ export async function GET(request: Request) {
     logger.error('[barber-billing cron] fatal', err);
     return NextResponse.json({ error: 'Cron failed', details: String(err) }, { status: 500 });
   }
-}
+  }
+);
 
 function suspensionEmailHtml({ name, updateUrl }: { name: string; updateUrl: string }) {
   return `

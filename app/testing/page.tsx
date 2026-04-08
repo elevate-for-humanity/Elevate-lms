@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { CalendarDays, DollarSign, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ACTIVE_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
+import { CALENDLY_CONFIG } from '@/lib/testing/testing-config';
 
 export const metadata: Metadata = {
   title: 'Testing & Credential Exams | Elevate for Humanity',

@@ -18,11 +18,13 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError } from '@/lib/api/safe-error';
 import { CALENDLY_CONFIG } from '@/lib/testing/testing-config';
+import { hydrateProcessEnv } from '@/lib/secrets';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function GET(req: NextRequest) {
+  await hydrateProcessEnv();
   const rateLimited = await applyRateLimit(req, 'public');
   if (rateLimited) return rateLimited;
 

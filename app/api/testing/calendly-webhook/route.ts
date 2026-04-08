@@ -23,6 +23,7 @@ import { sendSMS } from '@/lib/notifications/sms';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { TESTING_CENTER } from '@/lib/testing/testing-config';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import crypto from 'crypto';
 
 export const runtime = 'nodejs';
@@ -127,6 +128,7 @@ function cancellationEmailHtml(name: string, startTime: string): string {
 // ─── Handler ──────────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  await hydrateProcessEnv();
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
 

@@ -17,11 +17,13 @@ import { resend } from '@/lib/resend';
 import { sendSMS } from '@/lib/notifications/sms';
 import { logger } from '@/lib/logger';
 import { TESTING_CENTER } from '@/lib/testing/testing-config';
+import { hydrateProcessEnv } from '@/lib/secrets';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
+  await hydrateProcessEnv();
   const secret = req.headers.get('x-cron-secret');
   if (secret !== process.env.CRON_SECRET) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

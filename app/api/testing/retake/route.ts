@@ -60,6 +60,7 @@ function getRetakeFeeCents(examType: string | null | undefined): number {
 export async function POST(req: NextRequest) {
   await hydrateProcessEnv();
   const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
 
   const db = createAdminClient();
   if (!db) return safeError('Database unavailable', 500);

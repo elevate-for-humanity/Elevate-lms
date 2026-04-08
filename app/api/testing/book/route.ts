@@ -20,8 +20,11 @@ function generateCode(): string {
   return Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
 
-function fmtDate(d: string) {
-  return new Date(d + 'T12:00:00').toLocaleDateString('en-US', {
+function fmtDate(d: string | null | undefined): string {
+  if (!d) return 'To be scheduled';
+  const parsed = new Date(d + 'T12:00:00');
+  if (isNaN(parsed.getTime())) return 'To be scheduled';
+  return parsed.toLocaleDateString('en-US', {
     weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
   });
 }

@@ -196,7 +196,10 @@ async function _POST(
       type: 'magiclink',
       email: partnerEmail,
       options: {
-        redirectTo: `${siteUrl}/partner-portal`,
+        // ?next= is read by /auth/callback and takes priority over role-based routing.
+        // Without it, partners land on /program-holder/dashboard (role default) instead
+        // of their dedicated portal.
+        redirectTo: `${siteUrl}/auth/callback?next=/partner/dashboard`,
       },
     });
 

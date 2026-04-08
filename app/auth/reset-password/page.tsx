@@ -100,6 +100,12 @@ export default function AuthResetPasswordPage() {
           >
             Sign In
           </Link>
+          <p className="mt-4 text-sm text-gray-500">
+            Partner?{' '}
+            <Link href="/partner/login" className="text-brand-blue-600 hover:underline">
+              Sign in to Partner Portal
+            </Link>
+          </p>
         </div>
       </div>
     );

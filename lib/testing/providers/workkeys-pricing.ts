@@ -65,7 +65,7 @@ if (agencyMargin < 0.30) {
 export const WORKKEYS_PRICING = {
   /**
    * Per-assessment (individual test-taker, single section).
-   * Applied Math · Workplace Documents · Business Writing
+   * Applied Math · Workplace Documents · Graphic Literacy
    */
   individual: {
     price:    individual.price,
@@ -107,7 +107,7 @@ export const WORKKEYS_FEES = [
   {
     label:  'Per assessment (individual)',
     amount: WORKKEYS_PRICING.individual.price,
-    note:   'Applied Math · Workplace Documents · Business Writing',
+    note:   'Applied Math · Workplace Documents · Graphic Literacy',
   },
   {
     label:  'Full NCRC (3 assessments)',

@@ -315,7 +315,7 @@ export default async function ProviderPage({ params }: Props) {
             <ul className="text-amber-800 text-sm space-y-1.5">
               <li>• Valid government-issued photo ID</li>
               <li>• Confirmation email / booking reference</li>
-              <li>• Arrive 10 minutes early</li>
+              <li>• Arrive 15 minutes early</li>
               {provider.capability !== 'IN_PERSON_ONLY' && (
                 <li>• Webcam + stable internet (remote option)</li>
               )}

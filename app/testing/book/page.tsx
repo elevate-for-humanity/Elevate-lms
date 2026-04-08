@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight, MapPinned, Monitor, Phone, AlertTriangle, CreditCard } from 'lucide-react';
@@ -9,6 +9,7 @@ import {
   getProctoringOptions,
   type CertProvider,
 } from '@/lib/testing/proctoring-capabilities';
+import { TESTING_CENTER } from '@/lib/testing/testing-config';
 
 const ORG_TYPES = [
   'Employer / Company',
@@ -73,19 +74,42 @@ function BookingForm() {
     }
   };
 
-  // Check for no-show/retake hold when email is entered
-  const checkEnforcementHold = async (emailVal: string) => {
-    if (!emailVal || !emailVal.includes('@')) return;
-    setCheckingHold(true);
-    try {
-      const res = await fetch(`/api/testing/enforcement?email=${encodeURIComponent(emailVal)}`);
-      const data = await res.json();
-      setEnforcementHold(data.hasHold ? data.holds[0] : null);
-    } catch {
-      // non-blocking — don't block booking if check fails
-    } finally {
+  // Check for no-show/retake hold when email is entered.
+  // Debounced 400ms + aborts in-flight requests to prevent stacked calls on fast typing.
+  const enforcementAbortRef = useRef<AbortController | null>(null);
+  const enforcementTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const checkEnforcementHold = (emailVal: string) => {
+    // Cancel any pending debounce
+    if (enforcementTimerRef.current) clearTimeout(enforcementTimerRef.current);
+    // Abort any in-flight request
+    if (enforcementAbortRef.current) enforcementAbortRef.current.abort();
+
+    if (!emailVal || !emailVal.includes('@')) {
+      setEnforcementHold(null);
       setCheckingHold(false);
+      return;
     }
+
+    enforcementTimerRef.current = setTimeout(async () => {
+      const controller = new AbortController();
+      enforcementAbortRef.current = controller;
+      setCheckingHold(true);
+      try {
+        const res = await fetch(
+          `/api/testing/enforcement?email=${encodeURIComponent(emailVal)}`,
+          { signal: controller.signal }
+        );
+        const data = await res.json();
+        setEnforcementHold(data.hasHold ? data.holds[0] : null);
+      } catch (err: any) {
+        if (err?.name !== 'AbortError') {
+          // non-blocking — don't block booking if check fails
+        }
+      } finally {
+        setCheckingHold(false);
+      }
+    }, 400);
   };
 
   const handlePayEnforcementFee = async () => {
@@ -100,7 +124,7 @@ function BookingForm() {
       const data = await res.json();
       if (data.url) window.location.href = data.url;
     } catch {
-      alert('Unable to start payment. Please call (317) 314-3757.');
+      alert(`Unable to start payment. Please call ${TESTING_CENTER.phone}.`);
     } finally {
       setPayingFee(false);
     }
@@ -226,7 +250,7 @@ function BookingForm() {
         }).catch(() => {});
         setSubmitted(true);
       } else {
-        alert(data.error ?? 'Booking failed. Please call (317) 314-3757.');
+        alert(data.error ?? `Booking failed. Please call ${TESTING_CENTER.phone}.`);
       }
     } catch {
       setSubmitted(true); // email fallback
@@ -246,7 +270,7 @@ function BookingForm() {
           <p className="text-slate-500 mb-6">
             We will contact you within 1 business day to confirm your testing session.
             If you need to reach us sooner, call{' '}
-            <a href="tel:+13173143757" className="text-brand-blue-600 font-semibold">(317) 314-3757</a>.
+            <a href={`tel:${TESTING_CENTER.phoneTel}`} className="text-brand-blue-600 font-semibold">{TESTING_CENTER.phone}</a>.
           </p>
           <Link href="/testing" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-blue-600 hover:text-brand-blue-800">
             ← Back to Testing Center
@@ -443,7 +467,7 @@ function BookingForm() {
                       <div>
                         <span className="font-semibold text-sm text-slate-900">{label}</span>
                         {mode === 'inPerson' && (
-                          <p className="text-xs text-slate-500 mt-0.5">8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240</p>
+                          <p className="text-xs text-slate-500 mt-0.5">{TESTING_CENTER.address}</p>
                         )}
                         {mode === 'remoteProvider' && (
                           <p className="text-xs text-slate-500 mt-0.5">The certifying organization controls the remote testing system. We facilitate access.</p>
@@ -521,7 +545,7 @@ function BookingForm() {
                   <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
                     <p className="text-xs text-amber-800 font-medium">No slots currently available online.</p>
                     <p className="text-xs text-amber-700 mt-0.5">
-                      Call <a href="tel:3173143757" className="font-semibold underline">(317) 314-3757</a> to schedule directly.
+                      Call <a href={`tel:${TESTING_CENTER.phoneTel}`} className="font-semibold underline">{TESTING_CENTER.phone}</a> to schedule directly.
                     </p>
                   </div>
                 ) : (
@@ -624,7 +648,7 @@ function BookingForm() {
               </button>
 
               <p className="text-xs text-slate-500 text-center">
-                Or call us directly: <a href="tel:+13173143757" className="text-brand-blue-600 font-semibold inline-flex items-center gap-1"><Phone className="w-3 h-3" />(317) 314-3757</a>
+                Or call us directly: <a href={`tel:${TESTING_CENTER.phoneTel}`} className="text-brand-blue-600 font-semibold inline-flex items-center gap-1"><Phone className="w-3 h-3" />{TESTING_CENTER.phone}</a>
               </p>
             </div>
           )}

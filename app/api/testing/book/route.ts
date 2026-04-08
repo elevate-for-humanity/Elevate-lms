@@ -4,14 +4,16 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { TESTING_CENTER, TESTING_EMAIL } from '@/lib/testing/testing-config';
+import { hydrateProcessEnv } from '@/lib/secrets';
 export const runtime = 'nodejs';
 export const maxDuration = 30;
 
 export const dynamic = 'force-dynamic';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
-const ADMIN_EMAIL = 'testing@elevateforhumanity.org';
-const FROM = 'Elevate Testing Center <testing@elevateforhumanity.org>';
+const ADMIN_EMAIL = TESTING_EMAIL.adminEmail;
+const FROM = TESTING_EMAIL.from;
 
 function generateCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -25,7 +27,8 @@ function fmtDate(d: string) {
 }
 
 export async function POST(req: NextRequest) {
-  const rateLimited = await applyRateLimit(req, 'standard');
+  await hydrateProcessEnv();
+  const rateLimited = await applyRateLimit(req, 'contact');
   if (rateLimited) return rateLimited;
 
   let body: any;
@@ -135,14 +138,14 @@ export async function POST(req: NextRequest) {
         <li>Bring a valid government-issued photo ID</li>
         <li>Arrive 15 minutes before your scheduled time</li>
         <li>No phones, notes, or outside materials permitted in the testing room</li>
-        <li>Location: 8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240</li>
+        <li>Location: ${TESTING_CENTER.address}</li>
       </ul>
     </div>
-    <p>Questions? Reply to this email or call <strong>(317) 314-3757</strong>.</p>
-    <p style="margin-bottom:0">See you soon,<br><strong>Alberta Davis</strong><br>Testing Center Coordinator<br>Elevate for Humanity</p>
+    <p>Questions? Reply to this email or call <strong>${TESTING_CENTER.phone}</strong>.</p>
+    <p style="margin-bottom:0">See you soon,<br><strong>${TESTING_CENTER.coordinator.name}</strong><br>${TESTING_CENTER.coordinator.title}<br>Elevate for Humanity</p>
   </div>
   <div style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:20px 32px;text-align:center;color:#64748b;font-size:12px">
-    <p style="margin:0">8888 Keystone Crossing Suite 1300 · Indianapolis, IN 46240 · (317) 314-3757</p>
+    <p style="margin:0">${TESTING_CENTER.address} · ${TESTING_CENTER.phone}</p>
   </div>
 </div>
 </body></html>`;
@@ -183,14 +186,14 @@ export async function POST(req: NextRequest) {
         <tr style="border-bottom:1px solid #fef3c7"><td style="padding:8px 0;color:#92400e;width:200px">Full-length practice test</td><td style="padding:8px 0"><a href="${BASE_URL}/lms" style="color:#1E3A5F;font-weight:600">Access in your LMS account →</a></td></tr>
         <tr style="border-bottom:1px solid #fef3c7"><td style="padding:8px 0;color:#92400e">Study guide</td><td style="padding:8px 0"><a href="${BASE_URL}/lms" style="color:#1E3A5F;font-weight:600">Access in your LMS account →</a></td></tr>
         <tr style="border-bottom:1px solid #fef3c7"><td style="padding:8px 0;color:#92400e">Retake strategy</td><td style="padding:8px 0">Included in your study guide</td></tr>
-        <tr><td style="padding:8px 0;color:#92400e">Email support</td><td style="padding:8px 0"><a href="mailto:testing@elevateforhumanity.org" style="color:#1E3A5F;font-weight:600">testing@elevateforhumanity.org</a></td></tr>
+        <tr><td style="padding:8px 0;color:#92400e">Email support</td><td style="padding:8px 0"><a href="mailto:${TESTING_CENTER.email}" style="color:#1E3A5F;font-weight:600">${TESTING_CENTER.email}</a></td></tr>
       </table>
     </div>
     <p>If you don't have an LMS account yet, reply to this email and we'll get you set up before your exam date.</p>
-    <p style="margin-bottom:0">Good luck,<br><strong>Alberta Davis</strong><br>Testing Center Coordinator<br>Elevate for Humanity</p>
+    <p style="margin-bottom:0">Good luck,<br><strong>${TESTING_CENTER.coordinator.name}</strong><br>${TESTING_CENTER.coordinator.title}<br>Elevate for Humanity</p>
   </div>
   <div style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:20px 32px;text-align:center;color:#64748b;font-size:12px">
-    <p style="margin:0">8888 Keystone Crossing Suite 1300 · Indianapolis, IN 46240 · (317) 314-3757</p>
+    <p style="margin:0">${TESTING_CENTER.address} · ${TESTING_CENTER.phone}</p>
   </div>
 </div>
 </body></html>` : null;

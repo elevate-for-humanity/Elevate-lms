@@ -17,7 +17,7 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 // Read at request time — module-level init freezes missing values at cold start
 function getWebhookSecret() {
-  return process.env.STRIPE_WEBHOOK_SECRET_SUPERSONIC || process.env.STRIPE_WEBHOOK_SECRET || '';
+  return process.env.STRIPE_WEBHOOK_SECRET_SUPERSONIC_STRIPE || process.env.STRIPE_WEBHOOK_SECRET_SUPERSONIC || process.env.STRIPE_WEBHOOK_SECRET || '';
 }
 
 async function _POST(request: NextRequest) {
@@ -34,10 +34,19 @@ async function _POST(request: NextRequest) {
     );
   }
 
+  if (!stripe) {
+    return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 });
+  }
+
+  const secret = getWebhookSecret();
+  if (!secret) {
+    return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 503 });
+  }
+
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, getWebhookSecret());
+    event = stripe.webhooks.constructEvent(body, signature, secret);
   } catch (err: any) {
     return NextResponse.json(
       { error: 'Webhook processing error' },
@@ -231,7 +240,7 @@ async function sendPurchaseConfirmationEmail(
               </div>
 
               <div style="text-align: center;">
-                <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://yourdomain.com'}/supersonic-fast-cash/careers/training" class="button">
+                <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/supersonic-fast-cash/careers/training" class="button">
                   Start Learning Now →
                 </a>
               </div>

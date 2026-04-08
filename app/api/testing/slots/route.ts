@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
+import { TESTING_CENTER } from '@/lib/testing/testing-config';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
       end_time,
       capacity,
       booked_count: 0,
-      location: location ?? 'In-person — 8888 Keystone Crossing Suite 1300, Indianapolis IN 46240',
+      location: location ?? `In-person — ${TESTING_CENTER.address}`,
       notes: notes ?? null,
     })
     .select('*')

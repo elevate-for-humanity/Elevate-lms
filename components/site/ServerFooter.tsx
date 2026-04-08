@@ -7,6 +7,7 @@ import Logo from '@/components/ui/Logo';
 import LogoImage from '@/components/site/LogoImage';
 import Copyright from '@/components/ui/Copyright';
 import { Facebook, Instagram, Linkedin, Youtube } from 'lucide-react';
+import { SOCIAL_LINKS } from '@/config/social-links';
 
 // GOVERNMENT-GRADE FOOTER STRUCTURE
 // 4 columns: About, Programs, Compliance & Trust, Access
@@ -206,18 +207,26 @@ export default function ServerFooter() {
 
             {/* Social Icons */}
             <div className="flex items-center justify-center gap-4 mb-4">
-              <a href="https://www.facebook.com/elevateforhumanity" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-white hover:text-white transition-colors">
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a href="https://www.instagram.com/elevateforhumanity" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-white hover:text-white transition-colors">
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a href="https://www.linkedin.com/company/elevate-for-humanity" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-white hover:text-white transition-colors">
-                <Linkedin className="w-5 h-5" />
-              </a>
-              <a href="https://www.youtube.com/@elevateforhumanity" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="text-white hover:text-white transition-colors">
-                <Youtube className="w-5 h-5" />
-              </a>
+              {SOCIAL_LINKS.facebook && (
+                <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-white hover:text-white transition-colors">
+                  <Facebook className="w-5 h-5" />
+                </a>
+              )}
+              {SOCIAL_LINKS.instagram && (
+                <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-white hover:text-white transition-colors">
+                  <Instagram className="w-5 h-5" />
+                </a>
+              )}
+              {SOCIAL_LINKS.linkedin && (
+                <a href={SOCIAL_LINKS.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-white hover:text-white transition-colors">
+                  <Linkedin className="w-5 h-5" />
+                </a>
+              )}
+              {SOCIAL_LINKS.youtube && (
+                <a href={SOCIAL_LINKS.youtube} target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="text-white hover:text-white transition-colors">
+                  <Youtube className="w-5 h-5" />
+                </a>
+              )}
             </div>
 
             {/* Authority Badges */}

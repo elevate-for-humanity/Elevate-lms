@@ -11,7 +11,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
-const FROM = 'Elevate Testing Center <testing@elevateforhumanity.org>';
+import { TESTING_CENTER, TESTING_EMAIL } from '@/lib/testing/testing-config';
+const FROM = TESTING_EMAIL.from;
 
 function fmtDate(d: string) {
   return new Date(d + 'T12:00:00').toLocaleDateString('en-US', {
@@ -81,18 +82,18 @@ async function _PATCH(req: NextRequest, { params }: { params: Promise<{ id: stri
     <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:16px 20px;margin:20px 0">
       <p style="margin:0 0 8px;font-weight:bold;color:#1e40af">Exam Day Instructions</p>
       <ul style="margin:0;padding-left:20px;color:#1e40af;font-size:14px">
-        <li>Arrive <strong>15 minutes early</strong> for check-in with Alberta Davis</li>
+        <li>Arrive <strong>15 minutes early</strong> for check-in at the testing center</li>
         <li>Bring a valid <strong>government-issued photo ID</strong></li>
         <li>No phones, notes, or outside materials in the testing room</li>
-        <li><strong>Location:</strong> 8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240</li>
+        <li><strong>Location:</strong> ${TESTING_CENTER.address}</li>
       </ul>
     </div>
     ${adminNotes ? `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;margin:20px 0"><p style="margin:0;font-size:14px;color:#475569"><strong>Note from Testing Center:</strong> ${adminNotes}</p></div>` : ''}
-    <p>Questions? Reply to this email or call <strong>(317) 314-3757</strong>.</p>
-    <p style="margin-bottom:0">See you soon,<br><strong>Alberta Davis</strong><br>Testing Center Coordinator<br>Elevate for Humanity</p>
+    <p>Questions? Reply to this email or call <strong>${TESTING_CENTER.phone}</strong>.</p>
+    <p style="margin-bottom:0">See you soon,<br><strong>${TESTING_CENTER.coordinator.name}</strong><br>${TESTING_CENTER.coordinator.title}<br>Elevate for Humanity</p>
   </div>
   <div style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:20px 32px;text-align:center;color:#64748b;font-size:12px">
-    <p style="margin:0">8888 Keystone Crossing Suite 1300 · Indianapolis, IN 46240 · (317) 314-3757</p>
+    <p style="margin:0">${TESTING_CENTER.address} · ${TESTING_CENTER.phone}</p>
   </div>
 </div>
 </body></html>`;

@@ -345,4 +345,4 @@ ElevateLMS.render('#dashboard', {
     ],
   };
 }
-export const POST = withRuntime(withApiAudit('/api/ai/build-remote', _POST));
+export const POST = withApiAudit('/api/ai/build-remote', _POST);

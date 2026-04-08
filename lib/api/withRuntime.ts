@@ -69,12 +69,28 @@ export interface RuntimeContext {
 }
 
 type Handler = (req: NextRequest, ctx: RuntimeContext) => Promise<NextResponse>;
+// Also accept plain Next.js handlers (no RuntimeContext) so routes that call
+// withRuntime(withApiAudit(...)) without an options object compile and run.
+type AnyHandler = (req: NextRequest, ...args: any[]) => Promise<Response>;
 
 /**
  * Wraps an API handler with guaranteed hydration, secret validation,
  * rate limiting, and auth — in that order.
+ *
+ * Overloads:
+ *   withRuntime(options, handler)  — full options + RuntimeContext
+ *   withRuntime(handler)           — passthrough, no options (legacy call sites)
  */
-export function withRuntime(options: RuntimeOptions, handler: Handler) {
+export function withRuntime(optionsOrHandler: RuntimeOptions | AnyHandler, handler?: Handler) {
+  // Passthrough overload: withRuntime(handler) — no options
+  if (typeof optionsOrHandler === 'function') {
+    const fn = optionsOrHandler;
+    return async function wrappedHandler(req: NextRequest, ...args: any[]): Promise<Response> {
+      await hydrateProcessEnv();
+      return fn(req, ...args);
+    };
+  }
+  const options = optionsOrHandler;
   return async function wrappedHandler(req: NextRequest): Promise<NextResponse> {
     // 1. Hydrate process.env from Supabase app_secrets (Netlify cold-start safe)
     await hydrateProcessEnv();
@@ -146,7 +162,7 @@ export function withRuntime(options: RuntimeOptions, handler: Handler) {
 
     // 6. Run handler — catch unhandled throws so they never surface as 500 HTML
     try {
-      return await handler(req, ctx);
+      return await handler!(req, ctx);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       logger.error('[withRuntime] Unhandled handler error', {

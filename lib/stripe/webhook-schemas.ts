@@ -53,22 +53,47 @@ export type TestingSessionMeta = z.infer<typeof TestingSessionMeta>;
 /**
  * Metadata set by all barber checkout routes on checkout.session.completed.
  * Required fields for enrollment processing.
+ *
+ * Replay compatibility: sessions created before pricing consolidation (2026-04)
+ * may carry weeks_remaining: '50' (legacy default) or original_price_cents: '0'
+ * (not yet set). The schema corrects both at parse time so replays produce the
+ * same outcome as live events — no separate replay path needed.
+ *
+ * Legacy → canonical mapping:
+ *   weeks_remaining '50' or '0' → 29  (PAYMENT_TERM_WEEKS)
+ *   original_price_cents '0'    → 498000  (TUITION_CENTS)
+ *   adjusted_price_cents '0'    → 498000
+ *   pricing_policy absent       → 'fixed_tuition_v1'
  */
+const PAYMENT_TERM_WEEKS = 29;
+const TUITION_CENTS = 498000;
+
+/** Coerce a metadata int, applying a canonical floor for known legacy sentinel values. */
+function metaIntCanonical(sentinel: number, canonical: number, fallback: number) {
+  return z.string().optional().transform(v => {
+    const n = v ? parseInt(v, 10) : fallback;
+    return (isNaN(n) || n === sentinel || n === 0) ? canonical : n;
+  });
+}
+
 export const BarberEnrollmentMeta = z.object({
   program:              z.literal('barber-apprenticeship'),
   checkout_type:        z.string().min(1),
   payment_type:         z.enum(['payment_plan', 'pay_in_full', 'bnpl']),
-  pricing_policy:       z.literal('fixed_tuition_v1'),
+  // pricing_policy absent on pre-consolidation sessions — default to canonical value
+  pricing_policy:       z.string().optional().default('fixed_tuition_v1'),
   // IDs
   application_id:       metaStrOpt,
   student_id:           metaStrOpt,
   program_id:           metaStrOpt,
-  // Amounts — all derived server-side from TUITION_CENTS
+  // Amounts — server-authoritative. Legacy sessions may have 0 or missing values;
+  // coerce to canonical TUITION_CENTS so replays produce correct enrollment records.
   checkout_amount_cents:  metaInt(0),
-  original_price_cents:   metaInt(498000),
-  adjusted_price_cents:   metaInt(498000),
+  original_price_cents:   metaIntCanonical(0, TUITION_CENTS, TUITION_CENTS),
+  adjusted_price_cents:   metaIntCanonical(0, TUITION_CENTS, TUITION_CENTS),
   weekly_payment_cents:   metaInt(0),
-  weeks_remaining:        metaInt(29),
+  // Legacy sessions used weeks_remaining: '50'. Canonical value is 29.
+  weeks_remaining:        metaIntCanonical(50, PAYMENT_TERM_WEEKS, PAYMENT_TERM_WEEKS),
   // Transfer hours — display/ops only, cannot affect price
   transfer_hours_claimed: metaInt(0),
   remaining_hours:        metaInt(2000),

@@ -121,11 +121,11 @@ export default async function ProgramHolderMOUPage() {
                   <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4">
                     <div className="flex justify-between items-center mb-2">
                       <span className="font-medium text-slate-800">Elevate for Humanity Career &amp; Technical Institute</span>
-                      <span className="font-bold text-slate-900">$2,378.00 (50%)</span>
+                      <span className="font-bold text-slate-900">$2,400.50 (50%)</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="font-medium text-slate-800">{orgName}</span>
-                      <span className="font-bold text-slate-900">$2,378.00 (50%)</span>
+                      <span className="font-bold text-slate-900">$2,400.50 (50%)</span>
                     </div>
                   </div>
                   <p className="mb-2 font-medium text-slate-800">Fee Breakdown &amp; Revenue Calculation</p>
@@ -137,31 +137,31 @@ export default async function ProgramHolderMOUPage() {
                     </div>
                     <div className="flex justify-between items-center py-1.5 border-b border-slate-200 pl-4">
                       <span className="text-slate-500 text-xs">EPA 608 Universal exam + proctoring</span>
-                      <span className="text-slate-500 text-xs">− $55.00</span>
+                      <span className="text-slate-500 text-xs">− $58.00</span>
                     </div>
                     <div className="flex justify-between items-center py-1.5 border-b border-slate-200 pl-4">
                       <span className="text-slate-500 text-xs">OSHA 10 certification</span>
-                      <span className="text-slate-500 text-xs">− $59.00</span>
+                      <span className="text-slate-500 text-xs">− $62.00</span>
                     </div>
                     <div className="flex justify-between items-center py-1.5 border-b border-slate-200 pl-4">
                       <span className="text-slate-500 text-xs">CPR / AED certification</span>
-                      <span className="text-slate-500 text-xs">− $50.00</span>
+                      <span className="text-slate-500 text-xs">− $53.00</span>
                     </div>
                     <div className="flex justify-between items-center py-1.5 border-b border-slate-200 pl-4">
                       <span className="text-slate-500 text-xs">Practice testing materials</span>
-                      <span className="text-slate-500 text-xs">− $25.00</span>
+                      <span className="text-slate-500 text-xs">− $26.00</span>
                     </div>
                     <div className="flex justify-between items-center py-1.5 border-b border-slate-200">
                       <span className="font-medium text-slate-800">Net distributable amount</span>
-                      <span className="font-bold text-slate-900">$4,756.00</span>
+                      <span className="font-bold text-slate-900">$4,801.00</span>
                     </div>
                     <div className="flex justify-between items-center py-1.5 border-b border-slate-200">
                       <span className="text-slate-700">Elevate share (50%)</span>
-                      <span className="font-medium text-slate-900">$2,378.00</span>
+                      <span className="font-medium text-slate-900">$2,400.50</span>
                     </div>
                     <div className="flex justify-between items-center pt-1.5">
                       <span className="text-slate-700">Program Holder share (50%)</span>
-                      <span className="font-bold text-emerald-700">$2,378.00</span>
+                      <span className="font-bold text-emerald-700">$2,400.50</span>
                     </div>
                   </div>
                   <p className="mb-4">Certification and testing costs are managed and paid by Elevate. The 50/50 revenue split is applied to the net amount after these costs are deducted.</p>

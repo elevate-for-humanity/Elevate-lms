@@ -49,6 +49,12 @@ export interface PricingResult {
 export const MARGIN_FLOOR = 0.40;
 
 /**
+ * Global price adjustment multiplier applied on top of all calculated prices.
+ * 1.05 = 5% markup across all exam types.
+ */
+export const GLOBAL_PRICE_MULTIPLIER = 1.05;
+
+/**
  * Per-provider target multipliers applied to true cost.
  * Certiport carries higher compliance overhead (Pearson audit requirements,
  * system maintenance, annual authorization fees) so it gets a higher multiplier.
@@ -64,7 +70,7 @@ const PROVIDER_MULTIPLIERS: Record<Provider, number> = {
 export function calculatePrice(input: PricingInput): PricingResult {
   const trueCost = input.voucherCost + input.proctorCost + input.overheadCost;
   const multiplier = PROVIDER_MULTIPLIERS[input.provider];
-  const price = Math.ceil(trueCost * multiplier);
+  const price = Math.ceil(trueCost * multiplier * GLOBAL_PRICE_MULTIPLIER);
   const profit = price - trueCost;
   const margin = profit / price;
 

@@ -124,15 +124,15 @@ export const EPA608_ONLINE_PRODUCTS: EpaProduct[] = [
     label:       'EPA 608 Basic Enrollment',
     vendorBase:  26.51,
     type:        'bundle_basic',
-    retailPrice: 129,
+    retailPrice: 135, // was $129 + 5%
     description: 'Online exam access + scheduling support + learner support. Vendor study kit included at no charge.',
   },
   {
     key:         'bundle_premium',
     label:       'EPA 608 Premium Enrollment',
-    vendorBase:  58.33, // online exam + reference manual
+    vendorBase:  58.33,
     type:        'bundle_premium',
-    retailPrice: 189,
+    retailPrice: 198, // was $189 + 5%
     description: 'Online exam + reference manual + scheduling support + learner support.',
   },
   {
@@ -140,7 +140,7 @@ export const EPA608_ONLINE_PRODUCTS: EpaProduct[] = [
     label:       'EPA 608 Online Exam Only',
     vendorBase:  26.51,
     type:        'online_exam',
-    retailPrice: 59,
+    retailPrice: 62, // was $59 + 5%
     description: 'Online exam via EPATest platform. Unlimited vendor-level retakes included.',
   },
   {
@@ -148,7 +148,7 @@ export const EPA608_ONLINE_PRODUCTS: EpaProduct[] = [
     label:       'EPA 608 Paper Exam',
     vendorBase:  31.82,
     type:        'paper_exam',
-    retailPrice: 69,
+    retailPrice: 72, // was $69 + 5%
     description: 'Paper-based exam option.',
   },
   {
@@ -156,7 +156,7 @@ export const EPA608_ONLINE_PRODUCTS: EpaProduct[] = [
     label:       'EPA 608 Reference Manual',
     vendorBase:  31.82,
     type:        'reference_manual',
-    retailPrice: 69,
+    retailPrice: 72, // was $69 + 5%
     description: 'Optional 200+ page reference manual.',
   },
   {
@@ -164,7 +164,7 @@ export const EPA608_ONLINE_PRODUCTS: EpaProduct[] = [
     label:       'EPA 608 Administrative Retake Fee',
     vendorBase:  26.51,
     type:        'retake',
-    retailPrice: 49,
+    retailPrice: 51, // was $49 + 5%
     description: 'Administrative support fee for Elevate-managed retake workflow.',
   },
 ];

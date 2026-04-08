@@ -95,6 +95,54 @@ async function _POST(req: NextRequest) {
     return new Response(toErrorMessage(error), { status: 500 });
   }
 
+  // Notify admin that MOU was signed
+  try {
+    const { data: holder } = await adminClient
+      .from('program_holders')
+      .select('organization_name, contact_name, contact_email, mou_type')
+      .eq('id', phId)
+      .single();
+
+    const orgName = holder?.organization_name || name;
+    const isHvac = holder?.mou_type === 'custom_hvac_codelivery';
+
+    await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        personalizations: [{
+          to: [{ email: 'info@elevateforhumanity.org', name: 'Elevate for Humanity' }],
+          subject: `MOU Signed — ${orgName}`,
+        }],
+        from: { email: 'info@elevateforhumanity.org', name: 'Elevate for Humanity' },
+        content: [{
+          type: 'text/html',
+          value: `<!DOCTYPE html><html><body style="font-family: Arial, sans-serif; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #1e293b;">✅ MOU Signed</h2>
+            <p><strong>${orgName}</strong> has signed their Memorandum of Understanding.</p>
+            <table style="width:100%; border-collapse:collapse; margin: 16px 0;">
+              <tr><td style="padding:8px; border:1px solid #e2e8f0; font-weight:600;">Organization</td><td style="padding:8px; border:1px solid #e2e8f0;">${orgName}</td></tr>
+              <tr><td style="padding:8px; border:1px solid #e2e8f0; font-weight:600;">Contact</td><td style="padding:8px; border:1px solid #e2e8f0;">${holder?.contact_name || name}</td></tr>
+              <tr><td style="padding:8px; border:1px solid #e2e8f0; font-weight:600;">Email</td><td style="padding:8px; border:1px solid #e2e8f0;">${holder?.contact_email || ''}</td></tr>
+              <tr><td style="padding:8px; border:1px solid #e2e8f0; font-weight:600;">MOU Type</td><td style="padding:8px; border:1px solid #e2e8f0;">${isHvac ? 'HVAC Co-Delivery (Custom)' : 'Universal'}</td></tr>
+              <tr><td style="padding:8px; border:1px solid #e2e8f0; font-weight:600;">Signed At</td><td style="padding:8px; border:1px solid #e2e8f0;">${new Date(now).toLocaleString('en-US', { timeZone: 'America/New_York' })} ET</td></tr>
+              ${isHvac ? `<tr><td style="padding:8px; border:1px solid #e2e8f0; font-weight:600; color:#dc2626;">HVAC License</td><td style="padding:8px; border:1px solid #e2e8f0; color:#dc2626;">Pending upload — check program holder dashboard</td></tr>` : ''}
+            </table>
+            <div style="text-align:center; margin:24px 0;">
+              <a href="https://elevateforhumanity.org/admin/program-holders/${phId}" style="background-color:#2563eb; color:white; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:bold;">View in Admin Dashboard</a>
+            </div>
+          </body></html>`,
+        }],
+      }),
+    });
+  } catch (emailErr) {
+    logger.error('Admin MOU notification failed', emailErr);
+    // Non-fatal — MOU is still signed
+  }
+
   return Response.json(updated);
 }
 export const POST = withApiAudit('/api/program-holder/mou/sign', _POST);

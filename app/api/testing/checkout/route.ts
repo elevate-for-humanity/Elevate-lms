@@ -25,12 +25,17 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { CERT_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
 import { getStripe } from '@/lib/stripe/client';
+import { hydrateProcessEnv } from '@/lib/secrets';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const maxDuration = 30;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
 
 export async function POST(req: NextRequest) {
+  await hydrateProcessEnv();
+
   const stripe = getStripe();
   if (!stripe) return safeError('Stripe not configured', 503);
 

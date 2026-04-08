@@ -138,11 +138,12 @@ export default async function ProviderPage({ params }: Props) {
           {/* Proctoring options */}
           <section>
             <h2 className="text-2xl font-bold text-slate-900 mb-4">How It Works</h2>
+            <p className="text-slate-600 text-sm mb-4">All exams are proctored. Most are administered in-person at our Indianapolis testing center.{provider.capability !== 'IN_PERSON_ONLY' ? ' This provider also supports remote proctoring — see options below.' : ''}</p>
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
                 <MapPin className="w-5 h-5 text-brand-red-600 mb-2" />
-                <h3 className="font-semibold text-slate-900 mb-1">In-Person</h3>
-                <p className="text-slate-600 text-sm">Proctored at our Indianapolis testing center. Book a time slot and arrive with valid ID.</p>
+                <h3 className="font-semibold text-slate-900 mb-1">In-Person (Required)</h3>
+                <p className="text-slate-600 text-sm">Proctored at our Indianapolis testing center. Appointment required — no walk-ins. Arrive 15 minutes early with valid government-issued photo ID.</p>
               </div>
               {provider.capability !== 'IN_PERSON_ONLY' && (
                 <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
@@ -152,8 +153,8 @@ export default async function ProviderPage({ params }: Props) {
                   </h3>
                   <p className="text-slate-600 text-sm">
                     {provider.capability === 'CENTER_REMOTE_ALLOWED'
-                      ? 'We proctor you live via video. Take the exam from home with a webcam and stable internet.'
-                      : 'The provider runs their own remote proctoring system. We can also host you in-person.'}
+                      ? 'We proctor you live via video. Take the exam from home with a webcam and stable internet. Appointment still required.'
+                      : 'This provider operates their own remote proctoring system. You may test remotely through their platform or in-person at our center.'}
                   </p>
                 </div>
               )}
@@ -254,7 +255,7 @@ export default async function ProviderPage({ params }: Props) {
       <section className="bg-slate-900 py-16 px-6 text-center">
         <h2 className="text-3xl font-extrabold text-white mb-3">Ready to Get Certified?</h2>
         <p className="text-slate-400 mb-8 max-w-xl mx-auto">
-          Book your exam session online. All testing is by appointment only — no walk-ins accepted.
+          All exams are by appointment only. Walk-ins are not accepted. Same-day appointments may be available depending on capacity — call us to check.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           {isActive && (

@@ -288,10 +288,30 @@ function BookingForm() {
           <Link href="/testing" className="text-xs text-slate-400 hover:text-white mb-4 inline-flex items-center gap-1">
             ← Testing Center
           </Link>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">Book a Testing Session</h1>
-          <p className="text-slate-600 text-sm">
-            Fill out the form below. We respond within 1 business day to confirm your session.
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">Book a Testing Session</h1>
+          <p className="text-white/80 text-sm">
+            Complete the form below to reserve your exam seat. Payment is required to confirm your booking.
           </p>
+        </div>
+      </div>
+
+      {/* Server-rendered booking summary — visible without JS, helps crawlers and screen readers */}
+      <div className="bg-slate-50 border-b border-slate-200">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-5">
+          <h2 className="font-bold text-slate-900 mb-3 text-sm uppercase tracking-wide">How Booking Works</h2>
+          <ol className="grid sm:grid-cols-2 gap-x-8 gap-y-1 text-sm text-slate-600 list-none">
+            <li><span className="font-semibold text-slate-800">1.</span> Select your exam provider and type</li>
+            <li><span className="font-semibold text-slate-800">2.</span> Choose an available date and time</li>
+            <li><span className="font-semibold text-slate-800">3.</span> Enter your contact information</li>
+            <li><span className="font-semibold text-slate-800">4.</span> Complete payment to confirm your seat</li>
+            <li><span className="font-semibold text-slate-800">5.</span> Receive email confirmation within 1 business day</li>
+          </ol>
+          <div className="mt-3 pt-3 border-t border-slate-200 text-xs text-slate-500 space-y-0.5">
+            <p>• <strong>Appointments required</strong> — walk-ins are not accepted</p>
+            <p>• <strong>Arrive 15 minutes early</strong> with a valid government-issued photo ID</p>
+            <p>• <strong>Cancellations:</strong> reschedule with at least 24 hours&apos; notice — fees are non-refundable once reserved</p>
+            <p>• Exam fees are set by the credentialing provider and may change without notice</p>
+          </div>
         </div>
       </div>
 

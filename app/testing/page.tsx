@@ -94,7 +94,8 @@ export default function TestingPage() {
       <section className="py-14">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl font-black text-slate-900 mb-2">Available Credential Exams</h2>
-          <p className="text-slate-500 mb-10 text-sm">All exams are proctor-supervised. Government-issued photo ID required. By appointment only.</p>
+          <p className="text-slate-500 mb-4 text-sm">All exams are proctored. Most are administered in-person at our Indianapolis testing center. Some providers (such as Certiport) also support remote proctoring through their own systems. All exam fees are set by the credentialing provider and may change without notice.</p>
+          <p className="text-slate-500 mb-10 text-sm font-medium">By appointment only — walk-ins are not accepted. Government-issued photo ID required. Arrive at least 15 minutes before your scheduled time.</p>
 
           <div className="space-y-10">
             {ACTIVE_PROVIDERS.map((provider) => (
@@ -234,10 +235,10 @@ export default function TestingPage() {
           <h2 className="text-3xl font-black text-slate-900 mb-8 text-center">How Testing Works</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { step: '1', title: 'Book Your Seat', desc: 'Select your exam and preferred date. Pay the exam fee at booking. No walk-ins accepted.' },
-              { step: '2', title: 'Bring Valid ID', desc: 'Government-issued photo ID required. No ID, no exam — no exceptions.' },
-              { step: '3', title: 'Take the Exam', desc: 'Proctor-supervised on-site. No phones or outside materials unless permitted by the provider.' },
-              { step: '4', title: 'Receive Your Credential', desc: 'Results and credentials issued directly by the certifying body. Elevate records your outcome.' },
+              { step: '1', title: 'Book Your Seat', desc: 'Select your exam and preferred date. Pay the exam fee at booking to reserve your seat. Appointments required — walk-ins are not accepted.' },
+              { step: '2', title: 'Arrive Prepared', desc: 'Arrive at least 15 minutes early. Bring a valid government-issued photo ID. No ID, no exam — no exceptions.' },
+              { step: '3', title: 'Take the Exam', desc: 'All exams are proctored. No phones or outside materials unless explicitly permitted by the provider.' },
+              { step: '4', title: 'Receive Your Credential', desc: 'Results and credentials are issued directly by the certifying body. Elevate records your outcome for your training record.' },
             ].map((s) => (
               <div key={s.step} className="bg-white rounded-xl p-5 border border-slate-200">
                 <div className="w-8 h-8 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold text-sm mb-3">{s.step}</div>
@@ -249,12 +250,42 @@ export default function TestingPage() {
         </div>
       </section>
 
+      {/* TESTING SITE INFO */}
+      <section className="py-14 border-t border-slate-100 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-2xl font-black text-slate-900 mb-6">Testing Site Information</h2>
+          <div className="grid sm:grid-cols-2 gap-6">
+            <div>
+              <h3 className="font-semibold text-slate-900 mb-2">Location</h3>
+              <p className="text-slate-600 text-sm">{TESTING_CENTER.address}</p>
+              <p className="text-slate-600 text-sm mt-1">{TESTING_CENTER.phone}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-900 mb-2">What to Bring</h3>
+              <ul className="text-slate-600 text-sm space-y-1">
+                <li>• Valid government-issued photo ID</li>
+                <li>• Arrive at least 15 minutes early</li>
+                <li>• No phones or outside materials unless permitted</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-900 mb-2">Appointments &amp; Cancellations</h3>
+              <p className="text-slate-600 text-sm">All exams are by appointment only — walk-ins are not accepted. Appointments may be rescheduled with at least 24 hours&apos; notice. Exam fees are non-refundable once a session is reserved.</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-900 mb-2">Retakes</h3>
+              <p className="text-slate-600 text-sm">Retake eligibility and waiting periods are set by each credentialing provider. Contact us for provider-specific retake policies.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-16 border-t border-slate-100">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-black text-slate-900 mb-4">Ready to Get Certified?</h2>
-          <p className="text-slate-600 mb-8">Book your exam seat online or call us to schedule. All testing is by appointment only — no walk-ins accepted.</p>
-          <div className="flex flex-wrap gap-4 justify-center mb-8">
+          <p className="text-slate-600 mb-8">Book your exam seat online or call us to schedule. Appointments required — walk-ins not accepted.</p>
+          <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/testing/book"
               className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-colors"

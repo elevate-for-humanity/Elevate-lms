@@ -123,12 +123,17 @@ export default function TestingPage() {
                     <div className="mb-5">
                       <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Exams Available</p>
                       <div className="grid sm:grid-cols-2 gap-x-4 gap-y-1.5">
-                        {provider.exams.map((exam) => (
-                          <div key={exam} className="flex items-start gap-2 text-sm text-slate-700">
-                            <CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />
-                            {exam}
-                          </div>
-                        ))}
+                        {provider.exams.map((exam) => {
+                          const label = typeof exam === 'object' && exam !== null
+                            ? (exam as { name: string }).name
+                            : exam as string;
+                          return (
+                            <div key={label} className="flex items-start gap-2 text-sm text-slate-700">
+                              <CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                              {label}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
 

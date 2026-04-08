@@ -41,12 +41,15 @@ export default async function PartnerDashboardPage() {
     redirect('/admin/dashboard');
   }
 
-  // Check partner onboarding state
-  const { data: partner } = await db
-    .from('partners')
-    .select('id, onboarding_completed, status')
+  // Resolve partner record via partner_users join (partners has no user_id column)
+  const { data: partnerLink } = await db
+    .from('partner_users')
+    .select('partner_id, status, partners(id, onboarding_completed, status)')
     .eq('user_id', user.id)
+    .eq('status', 'active')
     .maybeSingle();
+
+  const partner = partnerLink?.partners as { id: string; onboarding_completed: boolean; status: string } | null;
 
   if (!partner || partner.onboarding_completed !== true || partner.status !== 'active') {
     redirect('/partner/onboarding');

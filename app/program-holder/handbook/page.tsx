@@ -71,7 +71,7 @@ export default async function ProgramHolderHandbookPage() {
               poster="/images/pages/program-holder-page-1.jpg"
               preload="metadata"
             >
-              <source src="/videos/program-holder-orientation.mp4" type="video/mp4" />
+              <source src="/videos/programs-overview-video-with-narration.mp4" type="video/mp4" />
             </video>
           </div>
           <div className="px-5 py-3 bg-amber-50 border-t border-amber-100">

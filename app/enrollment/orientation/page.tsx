@@ -129,7 +129,7 @@ export default function EnrollmentOrientationPage() {
               playsInline
               preload="metadata"
             >
-              <source src="/videos/orientation-welcome.mp4" type="video/mp4" />
+              <source src="/videos/orientation-full.mp4" type="video/mp4" />
             </video>
 
             {!playing && (

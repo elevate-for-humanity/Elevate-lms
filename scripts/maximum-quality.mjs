@@ -18,8 +18,8 @@ const imagesToEnhance = [
   'images/location-9.jpg',
 
   // Artlist images
-  'images/artlist/hero-training-1.jpg',
-  'images/artlist/hero-training-2.jpg',
+  'images/hp/train.jpg',
+  'images/hp/complete-training.jpg',
   'images/artlist/hero-training-3.jpg',
   'images/artlist/hero-training-4.jpg',
   'images/artlist/hero-training-5.jpg',

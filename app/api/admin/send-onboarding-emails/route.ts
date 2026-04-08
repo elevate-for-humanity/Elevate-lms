@@ -6,6 +6,8 @@ import { workoneOnboardingEmail } from '@/lib/email/templates/workone-onboarding
 import { barberOnboardingEmail } from '@/lib/email/templates/barber-onboarding';
 import { logger } from '@/lib/logger';
 
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 const ADMIN_BCC = 'elevate4humanityedu@gmail.com';
 
 // Programs that go through the barber/beauty flow (not WorkOne)
@@ -78,6 +80,7 @@ function formatProgramName(slug: string): string {
  * - Skips applicants who already received an onboarding email
  */
 export async function POST(request: Request) {
+  await hydrateProcessEnv();
   const authHeader = request.headers.get('authorization');
   const adminSecret = process.env.ADMIN_API_SECRET || process.env.CRON_SECRET;
   if (adminSecret && authHeader !== `Bearer ${adminSecret}`) {

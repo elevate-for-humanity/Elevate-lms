@@ -17,6 +17,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import * as crypto from 'node:crypto';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -186,5 +188,5 @@ async function _GET(req: NextRequest) {
   }
 }
 
-export const GET  = withApiAudit('/api/org/invite', _GET);
-export const POST = withApiAudit('/api/org/invite', _POST);
+export const GET  = withRuntime(withApiAudit('/api/org/invite', _GET));
+export const POST = withRuntime(withApiAudit('/api/org/invite', _POST));

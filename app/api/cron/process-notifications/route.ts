@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { processNotificationQueue, getQueueStats } from '@/lib/notifications/processor';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -72,5 +74,5 @@ async function _GET(request: NextRequest) {
     );
   }
 }
-export const GET = withApiAudit('/api/cron/process-notifications', _GET);
-export const POST = withApiAudit('/api/cron/process-notifications', _POST);
+export const GET = withRuntime(withApiAudit('/api/cron/process-notifications', _GET));
+export const POST = withRuntime(withApiAudit('/api/cron/process-notifications', _POST));

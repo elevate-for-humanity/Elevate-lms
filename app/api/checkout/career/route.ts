@@ -6,6 +6,8 @@ import { toError, toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PRICES } from '@/lib/stripe/prices';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -62,4 +64,4 @@ async function _POST(request: Request) {
     );
   }
 }
-export const POST = withApiAudit('/api/checkout/career', _POST);
+export const POST = withRuntime(withApiAudit('/api/checkout/career', _POST));

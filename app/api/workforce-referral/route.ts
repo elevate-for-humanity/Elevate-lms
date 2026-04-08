@@ -11,6 +11,8 @@ import { createClient } from '@/lib/supabase/server';
 import { WorkforceAgencyType, WorkforceReferralStatus } from '@/types/enrollment';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -347,7 +349,7 @@ const supabase = await createClient();
     count: sentCount 
   });
 }
-export const GET = withApiAudit('/api/workforce-referral', _GET);
-export const POST = withApiAudit('/api/workforce-referral', _POST);
-export const PUT = withApiAudit('/api/workforce-referral', _PUT);
-export const PATCH = withApiAudit('/api/workforce-referral', _PATCH);
+export const GET = withRuntime(withApiAudit('/api/workforce-referral', _GET));
+export const POST = withRuntime(withApiAudit('/api/workforce-referral', _POST));
+export const PUT = withRuntime(withApiAudit('/api/workforce-referral', _PUT));
+export const PATCH = withRuntime(withApiAudit('/api/workforce-referral', _PATCH));

@@ -22,6 +22,8 @@ import {
 } from '@/lib/payments';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -351,5 +353,5 @@ async function _POST(request: NextRequest) {
     );
   }
 }
-export const GET = withApiAudit('/api/payments', _GET);
-export const POST = withApiAudit('/api/payments', _POST);
+export const GET = withRuntime(withApiAudit('/api/payments', _GET));
+export const POST = withRuntime(withApiAudit('/api/payments', _POST));

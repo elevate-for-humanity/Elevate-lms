@@ -5,6 +5,8 @@ import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import Stripe from 'stripe';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -95,4 +97,4 @@ async function _POST(request: NextRequest) {
   return NextResponse.json({ received: true });
 }
 
-export const POST = withApiAudit('/api/supersonic-fast-cash/payment-webhook', _POST, { actor_type: 'webhook', skip_body: true });
+export const POST = withRuntime(withApiAudit('/api/supersonic-fast-cash/payment-webhook', _POST, { actor_type: 'webhook', skip_body: true }));

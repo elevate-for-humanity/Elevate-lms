@@ -10,6 +10,8 @@ import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { requireAdminRole } from '@/lib/api/requireAdminRole';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 120;
 
@@ -116,4 +118,4 @@ async function _POST(req: Request) {
   }
 }
 
-export const POST = withApiAudit('/api/ai/course-builder', _POST);
+export const POST = withRuntime(withApiAudit('/api/ai/course-builder', _POST));

@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -250,5 +252,5 @@ async function _GET(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-export const GET = withApiAudit('/api/partners/sync', _GET);
-export const POST = withApiAudit('/api/partners/sync', _POST);
+export const GET = withRuntime(withApiAudit('/api/partners/sync', _GET));
+export const POST = withRuntime(withApiAudit('/api/partners/sync', _POST));

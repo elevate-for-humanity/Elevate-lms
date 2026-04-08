@@ -12,6 +12,8 @@ import { logger } from '@/lib/logger';
 import OpenAI from 'openai';
 import type { GeneratedLesson } from '../route';
 
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 const ADMIN_ROLES = new Set(['admin', 'super_admin', 'staff']);
 
 export const runtime = 'nodejs';
@@ -19,6 +21,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
+  await hydrateProcessEnv();
   try {
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

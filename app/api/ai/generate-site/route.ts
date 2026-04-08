@@ -6,6 +6,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { apiAuthGuard } from '@/lib/admin/guards';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 // Lazy-load OpenAI client to prevent build-time errors
 function getOpenAI() {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -238,4 +240,4 @@ function getDefaultConfig(name: string, type: string) {
     },
   };
 }
-export const POST = withApiAudit('/api/ai/generate-site', _POST);
+export const POST = withRuntime(withApiAudit('/api/ai/generate-site', _POST));

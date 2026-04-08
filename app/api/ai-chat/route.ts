@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -203,4 +205,4 @@ You are the Elevate for Humanity AI Assistant - a warm, helpful guide for prospe
     });
   }
 }
-export const POST = withApiAudit('/api/ai-chat', _POST);
+export const POST = withRuntime(withApiAudit('/api/ai-chat', _POST));

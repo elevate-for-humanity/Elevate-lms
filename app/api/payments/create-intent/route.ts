@@ -5,6 +5,8 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 
 async function _POST(request: NextRequest) {
@@ -66,4 +68,4 @@ async function _POST(request: NextRequest) {
     );
   }
 }
-export const POST = withApiAudit('/api/payments/create-intent', _POST);
+export const POST = withRuntime(withApiAudit('/api/payments/create-intent', _POST));

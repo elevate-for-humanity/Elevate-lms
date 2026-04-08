@@ -4,6 +4,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { logger } from '@/lib/logger';
 
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 let _client: OpenAI | null = null;
 function getClient() {
   if (!_client) _client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -21,6 +23,7 @@ function cacheKey(content: string) {
 }
 
 export async function POST(req: NextRequest) {
+  await hydrateProcessEnv();
   const rateLimited = await applyRateLimit(req, 'public');
   if (rateLimited) return rateLimited;
 

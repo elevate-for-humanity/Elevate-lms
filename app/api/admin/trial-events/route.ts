@@ -6,6 +6,8 @@ import { withAuth } from '@/lib/with-auth';
 import { createClient } from '@supabase/supabase-js';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -103,4 +105,4 @@ const _GET = withAuth(
   },
   { roles: ['admin'] }
 );
-export const GET = withApiAudit('/api/admin/trial-events', _GET);
+export const GET = withRuntime(withApiAudit('/api/admin/trial-events', _GET));

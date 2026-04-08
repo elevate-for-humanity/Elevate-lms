@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 30;
 
@@ -161,5 +163,5 @@ async function _GET(request: NextRequest) {
     threshold_hours: STUCK_THRESHOLD_HOURS,
   });
 }
-export const GET = withApiAudit('/api/cron/check-stuck-approvals', _GET);
-export const POST = withApiAudit('/api/cron/check-stuck-approvals', _POST);
+export const GET = withRuntime(withApiAudit('/api/cron/check-stuck-approvals', _GET));
+export const POST = withRuntime(withApiAudit('/api/cron/check-stuck-approvals', _POST));

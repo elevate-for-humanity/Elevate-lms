@@ -8,6 +8,8 @@ import { paymentRateLimit } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 const enrollPaymentSchema = z.object({
   amount: z.number().positive(),
   program: z.string().min(1).max(100),
@@ -140,4 +142,4 @@ async function _POST(req: Request) {
     );
   }
 }
-export const POST = withApiAudit('/api/enroll/payment', _POST);
+export const POST = withRuntime(withApiAudit('/api/enroll/payment', _POST));

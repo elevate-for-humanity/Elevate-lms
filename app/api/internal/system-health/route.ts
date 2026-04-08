@@ -15,6 +15,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { checkAdminIP } from '@/lib/api/admin-ip-guard';
 import { safeInternalError } from '@/lib/api/safe-error';
 
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 export const dynamic = 'force-dynamic';
 
 interface ProgramHealthResult {
@@ -32,6 +34,7 @@ interface ProgramHealthResult {
 }
 
 export async function GET(request: NextRequest) {
+  await hydrateProcessEnv();
   // IP guard — no-op if ADMIN_IP_ALLOWLIST is unset
   const blocked = checkAdminIP(request);
   if (blocked) return blocked;

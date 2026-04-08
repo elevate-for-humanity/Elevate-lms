@@ -6,6 +6,8 @@ import { createClient } from '@supabase/supabase-js';
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -174,4 +176,4 @@ async function _GET(request: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-export const GET = withApiAudit('/api/cron/trial-lifecycle', _GET);
+export const GET = withRuntime(withApiAudit('/api/cron/trial-lifecycle', _GET));

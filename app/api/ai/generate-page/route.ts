@@ -5,6 +5,8 @@ import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { apiAuthGuard } from '@/lib/admin/guards';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -95,4 +97,4 @@ Component should be a default export function.`;
     );
   }
 }
-export const GET = withApiAudit('/api/ai/generate-page', _GET);
+export const GET = withRuntime(withApiAudit('/api/ai/generate-page', _GET));

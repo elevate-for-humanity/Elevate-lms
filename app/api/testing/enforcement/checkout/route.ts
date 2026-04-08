@@ -14,6 +14,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
@@ -26,6 +28,7 @@ const FEE_LABELS: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
+  await hydrateProcessEnv();
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   if (!stripeKey) return safeError('Stripe not configured', 500);
 

@@ -8,6 +8,8 @@ import { paymentRateLimit } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { injectFailureRedirect } from '@/lib/api/failure-injection';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -166,4 +168,4 @@ async function handler(req: Request) {
     return NextResponse.redirect(new URL(`${storeUrl}?error=checkout-failed`, req.url), 303);
   }
 }
-export const POST = withApiAudit('/api/stripe/checkout', handler);
+export const POST = withRuntime(withApiAudit('/api/stripe/checkout', handler));

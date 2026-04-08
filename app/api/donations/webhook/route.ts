@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -196,4 +198,4 @@ async function _POST(request: Request) {
     );
   }
 }
-export const POST = withApiAudit('/api/donations/webhook', _POST, { actor_type: 'webhook', skip_body: true });
+export const POST = withRuntime(withApiAudit('/api/donations/webhook', _POST, { actor_type: 'webhook', skip_body: true }));

@@ -5,6 +5,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 const getOpenAI = () => new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -61,4 +63,4 @@ ${beforeCursor}[CURSOR]${afterCursor}`,
     );
   }
 }
-export const POST = withApiAudit('/api/devstudio/complete', _POST);
+export const POST = withRuntime(withApiAudit('/api/devstudio/complete', _POST));

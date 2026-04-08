@@ -6,6 +6,8 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -98,4 +100,4 @@ async function _POST(req: Request) {
     );
   }
 }
-export const POST = withApiAudit('/api/ai/tutor', _POST);
+export const POST = withRuntime(withApiAudit('/api/ai/tutor', _POST));

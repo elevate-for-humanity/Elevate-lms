@@ -6,6 +6,8 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -321,5 +323,5 @@ async function _POST(req: Request) {
 
   return GET(req);
 }
-export const GET = withApiAudit('/api/social-media/scheduler', _GET);
-export const POST = withApiAudit('/api/social-media/scheduler', _POST);
+export const GET = withRuntime(withApiAudit('/api/social-media/scheduler', _GET));
+export const POST = withRuntime(withApiAudit('/api/social-media/scheduler', _POST));

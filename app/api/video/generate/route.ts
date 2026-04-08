@@ -8,6 +8,8 @@ import { generateCourseVideo, getAvailableServices } from '@/lib/video/generate'
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 300; // 5 minutes for video generation
 
@@ -219,5 +221,5 @@ const { searchParams } = new URL(request.url);
     { status: 404 }
   );
 }
-export const GET = withApiAudit('/api/video/generate', _GET);
-export const POST = withApiAudit('/api/video/generate', _POST);
+export const GET = withRuntime(withApiAudit('/api/video/generate', _GET));
+export const POST = withRuntime(withApiAudit('/api/video/generate', _POST));

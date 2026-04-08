@@ -6,6 +6,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -196,5 +198,5 @@ Be concise, direct, and provide working code. Focus on the task at hand.`;
     );
   }
 }
-export const GET = withApiAudit('/api/studio/chat', _GET);
-export const POST = withApiAudit('/api/studio/chat', _POST);
+export const GET = withRuntime(withApiAudit('/api/studio/chat', _GET));
+export const POST = withRuntime(withApiAudit('/api/studio/chat', _POST));

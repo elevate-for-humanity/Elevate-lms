@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
@@ -96,4 +98,4 @@ async function _POST(request: NextRequest) {
     );
   }
 }
-export const POST = withApiAudit('/api/licensing/request', _POST);
+export const POST = withRuntime(withApiAudit('/api/licensing/request', _POST));

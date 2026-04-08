@@ -11,6 +11,8 @@ import {
   handlePaymentFailed,
 } from '@/lib/license/linkStripeToLicense';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 function getWebhookSecret() {
   return process.env.STRIPE_WEBHOOK_SECRET_LICENSES || process.env.STRIPE_WEBHOOK_SECRET || '';
 }
@@ -84,4 +86,4 @@ async function _POST(request: NextRequest) {
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
   }
 }
-export const POST = withApiAudit('/api/licenses/webhook', _POST, { actor_type: 'webhook', skip_body: true });
+export const POST = withRuntime(withApiAudit('/api/licenses/webhook', _POST, { actor_type: 'webhook', skip_body: true }));

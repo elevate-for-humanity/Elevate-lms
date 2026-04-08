@@ -6,6 +6,8 @@ import { Redis } from '@upstash/redis';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -143,4 +145,4 @@ function getMetrics() {
   };
 }
 
-export const GET = withApiAudit('/api/admin/monitoring/status', _GET);
+export const GET = withRuntime(withApiAudit('/api/admin/monitoring/status', _GET));

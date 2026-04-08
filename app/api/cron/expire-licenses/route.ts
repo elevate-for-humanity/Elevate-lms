@@ -3,6 +3,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -52,4 +54,4 @@ async function _GET(request: Request) {
     );
   }
 }
-export const GET = withApiAudit('/api/cron/expire-licenses', _GET);
+export const GET = withRuntime(withApiAudit('/api/cron/expire-licenses', _GET));

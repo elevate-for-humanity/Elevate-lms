@@ -8,6 +8,8 @@ import { processEmailSend } from '@/lib/jobs/handlers/email-send';
 import { createClient } from '@supabase/supabase-js';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -208,4 +210,4 @@ async function processJob(job: ProvisioningJob): Promise<void> {
       throw new Error(`Unknown job type: ${job.job_type}`);
   }
 }
-export const GET = withApiAudit('/api/cron/process-provisioning-jobs', _GET);
+export const GET = withRuntime(withApiAudit('/api/cron/process-provisioning-jobs', _GET));

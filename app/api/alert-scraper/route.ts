@@ -6,6 +6,8 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 10;
 
@@ -217,5 +219,5 @@ return NextResponse.json({
     ],
   });
 }
-export const GET = withApiAudit('/api/alert-scraper', _GET);
-export const POST = withApiAudit('/api/alert-scraper', _POST);
+export const GET = withRuntime(withApiAudit('/api/alert-scraper', _GET));
+export const POST = withRuntime(withApiAudit('/api/alert-scraper', _POST));

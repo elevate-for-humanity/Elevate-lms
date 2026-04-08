@@ -10,6 +10,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { apiRequireAdmin } from '@/lib/admin/guards';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -161,4 +163,4 @@ Focus on workforce, community impact, and elevation if applicable.
     );
   }
 }
-export const POST = withApiAudit('/api/grants/draft', _POST);
+export const POST = withRuntime(withApiAudit('/api/grants/draft', _POST));

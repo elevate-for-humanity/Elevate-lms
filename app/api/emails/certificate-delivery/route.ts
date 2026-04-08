@@ -5,6 +5,8 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const maxDuration = 60;
 
 async function _POST(req: NextRequest) {
@@ -170,4 +172,4 @@ async function _POST(req: NextRequest) {
     );
   }
 }
-export const POST = withApiAudit('/api/emails/certificate-delivery', _POST);
+export const POST = withRuntime(withApiAudit('/api/emails/certificate-delivery', _POST));

@@ -19,6 +19,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import type { CertificateIssuedPayload } from '@/lib/jobs/enqueue';
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -87,6 +89,7 @@ async function handleCertificateIssued(
 // ── Main handler ──────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  await hydrateProcessEnv();
   if (!isAuthorized(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }

@@ -14,6 +14,8 @@ import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
 import OpenAI from 'openai';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 const ADMIN_ROLES = new Set(['admin', 'super_admin', 'staff']);
 
 export const runtime = 'nodejs';
@@ -184,4 +186,4 @@ async function _POST(req: NextRequest) {
   }
 }
 
-export const POST = withApiAudit('/api/admin/courses/generate', _POST);
+export const POST = withRuntime(withApiAudit('/api/admin/courses/generate', _POST));

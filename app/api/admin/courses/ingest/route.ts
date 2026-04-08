@@ -6,6 +6,8 @@ import { ingestCourse } from '@/lib/ai/course-ingestion';
 import { saveCourseBlueprint } from '@/lib/db/courses';
 import { isOpenAIConfigured, getOpenAIClient } from '@/lib/openai-client';
 import {
+import { withRuntime } from '@/lib/api/withRuntime';
+
   SAFE_CHARS, MAX_CHARS,
   summarizeForExtraction,
   persistIngestionDraft,
@@ -277,5 +279,5 @@ async function _GET(request: Request) {
   }
 }
 
-export const POST = withApiAudit('/api/admin/courses/ingest', _POST);
-export const GET = withApiAudit('/api/admin/courses/ingest', _GET);
+export const POST = withRuntime(withApiAudit('/api/admin/courses/ingest', _POST));
+export const GET = withRuntime(withApiAudit('/api/admin/courses/ingest', _GET));

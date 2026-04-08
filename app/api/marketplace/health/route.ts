@@ -4,6 +4,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -71,4 +73,4 @@ async function _GET(request: Request) {
     );
   }
 }
-export const GET = withApiAudit('/api/marketplace/health', _GET);
+export const GET = withRuntime(withApiAudit('/api/marketplace/health', _GET));

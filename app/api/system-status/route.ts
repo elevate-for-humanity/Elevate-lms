@@ -4,6 +4,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
@@ -236,4 +238,4 @@ async function _GET(request: Request) {
     },
   });
 }
-export const GET = withApiAudit('/api/system-status', _GET);
+export const GET = withRuntime(withApiAudit('/api/system-status', _GET));

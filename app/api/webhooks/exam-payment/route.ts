@@ -14,11 +14,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { markPaymentSucceeded } from '@/lib/services/credential-pipeline';
 import { logger } from '@/lib/logger';
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
+  await hydrateProcessEnv();
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!stripeKey || !webhookSecret) {

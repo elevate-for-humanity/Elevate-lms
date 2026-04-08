@@ -19,6 +19,8 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -334,4 +336,4 @@ async function _POST(req: Request) {
     );
   }
 }
-export const POST = withApiAudit('/api/enroll/finalize-payment', _POST);
+export const POST = withRuntime(withApiAudit('/api/enroll/finalize-payment', _POST));

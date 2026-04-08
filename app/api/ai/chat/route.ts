@@ -7,6 +7,8 @@ import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -198,5 +200,5 @@ async function _GET(req: Request) {
     );
   }
 }
-export const GET = withApiAudit('/api/ai/chat', _GET);
-export const POST = withApiAudit('/api/ai/chat', _POST);
+export const GET = withRuntime(withApiAudit('/api/ai/chat', _GET));
+export const POST = withRuntime(withApiAudit('/api/ai/chat', _POST));

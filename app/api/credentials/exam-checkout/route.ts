@@ -18,9 +18,12 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { resolvePaymentResponsibility } from '@/lib/services/credential-pipeline';
 
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
+  await hydrateProcessEnv();
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   if (!stripeKey) return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
   const stripe = new Stripe(stripeKey);

@@ -20,6 +20,8 @@ import { logger } from '@/lib/logger';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import OpenAI from 'openai';
 
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 const ADMIN_ROLES = new Set(['admin', 'super_admin']);
 
 export const runtime = 'nodejs';
@@ -102,6 +104,7 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ courseId: string }> },
 ) {
+  await hydrateProcessEnv();
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
 

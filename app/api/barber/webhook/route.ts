@@ -8,6 +8,8 @@ import { BARBER_PRICING, calculateWeeklyPayment } from '@/lib/programs/pricing';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { runBarberPostPayment } from '@/lib/enrollment/barber-post-payment';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 const LMS_URL =
   (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org') + '/lms/courses';
 
@@ -1149,5 +1151,5 @@ async function _PUT(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to update subscription' }, { status: 500 });
   }
 }
-export const POST = withApiAudit('/api/barber/webhook', _POST, { actor_type: 'webhook', skip_body: true });
-export const PUT = withApiAudit('/api/barber/webhook', _PUT, { actor_type: 'webhook', skip_body: true });
+export const POST = withRuntime(withApiAudit('/api/barber/webhook', _POST, { actor_type: 'webhook', skip_body: true }));
+export const PUT = withRuntime(withApiAudit('/api/barber/webhook', _PUT, { actor_type: 'webhook', skip_body: true }));

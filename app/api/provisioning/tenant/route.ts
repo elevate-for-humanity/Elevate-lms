@@ -9,6 +9,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -289,5 +291,5 @@ const subdomain = request.nextUrl.searchParams.get('subdomain');
     domain: `${normalized}.elevatelms.com`,
   });
 }
-export const GET = withApiAudit('/api/provisioning/tenant', _GET);
-export const POST = withApiAudit('/api/provisioning/tenant', _POST);
+export const GET = withRuntime(withApiAudit('/api/provisioning/tenant', _GET));
+export const POST = withRuntime(withApiAudit('/api/provisioning/tenant', _POST));

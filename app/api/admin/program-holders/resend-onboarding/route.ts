@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -16,6 +18,7 @@ export const dynamic = 'force-dynamic';
  * invalidates the previous one.
  */
 export async function POST(req: NextRequest) {
+  await hydrateProcessEnv();
   const supabase = await createClient();
   const adminDb = createAdminClient();
 

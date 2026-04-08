@@ -7,6 +7,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 async function _POST(request: NextRequest) {
   let body: string;
   let signature: string | null;
@@ -72,4 +74,4 @@ async function _POST(request: NextRequest) {
 
   return NextResponse.json({ received: true });
 }
-export const POST = withApiAudit('/api/license/webhook', _POST, { actor_type: 'webhook', skip_body: true });
+export const POST = withRuntime(withApiAudit('/api/license/webhook', _POST, { actor_type: 'webhook', skip_body: true }));

@@ -5,6 +5,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import webpush from 'web-push';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -146,4 +148,4 @@ async function _GET(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-export const GET = withApiAudit('/api/cron/weekly-reminders', _GET);
+export const GET = withRuntime(withApiAudit('/api/cron/weekly-reminders', _GET));

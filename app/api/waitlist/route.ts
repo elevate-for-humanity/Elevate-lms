@@ -3,6 +3,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { logger } from '@/lib/logger';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 // Programs that have a waitlist — all others are rejected
 const WAITLIST_PROGRAMS = new Set(['cdl-training', 'barber-apprenticeship']);
 const PROGRAM_NAMES: Record<string, string> = {
@@ -160,5 +162,5 @@ async function _GET(request: NextRequest) {
     waitlistCount: count || 0,
   });
 }
-export const GET = withApiAudit('/api/waitlist', _GET);
-export const POST = withApiAudit('/api/waitlist', _POST);
+export const GET = withRuntime(withApiAudit('/api/waitlist', _GET));
+export const POST = withRuntime(withApiAudit('/api/waitlist', _POST));

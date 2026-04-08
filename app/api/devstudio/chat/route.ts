@@ -5,6 +5,8 @@ import OpenAI from 'openai';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 const getOpenAI = () => new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -75,4 +77,4 @@ Be concise and direct. Provide working code.`;
     );
   }
 }
-export const POST = withApiAudit('/api/devstudio/chat', _POST);
+export const POST = withRuntime(withApiAudit('/api/devstudio/chat', _POST));

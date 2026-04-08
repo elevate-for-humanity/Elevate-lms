@@ -5,6 +5,8 @@ import { NextResponse } from 'next/server';
 import { sendEmail, emailTemplates } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -133,4 +135,4 @@ async function _GET(request: Request) {
     );
   }
 }
-export const GET = withApiAudit('/api/cron/inactivity-reminders', _GET);
+export const GET = withRuntime(withApiAudit('/api/cron/inactivity-reminders', _GET));

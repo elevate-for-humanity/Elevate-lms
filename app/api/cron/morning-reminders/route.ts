@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -104,4 +106,4 @@ async function _GET(request: NextRequest) {
     );
   }
 }
-export const GET = withApiAudit('/api/cron/morning-reminders', _GET);
+export const GET = withRuntime(withApiAudit('/api/cron/morning-reminders', _GET));

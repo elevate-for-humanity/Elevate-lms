@@ -6,6 +6,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
@@ -113,4 +115,4 @@ This request was submitted via the Platform Licensing page.
     );
   }
 }
-export const POST = withApiAudit('/api/licenses/request', _POST);
+export const POST = withRuntime(withApiAudit('/api/licenses/request', _POST));

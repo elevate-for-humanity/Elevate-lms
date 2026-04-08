@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -17,6 +19,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhuma
  * Stores in applications table and sends admin notification email.
  */
 export async function POST(req: NextRequest) {
+  await hydrateProcessEnv();
   const limited = await applyRateLimit(req, 'contact');
   if (limited) return limited;
 

@@ -6,6 +6,8 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -138,4 +140,4 @@ ${JSON.stringify(features, null, 2)}
     );
   }
 }
-export const GET = withApiAudit('/api/analytics/dropout-risk', _GET);
+export const GET = withRuntime(withApiAudit('/api/analytics/dropout-risk', _GET));

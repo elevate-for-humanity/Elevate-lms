@@ -8,6 +8,8 @@ import {
 } from '@/lib/email/career-course-sequences';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const dynamic = 'force-dynamic';
 
 // This endpoint should be called by a cron job daily
@@ -114,4 +116,4 @@ async function sendEmail(to: string, subject: string, html: string) {
     throw new Error(`Email send failed: ${response.statusText}`);
   }
 }
-export const GET = withApiAudit('/api/cron/career-course-emails', _GET);
+export const GET = withRuntime(withApiAudit('/api/cron/career-course-emails', _GET));

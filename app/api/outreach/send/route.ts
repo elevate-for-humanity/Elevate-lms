@@ -1,6 +1,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -191,6 +193,7 @@ async function sendViaSendGrid(to: string[], subject: string, html: string, text
 }
 
 export async function POST(request: NextRequest) {
+  await hydrateProcessEnv();
   // Auth check — only admin can trigger outreach
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

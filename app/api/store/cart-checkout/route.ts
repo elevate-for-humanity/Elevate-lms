@@ -6,6 +6,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { injectFailureRedirect } from '@/lib/api/failure-injection';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -146,4 +148,4 @@ async function _POST(req: Request) {
     return NextResponse.redirect(`${baseUrl}/store/cart?error=checkout-failed`);
   }
 }
-export const POST = withApiAudit('/api/store/cart-checkout', _POST);
+export const POST = withRuntime(withApiAudit('/api/store/cart-checkout', _POST));

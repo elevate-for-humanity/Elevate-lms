@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -84,4 +86,4 @@ async function _GET(request: NextRequest) {
     );
   }
 }
-export const GET = withApiAudit('/api/cron/check-expiring-documents', _GET);
+export const GET = withRuntime(withApiAudit('/api/cron/check-expiring-documents', _GET));

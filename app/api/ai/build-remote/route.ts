@@ -133,6 +133,8 @@ add_action('wp_enqueue_scripts', 'elevate_lms_init');
 import { elevateLMS } from 'public/elevate-lms.js';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 $w.onReady(function () {
     elevateLMS.init({
         siteId: '${siteId}',
@@ -341,4 +343,4 @@ ElevateLMS.render('#dashboard', {
     ],
   };
 }
-export const POST = withApiAudit('/api/ai/build-remote', _POST);
+export const POST = withRuntime(withApiAudit('/api/ai/build-remote', _POST));

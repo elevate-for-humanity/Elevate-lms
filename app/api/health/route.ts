@@ -7,6 +7,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getAuditTelemetry } from '@/lib/audit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -208,4 +210,4 @@ const checks: Record<string, any> = {
     },
   });
 }
-export const GET = withApiAudit('/api/health', _GET);
+export const GET = withRuntime(withApiAudit('/api/health', _GET));

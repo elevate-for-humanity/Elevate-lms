@@ -7,6 +7,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 /**
  * POST /api/license/checkout
  * 
@@ -206,4 +208,4 @@ async function _POST(request: NextRequest) {
     );
   }
 }
-export const POST = withApiAudit('/api/license/checkout', _POST);
+export const POST = withRuntime(withApiAudit('/api/license/checkout', _POST));

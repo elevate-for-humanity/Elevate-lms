@@ -7,6 +7,8 @@ import { strictRateLimit } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 const TRIAL_DURATION_DAYS = 14;
 
 // In-memory fallback when Upstash Redis is not configured
@@ -267,4 +269,4 @@ async function _POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error', correlationId }, { status: 500 });
   }
 }
-export const POST = withApiAudit('/api/trial/start-managed', _POST);
+export const POST = withRuntime(withApiAudit('/api/trial/start-managed', _POST));

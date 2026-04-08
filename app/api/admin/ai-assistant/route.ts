@@ -13,6 +13,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 export const runtime = 'nodejs';
 export const maxDuration = 30;
 
@@ -92,6 +94,7 @@ LIVE DATA SNAPSHOT (as of ${now.toLocaleString('en-US', { timeZone: 'America/Ind
 }
 
 export async function POST(req: NextRequest) {
+  await hydrateProcessEnv();
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;

@@ -17,6 +17,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
 
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
@@ -42,6 +44,7 @@ function examLabel(examType: string) {
 }
 
 export async function GET(req: NextRequest) {
+  await hydrateProcessEnv();
   const secret = req.headers.get('x-cron-secret');
   if (secret !== process.env.CRON_SECRET) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

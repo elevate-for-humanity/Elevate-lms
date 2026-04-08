@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 
 import { runAutomationTasks } from '@/lib/automation/enrollment-automation';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -40,4 +42,4 @@ async function _GET(req: Request) {
     );
   }
 }
-export const GET = withApiAudit('/api/cron/enrollment-automation', _GET, { actor_type: 'cron' });
+export const GET = withRuntime(withApiAudit('/api/cron/enrollment-automation', _GET, { actor_type: 'cron' }));

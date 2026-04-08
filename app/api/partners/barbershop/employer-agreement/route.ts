@@ -5,6 +5,8 @@ import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { logger } from '@/lib/logger';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -183,4 +185,4 @@ async function _POST(request: NextRequest) {
   }
 }
 
-export const POST = withApiAudit('/api/partners/barbershop/employer-agreement', _POST);
+export const POST = withRuntime(withApiAudit('/api/partners/barbershop/employer-agreement', _POST));

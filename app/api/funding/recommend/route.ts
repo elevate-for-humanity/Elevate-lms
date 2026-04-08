@@ -6,6 +6,8 @@ import { getOpenAIClient, isOpenAIConfigured } from "@/lib/openai-client";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -119,4 +121,4 @@ Be specific and actionable. Focus on practical next steps.
     narrative,
   });
 }
-export const POST = withApiAudit('/api/funding/recommend', _POST);
+export const POST = withRuntime(withApiAudit('/api/funding/recommend', _POST));

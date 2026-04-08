@@ -4,6 +4,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { sendSlackMessage } from '@/lib/notifications/slack';
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -22,6 +24,7 @@ export const dynamic = 'force-dynamic';
  *   - Any escalations fired (ops visibility for follow-up)
  */
 export async function GET(req: Request) {
+  await hydrateProcessEnv();
   const cronSecret = process.env.CRON_SECRET;
 
   if (!cronSecret) {

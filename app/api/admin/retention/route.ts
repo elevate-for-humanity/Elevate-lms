@@ -6,6 +6,8 @@ import { enforceDocumentRetention } from '@/lib/retention/document-retention';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -111,5 +113,5 @@ async function _GET(request: NextRequest) {
     note: 'WIOA requires 3-year retention from program exit. Default is 1095 days.',
   });
 }
-export const GET = withApiAudit('/api/admin/retention', _GET);
-export const POST = withApiAudit('/api/admin/retention', _POST);
+export const GET = withRuntime(withApiAudit('/api/admin/retention', _GET));
+export const POST = withRuntime(withApiAudit('/api/admin/retention', _POST));

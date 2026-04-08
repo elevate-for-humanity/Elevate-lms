@@ -20,6 +20,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { PRE_AUTH_TABLES } from '@/lib/pre-auth-tables';
 import { logger } from '@/lib/logger';
 
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
@@ -31,6 +33,7 @@ interface TableOrphanResult {
 }
 
 export async function GET(request: NextRequest) {
+  await hydrateProcessEnv();
   // Require CRON_SECRET to prevent open access
   const secret = request.headers.get('x-cron-secret')
     ?? request.nextUrl.searchParams.get('secret');

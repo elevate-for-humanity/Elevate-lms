@@ -14,6 +14,8 @@ import Stripe from 'stripe';
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 300;
 
@@ -188,4 +190,4 @@ async function sendExpiryWarningEmail(email: string, companyName: string, expire
     logger.error('Failed to send expiry warning email:', error);
   }
 }
-export const GET = withApiAudit('/api/cron/check-licenses', _GET);
+export const GET = withRuntime(withApiAudit('/api/cron/check-licenses', _GET));

@@ -6,6 +6,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 // Lazy-load OpenAI client to prevent build-time errors
 function getOpenAI() {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -323,4 +325,4 @@ Return ONLY valid JSON.`;
     };
   }
 }
-export const POST = withApiAudit('/api/ai/import-site', _POST);
+export const POST = withRuntime(withApiAudit('/api/ai/import-site', _POST));

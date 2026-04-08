@@ -5,6 +5,8 @@ import OpenAI from 'openai';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -68,4 +70,4 @@ Provide ONLY the fixed code, no explanation. Return the complete fixed code.`;
     );
   }
 }
-export const POST = withApiAudit('/api/studio/fix', _POST);
+export const POST = withRuntime(withApiAudit('/api/studio/fix', _POST));

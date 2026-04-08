@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@supabase/supabase-js';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -95,5 +97,5 @@ async function _GET(request: NextRequest) {
   // Manually trigger the cron job for testing
   return POST(request);
 }
-export const GET = withApiAudit('/api/cron/daily-attendance-alerts', _GET);
-export const POST = withApiAudit('/api/cron/daily-attendance-alerts', _POST);
+export const GET = withRuntime(withApiAudit('/api/cron/daily-attendance-alerts', _GET));
+export const POST = withRuntime(withApiAudit('/api/cron/daily-attendance-alerts', _POST));

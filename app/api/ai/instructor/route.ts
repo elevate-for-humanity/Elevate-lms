@@ -10,6 +10,8 @@ import { allPrograms } from '@/lms-data/programs';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -138,4 +140,4 @@ Keep responses concise (2-4 paragraphs max), practical, and encouraging. Focus o
     );
   }
 }
-export const POST = withApiAudit('/api/ai/instructor', _POST);
+export const POST = withRuntime(withApiAudit('/api/ai/instructor', _POST));

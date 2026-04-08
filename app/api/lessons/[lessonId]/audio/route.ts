@@ -11,6 +11,8 @@ import type { CourseLesson, CourseModule } from '@/lib/courses/definitions';
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import { aiChat, isAIAvailable } from '@/lib/ai/ai-service';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 300;
 
@@ -380,4 +382,4 @@ async function _GET(
     );
   }
 }
-export const GET = withApiAudit('/api/lessons/[lessonId]/audio', _GET);
+export const GET = withRuntime(withApiAudit('/api/lessons/[lessonId]/audio', _GET));

@@ -5,6 +5,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -186,5 +188,5 @@ async function _GET(request: NextRequest) {
 
   return POST(request);
 }
-export const GET = withApiAudit('/api/cron/weekly-verdicts', _GET);
-export const POST = withApiAudit('/api/cron/weekly-verdicts', _POST);
+export const GET = withRuntime(withApiAudit('/api/cron/weekly-verdicts', _GET));
+export const POST = withRuntime(withApiAudit('/api/cron/weekly-verdicts', _POST));

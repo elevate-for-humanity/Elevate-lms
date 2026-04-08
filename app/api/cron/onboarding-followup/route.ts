@@ -5,6 +5,8 @@ import { workoneOnboardingEmail } from '@/lib/email/templates/workone-onboarding
 import { barberOnboardingEmail } from '@/lib/email/templates/barber-onboarding';
 import { logger } from '@/lib/logger';
 
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 const ADMIN_BCC = 'elevate4humanityedu@gmail.com';
 
 /**
@@ -12,6 +14,7 @@ const ADMIN_BCC = 'elevate4humanityedu@gmail.com';
  * Runs daily. Only follows up once (follow_up_count < 1).
  */
 export async function GET(request: Request) {
+  await hydrateProcessEnv();
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
   if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {

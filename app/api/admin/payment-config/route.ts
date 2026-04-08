@@ -12,6 +12,8 @@ import { affirm } from '@/lib/affirm/client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -63,4 +65,4 @@ async function _GET(request: Request) {
     return response;
   });
 }
-export const GET = withApiAudit('/api/admin/payment-config', _GET);
+export const GET = withRuntime(withApiAudit('/api/admin/payment-config', _GET));

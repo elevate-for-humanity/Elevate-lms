@@ -3,6 +3,8 @@ import { processFulfillmentQueue, getQueueStats } from '@/lib/store/fulfillment-
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -78,5 +80,5 @@ async function _GET(request: Request) {
     return Response.json({ error: 'Failed to get stats' }, { status: 500 });
   }
 }
-export const GET = withApiAudit('/api/store/process-queue', _GET);
-export const POST = withApiAudit('/api/store/process-queue', _POST);
+export const GET = withRuntime(withApiAudit('/api/store/process-queue', _GET));
+export const POST = withRuntime(withApiAudit('/api/store/process-queue', _POST));

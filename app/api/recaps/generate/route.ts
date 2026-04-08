@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -162,4 +164,4 @@ ${transcript}
     );
   }
 }
-export const POST = withApiAudit('/api/recaps/generate', _POST);
+export const POST = withRuntime(withApiAudit('/api/recaps/generate', _POST));

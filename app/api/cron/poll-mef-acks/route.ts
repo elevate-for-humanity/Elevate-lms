@@ -14,6 +14,8 @@ import { createAcknowledgmentHandler } from '@/lib/tax-software/mef/acknowledgme
 import { isAuthorizedCronRequest } from '@/lib/server/cron-auth';
 import { getRuntimeReadiness } from '@/lib/tax-software/config/runtime-readiness';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 // Allow up to 60s — IRS status endpoint can be slow
@@ -134,4 +136,4 @@ async function _GET(request: Request) {
   return NextResponse.json({ ok: true, ...results });
 }
 
-export const GET = withApiAudit('/api/cron/poll-mef-acks', _GET);
+export const GET = withRuntime(withApiAudit('/api/cron/poll-mef-acks', _GET));

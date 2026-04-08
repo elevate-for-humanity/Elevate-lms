@@ -4,6 +4,8 @@ import { resend } from '@/lib/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tracker';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 // AUTH: Intentionally public — no authentication required
 
 export const runtime = 'nodejs';
@@ -356,5 +358,5 @@ return NextResponse.json({
     events: ['invitee.created', 'invitee.canceled'],
   });
 }
-export const GET = withApiAudit('/api/chatbot/calendly-webhook', _GET, { actor_type: 'webhook', skip_body: true });
-export const POST = withApiAudit('/api/chatbot/calendly-webhook', _POST, { actor_type: 'webhook', skip_body: true });
+export const GET = withRuntime(withApiAudit('/api/chatbot/calendly-webhook', _GET, { actor_type: 'webhook', skip_body: true }));
+export const POST = withRuntime(withApiAudit('/api/chatbot/calendly-webhook', _POST, { actor_type: 'webhook', skip_body: true }));

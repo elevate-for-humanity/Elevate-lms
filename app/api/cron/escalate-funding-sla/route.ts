@@ -10,6 +10,8 @@ import { safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -55,4 +57,4 @@ async function _GET(request: Request) {
   }
 }
 
-export const GET = withApiAudit('/api/cron/escalate-funding-sla', _GET);
+export const GET = withRuntime(withApiAudit('/api/cron/escalate-funding-sla', _GET));

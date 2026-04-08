@@ -2,6 +2,8 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +22,7 @@ const ERROR_RATE_THRESHOLD = 0.2;
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
 export async function GET(request: NextRequest) {
+  await hydrateProcessEnv();
   // Verify cron secret
   const cronSecret = process.env.CRON_SECRET;
   const providedSecret = request.headers.get('authorization')?.replace('Bearer ', '');

@@ -12,6 +12,8 @@ import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -170,4 +172,4 @@ Keep responses concise but helpful. Use bullet points for clarity when listing i
     });
   }
 }
-export const POST = withApiAudit('/api/chat/ai-response', _POST);
+export const POST = withRuntime(withApiAudit('/api/chat/ai-response', _POST));

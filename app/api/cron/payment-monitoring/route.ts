@@ -18,6 +18,8 @@ import { createClient } from '@supabase/supabase-js';
 import { resend } from '@/lib/resend';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -220,4 +222,4 @@ async function sendPastDueAlert(
     `,
   });
 }
-export const GET = withApiAudit('/api/cron/payment-monitoring', _GET, { actor_type: 'cron' });
+export const GET = withRuntime(withApiAudit('/api/cron/payment-monitoring', _GET, { actor_type: 'cron' }));

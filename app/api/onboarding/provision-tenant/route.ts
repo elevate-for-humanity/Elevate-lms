@@ -7,6 +7,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -437,4 +439,4 @@ function generateSetupGuideEmail(data: any): string {
 </html>
   `;
 }
-export const POST = withApiAudit('/api/onboarding/provision-tenant', _POST);
+export const POST = withRuntime(withApiAudit('/api/onboarding/provision-tenant', _POST));

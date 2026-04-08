@@ -5,6 +5,8 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { generateMOUPdf } from '@/lib/documents/generate-mou-pdf';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -332,4 +334,4 @@ async function _POST(req: NextRequest) {
   }
 }
 
-export const POST = withApiAudit('/api/partners/barbershop-apprenticeship/sign-mou', _POST);
+export const POST = withRuntime(withApiAudit('/api/partners/barbershop-apprenticeship/sign-mou', _POST));

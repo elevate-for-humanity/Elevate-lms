@@ -6,6 +6,8 @@ import { searchEntities } from '@/lib/integrations/sam-gov';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -117,5 +119,5 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 return POST(request);
 }
-export const GET = withApiAudit('/api/sam-gov/sync', _GET);
-export const POST = withApiAudit('/api/sam-gov/sync', _POST);
+export const GET = withRuntime(withApiAudit('/api/sam-gov/sync', _GET));
+export const POST = withRuntime(withApiAudit('/api/sam-gov/sync', _POST));

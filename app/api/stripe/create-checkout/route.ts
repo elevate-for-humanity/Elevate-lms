@@ -8,6 +8,8 @@ import { paymentRateLimit } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
+import { withRuntime } from '@/lib/api/withRuntime';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -127,4 +129,4 @@ async function handler(req: Request) {
     );
   }
 }
-export const POST = withApiAudit('/api/stripe/create-checkout', handler);
+export const POST = withRuntime(withApiAudit('/api/stripe/create-checkout', handler));

@@ -469,37 +469,51 @@ function BookingForm() {
           )}
 
           {/* Dynamic price summary — shown for individual or unset org type */}
-          {selectedProvider?.fees && selectedProvider.fees.length > 0 && (orgType === 'Individual' || orgType === '') && (
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Order Summary</p>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between text-slate-700">
-                  <span>NHA Certification Exam</span>
-                  <span className="font-semibold">$149</span>
-                </div>
-                <div className="flex justify-between text-slate-700">
-                  <span>Testing &amp; Administration</span>
-                  <span className="font-semibold">$94</span>
-                </div>
-                {addOnSelected && selectedProvider.addOn && (
-                  <div className="flex justify-between text-amber-700">
-                    <span>{selectedProvider.addOn.label}</span>
-                    <span className="font-semibold">+${(selectedProvider.addOn.amountCents / 100).toFixed(0)}</span>
+          {selectedProvider?.fees && selectedProvider.fees.length > 0 && (orgType === 'Individual' || orgType === '') && (() => {
+            const fee = selectedProvider.fees![0];
+            const addOnCents = addOnSelected && selectedProvider.addOn ? selectedProvider.addOn.amountCents : 0;
+            const total = fee.amount + addOnCents / 100;
+
+            // NHA fees have a breakdown note: "$149 NHA exam + $94 testing & administration"
+            // Parse it so the line items match what the candidate actually sees on the NHA invoice.
+            const nhaBreakdown = fee.note?.match(/\$(\d+)\s+(.+?)\s*\+\s*\$(\d+)\s+(.+)/);
+
+            return (
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Order Summary</p>
+                <div className="space-y-2 text-sm">
+                  {nhaBreakdown ? (
+                    <>
+                      <div className="flex justify-between text-slate-700">
+                        <span>{nhaBreakdown[2]}</span>
+                        <span className="font-semibold">${nhaBreakdown[1]}</span>
+                      </div>
+                      <div className="flex justify-between text-slate-700">
+                        <span>{nhaBreakdown[4]}</span>
+                        <span className="font-semibold">${nhaBreakdown[3]}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex justify-between text-slate-700">
+                      <span>{fee.label}</span>
+                      <span className="font-semibold">${fee.amount.toFixed(0)}</span>
+                    </div>
+                  )}
+                  {addOnSelected && selectedProvider.addOn && (
+                    <div className="flex justify-between text-amber-700">
+                      <span>{selectedProvider.addOn.label}</span>
+                      <span className="font-semibold">+${(selectedProvider.addOn.amountCents / 100).toFixed(0)}</span>
+                    </div>
+                  )}
+                  <div className="border-t border-slate-200 pt-2 flex justify-between font-extrabold text-slate-900 text-base">
+                    <span>Total</span>
+                    <span>${total.toFixed(0)}</span>
                   </div>
-                )}
-                <div className="border-t border-slate-200 pt-2 flex justify-between font-extrabold text-slate-900 text-base">
-                  <span>Total</span>
-                  <span>
-                    ${(
-                      (selectedProvider.fees[0].amount) +
-                      (addOnSelected && selectedProvider.addOn ? selectedProvider.addOn.amountCents / 100 : 0)
-                    ).toFixed(0)}
-                  </span>
                 </div>
+                <p className="text-xs text-slate-400 mt-3">Secure checkout · Instant confirmation · No hidden fees</p>
               </div>
-              <p className="text-xs text-slate-400 mt-3">Secure checkout · Instant confirmation · No hidden fees</p>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Step 2 — Proctoring mode (driven by capability) */}
           {selectedProvider && availableModes.length > 0 && (

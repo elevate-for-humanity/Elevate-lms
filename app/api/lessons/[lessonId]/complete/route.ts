@@ -155,17 +155,14 @@ async function _POST(
       return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
     }
 
+    // Fallback to 'reading' if content_type is missing — this happens for
+    // HVAC curriculum_lessons rows where lesson_type may not be set.
+    // Blocking with 422 here prevents all lesson completion for affected lessons.
     if (!lessonDetail.content_type) {
-      // Lesson has no content_type — cannot enforce seat time or quiz rules.
-      // This is a data integrity failure, not a client error.
-      logger.error(`INVALID_LESSON_CONTENT_TYPE lessonId=${lessonId}`);
-      return NextResponse.json(
-        { error: 'INVALID_LESSON_CONTENT_TYPE' },
-        { status: 422 }
-      );
+      logger.warn(`Missing content_type for lessonId=${lessonId} — defaulting to 'reading'`);
     }
 
-    const contentType = lessonDetail.content_type;
+    const contentType = lessonDetail.content_type || 'reading';
 
     // Quiz lessons require a passing attempt before they can be marked complete.
     // HVAC quizzes use a local question bank (not the quizzes table), so

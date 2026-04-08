@@ -6,8 +6,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { setAuditContext } from '@/lib/audit-context';
 
-const supabaseAdmin = createAdminClient();
-setAuditContext(supabaseAdmin, { systemActor: 'grants_package_builder' }).catch(() => {});
+function getDb() { return createAdminClient(); }
 import { Document, Packer, Paragraph, HeadingLevel } from 'docx';
 import JSZip from 'jszip';
 
@@ -44,7 +43,7 @@ export interface PackageAttachment {
 export async function generateNarrativeDocx(
   applicationId: string
 ): Promise<Buffer> {
-  const { data: app, error } = await supabaseAdmin
+  const { data: app, error } = await getDb()
     .from('grant_applications')
     .select('*, grant:grant_opportunities(*), entity:entities(*)')
     .eq('id', applicationId)
@@ -114,7 +113,7 @@ export async function generateNarrativeDocx(
 export async function generateNarrativePdf(
   applicationId: string
 ): Promise<Buffer> {
-  const { data: app, error } = await supabaseAdmin
+  const { data: app, error } = await getDb()
     .from('grant_applications')
     .select('*, grant:grant_opportunities(*), entity:entities(*)')
     .eq('id', applicationId)
@@ -220,7 +219,7 @@ function convertMarkdownToHtml(markdown: string): string {
 export async function generateCapabilityStatement(
   entityId: string
 ): Promise<Buffer> {
-  const { data: entity, error } = await supabaseAdmin
+  const { data: entity, error } = await getDb()
     .from('entities')
     .select('*')
     .eq('id', entityId)
@@ -335,7 +334,7 @@ export async function generateCapabilityStatement(
 export async function generateBudgetSpreadsheet(
   applicationId: string
 ): Promise<Buffer> {
-  const { data: app, error } = await supabaseAdmin
+  const { data: app, error } = await getDb()
     .from('grant_applications')
     .select('*')
     .eq('id', applicationId)
@@ -367,7 +366,9 @@ Total,,0
 export async function buildGrantPackage(
   applicationId: string
 ): Promise<GrantPackage> {
-  const { data: app, error } = await supabaseAdmin
+  const db = getDb();
+  await setAuditContext(db, { systemActor: 'grants_package_builder' }).catch(() => {});
+  const { data: app, error } = await db
     .from('grant_applications')
     .select('*, grant:grant_opportunities(*), entity:entities(*)')
     .eq('id', applicationId)
@@ -468,7 +469,7 @@ export async function buildGrantPackage(
 
   const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
 
-  await supabaseAdmin.from('grant_packages').upsert(
+  await db.from('grant_packages').upsert(
     {
       application_id: applicationId,
       grant_id: app.grant_id,

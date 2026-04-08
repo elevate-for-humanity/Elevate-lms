@@ -24,6 +24,8 @@ export default async function PartnerAttendancePage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/partner/login');
 
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  if (!profile || !['partner', 'admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 
   let sessions: any[] = [];
   let summary: any = null;

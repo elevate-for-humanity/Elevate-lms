@@ -256,6 +256,13 @@
 [functions."cron-compliance-expiration"]
   schedule = "0 8 * * 1"
 
+# Pre-auth orphan detection — daily 06:00 UTC
+# Alerts if any pre-auth table has rows with user_id IS NULL and a matching profile.
+# See lib/pre-auth-tables.ts for the registry and scripts/detect-orphaned-rows.sql
+# for the manual equivalent.
+[functions."cron-orphan-check"]
+  schedule = "0 6 * * *"
+
 # Onboarding reminder — weekly, Monday 9 AM ET
 # Nudges providers with incomplete onboarding steps.
 # Requires CRON_SECRET env var in Netlify site settings.

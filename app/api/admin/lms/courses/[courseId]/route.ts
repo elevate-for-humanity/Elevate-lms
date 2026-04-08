@@ -73,6 +73,15 @@ export async function DELETE(
 
     const { courseId } = await params;
 
+    // Pre-read: verify course exists before archiving
+    const { data: existing, error: fetchErr } = await supabase
+      .from('courses')
+      .select('id')
+      .eq('id', courseId)
+      .single();
+
+    if (fetchErr || !existing) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+
     // Archive, never hard-delete — preserves enrollment history
     const { error } = await supabase
       .from('courses')

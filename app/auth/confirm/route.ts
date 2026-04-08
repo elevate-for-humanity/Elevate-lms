@@ -118,6 +118,18 @@ export async function GET(request: NextRequest) {
             } else {
               logger.info('[auth/confirm] no pending enrollments to link', { userId: user.id });
             }
+
+            // Reconcile remaining pre-auth tables (applications, barber_subscriptions).
+            // program_enrollments is handled above with barber_sub_id backfill logic.
+            // Registry-driven — see lib/pre-auth-tables.ts.
+            if (db && user?.email) {
+              const { reconcilePreAuthRows } = await import('@/lib/pre-auth-tables');
+              await reconcilePreAuthRows(db, user.email).catch((err: unknown) => {
+                logger.error('[auth/confirm] pre-auth reconciliation failed', {
+                  error: err instanceof Error ? err.message : String(err),
+                });
+              });
+            }
           }
         } catch (err: any) {
           // Non-fatal — enrollment-success page has its own email-linking fallback

@@ -113,3 +113,31 @@ Every box must be checked before merge when this PR touches enrollment, booking,
 - [ ] `pnpm lint:critical-routes` passes
 
 > **Rule: No DB record = no success state.**
+
+---
+
+## Pre-auth Registry Check
+
+> **Required for any PR that adds or modifies a public-write route, webhook, intake form,
+> application form, enrollment flow, checkout flow, or anonymous insert path.**
+
+- [ ] This PR does **NOT** add or modify any public-write route or anonymous insert path
+- [ ] This PR **does** add or modify a public-write path — and I have done the following:
+
+  **If the new table needs user_id reconciliation after account creation:**
+  - [ ] Table added to `lib/pre-auth-tables.ts` with `mode: 'reconcile'`
+  - [ ] `emailColumn` and `userIdColumn` are correct
+  - [ ] `scripts/detect-orphaned-rows.sql` updated to include the new table
+  - [ ] Detection query run in Supabase and returns 0 linkable rows
+
+  **If the table is intentionally anonymous (no user_id ever needed):**
+  - [ ] Table added to `lib/pre-auth-tables.ts` with `mode: 'anonymous'`
+  - [ ] `reason` field explains why no reconciliation is needed
+
+  **If the route is exempt from the registry (e.g. auth is enforced by a non-standard pattern):**
+  - [ ] Route file contains `// pre-auth-registry: exempt — <reason>`
+
+- [ ] `node scripts/check-pre-auth-registry.cjs` passes locally
+
+> **Rule: Every public-write table must be consciously categorized. Unregistered pre-auth
+> inserts block merge via the integrity-gate CI check.**

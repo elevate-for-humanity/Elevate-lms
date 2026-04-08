@@ -99,7 +99,10 @@ async function _POST(req: Request) {
   if (error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 
-  await logAdminAudit({ action: AdminAction.NEXT_STEPS_UPDATED, actorId: user.id, entityType: 'next_steps', entityId: body.id, metadata: {}, req: request });
+  if (!data)
+    return NextResponse.json({ error: 'Record not found' }, { status: 404 });
+
+  await logAdminAudit({ action: AdminAction.NEXT_STEPS_UPDATED, actorId: user.id, entityType: 'next_steps', entityId: body.id, metadata: {}, req });
 
   return NextResponse.json({ ok: true, row: data });
 }

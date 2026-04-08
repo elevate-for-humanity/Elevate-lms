@@ -21,9 +21,10 @@ export default async function LeadsPage() {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect('/login?redirect=/admin/crm/leads');
-  }
+  if (!user) redirect('/login?redirect=/admin/crm/leads');
+
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 
   // Fetch real leads from CRM
   const { data: leadData } = await supabase

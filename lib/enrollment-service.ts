@@ -162,6 +162,90 @@ export async function createOrUpdateEnrollment(
  *
  * Safe to call multiple times — only touches null user_id rows.
  */
+/**
+ * Link barber_subscriptions rows that have user_id = null but match the given
+ * email via customer_email. Direct reconciliation — does not depend on
+ * program_enrollments.barber_sub_id being populated.
+ * Safe to call multiple times.
+ */
+export async function linkOrphanedBarberSubscriptions(
+  supabase: SupabaseClient,
+  email: string,
+): Promise<{ linked: number }> {
+  if (!email) return { linked: 0 };
+
+  const normalizedEmail = email.toLowerCase().trim();
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('email', normalizedEmail)
+    .single();
+
+  if (!profile?.id) return { linked: 0 };
+
+  const { data, error } = await supabase
+    .from('barber_subscriptions')
+    .update({ user_id: profile.id })
+    .ilike('customer_email', normalizedEmail)
+    .is('user_id', null)
+    .select('id');
+
+  if (error) {
+    logger.error('[enrollment-service] linkOrphanedBarberSubscriptions failed:', error.message);
+    return { linked: 0 };
+  }
+
+  const linked = data?.length ?? 0;
+  if (linked > 0) {
+    logger.info(
+      `[enrollment-service] Linked ${linked} orphaned barber_subscription(s) for ${normalizedEmail}`,
+    );
+  }
+  return { linked };
+}
+
+/**
+ * Link applications rows that have user_id = null but match the given email
+ * to the authenticated user's profile. Safe to call multiple times.
+ */
+export async function linkOrphanedApplications(
+  supabase: SupabaseClient,
+  email: string,
+): Promise<{ linked: number }> {
+  if (!email) return { linked: 0 };
+
+  const normalizedEmail = email.toLowerCase().trim();
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('email', normalizedEmail)
+    .single();
+
+  if (!profile?.id) return { linked: 0 };
+
+  const { data, error } = await supabase
+    .from('applications')
+    .update({ user_id: profile.id })
+    .ilike('email', normalizedEmail)
+    .is('user_id', null)
+    .select('id');
+
+  if (error) {
+    logger.error('[enrollment-service] linkOrphanedApplications failed:', error.message);
+    return { linked: 0 };
+  }
+
+  const linked = data?.length ?? 0;
+  if (linked > 0) {
+    logger.info(
+      `[enrollment-service] Linked ${linked} orphaned application(s) for ${normalizedEmail}`,
+    );
+  }
+  return { linked };
+}
+
 export async function linkOrphanedEnrollments(
   supabase: SupabaseClient,
   email: string,

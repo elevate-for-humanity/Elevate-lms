@@ -6,9 +6,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { setAuditContext } from '@/lib/audit-context';
 
-const supabaseAdmin = createAdminClient();
-// Set audit context once at module init — all writes attributed to grants system
-setAuditContext(supabaseAdmin, { systemActor: 'grants_submission_tracker' }).catch(() => {});
+function getDb() { return createAdminClient(); }
 import { notifyGrantSubmitted } from './notification-system';
 
 import { logAuditEvent } from '@/lib/audit';
@@ -54,6 +52,8 @@ export interface SubmissionTimelineEvent {
 export async function recordSubmission(
   submission: Omit<SubmissionRecord, 'id' | 'timeline'>
 ): Promise<SubmissionRecord> {
+  const db = getDb();
+  await setAuditContext(db, { systemActor: 'grants_submission_tracker' }).catch(() => {});
   const timeline: SubmissionTimelineEvent[] = [
     {
       timestamp: submission.submittedAt,
@@ -67,7 +67,7 @@ export async function recordSubmission(
     },
   ];
 
-  const { data, error }: any = await supabaseAdmin
+  const { data, error }: any = await db
     .from('grant_submissions')
     .insert({
       application_id: submission.applicationId,
@@ -92,7 +92,7 @@ export async function recordSubmission(
     throw error;
   }
 
-  await supabaseAdmin
+  await db
     .from('grant_applications')
     .update({
       status: 'submitted',
@@ -131,7 +131,9 @@ export async function addTimelineEvent(
   submissionId: string,
   event: Omit<SubmissionTimelineEvent, 'timestamp'>
 ): Promise<void> {
-  const { data: submission } = await supabaseAdmin
+  const db = getDb();
+  await setAuditContext(db, { systemActor: 'grants_submission_tracker' }).catch(() => {});
+  const { data: submission } = await db
     .from('grant_submissions')
     .select('timeline')
     .eq('id', submissionId)
@@ -147,7 +149,7 @@ export async function addTimelineEvent(
     ...event,
   });
 
-  await supabaseAdmin
+  await db
     .from('grant_submissions')
     .update({ timeline })
     .eq('id', submissionId);
@@ -162,7 +164,9 @@ export async function updateSubmissionStatus(
   notes?: string,
   performedBy?: string
 ): Promise<void> {
-  await supabaseAdmin
+  const db = getDb();
+  await setAuditContext(db, { systemActor: 'grants_submission_tracker' }).catch(() => {});
+  await db
     .from('grant_submissions')
     .update({ status, notes })
     .eq('id', submissionId);
@@ -188,7 +192,7 @@ export async function recordEmailSubmission(
     attachments: string[];
   }
 ): Promise<SubmissionRecord> {
-  const { data: app } = await supabaseAdmin
+  const { data: app } = await getDb()
     .from('grant_applications')
     .select('grant_id, entity_id')
     .eq('id', applicationId)
@@ -223,7 +227,7 @@ export async function recordPortalSubmission(
     confirmationReceipt?: string;
   }
 ): Promise<SubmissionRecord> {
-  const { data: app } = await supabaseAdmin
+  const { data: app } = await getDb()
     .from('grant_applications')
     .select('grant_id, entity_id')
     .eq('id', applicationId)
@@ -253,7 +257,7 @@ export async function recordPortalSubmission(
 export async function getSubmissionHistory(
   applicationId: string
 ): Promise<SubmissionRecord | null> {
-  const { data, error }: any = await supabaseAdmin
+  const { data, error }: any = await getDb()
     .from('grant_submissions')
     .select('*')
     .eq('application_id', applicationId)
@@ -285,7 +289,7 @@ export async function getSubmissionHistory(
  * Get all submissions
  */
 export async function getAllSubmissions(): Promise<SubmissionRecord[]> {
-  const { data, error }: any = await supabaseAdmin
+  const { data, error }: any = await getDb()
     .from('grant_submissions')
     .select('*')
     .order('submitted_at', { ascending: false });
@@ -334,7 +338,7 @@ export async function checkDeadlinesAndNotify(): Promise<void> {
     const endOfDay = new Date(targetDate);
     endOfDay.setHours(23, 59, 59, 999);
 
-    const { data: grants } = await supabaseAdmin
+    const { data: grants } = await getDb()
       .from('grant_opportunities')
       .select('id, title, due_date')
       .gte('due_date', startOfDay.toISOString())

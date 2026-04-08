@@ -132,6 +132,8 @@ async function _GET(req: NextRequest) {
 }
 
 async function _PATCH(req: NextRequest) {
+  // grants-audit: exempt — mark-read update only; no system actor applies.
+  // User-initiated read-state toggle, not a grants system write.
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;

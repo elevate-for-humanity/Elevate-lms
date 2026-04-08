@@ -4,6 +4,7 @@ import Stripe from 'stripe';
 import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@supabase/supabase-js';
 import { resend } from '@/lib/resend';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -23,6 +24,7 @@ function getWebhookSecret() {
 }
 
 async function _POST(request: NextRequest) {
+  await hydrateProcessEnv();
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 

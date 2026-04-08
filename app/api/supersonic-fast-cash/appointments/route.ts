@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
 import { resend } from '@/lib/resend';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -13,6 +14,7 @@ export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   try {
+  await hydrateProcessEnv();
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 

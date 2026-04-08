@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { ExternalLink, Clock, Award, ShoppingBag } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { OfferingBadge } from '@/components/ui/OfferingBadge';
+import { SERVSAFE_BY_KEY } from '@/lib/testing/servsafe-programs';
+import { getRetailPrice } from '@/lib/testing/servsafe-pricing';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,7 +66,8 @@ export default async function NrfPage() {
       id: 'servsafe-manager',
       title: 'ServSafe Manager',
       duration: '8-10 hours',
-      price: 'Included',
+      price: `$${getRetailPrice(SERVSAFE_BY_KEY['servsafe_manager'].products[0])}`,
+      enrollHref: '/apply?program=servsafe-manager',
       description:
         'Food safety certification for restaurant managers and supervisors',
       certificate: 'ServSafe Manager Certification',
@@ -80,7 +83,8 @@ export default async function NrfPage() {
       id: 'servsafe-food-handler',
       title: 'ServSafe Food Handler',
       duration: '2-3 hours',
-      price: 'Included',
+      price: `$${getRetailPrice(SERVSAFE_BY_KEY['food_handler'].products[0])}`,
+      enrollHref: '/apply?program=servsafe-food-handler',
       description: 'Basic food safety training for all food service workers',
       certificate: 'ServSafe Food Handler Certificate',
       topics: [
@@ -95,7 +99,8 @@ export default async function NrfPage() {
       id: 'servsafe-alcohol',
       title: 'ServSafe Alcohol',
       duration: '4-6 hours',
-      price: 'Included',
+      price: 'Contact us',
+      enrollHref: '/contact?program=servsafe-alcohol',
       description:
         'Responsible alcohol service training for servers and bartenders',
       certificate: 'ServSafe Alcohol Certificate',

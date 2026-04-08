@@ -19,22 +19,18 @@ import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
-
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { withRuntime } from '@/lib/api/withRuntime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
-export async function GET(request: Request) {
-  await hydrateProcessEnv();
-  const authHeader = request.headers.get('authorization');
-  if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export const GET = withRuntime(
+  { cron: 'bearer' },
+  async () => {
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
   const db = createAdminClient();
   if (!db) {
@@ -117,15 +113,16 @@ export async function GET(request: Request) {
     logger.error('[barber-billing cron] fatal', err);
     return NextResponse.json({ error: 'Cron failed', details: String(err) }, { status: 500 });
   }
-}
+  }
+);
 
 function suspensionEmailHtml({ name, updateUrl }: { name: string; updateUrl: string }) {
   return `
     <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-      <h2 style="color:#dc2626">Access Suspended — Payment Required</h2>
+      <h2 style="color:#dc2626">Account Suspended — Payment Required</h2>
       <p>Hi ${name},</p>
-      <p>Your barber apprenticeship access has been suspended because a weekly tuition payment could not be processed and the 7-day grace period has passed.</p>
-      <p><strong>Your hours and progress are saved.</strong> Access is restored immediately once payment is updated.</p>
+      <p>Your barber apprenticeship account has been suspended because a weekly tuition payment could not be processed and the 7-day grace period has passed.</p>
+      <p>You can continue coursework, but <strong>hours cannot be logged</strong> until your billing is resolved. Your recorded hours and progress are saved. Hour logging resumes immediately once payment is updated.</p>
       <p style="margin:24px 0">
         <a href="${updateUrl}"
            style="background:#ea580c;color:#fff;padding:12px 24px;text-decoration:none;border-radius:6px;display:inline-block;font-weight:600">

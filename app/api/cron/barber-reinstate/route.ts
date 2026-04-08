@@ -16,21 +16,16 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { getStripe } from '@/lib/stripe/client';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
-
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { withRuntime } from '@/lib/api/withRuntime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
-
-export async function GET(request: Request) {
-  await hydrateProcessEnv();
-  const authHeader = request.headers.get('authorization');
-  if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export const GET = withRuntime(
+  { cron: 'bearer' },
+  async () => {
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
   const db = createAdminClient();
   if (!db) {
@@ -42,12 +37,14 @@ export async function GET(request: Request) {
   const results = { reinstated: 0, still_suspended: 0, errors: [] as string[] };
 
   try {
-    // Find all suspended subscriptions that have a Stripe subscription ID
+    // Find subscriptions suspended for payment reasons only.
+    // Excludes manually_disabled records — those require admin action to reinstate.
     const { data: suspended, error } = await db
       .from('barber_subscriptions')
-      .select('id, user_id, customer_email, customer_name, stripe_subscription_id')
+      .select('id, user_id, customer_email, customer_name, stripe_subscription_id, suspension_reason')
       .in('payment_status', ['past_due', 'suspended'])
-      .not('stripe_subscription_id', 'is', null);
+      .not('stripe_subscription_id', 'is', null)
+      .not('suspension_reason', 'eq', 'manually_disabled');
 
     if (error) {
       logger.error('[barber-reinstate cron] fetch error', error);
@@ -58,7 +55,9 @@ export async function GET(request: Request) {
       try {
         const stripeSub = await stripe.subscriptions.retrieve(sub.stripe_subscription_id!);
 
-        if (stripeSub.status === 'active') {
+        // Only reinstate for payment-collectible statuses.
+        // 'canceled' or 'unpaid' means the subscription is gone — do not reinstate.
+        if (['active', 'trialing'].includes(stripeSub.status)) {
           // Stripe says active — reinstate
           await db
             .from('barber_subscriptions')
@@ -108,7 +107,8 @@ export async function GET(request: Request) {
     logger.error('[barber-reinstate cron] fatal', err);
     return NextResponse.json({ error: 'Cron failed', details: String(err) }, { status: 500 });
   }
-}
+  }
+);
 
 function reinstateEmailHtml({ name, dashboardUrl }: { name: string; dashboardUrl: string }) {
   return `

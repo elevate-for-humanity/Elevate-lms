@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { insertWithPreAuthCheck } from '@/lib/pre-auth-guard';
 
 export const runtime = 'nodejs';
 
@@ -37,21 +38,20 @@ async function _POST(req: NextRequest) {
       );
     }
 
-    const { data: enrollment, error } = await supabase
-      .from('program_enrollments')
-      .insert({
-        first_name: data.firstName.trim(),
-        last_name: data.lastName.trim(),
-        email: data.email.trim().toLowerCase(),
-        phone: data.phone?.trim() || null,
-        program_id: data.programId,
-        program_name: data.programName,
-        funding_type: data.fundingType || 'wioa',
-        status: 'pending',
-        source: data.source || 'website',
-        notes: data.notes || null,
-        created_at: new Date().toISOString(),
-      })
+    // @preAuthWrite table=program_enrollments mode=reconcile
+    const { data: enrollment, error } = await insertWithPreAuthCheck(supabase, 'program_enrollments', {
+      first_name: data.firstName.trim(),
+      last_name: data.lastName.trim(),
+      email: data.email.trim().toLowerCase(),
+      phone: data.phone?.trim() || null,
+      program_id: data.programId,
+      program_name: data.programName,
+      funding_type: data.fundingType || 'wioa',
+      status: 'pending',
+      source: data.source || 'website',
+      notes: data.notes || null,
+      created_at: new Date().toISOString(),
+    })
       .select()
       .single();
 

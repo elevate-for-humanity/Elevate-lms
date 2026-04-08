@@ -19,7 +19,7 @@ const LEVELS = [
 const SUBJECTS = [
   { name: 'Applied Math', desc: 'Workplace math problems — measurements, calculations, and data interpretation.', img: '/images/pages/courses-page-11.jpg' },
   { name: 'Workplace Documents', desc: 'Reading and interpreting workplace materials — forms, charts, graphs, and instructions.', img: '/images/pages/courses-page-12.jpg' },
-  { name: 'Business Writing', desc: 'Writing clear, professional workplace communications.', img: '/images/pages/courses-page-13.jpg' },
+  { name: 'Graphic Literacy', desc: 'Reading and interpreting workplace graphics — charts, graphs, diagrams, and tables.', img: '/images/pages/courses-page-13.jpg' },
 ];
 
 export default function WorkKeysPage() {

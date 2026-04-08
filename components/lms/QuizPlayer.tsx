@@ -14,8 +14,56 @@ interface Question {
   explanation?: string;
 }
 
+/**
+ * Normalizes a raw quiz question from any known shape into the canonical Question type.
+ *
+ * Handles three shapes that exist in the codebase:
+ *   Canonical:  { id, question, options, correctAnswer, explanation }
+ *   HVAC banks: { question, options, answer, explanation }  (answer = 0-based index)
+ *   AI-ingest:  { question_text, options, correct_answer, points, question_type }
+ *
+ * Any unrecognized shape is skipped (returns null) to prevent "object as React child" errors.
+ */
+function normalizeQuestion(raw: unknown, index: number): Question | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const q = raw as Record<string, unknown>;
+
+  // Canonical shape — also handles {answer} variant used in HVAC quiz banks
+  if (typeof q.question === 'string' && Array.isArray(q.options)) {
+    const correctAnswer =
+      typeof q.correctAnswer === 'number' ? q.correctAnswer :
+      typeof q.answer       === 'number' ? q.answer :
+      0;
+    return {
+      id:            typeof q.id === 'string' ? q.id : `q-${index}`,
+      question:      q.question,
+      options:       q.options.filter((o): o is string => typeof o === 'string'),
+      correctAnswer,
+      explanation:   typeof q.explanation === 'string' ? q.explanation : undefined,
+    };
+  }
+
+  // AI-ingest shape: { question_text, options, correct_answer (letter A/B/C/D) }
+  if (typeof q.question_text === 'string' && Array.isArray(q.options)) {
+    const opts = q.options.filter((o): o is string => typeof o === 'string');
+    // correct_answer is a letter like "A", "B", "C", "D"
+    const letter = typeof q.correct_answer === 'string' ? q.correct_answer.trim().toUpperCase() : '';
+    const correctIndex = ['A', 'B', 'C', 'D'].indexOf(letter);
+    return {
+      id:            `q-${index}`,
+      question:      q.question_text,
+      options:       opts,
+      correctAnswer: correctIndex >= 0 ? correctIndex : 0,
+      explanation:   undefined,
+    };
+  }
+
+  return null;
+}
+
 interface QuizPlayerProps {
-  questions: Question[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  questions: any[];
   onComplete: (score: number, answers?: Record<string, number>) => void;
   passingScore?: number;
   /** Title shown above the quiz (e.g. "Module 6 Quiz — EPA 608 Core") */
@@ -64,11 +112,16 @@ function playWrongSound() {
 // ── Component ──────────────────────────────────────────────────────────
 
 export default function QuizPlayer({
-  questions,
+  questions: rawQuestions,
   onComplete,
   passingScore = 70,
   title,
 }: QuizPlayerProps) {
+  // Normalize all questions to the canonical shape, dropping any unrecognized items.
+  const questions: Question[] = (rawQuestions ?? [])
+    .map((q, i) => normalizeQuestion(q, i))
+    .filter((q): q is Question => q !== null);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [isRevealed, setIsRevealed] = useState(false);

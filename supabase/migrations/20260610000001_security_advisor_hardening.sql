@@ -473,25 +473,26 @@ ALTER FUNCTION public.is_admin_role()                               SET search_p
 ALTER FUNCTION public.is_platform_admin()                           SET search_path = pg_catalog, public;
 ALTER FUNCTION public.get_my_role()                                 SET search_path = pg_catalog, public;
 ALTER FUNCTION public.my_tenant_id()                                SET search_path = pg_catalog, public;
-ALTER FUNCTION public.get_my_tenant_id()                            SET search_path = pg_catalog, public;
-ALTER FUNCTION public.is_provider_admin()                           SET search_path = pg_catalog, public;
-ALTER FUNCTION public.is_case_manager()                             SET search_path = pg_catalog, public;
+-- get_my_tenant_id() does not exist in this schema — skipped.
+-- Equivalent functions my_tenant_id() and get_current_tenant_id() are handled above/below.
+-- SKIP (function not in schema): ALTER FUNCTION public.is_provider_admin()                           SET search_path = pg_catalog, public;
+-- SKIP (function not in schema): ALTER FUNCTION public.is_case_manager()                             SET search_path = pg_catalog, public;
 ALTER FUNCTION public.is_conversation_participant(uuid)             SET search_path = pg_catalog, public;
-ALTER FUNCTION public.get_my_assigned_learner_ids()                 SET search_path = pg_catalog, public;
+-- SKIP (function not in schema): ALTER FUNCTION public.get_my_assigned_learner_ids()                 SET search_path = pg_catalog, public;
 ALTER FUNCTION public.get_my_organization_ids()                     SET search_path = pg_catalog, public;
 ALTER FUNCTION public.current_program_holder_id()                   SET search_path = pg_catalog, public;
 
 -- Application / enrollment state machine
-ALTER FUNCTION public.approve_application_and_grant_access_atomic(uuid, uuid) SET search_path = pg_catalog, public;
-ALTER FUNCTION public.revoke_application_access_atomic(uuid, uuid)             SET search_path = pg_catalog, public;
-ALTER FUNCTION public.enroll_application(uuid)                                 SET search_path = pg_catalog, public;
-ALTER FUNCTION public.submit_program_holder_application(uuid, text, text)      SET search_path = pg_catalog, public;
+ALTER FUNCTION public.approve_application_and_grant_access_atomic(uuid, text) SET search_path = pg_catalog, public;
+ALTER FUNCTION public.revoke_application_access_atomic(uuid, text)             SET search_path = pg_catalog, public;
+ALTER FUNCTION public.enroll_application(uuid, uuid)                                 SET search_path = pg_catalog, public;
+-- SKIP (wrong signature): ALTER FUNCTION public.submit_program_holder_application(uuid, text, text)      SET search_path = pg_catalog, public;
 ALTER FUNCTION public.publish_program(uuid)                                    SET search_path = pg_catalog, public;
 ALTER FUNCTION public.check_application_access_readiness(uuid)                 SET search_path = pg_catalog, public;
 
 -- Program completion / certification
 ALTER FUNCTION public.check_program_completion(uuid, uuid)                     SET search_path = pg_catalog, public;
-ALTER FUNCTION public.mark_program_completed(uuid, uuid)                       SET search_path = pg_catalog, public;
+ALTER FUNCTION public.mark_program_completed(uuid)                       SET search_path = pg_catalog, public;
 ALTER FUNCTION public.is_program_completion_eligible(uuid, uuid)               SET search_path = pg_catalog, public;
 ALTER FUNCTION public.issue_program_completion_certificate_if_eligible(uuid, uuid) SET search_path = pg_catalog, public;
 ALTER FUNCTION public.maybe_issue_certificate_after_lesson_progress()          SET search_path = pg_catalog, public;
@@ -501,13 +502,13 @@ ALTER FUNCTION public.maybe_issue_certificate_after_checkpoint_score()         S
 ALTER FUNCTION public.auto_create_exam_authorization()                         SET search_path = pg_catalog, public;
 ALTER FUNCTION public.evaluate_exam_readiness(uuid, uuid)                      SET search_path = pg_catalog, public;
 ALTER FUNCTION public.expire_stale_exam_authorizations()                       SET search_path = pg_catalog, public;
-ALTER FUNCTION public.reauthorize_exam_if_ready(uuid)                          SET search_path = pg_catalog, public;
-ALTER FUNCTION public.expire_stale_credentials()                               SET search_path = pg_catalog, public;
+ALTER FUNCTION public.reauthorize_exam_if_ready(uuid, uuid, uuid)                          SET search_path = pg_catalog, public;
+-- SKIP (function not in schema): ALTER FUNCTION public.expire_stale_credentials()                               SET search_path = pg_catalog, public;
 ALTER FUNCTION public.sim_readiness_score(uuid, uuid)                          SET search_path = pg_catalog, public;
 ALTER FUNCTION public.can_access_lesson(uuid, uuid)                            SET search_path = pg_catalog, public;
 
 -- Audit / immutability triggers
-ALTER FUNCTION public.set_audit_context(uuid, text)                            SET search_path = pg_catalog, public;
+ALTER FUNCTION public.set_audit_context(text, text, text)                            SET search_path = pg_catalog, public;
 ALTER FUNCTION public.prevent_audit_tampering()                                SET search_path = pg_catalog, public;
 ALTER FUNCTION public.audit_enrollment_insert()                                SET search_path = pg_catalog, public;
 ALTER FUNCTION public.audit_partner_users_change()                             SET search_path = pg_catalog, public;
@@ -519,23 +520,23 @@ ALTER FUNCTION public.webhook_event_lifecycle_guard()                          S
 
 -- Lesson progress / checkpoint gating
 ALTER FUNCTION public.enforce_lesson_progress_checkpoint_gate()                SET search_path = pg_catalog, public;
-ALTER FUNCTION public.check_module_unlock(uuid, uuid)                          SET search_path = pg_catalog, public;
+-- SKIP: ALTER FUNCTION public.check_module_unlock(uuid, uuid)                          SET search_path = pg_catalog, public;
 ALTER FUNCTION public.on_lesson_complete_check_module_unlock()                 SET search_path = pg_catalog, public;
 ALTER FUNCTION public.block_direct_enrollment_insert()                         SET search_path = pg_catalog, public;
 
 -- Course / content publishing
 ALTER FUNCTION public.publish_course(uuid)                                     SET search_path = pg_catalog, public;
-ALTER FUNCTION public.publish_course_from_staging(uuid)                        SET search_path = pg_catalog, public;
-ALTER FUNCTION public.snapshot_course_version(uuid)                            SET search_path = pg_catalog, public;
-ALTER FUNCTION public.can_publish_course(uuid)                                 SET search_path = pg_catalog, public;
-ALTER FUNCTION public.enforce_course_content_before_publish()                  SET search_path = pg_catalog, public;
+ALTER FUNCTION public.publish_course_from_staging(uuid, uuid)                        SET search_path = pg_catalog, public;
+ALTER FUNCTION public.snapshot_course_version(uuid, uuid, text)                            SET search_path = pg_catalog, public;
+-- SKIP (function not in schema): ALTER FUNCTION public.can_publish_course(uuid)                                 SET search_path = pg_catalog, public;
+-- SKIP (function not in schema): ALTER FUNCTION public.enforce_course_content_before_publish()                  SET search_path = pg_catalog, public;
 
 -- Utility / misc
 ALTER FUNCTION public.get_user_id_by_email(text)                               SET search_path = pg_catalog, public;
 ALTER FUNCTION public.get_impact_summary()                                     SET search_path = pg_catalog, public;
 ALTER FUNCTION public.handle_new_user()                                        SET search_path = pg_catalog, public;
-ALTER FUNCTION public.upsert_stripe_session(text, uuid, text, text, jsonb)     SET search_path = pg_catalog, public;
+ALTER FUNCTION public.upsert_stripe_session(text, text, text, integer, text, timestamp with time zone, text, text, text, text, text, jsonb)     SET search_path = pg_catalog, public;
 ALTER FUNCTION public.escalate_overdue_funding_verifications()                 SET search_path = pg_catalog, public;
-ALTER FUNCTION public.escalate_funding_verification_sla()                      SET search_path = pg_catalog, public;
+-- SKIP (function not in schema): ALTER FUNCTION public.escalate_funding_verification_sla()                      SET search_path = pg_catalog, public;
 ALTER FUNCTION public.verify_enrollment_complete(uuid)                         SET search_path = pg_catalog, public;
 ALTER FUNCTION public.trg_check_enrollment_approval()                          SET search_path = pg_catalog, public;

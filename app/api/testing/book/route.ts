@@ -1,17 +1,17 @@
 
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
-import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { TESTING_CENTER, TESTING_EMAIL } from '@/lib/testing/testing-config';
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { withRuntime } from '@/lib/api/withRuntime';
+import { formatBookingDate } from '@/lib/testing/booking-validation';
+
 export const runtime = 'nodejs';
 export const maxDuration = 30;
-
 export const dynamic = 'force-dynamic';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 const ADMIN_EMAIL = TESTING_EMAIL.adminEmail;
 const FROM = TESTING_EMAIL.from;
 
@@ -20,29 +20,54 @@ function generateCode(): string {
   return Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
 
-function fmtDate(d: string) {
-  return new Date(d + 'T12:00:00').toLocaleDateString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-  });
-}
+// ISO date string YYYY-MM-DD, or empty/null (Calendly flow — date chosen later)
+const isoDate = z.string().refine(
+  v => !v || /^\d{4}-\d{2}-\d{2}$/.test(v) && !isNaN(new Date(v + 'T12:00:00').getTime()),
+  { message: 'Invalid date — use YYYY-MM-DD' }
+).transform(v => v || null).nullable().optional();
 
-export async function POST(req: NextRequest) {
-  await hydrateProcessEnv();
-  const rateLimited = await applyRateLimit(req, 'contact');
-  if (rateLimited) return rateLimited;
+const BookingSchema = z.object({
+  examType:         z.string().min(1),
+  examName:         z.string().min(1),
+  bookingType:      z.enum(['individual', 'organization']).default('individual'),
+  firstName:        z.string().min(1),
+  lastName:         z.string().min(1),
+  email:            z.string().email(),
+  phone:            z.string().nullish().transform(v => v || null),
+  organization:     z.string().nullish().transform(v => v || null),
+  participantCount: z.number().int().positive().default(1),
+  preferredDate:    isoDate,
+  preferredTime:    z.string().nullish().transform(v => v || null),
+  alternateDate:    isoDate,
+  notes:            z.string().nullish().transform(v => v || null),
+  addOn:            z.boolean().default(false),
+  slotId:           z.string().nullish().transform(v => v || null),
+  paymentStatus:    z.string().nullish().transform(v => v || null),
+  stripeSessionId:  z.string().nullish().transform(v => v || null),
+});
 
-  let body: any;
-  try { body = await req.json(); } catch { return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 }); }
+export const POST = withRuntime(
+  { rateLimit: 'contact' },
+  async (req) => {
+    let rawBody: unknown;
+    try { rawBody = await req.json(); }
+    catch { return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 }); }
 
-  const {
-    examType, examName, bookingType, firstName, lastName, email, phone,
-    organization, participantCount, preferredDate, preferredTime,
-    alternateDate, notes, addOn, slotId, paymentStatus, stripeSessionId,
-  } = body;
+    const parsed = BookingSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid request', details: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
 
-  if (!examType || !firstName || !lastName || !email) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-  }
+    const {
+      examType, examName, bookingType, firstName, lastName, email, phone,
+      organization, participantCount, preferredDate, preferredTime,
+      alternateDate, notes, addOn, slotId, paymentStatus, stripeSessionId,
+    } = parsed.data;
+
+    const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
   const db = createAdminClient();
   const confirmationCode = generateCode();
@@ -127,7 +152,7 @@ export async function POST(req: NextRequest) {
         <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b">Exam</td><td style="padding:8px 0;font-weight:600">${examLabel}</td></tr>
         <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b">Seats</td><td style="padding:8px 0;font-weight:600">${seats}</td></tr>
         ${isOrg ? `<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b">Organization</td><td style="padding:8px 0;font-weight:600">${organization}</td></tr>` : ''}
-        <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b">Preferred Date</td><td style="padding:8px 0;font-weight:600">${fmtDate(preferredDate)}</td></tr>
+        <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b">Preferred Date</td><td style="padding:8px 0;font-weight:600">${formatBookingDate(preferredDate)}</td></tr>
         <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b">Preferred Time</td><td style="padding:8px 0;font-weight:600">${preferredTime}</td></tr>
         <tr><td style="padding:8px 0;color:#64748b">Status</td><td style="padding:8px 0"><span style="background:#fef3c7;color:#92400e;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600">Pending Confirmation</span></td></tr>
       </table>
@@ -161,8 +186,8 @@ export async function POST(req: NextRequest) {
     <tr><td style="padding:6px 12px 6px 0;color:#64748b">Phone</td><td style="padding:6px 0">${phone || '—'}</td></tr>
     <tr><td style="padding:6px 12px 6px 0;color:#64748b">Exam</td><td style="padding:6px 0;font-weight:600">${examLabel}</td></tr>
     <tr><td style="padding:6px 12px 6px 0;color:#64748b">Type</td><td style="padding:6px 0">${isOrg ? `Organization — ${organization} (${participantCount} seats)` : 'Individual'}</td></tr>
-    <tr><td style="padding:6px 12px 6px 0;color:#64748b">Preferred Date</td><td style="padding:6px 0;font-weight:600">${fmtDate(preferredDate)} at ${preferredTime}</td></tr>
-    ${alternateDate ? `<tr><td style="padding:6px 12px 6px 0;color:#64748b">Alternate Date</td><td style="padding:6px 0">${fmtDate(alternateDate)}</td></tr>` : ''}
+    <tr><td style="padding:6px 12px 6px 0;color:#64748b">Preferred Date</td><td style="padding:6px 0;font-weight:600">${formatBookingDate(preferredDate)} at ${preferredTime}</td></tr>
+    ${alternateDate ? `<tr><td style="padding:6px 12px 6px 0;color:#64748b">Alternate Date</td><td style="padding:6px 0">${formatBookingDate(alternateDate)}</td></tr>` : ''}
     ${notes ? `<tr><td style="padding:6px 12px 6px 0;color:#64748b">Notes</td><td style="padding:6px 0">${notes}</td></tr>` : ''}
   </table>
   <p style="margin-top:20px"><a href="${BASE_URL}/admin/testing" style="background:#1E3A5F;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:bold">Manage in Admin →</a></p>
@@ -212,4 +237,5 @@ export async function POST(req: NextRequest) {
   await Promise.allSettled(emailJobs);
 
   return NextResponse.json({ success: true, confirmationCode, addOn: hasAddOn });
-}
+  }
+);

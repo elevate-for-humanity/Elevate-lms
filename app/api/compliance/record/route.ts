@@ -1,6 +1,7 @@
 import { safeInternalError } from '@/lib/api/safe-error';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 
@@ -9,9 +10,10 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function _POST(request: NextRequest) {
   try {
+    await hydrateProcessEnv();
     const supabase = await createClient();
     const db = createAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
+    if (!db) throw new Error('Admin client failed to initialize');
 
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
@@ -112,9 +114,10 @@ async function _POST(request: NextRequest) {
 // GET: fetch user's compliance data (acknowledgments, agreements)
 async function _GET(request: NextRequest) {
   try {
+    await hydrateProcessEnv();
     const supabase = await createClient();
     const db = createAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
+    if (!db) throw new Error('Admin client failed to initialize');
 
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {

@@ -1,88 +1,100 @@
 /**
- * GET  /api/testing/slots          — list upcoming slots (admin)
- * POST /api/testing/slots          — create a slot (admin)
- * DELETE /api/testing/slots?id=    — cancel a slot (admin)
+ * GET    /api/testing/slots       — list upcoming slots (admin)
+ * POST   /api/testing/slots       — create a slot (admin)
+ * DELETE /api/testing/slots?id=   — cancel a slot (admin)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { apiRequireAdmin } from '@/lib/admin/guards';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { TESTING_CENTER } from '@/lib/testing/testing-config';
+import { withRuntime } from '@/lib/api/withRuntime';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-export async function GET(req: NextRequest) {
-  const auth = await apiRequireAdmin(req);
+const SlotSchema = z.object({
+  exam_type:  z.string().min(1),
+  start_time: z.string().datetime({ message: 'start_time must be ISO 8601' }),
+  end_time:   z.string().datetime({ message: 'end_time must be ISO 8601' }),
+  capacity:   z.number().int().min(1).max(200),
+  location:   z.string().optional(),
+  notes:      z.string().optional(),
+});
 
-  const db = createAdminClient();
-  if (!db) return safeError('Database unavailable', 500);
+export const GET = withRuntime(
+  { auth: 'admin' },
+  async () => {
+    const db = createAdminClient();
+    if (!db) return safeError('Database unavailable', 500);
 
-  const { data, error } = await db
-    .from('testing_slots')
-    .select('*')
-    .eq('is_cancelled', false)
-    .gte('start_time', new Date().toISOString())
-    .order('start_time', { ascending: true });
+    const { data, error } = await db
+      .from('testing_slots')
+      .select('*')
+      .eq('is_cancelled', false)
+      .gte('start_time', new Date().toISOString())
+      .order('start_time', { ascending: true });
 
-  if (error) return safeInternalError(error, 'Failed to fetch slots');
-  return NextResponse.json({ slots: data ?? [] });
-}
-
-export async function POST(req: NextRequest) {
-  const auth = await apiRequireAdmin(req);
-
-  const db = createAdminClient();
-  if (!db) return safeError('Database unavailable', 500);
-
-  let body: {
-    exam_type: string;
-    start_time: string;
-    end_time: string;
-    capacity: number;
-    location?: string;
-    notes?: string;
-  };
-  try { body = await req.json(); } catch { return safeError('Invalid JSON', 400); }
-
-  const { exam_type, start_time, end_time, capacity, location, notes } = body;
-  if (!exam_type || !start_time || !end_time || !capacity) {
-    return safeError('exam_type, start_time, end_time, and capacity are required', 400);
+    if (error) return safeInternalError(error, 'Failed to fetch slots');
+    return NextResponse.json({ slots: data ?? [] });
   }
+);
 
-  const { data, error } = await db
-    .from('testing_slots')
-    .insert({
-      exam_type,
-      start_time,
-      end_time,
-      capacity,
-      booked_count: 0,
-      location: location ?? `In-person — ${TESTING_CENTER.address}`,
-      notes: notes ?? null,
-    })
-    .select('*')
-    .single();
+export const POST = withRuntime(
+  { auth: 'admin' },
+  async (req) => {
+    const db = createAdminClient();
+    if (!db) return safeError('Database unavailable', 500);
 
-  if (error) return safeInternalError(error, 'Failed to create slot');
-  return NextResponse.json({ slot: data }, { status: 201 });
-}
+    let raw: unknown;
+    try { raw = await req.json(); }
+    catch { return safeError('Invalid JSON', 400); }
 
-export async function DELETE(req: NextRequest) {
-  const auth = await apiRequireAdmin(req);
+    const parsed = SlotSchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid request', details: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
 
-  const db = createAdminClient();
-  if (!db) return safeError('Database unavailable', 500);
+    const { exam_type, start_time, end_time, capacity, location, notes } = parsed.data;
 
-  const id = req.nextUrl.searchParams.get('id');
-  if (!id) return safeError('id is required', 400);
+    const { data, error } = await db
+      .from('testing_slots')
+      .insert({
+        exam_type,
+        start_time,
+        end_time,
+        capacity,
+        booked_count: 0,
+        location: location ?? `In-person — ${TESTING_CENTER.address}`,
+        notes: notes ?? null,
+      })
+      .select('*')
+      .single();
 
-  const { error } = await db
-    .from('testing_slots')
-    .update({ is_cancelled: true, updated_at: new Date().toISOString() })
-    .eq('id', id);
+    if (error) return safeInternalError(error, 'Failed to create slot');
+    return NextResponse.json({ slot: data }, { status: 201 });
+  }
+);
 
-  if (error) return safeInternalError(error, 'Failed to cancel slot');
-  return NextResponse.json({ success: true });
-}
+export const DELETE = withRuntime(
+  { auth: 'admin' },
+  async (req) => {
+    const db = createAdminClient();
+    if (!db) return safeError('Database unavailable', 500);
+
+    const id = req.nextUrl.searchParams.get('id');
+    if (!id) return safeError('id is required', 400);
+
+    const { error } = await db
+      .from('testing_slots')
+      .update({ is_cancelled: true, updated_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (error) return safeInternalError(error, 'Failed to cancel slot');
+    return NextResponse.json({ success: true });
+  }
+);

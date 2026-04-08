@@ -1,7 +1,7 @@
 
 // app/api/applications/route.ts
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { sendEmail } from '@/lib/email/sendgrid';
@@ -67,7 +67,7 @@ async function _POST(req: Request) {
       }
     }
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     if (!supabase) {
       return NextResponse.json(
@@ -114,11 +114,19 @@ async function _POST(req: Request) {
       body.hasCaseManager ? `Has Case Manager: ${body.hasCaseManager}` : '',
       body.caseManagerAgency ? `Case Manager Agency: ${body.caseManagerAgency}` : '',
       body.supportNeeds ? `Support Needs: ${body.supportNeeds}` : '',
+      // Transfer hours are stored in transfer_hours_claimed column — not duplicated here.
     ]
       .filter(Boolean)
       .join('\n');
 
     // Insert into applications table
+    // Parse claimed transfer hours — stored in structured column, not notes.
+    // Does not affect pricing. Progress credit only.
+    const transferHoursClaimed = Math.max(
+      0,
+      parseInt(body.transferHours ?? body.transfer_hours_claimed ?? '0') || 0
+    );
+
     const { data, error }: any = await supabase
       .from('applications')
       .insert({
@@ -134,6 +142,8 @@ async function _POST(req: Request) {
         status: 'submitted',
         source: body.source || 'website',
         contact_preference: body.preferredContact || 'phone',
+        transfer_hours_claimed: transferHoursClaimed,
+        // transfer_hours_verified is null until staff reviews documentation
       })
       .select()
       .single();

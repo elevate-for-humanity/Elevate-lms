@@ -12,37 +12,67 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { apiRequireAdmin } from '@/lib/admin/guards';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
+import { withRuntime } from '@/lib/api/withRuntime';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 import { TESTING_CENTER, TESTING_EMAIL } from '@/lib/testing/testing-config';
-import { hydrateProcessEnv } from '@/lib/secrets';
-const FROM = TESTING_EMAIL.from;
+import { CERT_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
+import { CERTIPORT_DEFAULT_RETAKE_FEE, getCertiportRetakePrice } from '@/lib/testing/providers/certiport-pricing';
+import { WORKKEYS_PRICING } from '@/lib/testing/providers/workkeys-pricing';
+import { NRF_RISEUP_PRICING } from '@/lib/testing/providers/nrf-riseup';
+import { EPA608_PRICING } from '@/lib/testing/providers/epa608-pricing';
+
+
+const FROM     = TESTING_EMAIL.from;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
-const RETAKE_FEE_CENTS = 5000; // $50
 
-export async function POST(req: NextRequest) {
-  await hydrateProcessEnv();
-  const auth = await apiRequireAdmin(req);
+/**
+ * Returns the retake fee in cents for a given exam type key.
+ * Falls back to the Certiport default if the provider is unknown.
+ * All values come from the pricing engine — no hardcoded amounts.
+ */
+function getRetakeFeeCents(examType: string | null | undefined): number {
+  if (!examType) return CERTIPORT_DEFAULT_RETAKE_FEE * 100;
 
+  const key = examType.toLowerCase();
+
+  if (key === 'workkeys' || key === 'ncrc') return WORKKEYS_PRICING.retake * 100;
+  if (key === 'nrf' || key === 'riseup')   return NRF_RISEUP_PRICING.retake * 100;
+  if (key === 'esco' || key === 'epa608')  return EPA608_PRICING.retake * 100;
+
+  // Certiport — use per-exam retake price where possible
+  if (key === 'comptia') return getCertiportRetakePrice('comptia') * 100;
+  if (key === 'adobe')   return getCertiportRetakePrice('adobe') * 100;
+  if (key === 'mos')     return getCertiportRetakePrice('mos') * 100;
+  if (key === 'ic3')     return getCertiportRetakePrice('ic3') * 100;
+
+  // Generic Certiport fallback
+  if (key === 'certiport') return CERTIPORT_DEFAULT_RETAKE_FEE * 100;
+
+  return CERTIPORT_DEFAULT_RETAKE_FEE * 100;
+}
+
+export const POST = withRuntime(
+  { auth: 'admin' },
+  async (req) => {
   const db = createAdminClient();
   if (!db) return safeError('Database unavailable', 500);
 
-  let body: { bookingId: string; email: string; examName: string };
+  let body: { bookingId: string; email: string; examName: string; examType?: string };
   try { body = await req.json(); } catch { return safeError('Invalid JSON', 400); }
 
-  const { bookingId, email, examName } = body;
+  const { bookingId, email, examName, examType } = body;
   if (!bookingId || !email) return safeError('bookingId and email are required', 400);
 
   // Verify booking exists
   const { data: booking } = await db
     .from('exam_bookings')
-    .select('id, user_id, exam_result')
+    .select('id, user_id, exam_result, exam_type')
     .eq('id', bookingId)
     .maybeSingle();
 
@@ -70,23 +100,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: 'Retake hold already exists', holdId: existing.id });
   }
 
+  // Derive retake fee from the provider — never hardcoded
+  const resolvedExamType = examType ?? booking.exam_type ?? null;
+  const retakeFeeCents   = getRetakeFeeCents(resolvedExamType);
+  const retakeFeeDisplay = `$${Math.round(retakeFeeCents / 100)}`;
+
   // Create enforcement hold
   const { data: hold, error } = await db
     .from('testing_enforcement')
     .insert({
-      booking_id: bookingId,
-      user_id: booking.user_id ?? null,
-      email: email.toLowerCase().trim(),
+      booking_id:       bookingId,
+      user_id:          booking.user_id ?? null,
+      email:            email.toLowerCase().trim(),
       enforcement_type: 'retake',
-      fee_cents: RETAKE_FEE_CENTS,
-      fee_paid: false,
+      fee_cents:        retakeFeeCents,
+      fee_paid:         false,
     })
     .select('id')
     .single();
 
   if (error) return safeInternalError(error, 'Failed to create retake hold');
 
-  logger.info('[testing/retake] Retake hold created', { bookingId, holdId: hold.id });
+  logger.info('[testing/retake] Retake hold created', { bookingId, holdId: hold.id, retakeFeeCents });
 
   // Notify candidate
   await sendEmail({
@@ -97,11 +132,12 @@ export async function POST(req: NextRequest) {
 <html><body style="font-family:Arial,sans-serif;padding:24px;color:#1E293B;max-width:600px;margin:0 auto">
   <h2 style="color:#1E3A5F">Exam Result — ${examName ?? 'Your Exam'}</h2>
   <p>Thank you for testing at Elevate for Humanity. Unfortunately, you did not pass this attempt.</p>
-  <p>You are eligible to retake the exam. A <strong>$50 retake fee</strong> is required to schedule your next attempt.</p>
+  <p>You are eligible to retake the exam. A <strong>${retakeFeeDisplay} retake fee</strong> is required to schedule your next attempt.</p>
   <p><a href="${SITE_URL}/testing/book" style="background:#1E3A5F;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;display:inline-block">Pay Fee &amp; Schedule Retake →</a></p>
   <p style="color:#64748b;font-size:13px">Questions? Call <strong>${TESTING_CENTER.phone}</strong> or reply to this email.</p>
 </body></html>`,
   }).catch(err => logger.warn('[testing/retake] Email failed', { email, err }));
 
   return NextResponse.json({ success: true, holdId: hold.id });
-}
+  }
+);

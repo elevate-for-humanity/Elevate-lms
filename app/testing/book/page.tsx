@@ -131,6 +131,15 @@ function BookingForm() {
     }
   };
 
+  // Pre-select provider + bundle type from URL params (e.g. ?provider=esco&type=bundle_basic)
+  useEffect(() => {
+    const providerParam = searchParams.get('provider') ?? '';
+    if (providerParam) {
+      const match = ALL_PROVIDERS.find(p => p.key === providerParam);
+      if (match) setSelectedProvider(match);
+    }
+  }, []);
+
   // Pre-select org type from URL param
   useEffect(() => {
     if (typeParam === 'employer-testing') setOrgType('Employer / Company');

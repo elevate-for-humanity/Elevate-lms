@@ -1,7 +1,7 @@
 'use server';
 
 import { createAdminClient } from '@/lib/supabase/admin';
-import { sendEmail } from '@/lib/email/resend';
+import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
 
 // Use NETLIFY_URL (set automatically on Netlify) so deploy-preview reset links

@@ -5,7 +5,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { validateEnrollmentIntegrity } from '@/lib/enrollment-integrity-audit';
-import { trySendEmail } from '@/lib/email/resend';
+import { trySendEmail } from '@/lib/email/sendgrid';
+import { hydrateProcessEnv } from '@/lib/secrets';
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -18,6 +19,7 @@ const SLA_HOURS: Record<string, number> = {
 };
 
 export async function GET(request: NextRequest) {
+  await hydrateProcessEnv();
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 

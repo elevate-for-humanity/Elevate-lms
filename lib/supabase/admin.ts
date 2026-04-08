@@ -10,6 +10,11 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
  *
  * Call sites that previously handled `null` returns must be updated to
  * handle a thrown error instead.
+ *
+ * Note: SUPABASE_SERVICE_ROLE_KEY lives in Supabase app_secrets and is
+ * loaded by hydrateProcessEnv() at startup (instrumentation.ts). If this
+ * throws MISSING_ENV on cold start, ensure hydrateProcessEnv() ran first.
+ * For routes that cannot guarantee startup order, use getAdminClient() instead.
  */
 export function createAdminClient(): SupabaseClient<any> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -28,6 +33,20 @@ export function createAdminClient(): SupabaseClient<any> {
       persistSession: false,
     },
   });
+}
+
+/**
+ * Async version of createAdminClient that hydrates secrets first.
+ * Use this in API routes instead of createAdminClient() to guarantee
+ * SUPABASE_SERVICE_ROLE_KEY is loaded even on cold starts.
+ *
+ * Usage:
+ *   const db = await getAdminClient();
+ */
+export async function getAdminClient(): Promise<SupabaseClient<any>> {
+  const { hydrateProcessEnv } = await import('@/lib/secrets');
+  await hydrateProcessEnv();
+  return createAdminClient();
 }
 
 /**

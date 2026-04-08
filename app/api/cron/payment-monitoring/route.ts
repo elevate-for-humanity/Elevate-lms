@@ -16,6 +16,7 @@ import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { resend } from '@/lib/resend';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 import { withRuntime } from '@/lib/api/withRuntime';
@@ -33,6 +34,7 @@ function getSupabaseAdmin() {
 }
 
 async function _GET(request: Request) {
+  await hydrateProcessEnv();
   // Verify cron secret
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {

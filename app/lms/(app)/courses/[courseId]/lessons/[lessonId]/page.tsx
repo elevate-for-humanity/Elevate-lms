@@ -383,8 +383,11 @@ export default function LessonPage() {
     fetchLessonData();
   }, [lessonId, fetchLessonData]);
 
-  const markComplete = async () => {
-    const newStatus = !isCompleted;
+  const markComplete = async (forceComplete?: boolean) => {
+    // forceComplete=true means "always mark complete" (called from activity handlers).
+    // Without it, the button toggles — allowing un-complete from the manual button only.
+    const newStatus = forceComplete ? true : !isCompleted;
+    if (newStatus === isCompleted) return; // no-op if already in target state
     setIsCompleted(newStatus);
     setCompletionError(null);
 

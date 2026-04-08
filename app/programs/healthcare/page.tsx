@@ -2,11 +2,13 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import { CheckCircle, CreditCard } from 'lucide-react';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 import ProgramPageLayout from '@/components/programs/ProgramPageLayout';
 import type { ProgramPageConfig } from '@/components/programs/ProgramPageLayout';
 import { InView } from '@/components/ui/InView';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
+import { NHA_FEATURED_PROGRAMS, getBundleRetailPrice, showPaymentPlan } from '@/lib/testing/nha-pricing';
 
 export const dynamic = 'force-static';
 export const revalidate = 86400;
@@ -91,6 +93,14 @@ const config: ProgramPageConfig = {
     { label: 'Programs', href: '/programs' },
     { label: 'Healthcare Programs' },
   ],
+};
+
+// Maps nha-pricing.ts program keys to their /programs/healthcare/[slug] routes
+const NHA_PROGRAM_SLUGS: Record<string, string> = {
+  medicalAssistant:     'nha-medical-assistant',
+  pharmacyTechnician:   'nha-pharmacy-technician',
+  phlebotomy:           'nha-phlebotomy',
+  billingAndCoding:     'nha-billing-coding',
 };
 
 const healthcarePrograms = [
@@ -178,6 +188,117 @@ export default function Page() {
             </div>
           </section>
         </InView>
+        {/* NHA Training Partner Programs */}
+        <InView animation="fade-up">
+          <section className="py-14 lg:py-20 border-t border-slate-100 bg-slate-50">
+            <div className="max-w-5xl mx-auto px-6">
+
+              {/* Section header */}
+              <div className="text-center mb-4">
+                <p className="text-emerald-700 font-semibold text-sm uppercase tracking-wider mb-2">
+                  NHA Certification Programs
+                </p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">
+                  Healthcare Career Training That Leads to Certification
+                </h2>
+                <p className="text-slate-600 max-w-2xl mx-auto text-base">
+                  Get trained, certified, and job-ready for high-demand healthcare roles.
+                  Flexible programs with exam prep and support included.
+                </p>
+              </div>
+              <p className="text-center text-slate-500 text-sm mb-10">
+                No experience required. Payment plans available.
+              </p>
+
+              {/* Featured program cards — lead with the 4 strongest */}
+              <div className="grid sm:grid-cols-2 gap-6 mb-10">
+                {NHA_FEATURED_PROGRAMS.map((program, i) => {
+                  const bundlePrice  = getBundleRetailPrice(program);
+                  const hasPayPlan   = showPaymentPlan(program);
+                  const slug         = NHA_PROGRAM_SLUGS[program.key];
+
+                  return (
+                    <ScrollReveal key={program.key} delay={i * 80} direction="up">
+                      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-full">
+                        <div className="bg-emerald-700 px-6 py-5">
+                          <h3 className="font-extrabold text-white text-xl leading-tight">
+                            {program.label} Program
+                          </h3>
+                          <p className="text-emerald-200 text-xs mt-1">{program.tagline}</p>
+                        </div>
+
+                        <div className="px-6 py-5 flex-1 flex flex-col">
+                          {/* Price */}
+                          {bundlePrice != null ? (
+                            <div className="mb-4">
+                              <p className="text-3xl font-extrabold text-slate-900">
+                                Starting at ${bundlePrice}
+                              </p>
+                              {hasPayPlan && (
+                                <p className="text-emerald-700 text-xs font-semibold mt-1 flex items-center gap-1">
+                                  <CreditCard className="w-3.5 h-3.5" />
+                                  Payment plans available
+                                </p>
+                              )}
+                            </div>
+                          ) : (
+                            <p className="text-slate-500 text-sm mb-4">Contact us for pricing</p>
+                          )}
+
+                          {/* What's included */}
+                          <ul className="space-y-2 mb-5 flex-1">
+                            {[
+                              'Certification exam preparation',
+                              'Practice assessments',
+                              'Exam attempt included',
+                              'Learner support throughout',
+                            ].map(item => (
+                              <li key={item} className="flex items-start gap-2 text-sm text-slate-600">
+                                <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+
+                          <Link
+                            href={slug ? `/programs/healthcare/${slug}` : '/contact?program=healthcare'}
+                            className="flex items-center justify-center w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-4 py-3 rounded-xl transition-colors text-sm"
+                          >
+                            View Program →
+                          </Link>
+                        </div>
+                      </div>
+                    </ScrollReveal>
+                  );
+                })}
+              </div>
+
+              {/* Trust strip */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-6">
+                <h3 className="font-extrabold text-slate-900 text-lg mb-4 text-center">
+                  Built for Real Career Outcomes
+                </h3>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {[
+                    'Certification-focused training aligned with industry standards',
+                    'Includes exam prep and learner support',
+                    'Flexible online learning options',
+                    'Designed for entry-level healthcare careers',
+                    'Pathways to employment and advancement',
+                    'No experience required to enroll',
+                  ].map(point => (
+                    <div key={point} className="flex items-start gap-2 text-sm text-slate-600">
+                      <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                      {point}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </section>
+        </InView>
+
       </ProgramPageLayout>
     </>
   );

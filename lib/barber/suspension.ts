@@ -1,6 +1,23 @@
 /**
  * Barber apprenticeship suspension helpers.
  *
+ * SUSPENSION POLICY (locked — do not change without updating all email copy):
+ *   Partial suspension — hour logging blocked, LMS coursework allowed.
+ *
+ *   BLOCKED when suspended:
+ *     - Clock in / time tracking  (timeclock/action, timeclock/heartbeat)
+ *     - Hour logging API          (pwa/barber/log-hours)
+ *     - PWA dashboard             (pwa/barber layout)
+ *
+ *   ALLOWED when suspended:
+ *     - LMS coursework, videos, reading, quizzes (/lms/courses/...)
+ *     - Public program pages
+ *
+ *   Rationale: keeps students engaged and reduces churn during billing gaps.
+ *   If this policy changes, update email templates in:
+ *     - app/api/barber/webhook/route.ts  (invoice.payment_failed email)
+ *     - app/api/cron/barber-billing/route.ts  (suspension email)
+ *
  * checkBarberSuspension — looks up the user's barber_subscriptions row and
  * returns a 402 NextResponse if the account is suspended or past_due beyond
  * the grace period. Returns null when the account is in good standing.

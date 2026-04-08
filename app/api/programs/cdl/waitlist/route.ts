@@ -1,7 +1,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { sendEmail } from '@/lib/email/resend';
+import { sendEmail } from '@/lib/email/sendgrid';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 
@@ -11,6 +12,7 @@ const ADMIN_EMAIL = process.env.PARTNER_NOTIFICATION_EMAIL || 'elevate4humanitye
 
 export async function POST(request: NextRequest) {
   try {
+  await hydrateProcessEnv();
     const body = await request.json();
 
     const required = ['firstName', 'lastName', 'email', 'phone', 'city', 'zip'];

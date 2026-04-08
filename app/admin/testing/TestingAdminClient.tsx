@@ -49,9 +49,11 @@ interface Props {
   stats: { pending: number; confirmed: number; total: number };
 }
 
-function fmtDate(d: string | null) {
+function fmtDate(d: string | null | undefined): string {
   if (!d) return '—';
-  return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const parsed = new Date(d + 'T12:00:00');
+  if (isNaN(parsed.getTime())) return '—';
+  return parsed.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function statusBadge(status: string) {

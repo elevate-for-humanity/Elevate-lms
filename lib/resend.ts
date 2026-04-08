@@ -6,6 +6,11 @@
 export const resend = {
   emails: {
     send: async (data: { from: string; to: string | string[]; subject: string; html?: string; text?: string }) => {
+      // Hydrate secrets from Supabase app_secrets before reading env vars.
+      // This is a no-op after the first call (cached for 5 min).
+      const { hydrateProcessEnv } = await import('@/lib/secrets');
+      await hydrateProcessEnv();
+
       const apiKey = process.env.SENDGRID_API_KEY;
       if (!apiKey) throw new Error('SENDGRID_API_KEY not configured');
 

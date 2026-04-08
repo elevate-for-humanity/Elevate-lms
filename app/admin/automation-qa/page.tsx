@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -52,6 +53,7 @@ interface ReviewQueueItem {
 }
 
 export default function AutomationQAPage() {
+  const router = useRouter();
   const [decisions, setDecisions] = useState<AutomatedDecision[]>([]);
   const [reviewItems, setReviewItems] = useState<ReviewQueueItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +61,10 @@ export default function AutomationQAPage() {
   const [testRunning, setTestRunning] = useState(false);
 
   useEffect(() => {
-    loadData();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.replace('/login?redirect=/admin/automation-qa'); return; }
+      loadData();
+    });
   }, []);
 
   async function loadData() {

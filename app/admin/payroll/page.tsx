@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 
-export default async function AdminPayroll() {
+export default function AdminPayroll() {
   const router = useRouter();
 
   const supabase = createClient();
@@ -19,8 +19,13 @@ export default async function AdminPayroll() {
   const [payrolls, setPayrolls] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+
   useEffect(() => {
-    loadData();
+    // Verify session before loading sensitive payroll data
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.replace('/login?redirect=/admin/payroll'); return; }
+      loadData();
+    });
   }, []);
 
   async function loadData() {

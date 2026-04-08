@@ -1,6 +1,7 @@
 'use client';
 
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
 import { useState, useEffect, useMemo } from "react";
 import { Search, Star, X } from "lucide-react";
 
@@ -152,14 +153,18 @@ function ToolCard({
 }
 
 export default function AdvancedToolsPage() {
+  const router = useRouter();
   const [dbRows, setDbRows] = useState<any[]>([]);
   useEffect(() => {
     const supabase = createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
-    supabase.from('settings').select('*').limit(50)
-      .then(({ data }) => { if (data) setDbRows(data); });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.replace('/login?redirect=/admin/advanced-tools'); return; }
+      supabase.from('settings').select('*').limit(50)
+        .then(({ data }) => { if (data) setDbRows(data); });
+    });
   }, []);
 
   const [search, setSearch] = useState("");

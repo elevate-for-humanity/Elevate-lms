@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -10,6 +11,7 @@ import type { ExamSession, ExamProvider, ExamResult } from './types';
 import { PROVIDER_LABELS, RESULT_LABELS } from './types';
 
 export default function ProctorPortalPage() {
+  const router = useRouter();
   const supabase = createClient();
   const [sessions, setSessions] = useState<ExamSession[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,7 +42,12 @@ export default function ProctorPortalPage() {
     setLoading(false);
   }, [supabase, sortField, sortDir, providerFilter, resultFilter, reviewFilter, searchTerm]);
 
-  useEffect(() => { fetchSessions(); }, [fetchSessions]);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.replace('/login?redirect=/admin/proctor-portal'); return; }
+      fetchSessions();
+    });
+  }, [fetchSessions]);
 
   const handleSaved = () => {
     setShowForm(false);

@@ -4,6 +4,7 @@
 
 import React from 'react';
 
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
@@ -11,14 +12,18 @@ import Image from 'next/image';
 import { Users, Award, BookOpen, Star } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-export default async function InstructorsPage() {
+export default function InstructorsPage() {
+  const router = useRouter();
   const supabase = createClient();
   const [instructors, setInstructors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
-    loadData();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.replace('/login?redirect=/admin/instructors'); return; }
+      loadData();
+    });
   }, [filter]);
 
   async function loadData() {

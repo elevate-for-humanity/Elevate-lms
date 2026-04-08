@@ -1,4 +1,5 @@
 'use client';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -8,14 +9,18 @@ import Link from 'next/link';
 
 import { createBrowserClient } from '@supabase/ssr';
 export default function RapidsAdminPage() {
+  const router = useRouter();
   const [dbRows, setDbRows] = useState<any[]>([]);
   useEffect(() => {
     const supabase = createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
-    supabase.from('apprenticeships').select('*').limit(50)
-      .then(({ data }) => { if (data) setDbRows(data); });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.replace('/login?redirect=/admin/rapids'); return; }
+      supabase.from('apprenticeships').select('*').limit(50)
+        .then(({ data }) => { if (data) setDbRows(data); });
+    });
   }, []);
 
   const programs = Object.entries(RAPIDS_CONFIG.programs).map(([key, program]) => ({

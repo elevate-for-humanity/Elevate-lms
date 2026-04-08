@@ -24,13 +24,17 @@ interface Tenant {
   active: boolean;
 }
 
-export default async function LicensingPage() {
+export default function LicensingPage() {
+  const router = useRouter();
   const [licenses, setLicenses] = useState<License[]>([]);
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadData();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.replace('/login?redirect=/admin/licensing'); return; }
+      loadData();
+    });
   }, []);
 
   async function loadData() {

@@ -50,7 +50,9 @@ export interface NotificationRecipient {
 export async function createNotification(
   notification: Omit<GrantNotification, 'id' | 'createdAt' | 'read'>
 ): Promise<GrantNotification> {
-  const { data, error }: any = await getDb()
+  const db = getDb();
+  await setAuditContext(db, { systemActor: 'grants_notification_system' }).catch(() => {});
+  const { data, error }: any = await db
     .from('grant_notifications')
     .insert({
       type: notification.type,
@@ -207,17 +209,19 @@ export async function sendGrantNotification(
     recipients?: NotificationRecipient[];
   } = {}
 ): Promise<void> {
+  const db = getDb();
+  await setAuditContext(db, { systemActor: 'grants_notification_system' }).catch(() => {});
   const { sendEmail: emailEnabled = true, sendSMS: smsEnabled = false } = options;
 
   const createdNotification = await createNotification(notification);
 
-  const { data: grant } = await getDb()
+  const { data: grant } = await db
     .from('grant_opportunities')
     .select('title')
     .eq('id', notification.grantId)
     .single();
 
-  const { data: entity } = await getDb()
+  const { data: entity } = await db
     .from('entities')
     .select('name')
     .eq('id', notification.entityId)
@@ -251,7 +255,7 @@ export async function sendGrantNotification(
     }
   }
 
-  await getDb().from('grant_notification_log').insert({
+  await db.from('grant_notification_log').insert({
     notification_id: createdNotification.id,
     sent_at: new Date().toISOString(),
     recipients_count: recipients.length,

@@ -366,7 +366,9 @@ Total,,0
 export async function buildGrantPackage(
   applicationId: string
 ): Promise<GrantPackage> {
-  const { data: app, error } = await getDb()
+  const db = getDb();
+  await setAuditContext(db, { systemActor: 'grants_package_builder' }).catch(() => {});
+  const { data: app, error } = await db
     .from('grant_applications')
     .select('*, grant:grant_opportunities(*), entity:entities(*)')
     .eq('id', applicationId)
@@ -467,7 +469,7 @@ export async function buildGrantPackage(
 
   const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
 
-  await getDb().from('grant_packages').upsert(
+  await db.from('grant_packages').upsert(
     {
       application_id: applicationId,
       grant_id: app.grant_id,

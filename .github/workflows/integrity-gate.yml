@@ -44,6 +44,14 @@ jobs:
       - name: Pre-auth registry check
         run: node scripts/check-pre-auth-registry.cjs
 
+      # Grants audit context check — no secrets needed.
+      # Fails if any function writes to an auditable grants table without
+      # calling setAuditContext() first. Blocks merge on missing audit attribution.
+      # To add a new auditable table: update AUDITABLE_TABLES in the script.
+      # To exempt a read-only or user-action write: add // grants-audit: exempt — <reason>
+      - name: Grants audit context check
+        run: node scripts/check-grants-audit-context.cjs
+
       # Migration lint — runs before any other check, no secrets needed
       - name: Migration lint
         run: node scripts/lint-migrations.cjs
@@ -91,4 +99,5 @@ jobs:
             reports/lms_integrity_report.json
             reports/store_integrity_report.json
             reports/pre_auth_registry_report.json
+            reports/grants_audit_context_report.json
           retention-days: 30

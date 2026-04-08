@@ -52,6 +52,8 @@ export interface SubmissionTimelineEvent {
 export async function recordSubmission(
   submission: Omit<SubmissionRecord, 'id' | 'timeline'>
 ): Promise<SubmissionRecord> {
+  const db = getDb();
+  await setAuditContext(db, { systemActor: 'grants_submission_tracker' }).catch(() => {});
   const timeline: SubmissionTimelineEvent[] = [
     {
       timestamp: submission.submittedAt,
@@ -65,7 +67,7 @@ export async function recordSubmission(
     },
   ];
 
-  const { data, error }: any = await getDb()
+  const { data, error }: any = await db
     .from('grant_submissions')
     .insert({
       application_id: submission.applicationId,
@@ -90,7 +92,7 @@ export async function recordSubmission(
     throw error;
   }
 
-  await getDb()
+  await db
     .from('grant_applications')
     .update({
       status: 'submitted',
@@ -129,7 +131,9 @@ export async function addTimelineEvent(
   submissionId: string,
   event: Omit<SubmissionTimelineEvent, 'timestamp'>
 ): Promise<void> {
-  const { data: submission } = await getDb()
+  const db = getDb();
+  await setAuditContext(db, { systemActor: 'grants_submission_tracker' }).catch(() => {});
+  const { data: submission } = await db
     .from('grant_submissions')
     .select('timeline')
     .eq('id', submissionId)
@@ -145,7 +149,7 @@ export async function addTimelineEvent(
     ...event,
   });
 
-  await getDb()
+  await db
     .from('grant_submissions')
     .update({ timeline })
     .eq('id', submissionId);
@@ -160,7 +164,9 @@ export async function updateSubmissionStatus(
   notes?: string,
   performedBy?: string
 ): Promise<void> {
-  await getDb()
+  const db = getDb();
+  await setAuditContext(db, { systemActor: 'grants_submission_tracker' }).catch(() => {});
+  await db
     .from('grant_submissions')
     .update({ status, notes })
     .eq('id', submissionId);

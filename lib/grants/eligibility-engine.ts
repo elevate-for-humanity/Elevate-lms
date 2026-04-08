@@ -6,6 +6,7 @@
 
 import { getEntityByUEI, checkExclusions } from '@/lib/integrations/sam-gov';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { setAuditContext } from '@/lib/audit-context';
 
 function getDb() { return createAdminClient(); }
 
@@ -49,7 +50,9 @@ export interface GrantEligibilityResult {
 export async function checkEntityEligibility(
   entityId: string
 ): Promise<EligibilityCheck> {
-  const { data: entity, error } = await getDb()
+  const db = getDb();
+  await setAuditContext(db, { systemActor: 'grants_eligibility_engine' }).catch(() => {});
+  const { data: entity, error } = await db
     .from('entities')
     .select('*')
     .eq('id', entityId)
@@ -159,7 +162,7 @@ export async function checkEntityEligibility(
     const score = Object.values(checks).filter(Boolean).length * 14.3;
     const eligible = issues.length === 0;
 
-    await getDb().from('entity_eligibility_checks').upsert(
+    await db.from('entity_eligibility_checks').upsert(
       {
         entity_id: entityId,
         uei: entity.uei,
@@ -216,7 +219,9 @@ export async function checkGrantEligibility(
   grantId: string,
   entityId: string
 ): Promise<GrantEligibilityResult> {
-  const { data: grant, error: grantError } = await getDb()
+  const db = getDb();
+  await setAuditContext(db, { systemActor: 'grants_eligibility_engine' }).catch(() => {});
+  const { data: grant, error: grantError } = await db
     .from('grant_opportunities')
     .select('*')
     .eq('id', grantId)
@@ -226,7 +231,7 @@ export async function checkGrantEligibility(
     throw new Error(`Grant not found: ${grantId}`);
   }
 
-  const { data: entity, error: entityError } = await getDb()
+  const { data: entity, error: entityError } = await db
     .from('entities')
     .select('*')
     .eq('id', entityId)
@@ -300,7 +305,7 @@ export async function checkGrantEligibility(
     reasons.push(...eligibilityCheck.issues);
   }
 
-  await getDb().from('grant_eligibility_results').upsert(
+  await db.from('grant_eligibility_results').upsert(
     {
       grant_id: grantId,
       entity_id: entityId,

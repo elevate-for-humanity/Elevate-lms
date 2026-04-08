@@ -55,6 +55,50 @@ This policy covers the Elevate for Humanity Workforce Operating System, includin
 | Course content and credentials | Internal | RLS-protected |
 | Public program information | Public | No restrictions |
 
+## Integrity Controls
+
+Two merge-blocking CI scanners enforce structural invariants on every PR. Neither requires secrets. Both run in `integrity-gate.yml` before build.
+
+### Pre-auth registry (`scripts/check-pre-auth-registry.cjs`)
+
+**Invariant:** Any route that inserts into a table before the user is authenticated must declare that table in `lib/pre-auth-tables.ts`.
+
+**What it catches:** Public form routes (enrollment, application, barbershop) that write rows without a `user_id`. Those rows must be reconcilable after signup — the registry drives `reconcilePreAuthRows()` in both auth callback paths.
+
+**Exemption:** `// pre-auth-registry: exempt — <reason>` in the route file. Use only for routes that are always called with a verified `userId` (e.g. Stripe webhook handlers).
+
+**Extending:** Add the table to `PRE_AUTH_TABLES` in `lib/pre-auth-tables.ts`. CI enforces immediately.
+
+---
+
+### Grants audit context (`scripts/check-grants-audit-context.cjs`)
+
+**Invariant:** Any function that writes to a registered auditable grants table must call `setAuditContext(db, { systemActor: '...' })` before the write.
+
+**What it catches:** Missing audit attribution on grants system writes — submissions, eligibility checks, package builds, federal form generation, notifications. These tables are compliance-relevant; writes without actor context produce unattributable audit records.
+
+**Registered tables:**
+
+| Table | Written by |
+|-------|-----------|
+| `grant_submissions` | `grants_submission_tracker` |
+| `grant_federal_forms` | `grants_federal_forms` |
+| `grant_packages` | `grants_package_builder` |
+| `entity_eligibility_checks` | `grants_eligibility_engine` |
+| `grant_eligibility_results` | `grants_eligibility_engine` |
+| `grant_notifications` | `grants_notification_system` |
+| `grant_notification_log` | `grants_notification_system` |
+
+**Exemption:** `// grants-audit: exempt — <reason>` inside the function body. Use only for user-initiated writes where system actor attribution would be misleading (e.g. mark-read toggles).
+
+**Extending:** Add the table to `AUDITABLE_TABLES` in the scanner script. CI enforces immediately on all existing and future write functions.
+
+**Known boundary:** The scanner uses brace-walking to extract function bodies and a 500-character lookahead to detect write operations after `.from()`. This correctly handles multi-line signatures, generic return types, and chained queries. It does not cover write paths hidden behind helper indirection (a function that calls another function that writes), unusually long query construction chains that exceed the lookahead window, or writes split across intermediate variables before execution. CI green means "no violations in scanner-recognized patterns" — not "formally proven audit coverage." If a new delegation pattern is introduced, verify manually and add an exemption comment documenting the reasoning.
+
+**Actor naming convention:** `grants_<module>` — e.g. `grants_submission_tracker`, `grants_eligibility_engine`. Keep actor strings consistent; they appear verbatim in audit records.
+
+---
+
 ## Responsible Disclosure
 
 We ask that you:

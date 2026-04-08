@@ -429,7 +429,9 @@ export async function generateAllFederalForms(
   sf424a: SF424AData;
   sflll: SFLLLData;
 }> {
-  const { data: app, error } = await getDb()
+  const db = getDb();
+  await setAuditContext(db, { systemActor: 'grants_federal_forms' }).catch(() => {});
+  const { data: app, error } = await db
     .from('grant_applications')
     .select('*, grant:grant_opportunities(*), entity:entities(*)')
     .eq('id', applicationId)
@@ -486,7 +488,7 @@ export async function generateAllFederalForms(
 
   const sflll = await generateSFLLL(app.entity_id, app.grant_id);
 
-  await getDb().from('grant_federal_forms').upsert(
+  await db.from('grant_federal_forms').upsert(
     {
       application_id: applicationId,
       sf424_data: sf424,

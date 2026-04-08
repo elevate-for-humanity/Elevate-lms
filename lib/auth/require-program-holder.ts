@@ -70,7 +70,10 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
   }
 
   // Not yet approved — send to onboarding
-  if (holder.status !== 'active' || !holder.approved_at) {
+  // 'approved' and 'active' are both valid post-approval states.
+  // 'approved' means admin approved but MOU not yet signed.
+  // 'active' means MOU signed and fully onboarded.
+  if (!['approved', 'active'].includes(holder.status) || !holder.approved_at) {
     redirect('/program-holder/onboarding?status=pending-approval');
   }
 

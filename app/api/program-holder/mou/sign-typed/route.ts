@@ -35,13 +35,14 @@ export async function POST(req: NextRequest) {
   const phId = profile.program_holder_id;
   const signedAt = new Date().toISOString();
 
-  // Mark MOU as signed on program_holders
+  // Mark MOU as signed and promote status to 'active'
   const { error } = await db
     .from('program_holders')
     .update({
       mou_signed: true,
       mou_signed_at: signedAt,
       mou_status: 'signed',
+      status: 'active',
     })
     .eq('id', phId);
 

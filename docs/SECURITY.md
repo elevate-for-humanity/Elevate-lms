@@ -93,7 +93,12 @@ Two merge-blocking CI scanners enforce structural invariants on every PR. Neithe
 
 **Extending:** Add the table to `AUDITABLE_TABLES` in the scanner script. CI enforces immediately on all existing and future write functions.
 
-**Known boundary:** The scanner uses brace-walking to extract function bodies and a 500-character lookahead to detect write operations after `.from()`. This correctly handles multi-line signatures, generic return types, and chained queries. It does not cover write paths hidden behind helper indirection (a function that calls another function that writes), unusually long query construction chains that exceed the lookahead window, or writes split across intermediate variables before execution. CI green means "no violations in scanner-recognized patterns" — not "formally proven audit coverage." If a new delegation pattern is introduced, verify manually and add an exemption comment documenting the reasoning.
+**Detection layers:** The scanner uses three layers to cover all known write patterns:
+- **Layer 1 (direct):** Statement-boundary scanning — walks to semicolon or depth-0 close, covering arbitrarily long chained queries.
+- **Layer 2 (intermediate variables):** Tracks variables assigned from `.from(auditable_table)` and flags write ops on those variables anywhere in the function body.
+- **Layer 3 (helper indirection):** Builds a per-file function map and flags callers whose local callees write to auditable tables without audit context.
+
+All three layers are verified with break tests on every CI run. No known undetected patterns remain as of commit `88a4d07`.
 
 **Actor naming convention:** `grants_<module>` — e.g. `grants_submission_tracker`, `grants_eligibility_engine`. Keep actor strings consistent; they appear verbatim in audit records.
 

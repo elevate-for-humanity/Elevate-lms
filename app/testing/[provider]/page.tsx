@@ -12,7 +12,6 @@ const PROVIDER_HERO: Record<string, string> = {
   nha:        '/images/pages/medical-assistant.jpg',
   nrf:        '/images/pages/apply-employer-hero.jpg',
   workkeys:   '/images/pages/career-services-page-4.jpg',
-  servsafe:   '/images/pages/career-services-page-3.jpg',
   careersafe: '/images/pages/apprenticeships-hero.jpg',
   lms:     '/images/pages/barber-apprenticeship.jpg',
 };
@@ -23,7 +22,6 @@ const PROVIDER_ACCENT: Record<string, string> = {
   nha:        'from-emerald-900',
   nrf:        'from-orange-900',
   workkeys:   'from-violet-900',
-  servsafe:   'from-red-900',
   careersafe: 'from-yellow-900',
   lms:     'from-pink-900',
 };
@@ -256,7 +254,7 @@ export default async function ProviderPage({ params }: Props) {
       <section className="bg-slate-900 py-16 px-6 text-center">
         <h2 className="text-3xl font-extrabold text-white mb-3">Ready to Get Certified?</h2>
         <p className="text-slate-400 mb-8 max-w-xl mx-auto">
-          Book your exam session online. Walk-ins welcome when space is available — appointments guaranteed.
+          Book your exam session online. All testing is by appointment only — no walk-ins accepted.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           {isActive && (

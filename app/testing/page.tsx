@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { CalendarDays, DollarSign, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ACTIVE_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
+import { CALENDLY_CONFIG } from '@/lib/testing/testing-config';
 
 export const metadata: Metadata = {
   title: 'Testing & Credential Exams | Elevate for Humanity',
@@ -21,7 +22,6 @@ const PROVIDER_IMAGES: Record<string, string> = {
   certiport: '/images/pages/testing-page-1.jpg',
   nha: '/images/pages/medical-assistant.jpg',
   workkeys: '/images/pages/career-services-page-4.jpg',
-  servsafe: '/images/pages/career-services-page-3.jpg',
 };
 
 const CAPABILITY_LABELS: Record<string, string> = {
@@ -53,8 +53,19 @@ export default function TestingPage() {
       {/* Hero text — below image, never overlaid */}
       <section className="bg-white border-b border-gray-100 py-8">
         <div className="max-w-5xl mx-auto px-4">
+          {/* Pathway context — testing is step 3, not a standalone service */}
+          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-4">
+            <Link href="/programs" className="hover:text-brand-red-600 transition-colors">Get Trained</Link>
+            <span className="text-slate-300">→</span>
+            <span className="text-brand-red-600 font-bold">Get Tested</span>
+            <span className="text-slate-300">→</span>
+            <Link href="/employers" className="hover:text-brand-red-600 transition-colors">Get Hired</Link>
+          </div>
           <h1 className="text-3xl md:text-4xl font-black text-gray-900 mb-2">Testing &amp; Credential Exams</h1>
-          <p className="text-gray-600 text-lg">Authorized testing center for workforce certifications</p>
+          <p className="text-gray-600 text-lg mb-1">Authorized testing center for workforce certifications</p>
+          <p className="text-slate-500 text-sm max-w-2xl">
+            Elevate provides training and proctored testing access. Certifications are issued by official credentialing bodies — NHA, ACT, Certiport, ESCO, and NRF — upon passing their exam.
+          </p>
         </div>
       </section>
 
@@ -242,8 +253,8 @@ export default function TestingPage() {
       <section className="py-16 border-t border-slate-100">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-black text-slate-900 mb-4">Ready to Get Certified?</h2>
-          <p className="text-slate-600 mb-8">Book your exam seat online or call us to schedule. All testing is by appointment only.</p>
-          <div className="flex flex-wrap gap-4 justify-center">
+          <p className="text-slate-600 mb-8">Book your exam seat online or call us to schedule. All testing is by appointment only — no walk-ins accepted.</p>
+          <div className="flex flex-wrap gap-4 justify-center mb-8">
             <Link
               href="/testing/book"
               className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-colors"
@@ -258,6 +269,12 @@ export default function TestingPage() {
               {TESTING_CENTER.phone}
             </a>
           </div>
+          <p className="text-slate-500 text-sm">
+            Not enrolled in training yet?{' '}
+            <Link href="/programs" className="text-brand-red-600 hover:text-brand-red-700 font-semibold">
+              Browse programs →
+            </Link>
+          </p>
         </div>
       </section>
     </main>

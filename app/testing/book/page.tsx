@@ -9,7 +9,7 @@ import {
   getProctoringOptions,
   type CertProvider,
 } from '@/lib/testing/proctoring-capabilities';
-import { TESTING_CENTER } from '@/lib/testing/testing-config';
+import { TESTING_CENTER, CALENDLY_CONFIG } from '@/lib/testing/testing-config';
 
 const ORG_TYPES = [
   'Employer / Company',
@@ -296,6 +296,31 @@ function BookingForm() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+
+        {/* Calendly quick-schedule option */}
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-2xl p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="flex-1">
+            <p className="font-bold text-brand-blue-900 text-sm mb-1">Schedule directly on our calendar</p>
+            <p className="text-brand-blue-700 text-xs leading-relaxed">
+              Pick a date and time that works for you. We'll confirm your exam and send instructions.
+            </p>
+          </div>
+          <a
+            href={CALENDLY_CONFIG.testingUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 inline-flex items-center gap-2 bg-brand-blue-700 hover:bg-brand-blue-800 text-white font-bold px-5 py-3 rounded-xl transition-colors text-sm whitespace-nowrap"
+          >
+            Open Calendar →
+          </a>
+        </div>
+
+        <div className="flex items-center gap-3 mb-8">
+          <div className="flex-1 h-px bg-slate-200" />
+          <span className="text-xs text-slate-400 font-medium">or fill out the request form below</span>
+          <div className="flex-1 h-px bg-slate-200" />
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-8">
 
           {/* Step 1 — Select exam */}

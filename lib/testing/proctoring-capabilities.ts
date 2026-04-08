@@ -164,18 +164,9 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
     ],
     groupDiscount: 'Groups of 5+ — $30/assessment. Contact us for employer or cohort scheduling.',
   },
-  servsafe: {
-    key: 'servsafe',
-    name: 'ServSafe (National Restaurant Association)',
-    capability: 'IN_PERSON_OR_PROVIDER_REMOTE',
-    description: 'Food handler and food manager certification required by most states for food service workers.',
-    exams: ['Food Handler', 'Food Manager', 'Alcohol', 'Allergens'],
-    verifyUrl: 'https://www.servsafe.com/',
-    status: 'available_through_partner',
-    fees: [
-      { label: 'Per exam', amount: 45, note: 'Includes exam fee + proctoring' },
-    ],
-  },
+  // ServSafe removed from testing center — NRA administers its own exam delivery.
+  // ServSafe credentials are earned through Elevate's culinary/food service programs,
+  // not through the testing center. See /programs/culinary-apprenticeship.
   careersafe: {
     key: 'careersafe',
     name: 'CareerSafe / OSHA Outreach',

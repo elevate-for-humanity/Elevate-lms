@@ -84,28 +84,30 @@ export default function HomePage() {
       {/* ── HOW IT WORKS ── */}
       <section className="bg-slate-800 py-16 px-6">
         <div className="max-w-5xl mx-auto">
-          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3 text-center">Process</p>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3 text-center">A Clear Path from Training to Employment</h2>
-          <p className="text-white/70 text-sm text-center mb-12 max-w-xl mx-auto">
-            Every participant moves through a structured pipeline — from eligibility determination to career placement.
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3 text-center">How Elevate Works</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3 text-center">Get Funded. Get Trained. Get Tested. Get Hired.</h2>
+          <p className="text-white/70 text-sm text-center mb-12 max-w-2xl mx-auto">
+            Elevate for Humanity is a workforce training institute that helps learners access funding, earn industry credentials through training and proctored testing, and connect to employment.
           </p>
-          <div className="grid sm:grid-cols-5 gap-8">
+          <div className="grid sm:grid-cols-4 gap-8">
             {[
-              { step: '1', label: 'Get Approved', desc: 'We help determine eligibility for funding through workforce programs and partner agencies.' },
-              { step: '2', label: 'Enroll with Elevate', desc: 'Participants are onboarded into a structured program with clear timelines and expectations.' },
-              { step: '3', label: 'Complete Training', desc: 'Training is delivered directly by Elevate or through approved providers aligned with certification requirements.' },
-              { step: '4', label: 'Obtain Credential', desc: 'Participants complete required hours and are guided through certification application and exam readiness.' },
-              { step: '5', label: 'Transition to Employment', desc: 'We connect participants with employer partners and workforce opportunities.' },
+              { step: '1', label: 'Get Funded', desc: 'We help you access WIOA, Workforce Ready Grant, and other funding so training costs nothing out of pocket for eligible participants.', href: '/funding' },
+              { step: '2', label: 'Get Trained', desc: 'Complete structured, employer-aligned training in healthcare, trades, IT, or business — delivered by Elevate or approved partner providers.', href: '/programs' },
+              { step: '3', label: 'Get Tested', desc: 'Take your certification exam at our authorized testing center. We proctor EPA 608, NHA, Certiport, ACT WorkKeys, and NRF credentials on-site.', href: '/testing' },
+              { step: '4', label: 'Get Hired', desc: 'We connect graduates to employer partners and workforce agencies. Placement support is built into every program.', href: '/employers' },
             ].map((s, i) => (
               <div key={s.step} className="flex flex-col items-center text-center relative">
                 <div className="w-14 h-14 rounded-full bg-brand-red-600 text-white font-black text-xl flex items-center justify-center mb-4 flex-shrink-0 z-10">
                   {s.step}
                 </div>
-                {i < 4 && (
+                {i < 3 && (
                   <div className="hidden sm:block absolute top-7 left-[calc(50%+28px)] right-[calc(-50%+28px)] h-px bg-white/20" />
                 )}
                 <p className="text-white font-bold text-sm mb-2">{s.label}</p>
                 <p className="text-white/60 text-xs leading-relaxed">{s.desc}</p>
+                <Link href={s.href} className="mt-3 text-brand-red-400 hover:text-brand-red-300 text-xs font-semibold transition-colors">
+                  Learn more →
+                </Link>
               </div>
             ))}
           </div>

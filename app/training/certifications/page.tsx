@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowRight, Clock, DollarSign, MapPin } from 'lucide-react';
+import { ArrowRight, CalendarDays, Clock, DollarSign, MapPin } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Certification Training Programs | Elevate for Humanity',
@@ -91,6 +91,36 @@ export default function CertificationsPage() {
           <Link href="/microclasses" className="inline-flex items-center text-brand-red-600 font-semibold text-sm hover:text-brand-red-700">
             Browse Micro-Classes <ArrowRight className="ml-1 w-4 h-4" />
           </Link>
+        </div>
+      </section>
+
+      {/* Exam bridge — explicit next step after training */}
+      <section className="py-14 border-t border-slate-200 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="flex flex-col sm:flex-row items-center gap-8 bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+            <div className="flex-1">
+              <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-2">Next Step After Training</p>
+              <h2 className="text-2xl font-extrabold text-slate-900 mb-3">Ready to take your certification exam?</h2>
+              <p className="text-slate-600 text-sm leading-relaxed mb-0">
+                Elevate operates an authorized testing center for EPA 608, NHA healthcare credentials, Certiport (Microsoft, CompTIA, Adobe), ACT WorkKeys, and NRF Rise Up exams. Book your seat once you complete training — no need to find a separate testing site.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 shrink-0">
+              <Link
+                href="/testing"
+                className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-xl transition-colors whitespace-nowrap"
+              >
+                <CalendarDays className="w-4 h-4" />
+                Book a Testing Session
+              </Link>
+              <Link
+                href="/testing"
+                className="inline-flex items-center justify-center gap-1 text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors"
+              >
+                View available exams <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 

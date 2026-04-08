@@ -76,7 +76,7 @@ export default async function TrainingPage() {
                   preload="metadata"
                 >
                   <source
-                    src="/videos/program-holder-orientation.mp4"
+                    src="/videos/programs-overview-video-with-narration.mp4"
                     type="video/mp4"
                   />
                   Your browser does not support the video tag.

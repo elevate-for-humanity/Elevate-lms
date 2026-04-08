@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
+import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { Inbox, Clock, CheckCircle, XCircle, Eye, Users } from 'lucide-react';
 import { AdminPageShell, AdminFilterBar, AdminCard, AdminEmptyState, AdminPagination, StatusBadge } from '@/components/admin/AdminPageShell';
@@ -20,9 +21,9 @@ export default async function ApplicationsPage({
 }: {
   searchParams: Promise<{ status?: string; search?: string; page?: string }>;
 }) {
+  await requireRole(['admin', 'super_admin', 'staff', 'org_admin']);
   const params = await searchParams;
 
-  // Auth check via session client
   const sessionClient = await createClient();
 
   const rawStatus = params.status;

@@ -2,8 +2,15 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { CheckCircle, Clock, MapPin, Monitor, DollarSign, ExternalLink, CalendarDays } from 'lucide-react';
-import { CERT_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
+import { CheckCircle, Clock, MapPin, Monitor, DollarSign, ExternalLink, CalendarDays, Briefcase } from 'lucide-react';
+import { CERT_PROVIDERS, type ExamDefinition } from '@/lib/testing/proctoring-capabilities';
+
+const LEVEL_COLORS: Record<string, string> = {
+  amber:  'bg-amber-50 border-amber-200 text-amber-900',
+  slate:  'bg-slate-50 border-slate-200 text-slate-900',
+  yellow: 'bg-yellow-50 border-yellow-200 text-yellow-900',
+  blue:   'bg-blue-50 border-blue-200 text-blue-900',
+};
 
 // Hero images per provider key
 const PROVIDER_HERO: Record<string, string> = {
@@ -125,14 +132,44 @@ export default async function ProviderPage({ params }: Props) {
           {/* Exams available */}
           <section>
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Exams Available</h2>
-            <ul className="space-y-2">
-              {provider.exams.map((exam) => (
-                <li key={exam} className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-slate-700">{exam}</span>
-                </li>
-              ))}
-            </ul>
+            <div className="space-y-4">
+              {provider.exams.map((exam) => {
+                const isObj = typeof exam === 'object';
+                const name = isObj ? (exam as ExamDefinition).name : exam as string;
+                const desc = isObj ? (exam as ExamDefinition).description : undefined;
+                const duration = isObj ? (exam as ExamDefinition).durationMinutes : undefined;
+                const questions = isObj ? (exam as ExamDefinition).questionCount : undefined;
+                const ncrc = isObj ? (exam as ExamDefinition).ncrcLevel : undefined;
+                return (
+                  <div key={name} className="bg-slate-50 rounded-xl border border-slate-100 p-5">
+                    <div className="flex items-start gap-3 mb-2">
+                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <h3 className="font-bold text-slate-900 text-base leading-snug">{name}</h3>
+                    </div>
+                    {desc && <p className="text-slate-600 text-sm leading-relaxed ml-8">{desc}</p>}
+                    {(duration || questions || ncrc) && (
+                      <div className="ml-8 mt-3 flex flex-wrap gap-3">
+                        {duration && (
+                          <span className="text-xs bg-white border border-slate-200 text-slate-500 px-2.5 py-1 rounded-full">
+                            ⏱ {duration >= 60 ? `${Math.floor(duration / 60)}h${duration % 60 ? ` ${duration % 60}m` : ''}` : `${duration} min`}
+                          </span>
+                        )}
+                        {questions && (
+                          <span className="text-xs bg-white border border-slate-200 text-slate-500 px-2.5 py-1 rounded-full">
+                            {questions} question{questions !== 1 ? 's' : ''}
+                          </span>
+                        )}
+                        {ncrc && (
+                          <span className="text-xs bg-white border border-slate-200 text-slate-500 px-2.5 py-1 rounded-full">
+                            {ncrc}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </section>
 
           {/* Proctoring options */}
@@ -160,6 +197,40 @@ export default async function ProviderPage({ params }: Props) {
               )}
             </div>
           </section>
+
+          {/* Jobs this credential unlocks */}
+          {'ncrcJobProfiles' in provider && Array.isArray((provider as any).ncrcJobProfiles) && (
+            <section>
+              <div className="flex items-center gap-2 mb-4">
+                <Briefcase className="w-6 h-6 text-brand-blue-600" />
+                <h2 className="text-2xl font-bold text-slate-900">Jobs This Credential Unlocks</h2>
+              </div>
+              <p className="text-slate-500 text-sm mb-6">
+                Employers use these credentials as a hiring filter. Knowing the target level before you test helps you prepare to the right standard.
+              </p>
+              <div className="space-y-4">
+                {((provider as any).ncrcJobProfiles as any[]).map((tier: any) => (
+                  <div key={tier.level} className={`rounded-xl border p-5 ${LEVEL_COLORS[tier.color] ?? LEVEL_COLORS.slate}`}>
+                    <div className="flex items-baseline gap-3 mb-3">
+                      <span className="font-extrabold text-base">{tier.level}</span>
+                      <span className="text-xs font-medium opacity-70">{tier.score}</span>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-2">
+                      {tier.jobs.map((job: any) => (
+                        <div key={job.title} className="flex items-start gap-2">
+                          <CheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5 opacity-60" />
+                          <div>
+                            <p className="text-sm font-semibold leading-snug">{job.title}</p>
+                            {job.note && <p className="text-xs opacity-70 leading-snug">{job.note}</p>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
         </div>
 

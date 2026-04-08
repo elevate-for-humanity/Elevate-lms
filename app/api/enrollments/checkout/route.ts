@@ -1,5 +1,5 @@
 /**
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
  * @deprecated Use canonical enrollment routes:
  *   - /api/enroll (student enrollment)
  *   - /api/enrollment/submit (comprehensive wizard)
@@ -12,6 +12,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@supabase/supabase-js';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -30,6 +31,8 @@ function getSupabase() {
 async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'payment');
   if (rateLimited) return rateLimited;
+
+  await hydrateProcessEnv();
 
   // Auth: require authenticated user — payments must be tied to a real session
   const { createClient: createAuthClient } = await import('@/lib/supabase/server');

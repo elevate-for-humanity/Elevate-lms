@@ -2,7 +2,7 @@ import { logger } from '@/lib/logger';
 import { checkEligibilityAndAuthorize } from '@/lib/services/exam-eligibility';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -50,7 +50,7 @@ async function _POST(
 
     // Admin client required — bypasses RLS recursion in lms_lessons view.
     // createAdminClient() throws if SUPABASE_SERVICE_ROLE_KEY is missing.
-    const db = createAdminClient();
+    const db = await getAdminClient();
 
     // Get lesson to find course_id.
     // lms_lessons is a view: curriculum_lessons (priority) UNION training_lessons (fallback).
@@ -379,7 +379,7 @@ async function _DELETE(
     }
 
     const { lessonId } = await params;
-    const db = createAdminClient();
+    const db = await getAdminClient();
 
     // Resolve course_id for progress recalculation
     const { data: lessonRow } = await db

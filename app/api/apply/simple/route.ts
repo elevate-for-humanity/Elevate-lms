@@ -4,6 +4,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { sendApplicationWelcomeEmail } from '@/lib/email/application-welcome';
 import { sendOnboardingEmail } from '@/lib/email/send-onboarding';
+import { insertWithPreAuthCheck } from '@/lib/pre-auth-guard';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,7 +41,8 @@ async function _POST(req: Request) {
       resolvedProgramId = matchedProgram?.id ?? null;
     }
 
-    const { error } = await supabase.from("applications").insert({
+    // @preAuthWrite table=applications mode=reconcile
+    const { error } = await insertWithPreAuthCheck(supabase, 'applications', {
       name: data.get("name"),
       email: data.get("email"),
       phone: data.get("phone"),

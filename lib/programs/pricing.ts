@@ -1,10 +1,15 @@
 /**
  * BARBER APPRENTICESHIP PRICING - Single Source of Truth
  *
- * Full Program Price: $4,980
+ * Full Program Price: $4,980 (fixed — never adjusted for transfer hours)
  * Minimum Down Payment: $600 (due at enrollment — customizable upward)
  * Payment Term: 29 weeks (fixed), weekly invoices every Friday
  * Weekly Payment: ($4,980 - down payment) / 29 weeks
+ *
+ * TRANSFER HOUR POLICY (locked):
+ *   Transfer hours are progress credit only. They reduce program duration,
+ *   NOT tuition. A student transferring 1,000 hours still owes $4,980.
+ *   Do not add transfer-hour-to-dollar conversion logic here.
  *
  * Billing: Down payment at enrollment, weekly charges every Friday.
  * If enrolled on Friday, first weekly charge is the following Friday.

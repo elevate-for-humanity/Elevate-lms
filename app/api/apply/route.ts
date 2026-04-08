@@ -10,6 +10,7 @@ import { sendApplicationWelcomeEmail } from '@/lib/email/application-welcome';
 import { sendOnboardingEmail } from '@/lib/email/send-onboarding';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { getRoutingRecommendations } from '@/lib/automation/shop-routing';
+import { insertWithPreAuthCheck } from '@/lib/pre-auth-guard';
 export const runtime = 'nodejs';
 export const maxDuration = 30;
 
@@ -81,18 +82,19 @@ export const POST = withRateLimit(
         support_notes: `Funding: ${funding}. ${eligible ? 'Prescreen pass' : 'Manual review'}${pathway_slug ? `. Pathway: ${pathway_slug}` : ''}`,
       };
 
+      // @preAuthWrite table=applications mode=reconcile
       // Try with new columns first, fall back without them
       let application, error;
       if (pathway_slug || source) {
-        const result = await supabase.from('applications').insert({
+        const result = await insertWithPreAuthCheck(supabase, 'applications', {
           ...insertData,
           pathway_slug: pathway_slug || null,
           source: source || 'direct',
         }).select('id').single();
-        
+
         if (result.error?.message?.includes('column') || result.error?.code === '42703') {
           // Columns don't exist yet, insert without them
-          const fallback = await supabase.from('applications').insert(insertData).select('id').single();
+          const fallback = await insertWithPreAuthCheck(supabase, 'applications', insertData).select('id').single();
           application = fallback.data;
           error = fallback.error;
         } else {

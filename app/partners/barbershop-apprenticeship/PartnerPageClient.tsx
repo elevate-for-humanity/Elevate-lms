@@ -19,13 +19,14 @@ export default function PartnerPageClient() {
         videoSrc="/videos/barber-hero-final.mp4"
         posterSrc="/images/pages/barber-hero-main.jpg"
         posterAlt="Barber apprentice training in a barbershop"
+        preloadFull
       />
 
       {/* CTA Section below hero */}
       <section className="py-16 border-b border-slate-100">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold text-black mb-4">Barbershop Partner Program</h1>
-          <p className="text-xl text-black mb-8 max-w-2xl mx-auto">
+          <p className="text-xl font-medium text-black mb-8 max-w-2xl mx-auto">
             Host apprentices in your shop. Develop talent. Grow your team through Indiana&apos;s
             USDOL Registered Barber Apprenticeship.
           </p>
@@ -52,7 +53,7 @@ export default function PartnerPageClient() {
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">How the Program Works</h2>
-          <p className="text-lg text-black text-center mb-12 max-w-2xl mx-auto">
+          <p className="text-lg font-medium text-black text-center mb-12 max-w-2xl mx-auto">
             The Indiana Barber Apprenticeship is a USDOL Registered Apprenticeship. Your shop hosts
             apprentices who train under your licensed barbers while earning a wage.
           </p>
@@ -62,21 +63,21 @@ export default function PartnerPageClient() {
                 <span className="text-orange-600 font-bold text-xl">1</span>
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Apply &amp; Get Approved</h3>
-              <p className="text-black text-sm">Submit your application, complete a Zoom site visit, and sign the MOU. Approval takes about 1 week.</p>
+              <p className="text-sm font-medium text-black">Submit your application, complete a Zoom site visit, and sign the MOU. Approval takes about 1 week.</p>
             </div>
             <div className="text-center">
               <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-orange-600 font-bold text-xl">2</span>
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Host an Apprentice</h3>
-              <p className="text-black text-sm">We match qualified apprentices to your shop. They complete 2,000 hours of on-the-job training under your supervision.</p>
+              <p className="text-sm font-medium text-black">We match qualified apprentices to your shop. They complete 2,000 hours of on-the-job training under your supervision.</p>
             </div>
             <div className="text-center">
               <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-orange-600 font-bold text-xl">3</span>
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Grow Your Team</h3>
-              <p className="text-black text-sm">Apprentices complete theory through Elevate LMS, then sit for the Indiana State Board exam. You get a trained, licensed barber.</p>
+              <p className="text-sm font-medium text-black">Apprentices complete theory through Elevate LMS, then sit for the Indiana State Board exam. You get a trained, licensed barber.</p>
             </div>
           </div>
         </div>
@@ -99,7 +100,7 @@ export default function PartnerPageClient() {
             ].map((item) => (
               <div key={item.title} className="bg-white p-6 rounded-xl border border-gray-200">
                 <h3 className="font-bold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-black text-sm">{item.desc}</p>
+                <p className="text-sm font-medium text-black">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -127,7 +128,7 @@ export default function PartnerPageClient() {
                     <h3 className="font-bold text-gray-900">{item.title}</h3>
                     <span className="text-xs bg-white text-black px-2 py-0.5 rounded-full">{item.time}</span>
                   </div>
-                  <p className="text-black text-sm">{item.desc}</p>
+                  <p className="text-sm font-medium text-black">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -153,10 +154,10 @@ export default function PartnerPageClient() {
               { q: 'What do I need to provide for my application?', a: 'Your shop license number, supervising barber\'s license info, your shop logo, and photos of the inside and outside of your shop.' },
             ].map((item, i) => (
               <details key={i} className="bg-white rounded-xl border border-gray-200 overflow-hidden group">
-                <summary className="px-6 py-4 cursor-pointer font-semibold text-gray-900 hover:bg-white transition-colors">
+                <summary className="px-6 py-4 cursor-pointer font-bold text-black hover:bg-white transition-colors">
                   {item.q}
                 </summary>
-                <div className="px-6 pb-4 text-black text-sm">
+                <div className="px-6 pb-4 text-sm font-medium text-black">
                   {item.a}
                 </div>
               </details>
@@ -170,7 +171,7 @@ export default function PartnerPageClient() {
       <section className="py-16 bg-slate-900 border-t border-slate-800">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-extrabold text-white mb-4">Ready to Partner With Us?</h2>
-          <p className="text-lg text-white mb-8">
+          <p className="text-lg font-medium text-white mb-8">
             Join the Indiana Barber Apprenticeship program and start developing talent for your shop.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -203,7 +204,7 @@ export default function PartnerPageClient() {
             <CheckCircle2 className="w-6 h-6 text-brand-green-600 flex-shrink-0" />
             <h2 className="text-2xl font-bold text-slate-900">After Your Application Is Approved</h2>
           </div>
-          <p className="text-black mb-6 text-sm">
+          <p className="text-sm font-medium text-black mb-6">
             Once your partner application is reviewed and approved, complete these four steps to receive your first apprentice placement.
           </p>
           <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-6">

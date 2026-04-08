@@ -11,6 +11,8 @@ interface VideoHeroProps {
   heightClass?: string;
   /** Voiceover caption shown when unmuted */
   caption?: string;
+  /** Aggressively buffer the video — use for above-the-fold heroes */
+  preloadFull?: boolean;
 }
 
 export default function VideoHero({
@@ -18,6 +20,7 @@ export default function VideoHero({
   posterSrc,
   heightClass = 'h-[50vh] md:h-[60vh]',
   caption,
+  preloadFull = false,
 }: VideoHeroProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [muted, setMuted] = useState(true);
@@ -37,6 +40,7 @@ export default function VideoHero({
         poster={posterSrc as `/${string}`}
         className="absolute inset-0 w-full h-full object-cover"
         autoPlayOnMount
+        preloadFull={preloadFull}
       />
 
       <button

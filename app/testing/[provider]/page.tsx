@@ -279,18 +279,7 @@ export default async function ProviderPage({ params }: Props) {
                 <CalendarDays className="w-5 h-5" />
                 Book at Elevate Testing Center
               </Link>
-              {/* WorkKeys remote option — ACT runs their own remote proctoring system */}
-              {key === 'workkeys' && (
-                <a
-                  href="https://www.act.org/content/act/en/products-and-services/workkeys-for-job-seekers/workkeys-online.html"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full border-2 border-violet-300 text-violet-800 hover:bg-violet-50 font-bold px-6 py-4 rounded-xl transition-colors text-sm"
-                >
-                  <Monitor className="w-4 h-4" />
-                  Schedule Remote via ACT →
-                </a>
-              )}
+
               <Link
                 href="/testing"
                 className="flex items-center justify-center w-full border border-slate-200 text-slate-700 font-medium px-6 py-3 rounded-xl hover:bg-slate-50 transition-colors text-sm"

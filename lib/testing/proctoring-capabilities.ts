@@ -463,7 +463,7 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
   workkeys: {
     key: 'workkeys',
     name: 'ACT WorkKeys / NCRC',
-    capability: 'IN_PERSON_OR_PROVIDER_REMOTE',
+    capability: 'CENTER_REMOTE_ALLOWED',
     description: 'The National Career Readiness Certificate (NCRC) is a portable, evidence-based credential recognized by 22,000+ employers nationwide. Earned by passing three ACT WorkKeys assessments. Elevate is an authorized ACT testing site (Realm: 1317721865). Scores are valid for 5 years.',
     exams: [
       {

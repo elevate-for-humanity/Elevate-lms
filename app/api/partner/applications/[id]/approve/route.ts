@@ -196,10 +196,10 @@ async function _POST(
       type: 'magiclink',
       email: partnerEmail,
       options: {
-        // ?next= is read by /auth/callback and takes priority over role-based routing.
-        // Without it, partners land on /program-holder/dashboard (role default) instead
-        // of their dedicated portal.
-        redirectTo: `${siteUrl}/auth/callback?next=/partner/dashboard`,
+        // Supabase strips query params from redirectTo and uses only the base
+        // allowed URL. Role-based routing in /auth/callback handles destination:
+        // role='partner' → /partner/dashboard (set in lib/auth/role-destinations.ts).
+        redirectTo: `${siteUrl}/auth/callback`,
       },
     });
 

@@ -59,8 +59,10 @@ export const ROLE_DESTINATIONS: Record<string, string> = {
   delegate:       '/program-holder/dashboard',
   provider_admin: '/provider/dashboard',
 
-  // External partners — same as program_holder
-  partner:        '/program-holder/dashboard',
+  // External partners — barber shop / training site partners
+  // /partner/dashboard checks onboarding status and routes accordingly.
+  // Do NOT point to /program-holder/dashboard — that guard rejects role='partner'.
+  partner:        '/partner/dashboard',
   sponsor:        '/program-holder/dashboard',
   employer:       '/employer/dashboard',
   workforce_board:'/workforce-board/dashboard',

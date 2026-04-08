@@ -1,7 +1,56 @@
 import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
-// Canonical partner dashboard is /program-holder/dashboard.
-// role-destinations.ts sends the 'partner' role to /program-holder/dashboard.
-export default function PartnerDashboardRedirect() {
-  redirect('/program-holder/dashboard');
+export const dynamic = 'force-dynamic';
+
+/**
+ * Partner dashboard entry point.
+ *
+ * Routes approved partners (role='partner') based on their onboarding state:
+ *   - Not authenticated          → /partner/login
+ *   - Wrong role                 → /unauthorized
+ *   - Onboarding not complete    → /partner/onboarding
+ *   - Onboarding complete        → /partner/attendance (primary working view)
+ *
+ * Must never redirect to /program-holder/dashboard —
+ * that guard rejects role='partner' and sends them to /unauthorized.
+ */
+export default async function PartnerDashboardPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) redirect('/partner/login');
+
+  const db = createAdminClient();
+  if (!db) redirect('/partner/login');
+
+  const { data: profile } = await db
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  const allowedRoles = ['partner', 'admin', 'super_admin', 'staff'];
+  if (!profile || !allowedRoles.includes(profile.role)) {
+    redirect('/unauthorized');
+  }
+
+  // Admins/staff have no partners row — send them to their own dashboard
+  if (['admin', 'super_admin', 'staff'].includes(profile.role)) {
+    redirect('/admin/dashboard');
+  }
+
+  // Check partner onboarding state
+  const { data: partner } = await db
+    .from('partners')
+    .select('id, onboarding_completed, status')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (!partner || partner.onboarding_completed !== true || partner.status !== 'active') {
+    redirect('/partner/onboarding');
+  }
+
+  redirect('/partner/attendance');
 }

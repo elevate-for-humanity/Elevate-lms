@@ -91,7 +91,7 @@ export default function PartnerOnboardingSuccessPage() {
 
           <div className="space-y-3">
             <Link
-              href="/program-holder/dashboard"
+              href="/partner/dashboard"
               className="block w-full py-3 px-6 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition-colors"
             >
               Go to Partner Dashboard

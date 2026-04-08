@@ -269,7 +269,7 @@ export default function PartnerDocumentsPage() {
         <div className="mt-8 flex justify-center gap-4">
           {allComplete ? (
             <Link
-              href="/program-holder/dashboard"
+              href="/partner/dashboard"
               className="flex items-center gap-2 px-8 py-3 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700 transition-colors"
             >
               Go to Dashboard

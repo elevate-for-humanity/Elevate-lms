@@ -110,8 +110,9 @@ function PartnerLoginPageInner() {
       const { error: magicLinkError } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          // ?next= is read by /auth/callback and takes priority over role-based routing.
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=/partner/dashboard`,
+          // Supabase strips query params from redirectTo. Role-based routing in
+          // /auth/callback handles destination: role='partner' → /partner/dashboard.
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 

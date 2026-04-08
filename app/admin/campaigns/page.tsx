@@ -1,6 +1,6 @@
 
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { requireRole } from '@/lib/admin/guards';
 import Link from 'next/link';
 import { Mail, Plus, Users, Calendar, Send, Eye, MousePointer } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -30,7 +30,9 @@ const typeIcons: Record<string, typeof Mail> = {
 };
 
 export default async function AdminCampaignsPage() {
-  const supabase = await createClient();
+  const auth = await requireRole(['admin', 'super_admin', 'staff']);
+  if (auth.error) return auth.error;
+  const supabase = auth.supabase;
 
   // Fetch campaigns from database
   let campaigns: any[] | null = null;

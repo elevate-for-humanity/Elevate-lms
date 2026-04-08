@@ -96,6 +96,9 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
       .eq('completed', true),
   ]);
 
+  if (enrollmentsRes.error) throw new Error(`enrollments query failed: ${enrollmentsRes.error.message}`);
+  if (applicationsRes.error) throw new Error(`applications query failed: ${applicationsRes.error.message}`);
+
   const enrollments = enrollmentsRes.data ?? [];
   const applications = applicationsRes.data ?? [];
   const completedLessons = progressRes.count ?? 0;

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { getRoleDestination } from '@/lib/auth/role-destinations';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
+import { reconcilePreAuthRows } from '@/lib/pre-auth-tables';
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
@@ -43,12 +44,24 @@ export async function GET(request: Request) {
         );
       }
 
-      // Claim any pre-auth applications
+      // Claim any pre-auth applications and link orphaned enrollments
+      // (enrollments submitted via public form before account creation have no user_id)
       try {
         await supabase.rpc('claim_applications_for_current_user');
       } catch (claimError) {
-        // Don't block redirect if claim fails
         logger.warn('Failed to claim applications:', claimError);
+      }
+
+      // Reconcile all pre-auth tables (program_enrollments, applications,
+      // barber_subscriptions). Registry-driven — see lib/pre-auth-tables.ts.
+      try {
+        const { data: { user: callbackUser } } = await supabase.auth.getUser();
+        if (callbackUser?.email) {
+          await reconcilePreAuthRows(supabase, callbackUser.email);
+        }
+      } catch (linkError) {
+        // Non-fatal — rows can be reconciled manually via scripts/detect-orphaned-rows.sql
+        logger.warn('[auth/callback] pre-auth reconciliation failed:', linkError);
       }
 
       // Resolve role — check user_metadata first (set at signup), then profiles table

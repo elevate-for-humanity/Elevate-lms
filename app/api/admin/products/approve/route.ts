@@ -3,7 +3,6 @@ import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 // Using Node.js runtime for email compatibility
 import { createClient } from '@/lib/supabase/server';
-import { requireAdmin } from '@/lib/auth';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -17,17 +16,36 @@ async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    await requireAdmin();
-
     const supabase = await createClient();
-    const { productId } = await req.json();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    // Get product details before updating
-    const { data: product } = await supabase
+    const { data: adminProfile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    if (!adminProfile || !['admin', 'super_admin'].includes(adminProfile.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const body = await req.json().catch(() => null);
+    const { productId } = body ?? {};
+
+    if (!productId) {
+      return NextResponse.json({ error: 'productId is required' }, { status: 400 });
+    }
+
+    // Pre-read: verify product exists before updating
+    const { data: product, error: fetchError } = await supabase
       .from('marketplace_products')
-      .select('title, creator_id')
+      .select('title, creator_id, status')
       .eq('id', productId)
       .single();
+
+    if (fetchError || !product) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    }
 
     const { error } = await supabase
       .from('marketplace_products')
@@ -72,7 +90,7 @@ async function _POST(req: Request) {
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
-    return NextResponse.json({ err: toErrorMessage(err) }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 export const POST = withApiAudit('/api/admin/products/approve', _POST);

@@ -14,6 +14,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -133,6 +134,15 @@ export async function POST(
     studentEmail,
     programName,
   });
+
+  await logAdminAudit({
+    action: AdminAction.ENROLLMENT_ACCESS_GRANTED,
+    actorId: user.id,
+    entityType: 'program_enrollments',
+    entityId: enrollmentId,
+    metadata: { program_name: programName, student_email: studentEmail, granted_at: now },
+    req: request,
+  }).catch(e => logger.warn('[grant-access] Audit log failed', e));
 
   return NextResponse.json({ ok: true, access_granted_at: now });
 }

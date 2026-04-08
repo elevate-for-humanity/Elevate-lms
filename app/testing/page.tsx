@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { TESTING_CENTER } from '@/lib/testing/testing-config';
 import Image from 'next/image';
 import { CalendarDays, DollarSign, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -254,7 +255,7 @@ export default function TestingPage() {
               href="tel:3173143757"
               className="inline-flex items-center gap-2 border-2 border-slate-300 hover:border-slate-400 text-slate-700 px-8 py-4 rounded-full font-bold text-lg transition-colors"
             >
-              (317) 314-3757
+              {TESTING_CENTER.phone}
             </a>
           </div>
         </div>

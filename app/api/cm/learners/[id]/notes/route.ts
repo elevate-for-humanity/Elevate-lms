@@ -19,6 +19,8 @@ async function _POST(
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
+  const supabaseAdmin = createAdminClient();
+
   try {
     const { id } = await params;
 

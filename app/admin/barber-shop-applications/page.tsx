@@ -145,7 +145,7 @@ export default async function BarberShopApplicationsPage() {
             </p>
           </div>
           <Link
-            href="/apply/barber-apprenticeship?type=partner_shop"
+            href="/apply/student?program=barber-apprenticeship&type=partner_shop"
             className="text-sm text-brand-blue-600 hover:underline"
             target="_blank"
           >

@@ -39,6 +39,7 @@ export const AdminAction = {
   // Applications & enrollment
   APPLICATION_APPROVED: 'application.approved',
   APPLICATION_STATUS_CHANGED: 'application.status_changed',
+  ENROLLMENT_ACCESS_GRANTED: 'enrollment.access_granted',
   ENROLLMENT_JOB_UPDATED: 'enrollment.job_updated',
   BULK_GRADES_UPDATED: 'grades.bulk_updated',
   EXTERNAL_PROGRESS_UPDATED: 'external_progress.updated',
@@ -49,6 +50,10 @@ export const AdminAction = {
   WOTC_APPLICATION_CREATED: 'wotc.application_created',
   WOTC_APPLICATION_UPDATED: 'wotc.application_updated',
   WOTC_APPLICATION_DELETED: 'wotc.application_deleted',
+
+  // Exam results
+  EXAM_RESULT_PASSED: 'exam.result_passed',
+  EXAM_RESULT_FAILED: 'exam.result_failed',
 
   // Licenses
   LICENSE_CREATED: 'license.created',

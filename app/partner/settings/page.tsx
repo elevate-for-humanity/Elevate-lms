@@ -19,12 +19,13 @@ export default async function PartnerSettingsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/partner/settings');
 
-
   const { data: partnerUser } = await supabase
     .from('partner_users')
     .select('partner_id')
     .eq('user_id', user.id)
     .single();
+
+  if (!partnerUser) redirect('/unauthorized');
 
   const orgId = partnerUser?.partner_id ?? null;
 

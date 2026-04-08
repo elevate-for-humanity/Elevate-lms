@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { EnrollmentUpdateSchema } from '@/lib/validators/course';
 import { getEnrollment, updateEnrollment, deleteEnrollment } from '@/lib/db/courses';
 import { createClient } from '@/lib/supabase/server';
@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 async function requireAdmin() {
   const supabase = await createClient();
-const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Unauthorized', status: 401 };
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
@@ -19,29 +19,31 @@ const { data: { user } } = await supabase.auth.getUser();
   return { user, profile };
 }
 
-async function _GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
-  
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
-const { id } = await params;
+async function _GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  const { id } = await params;
   const auth = await requireAdmin();
   if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
+
   try {
     const data = await getEnrollment(id);
     if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     return NextResponse.json({ data }, { status: 200 });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-async function _PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
-const { id } = await params;
+async function _PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  const { id } = await params;
   const auth = await requireAdmin();
   if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
+
   try {
     const body = await request.json().catch(() => null);
     const parsed = EnrollmentUpdateSchema.safeParse(body);
@@ -54,25 +56,31 @@ const { id } = await params;
     const data = await updateEnrollment(id, parsed.data);
     if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     return NextResponse.json({ data }, { status: 200 });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-async function _DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
-  
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
-const { id } = await params;
+async function _DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  const { id } = await params;
   const auth = await requireAdmin();
   if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
+
   try {
+    // Pre-read: verify record exists before attempting delete
+    const existing = await getEnrollment(id);
+    if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
     const data = await deleteEnrollment(id);
     return NextResponse.json({ data }, { status: 200 });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-export const GET = withApiAudit('/api/admin/enrollments/[id]', _GET, { critical: true });
-export const PATCH = withApiAudit('/api/admin/enrollments/[id]', _PATCH, { critical: true });
-export const DELETE = withApiAudit('/api/admin/enrollments/[id]', _DELETE, { critical: true });
+
+export const GET = withApiAudit('/api/admin/enrollments/[id]', _GET as any, { critical: true });
+export const PATCH = withApiAudit('/api/admin/enrollments/[id]', _PATCH as any, { critical: true });
+export const DELETE = withApiAudit('/api/admin/enrollments/[id]', _DELETE as any, { critical: true });

@@ -21,36 +21,35 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { apiAuthGuard } from '@/lib/admin/guards';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { CERT_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
+import { getStripe } from '@/lib/stripe/client';
 
 export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
 
 export async function POST(req: NextRequest) {
-  const stripeKey = process.env.STRIPE_SECRET_KEY;
-  if (!stripeKey) return safeError('Stripe not configured', 500);
+  const stripe = getStripe();
+  if (!stripe) return safeError('Stripe not configured', 503);
 
-  const rateLimited = await applyRateLimit(req, 'payment');
+  // Use 'public' tier — fails open if Redis is unavailable so checkout is never blocked
+  // by infrastructure issues. Stripe's own fraud detection is the primary abuse layer.
+  const rateLimited = await applyRateLimit(req, 'public');
   if (rateLimited) return rateLimited;
-
-  const auth = await apiAuthGuard(req);
-  if (auth.error) return auth.error;
 
   let body: {
     examType: string;
     examName?: string;
-    feeCents: number;
+    feeCents?: number;
     bookingType?: string;
     participantCount?: number;
     email?: string;
     name?: string;
-    pendingBookingId?: string; // set if booking row already created
+    pendingBookingId?: string;
+    addOn?: boolean;
+    slotId?: string;
   };
 
   try {
@@ -78,7 +77,6 @@ export async function POST(req: NextRequest) {
     return safeError('No fee configured for this exam type', 400);
   }
 
-  const stripe = new Stripe(stripeKey);
   const qty = bookingType === 'organization' ? (participantCount ?? 1) : 1;
   const displayName = examName ?? provider.name;
 
@@ -115,7 +113,7 @@ export async function POST(req: NextRequest) {
       },
 
       success_url: `${SITE_URL}/testing/book/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${SITE_URL}/certification-testing?cancelled=1`,
+      cancel_url: `${SITE_URL}/testing/book?cancelled=1`,
     });
 
     return NextResponse.json({ url: session.url, sessionId: session.id });

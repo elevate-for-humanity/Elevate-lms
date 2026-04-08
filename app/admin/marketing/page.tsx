@@ -1,6 +1,6 @@
 
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { requireRole } from '@/lib/admin/guards';
 import Link from 'next/link';
 import { 
   Megaphone, 
@@ -22,7 +22,9 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminMarketingPage() {
-  const supabase = await createClient();
+  const auth = await requireRole(['admin', 'super_admin', 'staff']);
+  if (auth.error) return auth.error;
+  const supabase = auth.supabase;
 
   // Fetch leads stats
   const { count: totalLeads } = await supabase

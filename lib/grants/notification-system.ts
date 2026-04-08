@@ -5,18 +5,10 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { setAuditContext } from '@/lib/audit-context';
-
-// Lazy singleton — instantiated on first use, not at module load time
-let _supabaseAdmin: ReturnType<typeof createAdminClient> | null = null;
-const supabaseAdmin = new Proxy({} as ReturnType<typeof createAdminClient>, {
-  get(_target, prop) {
-    if (!_supabaseAdmin) _supabaseAdmin = createAdminClient();
-    return (_supabaseAdmin as any)[prop];
-  },
-});
-setAuditContext(supabaseAdmin, { systemActor: 'grants_notification_system' }).catch(() => {});
 import { EmailService } from '@/lib/notifications/email';
 import { SMSService } from '@/lib/notifications/sms';
+
+function getDb() { return createAdminClient(); }
 
 export type GrantNotificationType =
   | 'draft_generated'
@@ -58,7 +50,9 @@ export interface NotificationRecipient {
 export async function createNotification(
   notification: Omit<GrantNotification, 'id' | 'createdAt' | 'read'>
 ): Promise<GrantNotification> {
-  const { data, error }: any = await supabaseAdmin
+  const db = getDb();
+  await setAuditContext(db, { systemActor: 'grants_notification_system' }).catch(() => {});
+  const { data, error }: any = await db
     .from('grant_notifications')
     .insert({
       type: notification.type,
@@ -188,7 +182,7 @@ async function sendSMSNotification(
  * Get notification recipients
  */
 async function getNotificationRecipients(): Promise<NotificationRecipient[]> {
-  const { data: users } = await supabaseAdmin
+  const { data: users } = await getDb()
     .from('users')
     .select('id, email, phone, full_name, role')
     .in('role', ['founder', 'admin', 'grant_admin']);
@@ -215,17 +209,19 @@ export async function sendGrantNotification(
     recipients?: NotificationRecipient[];
   } = {}
 ): Promise<void> {
+  const db = getDb();
+  await setAuditContext(db, { systemActor: 'grants_notification_system' }).catch(() => {});
   const { sendEmail: emailEnabled = true, sendSMS: smsEnabled = false } = options;
 
   const createdNotification = await createNotification(notification);
 
-  const { data: grant } = await supabaseAdmin
+  const { data: grant } = await db
     .from('grant_opportunities')
     .select('title')
     .eq('id', notification.grantId)
     .single();
 
-  const { data: entity } = await supabaseAdmin
+  const { data: entity } = await db
     .from('entities')
     .select('name')
     .eq('id', notification.entityId)
@@ -259,7 +255,7 @@ export async function sendGrantNotification(
     }
   }
 
-  await supabaseAdmin.from('grant_notification_log').insert({
+  await db.from('grant_notification_log').insert({
     notification_id: createdNotification.id,
     sent_at: new Date().toISOString(),
     recipients_count: recipients.length,
@@ -274,7 +270,7 @@ export async function sendGrantNotification(
 export async function notifyDraftGenerated(
   applicationId: string
 ): Promise<void> {
-  const { data: app } = await supabaseAdmin
+  const { data: app } = await getDb()
     .from('grant_applications')
     .select('*, grant:grant_opportunities(title), entity:entities(name)')
     .eq('id', applicationId)
@@ -301,7 +297,7 @@ export async function notifyDraftGenerated(
  * Notify when package is ready
  */
 export async function notifyPackageReady(applicationId: string): Promise<void> {
-  const { data: app } = await supabaseAdmin
+  const { data: app } = await getDb()
     .from('grant_applications')
     .select('*, grant:grant_opportunities(title, due_date), entity:entities(name)')
     .eq('id', applicationId)
@@ -333,7 +329,7 @@ export async function notifyGrantSubmitted(
   submittedBy: string,
   confirmationNumber?: string
 ): Promise<void> {
-  const { data: app } = await supabaseAdmin
+  const { data: app } = await getDb()
     .from('grant_applications')
     .select('*, grant:grant_opportunities(title), entity:entities(name)')
     .eq('id', applicationId)
@@ -369,7 +365,7 @@ export async function notifyDeadlineApproaching(
   grantId: string,
   daysRemaining: number
 ): Promise<void> {
-  const { data: grant } = await supabaseAdmin
+  const { data: grant } = await getDb()
     .from('grant_opportunities')
     .select('*, applications:grant_applications(id, entity:entities(name))')
     .eq('id', grantId)

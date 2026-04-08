@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, Phone, MapPin } from 'lucide-react';
+import { TESTING_CENTER } from '@/lib/testing/testing-config';
 import { Suspense } from 'react';
 
 function SuccessContent() {
@@ -38,14 +39,14 @@ function SuccessContent() {
             <div className="flex items-start gap-2">
               <MapPin className="w-4 h-4 text-brand-blue-600 shrink-0 mt-0.5" />
               <p className="text-sm text-brand-blue-900">
-                <strong>Location:</strong> 8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240
+                <strong>Location:</strong> {TESTING_CENTER.address}
               </p>
             </div>
             <div className="flex items-start gap-2">
               <Phone className="w-4 h-4 text-brand-blue-600 shrink-0 mt-0.5" />
               <p className="text-sm text-brand-blue-900">
                 <strong>Questions?</strong>{' '}
-                <a href="tel:+13173143757" className="font-semibold hover:underline">(317) 314-3757</a>
+                <a href={`tel:${TESTING_CENTER.phoneTel}`} className="font-semibold hover:underline">{TESTING_CENTER.phone}</a>
               </p>
             </div>
           </div>

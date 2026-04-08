@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { TESTING_CENTER } from '@/lib/testing/testing-config';
 import { AlertTriangle, CheckCircle, ChevronRight, Mail, Phone } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -108,18 +109,18 @@ export default function TestingAccommodationsPage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
-              href="mailto:testing@elevateforhumanity.org"
+              href={`mailto:${TESTING_CENTER.email}`}
               className="inline-flex items-center gap-2 bg-[#1E3A5F] hover:bg-[#162d4a] text-white font-semibold px-6 py-3 rounded-full transition-colors"
             >
               <Mail className="w-4 h-4" />
               Email Testing Center
             </a>
             <a
-              href="tel:3173143757"
+              href={`tel:${TESTING_CENTER.phoneTel}`}
               className="inline-flex items-center gap-2 border border-slate-300 hover:border-slate-400 text-slate-700 font-semibold px-6 py-3 rounded-full transition-colors"
             >
               <Phone className="w-4 h-4" />
-              (317) 314-3757
+              {TESTING_CENTER.phone}
             </a>
           </div>
           <div className="mt-10 pt-8 border-t border-slate-200">

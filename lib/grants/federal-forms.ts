@@ -5,17 +5,9 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { setAuditContext } from '@/lib/audit-context';
-
-// Lazy singleton — instantiated on first use, not at module load time
-let _supabaseAdmin: ReturnType<typeof createAdminClient> | null = null;
-const supabaseAdmin = new Proxy({} as ReturnType<typeof createAdminClient>, {
-  get(_target, prop) {
-    if (!_supabaseAdmin) _supabaseAdmin = createAdminClient();
-    return (_supabaseAdmin as any)[prop];
-  },
-});
-setAuditContext(supabaseAdmin, { systemActor: 'grants_federal_forms' }).catch(() => {});
 import { getEntityByUEI } from '@/lib/integrations/sam-gov';
+
+function getDb() { return createAdminClient(); }
 
 export interface SF424Data {
   // 1. Type of Submission
@@ -259,7 +251,7 @@ export async function generateSF424(
   projectDates: { start: string; end: string },
   funding: SF424Data['funding']
 ): Promise<SF424Data> {
-  const { data: entity, error: entityError } = await supabaseAdmin
+  const { data: entity, error: entityError } = await getDb()
     .from('entities')
     .select('*')
     .eq('id', entityId)
@@ -269,7 +261,7 @@ export async function generateSF424(
     throw new Error('Entity not found');
   }
 
-  const { data: grant, error: grantError } = await supabaseAdmin
+  const { data: grant, error: grantError } = await getDb()
     .from('grant_opportunities')
     .select('*')
     .eq('id', grantId)
@@ -339,7 +331,7 @@ export async function generateSF424A(
   grantId: string,
   budgetData: SF424AData['sections']['budgetCategories']
 ): Promise<SF424AData> {
-  const { data: grant } = await supabaseAdmin
+  const { data: grant } = await getDb()
     .from('grant_opportunities')
     .select('*')
     .eq('id', grantId)
@@ -387,13 +379,13 @@ export async function generateSFLLL(
   entityId: string,
   grantId: string
 ): Promise<SFLLLData> {
-  const { data: entity } = await supabaseAdmin
+  const { data: entity } = await getDb()
     .from('entities')
     .select('*')
     .eq('id', entityId)
     .single();
 
-  const { data: grant } = await supabaseAdmin
+  const { data: grant } = await getDb()
     .from('grant_opportunities')
     .select('*')
     .eq('id', grantId)
@@ -437,7 +429,9 @@ export async function generateAllFederalForms(
   sf424a: SF424AData;
   sflll: SFLLLData;
 }> {
-  const { data: app, error } = await supabaseAdmin
+  const db = getDb();
+  await setAuditContext(db, { systemActor: 'grants_federal_forms' }).catch(() => {});
+  const { data: app, error } = await db
     .from('grant_applications')
     .select('*, grant:grant_opportunities(*), entity:entities(*)')
     .eq('id', applicationId)
@@ -494,7 +488,7 @@ export async function generateAllFederalForms(
 
   const sflll = await generateSFLLL(app.entity_id, app.grant_id);
 
-  await supabaseAdmin.from('grant_federal_forms').upsert(
+  await db.from('grant_federal_forms').upsert(
     {
       application_id: applicationId,
       sf424_data: sf424,

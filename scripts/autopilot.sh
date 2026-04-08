@@ -10,7 +10,7 @@ echo "== Autopilot (Builder Mode) =="
 # - dashboard-consolidation-verification.md
 # - autopilot-run-log.md
 # Existing locked docs are also allowed.
-ALLOWED_DOCS_REGEX='^(docs/(dashboard-inventory\.md|dashboard-canonical-architecture\.md|dashboard-crossed-analysis\.md|dashboard-schema-verification\.md|dashboard-orphans-disposition\.md|dashboard-consolidation-verification\.md|autopilot-run-log\.md|dashboard-consolidation-baseline\.md))$'
+ALLOWED_DOCS_REGEX='^(docs/(dashboard-inventory\.md|dashboard-canonical-architecture\.md|dashboard-crossed-analysis\.md|dashboard-schema-verification\.md|dashboard-orphans-disposition\.md|dashboard-consolidation-verification\.md|autopilot-run-log\.md|dashboard-consolidation-baseline\.md|SECURITY\.md))$'
 
 NEW_DOCS=$(git diff --name-only --diff-filter=ACMRT origin/main...HEAD 2>/dev/null | grep '^docs/.*\.md$' || true)
 
@@ -25,12 +25,16 @@ if [[ -n "${NEW_DOCS}" ]]; then
   done <<< "${NEW_DOCS}"
 fi
 
-# 2) Verify redirect routes exist if referenced by canonical plan
-# (Light check: these files should exist after execution)
+# 2) Verify canonical portal routes exist
+# Paths updated to match current repo structure (post-dashboard-consolidation).
+# Original paths: app/portal/staff/dashboard, app/programs/admin/dashboard
+# Canonical paths per AGENTS.md:
+#   Staff  → /staff-portal/dashboard
+#   Admin  → /admin/dashboard (programs sub-pages under /admin/programs/[code]/dashboard)
 REQUIRED_REDIRECT_FILES=(
   "app/partner/dashboard/page.tsx"
-  "app/portal/staff/dashboard/page.tsx"
-  "app/programs/admin/dashboard/page.tsx"
+  "app/staff-portal/dashboard/page.tsx"
+  "app/admin/dashboard/page.tsx"
 )
 
 missing=0

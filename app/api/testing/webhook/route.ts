@@ -17,14 +17,17 @@ import Stripe from 'stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
+import { TESTING_CENTER, TESTING_EMAIL } from '@/lib/testing/testing-config';
+import { hydrateProcessEnv } from '@/lib/secrets';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const FROM = 'Elevate Testing Center <testing@elevateforhumanity.org>';
+const FROM = TESTING_EMAIL.from;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
 
 export async function POST(req: NextRequest) {
+  await hydrateProcessEnv();
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   const webhookSecret = process.env.STRIPE_TESTING_WEBHOOK_SECRET ?? process.env.STRIPE_WEBHOOK_SECRET;
   if (!stripeKey || !webhookSecret) {
@@ -131,8 +134,8 @@ export async function POST(req: NextRequest) {
     <p>Exam: <strong>${meta.exam_name}</strong></p>
     <p>Our testing coordinator will contact you within 1 business day to confirm your date and time.</p>
     <p><strong>Exam Day:</strong> Bring a valid government-issued photo ID. Arrive 15 minutes early.<br>
-    <strong>Location:</strong> 8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240</p>
-    <p>Questions? Call <strong>(317) 314-3757</strong>.</p>
+    <strong>Location:</strong> ${TESTING_CENTER.address}</p>
+    <p>Questions? Call <strong>${TESTING_CENTER.phone}</strong>.</p>
   </div>
 </body></html>`,
         }).catch(err => logger.warn('[testing/webhook] Confirmation email failed', { err }))
@@ -157,10 +160,10 @@ export async function POST(req: NextRequest) {
       <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b;width:200px">Full-length practice test</td><td style="padding:8px 0"><a href="${SITE_URL}/lms" style="color:#1E3A5F;font-weight:600">Access in your LMS account →</a></td></tr>
       <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b">Study guide</td><td style="padding:8px 0"><a href="${SITE_URL}/lms" style="color:#1E3A5F;font-weight:600">Access in your LMS account →</a></td></tr>
       <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b">Retake strategy</td><td style="padding:8px 0">Included in your study guide</td></tr>
-      <tr><td style="padding:8px 0;color:#64748b">Email support</td><td style="padding:8px 0"><a href="mailto:testing@elevateforhumanity.org" style="color:#1E3A5F;font-weight:600">testing@elevateforhumanity.org</a></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b">Email support</td><td style="padding:8px 0"><a href="mailto:${TESTING_CENTER.email}" style="color:#1E3A5F;font-weight:600">${TESTING_CENTER.email}</a></td></tr>
     </table>
     <p>Don't have an LMS account yet? Reply to this email and we'll get you set up before your exam date.</p>
-    <p>Good luck,<br><strong>Alberta Davis</strong><br>Testing Center Coordinator</p>
+    <p>Good luck,<br><strong>${TESTING_CENTER.coordinator.name}</strong><br>${TESTING_CENTER.coordinator.title}</p>
   </div>
 </body></html>`,
           }).catch(err => logger.warn('[testing/webhook] Add-on email failed', { err }))
@@ -215,7 +218,7 @@ export async function POST(req: NextRequest) {
   <h2 style="color:#1E3A5F">Your ${label} has been received.</h2>
   <p>You can now schedule your exam at Elevate for Humanity Testing Center.</p>
   <p><a href="${SITE_URL}/testing/book" style="background:#1E3A5F;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;display:inline-block">Book Your Exam →</a></p>
-  <p style="color:#64748b;font-size:13px">Questions? Call (317) 314-3757 or reply to this email.</p>
+  <p style="color:#64748b;font-size:13px">Questions? Call ${TESTING_CENTER.phone} or reply to this email.</p>
 </body></html>`,
       }).catch(err => logger.warn('[testing/webhook] Email send failed', { err }));
     }

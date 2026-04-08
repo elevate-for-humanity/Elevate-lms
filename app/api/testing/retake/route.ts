@@ -20,11 +20,14 @@ import { logger } from '@/lib/logger';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const FROM = 'Elevate Testing Center <testing@elevateforhumanity.org>';
+import { TESTING_CENTER, TESTING_EMAIL } from '@/lib/testing/testing-config';
+import { hydrateProcessEnv } from '@/lib/secrets';
+const FROM = TESTING_EMAIL.from;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
 const RETAKE_FEE_CENTS = 5000; // $50
 
 export async function POST(req: NextRequest) {
+  await hydrateProcessEnv();
   const auth = await apiRequireAdmin(req);
 
   const db = createAdminClient();
@@ -96,7 +99,7 @@ export async function POST(req: NextRequest) {
   <p>Thank you for testing at Elevate for Humanity. Unfortunately, you did not pass this attempt.</p>
   <p>You are eligible to retake the exam. A <strong>$50 retake fee</strong> is required to schedule your next attempt.</p>
   <p><a href="${SITE_URL}/testing/book" style="background:#1E3A5F;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;display:inline-block">Pay Fee &amp; Schedule Retake →</a></p>
-  <p style="color:#64748b;font-size:13px">Questions? Call <strong>(317) 314-3757</strong> or reply to this email.</p>
+  <p style="color:#64748b;font-size:13px">Questions? Call <strong>${TESTING_CENTER.phone}</strong> or reply to this email.</p>
 </body></html>`,
   }).catch(err => logger.warn('[testing/retake] Email failed', { email, err }));
 

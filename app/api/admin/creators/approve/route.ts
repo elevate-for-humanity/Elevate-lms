@@ -38,12 +38,20 @@ export async function POST(req: Request) {
     const { creatorId } = await req.json();
     const { ipAddress } = getRequestMetadata(req);
 
-    // Get creator details
-    const { data: creator } = await supabase
+    if (!creatorId) {
+      return NextResponse.json({ error: 'creatorId is required' }, { status: 400 });
+    }
+
+    // Pre-read: verify creator exists before updating
+    const { data: creator, error: fetchError } = await supabase
       .from('marketplace_creators')
-      .select('user_id, profiles(email, full_name)')
+      .select('user_id, status, profiles(email, full_name)')
       .eq('id', creatorId)
       .single();
+
+    if (fetchError || !creator) {
+      return NextResponse.json({ error: 'Creator not found' }, { status: 404 });
+    }
 
     const { error } = await supabase
       .from('marketplace_creators')

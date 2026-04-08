@@ -93,12 +93,12 @@ Two merge-blocking CI scanners enforce structural invariants on every PR. Neithe
 
 **Extending:** Add the table to `AUDITABLE_TABLES` in the scanner script. CI enforces immediately on all existing and future write functions.
 
-**Detection layers:** The scanner uses three layers to cover all known write patterns:
+**Detection layers:** The scanner uses three layers:
 - **Layer 1 (direct):** Statement-boundary scanning — walks to semicolon or depth-0 close, covering arbitrarily long chained queries.
 - **Layer 2 (intermediate variables):** Tracks variables assigned from `.from(auditable_table)` and flags write ops on those variables anywhere in the function body.
-- **Layer 3 (helper indirection):** Builds a per-file function map and flags callers whose local callees write to auditable tables without audit context.
+- **Layer 3 (single-level local helper indirection):** Builds a per-file function map and flags callers whose same-file callees write to auditable tables without audit context.
 
-All three layers are verified with break tests on every CI run. No known undetected patterns remain as of commit `88a4d07`.
+**Coverage statement:** Within the scanner's intended scope, there are no known detection gaps for direct writes, intermediate variables, single-level local helper indirection, or long chained statements. Remaining out-of-scope cases are multi-file indirection and dynamic dispatch — neither pattern exists in the grants codebase as of commit `88a4d07`, and both would require deliberate architectural choices to introduce.
 
 **Actor naming convention:** `grants_<module>` — e.g. `grants_submission_tracker`, `grants_eligibility_engine`. Keep actor strings consistent; they appear verbatim in audit records.
 

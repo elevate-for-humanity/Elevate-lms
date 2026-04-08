@@ -20,9 +20,24 @@
  *     Tracks variables assigned from .from(auditable_table) and flags write ops
  *     on those variables anywhere in the same function body.
  *
- *   Layer 3 — Helper indirection
- *     Detects: function A calls function B which writes, where neither A nor B
- *     has audit context. Builds a per-file function map and resolves call sites.
+ *   Layer 3 — Single-level local helper indirection
+ *     Detects: function A calls function B (defined in the same file) which
+ *     writes, where neither A nor B has audit context. Builds a per-file
+ *     function map and resolves call sites one level deep.
+ *
+ * SCOPE AND REMAINING OUT-OF-SCOPE CASES
+ *   Within this scanner's intended scope, there are no known detection gaps
+ *   for direct writes, intermediate variables, single-level local helper
+ *   indirection, or long chained statements.
+ *
+ *   Remaining out-of-scope cases (not enforced, not expected in this codebase):
+ *     - Multi-file indirection: function in file A calls function in file B
+ *       which writes. The scanner only resolves calls within the same file.
+ *     - Dynamic dispatch: writes triggered via computed function references,
+ *       callbacks, or runtime-resolved method calls.
+ *
+ *   If either pattern is introduced, add an exemption comment with a manual
+ *   audit note, or extend the scanner to cover the new pattern.
  *
  * EXEMPTIONS
  *   Add inside the function body:

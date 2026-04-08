@@ -48,15 +48,16 @@ export default async function RecordAttendancePage() {
   if (partnerLink?.partner_id) {
     const partnerId = partnerLink.partner_id;
 
-    // Get active apprentices assigned to this partner site
-    const { data: apprenticeships } = await db
-      .from('apprenticeships')
+    // Get active apprentices placed at this partner site.
+    // apprentice_placements.shop_id = partners.id (barber shop partner)
+    const { data: placements } = await db
+      .from('apprentice_placements')
       .select('apprentice_id, profiles:apprentice_id(id, full_name)')
-      .eq('partner_id', partnerId)
+      .eq('shop_id', partnerId)
       .eq('status', 'active');
 
-    if (apprenticeships) {
-      students = apprenticeships.map((a: any) => ({
+    if (placements) {
+      students = placements.map((a: any) => ({
         id: a.profiles?.id || a.apprentice_id,
         name: a.profiles?.full_name || 'Student',
         present: true,

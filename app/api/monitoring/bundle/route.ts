@@ -49,9 +49,6 @@ async function _GET(req: Request) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    // Use the cookie-authenticated client for the profile lookup so RLS
-    // allows the user to read their own row regardless of whether the
-    // service role key is configured.
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
@@ -65,13 +62,19 @@ async function _GET(req: Request) {
 
     // Run all queries in parallel with individual timeouts
     const [
-      courses,
-      lessons,
-      enrollments,
-      profiles,
+      // Canonical LMS tables
+      programs,
+      courseModules,
+      courseLessons,
+      curriculumLessons,
+      programEnrollments,
       lessonProgress,
-      courseProgress,
-      certificates,
+      checkpointScores,
+      stepSubmissions,
+      completionCertificates,
+      examAuthorizations,
+      // Supporting tables
+      profiles,
       credentials,
       partnerEnrollments,
       partnerProviders,
@@ -79,13 +82,17 @@ async function _GET(req: Request) {
       fundingCases,
       rapidsSubmissions,
     ] = await Promise.all([
-      safeQuery(db, 'training_courses', 'id, course_name, course_code, is_active, duration_hours'),
-      safeQuery(db, 'training_lessons', 'id, title, video_url, course_id', { limit: 1000 }),
-      safeQuery(db, 'enrollments', 'id, user_id, course_id, status, enrolled_at', { limit: 200, order: 'enrolled_at' }),
-      safeQuery(db, 'profiles', 'id, role, created_at', { limit: 1 }),
+      safeQuery(db, 'programs', 'id, title, slug, published, is_active, status'),
+      safeQuery(db, 'course_modules', 'id, title, program_id'),
+      safeQuery(db, 'course_lessons', 'id, title, lesson_type, course_id', { limit: 2000 }),
+      safeQuery(db, 'curriculum_lessons', 'id, title, step_type, status, video_url', { limit: 2000 }),
+      safeQuery(db, 'program_enrollments', 'id, user_id, program_id, status, enrolled_at', { limit: 200, order: 'enrolled_at' }),
       safeQuery(db, 'lesson_progress', 'id, user_id, lesson_id, completed', { limit: 200 }),
-      safeQuery(db, 'course_progress', 'id', { limit: 1 }),
-      safeQuery(db, 'certificates', 'id, user_id, course_id, issued_at', { limit: 100 }),
+      safeQuery(db, 'checkpoint_scores', 'id, user_id, passed'),
+      safeQuery(db, 'step_submissions', 'id, user_id, status'),
+      safeQuery(db, 'program_completion_certificates', 'id, user_id, program_id, issued_at', { limit: 100 }),
+      safeQuery(db, 'exam_funding_authorizations', 'id, user_id, status'),
+      safeQuery(db, 'profiles', 'id, role, created_at', { limit: 1 }),
       safeQuery(db, 'credentials', 'id, name, type', { limit: 50 }),
       safeQuery(db, 'partner_lms_enrollments', 'id, provider_id, status', { limit: 100 }),
       safeQuery(db, 'partner_lms_providers', 'id, provider_type, active'),
@@ -94,29 +101,53 @@ async function _GET(req: Request) {
       safeQuery(db, 'rapids_submissions', 'id'),
     ]);
 
-    // Video coverage
-    const lessonsWithMp4 = lessons.data.filter((l: any) => l.video_url?.includes('.mp4')).length;
-    const lessonsWithMp3 = lessons.data.filter((l: any) => l.video_url?.includes('.mp3') && !l.video_url?.includes('.mp4')).length;
-    const lessonsNoMedia = lessons.count - lessonsWithMp4 - lessonsWithMp3;
+    // Program breakdown
+    const publishedPrograms = programs.data.filter(
+      (p: any) => p.published && p.is_active && p.status !== 'archived'
+    ).length;
+
+    // Lesson media coverage (curriculum_lessons is canonical)
+    const lessonsWithMp4 = curriculumLessons.data.filter((l: any) => l.video_url?.includes('.mp4')).length;
+    const lessonsWithMp3 = curriculumLessons.data.filter(
+      (l: any) => l.video_url?.includes('.mp3') && !l.video_url?.includes('.mp4')
+    ).length;
+    const lessonsNoMedia = curriculumLessons.count - lessonsWithMp4 - lessonsWithMp3;
+
+    // Lesson type breakdown from course_lessons
+    const lessonsByType: Record<string, number> = {};
+    for (const l of courseLessons.data) {
+      const t = (l as any).lesson_type || 'unknown';
+      lessonsByType[t] = (lessonsByType[t] || 0) + 1;
+    }
 
     // Enrollment breakdown by status
     const enrollmentsByStatus: Record<string, number> = {};
-    for (const e of enrollments.data) {
+    for (const e of programEnrollments.data) {
       const s = (e as any).status || 'unknown';
       enrollmentsByStatus[s] = (enrollmentsByStatus[s] || 0) + 1;
     }
 
-    const enrolledCourseIds = new Set(enrollments.data.map((e: any) => e.course_id));
+    const enrolledProgramIds = new Set(programEnrollments.data.map((e: any) => e.program_id));
+
+    // Checkpoint pass rate
+    const checkpointsPassed = checkpointScores.data.filter((c: any) => c.passed).length;
+    const checkpointPassRate = checkpointScores.count > 0
+      ? Math.round((checkpointsPassed / checkpointScores.count) * 100)
+      : null;
 
     // Surface any query errors in the bundle for transparency
     const queryErrors: Record<string, string | null> = {
-      training_courses: courses.error,
-      training_lessons: lessons.error,
-      enrollments: enrollments.error,
-      profiles: profiles.error,
+      programs: programs.error,
+      course_modules: courseModules.error,
+      course_lessons: courseLessons.error,
+      curriculum_lessons: curriculumLessons.error,
+      program_enrollments: programEnrollments.error,
       lesson_progress: lessonProgress.error,
-      course_progress: courseProgress.error,
-      certificates: certificates.error,
+      checkpoint_scores: checkpointScores.error,
+      step_submissions: stepSubmissions.error,
+      program_completion_certificates: completionCertificates.error,
+      exam_funding_authorizations: examAuthorizations.error,
+      profiles: profiles.error,
       credentials: credentials.error,
       partner_lms_enrollments: partnerEnrollments.error,
       partner_lms_providers: partnerProviders.error,
@@ -139,32 +170,49 @@ async function _GET(req: Request) {
     const bundle = {
       generated_at: new Date().toISOString(),
       summary: {
-        total_courses: courses.count,
-        active_courses: courses.data.filter((c: any) => c.is_active).length,
-        total_lessons: lessons.count,
+        // Programs
+        total_programs: programs.count,
+        published_programs: publishedPrograms,
+        total_modules: courseModules.count,
+        // Lessons
+        total_course_lessons: courseLessons.count,
+        total_curriculum_lessons: curriculumLessons.count,
+        lessons_by_type: lessonsByType,
         lessons_with_mp4: lessonsWithMp4,
         lessons_with_mp3_only: lessonsWithMp3,
         lessons_no_media: lessonsNoMedia,
-        video_coverage_pct: lessons.count > 0 ? Math.round((lessonsWithMp4 / lessons.count) * 100) : 0,
+        video_coverage_pct: curriculumLessons.count > 0
+          ? Math.round((lessonsWithMp4 / curriculumLessons.count) * 100)
+          : 0,
+        // Enrollments & progress
         total_profiles: profiles.count,
-        total_enrollments: enrollments.count,
-        courses_with_enrollments: enrolledCourseIds.size,
+        total_enrollments: programEnrollments.count,
+        programs_with_enrollments: enrolledProgramIds.size,
         enrollments_by_status: enrollmentsByStatus,
         lesson_completions: lessonProgress.count,
-        course_completions: courseProgress.count,
-        certificates_issued: certificates.count,
+        checkpoint_attempts: checkpointScores.count,
+        checkpoint_pass_rate_pct: checkpointPassRate,
+        step_submissions: stepSubmissions.count,
+        // Completions
+        certificates_issued: completionCertificates.count,
+        exam_authorizations: examAuthorizations.count,
+        // Credentials & partners
         credentials_defined: credentials.count,
         partner_providers: partnerProviders.count,
         partner_enrollments: partnerEnrollments.count,
+        // RAPIDS / funding
         rapids_tracking: rapidsTracking.count,
         rapids_submissions: rapidsSubmissions.count,
         funding_cases: fundingCases.count,
       },
-      courses: courses.data,
+      programs: programs.data,
       credentials: credentials.data,
       partner_providers: partnerProviders.data,
-      recent_enrollments: enrollments.data.slice(0, 20),
-      mef_readiness: mefReadiness ?? { ok: false, issues: [{ code: 'UNAVAILABLE', message: 'Could not check MeF readiness' }] },
+      recent_enrollments: programEnrollments.data.slice(0, 20),
+      mef_readiness: mefReadiness ?? {
+        ok: false,
+        issues: [{ code: 'UNAVAILABLE', message: 'Could not check MeF readiness' }],
+      },
       ...(Object.keys(activeErrors).length > 0 && { errors: activeErrors }),
     };
 

@@ -5,9 +5,8 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { ingestCourse } from '@/lib/ai/course-ingestion';
 import { saveCourseBlueprint } from '@/lib/db/courses';
 import { isOpenAIConfigured, getOpenAIClient } from '@/lib/openai-client';
-import {
 import { withRuntime } from '@/lib/api/withRuntime';
-
+import {
   SAFE_CHARS, MAX_CHARS,
   summarizeForExtraction,
   persistIngestionDraft,

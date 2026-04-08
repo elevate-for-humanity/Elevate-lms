@@ -14,7 +14,7 @@ import { revalidatePath } from 'next/cache';
 import { logAuditEvent } from '@/lib/audit';
 import { logger } from '@/lib/logger';
 
-const supabaseAdmin = createAdminClient();
+function getDb() { return createAdminClient(); }
 
 // ============================================================================
 // TYPES
@@ -67,7 +67,7 @@ export interface UpdateFundingAmountsInput {
 export async function createEnrollment(input: CreateEnrollmentInput) {
   try {
     // 1. Verify student exists
-    const { data: student, error: studentError } = await supabaseAdmin
+    const { data: student, error: studentError } = await getDb()
       .from('students')
       .select('id, first_name, last_name, email')
       .eq('id', input.student_id)
@@ -76,7 +76,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
       throw new Error(`Student not found: ${input.student_id}`);
     }
     // 2. Verify program exists and is active
-    const { data: program, error: programError } = await supabaseAdmin
+    const { data: program, error: programError } = await getDb()
       .from('programs')
       .select('id, slug, name, is_apprenticeship')
       .eq('id', input.program_id)
@@ -86,7 +86,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
       throw new Error(`Program not found or inactive: ${input.program_id}`);
     }
     // 3. Verify funding program is allowed for this program
-    const { data: fundingOption, error: fundingError } = await supabaseAdmin
+    const { data: fundingOption, error: fundingError } = await getDb()
       .from('program_funding_options')
       .select(
         `
@@ -101,7 +101,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
       throw new Error(`Funding program not allowed for this program`);
     }
     // 4. Check for existing active enrollment
-    const { data: existingEnrollment } = await supabaseAdmin
+    const { data: existingEnrollment } = await getDb()
       .from('student_enrollments')
       .select('id, status')
       .eq('student_id', input.student_id)
@@ -114,7 +114,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
       );
     }
     // 5. Create enrollment
-    const { data: enrollment, error: enrollmentError } = await supabaseAdmin
+    const { data: enrollment, error: enrollmentError } = await getDb()
       .from('student_enrollments')
       .insert({
         student_id: input.student_id,
@@ -142,7 +142,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
       );
     }
     // 6. Get all required modules for this program
-    const { data: modules, error: modulesError } = await supabaseAdmin
+    const { data: modules, error: modulesError } = await getDb()
       .from('course_modules')
       .select('id, title, is_required')
       .eq('program_id', input.program_id)
@@ -160,7 +160,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
           module_id: module.id,
           status: 'not_started',
         }));
-      const { error: progressError } = await supabaseAdmin
+      const { error: progressError } = await getDb()
         .from('enrollment_module_progress')
         .insert(moduleProgressRows);
       if (progressError) {
@@ -172,7 +172,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
     }
     // 8. If this is an apprenticeship program, create apprenticeship_enrollments record
     if (program.is_apprenticeship) {
-      const { error: apprenticeError } = await supabaseAdmin
+      const { error: apprenticeError } = await getDb()
         .from('apprenticeship_enrollments')
         .insert({
           student_id: input.student_id,
@@ -215,7 +215,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
 export async function addTransferHours(input: AddTransferHoursInput) {
   try {
     // 1. Verify enrollment exists
-    const { data: enrollment, error: enrollmentError } = await supabaseAdmin
+    const { data: enrollment, error: enrollmentError } = await getDb()
       .from('student_enrollments')
       .select('id, student_id, program_id')
       .eq('id', input.enrollment_id)
@@ -224,7 +224,7 @@ export async function addTransferHours(input: AddTransferHoursInput) {
       throw new Error(`Enrollment not found: ${input.enrollment_id}`);
     }
     // 2. Create transfer hours record
-    const { data: transferHours, error: transferError } = await supabaseAdmin
+    const { data: transferHours, error: transferError } = await getDb()
       .from('transfer_hours')
       .insert({
         enrollment_id: input.enrollment_id,
@@ -272,7 +272,7 @@ export async function addTransferHours(input: AddTransferHoursInput) {
 export async function approveTransferHours(input: ApproveTransferHoursInput) {
   try {
     // 1. Get transfer hours record
-    const { data: transferHours, error: fetchError } = await supabaseAdmin
+    const { data: transferHours, error: fetchError } = await getDb()
       .from('transfer_hours')
       .select(
         `
@@ -306,7 +306,7 @@ export async function approveTransferHours(input: ApproveTransferHoursInput) {
       );
     }
     // 3. Update transfer hours record
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await getDb()
       .from('transfer_hours')
       .update({
         hours_theory_accepted: input.hours_theory_accepted,
@@ -327,7 +327,7 @@ export async function approveTransferHours(input: ApproveTransferHoursInput) {
     // 4. If this is an apprenticeship, update apprenticeship_enrollments
     if (transferHours.enrollment?.program?.is_apprenticeship) {
       // Calculate total transferred hours for this enrollment
-      const { data: allTransfers } = await supabaseAdmin
+      const { data: allTransfers } = await getDb()
         .from('transfer_hours')
         .select(
           'hours_theory_accepted, hours_practical_accepted, hours_other_accepted'
@@ -348,7 +348,7 @@ export async function approveTransferHours(input: ApproveTransferHoursInput) {
           0
         );
         // Update apprenticeship record
-        await supabaseAdmin
+        await getDb()
           .from('apprenticeship_enrollments')
           .update({
             transferred_related_instruction_hours: totalTheory,
@@ -384,7 +384,7 @@ export async function rejectTransferHours(
   reason: string
 ) {
   try {
-    const { error } = await supabaseAdmin
+    const { error } = await getDb()
       .from('transfer_hours')
       .update({
         status: 'rejected',
@@ -416,7 +416,7 @@ export async function rejectTransferHours(
 export async function updateFundingAmounts(input: UpdateFundingAmountsInput) {
   try {
     // 1. Verify enrollment exists
-    const { data: enrollment, error: enrollmentError } = await supabaseAdmin
+    const { data: enrollment, error: enrollmentError } = await getDb()
       .from('student_enrollments')
       .select('id, student_id')
       .eq('id', input.enrollment_id)
@@ -425,7 +425,7 @@ export async function updateFundingAmounts(input: UpdateFundingAmountsInput) {
       throw new Error(`Enrollment not found: ${input.enrollment_id}`);
     }
     // 2. Update funding amounts
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await getDb()
       .from('student_enrollments')
       .update({
         wage_rate_hour: input.wage_rate_hour,
@@ -462,7 +462,7 @@ export async function updateFundingAmounts(input: UpdateFundingAmountsInput) {
 // ============================================================================
 export async function getEnrollmentDetails(enrollment_id: string) {
   try {
-    const { data, error }: any = await supabaseAdmin
+    const { data, error }: any = await getDb()
       .from('student_enrollments')
       .select(
         `

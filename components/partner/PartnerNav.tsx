@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 const items = [
-  { href: '/partner-portal', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/partner/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/partner/hours', label: 'Training Hours', icon: Clock },
   { href: '/partner/attendance', label: 'Attendance', icon: ClipboardCheck },
   { href: '/partner/documents', label: 'Documents', icon: FileText },

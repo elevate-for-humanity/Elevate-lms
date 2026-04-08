@@ -13,10 +13,10 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 async function _GET(_req: NextRequest) {
+  const supabase = createAdminClient();
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const supabase = createAdminClient();
   const cacheKey = 'programs:featured';
 
   // Try cache first

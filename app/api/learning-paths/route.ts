@@ -14,10 +14,10 @@ async function parseBody<T>(request: NextRequest): Promise<T> {
 }
 
 async function _GET(request: NextRequest) {
+  const supabase = createAdminClient();
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const supabase = createAdminClient();
 
   const { data, error }: any = await supabase
     .from("learning_paths")
@@ -33,10 +33,9 @@ const supabase = createAdminClient();
 }
 
 async function _POST(request: NextRequest) {
+  const supabase = createAdminClient();
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-
-  const supabase = createAdminClient();
 
   const { data: { user } } = await supabase.auth.getUser();
 

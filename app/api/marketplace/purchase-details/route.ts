@@ -10,10 +10,10 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 async function _GET(req: Request) {
+  const supabase = createAdminClient();
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
-const supabase = createAdminClient();
 
     if (!supabase) {
       return NextResponse.json(

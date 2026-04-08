@@ -10,8 +10,8 @@ export const metadata: Metadata = {
   description: 'View and manage employer partnership proposals.',
 };
 
-export default async function EmployerProposalPage({
-  await requireRole(['admin', 'super_admin']); params }: { params: { id: string } }) {
+export default async function EmployerProposalPage({ params }: { params: { id: string } }) {
+  await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
 
   const { data: employer } = await supabase.from('employers').select('*').eq('id', params.id).single();

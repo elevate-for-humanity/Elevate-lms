@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   description: 'Manage quiz questions and answers.',
 };
 
-export default async function QuizQuestionsPage({
-  await requireRole(['admin', 'super_admin']); params }: { params: Promise<{ courseId: string; quizId: string }> }) {
+export default async function QuizQuestionsPage({ params }: { params: Promise<{ courseId: string; quizId: string }> }) {
+  await requireRole(['admin', 'super_admin']);
   const { courseId, quizId } = await params;
   const supabase = await createClient();
 

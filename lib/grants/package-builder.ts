@@ -6,7 +6,14 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { setAuditContext } from '@/lib/audit-context';
 
-const supabaseAdmin = createAdminClient();
+// Lazy singleton — instantiated on first use, not at module load time
+let _supabaseAdmin: ReturnType<typeof createAdminClient> | null = null;
+const supabaseAdmin = new Proxy({} as ReturnType<typeof createAdminClient>, {
+  get(_target, prop) {
+    if (!_supabaseAdmin) _supabaseAdmin = createAdminClient();
+    return (_supabaseAdmin as any)[prop];
+  },
+});
 setAuditContext(supabaseAdmin, { systemActor: 'grants_package_builder' }).catch(() => {});
 import { Document, Packer, Paragraph, HeadingLevel } from 'docx';
 import JSZip from 'jszip';

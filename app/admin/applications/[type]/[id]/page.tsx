@@ -45,11 +45,11 @@ const typeLabels: Record<string, string> = {
 };
 
 export default async function ApplicationDetailPage({
-  await requireRole(['admin', 'super_admin']);
   params,
 }: {
   params: Promise<{ type: string; id: string }>;
 }) {
+  await requireRole(['admin', 'super_admin']);
   const { type, id } = await params;
   const supabase = await createClient();
 

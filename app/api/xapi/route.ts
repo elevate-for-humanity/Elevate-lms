@@ -12,11 +12,11 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 async function _POST(request: Request) {
+  const supabase = createAdminClient();
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = createAdminClient();
-  // xAPI endpoint for receiving learning activity statements
+    // xAPI endpoint for receiving learning activity statements
   const body = await parseBody<Record<string, any>>(request);
 
   const statements = Array.isArray(body) ? body : [body];
@@ -48,10 +48,10 @@ async function _POST(request: Request) {
 }
 
 async function _GET(request: Request) {
+  const supabase = createAdminClient();
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const supabase = createAdminClient();
   // xAPI GET endpoint for retrieving statements
   const { searchParams } = new URL(request.url);
   const actor = searchParams.get('agent');

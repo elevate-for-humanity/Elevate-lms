@@ -42,8 +42,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function DocumentCategoryPage({
-  await requireRole(['admin', 'super_admin']); params }: Props) {
+export default async function DocumentCategoryPage({ params }: Props) {
+  await requireRole(['admin', 'super_admin']);
   const { category } = await params;
   const supabase = await createClient();
 

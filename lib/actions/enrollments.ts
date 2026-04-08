@@ -14,7 +14,14 @@ import { revalidatePath } from 'next/cache';
 import { logAuditEvent } from '@/lib/audit';
 import { logger } from '@/lib/logger';
 
-const supabaseAdmin = createAdminClient();
+// Lazy singleton — instantiated on first use, not at module load time
+let _supabaseAdmin: ReturnType<typeof createAdminClient> | null = null;
+const supabaseAdmin = new Proxy({} as ReturnType<typeof createAdminClient>, {
+  get(_target, prop) {
+    if (!_supabaseAdmin) _supabaseAdmin = createAdminClient();
+    return (_supabaseAdmin as any)[prop];
+  },
+});
 
 // ============================================================================
 // TYPES

@@ -7,7 +7,6 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-const supabaseAdmin = createAdminClient();
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -32,6 +31,7 @@ async function _POST(
       );
     }
 
+    const supabaseAdmin = createAdminClient();
     const learnerId = id;
     const caseManagerId = user.id;
 

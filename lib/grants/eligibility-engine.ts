@@ -7,7 +7,14 @@
 import { getEntityByUEI, checkExclusions } from '@/lib/integrations/sam-gov';
 import { createAdminClient } from '@/lib/supabase/admin';
 
-const supabaseAdmin = createAdminClient();
+// Lazy singleton — instantiated on first use, not at module load time
+let _supabaseAdmin: ReturnType<typeof createAdminClient> | null = null;
+const supabaseAdmin = new Proxy({} as ReturnType<typeof createAdminClient>, {
+  get(_target, prop) {
+    if (!_supabaseAdmin) _supabaseAdmin = createAdminClient();
+    return (_supabaseAdmin as any)[prop];
+  },
+});
 
 export interface EligibilityCheck {
   entityId: string;

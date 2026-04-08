@@ -12,8 +12,8 @@ export const metadata: Metadata = {
   description: 'Manage course content, lessons, and materials.',
 };
 
-export default async function CourseContentPage({
-  await requireRole(['admin', 'super_admin']); params }: { params: Promise<{ courseId: string }> }) {
+export default async function CourseContentPage({ params }: { params: Promise<{ courseId: string }> }) {
+  await requireRole(['admin', 'super_admin']);
   const { courseId } = await params;
   const supabase = await createClient();
 

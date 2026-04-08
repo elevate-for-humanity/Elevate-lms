@@ -17,14 +17,14 @@ export const dynamic = 'force-dynamic';
  * Receive and store xAPI statements
  */
 async function _POST(request: NextRequest) {
+  const supabase = createAdminClient();
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
     const { apiAuthGuard } = await import('@/lib/admin/guards');
     try { await apiAuthGuard(request); } catch (e) { return e instanceof Response ? e : NextResponse.json({ error: 'Unauthorized' }, { status: 401 }); }
 
-  const supabase = createAdminClient();
-  try {
+    try {
     const body = await parseBody<Record<string, any>>(request);
 
     // xAPI statement can be single or array; normalize
@@ -85,10 +85,10 @@ async function _POST(request: NextRequest) {
  * Retrieve xAPI statements (LRS query)
  */
 async function _GET(request: NextRequest) {
+  const supabase = createAdminClient();
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const supabase = createAdminClient();
   try {
     const { searchParams } = new URL(request.url);
     const learnerId = searchParams.get('actor');

@@ -36,11 +36,11 @@ const statusColors: Record<string, string> = {
 };
 
 export default async function ReviewApplicationPage({
-  await requireRole(['admin', 'super_admin']);
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireRole(['admin', 'super_admin']);
   const { id } = await params;
   const supabase = await createClient();
 

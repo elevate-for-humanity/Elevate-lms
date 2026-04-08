@@ -13,11 +13,11 @@ export const metadata: Metadata = {
 };
 
 export default async function ReviewVerificationPage({
-  await requireRole(['admin', 'super_admin']);
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireRole(['admin', 'super_admin']);
   const { id } = await params;
   const supabase = await createClient();
 

@@ -8,22 +8,21 @@
  *   Any function that writes to a registered auditable grants table MUST call
  *   setAuditContext(db, { systemActor: '...' }) before the write.
  *
- * HOW IT WORKS
- *   1. Scans all .ts/.tsx files under app/ and lib/
- *   2. Extracts function bodies using brace-walking (handles multi-line
- *      signatures and generic return types like Promise<{ ... }>)
- *   3. For each body: if it writes to a registered auditable table AND does
- *      not call setAuditContext(), it is a violation
+ * HOW IT WORKS — three detection layers
  *
- * KNOWN BOUNDARY
- *   Detection uses a 500-char lookahead after .from('table') to find write ops.
- *   This covers chained calls and multi-line patterns. It does NOT cover:
- *     - Write paths hidden behind helper indirection (fn A calls fn B which writes)
- *     - Query construction chains longer than 500 chars before the write op
- *     - Writes split across intermediate variables before execution
- *   CI green = no violations in scanner-recognized patterns, not formal proof.
- *   If a new delegation pattern is introduced, verify manually and add an
- *   exemption comment documenting the reasoning.
+ *   Layer 1 — Direct writes (statement-boundary scanning)
+ *     Detects .from('table').insert/update/upsert() in the same statement.
+ *     Walks to statement boundary (semicolon or depth-0 close), so arbitrarily
+ *     long chained queries are covered. No fixed character window.
+ *
+ *   Layer 2 — Intermediate variable writes
+ *     Detects: const q = db.from('table'); ... await q.insert/update/upsert()
+ *     Tracks variables assigned from .from(auditable_table) and flags write ops
+ *     on those variables anywhere in the same function body.
+ *
+ *   Layer 3 — Helper indirection
+ *     Detects: function A calls function B which writes, where neither A nor B
+ *     has audit context. Builds a per-file function map and resolves call sites.
  *
  * EXEMPTIONS
  *   Add inside the function body:
@@ -32,8 +31,8 @@
  *   misleading (e.g. mark-read toggles). Never exempt system writes.
  *
  * ADDING A NEW AUDITABLE TABLE
- *   Add it to AUDITABLE_TABLES below. CI enforces immediately on all existing
- *   and future write functions.
+ *   Add it to AUDITABLE_TABLES below. CI enforces immediately across all three
+ *   detection layers.
  *
  * ACTOR NAMING
  *   Use grants_<module> — e.g. grants_submission_tracker. Strings appear
@@ -51,10 +50,6 @@ const path = require('path');
 
 // ─── Registry ────────────────────────────────────────────────────────────────
 
-/**
- * Tables that require setAuditContext() before any insert/update/upsert.
- * Add new tables here — CI enforces immediately.
- */
 const AUDITABLE_TABLES = new Set([
   'grant_federal_forms',
   'grant_packages',
@@ -67,25 +62,21 @@ const AUDITABLE_TABLES = new Set([
 
 // ─── Patterns ────────────────────────────────────────────────────────────────
 
-// Matches: .from('table_name') or .from("table_name")
-const FROM_RE = /\.from\(['"]([^'"]+)['"]\)/g;
+const FROM_RE       = /\.from\(['"]([^'"]+)['"]\)/g;
+const WRITE_OP_RE   = /\.(insert|update|upsert)\s*\(/;
+const AUDIT_CTX_RE  = /setAuditContext\s*\(/;
+const EXEMPT_RE     = /\/\/\s*grants-audit:\s*exempt/;
+const VAR_ASSIGN_RE = /(?:const|let|var)\s+(\w+)\s*=\s*(?:[^;]*?)\.from\(['"]([^'"]+)['"]\)/g;
+const FN_CALL_RE    = /\b(\w+)\s*\(/g;
 
-// Matches write operations that follow a .from() call
-const WRITE_OP_RE = /\.(insert|update|upsert)\s*\(/;
-
-// Matches audit context call
-const AUDIT_CONTEXT_RE = /setAuditContext\s*\(/;
-
-// Exemption comment inside function body
-const EXEMPT_RE = /\/\/\s*grants-audit:\s*exempt/;
+function varWriteRE(varName) {
+  return new RegExp(`\\b${varName}\\s*\\.\\s*(?:insert|update|upsert)\\s*\\(`);
+}
 
 // ─── File collection ─────────────────────────────────────────────────────────
 
-const ROOT     = path.resolve(__dirname, '..');
-const SCAN_DIRS = [
-  path.join(ROOT, 'app'),
-  path.join(ROOT, 'lib'),
-];
+const ROOT      = path.resolve(__dirname, '..');
+const SCAN_DIRS = [path.join(ROOT, 'app'), path.join(ROOT, 'lib')];
 
 function collectFiles(dirs) {
   const results = [];
@@ -103,35 +94,18 @@ function collectFiles(dirs) {
   return results;
 }
 
-// ─── Function block extraction ───────────────────────────────────────────────
+// ─── Function block extraction ────────────────────────────────────────────────
 
-/**
- * Extract function bodies from source as { name, startLine, body } objects.
- *
- * Strategy: find `export async function name` / `async function name` /
- * `function name` declarations, then locate the opening brace of the function
- * body (skipping angle-bracket generics and return type annotations), then
- * walk braces to find the matching close.
- *
- * This correctly handles:
- *   - Multi-line parameter lists
- *   - Generic return types: Promise<{ ... }>
- *   - Nested functions (each block is self-contained)
- */
 function extractFunctionBlocks(source) {
   const blocks = [];
-
-  // Match named function declarations (sync and async, exported or not).
-  // We capture just the name and position — body extraction is done separately.
   const FN_DECL_RE = /(?:export\s+)?(?:async\s+)?function\s+(\w+)\s*(?:<[^>]*>)?\s*\(/g;
 
   let match;
   while ((match = FN_DECL_RE.exec(source)) !== null) {
     const name = match[1];
-    const searchFrom = match.index + match[0].length - 1; // position of '('
+    let i = match.index + match[0].length - 1;
 
-    // Walk forward past the parameter list (balanced parens)
-    let i = searchFrom;
+    // Walk past parameter list
     let depth = 0;
     while (i < source.length) {
       if (source[i] === '(') depth++;
@@ -139,18 +113,14 @@ function extractFunctionBlocks(source) {
       i++;
     }
 
-    // Skip optional return type annotation: `: Promise<{...}>` or `: void` etc.
-    // We need to find the `{` that opens the function body, not one inside `<>`.
-    // Strategy: skip whitespace, then if we see `:` skip until we find `{` at
-    // angle-bracket depth 0 and paren depth 0.
+    // Skip return type annotation
     while (i < source.length && /\s/.test(source[i])) i++;
     if (source[i] === ':') {
-      i++; // skip ':'
-      let anglDepth = 0;
-      let parenDepth = 0;
+      i++;
+      let anglDepth = 0, parenDepth = 0;
       while (i < source.length) {
         const ch = source[i];
-        if (ch === '<') anglDepth++;
+        if      (ch === '<') anglDepth++;
         else if (ch === '>') anglDepth--;
         else if (ch === '(') parenDepth++;
         else if (ch === ')') parenDepth--;
@@ -159,7 +129,6 @@ function extractFunctionBlocks(source) {
       }
     }
 
-    // i should now be at the opening `{` of the function body
     if (i >= source.length || source[i] !== '{') continue;
 
     const braceStart = i;
@@ -170,7 +139,7 @@ function extractFunctionBlocks(source) {
       i++;
     }
 
-    const body = source.slice(braceStart, i + 1);
+    const body      = source.slice(braceStart, i + 1);
     const startLine = source.slice(0, braceStart).split('\n').length;
     blocks.push({ name, startLine, body });
   }
@@ -178,48 +147,99 @@ function extractFunctionBlocks(source) {
   return blocks;
 }
 
-// ─── Write detection ─────────────────────────────────────────────────────────
+// ─── Layer 1: Direct write detection (statement-boundary) ────────────────────
 
 /**
- * Returns the auditable tables written to in a function body.
- * A "write" is: .from('table') followed by .insert/.update/.upsert
- * anywhere in the same function body (not necessarily same line).
+ * Walk forward from pos until a statement boundary:
+ * semicolon at depth 0, or a closing paren/brace that would exit the chain.
  */
-function writtenAuditableTables(body) {
+function statementFrom(text, pos) {
+  let i = pos;
+  let parenDepth = 0, braceDepth = 0;
+  while (i < text.length) {
+    const ch = text[i];
+    if      (ch === '(') parenDepth++;
+    else if (ch === ')') { if (parenDepth === 0) break; parenDepth--; }
+    else if (ch === '{') braceDepth++;
+    else if (ch === '}') { if (braceDepth === 0) break; braceDepth--; }
+    else if (ch === ';' && parenDepth === 0 && braceDepth === 0) { i++; break; }
+    i++;
+  }
+  return text.slice(pos, i);
+}
+
+function directWrittenTables(body) {
   const written = new Set();
-
-  // Collect all .from('table') positions and their table names
-  const froms = [];
-  let m;
   FROM_RE.lastIndex = 0;
+  let m;
   while ((m = FROM_RE.exec(body)) !== null) {
-    if (AUDITABLE_TABLES.has(m[1])) {
-      froms.push({ table: m[1], end: m.index + m[0].length });
-    }
+    if (!AUDITABLE_TABLES.has(m[1])) continue;
+    const stmt = statementFrom(body, m.index + m[0].length);
+    if (WRITE_OP_RE.test(stmt)) written.add(m[1]);
   }
-
-  // For each .from(auditable), check if a write op appears after it
-  // within the same function body (within 500 chars — covers chained calls
-  // and multi-line patterns like .from(...)\n  .select(...)\n  .insert(...))
-  for (const { table, end } of froms) {
-    const window = body.slice(end, end + 500);
-    if (WRITE_OP_RE.test(window)) {
-      written.add(table);
-    }
-  }
-
   return written;
 }
 
-// ─── Main scan ───────────────────────────────────────────────────────────────
+// ─── Layer 2: Intermediate variable write detection ───────────────────────────
 
-const files     = collectFiles(SCAN_DIRS);
+function intermediateVarWrittenTables(body) {
+  const written = new Set();
+  VAR_ASSIGN_RE.lastIndex = 0;
+  let m;
+  while ((m = VAR_ASSIGN_RE.exec(body)) !== null) {
+    const [, varName, table] = m;
+    if (!AUDITABLE_TABLES.has(table)) continue;
+    if (varWriteRE(varName).test(body)) written.add(table);
+  }
+  return written;
+}
+
+// ─── Layer 3: Helper indirection detection ────────────────────────────────────
+
+function buildFunctionMap(blocks) {
+  const map = new Map();
+  for (const { name, body } of blocks) {
+    const directTables  = directWrittenTables(body);
+    const varTables     = intermediateVarWrittenTables(body);
+    map.set(name, {
+      body,
+      hasAuditCtx:  AUDIT_CTX_RE.test(body),
+      isExempt:     EXEMPT_RE.test(body),
+      writtenTables: new Set([...directTables, ...varTables]),
+    });
+  }
+  return map;
+}
+
+function indirectionViolations(callerBody, fnMap) {
+  const violations = [];
+  const seen = new Set();
+  FN_CALL_RE.lastIndex = 0;
+  let m;
+  while ((m = FN_CALL_RE.exec(callerBody)) !== null) {
+    const callee = m[1];
+    if (seen.has(callee)) continue;
+    seen.add(callee);
+    const calleeDef = fnMap.get(callee);
+    if (!calleeDef) continue;
+    if (calleeDef.isExempt) continue;
+    if (calleeDef.hasAuditCtx) continue;
+    if (calleeDef.writtenTables.size === 0) continue;
+    for (const table of calleeDef.writtenTables) {
+      violations.push({ callee, table });
+    }
+  }
+  return violations;
+}
+
+// ─── Main scan ────────────────────────────────────────────────────────────────
+
+const files      = collectFiles(SCAN_DIRS);
 const violations = [];
 
 for (const file of files) {
   const source = fs.readFileSync(file, 'utf8');
 
-  // Skip files that don't reference any auditable table at all
   let hasAuditableRef = false;
   for (const table of AUDITABLE_TABLES) {
     if (source.includes(table)) { hasAuditableRef = true; break; }
@@ -227,43 +247,56 @@ for (const file of files) {
   if (!hasAuditableRef) continue;
 
   const blocks = extractFunctionBlocks(source);
+  const fnMap  = buildFunctionMap(blocks);
 
   for (const { name, startLine, body } of blocks) {
-    // Exempted
     if (EXEMPT_RE.test(body)) continue;
 
-    const written = writtenAuditableTables(body);
-    if (written.size === 0) continue;
+    // Layers 1 + 2
+    const directTables = directWrittenTables(body);
+    const varTables    = intermediateVarWrittenTables(body);
+    const allWritten   = new Set([...directTables, ...varTables]);
 
-    // Has audit context?
-    if (AUDIT_CONTEXT_RE.test(body)) continue;
+    if (allWritten.size > 0 && !AUDIT_CTX_RE.test(body)) {
+      for (const table of allWritten) {
+        violations.push({
+          file:    path.relative(ROOT, file),
+          fn:      name,
+          line:    startLine,
+          table,
+          pattern: varTables.has(table) ? 'intermediate-variable' : 'direct',
+        });
+      }
+    }
 
-    // Violation
-    for (const table of written) {
-      violations.push({
-        file: path.relative(ROOT, file),
-        fn:   name,
-        line: startLine,
-        table,
-      });
+    // Layer 3: indirection — only flag if caller also lacks audit context
+    if (!AUDIT_CTX_RE.test(body)) {
+      for (const { callee, table } of indirectionViolations(body, fnMap)) {
+        violations.push({
+          file:    path.relative(ROOT, file),
+          fn:      name,
+          line:    startLine,
+          table,
+          pattern: `indirection via ${callee}()`,
+        });
+      }
     }
   }
 }
 
-// ─── Report ──────────────────────────────────────────────────────────────────
+// ─── Report ───────────────────────────────────────────────────────────────────
 
 const REPORT_DIR = path.join(ROOT, 'reports');
 if (!fs.existsSync(REPORT_DIR)) fs.mkdirSync(REPORT_DIR, { recursive: true });
 
-const report = {
-  generated_at: new Date().toISOString(),
-  violations,
-  auditable_tables: [...AUDITABLE_TABLES],
-  files_scanned: files.length,
-};
 fs.writeFileSync(
   path.join(REPORT_DIR, 'grants_audit_context_report.json'),
-  JSON.stringify(report, null, 2)
+  JSON.stringify({
+    generated_at:     new Date().toISOString(),
+    violations,
+    auditable_tables: [...AUDITABLE_TABLES],
+    files_scanned:    files.length,
+  }, null, 2)
 );
 
 if (violations.length === 0) {
@@ -274,11 +307,11 @@ if (violations.length === 0) {
 console.error('[grants-audit-check] AUDIT CONTEXT VIOLATIONS FOUND:\n');
 for (const v of violations) {
   console.error(`  VIOLATION  ${v.file}:${v.line}`);
-  console.error(`             function: ${v.fn}`);
-  console.error(`             writes to: ${v.table}`);
-  console.error(`             missing: setAuditContext(db, { systemActor: '...' })`);
-  console.error(`             fix: add setAuditContext() after const db = getDb()`);
-  console.error(`             exempt: add // grants-audit: exempt — <reason> inside function`);
+  console.error(`             function : ${v.fn}`);
+  console.error(`             table    : ${v.table}`);
+  console.error(`             pattern  : ${v.pattern}`);
+  console.error(`             fix      : add setAuditContext(db, { systemActor: '...' }) at function entry`);
+  console.error(`             exempt   : add // grants-audit: exempt — <reason> inside function`);
   console.error('');
 }
 console.error(`[grants-audit-check] ${violations.length} violation(s). Resolve before merging.`);

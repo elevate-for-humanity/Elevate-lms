@@ -31,16 +31,17 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
     v.play().catch(() => {});
   }, [reducedMotion]);
 
-  // Start audio on first genuine user gesture (click or touch).
+  // Start audio from the beginning on first genuine user gesture (click or touch).
+  // Audio is a voiceover script — it must always start from 0, not synced to
+  // video position. The video is ambient b-roll and does not need to be in sync.
   // scroll is intentionally excluded — browsers do not treat scroll as a
   // user gesture for audio autoplay and the play() call silently fails.
   useEffect(() => {
     if (!audioSrc) return;
     const tryPlay = () => {
       const a = audioRef.current;
-      const v = videoRef.current;
       if (!a) return;
-      a.currentTime = v?.currentTime ?? 0;
+      a.currentTime = 0;
       a.play().catch(() => {});
       setMuted(false);
     };
@@ -53,11 +54,10 @@ export function HeroVideoBg({ src, poster, audioSrc }: HeroVideoBgProps) {
   }, [audioSrc]);
 
   function toggleMute() {
-    const v = videoRef.current;
     const a = audioRef.current;
-    if (!v) return;
     if (muted) {
-      if (a) { a.currentTime = v.currentTime; a.play().catch(() => {}); }
+      // Resume from beginning — voiceover is a script, not synced to video
+      if (a) { a.currentTime = 0; a.play().catch(() => {}); }
       setMuted(false);
     } else {
       if (a) { a.pause(); a.currentTime = 0; }

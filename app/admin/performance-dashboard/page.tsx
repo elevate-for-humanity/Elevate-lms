@@ -1,7 +1,8 @@
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { requireRole } from '@/lib/admin/guards';
+import { requireRole } from '@/lib/auth/require-role';
+import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { 
 
@@ -20,8 +21,7 @@ export const metadata: Metadata = {
 
 export default async function AdminPerformanceDashboardPage() {
   const auth = await requireRole(['admin', 'super_admin', 'staff']);
-  if (auth.error) return auth.error;
-  const supabase = auth.supabase;
+  const supabase = await createClient();
 
   // Fetch real data from database
   const { count: totalLeads } = await supabase

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
-import { requireRole } from '@/lib/admin/guards';
+import { requireRole } from '@/lib/auth/require-role';
+import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { 
   Target, Search, Filter, Plus, Mail, Phone, Calendar,
@@ -16,8 +17,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function LeadsPage() {
   const auth = await requireRole(['admin', 'super_admin', 'staff']);
-  if (auth.error) return auth.error;
-  const supabase = auth.supabase;
+  const supabase = await createClient();
 
   // Fetch real leads from CRM
   const { data: leadData } = await supabase

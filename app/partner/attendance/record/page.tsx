@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Users } from 'lucide-react';
@@ -18,48 +19,58 @@ export default async function RecordAttendancePage() {
   
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/partner/attendance/record');
+  if (!user) redirect('/partner/login');
 
-  // Get partner info
-  const { data: partner } = await supabase
-    .from('partners')
-    .select('id')
-    .eq('user_id', user.id)
+  const db = createAdminClient();
+  if (!db) redirect('/partner/login');
+
+  // Resolve role
+  const { data: profile } = await db
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
     .single();
+
+  const allowedRoles = ['partner', 'admin', 'super_admin', 'staff'];
+  if (!profile || !allowedRoles.includes(profile.role)) redirect('/unauthorized');
+
+  // Resolve partner_id via partner_users (partners table has no user_id column)
+  const { data: partnerLink } = await db
+    .from('partner_users')
+    .select('partner_id')
+    .eq('user_id', user.id)
+    .eq('status', 'active')
+    .maybeSingle();
 
   let students: any[] = [];
   let courses: any[] = [];
 
-  if (partner) {
-    // Get students enrolled with this partner
-    const { data: enrollmentData } = await supabase
-      .from('program_enrollments')
-      .select(`
-        id,
-        user_id,
-        profiles!enrollments_user_id_fkey(id, full_name)
-      `)
-      .eq('partner_id', partner.id)
+  if (partnerLink?.partner_id) {
+    const partnerId = partnerLink.partner_id;
+
+    // Get active apprentices assigned to this partner site
+    const { data: apprenticeships } = await db
+      .from('apprenticeships')
+      .select('apprentice_id, profiles:apprentice_id(id, full_name)')
+      .eq('partner_id', partnerId)
       .eq('status', 'active');
 
-    if (enrollmentData) {
-      students = enrollmentData.map((e: any) => ({
-        id: e.profiles?.id || e.user_id,
-        name: e.profiles?.full_name || 'Student',
+    if (apprenticeships) {
+      students = apprenticeships.map((a: any) => ({
+        id: a.profiles?.id || a.apprentice_id,
+        name: a.profiles?.full_name || 'Student',
         present: true,
       }));
     }
 
-    // Get courses for this partner
-    const { data: courseData } = await supabase
+    // Get active courses linked to this partner
+    const { data: courseData } = await db
       .from('training_courses')
       .select('id, title')
-      .eq('partner_id', partner.id)
+      .eq('partner_id', partnerId)
       .eq('is_active', true);
 
-    if (courseData) {
-      courses = courseData;
-    }
+    if (courseData) courses = courseData;
   }
 
   return (

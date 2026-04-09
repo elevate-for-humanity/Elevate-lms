@@ -11,4 +11,8 @@ WHERE slug = 'cosmetology-apprenticeship';
 
 -- completion_requirements does not exist in the live schema — skipped.
 
--- training_courses.total_hours does not exist in the live schema — skipped.
+-- Update training_courses (column is duration_hours, not total_hours)
+UPDATE public.training_courses
+SET duration_hours = 2000
+WHERE program_id = (SELECT id FROM public.programs WHERE slug = 'cosmetology-apprenticeship')
+  AND duration_hours = 1500;

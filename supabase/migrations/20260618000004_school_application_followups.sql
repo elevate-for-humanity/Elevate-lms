@@ -4,7 +4,7 @@
 CREATE TABLE IF NOT EXISTS public.school_application_followups (
   id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   application_id UUID NOT NULL REFERENCES public.school_applications(id) ON DELETE CASCADE,
-  sequence       TEXT NOT NULL CHECK (sequence IN ('24h', '72h')),
+  sequence       TEXT NOT NULL CHECK (sequence IN ('24h', '72h', '96h')),
   sent_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (application_id, sequence)
 );

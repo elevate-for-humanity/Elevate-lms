@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -49,6 +49,22 @@ interface FormData {
 }
 
 export default function PartnerOnboardingPage() {
+  // Auth guard — must be signed in to access onboarding
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { createBrowserClient } = await import('@supabase/ssr');
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = '/login?redirect=/partner/onboarding';
+      }
+    };
+    checkAuth();
+  }, []);
+
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);

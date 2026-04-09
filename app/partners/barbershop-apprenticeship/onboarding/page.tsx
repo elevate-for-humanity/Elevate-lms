@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CheckCircle, AlertCircle, ChevronRight, Upload, PenLine } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+de-react';
 
 // ── Step definitions ──────────────────────────────────────────────────────────
 const STEPS = [
@@ -332,6 +334,22 @@ function EmployerAgreementStep({ profileData, onNext }: { profileData: Record<st
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function BarbershopOnboardingPage() {
+  // Auth guard — must be signed in to access onboarding
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { createBrowserClient } = await import('@supabase/ssr');
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = '/login?redirect=/partners/barbershop-apprenticeship/onboarding';
+      }
+    };
+    checkAuth();
+  }, []);
+
   const [step, setStep] = useState<Step>('profile');
   const [profileData, setProfileData] = useState<Record<string, string>>({});
 

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -26,6 +27,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ProgramHolderOnboarding() {
+  await requireRole(['program_holder', 'admin', 'super_admin', 'staff']);
   const supabase = await createClient();
 
   

@@ -13,6 +13,22 @@ export default function ProgramCoursesPage() {
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Auth guard — course content requires a signed-in account
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { createBrowserClient } = await import('@supabase/ssr');
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = `/login?redirect=/programs/${slug}/courses`;
+      }
+    };
+    checkAuth();
+  }, [slug]);
+
   useEffect(() => {
     fetch(`/api/programs/${slug}/courses`)
       .then(res => res.json())

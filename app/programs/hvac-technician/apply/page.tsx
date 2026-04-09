@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect} from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Loader2, CreditCard, Info, Shield } from 'lucide-react';
@@ -24,6 +24,22 @@ function calcWeekly(customWeekly: number) {
 }
 
 export default function HvacApplyPage() {
+  // Auth guard — enrollment requires a signed-in account
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { createBrowserClient } = await import('@supabase/ssr');
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = '/login?redirect=/programs/hvac-technician/apply';
+      }
+    };
+    checkAuth();
+  }, []);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [errorSeverity, setErrorSeverity] = useState<'info' | 'critical'>('info');

@@ -1,11 +1,29 @@
 'use client';
 
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload, AlertCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { useRouter } from 'next/navigation';
+adcrumbs';
 
 export default function ProgramHolderSetup() {
+  // Auth guard — must be signed in to access onboarding
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { createBrowserClient } = await import('@supabase/ssr');
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = '/login?redirect=/program-holder/onboarding/setup';
+      }
+    };
+    checkAuth();
+  }, []);
+
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     organizationName: '',

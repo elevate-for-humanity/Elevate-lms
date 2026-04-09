@@ -4,12 +4,29 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Mail, Clock, ArrowRight, CheckCircle, DollarSign } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { useRouter } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'Application Submitted | Partner Shop | Elevate for Humanity',
 };
 
 export default function PartnerOnboardingSuccessPage() {
+  // Auth guard — must be signed in to access onboarding
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { createBrowserClient } = await import('@supabase/ssr');
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = '/login?redirect=/partner/onboarding/success';
+      }
+    };
+    checkAuth();
+  }, []);
+
 
   return (
     <div className="min-h-screen bg-white">

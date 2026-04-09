@@ -1,7 +1,7 @@
 'use client';
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { useState } from 'react';
+import { useState, useEffect} from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
@@ -27,6 +27,22 @@ const PROGRAM_DETAILS = {
 };
 
 export default function CNAEnrollPage() {
+  // Auth guard — enrollment requires a signed-in account
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { createBrowserClient } = await import('@supabase/ssr');
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = '/login?redirect=/programs/cna/enroll';
+      }
+    };
+    checkAuth();
+  }, []);
+
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     firstName: '',

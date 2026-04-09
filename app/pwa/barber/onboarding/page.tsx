@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { createBrowserClient } from '@supabase/ssr';
 import { 
+import { useRouter } from 'next/navigation';
   ArrowLeft, Circle, ChevronRight, 
   User, FileText, Building2, BookOpen, Clock,
   Award, Bell, Loader2, Sparkles, Scissors, TrendingUp
@@ -29,6 +30,22 @@ const ICON_MAP = {
 };
 
 export default function OnboardingPage() {
+  // Auth guard — must be signed in to access onboarding
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { createBrowserClient } = await import('@supabase/ssr');
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = '/login?redirect=/pwa/barber/onboarding';
+      }
+    };
+    checkAuth();
+  }, []);
+
   const [dbRows, setDbRows] = useState<any[]>([]);
   useEffect(() => {
     const supabase = createBrowserClient(

@@ -1,11 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect} from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Loader2, CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function EstheticianApplyPage() {
+  // Auth guard — enrollment requires a signed-in account
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { createBrowserClient } = await import('@supabase/ssr');
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = '/login?redirect=/programs/esthetician/apply';
+      }
+    };
+    checkAuth();
+  }, []);
+
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

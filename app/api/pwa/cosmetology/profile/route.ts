@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { getAchievedMilestones, COSMETOLOGY_MILESTONES } from '@/lib/pwa/milestones';
+import { requireCosmetologyEnrollment } from '@/lib/pwa/cosmetology-auth';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
@@ -16,6 +17,11 @@ async function _GET(request: Request) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const enrollment = await requireCosmetologyEnrollment(supabase, user.id);
+    if (!enrollment) {
+      return NextResponse.json({ error: 'Not enrolled in cosmetology apprenticeship' }, { status: 403 });
+    }
 
     const { data: profile } = await supabase
       .from('profiles')
@@ -38,18 +44,20 @@ async function _GET(request: Request) {
       .eq('apprentice_id', user.id)
       .eq('program_id', 'COSMETOLOGY');
 
-    const totalHours = progressEntries?.reduce((sum, e) => sum + parseFloat(e.hours_worked ?? 0), 0) ?? 0;
-    const achieved = getAchievedMilestones(totalHours, 'cosmetology');
+    const totalHours = progressEntries?.reduce((sum, e) => sum + (parseFloat(e.hours_worked) || 0), 0) ?? 0;
+    const achieved = totalHours > 0 ? getAchievedMilestones(totalHours, 'cosmetology') : [];
     const partner = partnerUser?.partners as any;
+    const salonAssigned = !!partner?.name;
 
     return NextResponse.json({
       id: profile.id,
       name: profile.full_name ?? profile.first_name ?? user.email?.split('@')[0] ?? 'Apprentice',
       email: profile.email ?? user.email,
       phone: profile.phone,
-      shopName: partner?.name ?? 'Not yet assigned',
-      shopCity: partner?.city,
-      shopState: partner?.state,
+      shopName: salonAssigned ? partner.name : null,
+      shopCity: partner?.city ?? null,
+      shopState: partner?.state ?? null,
+      salonAssigned,
       startDate: partnerUser?.created_at ?? user.created_at,
       totalHours,
       targetHours: 2000,

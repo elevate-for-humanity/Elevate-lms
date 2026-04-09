@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { requireCosmetologyEnrollment } from '@/lib/pwa/cosmetology-auth';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
@@ -15,6 +16,11 @@ async function _GET(request: Request) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const enrollment = await requireCosmetologyEnrollment(supabase, user.id);
+    if (!enrollment) {
+      return NextResponse.json({ error: 'Not enrolled in cosmetology apprenticeship' }, { status: 403 });
+    }
 
     const { data: progressEntries, error } = await supabase
       .from('progress_entries')

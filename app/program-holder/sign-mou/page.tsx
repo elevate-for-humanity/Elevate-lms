@@ -80,15 +80,44 @@ export default async function SignMOUPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/program-holder/sign-mou');
 
-  // Determine which MOU to show based on program holder's mou_type
+  // Determine which MOU to show based on program holder's mou_type.
+  // Live DB values: 'universal', 'custom_hvac_codelivery', 'custom_cosmetology_codelivery'.
+  // There are no null or 'barber' records — do not fall back silently.
   const { data: programHolder } = await supabase
     .from('program_holders')
     .select('mou_type, primary_program_id')
     .eq('user_id', user.id)
     .single();
 
-  const mouType = (programHolder?.mou_type ?? 'barber') as keyof typeof MOU_CONTENT;
-  const mou = MOU_CONTENT[mouType] ?? MOU_CONTENT.barber;
+  const rawMouType = programHolder?.mou_type ?? null;
+
+  // Map DB mou_type values to MOU_CONTENT keys
+  const MOU_TYPE_MAP: Record<string, keyof typeof MOU_CONTENT> = {
+    'custom_cosmetology_codelivery': 'cosmetology',
+    'custom_hvac_codelivery':        'barber', // HVAC uses barber MOU structure for now
+    'universal':                     'barber', // Universal defaults to barber (most common)
+  };
+
+  const mouKey = rawMouType ? MOU_TYPE_MAP[rawMouType] : null;
+
+  // If mou_type is unrecognized or missing, surface an explicit error rather than
+  // rendering the wrong legal document.
+  if (!mouKey) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-8">
+        <div className="max-w-md text-center">
+          <p className="text-2xl font-bold text-slate-900 mb-3">MOU Not Configured</p>
+          <p className="text-slate-600 text-sm mb-4">
+            Your program type ({rawMouType ?? 'unknown'}) does not have a configured MOU template.
+            Contact your coordinator to resolve this before signing.
+          </p>
+          <Link href="/program-holder/support" className="text-brand-blue-600 hover:underline text-sm">Contact Support</Link>
+        </div>
+      </div>
+    );
+  }
+
+  const mou = MOU_CONTENT[mouKey];
 
   return (
     <div className="min-h-screen">

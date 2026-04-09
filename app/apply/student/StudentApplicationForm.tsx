@@ -215,10 +215,15 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
           return;
         }
 
+        // WorkOne-pending — applicant needs to visit WorkOne before enrollment
+        if (result.status === 'pending_workone') {
+          router.push('/apply/pending-workone');
+          return;
+        }
+
         // Enrollment path — application is submitted and pending review.
-        // Redirect to checkout so the applicant can complete payment.
-        // Enrollment is not granted until payment is verified and admin approves.
-        router.push(`/enroll/checkout?program=${encodeURIComponent(data.programInterest)}&application_id=${result.applicationId}`);
+        // Redirect to success page; admin reviews and grants LMS access after funding verification.
+        router.push(`/apply/success?ref=${encodeURIComponent(result.referenceNumber || '')}&program=${encodeURIComponent(data.programInterest)}`);
         return;
       } else {
         setError(

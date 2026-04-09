@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 import { logger } from '@/lib/logger';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { FileText, Calendar, DollarSign, Download } from 'lucide-react';
 
@@ -27,7 +27,7 @@ export default async function ClientPortalPage() {
   }
 
   // Require signed consent before portal access
-  const admin = createAdminClient();
+  const admin = await getAdminClient();
   const { data: consent } = await admin!
     .from('client_consents')
     .select('id')

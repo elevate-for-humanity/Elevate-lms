@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FileText, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
@@ -18,7 +18,7 @@ export default async function ExternalCourseApprovalsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')

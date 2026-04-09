@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -22,7 +22,7 @@ export default async function ApplicantsPage() {
   const sessionClient = await createClient();
 
   // All data queries use admin client to bypass RLS
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const { data: applications, count: totalApplications } = await supabase
     .from('applications')

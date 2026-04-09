@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { redirect, notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import CredentialForm from '../CredentialForm';
 
@@ -11,7 +11,7 @@ export async function generateMetadata(
   { params }: { params: Promise<{ credentialId: string }> }
 ): Promise<Metadata> {
   const { credentialId } = await params;
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data } = await supabase.from('credential_registry').select('name').eq('id', credentialId).single();
   return { title: data ? `${data.name} | Credential Registry` : 'Edit Credential | Admin' };
 }
@@ -25,7 +25,7 @@ export default async function EditCredentialPage({
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin','super_admin','org_admin','staff'].includes(profile.role)) redirect('/unauthorized');

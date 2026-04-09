@@ -1,6 +1,6 @@
 'use server';
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
 
@@ -19,7 +19,7 @@ export async function sendRecoveryEmail(email: string): Promise<{ success: boole
     return { success: false, error: 'Please enter a valid email address.' };
   }
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   if (!supabase) {
     logger.error('[Recovery] Admin client unavailable');
     return { success: false, error: 'Service temporarily unavailable. Please try again later.' };

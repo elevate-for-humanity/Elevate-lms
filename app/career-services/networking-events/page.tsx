@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Building2 } from 'lucide-react';
 import { getUpcomingEvents, getPastEvents } from '@/lib/data/events';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import EventCard from '@/components/events/EventCard';
 import EventsEmptyState from '@/components/events/EventsEmptyState';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 const NETWORKING_TYPES = ['networking', 'career_fair'];
 
 export default async function NetworkingEventsPage() {
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const [upcoming, past, employerCount, eventCount] = await Promise.all([
     getUpcomingEvents({ types: NETWORKING_TYPES, limit: 9 }),

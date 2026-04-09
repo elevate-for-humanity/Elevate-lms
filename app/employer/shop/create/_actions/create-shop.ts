@@ -1,12 +1,12 @@
 'use server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 
 export async function createShop(formData: FormData) {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
 
   // Get authenticated user

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -75,7 +75,7 @@ function StatusPill({ verified, pending }: { verified: number; pending: number }
 
 export default async function ApprenticeCompetenciesPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
+  const _admin = await getAdminClient();
   const db = _admin;
   if (!db) throw new Error('Admin client failed to initialize');
 

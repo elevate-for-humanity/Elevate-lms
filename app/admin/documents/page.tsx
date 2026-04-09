@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { requireAdmin } from '@/lib/auth';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { FileText, Upload, ChevronRight, Download, ArrowRight } from 'lucide-react';
 
@@ -23,7 +23,7 @@ function fmtBytes(bytes: number) {
 
 export default async function DocumentsPage() {
   await requireAdmin();
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data: documents, count } = await db
     .from('documents')

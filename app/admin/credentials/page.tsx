@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Shield, Plus, ExternalLink, Award, BookOpen, Users } from 'lucide-react';
 import { mapCredentialRow, type RawCredentialRow, type CredentialRecord } from '@/lib/domain';
@@ -28,7 +28,7 @@ export default async function CredentialRegistryPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
 
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();

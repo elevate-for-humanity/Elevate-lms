@@ -1,14 +1,14 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export async function createLicense(formData: FormData) {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
   if (!supabase) throw new Error('Database unavailable');
 

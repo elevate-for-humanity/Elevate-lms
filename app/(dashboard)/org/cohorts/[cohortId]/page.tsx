@@ -1,7 +1,7 @@
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { getOrgContext } from '@/lib/org/getOrgContext';
 import { getOrgLearners, getOrgProgress } from '@/lib/lms/engine/org-scope';
 
@@ -25,7 +25,7 @@ export default async function OrgCohortDetailPage({ params }: Props) {
     redirect('/org/create');
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return <p className="p-8 text-sm text-gray-500">Service unavailable.</p>;
 
   // Verify cohort belongs to this org

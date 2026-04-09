@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { requireAdmin } from '@/lib/authGuards';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import FERPATrainingDashboard from '@/components/compliance/FERPATrainingDashboard';
 
 export const dynamic = 'force-dynamic';
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default async function FERPATrainingPage() {
   const { id: userId } = await requireAdmin();
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const [{ data: profile }, { data: trainingRecords }, { data: pendingUsers }] = await Promise.all([
     db.from('profiles').select('role, full_name').eq('id', userId).single(),

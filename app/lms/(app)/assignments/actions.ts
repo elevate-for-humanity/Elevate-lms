@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { updateProgramProgress } from '@/lib/lms/update-program-progress';
 import { logger } from '@/lib/logger';
@@ -22,7 +22,7 @@ export async function submitAssignment(formData: FormData) {
 
   if (!assignmentId) return { error: 'Assignment ID is required' };
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return { error: 'Service unavailable' };
 
   // Verify assignment exists and resolve course_id

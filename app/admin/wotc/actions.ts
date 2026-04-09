@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
@@ -10,7 +10,7 @@ import { logger } from '@/lib/logger';
 
 export async function createWOTCApplication(formData: FormData) {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
@@ -70,7 +70,7 @@ export async function createWOTCApplication(formData: FormData) {
 
 export async function updateWOTCApplication(id: string, formData: FormData) {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
@@ -128,7 +128,7 @@ export async function updateWOTCApplication(id: string, formData: FormData) {
 
 export async function submitWOTCApplication(id: string) {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Not authenticated' };
@@ -158,7 +158,7 @@ export async function submitWOTCApplication(id: string) {
 
 export async function updateWOTCStatus(id: string, status: string, notes?: string) {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Not authenticated' };
@@ -197,7 +197,7 @@ export async function updateWOTCStatus(id: string, status: string, notes?: strin
 
 export async function deleteWOTCApplication(id: string) {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Not authenticated' };

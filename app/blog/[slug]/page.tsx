@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { createAdminClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { SocialShare } from '@/components/blog/SocialShare';
 import { ArrowLeft, Calendar, User, Clock, Tag } from 'lucide-react';
 import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
@@ -25,7 +25,7 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
 
   // Fall back to DB
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     const { data: post, error } = await supabase
       .from('blog_posts')
@@ -59,7 +59,7 @@ async function getRelatedPosts(category: string, currentSlug: string): Promise<P
 
   // Top up from DB if needed
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     const staticSlugs = staticRelated.map((p) => p.slug);
     const { data: posts } = await supabase

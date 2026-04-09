@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import {
   ArrowLeft, Mail, Phone, MapPin, Calendar, User,
   BookOpen, CreditCard, FileText, Clock, CheckCircle,
@@ -65,7 +65,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: adminProfile } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!['admin', 'super_admin', 'staff'].includes(adminProfile?.role ?? '')) redirect('/unauthorized');
 

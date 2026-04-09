@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +22,7 @@ export default async function PartnerDashboardPage() {
 
   if (!user) redirect('/partner/login');
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) redirect('/partner/login');
 
   const { data: profile } = await db

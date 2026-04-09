@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 export default async function LMSCourseLayout({
   children,
@@ -13,7 +13,7 @@ export default async function LMSCourseLayout({
 }) {
   const { courseId } = await params;
   const supabase = await createClient();
-  const admin = createAdminClient();
+  const admin = await getAdminClient();
   const db = admin || supabase;
 
   if (!db) return notFound();

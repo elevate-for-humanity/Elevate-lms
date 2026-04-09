@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
@@ -41,7 +41,7 @@ export default async function ApplicationsPage({
         : [];
 
   // Use admin client for data queries to bypass RLS
-  const adminDb = createAdminClient();
+  const adminDb = await getAdminClient();
 
   let query = adminDb.from('applications').select('*', { count: 'exact' }).order('created_at', { ascending: false });
   if (resolvedStatuses.length === 1) query = query.eq('status', resolvedStatuses[0]);

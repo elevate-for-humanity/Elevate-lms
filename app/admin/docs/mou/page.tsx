@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/authGuards';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 
@@ -21,7 +21,7 @@ const STATUS_BADGE: Record<string, string> = {
 
 export default async function MouDocumentsPage() {
   await requireAdmin();
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data: documents } = await db
     .from('mou_documents')

@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Users, DollarSign, TrendingUp, UserPlus, Search, Filter, MoreVertical } from 'lucide-react';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 async function getAffiliateData() {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   
   // Get affiliates from database
   const { data: affiliates, count } = await supabase

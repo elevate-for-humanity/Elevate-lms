@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { redirect, notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import {
@@ -29,7 +29,7 @@ export default async function ProviderDetailPage({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return <div className="p-8 text-red-600">Database unavailable</div>;
 
   const { data: profile } = await supabase

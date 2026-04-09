@@ -2,19 +2,21 @@ import { logger } from '@/lib/logger';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 /**
- * Returns a Supabase client authenticated with the service role key.
+ * @deprecated Use `getAdminClient()` instead in all request-time code
+ * (server components, layouts, server actions, API routes).
  *
- * Throws if either env var is missing — there is no anon fallback.
- * A missing service role key must be caught at startup, not silently
- * degraded to an RLS-blocked anon client that fails at query time.
+ * This function is synchronous and throws if SUPABASE_SERVICE_ROLE_KEY is not
+ * yet hydrated — which happens on every cold serverless start. That causes a
+ * 500 on the first request to any page that calls this directly.
  *
- * Call sites that previously handled `null` returns must be updated to
- * handle a thrown error instead.
+ * `getAdminClient()` calls `hydrateProcessEnv()` first and is safe on cold starts.
  *
- * Note: SUPABASE_SERVICE_ROLE_KEY lives in Supabase app_secrets and is
- * loaded by hydrateProcessEnv() at startup (instrumentation.ts). If this
- * throws MISSING_ENV on cold start, ensure hydrateProcessEnv() ran first.
- * For routes that cannot guarantee startup order, use getAdminClient() instead.
+ * The only valid remaining uses of `createAdminClient()` are:
+ *   - `lib/` utilities called after hydration is guaranteed (e.g. from within getAdminClient itself)
+ *   - `scripts/` and build-time tooling where env is pre-loaded
+ *   - `instrumentation.ts` startup code
+ *
+ * Do NOT call this from `app/` — use `getAdminClient()` there.
  */
 export function createAdminClient(): SupabaseClient<any> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

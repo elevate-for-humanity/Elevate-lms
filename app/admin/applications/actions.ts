@@ -2,7 +2,7 @@
 
 import { logger } from '@/lib/logger';
 import { revalidatePath } from 'next/cache';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { approveApplication as runApprovalPipeline } from '@/lib/enrollment/approve';
 
@@ -28,7 +28,7 @@ export async function approveApplication(id: string): Promise<void> {
     throw new Error('Forbidden');
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const result = await runApprovalPipeline(db, { applicationId: id });
 
   if (!result.success) {
@@ -58,7 +58,7 @@ export async function rejectApplication(id: string): Promise<void> {
     throw new Error('Forbidden');
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   // Confirm the application exists and is in a rejectable state before mutating.
   const { data: record, error: fetchError } = await db

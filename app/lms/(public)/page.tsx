@@ -29,8 +29,8 @@ export default async function LmsPublicPage() {
   if (user) redirect('/learner/dashboard');
 
   // Load programs from DB — active, published, ordered
-  const { createAdminClient } = await import('@/lib/supabase/admin');
-  const db = createAdminClient();
+  const { getAdminClient } = await import('@/lib/supabase/admin');
+  const db = await getAdminClient();
   const { data: dbPrograms } = await db
     .from('programs')
     .select('id, title, slug, description, excerpt, image_url, duration_weeks, credential, credential_name, is_active, status')

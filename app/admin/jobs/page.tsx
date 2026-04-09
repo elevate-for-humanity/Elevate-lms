@@ -2,7 +2,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Briefcase, Building2, MapPin, Clock, Plus, Search, Eye, Edit, Trash2 } from 'lucide-react';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 async function getJobsData() {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   
   const { data: jobPostings, count: jobCount } = await supabase
     .from('job_postings')

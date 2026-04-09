@@ -1,9 +1,9 @@
-import { createAdminClient } from '@/lib/supabase/admin'
+import { getAdminClient } from '@/lib/supabase/admin'
 import { notFound } from 'next/navigation'
 import PartnerUploadForm from './PartnerUploadForm'
 
 export default async function PartnerUploadPage({ params }: { params: { token: string } }) {
-  const supabase = createAdminClient()
+  const supabase = await getAdminClient()
 
   const { data: partner } = await supabase
     .from('partners')

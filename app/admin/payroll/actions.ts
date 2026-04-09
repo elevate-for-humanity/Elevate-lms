@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { writeAdminAuditEvent, AuditActions } from '@/lib/audit';
 
 export async function markPayrollPaid(payrollId: string) {
@@ -10,7 +10,7 @@ export async function markPayrollPaid(payrollId: string) {
   if (authError) throw new Error(`Auth failed: ${authError.message}`);
   if (!user) throw new Error('Not authenticated');
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data: profile, error: profileError } = await db
     .from('profiles').select('role').eq('id', user.id).single();

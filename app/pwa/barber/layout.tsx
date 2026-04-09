@@ -4,7 +4,7 @@ import { ServiceWorkerRegistration } from '@/components/pwa/ServiceWorkerRegistr
 import { InstallPrompt } from '@/components/pwa/InstallPrompt';
 import { OfflineIndicator } from '@/components/pwa/OfflineIndicator';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { checkBarberSuspension } from '@/lib/barber/suspension';
 
 export const metadata: Metadata = {
@@ -39,7 +39,7 @@ export default async function BarberPWALayout({
   }
 
   // Suspension gate — suspended/past-due accounts see the billing page
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (db) {
     const suspended = await checkBarberSuspension(user.id, db);
     if (suspended) {

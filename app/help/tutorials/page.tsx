@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { TutorialsClient } from './TutorialsClient';
 import { BookOpen } from 'lucide-react';
 
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function TutorialsPage() {
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data: tutorials, error } = await (db ?? (await createClient()))
     .from('tutorials')

@@ -1,6 +1,6 @@
 'use server';
 
-import { createAdminClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
@@ -281,7 +281,7 @@ async function insertApplication(payload: {
   supportNotes: string;
   source: string;
 }): Promise<{ success: true; applicationId: string; referenceNumber: string; email?: string } | { success: false; error: string }> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const referenceNumber = generateReferenceNumber();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
   const programLabel = payload.programInterest.replace(/-/g, ' ');
@@ -586,7 +586,7 @@ export async function submitStudentApplication(data: StudentApplicationData) {
   if (!result.success) return result;
 
   // Persist funding eligibility fields and set status for WorkOne-pending applications
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   if (supabase && result.applicationId) {
     const requestedSource = data.requestedFundingSource ?? 'self_pay';
     const needsWorkOne = ['workone', 'workforce_ready_grant'].includes(requestedSource)
@@ -732,7 +732,7 @@ export async function submitProgramHolderApplication(data: ProgramHolderApplicat
 
   if (result.success) {
     // Create program_holders row and set role immediately — no admin approval needed.
-    const adminDb = createAdminClient();
+    const adminDb = await getAdminClient();
     if (adminDb) {
       const normalizedEmail = data.email.toLowerCase().trim();
       const { data: profile } = await adminDb
@@ -946,7 +946,7 @@ export async function submitStaffApplication(data: StaffApplicationData) {
 }
 
 export async function getApplicationStatus(identifier: string) {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   if (!supabase) return null;
 
   const { data: byRef } = await supabase

@@ -1,7 +1,8 @@
 import Image from 'next/image';
 import Logo from '@/components/ui/Logo';
 import Link from 'next/link';
-import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,7 +10,7 @@ export const dynamic = 'force-dynamic';
 // Uses admin client to bypass RLS — auth is verified before calling this.
 
 async function getStudentData(userId: string, email: string) {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const [profileRes, progEnrollRes, courseEnrollRes, appRes, apptRes] = await Promise.all([
     // Profile — onboarding state

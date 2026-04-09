@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import AICourseBuilderForm from './AICourseBuilderForm';
 
@@ -17,7 +17,7 @@ export default async function AICourseBuilderPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const adminDb = createAdminClient();
+  const adminDb = await getAdminClient();
   if (adminDb) {
     const { data: profile } = await adminDb
       .from('profiles')

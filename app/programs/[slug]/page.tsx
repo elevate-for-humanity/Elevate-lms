@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 import { notFound } from 'next/navigation';
 import { createPublicClient } from '@/lib/supabase/server';
@@ -77,7 +77,7 @@ export async function generateStaticParams() {
 
   // Get all active slugs from DB
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     const { data: dbPrograms } = await supabase
       .from('programs')
       .select('slug')
@@ -107,7 +107,7 @@ export async function generateMetadata({
   // Fallback to DB if no static data
   if (!program) {
     try {
-      const supabase = createAdminClient();
+      const supabase = await getAdminClient();
       if (supabase) {
         const { data } = await supabase
           .from('programs')
@@ -220,7 +220,7 @@ export default async function ProgramDetailPage({
   // Fetch outcomes/requirements from DB if program has an ID
   if (program?.id) {
     try {
-      const supabase = createAdminClient();
+      const supabase = await getAdminClient();
       if (supabase) {
         const { data: outcomes } = await supabase
           .from('program_outcomes')

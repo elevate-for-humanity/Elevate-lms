@@ -1,10 +1,10 @@
 import Image from 'next/image';
 import Logo from '@/components/ui/Logo';
 import Link from 'next/link';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 async function getInstructorData() {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const [courseRes, totalRes, activeRes] = await Promise.all([
     supabase.from('courses').select('id, title, course_code, description, duration_hours, is_active, instructor_id').eq('is_active', true).order('title').limit(30),

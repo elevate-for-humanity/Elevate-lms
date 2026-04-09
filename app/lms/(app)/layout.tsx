@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import type { ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { canAccessRoute, getUnauthorizedRedirect } from '@/lib/auth/lms-routes';
 import { LmsAppShell } from './LmsAppShell';
 
@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function LmsAppLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
 
   // Preserve the requested path through login so the user lands back here after auth.

@@ -1,10 +1,10 @@
 import Image from 'next/image';
 import Logo from '@/components/ui/Logo';
 import Link from 'next/link';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 async function getEnrollmentData() {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const [appRes, programRes, enrollRes] = await Promise.all([
     supabase.from('applications').select('id, first_name, last_name, email, phone, status, created_at').order('created_at', { ascending: false }).limit(20),

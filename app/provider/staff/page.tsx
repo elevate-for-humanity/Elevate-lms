@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { Users } from 'lucide-react';
 import InviteStaff from './InviteStaff';
 
@@ -17,7 +17,7 @@ export default async function ProviderStaffPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/provider/staff');
 
-  const db = createAdminClient()!;
+  const db = await getAdminClient();
   const { data: profile } = await supabase.from('profiles').select('tenant_id').eq('id', user.id).single();
   if (!profile?.tenant_id) redirect('/unauthorized');
 

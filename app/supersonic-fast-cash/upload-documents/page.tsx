@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import UploadDocumentsClient from './UploadDocumentsClient';
 
 export const metadata: Metadata = {
@@ -17,7 +17,7 @@ export default async function UploadDocumentsPage() {
 
   if (!user) redirect('/login?redirect=/supersonic-fast-cash/upload-documents');
 
-  const admin = createAdminClient();
+  const admin = await getAdminClient();
 
   const { data: consent } = await admin!
     .from('client_consents').select('id').eq('client_id', user.id).limit(1).maybeSingle();

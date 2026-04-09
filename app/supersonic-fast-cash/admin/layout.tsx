@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 export const metadata: Metadata = {
   title: 'Supersonic Fast Cash | Admin | Elevate for Humanity',
@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
   
   if (!supabase) {

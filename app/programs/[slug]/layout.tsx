@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 export default async function ProgramLayout({
   children,
@@ -9,7 +9,7 @@ export default async function ProgramLayout({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   if (!supabase) return notFound();
 

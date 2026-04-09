@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 async function requireAdminClient() {
   const supabase = await createClient();
@@ -10,7 +10,7 @@ async function requireAdminClient() {
   if (!user) throw new Error('Unauthorized');
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin', 'super_admin'].includes(profile.role)) throw new Error('Forbidden');
-  return createAdminClient();
+  return getAdminClient();
 }
 
 // ── Course-level actions ──────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import SettingsForm from './SettingsForm';
 
 export const dynamic = 'force-dynamic';
@@ -10,7 +10,7 @@ export default async function ProviderSettingsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/provider/settings');
 
-  const db = createAdminClient()!;
+  const db = await getAdminClient();
   const { data: profile } = await supabase.from('profiles').select('tenant_id, full_name, email').eq('id', user.id).single();
   if (!profile?.tenant_id) redirect('/unauthorized');
 

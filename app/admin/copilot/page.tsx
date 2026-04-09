@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { requireAdmin } from '@/lib/authGuards';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 import Link from 'next/link';
 import CopilotAssistant from '@/components/admin/CopilotAssistant';
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default async function CopilotPage() {
   await requireAdmin();
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   // Query real deployment status and active user count
   const [{ data: deployments }, { count: activeUsers }] = await Promise.all([

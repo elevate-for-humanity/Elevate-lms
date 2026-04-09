@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 // All routes under (onboarding) require an authenticated program_holder or partner.
 // Public visitors are redirected to login, then back here after sign-in.
@@ -16,7 +16,7 @@ export default async function OnboardingLayout({
     redirect('/login?redirect=/partners/barbershop-apprenticeship/forms');
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: profile } = await db
     .from('profiles')
     .select('role')

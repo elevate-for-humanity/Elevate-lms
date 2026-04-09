@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { requireAdmin } from '@/lib/authGuards';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Video, Upload, Play, Eye } from 'lucide-react';
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 export default async function VideosPage() {
   await requireAdmin();
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data: videos, error } = await db
     .from('videos')

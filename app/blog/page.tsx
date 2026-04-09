@@ -18,8 +18,8 @@ export const revalidate = 600;
 
 async function getDbPosts(): Promise<BlogPost[]> {
   try {
-    const { createAdminClient } = await import('@/lib/supabase/admin');
-    const supabase = createAdminClient();
+    const { getAdminClient } = await import('@/lib/supabase/admin');
+    const supabase = await getAdminClient();
     const { data } = await supabase
       .from('blog_posts')
       .select('*')

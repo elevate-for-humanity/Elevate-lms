@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/admin';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { logger } from '@/lib/logger';
@@ -28,10 +30,10 @@ function canApprove(role: AdminRole): boolean {
 }
 
 /** Re-verify caller is admin/super_admin. Returns caller ID + admin client, or redirects with error. */
-async function verifyApprovalCaller(holderId: string): Promise<{ callerId: string; adb: ReturnType<typeof createAdminClient> }> {
+async function verifyApprovalCaller(holderId: string): Promise<{ callerId: string; adb: SupabaseClient }> {
   const supa = await createClient();
-  const adb = createAdminClient();
-  const sdb = adb || supa;
+  const adb = await getAdminClient();
+  const sdb = adb;
 
   const { data: { user: caller } } = await supa.auth.getUser();
   if (!caller) {

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { createAdminClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { Search, ArrowRight, HelpCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ const categories = [
 ];
 
 async function getArticles(category?: string, search?: string) {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   
   let query = supabase
     .from('support_articles')

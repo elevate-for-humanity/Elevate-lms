@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import HVACStandardsContent from './HVACStandardsContent';
 
 export const dynamic = 'force-dynamic';
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function HVACStandardsPage() {
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data: lessons } = await db
     .from('curriculum_lessons')

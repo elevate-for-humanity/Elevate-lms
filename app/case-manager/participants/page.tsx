@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
 import { Users, ChevronRight, Search } from 'lucide-react';
@@ -16,7 +16,7 @@ export default async function CaseManagerParticipantsPage() {
   const { user } = await requireRole(['case_manager', 'admin', 'super_admin', 'staff']);
 
   const supabase = await createClient();
-  const admin    = createAdminClient();
+  const admin    = await getAdminClient();
   const db       = admin || supabase;
 
   // Resolve assigned application IDs for this case manager

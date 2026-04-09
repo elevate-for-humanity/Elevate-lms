@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
 import AddPlacementForm from './_components/AddPlacementForm';
@@ -22,7 +22,7 @@ export default async function ParticipantDetailPage({ params }: Props) {
   const { user } = await requireRole(['case_manager', 'admin', 'super_admin', 'staff']);
 
   const supabase = await createClient();
-  const admin    = createAdminClient();
+  const admin    = await getAdminClient();
   const db       = admin || supabase;
 
   // Verify this application is assigned to this case manager (or user is admin)

@@ -14,7 +14,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
   BookOpen, ExternalLink, Clock, Award, CheckCircle2,
@@ -27,7 +27,7 @@ export async function generateMetadata(
   { params }: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {
   const { slug } = await params;
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: program } = await supabase
     .from('programs')
     .select('title, description')
@@ -137,7 +137,7 @@ export default async function ProgramTrainingPage({
   const { slug } = await params;
 
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?redirect=/programs/${slug}/training`);

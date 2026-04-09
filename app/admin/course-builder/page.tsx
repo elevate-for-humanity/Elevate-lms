@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import ProgramBuilderClient from '@/components/admin/course-builder/ProgramBuilderClient';
 import type {
@@ -38,7 +38,7 @@ export default async function CourseBuilderPage({ searchParams }: PageProps) {
     redirect('/unauthorized');
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   // If no program specified, redirect to programs list so admin picks one
   const programId = params.program ?? null;

@@ -1,11 +1,11 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 export async function generateEnrollmentReport(dateRange: string = '30') {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
   
   const daysAgo = parseInt(dateRange);
@@ -52,7 +52,7 @@ export async function generateEnrollmentReport(dateRange: string = '30') {
 
 export async function generateLeadReport(dateRange: string = '30') {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
   
   const daysAgo = parseInt(dateRange);
@@ -102,7 +102,7 @@ export async function generateLeadReport(dateRange: string = '30') {
 
 export async function generateFinancialReport(dateRange: string = '30') {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
   
   const daysAgo = parseInt(dateRange);
@@ -140,7 +140,7 @@ export async function generateFinancialReport(dateRange: string = '30') {
 
 export async function generateUserActivityReport(dateRange: string = '30') {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
   
   const daysAgo = parseInt(dateRange);
@@ -184,7 +184,7 @@ export async function generateUserActivityReport(dateRange: string = '30') {
 
 export async function exportEnrollmentCSV(): Promise<string> {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
 
   const { data: enrollments } = await db
@@ -209,7 +209,7 @@ export async function exportEnrollmentCSV(): Promise<string> {
 
 export async function exportLeadsCSV(): Promise<string> {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
 
   const { data: leads } = await db

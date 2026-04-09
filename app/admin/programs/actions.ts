@@ -1,14 +1,14 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export async function createProgram(formData: FormData) {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -63,7 +63,7 @@ export async function createProgram(formData: FormData) {
 
 export async function updateProgram(id: string, formData: FormData) {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) redirect('/login');
@@ -114,7 +114,7 @@ export async function updateProgram(id: string, formData: FormData) {
 
 export async function deleteProgram(id: string) {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) throw new Error('Unauthorized');

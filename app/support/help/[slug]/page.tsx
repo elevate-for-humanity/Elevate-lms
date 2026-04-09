@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { createAdminClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { ArrowLeft, ThumbsUp, ThumbsDown, Eye } from 'lucide-react';
 import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 
@@ -11,7 +11,7 @@ export const revalidate = 600;
 type Params = Promise<{ slug: string }>;
 
 async function getArticle(slug: string) {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   
   const { data: article, error } = await supabase
     .from('support_articles')
@@ -32,7 +32,7 @@ async function getArticle(slug: string) {
 }
 
 async function getRelatedArticles(category: string, currentSlug: string) {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   
   const { data: articles } = await supabase
     .from('support_articles')

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { CheckCircle, Award, ArrowRight, BookOpen, ExternalLink } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import ExamReadinessWidget from '@/components/lms/ExamReadinessWidget';
 
 export const dynamic = 'force-dynamic';
@@ -21,7 +21,7 @@ interface Props {
 export default async function CertificationPage({ params }: Props) {
   const { courseId } = await params;
   const supabase = await createClient();
-  const admin = createAdminClient();
+  const admin = await getAdminClient();
   const db = admin || supabase;
 
   const { data: { user } } = await supabase.auth.getUser();

@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 
 async function requireAdmin() {
@@ -22,7 +22,7 @@ async function requireAdmin() {
   }
 
   // Admin client bypasses RLS on program_enrollments
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
   return { supabase, db, adminId: user.id };
 }

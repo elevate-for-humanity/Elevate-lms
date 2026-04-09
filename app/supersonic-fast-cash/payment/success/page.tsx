@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
@@ -18,7 +18,7 @@ export default async function PaymentSuccessPage({
   if (!user) redirect('/login?redirect=/supersonic-fast-cash/payment/success');
 
   // Look up payment record — status is set by webhook, not this page
-  const admin = createAdminClient();
+  const admin = await getAdminClient();
   const { data: payment } = await admin!
     .from('tax_payments')
     .select('id, status, amount, paid_at, stripe_checkout_session_id')

@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import React from 'react';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import PartnerNav from '@/components/partner/PartnerNav';
 
@@ -26,7 +26,7 @@ export default async function PartnerPortalLayout({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/partner/login');
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
   const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   const isAdmin = ['admin', 'super_admin'].includes(profile?.role || '');

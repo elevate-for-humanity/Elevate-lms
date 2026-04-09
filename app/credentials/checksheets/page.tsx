@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import ChecksheetsContent from './ChecksheetsContent';
 
 export const dynamic = 'force-dynamic';
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ChecksheetsPage() {
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   // Pull live lesson data so checksheet competency codes link to real lessons
   const { data: lessons } = await db

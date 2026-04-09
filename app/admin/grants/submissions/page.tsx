@@ -4,7 +4,7 @@
  */
 
 import { Metadata } from 'next';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 };
 
 async function getSubmissionsData() {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: submissions } = await db
     .from('grant_submissions')
     .select(

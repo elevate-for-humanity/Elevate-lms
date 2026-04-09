@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import type { EmailOtpType } from '@supabase/supabase-js';
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
         // Link any pre-payment program_enrollments rows (user paid before
         // creating an account — email matches, user_id is null).
         try {
-          const db = createAdminClient();
+          const db = await getAdminClient();
           const { data: { user } } = await supabase.auth.getUser();
           if (user?.email && db) {
             // Normalize email to prevent casing mismatches (User@Email.com vs user@email.com)
@@ -142,7 +142,27 @@ export async function GET(request: NextRequest) {
         // same-origin paths (must start with /, no protocol-relative or external URLs).
         redirectTo = next !== '/' ? next : '/auth/reset-password';
       } else if (type === 'invite') {
-        redirectTo = '/learner/dashboard?invited=true';
+        // Invited users must set a password before accessing their portal.
+        // /auth/set-password reads their role after password creation and
+        // redirects them to the correct dashboard automatically.
+        redirectTo = '/auth/set-password';
+
+        // Run the same pre-auth reconciliation as signup so any pending
+        // applications or enrollments are linked to the new account.
+        try {
+          const db = await getAdminClient();
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user?.email && db) {
+            const { reconcilePreAuthRows } = await import('@/lib/pre-auth-tables');
+            await reconcilePreAuthRows(db, user.email).catch((err: unknown) => {
+              logger.error('[auth/confirm] invite pre-auth reconciliation failed', {
+                error: err instanceof Error ? err.message : String(err),
+              });
+            });
+          }
+        } catch (err: any) {
+          logger.error('[auth/confirm] invite reconciliation threw', { error: err?.message });
+        }
       }
 
       // Use NEXT_PUBLIC_SITE_URL if set, otherwise fall back to the origin

@@ -1,10 +1,10 @@
 import Image from 'next/image';
 import Logo from '@/components/ui/Logo';
 import Link from 'next/link';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 async function getStoreData() {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const { data: products } = await supabase
     .from('products')

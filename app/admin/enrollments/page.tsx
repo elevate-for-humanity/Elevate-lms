@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { TrendingUp, Users, CheckCircle, AlertTriangle, Clock } from 'lucide-react';
 import { AdminPageShell } from '@/components/admin/AdminPageShell';
@@ -22,7 +22,7 @@ export default async function AdminEnrollmentsPage() {
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   // Students who paid but haven't been granted LMS access yet (pending admin review)
   const { data: pendingAccess } = await db

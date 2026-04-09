@@ -1,6 +1,6 @@
 
 import { Metadata } from 'next';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -86,7 +86,7 @@ export const revalidate = 600;
 export default async function DrugTestingLandingPage() {
   let program: any = null;
   try {
-    const db = createAdminClient();
+    const db = await getAdminClient();
     const { data } = await supabase
       .from('programs')
       .select('id, name, description, full_description, training_hours, tuition, credential_name, career_outcomes, what_you_learn, salary_min, salary_max, industry_demand, wioa_approved')

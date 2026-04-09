@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/authGuards';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { DollarSign, Plus, Building2, Calendar, ArrowRight } from 'lucide-react';
 
@@ -28,7 +28,7 @@ const STAGE_BADGE: Record<string, string> = {
 
 export default async function DealsPage() {
   await requireAdmin();
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data: deals, error } = await db
     .from('crm_deals')

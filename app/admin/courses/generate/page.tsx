@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import CourseGeneratorClient from './CourseGeneratorClient';
 
 export const dynamic = 'force-dynamic';
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default async function CourseGeneratorPage() {
   const supabase = await createClient();
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: programs } = await supabase
     .from('training_programs')
     .select('id, name, category')

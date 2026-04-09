@@ -1,11 +1,11 @@
 import Image from 'next/image';
 import Logo from '@/components/ui/Logo';
 import Link from 'next/link';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { AdminInstallPrompt } from '@/components/pwa/AdminInstallPrompt';
 
 async function getAdminDashboardData() {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const [profileRes, appRes, enrollRes, courseRes, programRes, productRes, recentAppsRes, recentEnrollRes] = await Promise.all([
     supabase.from('profiles').select('id', { count: 'exact', head: true }),

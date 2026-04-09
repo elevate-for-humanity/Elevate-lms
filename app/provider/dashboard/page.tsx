@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { CheckCircle, Clock, ArrowRight, BookOpen, Users, ShieldCheck, TrendingUp, Award, ChevronRight } from 'lucide-react';
@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export default async function ProviderDashboardPage() {
   const { user } = await requireRole(['provider_admin', 'admin', 'super_admin', 'staff']);
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data: profile } = await supabase
     .from('profiles')

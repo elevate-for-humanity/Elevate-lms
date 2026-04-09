@@ -2,7 +2,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Image from 'next/image';
 import {
@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic';
 type Params = Promise<{ courseId: string }>;
 
 async function resolveCourse(courseId: string) {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: course } = await db
     .from('courses')
     .select('id, title, description, short_description, status, is_active, program_id, slug')
@@ -57,7 +57,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function CoursePage({ params }: { params: Params }) {
   const { courseId } = await params;
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/lms/courses/' + courseId);

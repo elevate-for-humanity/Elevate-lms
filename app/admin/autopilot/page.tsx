@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { requireAdmin } from '@/lib/authGuards';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import {
   Zap, Activity, FlaskConical, Cpu, ArrowRight,
@@ -22,7 +22,7 @@ const STATUS_STYLES: Record<string, string> = {
 
 export default async function AutopilotPage() {
   await requireAdmin();
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   // workflows and automation_rules tables may not exist yet — use empty fallback
   const [workflowsResult, automationsResult] = await Promise.all([

@@ -1,13 +1,13 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { generateCertificateNumber } from '@/lib/partner-workflows/certificates';
 
 export async function issueCertificate(formData: FormData) {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -70,7 +70,7 @@ export async function issueCertificate(formData: FormData) {
 
 export async function revokeCertificate(formData: FormData) {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
 
   const { data: { user } } = await supabase.auth.getUser();

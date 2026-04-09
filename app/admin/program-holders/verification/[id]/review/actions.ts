@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { writeAdminAuditEvent, AuditActions } from '@/lib/audit';
 
 const ADMIN_ROLES = ['admin', 'super_admin'];
@@ -20,7 +20,7 @@ export async function submitVerificationDecision(
   if (authError) throw new Error(`Auth failed: ${authError.message}`);
   if (!user) return { error: 'Not authenticated' };
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return { error: 'Service unavailable' };
 
   // ── 2. ROLE CHECK ──────────────────────────────────────────────────

@@ -4,6 +4,64 @@
 import fs from "node:fs";
 import path from "node:path";
 
+// ── createAdminClient() cold-start guard ─────────────────────────────────────
+// createAdminClient() is synchronous and throws on cold serverless starts when
+// SUPABASE_SERVICE_ROLE_KEY is not yet hydrated. All request-time code in app/
+// must use getAdminClient() instead. This check enforces that at CI time.
+//
+// Allowed locations (not in app/): lib/, scripts/, instrumentation.ts
+// ─────────────────────────────────────────────────────────────────────────────
+{
+  const APP_DIR = path.join(process.cwd(), "app");
+  // app/api/ routes are tracked separately — many use withRuntime/withApiAudit wrappers.
+  // Scope this guard to server components, layouts, and server actions only.
+  const API_DIR = path.join(process.cwd(), "app/api");
+  const EXTS = new Set([".ts", ".tsx"]);
+  const IGNORE = new Set(["node_modules", ".git", ".next", "dist", "build"]);
+
+  function walkApp(dir) {
+    const out = [];
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (IGNORE.has(entry.name)) continue;
+      const full = path.join(dir, entry.name);
+      // Skip app/api — covered by a separate audit pass
+      if (full === API_DIR) continue;
+      if (entry.isDirectory()) out.push(...walkApp(full));
+      else if (EXTS.has(path.extname(entry.name))) out.push(full);
+    }
+    return out;
+  }
+
+  let coldStartViolations = 0;
+  for (const file of walkApp(APP_DIR)) {
+    const text = fs.readFileSync(file, "utf8");
+    // Match call sites only — not import declarations or comments
+    const callRe = /(?<!\/\/.*)\bcreateAdminClient\(\)/g;
+    for (const m of text.matchAll(callRe)) {
+      // Skip if the match is on an import line
+      const lineStart = text.lastIndexOf("\n", m.index) + 1;
+      const lineEnd = text.indexOf("\n", m.index);
+      const line = text.slice(lineStart, lineEnd === -1 ? text.length : lineEnd);
+      if (line.trimStart().startsWith("import ")) continue;
+      if (line.trimStart().startsWith("//") || line.trimStart().startsWith("*")) continue;
+
+      let lineNum = 1;
+      for (let i = 0; i < m.index; i++) if (text[i] === "\n") lineNum++;
+      const rel = path.relative(process.cwd(), file);
+      console.log(`ERROR [createAdminClient() in app/] ${rel}:${lineNum}`);
+      console.log(`  ${line.trim()}`);
+      console.log(`  → Replace with: const db = await getAdminClient()`);
+      coldStartViolations++;
+    }
+  }
+
+  if (coldStartViolations > 0) {
+    console.log(`\n${coldStartViolations} createAdminClient() call(s) found in app/. These cause 500s on cold starts.`);
+    console.log("Use getAdminClient() (async, hydrates secrets first) in all request-time code.\n");
+    process.exit(1);
+  }
+}
+
 const ROOT = process.cwd();
 const TARGET_DIRS = [
   "app/admin",

@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -14,7 +14,7 @@ export const metadata = {
 export default async function EmployerOnboardingReview() {
   const auth = await createClient();
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   
   let onboardings: any[] = [];
   if (supabase) {

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import {
   LayoutDashboard, BookOpen, ShieldCheck, Settings, Users, LogOut,
@@ -23,7 +23,7 @@ export default async function ProviderLayout({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/provider/dashboard');
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: profile } = await db!
     .from('profiles')
     .select('role, tenant_id, full_name, email')

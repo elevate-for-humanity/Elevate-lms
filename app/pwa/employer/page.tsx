@@ -1,10 +1,10 @@
 import Image from 'next/image';
 import Logo from '@/components/ui/Logo';
 import Link from 'next/link';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 async function getEmployerData() {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const [programRes, enrollRes, completedRes] = await Promise.all([
     supabase.from('programs').select('id, name, slug, category, placement_rate, completion_rate').eq('is_active', true).order('name').limit(20),

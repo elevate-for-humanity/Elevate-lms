@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 // Courses with local definitions that work without Supabase data.
 // Skip the DB existence check for these — the child pages and API
@@ -26,7 +26,7 @@ export default async function CourseLayout({
   }
 
   const supabase = await createClient();
-  const admin = createAdminClient();
+  const admin = await getAdminClient();
   const db = admin || supabase;
 
   if (!db) return notFound();

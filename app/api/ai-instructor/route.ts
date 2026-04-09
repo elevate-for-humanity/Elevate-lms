@@ -23,7 +23,7 @@ const SYSTEM_PROMPT = `You are an AI instructor assistant for Elevate for Humani
 5. **Resource Direction**: Point students to handbooks, workbooks, and support services
 
 ## Available Programs:
-1. **Barbering** (2,000 hours, 15-24 months) / **Cosmetology** (1,500 hours, 12-18 months)
+1. **Barbering** (2,000 hours, 15-24 months) / **Cosmetology** (2,000 hours, 12-18 months)
 2. **Certified Nursing Assistant (CNA)** (120 hours, 4-8 weeks)
 3. **HVAC Technician** (400 hours) — EPA 608, NATE certification prep
 4. **Tax Preparation** (240 hours, 8 weeks) — IRS PTIN, AFSP

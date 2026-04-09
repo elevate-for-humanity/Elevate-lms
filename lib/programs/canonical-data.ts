@@ -79,7 +79,7 @@ export const PROGRAMS: Record<string, ProgramData> = {
     startingWage: '$10-12/hour + tips',
     wageRange: '$10-16/hour during training',
     careerOutcomeRange: '$30,000-$55,000+/year',
-    stateRequirements: 'Indiana requires 1,500 hours of training for cosmetology licensure.',
+    stateRequirements: 'Indiana requires 2,000 hours of apprenticeship training for cosmetology licensure.',
     category: 'apprenticeship',
     isRegisteredApprenticeship: true,
   },

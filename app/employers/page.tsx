@@ -275,7 +275,7 @@ export default function EmployersPage() {
                   <h3 className="font-semibold text-white mb-3">Available Apprenticeship Programs</h3>
                   {[
                     { program: 'Barber Apprenticeship', hours: '2,000 OJT hours', credential: 'Indiana Barber License (PLA)', duration: '12 months' },
-                    { program: 'Cosmetology Apprenticeship', hours: '1,500 OJT hours', credential: 'Indiana Cosmetology License', duration: '10 months' },
+                    { program: 'Cosmetology Apprenticeship', hours: '2,000 OJT hours', credential: 'Indiana Cosmetology License', duration: '12 months' },
                     { program: 'HVAC Technician', hours: '2,000 OJT hours', credential: 'EPA 608 + OSHA 10', duration: '12 months' },
                     { program: 'Electrical Apprenticeship', hours: '2,000 OJT hours', credential: 'NCCER Level 1', duration: '12 months' },
                     { program: 'Welding', hours: '2,000 OJT hours', credential: 'AWS D1.1', duration: '12 months' },

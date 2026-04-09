@@ -18,7 +18,7 @@ const openai = process.env.OPENAI_API_KEY
 
 const PROGRAM_INFO = {
   barber:
-    'DOL Registered Apprenticeship. 2,000 hours for barber, 1,500 for cosmetology. Earn while learning. State-licensed. WIOA-fundable.',
+    'DOL Registered Apprenticeship. 2,000 hours for barber and cosmetology. Earn while learning. State-licensed. WIOA-fundable.',
   cna: 'Certified Nursing Assistant. 4-6 weeks. High demand in Indianapolis hospitals. $16-20/hour starting. WIOA-funded.',
   cdl: "Commercial Driver's License Class A. 4-6 weeks. $50K-70K/year. High demand. WIOA-funded.",
   hvac: 'HVAC Technician. EPA 608 certification. 6-12 months. $45K-65K/year. ETPL-approved.',

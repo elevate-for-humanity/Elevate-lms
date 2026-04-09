@@ -47,7 +47,7 @@ const PROGRAM_HERO_MEDIA: Record<string, {
     audio: '/audio/heroes/cosmetology.mp3',
     poster: '/images/pages/cosmetology-hero.jpg',
     microLabel: 'Cosmetology Apprenticeship',
-    script: `The Elevate Cosmetology Apprenticeship puts you in a licensed salon from week one. You earn a wage while completing your 1,500 required hours toward your Indiana Cosmetology License. Most apprentices qualify for full funding through WIOA or the Workforce Ready Grant. Apply today.`,
+    script: `The Elevate Cosmetology Apprenticeship puts you in a licensed salon from week one. You earn a wage while completing your 2,000 required hours toward your Indiana Cosmetology License. Most apprentices qualify for full funding through WIOA or the Workforce Ready Grant. Apply today.`,
   },
   'nail-technician-apprenticeship': {
     video: '/videos/nail-tech.mp4',

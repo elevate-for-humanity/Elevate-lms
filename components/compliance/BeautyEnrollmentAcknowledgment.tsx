@@ -37,7 +37,7 @@ const PROGRAM_HOURS: Record<ProgramType, number> = {
   'barber': 1500,
   'nail-technician': 450,
   'esthetician': 700,
-  'cosmetology': 1500,
+  'cosmetology': 2000,
 };
 
 export function BeautyEnrollmentAcknowledgment({ 

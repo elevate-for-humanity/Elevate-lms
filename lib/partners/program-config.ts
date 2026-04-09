@@ -130,7 +130,7 @@ export const PROGRAM_CONFIGS: Record<string, ProgramConfig> = {
     heroImage: '/images/pages/training-classroom.jpg',
     description: 'Host cosmetology apprentices at your salon. Build your team through Indiana\'s USDOL Registered Cosmetology Apprenticeship.',
     registeredApprenticeship: true,
-    trainingHours: 2100,
+    trainingHours: 2000,
     theoryProvider: 'Elevate LMS',
     licensingBody: 'Indiana Professional Licensing Agency (IPLA)',
     licensingExam: 'Indiana State Board cosmetology license exam',
@@ -162,7 +162,7 @@ export const PROGRAM_CONFIGS: Record<string, ProgramConfig> = {
     ],
     faq: [
       { question: 'How much does it cost?', answer: 'No fee. You pay the apprentice a wage. Elevate handles administration and theory training.' },
-      { question: 'How long is the program?', answer: '2,100 hours of on-the-job training. About 1 year full-time.' },
+      { question: 'How long is the program?', answer: '2,000 hours of on-the-job training. About 1 year full-time.' },
       { question: 'What license do I need?', answer: 'A valid Indiana salon license and a licensed cosmetologist to supervise.' },
     ],
   },

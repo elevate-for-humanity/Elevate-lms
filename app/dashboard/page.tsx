@@ -26,11 +26,23 @@ export default async function DashboardRouterPage() {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role')
+      .select('role, onboarding_completed, enrollment_status')
       .eq('id', user.id)
       .single();
 
-    const destination = getRoleDestination(profile?.role ?? 'learner');
+    const role = profile?.role ?? 'student';
+
+    // Students who haven't completed onboarding go there first — always.
+    // Admins and staff bypass onboarding.
+    const bypassOnboarding = ['admin', 'super_admin', 'org_admin', 'staff', 'instructor',
+      'mentor', 'case_manager', 'creator', 'vita_staff', 'supersonic_staff'].includes(role);
+
+    if (!bypassOnboarding && !profile?.onboarding_completed) {
+      const { redirect } = await import('next/navigation');
+      redirect('/onboarding/learner');
+    }
+
+    const destination = getRoleDestination(role);
     const { redirect } = await import('next/navigation');
     redirect(destination);
   } catch (error) {

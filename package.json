@@ -170,6 +170,7 @@
     "autoprefixer": "10.4.22",
     "axe-core": "^4.11.1",
     "critters": "^0.0.25",
+    "csv-parse": "^6.2.1",
     "dotenv": "17.2.3",
     "eslint": "9.39.1",
     "eslint-plugin-react": "7.37.5",

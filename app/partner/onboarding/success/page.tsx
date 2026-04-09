@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Mail, Clock, ArrowRight, CheckCircle, DollarSign } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+
 export default function PartnerOnboardingSuccessPage() {
   // Auth guard — must be signed in to access onboarding
   useEffect(() => {

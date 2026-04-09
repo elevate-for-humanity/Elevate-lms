@@ -1,20 +1,10 @@
-
-
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { 
-  Award, 
-  
-  Clock, 
-  AlertTriangle,
-  ExternalLink,
-  FileText,
-  Calendar,
-  DollarSign,
-  ArrowRight,
-  Lock,
+import {
+  Award, Clock, AlertTriangle, ExternalLink,
+  FileText, Calendar, ArrowRight, Lock, CheckCircle2,
 } from 'lucide-react';
 import { IPLA_EXAM_INFO, IPLA_EXAM_FEES } from '@/lib/payment-config';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -26,349 +16,295 @@ export const metadata: Metadata = {
   description: 'Schedule your Indiana Professional Licensing Agency state board exam.',
 };
 
+const REQUIRED_HOURS: Record<string, number> = {
+  'cosmetology-apprenticeship':       1500,
+  'barber-apprenticeship':            2000,
+  'esthetician-apprenticeship':        700,
+  'nail-technician-apprenticeship':    450,
+};
+
 export default async function StateBoardExamPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/apprentice/state-board');
 
-  if (!user) {
-    redirect('/login');
-  }
+  // Canonical enrollment source
+  const { data: programEnrollment } = await supabase
+    .from('program_enrollments')
+    .select('program_slug, enrolled_at, status')
+    .eq('user_id', user.id)
+    .in('program_slug', Object.keys(REQUIRED_HOURS))
+    .eq('status', 'active')
+    .order('enrolled_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
-  // Get student enrollment
-  const { data: enrollment } = await supabase
+  // Legacy enrollment for extra fields (lms_completed, practical_skills_verified, transfer_hours)
+  const { data: legacyEnrollment } = await supabase
     .from('student_enrollments')
-    .select('*')
+    .select('program_slug, required_hours, transfer_hours, lms_completed, practical_skills_verified')
     .eq('student_id', user.id)
-    .single();
+    .maybeSingle();
 
-  // Get time entries to calculate hours
-  const { data: timeEntries } = await supabase
-    .from('time_entries')
-    .select('minutes, status')
-    .eq('student_id', user.id)
-    .eq('status', 'APPROVED');
+  const programSlug =
+    programEnrollment?.program_slug ??
+    legacyEnrollment?.program_slug ??
+    'cosmetology-apprenticeship';
 
-  const approvedMinutes = timeEntries?.reduce((sum, e) => sum + (e.minutes || 0), 0) || 0;
-  const approvedHours = approvedMinutes / 60;
-  const transferHours = enrollment?.transfer_hours || 0;
-  const totalHours = approvedHours + transferHours;
-  const requiredHours = enrollment?.required_hours || 2000;
+  const requiredHours =
+    legacyEnrollment?.required_hours ??
+    REQUIRED_HOURS[programSlug] ??
+    1500;
 
-  // Check readiness
-  const hoursComplete = totalHours >= requiredHours;
-  const lmsComplete = enrollment?.lms_completed || false;
-  const skillsVerified = enrollment?.practical_skills_verified || false;
-  const isReady = hoursComplete && lmsComplete;
+  // Hours from apprentice_hours (canonical PWA source) — approved only
+  const { data: approvedRows } = await supabase
+    .from('apprentice_hours')
+    .select('hours')
+    .eq('user_id', user.id)
+    .eq('status', 'approved');
 
-  // Determine program type for exam info
-  const programSlug = enrollment?.program_slug || 'barber-apprenticeship';
-  let examInfo = IPLA_EXAM_INFO.barber;
-  if (programSlug.includes('cosmetology')) examInfo = IPLA_EXAM_INFO.cosmetology;
-  else if (programSlug.includes('esthetician')) examInfo = IPLA_EXAM_INFO.esthetician;
-  else if (programSlug.includes('nail')) examInfo = IPLA_EXAM_INFO.nail;
+  const pwaHours = (approvedRows ?? []).reduce((sum, r) => sum + (r.hours ?? 0), 0);
+  const transferHours = legacyEnrollment?.transfer_hours ?? 0;
+  const totalHours = pwaHours + transferHours;
 
-  const examFee = IPLA_EXAM_FEES[programSlug] || 50;
+  const hoursComplete  = totalHours >= requiredHours;
+  const lmsComplete    = legacyEnrollment?.lms_completed ?? false;
+  const skillsVerified = legacyEnrollment?.practical_skills_verified ?? false;
+  const isReady        = hoursComplete && lmsComplete;
+
+  let examInfo = IPLA_EXAM_INFO.cosmetology;
+  if (programSlug.includes('barber'))      examInfo = IPLA_EXAM_INFO.barber;
+  else if (programSlug.includes('esthet')) examInfo = IPLA_EXAM_INFO.esthetician;
+  else if (programSlug.includes('nail'))   examInfo = IPLA_EXAM_INFO.nail;
+
+  const examFee  = IPLA_EXAM_FEES[programSlug] ?? 50;
+  const remaining = Math.max(0, requiredHours - totalHours);
+  const pct       = Math.min(100, Math.round((totalHours / requiredHours) * 100));
 
   return (
-    <div className="min-h-screen bg-white p-6">
-      <Breadcrumbs
-        items={[
+    <div className="min-h-screen bg-slate-50">
+      <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+        <Breadcrumbs items={[
           { label: 'Apprentice Portal', href: '/apprentice' },
           { label: 'State Board Exam' },
-        ]}
-      />
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
+        ]} />
+
         <div>
-          <h1 className="text-3xl font-bold text-black flex items-center gap-3">
-            <Award className="w-8 h-8 text-brand-blue-600" />
+          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+            <Award className="w-7 h-7 text-purple-600" />
             Indiana State Board Exam
           </h1>
-          <p className="text-slate-600 mt-1">
-            Indiana Professional Licensing Agency (IPLA) Examination
+          <p className="text-slate-500 mt-1 text-sm">
+            Indiana Professional Licensing Agency (IPLA) — {examInfo.examProvider}
           </p>
         </div>
 
-        {/* Readiness Status */}
+        {/* Readiness banner */}
         {isReady ? (
-          <div className="bg-brand-blue-700 rounded-2xl p-6 text-white">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                <span className="text-slate-500 flex-shrink-0">•</span>
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold">You're Ready!</h2>
-                <p className="text-white">
-                  All requirements complete. You can now schedule your state board exam.
-                </p>
-              </div>
+          <div className="bg-emerald-600 rounded-2xl p-6 text-white flex items-center gap-5">
+            <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <CheckCircle2 className="w-8 h-8" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold">You&apos;re eligible to test</h2>
+              <p className="text-emerald-100 text-sm mt-0.5">All requirements complete. Schedule your exam below.</p>
             </div>
           </div>
         ) : (
-          <div className="bg-brand-blue-700 rounded-2xl p-6 text-white">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                <Lock className="w-10 h-10" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold">Not Yet Eligible</h2>
-                <p className="text-amber-100">
-                  Complete the requirements below to unlock exam scheduling.
-                </p>
-              </div>
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 flex items-center gap-5">
+            <div className="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <Lock className="w-7 h-7 text-amber-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-amber-900">Not yet eligible</h2>
+              <p className="text-amber-700 text-sm mt-0.5">Complete the requirements below to unlock exam scheduling.</p>
             </div>
           </div>
         )}
 
-        {/* Requirements Checklist */}
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-          <div className="p-4 border-b border-slate-200 bg-white">
-            <h3 className="font-bold text-black">Exam Eligibility Requirements</h3>
+        {/* Requirements */}
+        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-100">
+            <h3 className="font-semibold text-slate-900">Eligibility Requirements</h3>
           </div>
-          <div className="divide-y divide-slate-100">
-            {/* Hours Requirement */}
-            <div className="p-4 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                {hoursComplete ? (
-                  <span className="text-slate-500 flex-shrink-0">•</span>
-                ) : (
-                  <Clock className="w-6 h-6 text-amber-500" />
-                )}
+
+          {/* Hours */}
+          <div className="px-5 py-4 border-b border-slate-100">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-3">
+                {hoursComplete
+                  ? <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 flex-shrink-0" />
+                  : <Clock className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" />}
                 <div>
-                  <div className="font-semibold text-black">Complete {requiredHours} Hours</div>
-                  <div className="text-sm text-slate-500">
-                    {totalHours.toFixed(1)} / {requiredHours} hours completed
+                  <p className="font-medium text-slate-900">
+                    Complete {requiredHours.toLocaleString()} training hours
+                  </p>
+                  <p className="text-sm text-slate-500 mt-0.5">
+                    {totalHours.toFixed(1)} / {requiredHours.toLocaleString()} hours
+                    {transferHours > 0 && ` (includes ${transferHours}h transfer credit)`}
+                  </p>
+                  <div className="mt-2 w-48 bg-slate-100 rounded-full h-1.5">
+                    <div
+                      className={`h-1.5 rounded-full transition-all ${hoursComplete ? 'bg-emerald-500' : 'bg-amber-400'}`}
+                      style={{ width: `${pct}%` }}
+                    />
                   </div>
                 </div>
               </div>
               {hoursComplete ? (
-                <span className="px-3 py-2 bg-brand-green-100 text-brand-green-700 text-sm font-semibold rounded-full">
-                  Complete
-                </span>
+                <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full whitespace-nowrap">Complete</span>
               ) : (
-                <span className="px-3 py-2 bg-amber-100 text-amber-700 text-sm font-semibold rounded-full">
-                  {(requiredHours - totalHours).toFixed(1)} hrs remaining
-                </span>
+                <span className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full whitespace-nowrap">{remaining.toFixed(1)}h remaining</span>
               )}
             </div>
+          </div>
 
-            {/* Elevate LMS Theory */}
-            <div className="p-4 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                {lmsComplete ? (
-                  <span className="text-slate-500 flex-shrink-0">•</span>
-                ) : (
-                  <Clock className="w-6 h-6 text-amber-500" />
-                )}
+          {/* LMS */}
+          <div className="px-5 py-4 border-b border-slate-100">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                {lmsComplete
+                  ? <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                  : <Clock className="w-5 h-5 text-amber-500 flex-shrink-0" />}
                 <div>
-                  <div className="font-semibold text-black">Complete Elevate LMS Theory</div>
-                  <div className="text-sm text-slate-500">
-                    Related Technical Instruction (RTI)
-                  </div>
+                  <p className="font-medium text-slate-900">Complete Elevate LMS theory</p>
+                  <p className="text-sm text-slate-500">Related Technical Instruction (RTI)</p>
                 </div>
               </div>
               {lmsComplete ? (
-                <span className="px-3 py-2 bg-brand-green-100 text-brand-green-700 text-sm font-semibold rounded-full">
-                  Complete
-                </span>
+                <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">Complete</span>
               ) : (
-                <Link
-                  href="/lms/progress"
-                  className="px-3 py-2 bg-brand-blue-100 text-brand-blue-700 text-sm font-semibold rounded-full hover:bg-brand-blue-200"
-                >
-                  Access Elevate LMS →
+                <Link href="/lms/dashboard" className="text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200 px-2.5 py-1 rounded-full hover:bg-purple-100 transition-colors whitespace-nowrap">
+                  Open LMS →
                 </Link>
               )}
             </div>
+          </div>
 
-            {/* Practical Skills (optional indicator) */}
-            <div className="p-4 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                {skillsVerified ? (
-                  <span className="text-slate-500 flex-shrink-0">•</span>
-                ) : (
-                  <Clock className="w-6 h-6 text-slate-400" />
-                )}
+          {/* Practical skills */}
+          <div className="px-5 py-4 border-b border-slate-100">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                {skillsVerified
+                  ? <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                  : <Clock className="w-5 h-5 text-slate-300 flex-shrink-0" />}
                 <div>
-                  <div className="font-semibold text-black">Practical Skills Verified</div>
-                  <div className="text-sm text-slate-500">
-                    Mentor verification of hands-on competencies
-                  </div>
+                  <p className="font-medium text-slate-900">Practical skills verified</p>
+                  <p className="text-sm text-slate-500">Mentor sign-off on hands-on competencies</p>
                 </div>
               </div>
-              <Link
-                href="/apprentice/skills"
-                className="px-3 py-2 bg-white text-slate-700 text-sm font-semibold rounded-full hover:bg-slate-200"
-              >
-                View Skills →
+              <Link href="/apprentice/competencies" className="text-xs font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full hover:bg-slate-200 transition-colors whitespace-nowrap">
+                View skills →
               </Link>
             </div>
+          </div>
 
-            {/* Exam Fee */}
-            <div className="p-4 flex items-center justify-between bg-brand-green-50">
-              <div className="flex items-center gap-4">
-                <span className="text-slate-500 flex-shrink-0">•</span>
+          {/* Exam fee */}
+          <div className="px-5 py-4 bg-emerald-50">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
                 <div>
-                  <div className="font-semibold text-black">State Board Exam Fee</div>
-                  <div className="text-sm text-slate-500">
-                    ${examFee} - Included in your program tuition
-                  </div>
+                  <p className="font-medium text-slate-900">State board exam fee — ${examFee}</p>
+                  <p className="text-sm text-slate-500">Included in your program tuition</p>
                 </div>
               </div>
-              <span className="px-3 py-2 bg-brand-green-100 text-brand-green-700 text-sm font-semibold rounded-full">
-                Paid
-              </span>
+              <span className="text-xs font-semibold text-emerald-700 bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded-full">Paid</span>
             </div>
           </div>
         </div>
 
-        {/* Exam Scheduling Section */}
+        {/* Scheduling */}
         {isReady ? (
-          <div className="bg-white rounded-xl border-2 border-brand-green-200 overflow-hidden">
-            <div className="p-4 border-b border-brand-green-200 bg-brand-green-50">
-              <h3 className="font-bold text-brand-green-800 flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
-                Schedule Your Exam
-              </h3>
+          <div className="bg-white rounded-2xl border-2 border-emerald-200 overflow-hidden">
+            <div className="px-5 py-4 border-b border-emerald-100 bg-emerald-50 flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-emerald-700" />
+              <h3 className="font-semibold text-emerald-900">Schedule your exam</h3>
             </div>
-            <div className="p-6 space-y-6">
-              <div className="grid md:grid-cols-2 gap-4">
-                {/* PSI Exam Registration */}
-                <a
-                  href={examInfo.examProviderUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block p-6 bg-brand-blue-50 border-2 border-brand-blue-200 rounded-xl hover:border-brand-blue-400 transition-all group"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-bold text-brand-blue-900">Schedule Exam</h4>
-                    <ExternalLink className="w-5 h-5 text-brand-blue-600 group-hover:translate-x-1 transition-transform" />
+            <div className="p-5 space-y-5">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <a href={examInfo.examProviderUrl} target="_blank" rel="noopener noreferrer"
+                  className="group block p-5 bg-slate-50 border border-slate-200 rounded-xl hover:border-purple-300 hover:bg-purple-50 transition-all">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-semibold text-slate-900">Schedule exam</h4>
+                    <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-purple-600 transition-colors" />
                   </div>
-                  <p className="text-sm text-brand-blue-700 mb-3">
-                    Register and schedule your written and practical exams through {examInfo.examProvider}.
-                  </p>
-                  <div className="text-brand-blue-600 font-semibold text-sm flex items-center gap-1">
-                    Go to {examInfo.examProvider} <ArrowRight className="w-4 h-4" />
-                  </div>
+                  <p className="text-sm text-slate-500 mb-3">Register for written and practical exams via {examInfo.examProvider}.</p>
+                  <span className="text-sm font-semibold text-purple-700 flex items-center gap-1">
+                    Go to {examInfo.examProvider} <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
                 </a>
-
-                {/* IPLA Application */}
-                <a
-                  href={examInfo.applicationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block p-6 bg-brand-blue-50 border-2 border-brand-blue-200 rounded-xl hover:border-brand-blue-400 transition-all group"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-bold text-brand-blue-900">License Application</h4>
-                    <ExternalLink className="w-5 h-5 text-brand-blue-600 group-hover:translate-x-1 transition-transform" />
+                <a href={examInfo.applicationUrl} target="_blank" rel="noopener noreferrer"
+                  className="group block p-5 bg-slate-50 border border-slate-200 rounded-xl hover:border-purple-300 hover:bg-purple-50 transition-all">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-semibold text-slate-900">License application</h4>
+                    <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-purple-600 transition-colors" />
                   </div>
-                  <p className="text-sm text-brand-blue-700 mb-3">
-                    Apply for your Indiana license through the IPLA MyLicense portal.
-                  </p>
-                  <div className="text-brand-blue-600 font-semibold text-sm flex items-center gap-1">
-                    Go to MyLicense.IN.gov <ArrowRight className="w-4 h-4" />
-                  </div>
+                  <p className="text-sm text-slate-500 mb-3">Apply for your Indiana license through the IPLA MyLicense portal.</p>
+                  <span className="text-sm font-semibold text-purple-700 flex items-center gap-1">
+                    MyLicense.IN.gov <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
                 </a>
               </div>
-
-              {/* Exam Info */}
-              <div className="bg-white rounded-lg p-4">
-                <h4 className="font-semibold text-black mb-3">Exam Information</h4>
-                <div className="grid md:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-slate-500">Written Exam:</span>
-                    <span className="ml-2 text-black">100 questions, 90 minutes</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500">Practical Exam:</span>
-                    <span className="ml-2 text-black">Live demonstration</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500">Passing Score:</span>
-                    <span className="ml-2 text-black">75% on each section</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500">Exam Fee:</span>
-                    <span className="ml-2 text-brand-green-600 font-semibold">Included in tuition</span>
-                  </div>
-                </div>
+              <div className="bg-slate-50 rounded-xl p-4 grid sm:grid-cols-2 gap-3 text-sm">
+                <div><span className="text-slate-500">Written exam:</span> <span className="font-medium text-slate-900">100 questions, 90 min</span></div>
+                <div><span className="text-slate-500">Practical exam:</span> <span className="font-medium text-slate-900">Live demonstration</span></div>
+                <div><span className="text-slate-500">Passing score:</span> <span className="font-medium text-slate-900">75% on each section</span></div>
+                <div><span className="text-slate-500">Exam fee:</span> <span className="font-semibold text-emerald-700">Included in tuition</span></div>
               </div>
-
-              {/* Resources */}
               <div className="flex flex-wrap gap-3">
-                <a
-                  href={examInfo.boardUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2 bg-white text-slate-700 rounded-lg hover:bg-slate-200 text-sm font-medium"
-                >
-                  <FileText className="w-4 h-4" />
-                  IPLA Board Info
+                <a href={examInfo.boardUrl} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-lg transition-colors">
+                  <FileText className="w-4 h-4" /> IPLA Board Info
                 </a>
-                <a
-                  href={examInfo.examUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2 bg-white text-slate-700 rounded-lg hover:bg-slate-200 text-sm font-medium"
-                >
-                  <FileText className="w-4 h-4" />
-                  Exam Requirements
+                <a href={examInfo.examUrl} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-lg transition-colors">
+                  <FileText className="w-4 h-4" /> Exam Requirements
                 </a>
               </div>
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-xl p-8 text-center">
-            <Lock className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-slate-600 mb-2">Exam Scheduling Locked</h3>
-            <p className="text-slate-500 mb-4">
-              Complete all requirements above to unlock exam scheduling.
-            </p>
-            <Link
-              href="/lms/progress"
-              className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700"
-            >
-              View My Progress <ArrowRight className="w-4 h-4" />
+          <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center">
+            <Lock className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+            <h3 className="font-semibold text-slate-700 mb-1">Exam scheduling locked</h3>
+            <p className="text-sm text-slate-500 mb-4">Complete all requirements above to unlock.</p>
+            <Link href="/pwa/cosmetology"
+              className="inline-flex items-center gap-2 bg-purple-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-purple-700 transition-colors">
+              Log hours <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         )}
 
-        {/* Important Notice */}
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
+        {/* Important notes */}
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-bold text-amber-900 mb-2">Important Information</h4>
-              <ul className="text-sm text-amber-800 space-y-2">
-                <li>• Your exam fee (${examFee}) is included in your program tuition and has been paid.</li>
-                <li>• You must bring valid government-issued photo ID to the exam.</li>
-                <li>• Bring your own tools/kit for the practical exam (check IPLA requirements).</li>
-                <li>• If you fail, retake fees may apply (contact us for assistance).</li>
-                <li>• After passing, apply for your license through MyLicense.IN.gov.</li>
+              <h4 className="font-semibold text-amber-900 mb-2">Before you test</h4>
+              <ul className="text-sm text-amber-800 space-y-1.5">
+                <li>• Bring valid government-issued photo ID to the exam site.</li>
+                <li>• Bring your own tools/kit for the practical exam — check IPLA requirements for the approved list.</li>
+                <li>• Your exam fee (${examFee}) is included in your tuition and has been paid.</li>
+                <li>• Retake fees apply if you do not pass — contact us for assistance.</li>
+                <li>• After passing both sections, apply for your license at MyLicense.IN.gov.</li>
               </ul>
             </div>
           </div>
         </div>
 
-        {/* Contact Support */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6 text-center">
-          <h4 className="font-bold text-black mb-2">Need Help?</h4>
-          <p className="text-slate-600 mb-4">
-            Questions about the state board exam? We're here to help.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <a
-              href="/support"
-              className="px-4 py-2 bg-brand-blue-100 text-brand-blue-700 rounded-lg font-medium hover:bg-brand-blue-200"
-            >
-              Call: 317-314-3757
+        {/* Support */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-5 text-center">
+          <h4 className="font-semibold text-slate-900 mb-1">Questions?</h4>
+          <p className="text-sm text-slate-500 mb-4">We&apos;re here to help you get licensed.</p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <a href="tel:3173143757"
+              className="text-sm font-medium text-purple-700 bg-purple-50 border border-purple-200 px-4 py-2 rounded-lg hover:bg-purple-100 transition-colors">
+              Call 317-314-3757
             </a>
-            <a
-              href="/contact"
-              className="px-4 py-2 bg-brand-blue-100 text-brand-blue-700 rounded-lg font-medium hover:bg-brand-blue-200"
-            >
-              Email Support
+            <a href="/contact"
+              className="text-sm font-medium text-slate-700 bg-slate-100 border border-slate-200 px-4 py-2 rounded-lg hover:bg-slate-200 transition-colors">
+              Email support
             </a>
           </div>
         </div>

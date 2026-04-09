@@ -59,7 +59,7 @@ export default async function OrgProfilePage() {
               <p className="text-slate-500 text-sm">Legal identity used in all submission packets</p>
             </div>
           </div>
-          <Link href="/admin/submissions/org/edit" className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
+          <Link href="/admin/submissions/org" className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
             Edit
           </Link>
         </div>
@@ -69,7 +69,7 @@ export default async function OrgProfilePage() {
             <AlertTriangle className="w-8 h-8 text-amber-500 mx-auto mb-3" />
             <p className="font-semibold text-amber-900 mb-1">No organization record found</p>
             <p className="text-sm text-amber-700 mb-4">Apply the Submissions OS migrations, then add your organization.</p>
-            <Link href="/admin/submissions/org/edit" className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-semibold hover:bg-amber-700 transition">
+            <Link href="/admin/submissions/org" className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-semibold hover:bg-amber-700 transition">
               Add Organization
             </Link>
           </div>

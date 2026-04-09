@@ -229,7 +229,7 @@ export default function SNAPETPartnerPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/snap-et-partner/questionnaire"
+              href="/snap-et-partner"
               className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold text-lg px-10 py-4 rounded-full transition shadow-lg"
             >
               Complete TPP Questionnaire <ArrowRight className="w-5 h-5" />

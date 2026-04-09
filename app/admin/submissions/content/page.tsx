@@ -47,7 +47,7 @@ export default async function ContentLibraryPage() {
               <p className="text-slate-500 text-sm">Approved prose blocks — mission, org overview, program summaries, equity statement</p>
             </div>
           </div>
-          <Link href="/admin/submissions/content/new" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
+          <Link href="/admin/submissions/content" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
             <Plus className="w-4 h-4" /> New Block
           </Link>
         </div>
@@ -64,7 +64,7 @@ export default async function ContentLibraryPage() {
             <BookOpen className="w-10 h-10 text-slate-300 mx-auto mb-3" />
             <p className="font-semibold text-slate-700 mb-1">No content blocks yet</p>
             <p className="text-sm text-slate-500 mb-4">Add approved prose for mission statements, program summaries, and more.</p>
-            <Link href="/admin/submissions/content/new" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
+            <Link href="/admin/submissions/content" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
               <Plus className="w-4 h-4" /> Add First Block
             </Link>
           </div>

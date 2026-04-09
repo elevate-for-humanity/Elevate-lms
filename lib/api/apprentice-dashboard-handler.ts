@@ -24,20 +24,24 @@ export async function handleDashboard(request: NextRequest, discipline: string) 
     // Total approved hours for this discipline
     const { data: hoursData } = await supabase
       .from('apprentice_hours')
-      .select('hours, submitted_at')
+      .select('hours, date')
       .eq('user_id', user.id)
       .eq('discipline', discipline)
       .eq('status', 'approved');
 
     const totalHours = (hoursData ?? []).reduce((sum, r) => sum + (r.hours ?? 0), 0);
 
-    // Hours logged this week
-    const weekStart = new Date();
-    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-    weekStart.setHours(0, 0, 0, 0);
+    // Hours with a date in the current calendar week (Sunday–Saturday, UTC).
+    // Filter on the `date` column (YYYY-MM-DD), not submitted_at, so that
+    // hours approved after the week they were worked still count correctly.
+    const now = new Date();
+    const weekStartDate = new Date(Date.UTC(
+      now.getUTCFullYear(), now.getUTCMonth(),
+      now.getUTCDate() - now.getUTCDay()   // back to Sunday
+    )).toISOString().split('T')[0];
 
     const weeklyHours = (hoursData ?? [])
-      .filter(r => r.submitted_at && new Date(r.submitted_at) >= weekStart)
+      .filter(r => r.date && r.date >= weekStartDate)
       .reduce((sum, r) => sum + (r.hours ?? 0), 0);
 
     return NextResponse.json({

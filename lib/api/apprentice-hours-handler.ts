@@ -46,20 +46,27 @@ export async function handleLogHours(request: NextRequest, discipline: string) {
       return safeError(`Cannot log more than ${MAX_HOURS_PER_DAY} hours in a single entry`, 400);
     }
 
-    // ── Date validation ───────────────────────────────────────────────────────
-    const entryDate = new Date(date);
-    if (isNaN(entryDate.getTime())) return safeError('Invalid date format', 400);
+    // ── Date validation — all comparisons in UTC ──────────────────────────────
+    // Parse the incoming date as a UTC calendar date regardless of client timezone.
+    // This prevents cross-midnight boundary exploits where a client in UTC-5
+    // could submit "tomorrow" as their local date.
+    const dateMatch = String(date).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!dateMatch) return safeError('Date must be in YYYY-MM-DD format', 400);
 
-    const today = new Date();
-    today.setUTCHours(23, 59, 59, 999);
+    const [, y, m, d] = dateMatch;
+    const entryDate = new Date(Date.UTC(Number(y), Number(m) - 1, Number(d)));
+    if (isNaN(entryDate.getTime())) return safeError('Invalid date', 400);
 
-    if (entryDate > today) {
+    // UTC "today" — midnight boundary
+    const todayUTC = new Date();
+    todayUTC.setUTCHours(0, 0, 0, 0);
+
+    if (entryDate > todayUTC) {
       return safeError('Cannot log hours for a future date', 400);
     }
 
-    const oldestAllowed = new Date();
-    oldestAllowed.setDate(oldestAllowed.getDate() - MAX_BACKDATE_DAYS);
-    oldestAllowed.setUTCHours(0, 0, 0, 0);
+    const oldestAllowed = new Date(todayUTC);
+    oldestAllowed.setUTCDate(oldestAllowed.getUTCDate() - MAX_BACKDATE_DAYS);
 
     if (entryDate < oldestAllowed) {
       return safeError(
@@ -69,6 +76,7 @@ export async function handleLogHours(request: NextRequest, discipline: string) {
     }
 
     // ── Daily cap enforcement ─────────────────────────────────────────────────
+    // dateStr is always YYYY-MM-DD UTC — matches the DB date column exactly.
     const dateStr = entryDate.toISOString().split('T')[0];
 
     const { data: existingToday, error: existingErr } = await supabase
@@ -116,6 +124,18 @@ export async function handleLogHours(request: NextRequest, discipline: string) {
       });
 
     if (insertErr) {
+      // Unique constraint violation — race condition where two concurrent
+      // submissions both passed the cap check but only one can win.
+      if (insertErr.code === '23505') {
+        return safeError(
+          `You already have a pending or approved entry for this date. Wait for it to be reviewed before submitting again.`,
+          409
+        );
+      }
+      // DB check constraint — future date or hours out of range caught at DB level
+      if (insertErr.code === '23514') {
+        return safeError('Entry violates a data integrity rule. Check the date and hours and try again.', 400);
+      }
       logger.error(`[pwa/${discipline}/log-hours] insert error`, insertErr);
       return safeError('Failed to save hours. Please try again.', 500);
     }

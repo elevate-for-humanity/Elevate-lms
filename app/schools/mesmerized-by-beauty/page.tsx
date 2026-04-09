@@ -430,6 +430,70 @@ export default function MesmerizedByBeautyPage() {
         </div>
       </section>
 
+      {/* ── STUDENT JOURNEY ──────────────────────────────────────────── */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <p className="text-purple-600 font-semibold text-sm uppercase tracking-widest mb-3">Real Outcomes</p>
+            <h2 className="text-3xl font-black text-slate-900 mb-4">What apprentices actually experience</h2>
+            <p className="text-slate-500 text-sm max-w-lg mx-auto">
+              We don&apos;t have 10 years of data yet — we&apos;re building this program with you. Here&apos;s what the path looks like based on Indiana apprenticeship standards and our partner network.
+            </p>
+          </div>
+
+          {/* Outcome stats */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
+            {[
+              { value: '$12–$16', unit: '/hr', label: 'Typical starting wage during training', color: 'text-purple-700' },
+              { value: '3–4', unit: ' weeks', label: 'Average time from application to first paid shift', color: 'text-purple-700' },
+              { value: '$0', unit: '', label: 'Tuition cost for most WIOA-eligible students', color: 'text-emerald-700' },
+              { value: '100%', unit: '', label: 'Hands-on training in a real licensed salon', color: 'text-purple-700' },
+            ].map((stat) => (
+              <div key={stat.label} className="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-center">
+                <p className={`text-3xl font-black ${stat.color}`}>
+                  {stat.value}<span className="text-lg">{stat.unit}</span>
+                </p>
+                <p className="text-xs text-slate-500 mt-2 leading-snug">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* A day in the life */}
+          <div className="bg-slate-900 rounded-2xl overflow-hidden">
+            <div className="px-6 py-5 border-b border-white/10">
+              <h3 className="text-white font-black text-lg">A day in the life of a cosmetology apprentice</h3>
+              <p className="text-slate-400 text-sm mt-1">Month 3 of training — a typical Tuesday</p>
+            </div>
+            <div className="p-6 space-y-4">
+              {[
+                { time: '8:30 AM', event: 'Arrive at partner salon. Clock in on the Elevate app.', tag: 'Paid hours start' },
+                { time: '9:00 AM', event: 'First client — shampoo, blow-dry, and style under supervisor observation.', tag: 'Practical training' },
+                { time: '12:00 PM', event: 'Lunch break. Review today\'s theory module on the Elevate LMS — 20 minutes on chemical services.', tag: 'Theory coursework' },
+                { time: '1:00 PM', event: 'Two more clients. Supervisor signs off on a new competency: basic color application.', tag: 'Skills milestone' },
+                { time: '5:00 PM', event: 'Clock out. 8 hours logged. Running total: 312 of 1,500 hours. On track to test in 11 months.', tag: 'Progress tracked' },
+              ].map((item) => (
+                <div key={item.time} className="flex gap-4 items-start">
+                  <div className="w-16 flex-shrink-0 text-right">
+                    <span className="text-purple-400 text-xs font-bold">{item.time}</span>
+                  </div>
+                  <div className="flex-1 bg-white/5 rounded-xl px-4 py-3">
+                    <p className="text-white text-sm leading-relaxed">{item.event}</p>
+                    <span className="inline-block mt-1.5 text-xs font-semibold text-purple-300 bg-purple-900/50 px-2 py-0.5 rounded-full">
+                      {item.tag}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="px-6 py-4 bg-white/5 border-t border-white/10">
+              <p className="text-slate-400 text-sm text-center">
+                This is what the program is designed to look like — structured, supervised, and paid.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── ELEVATE PARTNERSHIP ───────────────────────────────────────── */}
       <section className="py-14 bg-purple-700">
         <div className="max-w-4xl mx-auto px-4">

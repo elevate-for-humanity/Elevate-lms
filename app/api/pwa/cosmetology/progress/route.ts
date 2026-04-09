@@ -143,7 +143,11 @@ export async function GET(request: NextRequest) {
     let weeklyAvgHours: number | null = null;
     let projectedCompletionDate: string | null = null;
 
-    if (approved.length >= 2) {
+    const totalHoursTowardRequired = totalHoursApproved + transferHours;
+    const hoursLeft = Math.max(0, REQUIRED_HOURS - totalHoursTowardRequired);
+
+    // Only project if hours are not yet complete
+    if (hoursLeft > 0 && approved.length >= 2) {
       const dates = approved
         .map(r => new Date(r.date).getTime())
         .sort((a, b) => a - b);
@@ -151,10 +155,10 @@ export async function GET(request: NextRequest) {
       const spanWeeks = Math.max(1, (dates[dates.length - 1] - dates[0]) / (7 * 24 * 60 * 60 * 1000));
       weeklyAvgHours = Math.round((totalHoursApproved / spanWeeks) * 10) / 10;
 
-      const hoursLeft = Math.max(0, REQUIRED_HOURS - (totalHoursApproved + transferHours));
-      if (weeklyAvgHours > 0 && hoursLeft > 0) {
-        const weeksLeft = hoursLeft / weeklyAvgHours;
-        const projected = new Date();
+      if (weeklyAvgHours > 0) {
+        const weeksLeft  = hoursLeft / weeklyAvgHours;
+        const projected  = new Date();
+        projected.setUTCHours(0, 0, 0, 0);
         projected.setDate(projected.getDate() + Math.ceil(weeksLeft * 7));
         projectedCompletionDate = projected.toISOString().split('T')[0];
       }

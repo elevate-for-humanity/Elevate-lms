@@ -12,6 +12,7 @@ import { logger } from '@/lib/logger';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 const BARBER_PROGRAM_SLUG = 'barber-apprenticeship';
+const BARBER_COURSE_ID    = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';
 
 export interface BarberPostPaymentInput {
   db: SupabaseClient;
@@ -107,6 +108,7 @@ export async function runBarberPostPayment(
               user_id:                     profileId,
               program_id:                  program.id,
               program_slug:                BARBER_PROGRAM_SLUG,
+              course_id:                   BARBER_COURSE_ID,
               email:                       studentEmail,
               full_name:                   studentName,
               phone:                       app.phone ?? null,

@@ -251,6 +251,58 @@ async function _POST(
       lessonTitle: lesson.title,
     });
 
+    // Update competency progress — non-fatal, runs after lesson_progress is written.
+    // Increments touchpoints for every competency linked to this lesson.
+    // Marks competency as mastered when touchpoints >= minimum_touchpoints.
+    try {
+      const { data: linkedCompetencies } = await db
+        .from('lesson_competencies')
+        .select('competency_id')
+        .eq('lesson_id', lessonId);
+
+      if (linkedCompetencies && linkedCompetencies.length > 0) {
+        const programId = enrollment.program_id ?? null;
+
+        for (const { competency_id } of linkedCompetencies) {
+          // Fetch minimum_touchpoints threshold for this competency
+          const { data: comp } = await db
+            .from('competencies')
+            .select('minimum_touchpoints')
+            .eq('id', competency_id)
+            .maybeSingle();
+
+          const minTouchpoints = comp?.minimum_touchpoints ?? 1;
+
+          // Upsert progress row, incrementing touchpoints
+          const { data: existing } = await db
+            .from('student_competency_progress')
+            .select('id, touchpoints')
+            .eq('user_id', user.id)
+            .eq('competency_id', competency_id)
+            .maybeSingle();
+
+          const newTouchpoints = (existing?.touchpoints ?? 0) + 1;
+          const isMastered     = newTouchpoints >= minTouchpoints;
+
+          await db.from('student_competency_progress').upsert(
+            {
+              user_id:        user.id,
+              competency_id,
+              program_id:     programId,
+              touchpoints:    newTouchpoints,
+              is_mastered:    isMastered,
+              mastered_at:    isMastered && !existing ? new Date().toISOString() : undefined,
+              updated_at:     new Date().toISOString(),
+            },
+            { onConflict: 'user_id,competency_id' }
+          );
+        }
+      }
+    } catch (compErr) {
+      // Non-fatal — competency tracking failure must not block lesson completion
+      logger.warn('Competency progress update failed (non-fatal):', compErr);
+    }
+
     // Delegate progress recalculation, enrollment % update, and certificate
     // issuance to the engine. This is the single path for all three concerns.
     const completionResult = await recordStepCompletion(

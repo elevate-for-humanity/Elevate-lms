@@ -68,6 +68,8 @@ interface QuizPlayerProps {
   passingScore?: number;
   /** Title shown above the quiz (e.g. "Module 6 Quiz — EPA 608 Core") */
   title?: string;
+  /** When true, fail messaging explicitly states the next module is locked. */
+  isCheckpoint?: boolean;
 }
 
 // ── Sound helpers (Web Audio API — no external files) ──────────────────
@@ -116,6 +118,7 @@ export default function QuizPlayer({
   onComplete,
   passingScore = 70,
   title,
+  isCheckpoint = false,
 }: QuizPlayerProps) {
   // Normalize all questions to the canonical shape, dropping any unrecognized items.
   const questions: Question[] = (rawQuestions ?? [])
@@ -221,7 +224,7 @@ export default function QuizPlayer({
             )}
           </div>
           <h2 className="text-3xl font-bold mb-2">
-            {passed ? "Congratulations!" : "Keep Studying!"}
+            {passed ? "Congratulations!" : isCheckpoint ? "Not Yet" : "Keep Studying!"}
           </h2>
           <p className="text-lg text-slate-700">
             You scored <span className="font-bold">{score}%</span> — {correctCount} of{" "}
@@ -230,7 +233,9 @@ export default function QuizPlayer({
           <p className="text-sm text-slate-500 mt-1">
             {passed
               ? `You passed! (${passingScore}% required)`
-              : `You need ${passingScore}% to pass. Review the explanations below and try again.`}
+              : isCheckpoint
+                ? `You need ${passingScore}% to unlock the next module. Review the explanations below and retake when ready.`
+                : `You need ${passingScore}% to pass. Review the explanations below and try again.`}
           </p>
         </div>
 
@@ -397,7 +402,7 @@ export default function QuizPlayer({
                 className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex items-center gap-4 ${optionStyle}`}
               >
                 {indicator}
-                <span className="font-medium text-slate-800">{option}</span>
+                <span className="font-medium text-slate-800 min-w-0 break-words">{option}</span>
               </button>
             );
           })}

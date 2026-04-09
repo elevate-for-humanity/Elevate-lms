@@ -24,7 +24,7 @@ async function runHealthCheck(
 ): Promise<{ pass: boolean; blocking_issues: string[] }> {
   const modules = await supabase
     .from('course_modules')
-    .select('id, title, course_lessons(id, lesson_type)')
+    .select('id, title, course_lessons(id, title, lesson_type, content, video_url, quiz_questions)')
     .eq('course_id', courseId);
 
   const blocking: string[] = [];
@@ -33,12 +33,40 @@ async function runHealthCheck(
   if (mods.length === 0) blocking.push('no modules');
 
   let totalLessons = 0;
-  for (const m of mods as Array<{ id: string; title: string; course_lessons: Array<{ id: string; lesson_type: string | null }> }>) {
+  for (const m of mods as Array<{
+    id: string;
+    title: string;
+    course_lessons: Array<{
+      id: string;
+      title: string;
+      lesson_type: string | null;
+      content: string | null;
+      video_url: string | null;
+      quiz_questions: unknown[] | null;
+    }>;
+  }>) {
     const lessons = m.course_lessons ?? [];
     if (lessons.length === 0) blocking.push(`empty module: ${m.title}`);
     totalLessons += lessons.length;
-    const nullTypes = lessons.filter(l => !l.lesson_type).length;
-    if (nullTypes > 0) blocking.push(`${nullTypes} lesson(s) with NULL lesson_type in module: ${m.title}`);
+
+    for (const l of lessons) {
+      const issues: string[] = [];
+      const type = l.lesson_type ?? '';
+      const isAssessment = ['quiz', 'checkpoint', 'exam'].includes(type);
+
+      if (!l.lesson_type) issues.push('no lesson_type');
+      if (!l.content)     issues.push('no content');
+      // Assessments (checkpoint/quiz/exam) are quiz-only — no video required
+      if (!isAssessment && !l.video_url) issues.push('no video');
+      // Assessments must have quiz_questions
+      if (isAssessment &&
+          (!l.quiz_questions || (l.quiz_questions as unknown[]).length === 0)) {
+        issues.push('no quiz_questions');
+      }
+      if (issues.length > 0) {
+        blocking.push(`"${l.title}" (${m.title}): ${issues.join(', ')}`);
+      }
+    }
   }
 
   if (totalLessons === 0) blocking.push('no lessons');

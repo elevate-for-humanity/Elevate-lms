@@ -485,6 +485,7 @@ ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive ev
             userId: null as unknown as string, // linked by email post-signup
             programId: resolvedProgramId,
             programSlug: 'barber-apprenticeship',
+            courseId: '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17',
             fundingSource: 'self_pay',
             amountPaidCents,
             stripeCheckoutSessionId: session.id,

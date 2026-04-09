@@ -183,6 +183,7 @@ async function _POST(request: NextRequest) {
         program: 'barber-apprenticeship',
         program_slug: 'barber-apprenticeship',
         program_id: '5ff21fcb-1968-41fd-99d3-37d69a31bd5c',
+        course_id: '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17',
         student_id: application_id || '',
         application_id: application_id || '',
         payment_type,

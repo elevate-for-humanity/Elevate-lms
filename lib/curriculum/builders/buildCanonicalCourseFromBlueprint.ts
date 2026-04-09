@@ -577,6 +577,15 @@ async function upsertLessonFromCurriculum(
     if (cur.video_file)       payload.video_url        = cur.video_file;
   }
 
+  // Blueprint-level videoFile overrides video_url when no DB video_file is set
+  if (lessonRef.videoFile && !payload.video_url) {
+    payload.video_url = lessonRef.videoFile;
+  }
+  // Always store blueprint videoFile in video_config for runtime fallback
+  if (lessonRef.videoFile) {
+    payload.video_config = { ...(payload.video_config as object ?? {}), videoFile: lessonRef.videoFile };
+  }
+
   const { data: existing } = await db
     .from('course_lessons')
     .select('id')

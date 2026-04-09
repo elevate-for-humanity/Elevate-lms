@@ -1,3 +1,24 @@
+/**
+ * Barber Apprenticeship Blueprint
+ *
+ * Slug numbering convention (intentional — do not "fix"):
+ *   Each module contains 6 lessons + 1 checkpoint.
+ *   Lessons are numbered sequentially across modules (1–6, 8–13, 15–20, …).
+ *   The 7th slot of each module (7, 14, 21, 28, …) is reserved for the checkpoint,
+ *   which uses a named slug (barber-module-N-checkpoint) instead of barber-lesson-N.
+ *   These gaps are load-bearing — progress tracking and unlock logic depend on them.
+ *   Never renumber existing slugs. Add new lessons at the next available number.
+ *
+ * Module → lesson slug map:
+ *   Module 1 (Foundations & Safety):          lessons 1–6,  checkpoint slot 7
+ *   Module 2 (Hair Science & Scalp Analysis):  lessons 8–13, checkpoint slot 14
+ *   Module 3 (Haircutting Theory):             lessons 15–20, checkpoint slot 21
+ *   Module 4 (Shaving & Facial Hair):          lessons 22–27, checkpoint slot 28
+ *   Module 5 (Chemical Services):              lessons 29–33, checkpoint slot 34
+ *   Module 6 (Business & Client Relations):    lessons 35–38, checkpoint slot 39
+ *   Module 7 (State Board Prep):               lessons 40–44, checkpoint slot 45
+ *   Module 8 (Capstone):                       lessons 46–49, final exam
+ */
 import type { CredentialBlueprint, BlueprintVideoConfig } from './types';
 
 const BARBER_VIDEO_CONFIG: BlueprintVideoConfig = {
@@ -65,196 +86,887 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
       lessons: [
         {
           slug: 'barber-lesson-1',
-          title: 'Welcome to the Barber Apprenticeship',
+          title: 'Introduction to Barbering',
           order: 1,
           domainKey: 'infection_control',
-          objective: 'Understand the structure of the DOL-registered barber apprenticeship program.',
-          durationMinutes: 15,
-          content: `<h2>Welcome to Your Barber Apprenticeship</h2>
-<p>This program is a U.S. Department of Labor registered apprenticeship. You will complete 2,000 hours of on-the-job training alongside this related technical instruction.</p>
-<h3>What You Will Learn</h3>
+          objective: 'Describe the history and legal framework of barbering in Indiana, explain the DOL apprenticeship structure, and identify the scope of practice for licensed barbers.',
+          durationMinutes: 25,
+          videoFile: '/videos/barber-course-intro-with-voice.mp4',
+          content: `<h2>Introduction to Barbering</h2>
+
+<h3>Objective</h3>
+<p>By the end of this lesson, you will be able to: (1) describe the history of barbering and the origin of the barber pole; (2) explain Indiana's licensing requirements and scope of practice; (3) describe the DOL apprenticeship structure and your obligations as a registered apprentice; (4) identify the consequences of practicing without a license.</p>
+
+<h3>Key Concepts</h3>
 <ul>
-<li>Indiana state barbering laws and regulations</li>
-<li>Infection control and sanitation</li>
-<li>Hair science and scalp analysis</li>
-<li>Haircutting, fading, and clipper techniques</li>
-<li>Shaving and razor work</li>
-<li>Chemical services</li>
-<li>Professional and business skills</li>
+  <li><strong>Scope of practice</strong> — the specific services a licensed barber is legally permitted to perform in Indiana</li>
+  <li><strong>Indiana Code Title 25, Article 8</strong> — the state law governing barbering licensure and practice</li>
+  <li><strong>Indiana Professional Licensing Agency (IPLA)</strong> — the state body that issues and regulates barber licenses</li>
+  <li><strong>DOL-registered apprenticeship</strong> — a federally recognized training program combining on-the-job hours with related technical instruction</li>
+  <li><strong>Related Technical Instruction (RTI)</strong> — the coursework you are completing now; required alongside your 2,000 OJT hours</li>
+  <li><strong>Supervision requirement</strong> — apprentices must work under a licensed barber at all times; independent practice is illegal</li>
 </ul>
-<h3>How This Works</h3>
-<p>Each module ends with a checkpoint quiz. You must score 70% or higher to advance. Your on-the-job hours are logged separately with your host shop supervisor.</p>`,
-        },
-        {
-          slug: 'barber-lesson-2',
-          title: 'OSHA Standards & Bloodborne Pathogens',
-          order: 2,
-          domainKey: 'infection_control',
-          objective: 'Identify OSHA requirements and bloodborne pathogen risks in a barbershop.',
-          durationMinutes: 20,
-          videoFile: '/videos/course-barber-sanitation-narrated.mp4',
-          content: `<h2>OSHA in the Barbershop</h2>
-<p>OSHA (Occupational Safety and Health Administration) sets the standards that protect you and your clients from workplace hazards.</p>
-<h3>Bloodborne Pathogens</h3>
-<p>Bloodborne pathogens are microorganisms in human blood that can cause disease. In barbering, the primary risks are:</p>
+
+<h3>Explanation</h3>
+
+<h4>History of Barbering</h4>
+<p>The barber pole — red, white, and blue — is one of the oldest professional symbols in the world. In medieval Europe, barbers performed surgery, tooth extractions, and bloodletting alongside haircuts. The red stripe represents blood, the white represents bandages, and the blue (added in the United States) represents veins. The rotating pole mimics the bandages wrung out after bloodletting.</p>
+<p>By the 19th century, medicine and barbering separated into distinct professions. Today, barbering is a regulated trade in all 50 states. The first barber licensing law in the United States was passed in Minnesota in 1897.</p>
+
+<h4>Indiana Licensing Requirements</h4>
+<table style="width:100%; border-collapse:collapse; margin:1rem 0;">
+  <thead>
+    <tr style="background:#f3f4f6;">
+      <th style="padding:8px; border:1px solid #d1d5db; text-align:left;">Requirement</th>
+      <th style="padding:8px; border:1px solid #d1d5db; text-align:left;">Standard Path</th>
+      <th style="padding:8px; border:1px solid #d1d5db; text-align:left;">Apprenticeship Path</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:8px; border:1px solid #d1d5db;">Training hours</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">1,500 school hours</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">2,000 OJT hours + RTI</td>
+    </tr>
+    <tr style="background:#f9fafb;">
+      <td style="padding:8px; border:1px solid #d1d5db;">Written exam</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Required</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Required</td>
+    </tr>
+    <tr>
+      <td style="padding:8px; border:1px solid #d1d5db;">Practical exam</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Required</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Required</td>
+    </tr>
+    <tr style="background:#f9fafb;">
+      <td style="padding:8px; border:1px solid #d1d5db;">License renewal</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Every 2 years</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Every 2 years</td>
+    </tr>
+    <tr>
+      <td style="padding:8px; border:1px solid #d1d5db;">License display</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">At workstation</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">At workstation</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>Indiana Scope of Practice</h4>
+<p>Indiana-licensed barbers are authorized to perform the following services on the head, face, and neck:</p>
 <ul>
-<li>Cuts from razors or clippers</li>
-<li>Contact with open wounds or sores</li>
-<li>Improper disposal of sharps</li>
+  <li>Haircutting and styling</li>
+  <li>Shaving and beard trimming</li>
+  <li>Scalp treatments and massages</li>
+  <li>Limited chemical services (color, relaxers) — within training</li>
+  <li>Eyebrow arching (with blade or thread)</li>
 </ul>
-<h3>Universal Precautions</h3>
-<p>Treat all blood and bodily fluids as potentially infectious. Always wear gloves when there is risk of contact with blood.</p>
-<h3>Sharps Disposal</h3>
-<p>Used razor blades must be placed in a puncture-resistant sharps container — never in a regular trash can.</p>`,
-        },
-        {
-          slug: 'barber-lesson-3',
-          title: 'Sanitation vs. Disinfection vs. Sterilization',
-          order: 3,
-          domainKey: 'infection_control',
-          objective: 'Distinguish between sanitation, disinfection, and sterilization and apply each correctly.',
-          durationMinutes: 20,
-          videoFile: '/videos/course-barber-sanitation.mp4',
-          content: `<h2>Three Levels of Decontamination</h2>
-<h3>Sanitation</h3>
-<p>Sanitation reduces the number of pathogens on a surface to a safe level. Example: washing hands with soap and water, wiping down a chair with a clean cloth.</p>
-<h3>Disinfection</h3>
-<p>Disinfection destroys most pathogens on non-living surfaces. In Indiana, barbershops must use an EPA-registered disinfectant on all tools between clients.</p>
+<p>Barbers are <strong>not</strong> authorized to perform nail services, full-body waxing, or medical procedures. Performing services outside your scope of practice is a licensing violation.</p>
+
+<h4>Your DOL Apprenticeship Obligations</h4>
+<p>As a registered apprentice, you have three obligations: (1) complete your 2,000 OJT hours under a licensed supervising barber; (2) complete all RTI coursework (this program); (3) maintain your apprenticeship registration with the DOL. Your supervising barber is legally responsible for your work. If you perform a service without supervision and something goes wrong, both you and your supervisor face liability.</p>
+
+<h3>Real-World Application</h3>
+<p>On your first day, a walk-in client asks if you can cut their hair. Your supervisor is in the back. You are a registered apprentice — not yet licensed. The correct response: "I'm an apprentice — let me get my supervising barber." Do not start the service. Do not ask the client to wait while you "just do a quick trim." There is no such thing as a quick trim that is legally protected for an unsupervised apprentice. Get your supervisor first, every time.</p>
+
+<h3>Summary</h3>
 <ul>
-<li>Immerse metal tools in disinfectant solution for the manufacturer's recommended time</li>
-<li>Combs and brushes must be fully submerged</li>
-<li>Disinfectant solution must be changed daily or when visibly contaminated</li>
+  <li>The barber pole's red/white/blue stripes trace to medieval surgical practice</li>
+  <li>Indiana requires 2,000 OJT hours + RTI + written and practical exams for the apprenticeship path</li>
+  <li>Scope of practice: head, face, and neck services only — no nail or medical services</li>
+  <li>Apprentices must work under licensed supervision at all times — no exceptions</li>
+  <li>License must be displayed at your workstation and renewed every 2 years</li>
 </ul>
-<h3>Sterilization</h3>
-<p>Sterilization destroys all microorganisms including spores. Autoclave sterilization is the gold standard but not required for most barbershop tools.</p>`,
-        },
-        {
-          slug: 'barber-lesson-4',
-          title: 'Tool Disinfection Procedures',
-          order: 4,
-          domainKey: 'infection_control',
-          objective: 'Perform correct pre-service and post-service tool disinfection.',
-          durationMinutes: 20,
-          content: `<h2>Disinfecting Your Tools</h2>
-<h3>Pre-Service</h3>
-<ol>
-<li>Remove all hair and debris from tools</li>
-<li>Wash tools with soap and water</li>
-<li>Fully immerse in EPA-registered disinfectant</li>
-<li>Remove after required contact time and allow to air dry</li>
-<li>Store in a clean, covered container</li>
-</ol>
-<h3>Post-Service</h3>
-<p>Repeat the same process after every client. Never use the same tool on a second client without disinfecting first.</p>
-<h3>Indiana State Board Requirements</h3>
-<p>The Indiana Professional Licensing Agency requires all barbershops to maintain a disinfection log. Tools found undisinfected during inspection result in immediate citation.</p>`,
-        },
-        {
-          slug: 'barber-lesson-5',
-          title: 'Shop Sanitation & Client Safety',
-          order: 5,
-          domainKey: 'infection_control',
-          objective: 'Maintain a sanitary workstation and protect client health.',
-          durationMinutes: 15,
-          content: `<h2>Keeping Your Station Clean</h2>
-<h3>Workstation Standards</h3>
+
+<h4>State Board Alignment</h4>
 <ul>
-<li>Clean and disinfect chair, headrest, and armrests between every client</li>
-<li>Use a fresh neck strip and clean cape for every client</li>
-<li>Sweep hair from floor between clients</li>
-<li>Keep all products capped and stored properly</li>
-</ul>
-<h3>Personal Hygiene</h3>
-<ul>
-<li>Wash hands before and after every service</li>
-<li>Keep nails trimmed and clean</li>
-<li>Wear clean professional attire</li>
-</ul>
-<h3>Client Contraindications</h3>
-<p>Do not perform services on clients with visible scalp infections, open wounds, or contagious skin conditions. Refer them to a physician.</p>`,
-        },
-        {
-          slug: 'barber-lesson-6',
-          title: 'Indiana Barbering Laws & Regulations',
-          order: 6,
-          domainKey: 'infection_control',
-          objective: 'Identify key Indiana state barbering laws that govern practice.',
-          durationMinutes: 20,
-          content: `<h2>Indiana Barbering Laws</h2>
-<p>Indiana Code Title 25, Article 8 governs the practice of barbering in Indiana.</p>
-<h3>License Requirements</h3>
-<ul>
-<li>Must complete 1,500 hours of training (apprenticeship path: 2,000 OJT hours)</li>
-<li>Must pass the Indiana State Board written and practical exams</li>
-<li>License must be renewed every two years</li>
-<li>License must be displayed at the workstation</li>
-</ul>
-<h3>Scope of Practice</h3>
-<p>Indiana barbers are licensed to perform: haircutting, shaving, beard trimming, scalp treatments, and limited chemical services on the head and neck.</p>
-<h3>Violations</h3>
-<p>Practicing without a license, failing inspections, or violating sanitation standards can result in fines, suspension, or revocation of license.</p>`,
-        },
-        {
-          slug: 'barber-module-1-checkpoint',
-          title: 'Infection Control Checkpoint',
-          order: 7,
-          domainKey: 'infection_control',
-          objective: 'Demonstrate mastery of infection control and Indiana barbering law.',
-          durationMinutes: 20,
-          passingScore: 70,
-          content: `<h2>Module 1 Review — Infection Control & Safety</h2><p>Review the key concepts before taking this checkpoint: sanitation vs. disinfection vs. sterilization, OSHA bloodborne pathogen standards, tool disinfection procedures, Indiana barbering laws, and client contraindications. You must score 70% or higher to advance to Module 2.</p>`,
+  <li>Indiana Code Title 25, Article 8 — Barbering Licensure</li>
+  <li>Indiana Professional Licensing Agency — License Requirements</li>
+  <li>U.S. Department of Labor — Registered Apprenticeship Standards</li>
+</ul>`,
           quizQuestions: [
             {
-              id: 'ic-q1',
-              question: 'What level of decontamination is required for barbering tools between clients in Indiana?',
-              options: ['Sanitation', 'Disinfection', 'Sterilization', 'Rinsing with water'],
+              id: 'mod1-l1-q1',
+              question: 'What does the red stripe on the barber pole historically represent?',
+              options: ['Red hair dye used in ancient Rome', 'Blood from surgical and bloodletting services', 'The red uniform of medieval barbers', 'A warning sign for dangerous tools'],
               correctAnswer: 1,
-              explanation: 'Indiana requires EPA-registered disinfection of all tools between clients.',
+              explanation: 'The red stripe represents blood from the surgical and bloodletting services barbers performed in medieval Europe.',
             },
             {
-              id: 'ic-q2',
-              question: 'Where must used razor blades be disposed of?',
-              options: ['Regular trash can', 'Sink drain', 'Puncture-resistant sharps container', 'Paper bag'],
+              id: 'mod1-l1-q2',
+              question: 'Under the Indiana apprenticeship path, how many on-the-job training hours are required before licensure?',
+              options: ['1,000', '1,500', '2,000', '2,500'],
               correctAnswer: 2,
-              explanation: 'Sharps must go in a puncture-resistant container to prevent injury and contamination.',
+              explanation: 'The Indiana apprenticeship path requires 2,000 OJT hours plus completion of Related Technical Instruction (RTI).',
             },
             {
-              id: 'ic-q3',
-              question: 'What does OSHA stand for?',
+              id: 'mod1-l1-q3',
+              question: 'A walk-in client asks you to cut their hair. Your supervisor is in the back. You are a registered apprentice. What do you do?',
               options: [
-                'Occupational Safety and Health Administration',
-                'Office of Sanitation and Hygiene Authority',
-                'Organized Standards for Health Agencies',
-                'Occupational Standards for Hazard Avoidance',
-              ],
-              correctAnswer: 0,
-              explanation: 'OSHA sets workplace safety standards including those for barbershops.',
-            },
-            {
-              id: 'ic-q4',
-              question: 'A client arrives with a visible scalp infection. What should you do?',
-              options: [
-                'Proceed with the service using gloves',
-                'Disinfect tools extra thoroughly and proceed',
-                'Decline the service and refer to a physician',
-                'Only perform a dry haircut',
+                'Start the cut — it is just a trim',
+                'Ask the client to sign a waiver, then proceed',
+                'Tell the client you are an apprentice and get your supervising barber first',
+                'Do a dry cut only since that does not require supervision',
               ],
               correctAnswer: 2,
-              explanation: 'Performing services on infected skin risks spreading infection to other clients.',
+              explanation: 'Apprentices must work under licensed supervision at all times. There is no unsupervised service that is legally protected.',
             },
             {
-              id: 'ic-q5',
-              question: 'How often must disinfectant solution be changed?',
-              options: ['Once a week', 'Once a month', 'Daily or when visibly contaminated', 'Only when it smells bad'],
+              id: 'mod1-l1-q4',
+              question: 'Which of the following is OUTSIDE the scope of practice for an Indiana-licensed barber?',
+              options: ['Scalp treatments', 'Beard trimming', 'Full-body waxing', 'Eyebrow arching with a blade'],
               correctAnswer: 2,
-              explanation: 'Disinfectant loses effectiveness when contaminated and must be changed daily.',
+              explanation: 'Full-body waxing is outside the barber scope of practice in Indiana. Barbers are licensed for head, face, and neck services only.',
             },
             {
-              id: 'ic-q6',
+              id: 'mod1-l1-q5',
               question: 'Indiana barber licenses must be renewed every:',
               options: ['1 year', '2 years', '3 years', '5 years'],
               correctAnswer: 1,
               explanation: 'Indiana requires barber license renewal every two years.',
+            },
+            {
+              id: 'mod1-l1-q6',
+              question: 'A barber performs a chemical relaxer service on a client without having received training in relaxers. This is:',
+              options: [
+                'Acceptable if the client consents',
+                'A violation of scope of practice',
+                'Allowed if the barber has 5+ years of experience',
+                'Only a problem if the client is harmed',
+              ],
+              correctAnswer: 1,
+              explanation: 'Performing services outside your training is a scope of practice violation regardless of client consent or experience level.',
+            },
+            {
+              id: 'mod1-l1-q7',
+              question: 'The first barber licensing law in the United States was passed in which state?',
+              options: ['New York', 'Indiana', 'Minnesota', 'California'],
+              correctAnswer: 2,
+              explanation: 'Minnesota passed the first barber licensing law in the United States in 1897.',
+            },
+            {
+              id: 'mod1-l1-q8',
+              question: 'Which body issues and regulates barber licenses in Indiana?',
+              options: [
+                'U.S. Department of Labor',
+                'Indiana Professional Licensing Agency (IPLA)',
+                'Indiana Department of Health',
+                'National Barber Association',
+              ],
+              correctAnswer: 1,
+              explanation: 'The Indiana Professional Licensing Agency (IPLA) issues and regulates barber licenses under Indiana Code Title 25, Article 8.',
+            },
+          ],
+        },
+        {
+          slug: 'barber-lesson-2',
+          title: 'Professional Conduct & Ethics',
+          order: 2,
+          domainKey: 'infection_control',
+          objective: 'Apply professional standards of conduct, ethics, and client communication in a barbershop setting.',
+          durationMinutes: 20,
+          videoFile: '/videos/barber-client-experience.mp4',
+          content: `<h2>Professional Conduct & Ethics</h2>
+
+<h3>Objective</h3>
+<p>By the end of this lesson, you will be able to define professional conduct in a barbershop, handle difficult client situations ethically, and understand the consequences of unprofessional behavior.</p>
+
+<h3>Key Concepts</h3>
+<ul>
+  <li>Professionalism is how clients judge your competence before you touch their hair</li>
+  <li>Ethical conduct means doing the right thing even when no one is watching</li>
+  <li>Client confidentiality — what happens in the chair stays in the chair</li>
+  <li>Scope of practice — never perform services you are not trained or licensed to do</li>
+  <li>Discrimination is illegal — you must serve all clients equally</li>
+</ul>
+
+<h3>Explanation</h3>
+<p>Professional conduct covers everything from how you greet a client to how you handle a complaint. It includes your appearance, your language, your punctuality, and your attitude. Clients form an impression of your skill level based on your professionalism before the first cut.</p>
+<p>Ethics in barbering means respecting client privacy, being honest about what a service will cost and what results are realistic, and never performing a service outside your training. If a client asks for a chemical service you have not been trained on, the ethical answer is to refer them to someone qualified — not to attempt it and risk harm.</p>
+<p>Indiana law prohibits discrimination in licensed service businesses. You must provide services to all clients regardless of race, religion, gender, disability, or national origin.</p>
+
+<h3>Real-World Application</h3>
+<p>A regular client tells you personal information about a family problem while in your chair. Later, another client asks about that person. The correct response: say nothing. Client conversations are confidential. Sharing personal information — even casually — is an ethical violation that destroys trust and can cost you your clientele.</p>
+
+<h3>Summary</h3>
+<ul>
+  <li>Professionalism shapes client perception before the service begins</li>
+  <li>Ethics means honesty, confidentiality, and staying within your scope of practice</li>
+  <li>Discrimination in service is illegal in Indiana</li>
+  <li>Refer clients to qualified professionals when a service is outside your training</li>
+</ul>`,
+          quizQuestions: [
+            {
+              id: 'mod1-l2-q1',
+              question: 'A client asks you to perform a chemical relaxer service. You have not been trained on relaxers yet. What is the ethical response?',
+              options: [
+                'Attempt it — you can figure it out',
+                'Watch a video first, then proceed',
+                'Decline and refer the client to a qualified barber',
+                'Do a patch test and proceed if there is no reaction',
+              ],
+              correctAnswer: 2,
+              explanation: 'Performing services outside your training risks client harm and violates your scope of practice.',
+            },
+            {
+              id: 'mod1-l2-q2',
+              question: 'A client shares personal information while in your chair. Another client later asks about that person. You should:',
+              options: [
+                'Share only general information',
+                'Say nothing — client conversations are confidential',
+                'Tell them to ask the person directly',
+                'Share if the information is not sensitive',
+              ],
+              correctAnswer: 1,
+              explanation: 'Client confidentiality is an ethical obligation. All personal information shared in the chair stays private.',
+            },
+            {
+              id: 'mod1-l2-q3',
+              question: 'Which of the following is an example of professional conduct?',
+              options: [
+                'Arriving 10 minutes late but finishing the cut quickly',
+                'Wearing clean attire, greeting clients by name, and being on time',
+                'Checking your phone between cuts',
+                'Discussing other clients with the current client',
+              ],
+              correctAnswer: 1,
+              explanation: 'Professional conduct includes appearance, punctuality, and respectful client interaction.',
+            },
+            {
+              id: 'mod1-l2-q4',
+              question: 'Under Indiana law, you must provide services to clients regardless of:',
+              options: [
+                'Their ability to tip',
+                'Their hair type',
+                'Race, religion, gender, disability, or national origin',
+                'Whether they have an appointment',
+              ],
+              correctAnswer: 2,
+              explanation: 'Indiana law prohibits discrimination in licensed service businesses.',
+            },
+          ],
+        },
+        {
+          slug: 'barber-lesson-3',
+          title: 'Tools & Equipment',
+          order: 3,
+          domainKey: 'infection_control',
+          objective: 'Identify, name, and describe the correct use of essential barbering tools and equipment.',
+          durationMinutes: 25,
+          videoFile: '/videos/course-barber-clipper-techniques.mp4',
+          content: `<h2>Tools & Equipment</h2>
+
+<h3>Objective</h3>
+<p>By the end of this lesson, you will be able to identify every essential barbering tool, explain its purpose, and describe the correct technique for holding and using each one safely.</p>
+
+<h3>Key Concepts</h3>
+<ul>
+  <li>Clippers — electric tools used for bulk cutting and fading; guards control length</li>
+  <li>Trimmers (edgers) — smaller electric tools for detail work, lineups, and edges</li>
+  <li>Shears (scissors) — used for scissor-over-comb, texturizing, and finishing</li>
+  <li>Straight razor — used for shaving, lineups, and neck cleanup; requires a license</li>
+  <li>Combs — wide-tooth for detangling, fine-tooth for cutting guides</li>
+  <li>Brushes — neck brush for removing clippings; boar bristle for styling</li>
+  <li>Cape and neck strip — protect client clothing and prevent hair contact with skin</li>
+</ul>
+
+<h3>Explanation</h3>
+<p><strong>Clippers:</strong> Hold the clipper with your dominant hand, thumb on top for control. Move against the grain for shorter cuts, with the grain for blending. Guards range from 0 (skin) to 8 (1 inch). Always oil clipper blades before and after use.</p>
+<p><strong>Shears:</strong> Insert your thumb and ring finger into the rings. Only the thumb moves — the bottom blade stays still. Keep your pinky off the finger rest unless stabilizing. Dull shears push hair instead of cutting it — keep them sharp.</p>
+<p><strong>Straight razor:</strong> Hold with four fingers on the shank and thumb underneath. The blade angle should be 30 degrees to the skin. Never use a straight razor on broken skin or active acne.</p>
+<p><strong>Combs:</strong> Use the wide-tooth end to detangle before cutting. Use the fine-tooth end as a cutting guide for scissor-over-comb and clipper-over-comb techniques.</p>
+
+<h3>Real-World Application</h3>
+<p>You are setting up your station before your first client. Your clippers are not cutting cleanly — they are pulling hair instead of cutting. Before reaching for a new blade, check: Are the blades oiled? Is the taper lever in the correct position? Is there hair buildup between the blades? Most clipper problems are maintenance problems, not equipment failures.</p>
+
+<h3>Summary</h3>
+<ul>
+  <li>Know every tool by name and purpose before using it on a client</li>
+  <li>Clippers use guards to control length; oil blades before and after every use</li>
+  <li>Only the thumb moves when using shears</li>
+  <li>Straight razor angle: 30 degrees; never use on broken skin</li>
+  <li>Most tool problems are maintenance problems</li>
+</ul>`,
+          quizQuestions: [
+            {
+              id: 'mod1-l3-q1',
+              question: 'Your clippers are pulling hair instead of cutting cleanly. What is the most likely cause?',
+              options: [
+                'The guard is the wrong size',
+                'The blades need oiling or cleaning',
+                'The client\'s hair is too thick',
+                'The clipper motor is failing',
+              ],
+              correctAnswer: 1,
+              explanation: 'Pulling is almost always a maintenance issue — dirty or dry blades. Oil and clean before assuming equipment failure.',
+            },
+            {
+              id: 'mod1-l3-q2',
+              question: 'When using shears, which finger should be the only one that moves?',
+              options: ['Index finger', 'Ring finger', 'Thumb', 'Pinky'],
+              correctAnswer: 2,
+              explanation: 'Only the thumb moves when cutting with shears. The bottom blade stays stationary.',
+            },
+            {
+              id: 'mod1-l3-q3',
+              question: 'What is the correct blade angle when using a straight razor on a client?',
+              options: ['10 degrees', '20 degrees', '30 degrees', '45 degrees'],
+              correctAnswer: 2,
+              explanation: 'A 30-degree angle provides the correct balance between closeness and safety.',
+            },
+            {
+              id: 'mod1-l3-q4',
+              question: 'Which tool is used for detail work, lineups, and edges?',
+              options: ['Clipper', 'Trimmer (edger)', 'Wide-tooth comb', 'Boar bristle brush'],
+              correctAnswer: 1,
+              explanation: 'Trimmers (edgers) are smaller and more precise than clippers — designed for detail work.',
+            },
+            {
+              id: 'mod1-l3-q5',
+              question: 'A client sits down and you notice their collar is exposed. Before starting, you should:',
+              options: [
+                'Begin cutting — the collar will be fine',
+                'Apply a neck strip and cape to protect the client',
+                'Ask the client to tuck in their collar',
+                'Use a towel instead of a cape',
+              ],
+              correctAnswer: 1,
+              explanation: 'A fresh neck strip and clean cape are required for every client to prevent hair contact with skin and protect clothing.',
+            },
+          ],
+        },
+        {
+          slug: 'barber-lesson-4',
+          title: 'Sanitation & Infection Control',
+          order: 4,
+          domainKey: 'infection_control',
+          objective: 'Differentiate between cleaning, disinfecting, and sterilization; identify types of microorganisms and how they spread; apply OSHA infection control standards; execute blood exposure protocol; maintain a state board-compliant workstation.',
+          durationMinutes: 35,
+          videoFile: '/videos/course-barber-sanitation-narrated.mp4',
+          content: `<h2>Sanitation & Infection Control</h2>
+
+<h3>Objective</h3>
+<p>By the end of this lesson, you will be able to: differentiate between cleaning, disinfecting, and sterilization; identify types of microorganisms and how they spread in a barbering environment; apply proper infection control procedures in compliance with OSHA standards; execute blood exposure protocol correctly; maintain a sanitary workstation that meets state board requirements.</p>
+
+<h3>Key Concepts</h3>
+<ul>
+  <li><strong>Pathogens</strong> — bacteria, viruses, fungi, parasites</li>
+  <li><strong>Modes of transmission</strong> — direct contact, indirect contact (contaminated tools), airborne/droplet</li>
+  <li><strong>Levels of decontamination</strong> — cleaning, disinfecting, sterilization</li>
+  <li><strong>EPA-registered disinfectants</strong> — required by Indiana state board for all tools</li>
+  <li><strong>Contact time</strong> — disinfectant must remain wet for the full manufacturer-specified duration</li>
+  <li><strong>Bloodborne pathogens</strong> — hepatitis B, hepatitis C, HIV</li>
+  <li><strong>Cross-contamination</strong> — transferring pathogens from one surface or person to another via tools, hands, or linens</li>
+  <li><strong>Universal Precautions</strong> — treat every client as potentially infectious, every service</li>
+</ul>
+
+<h3>Explanation</h3>
+
+<h4>1. Types of Microorganisms — What You Are Actually Fighting</h4>
+<p>You are not "cleaning tools." You are interrupting biological transmission chains. Understanding what you are fighting determines how you fight it.</p>
+<ul>
+  <li><strong>Bacteria</strong> — single-celled organisms. Some are harmless; some are pathogenic. <em>Staphylococcus aureus</em> causes skin infections and folliculitis — spread by contaminated clippers and combs. Bacteria are destroyed by EPA-registered disinfectants.</li>
+  <li><strong>Viruses</strong> — require a living host to survive and reproduce. Examples: hepatitis B (survives on dry surfaces up to 7 days), hepatitis C, HIV. HIV is fragile outside the body; hepatitis B is not. Both are inactivated by proper disinfection.</li>
+  <li><strong>Fungi</strong> — cause conditions like ringworm (tinea capitis). Ringworm is not a worm — it is a fungal infection presenting as a circular, scaly patch on the scalp. Highly contagious through contaminated clippers, combs, and hats. A client with active ringworm is a contraindication — do not perform services.</li>
+  <li><strong>Parasites</strong> — live on or in a host. Head lice (pediculosis capitis) are the most common barbershop parasite. Spread by direct contact and shared tools. A client with visible lice is a contraindication — refer out immediately.</li>
+</ul>
+
+<h4>2. How Infection Spreads in a Barbershop</h4>
+<p>Your tools are the primary infection vehicle — not the client's hands or breath.</p>
+<table style="width:100%; border-collapse:collapse; margin:1rem 0;">
+  <thead>
+    <tr style="background:#f3f4f6;">
+      <th style="padding:8px; border:1px solid #d1d5db; text-align:left;">Route</th>
+      <th style="padding:8px; border:1px solid #d1d5db; text-align:left;">How It Happens</th>
+      <th style="padding:8px; border:1px solid #d1d5db; text-align:left;">Barbershop Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:8px; border:1px solid #d1d5db;"><strong>Direct contact</strong></td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Skin-to-skin or blood-to-skin</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Barber touches client's open wound without gloves</td>
+    </tr>
+    <tr style="background:#f9fafb;">
+      <td style="padding:8px; border:1px solid #d1d5db;"><strong>Indirect contact</strong></td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Contaminated object touches skin</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Undisinfected clipper used on next client — most common route</td>
+    </tr>
+    <tr>
+      <td style="padding:8px; border:1px solid #d1d5db;"><strong>Droplet/Airborne</strong></td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Respiratory droplets</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Client coughs or sneezes during service</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>3. Levels of Decontamination — Heavily Tested on State Board</h4>
+<table style="width:100%; border-collapse:collapse; margin:1rem 0;">
+  <thead>
+    <tr style="background:#f3f4f6;">
+      <th style="padding:8px; border:1px solid #d1d5db; text-align:left;">Level</th>
+      <th style="padding:8px; border:1px solid #d1d5db; text-align:left;">What It Does</th>
+      <th style="padding:8px; border:1px solid #d1d5db; text-align:left;">Required For</th>
+      <th style="padding:8px; border:1px solid #d1d5db; text-align:left;">State Board Rule</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:8px; border:1px solid #d1d5db;"><strong>Cleaning</strong></td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Removes visible debris with soap/detergent. Does NOT kill pathogens.</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">First step before disinfection</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Never sufficient alone for tools</td>
+    </tr>
+    <tr style="background:#f9fafb;">
+      <td style="padding:8px; border:1px solid #d1d5db;"><strong>Disinfecting</strong></td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Kills most microorganisms using EPA-approved chemical agents</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">All tools between every client</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Minimum required standard in Indiana</td>
+    </tr>
+    <tr>
+      <td style="padding:8px; border:1px solid #d1d5db;"><strong>Sterilization</strong></td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Destroys ALL microorganisms including spores. Typically via autoclave.</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Invasive instruments with blood exposure risk</td>
+      <td style="padding:8px; border:1px solid #d1d5db;">Not required for standard barbering tools</td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>State board trap:</strong> If a tool has blood exposure risk, cleaning alone is never enough. The answer is always disinfection at minimum.</p>
+
+<h4>4. Bloodborne Pathogens & OSHA Compliance</h4>
+<p>OSHA Standard 29 CFR 1910.1030 requires all barbershops to have a written Exposure Control Plan. High-risk scenarios in barbering:</p>
+<ul>
+  <li>Nicks from straight razors or clippers</li>
+  <li>Cuts from scissors</li>
+  <li>Skin abrasions from aggressive technique</li>
+</ul>
+<p>Universal Precautions means you treat every client as potentially infectious — every service, every time. You do not ask. You do not assume. You protect.</p>
+
+<h4>5. Blood Exposure Protocol — Memorize This</h4>
+<p>This is tested on the Indiana state board written exam. Missing any step is a fail risk.</p>
+<ol>
+  <li><strong>Stop the service immediately</strong></li>
+  <li><strong>Put on gloves</strong> before touching the wound or any blood</li>
+  <li><strong>Clean the wound</strong> with soap and water</li>
+  <li><strong>Apply antiseptic</strong> to the wound</li>
+  <li><strong>Cover with a sterile bandage</strong></li>
+  <li><strong>Dispose of contaminated materials</strong> — double-bag in biohazard bags</li>
+  <li><strong>Disinfect all tools and surfaces</strong> that contacted blood</li>
+  <li><strong>Wash hands thoroughly</strong> with soap and water</li>
+</ol>
+<p>Document the incident: date, time, what happened, actions taken. If your skin was exposed to the client's blood, report to your supervisor and seek medical evaluation immediately.</p>
+
+<h4>6. Tool & Workstation Sanitation Standards</h4>
+<p><strong>The most common mistake barbers make:</strong> spraying disinfectant and wiping immediately. That is not disinfection. That is cleaning. Disinfection requires full contact time — the surface must remain wet for the manufacturer's specified duration (typically 10 minutes for most barbershop disinfectants).</p>
+<p><strong>Minimum standards:</strong></p>
+<ul>
+  <li>Disinfect all tools after every client — no exceptions</li>
+  <li>Use a fresh towel and neck strip for every client</li>
+  <li>Clean and disinfect the workstation between every client</li>
+  <li>Store disinfected tools in a clean, closed container — not back in the disinfectant jar</li>
+  <li>Change disinfectant solution daily or when visibly contaminated</li>
+  <li>Maintain a disinfection log — Indiana inspectors will ask for it</li>
+</ul>
+
+<h3>Real-World Application</h3>
+<p>A barber finishes a fade, brushes hair off the clippers, sprays them with disinfectant, and immediately picks them up to use on the next client. The spray contact time is 10 minutes.</p>
+<p><strong>What went wrong:</strong> No cleaning step (hair debris still on blades). No contact time (wiped immediately). High risk of cross-contamination — any pathogen from the previous client is still on those blades.</p>
+<p><strong>Correct procedure:</strong> Remove all debris. Clean with soap and water. Apply EPA-registered disinfectant. Wait the full contact time. Store in a clean container. Only then use on the next client. On a busy Saturday, this means having multiple sets of blades rotating through the disinfection process — not rushing one set.</p>
+
+<h3>Summary</h3>
+<ul>
+  <li>Infection control is about breaking transmission chains — not just "cleaning"</li>
+  <li>Your tools are the highest-risk infection vector in barbering — not the client's hands</li>
+  <li>Disinfection is the minimum professional standard; cleaning alone is never enough for tools</li>
+  <li>Contact time is non-negotiable — spraying and wiping immediately is not disinfection</li>
+  <li>Blood exposure requires an 8-step protocol — memorize it for state board</li>
+  <li>Universal Precautions: treat every client as potentially infectious, every time</li>
+</ul>
+
+<h4>State Board Alignment</h4>
+<ul>
+  <li>Indiana State Board — Infection Control & Safety Standards</li>
+  <li>OSHA Standard 29 CFR 1910.1030 — Bloodborne Pathogens</li>
+  <li>EPA Disinfectant Registration Requirements</li>
+</ul>`,
+          quizQuestions: [
+            {
+              id: 'mod1-l4-q1',
+              question: 'What type of microorganism requires a living host to survive and reproduce?',
+              options: ['Bacteria', 'Virus', 'Fungus', 'Parasite'],
+              correctAnswer: 1,
+              explanation: 'Viruses cannot reproduce without a host cell. Examples relevant to barbering: hepatitis B, hepatitis C, HIV.',
+            },
+            {
+              id: 'mod1-l4-q2',
+              question: 'What is the minimum required level of decontamination for barber tools between clients in Indiana?',
+              options: ['Cleaning', 'Disinfecting', 'Sterilization', 'Sanitizing with alcohol wipes'],
+              correctAnswer: 1,
+              explanation: 'Disinfection with an EPA-registered product is the minimum standard required by Indiana state board for all tools between clients.',
+            },
+            {
+              id: 'mod1-l4-q3',
+              question: 'A barber reuses a towel on a second client after shaking the hair out. What risk is present?',
+              options: [
+                'No risk — the hair was removed',
+                'Cross-contamination — pathogens from the first client remain on the towel',
+                'Only a risk if the first client had visible skin conditions',
+                'Risk only if the towel is wet',
+              ],
+              correctAnswer: 1,
+              explanation: 'Shaking hair out does not remove pathogens. Reusing towels transfers microorganisms from one client to another — cross-contamination.',
+            },
+            {
+              id: 'mod1-l4-q4',
+              question: 'A clipper is sprayed with disinfectant and immediately picked up for the next client. What step was skipped?',
+              options: [
+                'Removing the blade guard',
+                'Oiling the blades',
+                'Allowing the full contact time for the disinfectant to work',
+                'Rinsing with water first',
+              ],
+              correctAnswer: 2,
+              explanation: 'Spraying and wiping immediately is cleaning, not disinfection. The disinfectant must remain wet for the full manufacturer-specified contact time.',
+            },
+            {
+              id: 'mod1-l4-q5',
+              question: 'Which method destroys ALL microorganisms, including bacterial spores?',
+              options: ['Disinfection with EPA-registered solution', 'Sanitizing with 70% isopropyl alcohol', 'Sterilization via autoclave', 'Cleaning with soap and water'],
+              correctAnswer: 2,
+              explanation: 'Sterilization (typically via autoclave) is the only method that destroys all microorganisms including spores. Disinfection does not destroy spores.',
+            },
+            {
+              id: 'mod1-l4-q6',
+              question: 'What is the FIRST step after a client begins bleeding during a service?',
+              options: [
+                'Apply antiseptic to the wound',
+                'Stop the service immediately',
+                'Put on gloves',
+                'Ask the client if they want to continue',
+              ],
+              correctAnswer: 1,
+              explanation: 'Step 1 of the blood exposure protocol is to stop the service immediately. Gloves come second — before touching the wound.',
+            },
+            {
+              id: 'mod1-l4-q7',
+              question: 'Why is contact time critical in disinfection?',
+              options: [
+                'Longer contact time makes tools smell cleaner',
+                'The disinfectant must remain wet on the surface long enough to chemically destroy pathogens',
+                'Contact time only matters for sterilization, not disinfection',
+                'It prevents the disinfectant from damaging metal tools',
+              ],
+              correctAnswer: 1,
+              explanation: 'Disinfectants work through a chemical reaction that requires time. Removing tools before the contact time is complete means the process failed — pathogens may still be present.',
+            },
+          ],
+        },
+
+        {
+          slug: 'barber-lesson-5',
+          title: 'Workplace Safety',
+          order: 5,
+          domainKey: 'infection_control',
+          objective: 'Apply OSHA workplace safety standards and identify hazards specific to barbershop environments.',
+          durationMinutes: 20,
+          videoFile: '/videos/course-barber-sanitation.mp4',
+          content: `<h2>Workplace Safety</h2>
+
+<h3>Objective</h3>
+<p>By the end of this lesson, you will be able to identify common barbershop safety hazards, apply OSHA standards to your daily workflow, and respond correctly to workplace injuries and emergencies.</p>
+
+<h3>Key Concepts</h3>
+<ul>
+  <li>OSHA (Occupational Safety and Health Administration) sets federal workplace safety standards</li>
+  <li>Ergonomics — proper posture and body mechanics prevent long-term injury</li>
+  <li>Chemical hazards — SDS (Safety Data Sheets) required for all chemical products</li>
+  <li>Electrical safety — inspect cords and equipment before every use</li>
+  <li>Slip and fall prevention — sweep hair immediately; keep floors dry</li>
+  <li>Emergency procedures — know the location of first aid kit, fire extinguisher, and emergency exits</li>
+</ul>
+
+<h3>Explanation</h3>
+<p><strong>Ergonomics:</strong> Barbers stand for 6–10 hours a day. Poor posture leads to back, neck, and shoulder injuries that end careers. Stand with feet shoulder-width apart, keep your back straight, and position the chair at the correct height so you are not hunching. Anti-fatigue mats reduce strain on your feet and lower back.</p>
+<p><strong>Chemical safety:</strong> Every chemical product in your shop — relaxers, color, disinfectants — must have a Safety Data Sheet (SDS) on file. The SDS tells you what the chemical contains, how to handle it safely, and what to do in case of exposure. Indiana OSHA requires SDS access for all employees.</p>
+<p><strong>Electrical safety:</strong> Never use equipment with frayed cords. Do not use clippers or trimmers near water. Unplug equipment before cleaning. Report damaged equipment to your supervisor immediately — do not use it.</p>
+<p><strong>Slip and fall:</strong> Hair on the floor is a slip hazard. Sweep between every client. Spilled product must be cleaned up immediately. Wet floors require a warning sign.</p>
+
+<h3>Real-World Application</h3>
+<p>You notice your clipper cord has a small crack in the insulation near the plug. You are about to start a client. The correct action: do not use the clipper. Tell your supervisor. Use a backup clipper. A cracked cord is an electrocution risk — no client service is worth that risk. Document the equipment issue so it gets repaired or replaced.</p>
+
+<h3>Summary</h3>
+<ul>
+  <li>OSHA standards apply to every barbershop — know them</li>
+  <li>Ergonomics: stand correctly, use anti-fatigue mats, adjust chair height</li>
+  <li>SDS sheets required for all chemical products — know where they are</li>
+  <li>Never use damaged electrical equipment</li>
+  <li>Sweep hair between every client — it is a slip hazard</li>
+</ul>`,
+          quizQuestions: [
+            {
+              id: 'mod1-l5-q1',
+              question: 'You notice your clipper cord has a crack in the insulation. You have a client waiting. What do you do?',
+              options: [
+                'Use it carefully — the crack is small',
+                'Wrap the crack with tape and proceed',
+                'Do not use it — report it and use a backup clipper',
+                'Finish the current client, then report it',
+              ],
+              correctAnswer: 2,
+              explanation: 'Damaged electrical equipment is an electrocution risk. Never use it regardless of client wait time.',
+            },
+            {
+              id: 'mod1-l5-q2',
+              question: 'What document is required on file for every chemical product used in a barbershop?',
+              options: [
+                'Product receipt',
+                'Safety Data Sheet (SDS)',
+                'Manufacturer warranty',
+                'OSHA inspection report',
+              ],
+              correctAnswer: 1,
+              explanation: 'OSHA requires a Safety Data Sheet (SDS) for every chemical product, accessible to all employees.',
+            },
+            {
+              id: 'mod1-l5-q3',
+              question: 'Hair clippings on the floor are primarily a hazard because they:',
+              options: [
+                'Clog drains',
+                'Create a slip and fall risk',
+                'Attract insects',
+                'Contaminate disinfectant solutions',
+              ],
+              correctAnswer: 1,
+              explanation: 'Hair on the floor is a slip hazard. Sweep between every client.',
+            },
+            {
+              id: 'mod1-l5-q4',
+              question: 'Which of the following best describes correct ergonomic posture for a barber?',
+              options: [
+                'Lean over the client to get closer to the work',
+                'Stand with feet together and bend at the waist',
+                'Stand with feet shoulder-width apart, back straight, chair at correct height',
+                'Sit on a stool whenever possible',
+              ],
+              correctAnswer: 2,
+              explanation: 'Correct posture prevents long-term back, neck, and shoulder injuries that can end a barbering career.',
+            },
+          ],
+        },
+        {
+          slug: 'barber-lesson-6',
+          title: 'Client Consultation',
+          order: 6,
+          domainKey: 'infection_control',
+          objective: 'Conduct a complete client consultation that identifies needs, contraindications, and service goals before beginning any service.',
+          durationMinutes: 20,
+          videoFile: '/videos/course-barber-consultation-narrated.mp4',
+          content: `<h2>Client Consultation</h2>
+
+<h3>Objective</h3>
+<p>By the end of this lesson, you will be able to conduct a structured client consultation, identify contraindications that prevent service, and document client preferences for future visits.</p>
+
+<h3>Key Concepts</h3>
+<ul>
+  <li>Consultation happens before every service — not just the first visit</li>
+  <li>Contraindications — conditions that prevent you from performing a service safely</li>
+  <li>Client history — medications, allergies, and scalp conditions affect service outcomes</li>
+  <li>Managing expectations — be honest about what is achievable with the client's hair type</li>
+  <li>Client record cards — document preferences, products used, and any reactions</li>
+</ul>
+
+<h3>Explanation</h3>
+<p><strong>The consultation process:</strong></p>
+<ol>
+  <li><strong>Greet and seat</strong> — welcome the client, apply neck strip and cape</li>
+  <li><strong>Ask open-ended questions</strong> — "What are we doing today?" not "Same as last time?"</li>
+  <li><strong>Assess the hair and scalp</strong> — look for conditions before touching</li>
+  <li><strong>Identify contraindications</strong> — scalp infections, open wounds, contagious conditions</li>
+  <li><strong>Confirm the service</strong> — repeat back what you will do before starting</li>
+  <li><strong>Document</strong> — record the service, products used, and any client notes</li>
+</ol>
+<p><strong>Contraindications that require referral:</strong> Active scalp infections (ringworm, impetigo), open wounds or sores, contagious skin conditions, severe scalp inflammation. Do not perform services on these clients — refer them to a physician.</p>
+<p><strong>Managing expectations:</strong> If a client shows you a photo of a style that will not work with their hair type, be honest. Explain what is achievable and offer an alternative. A client who gets a realistic result they were prepared for is more loyal than one who got a surprise.</p>
+
+<h3>Real-World Application</h3>
+<p>A new client sits down and asks for a skin fade. During your scalp assessment, you notice a circular, scaly patch near the crown — a classic sign of ringworm (tinea capitis). You must decline the service, explain that you noticed a scalp condition that requires a doctor's evaluation, and refer them out. Do not name the condition as a diagnosis — you are not a physician. Simply say you cannot safely perform the service and recommend they see a doctor before their next visit.</p>
+
+<h3>Summary</h3>
+<ul>
+  <li>Consult before every service — conditions change between visits</li>
+  <li>Assess the scalp visually before touching</li>
+  <li>Contraindications require referral, not service</li>
+  <li>Confirm the service plan before starting — eliminate surprises</li>
+  <li>Document every service on a client record card</li>
+</ul>`,
+          quizQuestions: [
+            {
+              id: 'mod1-l6-q1',
+              question: 'During a scalp assessment, you notice a circular, scaly patch on a new client\'s scalp. What should you do?',
+              options: [
+                'Proceed — it is probably just dry skin',
+                'Apply a medicated shampoo and continue',
+                'Decline the service and refer the client to a physician',
+                'Disinfect the area and proceed with gloves',
+              ],
+              correctAnswer: 2,
+              explanation: 'Circular, scaly patches may indicate ringworm — a contraindication. Decline and refer. Do not diagnose.',
+            },
+            {
+              id: 'mod1-l6-q2',
+              question: 'A client shows you a photo of a style. You know it will not work with their hair type. You should:',
+              options: [
+                'Attempt it anyway — the client knows what they want',
+                'Be honest, explain what is achievable, and offer an alternative',
+                'Do the style and let the client decide if they like it',
+                'Refuse the service',
+              ],
+              correctAnswer: 1,
+              explanation: 'Managing expectations honestly builds trust and loyalty. Surprises — even well-intentioned ones — damage the relationship.',
+            },
+            {
+              id: 'mod1-l6-q3',
+              question: 'Which question is better for a client consultation?',
+              options: [
+                '"Same as last time?"',
+                '"Short or long?"',
+                '"What are we doing today?"',
+                '"Do you want a fade?"',
+              ],
+              correctAnswer: 2,
+              explanation: 'Open-ended questions give the client space to describe what they want rather than confirming assumptions.',
+            },
+            {
+              id: 'mod1-l6-q4',
+              question: 'Why should you document each client service on a record card?',
+              options: [
+                'It is required by Indiana law for all services',
+                'To track products used, preferences, and any reactions for future visits',
+                'To calculate the client\'s total spend',
+                'To share with other barbers in the shop',
+              ],
+              correctAnswer: 1,
+              explanation: 'Client records allow you to replicate successful services and avoid repeating mistakes.',
+            },
+            {
+              id: 'mod1-l6-q5',
+              question: 'At what point in the service should you confirm the service plan with the client?',
+              options: [
+                'After the first cut',
+                'At the end of the service',
+                'Before starting — after the consultation',
+                'Only if the client asks',
+              ],
+              correctAnswer: 2,
+              explanation: 'Confirming before you start eliminates misunderstandings and protects both you and the client.',
+            },
+          ],
+        },
+        {
+          slug: 'barber-module-1-checkpoint',
+          title: 'Module 1 Checkpoint — Foundations & Safety',
+          order: 7,
+          domainKey: 'infection_control',
+          objective: 'Demonstrate mastery of professional conduct, tools, sanitation, workplace safety, and client consultation.',
+          durationMinutes: 20,
+          passingScore: 70,
+          content: `<h2>Module 1 Checkpoint — Foundations & Safety</h2>
+<p>This checkpoint covers all six lessons in Module 1: Introduction to Barbering, Professional Conduct & Ethics, Tools & Equipment, Sanitation & Infection Control, Workplace Safety, and Client Consultation.</p>
+<p>You must score <strong>70% or higher</strong> to unlock Module 2. Review your lesson notes before starting.</p>`,
+          quizQuestions: [
+            {
+              id: 'cp1-q1',
+              question: 'A walk-in asks you to cut their hair. You are a registered apprentice, not yet licensed. What is the correct action?',
+              options: [
+                'Perform the cut — apprentices can work independently',
+                'Decline and get your supervising licensed barber',
+                'Do a dry cut only since that does not require a license',
+                'Ask the client to sign a waiver',
+              ],
+              correctAnswer: 1,
+              explanation: 'Apprentices must work under licensed supervision at all times. Independent practice violates Indiana law.',
+            },
+            {
+              id: 'cp1-q2',
+              question: 'Your clipper cord has a crack in the insulation. A client is waiting. You should:',
+              options: [
+                'Use it carefully for this one client',
+                'Wrap the crack with electrical tape and proceed',
+                'Not use it — report it and use a backup',
+                'Finish the client, then report it',
+              ],
+              correctAnswer: 2,
+              explanation: 'Damaged electrical equipment is an electrocution risk. Never use it regardless of client wait time.',
+            },
+            {
+              id: 'cp1-q3',
+              question: 'What level of decontamination is required for barbering tools between clients in Indiana?',
+              options: ['Sanitation', 'Disinfection', 'Sterilization', 'Hot water rinse'],
+              correctAnswer: 1,
+              explanation: 'Indiana requires EPA-registered disinfection of all tools between every client.',
+            },
+            {
+              id: 'cp1-q4',
+              question: 'During a scalp assessment, you notice a circular scaly patch on a new client. You should:',
+              options: [
+                'Proceed — it is probably dandruff',
+                'Apply medicated shampoo and continue',
+                'Decline the service and refer the client to a physician',
+                'Disinfect the area and proceed with gloves',
+              ],
+              correctAnswer: 2,
+              explanation: 'Circular scaly patches may indicate ringworm — a contraindication. Decline and refer without diagnosing.',
+            },
+            {
+              id: 'cp1-q5',
+              question: 'Mid-haircut, your blade nicks a client and draws blood. Your FIRST action is:',
+              options: [
+                'Apply a styptic pencil immediately',
+                'Stop the service and put on gloves before touching the area',
+                'Finish the cut quickly, then address the nick',
+                'Ask the client if they want you to continue',
+              ],
+              correctAnswer: 1,
+              explanation: 'Universal Precautions: gloves before any blood contact. Stop the service first.',
+            },
+            {
+              id: 'cp1-q6',
+              question: 'When using shears, which finger should be the only one that moves?',
+              options: ['Index finger', 'Ring finger', 'Thumb', 'Pinky'],
+              correctAnswer: 2,
+              explanation: 'Only the thumb moves when cutting with shears. The bottom blade stays stationary.',
+            },
+            {
+              id: 'cp1-q7',
+              question: 'A client shares personal information in the chair. Another client later asks about them. You should:',
+              options: [
+                'Share only general information',
+                'Say nothing — client conversations are confidential',
+                'Tell them to ask the person directly',
+                'Share if the information is not sensitive',
+              ],
+              correctAnswer: 1,
+              explanation: 'Client confidentiality is an ethical obligation. All personal information stays private.',
+            },
+            {
+              id: 'cp1-q8',
+              question: 'What document is required on file for every chemical product in a barbershop?',
+              options: ['Product receipt', 'Safety Data Sheet (SDS)', 'Manufacturer warranty', 'OSHA inspection report'],
+              correctAnswer: 1,
+              explanation: 'OSHA requires a Safety Data Sheet (SDS) for every chemical product, accessible to all employees.',
+            },
+            {
+              id: 'cp1-q9',
+              question: 'Which consultation question is most effective for understanding what a client wants?',
+              options: ['"Same as last time?"', '"Short or long?"', '"What are we doing today?"', '"Do you want a fade?"'],
+              correctAnswer: 2,
+              explanation: 'Open-ended questions give clients space to describe their needs rather than confirming assumptions.',
+            },
+            {
+              id: 'cp1-q10',
+              question: 'How often must disinfectant solution be changed?',
+              options: ['Once a week', 'Once a month', 'Daily or when visibly contaminated', 'Only when it changes color'],
+              correctAnswer: 2,
+              explanation: 'Disinfectant loses effectiveness when contaminated. Indiana requires daily changes at minimum.',
             },
           ],
         },
@@ -290,6 +1002,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'hair_science',
           objective: 'Identify the layers of the hair shaft and scalp anatomy.',
           durationMinutes: 20,
+          videoFile: '/videos/course-barber-consultation-narrated.mp4',
           content: `<h2>Hair and Scalp Anatomy</h2>
 <h3>The Hair Shaft</h3>
 <p>Each hair strand has three layers:</p>
@@ -314,6 +1027,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'hair_science',
           objective: 'Explain the three phases of the hair growth cycle.',
           durationMinutes: 15,
+          videoFile: '/videos/course-barber-consultation-narrated.mp4',
           content: `<h2>The Hair Growth Cycle</h2>
 <p>Hair grows in a continuous cycle with three distinct phases:</p>
 <h3>Anagen (Growth Phase)</h3>
@@ -332,6 +1046,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'hair_science',
           objective: 'Assess hair texture, density, and porosity to select appropriate techniques.',
           durationMinutes: 20,
+          videoFile: '/videos/course-barber-consultation-narrated.mp4',
           content: `<h2>Hair Properties</h2>
 <h3>Texture</h3>
 <p>Hair texture refers to the diameter of the individual hair strand:</p>
@@ -357,6 +1072,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'hair_science',
           objective: 'Identify common scalp conditions and determine when to refer clients.',
           durationMinutes: 20,
+          videoFile: '/videos/course-barber-shampoo-narrated.mp4',
           content: `<h2>Common Scalp Conditions</h2>
 <h3>Dandruff (Pityriasis)</h3>
 <p>Excessive shedding of dead scalp cells. Can be treated with medicated shampoos. Not contagious.</p>
@@ -593,6 +1309,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'tools_equipment',
           objective: 'Perform routine clipper maintenance to extend tool life and ensure performance.',
           durationMinutes: 15,
+          videoFile: '/videos/course-barber-clipper-techniques.mp4',
           content: `<h2>Clipper Maintenance</h2>
 <h3>Daily Maintenance</h3>
 <ol>
@@ -615,6 +1332,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'tools_equipment',
           objective: 'Apply ergonomic principles to prevent injury during barbering services.',
           durationMinutes: 15,
+          videoFile: '/videos/barber-client-experience.mp4',
           content: `<h2>Ergonomics for Barbers</h2>
 <p>Barbering is physically demanding. Poor posture and repetitive motion cause chronic injuries that end careers.</p>
 <h3>Posture</h3>
@@ -641,6 +1359,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'tools_equipment',
           objective: 'Properly drape a client for haircut and shaving services.',
           durationMinutes: 10,
+          videoFile: '/videos/course-barber-consultation.mp4',
           content: `<h2>Draping the Client</h2>
 <h3>Haircut Draping</h3>
 <ol>
@@ -756,6 +1475,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'haircutting',
           objective: 'Identify the sections of the head and use them to guide haircut structure.',
           durationMinutes: 20,
+          videoFile: '/videos/course-barber-fade-narrated.mp4',
           content: `<h2>Head Shape and Sectioning</h2>
 <h3>Sections of the Head</h3>
 <ul>
@@ -878,6 +1598,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'haircutting',
           objective: 'Execute a flat top and classic taper haircut.',
           durationMinutes: 20,
+          videoFile: '/videos/course-barber-scissors-narrated.mp4',
           content: `<h2>Classic Barbering Cuts</h2>
 <h3>The Flat Top</h3>
 <p>The flat top requires a perfectly level surface on top of the head. It is one of the most technically demanding cuts in barbering.</p>
@@ -1002,6 +1723,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'shaving',
           objective: 'Prepare the skin for a professional shave using hot towel and pre-shave products.',
           durationMinutes: 20,
+          videoFile: '/videos/course-barber-razor-narrated.mp4',
           content: `<h2>Shave Preparation</h2>
 <h3>Why Preparation Matters</h3>
 <p>Proper preparation softens the beard, opens the pores, and reduces razor drag — preventing irritation and ingrown hairs.</p>
@@ -1078,6 +1800,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'shaving',
           objective: 'Apply correct post-shave products and handle common skin reactions.',
           durationMinutes: 15,
+          videoFile: '/videos/course-barber-beard-narrated.mp4',
           content: `<h2>Post-Shave Care</h2>
 <h3>Cold Towel</h3>
 <p>Apply a cold towel after shaving to close the pores and soothe the skin. Leave on for 1–2 minutes.</p>
@@ -1208,6 +1931,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'chemical_services',
           objective: 'Explain the color wheel and how it applies to hair color services.',
           durationMinutes: 20,
+          videoFile: '/videos/course-barber-styling-narrated.mp4',
           content: `<h2>Hair Color Theory</h2>
 <h3>The Color Wheel</h3>
 <p>Primary colors: red, yellow, blue. Secondary colors are made by mixing two primaries. Complementary colors cancel each other out — used to neutralize unwanted tones.</p>
@@ -1228,6 +1952,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'chemical_services',
           objective: 'Perform a patch test and identify chemical service contraindications.',
           durationMinutes: 20,
+          videoFile: '/videos/course-barber-sanitation-narrated.mp4',
           content: `<h2>Chemical Safety</h2>
 <h3>Patch Test</h3>
 <p>A patch test must be performed 24-48 hours before any chemical service. Apply a small amount of product behind the ear or inside the elbow. If redness, swelling, or itching occurs — do not proceed.</p>
@@ -1248,6 +1973,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'chemical_services',
           objective: 'Understand relaxer chemistry and application safety.',
           durationMinutes: 20,
+          videoFile: '/videos/course-barber-styling-narrated.mp4',
           content: `<h2>Relaxers and Texturizers</h2>
 <h3>How Relaxers Work</h3>
 <p>Relaxers break the disulfide bonds in the cortex that give hair its curl pattern. The hair is then restructured in a straighter form.</p>
@@ -1272,6 +1998,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'chemical_services',
           objective: 'Select and apply appropriate scalp treatments for common conditions.',
           durationMinutes: 15,
+          videoFile: '/videos/course-barber-shampoo-narrated.mp4',
           content: `<h2>Scalp Treatments</h2>
 <h3>Types of Treatments</h3>
 <ul>
@@ -1393,6 +2120,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'professional_skills',
           objective: 'Compare barbershop business models and their financial implications.',
           durationMinutes: 20,
+          videoFile: '/videos/barber-shop-culture.mp4',
           content: `<h2>Barbershop Business Models</h2>
 <h3>Commission</h3>
 <p>You work for the shop owner and receive a percentage of your service revenue (typically 40-60%). The shop provides clients, supplies, and equipment. Good for new barbers building skills.</p>
@@ -1410,6 +2138,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'professional_skills',
           objective: 'Set competitive prices and manage basic barbershop finances.',
           durationMinutes: 20,
+          videoFile: '/videos/barber-shop-culture.mp4',
           content: `<h2>Pricing and Finances</h2>
 <h3>Setting Your Prices</h3>
 <ul>
@@ -1435,6 +2164,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'professional_skills',
           objective: 'Apply professional and ethical standards in the barbershop.',
           durationMinutes: 15,
+          videoFile: '/videos/barber-client-experience.mp4',
           content: `<h2>Professionalism and Ethics</h2>
 <h3>The Barber's Code</h3>
 <ul>
@@ -1556,6 +2286,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'exam_prep',
           objective: 'Understand the format and requirements of the Indiana barber state board exam.',
           durationMinutes: 20,
+          videoFile: '/videos/barber-course-intro-with-voice.mp4',
           content: `<h2>Indiana State Board Exam</h2>
 <h3>Exam Components</h3>
 <ul>
@@ -1585,6 +2316,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'exam_prep',
           objective: 'Review key concepts in sanitation and hair science for the written exam.',
           durationMinutes: 25,
+          videoFile: '/videos/course-barber-sanitation-narrated.mp4',
           content: `<h2>Written Exam Review: Sanitation & Science</h2>
 <h3>Key Sanitation Facts</h3>
 <ul>
@@ -1610,6 +2342,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'exam_prep',
           objective: 'Review haircutting techniques and Indiana laws for the written exam.',
           durationMinutes: 25,
+          videoFile: '/videos/course-barber-fade-narrated.mp4',
           content: `<h2>Written Exam Review: Techniques & Laws</h2>
 <h3>Key Technique Facts</h3>
 <ul>
@@ -1637,6 +2370,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           domainKey: 'exam_prep',
           objective: 'Prepare for the practical exam with a structured practice checklist.',
           durationMinutes: 20,
+          videoFile: '/videos/course-barber-scissors-narrated.mp4',
           content: `<h2>Practical Exam Preparation</h2>
 <h3>What Examiners Look For</h3>
 <ul>

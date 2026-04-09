@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
     if (['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) {
-      return NextResponse.json({ enrolled: true, status: 'active', enrollment_state: 'active', progress: 0, approved: true });
+      return NextResponse.json({ enrolled: true, status: 'active', enrollment_state: 'active', progress: 0, approved: true, isAdmin: true });
     }
   }
 

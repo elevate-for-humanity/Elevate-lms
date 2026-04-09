@@ -22,6 +22,7 @@ export type EnrollmentInput = {
   userId: string;
   programId: string;
   programSlug?: string;
+  courseId?: string;
   fundingSource?: string;
   status?: string;
   paymentStatus?: string;
@@ -73,6 +74,7 @@ export async function createOrUpdateEnrollment(
     userId,
     programId,
     programSlug,
+    courseId,
     fundingSource,
     isDeposit = false,
     amountPaidCents = 0,
@@ -114,6 +116,7 @@ export async function createOrUpdateEnrollment(
       user_id: userId,
       program_id: programId,
       ...(programSlug ? { program_slug: programSlug } : {}),
+      ...(courseId   ? { course_id:    courseId    } : {}),
       funding_source: resolvedFundingSource,
       status: resolvedStatus,
       payment_status: resolvedPaymentStatus,

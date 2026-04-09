@@ -155,6 +155,9 @@ async function _POST(req: Request) {
           status: 'pending',
           payment_status: 'paid',
           stripe_checkout_session_id: sessionId,
+          ...(programSlug === 'barber-apprenticeship'
+            ? { course_id: '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17' }
+            : {}),
         })
         .eq('id', enrollmentId);
     } else {
@@ -167,6 +170,9 @@ async function _POST(req: Request) {
           status: 'pending',
           payment_status: 'paid',
           stripe_checkout_session_id: sessionId,
+          ...(programSlug === 'barber-apprenticeship'
+            ? { course_id: '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17' }
+            : {}),
         })
         .select('id')
         .single();

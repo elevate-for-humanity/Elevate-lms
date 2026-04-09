@@ -48,6 +48,7 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
       const userId = session.metadata?.student_id ?? session.metadata?.user_id;
       const programId = session.metadata?.program_id;
       const programSlug = session.metadata?.program_slug;
+      const courseId = session.metadata?.course_id ?? undefined;
       const fundingSource = session.metadata?.funding_source ?? 'self_pay';
       const amountPaidCents = session.amount_total ?? 0;
       const customerEmail =
@@ -66,6 +67,7 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
         userId,
         programId,
         programSlug,
+        courseId,
         fundingSource,
         amountPaidCents,
         stripeCheckoutSessionId: session.id,

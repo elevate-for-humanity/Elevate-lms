@@ -12,6 +12,7 @@ interface EnrollmentParams {
   studentId?: string;
   programId: string;
   programSlug?: string;
+  courseId?: string;
   email: string;
   firstName?: string;
   lastName?: string;
@@ -39,6 +40,7 @@ export async function createEnrollmentFromPayment(
     studentId: initialStudentId,
     programId,
     programSlug,
+    courseId,
     email,
     firstName,
     lastName,
@@ -51,12 +53,12 @@ export async function createEnrollmentFromPayment(
   } = params;
 
   try {
-    const { createAdminClient } = await import('@/lib/supabase/admin');
+    const { getAdminClient } = await import('@/lib/supabase/admin');
     const { setAuditContext } = await import('@/lib/audit-context');
-    const supabaseAdmin = createAdminClient();
+    const supabaseAdmin = await getAdminClient();
 
     if (!supabaseAdmin) {
-      logger.error('[Enrollment] createAdminClient returned null — SUPABASE_SERVICE_ROLE_KEY missing');
+      logger.error('[Enrollment] getAdminClient returned null — SUPABASE_SERVICE_ROLE_KEY missing');
       return { success: false, error: 'Database configuration error' };
     }
 
@@ -160,6 +162,8 @@ export async function createEnrollmentFromPayment(
         .insert({
           student_id: finalStudentId,
           program_id: programId,
+          ...(programSlug ? { program_slug: programSlug } : {}),
+          ...(courseId    ? { course_id:    courseId    } : {}),
           status: 'pending_review',
           payment_status: 'paid',
           payment_provider: paymentProvider,

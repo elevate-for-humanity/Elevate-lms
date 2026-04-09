@@ -109,9 +109,12 @@ export default async function CoursePage({ params }: { params: Params }) {
   // Admins are always treated as enrolled — they should never see "Enroll Now".
   const isPendingApproval = !isAdminUser && enrollment?.status === 'pending_approval';
 
-  const { data: modulesRaw } = await db
-    .from('course_modules').select('id, title, order_index')
+  const modulesQuery = db
+    .from('course_modules').select('id, title, order_index, is_draft, available_from')
     .eq('course_id', lessonCourseId).order('order_index', { ascending: true });
+  // Non-admin students only see modules that are live (not draft, available_from in the past or null)
+  if (!isAdminUser) modulesQuery.eq('is_draft', false);
+  const { data: modulesRaw } = await modulesQuery;
 
   const { data: lessonsRaw } = await db
     .from('lms_lessons')
@@ -129,12 +132,21 @@ export default async function CoursePage({ params }: { params: Params }) {
 
   const progressMap = new Map((lessonProgress || []).map((p: any) => [p.lesson_id, p]));
 
-  const modules = (modulesRaw || []).map((mod: any) => ({
-    ...mod,
-    lessons: allLessons
-      .filter((l) => l.module_id === mod.id)
-      .sort((a: any, b: any) => a.order_index - b.order_index),
-  }));
+  const now = new Date();
+  const modules = (modulesRaw || [])
+    .filter((mod: any) => {
+      // Admins see everything; students only see live modules
+      if (isAdminUser) return true;
+      if (mod.is_draft) return false;
+      if (mod.available_from && new Date(mod.available_from) > now) return false;
+      return true;
+    })
+    .map((mod: any) => ({
+      ...mod,
+      lessons: allLessons
+        .filter((l) => l.module_id === mod.id)
+        .sort((a: any, b: any) => a.order_index - b.order_index),
+    }));
 
   const ungrouped = allLessons.filter((l) => !l.module_id);
   const completedCount = allLessons.filter((l) => progressMap.get(l.id)?.completed).length;

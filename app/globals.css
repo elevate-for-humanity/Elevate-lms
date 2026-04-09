@@ -1860,3 +1860,55 @@ header[role="banner"] a.\!text-white {
     }
   }
 }
+
+/* ── Lesson content tables ───────────────────────────────────────────────────
+   Ensures tables in .prose lesson content always render with visible structure,
+   even if inline style attributes are absent or stripped.
+   Inline styles from the DB take precedence via specificity.
+   --------------------------------------------------------------------------- */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.prose table thead {
+  background-color: #f8fafc;
+}
+
+.prose table th {
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  text-align: left;
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.prose table td {
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  vertical-align: top;
+}
+
+.prose table tr:nth-child(even) td {
+  background-color: #f8fafc;
+}
+
+.prose table tr:hover td {
+  background-color: #f1f5f9;
+}
+
+/* Mobile: allow horizontal scroll on narrow tables */
+@media (max-width: 640px) {
+  .prose table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}

@@ -334,6 +334,9 @@ async function handleOrderCaptured(event: SezzleWebhookEvent, supabase: any) {
       studentId: studentId,
       programId: programId,
       programSlug: programSlug,
+      courseId: programSlug === 'barber-apprenticeship'
+        ? '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17'
+        : undefined,
       email: customer.email,
       firstName: customer.first_name,
       lastName: customer.last_name,
@@ -390,6 +393,9 @@ async function handleOrderCaptured(event: SezzleWebhookEvent, supabase: any) {
           status: 'active',
           payment_status: 'paid',
           activated_at: new Date().toISOString(),
+          ...(programSlug === 'barber-apprenticeship'
+            ? { course_id: '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17' }
+            : {}),
         })
         .eq('id', payment.enrollment_id);
 

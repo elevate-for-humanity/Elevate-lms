@@ -55,12 +55,33 @@ function hvacDefIdFromSlug(slug: string): string | undefined {
 import { transformLessonContent, isAiJsonBlob } from '@/lib/lms/transformLessonContent';
 import { HVAC_COURSE_ID } from '@/lib/courses/hvac-uuids';
 
-// Barber lesson video resolver — slug barber-lesson-N → /videos/barber-lessons/barber-lesson-N.mp4
-function barberVideoUrl(slug: string | null | undefined): string | null {
+const BARBER_COURSE_ID = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';
+
+/**
+ * Resolve a barber lesson video URL.
+ * Priority:
+ *   1. Per-lesson MP4 (lessons 1–5, pre-generated files)
+ *   2. lesson.video_url (set by seeder/migration for all other lessons)
+ *   3. video_config.videoFile (blueprint fallback)
+ *   4. null
+ */
+function barberVideoUrl(
+  slug: string | null | undefined,
+  videoConfig?: Record<string, string> | null,
+  videoUrl?: string | null,
+): string | null {
   if (!slug) return null;
+  // Per-lesson MP4s exist for lessons 1–5
   const match = slug.match(/^barber-lesson-(\d+)$/);
-  if (!match) return null;
-  return `/videos/barber-lessons/barber-lesson-${match[1]}.mp4`;
+  if (match) {
+    const n = parseInt(match[1], 10);
+    if (n <= 5) return `/videos/barber-lessons/barber-lesson-${n}.mp4`;
+  }
+  // video_url set directly on the lesson row (all seeded lessons)
+  if (videoUrl) return videoUrl;
+  // Fall back to blueprint-assigned videoFile stored in video_config JSONB
+  if (videoConfig?.videoFile) return videoConfig.videoFile;
+  return null;
 }
 import dynamic from 'next/dynamic';
 import { lessonUuidToSimulationKey } from '@/lib/lms/hvac-simulations';
@@ -111,8 +132,7 @@ export default function LessonPage() {
   const lessonId = params.lessonId as string;
 
   const isHvacCourse = courseId === HVAC_COURSE_ID;
-  // Barber lessons are identified by slug — course ID is dynamic (seeded per environment)
-  const isBarberLesson = !!barberVideoUrl(lesson?.slug);
+  const isBarberLesson = courseId === BARBER_COURSE_ID;
 
   // ── All state declarations first — no hooks may reference these before this block ──
   const [lesson, setLesson] = useState<any>(null);
@@ -273,6 +293,36 @@ export default function LessonPage() {
       .eq('id', courseId)
       .single();
 
+    // Module draft gate — block direct URL access to lessons in unreleased modules.
+    // Fetch role from profiles to determine admin bypass.
+    let isAdminUser = false;
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .maybeSingle();
+      isAdminUser = ['admin', 'super_admin', 'staff'].includes(profile?.role ?? '');
+    }
+    if (lessonData?.module_id && !isAdminUser) {
+      const { data: moduleData } = await supabase
+        .from('course_modules')
+        .select('is_draft, available_from')
+        .eq('id', lessonData.module_id)
+        .maybeSingle();
+      if (moduleData) {
+        const isDraft     = moduleData.is_draft === true;
+        const isScheduled = moduleData.available_from
+          ? new Date(moduleData.available_from) > new Date()
+          : false;
+        if (isDraft || isScheduled) {
+          setEnrollmentBlockReason('module_not_released');
+          setEnrollmentBlocked(true);
+          return;
+        }
+      }
+    }
+
     // 2. Set state
     if (lessonData) {
       let quizQuestions = lessonData.quiz_questions;
@@ -365,10 +415,10 @@ export default function LessonPage() {
 
     // 5. Determine if the current lesson is blocked by an unpassed checkpoint.
     // A lesson is blocked when it is in module N and the checkpoint for module N-1
-    // has not been passed. Applies to all DB-driven lessons (lesson_source = 'canonical').
-    // NOTE: passedCheckpointIds is read via a ref to avoid adding it as a dependency
-    // (which would cause fetchLessonData to re-run every time a checkpoint is passed).
-    if (lessonData && lessonsData && lessonData.lesson_source === 'canonical' && lessonData.module_order > 1) {
+    // has not been passed. Applies to all DB-driven lessons.
+    // lesson_source is 'course_lessons' from lms_lessons view, or 'canonical' from fallback path.
+    const isDbDrivenLesson = lessonData?.lesson_source === 'canonical' || lessonData?.lesson_source === 'course_lessons';
+    if (lessonData && lessonsData && isDbDrivenLesson && lessonData.module_order > 1) {
       const prevModuleOrder = lessonData.module_order - 1;
       const prevCheckpoint = lessonsData.find(
         (l: any) => l.module_order === prevModuleOrder && l.step_type === 'checkpoint'
@@ -497,6 +547,22 @@ export default function LessonPage() {
   }, [lesson]);
 
   if (enrollmentBlocked) {
+    if (enrollmentBlockReason === 'module_not_released') {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 p-8">
+          <div className="max-w-md text-center space-y-4">
+            <div className="text-4xl">🔒</div>
+            <h2 className="text-xl font-semibold text-gray-900">Module Not Yet Available</h2>
+            <p className="text-gray-600">
+              This module is still being prepared. Check back soon — your instructor will notify you when it opens.
+            </p>
+            <a href={`/lms/courses/${courseId}`} className="inline-block mt-4 text-sm text-blue-600 underline">
+              Back to course
+            </a>
+          </div>
+        </div>
+      );
+    }
     const isFundingBlock = enrollmentBlockReason === 'pending_funding_verification';
     return (
       <div className="flex items-center justify-center h-[100dvh] bg-white">
@@ -985,6 +1051,7 @@ export default function LessonPage() {
             <QuizPlayer
               questions={lesson.quiz_questions || []}
               title={lesson.title}
+              isCheckpoint={lesson.step_type === 'checkpoint'}
               onComplete={async (score, answers) => {
                 const passingScore = lesson.passing_score || 70;
                 const passed = score >= passingScore;
@@ -1051,15 +1118,21 @@ export default function LessonPage() {
             )}
           </div>
         ) : isBarberLesson ? (
-          /* Barber: MP4s live in /public/videos/barber-lessons/ — video_url is NULL in DB */
+          /* Barber: per-lesson MP4s for lessons 1–5; video_url for all others */
           <div className="max-w-4xl mx-auto p-4 md:p-8">
-            <InteractiveVideoPlayer
-              videoUrl={barberVideoUrl(lesson.slug)!}
-              title={lesson.title}
-              onComplete={() => {
-                if (!isCompleted) { setIsCompleted(true); markComplete(); }
-              }}
-            />
+            {barberVideoUrl(lesson.slug, lesson.video_config, lesson.video_url) ? (
+              <InteractiveVideoPlayer
+                videoUrl={barberVideoUrl(lesson.slug, lesson.video_config, lesson.video_url)!}
+                title={lesson.title}
+                onComplete={() => {
+                  if (!isCompleted) { setIsCompleted(true); markComplete(); }
+                }}
+              />
+            ) : (
+              <div className="bg-slate-100 rounded-xl flex items-center justify-center h-48 text-slate-400 text-sm">
+                Video coming soon
+              </div>
+            )}
             {lesson.content && (
               <div className="mt-6 bg-white rounded-xl p-8 shadow-sm">
                 <div
@@ -1281,11 +1354,17 @@ export default function LessonPage() {
                   {activeActivity === 'video' && (
                     <div>
                       {isBarberLesson ? (
-                        <InteractiveVideoPlayer
-                          videoUrl={barberVideoUrl(lesson.slug)!}
-                          title={lesson.title}
-                          onComplete={() => { markAttempted('video'); if (!isCompleted) markComplete(); }}
-                        />
+                        barberVideoUrl(lesson.slug, lesson.video_config, lesson.video_url) ? (
+                          <InteractiveVideoPlayer
+                            videoUrl={barberVideoUrl(lesson.slug, lesson.video_config, lesson.video_url)!}
+                            title={lesson.title}
+                            onComplete={() => { markAttempted('video'); if (!isCompleted) markComplete(); }}
+                          />
+                        ) : (
+                          <div className="bg-slate-100 rounded-xl flex items-center justify-center h-48 text-slate-400 text-sm">
+                            Video coming soon
+                          </div>
+                        )
                       ) : lesson.video_url ? (
                         isHvacCourse ? (
                           <HvacLessonVideo
@@ -1318,7 +1397,7 @@ export default function LessonPage() {
 
                   {/* READING */}
                   {activeActivity === 'reading' && (
-                    <div className="bg-white rounded-xl p-8 shadow-sm">
+                    <div className="bg-white rounded-xl p-4 md:p-8 shadow-sm">
                       {lesson.content ? (
                         <>
                           <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }} />
@@ -1388,6 +1467,7 @@ export default function LessonPage() {
                           questions={lesson.quiz_questions}
                           title={lesson.title}
                           passingScore={lesson.passing_score || 70}
+                          isCheckpoint={lesson.step_type === 'checkpoint'}
                           onComplete={(score) => {
                             if (score >= (lesson.passing_score || 70) && !isCompleted) markComplete();
                           }}

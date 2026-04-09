@@ -34,7 +34,9 @@ function hasEnv(name: string): boolean {
 
 function checkXmllint(): boolean {
   try {
-    execFileSync("xmllint", ["--version"], { stdio: "ignore" });
+    // timeout: 2s — prevents hanging in serverless environments where xmllint
+    // is not installed and execFileSync would block indefinitely
+    execFileSync("xmllint", ["--version"], { stdio: "ignore", timeout: 2000 });
     return true;
   } catch {
     return false;

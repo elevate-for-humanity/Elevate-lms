@@ -83,15 +83,15 @@ async function _GET(req: Request) {
       rapidsSubmissions,
     ] = await Promise.all([
       safeQuery(db, 'programs', 'id, title, slug, published, is_active, status'),
-      safeQuery(db, 'course_modules', 'id, title, program_id'),
+      safeQuery(db, 'course_modules', 'id, title, course_id'),
       safeQuery(db, 'course_lessons', 'id, title, lesson_type, course_id', { limit: 2000 }),
-      safeQuery(db, 'curriculum_lessons', 'id, title, step_type, status, video_url', { limit: 2000 }),
+      safeQuery(db, 'curriculum_lessons', 'id, lesson_title, step_type, status, video_file', { limit: 2000 }),
       safeQuery(db, 'program_enrollments', 'id, user_id, program_id, status, enrolled_at', { limit: 200, order: 'enrolled_at' }),
       safeQuery(db, 'lesson_progress', 'id, user_id, lesson_id, completed', { limit: 200 }),
       safeQuery(db, 'checkpoint_scores', 'id, user_id, passed'),
       safeQuery(db, 'step_submissions', 'id, user_id, status'),
       safeQuery(db, 'program_completion_certificates', 'id, user_id, program_id, issued_at', { limit: 100 }),
-      safeQuery(db, 'exam_funding_authorizations', 'id, user_id, status'),
+      safeQuery(db, 'exam_funding_authorizations', 'id, learner_id, funding_status'),
       safeQuery(db, 'profiles', 'id, role, created_at', { limit: 1 }),
       safeQuery(db, 'credentials', 'id, name, type', { limit: 50 }),
       safeQuery(db, 'partner_lms_enrollments', 'id, provider_id, status', { limit: 100 }),
@@ -106,10 +106,10 @@ async function _GET(req: Request) {
       (p: any) => p.published && p.is_active && p.status !== 'archived'
     ).length;
 
-    // Lesson media coverage (curriculum_lessons is canonical)
-    const lessonsWithMp4 = curriculumLessons.data.filter((l: any) => l.video_url?.includes('.mp4')).length;
+    // Lesson media coverage (curriculum_lessons is canonical, column is video_file)
+    const lessonsWithMp4 = curriculumLessons.data.filter((l: any) => l.video_file?.includes('.mp4')).length;
     const lessonsWithMp3 = curriculumLessons.data.filter(
-      (l: any) => l.video_url?.includes('.mp3') && !l.video_url?.includes('.mp4')
+      (l: any) => l.video_file?.includes('.mp3') && !l.video_file?.includes('.mp4')
     ).length;
     const lessonsNoMedia = curriculumLessons.count - lessonsWithMp4 - lessonsWithMp3;
 
@@ -159,12 +159,16 @@ async function _GET(req: Request) {
       Object.entries(queryErrors).filter(([, v]) => v !== null)
     );
 
-    // MeF readiness — non-blocking, errors surfaced in bundle
+    // MeF readiness — run in a race against a 3s timeout so xmllint check
+    // never hangs the bundle response in serverless environments
     let mefReadiness: ReturnType<typeof getRuntimeReadiness> | null = null;
     try {
-      mefReadiness = getRuntimeReadiness();
+      mefReadiness = await Promise.race([
+        Promise.resolve().then(() => getRuntimeReadiness()),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), 3000)),
+      ]);
     } catch {
-      // getRuntimeReadiness is synchronous and should never throw, but guard anyway
+      // swallow — mefReadiness stays null, surfaced in bundle errors
     }
 
     const bundle = {

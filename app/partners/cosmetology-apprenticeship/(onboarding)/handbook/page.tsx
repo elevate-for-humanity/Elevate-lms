@@ -216,11 +216,7 @@ export default function CosmetologyPartnerHandbookPage() {
         </div>
 
         <DocumentFooter
-          sponsor="2Exclusive LLC-S (DBA: Elevate for Humanity Technical and Career Institute)"
-          rapidsNumber="2025-IN-132301"
-          rtiProviderId="208029"
-          address="8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240"
-          phone="(317) 314-3757"
+          notice="RAPIDS Program No.: 2025-IN-132301 · RTI Provider ID: 208029 · DOL Registered Apprenticeship Sponsor"
         />
       </div>
     </div>

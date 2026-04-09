@@ -60,6 +60,14 @@ export default async function MyDashboardPage() {
     .single();
 
   const role = profile?.role ?? 'student';
+
+  // Gate: students must complete onboarding before accessing the dashboard
+  const bypassOnboarding = ['admin', 'super_admin', 'org_admin', 'staff', 'instructor',
+    'mentor', 'case_manager', 'creator', 'vita_staff', 'supersonic_staff'].includes(role);
+  if (!bypassOnboarding && !profile?.onboarding_completed) {
+    redirect('/onboarding/learner');
+  }
+
   const tabs = ROLE_TABS[role] ?? ['education'];
   const defaultTab = DEFAULT_TAB[role] ?? 'education';
 

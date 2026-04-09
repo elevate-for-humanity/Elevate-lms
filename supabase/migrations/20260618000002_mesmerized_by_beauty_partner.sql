@@ -10,7 +10,7 @@ ALTER TABLE public.program_holders
   ADD CONSTRAINT program_holders_mou_type_check
   CHECK (mou_type IN ('universal', 'custom_hvac_codelivery', 'custom_cosmetology_codelivery'));
 
--- 2. Insert partner record
+-- 2. Insert partner record (idempotent — skip if name already exists)
 INSERT INTO public.partners (
   name,
   owner_name,
@@ -27,10 +27,11 @@ INSERT INTO public.partners (
   onboarding_completed,
   created_at,
   updated_at
-) VALUES (
+)
+SELECT
   'Mesmerized by Beauty Cosmetology Academy',
   'Mesmerized by Beauty Cosmetology Academy',
-  'admin@mesmerizedbybeauty.com',
+  'mesmerizedbybeautyl@yahoo.com',
   'cosmetology_school',
   'active',
   'active',
@@ -43,9 +44,12 @@ INSERT INTO public.partners (
   false,
   NOW(),
   NOW()
-) ON CONFLICT DO NOTHING;
+WHERE NOT EXISTS (
+  SELECT 1 FROM public.partners
+  WHERE name = 'Mesmerized by Beauty Cosmetology Academy'
+);
 
--- 3. Insert program_holder record
+-- 3. Insert program_holder record (idempotent — skip if org name already exists)
 INSERT INTO public.program_holders (
   name,
   organization_name,
@@ -57,10 +61,11 @@ INSERT INTO public.program_holders (
   teaches_multiple,
   payout_status,
   created_at
-) VALUES (
+)
+SELECT
   'Mesmerized by Beauty Cosmetology Academy',
   'Mesmerized by Beauty Cosmetology Academy',
-  'admin@mesmerizedbybeauty.com',
+  'mesmerizedbybeautyl@yahoo.com',
   'custom_cosmetology_codelivery',
   false,
   'pending',
@@ -68,4 +73,7 @@ INSERT INTO public.program_holders (
   false,
   'not_started',
   NOW()
-) ON CONFLICT DO NOTHING;
+WHERE NOT EXISTS (
+  SELECT 1 FROM public.program_holders
+  WHERE organization_name = 'Mesmerized by Beauty Cosmetology Academy'
+);

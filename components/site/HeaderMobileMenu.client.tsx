@@ -65,10 +65,10 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
 
   return (
     <>
-      {/* Mobile Menu Button */}
+      {/* Mobile Menu Button — hidden on desktop (lg+), visible on mobile and tablet */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="md:hidden p-3 text-slate-700 hover:text-slate-900 min-w-[44px] min-h-[44px] flex items-center justify-center"
+        className="lg:hidden p-3 text-slate-700 hover:text-slate-900 min-w-[44px] min-h-[44px] flex items-center justify-center"
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={isOpen}
       >

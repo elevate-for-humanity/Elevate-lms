@@ -116,7 +116,7 @@ export default function Header() {
         <HeaderDesktopNav items={NAV_ITEMS} />
 
         {/* CTA Buttons - Always visible */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden lg:flex items-center gap-3">
           {/* Portal login — icon only to save space */}
           <Link
             href="/portals"

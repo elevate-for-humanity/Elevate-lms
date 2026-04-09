@@ -146,7 +146,7 @@ export default function CosmetologyDocumentsPage() {
         return;
       }
 
-      router.push('/apprentice');
+      router.push('/pwa/cosmetology');
     } catch {
       setSubmitError('Unable to submit. Please try again or call (317) 314-3757.');
       setSubmitting(false);

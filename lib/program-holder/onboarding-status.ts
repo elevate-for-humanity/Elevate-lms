@@ -116,10 +116,10 @@ export async function getProgramHolderOnboardingStatus(
     };
   }
 
-  // Check approval status
+  // Check approval status and program type
   const { data: programHolder } = await supabase
     .from('program_holders')
-    .select('status, approved_at')
+    .select('status, approved_at, mou_type')
     .eq('user_id', currentUserId)
     .single();
 
@@ -262,21 +262,33 @@ export async function getProgramHolderOnboardingStatus(
     .eq('user_id', currentUserId);
 
   const approvedDocs = documents?.filter((d) => d.approved) || [];
-  const hasSyllabus = approvedDocs.some((d) => d.document_type === 'syllabus');
-  const hasBusinessLicense = approvedDocs.some(
-    (d) => d.document_type === 'business_license'
-  );
-  const hasInsurance = approvedDocs.some(
-    (d) => d.document_type === 'insurance'
-  );
+  const mouType = programHolder?.mou_type ?? 'barber';
 
-  const requiredDocsComplete =
-    hasSyllabus && hasBusinessLicense && hasInsurance;
-  const requiredDocsList = [
-    ...(!hasSyllabus ? ['Syllabus'] : []),
-    ...(!hasBusinessLicense ? ['Business License'] : []),
-    ...(!hasInsurance ? ['Insurance Certificate'] : []),
-  ];
+  let requiredDocsComplete: boolean;
+  let requiredDocsList: string[];
+
+  if (mouType === 'cosmetology') {
+    const hasSalonLicense = approvedDocs.some((d) => d.document_type === 'salon_license');
+    const hasSupervisorLicense = approvedDocs.some((d) => d.document_type === 'supervisor_license');
+    const hasWorkersComp = approvedDocs.some((d) => d.document_type === 'workers_comp');
+    requiredDocsComplete = hasSalonLicense && hasSupervisorLicense && hasWorkersComp;
+    requiredDocsList = [
+      ...(!hasSalonLicense ? ['Indiana Salon License'] : []),
+      ...(!hasSupervisorLicense ? ['Supervising Cosmetologist License'] : []),
+      ...(!hasWorkersComp ? ["Workers' Compensation Insurance"] : []),
+    ];
+  } else {
+    // Barber (default)
+    const hasSyllabus = approvedDocs.some((d) => d.document_type === 'syllabus');
+    const hasBusinessLicense = approvedDocs.some((d) => d.document_type === 'business_license');
+    const hasInsurance = approvedDocs.some((d) => d.document_type === 'insurance');
+    requiredDocsComplete = hasSyllabus && hasBusinessLicense && hasInsurance;
+    requiredDocsList = [
+      ...(!hasSyllabus ? ['Syllabus'] : []),
+      ...(!hasBusinessLicense ? ['Business License'] : []),
+      ...(!hasInsurance ? ['Insurance Certificate'] : []),
+    ];
+  }
 
   if (!requiredDocsComplete) {
     return {

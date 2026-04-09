@@ -90,31 +90,38 @@ export default function CosmetologyOrientationPage() {
       ),
     },
     {
-      title: 'Payment Terms',
+      title: 'Pay & Funding',
       icon: DollarSign,
       content: (
         <div className="space-y-4">
-          <p>Your enrollment includes the following payment structure:</p>
-          <div className="bg-white p-4 rounded-lg space-y-3">
-            <div className="flex justify-between">
-              <span>Program Total</span>
-              <span className="font-bold">{formatCurrency(config.tuition.total)}</span>
+          <div className="bg-purple-50 border border-purple-200 p-5 rounded-xl">
+            <p className="text-2xl font-black text-purple-900 mb-1">$0 Tuition</p>
+            <p className="text-purple-800 text-sm">This is an earn-while-you-learn apprenticeship. There is no tuition.</p>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
+              <span className="w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</span>
+              <div>
+                <p className="font-bold text-slate-900 text-sm">You earn wages from your host salon</p>
+                <p className="text-slate-600 text-sm">Apprentices are employees. Your salon pays you at least minimum wage throughout training.</p>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span>Setup Fee (paid at enrollment)</span>
-              <span className="font-bold">{config.tuition.setupFeePercent}%</span>
+            <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
+              <span className="w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</span>
+              <div>
+                <p className="font-bold text-slate-900 text-sm">WIOA & Workforce Ready Grant may cover tools and exam fees</p>
+                <p className="text-slate-600 text-sm">If you qualify, public workforce funding can cover your state board exam fee, tools, and supplies.</p>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span>Weekly Payments</span>
-              <span className="font-bold">{config.tuition.paymentFrequency}</span>
+            <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
+              <span className="w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">3</span>
+              <div>
+                <p className="font-bold text-slate-900 text-sm">State board exam fee: ~$75</p>
+                <p className="text-slate-600 text-sm">Paid directly to Indiana IPLA when you apply for your license after completing 2,000 hours.</p>
+              </div>
             </div>
           </div>
-          <p className="text-sm text-black">
-            {config.tuition.fundingNote}
-          </p>
-          <p className="text-sm text-brand-red-600 font-medium">
-            Missed payments may result in program suspension. Contact us immediately if you anticipate payment issues.
-          </p>
+          <p className="text-sm text-slate-500">{config.tuition.fundingNote}</p>
         </div>
       ),
     },
@@ -204,8 +211,8 @@ export default function CosmetologyOrientationPage() {
             </span>
           </div>
           <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-white transition-all duration-300"
+            <div
+              className="h-full bg-purple-600 transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -215,12 +222,12 @@ export default function CosmetologyOrientationPage() {
       {/* Content */}
       <div className="max-w-3xl mx-auto px-6 py-12">
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          <div className="bg-white px-6 py-4">
+          <div className="bg-purple-600 px-6 py-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
                 <CurrentIcon className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-xl font-bold text-slate-900">
+              <h2 className="text-xl font-bold text-white">
                 {sections[currentSection].title}
               </h2>
             </div>

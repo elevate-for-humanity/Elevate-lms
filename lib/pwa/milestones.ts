@@ -60,12 +60,26 @@ export const BARBER_MILESTONES: Milestone[] = [
   },
 ];
 
-export function getAchievedMilestones(totalHours: number): Milestone[] {
-  return BARBER_MILESTONES.filter(m => totalHours >= m.hours);
+export const COSMETOLOGY_MILESTONES: Milestone[] = [
+  { id: 'first-100',      hours: 100,  title: 'First 100 Hours',       description: 'Completed your first 100 hours of salon training.',                    badge: '🎯' },
+  { id: 'shampoo',        hours: 250,  title: 'Shampoo & Conditioning', description: 'Proficiency in scalp analysis and conditioning treatments.',            badge: '💧' },
+  { id: 'quarter',        hours: 500,  title: 'Quarter Way There',      description: '500 hours complete. Building real salon skills.',                       badge: '📈' },
+  { id: 'chemical',       hours: 750,  title: 'Chemical Services',      description: 'Demonstrated competency in color, perms, and relaxers.',                badge: '⭐' },
+  { id: 'halfway',        hours: 1000, title: 'Halfway to Licensure',   description: '1,000 hours complete. Halfway to your Indiana Cosmetology License.',   badge: '🌟' },
+  { id: 'skin-nail',      hours: 1250, title: 'Skin & Nail Services',   description: 'Proficiency in facials, waxing, manicures, and pedicures.',            badge: '💅' },
+  { id: 'advanced',       hours: 1500, title: 'Advanced Techniques',    description: 'Mastery of advanced cutting, coloring, and styling techniques.',        badge: '💫' },
+  { id: 'salon-mgmt',     hours: 1750, title: 'Salon Management',       description: 'Completed business, sanitation, and client management modules.',        badge: '🏢' },
+  { id: 'state-board',    hours: 2000, title: 'State Board Ready',      description: 'All 2,000 hours complete. Eligible for the Indiana State Board exam.', badge: '🏆' },
+];
+
+export function getAchievedMilestones(totalHours: number, program: 'barber' | 'cosmetology' = 'barber'): Milestone[] {
+  const list = program === 'cosmetology' ? COSMETOLOGY_MILESTONES : BARBER_MILESTONES;
+  return list.filter(m => totalHours >= m.hours);
 }
 
-export function getNextMilestone(totalHours: number): Milestone | null {
-  return BARBER_MILESTONES.find(m => totalHours < m.hours) || null;
+export function getNextMilestone(totalHours: number, program: 'barber' | 'cosmetology' = 'barber'): Milestone | null {
+  const list = program === 'cosmetology' ? COSMETOLOGY_MILESTONES : BARBER_MILESTONES;
+  return list.find(m => totalHours < m.hours) || null;
 }
 
 export function checkNewMilestone(

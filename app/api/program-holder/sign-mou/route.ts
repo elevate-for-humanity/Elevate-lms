@@ -59,13 +59,8 @@ async function _POST(request: NextRequest) {
 
     const now = new Date().toISOString();
 
-    // Update profiles table
-    await supabase
-      .from('profiles')
-      .update({ mou_signed: true, mou_signed_at: now })
-      .eq('id', user.id);
-
-    // Update program_holders so admin queries reflect the signed state
+    // Update program_holders — canonical MOU state lives here, not on profiles
+    // (profiles.mou_signed does not exist in the live schema)
     const admin = createAdminClient();
     if (admin) {
       await admin
@@ -74,6 +69,7 @@ async function _POST(request: NextRequest) {
           mou_signed: true,
           mou_signed_at: now,
           mou_status: 'holder_signed',
+          status: 'active',
         })
         .eq('user_id', user.id);
     }

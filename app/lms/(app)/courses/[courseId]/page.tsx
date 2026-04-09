@@ -116,7 +116,9 @@ export default async function CoursePage({ params }: { params: Params }) {
   const { data: lessonsRaw } = await db
     .from('lms_lessons')
     .select('id, title, duration_minutes, order_index, content_type, step_type, module_id, activities, lesson_slug, passing_score')
-    .eq('course_id', lessonCourseId).order('order_index', { ascending: true });
+    .eq('course_id', lessonCourseId)
+    .eq('status', 'published')
+    .order('order_index', { ascending: true });
 
   const allLessons = (lessonsRaw || []) as any[];
 

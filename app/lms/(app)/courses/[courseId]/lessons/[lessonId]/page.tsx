@@ -249,9 +249,10 @@ export default function LessonPage() {
       .from('lms_lessons')
       .select('*')
       .eq('course_id', courseId)
+      .eq('status', 'published')
       .order('order_index');
 
-    // Fallback for course list
+    // Fallback for course list — also filter to published only
     if (!lessonsData || lessonsData.length === 0) {
       const { data: clLessons } = await supabase
         .from('course_lessons')

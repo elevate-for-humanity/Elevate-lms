@@ -43,42 +43,31 @@ export type UserRole =
  * Roles not listed here fall through to the student default.
  */
 export const ROLE_DESTINATIONS: Record<string, string> = {
-  // Admin tier
-  super_admin:    '/admin/dashboard',
-  admin:          '/admin/dashboard',
-  org_admin:      '/admin/dashboard',
+  // All roles land on the consolidated My Dashboard
+  // which shows industry tabs based on role.
+  super_admin:      '/my-dashboard',
+  admin:            '/my-dashboard',
+  org_admin:        '/my-dashboard',
+  staff:            '/my-dashboard',
+  instructor:       '/my-dashboard',
+  mentor:           '/my-dashboard',
+  case_manager:     '/my-dashboard',
+  program_holder:   '/my-dashboard',
+  delegate:         '/my-dashboard',
+  provider_admin:   '/my-dashboard',
+  partner:          '/my-dashboard',
+  sponsor:          '/my-dashboard',
+  employer:         '/my-dashboard',
+  workforce_board:  '/my-dashboard',
+  creator:          '/my-dashboard',
+  student:          '/my-dashboard',
 
-  // Operations
-  staff:          '/staff-portal/dashboard',
-  instructor:     '/instructor/dashboard',
-  mentor:         '/mentor/dashboard',
-  case_manager:   '/case-manager/dashboard',
-
-  // Program holders
-  program_holder: '/program-holder/dashboard',
-  delegate:       '/program-holder/dashboard',
-  provider_admin: '/provider/dashboard',
-
-  // External partners — barber shop / training site partners
-  // /partner/dashboard checks onboarding status and routes accordingly.
-  // Do NOT point to /program-holder/dashboard — that guard rejects role='partner'.
-  partner:        '/partner/dashboard',
-  sponsor:        '/program-holder/dashboard',
-  employer:       '/employer/dashboard',
-  workforce_board:'/workforce-board/dashboard',
-
-  // Content creators
-  creator:        '/creator/dashboard',
-
-  // Tax / supersonic staff
-  vita_staff:     '/tax',
+  // Tax / supersonic staff go directly to their tools
+  vita_staff:       '/tax',
   supersonic_staff: '/supersonic-fast-cash',
 
   // Grant clients
-  grant_client:   '/grants',
-
-  // Students (default)
-  student:        '/learner/dashboard',
+  grant_client:     '/grants',
 };
 
 /**

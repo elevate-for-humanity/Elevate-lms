@@ -101,7 +101,7 @@ const ENROLLED_CONFIG = {
     { icon: <UserCheck className="w-5 h-5 text-brand-blue-600" />, title: 'Complete your onboarding steps', description: 'After clicking the link, you\'ll land on your onboarding page. Fill in your profile, upload your ID, confirm funding, and complete a short orientation.' },
     { icon: <BookOpen className="w-5 h-5 text-brand-blue-600" />, title: 'Get enrolled and start learning', description: 'Once all onboarding steps are done, you\'re automatically enrolled and your courses unlock in the student dashboard.' },
   ],
-  primaryLink: '/login?redirect=/onboarding/learner',
+  primaryLink: '/login?redirect=/my-dashboard',
   primaryLabel: 'Or Sign In With Password',
 };
 

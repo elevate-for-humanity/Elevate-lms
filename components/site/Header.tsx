@@ -102,7 +102,7 @@ export const NAV_ITEMS = [
   },
   {
     name: 'Portals',
-    href: '/dashboard',
+    href: '/my-dashboard',
     subItems: [
       { name: '— Learner & Education —', href: '/learner/dashboard', isHeader: true },
       { name: 'Learner Dashboard', href: '/learner/dashboard' },

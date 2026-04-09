@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { AlertCircle, CheckCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
+// Role → portal mapping — must stay in sync with lib/auth/role-destinations.ts
 const ROLE_DESTINATIONS: Record<string, string> = {
   admin:          '/admin/dashboard',
   super_admin:    '/admin/dashboard',
@@ -23,48 +24,37 @@ function portalFor(role: string | null | undefined): string {
   return ROLE_DESTINATIONS[role] ?? '/learner/dashboard';
 }
 
-export default function AuthResetPasswordPage() {
-  const [password, setPassword] = useState('');
-  const [confirm, setConfirm] = useState('');
+export default function SetPasswordPage() {
+  const [password, setPassword]       = useState('');
+  const [confirm, setConfirm]         = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [portal, setPortal] = useState('/learner/dashboard');
-  const [error, setError] = useState('');
+  const [loading, setLoading]         = useState(false);
+  const [success, setSuccess]         = useState(false);
+  const [portal, setPortal]           = useState('/learner/dashboard');
+  const [error, setError]             = useState('');
   const [sessionReady, setSessionReady] = useState<boolean | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
-
-    // Hoist cleanup handles so the useEffect return can always reach them.
     let subscription: { unsubscribe: () => void } | null = null;
     let timeout: ReturnType<typeof setTimeout> | null = null;
 
-    // First check for an existing session (set by /auth/confirm via cookie).
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) {
         setSessionReady(true);
         return;
       }
-
-      // No cookie session yet — listen for auth state events.
-      // PASSWORD_RECOVERY fires when the user arrives via a hash-fragment link.
-      // SIGNED_IN fires when the browser picks up the session cookie set by
-      // /auth/confirm after a short propagation delay.
       const { data: { subscription: sub } } = supabase.auth.onAuthStateChange((event) => {
         if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
           setSessionReady(true);
         }
       });
       subscription = sub;
-
-      // After 3 s with no auth event, declare the session invalid.
       timeout = setTimeout(() => {
         setSessionReady(prev => prev === null ? false : prev);
-      }, 3000);
+      }, 4000);
     });
 
-    // Cleanup is returned from useEffect directly so React always runs it.
     return () => {
       subscription?.unsubscribe();
       if (timeout !== null) clearTimeout(timeout);
@@ -75,35 +65,27 @@ export default function AuthResetPasswordPage() {
     e.preventDefault();
     setError('');
 
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters.');
-      return;
-    }
-    if (password !== confirm) {
-      setError('Passwords do not match.');
-      return;
-    }
+    if (password.length < 8) { setError('Password must be at least 8 characters.'); return; }
+    if (password !== confirm) { setError('Passwords do not match.'); return; }
 
     setLoading(true);
     try {
       const supabase = createClient();
       const { error: updateError } = await supabase.auth.updateUser({ password });
-      if (updateError) {
-        setError(updateError.message);
-      } else {
-        // Read role before signing out so we can show the correct portal link
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
-            .single();
-          setPortal(portalFor(profile?.role));
-        }
-        await supabase.auth.signOut();
-        setSuccess(true);
+      if (updateError) { setError(updateError.message); return; }
+
+      // Read role to redirect to the correct portal
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        setPortal(portalFor(profile?.role));
       }
+
+      setSuccess(true);
     } catch {
       setError('Something went wrong. Please try again.');
     } finally {
@@ -111,91 +93,96 @@ export default function AuthResetPasswordPage() {
     }
   };
 
+  // ── Success ──────────────────────────────────────────────────────────────────
   if (success) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full text-center">
-          <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-10 h-10 text-brand-green-600" />
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="w-10 h-10 text-green-600" />
           </div>
-          <h1 className="text-3xl font-extrabold text-black mb-4">Password Updated</h1>
-          <p className="text-gray-600 mb-8 text-lg">
-            Your password has been reset. Sign in with your new password to continue.
+          <h1 className="text-3xl font-extrabold text-black mb-3">Password Created</h1>
+          <p className="text-gray-600 mb-8 text-base">
+            Your account is ready. Click below to go to your dashboard.
           </p>
-          <Link
-            href={`/login?redirect=${encodeURIComponent(portal)}`}
+          <a
+            href={portal}
             className="inline-block bg-brand-red-600 text-white font-bold px-10 py-4 rounded-lg text-lg hover:bg-brand-red-700 transition"
           >
-            Sign In
-          </Link>
+            Go to My Dashboard
+          </a>
         </div>
       </div>
     );
   }
 
-  // No valid recovery session — link expired or direct navigation
+  // ── Session expired / invalid link ───────────────────────────────────────────
   if (sessionReady === false) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full text-center">
-          <div className="w-20 h-20 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <AlertCircle className="w-10 h-10 text-brand-red-600" />
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <AlertCircle className="w-10 h-10 text-red-600" />
           </div>
-          <h1 className="text-3xl font-extrabold text-black mb-4">Link Expired</h1>
-          <p className="text-gray-600 mb-8 text-lg">
-            This password reset link is invalid or has expired. Request a new one.
+          <h1 className="text-3xl font-extrabold text-black mb-3">Link Expired</h1>
+          <p className="text-gray-600 mb-8">
+            This invitation link has expired or already been used. Contact your coordinator to send a new one.
           </p>
           <Link
-            href="/auth/forgot-password"
+            href="/login"
             className="inline-block bg-brand-red-600 text-white font-bold px-10 py-4 rounded-lg text-lg hover:bg-brand-red-700 transition"
           >
-            Request New Link
+            Go to Login
           </Link>
+          <p className="mt-4 text-sm text-gray-500">
+            Need help?{' '}
+            <a href="tel:3173143757" className="text-brand-blue-600 hover:underline">(317) 314-3757</a>
+          </p>
         </div>
       </div>
     );
   }
 
-  // Checking session
+  // ── Loading ───────────────────────────────────────────────────────────────────
   if (sessionReady === null) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-red-600" />
+        <Loader2 className="w-10 h-10 text-brand-red-600 animate-spin" />
       </div>
     );
   }
 
+  // ── Set password form ─────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold text-black mb-2">Set New Password</h1>
-          <p className="text-gray-600 text-lg">Enter your new password below.</p>
+          <h1 className="text-3xl font-extrabold text-black mb-2">Create Your Password</h1>
+          <p className="text-gray-600">Set a password to secure your account.</p>
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-8">
           {error && (
-            <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
-              <p className="text-brand-red-700 text-sm font-medium">{error}</p>
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <p className="text-red-700 text-sm font-medium">{error}</p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-bold text-black mb-2">
-                New Password
-              </label>
+              <label className="block text-sm font-bold text-black mb-2">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   minLength={8}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-11 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 text-black text-lg"
+                  onChange={e => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 pr-11 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 text-black text-base"
                   placeholder="Minimum 8 characters"
                   autoComplete="new-password"
+                  autoFocus
                 />
                 <button
                   type="button"
@@ -209,23 +196,21 @@ export default function AuthResetPasswordPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-black mb-2">
-                Confirm Password
-              </label>
+              <label className="block text-sm font-bold text-black mb-2">Confirm Password</label>
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
                 minLength={8}
                 value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 text-black text-lg"
+                onChange={e => setConfirm(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 text-black text-base"
                 placeholder="Re-enter your password"
                 autoComplete="new-password"
               />
             </div>
 
             {password.length > 0 && (
-              <p className={`text-sm ${password.length >= 8 ? 'text-brand-green-600' : 'text-brand-red-500'}`}>
+              <p className={`text-sm ${password.length >= 8 ? 'text-green-600' : 'text-red-500'}`}>
                 {password.length >= 8
                   ? '✓ Meets minimum length'
                   : `${8 - password.length} more character${8 - password.length === 1 ? '' : 's'} needed`}
@@ -235,17 +220,11 @@ export default function AuthResetPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-brand-red-600 text-white font-bold rounded-lg text-lg hover:bg-brand-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-4 bg-brand-red-600 text-white font-bold rounded-lg text-lg hover:bg-brand-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              {loading ? 'Updating...' : 'Update Password'}
+              {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> Creating...</> : 'Create Password'}
             </button>
           </form>
-
-          <div className="mt-6 text-center">
-            <Link href="/login" className="text-gray-600 hover:text-black transition font-medium">
-              Back to Login
-            </Link>
-          </div>
         </div>
       </div>
     </div>

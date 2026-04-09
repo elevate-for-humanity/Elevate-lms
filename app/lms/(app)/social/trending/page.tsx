@@ -199,7 +199,7 @@ export default async function TrendingPage() {
                   Explore Courses
                 </h3>
                 <p className="text-sm text-gray-600 mb-4">Browse our training programs and start your career journey.</p>
-                <Link href="/courses" className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 text-sm font-medium">
+                <Link href="/lms/courses" className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 text-sm font-medium">
                   View Courses
                 </Link>
               </div>

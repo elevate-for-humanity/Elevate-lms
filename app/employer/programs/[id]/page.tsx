@@ -28,7 +28,7 @@ export default async function EmployerProgramDetailPage({ params }: Props) {
           <ol className="flex items-center gap-2">
             <li><Link href="/employer/dashboard" className="hover:text-gray-900">Employer</Link></li>
             <li>/</li>
-            <li><Link href="/employer/programs" className="hover:text-gray-900">Programs</Link></li>
+            <li><Link href="/employer/dashboard" className="hover:text-gray-900">Programs</Link></li>
             <li>/</li>
             <li className="text-gray-900 font-medium">{program.title}</li>
           </ol>
@@ -79,7 +79,7 @@ export default async function EmployerProgramDetailPage({ params }: Props) {
 
         <div className="flex gap-4">
           <Link
-            href="/employer/programs"
+            href="/employer/dashboard"
             className="px-5 py-2.5 rounded-lg border text-sm font-semibold text-gray-700 hover:bg-gray-50"
           >
             ← Back to Programs

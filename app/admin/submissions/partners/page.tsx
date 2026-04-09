@@ -42,7 +42,7 @@ export default async function PartnerEntitiesPage() {
               <p className="text-slate-500 text-sm">Approved subcontractors, MOU partners, co-applicants, letter-of-support providers</p>
             </div>
           </div>
-          <Link href="/admin/submissions/partners/new" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
+          <Link href="/admin/submissions/partners" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
             <Plus className="w-4 h-4" /> Add Partner
           </Link>
         </div>
@@ -70,7 +70,7 @@ export default async function PartnerEntitiesPage() {
             <Users className="w-10 h-10 text-slate-300 mx-auto mb-3" />
             <p className="font-semibold text-slate-700 mb-1">No partner entities yet</p>
             <p className="text-sm text-slate-500 mb-4">Add approved partners for use in subcontractor packets, MOUs, and letters of support.</p>
-            <Link href="/admin/submissions/partners/new" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
+            <Link href="/admin/submissions/partners" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
               <Plus className="w-4 h-4" /> Add First Partner
             </Link>
           </div>

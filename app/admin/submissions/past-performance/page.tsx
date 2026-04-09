@@ -40,7 +40,7 @@ export default async function PastPerformancePage() {
               <p className="text-slate-500 text-sm">Approved project history for capability statements and RFP responses</p>
             </div>
           </div>
-          <Link href="/admin/submissions/past-performance/new" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
+          <Link href="/admin/submissions/past-performance" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
             <Plus className="w-4 h-4" /> Add Record
           </Link>
         </div>
@@ -57,7 +57,7 @@ export default async function PastPerformancePage() {
             <Award className="w-10 h-10 text-slate-300 mx-auto mb-3" />
             <p className="font-semibold text-slate-700 mb-1">No past performance records yet</p>
             <p className="text-sm text-slate-500 mb-4">Add approved project history to use in capability statements and RFP responses.</p>
-            <Link href="/admin/submissions/past-performance/new" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
+            <Link href="/admin/submissions/past-performance" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
               <Plus className="w-4 h-4" /> Add First Record
             </Link>
           </div>

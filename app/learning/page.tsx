@@ -94,7 +94,7 @@ export default async function LearningHubPage() {
               icon={<GraduationCap className="w-12 h-12 text-indigo-600" />}
               title="Courses"
               description="Browse all available courses"
-              href="/courses"
+              href="/lms/courses"
               count="100+ courses"
             />
           </div>

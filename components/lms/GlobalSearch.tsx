@@ -67,7 +67,7 @@ function GlobalSearchContent() {
     e.preventDefault();
     const q = query.trim();
     if (!q) {
-      router.push("/courses");
+      router.push("/lms/courses");
       return;
     }
     logSearch(q);

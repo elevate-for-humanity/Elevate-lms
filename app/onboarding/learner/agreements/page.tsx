@@ -193,7 +193,7 @@ export default function AgreementsPage() {
               <Link href="/onboarding/learner" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-700 transition">
                 Continue Onboarding <ArrowRight className="w-4 h-4" />
               </Link>
-              <Link href="/lms/courses/0ba9a61c-1f1b-4019-be6f-90e92eba2bc0" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-semibold hover:bg-brand-blue-700 transition">
+              <Link href="/lms/courses" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-semibold hover:bg-brand-blue-700 transition">
                 Go to HVAC Course <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

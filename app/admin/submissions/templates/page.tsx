@@ -41,7 +41,7 @@ export default async function TemplatesPage() {
               <p className="text-slate-500 text-sm">Branded letterhead layouts with merge fields for every document type</p>
             </div>
           </div>
-          <Link href="/admin/submissions/templates/new" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
+          <Link href="/admin/submissions/templates" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
             <Plus className="w-4 h-4" /> New Template
           </Link>
         </div>
@@ -61,7 +61,7 @@ export default async function TemplatesPage() {
               Create branded templates for cover letters, capability statements, budget narratives, and more.
               Use <code className="font-mono text-xs bg-slate-100 px-1 rounded">{'{{org.legal_name}}'}</code> merge fields.
             </p>
-            <Link href="/admin/submissions/templates/new" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
+            <Link href="/admin/submissions/templates" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
               <Plus className="w-4 h-4" /> Create First Template
             </Link>
           </div>

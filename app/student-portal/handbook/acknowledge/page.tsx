@@ -229,7 +229,7 @@ export default function HandbookAcknowledgePage() {
             </p>
             <div className="flex gap-4 justify-center">
               <Link
-                href="/student-portal/handbook"
+                href="/student-portal/handbook/acknowledge"
                 className="text-brand-blue-600 hover:underline"
               >
                 View Handbook

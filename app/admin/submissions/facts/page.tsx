@@ -55,7 +55,7 @@ export default async function FactsVaultPage() {
               <p className="text-slate-500 text-sm">Approved atomic facts — the only values inserted into generated documents</p>
             </div>
           </div>
-          <Link href="/admin/submissions/facts/new" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
+          <Link href="/admin/submissions/facts" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
             <Plus className="w-4 h-4" /> Add Fact
           </Link>
         </div>
@@ -91,7 +91,7 @@ export default async function FactsVaultPage() {
               <Database className="w-10 h-10 text-slate-300 mx-auto mb-3" />
               <p className="font-semibold text-slate-700 mb-1">No facts yet</p>
               <p className="text-sm text-slate-500 mb-4">Add approved facts to use as merge fields in generated documents.</p>
-              <Link href="/admin/submissions/facts/new" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
+              <Link href="/admin/submissions/facts" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition">
                 <Plus className="w-4 h-4" /> Add First Fact
               </Link>
             </div>

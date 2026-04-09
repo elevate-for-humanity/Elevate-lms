@@ -1,14 +1,10 @@
+'use client';
 
+import { useEffect } from 'react';
 import Image from 'next/image';
-import { Metadata } from 'next';
 import Link from 'next/link';
 import { Mail, Clock, ArrowRight, CheckCircle, DollarSign } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { useRouter } from 'next/navigation';
-
-export const metadata: Metadata = {
-  title: 'Application Submitted | Partner Shop | Elevate for Humanity',
-};
 
 export default function PartnerOnboardingSuccessPage() {
   // Auth guard — must be signed in to access onboarding

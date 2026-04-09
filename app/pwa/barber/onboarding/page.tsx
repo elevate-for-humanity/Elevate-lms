@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { createBrowserClient } from '@supabase/ssr';
-import { 
 import { useRouter } from 'next/navigation';
-  ArrowLeft, Circle, ChevronRight, 
+import {
+  ArrowLeft, Circle, ChevronRight,
   User, FileText, Building2, BookOpen, Clock,
   Award, Bell, Loader2, Sparkles, Scissors, TrendingUp
 } from 'lucide-react';

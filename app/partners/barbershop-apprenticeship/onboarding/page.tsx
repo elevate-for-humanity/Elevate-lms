@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle, AlertCircle, ChevronRight, Upload, PenLine } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-de-react';
 
 // ── Step definitions ──────────────────────────────────────────────────────────
 const STEPS = [

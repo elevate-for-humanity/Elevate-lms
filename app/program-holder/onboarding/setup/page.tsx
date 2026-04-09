@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { Upload, AlertCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useRouter } from 'next/navigation';
-adcrumbs';
 
 export default function ProgramHolderSetup() {
   // Auth guard — must be signed in to access onboarding

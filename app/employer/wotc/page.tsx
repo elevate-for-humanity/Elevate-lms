@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-// WOTC page not yet implemented. Redirect to employer dashboard.
+// WOTC management is handled in the admin portal
 export default function Page() {
-  redirect('/employer/dashboard');
+  redirect('/admin/wotc');
 }

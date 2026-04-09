@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-// This page is not yet implemented. Redirect to parent until built.
+// Full job posting form lives at employer-portal/jobs/new
 export default function Page() {
-  redirect('/employer/jobs');
+  redirect('/employer-portal/jobs/new');
 }

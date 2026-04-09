@@ -30,6 +30,7 @@ async function completeOrientation() {
     supabase.from('profiles').update({
       orientation_completed: true,
       orientation_completed_at: now,
+      onboarding_completed: true,
     }).eq('id', user.id),
     // Write to orientation_completions table (also read by onboarding page)
     supabase.from('orientation_completions').upsert({

@@ -5,7 +5,7 @@ import { buildLoginRedirect } from '@/lib/lms/redirect';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
-import { Clock, Award, ChevronRight } from 'lucide-react';
+import { Clock, Award, ChevronRight, DollarSign } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -82,17 +82,38 @@ export default async function LmsProgramsPage() {
 
       {/* FUNDING NOTICE */}
       <div className="bg-green-50 border-b border-green-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center gap-2">
-          <span className="text-green-700 text-sm font-semibold">WIOA funding available</span>
-          <span className="text-green-700 text-sm">— Eligible Indiana residents may qualify for fully-funded training.</span>
-          <a
-            href="https://www.indianacareerconnect.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-auto text-xs font-semibold text-green-800 underline underline-offset-2 whitespace-nowrap"
-          >
-            Check eligibility →
-          </a>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <DollarSign className="w-4 h-4 text-green-700 flex-shrink-0" />
+            <span className="text-green-800 text-sm font-bold">Funding available for eligible Indiana residents</span>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href="https://www.indianacareerconnect.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 bg-green-700 text-white text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-green-800 transition"
+            >
+              WorkOne / WIOA — Schedule Appointment →
+            </a>
+            <a
+              href="https://www.in.gov/fssa/dfr/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-blue-800 transition"
+            >
+              FSSA / SNAP & TANF Benefits →
+            </a>
+            <span className="inline-flex items-center gap-1.5 bg-purple-100 text-purple-800 text-xs font-semibold px-3 py-1.5 rounded-full">
+              IMPACT Partnership Scholarships
+            </span>
+            <a
+              href="/start"
+              className="inline-flex items-center gap-1.5 bg-slate-800 text-white text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-slate-900 transition"
+            >
+              Check My Eligibility →
+            </a>
+          </div>
         </div>
       </div>
 

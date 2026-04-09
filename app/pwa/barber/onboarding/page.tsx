@@ -41,20 +41,16 @@ export default function OnboardingPage() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         window.location.href = '/login?redirect=/pwa/barber/onboarding';
+        return;
       }
+      // Only fetch data after auth is confirmed
+      const { data } = await supabase.from('settings').select('*').limit(50);
+      if (data) setDbRows(data);
     };
     checkAuth();
   }, []);
 
   const [dbRows, setDbRows] = useState<any[]>([]);
-  useEffect(() => {
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-    supabase.from('settings').select('*').limit(50)
-      .then(({ data }) => { if (data) setDbRows(data); });
-  }, []);
 
   const [loading, setLoading] = useState(true);
   const [steps, setSteps] = useState<OnboardingStep[]>([]);

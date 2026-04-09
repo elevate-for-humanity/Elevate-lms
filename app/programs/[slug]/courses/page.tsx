@@ -1,296 +1,125 @@
-'use client';
-
-import { useParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { BookOpen, Clock, Award, DollarSign, Users } from 'lucide-react';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { BookOpen, Clock, Award, Users, DollarSign } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { requireRole } from '@/lib/auth/require-role';
+import { createClient } from '@/lib/supabase/server';
 
-export default function ProgramCoursesPage() {
-  const params = useParams();
-  const slug = params.slug as string;
-  const [courses, setCourses] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+export const dynamic = 'force-dynamic';
 
-  // Auth guard — course content requires a signed-in account
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { createBrowserClient } = await import('@supabase/ssr');
-      const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        window.location.href = `/login?redirect=/programs/${slug}/courses`;
-      }
-    };
-    checkAuth();
-  }, [slug]);
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const name = params.slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  return { title: `${name} Courses | Elevate For Humanity` };
+}
 
-  useEffect(() => {
-    fetch(`/api/programs/${slug}/courses`)
-      .then(res => res.json())
-      .then(data => {
-        setCourses(data.courses || []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [slug]);
+const CATEGORY_IMAGES: Record<string, string> = {
+  healthcare:       '/images/pages/cna-patient-care.jpg',
+  'skilled-trades': '/images/pages/hvac-unit.jpg',
+  technology:       '/images/pages/it-helpdesk-desk.jpg',
+  business:         '/images/pages/tax-prep-desk.jpg',
+  transportation:   '/images/pages/cdl-truck-highway.jpg',
+  barber:           '/images/pages/barber-fade.jpg',
+};
 
-  const handleEnroll = async (courseId: string, price: number) => {
-    if (price === 0) {
-      window.location.href = `/courses/${courseId}/enroll`;
-      return;
-    }
+function getCategory(slug: string): string {
+  if (/hvac|electrical|welding|plumbing|building|skilled/.test(slug)) return 'skilled-trades';
+  if (/tech|web|cyber|network|software/.test(slug)) return 'technology';
+  if (/business|tax|accounting|financial|bookkeeping/.test(slug)) return 'business';
+  if (/cdl|transport/.test(slug)) return 'transportation';
+  if (/barber|beauty|cosmetology|nail|esthetician/.test(slug)) return 'barber';
+  return 'healthcare';
+}
 
-    const response = await fetch('/api/stripe/create-checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        courseId,
-        priceId: `price_${courseId}`,
-        successUrl: `${window.location.origin}/courses/${courseId}/success`,
-        cancelUrl: window.location.href
-      })
-    });
+export default async function ProgramCoursesPage({ params }: { params: { slug: string } }) {
+  await requireRole(['student', 'learner', 'admin', 'super_admin', 'staff', 'instructor', 'program_holder']);
 
-    const { url } = await response.json();
-    if (url) window.location.href = url;
-  };
+  const supabase = await createClient();
+  const { slug } = params;
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto mb-4"></div>
-          <p className="text-black">Loading courses...</p>
-        </div>
-      </div>
-    );
-  }
+  const { data: program } = await supabase
+    .from('programs')
+    .select('id, title, slug')
+    .eq('slug', slug)
+    .single();
 
-  // Format program name from slug
-  const programName = slug
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+  if (!program) notFound();
+
+  const { data: courses } = await supabase
+    .from('training_courses')
+    .select('id, title, description, price, duration, lessons_count, enrolled_count, certification, image_url')
+    .eq('program_id', program.id)
+    .eq('status', 'published')
+    .order('display_order', { ascending: true });
+
+  const allCourses = courses || [];
+  const category = getCategory(slug);
+  const fallbackImage = CATEGORY_IMAGES[category] ?? CATEGORY_IMAGES.healthcare;
+  const programName = program.title || slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
   return (
     <div className="min-h-screen bg-white">
-      <Breadcrumbs
-        items={[
-          { label: 'Programs', href: '/programs' },
-          { label: programName, href: `/programs/${slug}` },
-          { label: 'Courses' },
-        ]}
-      />
-      {/* Hero Banner */}
-      <section className="relative w-full">
-        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/pages/programs-slug-courses-hero.jpg" alt="Professional training courses and certification programs" fill sizes="100vw" className="object-cover" />
-        </div>
-        <div className="bg-white py-10 border-t">
-          <div className="max-w-5xl mx-auto px-6 text-center">
-            <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full mb-4">
-              <BookOpen className="w-5 h-5 text-white" />
-              <span className="text-sm font-bold uppercase tracking-wide text-black">{programName} Program</span>
+      <Breadcrumbs items={[
+        { label: 'Programs', href: '/programs' },
+        { label: programName, href: `/programs/${slug}` },
+        { label: 'Courses' },
+      ]} />
+
+      <section className="relative h-[280px] w-full overflow-hidden">
+        <Image src={fallbackImage} alt={`${programName} courses`} fill sizes="100vw" className="object-cover" priority />
+        <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center">
+          <div className="text-center text-white px-4">
+            <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full mb-3">
+              <BookOpen className="w-4 h-4" />
+              <span className="text-sm font-semibold uppercase tracking-wide">{programName}</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Available Courses</h1>
-            <p className="text-lg text-black mb-6 max-w-3xl mx-auto">
-              Choose a course to start your learning journey. Get certified and advance your career.
-            </p>
+            <h1 className="text-3xl md:text-4xl font-extrabold">Available Courses</h1>
           </div>
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        {courses.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <BookOpen className="w-16 h-16 text-brand-blue-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Enroll Through Our Admissions Team</h2>
-            <p className="text-black mb-6">
-              This program requires enrollment through our admissions process. 
-              Apply now to get started with personalized guidance.
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        {allCourses.length === 0 ? (
+          <div className="text-center py-20 bg-slate-50 rounded-2xl border border-slate-100">
+            <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-slate-900 mb-2">Enrollment Through Admissions</h2>
+            <p className="text-slate-500 mb-6 max-w-md mx-auto">
+              This program requires enrollment through our admissions process.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/start" className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition">
-                Apply Now
-              </Link>
-              <Link href="/programs" className="inline-block bg-white border-2 border-gray-300 hover:border-gray-400 text-black px-6 py-3 rounded-lg font-semibold transition">
-                Browse Programs
-              </Link>
+            <div className="flex gap-3 justify-center">
+              <Link href="/start" className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-xl font-bold transition">Apply Now</Link>
+              <Link href="/programs" className="border border-slate-200 text-slate-700 px-6 py-3 rounded-xl font-medium hover:bg-slate-50 transition">Browse Programs</Link>
             </div>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.map((course, index) => {
-              // Cycle through category images based on program
-              const categoryImages: Record<string, string[]> = {
-                'healthcare': [
-                  '/images/pages/cna-patient-care.jpg',
-                  '/images/pages/cna-vitals.jpg',
-                  '/images/pages/medical-assistant-lab.jpg',
-                  '/images/pages/phlebotomy-draw.jpg',
-                  '/images/pages/healthcare-classroom.jpg',
-                  '/images/pages/pharmacy-tech.jpg',
-                ],
-                'skilled-trades': [
-                  '/images/pages/hvac-unit.jpg',
-                  '/images/pages/hvac-tools.jpg',
-                  '/images/pages/electrical-wiring.jpg',
-                  '/images/pages/electrical-panel.jpg',
-                  '/images/pages/welding-sparks.jpg',
-                  '/images/pages/plumbing-pipes.jpg',
-                ],
-                'technology': [
-                  '/images/pages/it-helpdesk-desk.jpg',
-                  '/images/pages/it-hardware.jpg',
-                  '/images/pages/it-networking.jpg',
-                  '/images/pages/cybersecurity-screen.jpg',
-                  '/images/pages/cybersecurity-code.jpg',
-                  '/images/pages/tech-classroom.jpg',
-                ],
-                'business': [
-                  '/images/pages/tax-prep-desk.jpg',
-                  '/images/pages/tax-forms.jpg',
-                  '/images/pages/bookkeeping-ledger.jpg',
-                  '/images/pages/office-admin-desk.jpg',
-                  '/images/pages/workforce-training.jpg',
-                  '/images/pages/career-counseling.jpg',
-                ],
-                'transportation': [
-                  '/images/pages/cdl-truck-highway.jpg',
-                  '/images/pages/cdl-cab-interior.jpg',
-                  '/images/pages/cdl-pretrip.jpg',
-                  '/images/pages/cdl-loading-dock.jpg',
-                  '/images/pages/cdl-driver-seat.jpg',
-                  '/images/pages/cdl-truck-highway.jpg',
-                ],
-                'barber': [
-                  '/images/pages/barber-fade.jpg',
-                  '/images/pages/barber-shop-interior.jpg',
-                  '/images/pages/barber-clippers.jpg',
-                  '/images/pages/barber-lineup.jpg',
-                  '/images/pages/barber-student.jpg',
-                  '/images/pages/barber-gallery-1.jpg',
-                ],
-              };
-              
-              // Determine category from slug
-              let category = 'healthcare';
-              if (slug.includes('skilled') || slug.includes('hvac') || slug.includes('electrical') || slug.includes('building')) {
-                category = 'skilled-trades';
-              } else if (slug.includes('tech') || slug.includes('web') || slug.includes('cyber')) {
-                category = 'technology';
-              } else if (slug.includes('business') || slug.includes('tax') || slug.includes('accounting') || slug.includes('financial')) {
-                category = 'business';
-              } else if (slug.includes('cdl') || slug.includes('transport')) {
-                category = 'transportation';
-              } else if (slug.includes('barber') || slug.includes('beauty') || slug.includes('cosmetology')) {
-                category = 'barber';
-              }
-              
-              const images = categoryImages[category] || categoryImages['healthcare'];
-              const courseImage = course.image || images[index % images.length];
-              
-              return (
-                <div key={course.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition">
-                  <div className="relative aspect-video overflow-hidden bg-white">
-                    <Image alt="Course lesson" 
-                      src={courseImage} 
-                      alt={course.title}
-                      fill sizes="100vw"
-                      className="object-cover hover:scale-105 transition-transform duration-300"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = '/images/pages/workforce-training.jpg';
-                      }}
-                    />
-                    <div className="absolute top-4 right-4">
-                      {course.price === 0 && (
-                        <span className="bg-brand-green-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-                          FREE
-                        </span>
-                      )}
-                    </div>
+            {allCourses.map((course) => (
+              <div key={course.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition overflow-hidden flex flex-col">
+                <div className="relative aspect-video overflow-hidden bg-slate-100">
+                  <Image src={course.image_url || fallbackImage} alt={course.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover hover:scale-105 transition-transform duration-300" />
+                  {course.price === 0 && <span className="absolute top-3 right-3 bg-green-600 text-white text-xs font-bold px-2.5 py-1 rounded-full">FREE</span>}
+                </div>
+                <div className="p-5 flex flex-col flex-1">
+                  <h3 className="font-bold text-slate-900 text-base mb-2 leading-snug">{course.title}</h3>
+                  {course.description && <p className="text-slate-500 text-sm mb-4 line-clamp-2 flex-1">{course.description}</p>}
+                  <div className="flex flex-wrap gap-3 text-xs text-slate-500 mb-4">
+                    {course.duration && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{course.duration}</span>}
+                    {course.lessons_count && <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" />{course.lessons_count} lessons</span>}
+                    {course.enrolled_count > 0 && <span className="flex items-center gap-1"><Users className="w-3 h-3" />{course.enrolled_count} enrolled</span>}
+                    {course.certification && <span className="flex items-center gap-1"><Award className="w-3 h-3" />Certificate</span>}
                   </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-3">{course.title}</h3>
-                  <p className="text-black mb-4 line-clamp-3">{course.description}</p>
-
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-black">
-                      <Clock className="w-4 h-4" />
-                      <span>{course.duration || '8 weeks'}</span>
+                  <div className="border-t pt-4 flex items-center justify-between gap-3">
+                    <div className="font-extrabold text-lg text-slate-900">
+                      {course.price === 0 ? <span className="text-green-600">FREE</span> : `$${course.price}`}
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-black">
-                      <BookOpen className="w-4 h-4" />
-                      <span>{course.lessons || 24} lessons</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-black">
-                      <Users className="w-4 h-4" />
-                      <span>{course.enrolled || 0} enrolled</span>
-                    </div>
-                    {course.certification && (
-                      <div className="flex items-center gap-2 text-sm text-black">
-                        <Award className="w-4 h-4" />
-                        <span>Certificate included</span>
-                      </div>
-                    )}
+                    <Link href={`/lms/courses/${course.id}`} className="flex items-center gap-1.5 bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-bold px-4 py-2 rounded-xl transition">
+                      <DollarSign className="w-3.5 h-3.5" /> Enroll
+                    </Link>
                   </div>
-
-                  <div className="border-t pt-4 mb-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        {course.price === 0 ? (
-                          <div className="text-2xl font-bold text-brand-green-600">FREE</div>
-                        ) : (
-                          <>
-                            <div className="text-2xl font-bold text-black">${course.price}</div>
-                            {course.originalPrice && (
-                              <div className="text-sm text-black line-through">${course.originalPrice}</div>
-                            )}
-                          </>
-                        )}
-                      </div>
-                      {course.funding && (
-                        <div className="text-xs bg-brand-green-100 text-brand-green-800 px-2 py-1 rounded">
-                          {course.funding}
-                        </div>
-                      )}
-                    </div>
-
-                    <button
-                      onClick={() => handleEnroll(course.id, course.price)}
-                      className="w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
-                    >
-                      {course.price === 0 ? (
-                        <>
-                          <span className="text-black flex-shrink-0">•</span>
-                          Enroll Free
-                        </>
-                      ) : (
-                        <>
-                          <DollarSign className="w-5 h-5" />
-                          Enroll Now
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  <Link 
-                    href={`/courses/${course.id}`}
-                    className="block text-center text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold"
-                  >
-                    View Course Details →
-                  </Link>
                 </div>
               </div>
-            );
-            })}
+            ))}
           </div>
         )}
       </div>

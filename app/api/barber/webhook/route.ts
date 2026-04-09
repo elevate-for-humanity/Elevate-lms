@@ -306,10 +306,9 @@ async function _POST(request: NextRequest) {
 
           // Run post-payment pipeline (enrollment, emails)
           if (applicationId) {
-            const adminDb = await getAdminClient();
-            if (adminDb) {
+            if (supabase) {
               await runBarberPostPayment({
-                db: adminDb,
+                db: supabase,
                 applicationId,
                 stripeSessionId: session.id,
                 stripePaymentIntentId: session.payment_intent as string ?? null,
@@ -555,10 +554,9 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
 
           // Run post-payment pipeline (enrollment, onboarding + admin emails)
           if (applicationId) {
-            const adminDb = await getAdminClient();
-            if (adminDb) {
+            if (supabase) {
               await runBarberPostPayment({
-                db: adminDb,
+                db: supabase,
                 applicationId,
                 stripeSessionId: session.id,
                 stripePaymentIntentId: session.payment_intent as string ?? null,
@@ -859,10 +857,8 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
 
         if (!failedCustomerId) break;
 
-        const db = await getAdminClient();
-
         // 1. Mark enrollment as past_due and record failure timestamp
-        const { data: sub } = await db
+        const { data: sub } = await supabase
           .from('barber_subscriptions')
           .select('id, customer_email, payment_status, failed_payment_at')
           .eq('stripe_customer_id', failedCustomerId)
@@ -881,7 +877,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
           !['past_due', 'suspended', 'cancelled'].includes(sub.payment_status ?? '');
 
         if (isFirstFailure) {
-          await db
+          await supabase
             .from('barber_subscriptions')
             .update({
               payment_status: 'past_due',
@@ -892,7 +888,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
 
           // Log to billing_events for audit trail
           const invoiceId = 'id' in failedObj ? failedObj.id : undefined;
-          await db.from('billing_events').insert({
+          await supabase.from('billing_events').insert({
             barber_subscription_id: sub.id,
             event_type: 'payment_failed',
             stripe_invoice_id: invoiceId || null,

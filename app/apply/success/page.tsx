@@ -101,7 +101,7 @@ const ENROLLED_CONFIG = {
     { icon: <UserCheck className="w-5 h-5 text-brand-blue-600" />, title: 'Complete your onboarding steps', description: 'After clicking the link, you\'ll land on your onboarding page. Fill in your profile, upload your ID, confirm funding, and complete a short orientation.' },
     { icon: <BookOpen className="w-5 h-5 text-brand-blue-600" />, title: 'Get enrolled and start learning', description: 'Once all onboarding steps are done, you\'re automatically enrolled and your courses unlock in the student dashboard.' },
   ],
-  primaryLink: '/login',
+  primaryLink: '/login?redirect=/onboarding/learner',
   primaryLabel: 'Or Sign In With Password',
 };
 
@@ -230,12 +230,18 @@ export default async function ApplicationSuccessPage({
           </div>
 
           {/* Track Application */}
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-2">
             <Link
               href="/apply/track"
-              className="text-brand-blue-600 hover:underline text-sm font-medium"
+              className="text-brand-blue-600 hover:underline text-sm font-medium block"
             >
               Track your application status
+            </Link>
+            <Link
+              href="/onboarding/learner"
+              className="text-brand-blue-600 hover:underline text-sm font-medium block"
+            >
+              Already have an account? Go to onboarding →
             </Link>
           </div>
         </div>

@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { AdminLicenseWrapper } from '@/components/licensing/AdminLicenseWrapper';
 import { getLicenseAccessMode } from '@/lib/licensing/billing-authority';
 import { reconcileTrialOnboarding } from '@/lib/trial/reconcile-onboarding';
@@ -36,8 +36,7 @@ export const metadata: Metadata = {
 };
 
 async function getLicenseContext() {
-  const db = createAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize in getLicenseContext');
+  const db = await getAdminClient();
 
   const supabase = await createClient();
 
@@ -83,8 +82,7 @@ export default async function AdminLayout({
 
   // Fetch user + notifications + license context in parallel — single round-trip
   const supabase = await createClient();
-  const db = createAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize in AdminLayout');
+  const db = await getAdminClient();
 
   const [context, headerData] = await Promise.all([
     getLicenseContext(),

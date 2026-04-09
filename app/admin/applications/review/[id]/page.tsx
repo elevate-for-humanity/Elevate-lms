@@ -1,8 +1,7 @@
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import ApplicationActions from './ApplicationActions';
@@ -42,14 +41,11 @@ export default async function ReviewApplicationPage({
 }) {
   await requireRole(['admin', 'super_admin']);
   const { id } = await params;
-  const supabase = await createClient();
-
-
-
 
   // Use admin client — applications table RLS restricts session-based reads.
   // Auth check above already confirmed the caller is admin/super_admin.
-  const db = createAdminClient();
+  // getAdminClient() hydrates secrets first, safe on cold starts.
+  const db = await getAdminClient();
   const { data: app, error } = await db
     .from('applications')
     .select('*')
@@ -67,11 +63,11 @@ export default async function ReviewApplicationPage({
   // applications.status stays 'enrolled' (terminal) after revocation.
   const effectiveStatus = app.revoked_at ? 'revoked' : app.status;
 
-  // Resolve program_interest slug to a training_courses ID for enrollment creation
+  // Resolve program_interest slug to a courses ID for enrollment creation.
+  // Uses maybeSingle() — no match is valid (many applications predate course records).
   const programSlug = (app.program_interest || '') as string;
   let resolvedProgramId: string | null = null;
   if (programSlug) {
-    // Try exact match on slug-like patterns in title
     const searchTerm = programSlug.replace(/-/g, ' ');
     const { data: matchedCourse } = await db
       .from('courses')
@@ -79,8 +75,8 @@ export default async function ReviewApplicationPage({
       .ilike('title', `%${searchTerm}%`)
       .eq('is_active', true)
       .limit(1)
-      .single();
-    resolvedProgramId = matchedCourse?.id || null;
+      .maybeSingle();
+    resolvedProgramId = matchedCourse?.id ?? null;
   }
 
   // Parse support_notes for structured data

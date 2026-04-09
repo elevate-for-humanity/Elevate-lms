@@ -1,5 +1,5 @@
 import { logger } from '@/lib/logger';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -46,7 +46,7 @@ const userId = req.headers.get('x-user-id');
   }
 
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     
     const { data, error } = await supabase
       .from('studio_deploy_tokens')
@@ -92,7 +92,7 @@ async function _POST(req: NextRequest) {
       );
     }
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     const encryptedToken = encrypt(token);
 
     const { data, error } = await supabase
@@ -145,7 +145,7 @@ const userId = req.headers.get('x-user-id');
       return NextResponse.json({ error: 'Missing provider' }, { status: 400 });
     }
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     
     const { data, error } = await supabase
       .from('studio_deploy_tokens')
@@ -190,7 +190,7 @@ const userId = req.headers.get('x-user-id');
   }
 
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     const { error } = await supabase
       .from('studio_deploy_tokens')

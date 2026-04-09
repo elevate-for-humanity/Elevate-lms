@@ -1,6 +1,6 @@
 // AUTH: admin/super_admin/staff only
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -31,7 +31,7 @@ export async function PATCH(request: NextRequest) {
     return safeError('voucher_issued_date must be set before voucher_paid_date', 400);
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return safeError('Server error', 500);
 
   // Fetch current values for audit diff

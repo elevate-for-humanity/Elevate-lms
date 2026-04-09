@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { stripe } from '@/lib/stripe/client';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -35,7 +35,7 @@ async function _POST(request: NextRequest) {
 
   let admin;
   try {
-    admin = createAdminClient();
+    admin = await getAdminClient();
   } catch (err) {
     logger.error('[payment-webhook] Admin client unavailable:', err);
     return NextResponse.json({ error: 'Admin client unavailable' }, { status: 503 });

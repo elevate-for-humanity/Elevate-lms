@@ -12,7 +12,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
 
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return NextResponse.json({ error: 'DB unavailable' }, { status: 500 });
 
   // Find confirmed bookings whose preferred_date is strictly before today with no result.

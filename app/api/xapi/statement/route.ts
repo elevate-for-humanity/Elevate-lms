@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
  * Receive and store xAPI statements
  */
 async function _POST(request: NextRequest) {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -31,7 +31,7 @@ async function _POST(request: NextRequest) {
     const statements = Array.isArray(body) ? body : [body];
 
     // Resolve tenant from the authenticated user's profile
-    const db = createAdminClient();
+    const db = await getAdminClient();
     const { data: actorProfile } = await db
       .from('profiles')
       .select('tenant_id')
@@ -85,7 +85,7 @@ async function _POST(request: NextRequest) {
  * Retrieve xAPI statements (LRS query)
  */
 async function _GET(request: NextRequest) {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;

@@ -81,7 +81,7 @@ async function _POST(req: Request) {
       );
     }
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     if (!supabase) {
       return NextResponse.json(

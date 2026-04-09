@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 async function _GET(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const cacheKey = 'programs:featured';
 
   // Try cache first

@@ -1,5 +1,5 @@
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 // app/api/billing/report-usage/route.ts
 import { NextResponse } from 'next/server';
@@ -17,7 +17,7 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const auth = request.headers.get('x-internal-token');
   if (auth !== process.env.INTERNAL_CRON_TOKEN) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

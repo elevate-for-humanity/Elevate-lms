@@ -1,3 +1,4 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 /**
  * Admin AI Assistant API
  *
@@ -8,7 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
@@ -50,7 +51,7 @@ Rules:
 - Keep responses concise — 2-5 sentences unless a detailed breakdown is requested.
 - Never make up numbers. Only use the live data snapshot provided.`;
 
-async function getLiveDataSnapshot(db: ReturnType<typeof createAdminClient>) {
+async function getLiveDataSnapshot(db: SupabaseClient) {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
@@ -103,7 +104,7 @@ export async function POST(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return safeError('Unauthorized', 401);
 
-    const db = createAdminClient();
+    const db = await getAdminClient();
     const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
     if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) {
       return safeError('Forbidden', 403);

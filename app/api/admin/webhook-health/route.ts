@@ -1,6 +1,7 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -38,7 +39,7 @@ async function requireAdmin() {
   const { data: { user } } = await userSupabase.auth.getUser();
   if (!user) return { error: 'Unauthorized', status: 401 as const };
 
-  const adminDb = createAdminClient();
+  const adminDb = await getAdminClient();
   if (!adminDb) return { error: 'Database unavailable', status: 503 as const };
 
   const { data: profile } = await adminDb
@@ -79,7 +80,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function handleSummary(adminDb: NonNullable<ReturnType<typeof createAdminClient>>) {
+async function handleSummary(adminDb: NonNullable<SupabaseClient>) {
   const now = new Date();
   const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
   const last7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -202,7 +203,7 @@ async function handleSummary(adminDb: NonNullable<ReturnType<typeof createAdminC
 }
 
 async function handleEventsList(
-  adminDb: NonNullable<ReturnType<typeof createAdminClient>>,
+  adminDb: NonNullable<SupabaseClient>,
   params: URLSearchParams
 ) {
   const provider = params.get('provider');

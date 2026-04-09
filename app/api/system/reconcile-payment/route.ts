@@ -1,3 +1,4 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 /**
  * POST /api/system/reconcile-payment
  *
@@ -13,7 +14,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { stripe } from '@/lib/stripe/client';
 import { logger } from '@/lib/logger';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return safeError('Service unavailable', 503);
 
   // Auth: must be authenticated
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
 }
 
 async function reconcileApplication(
-  db: ReturnType<typeof createAdminClient>,
+  db: SupabaseClient,
   applicationId: string,
   actorId: string,
 ) {

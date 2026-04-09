@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeDbError, safeInternalError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getStripe } from '@/lib/stripe/client';
@@ -23,7 +23,7 @@ export async function POST(
 
   const { slug, courseId } = await params;
   const db = await createClient();
-  const adminDb = createAdminClient();
+  const adminDb = await getAdminClient();
 
   // Resolve slug → program
   const { data: program, error: progErr } = await db

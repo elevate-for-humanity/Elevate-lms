@@ -1,5 +1,4 @@
 import { logger } from '@/lib/logger';
-import { createAdminClient } from '@/lib/supabase/admin';
 /**
  * Direct IRS E-File API
  * Replaces SupersonicFastCash integration

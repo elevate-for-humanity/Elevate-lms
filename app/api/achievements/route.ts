@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { parseBody } from '@/lib/api-helpers';
 import { getCurrentUser } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -170,7 +170,7 @@ async function _POST(request: Request) {
     const body = await parseBody<{ achievementId?: string; points?: number }>(request);
     if (!body.achievementId) return safeError('achievementId is required', 400);
 
-    const db = createAdminClient();
+    const db = await getAdminClient();
 
     // Verify the badge definition exists
     const { data: badge } = await db

@@ -11,7 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
@@ -60,7 +60,7 @@ function getRetakeFeeCents(examType: string | null | undefined): number {
 export const POST = withRuntime(
   { auth: 'admin' },
   async (req) => {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return safeError('Database unavailable', 500);
 
   let body: { bookingId: string; email: string; examName: string; examType?: string };

@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { auditedMutation } from '@/lib/audit/transactional';
@@ -23,7 +23,7 @@ async function _POST(req: Request) {
       completion_date,
     } = body;
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     if (!supabase) {
       return NextResponse.json(
@@ -81,7 +81,7 @@ async function _GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     const { data, error }: any = await supabase
       .from('rapids_tracking')

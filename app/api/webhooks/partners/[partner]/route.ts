@@ -1,5 +1,4 @@
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { createAdminClient } from '@/lib/supabase/admin';
 
 
 // app/api/webhooks/partners/[partner]/route.ts

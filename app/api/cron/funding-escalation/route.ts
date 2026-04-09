@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { sendSlackMessage } from '@/lib/notifications/slack';
@@ -37,7 +37,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const timestamp = new Date().toISOString();
 
   const { data, error } = await db.rpc('escalate_overdue_funding_verifications');

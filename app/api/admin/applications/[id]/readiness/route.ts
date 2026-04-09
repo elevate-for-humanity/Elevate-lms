@@ -13,7 +13,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 export const runtime = 'nodejs';
@@ -31,7 +31,7 @@ export async function GET(
     const { id: applicationId } = await params;
 
     const supabase = await createClient();
-    const db = createAdminClient();
+    const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
 
     if (!supabase) return safeError('Database not configured', 503);

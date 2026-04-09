@@ -1,6 +1,6 @@
 import { logger } from "@/lib/logger";
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -23,7 +23,7 @@ async function _POST(request: Request) {
     return e instanceof Response ? e : NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   if (!supabase) {
     return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
   }

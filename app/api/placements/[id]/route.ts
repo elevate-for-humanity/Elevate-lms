@@ -1,7 +1,7 @@
 // GET   /api/placements/[id]  — fetch single placement
 // PATCH /api/placements/[id]  — update verification status or details
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAuditEvent, AuditActions } from '@/lib/audit';
@@ -19,7 +19,7 @@ export async function GET(
   const auth = await apiAuthGuard();
 
   const { id } = await params;
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
 
   const { data, error } = await db
@@ -51,7 +51,7 @@ export async function PATCH(
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: 'Request body required' }, { status: 400 });
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
 
   const { data: existing } = await db

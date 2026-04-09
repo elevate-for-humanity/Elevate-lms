@@ -1,6 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient, createClient } from '@/lib/supabase/server';
+import { getAdminClient, createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { checkBarberSuspension } from '@/lib/barber/suspension';
@@ -88,7 +88,7 @@ async function _POST(request: NextRequest) {
     if (authClient) {
       const { data: { user } } = await authClient.auth.getUser();
       if (user) {
-        const db = createAdminClient();
+        const db = await getAdminClient();
         if (db) {
           const suspended = await checkBarberSuspension(user.id, db);
           if (suspended) return suspended;
@@ -119,7 +119,7 @@ async function _POST(request: NextRequest) {
       );
     }
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     if (!supabase) {
       return NextResponse.json(
         { error: 'Database not configured' },

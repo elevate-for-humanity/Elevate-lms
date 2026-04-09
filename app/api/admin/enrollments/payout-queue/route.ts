@@ -1,7 +1,7 @@
 // AUTH: admin/super_admin/staff only
 // Returns enrollments where payout has been triggered, filtered by status.
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return NextResponse.json({ error: 'Server error' }, { status: 500 });
 
   const { searchParams } = new URL(request.url);

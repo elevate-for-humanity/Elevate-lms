@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { createZoomMeeting } from '@/lib/integrations/zoom';
@@ -57,7 +57,7 @@ async function _POST(request: Request) {
     }
 
     // Save to Supabase
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     if (supabase) {
       const { error: dbError } = await supabase.from('appointments').insert({
         email,

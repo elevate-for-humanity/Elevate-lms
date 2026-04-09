@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     employed_in_healthcare ? `Currently in healthcare: ${employed_in_healthcare}` : null,
   ].filter(Boolean).join(' | ');
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { error } = await db.from('waitlist').insert({
     name: full_name,
     email,

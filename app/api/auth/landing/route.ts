@@ -1,4 +1,3 @@
-import { createAdminClient } from '@/lib/supabase/admin';
 
 // app/api/auth/landing/route.ts
 import { NextResponse } from 'next/server';

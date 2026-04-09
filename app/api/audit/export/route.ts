@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { auditExport } from '@/lib/auditLog';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
@@ -16,7 +16,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const format = searchParams.get('format') || 'csv';
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     if (!supabase) {
       return NextResponse.json(

@@ -47,8 +47,7 @@ async function _POST(req: Request) {
     // Try saving to Supabase
     let dbSaved = false;
     try {
-      const { createAdminClient } = await import('@/lib/supabase/admin');
-      const supabase = createAdminClient();
+      const supabase = await getAdminClient();
 
     if (!supabase) {
       return NextResponse.json(

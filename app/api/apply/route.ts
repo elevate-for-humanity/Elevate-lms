@@ -1,7 +1,7 @@
 import { logger } from '@/lib/logger';
 
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { withRateLimit } from '@/lib/api/with-rate-limit';
 import { contactRateLimit } from '@/lib/rate-limit';
 import { applicationSchema } from '@/lib/api/validation-schemas';
@@ -48,7 +48,7 @@ export const POST = withRateLimit(
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
-      const supabase = createAdminClient();
+      const supabase = await getAdminClient();
 
     if (!supabase) {
       return NextResponse.json(

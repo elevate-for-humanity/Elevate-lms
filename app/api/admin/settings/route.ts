@@ -1,7 +1,7 @@
 import { safeInternalError } from '@/lib/api/safe-error';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -14,7 +14,7 @@ async function _GET(_req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!['admin', 'super_admin'].includes(profile?.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -35,7 +35,7 @@ async function _POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!['admin', 'super_admin'].includes(profile?.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

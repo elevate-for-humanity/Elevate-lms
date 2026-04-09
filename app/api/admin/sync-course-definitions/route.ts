@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { COURSE_DEFINITIONS } from '@/lib/courses/definitions';
 import { HVAC_QUIZ_MAP, getUniversalExam } from '@/lib/courses/hvac-quizzes';
 import { logger } from '@/lib/logger';
@@ -31,7 +31,7 @@ const { data: { user } } = await supabase.auth.getUser();
   if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
     return { error: 'Forbidden', status: 403 };
   }
-  const db = createAdminClient();
+  const db = await getAdminClient();
   return { user, supabase, db };
 }
 

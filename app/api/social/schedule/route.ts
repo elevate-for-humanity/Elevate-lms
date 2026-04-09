@@ -1,6 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { createClient, getAdminClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -24,7 +24,7 @@ async function _GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
-    const adminClient = createAdminClient();
+    const adminClient = await getAdminClient();
 
     if (!adminClient) {
       return NextResponse.json(
@@ -76,7 +76,7 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Content and platforms are required' }, { status: 400 });
     }
     
-    const adminClient = createAdminClient();
+    const adminClient = await getAdminClient();
     const { data: post, error } = await adminClient
       .from('social_posts')
       .insert({

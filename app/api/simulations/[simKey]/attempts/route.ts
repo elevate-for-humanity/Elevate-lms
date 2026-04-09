@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 
@@ -13,7 +13,7 @@ export async function GET(
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data: sim } = await db
     .from('training_simulations')
@@ -60,7 +60,7 @@ export async function POST(
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data: sim } = await db
     .from('training_simulations')

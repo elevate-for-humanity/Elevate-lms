@@ -36,7 +36,7 @@ async function _POST() {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  const adminClient = createAdminClient();
+  const adminClient = await getAdminClient();
 
   try {
     // Create test shops with varying characteristics

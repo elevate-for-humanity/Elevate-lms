@@ -1,4 +1,3 @@
-import { createAdminClient } from '@/lib/supabase/admin';
 
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';

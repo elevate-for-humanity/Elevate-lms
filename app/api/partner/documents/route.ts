@@ -92,7 +92,7 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    const supabaseAdmin = createAdminClient();
+    const supabaseAdmin = await getAdminClient();
 
     if (!supabaseAdmin) {
       return NextResponse.json(

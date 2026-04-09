@@ -12,7 +12,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { resend } from '@/lib/resend';
 import { sendSMS } from '@/lib/notifications/sms';
 import { logger } from '@/lib/logger';
@@ -26,7 +26,7 @@ export const POST = withRuntime(
   { cron: true },
   async () => {
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   // Fetch all unsent reminders due now or overdue
   const { data: reminders, error } = await db

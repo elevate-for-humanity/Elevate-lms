@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeInternalError, safeDbError } from '@/lib/api/safe-error';
 
@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
   try { await apiRequireAdmin(request); } catch (e) { return e instanceof Response ? e : NextResponse.json({ error: 'Unauthorized' }, { status: 401 }); }
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data, error } = await db
     .from('financial_assurance_records')
     .select('*')
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
   try { await apiRequireAdmin(request); } catch (e) { return e instanceof Response ? e : NextResponse.json({ error: 'Unauthorized' }, { status: 401 }); }
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const body = await request.json().catch(() => null);
   if (!body?.record_type || !body?.provider_name) {
     return NextResponse.json({ error: 'record_type and provider_name are required' }, { status: 400 });

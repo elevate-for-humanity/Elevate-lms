@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { getStripe } from '@/lib/stripe/client';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       return safeError('Payment not confirmed. Please complete checkout first.', 402);
     }
 
-    const db = createAdminClient();
+    const db = await getAdminClient();
     if (!db) return safeError('Database unavailable', 503);
 
     const renterEmail = session.metadata?.renter_email ?? session.customer_details?.email ?? '';

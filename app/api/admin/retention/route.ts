@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { enforceDocumentRetention } from '@/lib/retention/document-retention';
 import { logger } from '@/lib/logger';
@@ -31,7 +31,7 @@ async function _POST(request: NextRequest) {
 
     // Always require super_admin auth — cron secret is an additional check, not a bypass
     const supabase = await createClient();
-    const admin = createAdminClient();
+    const admin = await getAdminClient();
     const db = admin || supabase;
 
     const { data: { user } } = await supabase.auth.getUser();
@@ -84,7 +84,7 @@ async function _GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const admin = createAdminClient();
+  const admin = await getAdminClient();
   const db = admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -29,7 +29,7 @@ async function _POST(request: NextRequest) {
     return safeError('shop_name, owner_name, contact_email, signature, and agreed are required', 400);
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const now = new Date().toISOString();
   const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
   const ua = request.headers.get('user-agent') || 'unknown';

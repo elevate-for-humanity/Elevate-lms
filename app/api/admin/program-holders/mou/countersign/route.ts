@@ -1,6 +1,6 @@
 import { requireAdmin } from '@/lib/auth';
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
@@ -35,7 +35,7 @@ const _POST = withAuth(
     const base64 = matches[1];
     const buffer = Buffer.from(base64, 'base64');
 
-    const serviceClient = createAdminClient();
+    const serviceClient = await getAdminClient();
     if (!serviceClient) return new Response('Service unavailable', { status: 503 });
 
     // Pre-read — verify holder exists before mutating

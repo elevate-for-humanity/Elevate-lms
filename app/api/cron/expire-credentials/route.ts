@@ -4,7 +4,7 @@ import { safeInternalError } from '@/lib/api/safe-error';
 // Calls expire_stale_credentials() RPC and reports results.
 // Protected by CRON_SECRET header (same pattern as expire-licenses).
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -23,7 +23,7 @@ async function _GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) {
     return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
   }

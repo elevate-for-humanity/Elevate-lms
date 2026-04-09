@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
-import { createAdminClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/server';
 import { randomBytes } from 'node:crypto';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -33,7 +33,7 @@ async function _POST(req: NextRequest) {
     return new Response('Forbidden', { status: 403 });
 
   // Use service role for certificate writes (RLS restricts inserts to admin)
-  const adminDb = createAdminClient();
+  const adminDb = await getAdminClient();
 
     if (!adminDb) {
       return NextResponse.json(

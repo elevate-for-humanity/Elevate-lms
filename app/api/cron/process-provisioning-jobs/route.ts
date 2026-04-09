@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { claimJobs, completeJob, failJob, ProvisioningJob } from '@/lib/jobs/queue';
 import { logger } from '@/lib/logger';
 import { processLicenseProvision } from '@/lib/jobs/handlers/license-provision';

@@ -16,7 +16,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { PRE_AUTH_TABLES } from '@/lib/pre-auth-tables';
 import { logger } from '@/lib/logger';
 
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) {
     return NextResponse.json({ error: 'DB unavailable' }, { status: 503 });
   }

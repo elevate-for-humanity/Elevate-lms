@@ -1,6 +1,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
@@ -18,7 +18,7 @@ export async function GET(
   catch (e) { if (e instanceof Response) return e; return NextResponse.json({ error: 'Unauthorized' }, { status: 401 }); }
   const { id } = await params;
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     const { data, error } = await supabase
       .from('studio_workspaces')
       .select('*')
@@ -46,7 +46,7 @@ export async function DELETE(
   catch (e) { if (e instanceof Response) return e; return NextResponse.json({ error: 'Unauthorized' }, { status: 401 }); }
   const { id } = await params;
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     const { error } = await supabase
       .from('studio_workspaces')
       .delete()

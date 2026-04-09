@@ -14,7 +14,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
@@ -111,7 +111,7 @@ export async function POST(
   const user = await getCurrentUser();
   if (!user) return safeError('Unauthorized', 401);
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !ADMIN_ROLES.has(profile.role)) return safeError('Forbidden', 403);
 

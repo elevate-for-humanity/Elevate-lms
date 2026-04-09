@@ -8,7 +8,7 @@
  * Auth: CRON_SECRET bearer token
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email';
 
 export const runtime = 'nodejs';
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return NextResponse.json({ error: 'Server error' }, { status: 500 });
 
   const now = new Date();

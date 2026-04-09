@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
 import { safeInternalError } from '@/lib/api/safe-error';
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   if (!supabase) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
 
   try {

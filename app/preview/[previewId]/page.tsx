@@ -5,7 +5,7 @@
  * Data source: localStorage only. No DB reads. No Supabase queries.
  * Links to /store?preview=<id> for conversion.
  *
- * HARD RULE: Do NOT import createClient, createAdminClient, or any
+ * HARD RULE: Do NOT import createClient, or any
  * Supabase helper here. Do NOT add fetch() calls to internal APIs.
  * If this page needs protected data, add an auth gate first and
  * remove this comment block.

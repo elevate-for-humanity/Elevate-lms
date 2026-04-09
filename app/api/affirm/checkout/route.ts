@@ -16,7 +16,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAffirmCheckoutConfig, affirm } from '@/lib/affirm/client';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { resolvePaymentAmount } from '@/lib/payments/resolve-amount';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -86,7 +86,7 @@ async function _POST(request: NextRequest) {
     const orderId = `EFH-AFFIRM-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     // Store checkout context in DB (server-side, not URL params)
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     if (!supabase) {
       return NextResponse.json(

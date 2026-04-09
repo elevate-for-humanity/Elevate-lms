@@ -1,7 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
 import { TESTING_CENTER, TESTING_EMAIL } from '@/lib/testing/testing-config';
@@ -69,7 +69,7 @@ export const POST = withRuntime(
 
     const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const confirmationCode = generateCode();
   const hasAddOn = addOn === true;
   const isPaid = paymentStatus === 'paid';

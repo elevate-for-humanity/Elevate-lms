@@ -1,5 +1,4 @@
 // =====================================================
-import { createAdminClient } from '@/lib/supabase/admin';
 // CREDENTIAL SHARE LINK HANDOFF
 // /c/<token> → validates → redirects to verifier or partner portal
 // =====================================================

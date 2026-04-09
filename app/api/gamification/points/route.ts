@@ -13,7 +13,7 @@ async function parseBody<T>(request: NextRequest): Promise<T> {
 }
 
 async function _GET(request: NextRequest) {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -50,7 +50,7 @@ async function _GET(request: NextRequest) {
 }
 
 async function _POST(request: NextRequest) {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { logger } from '@/lib/logger';
 
@@ -28,7 +28,7 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'This program does not currently have a waitlist.' }, { status: 400 });
     }
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     if (!supabase) {
       return NextResponse.json({ error: 'Service unavailable' }, { status: 500 });
     }
@@ -137,7 +137,7 @@ async function _GET(request: NextRequest) {
     return NextResponse.json({ error: 'program parameter required' }, { status: 400 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   if (!supabase) {
     return NextResponse.json({ error: 'Service unavailable' }, { status: 500 });
   }

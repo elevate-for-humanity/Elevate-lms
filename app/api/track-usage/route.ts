@@ -1,6 +1,6 @@
 import { safeInternalError } from '@/lib/api/safe-error';
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
@@ -173,7 +173,7 @@ async function logUnauthorizedAccess(data: {
   });
 
   try {
-    const db = createAdminClient();
+    const db = await getAdminClient();
     const { error } = await db.from('unauthorized_access_log').insert({
       domain: data.domain,
       url: data.url,
@@ -208,7 +208,7 @@ async function sendDMCATakedown(data: {
 
   // Check if we already sent a takedown for this domain in the last 24h (avoid spam)
   try {
-    const db = createAdminClient();
+    const db = await getAdminClient();
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { data: existing } = await db
       .from('unauthorized_access_log')
@@ -371,7 +371,7 @@ Elevate for Humanity Career & Technical Institute
 
   // Mark in database that takedown was sent
   try {
-    const db = createAdminClient();
+    const db = await getAdminClient();
     await db
       .from('unauthorized_access_log')
       .update({ cease_desist_sent: true, cease_desist_date: new Date().toISOString() })

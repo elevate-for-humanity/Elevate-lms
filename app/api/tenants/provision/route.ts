@@ -1,5 +1,5 @@
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 // app/api/tenants/provision/route.ts
 import { NextResponse } from 'next/server';
@@ -17,7 +17,7 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const session = await requireApiAuth();
   if (!(session as string).isAdmin) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

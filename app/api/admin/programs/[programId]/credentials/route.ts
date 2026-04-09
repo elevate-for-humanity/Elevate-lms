@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
@@ -22,7 +22,7 @@ export async function GET(
 ) {
   const { programId } = await params;
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const user = await authorize(supabase, db);
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -61,7 +61,7 @@ export async function POST(
 ) {
   const { programId } = await params;
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const user = await authorize(supabase, db);
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 

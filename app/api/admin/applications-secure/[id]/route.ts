@@ -1,5 +1,5 @@
 import { requireAdmin } from '@/lib/auth';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 // app/api/admin/applications-secure/[id]/route.ts
 // SECURE VERSION with authentication
@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 const _GET = withAuth(
   async (req: NextRequest, { params, user }) => {
     const { id } = params;
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     try {
       const { data: application, error } = await supabase

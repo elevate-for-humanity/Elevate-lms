@@ -2,7 +2,7 @@
 // Records exam result (pass/fail + score) in exam_results.
 // Transitions authorization status to 'passed' or 'failed'.
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeDbError } from '@/lib/api/safe-error';
@@ -30,7 +30,7 @@ export async function POST(
 
   const passedBool = passed === true || passed === 'true';
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return safeError('Service unavailable', 503);
 
   const { data: existing, error: fetchErr } = await db

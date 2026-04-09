@@ -10,7 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { recordUpload } from '@/lib/services/exam-authorization';
 
 export const runtime = 'nodejs';
@@ -35,7 +35,7 @@ export async function POST(
     if (!ALLOWED_TYPES.includes(file.type)) return safeError('Only PDF, JPEG, PNG, or WebP allowed', 400);
     if (file.size > MAX_BYTES) return safeError('File must be under 10 MB', 400);
 
-    const db = createAdminClient();
+    const db = await getAdminClient();
     if (!db) return safeError('Storage unavailable', 503);
 
     // Sanitize filename

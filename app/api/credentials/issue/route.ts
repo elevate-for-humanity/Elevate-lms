@@ -1,4 +1,3 @@
-import { createAdminClient } from '@/lib/supabase/admin';
 import { generateCredentialCode, generateShareToken } from '@/lib/credential-generator';
 
 // =====================================================

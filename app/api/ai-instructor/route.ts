@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -56,7 +56,7 @@ async function _POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
-    const db = createAdminClient();
+    const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
     const {
       data: { user },
@@ -137,7 +137,7 @@ async function _GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    const db = createAdminClient();
+    const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
     const {
       data: { user },

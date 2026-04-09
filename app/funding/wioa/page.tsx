@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { createPublicClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';

@@ -1,7 +1,7 @@
 import { safeInternalError } from '@/lib/api/safe-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { appendSessionEvent } from '@/lib/proctor/session-events';
@@ -11,7 +11,7 @@ const ALLOWED_ROLES = ['admin', 'super_admin', 'staff', 'instructor'];
 async function getProctor() {
   const supabase = await createClient();
   if (!supabase) return null;
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
 
   const { data: { user } } = await supabase.auth.getUser();

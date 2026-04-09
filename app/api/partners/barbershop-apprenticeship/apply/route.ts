@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import crypto from 'crypto';
@@ -168,7 +168,7 @@ async function _POST(req: Request) {
       );
     }
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     if (!supabase) {
       logger.error('Supabase admin client not available');
       return NextResponse.json(

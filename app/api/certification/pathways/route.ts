@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
   if (!programId) return safeError('program_id required', 400);
 
   try {
-    const db = createAdminClient();
+    const db = await getAdminClient();
     if (!db) return safeError('Database unavailable', 503);
 
     const { data: pathways, error } = await db

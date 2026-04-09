@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { COURSE_DEFINITIONS } from '@/lib/courses/definitions';
@@ -117,7 +117,7 @@ async function _GET(
 ) {
   const { courseId } = await params;
 
-  const admin = createAdminClient();
+  const admin = await getAdminClient();
   const supabase = admin || (await createClient());
   if (!supabase) {
     const slug = COURSE_ID_TO_SLUG[courseId];

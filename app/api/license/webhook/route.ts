@@ -2,7 +2,7 @@ import { logger } from '@/lib/logger';
 import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -45,7 +45,7 @@ async function _POST(request: NextRequest) {
 
     if (licenseId) {
       try {
-        const supabase = createAdminClient();
+        const supabase = await getAdminClient();
         if (!supabase) {
           logger.error('[license-webhook] Supabase client not available');
           return NextResponse.json({ received: true, warning: 'db_unavailable' });

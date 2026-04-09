@@ -13,7 +13,7 @@ async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     const body = await req.json();
 
     const { data, error }: any = await supabase

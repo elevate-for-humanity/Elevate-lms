@@ -2,7 +2,7 @@ import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { checkNewMilestone } from '@/lib/pwa/milestones';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -25,7 +25,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Suspension gate
-    const adminDb = createAdminClient();
+    const adminDb = await getAdminClient();
     if (adminDb) {
       const suspended = await checkBarberSuspension(user.id, adminDb);
       if (suspended) return suspended;

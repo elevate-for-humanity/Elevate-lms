@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
 const _GET = withAuth(
   async (req: NextRequest, user) => {
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const db = supabase;
   const tenantId = req.headers.get('x-tenant-id');
 

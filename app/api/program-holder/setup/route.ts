@@ -107,8 +107,7 @@ async function _POST(req: NextRequest) {
 
   // Assign program_holder role so the portal layout and auth guards work.
   // Uses service role to bypass RLS on profiles.
-  const { createAdminClient } = await import('@/lib/supabase/admin');
-  const admin = createAdminClient();
+  const admin = await getAdminClient();
   if (admin) {
     await admin
       .from('profiles')

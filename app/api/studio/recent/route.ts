@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -20,7 +20,7 @@ const userId = req.headers.get('x-user-id');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   
   let query = supabase
     .from('studio_recent_files')
@@ -56,7 +56,7 @@ async function _POST(req: NextRequest) {
     return NextResponse.json({ error: 'repo_id and file_path required' }, { status: 400 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   
   // Upsert with increment
   const { data: existing } = await supabase

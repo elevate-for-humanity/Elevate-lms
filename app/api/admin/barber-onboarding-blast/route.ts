@@ -1,6 +1,6 @@
 import { safeInternalError } from '@/lib/api/safe-error';
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { barberFullOnboardingEmail } from '@/lib/email/templates/barber-full-onboarding';
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => ({}));
     const dryRun = body.dryRun === true;
 
-    const admin = createAdminClient();
+    const admin = await getAdminClient();
     if (!admin) {
       return NextResponse.json({ error: 'Service unavailable' }, { status: 500 });
     }

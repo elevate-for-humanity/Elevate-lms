@@ -1,7 +1,7 @@
 
 
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
@@ -45,7 +45,7 @@ const supabase = await createClient();
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const adminClient = createAdminClient();
+  const adminClient = await getAdminClient();
 
     if (!adminClient) {
       return NextResponse.json(
@@ -105,7 +105,7 @@ const supabase = await createClient();
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const adminClient = createAdminClient();
+  const adminClient = await getAdminClient();
   const body = await req.json();
 
   // Server-side allowlist (prevents random fields)

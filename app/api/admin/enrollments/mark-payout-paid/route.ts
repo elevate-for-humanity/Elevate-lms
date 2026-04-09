@@ -1,6 +1,6 @@
 // AUTH: admin/super_admin only — staff cannot mark payouts paid
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
   if (auth.error) return auth.error;
 
   // Only admin/super_admin can mark paid — not staff
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return safeError('Server error', 500);
 
   const { data: profile } = await db

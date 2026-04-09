@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 // app/api/partner-launch/[enrollmentId]/route.ts
 import { NextResponse } from 'next/server';
@@ -18,7 +18,7 @@ async function _GET(_req: Request, { params }: Params) {
   const rateLimited = await applyRateLimit(_req, 'api');
   if (rateLimited) return rateLimited;
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const { enrollmentId } = await params;
 
   const { data: enrollment, error } = await supabase

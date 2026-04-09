@@ -1,7 +1,7 @@
 // GET  /api/placements  — list placements (admin/staff/case_manager/provider_admin)
 // POST /api/placements  — create a placement record (admin/staff/case_manager)
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAuditEvent, AuditActions } from '@/lib/audit';
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
   const auth = await apiAuthGuard();
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
 
   const { searchParams } = new URL(req.url);
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'learner_id, hire_date, and job_title are required' }, { status: 400 });
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
 
   // Resolve tenant_id from learner's profile

@@ -14,7 +14,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { createAdminClient, getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { createEnrollmentFromPayment } from '@/lib/enrollment/create-enrollment';
 import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tracker';
@@ -152,7 +152,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Use admin client — webhooks have no user session, RLS would block writes
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     if (!supabase) {
       logger.error('[Sezzle Webhook] createAdminClient returned null — SUPABASE_SERVICE_ROLE_KEY likely missing. DB writes will be skipped.');
       await finalizeWebhookEvent('sezzle', sezzleEventId, 'errored', 'DB unavailable');

@@ -32,7 +32,7 @@ import Stripe from 'stripe';
 import { stripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 import { hydrateProcessEnv } from '@/lib/secrets';
@@ -67,7 +67,7 @@ export const dynamic = 'force-dynamic';
 // Returns null if env vars are missing rather than throwing.
 function getSupabase(): SupabaseClient | null {
   try {
-    return createAdminClient();
+    return getAdminClient();
   } catch {
     return null;
   }

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { stripe } from '@/lib/stripe/client';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -49,7 +49,7 @@ async function _POST(req: Request) {
     }
 
     // Price must come from DB — never trust client-supplied priceCents
-    const db = createAdminClient();
+    const db = await getAdminClient();
     if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
 
     const { data: product, error: productError } = await db

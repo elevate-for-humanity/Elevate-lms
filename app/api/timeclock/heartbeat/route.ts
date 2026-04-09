@@ -1,6 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient, createClient } from '@/lib/supabase/server';
+import { getAdminClient, createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { checkBarberSuspension } from '@/lib/barber/suspension';
@@ -70,7 +70,7 @@ async function _POST(request: NextRequest) {
       );
     }
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     // Suspension gate — suspended accounts cannot send heartbeats
     if (supabase) {

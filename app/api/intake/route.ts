@@ -1,6 +1,6 @@
 import { safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { sendApplicationConfirmation, sendAdminApplicationNotification } from '@/lib/notifications/application-emails';
@@ -18,7 +18,7 @@ async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   if (!supabase) {
     return NextResponse.json(
       { error: 'Service unavailable' },

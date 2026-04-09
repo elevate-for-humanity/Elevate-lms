@@ -1,5 +1,4 @@
 
-import { createAdminClient } from '@/lib/supabase/admin';
 
 // =====================================================
 // INTAKE STAGE 2: ELIGIBILITY

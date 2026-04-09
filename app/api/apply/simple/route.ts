@@ -21,7 +21,7 @@ async function _POST(req: Request) {
     // WIOA-style prescreen
     const eligible = funding !== "Self Pay" && program !== "Not Sure";
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     if (!supabase) {
       return NextResponse.json(

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { logger } from '@/lib/logger';
@@ -116,7 +116,7 @@ export async function POST(request: Request) {
   const auth = await apiRequireAdmin(request);
 
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
 
   // Optional: filter by status or program from request body

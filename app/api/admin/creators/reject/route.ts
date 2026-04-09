@@ -3,7 +3,7 @@ import { logger } from '@/lib/logger';
 // Using Node.js runtime for email compatibility
 
 import { NextResponse } from 'next/server';
-import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { createClient, getAdminClient } from '@/lib/supabase/server';
 import { sendCreatorRejectionEmail } from '@/lib/email/sendgrid';
 import { z } from 'zod';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -65,7 +65,7 @@ async function _POST(req: Request) {
     const { creatorId, reason } = validation.data;
 
     // 4. Use admin client to bypass RLS
-    const adminSupabase = createAdminClient();
+    const adminSupabase = await getAdminClient();
 
     if (!adminSupabase) {
       return NextResponse.json(

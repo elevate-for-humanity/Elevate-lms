@@ -11,7 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { affirm } from '@/lib/affirm/client';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -29,7 +29,7 @@ async function _GET(request: NextRequest) {
   const orderId = searchParams.get('order_id');
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
     if (!supabase) {
       return NextResponse.json(

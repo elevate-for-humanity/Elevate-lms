@@ -49,7 +49,7 @@ async function _POST(
     );
 
     // Admin client required — bypasses RLS recursion in lms_lessons view.
-    // createAdminClient() throws if SUPABASE_SERVICE_ROLE_KEY is missing.
+    // await getAdminClient() throws if SUPABASE_SERVICE_ROLE_KEY is missing.
     const db = await getAdminClient();
 
     // Get lesson to find course_id.

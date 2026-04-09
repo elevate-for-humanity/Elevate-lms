@@ -1,7 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { approveApplication } from '@/lib/enrollment/approve';
 import { logger } from '@/lib/logger';
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!supabase || !db) {
     return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
   }

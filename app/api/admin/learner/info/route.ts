@@ -1,6 +1,6 @@
 
 import { NextRequest } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -25,7 +25,7 @@ async function getHandler(
   }
 
   try {
-    const db = createAdminClient();
+    const db = await getAdminClient();
     const { data, error } = await db.auth.admin.getUserById(user_id);
     const userData = data?.user;
 

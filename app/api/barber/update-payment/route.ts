@@ -8,7 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { getStripe } from '@/lib/stripe/client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     return safeError('Unauthorized', 401);
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return safeError('Service unavailable', 503);
 
   const stripe = getStripe();

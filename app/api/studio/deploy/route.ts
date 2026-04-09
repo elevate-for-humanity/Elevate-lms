@@ -1,5 +1,5 @@
 import { logger } from '@/lib/logger';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -73,7 +73,7 @@ async function _POST(req: NextRequest) {
 
     // Save deployment to database
     if (userId) {
-      const supabase = createAdminClient();
+      const supabase = await getAdminClient();
       await supabase.from('studio_deployments').insert({
         user_id: userId,
         provider,
@@ -135,7 +135,7 @@ const userId = req.headers.get('x-user-id');
 
     // Update database
     if (userId) {
-      const supabase = createAdminClient();
+      const supabase = await getAdminClient();
       await supabase
         .from('studio_deployments')
         .update({ status, url, updated_at: new Date().toISOString() })
@@ -170,7 +170,7 @@ const userId = req.headers.get('x-user-id');
   try {
     const { repo } = await req.json();
     
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     let query = supabase
       .from('studio_deployments')
       .select('*')

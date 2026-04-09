@@ -3,7 +3,7 @@
 // including per-domain scores for the block reason panel.
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError } from '@/lib/api/safe-error';
 
@@ -22,7 +22,7 @@ export async function GET(
   if (!user) return safeError('Unauthorized', 401);
 
   const { courseId } = await params;
-  const db = createAdminClient() ?? supabase;
+  const db = await getAdminClient();
 
   // Resolve program_id from course
   const { data: course } = await db

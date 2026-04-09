@@ -1,6 +1,5 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 

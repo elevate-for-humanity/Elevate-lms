@@ -16,7 +16,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID } from 'crypto';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
@@ -36,7 +36,7 @@ export async function POST(
     const requestId = randomUUID();
 
     const supabase = await createClient();
-    const db = createAdminClient();
+    const db = await getAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
 
     if (!supabase) return safeError('Database not configured', 503);

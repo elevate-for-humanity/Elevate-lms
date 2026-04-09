@@ -11,7 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
@@ -41,7 +41,7 @@ export async function GET(
   const startMs = Date.now();
 
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     if (!supabase) {
       return NextResponse.json({ error: 'Admin client unavailable' }, { status: 503 });
     }

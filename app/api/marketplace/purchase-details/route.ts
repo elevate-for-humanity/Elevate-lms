@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -10,7 +10,7 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 async function _GET(req: Request) {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;

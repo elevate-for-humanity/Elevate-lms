@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 import { toErrorMessage } from '@/lib/safe';
 import { getAppVersion } from '@/lib/version/getAppVersion';
@@ -43,7 +43,7 @@ const checks: Record<string, any> = {
       process.env.NEXT_PUBLIC_SUPABASE_URL &&
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     ) {
-      const db = createAdminClient();
+      const db = await getAdminClient();
 
       const { error } = await db
         .from('programs')
@@ -137,7 +137,7 @@ const checks: Record<string, any> = {
 
   // Check 7: Audit infrastructure integrity (trigger health)
   try {
-    const adminClient = createAdminClient();
+    const adminClient = await getAdminClient();
     if (adminClient) {
       const { data: integrity } = await adminClient.rpc('verify_audit_integrity');
       checks.checks.audit_integrity = {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 
@@ -30,7 +30,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   if (!cert) return new Response('Certificate not found', { status: 404 });
 
   // Fetch user and course details
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: userAuth } = await db.auth.admin.getUserById(cert.user_id);
   const u = userAuth?.user;
 

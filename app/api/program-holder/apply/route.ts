@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 
 import {
@@ -63,7 +63,7 @@ async function _POST(req: NextRequest) {
     }
 
     // Check for duplicate by email
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     // Check for duplicate by email
     const { data: existing } = await supabase
       .from('applications')

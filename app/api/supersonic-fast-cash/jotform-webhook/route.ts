@@ -1,5 +1,5 @@
 import { logger } from '@/lib/logger';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { jotFormIntegration } from '@/lib/integrations/jotform';
 import { supersonicTaxEngine } from '@/lib/integrations/supersonic-tax';
@@ -73,7 +73,7 @@ async function _POST(request: NextRequest) {
       }
     }
 
-    const adminDb = createAdminClient();
+    const adminDb = await getAdminClient();
     const supabase = adminDb;
     const body = await request.json();
 
@@ -383,7 +383,7 @@ async function _POST(request: NextRequest) {
     // Fall back to insert if no row exists (failure happened before tracking insert).
     if (submissionId) {
       try {
-        const errDb = createAdminClient();
+        const errDb = await getAdminClient();
         if (errDb) {
           const eventId = String(submissionId);
           const now = new Date().toISOString();

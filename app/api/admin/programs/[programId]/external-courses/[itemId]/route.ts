@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 
@@ -32,7 +32,7 @@ const PatchSchema = z.object({
 async function requireAdmin() {
   const user = await getCurrentUser();
   if (!user) return null;
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin', 'super_admin', 'org_admin', 'staff'].includes(profile.role)) return null;
   return user;
@@ -55,7 +55,7 @@ export async function PATCH(
     return NextResponse.json({ error: issues }, { status: 422 });
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data, error } = await db
     .from('program_external_courses')
     .update({ ...parsed.data, updated_at: new Date().toISOString() })
@@ -79,7 +79,7 @@ export async function DELETE(
   const user = await requireAdmin();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { error } = await db
     .from('program_external_courses')
     .update({ is_active: false, updated_at: new Date().toISOString() })

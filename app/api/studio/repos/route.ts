@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -17,7 +17,7 @@ const userId = req.headers.get('x-user-id');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const { data, error } = await supabase
     .from('studio_repos')
     .select('*')
@@ -45,7 +45,7 @@ async function _POST(req: NextRequest) {
     return NextResponse.json({ error: 'repo_full_name required' }, { status: 400 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const { data, error } = await supabase
     .from('studio_repos')
     .upsert({
@@ -78,7 +78,7 @@ const userId = req.headers.get('x-user-id');
     return NextResponse.json({ error: 'repo_id required' }, { status: 400 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const { error } = await supabase
     .from('studio_repos')
     .delete()

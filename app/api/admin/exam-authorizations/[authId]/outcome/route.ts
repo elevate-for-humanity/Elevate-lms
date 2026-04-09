@@ -3,7 +3,7 @@
 // No-show policy: first no-show → reschedule allowed.
 //                 Second no-show → status set to 'revoked', requires staff re-approval.
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeDbError } from '@/lib/api/safe-error';
@@ -28,7 +28,7 @@ export async function POST(
     return safeError("outcome must be 'sat' or 'no_show'", 400);
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return safeError('Service unavailable', 503);
 
   // Get most recent scheduling row

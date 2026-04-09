@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeDbError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -31,7 +31,7 @@ export async function POST(
   if (!program) return safeError('Program not found', 404);
 
   const programId = program.id;
-  const adminDb = createAdminClient();
+  const adminDb = await getAdminClient();
 
   // Verify the external course belongs to this program and allows manual completion
   const { data: course, error: lookupErr } = await adminDb

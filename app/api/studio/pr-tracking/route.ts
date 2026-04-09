@@ -1,5 +1,5 @@
 import { logger } from '@/lib/logger';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -22,7 +22,7 @@ const userId = req.headers.get('x-user-id');
   }
 
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     
     let query = supabase
       .from('studio_pr_tracking')
@@ -69,7 +69,7 @@ async function _POST(req: NextRequest) {
       );
     }
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     // Upsert tracking record
     const { data, error } = await supabase
@@ -120,7 +120,7 @@ const userId = req.headers.get('x-user-id');
       return NextResponse.json({ error: 'Missing tracking ID' }, { status: 400 });
     }
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     const updates: Record<string, any> = {};
     if (is_watching !== undefined) updates.is_watching = is_watching;
@@ -164,7 +164,7 @@ const userId = req.headers.get('x-user-id');
   }
 
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     const { error } = await supabase
       .from('studio_pr_tracking')

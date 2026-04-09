@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { getAdminClient } from '@/lib/supabase/admin'
 import { safeError, safeInternalError } from '@/lib/api/safe-error'
 
 export async function POST(request: NextRequest) {
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       return safeError('Missing required fields', 400)
     }
 
-    const supabase = createAdminClient()
+    const supabase = await getAdminClient()
 
     // Verify token matches partner
     const { data: partner } = await supabase

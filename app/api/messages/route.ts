@@ -1,4 +1,3 @@
-import { createAdminClient } from '@/lib/supabase/admin';
 
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';

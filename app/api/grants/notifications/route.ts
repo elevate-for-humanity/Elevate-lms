@@ -12,7 +12,7 @@ import {
   notifyGrantSubmitted,
   notifyDeadlineApproaching,
 } from '@/lib/grants/notification-system';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -27,7 +27,7 @@ async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
   const auth = await apiRequireAdmin(req);
-  const supabaseAdmin = createAdminClient();
+  const supabaseAdmin = await getAdminClient();
 
     const body = await req.json();
     const { action, applicationId, grantId, submittedBy, confirmationNumber, daysRemaining } = body;
@@ -101,7 +101,7 @@ async function _GET(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabaseAdmin = createAdminClient();
+    const supabaseAdmin = await getAdminClient();
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('userId');
     const unreadOnly = searchParams.get('unreadOnly') === 'true';
@@ -148,7 +148,7 @@ async function _PATCH(req: NextRequest) {
       );
     }
 
-    const supabaseAdmin = createAdminClient();
+    const supabaseAdmin = await getAdminClient();
     const { error } = await supabaseAdmin
       .from('grant_notifications')
       .update({ read: read !== false })

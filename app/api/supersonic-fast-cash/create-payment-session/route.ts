@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { stripe } from '@/lib/stripe/client';
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   if (authError || !user) return safeError('Authentication required', 401);
 
   // Require consent on file before payment
-  const admin = createAdminClient();
+  const admin = await getAdminClient();
   if (!admin) return safeInternalError(new Error('Admin client unavailable'), 'Service unavailable');
 
   const { data: consent } = await admin

@@ -14,7 +14,7 @@
 // super_admin and admin only. provider_admin and below cannot impersonate.
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAuditEvent, AuditActions } from '@/lib/audit';
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { target_user_id, reason } = body;
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
 
   // Verify target user exists and is not an admin (cannot impersonate admins)

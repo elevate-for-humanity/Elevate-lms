@@ -11,7 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { getStripe } from '@/lib/stripe/client';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
@@ -43,7 +43,7 @@ export async function POST(
 
   const { cost_cents, payer_rule } = parsed.data;
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   // Fetch the row
   const { data: row, error: fetchErr } = await db

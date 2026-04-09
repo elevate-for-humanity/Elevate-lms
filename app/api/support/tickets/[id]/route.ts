@@ -1,6 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { createClient, getAdminClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -19,7 +19,7 @@ async function _GET(request: NextRequest, { params }: { params: Params }) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
-    const adminClient = createAdminClient();
+    const adminClient = await getAdminClient();
 
     if (!adminClient) {
       return NextResponse.json(
@@ -85,7 +85,7 @@ async function _PATCH(request: NextRequest, { params }: { params: Params }) {
     const body = await request.json();
     const { status, message, priority, assigned_to } = body;
     
-    const adminClient = createAdminClient();
+    const adminClient = await getAdminClient();
     
     // Update ticket if status/priority/assignment changed
     if (status || priority || assigned_to) {

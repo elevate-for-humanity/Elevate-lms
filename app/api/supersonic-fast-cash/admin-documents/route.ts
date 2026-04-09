@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 
   const auth = await apiRequireAdmin(request);
 
-  const admin = createAdminClient();
+  const admin = await getAdminClient();
   if (!admin) return safeInternalError(new Error('Admin client unavailable'), 'Service unavailable');
 
   const { searchParams } = new URL(request.url);
@@ -50,7 +50,7 @@ export async function PATCH(request: NextRequest) {
   if (!id) return safeError('Document ID required', 400);
   if (!['reviewed', 'pending_review', 'rejected'].includes(status ?? '')) return safeError('Invalid status', 400);
 
-  const admin = createAdminClient();
+  const admin = await getAdminClient();
   if (!admin) return safeInternalError(new Error('Admin client unavailable'), 'Service unavailable');
 
   const { error } = await admin

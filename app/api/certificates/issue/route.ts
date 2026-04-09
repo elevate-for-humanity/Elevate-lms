@@ -1,5 +1,5 @@
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
@@ -28,7 +28,7 @@ async function _POST(request: NextRequest) {
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const adminDb = createAdminClient();
+    const adminDb = await getAdminClient();
     const authDb = adminDb || authClient;
     const { data: profile } = await authDb.from('profiles').select('role').eq('id', session.user.id).single();
     if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {

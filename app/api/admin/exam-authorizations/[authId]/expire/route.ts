@@ -2,7 +2,7 @@
 // Manual expiration by staff. Only valid for active statuses.
 // Expired authorizations require a fresh readiness eval to re-authorize.
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeDbError } from '@/lib/api/safe-error';
@@ -23,7 +23,7 @@ export async function POST(
   const body = await request.json().catch(() => ({}));
   const { reason } = body;
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return safeError('Service unavailable', 503);
 
   const { data: existing, error: fetchErr } = await db

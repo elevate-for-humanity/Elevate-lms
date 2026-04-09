@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { checkMOUStatusServer } from '@/lib/mou-checks';
@@ -30,7 +30,7 @@ async function _POST(req: NextRequest) {
   }
 
   // Resolve program holder ID from profiles (canonical table)
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: profile } = await db
     .from('profiles')
     .select('id, role')

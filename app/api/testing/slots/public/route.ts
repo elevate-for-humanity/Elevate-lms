@@ -11,7 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'public');
   if (rateLimited) return rateLimited;
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return safeError('Database unavailable', 500);
 
   const examType = req.nextUrl.searchParams.get('examType');

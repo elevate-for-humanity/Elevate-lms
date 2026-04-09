@@ -1,5 +1,4 @@
 
-import { createAdminClient } from '@/lib/supabase/admin';
 
 // =====================================================
 // INTAKE STAGE 3: APPLICATION

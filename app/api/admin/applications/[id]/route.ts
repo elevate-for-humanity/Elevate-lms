@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { ApplicationUpdateSchema } from '@/lib/validators/course';
 import { getApplication, updateApplication, deleteApplication, createEnrollment } from '@/lib/db/courses';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -17,7 +17,7 @@ async function requireAdmin() {
   if (!user) return { error: 'Unauthorized', status: 401 };
   // Use admin client for the profile lookup — session-based reads on profiles
   // can return null when RLS policies restrict the session JWT in Route Handlers.
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return { error: 'Database unavailable', status: 500 };
   const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
@@ -79,7 +79,7 @@ async function findOrCreateUser(
   firstName: string,
   lastName: string
 ): Promise<string | null> {
-  const adminClient = createAdminClient();
+  const adminClient = await getAdminClient();
   if (!adminClient) return null;
 
   const normalizedEmail = email.toLowerCase().trim();

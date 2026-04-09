@@ -9,7 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { sendEmail } from '@/lib/email';
@@ -31,7 +31,7 @@ export async function POST(
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) return safeError('Unauthorized', 401);
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: adminProfile } = await db
     .from('profiles')
     .select('role, full_name')

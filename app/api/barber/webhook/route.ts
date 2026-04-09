@@ -2,7 +2,7 @@ import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import Stripe from 'stripe';
 import { BARBER_PRICING, calculateWeeklyPayment } from '@/lib/programs/pricing';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -116,8 +116,8 @@ async function _POST(request: NextRequest) {
   }
 
   // Webhook handlers must use the admin (service role) client — there is no user session.
-  // createAdminClient() throws if env vars are missing, which is the correct behaviour.
-  const supabase = createAdminClient();
+  // await getAdminClient() throws if env vars are missing, which is the correct behaviour.
+  const supabase = await getAdminClient();
 
   try {
     switch (event.type) {
@@ -306,7 +306,7 @@ async function _POST(request: NextRequest) {
 
           // Run post-payment pipeline (enrollment, emails)
           if (applicationId) {
-            const adminDb = createAdminClient();
+            const adminDb = await getAdminClient();
             if (adminDb) {
               await runBarberPostPayment({
                 db: adminDb,
@@ -555,7 +555,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
 
           // Run post-payment pipeline (enrollment, onboarding + admin emails)
           if (applicationId) {
-            const adminDb = createAdminClient();
+            const adminDb = await getAdminClient();
             if (adminDb) {
               await runBarberPostPayment({
                 db: adminDb,
@@ -859,7 +859,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
 
         if (!failedCustomerId) break;
 
-        const db = createAdminClient();
+        const db = await getAdminClient();
 
         // 1. Mark enrollment as past_due and record failure timestamp
         const { data: sub } = await db

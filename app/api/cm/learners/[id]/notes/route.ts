@@ -19,7 +19,7 @@ async function _POST(
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabaseAdmin = createAdminClient();
+  const supabaseAdmin = await getAdminClient();
 
   try {
     const { id } = await params;
@@ -33,7 +33,7 @@ async function _POST(
       );
     }
 
-    const supabaseAdmin = createAdminClient();
+    const supabaseAdmin = await getAdminClient();
     const learnerId = id;
     const caseManagerId = user.id;
 

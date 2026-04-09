@@ -1,7 +1,7 @@
 import { cloneRepoForCustomer } from '@/lib/store/github-clone';
 import { hashLicenseKey } from '@/lib/store/license';
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { checkRateLimit } from '@/lib/rate-limit';
@@ -45,7 +45,7 @@ async function _POST(req: Request) {
       );
     }
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     if (!supabase) {
       return NextResponse.json(

@@ -1,5 +1,5 @@
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 // app/api/scorm/attempts/[attemptId]/data/route.ts
 import { NextResponse } from 'next/server';
@@ -19,7 +19,7 @@ async function _GET(
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const { attemptId } = await params;
   const session = await requireApiAuth();
 
@@ -54,7 +54,7 @@ async function _POST(
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const { attemptId } = await params;
   const session = await requireApiAuth();
   const { data } = await request.json();

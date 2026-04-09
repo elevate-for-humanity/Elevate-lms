@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     }
 
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const { email, reason } = await req.json();
 
   if (!email) {

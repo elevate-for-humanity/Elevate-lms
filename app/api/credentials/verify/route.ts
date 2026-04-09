@@ -1,5 +1,4 @@
 
-import { createAdminClient } from '@/lib/supabase/admin';
 
 // =====================================================
 // CREDENTIAL VERIFICATION API - PUBLIC

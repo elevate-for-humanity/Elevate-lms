@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from "@supabase/supabase-js";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";

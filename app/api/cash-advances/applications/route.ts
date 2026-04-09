@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 // app/api/cash-advances/applications/route.ts
 import { NextRequest, NextResponse } from 'next/server';
@@ -16,7 +16,7 @@ async function _GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     const searchParams = request.nextUrl.searchParams;
 
     // Get query parameters

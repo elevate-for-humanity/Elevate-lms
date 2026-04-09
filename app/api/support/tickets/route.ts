@@ -1,7 +1,7 @@
 import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { createClient, getAdminClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -39,7 +39,7 @@ async function _GET(request: NextRequest) {
       .eq('id', user.id)
       .single();
     
-    const adminClient = createAdminClient();
+    const adminClient = await getAdminClient();
 
     if (!adminClient) {
       return NextResponse.json(
@@ -94,7 +94,7 @@ async function _POST(request: NextRequest) {
     // Generate ticket number
     const ticketNumber = `TKT-${Date.now().toString(36).toUpperCase()}`;
     
-    const adminClient = createAdminClient();
+    const adminClient = await getAdminClient();
     const { data: ticket, error } = await adminClient
       .from('support_tickets')
       .insert({

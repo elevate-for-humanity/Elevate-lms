@@ -1,6 +1,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { providerApiGuard } from '@/lib/api/provider-guard';
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
   if (!email?.trim()) return safeError('Email is required', 400);
   if (!ALLOWED_ROLES.includes(role)) return safeError('Invalid role. Providers may only invite instructor or staff.', 400);
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return safeError('Service unavailable', 503);
 
   const { data: existingUser } = await db.auth.admin.getUserByEmail(email);

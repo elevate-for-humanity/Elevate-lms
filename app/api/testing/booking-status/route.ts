@@ -14,7 +14,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { safeError } from '@/lib/api/safe-error';
 import { CALENDLY_CONFIG } from '@/lib/testing/testing-config';
 import { withRuntime } from '@/lib/api/withRuntime';
@@ -51,7 +51,7 @@ export const GET = withRuntime(
     return NextResponse.json({ found: false });
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: booking } = await db
     .from('exam_bookings')
     .select('confirmation_code, exam_name, calendly_scheduling_url')

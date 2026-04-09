@@ -11,7 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { getAllBlueprints } from '@/lib/curriculum/blueprints';
 import { generateCourseFromBlueprint } from '@/lib/curriculum/generate-course-from-blueprint';
@@ -27,7 +27,7 @@ export async function POST(
   catch (e) { if (e instanceof Response) return e; return NextResponse.json({ error: 'Unauthorized' }, { status: 401 }); }
 
   const { courseId } = await params;
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   // Resolve course from canonical courses table (not training_courses)
   const { data: course, error: courseError } = await db

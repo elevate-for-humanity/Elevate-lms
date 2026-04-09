@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -31,7 +31,7 @@ async function _POST(req: Request) {
       status,
     } = body;
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     if (!supabase) {
       return NextResponse.json(
@@ -73,7 +73,7 @@ async function _GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     const { data, error }: any = await supabase
       .from('ojt_reimbursements')
@@ -101,7 +101,7 @@ async function _PATCH(req: Request) {
     const body = await req.json();
     const { id, status } = body;
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     const { data, error }: any = await supabase
       .from('ojt_reimbursements')

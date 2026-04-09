@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import {
   normalizeRapidsStatus,
   canTransitionRapidsStatus,
@@ -31,7 +31,7 @@ async function _POST(req: Request) {
 
     const safeStatus = normalizeRapidsStatus(status);
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     if (!supabase) {
       return NextResponse.json(

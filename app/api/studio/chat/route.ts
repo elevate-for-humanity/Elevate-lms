@@ -1,5 +1,5 @@
 import { logger } from '@/lib/logger';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -29,7 +29,7 @@ const userId = req.headers.get('x-user-id');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   
   let query = supabase
     .from('studio_chat_history')
@@ -106,7 +106,7 @@ Be concise, direct, and provide working code. Focus on the task at hand.`;
             
             // Save to history if user is authenticated
             if (userId && repo_id) {
-              const supabase = createAdminClient();
+              const supabase = await getAdminClient();
               const updatedMessages = [...messages, { role: 'assistant', content: fullContent }];
               
               if (session_id) {
@@ -162,7 +162,7 @@ Be concise, direct, and provide working code. Focus on the task at hand.`;
 
       // Save to history
       if (userId && repo_id) {
-        const supabase = createAdminClient();
+        const supabase = await getAdminClient();
         const updatedMessages = [...messages, { role: 'assistant', content }];
         
         if (session_id) {

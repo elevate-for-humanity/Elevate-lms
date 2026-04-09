@@ -1,5 +1,4 @@
 import { requireAdmin } from '@/lib/auth';
-import { createAdminClient } from '@/lib/supabase/admin';
 
 import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { PROGRAMS, buildSystemPrompt } from '@/lib/ai/programRegistry';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -117,7 +117,7 @@ async function _POST(req: NextRequest) {
   // Log request (no PII)
   async function logRequest(responseLength: number, blocked: string | null) {
     try {
-      const supabase = createAdminClient();
+      const supabase = await getAdminClient();
       if (!supabase) return;
       await supabase.from('public_ai_tutor_logs').insert({
         ip_hash: ipHash,

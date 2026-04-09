@@ -3,7 +3,7 @@
  * DELETE /api/admin/credentials/[credentialId] — soft-delete (is_active = false)
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { mapCredentialRow, type RawCredentialRow } from '@/lib/domain';
@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 async function requireAdmin() {
   const user = await getCurrentUser();
   if (!user) return null;
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: p } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!p || !['admin','super_admin','org_admin','staff'].includes(p.role)) return null;
   return user;
@@ -30,7 +30,7 @@ export async function PATCH(
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   // Pre-read: verify credential exists before updating
   const { data: existing, error: fetchError } = await db
@@ -74,7 +74,7 @@ export async function DELETE(
   const user = await requireAdmin();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   // Pre-read: verify credential exists before soft-deleting
   const { data: existing, error: fetchError } = await db

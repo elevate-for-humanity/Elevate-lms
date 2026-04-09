@@ -11,7 +11,7 @@
 
 import Stripe from 'stripe';
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { markPaymentSucceeded } from '@/lib/services/credential-pipeline';
 import { logger } from '@/lib/logger';
 import { hydrateProcessEnv } from '@/lib/secrets';
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) {
     logger.error('exam-payment webhook: database unavailable');
     return NextResponse.json({ error: 'Database unavailable' }, { status: 500 });

@@ -23,7 +23,7 @@ async function grantLmsAccess(
   stripeSessionId?: string,
   amountPaidCents?: number
 ): Promise<boolean> {
-  const adminDb = createAdminClient();
+  const adminDb = await getAdminClient();
   if (!adminDb) {
     logger.error('grantLmsAccess: no admin DB client');
     return false;
@@ -229,7 +229,7 @@ async function _POST(req: NextRequest) {
 
     // Fail-closed idempotency: record in webhook_events_processed before mutating state
     const supabaseForIdem = await createClient();
-    const dbIdem = createAdminClient();
+    const dbIdem = await getAdminClient();
     if (!dbIdem) throw new Error('Admin client failed to initialize');
     try {
       const { error: idemErr } = await dbIdem.from('webhook_events_processed').insert({
@@ -253,7 +253,7 @@ async function _POST(req: NextRequest) {
     } catch (idemCatchErr) {
       logger.error('FAIL-CLOSED: Idempotency insert threw, skipping store refund', idemCatchErr);
       // Best-effort retry log — dbIdem may not be available if this threw
-      try { const fallbackDb = createAdminClient(); if (fallbackDb) await fallbackDb.from('webhook_retry_log').insert({ provider: 'stripe', event_id: event.id, event_type: event.type, outcome: 'idempotency_failed', metadata: { source: 'store_webhook' } }); } catch (_) {}
+      try { const fallbackDb = await getAdminClient(); if (fallbackDb) await fallbackDb.from('webhook_retry_log').insert({ provider: 'stripe', event_id: event.id, event_type: event.type, outcome: 'idempotency_failed', metadata: { source: 'store_webhook' } }); } catch (_) {}
       return NextResponse.json({ received: true, skipped: true, reason: 'idempotency_unavailable' });
     }
 

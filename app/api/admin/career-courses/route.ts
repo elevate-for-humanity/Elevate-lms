@@ -27,7 +27,7 @@ async function _GET(request: Request) {
 const denied = await guardAdmin();
   if (denied) return denied;
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     if (!supabase) {
       return NextResponse.json(
@@ -67,7 +67,7 @@ async function _POST(req: Request) {
     const { action } = await req.json();
 
     if (action === 'sync-stripe') {
-      const supabase = createAdminClient();
+      const supabase = await getAdminClient();
 
     if (!supabase) {
       return NextResponse.json(

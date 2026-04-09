@@ -40,7 +40,7 @@ export async function GET(req: Request) {
       );
     }
 
-    const adminSupabase = createAdminClient();
+    const adminSupabase = await getAdminClient();
 
     if (!adminSupabase) {
       return NextResponse.json(

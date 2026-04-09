@@ -2,7 +2,7 @@
 // Admin/staff approves or rejects a provider program submission.
 // On approval, sets programs.is_published = true.
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAuditEvent, AuditActions } from '@/lib/audit';
@@ -27,7 +27,7 @@ export async function POST(
   }
 
   const { decision, review_notes } = body;
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
 
   // Fetch the approval record

@@ -11,7 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import Stripe from 'stripe';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { ENV } from '@/lib/api/env-groups';
@@ -49,7 +49,7 @@ export const POST = withRuntime(
 
     const { enforcementId, email } = parsed.data;
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return safeError('Database unavailable', 500);
 
   const { data: hold, error } = await db

@@ -14,7 +14,7 @@ async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const { tenantId, userId, eventType, payload, path } = await req.json();
 
   if (!eventType || !tenantId) {

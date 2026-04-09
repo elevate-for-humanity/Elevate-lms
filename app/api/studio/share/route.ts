@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -27,7 +27,7 @@ const code = req.nextUrl.searchParams.get('code');
     return NextResponse.json({ error: 'code required' }, { status: 400 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   
   // Get share and increment view count
   const { data, error } = await supabase
@@ -68,7 +68,7 @@ async function _POST(req: NextRequest) {
     return NextResponse.json({ error: 'repo_id and file_path required' }, { status: 400 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   
   const expiresAt = expires_in_hours 
     ? new Date(Date.now() + expires_in_hours * 60 * 60 * 1000).toISOString()
@@ -110,7 +110,7 @@ const userId = req.headers.get('x-user-id');
     return NextResponse.json({ error: 'id required' }, { status: 400 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const { error } = await supabase
     .from('studio_shares')
     .delete()

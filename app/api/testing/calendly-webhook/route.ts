@@ -17,7 +17,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { resend } from '@/lib/resend';
 import { sendSMS } from '@/lib/notifications/sms';
 import { logger } from '@/lib/logger';
@@ -163,7 +163,7 @@ export const POST = withRuntime(
     return NextResponse.json({ ok: true, skipped: 'not a testing event' });
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const inviteeName: string  = payload?.invitee?.name ?? 'Test-taker';
   const inviteeEmail: string = payload?.invitee?.email ?? '';

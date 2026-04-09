@@ -1,3 +1,4 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 /**
  * POST /api/admin/courses/generate/publish
  *
@@ -21,7 +22,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { getCurrentUser } from '@/lib/auth';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { runAlignmentAudit } from '@/lib/services/credential-alignment-audit';
 import { slugify } from '@/lib/course-utils';
@@ -147,7 +148,7 @@ async function checkCoverageGate(
   if (!isLivePublish) return null; // drafts bypass the gate
 
   // runAlignmentAudit takes slugs; resolve the program slug from the DB
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) {
     // DB client unavailable — infrastructure failure, fail open
     logger.error('coverage-gate: DB client unavailable, skipping audit', { programId });
@@ -300,7 +301,7 @@ async function publishCompiledDraft(
   draft: PublishDraft,
   userId: string,
   callerRole: string | null | undefined,
-  db: ReturnType<typeof createAdminClient>
+  db: SupabaseClient
 ): Promise<{ courseId: string; slug: string; lessonCount: number }> {
   ensureUniqueLessonTitles(draft);
   validateQuizAnswers(draft);
@@ -501,7 +502,7 @@ async function _POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
-    const db = createAdminClient();
+    const db = await getAdminClient();
 
     const callerRole = user.profile?.role ?? null;
 

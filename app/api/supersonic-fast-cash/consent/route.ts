@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
   const user_agent = request.headers.get('user-agent') || 'unknown';
 
   // Write via service role (bypasses RLS — client cannot self-insert)
-  const admin = createAdminClient();
+  const admin = await getAdminClient();
   if (!admin) return safeInternalError(new Error('Admin client unavailable'), 'Service unavailable');
   const { error: insertError } = await admin
     .from('client_consents')
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
     return safeError('Authentication required', 401);
   }
 
-  const admin = createAdminClient();
+  const admin = await getAdminClient();
   if (!admin) return safeInternalError(new Error('Admin client unavailable'), 'Service unavailable');
   const { data, error } = await admin
     .from('client_consents')

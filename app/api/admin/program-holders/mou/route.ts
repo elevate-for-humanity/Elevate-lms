@@ -1,6 +1,5 @@
 import { requireAdmin } from '@/lib/auth';
 
-import { createAdminClient } from '@/lib/supabase/admin';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';

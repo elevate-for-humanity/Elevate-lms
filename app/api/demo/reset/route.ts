@@ -5,7 +5,7 @@ import { logger } from '@/lib/logger';
  */
 
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/server';
 import { isDemoEnabled, getDemoTenantSlug } from '@/lib/demo/context';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -32,7 +32,7 @@ async function _POST(request: Request) {
       );
     }
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     if (!supabase) {
       return NextResponse.json(

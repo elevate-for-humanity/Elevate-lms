@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
@@ -59,7 +59,7 @@ async function _POST(req: NextRequest) {
 
   // Get related data
   try {
-    const adminDb = createAdminClient();
+    const adminDb = await getAdminClient();
     const [learnerAuth, courseResult, programResult] = await Promise.all([
       adminDb.auth.admin.getUserById(app.user_id),
       supabase

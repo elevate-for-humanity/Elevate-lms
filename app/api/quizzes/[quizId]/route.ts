@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
@@ -28,7 +28,7 @@ async function _GET(
     }
 
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     const { quizId } = await params;
 
     // Fetch quiz details
@@ -75,7 +75,7 @@ async function _POST(
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     const { quizId } = await params;
     const body = await parseBody<Record<string, any>>(request);
     const { userId, enrollmentId, answers, timeTakenSeconds } = body;

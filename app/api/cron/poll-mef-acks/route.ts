@@ -6,7 +6,7 @@
 // MeF lifecycle: submitted → transmitted → accepted | rejected
 // IRS does not push ACKs — the transmitter must poll.
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { createTransmitter } from '@/lib/tax-software/mef/transmission';
@@ -45,7 +45,7 @@ async function _GET(request: Request) {
     );
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) {
     return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
   }

@@ -1,7 +1,7 @@
 import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import Stripe from 'stripe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -19,7 +19,7 @@ async function _POST(req: Request) {
     }
 
     const stripe = getStripe();
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     if (!supabase) {
       return NextResponse.json(

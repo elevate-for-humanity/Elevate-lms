@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import { logger } from '@/lib/logger';
@@ -17,7 +17,7 @@ async function _POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const adminClient = createAdminClient();
+  const adminClient = await getAdminClient();
   if (!adminClient) return NextResponse.json({ error: 'Server error' }, { status: 500 });
 
   const { data: prof } = await adminClient

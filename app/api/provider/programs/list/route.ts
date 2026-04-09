@@ -2,7 +2,7 @@
 // Returns provider_program_approvals for the caller's tenant (provider_admin)
 // or all approvals (admin/super_admin/staff).
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
   const auth = await apiAuthGuard();
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
 
   const { searchParams } = new URL(req.url);

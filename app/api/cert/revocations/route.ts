@@ -1,5 +1,4 @@
 import { cookies } from 'next/headers';
-import { createAdminClient } from '@/lib/supabase/admin';
 
 import { createRouteHandlerClient } from '@/lib/auth';
 import { toErrorMessage } from '@/lib/safe';

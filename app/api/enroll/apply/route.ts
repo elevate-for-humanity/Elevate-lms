@@ -83,7 +83,7 @@ async function _POST(req: Request) {
     // If no authenticated user, create a lead record
     if (!studentId) {
       // Use admin client to bypass RLS for public form submission
-      const adminClient = createAdminClient();
+      const adminClient = await getAdminClient();
 
     if (!adminClient) {
       return NextResponse.json(

@@ -1,3 +1,4 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 /**
  * POST /api/jobs/process
  *
@@ -16,7 +17,7 @@
 
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import type { CertificateIssuedPayload } from '@/lib/jobs/enqueue';
 import { hydrateProcessEnv } from '@/lib/secrets';
@@ -45,7 +46,7 @@ function isAuthorized(req: NextRequest): boolean {
 // ── Job handlers ──────────────────────────────────────────────────────────
 
 async function handleCertificateIssued(
-  db: ReturnType<typeof createAdminClient>,
+  db: SupabaseClient,
   payload: CertificateIssuedPayload
 ): Promise<void> {
   const { certificateId, learnerId, learnerEmail, learnerName, credentialName, certificateUrl } = payload;
@@ -94,7 +95,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const now = new Date().toISOString();
 
   // Claim a batch of pending jobs due for processing.

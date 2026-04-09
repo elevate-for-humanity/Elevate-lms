@@ -13,9 +13,6 @@ import path from "node:path";
 // ─────────────────────────────────────────────────────────────────────────────
 {
   const APP_DIR = path.join(process.cwd(), "app");
-  // app/api/ routes are tracked separately — many use withRuntime/withApiAudit wrappers.
-  // Scope this guard to server components, layouts, and server actions only.
-  const API_DIR = path.join(process.cwd(), "app/api");
   const EXTS = new Set([".ts", ".tsx"]);
   const IGNORE = new Set(["node_modules", ".git", ".next", "dist", "build"]);
 
@@ -24,8 +21,6 @@ import path from "node:path";
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       if (IGNORE.has(entry.name)) continue;
       const full = path.join(dir, entry.name);
-      // Skip app/api — covered by a separate audit pass
-      if (full === API_DIR) continue;
       if (entry.isDirectory()) out.push(...walkApp(full));
       else if (EXTS.has(path.extname(entry.name))) out.push(full);
     }

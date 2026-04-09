@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -54,9 +53,8 @@ const SCHEDULE_OPTIONS = [
 async function confirmSchedule(formData: FormData) {
   'use server';
   const { createClient: createServerClient } = await import('@/lib/supabase/server');
-  const { createAdminClient: createAdmin } = await import('@/lib/supabase/admin');
   const supabase = await createServerClient();
-  const admin = createAdmin();
+  const admin = await getAdminClient();
   const db = admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');

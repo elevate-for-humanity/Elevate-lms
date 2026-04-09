@@ -591,6 +591,13 @@ export async function submitStudentApplication(data: StudentApplicationData) {
     const needsWorkOne = ['workone', 'workforce_ready_grant'].includes(requestedSource)
       && !data.hasWorkOneApproval;
 
+    const elig = data.eligibilityData;
+    const eligStatus = elig?.eligibilityStatus ?? 'incomplete';
+    const fundingStatus = (elig?.hasSnap || elig?.hasTanf || elig?.hasReferral)
+      ? 'pending' : (elig?.otherFundingSource ? 'pending' : 'none');
+    const readinessStatus = eligStatus === 'eligible' ? 'ready'
+      : eligStatus === 'conditional_review' ? 'conditional' : 'not_ready';
+
     const { error: updateErr } = await supabase
       .from('applications')
       .update({
@@ -603,12 +610,55 @@ export async function submitStudentApplication(data: StudentApplicationData) {
         workone_approval_ref:       data.workoneApprovalRef ?? null,
         recommended_funding_source: data.eligibilityData?.recommended ?? requestedSource,
         eligibility_data:           data.eligibilityData ?? null,
-        eligibility_status:         needsWorkOne ? 'pending_workone' : 'pending',
+        eligibility_status:         needsWorkOne ? 'pending_workone' : eligStatus,
+        funding_status:             fundingStatus,
+        readiness_status:           readinessStatus,
+        support_needs_transport:    elig?.supportNeedsTransport ?? false,
+        support_needs_other:        elig?.supportNeedsOther ?? false,
+        case_manager_name:          elig?.caseManagerName ?? null,
+        case_manager_email:         elig?.caseManagerEmail ?? null,
+        referral_source:            elig?.referralSource ?? null,
         eligibility_evaluated_at:   new Date().toISOString(),
-        // Hold WorkOne applications — don't auto-approve until WorkOne confirms
         status:                     needsWorkOne ? 'pending_workone' : 'submitted',
       })
       .eq('id', result.applicationId);
+
+    // Insert structured eligibility review record
+    if (elig && !updateErr) {
+      await supabase.from('application_eligibility_reviews').insert({
+        application_id:             result.applicationId,
+        funding_snap:               elig.hasSnap,
+        funding_tanf:               elig.hasTanf,
+        referral_partner:           elig.hasReferral,
+        referral_source:            elig.referralSource || null,
+        case_manager_name:          elig.caseManagerName || null,
+        case_manager_email:         elig.caseManagerEmail || null,
+        other_funding_source:       elig.otherFundingSource || null,
+        age_confirmed:              elig.isAdult,
+        indiana_resident:           elig.isIndianaResident,
+        education_level:            elig.educationLevel || null,
+        has_diploma_or_ged:         elig.hasDiplomaOrGed,
+        enrolled_in_ged_program:    elig.enrolledInGed,
+        work_authorized:            elig.workAuthorized,
+        active_warrant:             elig.activeWarrant,
+        pending_charges:            elig.pendingCharges,
+        probation_or_parole:        elig.onProbationParole,
+        legal_notes:                elig.legalNotes || null,
+        can_attend_schedule:        elig.canAttendSchedule,
+        has_transportation_plan:    elig.hasTransportationPlan,
+        can_meet_physical:          elig.canMeetPhysical,
+        willing_to_follow_rules:    elig.willingToFollowRules,
+        willing_job_readiness:      elig.willingJobReadiness,
+        unavailable_times:          elig.unavailableTimes || null,
+        motivation:                 elig.motivation || null,
+        support_needs_transport:    elig.supportNeedsTransport ?? false,
+        support_needs_other:        elig.supportNeedsOther ?? false,
+        agrees_attendance_policy:   elig.agreesAttendance,
+        agrees_verification_policy: elig.agreesVerification,
+        eligibility_status:         eligStatus,
+        eligibility_reason_codes:   elig.eligibilityReasonCodes ?? [],
+      });
+    }
 
     if (updateErr) {
       logger.error('[Apply] Failed to persist funding eligibility fields', updateErr);

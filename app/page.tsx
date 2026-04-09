@@ -47,7 +47,7 @@ export default function HomePage() {
               Elevate for Humanity connects individuals to funded training programs, industry-recognized credentials, and real employment opportunities through a structured workforce pipeline.
             </p>
             <p className="text-white/80 text-sm leading-relaxed mb-6">
-              No upfront cost for eligible participants. Programs are designed to move individuals from enrollment to employment — fast.
+              No upfront cost for eligible participants. Training is only part of the solution — we also help participants navigate funding, transportation-related barriers, and supportive services that make completion possible.
             </p>
             <ul className="space-y-2 mb-8">
               {[
@@ -55,6 +55,7 @@ export default function HomePage() {
                 'Structured, outcome-driven training pathways',
                 'Certification application and exam preparation support',
                 'DOL Registered Apprenticeship Sponsor · ETPL listed',
+                'Help navigating transportation, barrier-removal, and supportive services when available',
               ].map((b) => (
                 <li key={b} className="flex items-start gap-2 text-sm text-white">
                   <span className="text-brand-red-400 font-bold flex-shrink-0">✔</span>
@@ -64,7 +65,7 @@ export default function HomePage() {
             </ul>
             <div className="flex flex-col sm:flex-row flex-wrap gap-3">
               <Link href="/apply" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3.5 rounded-lg transition-colors text-sm sm:text-base text-center">
-                Apply for Training
+                Check Eligibility &amp; Apply
               </Link>
               <Link href="/partnerships" className="border-2 border-white text-white font-bold px-6 py-3.5 rounded-lg hover:bg-white/10 transition-colors text-sm sm:text-base text-center">
                 Partner With Us
@@ -160,12 +161,13 @@ export default function HomePage() {
           <p className="text-slate-500 text-sm text-center mb-12 max-w-2xl mx-auto">
             Elevate for Humanity is not just a training provider. We operate as a workforce pipeline, ensuring participants don&apos;t just start programs — they complete them and move into careers.
           </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               { img: '/images/pages/about-career-training.jpg',      title: 'Funding Navigation',         desc: 'WIOA and workforce program eligibility support from day one.' },
               { img: '/images/pages/admin-certifications-hero.jpg',  title: 'Outcome-Driven Pathways',    desc: 'Structured programs with clear timelines, milestones, and completion requirements.' },
               { img: '/images/pages/barber-apprentice-learning.jpg', title: 'Certification Preparation',  desc: 'Exam readiness support and credential application guidance included.' },
               { img: '/images/pages/about-employer-partners.jpg',    title: 'Employer Connections',       desc: 'Participants are connected to employer partners and workforce opportunities upon completion.' },
+              { img: '/images/pages/about-career-training.jpg',      title: 'Supportive Services',        desc: 'We help eligible participants navigate barrier-removal support such as transportation assistance, work supplies, and other approved supportive services through workforce partners when available.' },
             ].map((w) => (
               <div key={w.title} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
                 <div className="relative h-36 w-full">
@@ -297,7 +299,7 @@ export default function HomePage() {
             </p>
             <div className="flex flex-wrap gap-4 justify-center mb-8">
               <Link href="/apply" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-lg font-bold text-lg transition-colors">
-                Apply for Training
+                Check Eligibility &amp; Apply
               </Link>
               <Link href="/programs" className="border-2 border-white text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition-colors">
                 Explore Programs

@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
 import { getRuntimeReadiness } from '@/lib/tax-software/config/runtime-readiness';
 
 export const runtime = 'nodejs';
@@ -58,7 +59,7 @@ async function _GET(req: Request) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const db = createAdminClient() ?? supabase;
+    const db = await getAdminClient();
 
     // Run all queries in parallel with individual timeouts
     const [
@@ -230,4 +231,4 @@ async function _GET(req: Request) {
   }
 }
 
-export const GET = withApiAudit('/api/monitoring/bundle', _GET);
+export const GET = withRuntime(withApiAudit('/api/monitoring/bundle', _GET));

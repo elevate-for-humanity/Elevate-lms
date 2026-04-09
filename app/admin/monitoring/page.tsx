@@ -327,7 +327,9 @@ export default function MonitoringDashboard() {
                 <div>
                   <div className="text-sm text-black">Error Rate</div>
                   <div className="text-2xl font-bold text-brand-red-600">
-                    {((status.metrics.requests.errors / status.metrics.requests.total) * 100).toFixed(2)}%
+                    {status.metrics.requests.total > 0
+                      ? ((status.metrics.requests.errors / status.metrics.requests.total) * 100).toFixed(2)
+                      : '0.00'}%
                   </div>
                 </div>
                 <div>
@@ -355,7 +357,9 @@ export default function MonitoringDashboard() {
                 <div>
                   <div className="text-sm text-black">Block Rate</div>
                   <div className="text-2xl font-bold text-brand-orange-600">
-                    {((status.metrics.rateLimits.blocked / (status.metrics.rateLimits.blocked + status.metrics.rateLimits.allowed)) * 100).toFixed(2)}%
+                    {(status.metrics.rateLimits.blocked + status.metrics.rateLimits.allowed) > 0
+                      ? ((status.metrics.rateLimits.blocked / (status.metrics.rateLimits.blocked + status.metrics.rateLimits.allowed)) * 100).toFixed(2)
+                      : '0.00'}%
                   </div>
                 </div>
               </div>

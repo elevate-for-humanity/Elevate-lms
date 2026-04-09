@@ -1,9 +1,10 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -19,7 +20,7 @@ async function _GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0', 10);
 
     const supabase = await createClient();
-  const db = createAdminClient() ?? supabase;
+    const db = await getAdminClient();
 
     // Check if user is admin
     const { data: { user } } = await supabase.auth.getUser();
@@ -75,4 +76,4 @@ async function _GET(request: NextRequest) {
     }, { status: 500 });
   }
 }
-export const GET = withApiAudit('/api/admin/monitoring/errors', _GET);
+export const GET = withRuntime(withApiAudit('/api/admin/monitoring/errors', _GET));

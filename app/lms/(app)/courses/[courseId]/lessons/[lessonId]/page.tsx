@@ -1130,7 +1130,7 @@ export default function LessonPage() {
               />
             ) : (
               <div className="bg-slate-100 rounded-xl flex items-center justify-center h-48 text-slate-400 text-sm">
-                Video coming soon
+                Video not yet available for this lesson
               </div>
             )}
             {lesson.content && (
@@ -1362,7 +1362,7 @@ export default function LessonPage() {
                           />
                         ) : (
                           <div className="bg-slate-100 rounded-xl flex items-center justify-center h-48 text-slate-400 text-sm">
-                            Video coming soon
+                            Video not yet available for this lesson
                           </div>
                         )
                       ) : lesson.video_url ? (

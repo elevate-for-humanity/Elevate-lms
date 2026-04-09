@@ -285,48 +285,147 @@ export default function MesmerizedByBeautyPage() {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ─────────────────────────────────────────────── */}
+      {/* ── EARN WHILE YOU LEARN ─────────────────────────────────────── */}
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <p className="text-purple-600 font-semibold text-sm uppercase tracking-widest mb-3">Enrollment Process</p>
-            <h2 className="text-3xl font-black text-slate-900 mb-4">How it works</h2>
+          <div className="text-center mb-10">
+            <p className="text-purple-600 font-semibold text-sm uppercase tracking-widest mb-3">Registered Apprenticeship</p>
+            <h2 className="text-3xl font-black text-slate-900 mb-4">You get paid while you train</h2>
             <p className="text-slate-600 max-w-xl mx-auto">
-              Students enroll through Mesmerized by Beauty first, then are placed at a licensed partner salon for their apprenticeship hours.
+              This is not a traditional school where you pay tuition and wait. As a DOL Registered Apprentice, you are placed at a licensed salon and earn wages from day one.
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid sm:grid-cols-3 gap-5 mb-10">
             {[
               {
-                step: '01',
-                title: 'Apply here',
-                desc: 'Submit your application for cosmetology, esthetician, or nail tech. Free to apply.',
+                icon: '💵',
+                title: 'Earn wages immediately',
+                desc: 'You are employed at a partner salon from day one. Your training hours are paid work hours.',
               },
               {
-                step: '02',
-                title: 'Admissions interview',
-                desc: 'Our team reviews your application and schedules a brief interview within 2–3 business days.',
+                icon: '🚗',
+                title: 'Transportation support',
+                desc: 'Through our partnership with Impact, eligible apprentices can access car repair assistance and transportation support so getting to work is never a barrier.',
               },
               {
-                step: '03',
-                title: 'Salon placement',
-                desc: 'Once accepted, you are placed at a licensed partner salon for your hands-on apprenticeship hours.',
-              },
-              {
-                step: '04',
-                title: 'Train & get licensed',
-                desc: 'Complete your required hours, pass the Indiana IPLA exam, and earn your state license.',
+                icon: '📋',
+                title: 'No tuition debt',
+                desc: 'Workforce funding (WIOA) may cover your program costs. We help you apply — most students pay nothing out of pocket.',
               },
             ].map((item) => (
-              <div key={item.step} className="text-center">
-                <div className="w-14 h-14 bg-purple-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-4 text-lg font-black">
-                  {item.step}
-                </div>
+              <div key={item.title} className="bg-purple-50 border border-purple-100 rounded-2xl p-6 text-center">
+                <div className="text-3xl mb-3">{item.icon}</div>
                 <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
+                <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
+          </div>
+
+          {/* Eligibility pre-check */}
+          <div className="bg-slate-900 rounded-2xl p-7">
+            <div className="text-center mb-6">
+              <h3 className="text-xl font-black text-white mb-2">Are you eligible?</h3>
+              <p className="text-slate-400 text-sm">Most people qualify. Check the basics before you apply.</p>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-3 mb-6">
+              {[
+                { check: 'Age 16 or older', note: 'No upper age limit' },
+                { check: 'High school diploma or GED', note: 'Or currently enrolled' },
+                { check: 'Authorized to work in the US', note: 'Citizen, resident, or work visa' },
+                { check: 'Able to commit to training schedule', note: 'Full-time or part-time tracks available' },
+                { check: 'No prior cosmetology license required', note: 'Beginners welcome' },
+                { check: 'Indiana resident preferred', note: 'Out-of-state applicants considered' },
+              ].map((item) => (
+                <div key={item.check} className="flex items-start gap-3 bg-white/5 rounded-xl px-4 py-3">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-white text-sm font-semibold">{item.check}</p>
+                    <p className="text-slate-400 text-xs">{item.note}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-center text-slate-400 text-sm">
+              Not sure if you qualify?{' '}
+              <a href="mailto:mesmerizedbybeautyl@yahoo.com" className="text-purple-400 hover:text-purple-300 font-semibold">
+                Email us before applying
+              </a>{' '}
+              — we will tell you honestly.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── HOW IT WORKS + TIMELINE ──────────────────────────────────────── */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <p className="text-purple-600 font-semibold text-sm uppercase tracking-widest mb-3">Enrollment Process</p>
+            <h2 className="text-3xl font-black text-slate-900 mb-4">What happens after you apply</h2>
+            <p className="text-slate-600 max-w-xl mx-auto">
+              From application to first paid shift — here is the exact timeline.
+            </p>
+          </div>
+
+          <div className="relative">
+            {/* Vertical line */}
+            <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-purple-100 hidden sm:block" />
+
+            <div className="space-y-6">
+              {[
+                {
+                  step: '01',
+                  time: 'Today',
+                  title: 'Submit your application',
+                  desc: 'Free to apply. Takes 3 minutes. You will receive a confirmation email immediately.',
+                  color: 'bg-purple-600',
+                },
+                {
+                  step: '02',
+                  time: 'Within 2–3 business days',
+                  title: 'Admissions interview',
+                  desc: 'A quick call or in-person visit at 8325 Michigan Road. We review your goals, answer your questions, and confirm your program choice.',
+                  color: 'bg-purple-600',
+                },
+                {
+                  step: '03',
+                  time: 'Within 1 week of acceptance',
+                  title: 'Funding & paperwork',
+                  desc: 'We help you apply for WIOA workforce funding if eligible. DOL apprenticeship registration is completed. Most students pay nothing out of pocket.',
+                  color: 'bg-purple-600',
+                },
+                {
+                  step: '04',
+                  time: 'Week 2–3',
+                  title: 'Salon placement',
+                  desc: 'You are matched with a licensed partner salon near you. Your schedule is set. Transportation support through Impact is arranged if needed.',
+                  color: 'bg-purple-600',
+                },
+                {
+                  step: '05',
+                  time: 'Week 3–4',
+                  title: 'First paid shift',
+                  desc: 'You start training and earning. Access the Elevate LMS for theory coursework on your phone. Your supervisor logs and approves your hours weekly.',
+                  color: 'bg-emerald-600',
+                },
+              ].map((item) => (
+                <div key={item.step} className="flex gap-5 sm:gap-8 items-start">
+                  <div className={`w-12 h-12 ${item.color} text-white rounded-2xl flex items-center justify-center flex-shrink-0 font-black text-sm z-10`}>
+                    {item.step}
+                  </div>
+                  <div className="flex-1 bg-white rounded-2xl border border-slate-200 p-5">
+                    <div className="flex flex-wrap items-center gap-3 mb-2">
+                      <h3 className="font-bold text-slate-900">{item.title}</h3>
+                      <span className="text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200 px-2.5 py-1 rounded-full">
+                        {item.time}
+                      </span>
+                    </div>
+                    <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

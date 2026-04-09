@@ -15,22 +15,11 @@ import {
   Lock, AlertCircle, Loader2, TrendingUp, Star,
   ChevronRight, ExternalLink,
 } from 'lucide-react';
+import type { ApprenticeProgressResponse } from '@/lib/api/apprentice-progress-contract';
+import { validateProgressResponse } from '@/lib/api/apprentice-progress-contract';
 
-interface ProgressData {
-  totalHoursApproved: number;
-  totalHoursPending: number;
-  requiredHours: number;
-  transferHours: number;
-  lmsCompleted: boolean;
-  lmsProgressPct: number;
-  practicalSkillsVerified: boolean;
-  checkpointsPassed: number;
-  checkpointsTotal: number;
-  programLabel: string;
-  partnerShopName?: string;
-  weeklyAvgHours?: number;
-  projectedCompletionDate?: string;
-}
+// Alias for component use — no optional fields, no fallbacks
+type ProgressData = ApprenticeProgressResponse;
 
 interface MilestoneProps {
   pct: number;
@@ -88,11 +77,22 @@ export default function ApprenticeProgress({
     try {
       const res = await fetch(apiPath);
       if (res.status === 401) { setAuthError(true); return; }
-      if (!res.ok) throw new Error('Failed to load');
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error ?? `Server error ${res.status}`);
+      }
       const json = await res.json();
-      setData(json.progress ?? json);
-    } catch {
-      setError('Could not load your progress.');
+
+      // Strict contract validation — no silent fallbacks
+      const violation = validateProgressResponse(json);
+      if (violation) {
+        throw new Error(`Progress data is invalid: ${violation}`);
+      }
+
+      setData(json as ProgressData);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Could not load your progress.';
+      setError(msg);
     } finally {
       setLoading(false);
     }

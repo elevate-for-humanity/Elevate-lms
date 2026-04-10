@@ -19,9 +19,12 @@ export function AIAssistantBubble() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Only show the welcome bubble once per session
+    if (sessionStorage.getItem('ai-bubble-shown')) return;
     const timer = setTimeout(() => {
       setShowWelcome(true);
-    }, 3000);
+      sessionStorage.setItem('ai-bubble-shown', '1');
+    }, 8000);
     return () => clearTimeout(timer);
   }, []);
 

@@ -171,7 +171,7 @@ export default async function SignMOUPage() {
             <p>This Memorandum of Understanding (<strong>&quot;MOU&quot;</strong>) is entered into between <strong>2Exclusive LLC-S, doing business as Elevate for Humanity Technical and Career Institute</strong> (<strong>&quot;Sponsor&quot;</strong>), a DOL Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301), and the Employer Training Site identified below (<strong>&quot;Employer&quot;</strong>).</p>
 
             <h3 className="text-base font-bold text-black mt-6 mb-2">1. Purpose</h3>
-            <p>This MOU establishes the terms under which the Employer will serve as a training site for the Sponsor&apos;s DOL Registered {mouType === 'cosmetology' ? 'Cosmetology' : 'Barber'} Apprenticeship Program. This agreement is governed by the Standards of Apprenticeship registered with the U.S. Department of Labor, Office of Apprenticeship, pursuant to 29 CFR Parts 29 and 30.</p>
+            <p>This MOU establishes the terms under which the Employer will serve as a training site for the Sponsor&apos;s DOL Registered {mouKey === 'cosmetology' ? 'Cosmetology' : 'Barber'} Apprenticeship Program. This agreement is governed by the Standards of Apprenticeship registered with the U.S. Department of Labor, Office of Apprenticeship, pursuant to 29 CFR Parts 29 and 30.</p>
 
             <h3 className="text-base font-bold text-black mt-6 mb-2">2. Employer Responsibilities</h3>
             <ul className="list-disc pl-6 space-y-2">

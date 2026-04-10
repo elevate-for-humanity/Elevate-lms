@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
       let redirectTo = next;
 
       if (type === 'signup' || type === 'email') {
+        // Default for learners — may be overridden below based on role
         redirectTo = '/learner/dashboard?verified=true';
 
         // Link any pre-payment program_enrollments rows (user paid before
@@ -134,6 +135,25 @@ export async function GET(request: NextRequest) {
         } catch (err: any) {
           // Non-fatal — enrollment-success page has its own email-linking fallback
           logger.error('[auth/confirm] enrollment linking threw', { error: err?.message });
+        }
+
+        // Role-based redirect override — program holders land on onboarding, not learner dashboard.
+        // This handles magic links sent by sendProgramHolderWelcomeEmail.
+        try {
+          const db = await getAdminClient();
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user && db) {
+            const { data: profile } = await db
+              .from('profiles')
+              .select('role')
+              .eq('id', user.id)
+              .single();
+            if (profile?.role === 'program_holder') {
+              redirectTo = '/program-holder/onboarding';
+            }
+          }
+        } catch {
+          // Non-fatal — fall through to default redirect
         }
       } else if (type === 'recovery') {
         // Use the next param set by sendRecoveryEmail's redirectTo option.

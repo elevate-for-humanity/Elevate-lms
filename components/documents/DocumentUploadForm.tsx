@@ -102,8 +102,20 @@ export function DocumentUploadForm({ requirements }: Props) {
       }
 
       setSuccess(true);
+      // Redirect to the correct documents page based on role
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      let dest = '/learner/dashboard';
+      if (currentUser) {
+        const { data: prof } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', currentUser.id)
+          .single();
+        if (prof?.role === 'program_holder') dest = '/program-holder/documents';
+        else if (prof?.role === 'student' || prof?.role === 'learner') dest = '/learner/dashboard';
+      }
       setTimeout(() => {
-        router.push('/student/documents');
+        router.push(dest);
       }, 2000);
     } catch (err: any) {
       setError('Failed to upload document');

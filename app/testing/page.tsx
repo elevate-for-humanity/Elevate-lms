@@ -101,12 +101,12 @@ export default function TestingPage() {
             {ACTIVE_PROVIDERS.map((provider) => (
               <div key={provider.key} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
                 <div className="grid lg:grid-cols-3">
-                  <div className="relative h-52 lg:h-auto overflow-hidden">
+                  <div className="relative h-64 sm:h-80 lg:h-full min-h-[280px] overflow-hidden">
                     <Image
                       src={PROVIDER_IMAGES[provider.key] || '/images/pages/career-services-page-1.jpg'}
                       alt={provider.name}
                       fill
-                      className="object-cover"
+                      className="object-cover object-center"
                       sizes="(max-width: 1024px) 100vw, 33vw"
                     />
                   </div>
@@ -240,15 +240,23 @@ export default function TestingPage() {
           <h2 className="text-3xl font-black text-slate-900 mb-8 text-center">How Testing Works</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { step: '1', title: 'Book Your Seat', desc: 'Select your exam and preferred date. Pay the exam fee at booking to reserve your seat. Appointments required — walk-ins are not accepted.' },
-              { step: '2', title: 'Arrive Prepared', desc: 'Arrive at least 15 minutes early. Bring a valid government-issued photo ID. No ID, no exam — no exceptions.' },
-              { step: '3', title: 'Take the Exam', desc: 'All exams are proctored. No phones or outside materials unless explicitly permitted by the provider.' },
-              { step: '4', title: 'Receive Your Credential', desc: 'Results and credentials are issued directly by the certifying body. Elevate records your outcome for your training record.' },
+              { step: '1', title: 'Book Your Seat',        img: '/images/pages/academic-calendar-hero.jpg',    desc: 'Select your exam and preferred date. Pay the exam fee at booking to reserve your seat. Appointments required — walk-ins are not accepted.' },
+              { step: '2', title: 'Arrive Prepared',       img: '/images/pages/apply-page-1.jpg',              desc: 'Arrive at least 15 minutes early. Bring a valid government-issued photo ID. No ID, no exam — no exceptions.' },
+              { step: '3', title: 'Take the Exam',         img: '/images/pages/testing-page-1.jpg',            desc: 'All exams are proctored. No phones or outside materials unless explicitly permitted by the provider.' },
+              { step: '4', title: 'Receive Your Credential', img: '/images/pages/certificates-page-1.jpg',     desc: 'Results and credentials are issued directly by the certifying body. Elevate records your outcome for your training record.' },
             ].map((s) => (
-              <div key={s.step} className="bg-white rounded-xl p-5 border border-slate-200">
-                <div className="w-8 h-8 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold text-sm mb-3">{s.step}</div>
-                <h3 className="font-bold text-slate-900 mb-1 text-sm">{s.title}</h3>
-                <p className="text-slate-600 text-xs leading-relaxed">{s.desc}</p>
+              <div key={s.step} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                <div className="relative h-40 w-full">
+                  <Image src={s.img} alt={s.title} fill className="object-cover object-center" sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 25vw" />
+                  <div className="absolute inset-0 bg-brand-blue-900/50" />
+                  <div className="absolute top-3 left-3 w-8 h-8 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold text-sm border-2 border-white">
+                    {s.step}
+                  </div>
+                </div>
+                <div className="p-4">
+                  <h3 className="font-bold text-slate-900 mb-1 text-sm">{s.title}</h3>
+                  <p className="text-slate-600 text-xs leading-relaxed">{s.desc}</p>
+                </div>
               </div>
             ))}
           </div>

@@ -5,54 +5,92 @@ import fs from "node:fs";
 import path from "node:path";
 
 // ── createAdminClient() cold-start guard ─────────────────────────────────────
-// createAdminClient() is synchronous and throws on cold serverless starts when
-// SUPABASE_SERVICE_ROLE_KEY is not yet hydrated. All request-time code in app/
-// must use getAdminClient() instead. This check enforces that at CI time.
+// Two rules enforced:
 //
-// Allowed locations (not in app/): lib/, scripts/, instrumentation.ts
+// Rule 1 — app/ (banned entirely):
+//   createAdminClient() throws on cold starts before env hydration.
+//   All app/ code must use getAdminClient() instead.
+//
+// Rule 2 — lib/auth/, lib/api/, lib/middleware/ (require SAFE: annotation):
+//   These lib/ dirs are directly called from request handlers. Any
+//   createAdminClient() call there must have a preceding line comment:
+//     // SAFE: <reason why hydration is guaranteed>
+//   Without it, the call is presumed unsafe and blocks CI.
+//
+// Remaining lib/ call sites outside these dirs are not checked here.
+// They carry accepted risk documented in the migration notes.
 // ─────────────────────────────────────────────────────────────────────────────
 {
-  const APP_DIR = path.join(process.cwd(), "app");
-  const EXTS = new Set([".ts", ".tsx"]);
-  const IGNORE = new Set(["node_modules", ".git", ".next", "dist", "build"]);
+  const _ROOT = process.cwd();
+  const APP_DIR = path.join(_ROOT, "app");
+  const REQUEST_TIME_LIB_DIRS = ["lib/auth", "lib/api", "lib/middleware"]
+    .map((d) => path.join(_ROOT, d))
+    .filter((d) => fs.existsSync(d));
+  const _EXTS = new Set([".ts", ".tsx"]);
+  const _IGNORE = new Set(["node_modules", ".git", ".next", "dist", "build"]);
 
-  function walkApp(dir) {
+  function walkGuard(dir) {
     const out = [];
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (IGNORE.has(entry.name)) continue;
+      if (_IGNORE.has(entry.name)) continue;
       const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) out.push(...walkApp(full));
-      else if (EXTS.has(path.extname(entry.name))) out.push(full);
+      if (entry.isDirectory()) out.push(...walkGuard(full));
+      else if (_EXTS.has(path.extname(entry.name))) out.push(full);
+    }
+    return out;
+  }
+
+  function findViolations(file, requireSafeAnnotation) {
+    const text = fs.readFileSync(file, "utf8");
+    const lines = text.split("\n");
+    const out = [];
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const stripped = line.trimStart();
+      if (stripped.startsWith("import ") || stripped.startsWith("//") || stripped.startsWith("*")) continue;
+      if (!line.includes("createAdminClient()")) continue;
+      if (requireSafeAnnotation) {
+        let prev = i - 1;
+        while (prev >= 0 && lines[prev].trim() === "") prev--;
+        if (prev < 0 || !lines[prev].includes("SAFE:")) {
+          out.push({ lineNum: i + 1, line: line.trim() });
+        }
+      } else {
+        out.push({ lineNum: i + 1, line: line.trim() });
+      }
     }
     return out;
   }
 
   let coldStartViolations = 0;
-  for (const file of walkApp(APP_DIR)) {
-    const text = fs.readFileSync(file, "utf8");
-    // Match call sites only — not import declarations or comments
-    const callRe = /(?<!\/\/.*)\bcreateAdminClient\(\)/g;
-    for (const m of text.matchAll(callRe)) {
-      // Skip if the match is on an import line
-      const lineStart = text.lastIndexOf("\n", m.index) + 1;
-      const lineEnd = text.indexOf("\n", m.index);
-      const line = text.slice(lineStart, lineEnd === -1 ? text.length : lineEnd);
-      if (line.trimStart().startsWith("import ")) continue;
-      if (line.trimStart().startsWith("//") || line.trimStart().startsWith("*")) continue;
 
-      let lineNum = 1;
-      for (let i = 0; i < m.index; i++) if (text[i] === "\n") lineNum++;
-      const rel = path.relative(process.cwd(), file);
-      console.log(`ERROR [createAdminClient() in app/] ${rel}:${lineNum}`);
-      console.log(`  ${line.trim()}`);
+  // Rule 1: app/ — banned entirely
+  for (const file of walkGuard(APP_DIR)) {
+    for (const v of findViolations(file, false)) {
+      const rel = path.relative(_ROOT, file);
+      console.log(`ERROR [createAdminClient() in app/] ${rel}:${v.lineNum}`);
+      console.log(`  ${v.line}`);
       console.log(`  → Replace with: const db = await getAdminClient()`);
       coldStartViolations++;
     }
   }
 
+  // Rule 2: request-time lib/ dirs — require SAFE: annotation
+  for (const libDir of REQUEST_TIME_LIB_DIRS) {
+    for (const file of walkGuard(libDir)) {
+      for (const v of findViolations(file, true)) {
+        const rel = path.relative(_ROOT, file);
+        const dirLabel = path.relative(_ROOT, libDir);
+        console.log(`ERROR [createAdminClient() without SAFE: in ${dirLabel}/] ${rel}:${v.lineNum}`);
+        console.log(`  ${v.line}`);
+        console.log(`  → Add '// SAFE: <reason>' above, or replace with getAdminClient()`);
+        coldStartViolations++;
+      }
+    }
+  }
+
   if (coldStartViolations > 0) {
-    console.log(`\n${coldStartViolations} createAdminClient() call(s) found in app/. These cause 500s on cold starts.`);
-    console.log("Use getAdminClient() (async, hydrates secrets first) in all request-time code.\n");
+    console.log(`\n${coldStartViolations} createAdminClient() violation(s). See above.\n`);
     process.exit(1);
   }
 }

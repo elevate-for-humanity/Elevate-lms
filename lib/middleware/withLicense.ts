@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { createAdminClient, getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { TenantContext } from './withTenant';
 import { checkLicenseAccess } from '@/lib/licensing/billing-authority';
@@ -43,7 +43,7 @@ export async function withLicense(
   requiredFeature?: string
 ): Promise<{ valid: boolean; license?: LicenseContext; error?: string }> {
   try {
-    const adminSupabase = createAdminClient();
+    const adminSupabase = await getAdminClient();
     await setAuditContext(adminSupabase, { systemActor: 'license_middleware' });
 
     // Get license for tenant - include all fields needed for billing authority check
@@ -129,7 +129,7 @@ export async function hasFeature(
   tenantId: string,
   feature: string
 ): Promise<boolean> {
-  const adminSupabase = createAdminClient();
+  const adminSupabase = await getAdminClient();
 
   const { data: license } = await adminSupabase
     .from('licenses')
@@ -149,7 +149,7 @@ export async function hasFeature(
 export async function checkUserLimit(
   tenantId: string
 ): Promise<{ allowed: boolean; current: number; max: number }> {
-  const adminSupabase = createAdminClient();
+  const adminSupabase = await getAdminClient();
 
   const [licenseResult, userCountResult] = await Promise.all([
     adminSupabase

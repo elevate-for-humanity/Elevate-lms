@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 
 export interface ProgramHolderContext {
@@ -27,7 +27,7 @@ export interface ProgramHolderContext {
  */
 export async function requireProgramHolder(): Promise<ProgramHolderContext> {
   const supabase = await createClient();
-  const _admin = createAdminClient();
+  const _admin = await getAdminClient();
   const db = _admin;
   if (!db) throw new Error('Admin client failed to initialize');
 

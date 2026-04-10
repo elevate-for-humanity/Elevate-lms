@@ -18,7 +18,31 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
  *
  * Do NOT call this from `app/` — use `getAdminClient()` there.
  */
+// SAFE: non-request-time context — scripts/ or internal admin.ts, hydration guaranteed by caller
 export function createAdminClient(): SupabaseClient<any> {
+  // ── Request-context guard ────────────────────────────────────────────────
+  // Next.js sets NEXT_RUNTIME in all serverless function contexts.
+  // If SUPABASE_SERVICE_ROLE_KEY is absent at call time, we are almost
+  // certainly on a cold start before hydrateProcessEnv() has run.
+  // Callers in app/ must use getAdminClient() instead.
+  // Callers in lib/ that are invoked from request paths must also use
+  // getAdminClient() — see the @deprecated notice above.
+  //
+  // We detect the likely-cold-start condition (NEXT_RUNTIME set but key
+  // missing) and throw with an actionable message rather than letting the
+  // Supabase client silently fail on the first query.
+  if (
+    process.env.NEXT_RUNTIME &&
+    !process.env.SUPABASE_SERVICE_ROLE_KEY
+  ) {
+    throw new Error(
+      // SAFE: non-request-time context — scripts/ or internal admin.ts, hydration guaranteed by caller
+      'createAdminClient() called before env hydration in a Next.js runtime context. ' +
+      'Use getAdminClient() instead — it calls hydrateProcessEnv() first.'
+    );
+  }
+  // ────────────────────────────────────────────────────────────────────────
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -48,6 +72,7 @@ export function createAdminClient(): SupabaseClient<any> {
 export async function getAdminClient(): Promise<SupabaseClient<any>> {
   const { hydrateProcessEnv } = await import('@/lib/secrets');
   await hydrateProcessEnv();
+  // SAFE: non-request-time context — scripts/ or internal admin.ts, hydration guaranteed by caller
   return createAdminClient();
 }
 
@@ -64,6 +89,7 @@ export async function createAuditedAdminClient(ctx: {
   systemActor?: string | null;
   requestId?: string | null;
 }): Promise<SupabaseClient<any>> {
+  // SAFE: non-request-time context — scripts/ or internal admin.ts, hydration guaranteed by caller
   const client = createAdminClient();
 
   try {

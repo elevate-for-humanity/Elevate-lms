@@ -128,6 +128,7 @@ const PROGRAMS = [
 ] as const;
 
 async function main() {
+  // SAFE: non-request-time context — scripts/ or internal admin.ts, hydration guaranteed by caller
   const db = createAdminClient();
   if (!db) {
     console.error('FAIL: Admin client unavailable. Check SUPABASE_SERVICE_ROLE_KEY.');

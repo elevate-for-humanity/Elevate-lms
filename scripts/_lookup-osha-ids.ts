@@ -4,6 +4,7 @@ dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 import { createAdminClient } from '../lib/supabase/admin';
 
 async function main() {
+  // SAFE: non-request-time context — scripts/ or internal admin.ts, hydration guaranteed by caller
   const db = createAdminClient();
 
   // All credentials

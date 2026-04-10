@@ -24,6 +24,7 @@ const PROMPT = [
 ].join(' ');
 
 async function run() {
+  // SAFE: non-request-time context — scripts/ or internal admin.ts, hydration guaranteed by caller
   const db = createAdminClient();
 
   console.log('═'.repeat(60));

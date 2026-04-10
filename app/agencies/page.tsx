@@ -10,8 +10,8 @@ export const dynamic = 'force-static';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'For Agencies | Government-Aligned Workforce Infrastructure',
-  description: 'DOL registered. ETPL approved. WIOA compliant. License our workforce development platform.',
+  title: 'For Workforce Agencies | Elevate Workforce OS',
+  description: 'DOL Registered Apprenticeship Sponsor. Indiana ETPL Certified. WIOA compliant. WorkOne referrals accepted. RAPIDS-tracked outcomes. Built for workforce boards, DWD, and case managers.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/agencies' },
 };
 
@@ -52,17 +52,53 @@ export default function AgenciesPage() {
       <HeroVideo
         videoSrcDesktop="/videos/training-providers-hero.mp4"
         posterImage="/images/pages/agencies-page-1.jpg"
-        microLabel="Workforce Agencies"
+        microLabel="For Workforce Agencies"
         analyticsName="agencies"
       >
-        <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Workforce Agencies &amp; Partners</p>
+        <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Workforce Agencies &amp; Boards</p>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
-          Built for government compliance.
+          A WIOA-compliant pipeline you can refer into today.
         </h1>
-        <p className="text-slate-600 text-lg leading-relaxed max-w-2xl">
-          DOL Registered Apprenticeship Sponsor. ETPL approved. WIOA compliant. Real-time outcome tracking for workforce boards and funding agencies.
+        <p className="text-slate-700 text-base leading-relaxed max-w-2xl mb-6">
+          Elevate for Humanity is Indiana ETPL certified, DOL Registered, and RAPIDS-tracked. WorkOne case managers can refer participants directly — funding is authorized before training begins, outcomes are documented, and credentials are issued on-site.
         </p>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/workone-partner-packet" className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-lg text-sm transition-colors">
+            WorkOne Partner Packet
+          </Link>
+          <Link href="/contact" className="border-2 border-slate-300 text-slate-800 font-bold px-6 py-3 rounded-lg text-sm hover:bg-slate-50 transition-colors">
+            Request Documentation
+          </Link>
+        </div>
       </HeroVideo>
+
+      {/* WIOA referral workflow */}
+      <section className="bg-blue-50 border-y border-blue-100 py-12 px-6">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-3">How WorkOne Referrals Work</p>
+          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 mb-8">Four steps from referral to credential.</h2>
+          <div className="grid sm:grid-cols-4 gap-6">
+            {[
+              { step: '1', title: 'Eligibility Determination', desc: 'Case manager determines WIOA eligibility and selects an ETPL-listed Elevate program.' },
+              { step: '2', title: 'Funding Authorization', desc: 'ITA or grant authorization issued. Training cost is covered before the participant begins.' },
+              { step: '3', title: 'Training & Tracking', desc: 'Participant completes checkpoint-gated training. Attendance, RTI hours, and progress are logged in real time.' },
+              { step: '4', title: 'Credential & Placement', desc: 'Exam funding authorized on completion. Credential issued on-site. Placement outcome reported to DWD.' },
+            ].map((s, i) => (
+              <div key={s.step} className="relative">
+                <div className="w-10 h-10 rounded-full bg-blue-600 text-white font-black text-base flex items-center justify-center mb-3">{s.step}</div>
+                {i < 3 && <div className="hidden sm:block absolute top-5 left-10 right-[-1rem] h-px bg-blue-200" />}
+                <p className="font-bold text-slate-900 text-sm mb-1">{s.title}</p>
+                <p className="text-slate-600 text-xs leading-relaxed">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href="/funding/wioa" className="text-sm font-semibold text-blue-700 hover:underline">WIOA eligibility details →</Link>
+            <Link href="/credentials" className="text-sm font-semibold text-blue-700 hover:underline">Compliance documentation →</Link>
+            <Link href="/workone-partner-packet" className="text-sm font-semibold text-blue-700 hover:underline">Download partner packet →</Link>
+          </div>
+        </div>
+      </section>
 
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">

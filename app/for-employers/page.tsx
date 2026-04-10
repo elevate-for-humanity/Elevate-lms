@@ -18,16 +18,16 @@ import {
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'For Employers | Hire Trained Workers | Elevate for Humanity',
+  title: 'For Employers | Hire, Sponsor & Train | Elevate Workforce OS',
   description:
-    'Partner with Elevate for Humanity to hire job-ready, certified candidates. Access our talent pipeline, build apprenticeships, claim WOTC tax credits, and grow your workforce at no cost.',
+    'Hire pre-credentialed graduates, sponsor DOL-registered apprentices, or co-design training cohorts. OJT wage reimbursement up to 50%. WOTC tax credits. No recruiting fees.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/for-employers',
   },
   openGraph: {
-    title: 'For Employers | Elevate for Humanity',
+    title: 'For Employers | Elevate Workforce OS',
     description:
-      'Hire trained, certified candidates. Access talent pipelines, apprenticeships, and WOTC tax credits.',
+      'Hire pre-credentialed graduates, sponsor apprentices, or co-design training cohorts. OJT wage reimbursement up to 50%.',
   },
 };
 
@@ -67,7 +67,8 @@ export default async function ForEmployersPage() {
       </section>
       <div className="bg-white border-b border-slate-200 py-8 px-4">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900">Hire Trained, Certified Workers</h1>
+          <p className="text-green-600 font-bold text-xs uppercase tracking-widest mb-2">For Employers</p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900">Hire. Sponsor. Train.<br />Three ways to work with the Elevate OS.</h1>
           <p className="text-slate-600 mt-2 max-w-3xl">Access our talent pipeline of job-ready candidates trained in healthcare, skilled trades, technology, and business. No recruitment fees. WIOA and WOTC eligible.</p>
           <div className="flex flex-wrap gap-3 mt-5">
             <Link href="/employer-portal" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-2.5 rounded-lg font-bold transition text-sm">
@@ -108,7 +109,8 @@ export default async function ForEmployersPage() {
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Why Partner With Us</h2>
+            <p className="text-green-600 font-bold text-xs uppercase tracking-widest mb-2">Three Employer Paths</p>
+            <h2 className="text-3xl font-bold mb-4">Hire graduates. Sponsor apprentices. Co-design cohorts.</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               We train candidates to your specifications and deliver them job-ready. You hire with confidence.
             </p>

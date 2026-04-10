@@ -13,20 +13,20 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Program Holder Portal | Elevate For Humanity',
-  description: 'Manage your training programs, track student progress, and access program management tools.',
+  title: 'For Program Holders | Run Programs on the Elevate OS',
+  description: 'Training providers, schools, and instructors: run your programs on Elevate infrastructure. Compliance, enrollment, credentialing, and WIOA reporting included.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/program-holder',
   },
 };
 
 const features = [
-  { icon: BookOpen, title: 'Program Management', description: 'Create and manage training programs, curricula, and course content.' },
-  { icon: Users, title: 'Student Tracking', description: 'Monitor student enrollment, progress, and completion rates.' },
-  { icon: BarChart3, title: 'Analytics Dashboard', description: 'View detailed reports on program performance and outcomes.' },
-  { icon: FileText, title: 'Compliance Reports', description: 'Generate WIOA compliance and funding reports automatically.' },
-  { icon: Building2, title: 'Partner Network', description: 'Connect with employers and workforce agencies.' },
-  { icon: Settings, title: 'Program Settings', description: 'Configure program requirements, schedules, and pricing.' },
+  { icon: BookOpen, title: 'Blueprint-Driven LMS', description: 'Define your program once in a blueprint. The engine handles enrollment, checkpoint gating, and lesson delivery automatically.' },
+  { icon: Users, title: 'Enrollment & Progress Tracking', description: 'Real-time learner progress, attendance logs, RTI hours, and completion records — all in one place.' },
+  { icon: BarChart3, title: 'Outcome Reporting', description: 'WIOA-compliant outcome reports generated automatically. DWD submission ready.' },
+  { icon: FileText, title: 'Compliance Infrastructure', description: 'ETPL documentation, RAPIDS reporting, and audit trails built into every program — not bolted on.' },
+  { icon: Building2, title: 'Employer & Agency Network', description: 'Connect graduates to the Elevate employer network and WorkOne referral pipeline.' },
+  { icon: Settings, title: 'Program Configuration', description: 'Set funding paths, pricing, cohort schedules, and credentialing requirements per program.' },
 ];
 
 export default async function ProgramHolderLanding() {
@@ -56,7 +56,8 @@ export default async function ProgramHolderLanding() {
       <section className="relative min-h-48 md:h-80 flex items-end overflow-hidden bg-slate-900">
         <Image src="/images/pages/program-holder-page-2.jpg" alt="Program Holder Portal" fill className="object-cover opacity-50" priority  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
         <div className="relative z-10 w-full max-w-6xl mx-auto px-4 pb-10">
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">Program Holder Portal</h1>
+          <p className="text-purple-300 font-bold text-xs uppercase tracking-widest mb-2">For Program Holders</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">Run your programs on the Elevate OS.</h1>
           <p className="text-white/80 text-lg mb-6 max-w-2xl">
             Partner with Elevate to deliver workforce training under our government credentials — ETPL, WIOA, DOL Registered Apprenticeship, and more.
           </p>

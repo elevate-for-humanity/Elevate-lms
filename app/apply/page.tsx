@@ -11,8 +11,8 @@ import { ArrowRight } from 'lucide-react';
 import { resolveProgram } from '@/lib/program-registry';
 
 export const metadata: Metadata = {
-  title: 'Apply | Elevate for Humanity',
-  description: 'Apply for workforce training programs, employer partnerships, or program holder positions at Elevate for Humanity.',
+  title: 'Apply | Check Eligibility for Funded Training | Elevate for Humanity',
+  description: 'Check eligibility for WIOA, WRG, and IMPACT-funded training in healthcare, trades, technology, and business. Most programs are no cost to eligible Indiana residents.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/apply',
   },
@@ -57,11 +57,12 @@ export default async function ApplyPage({
       {/* Heading */}
       <section className="pt-4 pb-8 px-4">
         <div className="max-w-4xl mx-auto text-center">
+          <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">For Learners</p>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
-            Start Your New Career
+            Check eligibility first. Apply in minutes.
           </h1>
-          <p className="text-black max-w-xl mx-auto">
-            Pick the path that fits you. Each application takes 5-10 minutes, no account needed. Funding available for qualifying students.
+          <p className="text-slate-600 max-w-xl mx-auto">
+            Most programs are fully funded through WIOA, WRG, or IMPACT for eligible Indiana residents. Check your eligibility before you apply — takes 2 minutes, no account needed.
           </p>
         </div>
       </section>
@@ -112,7 +113,7 @@ export default async function ApplyPage({
 
         {/* Student — full width, image fills left side */}
         <Link
-          href="/funding"
+          href="/apply/student"
           className="block rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow group"
         >
           <div className="flex flex-col md:flex-row">

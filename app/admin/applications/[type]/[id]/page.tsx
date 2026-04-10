@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import TransitionButtons from './TransitionButtons';
@@ -85,7 +85,7 @@ export default async function ApplicationDetailPage({
     .order('created_at', { ascending: true });
 
   // Fetch eligibility review if exists
-  const adminDb = createAdminClient();
+  const adminDb = await getAdminClient();
   const { data: eligibilityReview } = adminDb
     ? await adminDb
         .from('application_eligibility_reviews')

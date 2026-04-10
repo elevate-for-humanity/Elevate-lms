@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     // Check for duplicate pending application
     const { data: existing } = await supabase

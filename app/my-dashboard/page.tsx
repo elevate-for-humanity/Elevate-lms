@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import MyDashboard from './MyDashboard';
 
 export const dynamic = 'force-dynamic';
@@ -52,7 +52,7 @@ export default async function MyDashboardPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/my-dashboard');
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data: profile } = await db
     .from('profiles')
     .select('id, first_name, last_name, full_name, role, email, avatar_url, enrollment_status, onboarding_completed')

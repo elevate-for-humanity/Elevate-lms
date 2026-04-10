@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   const applicationId = req.nextUrl.searchParams.get('application_id');
   if (!applicationId) return safeError('application_id required', 400);
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return safeError('Server error', 500);
 
   const { data, error } = await db
@@ -45,7 +45,7 @@ export async function PATCH(req: NextRequest) {
     return safeError('reviewer_decision must be enroll, hold, or do_not_enroll', 400);
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return safeError('Server error', 500);
 
   // Map reviewer decision to application status

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
@@ -61,7 +61,7 @@ async function _POST(request: NextRequest) {
 
     // Update program_holders — canonical MOU state lives here, not on profiles
     // (profiles.mou_signed does not exist in the live schema)
-    const admin = createAdminClient();
+    const admin = await getAdminClient();
     if (admin) {
       await admin
         .from('program_holders')

@@ -14,7 +14,7 @@ import { logger } from '@/lib/logger';
  * - INSERT-only (cannot update, approve, or delete)
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import crypto from 'crypto';
 
 export type TokenPurpose = 'host_shop_hours' | 'school_transfer' | 'ce_submission';
@@ -48,7 +48,7 @@ export async function createAccessToken(params: {
   expires_in_days?: number;
   max_uses?: number;
 }): Promise<{ token: string; expires_at: string } | null> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   if (!supabase) return null;
 
   const token = generateToken();
@@ -88,7 +88,7 @@ export async function validateToken(
   token: string,
   expectedPurpose: TokenPurpose
 ): Promise<AccessToken | null> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   if (!supabase) return null;
 
   // Fetch token

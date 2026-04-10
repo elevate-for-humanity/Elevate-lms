@@ -1,5 +1,5 @@
 import { logger } from '@/lib/logger';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 
 export type CaseStatus = 'draft' | 'pending_signatures' | 'active' | 'in_progress' | 'completed' | 'closed' | 'cancelled';
@@ -58,7 +58,7 @@ export interface SignatureCompleteness {
 }
 
 export async function createEnrollmentCase(params: CreateCaseParams): Promise<EnrollmentCase | null> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   
   const defaultSignatures: SignerRole[] = params.signaturesRequired || ['student', 'employer', 'program_holder'];
   
@@ -112,7 +112,7 @@ export async function createEnrollmentCase(params: CreateCaseParams): Promise<En
 }
 
 export async function checkSignatureCompleteness(caseId: string): Promise<SignatureCompleteness> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const { data: caseData } = await supabase
     .from('enrollment_cases')
@@ -137,7 +137,7 @@ export async function checkSignatureCompleteness(caseId: string): Promise<Signat
 }
 
 export async function addSignature(params: SignatureParams): Promise<{ success: boolean; completeness: SignatureCompleteness }> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   // agreement_acceptances: subject_type, subject_id, agreement_key, agreement_version, accepted_name, accepted_email, accepted_ip, user_agent
   const { data: signature, error } = await supabase
@@ -179,7 +179,7 @@ export async function addSignature(params: SignatureParams): Promise<{ success: 
 }
 
 export async function transitionCaseStatus(caseId: string, newStatus: CaseStatus, actorId?: string, actorRole?: string): Promise<boolean> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const { data: currentCase } = await supabase
     .from('enrollment_cases')
@@ -225,7 +225,7 @@ export async function transitionCaseStatus(caseId: string, newStatus: CaseStatus
 }
 
 export async function getCaseTimeline(caseId: string): Promise<any[]> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const { data } = await supabase
     .from('case_events')
@@ -237,7 +237,7 @@ export async function getCaseTimeline(caseId: string): Promise<any[]> {
 }
 
 export async function getCaseTasks(caseId: string): Promise<any[]> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const { data } = await supabase
     .from('case_tasks')
@@ -249,7 +249,7 @@ export async function getCaseTasks(caseId: string): Promise<any[]> {
 }
 
 export async function completeTask(taskId: string, completedBy: string, evidenceUrl?: string, evidenceMetadata?: any): Promise<boolean> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const { data: task, error } = await supabase
     .from('case_tasks')
@@ -286,7 +286,7 @@ export async function completeTask(taskId: string, completedBy: string, evidence
 }
 
 export async function initializeCaseTasks(caseId: string): Promise<number> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const { data } = await supabase.rpc('initialize_case_tasks', { p_case_id: caseId });
 

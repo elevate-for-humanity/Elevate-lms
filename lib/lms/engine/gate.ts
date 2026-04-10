@@ -15,7 +15,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 export interface CheckpointGateError {
   code: 'CHECKPOINT_NOT_PASSED';
@@ -34,7 +34,7 @@ export interface CheckpointGateError {
  *   - A raw PostgreSQL 23514 error from the DB-layer trigger.
  *
  * Use this in catch blocks on lesson_progress write paths that use
- * createAdminClient() and do not call enforceCheckpointGate() first.
+ * await getAdminClient() and do not call enforceCheckpointGate() first.
  */
 export function isCheckpointGateError(err: unknown): boolean {
   if (!err) return false;
@@ -67,7 +67,7 @@ export async function enforceCheckpointGate(
   lessonId: string,
   courseId: string
 ): Promise<void> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   // Fetch the target lesson and its module — canonical tables
   const { data: targetLesson, error: lessonErr } = await db

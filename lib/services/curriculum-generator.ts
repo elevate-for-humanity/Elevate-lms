@@ -65,7 +65,7 @@
  *   const summary = gen.summarize();
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { createAdminClient, getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 
 // ─── Input types ──────────────────────────────────────────────────────────────
@@ -193,7 +193,7 @@ export class CurriculumGenerator {
     this.programId = programId;
     this.credentialId = credentialId;
     this.mode = mode;
-    this.db = createAdminClient();
+    this.db = await getAdminClient();
     this.summary = {
       programId,
       mode,
@@ -554,7 +554,7 @@ export class CurriculumGenerator {
  * Returns null if not found.
  */
 export async function resolveProgramId(slug: string): Promise<string | null> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return null;
   const { data } = await db
     .from('programs')
@@ -569,7 +569,7 @@ export async function resolveProgramId(slug: string): Promise<string | null> {
  * Returns null if no primary credential is mapped.
  */
 export async function resolvePrimaryCredentialId(programId: string): Promise<string | null> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return null;
   const { data } = await db
     .from('program_credentials')
@@ -585,7 +585,7 @@ export async function resolvePrimaryCredentialId(programId: string): Promise<str
  * Use this to skip generation when content already exists.
  */
 export async function hasCurriculumContent(programId: string): Promise<boolean> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return false;
   const { count } = await db
     .from('curriculum_lessons')

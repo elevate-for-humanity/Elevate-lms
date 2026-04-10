@@ -9,13 +9,13 @@
  *   short_description (added in 20260402000003), display_order (added in 20260402000003)
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import type { Program, CourseProgress } from './types';
 import { logger } from '@/lib/logger';
 
 async function getDb() {
-  const admin = createAdminClient();
+  const admin = await getAdminClient();
   if (admin) return admin;
   return await createClient();
 }

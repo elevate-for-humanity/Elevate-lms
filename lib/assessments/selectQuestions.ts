@@ -1,5 +1,5 @@
 // lib/assessments/selectQuestions.ts
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 interface Question {
   id: string;
@@ -19,7 +19,7 @@ export async function selectQuestionsForExamAttempt(
   examId: string,
   adaptive: boolean
 ): Promise<Question[]> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const { data: exam, error: examError } = await supabase
     .from('exams')
     .select('*, bank:question_banks(*, questions(*))')

@@ -1,5 +1,5 @@
 import { logger } from '@/lib/logger';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 export interface StateRules {
   state: string;
@@ -17,7 +17,7 @@ export interface StateRules {
  * Get state-specific rules for ETPL, WIOA, RAPIDS, etc.
  */
 export async function getStateRules(state: string): Promise<StateRules | null> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const { data, error }: any = await supabase
     .from('state_rules')
@@ -79,7 +79,7 @@ export async function isRapidsRequired(state: string): Promise<boolean> {
  * Get all state rules
  */
 export async function getAllStateRules(): Promise<StateRules[]> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const { data, error }: any = await supabase
     .from('state_rules')
@@ -101,7 +101,7 @@ export async function updateStateRules(
   state: string,
   rules: Partial<Omit<StateRules, 'state'>>
 ): Promise<StateRules | null> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const { data, error }: any = await supabase
     .from('state_rules')
@@ -154,7 +154,7 @@ export async function initializeDefaultStateRules() {
     },
   ];
 
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   for (const rules of defaultRules) {
     await supabase.from('state_rules').upsert(rules);

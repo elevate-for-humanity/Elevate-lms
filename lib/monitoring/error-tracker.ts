@@ -1,5 +1,5 @@
 import { logger } from '@/lib/logger';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { resend } from '@/lib/resend';
 
 async function sendCriticalAlert(data: {
@@ -69,7 +69,7 @@ export interface ErrorLog {
  */
 export async function logError(errorLog: ErrorLog): Promise<void> {
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     await supabase.from('audit_logs').insert({
       action_type: 'error',
@@ -103,7 +103,7 @@ export async function logRequest(data: {
   ipAddress?: string;
 }): Promise<void> {
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     await supabase.from('audit_logs').insert({
       action_type: 'api_request',
@@ -132,7 +132,7 @@ export async function logRateLimitHit(data: {
   remaining: number;
 }): Promise<void> {
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     await supabase.from('audit_logs').insert({
       action_type: 'rate_limit_hit',
@@ -161,7 +161,7 @@ export async function logSecurityEvent(data: {
   severity: 'low' | 'medium' | 'high' | 'critical';
 }): Promise<void> {
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     await supabase.from('audit_logs').insert({
       action_type: 'security_event',
@@ -198,7 +198,7 @@ export async function getErrorStats(timeRange: '1h' | '24h' | '7d' = '24h'): Pro
   byStatusCode: Record<number, number>;
 }> {
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     
     const now = new Date();
     const startTime = new Date(now);

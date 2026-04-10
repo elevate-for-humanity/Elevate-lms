@@ -8,7 +8,7 @@
  *               registration_required, is_active, slug
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 
@@ -43,7 +43,7 @@ const SELECT_COLS =
 
 async function getDb() {
   try {
-    const admin = createAdminClient();
+    const admin = await getAdminClient();
     if (admin) return admin;
   } catch {
     // Admin client unavailable (missing env vars) — fall through to server client

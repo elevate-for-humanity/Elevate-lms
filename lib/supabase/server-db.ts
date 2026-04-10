@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 /**
@@ -18,6 +18,6 @@ export async function getAuthenticatedDb(): Promise<{
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const admin = createAdminClient();
+  const admin = await getAdminClient();
   return { user, db: admin || supabase };
 }

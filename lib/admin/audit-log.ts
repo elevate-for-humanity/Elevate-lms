@@ -19,7 +19,7 @@
  *   });
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 
 // ── Action constants ────────────────────────────────────────────────────
@@ -176,7 +176,7 @@ export interface AdminAuditParams {
  */
 export async function logAdminAudit(params: AdminAuditParams): Promise<void> {
   try {
-    const db = createAdminClient();
+    const db = await getAdminClient();
     if (!db) {
       logger.error('[AdminAudit] No admin client available — audit event dropped', undefined, {
         action: params.action,

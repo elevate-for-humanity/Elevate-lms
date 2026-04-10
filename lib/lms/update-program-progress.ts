@@ -6,7 +6,7 @@
  * consistent with the rest of the system.
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { getLearnerProgress } from '@/lib/lms/engine';
 import { logger } from '@/lib/logger';
 
@@ -21,7 +21,7 @@ export async function updateProgramProgress(
   userId: string,
   courseId: string,
 ): Promise<void> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) {
     logger.error('updateProgramProgress: admin client unavailable');
     return;
@@ -71,7 +71,7 @@ export async function updateProgressAfterQuiz(
   userId: string,
   quizId: string,
 ): Promise<void> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return;
 
   // Try quizzes table first

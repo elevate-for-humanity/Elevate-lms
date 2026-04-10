@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { setAuditContext } from '@/lib/audit-context';
 
@@ -24,7 +24,7 @@ export async function getAdminDocumentUrl(params: {
 }): Promise<string | null> {
   const { adminId, documentId, context } = params;
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return null;
   await setAuditContext(db, { actorUserId: adminId, systemActor: 'admin_document_access' });
 

@@ -4,7 +4,7 @@
  * Read-only query helpers for organization-scoped data access.
  * Used by the partner portal and reporting API.
  *
- * All functions require createAdminClient() — they bypass RLS and apply
+ * All functions require await getAdminClient() — they bypass RLS and apply
  * org scoping explicitly. Callers must verify org membership before
  * calling these (see lib/auth/org-guard.ts).
  *
@@ -12,12 +12,12 @@
  * It does not call getLearnerProgress.
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 // ─── Internal helper ──────────────────────────────────────────────────────────
 
 function requireDb(caller: string) {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error(`${caller}: admin client unavailable (missing service role key)`);
   return db;
 }

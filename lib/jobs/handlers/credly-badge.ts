@@ -16,7 +16,7 @@
  *   }
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { issueCredlyBadge } from '@/lib/credentials/credly';
 
@@ -34,7 +34,7 @@ export async function handleCredlyBadgeIssue(payload: Record<string, any>): Prom
     throw new Error('Missing required payload fields: learner_credential_id, badge_template_id, recipient_email');
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('Admin client unavailable');
 
   // Idempotency check — skip if badge already issued

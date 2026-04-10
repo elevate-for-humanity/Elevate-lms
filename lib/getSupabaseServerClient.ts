@@ -1,7 +1,7 @@
 /** @deprecated Use '@/lib/supabase/admin' instead. */
 // lib/getSupabaseServerClient.ts
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
-export function createAdminClient() {
-  return createAdminClient();
+export function await getAdminClient() {
+  return getAdminClient();
 }

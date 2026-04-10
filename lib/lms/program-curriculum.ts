@@ -8,7 +8,7 @@
  * enrichment layer in lib/courses/hvac-enrichment.ts.
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -65,7 +65,7 @@ export interface ProgramModule {
  * Get all courses for a program.
  */
 export async function getCoursesByProgram(programId: string): Promise<ProgramCourse[]> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data, error } = await db
     .from('training_courses')
@@ -91,7 +91,7 @@ export async function getCoursesByProgram(programId: string): Promise<ProgramCou
  * Get all modules for a course.
  */
 export async function getModulesByCourse(courseId: string): Promise<ProgramModule[]> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data, error } = await db
     .from('modules')
@@ -115,7 +115,7 @@ export async function getModulesByCourse(courseId: string): Promise<ProgramModul
  * Get all lessons for a course, ordered by lesson_number.
  */
 export async function getLessonsByCourse(courseId: string): Promise<ProgramLesson[]> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data, error } = await db
     .from('training_lessons')
@@ -132,7 +132,7 @@ export async function getLessonsByCourse(courseId: string): Promise<ProgramLesso
  * Get a single lesson by ID.
  */
 export async function getLessonById(lessonId: string): Promise<ProgramLesson | null> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data, error } = await db
     .from('training_lessons')
@@ -152,7 +152,7 @@ export async function getLessonNav(
   courseId: string,
   lessonNumber: number
 ): Promise<{ prev: ProgramLesson | null; next: ProgramLesson | null }> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const [{ data: prevData }, { data: nextData }] = await Promise.all([
     db.from('training_lessons')
@@ -177,7 +177,7 @@ export async function getLessonNav(
  * Get course info by ID.
  */
 export async function getCourseById(courseId: string): Promise<ProgramCourse | null> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data, error } = await db
     .from('training_courses')
@@ -203,7 +203,7 @@ export async function getCourseById(courseId: string): Promise<ProgramCourse | n
  * Get program info by slug.
  */
 export async function getProgramBySlug(slug: string) {
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { data, error } = await db
     .from('programs')

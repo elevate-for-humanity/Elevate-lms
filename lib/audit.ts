@@ -6,7 +6,7 @@
 // 2. Written to stderr as structured JSON (container-level visibility)
 // 3. Counted in auditFailureCount (scrapable by monitoring)
 // 4. Written to fallback file if DB is unreachable (disaster recovery)
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 
 // Telemetry: in-process failure counter. Expose via /api/health or metrics endpoint.
@@ -36,7 +36,7 @@ function onAuditFailure(context: string, error: unknown, event: Record<string, u
   // Channel 3: Durable DB fallback — separate table with minimal constraints.
   // Uses a fresh client to avoid reusing the one that just failed.
   try {
-    const fallbackClient = createAdminClient();
+    const fallbackClient = await getAdminClient();
     // Fire-and-forget: don't await, don't let this throw
     fallbackClient.from('audit_failures').insert({
       context,
@@ -127,7 +127,7 @@ export async function logAuditEvent(event: AuditEvent): Promise<void> {
   };
 
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     const { error } = await supabase.from('audit_logs').insert(payload);
 
     if (error) {

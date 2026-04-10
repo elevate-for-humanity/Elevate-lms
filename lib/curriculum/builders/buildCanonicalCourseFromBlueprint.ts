@@ -16,7 +16,7 @@
  * The courses row itself is always upserted on (slug) so re-runs are safe.
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { createAdminClient, getAdminClient } from '@/lib/supabase/admin';
 import type { CredentialBlueprint, BlueprintModule, BlueprintLessonRef, BlueprintVideoConfig } from '../blueprints/types';
 import { logger } from '@/lib/logger';
 
@@ -210,7 +210,7 @@ function validateLessons(modules: CredentialBlueprint['modules']): void {
 export async function buildCanonicalCourseFromBlueprint(
   input: BuildCanonicalCourseInput,
 ): Promise<BuildCanonicalCourseResult> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const warnings: string[] = [];
 
   const slug  = input.courseSlug  ?? input.blueprint.programSlug;

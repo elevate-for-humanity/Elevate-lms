@@ -20,7 +20,7 @@
  *   const gaps = audit.programs.filter(p => !p.isAligned);
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -81,7 +81,7 @@ export interface AlignmentAudit {
 export async function runAlignmentAudit(
   programSlugs?: string[]   // if provided, audit only these programs
 ): Promise<AlignmentAudit> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const auditedAt = new Date().toISOString();
 
   if (!db) {

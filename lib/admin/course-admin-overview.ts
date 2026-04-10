@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { getAllBlueprints } from '@/lib/curriculum/blueprints';
 import { logger } from '@/lib/logger';
 
@@ -30,7 +30,7 @@ function deriveStatus(expected: number, actual: number): AdminCourseStatus {
 }
 
 export async function getAdminCoursesOverview(): Promise<AdminCourseOverview[]> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   if (!supabase) {
     // Service role key not available — return empty list rather than crashing the dashboard

@@ -31,7 +31,7 @@
  * so eligibility logic stays in one place.
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { createAdminClient, getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -75,7 +75,7 @@ export async function checkExamEligibility(
   credentialId: string,
   programId: string
 ): Promise<EligibilityResult> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const evaluatedAt = new Date().toISOString();
 
   if (!db) {
@@ -229,7 +229,7 @@ export async function checkEligibilityAndAuthorize(
     return { ...result, authorizationCreated: false };
   }
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return { ...result, authorizationCreated: false };
 
   // Idempotency guard: skip if a non-denied authorization already exists.

@@ -12,7 +12,7 @@
  *   course_modules.title        → curriculum_lessons.module_title
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 export interface PromoteResult {
   inserted: number;
@@ -28,7 +28,7 @@ export async function promoteToCurriculum(
   courseId: string,
   programId: string
 ): Promise<PromoteResult> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const result: PromoteResult = {
     inserted: 0,
     skipped: 0,

@@ -8,7 +8,7 @@
  * Throws on denial — callers must not catch and continue.
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 /**
  * Asserts the user can access a lesson.
@@ -22,7 +22,7 @@ export async function assertLessonAccess(
   userId: string,
   lessonId: string,
 ): Promise<void> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('DB_UNAVAILABLE');
 
   const { data, error } = await db.rpc('can_access_lesson', {
@@ -46,7 +46,7 @@ export async function assertModuleAccess(
   courseId: string,
   moduleId: string,
 ): Promise<void> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('DB_UNAVAILABLE');
 
   const { data, error } = await db.rpc('check_module_unlock', {

@@ -3,12 +3,12 @@
  * Creates submission-ready packages with PDF, Word, and ZIP exports
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { setAuditContext } from '@/lib/audit-context';
 import { Document, Packer, Paragraph, HeadingLevel } from 'docx';
 import JSZip from 'jszip';
 
-function getDb() { return createAdminClient(); }
+function getDb() { return getAdminClient(); }
 
 export interface GrantPackage {
   grantId: string;

@@ -19,7 +19,7 @@
 //     },
 //   });
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import * as Sentry from '@sentry/nextjs';
 
@@ -64,7 +64,7 @@ export async function auditedMutation<T = Record<string, unknown>>(
   const { table, operation, rowData, filter, conflictOn, audit } = params;
 
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     const { data, error } = await supabase.rpc('audited_mutation', {
       p_table: table,

@@ -3,12 +3,12 @@
  * Multi-channel notifications: Dashboard + Email + SMS
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { setAuditContext } from '@/lib/audit-context';
 import { EmailService } from '@/lib/notifications/email';
 import { SMSService } from '@/lib/notifications/sms';
 
-function getDb() { return createAdminClient(); }
+function getDb() { return getAdminClient(); }
 
 export type GrantNotificationType =
   | 'draft_generated'

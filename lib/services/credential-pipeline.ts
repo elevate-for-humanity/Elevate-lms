@@ -15,7 +15,7 @@
  *   certifying_body_routing       → partner routing rules (read-only here)
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { setAuditContext } from '@/lib/audit-context';
 import {
   type FundingSource,
@@ -51,7 +51,7 @@ export async function resolvePaymentResponsibility(
   programId: string | null,
   credentialAttemptId?: string | null
 ): Promise<FundingDecision> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) {
     return {
       fundingSource: 'self_pay',
@@ -156,7 +156,7 @@ export async function getLearnerCredentialLifecycle(
   credentialId: string,
   programId?: string | null
 ): Promise<{ state: CredentialLifecycleState; input: LifecycleInput; funding: FundingDecision }> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const [eligibilityRes, attemptRes, fundingRes, scheduleRes, lcRes, certRes] = await Promise.all([
     db?.from('learner_exam_eligibility')
@@ -248,7 +248,7 @@ export async function startCredentialAttempt(
   credentialId: string,
   programId: string | null
 ): Promise<{ attemptId: string; funding: FundingDecision } | { error: string }> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return { error: 'Database unavailable' };
 
   // Verify eligibility before creating attempt
@@ -333,7 +333,7 @@ export async function markPaymentSucceeded(
   stripeCheckoutSessionId: string,
   stripePaymentIntentId: string
 ): Promise<{ ok: boolean; error?: string }> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return { ok: false, error: 'Database unavailable' };
 
   const { error } = await db
@@ -361,7 +361,7 @@ export async function approveFundingAuthorization(
   approvedBy: string,
   notes?: string
 ): Promise<{ ok: boolean; error?: string }> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return { ok: false, error: 'Database unavailable' };
 
   const { data: auth } = await db
@@ -407,7 +407,7 @@ export async function queueCredentialDelivery(
   studentEmail: string,
   studentName: string
 ): Promise<{ ok: boolean; error?: string }> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return { ok: false, error: 'Database unavailable' };
 
   const { error } = await db.from('credential_delivery_queue').insert({
@@ -448,7 +448,7 @@ export async function verifyLearnerCredential(
     certificateUrl?: string;
   } = {}
 ): Promise<{ ok: boolean; learnerCredentialId?: string; error?: string }> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return { ok: false, error: 'Database unavailable' };
 
   await setAuditContext(db, { actorUserId: verifiedBy, systemActor: 'credential_pipeline' });
@@ -507,7 +507,7 @@ export async function issueCompletionCertificate(
   hoursCompleted: number,
   issuedBy: string = 'Elevate for Humanity'
 ): Promise<{ ok: boolean; certificateId?: string; error?: string }> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return { ok: false, error: 'Database unavailable' };
 
   // Idempotency check — do not double-issue
@@ -567,7 +567,7 @@ export async function checkCertificateIssuanceEligibility(
   learnerId: string,
   programId: string
 ): Promise<{ eligible: boolean; reason?: string }> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return { eligible: false, reason: 'Database unavailable' };
 
   // Load primary credential for this program (if any)

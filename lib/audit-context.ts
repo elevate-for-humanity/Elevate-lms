@@ -6,7 +6,7 @@
  * trigger can attribute the write to a specific actor.
  *
  * Usage:
- *   const db = createAdminClient();
+ *   const db = await getAdminClient();
  *   await setAuditContext(db, { actorUserId: user.id, systemActor: 'admin_api' });
  *   await db.from('profiles').update({ role: 'admin' }).eq('id', targetId);
  *   // The audit trigger now knows who did this.

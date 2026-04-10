@@ -6,7 +6,7 @@ import { logger } from '@/lib/logger';
  * Designed to be called by a scheduled function (cron) every 1-5 minutes.
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { getTemplate } from './templates';
 
 const DEFAULT_FROM = process.env.EMAIL_FROM || 'notifications@elevateforhumanity.org';
@@ -33,7 +33,7 @@ interface ProcessResult {
  * Process queued notifications
  */
 export async function processNotificationQueue(): Promise<ProcessResult> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   if (!supabase) {
     return { processed: 0, sent: 0, failed: 0, errors: [{ id: 'system', error: 'Database unavailable' }] };
   }
@@ -157,7 +157,7 @@ export async function getQueueStats(): Promise<{
   dead_letter: number;
   oldest_queued?: string;
 }> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   if (!supabase) {
     return { queued: 0, processing: 0, sent: 0, failed: 0, dead_letter: 0 };
   }

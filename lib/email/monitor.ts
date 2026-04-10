@@ -4,7 +4,7 @@ import { logger } from '@/lib/logger';
  * Tracks email success/failure rates and provides visibility
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 export interface EmailLog {
   id?: string;
@@ -22,7 +22,7 @@ export interface EmailLog {
  */
 export async function logEmailDelivery(log: EmailLog): Promise<void> {
   try {
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
 
     await supabase.from('email_logs').insert({
       to: log.to,
@@ -43,7 +43,7 @@ export async function logEmailDelivery(log: EmailLog): Promise<void> {
  * Get email delivery statistics
  */
 export async function getEmailStats(timeframe: '24h' | '7d' | '30d' = '24h') {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const hours = timeframe === '24h' ? 24 : timeframe === '7d' ? 168 : 720;
   const since = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
@@ -79,7 +79,7 @@ export async function getEmailStats(timeframe: '24h' | '7d' | '30d' = '24h') {
  * Get recent failed emails
  */
 export async function getRecentFailures(limit = 10) {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const { data: failures } = await supabase
     .from('email_logs')

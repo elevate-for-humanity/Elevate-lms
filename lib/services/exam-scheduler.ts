@@ -15,7 +15,7 @@
  *   'manual'         — staff schedules manually, no URL available
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -108,7 +108,7 @@ function buildInstruction(
 export async function resolveSchedulingRoute(
   credentialId: string
 ): Promise<SchedulingRoute | null> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return null;
 
   const { data, error } = await db
@@ -183,7 +183,7 @@ export async function resolveSchedulingRoute(
 export async function requestExamScheduling(
   req: ExamScheduleRequest
 ): Promise<{ route: SchedulingRoute | null; requestId: string | null; alreadyPending: boolean }> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return { route: null, requestId: null, alreadyPending: false };
 
   // Check for existing pending request

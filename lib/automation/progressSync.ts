@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { getPartnerClient, PartnerType } from '../partners';
 
-function createAdminClient() {
+function await getAdminClient() {
   const cookieStore = cookies();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,7 +20,7 @@ function createAdminClient() {
 }
 
 export async function syncSingleEnrollment(enrollmentId: string) {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const { data: enrollment, error } = await supabase
     .from('partner_lms_enrollments')
@@ -60,7 +60,7 @@ export async function syncSingleEnrollment(enrollmentId: string) {
 }
 
 export async function syncAllActivePartnerEnrollments() {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
 
   const { data: enrollments } = await supabase
     .from('partner_lms_enrollments')

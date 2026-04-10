@@ -474,7 +474,7 @@ export async function getApplication(id: string) {
   // Callers are admin API routes that have already verified the caller's role.
   const { createAdminClient } = await import('@/lib/supabase/admin');
   const { setAuditContext } = await import('@/lib/audit-context');
-  const db = createAdminClient();
+  const db = await getAdminClient();
   await setAuditContext(db, { systemActor: 'admin_applications_api' });
   const { data, error } = await db
     .from('applications')
@@ -490,7 +490,7 @@ export async function updateApplication(id: string, patch: ApplicationUpdate) {
   // Use admin client — applications table RLS blocks session-based updates.
   const { createAdminClient } = await import('@/lib/supabase/admin');
   const { setAuditContext } = await import('@/lib/audit-context');
-  const db = createAdminClient();
+  const db = await getAdminClient();
   await setAuditContext(db, { systemActor: 'admin_applications_api' });
   const updateData: any = { ...patch, updated_at: new Date().toISOString() };
   if (patch.status === 'approved' || patch.status === 'rejected') {
@@ -511,7 +511,7 @@ export async function updateApplication(id: string, patch: ApplicationUpdate) {
 export async function deleteApplication(id: string) {
   const { createAdminClient } = await import('@/lib/supabase/admin');
   const { setAuditContext } = await import('@/lib/audit-context');
-  const db = createAdminClient();
+  const db = await getAdminClient();
   await setAuditContext(db, { systemActor: 'admin_applications_api' });
   const { error } = await db.from('applications').delete().eq('id', id);
   if (error) throw new Error('Database operation failed');

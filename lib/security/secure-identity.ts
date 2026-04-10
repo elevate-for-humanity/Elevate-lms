@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 
 /**
@@ -6,7 +6,7 @@ import { logger } from '@/lib/logger';
  * Uses service_role client — caller must verify authorization.
  */
 export async function getSSNLast4(userId: string): Promise<string | null> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return null;
 
   const { data, error } = await db
@@ -28,7 +28,7 @@ export async function storeSSNData(
   ssnLast4: string,
   ssnHash?: string
 ): Promise<boolean> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return false;
 
   const { error } = await db
@@ -54,7 +54,7 @@ export async function storeSSNData(
  * Check if a user has SSN on file (without revealing the value).
  */
 export async function hasSSNOnFile(userId: string): Promise<boolean> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return false;
 
   const { data } = await db

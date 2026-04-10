@@ -9,12 +9,12 @@
  * - Applying transfer hours
  * - Updating funding amounts
  */
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { logAuditEvent } from '@/lib/audit';
 import { logger } from '@/lib/logger';
 
-function getDb() { return createAdminClient(); }
+function getDb() { return getAdminClient(); }
 
 // ============================================================================
 // TYPES

@@ -3,12 +3,12 @@
  * Tracks submission status, timeline, and confirmations
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { setAuditContext } from '@/lib/audit-context';
 import { notifyGrantSubmitted } from './notification-system';
 import { logAuditEvent } from '@/lib/audit';
 
-function getDb() { return createAdminClient(); }
+function getDb() { return getAdminClient(); }
 
 export type SubmissionMethod = 'email' | 'portal' | 'mail' | 'other';
 export type SubmissionStatus =

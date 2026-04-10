@@ -5,14 +5,14 @@
  * Reads course_lessons + course_modules (canonical tables only).
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import type { EngineLesson, EngineModule, ProgramStructure, StepType } from './types';
 
 export async function getProgramStructure(
   courseId: string,
   options: { includeUnpublished?: boolean } = {}
 ): Promise<ProgramStructure> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   // Resolve course title — canonical table
   const { data: course } = await db

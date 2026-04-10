@@ -4,7 +4,7 @@
  * No partial states - all or nothing
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { generateLicenseKey } from '@/lib/store/license';
 import * as crypto from 'node:crypto';
@@ -55,7 +55,7 @@ async function logProvisioningEvent(
   error?: string,
   metadata?: Record<string, any>
 ): Promise<void> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   await supabase.from('provisioning_events').insert({
     correlation_id: correlationId,
     step,
@@ -87,7 +87,7 @@ function generateSlug(name: string): string {
 }
 
 export async function provisionLicense(ctx: ProvisioningContext): Promise<ProvisioningResult> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const { correlationId, email, productId, paymentIntentId, sessionId, amountCents, currency, organizationName } = ctx;
 
   // Set audit context so DB triggers attribute writes to this automation
@@ -294,7 +294,7 @@ export async function provisionLicense(ctx: ProvisioningContext): Promise<Provis
 }
 
 export async function suspendLicense(tenantId: string, reason: string): Promise<void> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const correlationId = crypto.randomUUID();
 
   await setAuditContext(supabase, { systemActor: 'license_enforcement', requestId: correlationId });
@@ -315,13 +315,13 @@ export async function suspendLicense(tenantId: string, reason: string): Promise<
 }
 
 export async function enforceSubscriptionStatus(subscriptionId: string): Promise<void> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const { data: tenant } = await supabase.from('tenants').select('id').eq('stripe_subscription_id', subscriptionId).single();
   if (tenant) await suspendLicense(tenant.id, 'subscription_payment_failed');
 }
 
 export async function reactivateLicense(tenantId: string): Promise<void> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const correlationId = crypto.randomUUID();
 
   await setAuditContext(supabase, { systemActor: 'license_enforcement', requestId: correlationId });

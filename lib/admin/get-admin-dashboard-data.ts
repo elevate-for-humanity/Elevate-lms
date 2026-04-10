@@ -3,7 +3,7 @@
 // Only queries tables that exist and have live data.
 // No synthetic stats, no fake deltas.
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import type { AdminDashboardData, DegradedSection } from '@/components/admin/dashboard/types';
@@ -73,7 +73,7 @@ const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct'
 
 export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const supabase = await createClient();
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   let adminProfile: { full_name: string | null; role: string } | null = null;
   // Auth is critical — throw if it fails. Profile name resolution is non-critical

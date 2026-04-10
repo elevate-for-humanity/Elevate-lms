@@ -1,7 +1,7 @@
 /** @deprecated Use '@/lib/supabase/server' instead. */
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
-/** @deprecated Use createAdminClient() from '@/lib/supabase/admin' instead. */
+/** @deprecated Use await getAdminClient() from '@/lib/supabase/admin' instead. */
 export function supabaseServer() {
-  return createAdminClient();
+  return getAdminClient();
 }

@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { ProvisioningJob } from '../queue';
 
@@ -29,7 +29,7 @@ interface EmailPayload {
 }
 
 export async function processEmailSend(job: ProvisioningJob): Promise<void> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   const payload = job.payload as EmailPayload;
   
   if (!payload.to || !payload.emailType) {

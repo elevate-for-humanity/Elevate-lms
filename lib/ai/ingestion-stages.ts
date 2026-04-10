@@ -21,7 +21,7 @@
  */
 
 import { getOpenAIClient } from '@/lib/openai-client';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 export const SAFE_CHARS = 50_000;
 export const MAX_CHARS = 80_000;
@@ -104,7 +104,7 @@ export async function summarizeForExtraction(
 
 /** Persist an ingestion draft to job_queue for resumable processing */
 export async function persistIngestionDraft(draft: Omit<IngestionDraft, 'job_id'>): Promise<string> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) throw new Error('Database unavailable');
 
   const { data, error } = await db
@@ -125,7 +125,7 @@ export async function persistIngestionDraft(draft: Omit<IngestionDraft, 'job_id'
 
 /** Load an existing ingestion draft from job_queue */
 export async function loadIngestionDraft(jobId: string): Promise<IngestionDraft | null> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return null;
 
   const { data } = await db
@@ -145,7 +145,7 @@ export async function updateIngestionDraftStage(
   stage: IngestionStage,
   patch: Partial<IngestionDraft> = {}
 ): Promise<void> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   if (!db) return;
 
   const { data: existing } = await db

@@ -1,7 +1,7 @@
 // Server-only: computes and stamps sim readiness scores onto learner_credentials.
 // Called before issuing a credential to surface pre-exam performance data.
 import 'server-only';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 
 export interface SimReadiness {
@@ -18,7 +18,7 @@ export async function getSimReadiness(
   learnerId: string,
   credentialId: string,
 ): Promise<SimReadiness | null> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
   const { data, error } = await db.rpc('sim_readiness_score', {
     p_learner_id:   learnerId,
     p_credential_id: credentialId,
@@ -42,7 +42,7 @@ export async function stampSimReadiness(
   const readiness = await getSimReadiness(learnerId, credentialId);
   if (!readiness) return;
 
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   // Read existing metadata first to merge rather than overwrite.
   const { data: existing } = await db

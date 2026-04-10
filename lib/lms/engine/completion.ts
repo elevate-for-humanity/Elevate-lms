@@ -10,7 +10,7 @@
  * recordCheckpointAttempt — writes a checkpoint_scores row.
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { setAuditContext } from '@/lib/audit-context';
 import type { StepCompletionResult, CheckpointAttemptResult } from './types';
@@ -27,7 +27,7 @@ export async function recordStepCompletion(
   enrollmentId: string,
   timeSpentSeconds: number = 0
 ): Promise<StepCompletionResult> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   // Upsert lesson_progress.
   // The DB trigger trg_enforce_lesson_progress_checkpoint_gate fires here.
@@ -129,7 +129,7 @@ export async function recordStepUncompletion(
   lessonId: string,
   courseId: string
 ): Promise<{ progressPercent: number }> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   const { error } = await db
     .from('lesson_progress')
@@ -190,7 +190,7 @@ export async function recordCheckpointAttempt(
   passingScore: number,
   answers: Record<string, number> = {}
 ): Promise<CheckpointAttemptResult> {
-  const db = createAdminClient();
+  const db = await getAdminClient();
 
   // Determine next attempt number
   const { data: prior } = await db

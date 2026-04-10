@@ -8,7 +8,7 @@ import { logger } from '@/lib/logger';
  * Default sender: notifications@elevateforhumanity.org
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 export type TemplateKey =
   | 'inquiry_received'
@@ -58,7 +58,7 @@ const DEFAULT_FROM = 'notifications@elevateforhumanity.org';
  * Enqueue a notification for delivery
  */
 export async function enqueueNotification(data: NotificationData): Promise<string | null> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   if (!supabase) return null;
 
   const { data: result, error } = await supabase.rpc('enqueue_notification', {
@@ -82,7 +82,7 @@ export async function enqueueNotification(data: NotificationData): Promise<strin
  * Generate a token for no-login links
  */
 export async function generateToken(options: TokenOptions): Promise<string | null> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   if (!supabase) return null;
 
   const { data: token, error } = await supabase.rpc('generate_notification_token', {
@@ -114,7 +114,7 @@ export async function useToken(token: string): Promise<{
   email?: string;
   metadata?: Record<string, any>;
 } | null> {
-  const supabase = createAdminClient();
+  const supabase = await getAdminClient();
   if (!supabase) return null;
 
   const { data, error } = await supabase.rpc('use_notification_token', {

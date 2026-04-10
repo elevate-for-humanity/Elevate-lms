@@ -30,18 +30,19 @@ export default function ApprenticeProgressPage({ config }: { config: DisciplineC
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState<string | null>(null);
 
-  useEffect(() => { load(); }, []);
-
-  async function load() {
-    try {
-      const res = await fetch(`/api/pwa/${config.slug}/progress`);
-      if (res.status === 401) { setError('Please sign in to view your progress'); setLoading(false); return; }
-      if (res.status === 404) { setError(`You are not enrolled in the ${config.name} program`); setLoading(false); return; }
-      if (!res.ok) throw new Error('Failed to load');
-      setData(await res.json());
-    } catch { setError('Unable to load progress. Please try again.'); }
-    finally { setLoading(false); }
-  }
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch(`/api/pwa/${config.slug}/progress`);
+        if (res.status === 401) { setError('Please sign in to view your progress'); setLoading(false); return; }
+        if (res.status === 404) { setError(`You are not enrolled in the ${config.name} program`); setLoading(false); return; }
+        if (!res.ok) throw new Error('Failed to load');
+        setData(await res.json());
+      } catch { setError('Unable to load progress. Please try again.'); }
+      finally { setLoading(false); }
+    }
+    load();
+  }, [config.slug, config.name]);
 
   if (loading) return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center">

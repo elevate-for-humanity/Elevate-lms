@@ -360,13 +360,15 @@ export default function CosmetologySignMOUPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* MOU Text */}
-        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 mb-8 space-y-6 max-h-[60vh] overflow-y-auto">
-          {MOU_SECTIONS.map((section) => (
-            <div key={section.title}>
-              <h3 className="font-bold text-slate-900 mb-2 text-sm uppercase tracking-wide">{section.title}</h3>
-              <p className="text-sm text-slate-700 whitespace-pre-line leading-relaxed">{section.content}</p>
-            </div>
-          ))}
+        <div className="bg-slate-50 border border-slate-200 rounded-xl mb-8">
+          <div className="p-6 space-y-6">
+            {MOU_SECTIONS.map((section) => (
+              <div key={section.title}>
+                <h3 className="font-bold text-slate-900 mb-2 text-sm uppercase tracking-wide">{section.title}</h3>
+                <p className="text-sm text-slate-700 whitespace-pre-line leading-relaxed">{section.content}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -426,10 +428,12 @@ export default function CosmetologySignMOUPage() {
           <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
             <h2 className="font-bold text-slate-900">Digital Signature</h2>
             <p className="text-sm text-slate-500">Draw your signature in the box below using your mouse or finger.</p>
-            <div className="border-2 border-slate-300 rounded-lg overflow-hidden bg-white relative" style={{ height: 160 }}>
+            <div className="rounded-lg overflow-hidden bg-white" style={{ border: '2px solid #cbd5e1', height: 160 }}>
               <canvas
                 ref={canvasRef}
-                className="w-full h-full cursor-crosshair touch-none"
+                width={800}
+                height={160}
+                className="w-full h-full cursor-crosshair touch-none block"
                 onMouseDown={startDrawing}
                 onMouseMove={draw}
                 onMouseUp={stopDrawing}

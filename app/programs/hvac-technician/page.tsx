@@ -76,7 +76,6 @@ export default async function HVACTechnicianPage() {
   const banner = heroBanners['hvac-technician'];
 
   // DB row missing — render full static page so the page is never sparse.
-  // Fix: apply migration 20260603000003_publish_hvac_program.sql in Supabase Dashboard.
   if (!program) {
     return (
       <main className="min-h-screen bg-white text-slate-900">

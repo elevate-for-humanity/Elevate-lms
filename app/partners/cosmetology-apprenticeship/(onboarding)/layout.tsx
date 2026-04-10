@@ -11,7 +11,7 @@ export default async function CosmetologyOnboardingLayout({
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?redirect=/partners/cosmetology-apprenticeship/handbook');
+    redirect('/login?redirect=/partners/cosmetology-apprenticeship/sign-mou');
   }
 
   const db = await getAdminClient();

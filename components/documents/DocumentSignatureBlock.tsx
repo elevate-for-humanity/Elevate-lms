@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signAgreement } from '@/app/actions/sign-agreement';
 import SignatureCanvas from 'signature_pad';
 import { Check, Loader2, Pen, Type, CheckSquare, Lock, AlertCircle } from 'lucide-react';
 
@@ -36,6 +37,7 @@ export function DocumentSignatureBlock({
   const [error, setError] = useState<string | null>(null);
   const [alreadySigned, setAlreadySigned] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [signerEmail, setSignerEmail] = useState('');
 
   // Pre-fill name and check if already signed
   useEffect(() => {
@@ -43,6 +45,7 @@ export function DocumentSignatureBlock({
       const supabase = createClient();
       supabase?.auth.getUser().then(async ({ data }) => {
         if (!data?.user) { setLoading(false); return; }
+        setSignerEmail(data.user.email ?? '');
         const { data: profile } = await supabase
           .from('profiles').select('full_name').eq('id', data.user.id).single();
         if (profile?.full_name) setSignerName(profile.full_name);
@@ -97,21 +100,19 @@ export function DocumentSignatureBlock({
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch('/api/legal/sign', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          agreements: [agreementType],
-          signer_name: signerName.trim(),
-          signature_method: method,
-          signature_typed: method === 'typed' ? typed.trim() : undefined,
-          signature_data: method === 'drawn' ? drawn : undefined,
-          context: 'document',
-        }),
+      // Use a Server Action — avoids the Gitpod preview proxy's 403 block
+      // on browser fetch requests to /api/* routes with an Origin header.
+      const result = await signAgreement({
+        agreementType: agreementType as any,
+        signerName: signerName.trim(),
+        signerEmail,
+        signatureMethod: method,
+        signatureTyped: method === 'typed' ? typed.trim() : undefined,
+        signatureData: method === 'drawn' ? drawn ?? undefined : undefined,
+        context: 'onboarding',
       });
-      if (!res.ok) {
-        const d = await res.json();
-        throw new Error(d.error || 'Failed to sign');
+      if ('error' in result) {
+        throw new Error(result.error || 'Failed to sign');
       }
       setSigned(true);
       setTimeout(() => router.push(nextUrl), 1800);

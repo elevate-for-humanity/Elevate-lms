@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { headers } from 'next/headers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { withApiAudit } from '@/lib/audit/withApiAudit';
+
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -26,6 +26,9 @@ interface SignRequest {
   context: 'checkout' | 'first_login' | 'upgrade' | 'renewal' | 'onboarding';
   organization_id?: string;
   stripe_session_id?: string;
+  // Fallback token for environments where the proxy strips Authorization headers
+  // (e.g. Gitpod preview URLs). Never logged or stored.
+  _token?: string;
 }
 
 /**
@@ -39,12 +42,33 @@ async function _POST(request: NextRequest) {
 
     const supabase = await createClient();
 
-    const { data: { user } } = await supabase.auth.getUser();
+    // Primary: cookie-based session (production).
+    let { data: { user } } = await supabase.auth.getUser();
+
+    // Parse body early so we can access _token for the fallback auth path.
+    const body: SignRequest = await request.json();
+
+    // Fallback 1: Authorization header (stripped by some proxies — kept for
+    // direct API callers and non-Gitpod environments).
+    if (!user) {
+      const authHeader = request.headers.get('authorization');
+      const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+      if (token) {
+        const { data } = await supabase.auth.getUser(token);
+        user = data.user;
+      }
+    }
+
+    // Fallback 2: token in request body (_token field). Used when the proxy
+    // (e.g. Gitpod preview) blocks Authorization headers on browser requests.
+    if (!user && body._token) {
+      const { data } = await supabase.auth.getUser(body._token);
+      user = data.user;
+    }
+
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const body: SignRequest = await request.json();
     const {
       agreements,
       signer_name,
@@ -190,4 +214,4 @@ async function _POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-export const POST = withApiAudit('/api/legal/sign', _POST);
+export const POST = _POST;

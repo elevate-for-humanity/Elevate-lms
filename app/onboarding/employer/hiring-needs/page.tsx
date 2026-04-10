@@ -82,12 +82,39 @@ export default function HiringNeedsPage() {
         .eq('owner_user_id', user.id)
         .maybeSingle();
 
-      if (employerRow?.id) {
+      let empId = employerRow?.id;
+
+      // If no employers row yet (user navigated here before the index page ran),
+      // create it now so the FK constraint is satisfied.
+      if (!empId) {
+        const { data: { user } } = await supabase.auth.getUser();
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('first_name, last_name, email')
+          .eq('id', user!.id)
+          .maybeSingle();
+        const contactName = profile
+          ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim()
+          : '';
+        const { data: newEmp } = await supabase
+          .from('employers')
+          .insert({
+            owner_user_id: user!.id,
+            business_name: contactName || profile?.email || user!.email || 'Pending',
+            contact_name: contactName,
+            email: profile?.email || user!.email || '',
+          })
+          .select('id')
+          .maybeSingle();
+        empId = newEmp?.id;
+      }
+
+      if (empId) {
         // Try UPDATE first (index page seeds the row on first visit)
         const { data: updated, error: updateErr } = await supabase
           .from('employer_onboarding')
           .update({ hiring_needs: formData, updated_at: new Date().toISOString() })
-          .eq('employer_id', employerRow.id)
+          .eq('employer_id', empId)
           .select('id')
           .maybeSingle();
 
@@ -95,7 +122,7 @@ export default function HiringNeedsPage() {
           // No existing row — insert
           await supabase
             .from('employer_onboarding')
-            .insert({ employer_id: employerRow.id, hiring_needs: formData, status: 'pending_review' });
+            .insert({ employer_id: empId, hiring_needs: formData, status: 'pending_review' });
         }
       }
 

@@ -19,7 +19,7 @@ const DISCIPLINE_CONFIG = {
     icon: <Sparkles className="w-10 h-10 text-white" />,
     color: 'bg-purple-700',
     lightColor: 'bg-purple-500',
-    targetHours: 1500,
+    targetHours: 2000, // Indiana DOL Registered Apprenticeship
     applyHref: '/programs/cosmetology-apprenticeship/apply',
     logHref: '/pwa/cosmetology/log-hours',
     historyHref: '/pwa/cosmetology/history',

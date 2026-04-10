@@ -18,7 +18,7 @@ import { logger } from '@/lib/logger';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const REQUIRED_HOURS  = 1500;
+const REQUIRED_HOURS  = 2000; // Indiana DOL Registered Apprenticeship — same as barber
 const PROGRAM_LABEL   = 'Cosmetology Apprenticeship';
 const DISCIPLINE      = 'cosmetology';
 const PROGRAM_SLUG    = 'cosmetology-apprenticeship';

@@ -12,7 +12,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { sendEmail } from '@/lib/email/sendgrid';
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       return safeError('Select a valid program', 400);
     }
 
-    const supabase = createAdminClient();
+    const supabase = await getAdminClient();
     if (!supabase) return safeError('Service temporarily unavailable', 503);
 
     // Duplicate check — same email + program within 30 days

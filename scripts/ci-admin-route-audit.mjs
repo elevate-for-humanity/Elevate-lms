@@ -89,6 +89,25 @@ import path from "node:path";
     }
   }
 
+  // Rule 3: getAdminClient must not be imported from '@/lib/supabase/server'
+  // server.ts does not export getAdminClient — only '@/lib/supabase/admin' does.
+  const allFiles = [...walkGuard(APP_DIR), ...walkGuard(path.join(_ROOT, "lib"))];
+  for (const file of allFiles) {
+    const text = fs.readFileSync(file, "utf8");
+    if (text.includes("getAdminClient") && text.includes("from '@/lib/supabase/server'")) {
+      const lines = text.split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].includes("getAdminClient") && lines[i].includes("supabase/server")) {
+          const rel = path.relative(_ROOT, file);
+          console.log(`ERROR [getAdminClient imported from wrong module] ${rel}:${i + 1}`);
+          console.log(`  ${lines[i].trim()}`);
+          console.log(`  → Change to: import { getAdminClient } from '@/lib/supabase/admin'`);
+          coldStartViolations++;
+        }
+      }
+    }
+  }
+
   if (coldStartViolations > 0) {
     console.log(`\n${coldStartViolations} createAdminClient() violation(s). See above.\n`);
     process.exit(1);

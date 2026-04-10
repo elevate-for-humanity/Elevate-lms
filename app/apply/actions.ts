@@ -642,7 +642,7 @@ export async function submitStudentApplication(data: StudentApplicationData) {
 
     // Insert structured eligibility review record
     if (elig && !updateErr) {
-      await supabase.from('application_eligibility_reviews').insert({
+      const { error: eligReviewErr } = await supabase.from('application_eligibility_reviews').insert({
         application_id:             result.applicationId,
         funding_snap:               elig.hasSnap,
         funding_tanf:               elig.hasTanf,
@@ -675,6 +675,9 @@ export async function submitStudentApplication(data: StudentApplicationData) {
         eligibility_status:         eligStatus,
         eligibility_reason_codes:   elig.eligibilityReasonCodes ?? [],
       });
+      if (eligReviewErr) {
+        logger.error('[Apply] Failed to insert application_eligibility_reviews', eligReviewErr);
+      }
     }
 
     if (updateErr) {

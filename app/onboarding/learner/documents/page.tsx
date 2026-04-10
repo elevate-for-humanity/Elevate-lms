@@ -82,7 +82,10 @@ export default function DocumentsPage() {
         .then(res => res.json())
         .then(result => {
           const docs = result.documents || [];
-          const types = new Set(docs.map((d: any) => d.document_type));
+          // Use original_type from metadata when available — document_type in DB
+          // is normalized (e.g. 'other') but metadata.original_type preserves the
+          // frontend key ('income_proof', 'residency_proof', etc.)
+          const types = new Set(docs.map((d: any) => d.metadata?.original_type || d.document_type));
           setUploadedTypes(types);
           setLoading(false);
         })

@@ -223,7 +223,7 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
 
         // Enrollment path — application is submitted and pending review.
         // Redirect to success page; admin reviews and grants LMS access after funding verification.
-        router.push(`/apply/success?ref=${encodeURIComponent(result.referenceNumber || '')}&program=${encodeURIComponent(data.programInterest)}`);
+        router.push(`/apply/success?ref=${encodeURIComponent(result.referenceNumber || '')}&program=${encodeURIComponent(data.programInterest)}&pw=1`);
         return;
       } else {
         setError(

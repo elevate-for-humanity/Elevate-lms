@@ -108,13 +108,36 @@ const ENROLLED_CONFIG = {
 export default async function ApplicationSuccessPage({
   searchParams,
 }: {
-  searchParams: Promise<{ role?: string; ref?: string; enrolled?: string }>;
+  searchParams: Promise<{ role?: string; ref?: string; enrolled?: string; pw?: string }>;
 }) {
   const params = await searchParams;
   const role = params.role || 'student';
   const referenceNumber = params.ref || null;
   const isEnrolled = params.enrolled === 'true';
-  const config = isEnrolled ? ENROLLED_CONFIG : (ROLE_CONFIG[role] || ROLE_CONFIG.student);
+  // pw=1 means the student set a password on the application form — skip the "set password" step
+  const hasPassword = params.pw === '1';
+
+  let config = isEnrolled ? ENROLLED_CONFIG : (ROLE_CONFIG[role] || ROLE_CONFIG.student);
+
+  // Replace "Set your password" step with "Log in directly" when password was set on the form
+  if (!isEnrolled && role === 'student' && hasPassword) {
+    config = {
+      ...config,
+      steps: config.steps.map((step) =>
+        step.title === 'Set your password'
+          ? {
+              ...step,
+              title: 'Log in to your account',
+              description: 'Use the email and password you just created to sign in and start your onboarding.',
+              link: '/login?redirect=/onboarding/learner',
+              linkLabel: 'Sign In Now',
+            }
+          : step
+      ),
+      primaryLink: '/login?redirect=/onboarding/learner',
+      primaryLabel: 'Sign In Now',
+    };
+  }
 
   return (
     <div className="min-h-screen bg-white">

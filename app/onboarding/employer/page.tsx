@@ -123,7 +123,7 @@ export default async function EmployerOnboardingPage() {
       title: 'Employer Partnership Agreement',
       description: 'Review and sign the Memorandum of Understanding',
       icon: FileText,
-      href: '/onboarding/employer/agreement',
+      href: '/legal/employer-agreement',
       status: stepStatus(hasMOU, [hasHiringNeeds]),
       required: true,
     },

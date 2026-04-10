@@ -113,34 +113,49 @@ export default async function ProgramHolderDashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-slate-50">
       <Breadcrumbs items={[{ label: 'Program Holder Dashboard' }]} />
 
-      <div className="relative h-48 sm:h-56 w-full overflow-hidden">
-        <Image src="/images/pages/workforce-training.jpg" alt="Program Holder Portal" fill className="object-cover object-center" priority sizes="100vw" />
-      </div>
-      <div className="bg-brand-blue-700 px-6 py-6">
-        <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
+      {/* Hero */}
+      <div className="relative h-64 sm:h-80 w-full overflow-hidden">
+        <Image src="/images/pages/program-holder-page-1.jpg" alt="Program Holder Portal" fill className="object-cover object-center" priority sizes="100vw" />
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-blue-950/90 via-brand-blue-900/50 to-transparent" />
+        <div className="absolute inset-0 flex items-end">
+          <div className="max-w-7xl mx-auto w-full px-6 pb-8 flex items-end justify-between gap-4">
             <div>
-              <p className="text-brand-orange-400 text-xs font-bold uppercase tracking-widest mb-1">Elevate For Humanity</p>
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-white">Program Holder Portal</h1>
+              <p className="text-brand-orange-400 text-xs font-bold uppercase tracking-widest mb-2">Elevate For Humanity</p>
+              <h1 className="text-3xl sm:text-5xl font-extrabold text-white leading-tight">Program Holder Portal</h1>
+              <p className="text-slate-300 text-sm mt-2">Manage your programs, learners, and compliance from one place.</p>
             </div>
-            <Link href="/program-holder/settings" className="p-2 text-white hover:text-brand-orange-400 transition">
-              <Settings className="w-6 h-6" />
+            <Link href="/program-holder/settings" className="flex-shrink-0 p-3 bg-white/10 hover:bg-white/20 rounded-xl text-white transition">
+              <Settings className="w-5 h-5" />
             </Link>
           </div>
         </div>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+
+        {/* Stats — image-backed cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {stats.map((stat) => (
-            <div key={stat.label} className="bg-white rounded-xl border border-slate-200 p-5">
-              <div className={`w-10 h-10 ${stat.bg} rounded-lg flex items-center justify-center mb-3`}>
-                <stat.icon className={`w-5 h-5 ${stat.color}`} />
+          {[
+            { label: 'Active Learners',     value: totalActive.toLocaleString(),    img: '/images/pages/admin-students-hero.jpg',          href: '/program-holder/students' },
+            { label: 'Programs',            value: programs.length.toString(),       img: '/images/pages/about-career-training.jpg',        href: '/program-holder/programs' },
+            { label: 'Completions',         value: totalCompleted.toLocaleString(), img: '/images/pages/graduation-ceremony.jpg',           href: '/program-holder/reports' },
+            { label: 'Certificates Issued', value: totalCerts.toLocaleString(),     img: '/images/pages/certificates-page-1.jpg',           href: '/program-holder/reports' },
+          ].map((stat) => (
+            <Link key={stat.label} href={stat.href} className="group bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+              <div className="relative h-28 w-full">
+                <Image src={stat.img} alt={stat.label} fill className="object-cover object-center group-hover:scale-105 transition-transform duration-300" sizes="(max-width:768px) 50vw, 25vw" />
+                <div className="absolute inset-0 bg-brand-blue-950/50" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <p className="text-4xl font-black text-white drop-shadow-lg">{stat.value}</p>
+                </div>
               </div>
-              <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
-              <p className="text-sm text-slate-500 mt-0.5">{stat.label}</p>
-            </div>
+              <div className="px-4 py-3">
+                <p className="text-sm font-bold text-slate-800">{stat.label}</p>
+              </div>
+            </Link>
           ))}
         </div>
 
@@ -243,33 +258,40 @@ export default async function ProgramHolderDashboardPage() {
           </div>
 
           <div className="space-y-4">
-            <div className="bg-white rounded-xl border border-slate-200 p-5">
-              <h3 className="font-bold text-slate-900 mb-4">Quick Actions</h3>
-              <div className="space-y-2">
-                {[
-                  { label: 'Add New Program', href: '/program-holder/programs', icon: BookOpen, highlight: true },
-                  { label: 'Manage Students', href: '/program-holder/students', icon: Users },
-                  { label: 'View Reports', href: '/program-holder/reports', icon: BarChart3 },
-                  { label: 'Analytics', href: '/program-holder/analytics', icon: TrendingUp },
-                  { label: 'Settings', href: '/program-holder/settings', icon: Settings },
-                ].map((action) => (
-                  <Link
-                    key={action.href}
-                    href={action.href}
-                    className={`flex items-center justify-between p-3 rounded-lg text-sm transition-colors ${action.highlight ? 'bg-brand-blue-600 text-white hover:bg-brand-blue-700' : 'bg-slate-50 text-slate-700 hover:bg-slate-100'}`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <action.icon className="w-4 h-4" />
-                      {action.label}
-                    </div>
-                    <ChevronRight className="w-3.5 h-3.5 opacity-60" />
-                  </Link>
-                ))}
+            {/* Image-backed quick action cards */}
+            {[
+              { label: 'Program Holder Handbook', sub: 'Policies, rules & requirements', href: '/program-holder/handbook',  img: '/images/pages/program-holder-page-2.jpg' },
+              { label: 'Manage Students',         sub: 'View progress & enrollment',     href: '/program-holder/students',  img: '/images/pages/mentorship-page-1.jpg' },
+              { label: 'View Reports',            sub: 'Compliance & performance',       href: '/program-holder/reports',   img: '/images/pages/admin-analytics-programs-hero.jpg' },
+              { label: 'Documents',               sub: 'Licenses & compliance docs',     href: '/program-holder/documents', img: '/images/pages/program-holder-docs.jpg' },
+            ].map((action) => (
+              <Link key={action.href} href={action.href} className="group relative flex items-center gap-4 bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                <div className="relative w-20 h-20 flex-shrink-0">
+                  <Image src={action.img} alt={action.label} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="80px" />
+                  <div className="absolute inset-0 bg-brand-blue-900/30" />
+                </div>
+                <div className="flex-1 py-3 pr-4">
+                  <p className="font-bold text-slate-900 text-sm">{action.label}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{action.sub}</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-brand-blue-500 mr-3 transition-colors" />
+              </Link>
+            ))}
+
+            {/* Add program CTA */}
+            <Link href="/program-holder/programs" className="group relative flex items-center gap-4 bg-brand-blue-600 rounded-2xl overflow-hidden shadow-sm hover:bg-brand-blue-700 transition-colors">
+              <div className="relative w-20 h-20 flex-shrink-0">
+                <Image src="/images/pages/about-career-training.jpg" alt="Add Program" fill className="object-cover opacity-40 group-hover:scale-105 transition-transform duration-300" sizes="80px" />
               </div>
-            </div>
+              <div className="flex-1 py-3 pr-4">
+                <p className="font-bold text-white text-sm">Add New Program</p>
+                <p className="text-xs text-brand-blue-200 mt-0.5">Expand your offerings</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-white/60 mr-3" />
+            </Link>
 
             {programs.filter(p => !p.isActive).length > 0 && (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
                 <div className="flex gap-2">
                   <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
                   <div>

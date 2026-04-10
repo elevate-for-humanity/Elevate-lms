@@ -33,30 +33,35 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* Hero — clean image, no overlay */}
-      <section className="relative h-[45vh] min-h-[280px] max-h-[560px] overflow-hidden">
-        <Image
-          src="/images/team/elizabeth-greene-headshot.jpg"
-          alt="Elizabeth Greene, Founder of Elevate for Humanity"
-          fill
-          className="object-cover object-top"
-          priority
-          sizes="100vw"
-        />
-      </section>
-
-      {/* Page identity — below hero */}
-      <section className="border-b border-slate-100 py-10 px-4">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">
-            Indianapolis, Indiana
-          </p>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
-            Elevate for Humanity
-          </h1>
-          <p className="text-black text-base sm:text-lg max-w-2xl leading-relaxed">
-            Workforce development institute providing funded career training to people facing barriers to employment.
-          </p>
+      {/* Hero — founder portrait + page identity */}
+      <section className="border-b border-slate-100 py-12 px-4">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center gap-8">
+          {/* Contained headshot */}
+          <div className="relative w-40 h-40 sm:w-52 sm:h-52 flex-shrink-0 rounded-2xl overflow-hidden shadow-lg border border-slate-200">
+            <Image
+              src="/images/team/elizabeth-greene-headshot.jpg"
+              alt="Elizabeth Greene, Founder & CEO of Elevate for Humanity"
+              fill
+              className="object-cover object-top"
+              priority
+              sizes="(max-width: 640px) 160px, 208px"
+            />
+          </div>
+          {/* Page identity */}
+          <div>
+            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">
+              Indianapolis, Indiana
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
+              Elevate for Humanity
+            </h1>
+            <p className="text-black text-base sm:text-lg max-w-2xl leading-relaxed mb-2">
+              Workforce development institute providing funded career training to people facing barriers to employment.
+            </p>
+            <p className="text-sm text-slate-500 font-medium">
+              Founded by Elizabeth Greene · Founder &amp; CEO
+            </p>
+          </div>
         </div>
       </section>
 

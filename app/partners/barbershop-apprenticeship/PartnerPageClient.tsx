@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { ArrowRight, ClipboardList, BookOpen, FileText, PenLine, CheckCircle2, Lock } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import VideoHero from '@/components/ui/VideoHero';
+import Image from 'next/image';
 
 const CALENDLY_URL = process.env.NEXT_PUBLIC_CALENDLY_30MIN || 'https://calendly.com/elevate4humanityedu/30min';
 
@@ -14,13 +14,31 @@ export default function PartnerPageClient() {
         <Breadcrumbs items={[{ label: 'Partners', href: '/partners' }, { label: 'Barbershop Apprenticeship' }]} />
       </div>
 
-      {/* Video Hero — no text overlay */}
-      <VideoHero
-        videoSrc="/videos/barber-hero-final.mp4"
-        posterSrc="/images/pages/barber-hero-main.jpg"
-        posterAlt="Barber apprentice training in a barbershop"
-        preloadFull
-      />
+      {/* Hero */}
+      <div className="relative w-full h-[50vh] md:h-[65vh] overflow-hidden">
+        <Image
+          src="/images/pages/barber-shop-wide.jpg"
+          alt="Professional barbershop — Indiana Barbershop Apprenticeship Program"
+          fill
+          className="object-cover object-center"
+          priority
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+        <div className="absolute inset-0 flex flex-col justify-end px-6 pb-10">
+          <div className="max-w-4xl mx-auto w-full">
+            <span className="inline-block bg-brand-red-600 text-white text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-4">
+              DOL Registered Apprenticeship
+            </span>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white leading-tight mb-3">
+              Indiana Barbershop<br className="hidden sm:block" /> Apprenticeship
+            </h1>
+            <p className="text-white/90 text-lg sm:text-xl max-w-xl">
+              Host an apprentice. Grow your shop. Build the next generation of licensed barbers.
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* CTA Section below hero */}
       <section className="py-16 border-b border-slate-100">

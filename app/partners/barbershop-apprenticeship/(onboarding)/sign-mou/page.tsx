@@ -133,7 +133,15 @@ These restrictions do not prevent the Shop from: operating as a barbershop, empl
 A full Non-Compete Agreement is available at elevateforhumanity.org/legal/non-compete and is incorporated by reference into this MOU.`,
   },
   {
-    title: '9. Dispute Resolution',
+    title: '9. Partner Handbook — Required Reading',
+    content: `The Worksite Partner Handbook is incorporated by reference into this MOU and forms part of this agreement. The Handbook details the day-to-day responsibilities, compensation requirements, hour tracking procedures, prohibited practices, and communication expectations that govern the worksite relationship.
+
+By signing this MOU, the Shop confirms that it has read and understood the Partner Handbook in full prior to signing. The Handbook is available at: elevateforhumanity.org/partners/barbershop-apprenticeship/handbook
+
+Failure to comply with the standards set out in the Handbook constitutes a breach of this MOU and may result in immediate termination of the partnership and notification to USDOL.`,
+  },
+  {
+    title: '10. Dispute Resolution',
     content: `The parties agree to attempt to resolve any disputes through good-faith negotiation first. If a dispute cannot be resolved through negotiation within 15 business days, either party may submit the dispute to mediation.
 
 If mediation is unsuccessful, the parties consent to jurisdiction in Marion County, Indiana. This MOU is governed by the laws of the State of Indiana.
@@ -144,57 +152,76 @@ USDOL/RAPIDS compliance disputes are subject to federal apprenticeship regulatio
 
 export default function SignMOUPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const signatureDataRef = useRef<string>('');
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasSigned, setHasSigned] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
 
-  // Form fields
+  // Form fields — pre-populated from partner application on mount
   const [shopName, setShopName] = useState('');
   const [signerName, setSignerName] = useState('');
-  const [signerTitle, setSignerTitle] = useState('');
+  const [signerTitle, setSignerTitle] = useState('Owner / Barber on Duty');
   const [supervisorName, setSupervisorName] = useState('');
   const [supervisorLicense, setSupervisorLicense] = useState('');
-  const [compensationModel, setCompensationModel] = useState('');
+  const [compensationModel, setCompensationModel] = useState('hourly');
   const [compensationRate, setCompensationRate] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [handbookRead, setHandbookRead] = useState(false);
 
-  // Canvas setup
+  // Pre-populate from logged-in user's partner application
+  useEffect(() => {
+    fetch('/api/partners/barbershop-apprenticeship/my-application')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data) return;
+        if (data.shop_name)   setShopName(data.shop_name);
+        if (data.owner_name)  setSignerName(data.owner_name);
+        if (data.contact_email || data.email) { /* email display only */ }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Canvas setup — use ResizeObserver so canvas is sized after layout
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
 
-    // Set canvas size
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * 2;
-    canvas.height = rect.height * 2;
-    ctx.scale(2, 2);
+    const initCanvas = () => {
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width === 0) return; // not laid out yet
 
-    // Style
-    ctx.strokeStyle = '#1a1a1a';
-    ctx.lineWidth = 2;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
 
-    // Draw signature line
-    ctx.beginPath();
-    ctx.strokeStyle = '#d1d5db';
-    ctx.lineWidth = 1;
-    ctx.moveTo(20, rect.height - 30);
-    ctx.lineTo(rect.width - 20, rect.height - 30);
-    ctx.stroke();
+      ctx.strokeStyle = '#1a1a1a';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
 
-    // Label
-    ctx.fillStyle = '#9ca3af';
-    ctx.font = '12px system-ui';
-    ctx.fillText('Sign above this line', rect.width / 2 - 50, rect.height - 12);
+      // Baseline
+      ctx.beginPath();
+      ctx.strokeStyle = '#d1d5db';
+      ctx.lineWidth = 1;
+      ctx.moveTo(20, rect.height - 30);
+      ctx.lineTo(rect.width - 20, rect.height - 30);
+      ctx.stroke();
+      ctx.fillStyle = '#9ca3af';
+      ctx.font = '12px system-ui';
+      ctx.fillText('Sign above this line', rect.width / 2 - 60, rect.height - 12);
+      ctx.strokeStyle = '#1a1a1a';
+      ctx.lineWidth = 2;
+    };
 
-    // Reset stroke style for drawing
-    ctx.strokeStyle = '#1a1a1a';
-    ctx.lineWidth = 2;
+    const ro = new ResizeObserver(() => initCanvas());
+    ro.observe(canvas);
+    initCanvas();
+    return () => ro.disconnect();
   }, []);
 
   const getPos = useCallback((e: React.MouseEvent | React.TouchEvent) => {
@@ -221,7 +248,6 @@ export default function SignMOUPage() {
     ctx.beginPath();
     ctx.moveTo(pos.x, pos.y);
     setIsDrawing(true);
-    setHasSigned(true);
   }, [getPos]);
 
   const draw = useCallback((e: React.MouseEvent | React.TouchEvent) => {
@@ -236,9 +262,16 @@ export default function SignMOUPage() {
 
   const stopDrawing = useCallback(() => {
     setIsDrawing(false);
+    // Capture signature immediately after stroke ends
+    if (canvasRef.current) {
+      signatureDataRef.current = canvasRef.current.toDataURL('image/png');
+      setHasSigned(true);
+    }
   }, []);
 
   const clearSignature = () => {
+    signatureDataRef.current = '';
+    setHasSigned(false);
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -267,6 +300,14 @@ export default function SignMOUPage() {
     e.preventDefault();
     setError('');
 
+    if (!shopName.trim()) {
+      setError('Please enter your barbershop name.');
+      return;
+    }
+    if (!signerName.trim()) {
+      setError('Please enter your full legal name.');
+      return;
+    }
     if (!hasSigned) {
       setError('Please provide your signature above.');
       return;
@@ -279,8 +320,8 @@ export default function SignMOUPage() {
     setSubmitting(true);
 
     try {
-      // Get signature as data URL
-      const signatureData = canvasRef.current?.toDataURL('image/png');
+      // Use the captured signature (saved on stroke end, not at submit time)
+      const signatureData = signatureDataRef.current || canvasRef.current?.toDataURL('image/png');
 
       const payload = {
         shop_name: shopName,
@@ -360,6 +401,46 @@ export default function SignMOUPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="max-w-4xl mx-auto px-4 py-8">
+
+        {/* Handbook prerequisite */}
+        <div className={`rounded-xl border-2 p-5 mb-8 ${handbookRead ? 'border-green-400 bg-green-50' : 'border-amber-400 bg-amber-50'}`}>
+          <div className="flex items-start gap-4">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${handbookRead ? 'bg-green-100' : 'bg-amber-100'}`}>
+              {handbookRead
+                ? <CheckCircle2 className="w-6 h-6 text-green-600" />
+                : <AlertCircle className="w-6 h-6 text-amber-600" />
+              }
+            </div>
+            <div className="flex-1">
+              <p className={`font-bold text-base mb-1 ${handbookRead ? 'text-green-900' : 'text-amber-900'}`}>
+                {handbookRead ? 'Handbook reviewed — you may proceed' : 'Step 1: Read the Partner Handbook before signing'}
+              </p>
+              <p className={`text-sm mb-3 ${handbookRead ? 'text-green-800' : 'text-amber-800'}`}>
+                The Partner Handbook explains your responsibilities as a worksite employer, compensation requirements, hour tracking, and prohibited practices. You must review it before signing this MOU.
+              </p>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <Link
+                  href="/partners/barbershop-apprenticeship/handbook"
+                  target="_blank"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-amber-400 text-amber-800 rounded-lg text-sm font-semibold hover:bg-amber-50"
+                >
+                  <FileText className="w-4 h-4" />
+                  Open Partner Handbook
+                </Link>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={handbookRead}
+                    onChange={(e) => setHandbookRead(e.target.checked)}
+                    className="w-5 h-5 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                  />
+                  <span className="text-sm font-semibold text-gray-900">I have read and understood the Partner Handbook</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* MOU Content */}
         <div className="bg-white rounded-xl shadow-sm border mb-8">
           <div className="p-6 border-b rounded-t-xl">
@@ -503,15 +584,15 @@ export default function SignMOUPage() {
               <p className="text-xs text-black"><strong>Date:</strong> {new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</p>
               <div className="mt-3 bg-green-50 border border-green-200 rounded px-3 py-1.5 text-xs text-green-700 font-semibold text-center">✓ Signed by Elevate for Humanity</div>
             </div>
-            {/* Adam — needs to sign */}
+            {/* Employer — needs to sign */}
             <div className="border-2 border-dashed border-red-300 rounded-lg p-4 bg-red-50">
               <p className="text-xs font-bold text-red-600 uppercase tracking-wide mb-3">Employer Training Site — Your Signature Required</p>
               <div className="border-b border-dashed border-red-400 pb-2 mb-3 min-h-[32px]">
                 <span className="text-sm text-red-400 italic">Draw your signature below</span>
               </div>
-              <p className="text-xs text-black"><strong>Name:</strong> Adam Kriech</p>
+              <p className="text-xs text-black"><strong>Name:</strong> {signerName || '—'}</p>
               <p className="text-xs text-black"><strong>Title:</strong> Owner</p>
-              <p className="text-xs text-black"><strong>Organization:</strong> Kountry Kutz Barbershop</p>
+              <p className="text-xs text-black"><strong>Organization:</strong> {shopName || '—'}</p>
               <p className="text-xs text-black"><strong>Date:</strong> {new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</p>
               <div className="mt-3 bg-yellow-50 border border-yellow-300 rounded px-3 py-1.5 text-xs text-yellow-700 font-semibold text-center">⚠ Awaiting your signature</div>
             </div>
@@ -519,7 +600,7 @@ export default function SignMOUPage() {
         </div>
 
         {/* Digital Signature Canvas */}
-        <div className="bg-white rounded-xl shadow-sm border p-6 mb-8">
+        <div className={`bg-white rounded-xl shadow-sm border p-6 mb-8 ${!handbookRead ? 'opacity-50 pointer-events-none select-none' : ''}`}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-gray-900">Draw Your Signature</h2>
             <button
@@ -588,7 +669,7 @@ export default function SignMOUPage() {
         <div className="flex flex-col sm:flex-row gap-4">
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || !handbookRead || !shopName.trim() || !signerName.trim() || !hasSigned || !agreedToTerms}
             className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-blue-600 text-white rounded-lg font-bold text-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? (

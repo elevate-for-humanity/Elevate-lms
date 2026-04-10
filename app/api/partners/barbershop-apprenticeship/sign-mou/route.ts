@@ -64,8 +64,8 @@ async function _POST(req: NextRequest) {
       'unknown';
     const userAgent = req.headers.get('user-agent') || 'unknown';
 
-    // Find the matching application by shop name
-    const { data: application } = await supabase
+    // Find the matching application — check both tables
+    const { data: bpaApplication } = await supabase
       .from('barbershop_partner_applications')
       .select('id, status')
       .ilike('shop_legal_name', shop_name.trim())
@@ -73,39 +73,30 @@ async function _POST(req: NextRequest) {
       .limit(1)
       .maybeSingle();
 
+    const { data: paApplication } = await supabase
+      .from('partner_applications')
+      .select('id, status')
+      .ilike('shop_name', shop_name.trim())
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const application = bpaApplication || paApplication;
+    const applicationTable = bpaApplication ? 'barbershop_partner_applications' : 'partner_applications';
+
     const now = new Date().toISOString();
 
-    // Upload signature image to Supabase Storage (agreements bucket)
-    // Store path reference instead of raw base64 blob in DB
-    let signaturePath: string | null = null;
-    try {
-      const base64Data = signature_data.replace(/^data:image\/\w+;base64,/, '');
-      const buffer = Buffer.from(base64Data, 'base64');
-      const fileName = `barber-mou/${Date.now()}-${signer_name.trim().replace(/\s+/g, '-').toLowerCase()}.png`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('agreements')
-        .upload(fileName, buffer, { contentType: 'image/png', upsert: false });
-      if (!uploadError && uploadData) {
-        signaturePath = uploadData.path;
-      } else {
-        logger.warn('[sign-mou] Storage upload failed, falling back to DB blob:', uploadError);
-      }
-    } catch (uploadErr) {
-      logger.warn('[sign-mou] Storage upload exception, falling back to DB blob:', uploadErr);
-    }
-
-    // Insert MOU signature — use storage path if available, else fall back to data URL
+    // Insert MOU signature — only columns that exist in the live schema
     const { data: mouRecord, error: insertError } = await supabase
       .from('mou_signatures')
       .insert({
         signer_name: signer_name.trim(),
         signer_title: signer_title.trim(),
-        signature_data: signaturePath ? null : signature_data,
-        signature_path: signaturePath,
+        signature_data,
         signed_at: signed_at || now,
+        agreed_at: now,
         ip_address: ipAddress,
         user_agent: userAgent,
-        agreed_at: now,
         supervisor_name: supervisor_name?.trim(),
         supervisor_license: supervisor_license?.trim(),
         compensation_model,
@@ -139,16 +130,28 @@ async function _POST(req: NextRequest) {
 
     // Update application status if found
     if (application?.id) {
-      await supabase
-        .from('barbershop_partner_applications')
-        .update({
-          status: 'mou_signed',
-          mou_acknowledged: true,
-          updated_at: now,
-        })
-        .eq('id', application.id);
-
-      logger.info(`[sign-mou] Application ${application.id} updated to mou_signed`);
+      if (applicationTable === 'barbershop_partner_applications') {
+        await supabase
+          .from('barbershop_partner_applications')
+          .update({
+            status: 'mou_signed',
+            mou_acknowledged: true,
+            mou_signature_data: signature_data,
+            mou_signed_at: signed_at || now,
+            mou_signer_name: signer_name.trim(),
+            updated_at: now,
+          })
+          .eq('id', application.id);
+      } else {
+        await supabase
+          .from('partner_applications')
+          .update({
+            status: 'mou_signed',
+            approval_status: 'mou_signed',
+          })
+          .eq('id', application.id);
+      }
+      logger.info(`[sign-mou] Application ${application.id} updated to mou_signed (table: ${applicationTable})`);
     }
 
     // Generate signed PDF and email to partner + Elevate
@@ -176,9 +179,11 @@ async function _POST(req: NextRequest) {
       // Get public URL
       const { data: pdfUrl } = supabase.storage.from('mous').getPublicUrl(pdfFileName);
 
-      // Update mou_signatures with PDF path
+      // Update mou_signatures with PDF path (only if column exists in live schema)
       if (mouRecord?.id && pdfUpload) {
-        await supabase.from('mou_signatures').update({ mou_final_pdf_url: pdfUrl.publicUrl }).eq('id', mouRecord.id);
+        await supabase.from('mou_signatures').update({ pdf_url: pdfUrl.publicUrl }).eq('id', mouRecord.id)
+          .then(() => {}) // non-blocking — column may not exist yet
+          .catch(() => {});
       }
 
       // Update partners table

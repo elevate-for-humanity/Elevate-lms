@@ -53,8 +53,8 @@ function ProfileStep({ onNext }: { onNext: (data: Record<string, string>) => voi
 
       <h3 className="font-bold text-gray-900">Business Information</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {field('Barbershop Name', 'shop_name', 'text', true, 'Kountry Kutz Barbershop')}
-        {field('Owner Full Name', 'owner_name', 'text', true, 'Adam Kriech')}
+        {field('Barbershop Name', 'shop_name', 'text', true, 'e.g. Prestige Cuts Barbershop')}
+        {field('Owner Full Name', 'owner_name', 'text', true, 'e.g. Jane Smith')}
         {field('Contact Name (if different)', 'contact_name', 'text', false)}
         {field('Federal EIN', 'ein', 'text', true, 'XX-XXXXXXX')}
         {field('Phone', 'phone', 'tel', true, '(317) 000-0000')}

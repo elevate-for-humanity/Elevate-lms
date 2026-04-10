@@ -94,10 +94,36 @@ export async function generateMOUPdf(data: MOUPDFData): Promise<Uint8Array> {
   };
 
   // ── Header ──────────────────────────────────────────────────────────────────
-  page.drawRectangle({ x: 0, y: pageHeight - 80, width: pageWidth, height: 80, color: rgb(0.1, 0.1, 0.18) });
-  page.drawText('ELEVATE FOR HUMANITY', { x: margin, y: pageHeight - 35, size: 16, font: boldFont, color: rgb(1, 1, 1) });
-  page.drawText('Technical and Career Institute  ·  DOL Registered Apprenticeship', { x: margin, y: pageHeight - 52, size: 9, font: regularFont, color: rgb(0.7, 0.7, 0.7) });
-  page.drawText(`RAPIDS: ${RAPIDS}  ·  CAGE: ${CAGE}  ·  UEI: ${UEI}`, { x: margin, y: pageHeight - 66, size: 8, font: regularFont, color: rgb(0.6, 0.6, 0.6) });
+  page.drawRectangle({ x: 0, y: pageHeight - 90, width: pageWidth, height: 90, color: rgb(0.1, 0.1, 0.18) });
+
+  // Embed logo — try to load from public/images/logo.png
+  let logoEmbedded = false;
+  try {
+    const fs = await import('fs');
+    const path = await import('path');
+    const logoPath = path.join(process.cwd(), 'public', 'images', 'logo.png');
+    if (fs.existsSync(logoPath)) {
+      const logoBytes = fs.readFileSync(logoPath);
+      const logoImg = await doc.embedPng(logoBytes).catch(() => null);
+      if (logoImg) {
+        const logoDims = logoImg.scale(0.18);
+        page.drawImage(logoImg, {
+          x: margin,
+          y: pageHeight - 80,
+          width: logoDims.width,
+          height: logoDims.height,
+        });
+        logoEmbedded = true;
+      }
+    }
+  } catch {
+    // Logo embed failed — fall back to text
+  }
+
+  const textX = logoEmbedded ? margin + 120 : margin;
+  page.drawText('ELEVATE FOR HUMANITY', { x: textX, y: pageHeight - 38, size: 15, font: boldFont, color: rgb(1, 1, 1) });
+  page.drawText('Technical and Career Institute  ·  DOL Registered Apprenticeship', { x: textX, y: pageHeight - 54, size: 8, font: regularFont, color: rgb(0.7, 0.7, 0.7) });
+  page.drawText(`RAPIDS: ${RAPIDS}  ·  CAGE: ${CAGE}  ·  UEI: ${UEI}`, { x: textX, y: pageHeight - 68, size: 7.5, font: regularFont, color: rgb(0.6, 0.6, 0.6) });
 
   y = pageHeight - 100;
 

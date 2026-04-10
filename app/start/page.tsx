@@ -177,6 +177,12 @@ export default function StartPage() {
             Fill out the form above or call us directly.
           </p>
           <div className="mt-6 flex flex-col justify-center gap-4 sm:flex-row">
+            <Link
+              href="/apply"
+              className="inline-flex items-center justify-center rounded-lg bg-brand-red-600 hover:bg-brand-red-700 px-8 py-4 font-bold text-white transition"
+            >
+              Apply Now
+            </Link>
             <a
               href="#main-content"
               className="inline-flex items-center justify-center rounded-lg bg-white px-8 py-4 font-bold text-brand-blue-700 transition hover:bg-blue-50"

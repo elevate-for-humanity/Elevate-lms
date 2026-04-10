@@ -149,6 +149,9 @@ export default function EmployerPage() {
                 <Link href="/testing/book?type=group-testing" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm">
                   Partner With Us <ChevronRight className="w-4 h-4" />
                 </Link>
+                <Link href="/apply" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm">
+                  Apply Now <ChevronRight className="w-4 h-4" />
+                </Link>
                 <a href="mailto:info@elevateforhumanity.org" className="inline-flex items-center gap-2 border border-slate-300 hover:border-slate-400 text-slate-700 font-semibold px-6 py-3 rounded-lg transition-colors text-sm">
                   Email Us
                 </a>

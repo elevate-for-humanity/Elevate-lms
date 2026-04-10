@@ -139,6 +139,12 @@ export default async function HireGraduatesPage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
+              href="/apply"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-bold transition-colors"
+            >
+              Apply Now
+            </Link>
+            <Link
               href="/contact?type=employer"
               className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold transition-colors"
             >

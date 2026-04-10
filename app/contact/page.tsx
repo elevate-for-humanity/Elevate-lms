@@ -3,6 +3,7 @@
 import { Suspense } from 'react';
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Mail, Phone, MapPin, Clock, Send, AlertCircle, Loader2 } from 'lucide-react';
@@ -407,7 +408,13 @@ function ContactPageInner() {
       </div>
 
       {/* Email Contact */}
-      <div className="max-w-4xl mx-auto px-4 py-8 flex justify-center">
+      <div className="max-w-4xl mx-auto px-4 py-8 flex flex-wrap justify-center gap-4">
+        <Link
+          href="/apply"
+          className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors"
+        >
+          Apply Now
+        </Link>
         <a
           href="/contact"
           className="inline-flex items-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-lg font-semibold hover:bg-slate-800 transition-colors"

@@ -330,6 +330,12 @@ export default function EmployersPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
+              href="/apply"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-slate-900 font-bold rounded-lg hover:bg-slate-100 transition text-lg"
+            >
+              Apply Now <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link
               href="/contact?type=employer"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold rounded-lg transition text-lg"
             >

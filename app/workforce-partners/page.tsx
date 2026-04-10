@@ -180,6 +180,9 @@ export default function WorkforcePartnersPage() {
             </p>
           </div>
           <div className="flex flex-col gap-3 flex-shrink-0">
+            <Link href="/apply" className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-sm text-center">
+              Apply Now
+            </Link>
             <a href="#partner-form" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-sm text-center">
               Submit a Referral
             </a>

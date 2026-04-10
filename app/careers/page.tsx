@@ -325,8 +325,14 @@ export default async function CareersPage() {
               opportunities.
             </p>
             <Link
+              href="/apply"
+              className="inline-block bg-white text-brand-orange-600 px-8 py-3 rounded-lg font-semibold hover:bg-slate-100 transition"
+            >
+              Apply Now
+            </Link>
+            <Link
               href="/contact"
-              className="inline-block bg-white text-brand-orange-600 px-8 py-3 rounded-lg font-semibold hover:bg-white transition"
+              className="inline-block border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition"
             >
               Contact Us
             </Link>

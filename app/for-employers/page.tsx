@@ -233,6 +233,12 @@ export default async function ForEmployersPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
+              href="/apply"
+              className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-xl font-bold transition text-lg"
+            >
+              Apply Now
+            </Link>
+            <Link
               href="/employer-portal"
               className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-white transition text-lg"
             >

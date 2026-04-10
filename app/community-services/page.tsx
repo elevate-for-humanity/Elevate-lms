@@ -194,6 +194,12 @@ const services = (dbRows as any[]) || [];
             Not sure where to start? Contact us and we'll help connect you with the right services.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <Link
+              href="/apply"
+              className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition"
+            >
+              Apply Now
+            </Link>
             <a
               href="/support"
               className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-brand-green-700 transition"

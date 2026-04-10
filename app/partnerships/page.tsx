@@ -161,6 +161,12 @@ export default function PartnershipsPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
+              href="/apply"
+              className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-3 rounded-lg font-bold transition"
+            >
+              Apply Now <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
               href="/partners/training"
               className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
             >

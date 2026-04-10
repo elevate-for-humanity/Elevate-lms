@@ -3,8 +3,9 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import React from 'react';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createBrowserClient } from '@supabase/ssr';
+import { createClient } from '@/lib/supabase/client';
 
 import {
 
@@ -655,18 +656,32 @@ const adminRoutes: AdminRoute[] = [
 
 
 
-export default async function AdminPortalMapPage() {
+export default function AdminPortalMapPage() {
+  const supabase = createClient();
+  const router = useRouter();
+  const [authChecked, setAuthChecked] = useState(false);
   const [dbRows, setDbRows] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Role guard — admin/super_admin/staff only
   useEffect(() => {
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) { router.replace('/login?redirect=/admin/portal-map'); return; }
+      const { data: profile } = await supabase
+        .from('profiles').select('role').eq('id', user.id).single();
+      if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+        router.replace('/unauthorized');
+        return;
+      }
+      setAuthChecked(true);
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!authChecked) return;
     supabase.from('pages').select('*').limit(50)
       .then(({ data }) => { if (data) setDbRows(data); });
-  }, []);
-
-  const [searchQuery, setSearchQuery] = useState('');
+  }, [authChecked]); // eslint-disable-line react-hooks/exhaustive-deps
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set()
   );
@@ -725,6 +740,10 @@ export default async function AdminPortalMapPage() {
         );
     }
   };
+
+  if (!authChecked) {
+    return <div className="p-8">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-white">

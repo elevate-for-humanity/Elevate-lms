@@ -5,6 +5,7 @@ import React from 'react';
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -17,14 +18,30 @@ CheckCircle, } from 'lucide-react';
 
 export default function ExternalModulesPage() {
   const supabase = createClient();
+  const router = useRouter();
   const [modules, setModules] = useState<any[]>([]);
   const [pendingApprovals, setPendingApprovals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
   const [filter, setFilter] = useState('all');
 
+  // Role guard — admin/super_admin/staff only
   useEffect(() => {
-    loadData();
-  }, [filter]);
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) { router.replace('/login?redirect=/admin/external-modules'); return; }
+      const { data: profile } = await supabase
+        .from('profiles').select('role').eq('id', user.id).single();
+      if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+        router.replace('/unauthorized');
+        return;
+      }
+      setAuthChecked(true);
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (authChecked) loadData();
+  }, [filter, authChecked]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function loadData() {
     // Load external modules
@@ -63,36 +80,22 @@ export default function ExternalModulesPage() {
   }
 
   async function approveModule(moduleId: string) {
-    const { error } = await supabase
-      .from('external_modules')
-      .update({
-        approval_status: 'approved',
-        approved_at: new Date().toISOString(),
-        approved_by: (await supabase.auth.getUser()).data.user?.id,
-      })
-      .eq('id', moduleId);
-
-    if (!error) {
-      await loadData();
-    }
+    const res = await fetch(
+      `/api/admin/external-modules/${moduleId}/approve`,
+      { method: 'POST', credentials: 'include' },
+    );
+    if (res.ok) await loadData();
   }
 
   async function rejectModule(moduleId: string) {
-    const { error } = await supabase
-      .from('external_modules')
-      .update({
-        approval_status: 'rejected',
-        rejected_at: new Date().toISOString(),
-        rejected_by: (await supabase.auth.getUser()).data.user?.id,
-      })
-      .eq('id', moduleId);
-
-    if (!error) {
-      await loadData();
-    }
+    const res = await fetch(
+      `/api/admin/external-modules/${moduleId}/reject`,
+      { method: 'POST', credentials: 'include' },
+    );
+    if (res.ok) await loadData();
   }
 
-  if (loading) {
+  if (!authChecked || loading) {
     return <div className="p-8">Loading...</div>;
   }
 

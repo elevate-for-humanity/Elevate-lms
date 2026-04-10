@@ -6,13 +6,14 @@ import { AlertCircle, CheckCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 // Role → portal mapping — must stay in sync with lib/auth/role-destinations.ts
+// program_holder goes to onboarding (not dashboard) — they haven't completed setup yet
 const ROLE_DESTINATIONS: Record<string, string> = {
   admin:          '/admin/dashboard',
   super_admin:    '/admin/dashboard',
   staff:          '/staff-portal/dashboard',
   instructor:     '/instructor/dashboard',
   mentor:         '/mentor/dashboard',
-  program_holder: '/program-holder/dashboard',
+  program_holder: '/program-holder/onboarding',
   partner:        '/partner/dashboard',
   employer:       '/employer/dashboard',
   student:        '/learner/dashboard',
@@ -31,6 +32,7 @@ export default function SetPasswordPage() {
   const [loading, setLoading]         = useState(false);
   const [success, setSuccess]         = useState(false);
   const [portal, setPortal]           = useState('/learner/dashboard');
+  const [userRole, setUserRole]       = useState<string | null>(null);
   const [error, setError]             = useState('');
   const [sessionReady, setSessionReady] = useState<boolean | null>(null);
 
@@ -83,6 +85,7 @@ export default function SetPasswordPage() {
           .eq('id', user.id)
           .single();
         setPortal(portalFor(profile?.role));
+        setUserRole(profile?.role ?? null);
       }
 
       setSuccess(true);
@@ -103,13 +106,15 @@ export default function SetPasswordPage() {
           </div>
           <h1 className="text-3xl font-extrabold text-black mb-3">Password Created</h1>
           <p className="text-gray-600 mb-8 text-base">
-            Your account is ready. Click below to go to your dashboard.
+            {userRole === 'program_holder'
+              ? 'Your account is ready. Complete your onboarding steps to activate your portal.'
+              : 'Your account is ready. Click below to go to your dashboard.'}
           </p>
           <a
             href={portal}
             className="inline-block bg-brand-red-600 text-white font-bold px-10 py-4 rounded-lg text-lg hover:bg-brand-red-700 transition"
           >
-            Go to My Dashboard
+            {userRole === 'program_holder' ? 'Start Onboarding →' : 'Go to My Dashboard'}
           </a>
         </div>
       </div>

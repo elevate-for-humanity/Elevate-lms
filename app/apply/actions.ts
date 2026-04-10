@@ -810,25 +810,36 @@ async function sendProgramHolderWelcomeEmail(
 ) {
   const sgKey = process.env.SENDGRID_API_KEY;
   if (!sgKey) {
-    logger.warn('[Apply] SENDGRID_API_KEY not set — skipping program holder welcome email');
+    logger.warn('[Apply] SENDGRID_API_KEY not set — skipping program holder password setup email');
     return;
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
-  // Generate a magic link so the holder can log in without a password.
-  let magicLink = `${siteUrl}/login`;
+  // Generate an invite link — forces password creation at /auth/set-password,
+  // then redirects to /program-holder/onboarding. This is step 1 of onboarding.
+  // The full welcome email fires separately after all onboarding steps are complete.
+  let setupLink = `${siteUrl}/login`;
   try {
     const { data: linkData } = await adminDb.auth.admin.generateLink({
-      type: 'magiclink',
+      type: 'invite',
       email: opts.email,
-      options: { redirectTo: `${siteUrl}/program-holder/onboarding` },
+      options: { redirectTo: `${siteUrl}/auth/set-password` },
     });
     if (linkData?.properties?.action_link) {
-      magicLink = linkData.properties.action_link;
+      setupLink = linkData.properties.action_link;
     }
   } catch (err) {
-    logger.warn('[Apply] Could not generate magic link for program holder welcome email', err);
+    logger.warn('[Apply] Could not generate invite link for program holder', err);
+    // Fallback: magic link to set-password
+    try {
+      const { data: linkData } = await adminDb.auth.admin.generateLink({
+        type: 'magiclink',
+        email: opts.email,
+        options: { redirectTo: `${siteUrl}/auth/set-password` },
+      });
+      if (linkData?.properties?.action_link) setupLink = linkData.properties.action_link;
+    } catch {}
   }
 
   const logoUrl = `${siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
@@ -843,38 +854,34 @@ async function sendProgramHolderWelcomeEmail(
           <img src="${logoUrl}" alt="Elevate for Humanity" width="140" style="max-width:140px;height:auto" />
         </td></tr>
         <tr><td style="padding:32px">
-          <h2 style="color:#1a1a1a;font-size:20px;margin:0 0 16px">Hi ${opts.firstName}, your application was received!</h2>
+          <h2 style="color:#1a1a1a;font-size:20px;margin:0 0 16px">Hi ${opts.firstName} — set your password to begin onboarding</h2>
           <p style="color:#334155;font-size:15px;line-height:1.7;margin:0 0 16px">
-            Thank you for applying to become a Program Holder with <strong>Elevate for Humanity</strong>.
-            Your account for <strong>${opts.organizationName}</strong> has been created.
-          </p>
-          <p style="color:#334155;font-size:15px;line-height:1.7;margin:0 0 24px">
-            Click the button below to access your onboarding portal and complete the required steps.
-            This link logs you in automatically — no password needed.
+            Your Program Holder account for <strong>${opts.organizationName}</strong> has been created with
+            <strong>Elevate for Humanity</strong>. Click below to set your password — you will need it to
+            log in and complete your onboarding steps.
           </p>
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr><td align="center" style="padding:8px 0 28px">
-              <a href="${magicLink}" style="display:inline-block;background:#1d4ed8;color:#fff;text-decoration:none;padding:14px 36px;border-radius:6px;font-weight:bold;font-size:16px">
-                Start Onboarding →
+              <a href="${setupLink}" style="display:inline-block;background:#1d4ed8;color:#fff;text-decoration:none;padding:14px 36px;border-radius:6px;font-weight:bold;font-size:16px">
+                Set My Password →
               </a>
             </td></tr>
           </table>
           <div style="background:#f1f5f9;border-radius:6px;padding:16px 20px;margin:0 0 24px">
-            <p style="color:#475569;font-size:13px;font-weight:bold;margin:0 0 8px">Your onboarding steps:</p>
+            <p style="color:#475569;font-size:13px;font-weight:bold;margin:0 0 8px">After setting your password, complete these onboarding steps:</p>
             <ol style="color:#475569;font-size:13px;line-height:1.9;margin:0;padding-left:18px">
               <li>Sign the Memorandum of Understanding (MOU)</li>
               <li>Acknowledge the Program Holder Handbook</li>
               <li>Acknowledge Rights &amp; Responsibilities</li>
               <li>Upload required documents (syllabus, business license, insurance)</li>
-              <li><strong>Create your password</strong> — set a permanent password so you can log in anytime</li>
             </ol>
           </div>
           <p style="color:#64748b;font-size:13px;line-height:1.7;margin:0 0 8px">
-            <strong>This link expires in 1 hour</strong> — open it before it expires. If it expires, you can request a new one at
-            <a href="${siteUrl}/login" style="color:#1d4ed8">${siteUrl}/login</a> using the
-            "Send magic link" option, or contact us at
-            <a href="mailto:elevate4humanityedu@gmail.com" style="color:#1d4ed8">elevate4humanityedu@gmail.com</a>
-            or call <a href="tel:3173143757" style="color:#1d4ed8">(317) 314-3757</a>.
+            <strong>This link expires in 24 hours.</strong> If it expires, go to
+            <a href="${siteUrl}/login" style="color:#1d4ed8">${siteUrl}/login</a> and use
+            "Forgot Password" to get a new one. Questions? Call
+            <a href="tel:3173143757" style="color:#1d4ed8">(317) 314-3757</a> or email
+            <a href="mailto:elevate4humanityedu@gmail.com" style="color:#1d4ed8">elevate4humanityedu@gmail.com</a>.
           </p>
           <p style="color:#94a3b8;font-size:12px;margin:20px 0 0">Ref: ${opts.referenceNumber}</p>
         </td></tr>

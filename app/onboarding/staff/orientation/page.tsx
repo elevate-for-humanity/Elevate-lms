@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export default async function OnboardingStepPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
+  if (!user) redirect('/login?redirect=/onboarding/staff/orientation');
 
   return (
     <div className="min-h-screen bg-white">

@@ -98,8 +98,11 @@ async function createStudentAccount(
 
     if (existingProfile?.id) {
       userId = existingProfile.id;
-      // Update password to the one the student provided
-      await supabase.auth.admin.updateUserById(userId, { password });
+      // Update password and ensure role is set correctly (trigger may have defaulted to 'student')
+      await Promise.all([
+        supabase.auth.admin.updateUserById(userId, { password }),
+        supabase.from('profiles').update({ role: profileRole }).eq('id', userId),
+      ]);
     } else {
       // Create new auth user with student-provided password
       const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
@@ -520,7 +523,7 @@ async function insertApplication(payload: {
           'student-application':        '/onboarding/learner',
           'employer-application':       '/onboarding/employer',
           'staff-application':          '/onboarding/staff',
-          'program-holder-application': '/onboarding/program-holder',
+          'program-holder-application': '/program-holder/onboarding',
         };
         const profileRole    = roleBySource[payload.source]    ?? 'student';
         const onboardingPath = onboardingBySource[payload.source] ?? '/onboarding/learner';

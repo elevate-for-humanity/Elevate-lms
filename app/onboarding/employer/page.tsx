@@ -44,34 +44,57 @@ export default async function EmployerOnboardingPage() {
     // Non-fatal
   }
 
-  // Get or create onboarding record
-  let { data: onboarding } = await supabase
-    .from('employer_onboarding')
-    .select('*')
-    .eq('employer_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(1)
+  // Resolve the employers row for this user (employer_onboarding FK points to employers.id)
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('first_name, last_name, email')
+    .eq('id', user.id)
     .maybeSingle();
 
-  if (!onboarding) {
-    // First visit after application — seed the row so subsequent updates work
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('first_name, last_name, email')
-      .eq('id', user.id)
-      .maybeSingle();
+  let { data: employerRow } = await supabase
+    .from('employers')
+    .select('id')
+    .eq('owner_user_id', user.id)
+    .maybeSingle();
 
+  if (!employerRow) {
+    // Create the employers row on first onboarding visit
+    const contactName = profile
+      ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim()
+      : '';
+    const { data: newEmployer } = await supabase
+      .from('employers')
+      .insert({
+        owner_user_id: user.id,
+        business_name: contactName || (profile?.email ?? user.email ?? 'Pending'),
+        contact_name: contactName,
+        email: profile?.email || user.email || '',
+      })
+      .select('id')
+      .maybeSingle();
+    employerRow = newEmployer;
+  }
+
+  const employerId = employerRow?.id;
+
+  // Get or create onboarding record (keyed by employers.id, not auth uid)
+  let { data: onboarding } = employerId ? await supabase
+    .from('employer_onboarding')
+    .select('*')
+    .eq('employer_id', employerId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle() : { data: null };
+
+  if (!onboarding && employerId) {
     const { data: newRow } = await supabase
       .from('employer_onboarding')
       .insert({
-        employer_id: user.id,
-        contact_name: profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : '',
-        contact_email: profile?.email || user.email || '',
+        employer_id: employerId,
         status: 'pending_review',
       })
       .select()
       .maybeSingle();
-
     onboarding = newRow;
   }
 

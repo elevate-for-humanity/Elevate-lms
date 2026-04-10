@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -37,16 +37,6 @@ const hiringTimelines = [
 ];
 
 export default function HiringNeedsPage() {
-  const [dbRows, setDbRows] = useState<any[]>([]);
-  useEffect(() => {
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-    supabase.from('onboarding_steps').select('*').limit(50)
-      .then(({ data }) => { if (data) setDbRows(data); });
-  }, []);
-
   const router = useRouter();
   const [formData, setFormData] = useState({
     industry: '',
@@ -85,25 +75,31 @@ export default function HiringNeedsPage() {
         return;
       }
 
-      // Save hiring needs — upsert in case the row doesn't exist yet
-      await supabase
-        .from('employer_onboarding')
-        .upsert({
-          employer_id: user.id,
-          hiring_needs: formData,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'employer_id' });
+      // employer_onboarding.employer_id is a FK to employers.id (not auth.uid)
+      const { data: employerRow } = await supabase
+        .from('employers')
+        .select('id')
+        .eq('owner_user_id', user.id)
+        .maybeSingle();
 
-      // Also update onboarding step status
-      await supabase
-        .from('user_onboarding_status')
-        .upsert({
-          user_id: user.id,
-          profile_complete: true,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id' });
+      if (employerRow?.id) {
+        // Try UPDATE first (index page seeds the row on first visit)
+        const { data: updated, error: updateErr } = await supabase
+          .from('employer_onboarding')
+          .update({ hiring_needs: formData, updated_at: new Date().toISOString() })
+          .eq('employer_id', employerRow.id)
+          .select('id')
+          .maybeSingle();
 
-      router.push('/onboarding/employer?step=portal-access');
+        if (!updated && !updateErr) {
+          // No existing row — insert
+          await supabase
+            .from('employer_onboarding')
+            .insert({ employer_id: employerRow.id, hiring_needs: formData, status: 'pending_review' });
+        }
+      }
+
+      router.push('/onboarding/employer');
     } catch {
       setIsSubmitting(false);
     }

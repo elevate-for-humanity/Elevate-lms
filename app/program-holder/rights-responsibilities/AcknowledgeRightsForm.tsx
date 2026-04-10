@@ -72,7 +72,7 @@ export function AcknowledgeRightsForm() {
         </div>
         <button
           type="button"
-          onClick={() => router.push('/program-holder/documents?required=true')}
+          onClick={() => router.push('/program-holder/documents?required=true&next=set-password')}
           className="w-full flex items-center justify-center gap-2 min-h-[48px] px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition-colors"
         >
           Next: Upload Required Documents

@@ -16,7 +16,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function ProgramHolderDocumentsPage() {
+export default async function ProgramHolderDocumentsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ required?: string; next?: string }>;
+}) {
+  const params = await searchParams;
+  const isOnboarding = params.required === 'true';
+  const nextStep = params.next;
   const supabase = await createClient();
 
   const {
@@ -216,6 +223,20 @@ export default async function ProgramHolderDocumentsPage() {
             </div>
           )}
         </div>
+        {isOnboarding && nextStep === 'set-password' && (
+          <div className="mt-8 bg-brand-blue-50 border-2 border-brand-blue-200 rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h3 className="font-bold text-gray-900 text-lg mb-1">Last step — create your password</h3>
+              <p className="text-sm text-black">Set a permanent password so you can log in anytime without a magic link.</p>
+            </div>
+            <Link
+              href="/auth/set-password"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-blue-600 text-white rounded-lg font-bold text-lg hover:bg-brand-blue-700 whitespace-nowrap"
+            >
+              Create Password →
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

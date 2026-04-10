@@ -62,6 +62,7 @@ export default function ProgramHolderConfirmationPage() {
                   'Acknowledge the Program Holder Handbook',
                   'Acknowledge Rights & Responsibilities',
                   'Upload required documents',
+                  'Create your password',
                 ].map((step, i) => (
                   <li key={i} className="flex items-start gap-3 text-sm text-black">
                     <span className="flex-shrink-0 w-5 h-5 rounded-full bg-brand-blue-100 text-brand-blue-700 font-bold text-xs flex items-center justify-center mt-0.5">

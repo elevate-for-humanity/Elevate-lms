@@ -847,6 +847,7 @@ async function sendProgramHolderWelcomeEmail(
               <li>Acknowledge the Program Holder Handbook</li>
               <li>Acknowledge Rights &amp; Responsibilities</li>
               <li>Upload required documents (syllabus, business license, insurance)</li>
+              <li><strong>Create your password</strong> — set a permanent password so you can log in anytime</li>
             </ol>
           </div>
           <p style="color:#64748b;font-size:13px;line-height:1.7;margin:0 0 8px">

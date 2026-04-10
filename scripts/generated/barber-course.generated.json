@@ -1,0 +1,2145 @@
+{
+  "slug": "barber-apprenticeship",
+  "title": "Indiana Registered Barber License — Apprenticeship Program",
+  "hoursTotal": 12.5,
+  "modules": [
+    {
+      "slug": "barber-module-1",
+      "title": "Module 1: Infection Control & Safety",
+      "order": 1,
+      "objective": "Apply infection control standards, OSHA requirements, and Indiana barbering law to every service.",
+      "lessons": [
+        {
+          "slug": "barber-lesson-1",
+          "title": "Welcome to the Barber Apprenticeship",
+          "durationMin": 15,
+          "domain": "SAFETY_SANITATION",
+          "ojtCategory": "THEORY",
+          "hoursCredit": 0.25,
+          "content": "This is a DOL-registered apprenticeship program. You earn hours toward licensure while working under a licensed barber. The program combines on-the-job training (OJT) with related technical instruction (RTI). You must complete all required hours and pass the Indiana state board exam to receive your license.\n\nClock in and out accurately for every shift. Complete all LMS lessons and checkpoints. Follow all shop sanitation and safety rules at all times.",
+          "competencyChecks": [
+            {
+              "id": "program-structure",
+              "type": "KNOWLEDGE",
+              "description": "Describes the DOL apprenticeship structure and difference between OJT and RTI",
+              "required": true
+            },
+            {
+              "id": "hour-logging",
+              "type": "KNOWLEDGE",
+              "description": "Identifies how to log hours correctly and why accuracy is required",
+              "required": true
+            },
+            {
+              "id": "program-requirements",
+              "type": "KNOWLEDGE",
+              "description": "States the 1500-hour requirement and state board exam requirement for licensure",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-2",
+          "title": "OSHA Standards & Bloodborne Pathogens",
+          "durationMin": 20,
+          "domain": "SAFETY_SANITATION",
+          "ojtCategory": "THEORY",
+          "hoursCredit": 0.25,
+          "content": "OSHA sets workplace safety standards that apply to barbershops. Key requirements: exposure control plan, PPE availability, employee training, and proper disposal of sharps.\n\nBloodborne pathogens are microorganisms in blood that can cause disease — including HIV, Hepatitis B, and Hepatitis C. In barbering, exposure risk comes from cuts during shaving or edging.\n\nBlood Exposure Protocol: Stop service immediately. Put on gloves before touching the affected area. Apply antiseptic. Dispose of all contaminated single-use materials in a sealed bag. Clean and disinfect blood-contaminated tools with EPA-registered disinfectant. Double-bag contaminated waste. Wash hands thoroughly after removing gloves.",
+          "competencyChecks": [
+            {
+              "id": "osha-requirements",
+              "type": "KNOWLEDGE",
+              "description": "States OSHA requirements for barbershops including exposure control plan and PPE",
+              "required": true
+            },
+            {
+              "id": "blood-exposure-protocol",
+              "type": "SAFETY",
+              "description": "Demonstrates blood exposure protocol in correct order without prompting",
+              "required": true
+            },
+            {
+              "id": "universal-precautions",
+              "type": "SANITATION",
+              "description": "Applies universal precautions — treats every client's blood as potentially infectious",
+              "required": true
+            },
+            {
+              "id": "bloodborne-risks",
+              "type": "KNOWLEDGE",
+              "description": "Identifies bloodborne pathogen risks specific to barbering",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-3",
+          "title": "Sanitation vs. Disinfection vs. Sterilization",
+          "durationMin": 20,
+          "domain": "SAFETY_SANITATION",
+          "ojtCategory": "THEORY",
+          "hoursCredit": 0.25,
+          "content": "Sanitation reduces the number of pathogens to a safe level — cleaning visible debris. Disinfection destroys most pathogens on nonporous surfaces using an EPA-registered disinfectant. Sterilization destroys all microbial life including spores — required for invasive tools only.\n\nCorrect disinfection sequence: Pre-clean (remove all visible hair and debris) → Apply EPA-registered disinfectant → Maintain full contact time per label — do not wipe off early → Remove, dry, and store in a clean covered container.",
+          "competencyChecks": [
+            {
+              "id": "three-levels",
+              "type": "KNOWLEDGE",
+              "description": "Distinguishes sanitation, disinfection, and sterilization and states when each applies",
+              "required": true
+            },
+            {
+              "id": "disinfection-sequence",
+              "type": "PROCEDURE",
+              "description": "Correctly sequences pre-clean → disinfect → contact time → store without error",
+              "required": true
+            },
+            {
+              "id": "contact-time",
+              "type": "SANITATION",
+              "description": "States that contact time must be observed and explains why wiping early is a failure",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-4",
+          "title": "Tool Disinfection Procedures",
+          "durationMin": 20,
+          "domain": "SAFETY_SANITATION",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.25,
+          "content": "Nonporous tool disinfection: Put on gloves. Pre-clean — remove all hair and debris with a brush. Apply EPA-registered disinfectant — fully immerse or saturate. Maintain contact time per label (typically 10 minutes). Remove, rinse if required, dry, and store in a clean covered container.\n\nClipper and trimmer blade protocol: Turn off and unplug. Brush away all visible hair and debris. Apply clipper disinfectant spray — keep blade visibly wet for full contact time. Allow to dry before reuse or storage.\n\nPorous items (wooden handles, foam, emery boards) cannot be properly disinfected once contaminated. Discard them. Do not return to service.\n\nChange disinfectant solution every 24 hours or sooner if contaminated.",
+          "competencyChecks": [
+            {
+              "id": "pre-clean-first",
+              "type": "SANITATION",
+              "description": "Pre-cleans tools before applying disinfectant — never skips this step",
+              "required": true
+            },
+            {
+              "id": "contact-time-observed",
+              "type": "SANITATION",
+              "description": "Maintains full contact time without wiping early",
+              "required": true
+            },
+            {
+              "id": "clipper-spray",
+              "type": "PROCEDURE",
+              "description": "Uses clipper disinfectant spray correctly on blades with correct dwell time",
+              "required": true
+            },
+            {
+              "id": "porous-discard",
+              "type": "SAFETY",
+              "description": "Discards single-use and porous items after use — does not return to service",
+              "required": true
+            },
+            {
+              "id": "solution-change",
+              "type": "SANITATION",
+              "description": "Changes disinfectant solution every 24 hours or sooner if contaminated",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-5",
+          "title": "Shop Sanitation & Client Safety",
+          "durationMin": 15,
+          "domain": "SAFETY_SANITATION",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.25,
+          "content": "Between-client station reset: Remove used linens, disposables, and visible debris. Clean and disinfect nonporous surfaces — chair, headrest, counter. Replace with clean towels, fresh neck strip, and disinfected implements. Confirm station is dry, organized, and ready.\n\nClient draping: Always use a clean neck strip so the cape does not touch bare skin. Seat the client upright with head in natural position before beginning. Check draping throughout the service.",
+          "competencyChecks": [
+            {
+              "id": "station-reset",
+              "type": "SANITATION",
+              "description": "Resets station completely between clients — no skipped steps",
+              "required": true
+            },
+            {
+              "id": "neck-strip-first",
+              "type": "PROCEDURE",
+              "description": "Places neck strip before cape on every client without prompting",
+              "required": true
+            },
+            {
+              "id": "surface-disinfection",
+              "type": "SANITATION",
+              "description": "Disinfects all nonporous surfaces between clients",
+              "required": true
+            },
+            {
+              "id": "single-use-disposal",
+              "type": "SANITATION",
+              "description": "Disposes of single-use items immediately after use",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-6",
+          "title": "Indiana Barbering Laws & Regulations",
+          "durationMin": 20,
+          "domain": "SAFETY_SANITATION",
+          "ojtCategory": "THEORY",
+          "hoursCredit": 0.25,
+          "content": "The Indiana Professional Licensing Agency (IPLA) regulates barbers under IC 25-8. You must hold a valid Indiana barber license to practice independently. Apprentices must work under a licensed barber at a licensed shop.\n\nKey requirements: 1500 apprenticeship hours. Written + practical exam through PSI/NIC. License renewal every 2 years with CE requirements. Shop license required for every location.\n\nScope of practice: Indiana barbers may perform haircuts, shaves, beard trims, scalp treatments, and limited chemical services. Services outside scope require additional licensure.",
+          "competencyChecks": [
+            {
+              "id": "ipla-governing-body",
+              "type": "KNOWLEDGE",
+              "description": "Identifies IPLA as the governing body for Indiana barbers under IC 25-8",
+              "required": true
+            },
+            {
+              "id": "hour-requirement",
+              "type": "KNOWLEDGE",
+              "description": "States the 1500-hour apprenticeship requirement",
+              "required": true
+            },
+            {
+              "id": "renewal-requirement",
+              "type": "KNOWLEDGE",
+              "description": "Describes license renewal requirements including CE",
+              "required": true
+            },
+            {
+              "id": "scope-of-practice",
+              "type": "KNOWLEDGE",
+              "description": "Identifies services within and outside barber scope of practice",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "checkpoint": {
+        "slug": "barber-module-1-checkpoint",
+        "title": "Infection Control Checkpoint",
+        "durationMin": 20,
+        "domain": "SAFETY_SANITATION",
+        "ojtCategory": "ASSESSMENT",
+        "hoursCredit": 0.25,
+        "passingScore": 70,
+        "questions": [
+          {
+            "prompt": "What must happen before applying disinfectant to a tool?",
+            "choices": [
+              "Rinse with water only",
+              "Pre-clean to remove visible debris",
+              "Soak in bleach",
+              "Dry with a towel"
+            ],
+            "answerIndex": 1,
+            "rationale": "Disinfection is not effective on visibly soiled implements. Pre-cleaning is always the first step."
+          },
+          {
+            "prompt": "What is the correct first action when a client is nicked during a shave?",
+            "choices": [
+              "Continue the service quickly",
+              "Stop service and put on gloves",
+              "Apply more lather",
+              "Wipe with a dry towel"
+            ],
+            "answerIndex": 1,
+            "rationale": "Service stops immediately. Gloves go on before any contact with blood."
+          },
+          {
+            "prompt": "Which item must be discarded after one use?",
+            "choices": [
+              "Metal clipper guard",
+              "Neck strip",
+              "Straight razor handle",
+              "Barber comb"
+            ],
+            "answerIndex": 1,
+            "rationale": "Neck strips are single-use and must be discarded after every client."
+          },
+          {
+            "prompt": "How often must disinfectant solution be changed at minimum?",
+            "choices": [
+              "Once a week",
+              "Every 24 hours or sooner if contaminated",
+              "Once a month",
+              "Only when it looks dirty"
+            ],
+            "answerIndex": 1,
+            "rationale": "Fresh solution is required to maintain effectiveness."
+          },
+          {
+            "prompt": "Which agency regulates barbers in Indiana?",
+            "choices": [
+              "OSHA",
+              "NIC",
+              "IPLA",
+              "DOL"
+            ],
+            "answerIndex": 2,
+            "rationale": "The Indiana Professional Licensing Agency (IPLA) regulates barbers under IC 25-8."
+          },
+          {
+            "prompt": "What does contact time mean in disinfection?",
+            "choices": [
+              "How long the service takes",
+              "How long the disinfectant must stay wet on the surface",
+              "How long tools are stored",
+              "How long the client waits"
+            ],
+            "answerIndex": 1,
+            "rationale": "Contact time is the required dwell time for the disinfectant to be effective."
+          }
+        ]
+      }
+    },
+    {
+      "slug": "barber-module-2",
+      "title": "Module 2: Hair Science & Scalp Analysis",
+      "order": 2,
+      "objective": "Apply hair science and scalp analysis to guide service decisions and client consultations.",
+      "lessons": [
+        {
+          "slug": "barber-lesson-8",
+          "title": "Structure of the Hair and Scalp",
+          "durationMin": 20,
+          "domain": "HAIR_SCALP",
+          "ojtCategory": "THEORY",
+          "hoursCredit": 0.25,
+          "content": "The hair shaft has three layers. Cuticle: outermost layer — overlapping scales that protect the cortex, determines shine and porosity. Cortex: middle layer — contains melanin (color) and keratin (strength). Medulla: inner core — not always present, more common in coarse hair.\n\nThe scalp has five layers: skin, connective tissue, aponeurosis, loose connective tissue, and periosteum. Hair follicles are embedded in the dermis. Each follicle produces one hair strand. Sebaceous glands produce sebum, which lubricates the hair and scalp.",
+          "competencyChecks": [
+            {
+              "id": "hair-shaft-layers",
+              "type": "KNOWLEDGE",
+              "description": "Names the three layers of the hair shaft and states the function of each",
+              "required": true
+            },
+            {
+              "id": "follicle-function",
+              "type": "KNOWLEDGE",
+              "description": "Identifies the follicle and explains its role in hair growth",
+              "required": true
+            },
+            {
+              "id": "cuticle-service-impact",
+              "type": "KNOWLEDGE",
+              "description": "Explains how cuticle condition affects service outcomes and product selection",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-9",
+          "title": "Hair Growth Cycle",
+          "durationMin": 15,
+          "domain": "HAIR_SCALP",
+          "ojtCategory": "THEORY",
+          "hoursCredit": 0.25,
+          "content": "The hair growth cycle has three phases. Anagen: active growth phase — lasts 2–7 years, 85–90% of hair at any time. Catagen: transition phase — hair detaches from follicle, lasts 2–3 weeks. Telogen: resting/shedding phase — lasts 3–4 months, normal to shed 50–100 hairs per day.\n\nClients often worry about shedding. Explain that telogen shedding is normal. Excessive shedding may indicate stress, nutrition, or medical issues — refer to a physician.",
+          "competencyChecks": [
+            {
+              "id": "three-phases",
+              "type": "KNOWLEDGE",
+              "description": "Names and describes all three phases of the hair growth cycle with correct durations",
+              "required": true
+            },
+            {
+              "id": "anagen-percentage",
+              "type": "KNOWLEDGE",
+              "description": "States what percentage of hair is in anagen at any given time (85–90%)",
+              "required": true
+            },
+            {
+              "id": "shedding-referral",
+              "type": "KNOWLEDGE",
+              "description": "Identifies when to refer a client for excessive shedding vs normal telogen loss",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-10",
+          "title": "Hair Texture, Density & Porosity",
+          "durationMin": 20,
+          "domain": "HAIR_SCALP",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.25,
+          "content": "Texture: diameter of the individual hair strand — fine, medium, or coarse. Density: number of hairs per square inch on the scalp. Porosity: hair's ability to absorb and retain moisture.\n\nDecision logic: Fine hair — use lighter pressure, avoid over-thinning, choose softer lines. Coarse hair — use firmer tension, expect more resistance, check blend frequently. High porosity — product absorbs fast, apply evenly and work quickly. Low porosity — product may sit on top, use heat or steam to open cuticle.",
+          "competencyChecks": [
+            {
+              "id": "texture-assessment",
+              "type": "TECHNIQUE",
+              "description": "Assesses hair texture by feel and visual inspection and names the result correctly",
+              "required": true
+            },
+            {
+              "id": "porosity-identification",
+              "type": "KNOWLEDGE",
+              "description": "Identifies high vs low porosity and explains the difference in behavior",
+              "required": true
+            },
+            {
+              "id": "technique-adjustment",
+              "type": "TECHNIQUE",
+              "description": "Adjusts technique based on texture and density findings — not a one-size approach",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-11",
+          "title": "Scalp Conditions & Disorders",
+          "durationMin": 20,
+          "domain": "HAIR_SCALP",
+          "ojtCategory": "THEORY",
+          "hoursCredit": 0.25,
+          "content": "Common scalp conditions: Dandruff (Pityriasis) — dry flaking, service allowed. Seborrheic Dermatitis — oily flaking and redness, service with caution, refer if severe. Tinea Capitis (Ringworm) — fungal infection, DO NOT SERVICE, refer immediately. Psoriasis — thick silvery scales, service allowed unless open lesions present. Alopecia — hair loss, service allowed, refer to physician for diagnosis.\n\nStop condition: If you observe open lesions, active infection, or contagious scalp conditions — stop the consultation and refer the client to a physician. Do not perform the service.",
+          "competencyChecks": [
+            {
+              "id": "five-conditions",
+              "type": "KNOWLEDGE",
+              "description": "Identifies at least 5 common scalp conditions and states service status for each",
+              "required": true
+            },
+            {
+              "id": "referral-identification",
+              "type": "SAFETY",
+              "description": "Correctly identifies which conditions require immediate referral to a physician",
+              "required": true
+            },
+            {
+              "id": "stop-condition",
+              "type": "SAFETY",
+              "description": "Stops service when a contraindicated scalp condition is observed — no exceptions",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-12",
+          "title": "Client Consultation",
+          "durationMin": 20,
+          "domain": "HAIR_SCALP",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.25,
+          "content": "Consultation sequence: Greet the client and introduce yourself. Ask about the desired service and any specific concerns. Inspect the scalp and hair for contraindications before touching. Confirm the service plan and set realistic expectations. Ask about allergies, sensitivities, or recent chemical services. Document findings if required by shop protocol.\n\nScreen for: open cuts, abrasions, or active skin conditions; recent chemical services; sensitivity to products, razors, or heat; medical conditions affecting the scalp or hair.",
+          "competencyChecks": [
+            {
+              "id": "consult-before-touch",
+              "type": "PROCEDURE",
+              "description": "Completes consultation before touching the client — never skips this step",
+              "required": true
+            },
+            {
+              "id": "contraindication-screen",
+              "type": "SAFETY",
+              "description": "Screens for contraindications during consultation and acts on findings",
+              "required": true
+            },
+            {
+              "id": "service-plan-confirm",
+              "type": "PROCEDURE",
+              "description": "Confirms service plan with client before beginning",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-13",
+          "title": "Shampoo & Scalp Massage",
+          "durationMin": 15,
+          "domain": "HAIR_SCALP",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.25,
+          "content": "Shampoo procedure: Drape client with neck strip and cape. Wet hair thoroughly with warm water. Apply shampoo and work into a lather using fingertip (not fingernail) pressure. Rinse thoroughly — no product residue. Apply conditioner if needed, process, and rinse. Towel dry gently.\n\nScalp massage: Use the pads of the fingers, not the nails. Apply firm but gentle rotary movements across the scalp. Massage stimulates circulation and relaxes the client. Stop immediately if the client reports discomfort.\n\nSanitation: Use clean towels for every client. Disinfect shampoo bowl between clients.",
+          "competencyChecks": [
+            {
+              "id": "drape-before-shampoo",
+              "type": "PROCEDURE",
+              "description": "Drapes client correctly with neck strip and cape before shampooing",
+              "required": true
+            },
+            {
+              "id": "fingertip-pressure",
+              "type": "TECHNIQUE",
+              "description": "Uses fingertip pressure — not fingernails — throughout shampoo and massage",
+              "required": true
+            },
+            {
+              "id": "thorough-rinse",
+              "type": "TECHNIQUE",
+              "description": "Rinses thoroughly with no product residue remaining",
+              "required": true
+            },
+            {
+              "id": "bowl-disinfection",
+              "type": "SANITATION",
+              "description": "Disinfects shampoo bowl between clients",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "checkpoint": {
+        "slug": "barber-module-2-checkpoint",
+        "title": "Hair Science Checkpoint",
+        "durationMin": 20,
+        "domain": "HAIR_SCALP",
+        "ojtCategory": "ASSESSMENT",
+        "hoursCredit": 0.25,
+        "passingScore": 70,
+        "questions": [
+          {
+            "prompt": "Which layer of the hair shaft contains melanin and keratin?",
+            "choices": [
+              "Cuticle",
+              "Cortex",
+              "Medulla",
+              "Follicle"
+            ],
+            "answerIndex": 1,
+            "rationale": "The cortex is the middle layer and contains both melanin (color) and keratin (strength)."
+          },
+          {
+            "prompt": "During which phase does hair actively grow?",
+            "choices": [
+              "Telogen",
+              "Catagen",
+              "Anagen",
+              "Exogen"
+            ],
+            "answerIndex": 2,
+            "rationale": "Anagen is the active growth phase, lasting 2–7 years."
+          },
+          {
+            "prompt": "A client has tinea capitis. What is the correct action?",
+            "choices": [
+              "Proceed with the service using gloves",
+              "Apply antifungal shampoo and continue",
+              "Refuse the service and refer to a physician",
+              "Use a stronger disinfectant on tools after"
+            ],
+            "answerIndex": 2,
+            "rationale": "Tinea capitis is a contagious fungal infection. Service must be refused and the client referred."
+          },
+          {
+            "prompt": "Hair with high porosity will:",
+            "choices": [
+              "Resist moisture absorption",
+              "Absorb moisture quickly but lose it fast",
+              "Always be coarse in texture",
+              "Require no product"
+            ],
+            "answerIndex": 1,
+            "rationale": "High porosity hair has an open or damaged cuticle — it absorbs quickly but cannot retain moisture well."
+          },
+          {
+            "prompt": "What is the purpose of a client consultation before service?",
+            "choices": [
+              "To upsell products",
+              "To assess needs, screen for contraindications, and confirm the service plan",
+              "To fill time before the appointment",
+              "To check the client's payment method"
+            ],
+            "answerIndex": 1,
+            "rationale": "Consultation protects the client and the barber by identifying contraindications and setting expectations."
+          },
+          {
+            "prompt": "Which describes hair density?",
+            "choices": [
+              "The diameter of individual strands",
+              "The number of hairs per square inch",
+              "The ability to absorb moisture",
+              "The phase of the growth cycle"
+            ],
+            "answerIndex": 1,
+            "rationale": "Density refers to how many hairs are present per square inch on the scalp."
+          }
+        ]
+      }
+    },
+    {
+      "slug": "barber-module-3",
+      "title": "Module 3: Haircutting Fundamentals",
+      "order": 3,
+      "objective": "Execute foundational haircutting techniques with correct posture, sectioning, and elevation.",
+      "lessons": [
+        {
+          "slug": "barber-lesson-15",
+          "title": "Tools of the Trade",
+          "durationMin": 20,
+          "domain": "TOOLS_EQUIPMENT",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.25,
+          "content": "Standard barbering tools: Clippers — electric cutting tool for bulk removal and fades, requires blade disinfection after each use. Trimmers/Edgers — smaller precision tool for outlines and detail work. Shears — scissors for cutting and texturizing, keep sharp and clean. Straight Razor — used for shaving and edging, blade must be replaced between clients. Combs — nonporous, must be disinfected between clients. Brushes — neck brush and cleaning brush, disinfect between clients.\n\nClipper blade maintenance: Turn off and unplug. Brush all visible hair from the blade. Apply clipper disinfectant spray — keep blade visibly wet for full contact time. Allow to dry before reuse. Oil the blade lightly after disinfection to prevent rust.\n\nStraight razor blades must be replaced between every client. A used blade is a single-use item.",
+          "competencyChecks": [
+            {
+              "id": "tool-identification",
+              "type": "KNOWLEDGE",
+              "description": "Identifies all standard barbering tools by name and function without prompting",
+              "required": true
+            },
+            {
+              "id": "clipper-disinfection",
+              "type": "SANITATION",
+              "description": "Performs clipper blade disinfection in correct sequence with correct dwell time",
+              "required": true
+            },
+            {
+              "id": "razor-blade-replacement",
+              "type": "SAFETY",
+              "description": "Replaces straight razor blade between clients — never reuses a blade",
+              "required": true
+            },
+            {
+              "id": "nonporous-disinfection",
+              "type": "SANITATION",
+              "description": "Disinfects all nonporous tools between clients",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-16",
+          "title": "Sectioning & Parting",
+          "durationMin": 20,
+          "domain": "HAIRCUTTING",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.25,
+          "content": "Consistent sections create consistent results. Uneven sections lead to uneven cuts. Sections control the amount of hair you work with at one time. Parts create visual guides that keep the cut organized.\n\nBasic sectioning sequence: Start at the nape — establish the perimeter first. Create a horizontal part from ear to ear across the crown. Clip the top section out of the way. Work in horizontal sections from nape to crown. Release the top section and work from front to back.\n\nA guide line is the first section cut — all subsequent sections are matched to it. Keep your guide visible at all times.",
+          "competencyChecks": [
+            {
+              "id": "consistent-sections",
+              "type": "TECHNIQUE",
+              "description": "Creates consistent horizontal sections from nape to crown without gaps or overlaps",
+              "required": true
+            },
+            {
+              "id": "guide-line",
+              "type": "TECHNIQUE",
+              "description": "Establishes and maintains a visible guide line throughout the cut",
+              "required": true
+            },
+            {
+              "id": "clean-clips",
+              "type": "PROCEDURE",
+              "description": "Clips sections cleanly without tangling or distorting the hair",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-17",
+          "title": "Elevation & Overdirection",
+          "durationMin": 20,
+          "domain": "HAIRCUTTING",
+          "ojtCategory": "THEORY",
+          "hoursCredit": 0.25,
+          "content": "Elevation: the angle at which hair is held away from the head before cutting. 0° (no elevation) — maximum weight, blunt perimeter, no layering. 45° — moderate weight removal, soft layers. 90° — significant weight removal, uniform layers. 180° — maximum weight removal, highly layered.\n\nOverdirection: pulling hair away from its natural fall to create weight or length variation. Overdirecting toward the front adds length at the back. Overdirecting toward the back adds length at the front. Use overdirection to create graduation or to maintain length in specific areas.",
+          "competencyChecks": [
+            {
+              "id": "elevation-demonstration",
+              "type": "TECHNIQUE",
+              "description": "Demonstrates 0°, 45°, and 90° elevation on a mannequin with correct angle",
+              "required": true
+            },
+            {
+              "id": "elevation-weight-effect",
+              "type": "KNOWLEDGE",
+              "description": "Explains the weight effect of each elevation angle without prompting",
+              "required": true
+            },
+            {
+              "id": "overdirection-application",
+              "type": "TECHNIQUE",
+              "description": "Uses overdirection to achieve a specific shape as directed",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-18",
+          "title": "Clipper Cutting Basics",
+          "durationMin": 25,
+          "domain": "HAIRCUTTING",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.5,
+          "content": "Guard sizes: #0 (no guard) — closest cut, skin fade. #1 — 1/8 inch. #2 — 1/4 inch. #3 — 3/8 inch. #4 — 1/2 inch. #8 — 1 inch, longest standard guard.\n\nBasic clipper technique: Select the appropriate guard. Start at the nape and work upward against the grain. Use smooth, consistent strokes. Check for evenness by combing through after each pass. Blend between guard sizes using a flicking motion at the transition.\n\nCutting against the grain (against hair growth direction) gives a closer, more even cut. Know which direction the client's hair grows before you start.",
+          "competencyChecks": [
+            {
+              "id": "guard-selection",
+              "type": "KNOWLEDGE",
+              "description": "Selects correct guard for desired length without reference chart",
+              "required": true
+            },
+            {
+              "id": "against-grain",
+              "type": "TECHNIQUE",
+              "description": "Cuts against the grain for even results — identifies growth direction first",
+              "required": true
+            },
+            {
+              "id": "guard-blending",
+              "type": "TECHNIQUE",
+              "description": "Blends between guard sizes without visible lines",
+              "required": true
+            },
+            {
+              "id": "clipper-disinfection-post",
+              "type": "SANITATION",
+              "description": "Disinfects clipper blade after each client",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-19",
+          "title": "Scissor Over Comb",
+          "durationMin": 25,
+          "domain": "HAIRCUTTING",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.5,
+          "content": "Scissor over comb technique: Hold the comb at the desired angle against the head. Slide the comb upward through the hair. Cut the hair that extends above the comb teeth. Keep the comb moving — do not stop mid-stroke. Work in small sections for even results. Check blend by combing through and looking for lines.\n\nUse for: blending between clipper lengths, areas where clippers cannot reach (around the ears, nape), soft tapers on fine or thin hair.\n\nCommon error: Stopping the comb mid-stroke creates a visible line. Keep the comb moving continuously while cutting.",
+          "competencyChecks": [
+            {
+              "id": "comb-angle",
+              "type": "TECHNIQUE",
+              "description": "Maintains consistent comb angle throughout the stroke",
+              "required": true
+            },
+            {
+              "id": "continuous-motion",
+              "type": "TECHNIQUE",
+              "description": "Keeps comb moving continuously — no stops mid-stroke",
+              "required": true
+            },
+            {
+              "id": "blend-check",
+              "type": "TECHNIQUE",
+              "description": "Blends clipper and scissor work without visible lines",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-20",
+          "title": "Taper & Fade Fundamentals",
+          "durationMin": 25,
+          "domain": "HAIRCUTTING",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.5,
+          "content": "A taper gradually decreases length from top to nape — hair is never cut to the skin. A fade cuts to the skin at the nape and sides, blending upward to longer lengths. Both require a smooth, invisible transition between lengths.\n\nLow fade procedure: Establish the fade line at the desired height (low = at or below the occipital bone). Use a #0 or open blade to cut the skin line. Work upward with increasing guard sizes (#1, #2, #3). Blend each transition using a flicking motion. Check the blend from all angles. Use trimmers to clean the hairline and edges.\n\nAfter each guard change, comb through and look for a visible line. If you see a line, blend it before moving on.",
+          "competencyChecks": [
+            {
+              "id": "fade-line",
+              "type": "TECHNIQUE",
+              "description": "Establishes a clean fade line at the correct height",
+              "required": true
+            },
+            {
+              "id": "transition-blend",
+              "type": "TECHNIQUE",
+              "description": "Blends between guard sizes without visible lines",
+              "required": true
+            },
+            {
+              "id": "multi-angle-check",
+              "type": "PROCEDURE",
+              "description": "Checks blend from multiple angles during the cut — not just at the end",
+              "required": true
+            },
+            {
+              "id": "hairline-cleanup",
+              "type": "TECHNIQUE",
+              "description": "Cleans hairline with trimmers after fading",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "checkpoint": {
+        "slug": "barber-module-3-checkpoint",
+        "title": "Haircutting Fundamentals Checkpoint",
+        "durationMin": 20,
+        "domain": "HAIRCUTTING",
+        "ojtCategory": "ASSESSMENT",
+        "hoursCredit": 0.25,
+        "passingScore": 70,
+        "questions": [
+          {
+            "prompt": "What guard size produces a 1/4-inch cut?",
+            "choices": [
+              "#1",
+              "#2",
+              "#3",
+              "#4"
+            ],
+            "answerIndex": 1,
+            "rationale": "Guard #2 = 1/4 inch."
+          },
+          {
+            "prompt": "What does 90-degree elevation do to the hair?",
+            "choices": [
+              "Creates maximum weight",
+              "Removes significant weight and creates layers",
+              "Creates a blunt perimeter",
+              "Has no effect on weight"
+            ],
+            "answerIndex": 1,
+            "rationale": "90-degree elevation holds hair straight out from the head, removing significant weight."
+          },
+          {
+            "prompt": "What is the correct action when you see a visible blend line during a fade?",
+            "choices": [
+              "Continue and fix at the end",
+              "Blend it immediately before moving on",
+              "Switch to a smaller guard",
+              "Start the fade over"
+            ],
+            "answerIndex": 1,
+            "rationale": "Blend lines should be corrected immediately — waiting makes them harder to fix."
+          },
+          {
+            "prompt": "What is the key error to avoid in scissor-over-comb technique?",
+            "choices": [
+              "Using too much tension",
+              "Stopping the comb mid-stroke",
+              "Cutting too close to the head",
+              "Using the wrong shear size"
+            ],
+            "answerIndex": 1,
+            "rationale": "Stopping the comb mid-stroke creates a visible line in the cut."
+          },
+          {
+            "prompt": "A straight razor blade must be replaced:",
+            "choices": [
+              "Once a week",
+              "Once a day",
+              "Between every client",
+              "When it looks dull"
+            ],
+            "answerIndex": 2,
+            "rationale": "Straight razor blades are single-use items and must be replaced between every client."
+          },
+          {
+            "prompt": "What is the difference between a taper and a fade?",
+            "choices": [
+              "A taper cuts to the skin; a fade does not",
+              "A fade cuts to the skin; a taper does not",
+              "They are the same technique",
+              "A taper uses clippers; a fade uses scissors"
+            ],
+            "answerIndex": 1,
+            "rationale": "A fade cuts to the skin at the nape/sides. A taper gradually decreases length without reaching the skin."
+          }
+        ]
+      }
+    },
+    {
+      "slug": "barber-module-4",
+      "title": "Module 4: Haircutting Techniques",
+      "order": 4,
+      "objective": "Execute foundational and advanced haircutting techniques with correct sanitation, safety, and NIC-compliant infection control on every service.",
+      "lessons": [
+        {
+          "slug": "barber-lesson-22",
+          "title": "Head Shape & Sectioning",
+          "durationMin": 20,
+          "domain": "HAIRCUTTING",
+          "ojtCategory": "THEORY",
+          "hoursCredit": 0.25,
+          "content": "Sections of the head: Top (crown to front hairline), Sides (temples to behind the ears), Back (occipital bone to nape), Nape (hairline at the back of the neck).\n\nKey reference points: Occipital bone — bony protrusion at the back of the skull, key reference for fade lines. Parietal ridge — widest part of the head, determines where the fade transitions. Temporal recession — natural recession at the temples.\n\nPre-service sanitation (required): Wash or sanitize hands. Pre-clean all tools — remove hair and debris before applying disinfectant. Apply EPA-registered disinfectant and maintain full contact time per label. Discard all single-use items after use.\n\nStop conditions: Stop service immediately if you observe open cuts or broken skin on the scalp, signs of scalp infection or inflammation, client reports pain or discomfort, or tool malfunction.",
+          "competencyChecks": [
+            {
+              "id": "head-sections",
+              "type": "KNOWLEDGE",
+              "description": "Identifies all head sections and reference points correctly without prompting",
+              "required": true
+            },
+            {
+              "id": "pre-service-sanitation",
+              "type": "SANITATION",
+              "description": "Follows pre-clean → disinfect → contact time sequence before every service",
+              "required": true
+            },
+            {
+              "id": "stop-condition-response",
+              "type": "SAFETY",
+              "description": "Stops service and follows blood exposure protocol if skin is broken",
+              "required": true
+            },
+            {
+              "id": "single-use-disposal",
+              "type": "SANITATION",
+              "description": "Discards single-use items immediately after use",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-23",
+          "title": "The Fade — Low, Mid & High",
+          "durationMin": 30,
+          "domain": "HAIRCUTTING",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.5,
+          "content": "Fade types: Low fade — starts just above the ear and nape, conservative and professional. Mid fade — starts at the temple, versatile and most requested. High fade — starts at the parietal ridge, bold and dramatic. Skin fade (bald fade) — goes to bare skin, requires #0 or foil shaver.\n\nFade technique: Establish the fade line with a #1 or #2. Work upward with progressively larger guards. Use the open/close lever to blend between guard sizes. Blend with a flicking motion at each transition. Check for lines from all angles and blend until smooth.\n\nPre-service sanitation: Pre-clean clipper blades before applying disinfectant spray. Use clipper disinfectant spray — keep blades visibly wet for full contact time per label. Disinfect workstation and chair after each client.\n\nStop conditions: Stop service immediately if you observe open cuts or broken skin, signs of scalp infection or inflammation, client reports pain, or clipper malfunction or overheating.",
+          "competencyChecks": [
+            {
+              "id": "fade-types",
+              "type": "KNOWLEDGE",
+              "description": "Identifies low, mid, and high fade by starting point without prompting",
+              "required": true
+            },
+            {
+              "id": "smooth-transitions",
+              "type": "TECHNIQUE",
+              "description": "Executes fade with smooth transitions — no visible lines between guard sizes",
+              "required": true
+            },
+            {
+              "id": "clipper-disinfection",
+              "type": "SANITATION",
+              "description": "Uses clipper disinfectant spray with correct dwell time on blades before service",
+              "required": true
+            },
+            {
+              "id": "blood-exposure-response",
+              "type": "SAFETY",
+              "description": "Stops service and follows blood exposure protocol if skin is broken",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-24",
+          "title": "Clipper Over Comb",
+          "durationMin": 20,
+          "domain": "HAIRCUTTING",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.25,
+          "content": "Clipper over comb technique: Hold the comb flat against the head at the desired angle. Lift the comb slightly to expose the hair to be cut. Run the clipper along the top of the comb in a smooth, continuous motion. Work in sections, overlapping each pass slightly.\n\nCommon mistakes: Comb too far from head — creates uneven results, keep comb close to the scalp. Moving too slowly — causes clipper lines, keep motion smooth and continuous. Not following head curve — creates flat spots, follow the contour of the head.\n\nPre-service sanitation: Pre-clean clipper blades before applying disinfectant spray. Apply clipper disinfectant spray and maintain full contact time per label. Disinfect workstation and chair after each client.",
+          "competencyChecks": [
+            {
+              "id": "comb-angle-consistency",
+              "type": "TECHNIQUE",
+              "description": "Executes clipper-over-comb with consistent angle and smooth continuous motion",
+              "required": true
+            },
+            {
+              "id": "head-contour-follow",
+              "type": "TECHNIQUE",
+              "description": "Follows the contour of the head — no flat spots",
+              "required": true
+            },
+            {
+              "id": "clipper-spray-dwell",
+              "type": "SANITATION",
+              "description": "Uses clipper disinfectant spray with correct dwell time on blades",
+              "required": true
+            },
+            {
+              "id": "stop-on-injury",
+              "type": "SAFETY",
+              "description": "Stops service and follows blood exposure protocol if skin is broken",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-25",
+          "title": "Scissor Over Comb",
+          "durationMin": 20,
+          "domain": "HAIRCUTTING",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.25,
+          "content": "Scissor over comb technique: Comb hair upward or outward from the head. Position the comb at the desired length. Cut along the top of the comb with the shears. Work in consistent sections.\n\nAdvanced techniques: Point cutting — cut into the ends at an angle to remove weight and add texture, hold shears vertically and make small snips into the hair ends. Slide cutting — thin and taper hair by sliding the open shears down the hair shaft, used for blending and removing bulk.\n\nPre-service sanitation: Pre-clean shears and combs before applying disinfectant. Apply EPA-registered disinfectant and maintain full contact time per label. Disinfect workstation and chair after each client.",
+          "competencyChecks": [
+            {
+              "id": "scissor-comb-angle",
+              "type": "TECHNIQUE",
+              "description": "Executes scissor-over-comb with consistent angle and soft finish",
+              "required": true
+            },
+            {
+              "id": "point-cutting",
+              "type": "TECHNIQUE",
+              "description": "Demonstrates point cutting correctly — vertical shear angle, small snips into ends",
+              "required": true
+            },
+            {
+              "id": "shear-disinfection",
+              "type": "SANITATION",
+              "description": "Disinfects shears and combs with EPA-registered disinfectant before service",
+              "required": true
+            },
+            {
+              "id": "blood-protocol",
+              "type": "SAFETY",
+              "description": "Stops service and follows blood exposure protocol if skin is broken",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-26",
+          "title": "Lineup & Edging",
+          "durationMin": 20,
+          "domain": "HAIRCUTTING",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.25,
+          "content": "A lineup is a finishing service. Its job is to sharpen the front hairline, temples, sideburn edges, around the ears, and nape. The barber's rule: define what is already there. Do not invent a new hairline unless the service plan clearly calls for it.\n\nContraindications — do not use razor over: cuts, abrasions, or open skin; active acne or inflamed bumps; rash or infection; skin that is already irritated; areas prone to keloid scarring.\n\nService order: Front hairline → temples → around ears → sideburns → nape → symmetry check → razor detailing if appropriate.\n\nProcedure: Establish the front hairline at center and work outward. Use light pressure and short controlled motions. Remove only overgrowth — do not push the line back. Shape the temples based on haircut, growth pattern, and client preference. Outline around the ears with short controlled movements. Balance the sideburns — check from the front, not only from the side. Create the nape outline per client preference. Check symmetry from the front view. Razor detailing if skin is healthy: apply lather, stretch skin firmly, hold razor at low angle with light pressure, use short controlled strokes.\n\nPre-service sanitation: Wash or sanitize hands. Pre-clean all tools. Apply EPA-registered disinfectant and maintain full contact time. Use clipper disinfectant spray on trimmer blades with full contact time. Discard single-use razor blades in a sharps container immediately after use.",
+          "competencyChecks": [
+            {
+              "id": "contraindication-check",
+              "type": "SAFETY",
+              "description": "Identifies contraindications before service and does not use razor over broken or irritated skin",
+              "required": true
+            },
+            {
+              "id": "natural-hairline",
+              "type": "TECHNIQUE",
+              "description": "Preserves natural hairline — does not push line back without intentional redesign",
+              "required": true
+            },
+            {
+              "id": "symmetry-check",
+              "type": "TECHNIQUE",
+              "description": "Checks symmetry from the front view and corrects only the uneven side",
+              "required": true
+            },
+            {
+              "id": "short-controlled-strokes",
+              "type": "TECHNIQUE",
+              "description": "Uses short controlled strokes — not one long sweep",
+              "required": true
+            },
+            {
+              "id": "sharps-disposal",
+              "type": "SANITATION",
+              "description": "Disposes of used razor blades in a sharps container immediately after use",
+              "required": true
+            },
+            {
+              "id": "blood-exposure-lineup",
+              "type": "SAFETY",
+              "description": "Stops service and follows blood exposure protocol if skin is broken",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-27",
+          "title": "Flat Top & Classic Cuts",
+          "durationMin": 20,
+          "domain": "HAIRCUTTING",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.25,
+          "content": "Flat top procedure: Establish the height on top with a pick and clipper. Use a level comb or flat top comb to guide the cut. Work from front to back, maintaining a flat plane. Fade or taper the sides. Check the level from multiple angles — front, side, and above.\n\nClassic taper procedure: Start with the longest guard on top. Work down with progressively shorter guards. Blend each transition smoothly. Finish with a clean lineup.\n\nPre-service sanitation: Pre-clean all tools before applying disinfectant. Apply EPA-registered disinfectant. Use clipper disinfectant spray on blades and maintain full contact time per label. Discard all single-use items after use. Disinfect workstation and chair after each client.",
+          "competencyChecks": [
+            {
+              "id": "flat-top-level",
+              "type": "TECHNIQUE",
+              "description": "Executes flat top with level, even surface across the top — checked from multiple angles",
+              "required": true
+            },
+            {
+              "id": "classic-taper-blend",
+              "type": "TECHNIQUE",
+              "description": "Executes classic taper with smooth transitions from top to nape",
+              "required": true
+            },
+            {
+              "id": "pre-service-sanitation-27",
+              "type": "SANITATION",
+              "description": "Follows pre-clean → disinfect → contact time sequence before service",
+              "required": true
+            },
+            {
+              "id": "blood-protocol-27",
+              "type": "SAFETY",
+              "description": "Stops service and follows blood exposure protocol if skin is broken",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "checkpoint": {
+        "slug": "barber-module-4-checkpoint",
+        "title": "Haircutting Checkpoint",
+        "durationMin": 20,
+        "domain": "HAIRCUTTING",
+        "ojtCategory": "ASSESSMENT",
+        "hoursCredit": 0.25,
+        "passingScore": 70,
+        "questions": [
+          {
+            "prompt": "A mid fade starts at which reference point?",
+            "choices": [
+              "The nape",
+              "The occipital bone",
+              "The temple",
+              "The parietal ridge"
+            ],
+            "answerIndex": 2,
+            "rationale": "A mid fade starts at the temple area, between the low and high fade."
+          },
+          {
+            "prompt": "Which technique produces a softer result than clipper over comb?",
+            "choices": [
+              "Skin fade",
+              "Scissor over comb",
+              "Razor cutting",
+              "Clipper flicking"
+            ],
+            "answerIndex": 1,
+            "rationale": "Scissor over comb produces a softer, more natural finish."
+          },
+          {
+            "prompt": "What is the parietal ridge?",
+            "choices": [
+              "The hairline at the nape",
+              "The bony protrusion at the back of the skull",
+              "The widest part of the head",
+              "The front hairline"
+            ],
+            "answerIndex": 2,
+            "rationale": "The parietal ridge is the widest part of the head and a key reference for high fades."
+          },
+          {
+            "prompt": "When performing a lineup, you should never:",
+            "choices": [
+              "Use a razor",
+              "Cut above the natural temple hairline",
+              "Square the nape",
+              "Use a trimmer"
+            ],
+            "answerIndex": 1,
+            "rationale": "Cutting above the natural temple hairline creates an unnatural appearance and pushes the hairline back."
+          },
+          {
+            "prompt": "Point cutting is used to:",
+            "choices": [
+              "Create a blunt, heavy line",
+              "Remove weight and add texture",
+              "Create a skin fade",
+              "Establish the guide line"
+            ],
+            "answerIndex": 1,
+            "rationale": "Point cutting removes weight from the ends and adds texture and movement."
+          },
+          {
+            "prompt": "The flat top is technically demanding because it requires:",
+            "choices": [
+              "The most guards",
+              "A perfectly level surface on top",
+              "The longest cutting time",
+              "Special clippers"
+            ],
+            "answerIndex": 1,
+            "rationale": "Maintaining a perfectly flat, level plane on top of the head requires precision and skill."
+          }
+        ]
+      }
+    },
+    {
+      "slug": "barber-module-5",
+      "title": "Module 5: Shaving & Beard Services",
+      "order": 5,
+      "objective": "Execute professional shave preparation, straight razor technique, beard design, and post-shave care with correct sanitation and safety protocols.",
+      "lessons": [
+        {
+          "slug": "barber-lesson-29",
+          "title": "Shave Preparation & Hot Towel Service",
+          "durationMin": 20,
+          "domain": "SHAVING",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.25,
+          "content": "Proper preparation softens the beard, opens the pores, and reduces razor drag — preventing irritation and ingrown hairs. A well-prepared face requires fewer passes, which means less irritation and a closer result.\n\nHot towel application: Soak a clean towel in hot water. Test temperature on your wrist before applying to the client. Wring out excess water. Apply to the face for 2–3 minutes. Remove and apply pre-shave oil or cream.\n\nPre-shave products: Pre-shave oil — lubricates and protects the skin, applied before lather. Shaving cream — creates a protective lather, most common in barbershops. Shaving soap — traditional, requires a brush to build lather.\n\nContraindications — do not proceed if: client has open cuts, active acne, inflamed bumps, rash, or infection on the face; client reports sensitivity to heat or products; skin condition makes shaving unsafe.",
+          "competencyChecks": [
+            {
+              "id": "towel-temp-test",
+              "type": "SAFETY",
+              "description": "Tests towel temperature on wrist before applying to client — never skips this step",
+              "required": true
+            },
+            {
+              "id": "hot-towel-duration",
+              "type": "PROCEDURE",
+              "description": "Applies hot towel for correct duration (2–3 minutes)",
+              "required": true
+            },
+            {
+              "id": "product-selection",
+              "type": "TECHNIQUE",
+              "description": "Selects appropriate pre-shave product for client skin type",
+              "required": true
+            },
+            {
+              "id": "contraindication-screen",
+              "type": "SAFETY",
+              "description": "Identifies contraindications before beginning shave preparation and stops if present",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-30",
+          "title": "Straight Razor Shaving Technique",
+          "durationMin": 25,
+          "domain": "SHAVING",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.5,
+          "content": "Blade safety — non-negotiable: Shavette blades are single-use. Replace between every client. Dispose of used blades in a puncture-resistant sharps container immediately after use. Never recap a used blade with your fingers.\n\nRazor angle: Hold the razor at a 30-degree angle to the skin. Too steep (above 45°) causes cuts. Too flat (below 15°) causes drag and ineffective cutting. Maintain consistent angle throughout each stroke.\n\nThe three-pass shave: First pass — with the grain (WTG): follow the direction of hair growth, removes most of the beard, safest pass. Second pass — across the grain (XTG): cut perpendicular to growth, closer result. Third pass — against the grain (ATG): closest shave, only for clients with no sensitivity.\n\nSkin stretching: Use your free hand to keep the skin taut at all times. Loose skin causes nicks and uneven shaving. Stretch in the direction opposite to the razor stroke.\n\nStroke technique: Use short, controlled strokes. Rinse the blade after every 2–3 strokes. Never drag the razor — let the blade do the work.\n\nBlood exposure protocol: Stop service immediately. Put on gloves before touching the affected area. Apply antiseptic (alum block or styptic) to the nick. Dispose of all contaminated single-use materials in a sealed bag. Clean and disinfect blood-contaminated tools. Double-bag contaminated waste. Wash hands thoroughly after removing gloves.",
+          "competencyChecks": [
+            {
+              "id": "blade-replacement",
+              "type": "SANITATION",
+              "description": "Replaces shavette blade between every client — never reuses a blade",
+              "required": true
+            },
+            {
+              "id": "sharps-disposal",
+              "type": "SAFETY",
+              "description": "Disposes of used blade in sharps container immediately after use",
+              "required": true
+            },
+            {
+              "id": "razor-angle",
+              "type": "TECHNIQUE",
+              "description": "Maintains 30-degree razor angle throughout service — consistent, not variable",
+              "required": true
+            },
+            {
+              "id": "skin-tension",
+              "type": "TECHNIQUE",
+              "description": "Keeps skin taut with free hand during all passes",
+              "required": true
+            },
+            {
+              "id": "pass-sequence",
+              "type": "PROCEDURE",
+              "description": "Sequences passes correctly: WTG → XTG → ATG (if appropriate for client)",
+              "required": true
+            },
+            {
+              "id": "blood-protocol",
+              "type": "SAFETY",
+              "description": "Stops service and follows blood exposure protocol if skin is nicked",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-31",
+          "title": "Beard Design & Shaping",
+          "durationMin": 20,
+          "domain": "SHAVING",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.25,
+          "content": "Face shapes and beard strategy: Oval — most beard styles work, maintain natural proportions. Round — add length on the chin, keep sides tight. Square — round the corners, fuller on the chin. Oblong — keep sides full, minimize chin length.\n\nBeard lines: Cheek line — natural or defined, never set too low as it shortens the face. Neckline — two finger-widths above the Adam's apple, most common mistake is setting too high. Mustache line — follow the natural lip line.\n\nTrimming procedure: Comb beard downward to its natural fall. Trim to desired length with guards. Define cheek line with trimmer. Set neckline two finger-widths above the Adam's apple. Define mustache line along the lip. Refine lines with razor if appropriate and skin is healthy. Apply beard oil to finish.\n\nThe most common beard design error is setting the neckline too high. Two finger-widths above the Adam's apple is the standard.",
+          "competencyChecks": [
+            {
+              "id": "face-shape-strategy",
+              "type": "KNOWLEDGE",
+              "description": "Identifies face shape and selects appropriate beard strategy",
+              "required": true
+            },
+            {
+              "id": "neckline-placement",
+              "type": "TECHNIQUE",
+              "description": "Sets neckline at correct position — two finger-widths above Adam's apple",
+              "required": true
+            },
+            {
+              "id": "cheek-line-height",
+              "type": "TECHNIQUE",
+              "description": "Defines cheek line without setting it too low",
+              "required": true
+            },
+            {
+              "id": "trimmer-disinfection",
+              "type": "SANITATION",
+              "description": "Disinfects trimmer blades with clipper disinfectant spray before service",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-32",
+          "title": "Post-Shave Care & Skin Treatment",
+          "durationMin": 15,
+          "domain": "SHAVING",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.25,
+          "content": "Post-shave sequence: Apply a cold towel to close pores and soothe the skin — leave on for 1–2 minutes. Remove cold towel and inspect the skin for nicks or irritation. Apply alum block to any nicks — hold for 10–15 seconds. Apply witch hazel to tone and soothe. Apply aftershave balm to moisturize and calm irritation.\n\nPost-shave products: Alum block — stops minor bleeding from nicks, antiseptic, hold on nick for 10–15 seconds. Witch hazel — tones and soothes the skin, mild antiseptic. Aftershave balm — moisturizes and calms irritation, no alcohol, gentler on sensitive skin. Aftershave splash — antiseptic, contains alcohol, can sting on sensitive skin.\n\nNick treatment: Apply alum block or styptic pencil directly to the nick. Hold for 10–15 seconds. Never use a tissue — it leaves fibers in the wound. If bleeding does not stop, follow blood exposure protocol.\n\nRazor bumps (Pseudofolliculitis Barbae): Common in clients with curly hair. Recommend shaving with the grain only, using a single-blade razor, avoiding pulling skin too tight. Do not shave over active razor bumps.",
+          "competencyChecks": [
+            {
+              "id": "cold-towel-application",
+              "type": "PROCEDURE",
+              "description": "Applies cold towel for correct duration after shaving",
+              "required": true
+            },
+            {
+              "id": "alum-block-technique",
+              "type": "PROCEDURE",
+              "description": "Uses alum block correctly on nicks — holds for 10–15 seconds",
+              "required": true
+            },
+            {
+              "id": "product-selection-skin",
+              "type": "TECHNIQUE",
+              "description": "Selects appropriate aftershave product for client skin type",
+              "required": true
+            },
+            {
+              "id": "razor-bump-education",
+              "type": "KNOWLEDGE",
+              "description": "Identifies razor bumps and provides correct client education on prevention",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-33",
+          "title": "Mustache Trimming & Styling",
+          "durationMin": 15,
+          "domain": "SHAVING",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.25,
+          "content": "Mustache styles: Natural — trimmed to follow the lip line, clean and understated. Chevron — full and thick, trimmed straight across, classic masculine style. Handlebar — long ends styled upward with wax, requires product and maintenance. Pencil — thin line above the lip, precise trimming required.\n\nTrimming procedure: Comb mustache downward to its natural fall. Trim bulk with scissors or guards to desired length. Define the lip line with a trimmer — follow the natural curve. Clean up the philtrum (area between nose and lip). Apply mustache wax if styling a handlebar or shaped style. Comb through and inspect for evenness.\n\nAlways follow the natural lip line when defining the mustache edge. Cutting above the lip line removes too much and creates an unnatural gap.",
+          "competencyChecks": [
+            {
+              "id": "style-identification",
+              "type": "KNOWLEDGE",
+              "description": "Identifies mustache style requested and selects appropriate technique",
+              "required": true
+            },
+            {
+              "id": "bulk-before-line",
+              "type": "PROCEDURE",
+              "description": "Trims bulk before defining the lip line — correct sequence",
+              "required": true
+            },
+            {
+              "id": "lip-line-follow",
+              "type": "TECHNIQUE",
+              "description": "Follows natural lip line when defining the mustache edge",
+              "required": true
+            },
+            {
+              "id": "trimmer-disinfection-33",
+              "type": "SANITATION",
+              "description": "Disinfects trimmer blades before service",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "checkpoint": {
+        "slug": "barber-module-5-checkpoint",
+        "title": "Shaving & Beard Checkpoint",
+        "durationMin": 20,
+        "domain": "SHAVING",
+        "ojtCategory": "ASSESSMENT",
+        "hoursCredit": 0.25,
+        "passingScore": 70,
+        "questions": [
+          {
+            "prompt": "What angle should the straight razor be held at during shaving?",
+            "choices": [
+              "15 degrees",
+              "30 degrees",
+              "45 degrees",
+              "60 degrees"
+            ],
+            "answerIndex": 1,
+            "rationale": "A 30-degree angle provides the optimal balance between closeness and safety."
+          },
+          {
+            "prompt": "Where should the neckline be set when shaping a beard?",
+            "choices": [
+              "At the jawline",
+              "At the Adam's apple",
+              "Two finger-widths above the Adam's apple",
+              "At the chin"
+            ],
+            "answerIndex": 2,
+            "rationale": "Two finger-widths above the Adam's apple is the standard neckline position."
+          },
+          {
+            "prompt": "What is the first pass in a three-pass shave?",
+            "choices": [
+              "Against the grain",
+              "Across the grain",
+              "With the grain",
+              "In circular motions"
+            ],
+            "answerIndex": 2,
+            "rationale": "The first pass always goes with the grain to remove bulk safely."
+          },
+          {
+            "prompt": "Which product stops minor bleeding from razor nicks?",
+            "choices": [
+              "Aftershave balm",
+              "Witch hazel",
+              "Alum block",
+              "Pre-shave oil"
+            ],
+            "answerIndex": 2,
+            "rationale": "An alum block is an antiseptic that constricts blood vessels to stop minor bleeding."
+          },
+          {
+            "prompt": "Razor bumps are most common in clients with:",
+            "choices": [
+              "Straight hair",
+              "Fine hair",
+              "Curly hair",
+              "Thick hair"
+            ],
+            "answerIndex": 2,
+            "rationale": "Curly hair is more likely to curl back into the skin, causing ingrown hairs and razor bumps."
+          },
+          {
+            "prompt": "How long should a hot towel be applied before shaving?",
+            "choices": [
+              "30 seconds",
+              "2–3 minutes",
+              "10 minutes",
+              "15 minutes"
+            ],
+            "answerIndex": 1,
+            "rationale": "2–3 minutes is sufficient to soften the beard and open the pores."
+          }
+        ]
+      }
+    },
+    {
+      "slug": "barber-module-6",
+      "title": "Module 6: Chemical Services",
+      "order": 6,
+      "objective": "Apply chemical service knowledge including color theory, patch testing, relaxer chemistry, and scalp treatments with correct safety protocols.",
+      "lessons": [
+        {
+          "slug": "barber-lesson-35",
+          "title": "Hair Color Theory",
+          "durationMin": 20,
+          "domain": "CHEMICAL_SERVICES",
+          "ojtCategory": "THEORY",
+          "hoursCredit": 0.25,
+          "content": "Primary colors: red, yellow, blue. Secondary colors are made by mixing two primaries: orange (red + yellow), green (yellow + blue), violet (blue + red). Complementary colors cancel each other out — used to neutralize unwanted tones. Violet cancels yellow brassiness.\n\nHair color levels (1–10): Level 1 = black. Level 4–5 = dark brown. Level 6–7 = medium brown to dark blonde. Level 8–9 = light blonde. Level 10 = lightest blonde.\n\nTypes of hair color: Temporary — coats the cuticle, washes out in 1–2 shampoos, no developer. Semi-permanent — no developer, lasts 4–6 weeks, cannot lighten. Demi-permanent — low-volume developer, lasts 6–8 weeks, cannot lighten significantly. Permanent — opens cuticle with developer, permanent change, can lighten and deposit.",
+          "competencyChecks": [
+            {
+              "id": "color-wheel",
+              "type": "KNOWLEDGE",
+              "description": "Identifies primary, secondary, and complementary colors and states how complementary colors are used",
+              "required": true
+            },
+            {
+              "id": "level-system",
+              "type": "KNOWLEDGE",
+              "description": "States the hair color level system (1–10) with correct color descriptions",
+              "required": true
+            },
+            {
+              "id": "color-types",
+              "type": "KNOWLEDGE",
+              "description": "Distinguishes temporary, semi-permanent, demi-permanent, and permanent color by developer use and longevity",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-36",
+          "title": "Chemical Safety & Patch Testing",
+          "durationMin": 20,
+          "domain": "CHEMICAL_SERVICES",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.25,
+          "content": "Patch test procedure: Perform 24–48 hours before any chemical service. Apply a small amount of product behind the ear or inside the elbow. Leave uncovered for the required time. Inspect at 24 hours and again at 48 hours. If redness, swelling, itching, or burning occurs — do not proceed with the service.\n\nPPE for chemical services: Nitrile gloves — always, latex gloves are not adequate as chemicals can permeate. Protective apron — protects clothing and skin from splashes. Eye protection — required when mixing or applying chemicals. Ventilation — ensure adequate airflow, chemical fumes can cause respiratory irritation.\n\nContraindications — do not perform chemical services if: client has scalp abrasions, open wounds, or active skin conditions; client had a chemical service within the past 2–4 weeks; client has known allergies to ingredients; patch test showed a reaction.",
+          "competencyChecks": [
+            {
+              "id": "patch-test-timing",
+              "type": "PROCEDURE",
+              "description": "Performs patch test 24–48 hours before chemical service — not the same day",
+              "required": true
+            },
+            {
+              "id": "ppe-chemical",
+              "type": "SAFETY",
+              "description": "Wears nitrile gloves, apron, and eye protection during chemical services",
+              "required": true
+            },
+            {
+              "id": "contraindication-chemical",
+              "type": "SAFETY",
+              "description": "Identifies all contraindications before proceeding and stops if any are present",
+              "required": true
+            },
+            {
+              "id": "reaction-stop",
+              "type": "SAFETY",
+              "description": "Stops service if patch test shows any reaction — no exceptions",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-37",
+          "title": "Relaxers & Texturizers",
+          "durationMin": 20,
+          "domain": "CHEMICAL_SERVICES",
+          "ojtCategory": "THEORY",
+          "hoursCredit": 0.25,
+          "content": "Relaxers break the disulfide bonds in the cortex that give hair its curl pattern. The hair is restructured in a straighter form. The neutralizer stops the process by restoring the hair's pH and re-forming bonds in the new position.\n\nRelaxer types: Lye (sodium hydroxide) — faster processing, stronger, more scalp irritation risk, requires careful timing. No-lye (guanidine) — gentler, less scalp irritation, may leave calcium deposits requiring chelating shampoo. Texturizer — same chemistry as relaxer, shorter processing time, loosens curl without fully straightening.\n\nApplication rules: Never apply to a scratched, irritated, or broken scalp. Base the scalp with petroleum jelly before application to protect skin. Apply to new growth only — do not overlap onto previously relaxed hair. Process only to the manufacturer's recommended time. Neutralize thoroughly — insufficient neutralizing causes continued processing and breakage.\n\nCritical safety rule: Never apply a relaxer to a scratched scalp. Instruct clients not to scratch their scalp for 48 hours before a relaxer service.",
+          "competencyChecks": [
+            {
+              "id": "disulfide-bonds",
+              "type": "KNOWLEDGE",
+              "description": "Explains how relaxers break disulfide bonds and what the neutralizer does",
+              "required": true
+            },
+            {
+              "id": "lye-vs-nolye",
+              "type": "KNOWLEDGE",
+              "description": "Distinguishes lye from no-lye relaxers by chemistry and risk profile",
+              "required": true
+            },
+            {
+              "id": "scalp-basing",
+              "type": "PROCEDURE",
+              "description": "States the scalp basing requirement and the rule against applying to a scratched scalp",
+              "required": true
+            },
+            {
+              "id": "neutralizer-purpose",
+              "type": "KNOWLEDGE",
+              "description": "States the purpose of the neutralizer and consequence of insufficient neutralizing",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-38",
+          "title": "Scalp Treatments",
+          "durationMin": 15,
+          "domain": "CHEMICAL_SERVICES",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.25,
+          "content": "Scalp treatment types: Moisturizing — for dry, flaky scalp, restores hydration. Clarifying — removes product buildup and excess sebum. Anti-dandruff — contains zinc pyrithione or selenium sulfide, reduces Malassezia yeast. Stimulating — increases circulation, contains menthol or peppermint.\n\nApplication procedure: Shampoo hair first to remove debris and open the scalp. Apply treatment directly to scalp in sections using an applicator bottle. Massage in with fingertip pressure — not fingernails. Process per manufacturer instructions. Rinse thoroughly — no product residue.\n\nReferral rule: Scalp treatments address cosmetic conditions. If a client has a medical scalp condition (severe seborrheic dermatitis, psoriasis flare, fungal infection), refer to a physician before performing any treatment.",
+          "competencyChecks": [
+            {
+              "id": "treatment-selection",
+              "type": "TECHNIQUE",
+              "description": "Selects correct treatment type for the client's scalp condition",
+              "required": true
+            },
+            {
+              "id": "shampoo-first",
+              "type": "PROCEDURE",
+              "description": "Shampoos before applying treatment — correct sequence",
+              "required": true
+            },
+            {
+              "id": "fingertip-massage",
+              "type": "TECHNIQUE",
+              "description": "Uses fingertip pressure — not fingernails — during scalp massage",
+              "required": true
+            },
+            {
+              "id": "medical-referral",
+              "type": "SAFETY",
+              "description": "Refers client to physician when scalp condition is medical in nature",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "checkpoint": {
+        "slug": "barber-module-6-checkpoint",
+        "title": "Chemical Services Checkpoint",
+        "durationMin": 20,
+        "domain": "CHEMICAL_SERVICES",
+        "ojtCategory": "ASSESSMENT",
+        "hoursCredit": 0.25,
+        "passingScore": 70,
+        "questions": [
+          {
+            "prompt": "How long before a chemical service should a patch test be performed?",
+            "choices": [
+              "1 hour",
+              "6 hours",
+              "24–48 hours",
+              "1 week"
+            ],
+            "answerIndex": 2,
+            "rationale": "A patch test needs 24–48 hours to reveal any allergic reaction."
+          },
+          {
+            "prompt": "Which type of hair color requires a developer to open the cuticle?",
+            "choices": [
+              "Temporary",
+              "Semi-permanent",
+              "Permanent",
+              "Rinse"
+            ],
+            "answerIndex": 2,
+            "rationale": "Permanent color uses developer (hydrogen peroxide) to open the cuticle and deposit color."
+          },
+          {
+            "prompt": "What stops the chemical process during a relaxer service?",
+            "choices": [
+              "Shampoo",
+              "Conditioner",
+              "Neutralizer",
+              "Water rinse"
+            ],
+            "answerIndex": 2,
+            "rationale": "The neutralizer restores the hair's pH and stops the relaxer from processing."
+          },
+          {
+            "prompt": "Before applying a relaxer, the scalp should be:",
+            "choices": [
+              "Scratched to open pores",
+              "Wet with water",
+              "Based with petroleum jelly",
+              "Treated with alcohol"
+            ],
+            "answerIndex": 2,
+            "rationale": "Petroleum jelly protects the scalp from chemical burns during relaxer application."
+          },
+          {
+            "prompt": "Which complementary color neutralizes yellow/brassy tones?",
+            "choices": [
+              "Red",
+              "Green",
+              "Orange",
+              "Violet"
+            ],
+            "answerIndex": 3,
+            "rationale": "Violet is complementary to yellow on the color wheel and neutralizes brassiness."
+          },
+          {
+            "prompt": "Hair color level 1 represents:",
+            "choices": [
+              "Lightest blonde",
+              "Medium brown",
+              "Dark brown",
+              "Black"
+            ],
+            "answerIndex": 3,
+            "rationale": "Level 1 is the darkest — black. Level 10 is the lightest blonde."
+          }
+        ]
+      }
+    },
+    {
+      "slug": "barber-module-7",
+      "title": "Module 7: Professional & Business Skills",
+      "order": 7,
+      "objective": "Apply professional standards, business knowledge, and client retention strategies to build a sustainable barbering career.",
+      "lessons": [
+        {
+          "slug": "barber-lesson-40",
+          "title": "Building Your Clientele",
+          "durationMin": 20,
+          "domain": "BUSINESS_PROFESSIONAL",
+          "ojtCategory": "THEORY",
+          "hoursCredit": 0.25,
+          "content": "Clients decide within the first 30 seconds whether they will return. Be on time, be clean, be professional. Your station reflects your standards — a clean, organized station signals competence before you pick up a tool.\n\nRetention strategies: Remember names — use the client's name during the service. Client card — keep notes on style, products used, and last visit, review before each appointment. Follow up — a text after a new client's first visit goes a long way. Rebook — recommend the next appointment before they leave the chair.\n\nSocial media: Post your work consistently. Before-and-after photos with client permission are the most effective content. Use local hashtags and tag your shop location. Respond to comments and DMs promptly.\n\nEvery client who leaves without a next appointment is a client you may lose. Recommend rebooking at the end of every service.",
+          "competencyChecks": [
+            {
+              "id": "retention-strategies",
+              "type": "KNOWLEDGE",
+              "description": "Identifies at least 3 client retention strategies and explains the purpose of each",
+              "required": true
+            },
+            {
+              "id": "client-card",
+              "type": "KNOWLEDGE",
+              "description": "Explains the purpose of a client card and what information to track",
+              "required": true
+            },
+            {
+              "id": "rebook-recommendation",
+              "type": "PROCEDURE",
+              "description": "States the rebook recommendation at the end of service — every client, every time",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-41",
+          "title": "Booth Rental vs. Commission vs. Ownership",
+          "durationMin": 20,
+          "domain": "BUSINESS_PROFESSIONAL",
+          "ojtCategory": "THEORY",
+          "hoursCredit": 0.25,
+          "content": "Business models: Commission — work for the shop owner, receive 40–60% of service revenue, shop provides clients, supplies, and equipment, good for new barbers. Booth rental — pay a weekly or monthly fee to use a chair, keep 100% of service revenue, self-employed and responsible for taxes, supplies, and clients. Shop ownership — own the business, maximum income potential, maximum responsibility, requires business license, shop license, and startup capital.\n\nTypical career path: Most barbers start on commission to build skills and clientele. Move to booth rental when clientele is strong enough to cover the booth fee and generate profit. Consider ownership after 5+ years of experience and a solid client base.\n\nBooth renters are self-employed. You pay both the employee and employer portions of Social Security and Medicare taxes — approximately 15.3% on top of income tax. Set aside 25–30% of gross income for taxes.",
+          "competencyChecks": [
+            {
+              "id": "commission-model",
+              "type": "KNOWLEDGE",
+              "description": "Describes the commission model and its advantages for new barbers",
+              "required": true
+            },
+            {
+              "id": "booth-rental-finances",
+              "type": "KNOWLEDGE",
+              "description": "Explains what booth rental means financially — revenue kept, expenses owned",
+              "required": true
+            },
+            {
+              "id": "self-employment-tax",
+              "type": "KNOWLEDGE",
+              "description": "Identifies the tax obligations of a self-employed barber including self-employment tax rate",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-42",
+          "title": "Pricing, Tipping & Financial Basics",
+          "durationMin": 20,
+          "domain": "BUSINESS_PROFESSIONAL",
+          "ojtCategory": "THEORY",
+          "hoursCredit": 0.25,
+          "content": "Setting your prices: Research local market rates. Factor in your experience level — new barbers typically price below market. Price for the service, not the time. Raise prices as your clientele grows.\n\nTipping: The standard tip for barbering is 15–20%. Never expect a tip but always appreciate one. Make it easy — have a tip jar or use a payment system that prompts for tips.\n\nFinancial basics for self-employed barbers: Track all income — cash and card, every dollar must be reported. Set aside 25–30% of gross income for taxes. Keep receipts — all business expenses (supplies, tools, education) are deductible. Pay estimated taxes quarterly to avoid IRS penalties.",
+          "competencyChecks": [
+            {
+              "id": "price-research",
+              "type": "KNOWLEDGE",
+              "description": "Explains how to research and set competitive prices based on market and experience",
+              "required": true
+            },
+            {
+              "id": "tip-standard",
+              "type": "KNOWLEDGE",
+              "description": "States the standard tip percentage for barbering (15–20%)",
+              "required": true
+            },
+            {
+              "id": "quarterly-taxes",
+              "type": "KNOWLEDGE",
+              "description": "Explains the quarterly estimated tax requirement and consequence of non-payment",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-43",
+          "title": "Professionalism & Ethics",
+          "durationMin": 15,
+          "domain": "BUSINESS_PROFESSIONAL",
+          "ojtCategory": "THEORY",
+          "hoursCredit": 0.25,
+          "content": "The barber's code: No negative talk — never speak negatively about other barbers or shops. Confidentiality — what happens in the chair stays in the chair, client conversations are private. Scope of practice — do not perform services outside your license, refer when appropriate. Honesty — be honest about what you can and cannot achieve, never promise results you cannot deliver.\n\nHandling difficult clients: Stay calm. Listen without interrupting. Offer to fix the issue at no charge if it is your error. If a client is abusive or threatening, you have the right to refuse service. Document incidents per shop policy.\n\nIndiana requires continuing education for license renewal. The barbering industry evolves constantly — attend trade shows, watch tutorials, and practice new techniques.",
+          "competencyChecks": [
+            {
+              "id": "barbers-code",
+              "type": "KNOWLEDGE",
+              "description": "States the four elements of the barber's code without prompting",
+              "required": true
+            },
+            {
+              "id": "complaint-handling",
+              "type": "PROCEDURE",
+              "description": "Describes how to handle a client complaint professionally — calm, listen, offer to fix",
+              "required": true
+            },
+            {
+              "id": "scope-of-practice",
+              "type": "KNOWLEDGE",
+              "description": "Identifies services outside the barber's scope of practice",
+              "required": true
+            },
+            {
+              "id": "ce-requirement",
+              "type": "KNOWLEDGE",
+              "description": "States Indiana's continuing education requirement for license renewal",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-44",
+          "title": "Styling Products & Finishing",
+          "durationMin": 15,
+          "domain": "BUSINESS_PROFESSIONAL",
+          "ojtCategory": "PRACTICAL",
+          "hoursCredit": 0.25,
+          "content": "Styling products: Pomade — medium to high hold, medium to high shine, classic barbershop finish. Clay — medium to high hold, matte finish, modern styles. Cream — light hold, natural finish, good for textured or curly hair. Gel — strong hold, high shine, waves and slick styles. Wax — flexible hold, mustaches and detailed styling.\n\nApplication technique: Start with a small amount — you can always add more. Warm product between palms before applying. Work through hair evenly from roots to ends. Style with comb or fingers to desired shape. Add more product only if needed — avoid buildup.\n\nProduct selection logic: IF client wants shine → pomade or gel. IF client wants matte → clay or cream. IF client has textured/curly hair → cream or light pomade. IF client wants maximum hold → gel or strong pomade.",
+          "competencyChecks": [
+            {
+              "id": "product-identification",
+              "type": "KNOWLEDGE",
+              "description": "Identifies all five product types and their hold/finish characteristics",
+              "required": true
+            },
+            {
+              "id": "product-selection",
+              "type": "TECHNIQUE",
+              "description": "Selects appropriate product based on hair type and desired finish",
+              "required": true
+            },
+            {
+              "id": "application-technique",
+              "type": "TECHNIQUE",
+              "description": "Applies product correctly — warms between palms, works evenly through hair, does not over-apply",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "checkpoint": {
+        "slug": "barber-module-7-checkpoint",
+        "title": "Professional Skills Checkpoint",
+        "durationMin": 20,
+        "domain": "BUSINESS_PROFESSIONAL",
+        "ojtCategory": "ASSESSMENT",
+        "hoursCredit": 0.25,
+        "passingScore": 70,
+        "questions": [
+          {
+            "prompt": "In a booth rental arrangement, who keeps 100% of service revenue?",
+            "choices": [
+              "The shop owner",
+              "The barber",
+              "They split it 50/50",
+              "The landlord"
+            ],
+            "answerIndex": 1,
+            "rationale": "Booth renters are self-employed and keep all service revenue after paying their booth fee."
+          },
+          {
+            "prompt": "What percentage of income should a self-employed barber set aside for taxes?",
+            "choices": [
+              "5–10%",
+              "10–15%",
+              "25–30%",
+              "50%"
+            ],
+            "answerIndex": 2,
+            "rationale": "Self-employed individuals pay both income tax and self-employment tax, totaling approximately 25–30%."
+          },
+          {
+            "prompt": "Which styling product provides high hold with a matte finish?",
+            "choices": [
+              "Pomade",
+              "Gel",
+              "Clay",
+              "Cream"
+            ],
+            "answerIndex": 2,
+            "rationale": "Clay provides medium to high hold with a matte finish, popular for modern styles."
+          },
+          {
+            "prompt": "The standard tip for barbering services is:",
+            "choices": [
+              "5–10%",
+              "15–20%",
+              "25–30%",
+              "Tips are not expected"
+            ],
+            "answerIndex": 1,
+            "rationale": "15–20% is the standard tip for personal service professionals including barbers."
+          },
+          {
+            "prompt": "Which business model is recommended for a barber just starting out?",
+            "choices": [
+              "Booth rental",
+              "Shop ownership",
+              "Commission",
+              "Freelance"
+            ],
+            "answerIndex": 2,
+            "rationale": "Commission is best for new barbers — the shop provides clients, supplies, and equipment while skills are being built."
+          },
+          {
+            "prompt": "What is the most effective social media content for barbers?",
+            "choices": [
+              "Motivational quotes",
+              "Before-and-after photos of client work",
+              "Product advertisements",
+              "Shop interior photos"
+            ],
+            "answerIndex": 1,
+            "rationale": "Before-and-after photos showcase your skill directly and attract new clients."
+          }
+        ]
+      }
+    },
+    {
+      "slug": "barber-module-8",
+      "title": "Module 8: State Board Exam Preparation",
+      "order": 8,
+      "objective": "Prepare for the Indiana barber state board written and practical exams through structured review and practice.",
+      "lessons": [
+        {
+          "slug": "barber-lesson-46",
+          "title": "Indiana State Board Exam Overview",
+          "durationMin": 20,
+          "domain": "STATE_BOARD_PREP",
+          "ojtCategory": "THEORY",
+          "hoursCredit": 0.25,
+          "content": "Exam components: Written exam — 100 multiple choice questions, 75% passing score required, administered by PSI/NIC. Practical exam — performed on a mannequin or live model, graded by state board examiners.\n\nWritten exam topic weights: Infection control & sanitation 25%. Hair science & scalp analysis 20%. Haircutting & styling 25%. Chemical services 15%. Indiana laws & regulations 15%.\n\nPractical exam skills: Haircut with fade — clean fade with smooth transitions, no visible lines. Shave service — correct angle, grain direction, and skin tension. Sanitation procedures — pre-clean → disinfect → contact time, tested in sequence. Client draping — neck strip before cape, cape must not contact bare skin.\n\nApprenticeship vs. school path: School path requires 1,500 hours. Apprenticeship path (this program) requires 2,000 OJT hours. Both paths require the same written and practical exams.",
+          "competencyChecks": [
+            {
+              "id": "passing-score",
+              "type": "KNOWLEDGE",
+              "description": "States the written exam passing score (75%) without prompting",
+              "required": true
+            },
+            {
+              "id": "topic-weights",
+              "type": "KNOWLEDGE",
+              "description": "Identifies the five topic areas and their approximate weights",
+              "required": true
+            },
+            {
+              "id": "practical-criteria",
+              "type": "KNOWLEDGE",
+              "description": "Describes what the practical exam tests — draping, sanitation, fade, shave",
+              "required": true
+            },
+            {
+              "id": "ojt-hours",
+              "type": "KNOWLEDGE",
+              "description": "States the OJT hour requirement for the apprenticeship path (2,000)",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-47",
+          "title": "Written Exam Review — Sanitation & Science",
+          "durationMin": 25,
+          "domain": "STATE_BOARD_PREP",
+          "ojtCategory": "THEORY",
+          "hoursCredit": 0.5,
+          "content": "Key sanitation facts: Between-client requirement is disinfection — not sterilization. Disinfectant type must be EPA-registered. Sharps disposal requires a puncture-resistant sharps container — never regular trash. Solution must be changed daily or when visibly contaminated. Tinea capitis — no service, refer to physician immediately. Pre-clean rule — remove debris before applying disinfectant, debris blocks effectiveness.\n\nKey hair science facts: Cortex contains melanin (color) and keratin (strength). Anagen phase is active growth lasting 2–7 years. Normal daily hair loss is 50–100 hairs per day. High porosity means damaged cuticle — absorbs quickly, loses moisture fast. Patch test timing is 24–48 hours before chemical services.\n\nInfection control is the single largest topic on the written exam at 25%. Know the disinfection sequence (pre-clean → disinfect → contact time → store), the difference between sanitation/disinfection/sterilization, and all blood exposure protocol steps.",
+          "competencyChecks": [
+            {
+              "id": "between-client-requirement",
+              "type": "KNOWLEDGE",
+              "description": "States the between-client disinfection requirement — disinfection, not sterilization",
+              "required": true
+            },
+            {
+              "id": "sharps-disposal-method",
+              "type": "KNOWLEDGE",
+              "description": "Identifies the correct sharps disposal method — puncture-resistant container",
+              "required": true
+            },
+            {
+              "id": "hair-shaft-review",
+              "type": "KNOWLEDGE",
+              "description": "Names the three layers of the hair shaft and their functions from memory",
+              "required": true
+            },
+            {
+              "id": "growth-cycle-review",
+              "type": "KNOWLEDGE",
+              "description": "States the three phases of the hair growth cycle with correct durations",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-48",
+          "title": "Written Exam Review — Techniques & Laws",
+          "durationMin": 25,
+          "domain": "STATE_BOARD_PREP",
+          "ojtCategory": "THEORY",
+          "hoursCredit": 0.5,
+          "content": "Key technique facts: Parietal ridge is the widest part of head and high fade reference point. Occipital bone is at the back of skull and low/mid fade reference point. Razor angle is 30 degrees. Neckline placement is two finger-widths above the Adam's apple. First shave pass goes with the grain (WTG). Thinning shears remove bulk without changing length.\n\nKey Indiana law facts: Apprenticeship OJT hours — 2,000. School hours — 1,500. Written exam passing score — 75%. License renewal — every 2 years. License display — must be displayed at the workstation. Governing law — Indiana Code Title 25, Article 8.\n\nCommon exam traps: Sterilization vs. disinfection — barbershops require disinfection, not sterilization. Apprenticeship hours (2,000) vs. school hours (1,500) — frequently confused. Written exam passing score is 75%, not 70%. Module checkpoints use 70%.",
+          "competencyChecks": [
+            {
+              "id": "fade-reference-points",
+              "type": "KNOWLEDGE",
+              "description": "Identifies parietal ridge and occipital bone as fade reference points",
+              "required": true
+            },
+            {
+              "id": "razor-angle-recall",
+              "type": "KNOWLEDGE",
+              "description": "States correct razor angle (30 degrees) without prompting",
+              "required": true
+            },
+            {
+              "id": "apprenticeship-hours",
+              "type": "KNOWLEDGE",
+              "description": "Distinguishes apprenticeship hours (2,000) from school hours (1,500)",
+              "required": true
+            },
+            {
+              "id": "written-passing-score",
+              "type": "KNOWLEDGE",
+              "description": "States the written exam passing score (75%) — not 70%",
+              "required": true
+            }
+          ]
+        },
+        {
+          "slug": "barber-lesson-49",
+          "title": "Practical Exam Preparation",
+          "durationMin": 20,
+          "domain": "STATE_BOARD_PREP",
+          "ojtCategory": "ASSESSMENT",
+          "hoursCredit": 0.25,
+          "content": "What examiners look for: Draping — neck strip placed before cape, cape does not contact bare skin. Sanitation — pre-clean → disinfect → contact time, sequence must be correct. Fade — clean fade line, smooth transitions, no visible blend lines. Lineup — sharp, even edges, natural hairline preserved. Shave — correct angle (30°), skin tension maintained, correct grain direction. Demeanor — professional throughout, no rushing, no unsafe tool handling.\n\nPractice checklist — run this before every practice session: Drape client correctly with neck strip and cape. Disinfect all tools before beginning — pre-clean first, then disinfect, then maintain contact time. Establish fade line and work upward with progressively larger guards. Blend all transitions — check from multiple angles, no visible lines. Execute clean lineup at hairline, temples, and nape. Perform shave with correct angle and grain direction. Apply post-shave care. Clean and disinfect station after service.\n\nExaminers are not trying to fail you — they are verifying that you are safe to practice on the public. Sanitation sequence errors are automatic deductions.",
+          "competencyChecks": [
+            {
+              "id": "draping-sequence",
+              "type": "PROCEDURE",
+              "description": "Drapes client correctly with neck strip before cape — no prompting needed",
+              "required": true
+            },
+            {
+              "id": "sanitation-sequence-exam",
+              "type": "SANITATION",
+              "description": "Performs sanitation sequence in correct order before service — pre-clean → disinfect → contact time",
+              "required": true
+            },
+            {
+              "id": "fade-execution",
+              "type": "TECHNIQUE",
+              "description": "Executes fade with smooth transitions and no visible lines",
+              "required": true
+            },
+            {
+              "id": "shave-execution",
+              "type": "TECHNIQUE",
+              "description": "Performs shave with correct angle and grain direction",
+              "required": true
+            },
+            {
+              "id": "post-service-cleanup",
+              "type": "SANITATION",
+              "description": "Cleans and disinfects station after service",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "checkpoint": {
+        "slug": "barber-indiana-state-board-exam",
+        "title": "Program Final Exam",
+        "durationMin": 30,
+        "domain": "STATE_BOARD_PREP",
+        "ojtCategory": "ASSESSMENT",
+        "hoursCredit": 0.5,
+        "passingScore": 70,
+        "questions": [
+          {
+            "prompt": "What is the passing score for the Indiana barber written exam?",
+            "choices": [
+              "60%",
+              "70%",
+              "75%",
+              "80%"
+            ],
+            "answerIndex": 2,
+            "rationale": "Indiana requires a 75% passing score on the written state board exam."
+          },
+          {
+            "prompt": "How many OJT hours are required for the apprenticeship path in Indiana?",
+            "choices": [
+              "1,000",
+              "1,500",
+              "2,000",
+              "2,500"
+            ],
+            "answerIndex": 2,
+            "rationale": "The DOL-registered apprenticeship path requires 2,000 on-the-job training hours."
+          },
+          {
+            "prompt": "Which layer of the hair contains melanin?",
+            "choices": [
+              "Cuticle",
+              "Cortex",
+              "Medulla",
+              "Follicle"
+            ],
+            "answerIndex": 1,
+            "rationale": "The cortex contains melanin granules that determine hair color."
+          },
+          {
+            "prompt": "What is required between every client in Indiana?",
+            "choices": [
+              "Sterilization",
+              "Sanitation",
+              "Disinfection",
+              "Rinsing"
+            ],
+            "answerIndex": 2,
+            "rationale": "EPA-registered disinfection of all tools is required between every client."
+          },
+          {
+            "prompt": "The neckline should be set:",
+            "choices": [
+              "At the jawline",
+              "At the Adam's apple",
+              "Two finger-widths above the Adam's apple",
+              "At the occipital bone"
+            ],
+            "answerIndex": 2,
+            "rationale": "Two finger-widths above the Adam's apple is the standard neckline position."
+          },
+          {
+            "prompt": "A client has tinea capitis. You should:",
+            "choices": [
+              "Proceed with gloves",
+              "Perform a dry cut only",
+              "Decline service and refer to a physician",
+              "Use medicated shampoo first"
+            ],
+            "answerIndex": 2,
+            "rationale": "Tinea capitis is contagious — no services should be performed."
+          },
+          {
+            "prompt": "The first pass in a straight razor shave goes:",
+            "choices": [
+              "Against the grain",
+              "Across the grain",
+              "With the grain",
+              "In circles"
+            ],
+            "answerIndex": 2,
+            "rationale": "Always start with the grain to safely remove bulk before closer passes."
+          },
+          {
+            "prompt": "Indiana barber licenses must be renewed every:",
+            "choices": [
+              "1 year",
+              "2 years",
+              "3 years",
+              "5 years"
+            ],
+            "answerIndex": 1,
+            "rationale": "Indiana requires barber license renewal every two years."
+          }
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "lessonCount": 42,
+    "totalSlugs": 50,
+    "totalHours": 14.5,
+    "domainCoverage": [
+      "SAFETY_SANITATION",
+      "HAIR_SCALP",
+      "TOOLS_EQUIPMENT",
+      "HAIRCUTTING",
+      "SHAVING",
+      "CHEMICAL_SERVICES",
+      "BUSINESS_PROFESSIONAL",
+      "STATE_BOARD_PREP"
+    ],
+    "ojtBreakdown": {
+      "THEORY": 5,
+      "PRACTICAL": 7,
+      "ASSESSMENT": 0.25
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -54,7 +55,7 @@ async function completeOrientation() {
       .from('profiles')
       .select('email, first_name, full_name')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
     if (profile?.email) {
       const firstName = profile.first_name || profile.full_name?.split(' ')[0] || 'there';
@@ -122,9 +123,11 @@ const PROGRAM_META: Record<string, { duration: string; hours: string; credential
 };
 
 export default async function OrientationPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const sessionClient = await createClient();
+  const { data: { user } } = await sessionClient.auth.getUser();
   if (!user) redirect('/login');
+
+  const supabase = await getAdminClient();
 
   // Pull from program_enrollments first, fall back to training_enrollments (legacy HVAC)
   const [{ data: enrollment }, { data: legacyEnrollment }] = await Promise.all([

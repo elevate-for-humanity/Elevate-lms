@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle2, ExternalLink, ArrowRight, BookOpen } from 'lucide-react';
@@ -21,18 +22,18 @@ const WIOA_SOURCES = new Set([
 ]);
 
 export default async function OrientationCompletePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const sessionClient = await createClient();
+  const { data: { user } } = await sessionClient.auth.getUser();
   if (!user) redirect('/login');
+
+  const supabase = await getAdminClient();
 
   // Confirm orientation was actually completed — guard against direct navigation
   const { data: profile } = await supabase
     .from('profiles')
     .select('first_name, full_name, orientation_completed')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   if (!profile?.orientation_completed) {
     redirect('/onboarding/learner/orientation');

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -105,13 +106,16 @@ export default async function LearnerOnboardingPage({
   searchParams: Promise<{ checkout?: string }>;
 }) {
   const { checkout } = await searchParams;
-  const supabase = await createClient();
+  const sessionClient = await createClient();
 
-
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await sessionClient.auth.getUser();
   if (!user) {
     redirect('/login?redirect=/onboarding/learner');
   }
+
+  // Use admin client for all data queries — bypasses RLS so new accounts
+  // whose profile row hasn't been created yet don't throw PGRST116
+  const supabase = await getAdminClient();
 
   // Fetch all data in parallel
   const [
@@ -126,7 +130,7 @@ export default async function LearnerOnboardingPage({
     supabase.from('profiles')
       .select('*, onboarding_completed, funding_confirmed, funding_source, orientation_completed, schedule_selected, enrollment_status, full_name, first_name, last_name, phone, address')
       .eq('id', user.id)
-      .single(),
+      .maybeSingle(),
     supabase.from('program_enrollments')
       .select('id, program_id, program_slug, status, enrollment_state')
       .eq('user_id', user.id)
@@ -175,7 +179,7 @@ export default async function LearnerOnboardingPage({
       .select('name')
       .eq('id', enrollment.program_id)
       .maybeSingle();
-    enrollmentProgramName = prog?.name || null;
+    enrollmentProgramName = prog?.name ?? null;
   }
 
   // Determine completed steps from real DB state

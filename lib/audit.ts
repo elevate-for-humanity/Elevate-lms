@@ -17,7 +17,7 @@ export function getAuditTelemetry() {
   return { auditSuccessCount, auditFailureCount };
 }
 
-async function void onAuditFailure(context: string, error: unknown, event: Record<string, unknown>) {
+async function onAuditFailure(context: string, error: unknown, event: Record<string, unknown>) {
   auditFailureCount++;
   const errorMessage = error instanceof Error ? error.message : String(error);
 

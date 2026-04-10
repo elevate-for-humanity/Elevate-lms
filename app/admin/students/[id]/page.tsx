@@ -251,26 +251,33 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
           </div>
 
           {/* Voucher & Payout Tracking — one panel per enrollment that has voucher activity */}
-          {enrollments.filter(e => e.voucher_paid_date || e.voucher_issued_date || e.student_start_date).map(e => (
-            <EnrollmentVoucherPanel
-              key={e.id}
-              data={{
-                enrollment_id:       e.id,
-                student_name:        profile?.full_name ?? '—',
-                program_name:        programNames[e.program_id] || e.program_slug || e.id.slice(0, 8),
-                partner_name:        null,
-                student_start_date:  e.student_start_date,
-                voucher_issued_date: e.voucher_issued_date,
-                voucher_paid_date:   e.voucher_paid_date,
-                payout_due_date:     e.payout_due_date,
-                payout_status:       e.payout_status ?? 'not_triggered',
-                payout_paid_date:    e.payout_paid_date,
-                payout_paid_by_name: null,
-                payout_notes:        e.payout_notes,
-                audit_log:           [],
-              }}
-            />
-          ))}
+          {await Promise.all(enrollments.filter(e => e.voucher_paid_date || e.voucher_issued_date || e.student_start_date).map(async e => {
+            const { data: auditRows } = await supabase
+              .from('enrollment_voucher_audit')
+              .select('id, enrollment_id, changed_by, field_changed, old_value, new_value, changed_at, notes')
+              .eq('enrollment_id', e.id)
+              .order('changed_at', { ascending: false });
+            return (
+              <EnrollmentVoucherPanel
+                key={e.id}
+                data={{
+                  enrollment_id:       e.id,
+                  student_name:        profile?.full_name ?? '—',
+                  program_name:        programNames[e.program_id] || e.program_slug || e.id.slice(0, 8),
+                  partner_name:        null,
+                  student_start_date:  e.student_start_date,
+                  voucher_issued_date: e.voucher_issued_date,
+                  voucher_paid_date:   e.voucher_paid_date,
+                  payout_due_date:     e.payout_due_date,
+                  payout_status:       e.payout_status ?? 'not_triggered',
+                  payout_paid_date:    e.payout_paid_date,
+                  payout_paid_by_name: null,
+                  payout_notes:        e.payout_notes,
+                  audit_log:           auditRows ?? [],
+                }}
+              />
+            );
+          }))}
 
           {/* Applications */}
           <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">

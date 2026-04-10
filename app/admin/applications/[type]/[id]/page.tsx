@@ -2,9 +2,11 @@ import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import TransitionButtons from './TransitionButtons';
+import EligibilityReviewPanel from '@/components/admin/EligibilityReviewPanel';
 
 export const dynamic = 'force-dynamic';
 
@@ -82,6 +84,16 @@ export default async function ApplicationDetailPage({
     .eq('application_id', id)
     .order('created_at', { ascending: true });
 
+  // Fetch eligibility review if exists
+  const adminDb = createAdminClient();
+  const { data: eligibilityReview } = adminDb
+    ? await adminDb
+        .from('application_eligibility_reviews')
+        .select('*')
+        .eq('application_id', id)
+        .maybeSingle()
+    : { data: null };
+
   return (
     <div className="min-h-screen bg-white">
 
@@ -123,6 +135,16 @@ export default async function ApplicationDetailPage({
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Eligibility Review — full width above main content */}
+          {(eligibilityReview || type === 'student') && (
+            <div className="lg:col-span-3">
+              <EligibilityReviewPanel
+                review={eligibilityReview ?? null}
+                applicationId={id}
+              />
+            </div>
+          )}
+
           {/* Main Info */}
           <div className="lg:col-span-2 space-y-6">
             {/* Contact Information */}

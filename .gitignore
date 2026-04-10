@@ -18,6 +18,10 @@ build/
 out/
 .next/
 *.egg-info/
+# Video generation temp files
+public/videos/slide-image-cache/
+public/videos/barber-lessons/slides-*/
+
 __pycache__/
 *.pyc
 *.pyo

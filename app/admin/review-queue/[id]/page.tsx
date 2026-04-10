@@ -70,7 +70,7 @@ export default async function ReviewDetailPage({
       .from('documents')
       .select('*')
       .eq('id', item.subject_id)
-      .single();
+      .maybeSingle();
 
     // Generate signed URL via centralized admin document access
     if (doc?.file_path) {
@@ -92,14 +92,14 @@ export default async function ReviewDetailPage({
       .eq('document_id', item.subject_id)
       .order('created_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
     extraction = ext;
   } else if (item.subject_type === 'transfer_hours') {
     const { data: th } = await supabase
       .from('transfer_hours')
       .select('*, documents(*)')
       .eq('id', item.subject_id)
-      .single();
+      .maybeSingle();
     transferHours = th;
     subject = th;
     document = th?.documents;
@@ -109,7 +109,7 @@ export default async function ReviewDetailPage({
         .from('documents_extractions')
         .select('*')
         .eq('id', th.extraction_id)
-        .single();
+        .maybeSingle();
       extraction = ext;
     }
   } else if (item.subject_type === 'application') {
@@ -117,7 +117,7 @@ export default async function ReviewDetailPage({
       .from('applications')
       .select('*, profiles!applications_user_id_fkey(full_name, email)')
       .eq('id', item.subject_id)
-      .single();
+      .maybeSingle();
     subject = app;
 
     // Get routing scores
@@ -132,7 +132,7 @@ export default async function ReviewDetailPage({
       .from('partners')
       .select('*')
       .eq('id', item.subject_id)
-      .single();
+      .maybeSingle();
     subject = partner;
   }
 

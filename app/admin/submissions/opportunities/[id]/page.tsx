@@ -69,7 +69,7 @@ export default function OpportunityProfilePage() {
   const load = useCallback(async () => {
     setLoading(true);
     const [{ data: oppData }, { data: reqData }] = await Promise.all([
-      supabase.from('sos_opportunities').select('*').eq('id', id).single(),
+      supabase.from('sos_opportunities').select('*').eq('id', id).maybeSingle(),
       supabase.from('sos_opportunity_requirements').select('*').eq('opportunity_id', id).order('sort_order'),
     ]);
     if (oppData) setOpp(oppData as Opportunity);

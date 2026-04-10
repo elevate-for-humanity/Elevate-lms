@@ -28,7 +28,7 @@ export default async function FinancialAssurancePage() {
       .order('expiration_date', { ascending: true, nullsFirst: false }),
     db.from('v_admin_financial_assurance_summary')
       .select('*')
-      .single(),
+      .maybeSingle(),
   ]);
 
   const s = summary as any;

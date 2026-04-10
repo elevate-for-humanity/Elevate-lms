@@ -20,7 +20,7 @@ async function requireAdmin(supabase: any) {
     .from('user_profiles')
     .select('role')
     .eq('user_id', data.user.id)
-    .single();
+    .maybeSingle();
 
   return profile?.role === 'admin';
 }

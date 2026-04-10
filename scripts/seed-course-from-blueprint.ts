@@ -29,6 +29,7 @@ config({ path: path.resolve(process.cwd(), '.env.local') });
 
 import { getBlueprintById, getBlueprintByProgramSlug, getAllBlueprints } from '../lib/curriculum/blueprints/index';
 import { buildCanonicalCourseFromBlueprint } from '../lib/curriculum/builders/buildCanonicalCourseFromBlueprint';
+import { validateBlueprintLessons } from '../lib/curriculum/lqs-validator';
 
 // ── Parse args ────────────────────────────────────────────────────────
 
@@ -102,6 +103,29 @@ async function main() {
   console.log(`Mode       : ${modeArg}`);
   console.log(`Modules    : ${blueprint!.modules.length}`);
   console.log('');
+
+  // ── LQS validation — hard gate before any DB writes ──────────────────
+  const allLessons = blueprint!.modules.flatMap(m => m.lessons ?? []);
+  if (allLessons.length > 0) {
+    console.log(`Running LQS validation on ${allLessons.length} lessons...`);
+    const lqsResults = validateBlueprintLessons(allLessons);
+    const failures = lqsResults.filter(r => !r.passed);
+
+    if (failures.length > 0) {
+      console.error(`\n❌ LQS validation failed — ${failures.length} lesson(s) do not meet the quality standard.\n`);
+      for (const f of failures) {
+        console.error(`  ${f.slug} (${f.wordCount} words, ${f.questionCount} questions)`);
+        for (const v of f.violations) {
+          console.error(`    [${v.category}] ${v.rule}`);
+          console.error(`      ${v.detail}`);
+        }
+      }
+      console.error('\nFix all violations before seeding. No DB writes were made.\n');
+      process.exit(1);
+    }
+    console.log(`✅ LQS passed — all ${allLessons.length} lessons meet quality standard.\n`);
+  }
+  // ─────────────────────────────────────────────────────────────────────
 
   const result = await buildCanonicalCourseFromBlueprint({
     blueprint: blueprint!,

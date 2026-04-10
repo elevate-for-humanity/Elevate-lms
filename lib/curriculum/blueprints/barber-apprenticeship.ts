@@ -1491,7 +1491,42 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
 <li><strong>Temporal recession</strong> — natural recession at the temples</li>
 </ul>
 <h3>Why Sectioning Matters</h3>
-<p>Consistent sectioning ensures even weight distribution and a balanced haircut. Always establish your guide line before cutting.</p>`,
+<p>Consistent sectioning ensures even weight distribution and a balanced haircut. Always establish your guide line before cutting.</p>
+
+<h3>Sanitation — Required Before Service</h3>
+<p>Apply universal precautions before every service. These are non-negotiable under NIC and state board standards.</p>
+<ol>
+<li>Wash or sanitize hands.</li>
+<li>Pre-clean all tools — remove hair and debris before applying disinfectant. This lesson uses combs and sectioning clips; apply EPA-registered disinfectant and maintain full contact time per label.</li>
+<li>Apply EPA-registered disinfectant and maintain full contact time per label (typically 10 minutes). Do not wipe off early.</li>
+<li>Discard all single-use items after use. Do not reuse porous items — they cannot be disinfected.</li>
+</ol>
+
+<h3>Stop Conditions</h3>
+<p>Stop the service immediately if you observe:</p>
+<ul>
+<li>Open cuts, abrasions, or broken skin on the scalp</li>
+<li>Signs of scalp infection, rash, or inflammation</li>
+<li>Client reports pain or discomfort</li>
+<li>Tool malfunction</li>
+</ul>
+
+<h3>Blood Exposure Protocol</h3>
+<ol>
+<li>Stop service immediately.</li>
+<li>Put on gloves before touching the affected area.</li>
+<li>Apply antiseptic to the client's skin.</li>
+<li>Dispose of all contaminated single-use materials in a sealed bag.</li>
+<li>Clean and disinfect any blood-contaminated tools with EPA-registered disinfectant.</li>
+<li>Double-bag contaminated waste before disposal.</li>
+<li>Wash hands thoroughly after removing gloves.</li>
+</ol>`,
+          competencyChecks: [
+            'Identifies all head sections and reference points correctly',
+            'Follows pre-clean → disinfect → contact time sequence before service',
+            'Stops service and follows blood exposure protocol if skin is broken',
+            'Discards single-use items immediately after use',
+          ],
         },
         {
           slug: 'barber-lesson-23',
@@ -1517,7 +1552,44 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
 <li>Use the open/close lever to blend between guard sizes</li>
 <li>Blend with a #1.5 or by flicking the clipper out at the transition</li>
 <li>Check for lines and blend until smooth</li>
+</ol>
+
+<h3>Sanitation — Required Before Service</h3>
+<p>Apply universal precautions before every service.</p>
+<ol>
+<li>Wash or sanitize hands.</li>
+<li>Pre-clean all tools — remove hair and debris before applying disinfectant.</li>
+<li>Apply EPA-registered disinfectant. For clipper blades, use clipper disinfectant spray and keep blades visibly wet for full contact time per label.</li>
+<li>Discard all single-use items after use. Do not reuse porous items.</li>
+<li>Disinfect workstation and chair after each client.</li>
+</ol>
+
+<h3>Stop Conditions</h3>
+<p>Stop the service immediately if you observe:</p>
+<ul>
+<li>Open cuts or broken skin on the scalp</li>
+<li>Signs of scalp infection or inflammation</li>
+<li>Client reports pain or discomfort</li>
+<li>Clipper malfunction or overheating</li>
+</ul>
+
+<h3>Blood Exposure Protocol</h3>
+<ol>
+<li>Stop service immediately.</li>
+<li>Put on gloves before touching the affected area.</li>
+<li>Apply antiseptic to the client's skin.</li>
+<li>Dispose of all contaminated single-use materials in a sealed bag.</li>
+<li>Clean and disinfect blood-contaminated tools with EPA-registered disinfectant.</li>
+<li>Double-bag contaminated waste before disposal.</li>
+<li>Wash hands thoroughly after removing gloves.</li>
 </ol>`,
+          competencyChecks: [
+            'Executes low, mid, and high fade with smooth transitions',
+            'Follows pre-clean → disinfect → contact time sequence before service',
+            'Uses clipper disinfectant spray with correct dwell time on blades',
+            'Stops service and follows blood exposure protocol if skin is broken',
+            'Discards single-use items immediately after use',
+          ],
         },
         {
           slug: 'barber-lesson-24',
@@ -1541,7 +1613,44 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
 <li>Holding the comb too far from the head — creates uneven results</li>
 <li>Moving too slowly — causes clipper lines</li>
 <li>Not following the head's curve — creates flat spots</li>
-</ul>`,
+</ul>
+
+<h3>Sanitation — Required Before Service</h3>
+<p>Apply universal precautions before every service.</p>
+<ol>
+<li>Wash or sanitize hands.</li>
+<li>Pre-clean all tools — remove hair and debris before applying disinfectant.</li>
+<li>Apply EPA-registered disinfectant. Use clipper disinfectant spray on blades and maintain full contact time per label.</li>
+<li>Discard all single-use items after use. Do not reuse porous items — they cannot be disinfected.</li>
+<li>Disinfect workstation and chair after each client.</li>
+</ol>
+
+<h3>Stop Conditions</h3>
+<p>Stop the service immediately if you observe:</p>
+<ul>
+<li>Open cuts or broken skin on the scalp</li>
+<li>Signs of scalp infection or inflammation</li>
+<li>Client reports pain or discomfort</li>
+<li>Clipper overheating or malfunction</li>
+</ul>
+
+<h3>Blood Exposure Protocol</h3>
+<ol>
+<li>Stop service immediately.</li>
+<li>Put on gloves before touching the affected area.</li>
+<li>Apply antiseptic to the client's skin.</li>
+<li>Dispose of all contaminated single-use materials in a sealed bag.</li>
+<li>Clean and disinfect blood-contaminated tools with EPA-registered disinfectant.</li>
+<li>Double-bag contaminated waste before disposal.</li>
+<li>Wash hands thoroughly after removing gloves.</li>
+</ol>`,
+          competencyChecks: [
+            'Executes clipper-over-comb with consistent angle and smooth motion',
+            'Follows pre-clean → disinfect → contact time sequence before service',
+            'Uses clipper disinfectant spray with correct dwell time on blades',
+            'Stops service and follows blood exposure protocol if skin is broken',
+            'Discards single-use items immediately after use',
+          ],
         },
         {
           slug: 'barber-lesson-25',
@@ -1563,33 +1672,392 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
 <h3>Point Cutting</h3>
 <p>Point cutting (cutting into the ends at an angle) removes weight and adds texture. Hold shears vertically and make small snips into the hair ends.</p>
 <h3>Slide Cutting</h3>
-<p>Slide cutting thins and tapers hair by sliding the open shears down the hair shaft. Used for blending and removing bulk.</p>`,
+<p>Slide cutting thins and tapers hair by sliding the open shears down the hair shaft. Used for blending and removing bulk.</p>
+
+<h3>Sanitation — Required Before Service</h3>
+<p>Apply universal precautions before every service. This lesson uses shears and combs — no clipper blades.</p>
+<ol>
+<li>Wash or sanitize hands.</li>
+<li>Pre-clean all tools — remove hair and debris from shears and combs before applying disinfectant.</li>
+<li>Apply EPA-registered disinfectant and maintain full contact time per label. Do not wipe off early.</li>
+<li>Discard all single-use items after use. Do not reuse porous items.</li>
+<li>Disinfect workstation and chair after each client.</li>
+</ol>
+
+<h3>Stop Conditions</h3>
+<p>Stop the service immediately if you observe:</p>
+<ul>
+<li>Open cuts or broken skin on the scalp</li>
+<li>Signs of scalp infection or inflammation</li>
+<li>Client reports pain or discomfort from shear contact</li>
+<li>Shear malfunction or blade damage</li>
+</ul>
+
+<h3>Blood Exposure Protocol</h3>
+<ol>
+<li>Stop service immediately.</li>
+<li>Put on gloves before touching the affected area.</li>
+<li>Apply antiseptic to the client's skin.</li>
+<li>Dispose of all contaminated single-use materials in a sealed bag.</li>
+<li>Clean and disinfect blood-contaminated tools with EPA-registered disinfectant.</li>
+<li>Double-bag contaminated waste before disposal.</li>
+<li>Wash hands thoroughly after removing gloves.</li>
+</ol>`,
+          competencyChecks: [
+            'Executes scissor-over-comb with consistent angle and soft finish',
+            'Follows pre-clean → disinfect → contact time sequence before service',
+            'Stops service and follows blood exposure protocol if skin is broken',
+            'Discards single-use items immediately after use',
+            'Disinfects shears and combs with EPA-registered disinfectant before service',
+          ],
         },
         {
           slug: 'barber-lesson-26',
           title: 'Lineup & Edging',
           order: 5,
           domainKey: 'haircutting',
-          objective: 'Create clean, sharp lines at the hairline, temples, and nape.',
+          objective: 'Create clean, sharp lines at the hairline, temples, around the ears, sideburns, and nape while preserving the natural hairline, protecting the skin, maintaining sanitation, and choosing shapes that suit the client and grow out cleanly.',
           durationMinutes: 20,
           videoFile: '/videos/course-barber-lineup-narrated.mp4',
-          content: `<h2>Lineup and Edging</h2>
-<p>The lineup defines the haircut. A sharp, clean edge is the mark of a skilled barber.</p>
-<h3>Tools</h3>
+          content: `<h2>Lesson 26: Lineup &amp; Edging</h2>
+
+<h3>Why this skill matters</h3>
+<p>A lineup is a <strong>finishing service</strong>, not a haircut correction tool. Its job is to make the haircut look clean and intentional by sharpening the <strong>front hairline, temples, sideburn edges, around the ears, and nape</strong>. Good edging makes the haircut look polished. Bad edging removes too much hair, creates uneven corners, irritates skin, and can permanently push the hairline back over time.</p>
+<p>The barber's rule is simple: <strong>define what is already there; do not invent a new hairline unless the service plan clearly calls for it and the client understands the maintenance.</strong></p>
+
+<h3>Tools and setup</h3>
+<p>Use only clean, disinfected tools and a stable setup.</p>
+<h4>Required tools</h4>
 <ul>
-<li>T-liner or detailer trimmer</li>
-<li>Straight razor or shavette for razor-sharp lines</li>
+<li>T-liner, outliner, or detailer trimmer</li>
+<li>Straight razor or shavette, if appropriate</li>
+<li>Barber comb</li>
+<li>Hand mirror</li>
+<li>Neck strip and cape</li>
+<li>Towels or disposable wipes</li>
+<li>Shaving gel or lather</li>
+<li>Antiseptic or astringent as allowed by shop policy</li>
+<li>EPA-registered disinfectant</li>
+<li>Gloves if required by service condition or shop policy</li>
 </ul>
-<h3>Hairline Lineup</h3>
+<h4>Pre-service preparation</h4>
 <ol>
-<li>Establish the front hairline — follow the natural hairline or create a defined shape</li>
-<li>Use the trimmer to cut a clean edge</li>
-<li>Use a razor to sharpen and define</li>
+<li>Wash or sanitize hands before service.</li>
+<li>Clean and disinfect all tools with an EPA-registered disinfectant.</li>
+<li>Prepare a clean workstation to avoid cross-contamination.</li>
+<li>Drape the client with a neck strip and cape so the cape does not touch bare skin.</li>
+<li>Seat the client upright with the head in a natural position so the line is not created on a tilted angle.</li>
+<li>Inspect lighting and mirror position before beginning.</li>
 </ol>
-<h3>Temple Lineup</h3>
-<p>Temples should be squared off or tapered depending on the style. Never cut above the natural temple hairline.</p>
-<h3>Nape Lineup</h3>
-<p>The nape can be squared, rounded, or tapered. Ask the client their preference. A squared nape looks sharp but grows out faster.</p>`,
+
+<h3>Client consultation</h3>
+<ul>
+<li>Ask whether the client wants a natural lineup or a sharper, more defined finish.</li>
+<li>Confirm temple shape, sideburn shape, and nape preference: tapered, rounded, or square.</li>
+<li>Ask about recent irritation, razor sensitivity, acne breakout, ingrown hairs, or cuts.</li>
+<li>Explain that razor detailing will not be performed on broken or irritated skin.</li>
+<li>Confirm that the goal is a clean edge without pushing the hairline back.</li>
+</ul>
+
+<h3>Contraindications and razor safety</h3>
+<p>Do <strong>not</strong> use a razor over:</p>
+<ul>
+<li>Cuts, abrasions, or open skin</li>
+<li>Active acne</li>
+<li>Inflamed bumps</li>
+<li>Rash or infection</li>
+<li>Skin that is already irritated</li>
+<li>Areas prone to keloid scarring if razor use may trigger trauma</li>
+</ul>
+<p>Use extra caution or modify the service on clients with razor bumps, ingrown hairs, or highly irritated skin.</p>
+<p>If the skin condition makes edging unsafe, stop and refer to the instructor or follow shop procedure.</p>
+<p><strong>Non-negotiable rule:</strong> trimmer defines first, razor refines second. Never use the razor to guess the shape.</p>
+
+<h3>Service order</h3>
+<p>Front hairline → temples → around ears → sideburns → nape → symmetry check → razor detailing if appropriate</p>
+
+<h3>Procedure</h3>
+<ol>
+<li><strong>Establish the front hairline</strong>
+<ul>
+<li>Stand directly in front of the client.</li>
+<li>Identify the natural front hairline before cutting.</li>
+<li>Start at the center and work outward to keep both sides balanced.</li>
+<li>Use the trimmer with light pressure and short, controlled motions.</li>
+<li>Remove only the overgrowth outside the line. Do not push the line back.</li>
+</ul>
+</li>
+<li><strong>Refine the front edge</strong>
+<ul>
+<li>Use small anchor strokes instead of one long pass.</li>
+<li>Keep the blade steady and let the corners of the trimmer help create detail.</li>
+<li>Check the line from the front and slightly above eye level to catch uneven corners.</li>
+</ul>
+</li>
+<li><strong>Shape the temples</strong>
+<ul>
+<li>Decide whether the temple should be squared or softly tapered based on the haircut, growth pattern, and client preference.</li>
+<li>Follow the natural temple area instead of cutting above it.</li>
+<li>Match both sides by checking height, width, and angle before deepening the line.</li>
+</ul>
+</li>
+<li><strong>Outline around the ears</strong>
+<ul>
+<li>Fold the ear gently only as needed for visibility and safety.</li>
+<li>Use the trimmer in short controlled movements around the ear curve.</li>
+<li>Keep the outline clean without cutting into the skin.</li>
+</ul>
+</li>
+<li><strong>Balance the sideburns</strong>
+<ul>
+<li>Comb the sideburn area down.</li>
+<li>Check both sideburns from the front, not only from the side.</li>
+<li>Match length, width, and bottom line before finalizing.</li>
+</ul>
+</li>
+<li><strong>Create the nape outline</strong>
+<ul>
+<li>Ask whether the client wants a tapered, rounded, or square nape.</li>
+<li>Use the trimmer to outline the chosen shape.</li>
+<li>Keep the nape centered and symmetrical with the spine and head position.</li>
+</ul>
+</li>
+<li><strong>Check symmetry before detailing</strong>
+<ul>
+<li>Step back and inspect the entire outline.</li>
+<li>Use the mirror to compare both sides.</li>
+<li>Correct only the area that is uneven. Do not keep cutting both sides higher trying to chase perfection.</li>
+</ul>
+</li>
+<li><strong>Razor detailing if the skin is healthy</strong>
+<ul>
+<li>Apply lather or shaving gel if used in your service procedure.</li>
+<li>Stretch the skin firmly before using the razor.</li>
+<li>Hold the razor at a low angle with light pressure.</li>
+<li>Use short, controlled strokes to sharpen the edge.</li>
+<li>Wipe the blade safely as required by shop procedure.</li>
+<li>Do not go over broken, raised, or irritated skin.</li>
+</ul>
+</li>
+</ol>
+
+<h3>Safety &amp; Infection Control</h3>
+<p>Follow this sequence in order. NIC practical exams test sequence, not just knowledge.</p>
+<h4>Before service</h4>
+<ol>
+<li>Wash or sanitize hands before touching tools or the client.</li>
+<li><strong>Pre-clean all tools</strong> — remove all hair and debris before applying disinfectant. Debris blocks disinfectant effectiveness and makes the step invalid.</li>
+<li>Apply EPA-registered disinfectant and allow full contact time per the product label — typically 10 minutes for full disinfection. Do not wipe off early.</li>
+<li>For clipper and trimmer blades: use a clipper disinfectant spray and keep blades visibly wet for the full required contact time.</li>
+</ol>
+<h4>During service</h4>
+<ul>
+<li>Use only clean implements on the client.</li>
+<li>Avoid cross-contamination by keeping soiled items separate from disinfected tools.</li>
+<li>Do not perform razor work on irritated or broken skin.</li>
+<li>Maintain proper draping and client protection throughout the service.</li>
+<li><strong>Single-use items</strong> (razor blades, neck strips, disposable wipes) must be discarded immediately after use. Do not reuse.</li>
+<li><strong>Porous items</strong> (wooden sticks, foam, emery boards) cannot be disinfected — treat as single-use and discard.</li>
+</ul>
+<h4>After service</h4>
+<ol>
+<li>Pre-clean tools again — remove debris.</li>
+<li>Apply disinfectant and allow full contact time before storing.</li>
+<li>Disinfect workstation surfaces and chair between every client.</li>
+<li>Dispose of all single-use materials properly.</li>
+<li>Replace disinfectant solution if it is visibly cloudy or dirty. Change at minimum every 24 hours.</li>
+</ol>
+
+<h3>Correct vs. Incorrect Lineup Logic</h3>
+<h4>Correct</h4>
+<ul>
+<li>Follows the natural hairline</li>
+<li>Looks even from the front</li>
+<li>Matches the haircut design</li>
+<li>Keeps temple height appropriate</li>
+<li>Preserves density at weak corners</li>
+<li>Sharpens without irritating the skin</li>
+</ul>
+<h4>Incorrect</h4>
+<ul>
+<li>Pushed back to make it look "extra clean"</li>
+<li>One temple cut higher than the other</li>
+<li>Jagged line from long uncontrolled strokes</li>
+<li>Sideburns different in length or width</li>
+<li>Nape off-center</li>
+<li>Razor used over broken or inflamed skin</li>
+</ul>
+
+<h3>Hair type and growth-pattern decision rules</h3>
+<h4>IF the client has coarse or curly hair</h4>
+<p>Use a lighter touch and take less hair per pass. Follow the natural edge more closely. Avoid over-defining the front line. Expect the line to appear strong with less cutting. <em>Why: coarse or curly hair creates visual density fast. Too much pressure or carving makes the line look harsh and unnatural.</em></p>
+<h4>IF the client has fine or straight hair</h4>
+<p>Use extra caution because mistakes show immediately. Keep corners soft unless the haircut design clearly supports a harder edge. Do not widen the line trying to make it look darker. <em>Why: fine hair gives less visual forgiveness. Once pushed back, the edge can look thin and weak.</em></p>
+<h4>IF the client has a receding hairline</h4>
+<p>Do not force a low straight line across recessed corners. Clean the natural outline and preserve what exists. Explain that a conservative line will look better and grow out cleaner.</p>
+<h4>IF the hairline is naturally uneven</h4>
+<p>Improve the appearance without overcutting both sides. Remove obvious strays first. Decide what difference is natural and acceptable before cutting. Symmetry means <strong>balanced appearance</strong>, not always identical biology.</p>
+<h4>IF there are cowlicks at the temple or nape</h4>
+<p>Follow the growth pattern. Use smaller strokes. Avoid making the area shorter just to overpower the growth.</p>
+<h4>IF the skin is sensitive</h4>
+<p>Limit razor passes. Use gentle tension and clean strokes. Stop if redness or irritation develops.</p>
+
+<h3>Razor refinement</h3>
+<p>Only refine after the trimmer shape is correct.</p>
+<ol>
+<li>Apply appropriate prep according to shop protocol.</li>
+<li>Stretch the skin firmly.</li>
+<li>Use short, controlled razor strokes.</li>
+<li>Shave only the hair outside the established trimmer line.</li>
+<li>Wipe and inspect the skin often.</li>
+<li>Stop immediately if irritation appears.</li>
+</ol>
+<p>The razor is a refinement tool, not the primary design tool.</p>
+
+<h3>Common Failure Modes and Corrections</h3>
+<h4>Crooked front line</h4>
+<p><strong>Cause:</strong> started from one side instead of establishing the center.<br/><strong>Correction:</strong> recheck the center point, compare both corners, and make only minimal balancing adjustments.</p>
+<h4>Temple cut too high</h4>
+<p><strong>Cause:</strong> chasing sharpness instead of respecting the natural temple.<br/><strong>Correction:</strong> stop raising the opposite side; preserve what remains and let the area grow back rather than compounding the error.</p>
+<h4>Jagged edge</h4>
+<p><strong>Cause:</strong> heavy pressure or fast dragging motion.<br/><strong>Correction:</strong> use shorter anchor strokes with lighter pressure.</p>
+<h4>Uneven sideburns</h4>
+<p><strong>Cause:</strong> checked from side view only.<br/><strong>Correction:</strong> face the client head-on and compare both bottom lines visually.</p>
+<h4>Razor irritation or razor burn</h4>
+<p><strong>Cause:</strong> too many passes, poor skin tension, or working over compromised skin.<br/><strong>Correction:</strong> reduce passes, improve tension, and skip razor work where the skin is unsafe.</p>
+
+<h3>Sanitation and compliance</h3>
+<ul>
+<li>Clean and disinfect tools before service</li>
+<li>Remove cut hair from tools as needed during service</li>
+<li>Avoid cross-contaminating zones if skin becomes irritated</li>
+<li>Replace blades according to shop and safety protocol</li>
+<li>Dispose of single-use razor blades correctly</li>
+<li>Maintain clean draping and workstation control</li>
+</ul>
+<p>For state board readiness: proper draping, clean and disinfected implements, safe handling of sharp tools, protection of the client's skin, sanitary disposal of waste.</p>
+
+<h3>Quick service checklist</h3>
+<ul>
+<li>Front line is balanced</li>
+<li>Temple points are intentional</li>
+<li>Around-ear edge is clean</li>
+<li>Sideburns match from the front</li>
+<li>Nape matches requested shape</li>
+<li>No zone has been pushed back unnecessarily</li>
+<li>Skin is clean and not overworked</li>
+<li>Client has seen the result in the mirror</li>
+</ul>
+
+<h3>Summary</h3>
+<p>Lineup and edging require restraint, not aggression. Use the trimmer to establish shape, skin tension to protect precision, and the razor only when appropriate. Preserve the natural hairline whenever possible, adapt to hair type and growth pattern, and check symmetry from the client's front view before calling the service complete.</p>
+
+<h3>Result</h3>
+<ul>
+<li>Hairline is clean, even, and appropriate for the client.</li>
+<li>Temples, sideburns, and nape are balanced and symmetrical.</li>
+<li>The finish is sharp without obvious pushback of the natural line.</li>
+<li>The skin remains free from cuts, razor burn, and unnecessary irritation.</li>
+</ul>
+
+<h3>Advanced barber insight</h3>
+<p>A lineup should look intentional on day one and still grow out cleanly. A sharp line is not automatically a good line. The best lineup respects the client's natural growth pattern, face shape, density, and weak points in the hairline.</p>
+
+<h3>Technique notes</h3>
+<ul>
+<li>Anchor strokes create better control than a single sweeping pass.</li>
+<li>Skin tension is mandatory for razor detailing and helpful for cleaner trimmer work in loose skin areas.</li>
+<li>The corners of the trimmer are for detail; the full blade is for longer straight segments.</li>
+<li>Always judge the line with the client's head in a natural upright position.</li>
+</ul>
+
+<h3>Post-service procedure</h3>
+<ol>
+<li>Remove loose hair from the neck, face, and cape.</li>
+<li>Apply soothing product if appropriate and allowed by service protocol.</li>
+<li>Dispose of single-use items properly.</li>
+<li>Clean and disinfect tools and workstation.</li>
+<li>Reset the station for the next client.</li>
+</ol>`,
+          quizQuestions: [
+            {
+              id: 'l26-q1',
+              question: 'A client has slight recession in both front corners and asks for a perfectly straight, boxed hairline. What is the best professional response?',
+              options: [
+                'Cut a straight line higher to create a stronger look',
+                'Follow the natural hairline and create the sharpest realistic shape without pushing the corners back',
+                'Ignore the recession and cut both corners square at any cost',
+                'Refuse to line the front hairline at all',
+              ],
+              correctAnswer: 1,
+              explanation: 'A professional lineup improves neatness without creating an artificial line that removes too much natural hair or grows out poorly.',
+            },
+            {
+              id: 'l26-q2',
+              question: 'What is the safest reason to stretch the skin before razor detailing?',
+              options: [
+                'It makes the haircut take less time',
+                'It helps the razor glide on a flatter surface and reduces the risk of cuts',
+                'It removes more hair with each pass',
+                'It darkens the lineup visually',
+              ],
+              correctAnswer: 1,
+              explanation: 'Skin tension creates a flatter working surface so the razor moves more safely and precisely.',
+            },
+            {
+              id: 'l26-q3',
+              question: 'While detailing the temples, you notice one temple naturally sits slightly higher. What should you do?',
+              options: [
+                'Cut the lower temple higher to force both sides to match exactly',
+                'Ignore both temples and focus only on the nape',
+                'Respect the natural pattern and improve visual balance without unnecessarily raising either side',
+                'Round both temples to hide the difference',
+              ],
+              correctAnswer: 2,
+              explanation: 'The goal is visual balance, not destruction of the natural hairline. Chasing exact sameness often makes the result worse.',
+            },
+            {
+              id: 'l26-q4',
+              question: 'A student creates a jagged front line with the trimmer. What is the most likely cause?',
+              options: [
+                'Using short controlled anchor strokes',
+                'Holding the head upright',
+                'Using heavy pressure or dragging the trimmer in one uncontrolled pass',
+                'Checking the line in the mirror',
+              ],
+              correctAnswer: 2,
+              explanation: 'Jagged edges usually come from poor control, excessive pressure, or trying to create the line in one long pass.',
+            },
+            {
+              id: 'l26-q5',
+              question: 'After finishing the lineup, what should happen before the client leaves?',
+              options: [
+                'Only brush the client off and move to the next service',
+                'Remove loose hair, apply product if appropriate, then clean and disinfect tools and workstation',
+                'Leave used tools aside until the end of the day',
+                'Have the client inspect the cut while the station remains soiled',
+              ],
+              correctAnswer: 1,
+              explanation: 'State board standards require proper client cleanup plus cleaning and disinfection of tools and the workstation after service.',
+            },
+          ],
+          instructorNotes: [
+            'Demonstrate front-view checking, not mirror-only side checking.',
+            'Emphasize that razor use is optional and contraindication-dependent.',
+            'Correct students who try to create a new hairline instead of cleaning the existing one.',
+            'Require named skin tension and short anchor strokes during practical evaluation.',
+          ],
+          competencyChecks: [
+            'Demonstrates proper hand sanitation, draping, and workstation preparation',
+            'Identifies contraindications before service',
+            'Maintains skin tension during edging',
+            'Preserves natural hairline unless redesign is intentionally planned',
+            'Uses short controlled strokes instead of one long sweep',
+            'Checks symmetry from the front view',
+            'Selects correct nape shape based on client preference',
+            'Avoids razor use on contraindicated skin',
+            'Completes post-service cleanup and disinfection properly',
+          ],
         },
         {
           slug: 'barber-lesson-27',
@@ -1615,7 +2083,45 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
 <li>Work down with progressively shorter guards</li>
 <li>Blend each transition smoothly</li>
 <li>Finish with a clean lineup</li>
-</ul>`,
+</ul>
+
+<h3>Sanitation — Required Before Service</h3>
+<p>Apply universal precautions before every service.</p>
+<ol>
+<li>Wash or sanitize hands.</li>
+<li>Pre-clean all tools — remove hair and debris before applying disinfectant.</li>
+<li>Apply EPA-registered disinfectant. Use clipper disinfectant spray on blades and maintain full contact time per label.</li>
+<li>Discard all single-use items after use. Do not reuse porous items — they cannot be disinfected.</li>
+<li>Disinfect workstation and chair after each client.</li>
+</ol>
+
+<h3>Stop Conditions</h3>
+<p>Stop the service immediately if you observe:</p>
+<ul>
+<li>Open cuts or broken skin on the scalp</li>
+<li>Signs of scalp infection or inflammation</li>
+<li>Client reports pain or discomfort</li>
+<li>Tool malfunction or overheating</li>
+</ul>
+
+<h3>Blood Exposure Protocol</h3>
+<ol>
+<li>Stop service immediately.</li>
+<li>Put on gloves before touching the affected area.</li>
+<li>Apply antiseptic to the client's skin.</li>
+<li>Dispose of all contaminated single-use materials in a sealed bag.</li>
+<li>Clean and disinfect blood-contaminated tools with EPA-registered disinfectant.</li>
+<li>Double-bag contaminated waste before disposal.</li>
+<li>Wash hands thoroughly after removing gloves.</li>
+</ol>`,
+          competencyChecks: [
+            'Executes flat top with level, even surface across the top',
+            'Executes classic taper with smooth transitions from top to nape',
+            'Follows pre-clean → disinfect → contact time sequence before service',
+            'Uses clipper disinfectant spray with correct dwell time on blades',
+            'Stops service and follows blood exposure protocol if skin is broken',
+            'Discards single-use items immediately after use',
+          ],
         },
         {
           slug: 'barber-module-4-checkpoint',

@@ -91,6 +91,19 @@ export type BlueprintLessonRef = {
    * Required for exam lessons that use an external proctoring system.
    */
   partnerExamCode?: string;
+
+  /**
+   * Instructor-facing notes for practical evaluation.
+   * Not shown to learners. Used by instructor sign-off UI.
+   */
+  instructorNotes?: string[];
+
+  /**
+   * Observable competency checks for practical sign-off.
+   * Each string is a discrete behavior the instructor verifies.
+   * Required for lab and skill lessons.
+   */
+  competencyChecks?: string[];
 };
 
 // ─── Competency requirement (consumed by auditor) ─────────────────────────────

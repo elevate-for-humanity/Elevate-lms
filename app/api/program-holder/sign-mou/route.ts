@@ -26,28 +26,30 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Signature, name, and title are required' }, { status: 400 });
     }
 
-    // Check if already signed
-    const { data: existing } = await supabase
-      .from('mou_signatures')
-      .select('id')
+    // Check if already signed — keyed on signer_name + program_holder row
+    const admin = await getAdminClient();
+    const { data: holderRow } = await admin
+      .from('program_holders')
+      .select('id, mou_signed')
       .eq('user_id', user.id)
       .maybeSingle();
 
-    if (existing) {
-      return NextResponse.json({ error: 'MOU already signed', signature_id: existing.id }, { status: 409 });
+    if (holderRow?.mou_signed) {
+      return NextResponse.json({ error: 'MOU already signed' }, { status: 409 });
     }
 
-    // Store signature
+    // Store signature — use live schema columns only
     const { data: signature, error: sigError } = await supabase
       .from('mou_signatures')
       .insert({
-        user_id: user.id,
         signer_name: signerName,
         signer_title: signerTitle,
-        signature_data_url: signatureDataUrl,
+        signature_data: signatureDataUrl,   // live column name
         signed_at: new Date().toISOString(),
+        agreed_at: new Date().toISOString(),
         ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
         user_agent: request.headers.get('user-agent') || 'unknown',
+        mou_version: '2025-01',
       })
       .select('id')
       .single();
@@ -59,9 +61,7 @@ async function _POST(request: NextRequest) {
 
     const now = new Date().toISOString();
 
-    // Update program_holders — canonical MOU state lives here, not on profiles
-    // (profiles.mou_signed does not exist in the live schema)
-    const admin = await getAdminClient();
+    // Update program_holders — canonical MOU state lives here
     if (admin) {
       await admin
         .from('program_holders')

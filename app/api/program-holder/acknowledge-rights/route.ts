@@ -40,19 +40,12 @@ async function _POST(req: Request) {
       .eq('id', user.id)
       .single();
 
-    // Insert acknowledgement
+    // Insert acknowledgement — only live schema columns
     const { data, error }: any = await supabase
       .from('program_holder_acknowledgements')
       .insert({
         user_id: user.id,
         document_type: 'rights',
-        full_name: fullName,
-        title,
-        organization_name: profile?.full_name || fullName,
-        contact_name: fullName,
-        email: profile?.email || user.email,
-        agreed: true,
-        acknowledged_at: new Date().toISOString(),
       })
       .select()
       .single();

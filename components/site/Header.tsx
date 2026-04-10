@@ -17,6 +17,50 @@ import HeaderDesktopNav from './HeaderDesktopNav';
 // belongs in the LMS navigation (components/lms/LMSNavigation.tsx), not here.
 export const NAV_ITEMS = [
   {
+    name: 'For Agencies',
+    href: '/agencies',
+    subItems: [
+      { name: '— Workforce Agencies —', href: '/agencies', isHeader: true },
+      { name: 'Agency Overview', href: '/agencies' },
+      { name: 'WIOA / WorkOne Referrals', href: '/agencies#wioa' },
+      { name: 'ETPL & Compliance', href: '/agencies#compliance' },
+      { name: 'Outcome Reporting', href: '/agencies#outcomes' },
+      { name: 'Workforce Board Portal', href: '/login?redirect=/workforce-board/dashboard' },
+      { name: '— Funding —', href: '/funding', isHeader: true },
+      { name: 'How Funding Works', href: '/funding/how-it-works' },
+      { name: 'WIOA Eligibility', href: '/funding/wioa' },
+      { name: 'WorkOne Partner Packet', href: '/workone-partner-packet' },
+    ],
+  },
+  {
+    name: 'For Employers',
+    href: '/for-employers',
+    subItems: [
+      { name: '— Hire & Train —', href: '/for-employers', isHeader: true },
+      { name: 'Hire Our Graduates', href: '/for-employers' },
+      { name: 'OJT Partnerships', href: '/partnerships' },
+      { name: 'Sponsor an Apprentice', href: '/programs/apprenticeships' },
+      { name: 'Post a Job', href: '/employer/post-job' },
+      { name: '— Get Started —', href: '/apply/employer', isHeader: true },
+      { name: 'Employer Application', href: '/apply/employer' },
+      { name: 'Employer Portal', href: '/login?redirect=/employer/dashboard' },
+    ],
+  },
+  {
+    name: 'For Program Holders',
+    href: '/program-holder',
+    subItems: [
+      { name: '— Run Programs on Elevate —', href: '/program-holder', isHeader: true },
+      { name: 'Program Holder Overview', href: '/program-holder' },
+      { name: 'Platform Licensing', href: '/store/licensing' },
+      { name: 'Become a Training Provider', href: '/partners/training-provider' },
+      { name: 'Program Holder Handbook', href: '/program-holder/handbook' },
+      { name: '— Portal —', href: '/program-holder/dashboard', isHeader: true },
+      { name: 'Program Holder Dashboard', href: '/login?redirect=/program-holder/dashboard' },
+      { name: 'Training Provider Portal', href: '/login?redirect=/provider/dashboard' },
+    ],
+  },
+  {
     name: 'Programs',
     href: '/programs',
     subItems: [
@@ -72,32 +116,6 @@ export const NAV_ITEMS = [
       { name: '— Schedule —', href: '/testing/book', isHeader: true },
       { name: 'Book a Testing Session', href: '/testing/book' },
       { name: 'Verify a Credential', href: '/verify-credentials' },
-    ],
-  },
-  {
-    name: 'Employers',
-    href: '/employer',
-    subItems: [
-      { name: '— Hire Graduates —', href: '/employer', isHeader: true },
-      { name: 'Hire Our Graduates', href: '/for-employers' },
-      { name: 'OJT Partnerships', href: '/partnerships' },
-      { name: 'Post a Job', href: '/employer/post-job' },
-      { name: '— Get Started —', href: '/apply/employer', isHeader: true },
-      { name: 'Employer Application', href: '/apply/employer' },
-      { name: 'Employer Portal', href: '/login?redirect=/employer/dashboard' },
-    ],
-  },
-  {
-    name: 'Partners',
-    href: '/partners',
-    subItems: [
-      { name: '— Partner Types —', href: '/partners', isHeader: true },
-      { name: 'Workforce Agencies', href: '/partners/workforce' },
-      { name: 'Barbershop Partners', href: '/partners/barbershop-apprenticeship' },
-      { name: 'Training Providers', href: '/partners/training-provider' },
-      { name: 'Reentry Organizations', href: '/partners/reentry' },
-      { name: 'Program Holders', href: '/program-holder' },
-      { name: 'Become a Partner →', href: '/partners/join' },
     ],
   },
   {

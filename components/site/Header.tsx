@@ -24,6 +24,7 @@ export const NAV_ITEMS = [
       { name: 'Agency Overview', href: '/agencies' },
       { name: 'WIOA / WorkOne Referrals', href: '/agencies#wioa' },
       { name: 'ETPL & Compliance', href: '/agencies#compliance' },
+      { name: 'Credentials & Compliance', href: '/credentials' },
       { name: 'Outcome Reporting', href: '/agencies#outcomes' },
       { name: 'Workforce Board Portal', href: '/login?redirect=/workforce-board/dashboard' },
       { name: '— Funding —', href: '/funding', isHeader: true },

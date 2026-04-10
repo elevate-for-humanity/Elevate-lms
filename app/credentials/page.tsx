@@ -10,8 +10,9 @@ export const dynamic = 'force-static';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Credentials & Certifications | Elevate for Humanity',
-  description: 'Credentials earned through Elevate for Humanity: completion certificates, industry certifications via external testing bodies, and DOL Registered Apprenticeship credentials.',
+  title: 'Credentials & Compliance | Elevate Workforce OS',
+  description:
+    'DOL Registered Apprenticeship Sponsor. Indiana ETPL Certified. WIOA compliant. Authorized testing center for Certiport, NHA, EPA 608, ACT WorkKeys, and NRF. Tiered compliance infrastructure.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/credentials' },
 };
 
@@ -59,17 +60,57 @@ export default function CredentialsPage() {
       <HeroVideo
         videoSrcDesktop="/videos/welding-trades.mp4"
         posterImage="/images/pages/credentials-page-1.jpg"
-        microLabel="Credential Pathways"
+        microLabel="System of Record"
         analyticsName="credentials"
       >
-        <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Credential Pathways</p>
+        <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Compliance Infrastructure</p>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
-          Credentials at Elevate
+          Credentials &amp; Compliance
         </h1>
         <p className="text-black text-lg leading-relaxed max-w-2xl">
-          Three layers of credentials — completion certificates, industry certifications from national testing bodies, and DOL Registered Apprenticeship credentials backed by employer-verified OJT hours.
+          Every credential and affiliation is active, verifiable, and operationally integrated — not decorative. Four compliance tiers, three credential layers.
         </p>
       </HeroVideo>
+
+      {/* Compliance tier stack */}
+      <section className="bg-slate-900 py-14 px-6">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3">System of Record</p>
+          <h2 className="text-xl sm:text-2xl font-extrabold text-white mb-8">Four compliance tiers. Not a badge wall.</h2>
+          <div className="space-y-3">
+            {[
+              {
+                tier: 'Tier 1', color: 'bg-blue-600', title: 'DOL Registered Apprenticeship Sponsor',
+                detail: 'RAPIDS-tracked · OJT wage reimbursement eligible · DOL Certificate of Completion',
+              },
+              {
+                tier: 'Tier 2', color: 'bg-brand-red-600', title: 'Indiana ETPL Certified · WIOA Aligned',
+                detail: 'WorkOne referrals accepted · WIOA Title I · WRG · IMPACT · JRI funding eligible',
+              },
+              {
+                tier: 'Tier 3', color: 'bg-violet-600', title: 'Authorized Testing Center',
+                detail: 'Certiport · NHA · EPA 608 · ACT WorkKeys · NRF · ServSafe — proctored on-site',
+              },
+              {
+                tier: 'Tier 4', color: 'bg-slate-600', title: 'Partnerships & Affiliations',
+                detail: 'EmployIndy · IRS VITA · Government Contractor · Reentry Partner · SNAP E&T',
+              },
+            ].map((t) => (
+              <div key={t.tier} className="flex items-center gap-4 bg-slate-800 rounded-xl px-5 py-4">
+                <span className={`${t.color} text-white text-xs font-black px-2.5 py-1 rounded flex-shrink-0`}>{t.tier}</span>
+                <div className="min-w-0">
+                  <p className="text-white font-bold text-sm">{t.title}</p>
+                  <p className="text-slate-400 text-xs mt-0.5 truncate">{t.detail}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-slate-500 text-xs mt-6">
+            Workforce agencies and employers can request compliance documentation, ETPL verification, or DOL registration confirmation.{' '}
+            <Link href="/contact" className="text-brand-red-400 hover:underline">Request documentation →</Link>
+          </p>
+        </div>
+      </section>
 
       {/* Stats bar */}
       <div className="bg-white border-t border-slate-200">

@@ -7,9 +7,9 @@ export const dynamic = 'force-static';
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: 'Career Training Programs | Elevate for Humanity',
+  title: 'Programs | Elevate Workforce OS — Funded Training Pathways',
   description:
-    'Funded career training in healthcare, skilled trades, technology, CDL, and business. WIOA and grant funding available. Get trained, certified, and hired in weeks.',
+    'Credential pathways powered by the Elevate Workforce OS. WIOA-funded, DOL-registered, ETPL-approved. Healthcare, trades, technology, and business programs in Indiana.',
   alternates: { canonical: '/programs' },
 };
 
@@ -167,12 +167,12 @@ export default function ProgramsPage() {
         </div>
         <div className="bg-white py-10 border-t">
           <div className="max-w-5xl mx-auto px-6 text-center">
-            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Career Training Programs</p>
+            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Programs Powered by the Elevate Workforce OS</p>
             <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 leading-tight mb-4">
-              Start a Career — Not Just a Class
+              Credential Pathways Built for Real Employment Outcomes.
             </h1>
-            <p className="text-black text-lg max-w-lg mx-auto mb-8 leading-relaxed">
-              Short-term training. Real credentials. Most programs available at no cost to eligible Indiana residents.
+            <p className="text-slate-600 text-lg max-w-lg mx-auto mb-8 leading-relaxed">
+              Every program runs on the same compliant infrastructure — funding authorization, checkpoint-gated training, proctored credentialing, and employer placement.
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
               <Link href="/apply/student" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-xl transition-colors text-sm">
@@ -189,7 +189,7 @@ export default function ProgramsPage() {
       {/* Trust strip */}
       <section className="bg-slate-900 py-4 px-4">
         <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
-          {['WIOA & state funding available', 'DOL Registered Apprenticeship Sponsor', 'ETPL approved provider', 'Job placement assistance'].map((t) => (
+          {['WIOA & grant funding authorized before training begins', 'DOL Registered Apprenticeship Sponsor · RAPIDS tracked', 'Indiana ETPL Approved · WorkOne referrals accepted', 'Proctored credentialing on-site · Exam funding included'].map((t) => (
             <span key={t} className="text-white text-xs font-medium flex items-center gap-2">
               <span className="w-1.5 h-1.5 bg-brand-red-500 rounded-full" />{t}
             </span>
@@ -308,22 +308,31 @@ export default function ProgramsPage() {
         </section>
       </div>
 
-      {/* Final CTA */}
-      <section className="relative overflow-hidden bg-slate-900 py-20 px-4 text-center">
-        <div className="absolute inset-0 opacity-20">
-          <Image src="/images/pages/workforce-training.jpg" alt="" fill className="object-cover" sizes="100vw" />
-        </div>
-        <div className="relative max-w-2xl mx-auto">
-          <h2 className="text-3xl font-extrabold text-white mb-3">Your Career Starts Here</h2>
-          <p className="text-white text-base mb-8 leading-relaxed">
-            Short-term training. Real credentials. Job placement support.<br />
-            Most programs are available at no cost to eligible Indiana residents.
+      {/* Final CTA — buyer split */}
+      <section className="bg-slate-900 py-16 px-4">
+        <div className="max-w-5xl mx-auto text-center">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3">Not a learner?</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3">This system is built for multiple stakeholders.</h2>
+          <p className="text-white/60 text-sm mb-10 max-w-xl mx-auto">
+            Workforce agencies, employers, and training providers each have a dedicated entry point.
           </p>
+          <div className="grid sm:grid-cols-3 gap-4 mb-10">
+            {[
+              { label: 'Workforce Agency', sub: 'Refer participants, track WIOA outcomes', href: '/agencies', color: 'bg-blue-600 hover:bg-blue-700' },
+              { label: 'Employer', sub: 'Hire graduates or sponsor apprentices', href: '/for-employers', color: 'bg-green-600 hover:bg-green-700' },
+              { label: 'Program Holder', sub: 'Run programs on Elevate infrastructure', href: '/program-holder', color: 'bg-purple-600 hover:bg-purple-700' },
+            ].map((b) => (
+              <Link key={b.label} href={b.href} className={`${b.color} text-white rounded-xl px-4 py-5 text-center transition-colors block`}>
+                <p className="font-bold text-sm mb-1">{b.label}</p>
+                <p className="text-white/70 text-xs">{b.sub}</p>
+              </Link>
+            ))}
+          </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-10 py-4 rounded-xl transition-colors text-base w-full sm:w-auto">
-              Apply Now
+            <Link href="/apply/student" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-10 py-4 rounded-xl transition-colors text-base">
+              Apply as a Learner
             </Link>
-            <Link href="/contact" className="border-2 border-slate-600 hover:border-slate-400 text-white font-bold px-10 py-4 rounded-xl transition-colors text-base w-full sm:w-auto">
+            <Link href="/contact" className="border-2 border-slate-600 hover:border-slate-400 text-white font-bold px-10 py-4 rounded-xl transition-colors text-base">
               Talk to an Advisor
             </Link>
           </div>

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 const complianceFeatures = [
-  { image: '/images/pages/government-1.jpg', alt: 'DOL Registered apprenticeship compliance', title: 'DOL Registered', description: 'Registered apprenticeship sponsor with the Department of Labor', href: '/programs/apprenticeship', cta: 'View Apprenticeships' },
+  { image: '/images/pages/government-1.jpg', alt: 'DOL Registered apprenticeship compliance', title: 'DOL Registered', description: 'Registered apprenticeship sponsor with the Department of Labor', href: '/programs/apprenticeships', cta: 'View Apprenticeships' },
   { image: '/images/pages/government-2.jpg', alt: 'ETPL approved training provider listing', title: 'ETPL Approved', description: "Listed on Indiana's Eligible Training Provider List", href: '/funding/how-it-works', cta: 'How Funding Works' },
   { image: '/images/pages/government-3.jpg', alt: 'WIOA compliance documentation and reporting', title: 'WIOA Compliant', description: 'Full compliance with Workforce Innovation and Opportunity Act', href: '/funding/how-it-works#wioa', cta: 'WIOA Details' },
   { image: '/images/pages/government-4.jpg', alt: 'Real-time outcome tracking and placement reporting', title: 'Outcome Tracking', description: 'Real-time reporting on placement, retention, and wages', href: '/contact', cta: 'Request a Report' },

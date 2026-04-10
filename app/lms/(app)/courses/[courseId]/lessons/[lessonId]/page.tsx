@@ -55,7 +55,7 @@ function hvacDefIdFromSlug(slug: string): string | undefined {
 import { transformLessonContent, isAiJsonBlob } from '@/lib/lms/transformLessonContent';
 import { HVAC_COURSE_ID } from '@/lib/courses/hvac-uuids';
 
-const BARBER_COURSE_ID = BARBER_COURSE_ID;
+
 
 /**
  * Resolve a barber lesson video URL.

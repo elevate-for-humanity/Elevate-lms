@@ -180,7 +180,7 @@ export default function HeroVideo({
             <button
               onClick={toggleMute}
               aria-label={muted ? 'Unmute voiceover' : 'Mute voiceover'}
-              className="flex items-center gap-2 bg-black/60 hover:bg-black/80 text-white text-xs font-semibold px-3 py-2 rounded-full transition-colors border border-white/20"
+              className="flex items-center gap-2 text-white/70 hover:text-white text-xs font-semibold px-2 py-1.5 rounded-full transition-colors"
             >
               {muted ? (
                 <><VolumeX className="w-4 h-4 flex-shrink-0" /><span className="hidden sm:inline">Tap to hear</span></>

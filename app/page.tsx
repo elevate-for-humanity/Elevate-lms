@@ -35,7 +35,7 @@ export default function HomePage() {
           <HeroVideoBg
             src="/videos/homepage-hero-new.mp4"
             poster="/images/pages/comp-home-hero-programs.jpg"
-            audioSrc="/audio/heroes/cna.mp3"
+            audioSrc="/audio/heroes/programs.mp3"
           />
         </div>
         <div className="bg-slate-700 flex items-center">

@@ -5,7 +5,7 @@ import { logger } from '@/lib/logger';
  */
 
 import { NextResponse } from 'next/server';
-import { getAdminClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { isDemoEnabled, getDemoTenantSlug } from '@/lib/demo/context';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 

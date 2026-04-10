@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { ApplicationUpdateSchema } from '@/lib/validators/course';
 import { getApplication, updateApplication, deleteApplication, createEnrollment } from '@/lib/db/courses';
 import { createClient } from '@/lib/supabase/server';
-import { getAdminClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

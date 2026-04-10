@@ -55,6 +55,14 @@ export default async function ReviewQueuePage({
     redirect('/unauthorized');
   }
 
+  // Pending student applications — always shown at top regardless of queue_type filter
+  const { data: pendingApps } = await supabase
+    .from('applications')
+    .select('id, first_name, last_name, email, program_interest, status, reference_number, created_at')
+    .in('status', ['submitted', 'pending_workone'])
+    .order('created_at', { ascending: true })
+    .limit(50);
+
   // Build query
   let query = supabase
     .from('review_queue')
@@ -95,6 +103,60 @@ export default async function ReviewQueuePage({
           Items requiring manual review from automated processing
         </p>
       </div>
+
+      {/* Pending Applications — always visible */}
+      {pendingApps && pendingApps.length > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-amber-500" />
+              Pending Applications
+              <span className="ml-1 px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                {pendingApps.length}
+              </span>
+            </h2>
+            <Link href="/admin/applications" className="text-sm text-brand-blue-600 hover:underline">
+              View all applications →
+            </Link>
+          </div>
+          <div className="space-y-2">
+            {pendingApps.map((app: any) => (
+              <div key={app.id} className="bg-white border border-amber-200 rounded-lg px-4 py-3 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <User className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-slate-900 truncate">
+                      {app.first_name} {app.last_name}
+                    </p>
+                    <p className="text-xs text-slate-500 truncate">
+                      {app.program_interest} · {app.email}
+                      {app.reference_number && <span className="ml-2 font-mono">#{app.reference_number}</span>}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                    app.status === 'pending_workone'
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'bg-amber-100 text-amber-700'
+                  }`}>
+                    {app.status === 'pending_workone' ? 'Pending WorkOne' : 'Submitted'}
+                  </span>
+                  <span className="text-xs text-slate-400">
+                    {new Date(app.created_at).toLocaleDateString()}
+                  </span>
+                  <Link
+                    href={`/admin/applications/${app.id}`}
+                    className="px-3 py-1.5 bg-brand-blue-600 text-white text-xs font-medium rounded-lg hover:bg-brand-blue-700"
+                  >
+                    Review
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="mb-6 flex flex-wrap gap-2">

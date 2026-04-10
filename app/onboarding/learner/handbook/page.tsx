@@ -214,6 +214,12 @@ export default function HandbookPage() {
     });
 
     if (result.success) {
+      // Mark handbook step complete in onboarding_progress
+      await fetch('/api/onboarding/complete-step', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ step: 'handbook' }),
+      });
       setAlreadyAcknowledged(true);
       router.push('/onboarding/learner');
     } else {

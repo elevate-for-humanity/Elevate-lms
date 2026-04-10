@@ -48,3 +48,24 @@ CREATE POLICY "Admins can read all signatures"
         AND profiles.role IN ('admin', 'super_admin', 'org_admin', 'staff')
     )
   );
+
+-- Admins and staff can update and delete any signature row
+DROP POLICY IF EXISTS "Admins can manage all signatures" ON public.signatures;
+CREATE POLICY "Admins can manage all signatures"
+  ON public.signatures
+  FOR ALL
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE profiles.id = auth.uid()
+        AND profiles.role IN ('admin', 'super_admin', 'org_admin', 'staff')
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE profiles.id = auth.uid()
+        AND profiles.role IN ('admin', 'super_admin', 'org_admin', 'staff')
+    )
+  );

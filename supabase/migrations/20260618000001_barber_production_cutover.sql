@@ -52,9 +52,10 @@ END $$;
 -- 2A. Flip program delivery flags so the learner dashboard surfaces this as LMS.
 UPDATE public.programs
 SET    has_lms_course = true,
-       lms_model      = 'self_paced',
-       delivery_model = 'lms'
+       lms_model      = 'internal'
 WHERE  id = '5ff21fcb-1968-41fd-99d3-37d69a31bd5c';
+-- delivery_model left as 'external_admin' — constraint only allows external_admin|partner_managed|internal_lms
+-- lms_model constraint allows: internal|hybrid (not self_paced|lms)
 
 -- 2B. Publish all 7 draft modules.
 --     Course page filters is_draft = false for non-admin users.

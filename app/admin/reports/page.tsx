@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { getAdminClient } from '@/lib/supabase/admin';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { Users, GraduationCap, TrendingUp, DollarSign, FileText, HeartHandshake, Download, ChevronRight, ArrowRight } from 'lucide-react';
 
@@ -18,12 +17,8 @@ const REPORTS = [
 ];
 
 export default async function ReportsPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
+  await requireRole(['admin', 'super_admin', 'staff']);
   const db = await getAdminClient();
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
-  if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
   const [
     { count: totalStudents },

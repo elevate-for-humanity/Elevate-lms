@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
-import { redirect } from 'next/navigation';
+import { requireRole } from '@/lib/auth/require-role';
 import { TrendingUp, Users, CheckCircle, AlertTriangle, Clock } from 'lucide-react';
 import { AdminPageShell } from '@/components/admin/AdminPageShell';
 import EnrollmentManagementClient from './EnrollmentManagementClient';
@@ -15,13 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminEnrollmentsPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
-
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-  if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
-
+  await requireRole(['admin', 'super_admin', 'staff']);
   const db = await getAdminClient();
 
   // Students who paid but haven't been granted LMS access yet (pending admin review)
@@ -37,21 +30,21 @@ export default async function AdminEnrollmentsPage() {
     (pendingAccess || []).map(async (e: any) => {
       const { data: p } = await db.from('profiles')
         .select('full_name, email, onboarding_completed')
-        .eq('id', e.user_id).single();
+        .eq('id', e.user_id).maybeSingle();
       return { ...e, profile: p };
     })
   );
 
-  const { data: enrollments, error: enrollmentsError } = await supabase
+  const { data: enrollments, error: enrollmentsError } = await db
     .from('program_enrollments')
     .select('*, student:profiles(id, full_name, email), course:courses(id, title)')
     .order('enrolled_at', { ascending: false });
   if (enrollmentsError) throw new Error(`program_enrollments query failed: ${enrollmentsError.message}`);
 
   // Supporting data — degrade gracefully if unavailable
-  const { data: users } = await supabase.from('profiles').select('id, full_name, email').order('full_name');
-  const { data: coursesRaw } = await supabase.from('courses').select('id, title').eq('is_active', true).order('title');
-  const { data: cohortsRaw } = await supabase.from('cohorts').select('id, name, code, status').eq('status', 'active').order('name');
+  const { data: users } = await db.from('profiles').select('id, full_name, email').order('full_name');
+  const { data: coursesRaw } = await db.from('courses').select('id, title').eq('is_active', true).order('title');
+  const { data: cohortsRaw } = await db.from('cohorts').select('id, name, code, status').eq('status', 'active').order('name');
 
   const allEnrollments = enrollments;
   const stats = {

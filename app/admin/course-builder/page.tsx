@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getAdminClient } from '@/lib/supabase/admin';
-import { createClient } from '@/lib/supabase/server';
+import { requireRole } from '@/lib/auth/require-role';
 import ProgramBuilderClient from '@/components/admin/course-builder/ProgramBuilderClient';
 import type {
   ProgramBuilderState,
@@ -24,20 +24,7 @@ interface PageProps {
 export default async function CourseBuilderPage({ searchParams }: PageProps) {
   const params = await searchParams;
 
-  // Auth
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-  if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) {
-    redirect('/unauthorized');
-  }
-
+  await requireRole(['admin', 'super_admin', 'staff']);
   const db = await getAdminClient();
 
   // If no program specified, redirect to programs list so admin picks one

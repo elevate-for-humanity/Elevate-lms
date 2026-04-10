@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { getAdminClient } from '@/lib/supabase/admin';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import {
   Users, GraduationCap, TrendingUp, Award, BarChart3,
@@ -12,12 +11,8 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { robots: { index: false, follow: false }, title: 'Analytics | Admin' };
 
 export default async function AnalyticsPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
+  await requireRole(['admin', 'super_admin', 'staff']);
   const db = await getAdminClient();
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
-  if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
   const [
     { count: totalUsers },

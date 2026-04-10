@@ -1,8 +1,7 @@
 import { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
+import { requireRole } from '@/lib/auth/require-role';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Shield, Plus, ExternalLink, Award, BookOpen, Users } from 'lucide-react';
 import { mapCredentialRow, type RawCredentialRow, type CredentialRecord } from '@/lib/domain';
@@ -25,18 +24,10 @@ const STACK_LABELS: Record<string, string> = {
 };
 
 export default async function CredentialRegistryPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
+  await requireRole(['admin', 'super_admin', 'org_admin', 'staff']);
   const db = await getAdminClient();
 
-
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-  if (!profile || !['admin','super_admin','org_admin','staff'].includes(profile.role)) {
-    redirect('/unauthorized');
-  }
-
-  const { data: rawCredentials } = await supabase
+  const { data: rawCredentials } = await db
     .from('credential_registry')
     .select('*')
     .order('credential_stack')

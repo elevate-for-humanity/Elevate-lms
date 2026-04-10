@@ -52,7 +52,7 @@ export default async function ProgramHolderVerificationPage() {
         .from('program_holder_banking')
         .select('*')
         .eq('program_holder_id', holder.user_id)
-        .single();
+        .maybeSingle();
 
       return {
         ...holder,

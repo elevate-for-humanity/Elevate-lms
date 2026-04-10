@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { getAdminClient } from '@/lib/supabase/admin';
+import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { Building2, Clock, CheckCircle, XCircle, Eye, Send } from 'lucide-react';
 import ResendOnboardingButton from './ResendOnboardingButton';
@@ -22,20 +22,8 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export default async function AdminProgramHoldersPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
-
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
-    redirect('/unauthorized');
-  }
+  await requireRole(['admin', 'super_admin', 'staff']);
+  const supabase = await getAdminClient();
 
   // Fetch all program holders
   const { data: holders } = await supabase

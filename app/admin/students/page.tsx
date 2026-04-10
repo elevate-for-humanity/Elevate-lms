@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
-import { redirect } from 'next/navigation';
+import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { Users, TrendingUp, Clock, CheckCircle, Mail, Phone, UserPlus } from 'lucide-react';
 import { AdminPageShell, AdminCard, AdminEmptyState, StatusBadge } from '@/components/admin/AdminPageShell';
@@ -13,13 +12,8 @@ export const metadata: Metadata = {
 };
 
 export default async function StudentsPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
-
+  await requireRole(['admin', 'super_admin', 'staff']);
   const db = await getAdminClient();
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
-  if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
   const { data: students, count: totalStudents } = await db
     .from('profiles')

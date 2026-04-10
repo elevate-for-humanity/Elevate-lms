@@ -115,7 +115,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
 
   // Fetch linked user profile
   const { data: holderProfile } = holder.user_id
-    ? await supabase.from('profiles').select('id, email, full_name, role').eq('id', holder.user_id).single()
+    ? await supabase.from('profiles').select('id, email, full_name, role').eq('id', holder.user_id).maybeSingle()
     : { data: null };
 
   // Fetch audit events for this holder
@@ -169,13 +169,13 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
         .from('program_holders')
         .select('contact_email, contact_name, organization_name')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       const { data: programData } = await adb
         .from('programs')
         .select('name')
         .eq('id', programId)
-        .single();
+        .maybeSingle();
 
       if (holderData?.contact_email) {
         const { sendProgramHolderApprovalEmail } = await import('@/lib/email/sendgrid');

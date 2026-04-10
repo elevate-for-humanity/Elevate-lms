@@ -1,9 +1,8 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { requireAdmin } from '@/lib/auth';
+import { getAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { BarChart, DollarSign, Gift } from 'lucide-react';
 
@@ -15,38 +14,8 @@ export const metadata: Metadata = {
 };
 
 export default async function CashAdvancesAdminPage() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login');
-  }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
-    redirect('/unauthorized');
-  }
-
-  const { data: items, count: totalItems } = await supabase
-    .from('profiles')
-    .select('*', { count: 'exact' })
-    .order('created_at', { ascending: false })
-    .limit(50);
-
-  const { count: activeItems } = await supabase
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'active');
-
   await requireAdmin();
+  const supabase = await getAdminClient();
 
   // Fetch applications
   const { data: applications, error } = await supabase

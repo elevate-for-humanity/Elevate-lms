@@ -54,7 +54,7 @@ export default async function ReviewVerificationPage({
     .from('program_holder_banking')
     .select('*')
     .eq('program_holder_id', holder.user_id)
-    .single();
+    .maybeSingle();
 
   // Get verification history
   const { data: verificationHistory } = await supabase

@@ -1,6 +1,6 @@
 import { requireAdmin } from '@/lib/auth';
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
@@ -49,7 +49,7 @@ const COHORT_1 = {
 };
 
 export default async function CohortTrackerPage() {
-  const supabase = await createClient();
+  const supabase = await getAdminClient();
 
   // Try to get enrolled HVAC students
   let students: any[] = [];

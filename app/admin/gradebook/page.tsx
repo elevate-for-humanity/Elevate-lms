@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { getAdminClient } from '@/lib/supabase/admin';
+import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { BookOpen, Users, ArrowRight } from 'lucide-react';
 
@@ -12,21 +12,8 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminGradebookIndexPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
-
-
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (!['admin', 'super_admin', 'instructor'].includes(profile?.role || '')) {
-    redirect('/unauthorized');
-  }
+  await requireRole(['admin', 'super_admin', 'instructor']);
+  const supabase = await getAdminClient();
 
   const { data: courses } = await supabase
     .from('training_courses')

@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { getAdminClient } from '@/lib/supabase/admin';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { HeartHandshake, CheckCircle, Clock, AlertTriangle, Plus, ChevronRight, ArrowRight } from 'lucide-react';
 
@@ -17,12 +16,8 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export default async function WioaPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
+  await requireRole(['admin', 'super_admin', 'staff']);
   const db = await getAdminClient();
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
-  if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
   const soon = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 

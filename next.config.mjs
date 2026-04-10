@@ -117,7 +117,6 @@ const nextConfig = {
     '**.gitpod.dev',
   ],
 
-  turbopack: {},
   // Experimental features for better performance
   experimental: {
     serverActions: {

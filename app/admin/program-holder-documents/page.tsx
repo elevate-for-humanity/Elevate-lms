@@ -3,15 +3,17 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import React from 'react';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   FileText,
   XCircle,
   Clock,
-  Download,
+  ExternalLink,
   User,
   Building2,
-CheckCircle, } from 'lucide-react';
+  CheckCircle,
+  Loader2,
+} from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 interface Document {
@@ -35,6 +37,41 @@ interface Document {
   organizations?: {
     name: string;
   };
+}
+
+/** Opens a signed URL for a private storage file in a new tab. */
+function ViewDocumentButton({ filePath }: { filePath: string }) {
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState('');
+
+  const handleView = async () => {
+    setLoading(true);
+    setErr('');
+    try {
+      const { getSignedDocumentUrl } = await import('./actions');
+      const { url, error } = await getSignedDocumentUrl(filePath);
+      if (error || !url) { setErr(error || 'Could not open file'); return; }
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch {
+      setErr('Failed to open document');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-end gap-1">
+      <button
+        onClick={handleView}
+        disabled={loading}
+        className="text-brand-blue-600 hover:text-brand-blue-700 font-medium flex items-center gap-1 disabled:opacity-50"
+      >
+        {loading ? <Loader2 size={14} className="animate-spin" /> : <ExternalLink size={14} />}
+        View
+      </button>
+      {err && <p className="text-xs text-red-600">{err}</p>}
+    </div>
+  );
 }
 
 export default function AdminProgramHolderDocuments() {
@@ -113,9 +150,7 @@ export default function AdminProgramHolderDocuments() {
     if (doc.approved) {
       return (
         <span className="inline-flex items-center gap-1 px-3 py-2 rounded-full text-sm font-medium bg-brand-green-100 text-brand-green-800">
-
-      {/* Hero Image */}
-          <span className="text-slate-400 flex-shrink-0">•</span>
+          <CheckCircle size={14} />
           Approved
         </span>
       );
@@ -258,15 +293,7 @@ export default function AdminProgramHolderDocuments() {
                   </div>
                   <div className="flex items-center gap-3">
                     {getStatusBadge(doc)}
-                    <a
-                      href={doc.file_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-brand-blue-600 hover:text-brand-blue-700 font-medium flex items-center gap-1"
-                    >
-                      <Download size={16} />
-                      View
-                    </a>
+                    <ViewDocumentButton filePath={doc.file_url} />
                   </div>
                 </div>
 
@@ -302,7 +329,7 @@ export default function AdminProgramHolderDocuments() {
                           disabled={processing}
                           className="px-4 py-2 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition flex items-center gap-2"
                         >
-                          <span className="text-slate-400 flex-shrink-0">•</span>
+                          <CheckCircle size={16} />
                           Approve
                         </button>
                         <button

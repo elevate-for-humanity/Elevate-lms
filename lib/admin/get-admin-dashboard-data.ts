@@ -113,6 +113,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     lastMonthAppsRes,
     recentEnrollmentsRes,
     recentAppsActivityRes,
+    pendingHoldersRes,
+    pendingHolderDocsRes,
   ] = await Promise.all([
     db.from('applications')
       .select('id, first_name, last_name, full_name, email, program_interest, program_slug, status, created_at, submitted_at, next_step_due_date, funding_type')
@@ -185,6 +187,16 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       .select('id, first_name, last_name, full_name, program_interest, status, created_at')
       .order('created_at', { ascending: false })
       .limit(10),
+
+    // Program holder pending applications
+    db.from('program_holders')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'pending'),
+
+    // Program holder documents pending review
+    db.from('program_holder_documents')
+      .select('id', { count: 'exact', head: true })
+      .is('approved', null),
   ]);
 
   if (pendingAppsRes.error)       throw new Error(`applications query failed`);
@@ -197,6 +209,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const lastMonthAppsCount   = lastMonthAppsRes.error ? 0 : (lastMonthAppsRes.count ?? 0);
   const certsCount           = requireCount(certsRes,                'certificates');
   const certsThisMonth       = certsThisMonthRes.error ? 0 : (certsThisMonthRes.count ?? 0);
+  const pendingHoldersCount  = pendingHoldersRes.error ? 0 : (pendingHoldersRes.count ?? 0);
+  const pendingHolderDocsCount = pendingHolderDocsRes.error ? 0 : (pendingHolderDocsRes.count ?? 0);
 
   // Track which non-critical sections failed — UI renders a partial-failure notice.
   const degradedSections: DegradedSection[] = [];
@@ -380,6 +394,24 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       href: '/admin/certificates',
       urgent: false,
       sub: `${certsThisMonth} issued this month · ${certsCount} all time`,
+    },
+    {
+      label: 'Pending Program Holders',
+      value: pendingHoldersCount,
+      delta: 0,
+      deltaLabel: 'Awaiting approval',
+      href: '/admin/program-holders',
+      urgent: pendingHoldersCount > 0,
+      sub: pendingHoldersCount > 0 ? 'Requires admin review' : 'No pending applications',
+    },
+    {
+      label: 'Pending Documents',
+      value: pendingHolderDocsCount,
+      delta: 0,
+      deltaLabel: 'Awaiting review',
+      href: '/admin/program-holder-documents',
+      urgent: pendingHolderDocsCount > 0,
+      sub: pendingHolderDocsCount > 0 ? 'Program holder documents to review' : 'All documents reviewed',
     },
   ];
 

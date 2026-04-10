@@ -52,7 +52,11 @@ function Empty({ message }: { message: string }) {
 
 function isOperationallyEmpty(data: AdminDashboardData): boolean {
   const { pendingApplications, activeEnrollments, revenueThisMonthCents, certificatesIssued } = data.counts;
-  return pendingApplications === 0 && activeEnrollments === 0 && revenueThisMonthCents === 0 && certificatesIssued === 0;
+  const pendingHolders = data.kpis.find(k => k.label === 'Pending Program Holders')?.value ?? 0;
+  const pendingDocs    = data.kpis.find(k => k.label === 'Pending Documents')?.value ?? 0;
+  // Show dashboard if anything needs attention — not just student metrics
+  return pendingApplications === 0 && activeEnrollments === 0 && revenueThisMonthCents === 0
+    && certificatesIssued === 0 && pendingHolders === 0 && pendingDocs === 0;
 }
 
 function NoOperationalData() {
@@ -238,17 +242,39 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
             Operations
           </h1>
 
-          {/* Urgent CTA — only shown when there are pending applications */}
-          {pendingApplications > 0 && (
-            <Link
-              href="/admin/applications?status=submitted"
-              className="inline-flex items-center gap-3 bg-rose-600 hover:bg-rose-700 text-white px-7 py-4 rounded-2xl font-bold text-lg transition-colors mb-10"
-            >
-              <span className="w-2.5 h-2.5 rounded-full bg-white/80 animate-pulse" />
-              {pendingApplications} application{pendingApplications !== 1 ? "s" : ""} waiting for review
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-          )}
+          {/* Urgent CTAs */}
+          <div className="flex flex-wrap gap-3 mb-10">
+            {pendingApplications > 0 && (
+              <Link
+                href="/admin/applications?status=submitted"
+                className="inline-flex items-center gap-3 bg-rose-600 hover:bg-rose-700 text-white px-7 py-4 rounded-2xl font-bold text-lg transition-colors"
+              >
+                <span className="w-2.5 h-2.5 rounded-full bg-white/80 animate-pulse" />
+                {pendingApplications} application{pendingApplications !== 1 ? "s" : ""} waiting for review
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            )}
+            {(data.kpis.find(k => k.label === 'Pending Program Holders')?.value ?? 0) > 0 && (
+              <Link
+                href="/admin/program-holders"
+                className="inline-flex items-center gap-3 bg-amber-500 hover:bg-amber-600 text-white px-7 py-4 rounded-2xl font-bold text-lg transition-colors"
+              >
+                <span className="w-2.5 h-2.5 rounded-full bg-white/80 animate-pulse" />
+                {data.kpis.find(k => k.label === 'Pending Program Holders')?.value} program holder{(data.kpis.find(k => k.label === 'Pending Program Holders')?.value ?? 0) !== 1 ? "s" : ""} pending approval
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            )}
+            {(data.kpis.find(k => k.label === 'Pending Documents')?.value ?? 0) > 0 && (
+              <Link
+                href="/admin/program-holder-documents"
+                className="inline-flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-2xl font-bold text-lg transition-colors"
+              >
+                <span className="w-2.5 h-2.5 rounded-full bg-white/80 animate-pulse" />
+                {data.kpis.find(k => k.label === 'Pending Documents')?.value} document{(data.kpis.find(k => k.label === 'Pending Documents')?.value ?? 0) !== 1 ? "s" : ""} to review
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            )}
+          </div>
 
           {/* Quick-nav — same pill style as marketing site */}
           <div className="flex flex-wrap gap-3">
@@ -260,6 +286,8 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
               { label: "Certificates", href: "/admin/certificates",                    icon: Award      },
               { label: "Revenue",      href: "/admin/enrollments?payment_status=paid", icon: DollarSign },
               { label: "At-Risk",      href: "/admin/at-risk",                         icon: TrendingUp },
+              { label: "Program Holders", href: "/admin/program-holders",              icon: Users      },
+              { label: "PH Documents", href: "/admin/program-holder-documents",        icon: FileText   },
             ].map(({ label, href, icon: Icon }) => (
               <Link
                 key={label}
@@ -281,10 +309,12 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
         <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-10">At a glance</p>
         <div className="divide-y divide-slate-100">
           {[
-            { label: "Applications waiting",  value: fmtNum(pendingApplications),       href: "/admin/applications?status=submitted",       urgent: pendingApplications > 0 },
-            { label: "Active enrollments",     value: fmtNum(activeEnrollments),         href: "/admin/enrollments?status=active",            urgent: false },
-            { label: "Revenue this month",     value: fmtUsd(revenueThisMonthCents),     href: "/admin/enrollments?payment_status=paid",      urgent: false },
-            { label: "Certificates issued",    value: fmtNum(certificatesIssued),        href: "/admin/certificates",                         urgent: false },
+            { label: "Applications waiting",       value: fmtNum(pendingApplications),       href: "/admin/applications?status=submitted",       urgent: pendingApplications > 0 },
+            { label: "Active enrollments",         value: fmtNum(activeEnrollments),         href: "/admin/enrollments?status=active",            urgent: false },
+            { label: "Revenue this month",         value: fmtUsd(revenueThisMonthCents),     href: "/admin/enrollments?payment_status=paid",      urgent: false },
+            { label: "Certificates issued",        value: fmtNum(certificatesIssued),        href: "/admin/certificates",                         urgent: false },
+            { label: "Program holders pending",    value: fmtNum(data.kpis.find(k => k.label === 'Pending Program Holders')?.value ?? 0), href: "/admin/program-holders",              urgent: (data.kpis.find(k => k.label === 'Pending Program Holders')?.value ?? 0) > 0 },
+            { label: "Documents to review",        value: fmtNum(data.kpis.find(k => k.label === 'Pending Documents')?.value ?? 0),       href: "/admin/program-holder-documents",     urgent: (data.kpis.find(k => k.label === 'Pending Documents')?.value ?? 0) > 0 },
           ].map(({ label, value, href, urgent }) => (
             <Link
               key={label}
@@ -350,6 +380,66 @@ export function DashboardShell({ data }: { data: AdminDashboardData }) {
           </div>
         )}
       </section>
+
+      {/* ══════════════════════════════════════════════════════════
+          PROGRAM HOLDERS
+      ══════════════════════════════════════════════════════════ */}
+      {(() => {
+        const pendingHolders = data.kpis.find(k => k.label === 'Pending Program Holders')?.value ?? 0;
+        const pendingDocs    = data.kpis.find(k => k.label === 'Pending Documents')?.value ?? 0;
+        if (pendingHolders === 0 && pendingDocs === 0) return null;
+        return (
+          <section className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 sm:mb-28">
+            <div className="flex items-end justify-between mb-8 sm:mb-12">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Partner onboarding</p>
+                <h2 className="text-3xl sm:text-5xl font-black text-slate-900 leading-none">Program Holders</h2>
+              </div>
+              <Link href="/admin/program-holders" className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1.5">
+                View all <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+            <div className="divide-y divide-slate-100">
+              {pendingHolders > 0 && (
+                <Link
+                  href="/admin/program-holders"
+                  className="group flex items-center justify-between py-5 sm:py-8 hover:bg-slate-50 -mx-4 px-4 rounded-xl transition-colors"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-1 h-14 rounded-full bg-amber-400 flex-shrink-0" />
+                    <div>
+                      <p className="text-lg font-bold text-slate-900">Applications pending approval</p>
+                      <p className="text-sm text-slate-400 mt-0.5">Review and approve program holder applications</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-5">
+                    <span className="text-3xl sm:text-4xl font-black tabular-nums text-amber-600">{pendingHolders}</span>
+                    <ArrowRight className="w-5 h-5 text-slate-200 group-hover:text-slate-500 transition-colors" />
+                  </div>
+                </Link>
+              )}
+              {pendingDocs > 0 && (
+                <Link
+                  href="/admin/program-holder-documents"
+                  className="group flex items-center justify-between py-5 sm:py-8 hover:bg-slate-50 -mx-4 px-4 rounded-xl transition-colors"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-1 h-14 rounded-full bg-blue-400 flex-shrink-0" />
+                    <div>
+                      <p className="text-lg font-bold text-slate-900">Documents pending review</p>
+                      <p className="text-sm text-slate-400 mt-0.5">View, approve, or reject uploaded documents</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-5">
+                    <span className="text-3xl sm:text-4xl font-black tabular-nums text-blue-600">{pendingDocs}</span>
+                    <ArrowRight className="w-5 h-5 text-slate-200 group-hover:text-slate-500 transition-colors" />
+                  </div>
+                </Link>
+              )}
+            </div>
+          </section>
+        );
+      })()}
 
       {/* ══════════════════════════════════════════════════════════
           PROGRAMS

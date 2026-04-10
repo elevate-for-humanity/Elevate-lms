@@ -65,3 +65,31 @@ export async function reviewDocument(docId: string, approved: boolean, notes?: s
 
   return { success: true };
 }
+
+/**
+ * Generate a signed URL for a program_holder_documents file.
+ * Calls the dedicated API endpoint which handles auth, audit, and storage access.
+ */
+export async function getSignedDocumentUrl(filePath: string): Promise<{ url: string | null; error: string | null }> {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  try {
+    const { cookies } = await import('next/headers');
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join('; ');
+
+    const res = await fetch(`${siteUrl}/api/admin/program-holder-documents/signed-url`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: cookieHeader,
+      },
+      body: JSON.stringify({ filePath }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.url) return { url: null, error: data.error ?? 'Could not generate URL' };
+    return { url: data.url, error: null };
+  } catch {
+    return { url: null, error: 'Failed to generate document URL' };
+  }
+}

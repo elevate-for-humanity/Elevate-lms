@@ -111,8 +111,13 @@ export function DocumentUploadForm({ requirements }: Props) {
           .select('role')
           .eq('id', currentUser.id)
           .single();
-        if (prof?.role === 'program_holder') dest = '/program-holder/documents';
-        else if (prof?.role === 'student' || prof?.role === 'learner') dest = '/learner/dashboard';
+        if (prof?.role === 'program_holder') {
+          dest = '/program-holder/documents';
+          // Fire onboarding-complete check — sends welcome email if all steps done
+          fetch('/api/program-holder/onboarding-complete', { method: 'POST' }).catch(() => {});
+        } else if (prof?.role === 'student' || prof?.role === 'learner') {
+          dest = '/learner/dashboard';
+        }
       }
       setTimeout(() => {
         router.push(dest);

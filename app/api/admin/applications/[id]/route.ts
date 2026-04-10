@@ -119,6 +119,34 @@ async function findOrCreateUser(
       email: normalizedEmail,
     });
 
+    // Send password setup email so the user can create their own password
+    try {
+      const { data: linkData } = await adminClient.auth.admin.generateLink({
+        type: 'recovery',
+        email: normalizedEmail,
+        options: { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/auth/reset-password` },
+      });
+      if (linkData?.properties?.action_link) {
+        const { sendEmail } = await import('@/lib/email/sendgrid');
+        await sendEmail({
+          to: normalizedEmail,
+          subject: 'Set your password — Elevate for Humanity',
+          html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px">
+            <h2 style="color:#1e293b">Welcome to Elevate for Humanity, ${firstName}!</h2>
+            <p>Your application has been approved and your account is ready. Click the button below to set your password and access your dashboard.</p>
+            <p style="text-align:center;margin:32px 0">
+              <a href="${linkData.properties.action_link}" style="background:#dc2626;color:#fff;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:bold;display:inline-block">Set My Password</a>
+            </p>
+            <p style="color:#64748b;font-size:13px">This link expires in 24 hours. If you did not apply to Elevate for Humanity, you can ignore this email.</p>
+            <p style="color:#64748b;font-size:13px">Questions? Reply to this email or call (317) 314-3757.</p>
+          </div>`,
+        });
+      }
+    } catch (emailErr) {
+      logger.error('Failed to send password setup email', emailErr as Error);
+      // Don't block enrollment — user can use "Forgot password" on login page
+    }
+
     return newUser.user.id;
   }
 

@@ -7,6 +7,7 @@ import { safeInternalError } from '@/lib/api/safe-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling, APIErrors, ErrorCode } from '@/lib/api';
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { APIError } from '@/lib/api/api-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { validatePassword } from '@/lib/auth/password-validation';
@@ -68,16 +69,23 @@ const _POST = withErrorHandling(async (request: NextRequest) => {
     throw APIErrors.internal('Failed to create user');
   }
 
+  // Auto-confirm email so users can log in immediately without waiting for a confirmation email
+  if (!data.user.email_confirmed_at) {
+    const adminClient = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+    await adminClient.auth.admin.updateUserById(data.user.id, { email_confirm: true });
+  }
+
   return NextResponse.json({
     success: true,
     user: {
       id: data.user.id,
       email: data.user.email,
-      emailConfirmed: data.user.email_confirmed_at !== null,
+      emailConfirmed: true,
     },
-    message: data.user.email_confirmed_at 
-      ? 'Account created successfully' 
-      : 'Please check your email to confirm your account',
+    message: 'Account created successfully',
   });
 });
 

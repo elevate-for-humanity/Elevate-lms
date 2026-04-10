@@ -74,10 +74,10 @@ export const COSMETOLOGY_PROGRAM = {
   slug: 'cosmetology-apprenticeship',
   
   // Hours and Duration
-  totalHours: 1500,
-  totalHoursFormatted: '1,500',
-  durationWeeks: 40,
-  durationMonths: 10,
+  totalHours: 2000,
+  totalHoursFormatted: '2,000',
+  durationWeeks: 52,
+  durationMonths: 12,
   durationFormatted: '10 months',
   hoursPerWeek: 40,
   

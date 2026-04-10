@@ -46,9 +46,24 @@ export default async function ApprenticeHoursPage() {
   const approvedHours = logs
     .filter((log: any) => log.status === 'approved')
     .reduce((sum, log: any) => sum + (log.accepted_hours || log.hours_claimed || 0), 0);
-  
-  // Apprenticeship typically requires specific hours
-  const requiredHours = 2000;
+
+  // Resolve required hours from the learner's active enrollment
+  const { data: activeEnrollment } = await supabase
+    .from('program_enrollments')
+    .select('program_slug')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const PROGRAM_REQUIRED_HOURS: Record<string, number> = {
+    'barber-apprenticeship':            2000,
+    'cosmetology-apprenticeship':       2000,
+    'esthetician-apprenticeship':        700,
+    'nail-tech-apprenticeship':          450,
+    'nail-technician-apprenticeship':    450, // legacy alias
+  };
+  const requiredHours = PROGRAM_REQUIRED_HOURS[activeEnrollment?.program_slug ?? ''] ?? 2000;
   const progressPercent = Math.min(Math.round((approvedHours / requiredHours) * 100), 100);
 
   return (

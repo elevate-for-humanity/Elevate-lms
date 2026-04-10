@@ -74,7 +74,16 @@ export default async function ApprenticePortalPage() {
     .eq('enrollment_id', enrollment?.id);
   
   const totalHours = hoursData?.reduce((sum, h) => sum + (h.hours_logged || 0), 0) || 0;
-  const requiredHours = 1500; // Barber requirement
+
+  const PROGRAM_REQUIRED_HOURS: Record<string, number> = {
+    'barber-apprenticeship':            2000,
+    'cosmetology-apprenticeship':       2000,
+    'esthetician-apprenticeship':        700,
+    'nail-tech-apprenticeship':          450,
+    'nail-technician-apprenticeship':    450, // legacy alias
+  };
+  const programSlugForHours = enrollment?.programs?.slug ?? 'barber-apprenticeship';
+  const requiredHours = PROGRAM_REQUIRED_HOURS[programSlugForHours] ?? 2000;
 
   const quickLinks = [
     { name: 'Timeclock', href: '/apprentice/timeclock', icon: Clock, description: 'Clock in / out at your work site' },

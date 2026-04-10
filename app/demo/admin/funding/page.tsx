@@ -1,24 +1,29 @@
-
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 
-import { createClient } from '@/lib/supabase/server';
+export const metadata: Metadata = {
+  title: 'Funding | Admin Demo | Elevate for Humanity',
+  robots: { index: false, follow: false },
+};
 
-export const dynamic = 'force-dynamic';
+const DEMO_SOURCES = [
+  { name: 'WIOA Title I Adult', allocated: 48000, spent: 31200, students: 8 },
+  { name: 'WIOA Title I Dislocated Worker', allocated: 32000, spent: 18400, students: 5 },
+  { name: 'Pell Grant (via partner college)', allocated: 24000, spent: 24000, students: 6 },
+  { name: 'DOL ApprenticeshipUSA Grant', allocated: 75000, spent: 41250, students: 12 },
+  { name: 'Indiana ETPL Voucher', allocated: 15000, spent: 9000, students: 3 },
+  { name: 'Employer Co-Pay (Barber)', allocated: 12000, spent: 4800, students: 4 },
+];
 
-export default async function DemoFundingPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('funding_sources').select('*').limit(50);
-const sources = (dbRows as any[]) || [];
+export default function DemoFundingPage() {
 
   return (
     <DemoPageShell title="Funding" description="Track funding sources, allocations, and expenditures." portal="admin">
-      <div className="bg-white rounded-xl border overflow-hidden">
-
-      {/* Hero Image */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] mb-6">
         <Image src="/images/pages/demo-page-5.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
+      <div className="bg-white rounded-xl border overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-xs text-gray-500 border-b bg-gray-50">
@@ -31,7 +36,7 @@ const sources = (dbRows as any[]) || [];
             </tr>
           </thead>
           <tbody>
-            {sources.map((s, i) => {
+            {DEMO_SOURCES.map((s, i) => {
               const pct = Math.round((s.spent / s.allocated) * 100);
               return (
                 <tr key={i} className="border-b last:border-0 hover:bg-gray-50">
@@ -43,7 +48,7 @@ const sources = (dbRows as any[]) || [];
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
                       <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full ${pct > 85 ? 'bg-amber-500' : 'bg-brand-green-500'}`} style={{ width: `${pct}%` }} />
+                        <div className={`h-full rounded-full ${pct >= 100 ? 'bg-red-500' : pct > 85 ? 'bg-amber-500' : 'bg-green-500'}`} style={{ width: `${Math.min(pct, 100)}%` }} />
                       </div>
                       <span className="text-xs text-gray-500">{pct}%</span>
                     </div>

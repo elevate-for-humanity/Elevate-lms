@@ -1,50 +1,42 @@
-
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
+import { DEMO_HOURS_LOG } from '@/lib/demo/sandbox-data';
 
-import { createClient } from '@/lib/supabase/server';
+export const metadata: Metadata = {
+  title: 'Hours | Learner Demo | Elevate for Humanity',
+  robots: { index: false, follow: false },
+};
 
-export const dynamic = 'force-dynamic';
+const TOTAL_HOURS = 680;
+const REQUIRED_HOURS = 2000;
 
-export default async function DemoHoursPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('hour_entries').select('*').limit(50);
-const hours = (dbRows as any[]) || [];
-
-  const totalHours = 680;
-  const requiredHours = 2000;
-  const pct = Math.round((totalHours / requiredHours) * 100);
+export default function DemoHoursPage() {
+  const pct = Math.round((TOTAL_HOURS / REQUIRED_HOURS) * 100);
 
   return (
     <DemoPageShell title="Hours" description="Log and track your apprenticeship hours." portal="learner">
-      <div className="space-y-6">
-
-      {/* Hero Image */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] mb-6">
         <Image src="/images/pages/demo-page-17.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
-        {/* Summary */}
+      <div className="space-y-6">
         <div className="bg-white rounded-xl border p-5">
           <div className="flex items-center justify-between mb-3">
             <div>
               <div className="text-sm text-gray-500">Total Hours</div>
-              <div className="text-3xl font-bold text-gray-900">{totalHours} <span className="text-lg font-normal text-slate-500">/ {requiredHours}</span></div>
+              <div className="text-3xl font-bold text-gray-900">{TOTAL_HOURS} <span className="text-lg font-normal text-gray-500">/ {REQUIRED_HOURS}</span></div>
             </div>
-            <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-brand-blue-700">
-              + Log Hours
-            </button>
+            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700">+ Log Hours</button>
           </div>
           <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-            <div className="h-full bg-white rounded-full" style={{ width: `${pct}%` }} />
+            <div className="h-full bg-blue-500 rounded-full" style={{ width: `${pct}%` }} />
           </div>
-          <div className="text-xs text-gray-500 mt-1">{pct}% complete · {requiredHours - totalHours} hours remaining</div>
+          <div className="text-xs text-gray-500 mt-1">{pct}% complete · {REQUIRED_HOURS - TOTAL_HOURS} hours remaining</div>
         </div>
-
-        {/* Log table */}
         <div className="bg-white rounded-xl border overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs text-gray-500 border-b bg-white">
+              <tr className="text-left text-xs text-gray-500 border-b bg-gray-50">
                 <th className="px-5 py-3 font-medium">Date</th>
                 <th className="px-5 py-3 font-medium">Activity</th>
                 <th className="px-5 py-3 font-medium">Hours</th>
@@ -53,14 +45,14 @@ const hours = (dbRows as any[]) || [];
               </tr>
             </thead>
             <tbody>
-              {hours.map((h, i) => (
-                <tr key={i} className="border-b last:border-0 hover:bg-white">
+              {(DEMO_HOURS_LOG as any[]).map((h, i) => (
+                <tr key={i} className="border-b last:border-0 hover:bg-gray-50">
                   <td className="px-5 py-3 text-gray-600">{h.date}</td>
                   <td className="px-5 py-3 font-medium text-gray-900">{h.activity}</td>
                   <td className="px-5 py-3 font-semibold text-gray-900">{h.hours}h</td>
                   <td className="px-5 py-3 text-gray-600">{h.supervisor}</td>
                   <td className="px-5 py-3">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${h.approved ? 'bg-brand-green-100 text-brand-green-800' : 'bg-amber-100 text-amber-800'}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${h.approved ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
                       {h.approved ? 'Approved' : 'Pending'}
                     </span>
                   </td>

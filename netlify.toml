@@ -23,6 +23,7 @@
   NODE_VERSION = "20"
   NODE_OPTIONS = "--max-old-space-size=8192"
   NETLIFY_USE_PNPM = "true"
+  NEXT_DISABLE_TURBOPACK = "1"
   # Disable secret scanning - NEXT_PUBLIC_* vars are intentionally public
   SECRETS_SCAN_ENABLED = "false"
   # NHA account — non-secret, safe to store here

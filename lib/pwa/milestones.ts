@@ -72,13 +72,42 @@ export const COSMETOLOGY_MILESTONES: Milestone[] = [
   { id: 'state-board',    hours: 2000, title: 'State Board Ready',      description: 'All 2,000 hours complete. Eligible for the Indiana State Board exam.', badge: '🏆' },
 ];
 
-export function getAchievedMilestones(totalHours: number, program: 'barber' | 'cosmetology' = 'barber'): Milestone[] {
-  const list = program === 'cosmetology' ? COSMETOLOGY_MILESTONES : BARBER_MILESTONES;
+export const ESTHETICIAN_MILESTONES: Milestone[] = [
+  { id: 'first-75',      hours: 75,  title: 'First 75 Hours',        description: 'Completed your first 75 hours of esthetician training.',                badge: '🎯' },
+  { id: 'skin-science',  hours: 150, title: 'Skin Science Basics',    description: 'Demonstrated understanding of skin anatomy, disorders, and analysis.',  badge: '🔬' },
+  { id: 'facial',        hours: 250, title: 'Facial Specialist',      description: 'Proficiency in basic and advanced facial treatments.',                   badge: '✨' },
+  { id: 'hair-removal',  hours: 350, title: 'Hair Removal Expert',    description: 'Competency in waxing, threading, and other hair removal techniques.',   badge: '⭐' },
+  { id: 'chemical',      hours: 450, title: 'Chemical Services',      description: 'Demonstrated skill in chemical exfoliation and advanced skin care.',     badge: '🌟' },
+  { id: 'makeup',        hours: 575, title: 'Makeup & Lashes',        description: 'Proficiency in makeup application and lash services.',                   badge: '💄' },
+  { id: 'state-board',   hours: 700, title: 'State Board Ready',      description: 'All 700 hours complete. Eligible for the Indiana State Board exam.',    badge: '🏆' },
+];
+
+export const NAIL_TECH_MILESTONES: Milestone[] = [
+  { id: 'first-50',      hours: 50,  title: 'First 50 Hours',         description: 'Completed your first 50 hours of nail technician training.',             badge: '🎯' },
+  { id: 'sanitation',    hours: 100, title: 'Sanitation Certified',   description: 'Mastery of infection control and sanitation protocols.',                  badge: '🧼' },
+  { id: 'manicure',      hours: 150, title: 'Manicure Proficiency',   description: 'Proficiency in basic and spa manicure techniques.',                      badge: '💅' },
+  { id: 'pedicure',      hours: 225, title: 'Pedicure Specialist',    description: 'Competency in pedicure services and foot care.',                         badge: '⭐' },
+  { id: 'enhancements',  hours: 300, title: 'Nail Enhancements',      description: 'Demonstrated skill in acrylic, gel, and nail art applications.',         badge: '🌟' },
+  { id: 'client-ready',  hours: 375, title: 'Client Ready',           description: 'Consistently delivering professional-quality services to clients.',       badge: '💫' },
+  { id: 'state-board',   hours: 450, title: 'State Board Ready',      description: 'All 450 hours complete. Eligible for the Indiana State Board exam.',     badge: '🏆' },
+];
+
+type ProgramKey = 'barber' | 'cosmetology' | 'esthetician' | 'nail-tech';
+
+const MILESTONE_MAP: Record<ProgramKey, Milestone[]> = {
+  barber:       BARBER_MILESTONES,
+  cosmetology:  COSMETOLOGY_MILESTONES,
+  esthetician:  ESTHETICIAN_MILESTONES,
+  'nail-tech':  NAIL_TECH_MILESTONES,
+};
+
+export function getAchievedMilestones(totalHours: number, program: ProgramKey = 'barber'): Milestone[] {
+  const list = MILESTONE_MAP[program] ?? BARBER_MILESTONES;
   return list.filter(m => totalHours >= m.hours);
 }
 
-export function getNextMilestone(totalHours: number, program: 'barber' | 'cosmetology' = 'barber'): Milestone | null {
-  const list = program === 'cosmetology' ? COSMETOLOGY_MILESTONES : BARBER_MILESTONES;
+export function getNextMilestone(totalHours: number, program: ProgramKey = 'barber'): Milestone | null {
+  const list = MILESTONE_MAP[program] ?? BARBER_MILESTONES;
   return list.find(m => totalHours < m.hours) || null;
 }
 

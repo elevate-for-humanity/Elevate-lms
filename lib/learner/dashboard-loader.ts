@@ -23,6 +23,7 @@ export async function loadLearnerDashboard() {
   const supabase = await createClient();
 
   // ── 2. ENROLLMENTS (required) ──────────────────────────────────────
+  // program_enrollments has no FK to courses — fetch flat, then join manually.
   const { data: programEnrollments, error: enrollmentError } = await supabase
     .from('program_enrollments')
     .select(`
@@ -35,13 +36,7 @@ export async function loadLearnerDashboard() {
       progress,
       progress_percent,
       enrolled_at,
-      access_granted_at,
-      courses (
-        id,
-        title,
-        description,
-        duration_hours
-      )
+      access_granted_at
     `)
     .eq('user_id', user.id)
     .order('enrolled_at', { ascending: false });
@@ -50,6 +45,20 @@ export async function loadLearnerDashboard() {
     logger.error('loadLearnerDashboard: enrollments query failed', enrollmentError);
     throw new Error('ENROLLMENTS_LOAD_FAILED');
   }
+
+  // Fetch course details separately for enrollments that have a course_id
+  const enrollmentCourseIds = (programEnrollments ?? [])
+    .map((e) => e.course_id)
+    .filter(Boolean) as string[];
+
+  const { data: enrollmentCourses } = enrollmentCourseIds.length > 0
+    ? await supabase
+        .from('courses')
+        .select('id, title, description, duration_hours')
+        .in('id', enrollmentCourseIds)
+    : { data: [] };
+
+  const courseMap = new Map((enrollmentCourses ?? []).map((c: any) => [c.id, c]));
 
   // ── 3. TRAINING ENROLLMENTS (legacy, optional) ─────────────────────
   const { data: trainingEnrollments, error: trainingError } = await supabase
@@ -91,7 +100,12 @@ export async function loadLearnerDashboard() {
   const apMap = new Map((apprenticeshipPrograms ?? []).map((p: any) => [p.id, p]));
 
   const normalizedLegacy = (programEnrollments ?? []).map((e: any) => {
-    if (!e.courses && !e.course_id && e.program_id && apMap.has(e.program_id)) {
+    // Attach course details from the separately-fetched courses map
+    if (e.course_id && courseMap.has(e.course_id)) {
+      return { ...e, courses: courseMap.get(e.course_id) };
+    }
+    // Apprenticeship-only enrollment (no course_id) — use apprenticeship_programs name
+    if (!e.course_id && e.program_id && apMap.has(e.program_id)) {
       const ap = apMap.get(e.program_id);
       return {
         ...e,
@@ -170,7 +184,7 @@ export async function loadLearnerDashboard() {
   // ── 8. NOTIFICATIONS (optional) ───────────────────────────────────
   const { data: notifications } = await supabase
     .from('notifications')
-    .select('id, title, body, created_at, read')
+    .select('id, title, message, created_at, read')
     .eq('user_id', user.id)
     .eq('read', false)
     .order('created_at', { ascending: false })
@@ -268,7 +282,7 @@ export async function loadLearnerDashboard() {
   // ── 14. APPLICATIONS (for gate checks and diagnostic) ─────────────
   const { data: applications } = await supabase
     .from('applications')
-    .select('id, status, payment_status, program_id, requested_funding_source')
+    .select('id, status, payment_status, program_id, funding_type')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(10);
@@ -313,7 +327,7 @@ export async function loadLearnerDashboard() {
     (a) => a.payment_status === 'paid' && a.status !== 'enrolled'
   );
   if (paidApp) {
-    const { data: stripeSession } = await db
+    const { data: stripeSession } = await supabase
       .from('stripe_sessions_staging')
       .select('session_id')
       .eq('application_id', paidApp.id)

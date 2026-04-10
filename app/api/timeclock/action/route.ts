@@ -154,7 +154,7 @@ async function _POST(request: NextRequest) {
         site_name: site.name,
         action,
         distance_m: Math.round(distance),
-        radius_m: site.radius_m,
+        radius_m: site.radius_meters,
         lat,
         lng,
         timestamp: new Date().toISOString(),
@@ -164,7 +164,7 @@ async function _POST(request: NextRequest) {
         {
           error: 'Outside geofence',
           distance_m: Math.round(distance),
-          radius_m: site.radius_m,
+          radius_m: site.radius_meters,
         },
         { status: 403 }
       );

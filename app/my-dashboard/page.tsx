@@ -106,7 +106,7 @@ export default async function MyDashboardPage() {
     tabs.includes('trades') ? (async () => {
       const TARGETS: Record<string, number> = {
         'barber-apprenticeship': 2000,
-        cosmetology: 1500,
+        cosmetology: 2000,
         'nail-tech': 450,
         esthetician: 700,
       };

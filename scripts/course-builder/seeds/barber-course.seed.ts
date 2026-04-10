@@ -11,6 +11,6 @@ import { module8 } from './module-8.seed';
 export const barberCourse: CourseSeed = {
   slug: 'barber-apprenticeship',
   title: 'Indiana Registered Barber License — Apprenticeship Program',
-  hoursTotal: 12.5,
+  hoursTotal: 14.5, // computed: sum of all lesson + checkpoint hoursCredit
   modules: [module1, module2, module3, module4, module5, module6, module7, module8],
 };

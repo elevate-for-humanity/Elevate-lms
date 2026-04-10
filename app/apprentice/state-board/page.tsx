@@ -17,10 +17,11 @@ export const metadata: Metadata = {
 };
 
 const REQUIRED_HOURS: Record<string, number> = {
-  'cosmetology-apprenticeship':       1500,
+  'cosmetology-apprenticeship':       2000,
   'barber-apprenticeship':            2000,
   'esthetician-apprenticeship':        700,
-  'nail-technician-apprenticeship':    450,
+  'nail-tech-apprenticeship':          450,
+  'nail-technician-apprenticeship':    450, // legacy alias
 };
 
 export default async function StateBoardExamPage() {

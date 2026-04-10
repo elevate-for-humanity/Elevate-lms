@@ -3,6 +3,7 @@ import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import InteractiveDemoPlayer from '@/components/demo/InteractiveDemoPlayer';
 import { ADMIN_SCENES } from '@/lib/demo/scenes';
 
+
 export const metadata: Metadata = {
   title: 'Admin Portal Demo | Elevate for Humanity',
   description: 'Interactive walkthrough of the Elevate admin portal — enrollment, WIOA compliance, funding, and outcomes.',

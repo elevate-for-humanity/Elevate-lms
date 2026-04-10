@@ -1,25 +1,31 @@
-
+import type { Metadata } from 'next';
 import Image from 'next/image';
-import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { Clock, AlertTriangle } from 'lucide-react';
+import { DemoPageShell } from '@/components/demo/DemoPageShell';
 
-import { createClient } from '@/lib/supabase/server';
+export const metadata: Metadata = {
+  title: 'WIOA | Admin Demo | Elevate for Humanity',
+  robots: { index: false, follow: false },
+};
 
-export const dynamic = 'force-dynamic';
+const DEMO_PARTICIPANTS = [
+  { name: 'Marcus Johnson', title: 'Title I Adult', barriers: ['Low Income', 'Basic Skills Deficient'], ita: '$4,800', status: 'Active' },
+  { name: 'Destiny Williams', title: 'Title I Dislocated', barriers: ['Displaced Homemaker'], ita: '$6,200', status: 'Active' },
+  { name: 'Jamal Carter', title: 'Title I Adult', barriers: ['Ex-Offender', 'Low Income'], ita: '$4,800', status: 'Active' },
+  { name: 'Aaliyah Brooks', title: 'Title I Youth', barriers: ['In Foster Care'], ita: '$3,500', status: 'Pending Docs' },
+  { name: 'Devon Harris', title: 'Title I Adult', barriers: ['Homeless'], ita: '$4,800', status: 'Active' },
+  { name: 'Tanya Simmons', title: 'Title I Dislocated', barriers: ['Plant Closure'], ita: '$6,200', status: 'Active' },
+  { name: 'Robert King', title: 'Title I Adult', barriers: [], ita: '$4,800', status: 'Ineligible' },
+];
 
-export default async function DemoWioaPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('wioa_participants').select('*').limit(50);
-const participants = (dbRows as any[]) || [];
+export default function DemoWioaPage() {
 
   return (
     <DemoPageShell title="WIOA" description="WIOA eligibility, Individual Training Accounts, and participant tracking." portal="admin">
-      <div className="grid sm:grid-cols-3 gap-4 mb-6">
-
-      {/* Hero Image */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] mb-6">
         <Image src="/images/pages/demo-page-10.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
+      <div className="grid sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-xl border p-4">
           <div className="text-2xl font-bold text-gray-900">182</div>
           <div className="text-xs text-gray-500">WIOA Participants</div>
@@ -45,10 +51,10 @@ const participants = (dbRows as any[]) || [];
             </tr>
           </thead>
           <tbody>
-            {participants.map((p, i) => (
+            {DEMO_PARTICIPANTS.map((p, i) => (
               <tr key={i} className="border-b last:border-0 hover:bg-gray-50">
                 <td className="px-5 py-3 font-medium text-gray-900">{p.name}</td>
-                <td className="px-5 py-3 text-gray-600">{p.title}</td>
+                <td className="px-5 py-3 text-gray-600 text-xs">{p.title}</td>
                 <td className="px-5 py-3">
                   <div className="flex flex-wrap gap-1">
                     {p.barriers.map((b) => (
@@ -59,11 +65,11 @@ const participants = (dbRows as any[]) || [];
                 </td>
                 <td className="px-5 py-3 text-gray-600">{p.ita}</td>
                 <td className="px-5 py-3">
-                  <span className="flex items-center gap-1">
-                    {p.status === 'Active' && <span className="text-slate-400 flex-shrink-0">•</span>}
+                  <span className="flex items-center gap-1.5 text-xs">
+                    {p.status === 'Active'       && <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />}
                     {p.status === 'Pending Docs' && <Clock className="w-3.5 h-3.5 text-amber-500" />}
-                    {p.status === 'Ineligible' && <AlertTriangle className="w-3.5 h-3.5 text-brand-red-500" />}
-                    <span className="text-xs">{p.status}</span>
+                    {p.status === 'Ineligible'   && <AlertTriangle className="w-3.5 h-3.5 text-red-500" />}
+                    {p.status}
                   </span>
                 </td>
               </tr>

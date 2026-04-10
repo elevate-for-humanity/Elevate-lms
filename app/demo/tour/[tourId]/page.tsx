@@ -9,14 +9,17 @@ interface PageProps {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  // Demo pages are not indexed — gated behind requireDemo in layout
+  const baseRobots = { index: false, follow: false } as const;
   const { tourId } = await params;
   const tour = getTour(tourId as DemoLicenseType);
   
   if (!tour) {
-    return { title: 'Tour Not Found' };
+    return { title: 'Tour Not Found', robots: baseRobots };
   }
   
   return {
+    robots: baseRobots,
     title: `${tour.name} | Demo | Elevate LMS`,
     description: tour.description,
   };

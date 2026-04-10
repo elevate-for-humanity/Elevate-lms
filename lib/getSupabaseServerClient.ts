@@ -2,6 +2,6 @@
 // lib/getSupabaseServerClient.ts
 import { getAdminClient } from '@/lib/supabase/admin';
 
-export function await getAdminClient() {
+export async function getSupabaseServerClient() {
   return getAdminClient();
 }

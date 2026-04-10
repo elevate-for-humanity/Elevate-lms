@@ -8,12 +8,12 @@ export function getClientSupabase() {
 }
 
 /** @deprecated Use createClient() from '@/lib/supabase/server' instead. */
-export function getServerSupabase() {
+export async function getServerSupabase() {
   return getAdminClient();
 }
 
 /** @deprecated Use await getAdminClient() from '@/lib/supabase/admin' instead. */
-export function getAdminSupabase() {
+export async function getAdminSupabase() {
   return getAdminClient();
 }
 

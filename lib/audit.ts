@@ -17,7 +17,7 @@ export function getAuditTelemetry() {
   return { auditSuccessCount, auditFailureCount };
 }
 
-function onAuditFailure(context: string, error: unknown, event: Record<string, unknown>) {
+async function void onAuditFailure(context: string, error: unknown, event: Record<string, unknown>) {
   auditFailureCount++;
   const errorMessage = error instanceof Error ? error.message : String(error);
 
@@ -131,12 +131,12 @@ export async function logAuditEvent(event: AuditEvent): Promise<void> {
     const { error } = await supabase.from('audit_logs').insert(payload);
 
     if (error) {
-      onAuditFailure('logAuditEvent: DB insert rejected', error, payload);
+      void onAuditFailure('logAuditEvent: DB insert rejected', error, payload);
     } else {
       onAuditSuccess();
     }
   } catch (e) {
-    onAuditFailure('logAuditEvent: exception', e, payload);
+    void onAuditFailure('logAuditEvent: exception', e, payload);
   }
 }
 
@@ -391,7 +391,7 @@ export async function writeAdminAuditEvent(
       metadata: params.metadata ?? {},
     });
   } catch (e) {
-    onAuditFailure('writeAdminAuditEvent', e, {
+    void onAuditFailure('writeAdminAuditEvent', e, {
       action: params.action,
       target_type: params.target_type,
       target_id: params.target_id,

@@ -2,11 +2,11 @@
 import { getAdminClient } from '@/lib/supabase/admin';
 
 /** @deprecated Use await getAdminClient() from '@/lib/supabase/admin' instead. */
-export function supabaseServer() {
+export async function supabaseServer() {
   return getAdminClient();
 }
 
 /** @deprecated Use await getAdminClient() from '@/lib/supabase/admin' instead. */
-export function getSupabaseServerClient() {
+export async function getSupabaseServerClient() {
   return getAdminClient();
 }

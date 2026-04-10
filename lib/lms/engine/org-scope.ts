@@ -16,7 +16,7 @@ import { getAdminClient } from '@/lib/supabase/admin';
 
 // ─── Internal helper ──────────────────────────────────────────────────────────
 
-function requireDb(caller: string) {
+async function requireDb(caller: string) {
   const db = await getAdminClient();
   if (!db) throw new Error(`${caller}: admin client unavailable (missing service role key)`);
   return db;
@@ -74,7 +74,7 @@ export interface OrgReportFilters {
 // ─── getOrgPrograms ───────────────────────────────────────────────────────────
 
 export async function getOrgPrograms(organizationId: string): Promise<OrgProgram[]> {
-  const db = requireDb('getOrgPrograms');
+  const db = await requireDb('getOrgPrograms');
 
   const { data, error } = await db
     .from('program_organizations')
@@ -100,7 +100,7 @@ export async function getOrgPrograms(organizationId: string): Promise<OrgProgram
 // ─── getOrgCohorts ────────────────────────────────────────────────────────────
 
 export async function getOrgCohorts(organizationId: string): Promise<OrgCohort[]> {
-  const db = requireDb('getOrgCohorts');
+  const db = await requireDb('getOrgCohorts');
 
   const { data, error } = await db
     .from('cohorts')
@@ -132,7 +132,7 @@ export async function getOrgLearners(
   organizationId: string,
   cohortId?: string
 ): Promise<OrgLearner[]> {
-  const db = requireDb('getOrgLearners');
+  const db = await requireDb('getOrgLearners');
 
   let query = db
     .from('cohort_enrollments')
@@ -174,7 +174,7 @@ export async function getOrgLearners(
 export async function getOrgProgress(
   filters: OrgReportFilters
 ): Promise<OrgProgressSummary> {
-  const db = requireDb('getOrgProgress');
+  const db = await requireDb('getOrgProgress');
 
   const empty: OrgProgressSummary = {
     organizationId:     filters.organizationId,

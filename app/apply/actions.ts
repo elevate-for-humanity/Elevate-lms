@@ -74,6 +74,8 @@ async function createStudentAccount(
   lastName: string,
   programInterest: string,
   userPassword?: string,
+  profileRole: string = 'student',
+  onboardingPath: string = '/onboarding/learner',
 ): Promise<{ userId?: string; accountCreated: boolean; magicLink?: string | null; programId?: string | null }> {
   try {
     const normalizedEmail = email.toLowerCase().trim();
@@ -119,7 +121,7 @@ async function createStudentAccount(
           first_name: firstName,
           last_name: lastName,
           full_name: `${firstName} ${lastName}`,
-          role: 'student',
+          role: profileRole,
         }, { onConflict: 'id' });
       } else if (createError) {
         // User exists in auth but not profiles — look up directly by email
@@ -141,7 +143,7 @@ async function createStudentAccount(
               first_name: firstName,
               last_name: lastName,
               full_name: `${firstName} ${lastName}`,
-              role: 'student',
+              role: profileRole,
             }, { onConflict: 'id' }),
           ]);
         }
@@ -161,7 +163,7 @@ async function createStudentAccount(
       supabase.auth.admin.generateLink({
         type: 'magiclink',
         email: normalizedEmail,
-        options: { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/onboarding/learner` },
+        options: { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}${onboardingPath}` },
       }).catch((err: any) => { logger.warn('Could not generate magic link', err); return null; }),
     ]);
 
@@ -505,6 +507,24 @@ async function insertApplication(payload: {
       if (error) {
         logger.error(`[Application] DB insert failed for ${payload.email}`, new Error(error.message));
       } else {
+        // Derive the profile role and onboarding destination from the application source.
+        // These are passed into createStudentAccount so the profile is written correctly
+        // on first creation — no post-hoc correction needed.
+        const roleBySource: Record<string, string> = {
+          'student-application':        'student',
+          'employer-application':       'employer',
+          'staff-application':          'staff',
+          'program-holder-application': 'program_holder',
+        };
+        const onboardingBySource: Record<string, string> = {
+          'student-application':        '/onboarding/learner',
+          'employer-application':       '/onboarding/employer',
+          'staff-application':          '/onboarding/staff',
+          'program-holder-application': '/onboarding/program-holder',
+        };
+        const profileRole    = roleBySource[payload.source]    ?? 'student';
+        const onboardingPath = onboardingBySource[payload.source] ?? '/onboarding/learner';
+
         // Create auth account so the applicant can log in immediately.
         const accountResult = await createStudentAccount(
           supabase,
@@ -514,16 +534,9 @@ async function insertApplication(payload: {
           payload.lastName,
           payload.programInterest,
           payload.password,
+          profileRole,
+          onboardingPath,
         );
-
-        // Derive the profile role from the application source.
-        const roleBySource: Record<string, string> = {
-          'student-application': 'student',
-          'employer-application': 'employer',
-          'staff-application': 'staff',
-          'program-holder-application': 'program_holder',
-        };
-        const profileRole = roleBySource[payload.source] ?? 'student';
 
         // Application lands in admin queue as 'submitted' — admin reviews and approves.
         // Approval requires funding verification or a paid Stripe session before enrollment.

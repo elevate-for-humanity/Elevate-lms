@@ -98,7 +98,7 @@ export default function EmployerAgreementPage() {
           agreementType="employer_agreement"
           agreementVersion="1.0"
           buttonLabel="Sign Employer Agreement"
-          nextUrl="/employer/dashboard"
+          nextUrl="/onboarding/employer"
         />
       </DocumentPage>
     </>

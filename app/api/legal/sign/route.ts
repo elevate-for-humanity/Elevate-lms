@@ -8,7 +8,11 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-type AgreementType = 'eula' | 'tos' | 'aup' | 'disclosures' | 'license' | 'nda' | 'mou';
+// All values must match rows in the agreement_versions table.
+type AgreementType =
+  | 'eula' | 'tos' | 'aup' | 'disclosures' | 'license' | 'nda'
+  | 'mou' | 'employer_agreement' | 'staff_agreement' | 'program_holder_mou'
+  | 'enrollment' | 'handbook' | 'data_sharing' | 'ferpa' | 'participation';
 type SignatureMethod = 'checkbox' | 'typed' | 'drawn';
 
 interface SignRequest {

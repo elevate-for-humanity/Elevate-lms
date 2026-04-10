@@ -78,9 +78,11 @@ export async function runBarberPostPayment(
     } else {
       const profileId = profile.id;
 
-      // Find the barber program — program_enrollments.program_id FK references apprenticeship_programs
+      // Find the barber program — program_enrollments.program_id must reference programs.id,
+      // not apprenticeship_programs.id. The enrollment-status route fallback queries
+      // programs.id; writing apprenticeship_programs.id here breaks that lookup.
       const { data: program } = await db
-        .from('apprenticeship_programs')
+        .from('programs')
         .select('id')
         .eq('slug', BARBER_PROGRAM_SLUG)
         .maybeSingle();

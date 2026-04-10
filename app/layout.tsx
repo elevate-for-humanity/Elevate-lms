@@ -11,6 +11,7 @@ import { Inter } from 'next/font/google';
 import { GoogleAnalytics } from '@/components/analytics/google-analytics';
 import RootWidgets from './RootWidgets';
 import AdminPWAInit from '@/components/admin/AdminPWAInit';
+import PWAManager from '@/app/components/PWAManager';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -218,6 +219,7 @@ export default function RootLayout({
         <SkipToContent />
         <GoogleAnalytics />
         <AdminPWAInit />
+        <PWAManager />
         <PublicLayout>{children}</PublicLayout>
         <CookieConsent />
         <DMCATrackingPixel />

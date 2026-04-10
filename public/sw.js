@@ -1,6 +1,6 @@
 // Service Worker for Elevate for Humanity PWA
-// Version 3.0 - Fixed routing for SPA navigation
-const CACHE_VERSION = 'v6';
+// Version 4.0 - Re-enabled with deploy-time cache busting
+const CACHE_VERSION = 'v7';
 const STATIC_CACHE = `elevate-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `elevate-dynamic-${CACHE_VERSION}`;
 const COURSE_CACHE = `elevate-courses-${CACHE_VERSION}`;
@@ -360,4 +360,11 @@ self.addEventListener('notificationclose', (event) => {
   console.log('[SW] Notification closed:', event.notification.tag);
 });
 
-console.log('[SW] Service Worker v2 loaded');
+// Allow client to trigger immediate activation of waiting SW
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+console.log('[SW] Service Worker v7 loaded');

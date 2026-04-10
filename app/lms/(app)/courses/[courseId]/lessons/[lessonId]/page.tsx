@@ -55,7 +55,7 @@ function hvacDefIdFromSlug(slug: string): string | undefined {
 import { transformLessonContent, isAiJsonBlob } from '@/lib/lms/transformLessonContent';
 import { HVAC_COURSE_ID } from '@/lib/courses/hvac-uuids';
 
-const BARBER_COURSE_ID = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';
+const BARBER_COURSE_ID = BARBER_COURSE_ID;
 
 /**
  * Resolve a barber lesson video URL.
@@ -92,6 +92,7 @@ import SpacedRepetitionReview from '@/components/lms/SpacedRepetitionReview';
 import LessonActivityMenu from '@/components/lms/LessonActivityMenu';
 import { getActivitiesForLesson, getDefaultActivity } from '@/lib/lms/activity-map';
 import type { ActivityId } from '@/lib/lms/activity-map';
+import { BARBER_PROGRAM_ID, BARBER_COURSE_ID } from '@/lib/barber/pricing';
 
 const LessonVideoWithSimulation = dynamic(
   () => import('@/components/lms/LessonVideoWithSimulation'),

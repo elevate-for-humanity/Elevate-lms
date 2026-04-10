@@ -383,7 +383,7 @@ export default function MonitoringDashboard() {
                 <div>
                   <div className="text-sm text-black">Usage</div>
                   <div className="text-2xl font-bold text-brand-blue-600">
-                    {((status.metrics.memory.used / status.metrics.memory.total) * 100).toFixed(1)}%
+                    {status.metrics.memory.total > 0 ? ((status.metrics.memory.used / status.metrics.memory.total) * 100).toFixed(1) : '0.0'}%
                   </div>
                 </div>
               </div>

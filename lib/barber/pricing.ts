@@ -6,6 +6,10 @@
  *   Only custom_setup_fee is user-selectable, and it is server-clamped here.
  *   No other file may define or derive barber tuition amounts.
  *
+ * Program/course IDs — single source of truth.
+ *   Do not hardcode these UUIDs in checkout routes or page components.
+ *   Import BARBER_PROGRAM_ID and BARBER_COURSE_ID from here instead.
+ *
  * If this policy changes, update:
  *   - All four Stripe session creation routes in app/api/barber/checkout/
  *   - Email templates in app/api/barber/webhook/route.ts
@@ -14,6 +18,12 @@
  */
 
 /** Full program tuition in cents. Never derived from hours, ratios, or client input. */
+/** Barber Apprenticeship program_id in the programs table */
+export const BARBER_PROGRAM_ID = '5ff21fcb-1968-41fd-99d3-37d69a31bd5c';
+
+/** Barber Apprenticeship course_id in the courses/training_courses table */
+export const BARBER_COURSE_ID = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';
+
 export const TUITION_CENTS = 498000; // $4,980
 
 /** Full program tuition in dollars. */

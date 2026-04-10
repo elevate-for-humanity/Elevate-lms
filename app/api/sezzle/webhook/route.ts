@@ -23,6 +23,7 @@ import { BARBER_PRICING } from '@/lib/programs/pricing';
 import crypto from 'crypto';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import * as Sentry from '@sentry/nextjs';
+import { BARBER_PROGRAM_ID, BARBER_COURSE_ID } from '@/lib/barber/pricing';
 
 interface SezzleWebhookEvent {
   event_id: string;
@@ -335,7 +336,7 @@ async function handleOrderCaptured(event: SezzleWebhookEvent, supabase: any) {
       programId: programId,
       programSlug: programSlug,
       courseId: programSlug === 'barber-apprenticeship'
-        ? '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17'
+        ? BARBER_COURSE_ID
         : undefined,
       email: customer.email,
       firstName: customer.first_name,
@@ -394,7 +395,7 @@ async function handleOrderCaptured(event: SezzleWebhookEvent, supabase: any) {
           payment_status: 'paid',
           activated_at: new Date().toISOString(),
           ...(programSlug === 'barber-apprenticeship'
-            ? { course_id: '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17' }
+            ? { course_id: BARBER_COURSE_ID }
             : {}),
         })
         .eq('id', payment.enrollment_id);

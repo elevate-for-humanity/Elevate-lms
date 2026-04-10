@@ -15,6 +15,7 @@ import {
 } from '@/lib/stripe/webhook-schemas';
 
 import { withRuntime } from '@/lib/api/withRuntime';
+import { BARBER_PROGRAM_ID, BARBER_COURSE_ID } from '@/lib/barber/pricing';
 
 const LMS_URL =
   (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org') + '/lms/courses';
@@ -478,13 +479,13 @@ ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive ev
               .select('id')
               .eq('slug', 'barber-apprenticeship')
               .single();
-            resolvedProgramId = prog?.id || '5ff21fcb-1968-41fd-99d3-37d69a31bd5c';
+            resolvedProgramId = prog?.id || BARBER_PROGRAM_ID;
           }
           const enrollResult = await createOrUpdateEnrollment(supabase, {
             userId: null as unknown as string, // linked by email post-signup
             programId: resolvedProgramId,
             programSlug: 'barber-apprenticeship',
-            courseId: '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17',
+            courseId: BARBER_COURSE_ID,
             fundingSource: 'self_pay',
             amountPaidCents,
             stripeCheckoutSessionId: session.id,

@@ -8,6 +8,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { BARBER_PROGRAM_ID, BARBER_COURSE_ID } from '@/lib/barber/pricing';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -156,7 +157,7 @@ async function _POST(req: Request) {
           payment_status: 'paid',
           stripe_checkout_session_id: sessionId,
           ...(programSlug === 'barber-apprenticeship'
-            ? { course_id: '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17' }
+            ? { course_id: BARBER_COURSE_ID }
             : {}),
         })
         .eq('id', enrollmentId);
@@ -171,7 +172,7 @@ async function _POST(req: Request) {
           payment_status: 'paid',
           stripe_checkout_session_id: sessionId,
           ...(programSlug === 'barber-apprenticeship'
-            ? { course_id: '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17' }
+            ? { course_id: BARBER_COURSE_ID }
             : {}),
         })
         .select('id')

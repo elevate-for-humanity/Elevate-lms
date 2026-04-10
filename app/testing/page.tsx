@@ -40,7 +40,7 @@ export default function TestingPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-48 md:h-64 overflow-hidden">
+      <section className="relative h-[45vh] md:h-[55vh] min-h-[280px] max-h-[520px] overflow-hidden">
         <Image
           src="/images/pages/career-services-page-1.jpg"
           alt="Workforce credential testing"

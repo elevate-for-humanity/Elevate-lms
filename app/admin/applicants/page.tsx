@@ -1,8 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -18,10 +16,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ApplicantsPage() {
-  // Auth check via session client
-  const sessionClient = await createClient();
-
-  // All data queries use admin client to bypass RLS
+  // Auth enforced by app/admin/layout.tsx (requireAdmin)
   const supabase = await getAdminClient();
 
   const { data: applications, count: totalApplications } = await supabase

@@ -1,4 +1,5 @@
-import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 /**
  * Partner queries read enrollments/certificates for OTHER users (placed students).
@@ -8,9 +9,11 @@ import { createClient, createAdminClient } from '@/lib/supabase/server';
  * Falls back to session client if service role key is unavailable (dev environments).
  */
 async function getPartnerClient() {
-  const admin = createAdminClient();
-  if (admin) return admin;
-  return await createClient();
+  try {
+    return await getAdminClient();
+  } catch {
+    return await createClient();
+  }
 }
 
 export interface PartnerStudent {

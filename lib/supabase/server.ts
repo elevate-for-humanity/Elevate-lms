@@ -126,6 +126,7 @@ export function createPublicClient(): SupabaseClient<any> {
   }
 }
 
-// createAdminClient is the canonical export from '@/lib/supabase/admin'.
-// Re-exported here for callers that import from '@/lib/supabase/server' directly.
-export { createAdminClient } from '@/lib/supabase/admin';
+// createAdminClient was previously re-exported here for backward compatibility.
+// All call sites have been migrated to import getAdminClient() directly from
+// '@/lib/supabase/admin'. This re-export is intentionally removed to prevent
+// new code from bypassing the deprecation boundary.

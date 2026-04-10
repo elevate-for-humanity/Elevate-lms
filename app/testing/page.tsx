@@ -1,11 +1,10 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { TESTING_CENTER } from '@/lib/testing/testing-config';
+import { TESTING_CENTER, CALENDLY_CONFIG } from '@/lib/testing/testing-config';
 import Image from 'next/image';
 import { CalendarDays, DollarSign, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ACTIVE_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
-import { CALENDLY_CONFIG } from '@/lib/testing/testing-config';
 
 export const metadata: Metadata = {
   title: 'Testing & Credential Exams | Elevate for Humanity',
@@ -79,7 +78,7 @@ export default function TestingPage() {
                 <strong>Important Notice:</strong> Elevate for Humanity is an authorized testing and proctoring site — we do not issue credentials. All certifications and credentials are issued solely by the respective credentialing authority (NHA, ACT, Certiport, EPA/ESCO, NRF, etc.) upon passing their exam.
               </p>
               <p>
-                Exam fees listed are candidate-pay rates and are subject to change without notice. Fees are collected at time of booking and are <strong>non-refundable</strong> unless the exam is canceled by Elevate. Workforce-funded candidates (WIOA, WorkOne) may have fees covered — contact us before booking.
+                Exam fees listed are candidate-pay rates and are subject to change without notice. Fees are collected at time of booking and are <strong>non-refundable</strong> unless the exam is canceled by Elevate. {TESTING_CENTER.policy.workforceFunding}
               </p>
               <p>
                 Passing an exam does not guarantee employment. Credential requirements vary by employer and state. Some credentials require additional state licensure.{' '}
@@ -94,8 +93,8 @@ export default function TestingPage() {
       <section className="py-14">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl font-black text-slate-900 mb-2">Available Credential Exams</h2>
-          <p className="text-slate-500 mb-4 text-sm">All exams are proctored. Most are administered in-person at our Indianapolis testing center. Some providers (such as Certiport) also support remote proctoring through their own systems. All exam fees are set by the credentialing provider and may change without notice.</p>
-          <p className="text-slate-500 mb-10 text-sm font-medium">By appointment only — walk-ins are not accepted. Government-issued photo ID required. Arrive at least 15 minutes before your scheduled time.</p>
+          <p className="text-slate-500 mb-4 text-sm">All exams are proctored. Most are administered in-person at the {TESTING_CENTER.name}. Some providers support remote proctoring through their own systems. All exam fees are set by the credentialing provider and may change without notice.</p>
+          <p className="text-slate-500 mb-10 text-sm font-medium">{TESTING_CENTER.policy.noWalkIns} {TESTING_CENTER.policy.idRequired} Arrive at least {TESTING_CENTER.policy.arriveMinutesBefore} minutes before your scheduled time.</p>
 
           <div className="space-y-10">
             {ACTIVE_PROVIDERS.map((provider) => (
@@ -201,7 +200,7 @@ export default function TestingPage() {
             <h2 className="text-3xl font-black text-slate-900">Fee Summary</h2>
           </div>
           <p className="text-slate-500 mb-8 text-sm max-w-2xl">
-            All fees include the exam and proctoring. Workforce-funded candidates may have fees covered — contact us before booking.
+            All fees include the exam and proctoring. {TESTING_CENTER.policy.workforceFunding}
           </p>
           <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
             <table className="w-full text-sm">
@@ -240,8 +239,8 @@ export default function TestingPage() {
           <h2 className="text-3xl font-black text-slate-900 mb-8 text-center">How Testing Works</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { step: '1', title: 'Book Your Seat',        img: '/images/pages/academic-calendar-hero.jpg',    desc: 'Select your exam and preferred date. Pay the exam fee at booking to reserve your seat. Appointments required — walk-ins are not accepted.' },
-              { step: '2', title: 'Arrive Prepared',       img: '/images/pages/apply-page-1.jpg',              desc: 'Arrive at least 15 minutes early. Bring a valid government-issued photo ID. No ID, no exam — no exceptions.' },
+              { step: '1', title: 'Book Your Seat',        img: '/images/pages/academic-calendar-hero.jpg',    desc: `Select your exam and preferred date. Pay the exam fee at booking to reserve your seat. ${TESTING_CENTER.policy.noWalkIns}` },
+              { step: '2', title: 'Arrive Prepared',       img: '/images/pages/apply-page-1.jpg',              desc: `Arrive at least ${TESTING_CENTER.policy.arriveMinutesBefore} minutes early. ${TESTING_CENTER.policy.idRequired} No ID, no exam — no exceptions.` },
               { step: '3', title: 'Take the Exam',         img: '/images/pages/testing-page-1.jpg',            desc: 'All exams are proctored. No phones or outside materials unless explicitly permitted by the provider.' },
               { step: '4', title: 'Receive Your Credential', img: '/images/pages/certificates-page-1.jpg',     desc: 'Results and credentials are issued directly by the certifying body. Elevate records your outcome for your training record.' },
             ].map((s) => (
@@ -307,7 +306,7 @@ export default function TestingPage() {
               Book a Testing Session
             </Link>
             <a
-              href="tel:3173143757"
+              href={`tel:${TESTING_CENTER.phone.replace(/\D/g, '')}`}
               className="inline-flex items-center gap-2 border-2 border-slate-300 hover:border-slate-400 text-slate-700 px-8 py-4 rounded-full font-bold text-lg transition-colors"
             >
               {TESTING_CENTER.phone}

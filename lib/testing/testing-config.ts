@@ -14,6 +14,14 @@ export const TESTING_CENTER = {
     name:  'Alberta Davis',
     title: 'Testing Center Coordinator',
   },
+  policy: {
+    arriveMinutesBefore: 15,
+    appointmentOnly: true,
+    idRequired: 'Government-issued photo ID required.',
+    noWalkIns: 'By appointment only — walk-ins are not accepted.',
+    cancellationPolicy: 'Fees are non-refundable unless the exam is canceled by Elevate.',
+    workforceFunding: 'Workforce-funded candidates (WIOA, WorkOne) may have fees covered — contact us before booking.',
+  },
 } as const;
 
 /**

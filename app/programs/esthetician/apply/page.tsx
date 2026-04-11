@@ -23,7 +23,7 @@ const FUNDING_OPTIONS: { value: FundingType; label: string; desc: string; badge?
   {
     value: 'self_pay',
     label: 'Self-Pay',
-    desc: 'Pay out of pocket. Full payment ($2,800) or 35% deposit ($980) + payment plan.',
+    desc: 'Pay out of pocket. Full payment ($6,000) or 35% deposit ($2,100) + payment plan.',
   },
   {
     value: 'unsure',
@@ -208,14 +208,14 @@ export default function EstheticianApplyPage() {
                   <input type="radio" name="paymentPlan" value="deposit" checked={paymentPlan === 'deposit'} onChange={() => setPaymentPlan('deposit')} className="mt-0.5 accent-slate-900" />
                   <div>
                     <p className="text-xs font-semibold text-slate-900">35% Deposit + Payment Plan</p>
-                    <p className="text-xs text-slate-500 mt-0.5">$980 today, then 6 monthly payments of $303. Total: $2,800.</p>
+                    <p className="text-xs text-slate-500 mt-0.5">$2,100 today, then 6 monthly payments of $650. Total: $6,000.</p>
                     <p className="text-xs text-green-700 font-medium mt-1">BNPL eligible — Klarna, Afterpay, Zip, Affirm</p>
                   </div>
                 </label>
                 <label className={`flex items-start gap-3 rounded-xl border p-3 cursor-pointer bg-white ${paymentPlan === 'full' ? 'border-slate-900' : 'border-slate-200'}`}>
                   <input type="radio" name="paymentPlan" value="full" checked={paymentPlan === 'full'} onChange={() => setPaymentPlan('full')} className="mt-0.5 accent-slate-900" />
                   <div>
-                    <p className="text-xs font-semibold text-slate-900">Pay in Full — $2,800</p>
+                    <p className="text-xs font-semibold text-slate-900">Pay in Full — $6,000</p>
                     <p className="text-xs text-slate-500 mt-0.5">Card, bank transfer, or BNPL accepted.</p>
                   </div>
                 </label>

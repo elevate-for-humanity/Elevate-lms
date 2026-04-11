@@ -93,7 +93,7 @@ export const STRIPE_PRICE_IDS: Record<string, string> = {
   // CDL Program & Included Courses
   // These courses are included FREE with CDL program enrollment
   // ============================================================================
-  "cdl-training-program": "price_1Sw0KEIRNf5vPH3A0v7RlAZK", // $4,999 CDL Training Program
+  "cdl-training-program": "price_1TL78oH4a2yrVOt5j3W2RODU", // $5,000 CDL Training Program
   
   // CDL-Included NDS Courses (bundled with CDL program - no separate price)
   // These are tracked as products but don't have individual prices
@@ -110,22 +110,23 @@ export const STRIPE_PRICE_IDS: Record<string, string> = {
   
   // Healthcare Programs
   "cna-certification-program": "price_1Sw0MjIRNf5vPH3AsbrosRzm", // $1,200
-  "medical-assistant-program": "price_1Sw0MiIRNf5vPH3AKrl1byt4", // $4,200
+  "medical-assistant-program": "price_1TL78pH4a2yrVOt5e1fNELc1", // $5,000
   "phlebotomy-technician-program": "price_1Sw0MoIRNf5vPH3AkuXr8MH2", // $1,305
   "home-health-aide-program": "price_1Sw0MvIRNf5vPH3AVqaHbVEk", // $4,700
   "emergency-health-safety-program": "price_1Sw0MvIRNf5vPH3A9fiqsHgk", // $4,750
   
   // Skilled Trades Programs
   "hvac-technician-program": "price_1Sw0MiIRNf5vPH3AtfgR47tM", // $5,500
-  "building-maintenance-program": "price_1Sw0MoIRNf5vPH3AlfgIkzex", // $3,800
+  "building-maintenance-program": "price_1TL78qH4a2yrVOt5pPwKb1FN", // $5,000
   "welding-certification-program": "price_1Sw0N1IRNf5vPH3AxgRLR0Tc", // $4,999
-  "electrical-apprenticeship-program": "price_1Sw0N2IRNf5vPH3AUJiE2wcx", // $4,999
+  "electrical-apprenticeship-program": "price_1TL78qH4a2yrVOt5sMge9iWo", // $5,000
   "plumbing-apprenticeship-program": "price_1Sw0N7IRNf5vPH3AKxaVMVu7", // $4,999
   
   // Beauty & Cosmetology Programs
   "barber-apprenticeship-program": "price_1Sw0MiIRNf5vPH3AQm0MtqGP", // $4,980
-  "cosmetology-apprenticeship-program": "price_1Sw0N8IRNf5vPH3ACCquL2DS", // $4,999
-  "esthetician-apprenticeship-program": "price_1Sw0MvIRNf5vPH3AQmARwmN1", // $2,800
+  "cosmetology-apprenticeship-program": "price_1TL78oH4a2yrVOt55kVJPUm4", // $6,000
+  "esthetician-apprenticeship-program": "price_1TL78nH4a2yrVOt5nF6hrDxl", // $6,000
+  "nail-technician-apprenticeship-program": "price_1TL78mH4a2yrVOt5V1FmZlrB", // $5,000
   "beauty-career-educator-program": "price_1Sw0MpIRNf5vPH3AoiFUXQUY", // $4,575
   
   // Transportation Programs
@@ -166,44 +167,48 @@ export const STRIPE_PRICE_IDS: Record<string, string> = {
   "hvac-installment": "price_1Sw3YjIRNf5vPH3AQHvq4yd1", // $596
   
   // CDL Training - $5,000 = $1,750 (35%) + $542 × 6
-  "cdl-deposit": "price_1Sw3XsIRNf5vPH3AHXKqZ6OI", // $1,750
+  "cdl-deposit": "price_1TL78pH4a2yrVOt5C5MpaAtq", // $1,750
   "cdl-installment": "price_1Sw3YjIRNf5vPH3AxkT8PNbx", // $542
-  
-  // Cosmetology - $4,999 = $1,750 (35%) + $542 × 6
-  "cosmetology-deposit": "price_1Sw3Y2IRNf5vPH3AAJoD2ghz", // $1,750
-  "cosmetology-installment": "price_1Sw3YqIRNf5vPH3AAB0Obzjp", // $542
-  
-  // Esthetician - $2,800 = $980 (35%) + $303 × 6
-  "esthetician-deposit": "price_1TL6npH4a2yrVOt5MFmM27b3", // $980 (new live price)
-  "esthetician-installment": "price_1Sw3YqIRNf5vPH3AOC6VVohj", // $303
-  
-  // Medical Assistant - $4,200 = $1,470 (35%) + $455 × 6
-  "medical-assistant-deposit": "price_1Sw3Y3IRNf5vPH3AXRggDlJi", // $1,470
-  "medical-assistant-installment": "price_1Sw3YrIRNf5vPH3ANZfn2u9m", // $455
-  
+
+  // Cosmetology - $6,000 = $2,100 (35%) + $650 × 6
+  "cosmetology-deposit": "price_1TL78oH4a2yrVOt5s3YPcgck", // $2,100
+  "cosmetology-installment": "price_1Sw3YqIRNf5vPH3AAB0Obzjp", // $650 (TODO: update to $650 in Stripe Dashboard)
+
+  // Esthetician - $6,000 = $2,100 (35%) + $650 × 6
+  "esthetician-deposit": "price_1TL78nH4a2yrVOt5DsjMkXwl", // $2,100
+  "esthetician-installment": "price_1Sw3YqIRNf5vPH3AOC6VVohj", // $650 (TODO: update to $650 in Stripe Dashboard)
+
+  // Nail Technician - $5,000 = $1,750 (35%) + $542 × 6
+  "nail-technician-deposit": "price_1TL78mH4a2yrVOt5UCtbaZ6c", // $1,750
+  "nail-technician-installment": "price_1Sw3YqIRNf5vPH3AAB0Obzjp", // $542 (TODO: create in Stripe Dashboard)
+
+  // Medical Assistant - $5,000 = $1,750 (35%) + $542 × 6
+  "medical-assistant-deposit": "price_1TL78pH4a2yrVOt5HYh0t4JF", // $1,750
+  "medical-assistant-installment": "price_1Sw3YrIRNf5vPH3ANZfn2u9m", // $542 (TODO: update in Stripe Dashboard)
+
   // Welding - $4,999 = $1,750 (35%) + $542 × 6
   "welding-deposit": "price_1Sw3Y3IRNf5vPH3A30fWmtg3", // $1,750
   "welding-installment": "price_1Sw3YrIRNf5vPH3Ap1OsYkwq", // $542
-  
-  // Electrical - $4,999 = $1,750 (35%) + $542 × 6
-  "electrical-deposit": "price_1Sw3YEIRNf5vPH3AY5GRReaX", // $1,750
+
+  // Electrical - $5,000 = $1,750 (35%) + $542 × 6
+  "electrical-deposit": "price_1TL78qH4a2yrVOt52WqyvdBm", // $1,750
   "electrical-installment": "price_1Sw3Z3IRNf5vPH3AYxrQp4HL", // $542
-  
+
   // Plumbing - $4,999 = $1,750 (35%) + $542 × 6
   "plumbing-deposit": "price_1Sw3YEIRNf5vPH3AIeqemem8", // $1,750
   "plumbing-installment": "price_1Sw3Z4IRNf5vPH3AboQGZeSP", // $542
-  
+
   // IT Support - $4,499 = $1,575 (35%) + $487 × 6
   "it-support-deposit": "price_1Sw3YFIRNf5vPH3AULx56Eyc", // $1,575
   "it-support-installment": "price_1Sw3Z4IRNf5vPH3AEzQRlqTJ", // $487
-  
+
   // Cybersecurity - $4,499 = $1,575 (35%) + $487 × 6
   "cybersecurity-deposit": "price_1Sw3YFIRNf5vPH3AqtXyw81e", // $1,575
   "cybersecurity-installment": "price_1Sw3Z4IRNf5vPH3AIpbLLryI", // $487
-  
-  // Building Maintenance - $3,800 = $1,330 (35%) + $412 × 6
-  "building-maintenance-deposit": "price_1Sw3YFIRNf5vPH3AxAChyphR", // $1,330
-  "building-maintenance-installment": "price_1Sw3Z5IRNf5vPH3Av1R9U6qa", // $412
+
+  // Building Maintenance - $5,000 = $1,750 (35%) + $542 × 6
+  "building-maintenance-deposit": "price_1TL78rH4a2yrVOt50iYCGjXu", // $1,750
+  "building-maintenance-installment": "price_1Sw3Z5IRNf5vPH3Av1R9U6qa", // $542 (TODO: update in Stripe Dashboard)
 };
 
 // ============================================================================
@@ -229,16 +234,16 @@ export const PAYMENT_LINKS = {
     deposit: "https://buy.stripe.com/bJe6oHgLK1EG4NZdjHgIo04", // $600 (min deposit)
   },
   
-  // Cosmetology - $4,999
+  // Cosmetology - $6,000
   cosmetology: {
-    full: "https://buy.stripe.com/14AeVedVU3f98586Cb8EN0f", // $4,999
-    deposit: "https://buy.stripe.com/4gMcN63hg4jd99c8Kj8EN0s", // $1,750 (35%)
+    full: "https://buy.stripe.com/9B600jbrq1EGdkvgvTgIo09", // $6,000
+    deposit: "https://buy.stripe.com/fZu00j2UUdnofsDcfDgIo0a", // $2,100 (35%)
   },
-  
-  // Nail Technician - $2,490
+
+  // Nail Technician - $5,000
   nailTech: {
-    full: "https://buy.stripe.com/4gM5kEdVU8ztetwbWv8EN0L", // $2,490
-    deposit: "https://buy.stripe.com/8x25kE6ts9DxfxAgcL8EN0M", // $872 (35%)
+    full: "https://buy.stripe.com/bJedR91QQgzAfsD0wVgIo05", // $5,000
+    deposit: "https://buy.stripe.com/cNicN52UU4QS4NZ1AZgIo06", // $1,750 (35%)
   },
   
   // ============================================================================
@@ -255,14 +260,18 @@ export const PAYMENT_LINKS = {
     free: "https://buy.stripe.com/fZu3cw3hg2b5bhk0dN8EN0B",
   },
   
-  // CDL Training - FREE (WIOA)
+  // CDL Training - $5,000 self-pay / FREE (WIOA)
   cdl: {
-    free: "https://buy.stripe.com/7sYfZi198bLFfxA6Cb8EN0C",
+    free: "https://buy.stripe.com/7sYfZi198bLFfxA6Cb8EN0C", // $0 WIOA
+    full: "https://buy.stripe.com/00w28r0MM3MObcnenLgIo0b", // $5,000
+    deposit: "https://buy.stripe.com/7sYaEX1QQers0xJ93rgIo0c", // $1,750 (35%)
   },
-  
-  // Medical Assistant - FREE (WIOA)
+
+  // Medical Assistant - $5,000 self-pay / FREE (WIOA)
   medicalAssistant: {
-    free: "https://buy.stripe.com/eVq4gAdVU02X5X04u38EN0D",
+    free: "https://buy.stripe.com/eVq4gAdVU02X5X04u38EN0D", // $0 WIOA
+    full: "https://buy.stripe.com/7sYeVd1QQ5UW0xJ0wVgIo0d", // $5,000
+    deposit: "https://buy.stripe.com/3cI6oH3YY1EG5S37ZngIo0e", // $1,750 (35%)
   },
   
   // Welding - FREE (WIOA)
@@ -270,9 +279,11 @@ export const PAYMENT_LINKS = {
     free: "https://buy.stripe.com/3cIcN6054aHB2KO2lV8EN0E",
   },
   
-  // Electrical - FREE (WIOA)
+  // Electrical - $5,000 self-pay / FREE (WIOA)
   electrical: {
-    free: "https://buy.stripe.com/8x2dRaaJI171etwd0z8EN0F",
+    free: "https://buy.stripe.com/8x2dRaaJI171etwd0z8EN0F", // $0 WIOA
+    full: "https://buy.stripe.com/6oU14n6765UW94fgvTgIo0f", // $5,000
+    deposit: "https://buy.stripe.com/aFa7sL3YYdno80bgvTgIo0g", // $1,750 (35%)
   },
   
   // Plumbing - FREE (WIOA)
@@ -290,16 +301,18 @@ export const PAYMENT_LINKS = {
     free: "https://buy.stripe.com/5kQbJ26ts02X3OSaSr8EN0I",
   },
   
-  // Building Maintenance - FREE (WIOA)
+  // Building Maintenance - $5,000 self-pay / FREE (WIOA)
   buildingMaintenance: {
-    free: "https://buy.stripe.com/eVqaEY6ts8ztgBEbWv8EN0J",
+    free: "https://buy.stripe.com/eVqaEY6ts8ztgBEbWv8EN0J", // $0 WIOA
+    full: "https://buy.stripe.com/8x2fZhdzy1EG0xJ0wVgIo0h", // $5,000
+    deposit: "https://buy.stripe.com/4gMbJ1brqgzA5S31AZgIo0i", // $1,750 (35%)
   },
   
-  // Esthetician - FREE (WIOA) + Self-Pay ($2,800)
+  // Esthetician - FREE (WIOA) + Self-Pay ($6,000)
   esthetician: {
     free: "https://buy.stripe.com/9B6aEY6ts9Dx4SW6Cb8EN0K", // $0 WIOA
-    full: "https://buy.stripe.com/dRmaEX0MMabc80b6VjgIo02", // $2,800 self-pay full
-    deposit: "https://buy.stripe.com/9B628ranmcjkbcn1AZgIo03", // $980 (35% deposit)
+    full: "https://buy.stripe.com/6oUbJ16762IK1BN1AZgIo07", // $6,000 self-pay full
+    deposit: "https://buy.stripe.com/fZu4gzbrq2IK5S32F3gIo08", // $2,100 (35% deposit)
   },
 
   // Peer Recovery Specialist - $5,000 self-pay (WIOA also available)

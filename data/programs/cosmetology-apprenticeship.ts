@@ -17,7 +17,7 @@ export const COSMETOLOGY: ProgramSchema = {
   schedule: 'Full-time, Mon–Sat (varies by salon)',
   cohortSize: '1–3 apprentices per salon',
   fundingStatement: 'Earn while you learn — paid apprenticeship',
-  selfPayCost: '$0 (apprenticeship model)',
+  selfPayCost: '$6,000',
   badge: 'Earn & Learn',
   badgeColor: 'purple',
   credentials: [

@@ -97,13 +97,13 @@ export const PROGRAM_TUITION: ProgramTuition[] = [
   {
     programId: 'prog-esthetics-apprentice',
     programName: 'Esthetics Apprenticeship',
-    tuitionAmount: 4200,
+    tuitionAmount: 6000,
     registrationFee: 150,
     internalPlan: {
-      minDownPayment: 850,
-      downPaymentPercent: 20,
+      minDownPayment: 2100,
+      downPaymentPercent: 35,
       maxTermMonths: 6,
-      monthlyPayment: 558, // ($4200 - $850) / 6
+      monthlyPayment: 650, // ($6000 - $2100) / 6
     },
   },
 ];
@@ -535,15 +535,15 @@ export const TUITION_PRODUCTS: TuitionProduct[] = [
   {
     programId: 'prog-esthetics-apprentice',
     programName: 'Esthetics Apprenticeship',
-    totalTuition: 4200,
+    totalTuition: 6000,
     registrationFee: 150,
     payInFull: {
-      amount: 4200,
+      amount: 6000,
       discount: 0,
     },
     installmentPlan: {
-      depositAmount: 850,
-      weeklyAmount: 140, // ($4200 - $850) / 24 weeks
+      depositAmount: 2100,
+      weeklyAmount: 163, // ($6000 - $2100) / 24 weeks
       numberOfWeeks: 24,
       totalPayments: 24,
     },

@@ -18,7 +18,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   eveningSchedule: 'Evening cohorts available for working adults.',
   cohortSize: '10–15 participants per cohort',
   fundingStatement: '$0 with WIOA or Next Level Jobs funding',
-  selfPayCost: '$5,500',
+  selfPayCost: '$5,000',
   badge: 'Funding Available',
   badgeColor: 'green',
   credentials: [

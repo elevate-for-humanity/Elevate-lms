@@ -7,7 +7,7 @@ export const NAIL_TECH: ProgramSchema = {
   deliveryMode: 'in-person', durationWeeks: 20, hoursPerWeekMin: 25, hoursPerWeekMax: 30,
   hoursBreakdown: { onlineInstruction: 60, handsOnLab: 450, examPrep: 40, careerPlacement: 50 },
   schedule: 'Mon–Fri, varies by salon (25–30 hrs/week)', cohortSize: '1–3 apprentices per salon',
-  fundingStatement: 'Earn while you learn — paid apprenticeship', selfPayCost: '$0 (apprenticeship model)',
+  fundingStatement: 'Earn while you learn — paid apprenticeship', selfPayCost: '$5,000',
   badge: 'Earn & Learn', badgeColor: 'purple',
   credentials: [
     { name: 'Indiana Nail Technician License', issuer: 'Indiana Professional Licensing Agency (IPLA)', description: 'State license to practice nail technology in Indiana.', validity: 'Renewable every 4 years' },

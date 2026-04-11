@@ -136,7 +136,7 @@ export const STRIPE_PRICE_IDS: Record<string, string> = {
   "cybersecurity-program": "price_1Sw0N8IRNf5vPH3A6NdTRo3a", // $4,499
   
   // Human Services Programs
-  "peer-recovery-coach-program": "price_1Sw0MpIRNf5vPH3AovSyk3Z9", // $2,500
+  "peer-recovery-coach-program": "price_1Sw0MpIRNf5vPH3AovSyk3Z9", // TODO: replace with $5,000 price ID from Stripe Dashboard
   "public-safety-reentry-program": "price_1Sw0N1IRNf5vPH3AU4qwlgnV", // $4,325
   "drug-collector-certification-program": "price_1Sw0N1IRNf5vPH3ASlJFEiv8", // $4,750
   

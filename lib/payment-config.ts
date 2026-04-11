@@ -301,7 +301,7 @@ export const PROGRAM_PAYMENTS: ProgramPaymentConfig[] = [
     id: 'prc',
     label: 'Peer Recovery Coach',
     slug: 'peer-recovery-coach',
-    price: 4750,
+    price: 5000,
     isFlatFee: false,
     vendorName: null,
     vendorCost: 0,

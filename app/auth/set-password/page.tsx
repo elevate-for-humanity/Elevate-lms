@@ -34,6 +34,11 @@ export default function SetPasswordPage() {
   const [portal, setPortal]           = useState('/learner/dashboard');
   const [userRole, setUserRole]       = useState<string | null>(null);
   const [error, setError]             = useState('');
+
+  // ?next= param overrides role-based destination (e.g. from enrollment email)
+  const nextParam = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('next')
+    : null;
   const [sessionReady, setSessionReady] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -84,7 +89,8 @@ export default function SetPasswordPage() {
           .select('role')
           .eq('id', user.id)
           .single();
-        setPortal(portalFor(profile?.role));
+        const dest = nextParam || portalFor(profile?.role);
+        setPortal(dest);
         setUserRole(profile?.role ?? null);
       }
 
@@ -108,13 +114,19 @@ export default function SetPasswordPage() {
           <p className="text-gray-600 mb-8 text-base">
             {userRole === 'program_holder'
               ? 'Your account is ready. Complete your onboarding steps to activate your portal.'
+              : nextParam?.includes('onboarding')
+              ? 'Your account is ready. Complete your onboarding to access your courses.'
               : 'Your account is ready. Click below to go to your dashboard.'}
           </p>
           <a
             href={portal}
             className="inline-block bg-brand-red-600 text-white font-bold px-10 py-4 rounded-lg text-lg hover:bg-brand-red-700 transition"
           >
-            {userRole === 'program_holder' ? 'Start Onboarding →' : 'Go to My Dashboard'}
+            {userRole === 'program_holder'
+              ? 'Start Onboarding →'
+              : nextParam?.includes('onboarding')
+              ? 'Start Onboarding →'
+              : 'Go to My Dashboard'}
           </a>
         </div>
       </div>

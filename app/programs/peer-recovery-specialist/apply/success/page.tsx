@@ -27,7 +27,7 @@ export default function PeerRecoveryApplySuccessPage() {
           <Link href="/programs/peer-recovery-specialist" className="rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-900 hover:bg-slate-50 transition-colors">
             Back to program
           </Link>
-          <Link href="/learner/dashboard" className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 transition-colors">
+          <Link href="/login?redirect=/onboarding/learner" className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 transition-colors">
             Go to dashboard
           </Link>
         </div>

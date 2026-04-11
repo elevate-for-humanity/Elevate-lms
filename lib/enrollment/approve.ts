@@ -78,7 +78,15 @@ export async function approveApplication(
   //   4. Source is 'stripe_repair' (reconciliation — Stripe session verified separately)
   //   5. bypassPaymentGate = true (admin manual override — audited separately)
   const isRepair = (input as any).source === 'stripe_repair';
-  const skipGate = isRepair || input.bypassPaymentGate === true;
+
+  // Non-self-pay funding types bypass the payment gate — they go through
+  // WIOA, Workforce Ready Grant, employer sponsorship, or are pending review.
+  const NON_SELF_PAY = ['wioa', 'wrg', 'employer', 'unsure', 'workforce', 'grant', 'scholarship', 'dol', 'apprenticeship'];
+  const appFundingType = (app.funding_type || app.funding_source || '').toLowerCase();
+  const isFundedPath = NON_SELF_PAY.some(f => appFundingType.includes(f));
+
+  const skipGate = isRepair || input.bypassPaymentGate === true || isFundedPath;
+
   if (!skipGate) {
     const hasFundingVerified = app.funding_verified === true || app.has_workone_approval === true;
 
@@ -280,7 +288,7 @@ export async function approveApplication(
         type: 'recovery',
         email,
         options: {
-          redirectTo: `${siteUrl}/auth/confirm?next=/auth/reset-password`,
+          redirectTo: `${siteUrl}/auth/set-password?next=/onboarding/learner`,
         },
       });
       passwordSetupLink = linkData?.properties?.action_link || null;

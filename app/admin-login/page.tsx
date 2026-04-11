@@ -82,7 +82,7 @@ export default function AdminLoginPage() {
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-3 mb-8">
             <Image
-              src="/images/logo.png"
+              src="/logo.jpg"
               alt="Elevate for Humanity"
               width={140}
               height={40}

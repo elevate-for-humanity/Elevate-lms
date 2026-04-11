@@ -182,7 +182,7 @@ export function OrganizationStructuredData() {
     name: ORG_NAME,
     alternateName: 'EFH',
     url: SITE_URL,
-    logo: `${SITE_URL}/images/logo.png`,
+    logo: `${SITE_URL}/logo.jpg`,
     description: 'Nonprofit workforce development institute in Indianapolis providing career training at no cost to eligible Indiana residents through WIOA and state funding. Programs in healthcare, skilled trades, technology, barbering, and business.',
     address: {
       '@type': 'PostalAddress',

@@ -236,7 +236,7 @@ export async function POST(request: NextRequest) {
       content: [{
         type: 'text/html',
         value: `<div style="font-family:Arial,sans-serif;color:#1e293b;max-width:600px;margin:0 auto;padding:24px;">
-          <img src="https://elevateforhumanity.org/images/logo.png" alt="Elevate for Humanity" style="height:50px;margin-bottom:20px;"/><br/>
+          <img src="https://elevateforhumanity.org/logo.jpg" alt="Elevate for Humanity" style="height:50px;margin-bottom:20px;"/><br/>
           <p>Elizabeth,</p>
           <p>Your signed documents are attached:</p>
           <ul>${docLabels.map(l => `<li><strong>${l}</strong></li>`).join('')}</ul>

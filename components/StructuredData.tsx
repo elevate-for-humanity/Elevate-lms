@@ -10,7 +10,7 @@ export default function StructuredData() {
     url: 'https://www.elevateforhumanity.org',
     logo: {
       '@type': 'ImageObject',
-      url: 'https://www.elevateforhumanity.org/logo.png',
+      url: 'https://www.elevateforhumanity.org/logo.jpg',
       width: 341,
       height: 512,
     },

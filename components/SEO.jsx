@@ -44,7 +44,7 @@ export default function SEO({
           description:
             'Indianapolis-based ETPL provider offering 106+ industry-recognized certification programs with 92% job placement rate. FREE workforce development through WIOA funding.',
           url: 'https://elevateforhumanity.pages.dev',
-          logo: 'https://elevateforhumanity.pages.dev/images/logo.png',
+          logo: 'https://elevateforhumanity.pages.dev/logo.jpg',
           image: 'https://elevateforhumanity.pages.dev/og-image.svg',
           address: {
             '@type': 'PostalAddress',

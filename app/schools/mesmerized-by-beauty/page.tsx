@@ -109,7 +109,7 @@ export default function MesmerizedByBeautyPage() {
           <div className="absolute inset-0 bg-black/30" />
           {/* Sponsor bug — top left, per hero standard */}
           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1.5 flex items-center gap-2">
-            <Image src="/images/logo.png" alt="Elevate for Humanity" width={20} height={20} className="object-contain" />
+            <Image src="/logo.jpg" alt="Elevate for Humanity" width={20} height={20} className="object-contain" />
             <span className="text-xs font-semibold text-slate-700">Sponsored by Elevate for Humanity</span>
           </div>
         </div>
@@ -500,7 +500,7 @@ export default function MesmerizedByBeautyPage() {
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="flex-shrink-0">
               <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center">
-                <Image src="/images/logo.png" alt="Elevate for Humanity" width={52} height={52} className="object-contain" />
+                <Image src="/logo.jpg" alt="Elevate for Humanity" width={52} height={52} className="object-contain" />
               </div>
             </div>
             <div className="text-center md:text-left">

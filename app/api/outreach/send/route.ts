@@ -18,7 +18,7 @@ const PARTNERSHIP_HTML = `<!DOCTYPE html>
 <tr><td align="center" style="padding:32px 16px;">
 <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; width:100%;">
 <tr><td style="padding-bottom:24px; border-bottom:2px solid #222;">
-  <img src="https://www.elevateforhumanity.org/logo.png" alt="Elevate for Humanity" width="44" height="44" style="display:inline-block; vertical-align:middle; margin-right:12px;">
+  <img src="https://www.elevateforhumanity.org/logo.jpg" alt="Elevate for Humanity" width="44" height="44" style="display:inline-block; vertical-align:middle; margin-right:12px;">
   <span style="font-size:20px; font-weight:bold; vertical-align:middle;">Elevate for Humanity</span>
 </td></tr>
 <tr><td style="padding:24px 0;">

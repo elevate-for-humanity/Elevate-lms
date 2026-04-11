@@ -18,9 +18,9 @@ if (!SENDGRID_API_KEY) { console.error('❌ SENDGRID_API_KEY not set'); process.
 
 const PACKAGE_DIR = path.join(process.cwd(), 'docs/grants/employindy-2026-003-package');
 const OUT_DIR     = path.join(process.cwd(), 'docs/grants/employindy-2026-003-pdfs');
-const LOGO_PATH   = path.join(process.cwd(), 'public/images/logo.png');
+const LOGO_PATH   = path.join(process.cwd(), 'public/images/Elevate_for_Humanity_logo_81bf0fab.jpg');
 const LOGO_B64    = fs.existsSync(LOGO_PATH)
-  ? `data:image/png;base64,${fs.readFileSync(LOGO_PATH).toString('base64')}`
+  ? `data:image/jpeg;base64,${fs.readFileSync(LOGO_PATH).toString('base64')}`
   : '';
 
 const DOCUMENTS = [

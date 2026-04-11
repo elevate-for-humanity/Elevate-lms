@@ -14,5 +14,5 @@ export default function LogoImage({
   quality = 85,
   ...props
 }: LogoImageProps) {
-  return <Image src="/logo.png" alt={alt} quality={quality} {...props} />;
+  return <Image src="/logo.jpg" alt={alt} quality={quality} {...props} />;
 }

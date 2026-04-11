@@ -97,7 +97,7 @@ export default async function VideoWatchPage({
       name: 'Elevate for Humanity',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://www.elevateforhumanity.org/logo.png',
+        url: 'https://www.elevateforhumanity.org/logo.jpg',
       },
     },
   };

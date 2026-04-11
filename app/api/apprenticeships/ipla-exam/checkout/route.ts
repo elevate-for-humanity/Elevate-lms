@@ -33,7 +33,7 @@ async function _POST(request: NextRequest) {
             product_data: {
               name: 'IPLA Apprenticeship Exam',
               description: `Exam scheduled for ${new Date(examDate).toLocaleDateString()} at ${examTime}`,
-              images: ['https://www.elevateforhumanity.org/images/logo.png'],
+              images: ['https://www.elevateforhumanity.org/logo.jpg'],
             },
             unit_amount: 15000, // $150.00
           },

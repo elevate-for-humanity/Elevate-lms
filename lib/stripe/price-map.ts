@@ -136,7 +136,10 @@ export const STRIPE_PRICE_IDS: Record<string, string> = {
   "cybersecurity-program": "price_1Sw0N8IRNf5vPH3A6NdTRo3a", // $4,499
   
   // Human Services Programs
-  "peer-recovery-coach-program": "price_1Sw0MpIRNf5vPH3AovSyk3Z9", // TODO: replace with $5,000 price ID from Stripe Dashboard
+  "peer-recovery-coach-program": "price_1Sw0MpIRNf5vPH3AovSyk3Z9", // $5,000 self-pay (replace with new price ID once created in Stripe Dashboard)
+  // Peer Recovery — $5,000 = $1,750 (35%) + $542 × 6
+  "peer-recovery-deposit": "price_PEER_RECOVERY_DEPOSIT", // TODO: create in Stripe Dashboard
+  "peer-recovery-installment": "price_PEER_RECOVERY_INSTALLMENT", // TODO: create in Stripe Dashboard
   "public-safety-reentry-program": "price_1Sw0N1IRNf5vPH3AU4qwlgnV", // $4,325
   "drug-collector-certification-program": "price_1Sw0N1IRNf5vPH3ASlJFEiv8", // $4,750
   
@@ -291,9 +294,18 @@ export const PAYMENT_LINKS = {
     free: "https://buy.stripe.com/eVqaEY6ts8ztgBEbWv8EN0J",
   },
   
-  // Esthetician - FREE (WIOA)
+  // Esthetician - FREE (WIOA) + Self-Pay ($2,800)
   esthetician: {
-    free: "https://buy.stripe.com/9B6aEY6ts9Dx4SW6Cb8EN0K",
+    free: "https://buy.stripe.com/9B6aEY6ts9Dx4SW6Cb8EN0K", // $0 WIOA
+    full: "https://buy.stripe.com/ESTHETICIAN_FULL", // $2,800 — TODO: create in Stripe Dashboard
+    deposit: "https://buy.stripe.com/ESTHETICIAN_DEPOSIT", // $980 (35%) — TODO: create in Stripe Dashboard
+  },
+
+  // Peer Recovery Specialist - $5,000 self-pay (WIOA also available)
+  // TODO: create buy.stripe.com payment links in Stripe Dashboard and replace these placeholders
+  peerRecovery: {
+    full: "https://buy.stripe.com/PEER_RECOVERY_FULL", // $5,000 — create in Stripe Dashboard
+    deposit: "https://buy.stripe.com/PEER_RECOVERY_DEPOSIT", // $1,750 (35%) — create in Stripe Dashboard
   },
 };
 

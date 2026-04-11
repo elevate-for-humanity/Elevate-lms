@@ -14,7 +14,7 @@ Indianapolis, Indiana
 **Contract Term:** July 1, 2026 – June 30, 2027
 **Total Request:** $400,000
 **Participants Served:** 100
-**Cost Per Participant:** $4,000
+**Cost Per Participant:** $5,000
 
 ---
 
@@ -24,10 +24,10 @@ Indianapolis, Indiana
 |---|---|---|
 | Personnel | $120,000 | 30% |
 | LMS Platform & Technology | $24,000 | 6% |
-| Participant Supportive Services | $180,000 | 45% |
-| Work-Based Learning Coordination | $30,000 | 7.5% |
+| Participant Supportive Services | $144,000 | 36% |
+| Work-Based Learning Coordination | $50,000 | 12.5% |
 | Training & Curriculum | $24,000 | 6% |
-| Administrative Costs | $22,000 | 5.5% |
+| Administrative Costs | $38,000 | 9.5% |
 | **TOTAL** | **$400,000** | **100%** |
 
 ---
@@ -57,30 +57,30 @@ Elizabeth Greene serves as Case Manager, responsible for WIOA enrollment documen
 
 ### LMS Platform & Technology — $24,000
 
-Covers Elevate's proprietary LMS platform hosting, maintenance, AI-assisted content delivery infrastructure, participant dashboard reporting, Indiana Career Connect data export tools, and technology support. The LMS is the primary RTI delivery vehicle for all 100 participants and the source of real-time measurable skills gain data. Cost is $2,000/month × 12 months.
+Covers Elevate's proprietary LMS platform hosting, maintenance, AI-assisted content delivery infrastructure, participant dashboard reporting, Indiana Career Connect data export tools, and technology support. The LMS is the primary RTI delivery vehicle for all 80 participants and the source of real-time measurable skills gain data. Cost is $2,000/month × 12 months.
 
 ---
 
-### Participant Supportive Services — $180,000
+### Participant Supportive Services — $144,000
 
-Estimated 100 participants × $1,800 average per participant. Allowable WIOA supportive services include:
+Estimated 80 participants × $1,800 average per participant. Allowable WIOA supportive services include:
 
 | Service | Estimated Cost Per Participant | Total |
 |---|---|---|
-| Transportation stipends (WBL participation) | $600 | $60,000 |
-| Work attire and tools (OJT placement) | $300 | $30,000 |
-| EPA 608 exam fees | $150 | $15,000 |
-| Participant milestone incentives | $500 | $50,000 |
-| Accessibility/multilingual supports | $250 | $25,000 |
-| **Subtotal** | **$1,800** | **$180,000** |
+| Transportation stipends (WBL participation) | $450 | $36,000 |
+| Work attire and tools (OJT placement) | $300 | $24,000 |
+| EPA 608 exam fees | $150 | $12,000 |
+| Participant milestone incentives | $600 | $48,000 |
+| Accessibility/multilingual supports | $300 | $24,000 |
+| **Subtotal** | **$1,800** | **$144,000** |
 
 All supportive services are disbursed by Elizabeth Greene upon documented need and in compliance with EmployIndy supportive services policy. No participant is denied services due to inability to pay.
 
 ---
 
-### Work-Based Learning Coordination — $30,000
+### Work-Based Learning Coordination — $50,000
 
-Covers employer engagement activities, job shadowing coordination, OJT placement logistics, employer panel events at Warren Central, employer onboarding documentation, and WBL tracking and reporting. Includes mileage reimbursement for Career Coach travel between Warren Central and employer sites.
+Covers employer engagement activities, job shadowing coordination, OJT placement logistics, employer panel events at Warren Central, employer onboarding documentation, WBL tracking and reporting, and mileage reimbursement for Career Coach travel between Warren Central and employer sites.
 
 ---
 
@@ -90,7 +90,7 @@ Covers HVAC curriculum content licensing and updates, employability bootcamp mat
 
 ---
 
-### Administrative Costs — $22,000 (5.5%)
+### Administrative Costs — $38,000 (9.5%)
 
 Covers financial management, grant compliance, audit preparation, organizational insurance, office supplies, and indirect costs. Administrative costs are held to 5.5% of total budget, well within federal reasonableness standards for WIOA-funded contracts.
 
@@ -102,14 +102,14 @@ Covers financial management, grant compliance, audit preparation, organizational
 |---|---|
 | Total award | $400,000 |
 | Participants served | 100 |
-| Cost per participant | $4,000 |
+| Cost per participant | $5,000 |
 | WIOA median earnings target (Q2) | $4,300 |
 | Elevate projected median earnings (Q2) | $5,000 |
 | Return on investment | $1,200 above target per participant |
 | Credential attainment target | 68% |
 | Elevate projected credential attainment | 75% |
 
-At $4,000 per participant, Elevate delivers a federally recognized credential (EPA 608), work-based learning placement, 12-month follow-up, and all 14 WIOA service elements — below the projected Q2 median earnings of $5,000 per participant.
+At $5,000 per participant, Elevate delivers a federally recognized credential (EPA 608), work-based learning placement, 12-month follow-up, and all 14 WIOA service elements — below the projected Q2 median earnings of $5,000 per participant.
 
 ---
 

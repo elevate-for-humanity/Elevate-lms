@@ -237,12 +237,12 @@ Elevate's LMS generates automated participant risk scores based on login frequen
 | Elizabeth Greene — CEO & Case Manager (0.5 FTE) | $48,000 | Salary + benefits. WIOA enrollment, ICC management, follow-up, barrier coordination, monthly check-ins |
 | Program Director — Elizabeth Greene (0.25 FTE) | $20,000 | Oversight, EmployIndy coordination, quarterly reporting, continuous improvement |
 | LMS Platform & Technology | $24,000 | Hosting, maintenance, AI-assisted content delivery, dashboard reporting, participant tracking |
-| Participant Supportive Services | $180,000 | Transportation stipends, work attire/tools, EPA 608 exam fees, participant incentives, accessibility supports. Estimated 100 participants × $1,800 average |
+| Participant Supportive Services | $144,000 | Transportation stipends, work attire/tools, EPA 608 exam fees, participant incentives, accessibility supports. Estimated 80 participants × $1,800 average |
 | Work-Based Learning Coordination | $30,000 | Employer engagement, job shadowing coordination, OJT placement support, employer panel events |
 | Training & Curriculum | $24,000 | HVAC curriculum delivery, employability bootcamp, financial literacy, LMI sessions |
 | Administrative Costs | $22,000 | Financial management, compliance, audit preparation, insurance, office expenses |
 | **Total** | **$400,000** | |
 
-**Cost per Participant (100 participants):** $4,000 — below the $4,300 median earnings target.
+**Cost per Participant (80 participants):** $4,000 — below the $4,300 median earnings target.
 **Administrative costs:** 5.5% of total budget — within federal reasonableness standards.
 **Participant supportive services:** 45% of total budget — barrier removal is the primary driver of retention and credential attainment for this population.

@@ -16,7 +16,7 @@ Indianapolis, Indiana
 
 | Metric | Year 1 (PY26) |
 |---|---|
-| Total Participants Served | 100 |
+| Total Participants Served | 80 |
 | School | Warren Central High School, MSD Warren Township |
 | Age Range | 16–19 |
 | Primary Credential | EPA 608 Universal Certification |
@@ -66,7 +66,7 @@ Elevate's LMS checkpoint system requires participants to pass readiness assessme
 
 | Metric | PY26 (Year 1) | PY27 (Year 2) | PY28 (Year 3) |
 |---|---|---|---|
-| Participants Served | 100 | 125 | 150 |
+| Participants Served | 80 | 100 | 120 |
 | Credential Attainment | 75% | 78% | 80% |
 | Employment/Education Placement (2Q) | 83% | 85% | 87% |
 | Retention (4Q) | 85% | 87% | 88% |

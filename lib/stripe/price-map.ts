@@ -136,10 +136,10 @@ export const STRIPE_PRICE_IDS: Record<string, string> = {
   "cybersecurity-program": "price_1Sw0N8IRNf5vPH3A6NdTRo3a", // $4,499
   
   // Human Services Programs
-  "peer-recovery-coach-program": "price_1Sw0MpIRNf5vPH3AovSyk3Z9", // $5,000 self-pay (replace with new price ID once created in Stripe Dashboard)
+  "peer-recovery-coach-program": "price_1TL6nOH4a2yrVOt5uVAEh7Y7", // $5,000 self-pay
   // Peer Recovery — $5,000 = $1,750 (35%) + $542 × 6
-  "peer-recovery-deposit": "price_PEER_RECOVERY_DEPOSIT", // TODO: create in Stripe Dashboard
-  "peer-recovery-installment": "price_PEER_RECOVERY_INSTALLMENT", // TODO: create in Stripe Dashboard
+  "peer-recovery-deposit": "price_1TL6npH4a2yrVOt58BKj4ff7", // $1,750 (35%)
+  "peer-recovery-installment": "price_PEER_RECOVERY_INSTALLMENT", // TODO: create $542 recurring installment in Stripe Dashboard
   "public-safety-reentry-program": "price_1Sw0N1IRNf5vPH3AU4qwlgnV", // $4,325
   "drug-collector-certification-program": "price_1Sw0N1IRNf5vPH3ASlJFEiv8", // $4,750
   
@@ -173,7 +173,7 @@ export const STRIPE_PRICE_IDS: Record<string, string> = {
   "cosmetology-installment": "price_1Sw3YqIRNf5vPH3AAB0Obzjp", // $542
   
   // Esthetician - $2,800 = $980 (35%) + $303 × 6
-  "esthetician-deposit": "price_1Sw3Y3IRNf5vPH3Axy85e22q", // $980
+  "esthetician-deposit": "price_1TL6npH4a2yrVOt5MFmM27b3", // $980 (new live price)
   "esthetician-installment": "price_1Sw3YqIRNf5vPH3AOC6VVohj", // $303
   
   // Medical Assistant - $4,200 = $1,470 (35%) + $455 × 6
@@ -297,15 +297,14 @@ export const PAYMENT_LINKS = {
   // Esthetician - FREE (WIOA) + Self-Pay ($2,800)
   esthetician: {
     free: "https://buy.stripe.com/9B6aEY6ts9Dx4SW6Cb8EN0K", // $0 WIOA
-    full: "https://buy.stripe.com/ESTHETICIAN_FULL", // $2,800 — TODO: create in Stripe Dashboard
-    deposit: "https://buy.stripe.com/ESTHETICIAN_DEPOSIT", // $980 (35%) — TODO: create in Stripe Dashboard
+    full: "https://buy.stripe.com/dRmaEX0MMabc80b6VjgIo02", // $2,800 self-pay full
+    deposit: "https://buy.stripe.com/9B628ranmcjkbcn1AZgIo03", // $980 (35% deposit)
   },
 
   // Peer Recovery Specialist - $5,000 self-pay (WIOA also available)
-  // TODO: create buy.stripe.com payment links in Stripe Dashboard and replace these placeholders
   peerRecovery: {
-    full: "https://buy.stripe.com/PEER_RECOVERY_FULL", // $5,000 — create in Stripe Dashboard
-    deposit: "https://buy.stripe.com/PEER_RECOVERY_DEPOSIT", // $1,750 (35%) — create in Stripe Dashboard
+    full: "https://buy.stripe.com/8x2cN5eDC4QS5S3a7vgIo00", // $5,000 self-pay full
+    deposit: "https://buy.stripe.com/4gM3cv1QQcjk4NZenLgIo01", // $1,750 (35% deposit)
   },
 };
 

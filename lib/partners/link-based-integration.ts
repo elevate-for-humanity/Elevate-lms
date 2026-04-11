@@ -1,11 +1,11 @@
 // lib/partners/link-based-integration.ts
-// Link-based partner integration system (no API keys needed)
-// Partners: HSI, NRF, JRI, CareerSafe
+// Link-based partner integration — HSI and NRF/ServSafe only
 //
-// PRICING POLICY:
-//   retailPrice = vendorCost * 1.50 (50% markup), rounded up to nearest $5
-//   WIOA-funded students pay $0 — self-pay students pay retailPrice
-//   Revenue split: Elevate keeps markup, vendor cost paid to partner on invoice
+// CareerSafe (OSHA) removed — no reseller authorization.
+//
+// PRICING: retailPrice = vendorCost × 1.50, rounded up to nearest dollar
+// ServSafe Manager uses retailOverride $199 (from servsafe-programs.ts)
+// WIOA-funded students pay $0 — self-pay students pay retailPrice
 
 export interface PartnerCourse {
   id: string;
@@ -38,6 +38,7 @@ export interface PartnerEnrollment {
   certificateUrl?: string;
 }
 
+// HSI (Health & Safety Institute) — authorized reseller
 export const HSI_COURSES: PartnerCourse[] = [
   {
     id: 'hsi-cpr-aed',
@@ -47,10 +48,10 @@ export const HSI_COURSES: PartnerCourse[] = [
     description: 'American Heart Association CPR and AED certification training',
     category: 'Healthcare',
     duration: '4 hours',
-    vendorCost: 22,
-    retailPrice: 35,
-    stripePriceId: 'price_1TL8XXH4a2yrVOt52fdgADbs',
-    paymentLink: 'https://buy.stripe.com/dRmfZhbrq4QSfsD0wVgIo0j',
+    vendorCost: 18,
+    retailPrice: 27,   // $18 × 1.5 = $27
+    stripePriceId: 'price_1TL8hrH4a2yrVOt5ElYR7I96',
+    paymentLink: 'https://buy.stripe.com/6oU6oHdzycjka8jbbzgIo0v',
     enrollmentUrl: 'https://www.hsi.com/courses/cpr-aed',
     loginUrl: 'https://www.hsi.com/login',
     supportUrl: 'https://www.hsi.com/support',
@@ -65,10 +66,10 @@ export const HSI_COURSES: PartnerCourse[] = [
     description: 'Comprehensive first aid training and certification',
     category: 'Healthcare',
     duration: '4 hours',
-    vendorCost: 22,
-    retailPrice: 35,
-    stripePriceId: 'price_1TL8XYH4a2yrVOt5aNxzYQ5K',
-    paymentLink: 'https://buy.stripe.com/3cIfZh0MM1EG6W71AZgIo0k',
+    vendorCost: 18,
+    retailPrice: 27,   // $18 × 1.5 = $27
+    stripePriceId: 'price_1TL8hsH4a2yrVOt57ehb2iDo',
+    paymentLink: 'https://buy.stripe.com/3cIeVd2UUersbcn5RfgIo0w',
     enrollmentUrl: 'https://www.hsi.com/courses/first-aid',
     loginUrl: 'https://www.hsi.com/login',
     supportUrl: 'https://www.hsi.com/support',
@@ -83,10 +84,10 @@ export const HSI_COURSES: PartnerCourse[] = [
     description: 'OSHA-compliant bloodborne pathogens training',
     category: 'Healthcare',
     duration: '2 hours',
-    vendorCost: 15,
-    retailPrice: 25,
-    stripePriceId: 'price_1TL8XZH4a2yrVOt5m0S2EA4l',
-    paymentLink: 'https://buy.stripe.com/28EdR92UUers3JV6VjgIo0l',
+    vendorCost: 12,
+    retailPrice: 18,   // $12 × 1.5 = $18
+    stripePriceId: 'price_1TL8hsH4a2yrVOt56ipM5Rns',
+    paymentLink: 'https://buy.stripe.com/8x2cN5eDC6Z02FR7ZngIo0x',
     enrollmentUrl: 'https://www.hsi.com/courses/bloodborne-pathogens',
     loginUrl: 'https://www.hsi.com/login',
     supportUrl: 'https://www.hsi.com/support',
@@ -95,25 +96,9 @@ export const HSI_COURSES: PartnerCourse[] = [
   },
 ];
 
+// NRF (National Restaurant Foundation / ServSafe) — authorized training partner
+// vendorCost from servsafe-programs.ts vendorBase
 export const NRF_COURSES: PartnerCourse[] = [
-  {
-    id: 'nrf-servsafe-manager',
-    partnerId: 'nrf',
-    partnerName: 'National Restaurant Foundation',
-    title: 'ServSafe Manager Certification',
-    description: 'Food safety manager certification recognized nationwide',
-    category: 'Food Service',
-    duration: '16 hours',
-    vendorCost: 35,
-    retailPrice: 55,
-    stripePriceId: 'price_1TL8XZH4a2yrVOt5WGp5fqrm',
-    paymentLink: 'https://buy.stripe.com/eVq28r5325UW2FR0wVgIo0m',
-    enrollmentUrl: 'https://www.servsafe.com/access/ss/Catalog/ProductDetails/SSMC7',
-    loginUrl: 'https://www.servsafe.com/login',
-    supportUrl: 'https://www.servsafe.com/support',
-    certificationType: 'ServSafe Manager Certificate',
-    isActive: true,
-  },
   {
     id: 'nrf-servsafe-food-handler',
     partnerId: 'nrf',
@@ -122,14 +107,32 @@ export const NRF_COURSES: PartnerCourse[] = [
     description: 'Entry-level food safety certification',
     category: 'Food Service',
     duration: '2 hours',
-    vendorCost: 15,
-    retailPrice: 25,
-    stripePriceId: 'price_1TL8XaH4a2yrVOt57RA7dQXV',
-    paymentLink: 'https://buy.stripe.com/3cI6oH9ji834a8j7ZngIo0n',
+    vendorCost: 13.50,
+    retailPrice: 21,   // $13.50 × 1.5 = $20.25 → $21
+    stripePriceId: 'price_1TL8htH4a2yrVOt5NIqzSJ30',
+    paymentLink: 'https://buy.stripe.com/8x2aEXdzyfvw1BN4NbgIo0y',
     enrollmentUrl: 'https://www.servsafe.com/access/ss/Catalog/ProductDetails/SSFH7',
     loginUrl: 'https://www.servsafe.com/login',
     supportUrl: 'https://www.servsafe.com/support',
     certificationType: 'ServSafe Food Handler Certificate',
+    isActive: true,
+  },
+  {
+    id: 'nrf-servsafe-manager',
+    partnerId: 'nrf',
+    partnerName: 'National Restaurant Foundation',
+    title: 'ServSafe Manager Certification',
+    description: 'Food safety manager certification recognized nationwide',
+    category: 'Food Service',
+    duration: '16 hours',
+    vendorCost: 137.66,
+    retailPrice: 199,  // retailOverride from servsafe-programs.ts
+    stripePriceId: 'price_1TL8huH4a2yrVOt59YVknndf',
+    paymentLink: 'https://buy.stripe.com/28E7sLdzy6Z080bgvTgIo0z',
+    enrollmentUrl: 'https://www.servsafe.com/access/ss/Catalog/ProductDetails/SSMC7',
+    loginUrl: 'https://www.servsafe.com/login',
+    supportUrl: 'https://www.servsafe.com/support',
+    certificationType: 'ServSafe Manager Certificate',
     isActive: true,
   },
   {
@@ -141,7 +144,7 @@ export const NRF_COURSES: PartnerCourse[] = [
     category: 'Food Service',
     duration: '4 hours',
     vendorCost: 20,
-    retailPrice: 30,
+    retailPrice: 30,   // $20 × 1.5 = $30
     stripePriceId: 'price_1TL8XbH4a2yrVOt5XvDSzwsS',
     paymentLink: 'https://buy.stripe.com/cNidR9brq4QS2FR93rgIo0o',
     enrollmentUrl: 'https://www.servsafe.com/access/ss/Catalog/ProductDetails/SSA7',
@@ -152,7 +155,7 @@ export const NRF_COURSES: PartnerCourse[] = [
   },
 ];
 
-// JRI courses are grant-funded — no self-pay, no Stripe
+// JRI (Job Ready Indy) — grant-funded, no self-pay
 export const JRI_COURSES: PartnerCourse[] = [
   {
     id: 'jri-work-ethic',
@@ -210,122 +213,12 @@ export const JRI_COURSES: PartnerCourse[] = [
   },
 ];
 
-export const CAREERSAFE_COURSES: PartnerCourse[] = [
-  {
-    id: 'careersafe-osha10-general',
-    partnerId: 'careersafe',
-    partnerName: 'CareerSafe',
-    title: 'OSHA 10-Hour General Industry',
-    description: 'OSHA-authorized 10-hour general industry safety training',
-    category: 'Safety',
-    duration: '10 hours',
-    vendorCost: 30,
-    retailPrice: 45,
-    stripePriceId: 'price_1TL8XbH4a2yrVOt5MPMXmq3E',
-    paymentLink: 'https://buy.stripe.com/fZufZhgLK978dkva7vgIo0p',
-    enrollmentUrl: 'https://www.careersafeonline.com/osha-10-hour-general-industry',
-    loginUrl: 'https://www.careersafeonline.com/login',
-    supportUrl: 'https://www.careersafeonline.com/support',
-    certificationType: 'OSHA 10-Hour Card',
-    isActive: true,
-  },
-  {
-    id: 'careersafe-osha10-construction',
-    partnerId: 'careersafe',
-    partnerName: 'CareerSafe',
-    title: 'OSHA 10-Hour Construction',
-    description: 'OSHA-authorized 10-hour construction safety training',
-    category: 'Safety',
-    duration: '10 hours',
-    vendorCost: 30,
-    retailPrice: 45,
-    stripePriceId: 'price_1TL8XcH4a2yrVOt5T2wuQxPc',
-    paymentLink: 'https://buy.stripe.com/dRm4gzdzyfvw2FR4NbgIo0q',
-    enrollmentUrl: 'https://www.careersafeonline.com/osha-10-hour-construction',
-    loginUrl: 'https://www.careersafeonline.com/login',
-    supportUrl: 'https://www.careersafeonline.com/support',
-    certificationType: 'OSHA 10-Hour Card',
-    isActive: true,
-  },
-  {
-    id: 'careersafe-osha30-general',
-    partnerId: 'careersafe',
-    partnerName: 'CareerSafe',
-    title: 'OSHA 30-Hour General Industry',
-    description: 'Advanced OSHA safety training for supervisors and managers',
-    category: 'Safety',
-    duration: '30 hours',
-    vendorCost: 89,
-    retailPrice: 135,
-    stripePriceId: 'price_1TL8XdH4a2yrVOt5zOAVN4qX',
-    paymentLink: 'https://buy.stripe.com/14AcN5cvugzAbcn0wVgIo0r',
-    enrollmentUrl: 'https://www.careersafeonline.com/osha-30-hour-general-industry',
-    loginUrl: 'https://www.careersafeonline.com/login',
-    supportUrl: 'https://www.careersafeonline.com/support',
-    certificationType: 'OSHA 30-Hour Card',
-    isActive: true,
-  },
-  {
-    id: 'careersafe-bloodborne-pathogens',
-    partnerId: 'careersafe',
-    partnerName: 'CareerSafe',
-    title: 'Bloodborne Pathogens Training',
-    description: 'OSHA-compliant bloodborne pathogens training for healthcare workers',
-    category: 'Healthcare Safety',
-    duration: '1 hour',
-    vendorCost: 15,
-    retailPrice: 25,
-    stripePriceId: 'price_1TL8XeH4a2yrVOt5wE5aAIUX',
-    paymentLink: 'https://buy.stripe.com/dRm4gz7baers5S34NbgIo0s',
-    enrollmentUrl: 'https://www.careersafeonline.com/bloodborne-pathogens',
-    loginUrl: 'https://www.careersafeonline.com/login',
-    supportUrl: 'https://www.careersafeonline.com/support',
-    certificationType: 'Bloodborne Pathogens Certificate',
-    isActive: true,
-  },
-  {
-    id: 'careersafe-infection-control',
-    partnerId: 'careersafe',
-    partnerName: 'CareerSafe',
-    title: 'Infection Control & Prevention',
-    description: 'Healthcare infection control and prevention training',
-    category: 'Healthcare Safety',
-    duration: '2 hours',
-    vendorCost: 15,
-    retailPrice: 25,
-    stripePriceId: 'price_1TL8XeH4a2yrVOt5eYMWsJJN',
-    paymentLink: 'https://buy.stripe.com/eVq7sLfHG5UW5S34NbgIo0t',
-    enrollmentUrl: 'https://www.careersafeonline.com/infection-control',
-    loginUrl: 'https://www.careersafeonline.com/login',
-    supportUrl: 'https://www.careersafeonline.com/support',
-    certificationType: 'Infection Control Certificate',
-    isActive: true,
-  },
-  {
-    id: 'careersafe-patient-safety',
-    partnerId: 'careersafe',
-    partnerName: 'CareerSafe',
-    title: 'Patient Safety & Care',
-    description: 'Essential patient safety training for home health aides',
-    category: 'Healthcare Safety',
-    duration: '2 hours',
-    vendorCost: 15,
-    retailPrice: 25,
-    stripePriceId: 'price_1TL8XfH4a2yrVOt5LDGUltFP',
-    paymentLink: 'https://buy.stripe.com/14A14n1QQ4QS2FR6VjgIo0u',
-    enrollmentUrl: 'https://www.careersafeonline.com/patient-safety',
-    loginUrl: 'https://www.careersafeonline.com/login',
-    supportUrl: 'https://www.careersafeonline.com/support',
-    certificationType: 'Patient Safety Certificate',
-    isActive: true,
-  },
-];
+// CareerSafe removed — no reseller authorization to sell OSHA courses
 
 export const ALL_PARTNER_COURSES: PartnerCourse[] = [
   ...HSI_COURSES,
   ...NRF_COURSES,
   ...JRI_COURSES,
-  ...CAREERSAFE_COURSES,
 ];
 
 export function getPartnerCourses(partnerId: string): PartnerCourse[] {

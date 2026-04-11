@@ -4,22 +4,20 @@ import { Clock, Award, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
 import {
   HSI_COURSES,
   NRF_COURSES,
-  CAREERSAFE_COURSES,
   type PartnerCourse,
 } from '@/lib/partners/link-based-integration';
 
 export const metadata: Metadata = {
   title: 'Microclasses | Elevate for Humanity',
-  description: 'Job-ready certifications in hours. CPR, ServSafe, OSHA, Bloodborne Pathogens and more. Free with WIOA or pay as low as $25.',
+  description: 'Job-ready certifications in hours. CPR, First Aid, ServSafe and more. Free with WIOA or pay as low as $18.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/microclasses',
   },
 };
 
 const SECTIONS = [
-  { id: 'safety',     label: 'Safety & OSHA',  partner: 'CareerSafe',                      courses: CAREERSAFE_COURSES },
-  { id: 'healthcare', label: 'Healthcare',      partner: 'Health & Safety Institute',        courses: HSI_COURSES },
-  { id: 'food',       label: 'Food Service',    partner: 'National Restaurant Foundation',   courses: NRF_COURSES },
+  { id: 'healthcare', label: 'Healthcare',   partner: 'Health & Safety Institute',       courses: HSI_COURSES },
+  { id: 'food',       label: 'Food Service', partner: 'National Restaurant Foundation',  courses: NRF_COURSES },
 ];
 
 function CourseCard({ course }: { course: PartnerCourse }) {
@@ -69,10 +67,10 @@ export default function MicroclassesPage() {
           <span className="inline-block bg-white/15 text-white px-4 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-4">Quick Certifications</span>
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">Microclasses</h1>
           <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-8">
-            Job-ready certifications in hours, not months. Free through WIOA for eligible Indiana residents — or pay as low as $25 out of pocket.
+            Job-ready certifications in hours, not months. Free through WIOA for eligible Indiana residents — or pay as low as $18 out of pocket.
           </p>
           <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-300">
-            <div className="flex items-center gap-2"><Clock className="w-4 h-4" />1–30 hours</div>
+            <div className="flex items-center gap-2"><Clock className="w-4 h-4" />1–16 hours</div>
             <div className="flex items-center gap-2"><Award className="w-4 h-4" />Industry-recognized certificates</div>
             <div className="flex items-center gap-2"><Zap className="w-4 h-4" />Start immediately after payment</div>
           </div>

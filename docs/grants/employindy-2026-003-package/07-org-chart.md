@@ -27,7 +27,7 @@ Indianapolis, Indiana
 |---|---|---|---|
 | Elizabeth Greene | Founder & CEO / Program Director | 0.25 | Elevate HQ |
 | Ameco Martin | Career Coach | 1.0 | Warren Central High School (embedded) |
-| Case Manager | To Be Hired upon award | 1.0 | Elevate HQ / Field |
+| Elizabeth Greene | Founder & CEO / Program Director / Case Manager | 0.75 | Elevate HQ |
 | Alberta Davis | Testing Center Coordinator | As needed | Elevate Testing Center |
 
 ---
@@ -39,7 +39,7 @@ Indianapolis, Indiana
 | 1 — Governance | Board of Directors | Fiduciary oversight, organizational policy |
 | 2 — Executive | Elizabeth Greene, CEO | Program oversight, EmployIndy coordination, compliance, reporting |
 | 3 — Direct Service | Ameco Martin, Career Coach | In-person coaching at Warren Central, ISS development, ICC data entry, employer coordination |
-| 3 — Support | Case Manager | WIOA enrollment, follow-up, barrier coordination, supportive services |
+| 3 — Case Management | Elizabeth Greene, CEO | WIOA enrollment, ICC data entry, follow-up, barrier coordination, supportive services disbursement |
 | 4 — Testing | Alberta Davis | Credential exam administration, proctor services |
 
 ---
@@ -68,7 +68,7 @@ Indianapolis, Indiana
 | 1 | EmployIndy — Workforce Development Board | Contract oversight, performance monitoring |
 | 2 | Elizabeth Greene — Program Director | Monthly meetings with EmployIndy POC, quarterly reports |
 | 3 | Ameco Martin — Career Coach | Direct service delivery at Warren Central |
-| 4 | Case Manager | ICC data entry, follow-up, supportive services |
+| 4 | Elizabeth Greene — Case Manager | ICC data entry, follow-up, supportive services disbursement |
 | 5 | Participants | Warren Central High School students ages 16-19 |
 
 ---

@@ -156,7 +156,7 @@ Career Coach delivers sector-based career exploration sessions at Warren Central
 **Asynchronous Online Delivery**
 All RTI is delivered via Elevate's LMS on any device, eliminating transportation barriers to instruction. Participants complete coursework on their own schedule around school and work hours.
 
-**Dedicated Case Manager**
+**Case Management — Elizabeth Greene**
 Monthly check-ins for every participant. At-risk flags triggered automatically by LMS inactivity alerts. Structured re-engagement plan before any disenrollment action.
 
 **Supportive Services (WIOA allowable)**
@@ -234,7 +234,7 @@ Elevate's LMS generates automated participant risk scores based on login frequen
 | Line Item | Amount | Justification |
 |---|---|---|
 | Career Coach — Ameco Martin (1.0 FTE) | $52,000 | Salary + benefits. Embedded at Warren Central, delivers all career coaching, ISS development, ICC data entry, and employer coordination |
-| Case Manager (1.0 FTE) | $48,000 | Salary + benefits. WIOA enrollment, ICC management, follow-up, barrier coordination, monthly check-ins |
+| Elizabeth Greene — CEO & Case Manager (0.5 FTE) | $48,000 | Salary + benefits. WIOA enrollment, ICC management, follow-up, barrier coordination, monthly check-ins |
 | Program Director — Elizabeth Greene (0.25 FTE) | $20,000 | Oversight, EmployIndy coordination, quarterly reporting, continuous improvement |
 | LMS Platform & Technology | $24,000 | Hosting, maintenance, AI-assisted content delivery, dashboard reporting, participant tracking |
 | Participant Supportive Services | $180,000 | Transportation stipends, work attire/tools, EPA 608 exam fees, participant incentives, accessibility supports. Estimated 100 participants × $1,800 average |

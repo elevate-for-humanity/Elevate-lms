@@ -37,8 +37,7 @@ Indianapolis, Indiana
 | Position | FTE | Annual Salary | Benefits (20%) | Total |
 |---|---|---|---|---|
 | Career Coach — Ameco Martin | 1.0 | $43,333 | $8,667 | $52,000 |
-| Case Manager | 1.0 | $40,000 | $8,000 | $48,000 |
-| Program Director — Elizabeth Greene | 0.25 | $16,000 | $4,000 | $20,000 |
+| Elizabeth Greene — CEO / Program Director / Case Manager | 0.75 | $56,000 | $12,000 | $68,000 |
 | **Personnel Total** | | | | **$120,000** |
 
 ---
@@ -50,11 +49,9 @@ Indianapolis, Indiana
 **Career Coach — Ameco Martin (1.0 FTE) — $52,000**
 Ameco Martin serves as the dedicated Career Coach embedded at Warren Central High School. Responsibilities include: in-person career coaching, WIOA eligibility screening, ISS development and updates in Indiana Career Connect, employer coordination, work-based learning placement, monthly participant check-ins, and EmployIndy coordination meetings. Full-time position, 12 months.
 
-**Case Manager (1.0 FTE) — $48,000**
-Dedicated case manager responsible for WIOA enrollment documentation, Indiana Career Connect data entry and maintenance, participant follow-up at 30/90/180/365 days post-exit, barrier coordination, supportive services disbursement, and quarterly performance reporting. Full-time position, 12 months.
+**Elizabeth Greene — CEO / Program Director / Case Manager (0.75 FTE) — $68,000**
+Elizabeth Greene serves as Case Manager, responsible for WIOA enrollment documentation, Indiana Career Connect data entry and maintenance, participant follow-up at 30/90/180/365 days post-exit, barrier coordination, supportive services disbursement, and quarterly performance reporting. Full-time position, 12 months.
 
-**Program Director — Elizabeth Greene (0.25 FTE) — $20,000**
-Elizabeth Greene provides program oversight, EmployIndy relationship management, quarterly reporting, continuous improvement review, financial controls, and compliance monitoring. Allocated at 25% of full-time equivalent, 12 months.
 
 ---
 
@@ -77,7 +74,7 @@ Estimated 100 participants × $1,800 average per participant. Allowable WIOA sup
 | Accessibility/multilingual supports | $250 | $25,000 |
 | **Subtotal** | **$1,800** | **$180,000** |
 
-All supportive services are disbursed by the case manager upon documented need and in compliance with EmployIndy supportive services policy. No participant is denied services due to inability to pay.
+All supportive services are disbursed by Elizabeth Greene upon documented need and in compliance with EmployIndy supportive services policy. No participant is denied services due to inability to pay.
 
 ---
 

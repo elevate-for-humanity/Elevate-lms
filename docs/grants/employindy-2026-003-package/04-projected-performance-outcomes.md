@@ -30,7 +30,7 @@ Indianapolis, Indiana
 |---|---|---|---|
 | **Credential Attainment Rate** | 68.0% | **75%** | EPA 608 is a built-in federally recognized credential. LMS checkpoint system assesses exam readiness before registration, reducing failed attempts. Testing fees covered — no financial barrier to sitting the exam. |
 | **Placed in Employment, Education, or Training (2Q after exit)** | 80.0% | **83%** | Direct hiring pipeline via 2Exclusive Platinum Cleaning. Active HVAC employer network in Marion County. Participants not entering HVAC employment connected to postsecondary education or other training. |
-| **Retention in Employment, Education, or Training (4Q after exit)** | 82.1% | **85%** | Apprenticeship structure creates 24-month retention by design. 12-month follow-up by case manager. Milestone-based wage increases incentivize persistence. |
+| **Retention in Employment, Education, or Training (4Q after exit)** | 82.1% | **85%** | Apprenticeship structure creates 24-month retention by design. 12-month follow-up by Elizabeth Greene. Milestone-based wage increases incentivize persistence. |
 | **Median Earnings (2Q after exit — unsubsidized employment)** | $4,300 | **$5,200** | HVAC entry wages in Marion County exceed $13/hour. EPA 608 certified technicians command premium above entry level. Projected annualized Q2 earnings of $5,200 based on 20 hours/week at $13/hour minimum. |
 | **Measurable Skills Gain** | 69.0% | **78%** | LMS checkpoint system tracks skills gain in real time at the lesson level. Automated alerts prevent stagnation. Every participant completing at least one LMS module generates a measurable skills gain data point in Indiana Career Connect. |
 

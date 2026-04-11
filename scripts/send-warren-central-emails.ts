@@ -12,7 +12,7 @@ import fs from 'fs';
 import path from 'path';
 
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-const FROM_EMAIL = 'noreply@elevateforhumanity.org';
+const FROM_EMAIL = 'elevate4humanityedu@gmail.com';
 const FROM_NAME = 'Elizabeth Greene — Elevate for Humanity';
 const REPLY_TO = 'elevate4humanityedu@gmail.com';
 

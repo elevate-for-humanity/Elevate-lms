@@ -35,6 +35,7 @@ const DOCUMENTS = [
   { file: '05-budget-template.md',             title: 'Budget Template & Narrative',           subject: 'RFP 2026-003 — Budget Template & Narrative' },
   { file: '06-mou-warren-central.md',          title: 'MOU — Warren Central High School',      subject: 'RFP 2026-003 — MOU: Warren Central High School' },
   { file: '07-org-chart.md',                   title: 'Organizational Chart',                  subject: 'RFP 2026-003 — Organizational Chart' },
+  { file: '08-letter-of-recognition-warren-central.md', title: 'Letter of Recognition — Warren Central High School', subject: 'RFP 2026-003 — Letter of Recognition: Warren Central High School' },
 ];
 
 function markdownToHtml(markdown: string, title: string): string {

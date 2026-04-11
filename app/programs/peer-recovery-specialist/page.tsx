@@ -33,7 +33,7 @@ const FALLBACK = {
   funding: 'WIOA and Justice Reinvestment Initiative (Job Ready Indy) funding available for eligible Indiana residents.',
   program_tracks: [
     { id: '1', title: 'WIOA Funded', description: 'For eligible unemployed or underemployed Indiana residents. Covers full tuition, books, and exam fees.', cost_cents: 0, funding_type: 'wioa', available: true },
-    { id: '2', title: 'Self-Pay', description: 'Pay out of pocket. Payment plans available.', cost_cents: 149500, funding_type: 'self_pay', available: true },
+    { id: '2', title: 'Self-Pay', description: 'Pay out of pocket. Payment plans available.', cost_cents: 500000, funding_type: 'self_pay', available: true },
   ],
   program_modules: [
     { id: '1', module_number: 1, title: 'Introduction to Peer Recovery', description: 'History of peer support, roles and responsibilities, ethics and boundaries.', lesson_count: 4, duration_hours: 6 },

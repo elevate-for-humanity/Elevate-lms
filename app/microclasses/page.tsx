@@ -1,169 +1,158 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Clock, Award, ArrowRight } from 'lucide-react';
+import { Clock, Award, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
+import {
+  HSI_COURSES,
+  NRF_COURSES,
+  CAREERSAFE_COURSES,
+  type PartnerCourse,
+} from '@/lib/partners/link-based-integration';
 
 export const metadata: Metadata = {
   title: 'Microclasses | Elevate for Humanity',
-  description: 'Short, focused certification courses you can complete in days. CPR, First Aid, Food Handler, OSHA Safety and more.',
+  description: 'Job-ready certifications in hours. CPR, ServSafe, OSHA, Bloodborne Pathogens and more. Free with WIOA or pay as low as $25.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/microclasses',
   },
 };
 
-const microclasses = [
-  {
-    title: 'CPR & First Aid (HSI)',
-    description: 'American Heart Association aligned certification for healthcare and workplace safety.',
-    duration: '4-6 hours',
-    price: 'Free with WIOA',
-    certification: 'HSI CPR/AED/First Aid',
-    href: '/programs/cpr-first-aid',
-    image: '/images/pages/micro-programs.jpg',
-  },
-  {
-    title: 'Food Handler Certification',
-    description: 'Required certification for food service workers in Indiana.',
-    duration: '2-4 hours',
-    price: 'Free with WIOA',
-    certification: 'Indiana Food Handler Card',
-    href: '/programs/food-handler',
-    image: '/images/pages/micro-programs.jpg',
-  },
-  {
-    title: 'OSHA 10-Hour Safety',
-    description: 'Workplace safety certification for construction and general industry.',
-    duration: '10 hours',
-    price: 'Free with WIOA',
-    certification: 'OSHA 10 Card',
-    href: '/programs/osha-safety',
-    image: '/images/pages/hvac-technician.jpg',
-  },
-  {
-    title: 'OSHA 30-Hour Safety',
-    description: 'Advanced workplace safety certification for supervisors and managers.',
-    duration: '30 hours',
-    price: 'Free with WIOA',
-    certification: 'OSHA 30 Card',
-    href: '/programs/osha-30',
-    image: '/images/pages/hvac-technician.jpg',
-  },
-  {
-    title: 'Forklift Certification',
-    description: 'OSHA-compliant forklift operator training and certification.',
-    duration: '4-8 hours',
-    price: 'Free with WIOA',
-    certification: 'Forklift Operator Card',
-    href: '/programs/forklift',
-    image: '/images/pages/prog-hero-main-2.jpg',
-  },
-  {
-    title: 'Bloodborne Pathogens',
-    description: 'Required training for healthcare workers on infection control.',
-    duration: '2 hours',
-    price: 'Free with WIOA',
-    certification: 'BBP Certificate',
-    href: '/programs/bloodborne-pathogens',
-    image: '/images/pages/micro-programs.jpg',
-  },
+const SECTIONS = [
+  { id: 'safety',     label: 'Safety & OSHA',  partner: 'CareerSafe',                      courses: CAREERSAFE_COURSES },
+  { id: 'healthcare', label: 'Healthcare',      partner: 'Health & Safety Institute',        courses: HSI_COURSES },
+  { id: 'food',       label: 'Food Service',    partner: 'National Restaurant Foundation',   courses: NRF_COURSES },
 ];
+
+function CourseCard({ course }: { course: PartnerCourse }) {
+  const isFree = course.retailPrice === 0;
+  return (
+    <div className="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col hover:shadow-md transition-shadow">
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <h3 className="text-sm font-bold text-slate-900 leading-snug">{course.title}</h3>
+        {isFree ? (
+          <span className="shrink-0 text-xs font-bold text-green-700 bg-green-100 px-2 py-1 rounded-full">Free / WIOA</span>
+        ) : (
+          <span className="shrink-0 text-sm font-bold text-slate-900">${course.retailPrice}</span>
+        )}
+      </div>
+      <p className="text-xs text-slate-500 mb-4 flex-1">{course.description}</p>
+      <div className="space-y-1 mb-5">
+        <div className="flex items-center gap-2 text-xs text-slate-400"><Clock className="w-3 h-3" />{course.duration}</div>
+        <div className="flex items-center gap-2 text-xs text-slate-400"><Award className="w-3 h-3" />{course.certificationType}</div>
+        <div className="flex items-center gap-2 text-xs text-slate-400"><ShieldCheck className="w-3 h-3" />{course.partnerName}</div>
+      </div>
+      {isFree ? (
+        <Link href="/apply/student" className="block text-center bg-slate-900 text-white text-xs font-bold py-2.5 rounded-xl hover:bg-slate-800 transition-colors">
+          Apply — Free with WIOA
+        </Link>
+      ) : (
+        <div className="space-y-2">
+          <a href={course.paymentLink} target="_blank" rel="noopener noreferrer"
+            className="block text-center bg-slate-900 text-white text-xs font-bold py-2.5 rounded-xl hover:bg-slate-800 transition-colors">
+            Enroll Now — ${course.retailPrice}
+          </a>
+          <p className="text-center text-xs text-slate-400">
+            Free with WIOA?{' '}
+            <Link href="/apply/student" className="underline text-slate-600">Apply here</Link>
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function MicroclassesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="bg-brand-blue-700 text-white py-16 lg:py-24">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="text-center">
-            <span className="inline-block bg-white/20 text-white px-4 py-1 rounded-full text-sm font-medium mb-4">
-              Quick Certifications
-            </span>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Microclasses
-            </h1>
-            <p className="text-xl text-white max-w-2xl mx-auto mb-8">
-              Short, focused courses that give you job-ready certifications in hours or days, not months.
-            </p>
-            <div className="flex flex-wrap justify-center gap-6 text-sm">
-              <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5" />
-                <span>2-30 hours</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Award className="w-5 h-5" />
-                <span>Industry Certifications</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-slate-500 flex-shrink-0">•</span>
-                <span>Free with WIOA</span>
-              </div>
-            </div>
+      <section className="bg-slate-900 text-white py-16 lg:py-20">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
+          <span className="inline-block bg-white/15 text-white px-4 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-4">Quick Certifications</span>
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-4">Microclasses</h1>
+          <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-8">
+            Job-ready certifications in hours, not months. Free through WIOA for eligible Indiana residents — or pay as low as $25 out of pocket.
+          </p>
+          <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-300">
+            <div className="flex items-center gap-2"><Clock className="w-4 h-4" />1–30 hours</div>
+            <div className="flex items-center gap-2"><Award className="w-4 h-4" />Industry-recognized certificates</div>
+            <div className="flex items-center gap-2"><Zap className="w-4 h-4" />Start immediately after payment</div>
           </div>
         </div>
       </section>
 
-      {/* Microclasses Grid */}
-      <section className="py-16 lg:py-24">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {microclasses.map((course, index) => (
-              <div key={index} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition group">
-                <div className="h-48 bg-white flex items-center justify-center">
-                  <Award className="w-16 h-16 text-slate-600" />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{course.title}</h3>
-                  <p className="text-gray-600 text-sm mb-4">{course.description}</p>
-                  
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Clock className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-600">{course.duration}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Award className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-600">{course.certification}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="text-slate-500 flex-shrink-0">•</span>
-                      <span className="text-brand-green-600 font-medium">{course.price}</span>
-                    </div>
-                  </div>
+      {/* WIOA Banner */}
+      <div className="bg-green-50 border-b border-green-200">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <ShieldCheck className="w-5 h-5 text-green-600 shrink-0" />
+            <p className="text-sm text-green-900 font-medium">
+              All courses are <strong>free for eligible Indiana residents</strong> through WIOA / WorkOne funding.
+            </p>
+          </div>
+          <Link href="/apply/student" className="shrink-0 text-xs font-bold text-green-800 bg-green-200 hover:bg-green-300 px-4 py-2 rounded-full transition-colors">
+            Check WIOA Eligibility →
+          </Link>
+        </div>
+      </div>
 
-                  <Link 
-                    href={course.href}
-                    className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:text-brand-blue-700 group-hover:gap-3 transition-all"
-                  >
-                    Learn More <ArrowRight className="w-4 h-4" />
-                  </Link>
+      {/* Course Sections */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 space-y-16">
+        {SECTIONS.map((section) => (
+          <div key={section.id}>
+            <div className="mb-6">
+              <h2 className="text-xl font-bold text-slate-900">{section.label}</h2>
+              <p className="text-sm text-slate-500 mt-0.5">via {section.partner}</p>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {section.courses.map((course) => (
+                <CourseCard key={course.id} course={course} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Partner / Full Programs */}
+      <section className="bg-slate-50 border-t border-slate-200 py-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-slate-900">Full Apprenticeship Programs</h2>
+            <p className="text-sm text-slate-500 mt-1">
+              DOL-registered apprenticeship programs that include micro-class certifications as part of the curriculum.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { title: 'Barbershop Apprenticeship',   href: '/programs/barber-apprenticeship',       cert: 'Indiana Barber License',         duration: '12–18 months' },
+              { title: 'Cosmetology Apprenticeship',  href: '/programs/cosmetology-apprenticeship',  cert: 'Indiana Cosmetology License',    duration: '12–18 months' },
+              { title: 'HVAC Technician',             href: '/programs/hvac-technician',             cert: 'EPA 608 + HVAC Certification',   duration: '6–12 months'  },
+              { title: 'Electrical Apprenticeship',   href: '/programs/electrical',                  cert: 'Journeyman Electrician',         duration: '12–24 months' },
+              { title: 'Plumbing Apprenticeship',     href: '/programs/plumbing',                    cert: 'Journeyman Plumber',             duration: '12–24 months' },
+              { title: 'Welding',                     href: '/programs/welding',                     cert: 'AWS Welding Certification',      duration: '6–12 months'  },
+              { title: 'CDL Training',                href: '/programs/cdl-training',                cert: 'Class A CDL',                    duration: '4–8 weeks'    },
+              { title: 'CNA Certification',           href: '/programs/cna',                         cert: 'Indiana CNA License',            duration: '6–8 weeks'    },
+            ].map((prog) => (
+              <Link key={prog.href} href={prog.href}
+                className="bg-white border border-slate-200 rounded-xl p-4 hover:border-slate-400 hover:shadow-sm transition-all group flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-sm font-bold text-slate-900">{prog.title}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{prog.cert}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{prog.duration}</p>
                 </div>
-              </div>
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 shrink-0 mt-0.5 transition-colors" />
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Ready to Get Certified?
-          </h2>
-          <p className="text-lg text-gray-600 mb-8">
-            Most microclasses are free through WIOA funding. Check your eligibility today.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link
-              href="/wioa-eligibility"
-              className="bg-brand-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
-            >
-              Check Eligibility
-            </Link>
-            <Link
-              href="/contact"
-              className="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-white transition"
-            >
-              Contact Us
-            </Link>
+      {/* Bottom CTA */}
+      <section className="py-14 text-center">
+        <div className="max-w-xl mx-auto px-4">
+          <h2 className="text-2xl font-bold text-slate-900 mb-3">Not sure where to start?</h2>
+          <p className="text-slate-500 text-sm mb-6">Our team will help you find the right certification and funding option for your goals.</p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link href="/contact" className="bg-slate-900 text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-slate-800 transition-colors">Talk to an Advisor</Link>
+            <Link href="/apply/student" className="border border-slate-300 text-slate-700 px-6 py-3 rounded-xl font-semibold text-sm hover:bg-slate-50 transition-colors">Apply for WIOA Funding</Link>
           </div>
         </div>
       </section>

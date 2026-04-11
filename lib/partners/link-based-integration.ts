@@ -1,6 +1,11 @@
 // lib/partners/link-based-integration.ts
 // Link-based partner integration system (no API keys needed)
 // Partners: HSI, NRF, JRI, CareerSafe
+//
+// PRICING POLICY:
+//   retailPrice = vendorCost * 1.50 (50% markup), rounded up to nearest $5
+//   WIOA-funded students pay $0 — self-pay students pay retailPrice
+//   Revenue split: Elevate keeps markup, vendor cost paid to partner on invoice
 
 export interface PartnerCourse {
   id: string;
@@ -10,7 +15,10 @@ export interface PartnerCourse {
   description: string;
   category: string;
   duration: string;
-  price: number;
+  vendorCost: number;
+  retailPrice: number;
+  stripePriceId: string;
+  paymentLink: string;
   enrollmentUrl: string;
   loginUrl: string;
   supportUrl: string;
@@ -30,7 +38,6 @@ export interface PartnerEnrollment {
   certificateUrl?: string;
 }
 
-// HSI (Health & Safety Institute) Courses
 export const HSI_COURSES: PartnerCourse[] = [
   {
     id: 'hsi-cpr-aed',
@@ -40,7 +47,10 @@ export const HSI_COURSES: PartnerCourse[] = [
     description: 'American Heart Association CPR and AED certification training',
     category: 'Healthcare',
     duration: '4 hours',
-    price: 0, // Free through WIOA
+    vendorCost: 22,
+    retailPrice: 35,
+    stripePriceId: 'price_1TL8XXH4a2yrVOt52fdgADbs',
+    paymentLink: 'https://buy.stripe.com/dRmfZhbrq4QSfsD0wVgIo0j',
     enrollmentUrl: 'https://www.hsi.com/courses/cpr-aed',
     loginUrl: 'https://www.hsi.com/login',
     supportUrl: 'https://www.hsi.com/support',
@@ -55,7 +65,10 @@ export const HSI_COURSES: PartnerCourse[] = [
     description: 'Comprehensive first aid training and certification',
     category: 'Healthcare',
     duration: '4 hours',
-    price: 0,
+    vendorCost: 22,
+    retailPrice: 35,
+    stripePriceId: 'price_1TL8XYH4a2yrVOt5aNxzYQ5K',
+    paymentLink: 'https://buy.stripe.com/3cIfZh0MM1EG6W71AZgIo0k',
     enrollmentUrl: 'https://www.hsi.com/courses/first-aid',
     loginUrl: 'https://www.hsi.com/login',
     supportUrl: 'https://www.hsi.com/support',
@@ -70,7 +83,10 @@ export const HSI_COURSES: PartnerCourse[] = [
     description: 'OSHA-compliant bloodborne pathogens training',
     category: 'Healthcare',
     duration: '2 hours',
-    price: 0,
+    vendorCost: 15,
+    retailPrice: 25,
+    stripePriceId: 'price_1TL8XZH4a2yrVOt5m0S2EA4l',
+    paymentLink: 'https://buy.stripe.com/28EdR92UUers3JV6VjgIo0l',
     enrollmentUrl: 'https://www.hsi.com/courses/bloodborne-pathogens',
     loginUrl: 'https://www.hsi.com/login',
     supportUrl: 'https://www.hsi.com/support',
@@ -79,7 +95,6 @@ export const HSI_COURSES: PartnerCourse[] = [
   },
 ];
 
-// NRF (National Restaurant Foundation) Courses
 export const NRF_COURSES: PartnerCourse[] = [
   {
     id: 'nrf-servsafe-manager',
@@ -89,7 +104,10 @@ export const NRF_COURSES: PartnerCourse[] = [
     description: 'Food safety manager certification recognized nationwide',
     category: 'Food Service',
     duration: '16 hours',
-    price: 0,
+    vendorCost: 35,
+    retailPrice: 55,
+    stripePriceId: 'price_1TL8XZH4a2yrVOt5WGp5fqrm',
+    paymentLink: 'https://buy.stripe.com/eVq28r5325UW2FR0wVgIo0m',
     enrollmentUrl: 'https://www.servsafe.com/access/ss/Catalog/ProductDetails/SSMC7',
     loginUrl: 'https://www.servsafe.com/login',
     supportUrl: 'https://www.servsafe.com/support',
@@ -104,7 +122,10 @@ export const NRF_COURSES: PartnerCourse[] = [
     description: 'Entry-level food safety certification',
     category: 'Food Service',
     duration: '2 hours',
-    price: 0,
+    vendorCost: 15,
+    retailPrice: 25,
+    stripePriceId: 'price_1TL8XaH4a2yrVOt57RA7dQXV',
+    paymentLink: 'https://buy.stripe.com/3cI6oH9ji834a8j7ZngIo0n',
     enrollmentUrl: 'https://www.servsafe.com/access/ss/Catalog/ProductDetails/SSFH7',
     loginUrl: 'https://www.servsafe.com/login',
     supportUrl: 'https://www.servsafe.com/support',
@@ -119,7 +140,10 @@ export const NRF_COURSES: PartnerCourse[] = [
     description: 'Responsible alcohol service training',
     category: 'Food Service',
     duration: '4 hours',
-    price: 0,
+    vendorCost: 20,
+    retailPrice: 30,
+    stripePriceId: 'price_1TL8XbH4a2yrVOt5XvDSzwsS',
+    paymentLink: 'https://buy.stripe.com/cNidR9brq4QS2FR93rgIo0o',
     enrollmentUrl: 'https://www.servsafe.com/access/ss/Catalog/ProductDetails/SSA7',
     loginUrl: 'https://www.servsafe.com/login',
     supportUrl: 'https://www.servsafe.com/support',
@@ -128,7 +152,7 @@ export const NRF_COURSES: PartnerCourse[] = [
   },
 ];
 
-// JRI (Job Ready Indy) / EmployIndy Courses
+// JRI courses are grant-funded — no self-pay, no Stripe
 export const JRI_COURSES: PartnerCourse[] = [
   {
     id: 'jri-work-ethic',
@@ -138,7 +162,10 @@ export const JRI_COURSES: PartnerCourse[] = [
     description: 'Essential workplace skills and professional development',
     category: 'Soft Skills',
     duration: '8 hours',
-    price: 0,
+    vendorCost: 0,
+    retailPrice: 0,
+    stripePriceId: '',
+    paymentLink: '',
     enrollmentUrl: 'https://employindy.tovutilms.com',
     loginUrl: 'https://employindy.tovutilms.com/login',
     supportUrl: 'https://employindy.org/contact',
@@ -153,7 +180,10 @@ export const JRI_COURSES: PartnerCourse[] = [
     description: 'Professional communication and interpersonal skills',
     category: 'Soft Skills',
     duration: '6 hours',
-    price: 0,
+    vendorCost: 0,
+    retailPrice: 0,
+    stripePriceId: '',
+    paymentLink: '',
     enrollmentUrl: 'https://employindy.tovutilms.com',
     loginUrl: 'https://employindy.tovutilms.com/login',
     supportUrl: 'https://employindy.org/contact',
@@ -168,7 +198,10 @@ export const JRI_COURSES: PartnerCourse[] = [
     description: 'Personal development and career planning',
     category: 'Soft Skills',
     duration: '6 hours',
-    price: 0,
+    vendorCost: 0,
+    retailPrice: 0,
+    stripePriceId: '',
+    paymentLink: '',
     enrollmentUrl: 'https://employindy.tovutilms.com',
     loginUrl: 'https://employindy.tovutilms.com/login',
     supportUrl: 'https://employindy.org/contact',
@@ -177,7 +210,6 @@ export const JRI_COURSES: PartnerCourse[] = [
   },
 ];
 
-// CareerSafe Courses
 export const CAREERSAFE_COURSES: PartnerCourse[] = [
   {
     id: 'careersafe-osha10-general',
@@ -187,7 +219,10 @@ export const CAREERSAFE_COURSES: PartnerCourse[] = [
     description: 'OSHA-authorized 10-hour general industry safety training',
     category: 'Safety',
     duration: '10 hours',
-    price: 0,
+    vendorCost: 30,
+    retailPrice: 45,
+    stripePriceId: 'price_1TL8XbH4a2yrVOt5MPMXmq3E',
+    paymentLink: 'https://buy.stripe.com/fZufZhgLK978dkva7vgIo0p',
     enrollmentUrl: 'https://www.careersafeonline.com/osha-10-hour-general-industry',
     loginUrl: 'https://www.careersafeonline.com/login',
     supportUrl: 'https://www.careersafeonline.com/support',
@@ -202,7 +237,10 @@ export const CAREERSAFE_COURSES: PartnerCourse[] = [
     description: 'OSHA-authorized 10-hour construction safety training',
     category: 'Safety',
     duration: '10 hours',
-    price: 0,
+    vendorCost: 30,
+    retailPrice: 45,
+    stripePriceId: 'price_1TL8XcH4a2yrVOt5T2wuQxPc',
+    paymentLink: 'https://buy.stripe.com/dRm4gzdzyfvw2FR4NbgIo0q',
     enrollmentUrl: 'https://www.careersafeonline.com/osha-10-hour-construction',
     loginUrl: 'https://www.careersafeonline.com/login',
     supportUrl: 'https://www.careersafeonline.com/support',
@@ -214,10 +252,13 @@ export const CAREERSAFE_COURSES: PartnerCourse[] = [
     partnerId: 'careersafe',
     partnerName: 'CareerSafe',
     title: 'OSHA 30-Hour General Industry',
-    description: 'Advanced OSHA safety training for supervisors',
+    description: 'Advanced OSHA safety training for supervisors and managers',
     category: 'Safety',
     duration: '30 hours',
-    price: 0,
+    vendorCost: 89,
+    retailPrice: 135,
+    stripePriceId: 'price_1TL8XdH4a2yrVOt5zOAVN4qX',
+    paymentLink: 'https://buy.stripe.com/14AcN5cvugzAbcn0wVgIo0r',
     enrollmentUrl: 'https://www.careersafeonline.com/osha-30-hour-general-industry',
     loginUrl: 'https://www.careersafeonline.com/login',
     supportUrl: 'https://www.careersafeonline.com/support',
@@ -232,7 +273,10 @@ export const CAREERSAFE_COURSES: PartnerCourse[] = [
     description: 'OSHA-compliant bloodborne pathogens training for healthcare workers',
     category: 'Healthcare Safety',
     duration: '1 hour',
-    price: 0,
+    vendorCost: 15,
+    retailPrice: 25,
+    stripePriceId: 'price_1TL8XeH4a2yrVOt5wE5aAIUX',
+    paymentLink: 'https://buy.stripe.com/dRm4gz7baers5S34NbgIo0s',
     enrollmentUrl: 'https://www.careersafeonline.com/bloodborne-pathogens',
     loginUrl: 'https://www.careersafeonline.com/login',
     supportUrl: 'https://www.careersafeonline.com/support',
@@ -247,7 +291,10 @@ export const CAREERSAFE_COURSES: PartnerCourse[] = [
     description: 'Healthcare infection control and prevention training',
     category: 'Healthcare Safety',
     duration: '2 hours',
-    price: 0,
+    vendorCost: 15,
+    retailPrice: 25,
+    stripePriceId: 'price_1TL8XeH4a2yrVOt5eYMWsJJN',
+    paymentLink: 'https://buy.stripe.com/eVq7sLfHG5UW5S34NbgIo0t',
     enrollmentUrl: 'https://www.careersafeonline.com/infection-control',
     loginUrl: 'https://www.careersafeonline.com/login',
     supportUrl: 'https://www.careersafeonline.com/support',
@@ -262,7 +309,10 @@ export const CAREERSAFE_COURSES: PartnerCourse[] = [
     description: 'Essential patient safety training for home health aides',
     category: 'Healthcare Safety',
     duration: '2 hours',
-    price: 0,
+    vendorCost: 15,
+    retailPrice: 25,
+    stripePriceId: 'price_1TL8XfH4a2yrVOt5LDGUltFP',
+    paymentLink: 'https://buy.stripe.com/14A14n1QQ4QS2FR6VjgIo0u',
     enrollmentUrl: 'https://www.careersafeonline.com/patient-safety',
     loginUrl: 'https://www.careersafeonline.com/login',
     supportUrl: 'https://www.careersafeonline.com/support',
@@ -271,8 +321,6 @@ export const CAREERSAFE_COURSES: PartnerCourse[] = [
   },
 ];
 
-// All partner courses combined
-// Beauty/barber theory is delivered via Elevate LMS — no external partner courses
 export const ALL_PARTNER_COURSES: PartnerCourse[] = [
   ...HSI_COURSES,
   ...NRF_COURSES,
@@ -280,34 +328,40 @@ export const ALL_PARTNER_COURSES: PartnerCourse[] = [
   ...CAREERSAFE_COURSES,
 ];
 
-// Helper functions
 export function getPartnerCourses(partnerId: string): PartnerCourse[] {
-  return ALL_PARTNER_COURSES.filter(course => course.partnerId === partnerId);
+  return ALL_PARTNER_COURSES.filter(c => c.partnerId === partnerId);
 }
 
 export function getCourseById(courseId: string): PartnerCourse | undefined {
-  return ALL_PARTNER_COURSES.find(course => course.id === courseId);
+  return ALL_PARTNER_COURSES.find(c => c.id === courseId);
 }
 
 export function getCoursesByCategory(category: string): PartnerCourse[] {
-  return ALL_PARTNER_COURSES.filter(course => course.category === category);
+  return ALL_PARTNER_COURSES.filter(c => c.category === category);
 }
 
 export function getActiveCourses(): PartnerCourse[] {
-  return ALL_PARTNER_COURSES.filter(course => course.isActive);
+  return ALL_PARTNER_COURSES.filter(c => c.isActive);
 }
 
-// Enrollment tracking (no API needed - just track links)
+export function getPaidCourses(): PartnerCourse[] {
+  return ALL_PARTNER_COURSES.filter(c => c.retailPrice > 0);
+}
+
+export function getPaymentLink(courseId: string, email?: string): string {
+  const course = getCourseById(courseId);
+  if (!course?.paymentLink) return '';
+  return email
+    ? `${course.paymentLink}?prefilled_email=${encodeURIComponent(email)}`
+    : course.paymentLink;
+}
+
 export async function createPartnerEnrollment(
   studentId: string,
   courseId: string
 ): Promise<PartnerEnrollment> {
   const course = getCourseById(courseId);
-
-  if (!course) {
-    throw new Error(`Course not found: ${courseId}`);
-  }
-
+  if (!course) throw new Error(`Course not found: ${courseId}`);
   return {
     id: `enroll_${Date.now()}`,
     studentId,
@@ -318,23 +372,8 @@ export async function createPartnerEnrollment(
   };
 }
 
-// Generate enrollment instructions
 export function getEnrollmentInstructions(courseId: string): string {
   const course = getCourseById(courseId);
-
-  if (!course) {
-    return 'Course not found';
-  }
-
-  return `
-To enroll in ${course.title}:
-
-1. Click the enrollment link: ${course.enrollmentUrl}
-2. Create an account or log in at: ${course.loginUrl}
-3. Complete the course at your own pace
-4. Upon completion, your certificate will be available
-5. Need help? Contact support: ${course.supportUrl}
-
-This course is 100% free through WIOA funding.
-  `.trim();
+  if (!course) return 'Course not found';
+  return `To access ${course.title}:\n\n1. Go to: ${course.enrollmentUrl}\n2. Create an account or log in at: ${course.loginUrl}\n3. Complete the course at your own pace\n4. Your certificate will be available upon completion\n5. Need help? Contact: ${course.supportUrl}`;
 }

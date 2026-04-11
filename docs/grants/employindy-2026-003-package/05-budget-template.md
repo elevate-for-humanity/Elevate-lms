@@ -104,12 +104,12 @@ Covers financial management, grant compliance, audit preparation, organizational
 | Participants served | 100 |
 | Cost per participant | $4,000 |
 | WIOA median earnings target (Q2) | $4,300 |
-| Elevate projected median earnings (Q2) | $5,200 |
+| Elevate projected median earnings (Q2) | $5,000 |
 | Return on investment | $1,200 above target per participant |
 | Credential attainment target | 68% |
 | Elevate projected credential attainment | 75% |
 
-At $4,000 per participant, Elevate delivers a federally recognized credential (EPA 608), work-based learning placement, 12-month follow-up, and all 14 WIOA service elements — below the projected Q2 median earnings of $5,200 per participant.
+At $4,000 per participant, Elevate delivers a federally recognized credential (EPA 608), work-based learning placement, 12-month follow-up, and all 14 WIOA service elements — below the projected Q2 median earnings of $5,000 per participant.
 
 ---
 

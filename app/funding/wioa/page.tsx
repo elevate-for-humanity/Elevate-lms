@@ -26,7 +26,7 @@ export default async function WioaPage() {
         .from('funding_options')
         .select('*')
         .eq('type', 'wioa')
-        .single();
+        .maybeSingle();
       wioaInfo = data;
     }
   } catch (error) {

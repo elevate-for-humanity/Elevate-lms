@@ -34,7 +34,7 @@ export default async function OnboardingPage() {
       .from('profiles')
       .select('role, full_name')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
     profile = data;
     if (profile?.role === 'student') redirect('/onboarding/learner');
     else if (profile?.role === 'program_holder')

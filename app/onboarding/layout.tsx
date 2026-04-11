@@ -30,7 +30,7 @@ export default async function OnboardingLayout({
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   // All authenticated users can access onboarding
   // The specific onboarding page will determine what they can do based on role

@@ -29,7 +29,7 @@ export default async function PayrollSetupPage() {
     .from('profiles')
     .select('id, full_name, email, role')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   if (!profile || !profile.role) {
     redirect('/onboarding/start');

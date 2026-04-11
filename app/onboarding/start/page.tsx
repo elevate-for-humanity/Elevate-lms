@@ -31,7 +31,7 @@ export default async function OnboardingStartPage() {
     .from('profiles')
     .select('id, full_name, email, role')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   if (!profile || !profile.role) {
     return (
@@ -61,7 +61,7 @@ export default async function OnboardingStartPage() {
     .select('is_complete, role')
     .eq('user_id', user.id)
     .eq('role', profile.role)
-    .single();
+    .maybeSingle();
 
   if (progress?.is_complete) {
     // Redirect to appropriate dashboard based on role
@@ -80,7 +80,7 @@ export default async function OnboardingStartPage() {
     .select('id, title, description')
     .eq('role', profile.role)
     .eq('is_active', true)
-    .single();
+    .maybeSingle();
 
   if (!packet) {
     return (
@@ -126,7 +126,7 @@ export default async function OnboardingStartPage() {
     .select('status')
     .eq('user_id', user.id)
     .eq('role', profile.role)
-    .single();
+    .maybeSingle();
 
   return (
     <OnboardingFlow

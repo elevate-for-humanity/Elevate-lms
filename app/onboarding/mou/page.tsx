@@ -153,7 +153,7 @@ export default function MOUOnboardingPage() {
       setSignerEmail(data.user.email ?? '');
 
       const { data: profile } = await supabase
-        .from('profiles').select('full_name, role').eq('id', data.user.id).single();
+        .from('profiles').select('full_name, role').eq('id', data.user.id).maybeSingle();
       if (profile?.full_name) setSignerName(profile.full_name);
 
       const { data: existing } = await supabase

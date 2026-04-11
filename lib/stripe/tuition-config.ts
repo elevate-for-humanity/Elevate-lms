@@ -52,10 +52,10 @@ export const PROGRAM_TUITION: ProgramTuition[] = [
     tuitionAmount: 2200,
     registrationFee: 150,
     internalPlan: {
-      minDownPayment: 500,
-      downPaymentPercent: 23,
+      minDownPayment: 600,
+      downPaymentPercent: 27,
       maxTermMonths: 4,
-      monthlyPayment: 425, // ($2200 - $500) / 4
+      monthlyPayment: 400, // ($2200 - $600) / 4
     },
   },
   {
@@ -179,10 +179,10 @@ export const TIER3A_BRIDGE_PLAN = {
   
   // HARD LIMITS - DO NOT CHANGE WITHOUT EXECUTIVE APPROVAL
   rules: {
-    downPayment: 500, // Fixed $500
+    downPayment: 600, // Fixed $600 minimum
     monthlyPayment: 200, // Fixed $200/month minimum
     maxTermMonths: 3, // 90 DAYS HARD STOP
-    totalCollectedInternally: 1100, // $500 + ($200 × 3) = $1,100 max
+    totalCollectedInternally: 1200, // $600 + ($200 × 3) = $1,200 max
     paymentMethod: 'autopay_only' as const,
     lateFee: 50,
     gracePeriodDays: 7,
@@ -478,8 +478,8 @@ export const TUITION_PRODUCTS: TuitionProduct[] = [
       discount: 0,
     },
     installmentPlan: {
-      depositAmount: 500,
-      weeklyAmount: 106, // ($2200 - $500) / 16 weeks
+      depositAmount: 600,
+      weeklyAmount: 100, // ($2200 - $600) / 16 weeks
       numberOfWeeks: 16,
       totalPayments: 16,
     },

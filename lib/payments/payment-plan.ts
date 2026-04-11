@@ -40,8 +40,8 @@ export interface PaymentScheduleItem {
 export function calculatePaymentPlan(config: PaymentPlanConfig): PaymentPlan {
   const { totalAmount, downPaymentPercent, programHours, hoursPerWeek } = config;
 
-  // Calculate down payment (minimum $100, or percentage)
-  const downPayment = Math.max(100, Math.round(totalAmount * downPaymentPercent));
+  // Calculate down payment (minimum $600, or percentage)
+  const downPayment = Math.max(600, Math.round(totalAmount * downPaymentPercent));
   const remainingBalance = totalAmount - downPayment;
 
   // Calculate number of weeks based on program hours

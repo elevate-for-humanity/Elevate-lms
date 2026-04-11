@@ -156,9 +156,10 @@ export const STRIPE_PRICE_IDS: Record<string, string> = {
   "barber-deposit": "price_1Sw3XrIRNf5vPH3AV9CpXMQD", // $1,743
   "barber-installment": "price_1Sw3YiIRNf5vPH3A0HdYRJtK", // $540
   
-  // CNA Certification - $1,200 = $420 (35%) + $195 × 4
-  "cna-deposit": "price_1Sw3XrIRNf5vPH3AYj5EUeqD", // $420
-  "cna-installment": "price_1Sw3YjIRNf5vPH3AqtrrnWP0", // $195
+  // CNA Certification - $1,200 = $600 (min deposit) + $100 × 6
+  // Note: 35% of $1,200 = $420, but $600 minimum floor applies
+  "cna-deposit": "price_1TL6sCH4a2yrVOt5oCumO34g", // $600
+  "cna-installment": "price_1Sw3YjIRNf5vPH3AqtrrnWP0", // $100 (TODO: update price in Stripe Dashboard)
   
   // HVAC Technician - $5,500 = $1,925 (35%) + $596 × 6
   "hvac-deposit": "price_1Sw3XsIRNf5vPH3ATDbqt5QL", // $1,925
@@ -225,7 +226,7 @@ export const PAYMENT_LINKS = {
   // CNA Certification - $1,200
   cna: {
     full: "https://buy.stripe.com/fZu7sM6tseXRdps8Kj8EN0c", // $1,200
-    deposit: "https://buy.stripe.com/5kQ5kEbNMbLFadgf8H8EN0p", // $420 (35%)
+    deposit: "https://buy.stripe.com/bJe6oHgLK1EG4NZdjHgIo04", // $600 (min deposit)
   },
   
   // Cosmetology - $4,999

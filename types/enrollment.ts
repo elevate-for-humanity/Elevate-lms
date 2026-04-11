@@ -370,7 +370,7 @@ export interface ComplianceAudit {
 // =====================================================
 
 export const BRIDGE_PLAN_CONSTRAINTS = {
-  MIN_DOWN_PAYMENT: 500,
+  MIN_DOWN_PAYMENT: 600,
   MIN_MONTHLY_PAYMENT: 200,
   MAX_TERM_MONTHS: 3,
   MAX_TERM_DAYS: 90,

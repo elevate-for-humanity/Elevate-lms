@@ -135,7 +135,7 @@ export default async function PeerRecoverySpecialistPage() {
               {(program as any).hero_headline ?? program.title}
             </h1>
             {(program as any).hero_subheadline && (
-              <p className="mt-4 max-w-2xl text-lg text-slate-600">{(program as any).hero_subheadline}</p>
+              <p className="mt-4 max-w-2xl text-lg text-slate-900">{(program as any).hero_subheadline}</p>
             )}
             <div className="mt-6 flex flex-wrap gap-3">
               {program.program_ctas.map((cta: any) => {
@@ -147,7 +147,7 @@ export default async function PeerRecoverySpecialistPage() {
                 return <Link key={cta.id} href={cta.href} className={variant}>{cta.label}</Link>;
               })}
             </div>
-            <div className="mt-8 flex flex-wrap gap-6 text-sm font-medium text-slate-600">
+            <div className="mt-8 flex flex-wrap gap-6 text-sm font-medium text-slate-900">
               {program.length_weeks && <span>{program.length_weeks} weeks</span>}
               {program.delivery_model && <span className="capitalize">{program.delivery_model}</span>}
               {program.certificate_title && <span>{program.certificate_title}</span>}
@@ -256,7 +256,7 @@ export default async function PeerRecoverySpecialistPage() {
                     {mod.lesson_count} lessons{mod.duration_hours ? ` · ${mod.duration_hours}h` : ''}
                   </div>
                 </div>
-                {mod.description && <p className="mt-2 text-sm text-slate-600">{mod.description}</p>}
+                {mod.description && <p className="mt-2 text-sm text-slate-900">{mod.description}</p>}
               </div>
             </div>
           ))}

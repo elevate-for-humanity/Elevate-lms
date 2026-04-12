@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Clock, DollarSign, ArrowRight } from 'lucide-react';
+import { Clock, DollarSign, ArrowRight, CreditCard } from 'lucide-react';
+import { BNPL_PROVIDER_SUMMARY } from '@/lib/bnpl-config';
 
 export const dynamic = 'force-static';
 export const revalidate = 86400;
@@ -57,7 +58,7 @@ const BUSINESS = [
 ];
 
 const APPRENTICESHIPS = [
-  { title: 'Barber Apprenticeship', duration: '15–24 months', pay: '$28–$52k/yr', slug: 'barber-apprenticeship', image: '/images/pages/barber-hero-main.jpg' },
+  { title: 'Barber Apprenticeship', duration: '12 months', pay: 'Employer-set', slug: 'barber-apprenticeship', image: '/images/pages/barber-hero-main.jpg' },
   { title: 'Cosmetology Apprenticeship', duration: '12–18 months', pay: null, slug: 'cosmetology-apprenticeship', image: '/images/pages/cosmetology.jpg' },
   { title: 'Nail Technician Apprenticeship', duration: '20 weeks', pay: null, slug: 'nail-technician-apprenticeship', image: '/images/pages/nail-technician.jpg' },
   { title: 'Culinary Apprenticeship', duration: '26 weeks', pay: null, slug: 'culinary-apprenticeship', image: '/images/pages/culinary.jpg' },
@@ -297,6 +298,12 @@ export default function ProgramsPage() {
                         <p className="text-white font-bold text-sm leading-tight">{a.title}</p>
                         <p className="text-white text-xs mt-0.5">{a.duration} · Paid OJT</p>
                         {a.pay && <p className="text-green-300 text-xs font-semibold mt-0.5">{a.pay}</p>}
+                        {a.slug === 'barber-apprenticeship' && (
+                          <p className="text-white/80 text-[10px] mt-1 flex items-center gap-1">
+                            <CreditCard className="w-3 h-3 flex-shrink-0" />
+                            {BNPL_PROVIDER_SUMMARY} · payment plans available
+                          </p>
+                        )}
                       </div>
                     </div>
                   </Link>

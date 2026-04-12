@@ -26,6 +26,7 @@ export const IT_HELP_DESK: ProgramSchema = {
   cohortSize: '12–16 participants per cohort',
   fundingStatement: 'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.',
   selfPayCost: '$2,800',
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: '4-Star Top Job — DWD',
   badgeColor: 'blue',
 

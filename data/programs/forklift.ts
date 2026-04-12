@@ -17,6 +17,7 @@ export const FORKLIFT: ProgramSchema = {
   cohortSize: '8–12 participants per cohort',
   fundingStatement: 'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.',
   selfPayCost: '$500',
+  fundingOptions: ['wioa', 'impact', 'self_pay'],
   badge: 'Quick Cert',
   badgeColor: 'green',
   credentials: [

@@ -26,6 +26,7 @@ export const CYBERSECURITY_ANALYST: ProgramSchema = {
   cohortSize: '10–14 participants per cohort',
   fundingStatement: 'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.',
   selfPayCost: '$4,200',
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: '5-Star Top Job — DWD',
   badgeColor: 'purple',
 

@@ -208,5 +208,5 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
   enrollmentType: 'internal',
   deliveryModel: 'internal',
   lmsCourseSlug: 'hvac-technician',
-  fundingOptions: ['wioa', 'wrg'],
+  fundingOptions: ['wioa', 'wrg', 'impact'],
 };

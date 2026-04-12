@@ -30,6 +30,7 @@ export const PHARMACY_TECHNICIAN: ProgramSchema = {
   cohortSize: '12–16 participants per cohort',
   fundingStatement: '$0 with WIOA funding. Next Level Jobs accepted.',
   selfPayCost: '$4,200 (payment plans available)',
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: 'Funding Available',
   badgeColor: 'green',
 

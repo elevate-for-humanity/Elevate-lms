@@ -6,7 +6,7 @@ import { DollarSign, Users, Building2, ArrowRight, Shield, GraduationCap } from 
 
 export const metadata: Metadata = {
   title: 'Grants & Scholarships | Get Your Training Paid For | Elevate For Humanity',
-  description: 'Indiana residents may qualify for workforce funding through federal and state grants. Eligibility is required. See if you qualify for WIOA, Workforce Ready Grant, or other programs.',
+  description: 'Indiana residents may qualify for workforce funding through WIOA, Workforce Ready Grant, FSSA IMPACT, and other programs. Eligibility required. IMPACT covers training for current SNAP and TANF recipients at no cost.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/grants' },
 };
 
@@ -124,6 +124,57 @@ export default function GrantsPage() {
                         </li>
                       ))}
                     </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* FSSA IMPACT */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+              <div className="flex flex-col md:flex-row md:items-start gap-6">
+                <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Users className="w-8 h-8 text-purple-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center gap-3 mb-2">
+                    <h3 className="text-2xl font-bold text-slate-900">FSSA IMPACT</h3>
+                    <span className="text-xs font-semibold uppercase tracking-wide bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full">Indiana State</span>
+                  </div>
+                  <p className="text-sm text-slate-500 mb-3">Indiana Manpower Placement and Comprehensive Training — administered by FSSA / Division of Family Resources</p>
+                  <p className="text-slate-600 mb-4">
+                    IMPACT pays for job training at no cost to participants who currently receive SNAP or TANF benefits. A dedicated case manager works with you throughout the program — from enrollment through job placement. IMPACT covers tuition, and your case manager can connect you with additional support services.
+                  </p>
+                  <div className="bg-slate-50 rounded-lg p-4 mb-4">
+                    <h4 className="font-semibold text-slate-900 mb-2">Requirements:</h4>
+                    <ul className="space-y-2">
+                      {[
+                        'Currently receiving SNAP (food assistance) or TANF (cash assistance) benefits',
+                        'Indiana resident',
+                        'Able and available to work after training',
+                        'High school diploma or GED preferred for job skills training (not always required)',
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-start gap-2 text-slate-700 text-sm">
+                          <span className="text-slate-400 flex-shrink-0 mt-0.5">•</span> {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="bg-purple-50 border border-purple-100 rounded-lg p-4 mb-4">
+                    <h4 className="font-semibold text-slate-900 mb-1">How to get started:</h4>
+                    <p className="text-slate-700 text-sm">Call <strong>800-403-0864 and press 3</strong> to speak with an IMPACT representative, or ask your DFR eligibility worker for a referral at your next appointment. You can also self-refer — you do not need to wait for your caseworker to bring it up.</p>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <a
+                      href="https://www.in.gov/fssa/dfr/impact-job-training"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-purple-700 font-semibold hover:underline inline-flex items-center gap-1 text-sm"
+                    >
+                      FSSA IMPACT Program Page <ArrowRight className="w-4 h-4" />
+                    </a>
+                    <Link href="/fssa-impact" className="text-purple-700 font-semibold hover:underline inline-flex items-center gap-1 text-sm">
+                      How Elevate Works With IMPACT <ArrowRight className="w-4 h-4" />
+                    </Link>
                   </div>
                 </div>
               </div>

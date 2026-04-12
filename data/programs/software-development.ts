@@ -8,6 +8,7 @@ export const SOFTWARE_DEV: ProgramSchema = {
   hoursBreakdown: { onlineInstruction: 80, handsOnLab: 140, examPrep: 20, careerPlacement: 20 },
   schedule: 'Mon–Fri, 9:00 AM–1:00 PM', cohortSize: '10–14 participants per cohort',
   fundingStatement: '$0 with WIOA or Next Level Jobs funding', selfPayCost: '$5,000',
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: 'Funding Available', badgeColor: 'green',
   credentials: [
     { name: 'IT Specialist — Python', issuer: 'Certiport', description: 'Certification in Python programming.', validity: 'Lifetime' },

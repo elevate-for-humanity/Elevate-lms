@@ -180,7 +180,7 @@ export const BOOKKEEPING: ProgramSchema = {
   // ─── Content model ──────────────────────────────────────────────
   deliveryModel: 'internal',
   deliveryModelDetail: 'internal_lms',
-  fundingOptions: ['self_pay'],
+  fundingOptions: ['impact', 'self_pay'],
   enrollmentType: 'internal',
   lmsCourseSlug: 'bookkeeping-quickbooks',
 

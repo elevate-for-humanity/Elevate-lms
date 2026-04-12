@@ -3,8 +3,8 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 /**
  * Barber Apprenticeship — Program Detail Template v1
  * Indiana DOL Registered Apprenticeship
- * Hours math: 52 weeks × 15–20 hrs/week = 780–1040 hours
- * (Indiana requires 2,000 hours total: 1,500 OJT + 500 RTI — this covers the RTI portion)
+ * Indiana requires 2,000 hours total: 1,500 OJT + 500 RTI.
+ * Tuition ($4,980) covers the full program — RTI instruction, tool kit, exam fees, and placement support.
  */
 export const BARBER_APPRENTICESHIP: ProgramSchema = {
   slug: 'barber-apprenticeship',
@@ -133,8 +133,8 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     { standard: 'DOL Registered Apprenticeship', description: 'Program registered with the U.S. Department of Labor. Apprentices earn a nationally portable credential.' },
     { standard: 'Indiana IC 25-7', description: 'Training meets Indiana Code requirements for barber apprenticeship (2,000 hours: 1,500 OJT + 500 RTI).' },
     { standard: 'Indiana Board of Cosmetology and Barber Examiners', description: 'Curriculum aligned to state licensing exam content and sanitation standards.' },
-    { standard: 'WIOA Title I', description: 'Apprenticeship eligible for WIOA supportive services and on-the-job training reimbursement.' },
-    { standard: 'ETPL Listed', description: 'Eligible Training Provider List — approved for workforce board funding.' },
+    { standard: 'DOL Apprenticeship Standards', description: 'Program follows DOL registered apprenticeship wage and hour requirements. Employer-sponsored funding may apply.' },
+    { standard: 'Indiana Professional Licensing Agency', description: 'Program prepares apprentices for the Indiana Barber License exam administered by the Indiana Professional Licensing Agency.' },
   ],
 
   trainingPhases: [
@@ -213,9 +213,9 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   laborMarket: {
     medianSalary: 0,
     salaryRange: 'Employer-determined',
-    growthRate: '+5% (average)',
+    growthRate: '+3–4% (average)',
     source: 'U.S. Bureau of Labor Statistics, Occupational Outlook Handbook',
-    sourceYear: 2024,
+    sourceYear: 2024, // BLS OES 2024; projections 2024–2034
     region: 'Indiana',
   },
   careers: [
@@ -247,7 +247,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     'Indiana Barber Association',
   ],
   pricingIncludes: [
-    '900 hours of training (52 weeks)',
+    'Full 2,000-hour program (500 hrs RTI + 1,500 hrs OJT)',
     'Starter barber tool kit',
     'Indiana Barber License exam fee',
     'LMS access for full program duration',
@@ -259,7 +259,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   deliveryModel: 'partner',
   deliveryModelDetail: 'hybrid',
   partnerProvider: 'milady',
-  fundingOptions: ['employer_paid', 'wioa', 'self_pay'],
+  fundingOptions: ['employer_paid', 'self_pay'],
   enrollmentType: 'internal',
   partnerCourses: [
     {

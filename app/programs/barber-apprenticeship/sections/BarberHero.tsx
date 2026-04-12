@@ -33,7 +33,7 @@ export function BarberHero() {
             <span className="font-bold text-amber-900 text-sm uppercase tracking-wide">Waitlist Open</span>
           </div>
           <p className="text-amber-800 text-sm leading-snug">
-            Classes are scheduled to begin <strong>late May – early June 2025</strong>. We are currently gathering barbershops to participate as placement sites. You are on the waitlist — we will be in contact with next steps as soon as placements are confirmed.
+            We are actively matching apprentices with licensed host barbershops in the Indianapolis area. Spots are limited — join the waitlist and we will contact you as soon as a placement is confirmed.
           </p>
         </div>
       </section>

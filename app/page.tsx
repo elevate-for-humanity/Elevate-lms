@@ -10,7 +10,7 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'Elevate for Humanity | Workforce Training — Indianapolis, Indiana',
-  description: 'DOL-registered apprenticeship sponsor and ETPL-approved training provider. Healthcare, skilled trades, CDL, and more. WIOA and state funding available.',
+  description: 'DOL-registered apprenticeship sponsor and ETPL-approved training provider. Healthcare, skilled trades, CDL, and more. WIOA and state funding available for eligible programs.',
   keywords: 'workforce training Indianapolis, WIOA training Indiana, DOL registered apprenticeship, ETPL approved training provider, Elevate for Humanity',
   openGraph: {
     title: 'Elevate for Humanity | Workforce Training — Indianapolis, Indiana',
@@ -137,15 +137,16 @@ export default function HomePage() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
             <div className="w-full lg:max-w-2xl">
               <p className="text-white font-bold text-xs uppercase tracking-widest mb-3">Funding</p>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">No upfront cost for eligible participants</h2>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">Workforce funding available for eligible programs</h2>
               <p className="text-white/90 text-sm sm:text-base leading-relaxed mb-6">
-                Many participants qualify for full coverage of tuition, books, tools, and exam fees through federal and Indiana state workforce programs.
+                Many of our programs qualify for federal and Indiana state workforce funding. Eligibility depends on the program, your background, and current funding availability. Check before you apply — it takes two minutes.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
                 {[
-                  { label: 'WIOA',                  tag: 'Federal',       desc: 'For adults, dislocated workers, and youth 16–24.' },
-                  { label: 'Workforce Ready Grant', tag: 'Indiana State', desc: 'Covers high-demand certification programs.' },
-                  { label: 'Job Ready Indy',        tag: 'Indiana State', desc: 'For justice-involved individuals and employer OJT.' },
+                  { label: 'WIOA',                  tag: 'Federal',       desc: 'For adults, dislocated workers, and youth 16–24. Covers eligible high-demand programs.' },
+                  { label: 'Workforce Ready Grant', tag: 'Indiana State', desc: 'Covers tuition for high-demand certification programs on the INDemand list.' },
+                  { label: 'FSSA IMPACT',           tag: 'Indiana State', desc: 'Pays for training at no cost to current SNAP or TANF recipients. Elevate is a participating training provider.' },
+                  { label: 'Job Ready Indy',        tag: 'Indianapolis',  desc: 'For justice-involved individuals and employer OJT partnerships.' },
                 ].map((f) => (
                   <div key={f.label} className="bg-white rounded-xl p-4">
                     <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>
@@ -159,9 +160,9 @@ export default function HomePage() {
               </Link>
             </div>
             <div className="lg:flex-shrink-0 bg-white rounded-2xl p-8 text-center lg:w-64">
-              <p className="text-5xl font-black text-brand-red-600 mb-2">$0</p>
-              <p className="text-slate-800 text-sm font-semibold mb-4">Cost to eligible participants</p>
-              <p className="text-slate-500 text-xs leading-relaxed">Federal and Indiana state funding covers tuition, books, tools, and exam fees.</p>
+              <p className="text-4xl font-black text-brand-red-600 mb-2">Funded</p>
+              <p className="text-slate-800 text-sm font-semibold mb-4">for eligible participants</p>
+              <p className="text-slate-500 text-xs leading-relaxed">Funding covers tuition, books, tools, and exam fees for qualifying programs. Not all programs qualify — check eligibility first.</p>
             </div>
           </div>
         </div>

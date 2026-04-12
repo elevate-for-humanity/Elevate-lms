@@ -4,7 +4,7 @@ export const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const QUICK_STATS = [
   { val: '2,000', label: 'Total Hours' },
-  { val: '15 Months', label: 'Program Duration' },
+  { val: '12 Months', label: 'Program Duration' },
   { val: '$4,980', label: 'Total Cost' },
   { val: '3', label: 'Credentials Earned' },
 ];

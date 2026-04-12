@@ -7,6 +7,7 @@ import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { logBulkExport } from '@/lib/audit/ferpa';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 

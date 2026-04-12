@@ -64,7 +64,7 @@ async function handleCertificateIssued(
       logger.info('Certificate email sent', { certificateId, email: learnerEmail });
     } catch (err) {
       // Re-throw so the job retries — email failure is a real failure
-      throw new Error(`Email send failed: ${err instanceof Error ? err.message : 'unknown'}`);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
   }
 
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         await handleCertificateIssued(db, job.payload as CertificateIssuedPayload);
       } else {
         logger.error('Unknown job type', new Error(`Unknown job type: ${job.type}`), { jobId: job.id });
-        throw new Error(`Unknown job type: ${job.type}`);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
       }
 
       // Success

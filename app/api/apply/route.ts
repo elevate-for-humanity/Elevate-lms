@@ -11,6 +11,7 @@ import { sendOnboardingEmail } from '@/lib/email/send-onboarding';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { getRoutingRecommendations } from '@/lib/automation/shop-routing';
 import { insertWithPreAuthCheck } from '@/lib/pre-auth-guard';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
 export const maxDuration = 30;
 

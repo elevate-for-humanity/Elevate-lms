@@ -261,7 +261,7 @@ export async function POST(request: NextRequest) {
 
     if (sgRes.status !== 202) {
       const err = await sgRes.text();
-      throw new Error(`SendGrid error: ${err}`);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({

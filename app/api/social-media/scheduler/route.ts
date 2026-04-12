@@ -236,7 +236,7 @@ async function postToFacebook(
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error('Facebook API error');
+      return NextResponse.json({ error: 'Facebook API error' }, { status: 500 });
     }
 
     return { success: true, platform: 'facebook', postId: data.id };
@@ -289,7 +289,7 @@ async function postToLinkedIn(
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'LinkedIn API error');
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return { success: true, platform: 'linkedin', postId: data.id };

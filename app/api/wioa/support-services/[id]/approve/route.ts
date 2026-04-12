@@ -52,7 +52,7 @@ async function _POST(
       },
     });
 
-    if (error) { logger.error('[wioa/support-services] DB mutation failed', { code: error.code }); throw new Error('DB_MUTATION_FAILED'); }
+    if (error) { logger.error('[wioa/support-services] DB mutation failed', { code: error.code }); return NextResponse.json({ error: 'DB_MUTATION_FAILED' }, { status: 500 }); }
 
     return NextResponse.json({ success: true, data });
   } catch (error) { 

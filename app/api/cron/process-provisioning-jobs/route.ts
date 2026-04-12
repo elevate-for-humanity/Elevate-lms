@@ -12,7 +12,7 @@ import { withRuntime } from '@/lib/api/withRuntime';
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error('Supabase not configured');
+  if (!url || !key) return NextResponse.json({ error: 'Supabase not configured' }, { status: 500 });
   return createClient(url, key);
 }
 
@@ -206,7 +206,7 @@ async function processJob(job: ProvisioningJob): Promise<void> {
       break;
       
     default:
-      throw new Error(`Unknown job type: ${job.job_type}`);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 export const GET = withRuntime(withApiAudit('/api/cron/process-provisioning-jobs', _GET));

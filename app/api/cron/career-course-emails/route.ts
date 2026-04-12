@@ -113,7 +113,7 @@ async function sendEmail(to: string, subject: string, html: string) {
   });
 
   if (!response.ok) {
-    throw new Error(`Email send failed: ${response.statusText}`);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 export const GET = withRuntime(withApiAudit('/api/cron/career-course-emails', _GET));

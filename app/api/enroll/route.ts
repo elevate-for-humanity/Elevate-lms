@@ -135,7 +135,7 @@ async function _POST(req: NextRequest) {
 
     if (!checkoutResponse.ok) {
       const error = await checkoutResponse.json();
-      throw new Error(error.error || 'Failed to create checkout session');
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     const { checkoutUrl, sessionId } = await checkoutResponse.json();

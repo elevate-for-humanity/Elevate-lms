@@ -20,7 +20,7 @@ function getSupabaseClient() {
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    throw new Error('Supabase credentials not configured');
+    return NextResponse.json({ error: 'Supabase credentials not configured' }, { status: 500 });
   }
 
   return createClient(supabaseUrl, supabaseKey);

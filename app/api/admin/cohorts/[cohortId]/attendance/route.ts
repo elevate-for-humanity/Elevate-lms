@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 async function requireAdmin() {
   const supabase = await createClient();
   const db = await getAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
+  if (!db) return NextResponse.json({ error: 'Admin client failed to initialize' }, { status: 500 });
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Unauthorized', status: 401 };
   const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();

@@ -21,7 +21,7 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const db = await getAdminClient();
-    if (!db) throw new Error('Admin client failed to initialize');
+    if (!db) return NextResponse.json({ error: 'Admin client failed to initialize' }, { status: 500 });
 
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');

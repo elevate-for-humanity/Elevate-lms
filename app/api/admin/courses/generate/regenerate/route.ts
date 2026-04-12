@@ -71,7 +71,7 @@ Minimum 2 quiz questions. Real instructional content only.`;
     });
 
     const raw = completion.choices[0]?.message?.content;
-    if (!raw) throw new Error('Empty response');
+    if (!raw) return NextResponse.json({ error: 'Empty response' }, { status: 500 });
 
     const lesson: GeneratedLesson = JSON.parse(raw);
     lesson.lesson_number = lesson_number; // enforce original number

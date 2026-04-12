@@ -224,7 +224,7 @@ async function _POST(request: NextRequest) {
       session.links?.find(l => l.rel === 'checkout')?.href;
 
     if (!checkoutUrl) {
-      throw new Error('No checkout URL returned from Sezzle');
+      return NextResponse.json({ error: 'No checkout URL returned from Sezzle' }, { status: 500 });
     }
 
     // Store the Sezzle order reference in database

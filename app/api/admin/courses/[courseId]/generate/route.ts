@@ -31,7 +31,7 @@ export const maxDuration = 300;
 // ── OpenAI helpers ────────────────────────────────────────────────────────────
 
 function getOpenAI(): OpenAI {
-  if (!process.env.OPENAI_API_KEY) throw new Error('OPENAI_API_KEY not configured');
+  if (!process.env.OPENAI_API_KEY) return NextResponse.json({ error: 'OPENAI_API_KEY not configured' }, { status: 500 });
   return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 }
 
@@ -65,9 +65,9 @@ Rules: 6-12 lessons total. Titles are specific and action-oriented.`,
   });
 
   const raw = completion.choices[0]?.message?.content;
-  if (!raw) throw new Error('Empty outline response from OpenAI');
+  if (!raw) return NextResponse.json({ error: 'Empty outline response from OpenAI' }, { status: 500 });
   const parsed = JSON.parse(raw);
-  if (!Array.isArray(parsed.lessons)) throw new Error('Invalid outline shape');
+  if (!Array.isArray(parsed.lessons)) return NextResponse.json({ error: 'Invalid outline shape' }, { status: 500 });
   return parsed.lessons;
 }
 

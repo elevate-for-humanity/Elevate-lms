@@ -97,7 +97,7 @@ async function findMatchingMusic(
 //   const SUNO_API_KEY = process.env.SUNO_API_KEY;
 //
 //   if (!SUNO_API_KEY) {
-//     throw new Error('Suno API key not configured');
+//     return NextResponse.json({ error: 'Suno API key not configured' }, { status: 500 });
 //   }
 //
 //   const response = await fetch('https://api.suno.ai/v1/generate', {

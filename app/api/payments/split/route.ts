@@ -91,7 +91,7 @@ async function _POST(request: NextRequest) {
 
     if (splitError) {
       // Error: $1
-      throw new Error('Failed to record payment split');
+      return NextResponse.json({ error: 'Failed to record payment split' }, { status: 500 });
     }
 
     // Process payment split:

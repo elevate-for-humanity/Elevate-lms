@@ -178,7 +178,7 @@ async function _POST(request: NextRequest) {
       .single();
 
     if (clientError) {
-      throw new Error('Failed to save client data');
+      return NextResponse.json({ error: 'Failed to save client data' }, { status: 500 });
     }
 
     // Step 4: Create tax return in SupersonicFastCash Software
@@ -232,7 +232,7 @@ async function _POST(request: NextRequest) {
       .single();
 
     if (returnError) {
-      throw new Error('Failed to save tax return');
+      return NextResponse.json({ error: 'Failed to save tax return' }, { status: 500 });
     }
 
     // Step 6: Save bank account info if provided

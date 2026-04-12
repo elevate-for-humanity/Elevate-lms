@@ -54,7 +54,7 @@ export async function POST(req: Request) {
 
     if (!userId) {
       // Error: $1
-      throw new Error('User creation failed');
+      return NextResponse.json({ error: 'User creation failed' }, { status: 500 });
     }
 
     // Create user profile
@@ -92,7 +92,7 @@ export async function POST(req: Request) {
 
     if (shopError) {
       // Error: $1
-      throw new Error('Shop creation failed');
+      return NextResponse.json({ error: 'Shop creation failed' }, { status: 500 });
     }
 
     // Create shop staff record

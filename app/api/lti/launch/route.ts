@@ -64,7 +64,7 @@ async function _POST(request: Request) {
     const payload = JSON.parse(Buffer.from(payloadB64, 'base64url').toString());
     rawIssuer   = payload.iss;
     rawClientId = Array.isArray(payload.aud) ? payload.aud[0] : payload.aud;
-    if (!rawIssuer || !rawClientId) throw new Error('Missing iss/aud');
+    if (!rawIssuer || !rawClientId) return NextResponse.json({ error: 'Missing iss/aud' }, { status: 500 });
   } catch {
     return NextResponse.json({ error: 'Malformed id_token' }, { status: 400 });
   }

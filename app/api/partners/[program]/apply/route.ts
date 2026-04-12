@@ -5,6 +5,7 @@ import { sendEmail } from '@/lib/email/sendgrid';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { logger } from '@/lib/logger';
 import { getProgramConfig } from '@/lib/partners/program-config';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -17,6 +18,9 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ program: string }> }
 ) {
+  const rateLimited = await applyRateLimit(request, 'contact');
+  if (rateLimited) return rateLimited;
+
   await hydrateProcessEnv();
   try {
     const { program } = await params;

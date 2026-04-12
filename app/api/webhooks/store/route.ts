@@ -231,7 +231,7 @@ async function _POST(req: NextRequest) {
     // Fail-closed idempotency: record in webhook_events_processed before mutating state
     const supabaseForIdem = await createClient();
     const dbIdem = await getAdminClient();
-    if (!dbIdem) throw new Error('Admin client failed to initialize');
+    if (!dbIdem) return NextResponse.json({ error: 'Admin client failed to initialize' }, { status: 500 });
     try {
       const { error: idemErr } = await dbIdem.from('webhook_events_processed').insert({
         provider: 'stripe',

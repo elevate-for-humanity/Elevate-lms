@@ -174,7 +174,7 @@ async function _PATCH(
       .single();
 
     if (updateError) {
-      throw new Error(`Failed to update return: ${'Update failed'}`);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json(updated);

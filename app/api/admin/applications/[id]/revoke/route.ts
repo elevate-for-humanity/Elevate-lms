@@ -34,7 +34,7 @@ export async function POST(
 
     const supabase = await createClient();
     const db = await getAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
+  if (!db) return NextResponse.json({ error: 'Admin client failed to initialize' }, { status: 500 });
 
     if (!supabase) return safeError('Database not configured', 503);
 

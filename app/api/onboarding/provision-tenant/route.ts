@@ -66,7 +66,7 @@ async function _POST(request: NextRequest) {
       .single();
 
     if (tenantError || !tenant) {
-      throw new Error('Failed to create tenant');
+      return NextResponse.json({ error: 'Failed to create tenant' }, { status: 500 });
     }
 
     // 2. Create license
@@ -102,7 +102,7 @@ async function _POST(request: NextRequest) {
       });
 
     if (authError || !authUser) {
-      throw new Error('Failed to create admin user');
+      return NextResponse.json({ error: 'Failed to create admin user' }, { status: 500 });
     }
 
     // 4. Create profile

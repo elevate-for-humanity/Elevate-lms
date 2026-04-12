@@ -70,7 +70,7 @@ async function _POST(req: Request) {
       joinUrl = zoom.join_url;
     } else if (provider === 'teams') {
       // Teams meeting creation requires Graph API — not yet configured
-      throw new Error('Teams meeting creation not yet configured');
+      return NextResponse.json({ error: 'Teams meeting creation not yet configured' }, { status: 500 });
     }
 
     const { data: meeting, error } = await supabase

@@ -87,7 +87,7 @@ async function _POST(request: NextRequest) {
 
     const userId = session.user.id;
     const db = await getAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
+  if (!db) return NextResponse.json({ error: 'Admin client failed to initialize' }, { status: 500 });
 
     // Fetch profile + most recent application + enrollment in parallel
     const [profileResult, appResult, enrollmentResult] = await Promise.all([

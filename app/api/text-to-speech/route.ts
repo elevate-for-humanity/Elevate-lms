@@ -41,7 +41,7 @@ async function _POST(request: NextRequest) {
       );
 
       if (!response.ok) {
-        throw new Error('ElevenLabs API error');
+        return NextResponse.json({ error: 'ElevenLabs API error' }, { status: 500 });
       }
 
       const audioBuffer = await response.arrayBuffer();

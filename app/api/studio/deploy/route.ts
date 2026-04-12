@@ -43,7 +43,7 @@ async function _POST(req: NextRequest) {
         });
 
         if (!response.ok) {
-          throw new Error('Netlify build trigger failed');
+          return NextResponse.json({ error: 'Netlify build trigger failed' }, { status: 500 });
         }
 
         deploymentId = `netlify_${Date.now()}`;
@@ -61,7 +61,7 @@ async function _POST(req: NextRequest) {
         const data = await response.json();
         
         if (data.error) {
-          throw new Error(data.message || 'Netlify deployment failed');
+          return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
         }
 
         deploymentId = data.id;

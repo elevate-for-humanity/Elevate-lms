@@ -13,7 +13,7 @@ export async function PATCH(request: NextRequest) {
   if (!user) return safeError('Unauthorized', 401);
 
   const db = await getAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
+  if (!db) return NextResponse.json({ error: 'Admin client failed to initialize' }, { status: 500 });
 
   // Verify caller is a partner user
   const { data: partnerUser } = await db

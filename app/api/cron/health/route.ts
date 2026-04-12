@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
   // ── 2. Supabase DB reachability ───────────────────────────────────────────
   try {
     const supabase = await getAdminClient();
-    if (!supabase) throw new Error('Admin client returned null');
+    if (!supabase) return NextResponse.json({ error: 'Admin client returned null' }, { status: 500 });
 
     const { error } = await supabase
       .from('school_applications')
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
   // ── 3. Followups table reachability ───────────────────────────────────────
   try {
     const supabase = await getAdminClient();
-    if (!supabase) throw new Error('Admin client returned null');
+    if (!supabase) return NextResponse.json({ error: 'Admin client returned null' }, { status: 500 });
 
     const { error } = await supabase
       .from('school_application_followups')

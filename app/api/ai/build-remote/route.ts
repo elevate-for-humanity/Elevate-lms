@@ -9,7 +9,7 @@ import { apiAuthGuard } from '@/lib/admin/guards';
 function getOpenAI() {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    throw new Error('OPENAI_API_KEY not configured');
+    return NextResponse.json({ error: 'OPENAI_API_KEY not configured' }, { status: 500 });
   }
   return new OpenAI({ apiKey });
 }

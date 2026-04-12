@@ -149,7 +149,7 @@ const WAVES: Record<string, string[]> = {
 
 async function sendViaSendGrid(to: string[], subject: string, html: string, text: string) {
   if (!SENDGRID_KEY) {
-    throw new Error('SendGrid API key not configured (SENDGRID_KEY or SENDGRID_API_KEY)');
+    return NextResponse.json({ error: 'SendGrid API key not configured (SENDGRID_KEY or SENDGRID_API_KEY)' }, { status: 500 });
   }
 
   // Send individually (not BCC) so each org gets their own email

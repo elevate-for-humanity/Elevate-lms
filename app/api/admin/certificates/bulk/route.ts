@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 async function _POST(req: NextRequest) {
   const supabase = await createClient();
   const db = await getAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
+  if (!db) return NextResponse.json({ error: 'Admin client failed to initialize' }, { status: 500 });
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

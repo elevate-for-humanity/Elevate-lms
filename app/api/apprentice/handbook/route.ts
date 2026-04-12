@@ -20,7 +20,7 @@ async function _GET(request: NextRequest) {
 
     const supabase = await createClient();
     const db = await getAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
+  if (!db) return NextResponse.json({ error: 'Admin client failed to initialize' }, { status: 500 });
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -71,7 +71,7 @@ async function _POST(request: NextRequest) {
 
     const supabase = await createClient();
     const db = await getAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
+  if (!db) return NextResponse.json({ error: 'Admin client failed to initialize' }, { status: 500 });
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {

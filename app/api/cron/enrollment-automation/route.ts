@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { runAutomationTasks } from '@/lib/automation/enrollment-automation';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;

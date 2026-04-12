@@ -7,6 +7,7 @@ import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 import { writeApiAuditEvent } from '@/lib/audit/api-audit';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';

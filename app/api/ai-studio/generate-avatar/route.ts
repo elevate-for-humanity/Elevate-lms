@@ -181,7 +181,7 @@ async function generateWithDID(
   const DID_API_KEY = process.env.DID_API_KEY;
 
   if (!DID_API_KEY) {
-    throw new Error('D-ID API key not configured');
+    return NextResponse.json({ error: 'D-ID API key not configured' }, { status: 500 });
   }
 
   // Create talk
@@ -205,7 +205,7 @@ async function generateWithDID(
   });
 
   if (!createResponse.ok) {
-    throw new Error('D-ID API error');
+    return NextResponse.json({ error: 'D-ID API error' }, { status: 500 });
   }
 
   const { id } = await createResponse.json();
@@ -227,12 +227,12 @@ async function generateWithDID(
       videoUrl = status.result_url;
       break;
     } else if (status.status === 'error') {
-      throw new Error(`D-ID generation failed: ${status.error}`);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
   }
 
   if (!videoUrl) {
-    throw new Error('D-ID generation timeout');
+    return NextResponse.json({ error: 'D-ID generation timeout' }, { status: 500 });
   }
 
   return videoUrl;
@@ -248,7 +248,7 @@ async function generateWithSynthesia(
   const SYNTHESIA_API_KEY = process.env.SYNTHESIA_API_KEY;
 
   if (!SYNTHESIA_API_KEY) {
-    throw new Error('Synthesia API key not configured');
+    return NextResponse.json({ error: 'Synthesia API key not configured' }, { status: 500 });
   }
 
   const response = await fetch('https://api.synthesia.io/v2/videos', {
@@ -265,7 +265,7 @@ async function generateWithSynthesia(
   });
 
   if (!response.ok) {
-    throw new Error('Synthesia API error');
+    return NextResponse.json({ error: 'Synthesia API error' }, { status: 500 });
   }
 
   const data = await response.json();
@@ -289,10 +289,10 @@ async function generateWithSynthesia(
     if (status.status === 'complete') {
       return status.download;
     } else if (status.status === 'failed') {
-      throw new Error('Synthesia generation failed');
+      return NextResponse.json({ error: 'Synthesia generation failed' }, { status: 500 });
     }
   }
 
-  throw new Error('Synthesia generation timeout');
+  return NextResponse.json({ error: 'Synthesia generation timeout' }, { status: 500 });
 }
 export const POST = withApiAudit('/api/ai-studio/generate-avatar', _POST);

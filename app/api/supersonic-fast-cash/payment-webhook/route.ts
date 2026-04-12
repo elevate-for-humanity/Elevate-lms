@@ -6,6 +6,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import Stripe from 'stripe';
 
 import { withRuntime } from '@/lib/api/withRuntime';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

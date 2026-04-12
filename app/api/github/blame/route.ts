@@ -75,7 +75,7 @@ const userToken = req.headers.get('x-gh-token');
     const data = await response.json();
 
     if (data.errors) {
-      throw new Error(data.errors[0]?.message || 'GraphQL error');
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     const blame = data.data?.repository?.object?.blame;

@@ -105,7 +105,7 @@ async function _POST(request: NextRequest) {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to send email via SendGrid');
+        return NextResponse.json({ error: 'Failed to send email via SendGrid' }, { status: 500 });
       }
 
       return NextResponse.json({

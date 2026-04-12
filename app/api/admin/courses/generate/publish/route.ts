@@ -207,7 +207,7 @@ function ensureUniqueLessonTitles(draft: PublishDraft): void {
   for (const mod of draft.modules) {
     for (const lesson of mod.lessons) {
       const key = lesson.lesson_title.trim().toLowerCase();
-      if (seen.has(key)) throw new Error(`Duplicate lesson title: "${lesson.lesson_title}"`);
+      if (seen.has(key)) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
       seen.add(key);
     }
   }
@@ -218,10 +218,7 @@ function validateQuizAnswers(draft: PublishDraft): void {
     for (const lesson of mod.lessons) {
       for (const q of lesson.knowledge_check) {
         if (!q.options.includes(q.correct_answer)) {
-          throw new Error(
-            `Quiz answer mismatch in "${lesson.lesson_title}": ` +
-            `"${q.correct_answer}" not found in options`
-          );
+          return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
         }
       }
     }
@@ -232,9 +229,9 @@ function validateDurations(draft: PublishDraft): void {
   for (const mod of draft.modules) {
     for (const lesson of mod.lessons) {
       if (lesson.estimated_minutes < 3)
-        throw new Error(`Lesson too short: "${lesson.lesson_title}" (${lesson.estimated_minutes} min)`);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
       if (lesson.narration_script.trim().length < 400)
-        throw new Error(`Narration too short: "${lesson.lesson_title}" (${lesson.narration_script.trim().length} chars)`);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
   }
 }
@@ -311,7 +308,7 @@ async function publishCompiledDraft(
   // Drafts (auto_publish: false) are always allowed through.
   if (draft.program_id) {
     const coverageError = await checkCoverageGate(draft.program_id, draft.auto_publish);
-    if (coverageError) throw new Error(coverageError);
+    if (coverageError) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 
   const slugBase = draft.course_name
@@ -357,7 +354,7 @@ async function publishCompiledDraft(
     .single();
 
   if (courseErr || !courseRow)
-    throw new Error(`training_courses insert: ${courseErr?.message ?? 'no row returned'}`);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 
   const courseId = courseRow.id;
 
@@ -397,7 +394,7 @@ async function publishCompiledDraft(
   }
 
   const { error: lessonsErr } = await db.from('training_lessons').insert(lessonRows);
-  if (lessonsErr) throw new Error(`training_lessons insert: ${lessonsErr.message}`);
+  if (lessonsErr) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 
   // 2b. course_modules + course_lessons — canonical LMS delivery tables.
   // lms_lessons view reads course_lessons. Write here so learners see content.
@@ -577,7 +574,7 @@ async function _POST(req: NextRequest) {
       .select('id, slug')
       .single();
 
-    if (courseErr) throw new Error(`Course insert: ${courseErr.message}`);
+    if (courseErr) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     const courseId = courseRow.id;
 
     // ── 2. Lesson records ───────────────────────────────────────────────────
@@ -603,7 +600,7 @@ async function _POST(req: NextRequest) {
     );
 
     const { error: lessonsErr } = await db.from('training_lessons').insert(lessonRows);
-    if (lessonsErr) throw new Error(`Lessons insert: ${lessonsErr.message}`);
+    if (lessonsErr) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 
     // ── 2b. course_modules + course_lessons — canonical LMS delivery tables ──
     // lms_lessons view reads course_lessons. Write here so learners see content.

@@ -59,7 +59,7 @@ async function _POST(req: Request) {
       .single();
 
     if (programError || !program) {
-      throw new Error(`Program not found: ${programSlug}`);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     // Step 2: Check if user already exists
@@ -90,7 +90,7 @@ async function _POST(req: Request) {
 
       if (authError || !authData.user) {
         logger.error('Auth user creation error', authError);
-        throw new Error('Failed to create user account');
+        return NextResponse.json({ error: 'Failed to create user account' }, { status: 500 });
       }
 
       userId = authData.user.id;

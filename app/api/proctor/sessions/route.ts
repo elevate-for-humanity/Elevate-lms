@@ -12,7 +12,7 @@ async function getProctor() {
   const supabase = await createClient();
   if (!supabase) return null;
   const db = await getAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
+  if (!db) return NextResponse.json({ error: 'Admin client failed to initialize' }, { status: 500 });
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;

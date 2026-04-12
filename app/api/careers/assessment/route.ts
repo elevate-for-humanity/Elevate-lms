@@ -18,7 +18,7 @@ async function _POST(req: NextRequest) {
 
   const supabase = await createClient();
   const db = await getAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
+  if (!db) return NextResponse.json({ error: 'Admin client failed to initialize' }, { status: 500 });
 
   let body: { applicationId: string; score: number; answers: Record<string, string>; passed: boolean };
   try { body = await req.json(); } catch { return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 }); }

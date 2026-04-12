@@ -157,14 +157,14 @@ async function _POST(req: NextRequest) {
     });
 
     const raw = completion.choices[0]?.message?.content;
-    if (!raw) throw new Error('Empty response from OpenAI');
+    if (!raw) return NextResponse.json({ error: 'Empty response from OpenAI' }, { status: 500 });
 
     let course: GeneratedCourse;
     try { course = JSON.parse(raw); }
-    catch { throw new Error('OpenAI returned invalid JSON'); }
+    catch { return NextResponse.json({ error: 'OpenAI returned invalid JSON' }, { status: 500 }); }
 
     if (!course.title || !course.modules?.length) {
-      throw new Error('Generated course missing required fields');
+      return NextResponse.json({ error: 'Generated course missing required fields' }, { status: 500 });
     }
 
     // Normalize lesson_number sequential across all modules

@@ -32,28 +32,38 @@ async function _POST(request: Request) {
       weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
     });
 
-    // Create a real Zoom meeting for this appointment
+    // Create a Zoom meeting if credentials are configured — otherwise fall back to phone
     let zoomUrl = '';
     let zoomId = '';
-    try {
-      const meeting = await createZoomMeeting({
-        topic: `${typeLabel} — ${name}`,
-        startTime: `${appointment_date}T${appointment_time}:00`,
-        duration: 30,
-        agenda: `${typeLabel} with ${name} (${email})${notes ? `. Notes: ${notes}` : ''}`,
-        settings: {
-          waiting_room: true,
-          join_before_host: false,
-          mute_upon_entry: true,
-          auto_recording: 'cloud',
-        },
-      });
-      zoomUrl = meeting.join_url;
-      zoomId = meeting.id;
-      logger.info('[Schedule] Zoom meeting created', { meetingId: meeting.id });
-    } catch (zoomErr) {
-      logger.error('[Schedule] Zoom meeting creation failed:', zoomErr instanceof Error ? zoomErr.message : zoomErr);
-      return NextResponse.json({ error: 'Failed to create Zoom meeting. Please call (317) 314-3757 to schedule.' }, { status: 502 });
+    const zoomConfigured = !!(
+      process.env.ZOOM_ACCOUNT_ID &&
+      process.env.ZOOM_CLIENT_ID &&
+      process.env.ZOOM_CLIENT_SECRET
+    );
+
+    if (zoomConfigured) {
+      try {
+        const meeting = await createZoomMeeting({
+          topic: `${typeLabel} — ${name}`,
+          startTime: `${appointment_date}T${appointment_time}:00`,
+          duration: 30,
+          agenda: `${typeLabel} with ${name} (${email})${notes ? `. Notes: ${notes}` : ''}`,
+          settings: {
+            waiting_room: true,
+            join_before_host: false,
+            mute_upon_entry: true,
+            auto_recording: 'cloud',
+          },
+        });
+        zoomUrl = meeting.join_url;
+        zoomId = meeting.id;
+        logger.info('[Schedule] Zoom meeting created', { meetingId: meeting.id });
+      } catch (zoomErr) {
+        logger.warn('[Schedule] Zoom meeting creation failed — proceeding without Zoom link', zoomErr instanceof Error ? zoomErr.message : zoomErr);
+        // Non-fatal: appointment is still saved and emails sent with phone fallback
+      }
+    } else {
+      logger.info('[Schedule] Zoom not configured — appointment saved without video link');
     }
 
     // Save to Supabase
@@ -87,13 +97,16 @@ async function _POST(request: Request) {
 <tr><td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold;width:140px">Meeting</td><td style="padding:10px;border:1px solid #e5e7eb">${typeLabel}</td></tr>
 <tr><td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold">Date</td><td style="padding:10px;border:1px solid #e5e7eb">${dateFormatted}</td></tr>
 <tr><td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold">Time</td><td style="padding:10px;border:1px solid #e5e7eb">${appointment_time} (Eastern)</td></tr>
-<tr><td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold">Location</td><td style="padding:10px;border:1px solid #e5e7eb">Zoom Video Call</td></tr>
+<tr><td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold">Location</td><td style="padding:10px;border:1px solid #e5e7eb">${zoomUrl ? 'Zoom Video Call' : 'Phone / In-Person — details to follow'}</td></tr>
 </table>
-<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:16px;margin:16px 0">
+${zoomUrl ? `<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:16px;margin:16px 0">
 <strong style="color:#1e40af">Join via Zoom</strong><br/>
 <a href="${zoomUrl}" style="color:#2563eb;font-size:14px">${zoomUrl}</a><br/>
 <span style="color:#3b82f6;font-size:12px">Meeting ID: ${zoomId}</span>
-</div>
+</div>` : `<div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:16px;margin:16px 0">
+<strong style="color:#92400e">Our team will contact you to confirm meeting details.</strong><br/>
+<span style="color:#78350f;font-size:14px">Questions? Call <strong>(317) 314-3757</strong> or reply to this email.</span>
+</div>`}
 <h3 style="color:#111827">Before Your Meeting</h3>
 <ol style="line-height:1.8">
 <li>Register at <a href="https://indianacareerconnect.com" style="color:#dc2626">indianacareerconnect.com</a> if you haven't already</li>
@@ -122,7 +135,7 @@ async function _POST(request: Request) {
 <tr><td style="padding:6px 12px;border:1px solid #e5e7eb;font-weight:bold">Date</td><td style="padding:6px 12px;border:1px solid #e5e7eb">${dateFormatted} at ${appointment_time}</td></tr>
 <tr><td style="padding:6px 12px;border:1px solid #e5e7eb;font-weight:bold">Notes</td><td style="padding:6px 12px;border:1px solid #e5e7eb">${notes || 'None'}</td></tr>
 </table>
-<p><a href="${zoomUrl}">Join Zoom Meeting</a> (ID: ${zoomId})</p>
+${zoomUrl ? `<p><a href="${zoomUrl}">Join Zoom Meeting</a> (ID: ${zoomId})</p>` : `<p><strong>No Zoom link — contact student to arrange meeting.</strong></p>`}
 </div>`,
     }).catch((err) => {
       logger.error('[Schedule] Admin notification email failed:', err instanceof Error ? err.message : err);

@@ -9,10 +9,53 @@ HARD RULES — violating any of these will cause the output to be rejected:
 - subcaption: 4–12 words. One supporting line. Optional but recommended.
 - narration: 2–4 sentences. Natural spoken language. No bullet language. No filler phrases like "Welcome to the world of..." or "In this lesson we will explore...". Start with the substance.
 - videoQuery: describe footage that concretely exists in stock video. Specific actions, not concepts. Bad: "barber professionalism". Good: "barber disinfecting clippers at workstation".
-- visualFocus: one sentence describing exactly what should be visible on screen during this scene. This drives video selection.
-- layout: use "lower_third" unless the lesson type requires otherwise.
-- Recap scene (last): must only summarize the specific scenes before it. No new content.
-- Do NOT repeat videoQuery values across scenes in the same lesson.`;
+- Do NOT repeat videoQuery values across scenes in the same lesson.
+
+VISUAL FOCUS — this is the most important field. It drives clip selection directly.
+- visualFocus must describe the EXACT physical action happening on screen, not the topic.
+- It must match the narration word-for-word in terms of the action being performed.
+- Use the exact action phrases below when the narration covers that topic:
+
+  Narration about Barbicide / disinfectant jars / submerging tools:
+    → "barber submerging combs and scissors into Barbicide disinfectant jar"
+
+  Narration about washing hands / hand hygiene:
+    → "barber washing hands with soap at sink close up"
+
+  Narration about wiping down / disinfecting surfaces / chair / counter:
+    → "barber spraying and wiping down barber chair with disinfectant"
+
+  Narration about sweeping / hair on floor / floor cleanup:
+    → "barber sweeping hair off floor with broom"
+
+  Narration about cleaning clippers / brushes / combs / implements:
+    → "barber cleaning clippers with brush and sanitizing spray"
+
+  Narration about gloves:
+    → "barber putting on disposable gloves close up"
+
+  Narration about setting up / preparing the station:
+    → "barber arranging tools on workstation before client"
+
+  Narration about client consultation / talking to client:
+    → "barber talking to client in mirror during consultation"
+
+  Narration about cutting hair / clippers / fades / tapers:
+    → "barber cutting hair with clippers close up"
+
+  Narration about beard trimming:
+    → "barber trimming beard with clippers close up"
+
+  Narration about straight razor / shaving:
+    → "barber applying straight razor shave to client face"
+
+  Narration about neckline:
+    → "barber trimming neckline with clippers close up"
+
+- NEVER use a generic visual focus like "barber working" or "barbershop scene" when the narration describes a specific action.
+- NEVER assign a sweeping/floor clip to a scene about disinfection.
+- NEVER assign a handwashing clip to a scene about Barbicide or tool submersion.
+- Each scene's visualFocus must be distinct — no two scenes in the same lesson may have the same visualFocus.`;
 
 /**
  * Fixed 8-scene spine for introduction/overview lessons.

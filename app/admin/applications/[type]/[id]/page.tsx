@@ -85,7 +85,8 @@ export default async function ApplicationDetailPage({
     .order('created_at', { ascending: true });
 
   // Fetch eligibility review if exists
-  const adminDb = await getAdminClient();
+  let adminDb: Awaited<ReturnType<typeof getAdminClient>> | null = null;
+  try { adminDb = await getAdminClient(); } catch {}
   const { data: eligibilityReview } = adminDb
     ? await adminDb
         .from('application_eligibility_reviews')

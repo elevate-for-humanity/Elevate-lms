@@ -43,9 +43,10 @@ export default async function ReviewApplicationPage({
   const { id } = await params;
 
   // Use admin client — applications table RLS restricts session-based reads.
-  // Auth check above already confirmed the caller is admin/super_admin.
-  // getAdminClient() hydrates secrets first, safe on cold starts.
-  const db = await getAdminClient();
+  let db: Awaited<ReturnType<typeof getAdminClient>> | null = null;
+  try { db = await getAdminClient(); } catch {}
+  if (!db) notFound();
+
   const { data: app, error } = await db
     .from('applications')
     .select('*')
@@ -69,7 +70,7 @@ export default async function ReviewApplicationPage({
   let resolvedProgramId: string | null = null;
   if (programSlug) {
     const searchTerm = programSlug.replace(/-/g, ' ');
-    const { data: matchedCourse } = await db
+    const { data: matchedCourse } = await db!
       .from('courses')
       .select('id, title')
       .ilike('title', `%${searchTerm}%`)

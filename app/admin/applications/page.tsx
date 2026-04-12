@@ -41,7 +41,9 @@ export default async function ApplicationsPage({
         : [];
 
   // Use admin client for data queries to bypass RLS
-  const adminDb = await getAdminClient();
+  let adminDb: Awaited<ReturnType<typeof getAdminClient>> | null = null;
+  try { adminDb = await getAdminClient(); } catch {}
+  if (!adminDb) return <div className="p-8 text-red-600">Service temporarily unavailable. Please try again.</div>;
 
   let query = adminDb.from('applications').select('*', { count: 'exact' }).order('created_at', { ascending: false });
   if (resolvedStatuses.length === 1) query = query.eq('status', resolvedStatuses[0]);
@@ -50,10 +52,10 @@ export default async function ApplicationsPage({
   query = query.range(offset, offset + pageSize - 1);
 
   const { data: applications, count: totalCount, error: applicationsError } = await query;
-  if (applicationsError) throw new Error(`applications query failed: ${applicationsError.message}`);
+  if (applicationsError) return <div className="p-8 text-red-600">Failed to load applications. Please refresh.</div>;
 
   const { data: allApps, error: allAppsError } = await adminDb.from('applications').select('status');
-  if (allAppsError) throw new Error(`applications status counts failed: ${allAppsError.message}`);
+  if (allAppsError) return <div className="p-8 text-red-600">Failed to load application counts. Please refresh.</div>;
 
   const statusCounts: Record<string, number> = {};
   let totalApplications = 0;

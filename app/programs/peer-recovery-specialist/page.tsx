@@ -10,7 +10,7 @@ export const revalidate = 600;
 
 export const metadata: Metadata = {
   title: 'Peer Recovery Specialist (CPRS) | Indiana Certification | Elevate for Humanity',
-  description: 'Become a Certified Peer Recovery Specialist in Indiana. WIOA and Job Ready Indy funding available for eligible residents. 8-week program, state-approved.',
+  description: 'Become a Certified Peer Recovery Specialist in Indiana. WIOA, FSSA IMPACT, and Job Ready Indy funding available for eligible residents. 8-week program, state-approved.',
   alternates: { canonical: '/programs/peer-recovery-specialist' },
   openGraph: {
     title: 'Peer Recovery Specialist (CPRS) | Elevate for Humanity',
@@ -31,10 +31,56 @@ const FALLBACK = {
   length_weeks: 8,
   delivery_model: 'hybrid',
   certificate_title: 'Indiana CPRS Certification',
-  funding: 'WIOA and Justice Reinvestment Initiative (Job Ready Indy) funding available for eligible Indiana residents.',
+  funding: 'WIOA, FSSA IMPACT, and Justice Reinvestment Initiative (Job Ready Indy) funding available for eligible Indiana residents. Employer-sponsored coverage also available.',
   program_tracks: [
-    { id: '1', title: 'WIOA Funded', description: 'For eligible unemployed or underemployed Indiana residents. Covers full tuition, books, and exam fees.', cost_cents: 0, funding_type: 'wioa', available: true },
-    { id: '2', title: 'Self-Pay', description: 'Pay out of pocket. Payment plans available.', cost_cents: 500000, funding_type: 'self_pay', available: true },
+    {
+      id: '1',
+      title: 'WIOA Funded',
+      description: 'For eligible unemployed or underemployed Indiana residents. Covers full tuition, books, and exam fees. Eligibility determined through your local WorkOne center.',
+      cost_cents: 0,
+      funding_type: 'wioa',
+      available: true,
+    },
+    {
+      id: '2',
+      title: 'FSSA IMPACT',
+      description: 'For current SNAP or TANF recipients. IMPACT pays for training at no cost to you. Call 800-403-0864 (press 3) or ask your DFR eligibility worker for a referral.',
+      cost_cents: 0,
+      funding_type: 'impact',
+      available: true,
+    },
+    {
+      id: '3',
+      title: 'Justice Reinvestment Initiative (JRI)',
+      description: 'For justice-involved Indiana residents. Covers tuition and support services through EmployIndy and regional workforce boards.',
+      cost_cents: 0,
+      funding_type: 'jri',
+      available: true,
+    },
+    {
+      id: '4',
+      title: 'Employer-Sponsored',
+      description: 'Your employer covers tuition as part of workforce development or upskilling. Contact us to set up an employer billing agreement.',
+      cost_cents: 0,
+      funding_type: 'employer_paid',
+      available: true,
+    },
+    {
+      id: '5',
+      title: 'Self-Pay — Full',
+      description: 'Pay tuition in full upfront. Includes all course materials, LMS access, and CPRS exam fee.',
+      cost_cents: 500000,
+      funding_type: 'self_pay',
+      available: true,
+    },
+    {
+      id: '6',
+      title: 'Self-Pay — Payment Plan',
+      description: 'Start with a $600 deposit, then weekly payments until the balance is paid. No interest charged by Elevate.',
+      cost_cents: 500000,
+      funding_type: 'self_pay',
+      available: true,
+    },
   ],
   program_modules: [
     { id: '1', module_number: 1, title: 'Introduction to Peer Recovery', description: 'History of peer support, roles and responsibilities, ethics and boundaries.', lesson_count: 4, duration_hours: 6 },
@@ -68,7 +114,6 @@ export default async function PeerRecoverySpecialistPage() {
       {/* Hero video */}
       <HeroVideo
         videoSrcDesktop={banner.videoSrcDesktop}
-        posterImage={banner.posterImage}
         voiceoverSrc={banner.voiceoverSrc}
         microLabel={banner.microLabel}
         analyticsName={banner.analyticsName}
@@ -127,24 +172,24 @@ export default async function PeerRecoverySpecialistPage() {
         <div className="grid gap-10 lg:grid-cols-[1.4fr,0.9fr]">
           <div>
             <h2 className="text-2xl font-bold text-slate-950">About this program</h2>
-            {program.description && <p className="mt-4 text-slate-700 leading-relaxed">{program.description}</p>}
+            {program.description && <p className="mt-4 text-slate-900 leading-relaxed">{program.description}</p>}
             {program.outcomes && (
               <>
-                <h3 className="mt-8 text-xl font-semibold text-slate-950">Outcomes</h3>
-                <p className="mt-3 text-slate-700">{program.outcomes}</p>
+                <h3 className="mt-8 text-xl font-semibold text-slate-900">Outcomes</h3>
+                <p className="mt-3 text-slate-900">{program.outcomes}</p>
               </>
             )}
             {program.requirements && (
               <>
-                <h3 className="mt-8 text-xl font-semibold text-slate-950">Requirements</h3>
-                <p className="mt-3 text-slate-700">{program.requirements}</p>
+                <h3 className="mt-8 text-xl font-semibold text-slate-900">Requirements</h3>
+                <p className="mt-3 text-slate-900">{program.requirements}</p>
               </>
             )}
             {program.funding && (
               <div className="mt-8 rounded-xl bg-green-50 border border-green-200 p-5">
-                <p className="font-semibold text-green-900 mb-1">Funding Available</p>
-                <p className="text-green-800 text-sm">{program.funding}</p>
-                <Link href="/check-eligibility" className="inline-block mt-3 text-sm font-bold text-green-700 hover:text-green-900">
+                <p className="font-semibold text-slate-900 mb-1">Funding Available</p>
+                <p className="text-slate-900 text-sm">{program.funding}</p>
+                <Link href="/check-eligibility" className="inline-block mt-3 text-sm font-bold text-slate-900 hover:underline">
                   Check my eligibility →
                 </Link>
               </div>
@@ -152,27 +197,36 @@ export default async function PeerRecoverySpecialistPage() {
           </div>
           <aside className="self-start rounded-2xl border border-slate-200 p-6">
             <h2 className="text-xl font-bold text-slate-950">Enrollment options</h2>
-            <div className="mt-4 space-y-4">
-              {program.program_tracks.map((track: any) => (
-                <div key={track.id} className="rounded-xl border border-slate-200 p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <h3 className="font-semibold text-slate-900">{track.title}</h3>
-                    <span className="shrink-0 text-sm font-semibold text-slate-700">
-                      {typeof formatTrackCost === 'function' ? formatTrackCost(track.cost_cents) : track.cost_cents === 0 ? '$0 (Funded)' : `$${(track.cost_cents / 100).toFixed(0)}`}
-                    </span>
+            <div className="mt-4 space-y-3">
+              {program.program_tracks.map((track: any) => {
+                const isFunded = track.cost_cents === 0;
+                const isPaymentPlan = track.id === '6';
+                const costLabel = isFunded
+                  ? '$0 — Funded'
+                  : isPaymentPlan
+                  ? '$600 deposit'
+                  : `$${(track.cost_cents / 100).toLocaleString()}`;
+                return (
+                  <div key={track.id} className={`rounded-xl border p-4 ${isFunded ? 'border-green-200 bg-green-50' : 'border-slate-200 bg-white'}`}>
+                    <div className="flex items-start justify-between gap-4">
+                      <h3 className="font-semibold text-slate-900">{track.title}</h3>
+                      <span className={`shrink-0 text-sm font-bold ${isFunded ? 'text-green-700' : 'text-slate-900'}`}>
+                        {costLabel}
+                      </span>
+                    </div>
+                    {track.description && <p className="mt-2 text-sm text-slate-900">{track.description}</p>}
                   </div>
-                  {track.description && <p className="mt-2 text-sm text-slate-600">{track.description}</p>}
-                </div>
-              ))}
+                );
+              })}
 
-              {/* BNPL — shown for self-pay path */}
+              {/* BNPL */}
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <div className="flex items-start justify-between gap-4">
-                  <h3 className="font-semibold text-slate-900">Pay Over Time</h3>
-                  <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-slate-500">BNPL</span>
+                  <h3 className="font-semibold text-slate-900">Pay Over Time (BNPL)</h3>
+                  <span className="shrink-0 text-xs font-bold uppercase tracking-wide text-slate-900">0% interest</span>
                 </div>
-                <p className="mt-2 text-sm text-slate-600">{BNPL_DESCRIPTION}</p>
-                <p className="mt-2 text-xs text-slate-500">Available providers: {BNPL_PROVIDER_SUMMARY}</p>
+                <p className="mt-2 text-sm text-slate-900">{BNPL_DESCRIPTION}</p>
+                <p className="mt-1 text-xs font-medium text-slate-900">Providers: {BNPL_PROVIDER_SUMMARY}</p>
               </div>
             </div>
 
@@ -188,7 +242,7 @@ export default async function PeerRecoverySpecialistPage() {
 
       {/* Curriculum */}
       <section className="mx-auto max-w-7xl px-6 pb-16">
-        <h2 className="mb-6 text-2xl font-bold">Curriculum</h2>
+        <h2 className="mb-6 text-2xl font-bold text-slate-900">Curriculum</h2>
         <div className="space-y-4">
           {program.program_modules.map((mod: any) => (
             <div key={mod.id} className="overflow-hidden rounded-2xl border border-slate-200">
@@ -212,8 +266,8 @@ export default async function PeerRecoverySpecialistPage() {
       {/* Final CTA */}
       <section className="border-t border-slate-200 bg-slate-50 py-12">
         <div className="mx-auto max-w-3xl px-6 text-center">
-          <h2 className="text-2xl font-bold">Ready to start?</h2>
-          <p className="mt-3 text-slate-600">WIOA, FSSA IMPACT, and Justice Reinvestment Initiative funding available for eligible Indiana residents.</p>
+          <h2 className="text-2xl font-bold text-slate-900">Ready to start?</h2>
+          <p className="mt-3 text-slate-900">WIOA, FSSA IMPACT, and Justice Reinvestment Initiative funding available for eligible Indiana residents.</p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link href="/apply?program=peer-recovery-specialist"
               className="rounded-xl bg-slate-900 px-6 py-3 font-semibold text-white hover:bg-slate-800 transition-colors">

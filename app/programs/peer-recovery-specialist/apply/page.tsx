@@ -110,7 +110,7 @@ export default function PeerRecoveryApplyPage() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <div className="mx-auto max-w-2xl px-6 py-12">
-        <Link href="/programs/peer-recovery-specialist" className="inline-flex items-center gap-2 text-sm text-black hover:text-slate-900 mb-8">
+        <Link href="/programs/peer-recovery-specialist" className="inline-flex items-center gap-2 text-sm font-medium text-slate-900 hover:underline mb-8">
           ← Back to program
         </Link>
         <h1 className="text-3xl font-bold">Apply — Peer Recovery Specialist</h1>

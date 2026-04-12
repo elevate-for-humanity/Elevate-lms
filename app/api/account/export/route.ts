@@ -2,7 +2,7 @@ import { getAdminClient } from '@/lib/supabase/admin';
 
 // app/api/account/export/route.ts
 import { NextResponse } from 'next/server';
-import { requireApiAuth } from '@/lib/auth';
+import { apiAuthGuard } from '@/lib/admin/guards';
 
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -15,11 +15,11 @@ export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
   try {
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
+    try { const rl = await applyRateLimit(request, 'api'); if (rl) return rl; } catch {}
 
-    const session = await requireApiAuth();
-    const email = session.user?.email;
+    const auth = await apiAuthGuard(request as any);
+    if (auth.error) return auth.error;
+    const email = auth.user?.email;
 
     if (!email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

@@ -15,11 +15,10 @@ export const dynamic = 'force-dynamic';
  * Body: { course_lesson_id, course_id, step_type, submission_text?, file_urls? }
  */
 export async function POST(request: NextRequest) {
-  const rateLimited = await applyRateLimit(request, 'api');
-  if (rateLimited) return rateLimited;
+  try { const rl = await applyRateLimit(request, 'api'); if (rl) return rl; } catch {}
 
-  const auth = await apiAuthGuard();
-  
+  const auth = await apiAuthGuard(request);
+  if (auth.error) return auth.error;
   const { user } = auth;
 
   let body: {
@@ -115,11 +114,10 @@ export async function POST(request: NextRequest) {
  * Returns the learner's own submissions for a lesson.
  */
 export async function GET(request: NextRequest) {
-  const rateLimited = await applyRateLimit(request, 'api');
-  if (rateLimited) return rateLimited;
+  try { const rl = await applyRateLimit(request, 'api'); if (rl) return rl; } catch {}
 
-  const auth = await apiAuthGuard();
-  
+  const auth = await apiAuthGuard(request);
+  if (auth.error) return auth.error;
   const { user } = auth;
 
   const { searchParams } = new URL(request.url);

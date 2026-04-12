@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { getAdminClient } from '@/lib/supabase/admin';
-import { createAdminClient } from "@/lib/supabase/admin";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { sendApplicationWelcomeEmail } from '@/lib/email/application-welcome';
@@ -11,18 +10,25 @@ export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
   try {
-    const rateLimited = await applyRateLimit(req, 'strict');
-    if (rateLimited) return rateLimited;
+    try { const rl = await applyRateLimit(req, 'strict'); if (rl) return rl; } catch {}
 
-    const data = await req.formData();
-
-    const program = data.get("program") as string;
-    const funding = data.get("funding") as string;
+    // Accept both form data and JSON
+    const contentType = req.headers.get('content-type') || '';
+    let program: string, funding: string, name: string, email: string, phone: string;
+    if (contentType.includes('application/json')) {
+      const json = await req.json();
+      program = json.program; funding = json.funding; name = json.name; email = json.email; phone = json.phone;
+    } else {
+      const data = await req.formData();
+      program = data.get('program') as string; funding = data.get('funding') as string;
+      name = data.get('name') as string; email = data.get('email') as string; phone = data.get('phone') as string;
+    }
 
     // WIOA-style prescreen
     const eligible = funding !== "Self Pay" && program !== "Not Sure";
 
-    const supabase = await getAdminClient();
+    let supabase: Awaited<ReturnType<typeof getAdminClient>> | null = null;
+    try { supabase = await getAdminClient(); } catch {}
 
     if (!supabase) {
       return NextResponse.json(
@@ -44,9 +50,9 @@ async function _POST(req: Request) {
 
     // @preAuthWrite table=applications mode=reconcile
     const { error } = await insertWithPreAuthCheck(supabase, 'applications', {
-      name: data.get("name"),
-      email: data.get("email"),
-      phone: data.get("phone"),
+      name,
+      email,
+      phone,
       program,
       program_id: resolvedProgramId,
       funding,

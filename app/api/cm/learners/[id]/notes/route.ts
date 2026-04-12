@@ -2,7 +2,6 @@
 // app/api/cm/learners/[id]/notes/route.ts - Add case manager notes
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminClient } from '@/lib/supabase/admin';
-import { createAdminClient } from "@/lib/supabase/admin";
 import { getAuthUser } from "@/lib/auth";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

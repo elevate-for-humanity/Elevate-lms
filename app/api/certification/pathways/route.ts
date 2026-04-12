@@ -14,8 +14,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  const rateLimited = await applyRateLimit(request, 'api');
-  if (rateLimited) return rateLimited;
+  try { const rl = await applyRateLimit(request, 'api'); if (rl) return rl; } catch {}
 
   const auth = await apiAuthGuard(request);
 

@@ -4,7 +4,6 @@ import { getAdminClient } from '@/lib/supabase/admin';
 // app/api/admin/analytics/overview/route.ts
 // Real-time analytics overview
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from "@/lib/supabase/admin";
 import { withAuth } from '@/lib/with-auth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';

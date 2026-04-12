@@ -36,7 +36,7 @@ export default async function AdminGradebookPage({
 
   // Fetch course
   const { data: course } = await supabase
-    .from('training_courses')
+    .from('courses')
     .select('id, title')
     .eq('id', courseId)
     .single();

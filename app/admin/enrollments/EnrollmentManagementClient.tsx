@@ -1,9 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
-import { sendEnrollmentApprovalEmail } from './actions';
+import {
+  sendEnrollmentApprovalEmail,
+  updateEnrollment,
+  createEnrollment,
+  deleteEnrollment,
+  toggleAtRisk,
+  markEnrollmentComplete,
+  approveEnrollment,
+} from './actions';
 
 interface Enrollment {
   id: string;
@@ -49,10 +56,7 @@ interface Props {
   };
 }
 
-async function auditEnrollment(action: string, targetId: string, meta?: Record<string, unknown>) {
-  const { auditEnrollmentAction } = await import('./actions');
-  await auditEnrollmentAction(action, targetId, meta);
-}
+
 
 export default function EnrollmentManagementClient({ initialEnrollments, users, courses, cohorts, stats }: Props) {
   const [enrollments, setEnrollments] = useState<Enrollment[]>(initialEnrollments);
@@ -71,8 +75,6 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
     progress: '0',
     at_risk: false,
   });
-
-  const supabase = createClient();
 
   const resetForm = () => {
     setFormData({ user_id: '', course_id: '', cohort_id: '', status: 'active', progress: '0', at_risk: false });
@@ -104,61 +106,32 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
 
     try {
       if (editingEnrollment) {
-        // UPDATE existing enrollment
-        const { data, error: updateError } = await supabase
-          .from('training_enrollments')
-          .update({
-            status: formData.status,
-            progress: parseInt(formData.progress) || 0,
-            at_risk: formData.at_risk,
-            completed_at: formData.status === 'completed' ? new Date().toISOString() : null,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', editingEnrollment.id)
-          .select('*, student:profiles!enrollments_user_id_fkey(id, full_name, email), course:courses(id, title)')
-          .single();
-
-        if (updateError) throw updateError;
-        auditEnrollment('enrollment_updated', editingEnrollment.id, { status: formData.status });
-        setEnrollments(enrollments.map(e => e.id === editingEnrollment.id ? data : e));
+        await updateEnrollment(editingEnrollment.id, {
+          status: formData.status,
+          progress: parseInt(formData.progress) || 0,
+          at_risk: formData.at_risk,
+          completed_at: formData.status === 'completed' ? new Date().toISOString() : null,
+        });
+        setEnrollments(enrollments.map(e =>
+          e.id === editingEnrollment.id
+            ? { ...e, status: formData.status, progress: parseInt(formData.progress) || 0, at_risk: formData.at_risk }
+            : e
+        ));
       } else {
-        // CREATE new enrollment
-        // Check if already enrolled
-        const { data: existing } = await supabase
-          .from('training_enrollments')
-          .select('id')
-          .eq('user_id', formData.user_id)
-          .eq('course_id', formData.course_id)
-          .single();
-
-        if (existing) {
-          setError('User is already enrolled in this course');
-          setLoading(false);
-          return;
-        }
-
-        const { data, error: insertError } = await supabase
-          .from('training_enrollments')
-          .insert({
-            user_id: formData.user_id,
-            course_id: formData.course_id,
-            cohort_id: formData.cohort_id || null,
-            status: formData.status,
-            progress: parseInt(formData.progress) || 0,
-            enrolled_at: new Date().toISOString(),
-          })
-          .select('*, student:profiles(id, full_name, email), course:training_courses(id, course_name)')
-          .single();
-
-        if (insertError) throw insertError;
-        auditEnrollment('enrollment_created', data.id, { user_id: formData.user_id, course_id: formData.course_id });
-        setEnrollments([data, ...enrollments]);
+        await createEnrollment({
+          user_id: formData.user_id,
+          course_id: formData.course_id,
+          status: formData.status,
+          progress: parseInt(formData.progress) || 0,
+        });
+        // Refresh page to show new enrollment with full join data
+        window.location.reload();
+        return;
       }
-
       setShowModal(false);
       resetForm();
     } catch (err: any) {
-      setError('An error occurred');
+      setError(err.message || 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -169,99 +142,48 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
 
     setLoading(true);
     try {
-      // Delete lesson progress first
       const enrollment = enrollments.find(e => e.id === enrollmentId);
       if (enrollment) {
-        await supabase
-          .from('lesson_progress')
-          .delete()
-          .eq('user_id', enrollment.user_id)
-          .eq('course_id', enrollment.course_id);
+        await deleteEnrollment(enrollmentId, enrollment.user_id, enrollment.course_id);
+        setEnrollments(enrollments.filter(e => e.id !== enrollmentId));
       }
-
-      const { error: deleteError } = await supabase
-        .from('training_enrollments')
-        .delete()
-        .eq('id', enrollmentId);
-
-      if (deleteError) throw deleteError;
-      auditEnrollment('enrollment_deleted', enrollmentId);
-      setEnrollments(enrollments.filter(e => e.id !== enrollmentId));
     } catch (err: any) {
-      setError('An error occurred');
+      setError(err.message || 'An error occurred');
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleAtRisk = async (enrollment: Enrollment) => {
+  const handleToggleAtRisk = async (enrollment: Enrollment) => {
     try {
-      const { error: updateError } = await supabase
-        .from('training_enrollments')
-        .update({ at_risk: !enrollment.at_risk, updated_at: new Date().toISOString() })
-        .eq('id', enrollment.id);
-
-      if (updateError) throw updateError;
+      await toggleAtRisk(enrollment.id, enrollment.at_risk);
       setEnrollments(enrollments.map(e => e.id === enrollment.id ? { ...e, at_risk: !e.at_risk } : e));
     } catch (err: any) {
-      setError('An error occurred');
+      setError(err.message || 'An error occurred');
     }
   };
 
   const markComplete = async (enrollment: Enrollment) => {
     try {
-      const { error: updateError } = await supabase
-        .from('training_enrollments')
-        .update({ 
-          status: 'completed', 
-          progress: 100,
-          completed_at: new Date().toISOString(),
-          updated_at: new Date().toISOString() 
-        })
-        .eq('id', enrollment.id);
-
-      if (updateError) throw updateError;
+      await markEnrollmentComplete(enrollment.id);
       setEnrollments(enrollments.map(e => e.id === enrollment.id ? { ...e, status: 'completed', progress: 100 } : e));
     } catch (err: any) {
-      setError('An error occurred');
+      setError(err.message || 'An error occurred');
     }
   };
 
-  const approveEnrollment = async (enrollment: Enrollment) => {
+  const handleApproveEnrollment = async (enrollment: Enrollment) => {
     try {
-      const { data: { user: adminUser } } = await supabase.auth.getUser();
+      await approveEnrollment(enrollment.id, enrollment.user_id);
+      setEnrollments(enrollments.map(e => e.id === enrollment.id ? { ...e, status: 'active' } : e));
 
-      const { error: updateError } = await supabase
-        .from('training_enrollments')
-        .update({
-          status: 'active',
-          approved_at: new Date().toISOString(),
-          approved_by: adminUser?.id || null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', enrollment.id);
-
-      if (updateError) throw updateError;
-
-      // Also update program_enrollments and profile
-      await supabase
-        .from('program_enrollments')
-        .update({ status: 'active', enrollment_state: 'active' })
-        .eq('user_id', enrollment.user_id);
-
-      await supabase
-        .from('profiles')
-        .update({ enrollment_status: 'active' })
-        .eq('id', enrollment.user_id);
-
-      // Send approval email via server action — never call /api/email/send directly from client
       try {
         const studentEmail = enrollment.student?.email;
         if (studentEmail) {
           await sendEnrollmentApprovalEmail({
             to: studentEmail,
             studentName: enrollment.student?.full_name || 'Student',
-            courseName: enrollment.course?.course_name || enrollment.course?.title || 'your program',
+            courseName: enrollment.course?.title || 'your program',
           });
         }
       } catch {
@@ -415,13 +337,13 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
                       {enrollment.status === 'pending_approval' && (
-                        <button onClick={() => approveEnrollment(enrollment)} className="px-3 py-1 text-sm text-white bg-brand-green-600 rounded hover:bg-brand-green-700 font-medium">Approve</button>
+                        <button onClick={() => handleApproveEnrollment(enrollment)} className="px-3 py-1 text-sm text-white bg-brand-green-600 rounded hover:bg-brand-green-700 font-medium">Approve</button>
                       )}
                       <button onClick={() => openEditModal(enrollment)} className="px-3 py-1 text-sm border rounded hover:bg-gray-50">Edit</button>
                       {enrollment.status !== 'completed' && enrollment.status !== 'pending_approval' && (
                         <button onClick={() => markComplete(enrollment)} className="px-3 py-1 text-sm text-brand-green-600 border border-brand-green-200 rounded hover:bg-brand-green-50">Complete</button>
                       )}
-                      <button onClick={() => toggleAtRisk(enrollment)} className={`px-3 py-1 text-sm border rounded ${enrollment.at_risk ? 'text-gray-600 border-gray-200 hover:bg-gray-50' : 'text-brand-red-600 border-brand-red-200 hover:bg-brand-red-50'}`}>
+                      <button onClick={() => handleToggleAtRisk(enrollment)} className={`px-3 py-1 text-sm border rounded ${enrollment.at_risk ? 'text-gray-600 border-gray-200 hover:bg-gray-50' : 'text-brand-red-600 border-brand-red-200 hover:bg-brand-red-50'}`}>
                         {enrollment.at_risk ? 'Clear Risk' : 'Flag Risk'}
                       </button>
                       <button onClick={() => handleDelete(enrollment.id)} className="px-3 py-1 text-sm text-brand-red-600 border border-brand-red-200 rounded hover:bg-brand-red-50">Delete</button>

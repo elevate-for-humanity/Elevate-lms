@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
-import { BookOpen, Users, ArrowRight } from 'lucide-react';
+import { BookOpen, ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,8 +16,8 @@ export default async function AdminGradebookIndexPage() {
   const supabase = await getAdminClient();
 
   const { data: courses } = await supabase
-    .from('training_courses')
-    .select('id, title, enrollment_count, status')
+    .from('courses')
+    .select('id, title, status')
     .order('title');
 
   return (
@@ -47,10 +47,6 @@ export default async function AdminGradebookIndexPage() {
                       {course.title}
                     </h2>
                     <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
-                      <span className="flex items-center gap-1">
-                        <Users className="w-3.5 h-3.5" />
-                        {course.enrollment_count || 0} enrolled
-                      </span>
                       <span className="capitalize">{course.status || 'draft'}</span>
                     </div>
                   </div>

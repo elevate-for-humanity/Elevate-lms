@@ -183,6 +183,20 @@ async function _POST(req: NextRequest) {
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
+    // ── SYNC BACK TO program_enrollments ────────────────────────────
+    // Admin dashboard, gradebook, and enrollment list all read
+    // program_enrollments.status — update it so completion is visible there.
+    await db
+      .from('program_enrollments')
+      .update({
+        status: 'completed',
+        enrollment_state: 'completed',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', user.id)
+      .eq('course_id', courseId)
+      .in('status', ['active', 'in_progress', 'enrolled', 'confirmed', 'pending_funding_verification']);
+
     // Get user profile for certificate
     const { data: profile } = await db
       .from('profiles')

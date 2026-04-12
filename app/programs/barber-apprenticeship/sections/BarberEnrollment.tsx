@@ -15,7 +15,7 @@ export function BarberEnrollment() {
             Total tuition: <strong>$4,980</strong>. Multiple payment paths available — pick what works for you.
           </p>
           <p className="text-black text-center text-sm mb-8 max-w-2xl mx-auto">
-            Indiana residents may qualify for WIOA workforce funding or employer-sponsored coverage. If you are self-paying, payment plans and BNPL financing are available.
+            Employer-sponsored coverage may apply. If you are self-paying, payment plans and BNPL financing are available.
           </p>
           <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
             <div className="bg-white rounded-xl p-5 border border-slate-200 text-center">
@@ -187,7 +187,7 @@ export function BarberEnrollment() {
             <div className="flex items-start gap-3">
               <Shield className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-brand-blue-800 leading-relaxed">
-                Tuition is $4,980. Indiana residents may qualify for WIOA Title I workforce funding or employer-sponsored coverage — contact a career advisor to check eligibility before enrolling. If you are self-paying, flexible options are available: pay in full, use a payment plan starting at $600 down, or finance through a BNPL provider. Enrollment is contingent upon eligibility and employer participation.
+                Tuition is $4,980 and covers the full program — RTI instruction, tool kit, exam fees, and placement support. Employer-sponsored coverage may apply — contact a career advisor to discuss options. If you are self-paying, flexible options are available: pay in full, use a payment plan starting at $600 down, or finance through a BNPL provider. Enrollment is contingent upon eligibility and employer participation.
               </p>
             </div>
           </div>

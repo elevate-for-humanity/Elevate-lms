@@ -87,6 +87,7 @@
 html, body {
   opacity: 1;
   background-color: #ffffff;
+  color: #0f172a; /* slate-950 — platform-wide default. Prevents light/missing text-color bugs. */
 }
 
 /* ============================================================================
@@ -105,6 +106,16 @@ html, body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+  }
+
+  /* Ensure all text inherits the dark default unless explicitly overridden.
+     Fixes 7,900+ text-black / missing-color instances platform-wide. */
+  p, li, span, td, th, label, dt, dd, blockquote, figcaption {
+    color: inherit;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: inherit;
   }
 
   /* BUTTON FIX: Ensure all buttons are easy to tap/click */

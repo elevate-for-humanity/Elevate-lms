@@ -92,10 +92,10 @@ export default function CNAPage() {
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-5">
               Indiana CNA Certification — 6 weeks, state exam on-site.
             </h2>
-            <p className="text-black text-base leading-relaxed mb-5">
+            <p className="text-slate-900 text-base leading-relaxed mb-5">
               Elevate&apos;s CNA program prepares you for the Indiana state Certified Nursing Assistant exam in 6 weeks. You&apos;ll complete supervised clinical rotations at licensed healthcare facilities and sit for the state exam on-site — no separate testing center required.
             </p>
-            <p className="text-black text-base leading-relaxed mb-8">
+            <p className="text-slate-900 text-base leading-relaxed mb-8">
               CNAs are in high demand across Indiana hospitals, nursing homes, and home health agencies. Most Elevate CNA graduates receive job offers before or immediately after completing the program.
             </p>
             <ul className="space-y-3 mb-8">
@@ -107,7 +107,7 @@ export default function CNAPage() {
                 'Job placement support included',
                 'No prior healthcare experience required',
               ].map((item) => (
-                <li key={item} className="flex items-start gap-3 text-sm text-slate-700">
+                <li key={item} className="flex items-start gap-3 text-sm text-slate-800">
                   <CheckCircle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   {item}
                 </li>
@@ -144,7 +144,7 @@ export default function CNAPage() {
                 </div>
                 <ul className="grid sm:grid-cols-2 gap-2">
                   {block.topics.map((t) => (
-                    <li key={t} className="flex items-start gap-2 text-sm text-black">
+                    <li key={t} className="flex items-start gap-2 text-sm text-slate-900">
                       <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-brand-blue-500 flex-shrink-0" />
                       {t}
                     </li>
@@ -209,7 +209,7 @@ export default function CNAPage() {
             {FAQ.map(({ q, a }) => (
               <div key={q} className="bg-white rounded-xl border border-slate-200 p-6">
                 <h3 className="font-bold text-slate-900 mb-2">{q}</h3>
-                <p className="text-black text-sm leading-relaxed">{a}</p>
+                <p className="text-slate-900 text-sm leading-relaxed">{a}</p>
               </div>
             ))}
           </div>

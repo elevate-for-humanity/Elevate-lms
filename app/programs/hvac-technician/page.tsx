@@ -98,10 +98,10 @@ export default async function HVACTechnicianPage() {
         {/* Program identity + CTAs */}
         <section className="border-b border-slate-200 bg-white">
           <div className="mx-auto max-w-7xl px-6 py-12">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-black">12-Week Workforce Training Program</p>
+            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-slate-900">12-Week Workforce Training Program</p>
             <h1 className="text-4xl font-black text-slate-900 mb-4">{banner.belowHeroHeadline}</h1>
-            <p className="text-black text-lg mb-6">{banner.belowHeroSubheadline}</p>
-            <p className="mt-2 text-xl text-slate-700 leading-relaxed mb-8">
+            <p className="text-slate-900 text-lg mb-6">{banner.belowHeroSubheadline}</p>
+            <p className="mt-2 text-xl text-slate-800 leading-relaxed mb-8">
               You could be earning <strong className="text-slate-900">$18–$25/hr fixing AC units</strong> 90 days from now — with certifications that follow you for life.
             </p>
             <div className="flex flex-wrap gap-4">
@@ -120,7 +120,7 @@ export default async function HVACTechnicianPage() {
         {/* Authority strip */}
         <section className="bg-slate-900 text-white py-8 px-6">
           <div className="mx-auto max-w-7xl">
-            <p className="text-xs font-semibold uppercase tracking-widest text-black mb-4 text-center">What you earn when you complete this program</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-slate-900 mb-4 text-center">What you earn when you complete this program</p>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
               {AUTHORITY.map((item, i) => (
                 <div key={i} className="flex items-start gap-2 text-sm text-white">
@@ -137,7 +137,7 @@ export default async function HVACTechnicianPage() {
           <div className="mb-8">
             <p className="text-sm font-semibold uppercase tracking-widest text-brand-orange-600 mb-2">Week by week</p>
             <h2 className="text-3xl font-bold">What You&apos;ll Learn</h2>
-            <p className="mt-2 text-black">No fluff. Every week builds toward a job-ready skill set.</p>
+            <p className="mt-2 text-slate-900">No fluff. Every week builds toward a job-ready skill set.</p>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             {WEEKLY_CURRICULUM.map((item, i) => (
@@ -145,7 +145,7 @@ export default async function HVACTechnicianPage() {
                 <div className="shrink-0 w-20 text-xs font-bold text-brand-orange-600 uppercase tracking-wide pt-0.5">{item.weeks}</div>
                 <div>
                   <p className="font-semibold text-slate-900">{item.topic}</p>
-                  <p className="text-sm text-black mt-1">{item.detail}</p>
+                  <p className="text-sm text-slate-900 mt-1">{item.detail}</p>
                 </div>
               </div>
             ))}
@@ -158,12 +158,12 @@ export default async function HVACTechnicianPage() {
             <div className="mb-8">
               <p className="text-sm font-semibold uppercase tracking-widest text-brand-orange-600 mb-2">Career pathway</p>
               <h2 className="text-3xl font-bold">Training → Job → Money</h2>
-              <p className="mt-2 text-black">HVAC is one of the highest-demand trades in Indiana. Here&apos;s where this program takes you.</p>
+              <p className="mt-2 text-slate-900">HVAC is one of the highest-demand trades in Indiana. Here&apos;s where this program takes you.</p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {OUTCOMES.map((o, i) => (
                 <div key={i} className="bg-white rounded-xl border border-slate-200 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-black mb-2">{o.timeline}</p>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-slate-900 mb-2">{o.timeline}</p>
                   <p className="font-bold text-slate-900 text-lg">{o.role}</p>
                   <p className="text-2xl font-black text-brand-orange-600 mt-1">{o.pay}</p>
                 </div>
@@ -226,14 +226,14 @@ export default async function HVACTechnicianPage() {
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 py-12 md:grid-cols-2 md:items-center">
           <div>
-            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-black">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-slate-900">
               12-Week Workforce Training Program
             </p>
             <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
               {program.hero_headline ?? program.title}
             </h1>
             {/* Emotional hook */}
-            <p className="mt-4 text-xl text-black leading-relaxed">
+            <p className="mt-4 text-xl text-slate-900 leading-relaxed">
               You could be earning <strong className="text-slate-900">$18–$25/hr fixing AC units</strong> 90 days from now — with certifications that follow you for life.
             </p>
 
@@ -245,7 +245,7 @@ export default async function HVACTechnicianPage() {
                     ? `${base} bg-slate-900 text-white hover:bg-slate-800`
                     : cta.style_variant === 'secondary'
                     ? `${base} border border-slate-300 text-slate-900 hover:bg-slate-50`
-                    : `${base} border border-slate-200 text-black hover:bg-slate-50`;
+                    : `${base} border border-slate-200 text-slate-900 hover:bg-slate-50`;
                 if (cta.is_external) {
                   return <a key={cta.id} href={cta.href} target="_blank" rel="noreferrer" className={variant}>{cta.label}</a>;
                 }
@@ -253,7 +253,7 @@ export default async function HVACTechnicianPage() {
               })}
             </div>
 
-            <div className="mt-8 flex flex-wrap gap-6 text-sm text-black">
+            <div className="mt-8 flex flex-wrap gap-6 text-sm text-slate-900">
               {program.length_weeks      && <span>⏱ {program.length_weeks} weeks</span>}
               {program.delivery_model    && <span className="capitalize">📍 {program.delivery_model}</span>}
               {program.certificate_title && <span>🎓 {program.certificate_title}</span>}
@@ -289,7 +289,7 @@ export default async function HVACTechnicianPage() {
       {/* ── Authority stacking ────────────────────────────────────────────── */}
       <section className="bg-slate-900 text-white py-8 px-6">
         <div className="mx-auto max-w-7xl">
-          <p className="text-xs font-semibold uppercase tracking-widest text-black mb-4 text-center">What you earn when you complete this program</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-900 mb-4 text-center">What you earn when you complete this program</p>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             {AUTHORITY.map((item, i) => (
               <div key={i} className="flex items-start gap-2 text-sm text-white">
@@ -306,7 +306,7 @@ export default async function HVACTechnicianPage() {
         <div className="mb-8">
           <p className="text-sm font-semibold uppercase tracking-widest text-brand-orange-600 mb-2">Week by week</p>
           <h2 className="text-3xl font-bold">What You&apos;ll Learn</h2>
-          <p className="mt-2 text-black">No fluff. Every week builds toward a job-ready skill set.</p>
+          <p className="mt-2 text-slate-900">No fluff. Every week builds toward a job-ready skill set.</p>
         </div>
         <div className="grid md:grid-cols-2 gap-4">
           {WEEKLY_CURRICULUM.map((item, i) => (
@@ -314,7 +314,7 @@ export default async function HVACTechnicianPage() {
               <div className="shrink-0 w-20 text-xs font-bold text-brand-orange-600 uppercase tracking-wide pt-0.5">{item.weeks}</div>
               <div>
                 <p className="font-semibold text-slate-900">{item.topic}</p>
-                <p className="text-sm text-black mt-1">{item.detail}</p>
+                <p className="text-sm text-slate-900 mt-1">{item.detail}</p>
               </div>
             </div>
           ))}
@@ -327,19 +327,19 @@ export default async function HVACTechnicianPage() {
           <div className="mb-8">
             <p className="text-sm font-semibold uppercase tracking-widest text-brand-orange-600 mb-2">Career pathway</p>
             <h2 className="text-3xl font-bold">Training → Job → Money</h2>
-            <p className="mt-2 text-black">HVAC is one of the highest-demand trades in Indiana. Here&apos;s where this program takes you.</p>
+            <p className="mt-2 text-slate-900">HVAC is one of the highest-demand trades in Indiana. Here&apos;s where this program takes you.</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {OUTCOMES.map((o, i) => (
               <div key={i} className="bg-white rounded-xl border border-slate-200 p-5">
-                <p className="text-xs font-semibold uppercase tracking-widest text-black mb-2">{o.timeline}</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-900 mb-2">{o.timeline}</p>
                 <p className="font-bold text-slate-900 text-lg">{o.role}</p>
                 <p className="text-2xl font-black text-brand-orange-600 mt-1">{o.pay}</p>
               </div>
             ))}
           </div>
           {program.outcomes && (
-            <p className="mt-6 text-sm text-black max-w-2xl">{program.outcomes}</p>
+            <p className="mt-6 text-sm text-slate-900 max-w-2xl">{program.outcomes}</p>
           )}
         </div>
       </section>
@@ -350,7 +350,7 @@ export default async function HVACTechnicianPage() {
           <div>
             <h2 className="text-2xl font-bold">About This Program</h2>
             {program.description && (
-              <p className="mt-4 text-slate-700 leading-relaxed">{program.description}</p>
+              <p className="mt-4 text-slate-800 leading-relaxed">{program.description}</p>
             )}
             {program.requirements && (
               <>
@@ -358,14 +358,14 @@ export default async function HVACTechnicianPage() {
                 {Array.isArray(program.requirements) ? (
                   <ul className="mt-3 space-y-2">
                     {(program.requirements as string[]).map((r, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                      <li key={i} className="flex items-start gap-2 text-sm text-slate-800">
                         <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
                         {r}
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="mt-3 text-slate-700">{String(program.requirements)}</p>
+                  <p className="mt-3 text-slate-800">{String(program.requirements)}</p>
                 )}
               </>
             )}
@@ -378,12 +378,12 @@ export default async function HVACTechnicianPage() {
                 <div key={track.id} className="rounded-xl border border-slate-200 p-4">
                   <div className="flex items-start justify-between gap-4">
                     <h3 className="font-semibold text-slate-900">{track.title}</h3>
-                    <span className="shrink-0 text-sm font-semibold text-slate-700">
+                    <span className="shrink-0 text-sm font-semibold text-slate-800">
                       {formatTrackCost(track.cost_cents)}
                     </span>
                   </div>
                   {track.description && (
-                    <p className="mt-2 text-sm text-black">{track.description}</p>
+                    <p className="mt-2 text-sm text-slate-900">{track.description}</p>
                   )}
                   {!track.available && track.coming_soon_message && (
                     <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
@@ -406,17 +406,17 @@ export default async function HVACTechnicianPage() {
               <div className="border-b border-slate-200 bg-slate-50 px-6 py-4">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-black">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-900">
                       Module {mod.module_number}
                     </p>
                     <h3 className="text-lg font-semibold text-slate-900">{mod.title}</h3>
                   </div>
-                  <div className="text-sm text-black">
+                  <div className="text-sm text-slate-900">
                     {mod.lesson_count} lessons{mod.duration_hours ? ` · ${mod.duration_hours}h` : ''}
                   </div>
                 </div>
                 {mod.description && (
-                  <p className="mt-2 text-sm text-black">{mod.description}</p>
+                  <p className="mt-2 text-sm text-slate-900">{mod.description}</p>
                 )}
               </div>
               {mod.program_lessons?.length > 0 && (
@@ -426,7 +426,7 @@ export default async function HVACTechnicianPage() {
                       <span className="text-sm text-slate-800">
                         {lesson.lesson_number}. {lesson.title}
                       </span>
-                      <span className="shrink-0 text-xs uppercase tracking-wide text-black">
+                      <span className="shrink-0 text-xs uppercase tracking-wide text-slate-900">
                         {lesson.lesson_type}
                       </span>
                     </li>
@@ -452,7 +452,7 @@ export default async function HVACTechnicianPage() {
               <Link key={href} href={href}
                 className="rounded-xl border border-slate-200 bg-white p-4 hover:border-brand-orange-400 hover:shadow-sm transition-all">
                 <p className="font-semibold text-slate-900 text-sm">{label}</p>
-                <p className="text-xs text-black mt-1">{desc}</p>
+                <p className="text-xs text-slate-900 mt-1">{desc}</p>
               </Link>
             ))}
           </div>

@@ -217,6 +217,7 @@ const heroBanners: Record<string, HeroBannerConfig> = {
   home: {
     pageKey: 'home',
     videoSrcDesktop: '/videos/homepage-hero-montage.mp4',
+    voiceoverSrc: '/audio/heroes/home.mp3',
     microLabel: 'Indianapolis, Indiana',
     belowHeroHeadline: 'Workforce training for real jobs.',
     belowHeroSubheadline:
@@ -237,6 +238,7 @@ const heroBanners: Record<string, HeroBannerConfig> = {
   about: {
     pageKey: 'about',
     videoSrcDesktop: '/videos/about-mission.mp4',
+    voiceoverSrc: '/audio/heroes/about.mp3',
     microLabel: 'Our Mission',
     belowHeroHeadline: 'Built for workforce outcomes.',
     belowHeroSubheadline:
@@ -256,6 +258,7 @@ const heroBanners: Record<string, HeroBannerConfig> = {
   platform: {
     pageKey: 'platform',
     videoSrcDesktop: '/videos/training-providers-hero.mp4',
+    voiceoverSrc: '/audio/heroes/career-services.mp3',
     microLabel: 'Workforce Infrastructure',
     belowHeroHeadline: 'Workforce infrastructure, not just a website.',
     belowHeroSubheadline:
@@ -276,6 +279,7 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     pageKey: 'funding-how-it-works',
     // orientation-full.mp4 used until a dedicated funding hero video is produced
     videoSrcDesktop: '/videos/orientation-full.mp4',
+    voiceoverSrc: '/audio/heroes/apply.mp3',
     microLabel: 'Funded Training',
     belowHeroHeadline: 'How funded training works.',
     belowHeroSubheadline:
@@ -296,6 +300,7 @@ const heroBanners: Record<string, HeroBannerConfig> = {
   healthcare: {
     pageKey: 'healthcare',
     videoSrcDesktop: '/videos/healthcare-cna.mp4',
+    voiceoverSrc: '/audio/heroes/healthcare.mp3',
     microLabel: 'Healthcare Programs',
     belowHeroHeadline: 'Healthcare training that leads to certification.',
     belowHeroSubheadline:
@@ -317,6 +322,7 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     pageKey: 'store',
     videoSrcDesktop: '/videos/lms-learning.mp4',
     videoSrcMobile: '/videos/store-demo-narrated.mp4',
+    voiceoverSrc: '/audio/heroes/store.mp3',
     microLabel: 'White-Label Platform',
     belowHeroHeadline: 'License the LMS that runs workforce programs end to end.',
     belowHeroSubheadline:
@@ -355,6 +361,7 @@ Try the live demo — no signup, no time limit. Every screen is clickable. Searc
   programs: {
     pageKey: 'programs',
     videoSrcDesktop: '/videos/program-hero.mp4',
+    voiceoverSrc: '/audio/heroes/programs.mp3',
     microLabel: 'Career Training',
     belowHeroHeadline: 'Start a Career — Not Just a Class',
     belowHeroSubheadline:
@@ -418,6 +425,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'skilled-trades': {
     pageKey: 'skilled-trades',
     videoSrcDesktop: '/videos/electrician-trades.mp4',
+    voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
     microLabel: 'Skilled Trades',
     belowHeroHeadline: 'Skilled trades training for high-demand work.',
     belowHeroSubheadline: 'HVAC, Electrical, Welding, Plumbing, CDL, and Diesel.',
@@ -1146,6 +1154,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'technology': {
     pageKey: 'technology',
     videoSrcDesktop: '/videos/it-technology.mp4',
+    voiceoverSrc: '/audio/heroes/technology.mp3',
     microLabel: 'Technology Programs',
     belowHeroHeadline: 'Technology training with industry certifications.',
     belowHeroSubheadline: 'IT Help Desk, Cybersecurity, Web Development, Software Development, and more. WIOA and Next Level Jobs funding available.',
@@ -1159,6 +1168,7 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'business': {
     pageKey: 'business',
     videoSrcDesktop: '/videos/business-finance.mp4',
+    voiceoverSrc: '/audio/heroes/business.mp3',
     microLabel: 'Business Programs',
     belowHeroHeadline: 'Business training for professional careers.',
     belowHeroSubheadline: 'Tax preparation, bookkeeping, office administration, entrepreneurship, and project management. WIOA and Next Level Jobs funding available.',

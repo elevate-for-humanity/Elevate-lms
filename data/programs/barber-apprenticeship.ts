@@ -134,7 +134,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     { standard: 'Indiana IC 25-7', description: 'Training meets Indiana Code requirements for barber apprenticeship (2,000 hours: 1,500 OJT + 500 RTI).' },
     { standard: 'Indiana Board of Cosmetology and Barber Examiners', description: 'Curriculum aligned to state licensing exam content and sanitation standards.' },
     { standard: 'DOL Apprenticeship Standards', description: 'Program follows DOL registered apprenticeship wage and hour requirements. Employer-sponsored funding may apply.' },
-    { standard: 'ETPL Listed', description: 'Eligible Training Provider List — approved for workforce board funding.' },
+    { standard: 'Indiana Professional Licensing Agency', description: 'Program prepares apprentices for the Indiana Barber License exam administered by the Indiana Professional Licensing Agency.' },
   ],
 
   trainingPhases: [
@@ -213,9 +213,9 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   laborMarket: {
     medianSalary: 0,
     salaryRange: 'Employer-determined',
-    growthRate: '+5% (average)',
+    growthRate: '+3–4% (average)',
     source: 'U.S. Bureau of Labor Statistics, Occupational Outlook Handbook',
-    sourceYear: 2024,
+    sourceYear: 2024, // BLS OES 2024; projections 2024–2034
     region: 'Indiana',
   },
   careers: [

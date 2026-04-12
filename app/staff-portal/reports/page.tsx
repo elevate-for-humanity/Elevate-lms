@@ -67,18 +67,19 @@ export default async function StaffReportsPage() {
     .eq('date', today);
 
   // Recent enrollments for the table
-  const { data: recentEnrollments } = await supabase
+  const { data: rawStaffEnrollments } = await supabase
     .from('program_enrollments')
-    .select(`
-      id,
-      status,
-      funding_type,
-      enrolled_at,
-      student:profiles!enrollments_student_id_fkey(full_name, email),
-      program:programs(name)
-    `)
+    .select(`id, user_id, status, funding_type, enrolled_at, program:programs(name, title)`)
     .order('enrolled_at', { ascending: false })
     .limit(10);
+
+  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+  const staffRptUserIds = [...new Set((rawStaffEnrollments ?? []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: staffRptProfiles } = staffRptUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', staffRptUserIds)
+    : { data: [] };
+  const staffRptProfileMap = Object.fromEntries((staffRptProfiles ?? []).map((p: any) => [p.id, p]));
+  const recentEnrollments = (rawStaffEnrollments ?? []).map((e: any) => ({ ...e, student: staffRptProfileMap[e.user_id] ?? null }));
 
   const reportTypes = [
     { 
@@ -201,7 +202,7 @@ export default async function StaffReportsPage() {
                       <p className="font-medium">{enrollment.student?.full_name || 'Unknown'}</p>
                       <p className="text-sm text-gray-500">{enrollment.student?.email}</p>
                     </td>
-                    <td className="px-4 py-3 text-sm">{enrollment.program?.name || 'N/A'}</td>
+                    <td className="px-4 py-3 text-sm">{(enrollment.program as any)?.title || (enrollment.program as any)?.name || 'N/A'}</td>
                     <td className="px-4 py-3">
                       <span className="px-2 py-1 bg-brand-blue-100 text-brand-blue-700 rounded text-xs uppercase">
                         {enrollment.funding_type || 'self_pay'}

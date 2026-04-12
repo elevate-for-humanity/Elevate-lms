@@ -23,7 +23,7 @@ export default async function ModulesPage() {
     .select(
       `
       *,
-      program:programs(name, slug),
+      program:programs(name, title, slug),
       scorm_package:scorm_packages(id, title, version)
     `,
       { count: 'exact' }
@@ -48,9 +48,9 @@ export default async function ModulesPage() {
   // Get programs for filtering
   const { data: programs } = await supabase
     .from('programs')
-    .select('id, name, slug')
+    .select('id, title, slug')
     .eq('is_active', true)
-    .order('name');
+    .order('title');
 
   return (
     <div className="min-h-screen bg-white p-8">

@@ -274,7 +274,7 @@ export function TransferHoursTable({
               <div>
                 <h3 className="font-semibold text-black mb-2">Program</h3>
                 <p className="text-black">
-                  {selectedRequest.enrollment?.program?.name}
+                  {selectedRequest.enrollment?.program?.title || selectedRequest.enrollment?.program?.name}
                 </p>
               </div>
 

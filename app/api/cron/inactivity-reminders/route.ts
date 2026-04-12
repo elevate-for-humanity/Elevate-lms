@@ -31,29 +31,28 @@ async function _GET(request: Request) {
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
     // Get all active enrollments
-    const { data: enrollments } = await supabase
+    const { data: rawInactiveEnrollments } = await supabase
       .from('program_enrollments')
-      .select(
-        `
-        id,
-        student_id,
-        courses!inner (
-          id,
-          title
-        ),
-        profiles!enrollments_student_id_fkey!inner (
-          full_name,
-          email
-        )
-      `
-      )
+      .select(`id, user_id, courses!inner(id, title)`)
       .eq('status', 'active');
 
-    if (!enrollments || enrollments.length === 0) {
+    if (!rawInactiveEnrollments || rawInactiveEnrollments.length === 0) {
       return NextResponse.json({ message: 'No active enrollments found' });
     }
 
-    const studentIds = enrollments.map((e) => e.student_id);
+    // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+    const inactiveUserIds = [...new Set(rawInactiveEnrollments.map((e: any) => e.user_id).filter(Boolean))];
+    const { data: inactiveProfiles } = inactiveUserIds.length
+      ? await supabase.from('profiles').select('id, full_name, email').in('id', inactiveUserIds)
+      : { data: [] };
+    const inactiveProfileMap = Object.fromEntries((inactiveProfiles ?? []).map((p: any) => [p.id, p]));
+    const enrollments = rawInactiveEnrollments.map((e: any) => ({
+      ...e,
+      student_id: e.user_id,
+      profiles: inactiveProfileMap[e.user_id] ?? null,
+    }));
+
+    const studentIds = enrollments.map((e: any) => e.student_id);
 
     // Get last login for each student
     const { data: lastLogins } = await supabase

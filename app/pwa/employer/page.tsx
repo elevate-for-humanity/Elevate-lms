@@ -7,7 +7,7 @@ async function getEmployerData() {
   const supabase = await getAdminClient();
 
   const [programRes, enrollRes, completedRes] = await Promise.all([
-    supabase.from('programs').select('id, name, slug, category, placement_rate, completion_rate').eq('is_active', true).order('name').limit(20),
+    supabase.from('programs').select('id, title, slug, category, placement_rate, completion_rate').eq('is_active', true).order('name').limit(20),
     supabase.from('enrollments').select('id', { count: 'exact', head: true }).eq('status', 'active'),
     supabase.from('enrollments').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
   ]);
@@ -80,7 +80,7 @@ export default async function EmployerPWAPage() {
                 {prog.category?.slice(0, 3).toUpperCase() || 'PRG'}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-semibold text-slate-900 text-sm truncate">{prog.name}</div>
+                <div className="font-semibold text-slate-900 text-sm truncate">{prog.title || prog.name}</div>
                 <div className="text-xs text-slate-500">{prog.category}{prog.placement_rate ? ` · ${prog.placement_rate}% placement` : ''}</div>
               </div>
               <span className="text-slate-500 text-sm">→</span>

@@ -147,7 +147,7 @@ async function _POST(request: NextRequest) {
     if (programId) {
       const { data: program } = await supabase
         .from('programs')
-        .select('name, total_hours')
+        .select('title, total_hours')
         .eq('id', programId)
         .single();
       

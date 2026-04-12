@@ -177,7 +177,7 @@ function generateCatalogHtml(programList: typeof programs) {
     
     ${programList.map((program, i) => `
       <div class="program" id="program-${i}">
-        <h2>${program.name}</h2>
+        <h2>${program.title || program?.title || program?.name}</h2>
         
         <div class="program-meta">
           <div class="meta-item">

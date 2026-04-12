@@ -31,7 +31,7 @@ export default async function AssignmentsPage() {
       grade,
       max_points,
       submitted_at,
-      course:courses(name)
+      course:courses(title)
     `)
     .eq('user_id', user.id)
     .order('due_date', { ascending: true });

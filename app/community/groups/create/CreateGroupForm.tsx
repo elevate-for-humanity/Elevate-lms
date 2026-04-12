@@ -122,7 +122,7 @@ export default function CreateGroupForm({ userId, userName, programs }: Props) {
             className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500">
             <option value="">Select a program (optional)</option>
             {programs.map(program => (
-              <option key={program.id} value={program.id}>{program.name}</option>
+              <option key={program.id} value={program.id}>{program.title || program?.title || program?.name}</option>
             ))}
           </select>
         </div>

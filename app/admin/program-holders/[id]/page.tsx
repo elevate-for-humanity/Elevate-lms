@@ -175,7 +175,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
 
       const { data: programData } = await adb
         .from('programs')
-        .select('name')
+        .select('title')
         .eq('id', programId)
         .maybeSingle();
 

@@ -87,7 +87,7 @@ export default async function ApprenticeCompetenciesPage() {
   // Resolve barber program_id
   const { data: program } = await db
     .from('programs')
-    .select('id, name')
+    .select('id, title')
     .eq('slug', 'barber-apprenticeship')
     .single();
 

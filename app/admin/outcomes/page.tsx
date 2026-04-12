@@ -24,7 +24,7 @@ export default async function OutcomesPage() {
     supabase.from('program_enrollments').select('id', { count: 'exact', head: true }),
     supabase.from('certificates').select('id', { count: 'exact', head: true }),
     supabase.from('employment_outcomes')
-      .select('id, employment_status, employer_name, wage_at_placement, wage_at_followup, start_date, profiles(full_name)')
+      .select('id, user_id, employment_status, employer_name, wage_at_placement, wage_at_followup, start_date')
       .order('start_date', { ascending: false })
       .limit(15),
   ]);
@@ -34,10 +34,17 @@ export default async function OutcomesPage() {
   if (certsRes.error)          throw new Error(`certificates count failed: ${certsRes.error.message}`);
   if (recentOutcomesRes.error) throw new Error(`employment_outcomes recent query failed: ${recentOutcomesRes.error.message}`);
 
-  const outcomes       = outcomesRes.data;
+  const outcomes         = outcomesRes.data;
   const totalEnrollments = enrollmentsRes.count;
-  const totalCerts     = certsRes.count;
-  const recentOutcomes = recentOutcomesRes.data;
+  const totalCerts       = certsRes.count;
+
+  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+  const outcomeUserIds = [...new Set((recentOutcomesRes.data ?? []).map((o: any) => o.user_id).filter(Boolean))];
+  const { data: outcomeProfiles } = outcomeUserIds.length
+    ? await supabase.from('profiles').select('id, full_name').in('id', outcomeUserIds)
+    : { data: [] };
+  const outcomeProfileMap = Object.fromEntries((outcomeProfiles ?? []).map((p: any) => [p.id, p]));
+  const recentOutcomes = (recentOutcomesRes.data ?? []).map((o: any) => ({ ...o, profiles: outcomeProfileMap[o.user_id] ?? null }));
 
   const total = outcomes.length;
   const employed = outcomes.filter((o: any) => o.employment_status === 'employed').length;

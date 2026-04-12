@@ -127,7 +127,7 @@ const supabase = await createClient();
     .select(`
       *,
       profiles:user_id (id, full_name, email),
-      programs:program_id (id, name)
+      programs:program_id (id, name, title)
     `)
     .order('created_at', { ascending: false });
 

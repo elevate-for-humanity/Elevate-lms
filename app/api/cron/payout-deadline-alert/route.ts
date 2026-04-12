@@ -28,12 +28,11 @@ export async function GET(request: NextRequest) {
   const twoDaysFromNow = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
 
   // Find payouts due within 2 days OR already overdue, not yet paid
-  const { data: rows, error } = await db
+  const { data: rawRows, error } = await db
     .from('program_enrollments')
     .select(`
-      id, program_slug,
+      id, user_id, program_slug,
       voucher_paid_date, payout_due_date, payout_status,
-      profiles:user_id ( full_name, email ),
       program_holders:partner_id ( name, contact_name, contact_email )
     `)
     .in('payout_status', ['pending', 'due', 'overdue'])
@@ -44,9 +43,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'DB query failed' }, { status: 500 });
   }
 
-  if (!rows || rows.length === 0) {
+  if (!rawRows || rawRows.length === 0) {
     return NextResponse.json({ sent: 0, message: 'No upcoming payout deadlines' });
   }
+
+  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+  const cronUserIds = [...new Set(rawRows.map((r: any) => r.user_id).filter(Boolean))];
+  const { data: cronProfiles } = cronUserIds.length
+    ? await db.from('profiles').select('id, full_name, email').in('id', cronUserIds)
+    : { data: [] };
+  const cronProfileMap = Object.fromEntries((cronProfiles ?? []).map((p: any) => [p.id, p]));
+  const rows = rawRows.map((r: any) => ({ ...r, profiles: cronProfileMap[r.user_id] ?? null }));
 
   // Mark overdue in DB while we're here
   const overdueIds = rows

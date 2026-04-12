@@ -29,7 +29,7 @@ export default async function MenteesPage() {
       status,
       created_at,
       profiles!mentorships_mentee_id_fkey(id, full_name),
-      enrollments!mentorships_mentee_id_fkey(program_id, programs(name))
+      enrollments!mentorships_mentee_id_fkey(program_id, programs(name, title))
     `)
     .eq('mentor_id', user.id);
 
@@ -45,7 +45,7 @@ export default async function MenteesPage() {
       mentees.push({
         id: m.mentee_id,
         name: m.profiles?.full_name || 'Mentee',
-        program: m.enrollments?.[0]?.programs?.name || 'Program',
+        program: (m.enrollments?.[0]?.programs as any)?.title || (m.enrollments?.[0]?.programs as any)?.name || 'Program',
         startDate: new Date(m.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
         sessions: count || 0,
         status: m.status || 'active',

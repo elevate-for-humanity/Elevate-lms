@@ -67,36 +67,26 @@ async function _POST(req: Request) {
     }
 
     // Get enrollment details
-    const { data: enrollment, error: enrollmentError } = await supabase
+    const { data: rawEnrollment, error: enrollmentError } = await supabase
       .from('program_enrollments')
       .select(
-        `
-        *,
-        course:courses(
-          id,
-          title,
-          slug,
-          partner_id,
-          wholesale_cost_cents,
-          retail_price_cents
-        ),
-        student:profiles!enrollments_user_id_fkey(
-          id,
-          email,
-          full_name,
-          phone
-        )
-      `
+        `*, course:courses(id, title, slug, partner_id, wholesale_cost_cents, retail_price_cents)`
       )
       .eq('id', enrollmentId)
       .single();
 
-    if (enrollmentError || !enrollment) {
+    if (enrollmentError || !rawEnrollment) {
       return NextResponse.json(
         { error: 'Enrollment not found' },
         { status: 404 }
       );
     }
+
+    // Hydrate student profile separately (user_id → auth.users, no FK to profiles)
+    const { data: studentProfile } = rawEnrollment.user_id
+      ? await supabase.from('profiles').select('id, email, full_name, phone').eq('id', rawEnrollment.user_id).maybeSingle()
+      : { data: null };
+    const enrollment = { ...rawEnrollment, student: studentProfile ?? null };
 
     // Verify enrollment is in correct status
     if (!['approved', 'ready_to_start'].includes(enrollment.status)) {

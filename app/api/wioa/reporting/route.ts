@@ -96,7 +96,7 @@ async function generateEnrollmentReport(
   startDate: string | null,
   endDate: string | null
 ) {
-  let query = supabase.from('program_enrollments').select('*, profiles(*)');
+  let query = supabase.from('program_enrollments').select('*');
 
   if (startDate) query = query.gte('enrollment_date', startDate);
   if (endDate) query = query.lte('enrollment_date', endDate);

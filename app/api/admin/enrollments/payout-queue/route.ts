@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
     .from('program_enrollments')
     .select(`
       id,
+      user_id,
       status,
       program_slug,
       student_start_date,
@@ -34,7 +35,6 @@ export async function GET(request: NextRequest) {
       payout_status,
       payout_paid_date,
       payout_notes,
-      profiles:user_id ( full_name, email ),
       program_holders:partner_id ( name, contact_name, contact_email )
     `)
     .neq('payout_status', 'not_triggered')
@@ -45,11 +45,19 @@ export async function GET(request: NextRequest) {
   }
 
   // Mark overdue: payout_due_date < now and not paid
-  const { data, error } = await query;
+  const { data: rawData, error } = await query;
   if (error) return safeInternalError(error, 'Failed to fetch payout queue');
 
+  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+  const userIds = [...new Set((rawData ?? []).map((r: any) => r.user_id).filter(Boolean))];
+  const { data: profileRows } = userIds.length
+    ? await db.from('profiles').select('id, full_name, email').in('id', userIds)
+    : { data: [] };
+  const profileMap = Object.fromEntries((profileRows ?? []).map((p: any) => [p.id, p]));
+  const data = (rawData ?? []).map((r: any) => ({ ...r, profiles: profileMap[r.user_id] ?? null }));
+
   const now = new Date();
-  const enriched = (data ?? []).map(row => ({
+  const enriched = data.map(row => ({
     ...row,
     payout_status: row.payout_status !== 'paid' && row.payout_due_date && new Date(row.payout_due_date) < now
       ? 'overdue'

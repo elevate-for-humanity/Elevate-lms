@@ -26,7 +26,7 @@ export default async function TransferHoursPage() {
       *,
       enrollment:student_enrollments(
         student:profiles!student_enrollments_student_id_fkey(full_name, email),
-        program:programs(name, slug)
+        program:programs(name, title, slug)
       )
     `,
       { count: 'exact' }

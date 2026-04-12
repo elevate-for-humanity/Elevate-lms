@@ -34,27 +34,27 @@ export default async function CandidatesPage() {
     .from('program_enrollments')
     .select(`
       id,
-      progress,
+      user_id,
+      progress_percent,
       completed_at,
-      profiles:user_id (
-        id,
-        full_name,
-        email,
-        phone,
-        city,
-        state
-      ),
       training_courses:course_id (
         id,
         title
       )
     `)
-    .eq('progress', 100)
+    .eq('progress_percent', 100)
     .order('completed_at', { ascending: false })
     .limit(50);
 
+  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+  const userIds = [...new Set((enrollments ?? []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: profileRows } = userIds.length
+    ? await supabase.from('profiles').select('id, full_name, email, phone, city, state').in('id', userIds)
+    : { data: [] };
+  const profileMap = Object.fromEntries((profileRows ?? []).map((p: any) => [p.id, p]));
+
   const candidates = (enrollments ?? []).map((e: any) => ({
-    ...e.profiles,
+    ...profileMap[e.user_id],
     course_title: e.training_courses?.title ?? null,
     completed_at: e.completed_at,
   }));

@@ -35,14 +35,19 @@ export default async function AdminEnrollmentsPage() {
     })
   );
 
-  const { data: enrollments, error: enrollmentsError } = await db
+  const { data: rawEnrollments, error: enrollmentsError } = await db
     .from('program_enrollments')
-    .select('*, student:profiles(id, full_name, email), course:courses(id, title)')
+    .select('*, course:courses(id, title)')
     .order('enrolled_at', { ascending: false });
   if (enrollmentsError) throw new Error(`program_enrollments query failed: ${enrollmentsError.message}`);
 
   // Supporting data — degrade gracefully if unavailable
   const { data: users } = await db.from('profiles').select('id, full_name, email').order('full_name');
+
+  // Hydrate student profiles separately (user_id → auth.users, no FK to profiles)
+  const enrollUserIds = [...new Set((rawEnrollments ?? []).map((e: any) => e.user_id).filter(Boolean))];
+  const enrollProfileMap = Object.fromEntries((users ?? []).filter((p: any) => enrollUserIds.includes(p.id)).map((p: any) => [p.id, p]));
+  const enrollments = (rawEnrollments ?? []).map((e: any) => ({ ...e, student: enrollProfileMap[e.user_id] ?? null }));
   const { data: coursesRaw } = await db.from('courses').select('id, title').eq('is_active', true).order('title');
   const { data: cohortsRaw } = await db.from('cohorts').select('id, name, code, status').eq('status', 'active').order('name');
 

@@ -52,24 +52,19 @@ if (!isOpenAIConfigured()) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  const { data: enrollments } = await supabase
+  const { data: rawEnrollments } = await supabase
     .from('program_enrollments')
-    .select(
-      `
-      id,
-      progress,
-      status,
-      created_at,
-      updated_at,
-      profiles:user_id (
-        id,
-        email,
-        full_name
-      )
-    `
-    )
+    .select('id, user_id, progress_percent, status, created_at, updated_at')
     .eq('status', 'in_progress')
     .limit(100);
+
+  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+  const dropoutUserIds = [...new Set((rawEnrollments ?? []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: dropoutProfiles } = dropoutUserIds.length
+    ? await supabase.from('profiles').select('id, email, full_name').in('id', dropoutUserIds)
+    : { data: [] };
+  const dropoutProfileMap = Object.fromEntries((dropoutProfiles ?? []).map((p: any) => [p.id, p]));
+  const enrollments = (rawEnrollments ?? []).map((e: any) => ({ ...e, profiles: dropoutProfileMap[e.user_id] ?? null }));
 
   if (!enrollments || enrollments.length === 0) {
     return NextResponse.json({ scores: [] });
@@ -85,7 +80,7 @@ if (!isOpenAIConfigured()) {
 
     return {
       id: e.id,
-      progress: e.progress || 0,
+      progress: e.progress_percent || 0,
       daysSinceStart,
       daysSinceActivity,
       userEmail: e.profiles?.email || 'unknown',

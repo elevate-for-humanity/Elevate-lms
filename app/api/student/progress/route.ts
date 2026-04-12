@@ -45,7 +45,7 @@ async function _POST(request: NextRequest) {
     // Verify enrollment belongs to user
     const { data: enrollment, error: enrollmentError } = await supabase
       .from('program_enrollments')
-      .select('id, user_id, course_id, progress, status')
+      .select('id, user_id, course_id, progress_percent, status')
       .eq('id', enrollmentId)
       .eq('user_id', user.id)
       .single();
@@ -61,7 +61,7 @@ async function _POST(request: NextRequest) {
     const updates: any = {};
     
     if (progress !== undefined) {
-      updates.progress = progress;
+      updates.progress_percent = progress;
       
       // Auto-complete if progress reaches 100%
       if (progress === 100 && enrollment.status !== 'completed') {
@@ -157,7 +157,7 @@ async function _GET(request: NextRequest) {
       .from('program_enrollments')
       .select(`
         id,
-        progress,
+        progress_percent,
         status,
         started_at,
         completed_at,

@@ -68,7 +68,6 @@ export default async function PayoutQueuePage({
       voucher_issued_date, voucher_paid_date,
       payout_due_date, payout_status, payout_paid_date, payout_notes,
       user_id,
-      profiles:user_id ( full_name, email ),
       program_holders:partner_id ( name, contact_name, contact_email )
     `)
     .neq('payout_status', 'not_triggered')
@@ -78,10 +77,19 @@ export default async function PayoutQueuePage({
     query = query.eq('payout_status', filterStatus);
   }
 
-  const { data: rows } = await query;
+  const { data: rawRows } = await query;
+
+  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+  const payoutUserIds = [...new Set((rawRows ?? []).map((r: any) => r.user_id).filter(Boolean))];
+  const { data: payoutProfiles } = payoutUserIds.length
+    ? await db.from('profiles').select('id, full_name, email').in('id', payoutUserIds)
+    : { data: [] };
+  const payoutProfileMap = Object.fromEntries((payoutProfiles ?? []).map((p: any) => [p.id, p]));
+  const rows = (rawRows ?? []).map((r: any) => ({ ...r, profiles: payoutProfileMap[r.user_id] ?? null }));
+
   const now = new Date();
 
-  const queue = (rows ?? []).map(row => ({
+  const queue = rows.map(row => ({
     ...row,
     payout_status: row.payout_status !== 'paid' && row.payout_due_date && new Date(row.payout_due_date) < now
       ? 'overdue'

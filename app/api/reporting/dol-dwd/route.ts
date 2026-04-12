@@ -15,16 +15,18 @@ async function _GET(request: Request) {
 const supabase = await createServerSupabaseClient();
 
   // Get DOL/DWD reporting data
-  const { data: enrollments } = await supabase
+  const { data: rawDolEnrollments } = await supabase
     .from('program_enrollments')
-    .select(
-      `
-      *,
-      profiles (full_name, email),
-      courses (title, duration_hours)
-    `
-    )
+    .select(`id, user_id, funding_source, courses:course_id(title, duration_hours)`)
     .in('funding_source', ['WIOA', 'WRG', 'JRI', 'DOL']);
+
+  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+  const dolUserIds = [...new Set((rawDolEnrollments ?? []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: dolProfiles } = dolUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', dolUserIds)
+    : { data: [] };
+  const dolProfileMap = Object.fromEntries((dolProfiles ?? []).map((p: any) => [p.id, p]));
+  const enrollments = (rawDolEnrollments ?? []).map((e: any) => ({ ...e, profiles: dolProfileMap[e.user_id] ?? null }));
 
   return NextResponse.json({
     provider: 'DOL/DWD',

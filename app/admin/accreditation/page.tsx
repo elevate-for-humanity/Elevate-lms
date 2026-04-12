@@ -36,7 +36,7 @@ export default async function AccreditationPage() {
 
   const { data: enrollments } = await supabase
     .from('program_enrollments')
-    .select('*, program:programs(name)')
+    .select('*, program:programs(name, title)')
     .gte('created_at', new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString());
 
   const { data: completions } = await supabase

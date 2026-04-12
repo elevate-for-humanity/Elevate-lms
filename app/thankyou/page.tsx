@@ -29,7 +29,7 @@ export default async function ThankyouPage() {
   // Get featured programs to suggest
   const { data: programs } = await supabase
     .from('programs')
-    .select('id, name, slug, description')
+    .select('id, title, slug, description')
     .eq('is_active', true)
     .eq('is_featured', true)
     .limit(3);
@@ -159,7 +159,7 @@ export default async function ThankyouPage() {
                   className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition group"
                 >
                   <h3 className="font-semibold mb-2 group-hover:text-brand-blue-600 transition">
-                    {program.name}
+                    {program.title || program.title || program.name}
                   </h3>
                   {program.description && (
                     <p className="text-gray-600 text-sm line-clamp-2">{program.description}</p>

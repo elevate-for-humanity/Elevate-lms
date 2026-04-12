@@ -31,7 +31,7 @@ export default async function MentorDashboardPage() {
       status,
       created_at,
       profiles!mentorships_mentee_id_fkey(id, full_name),
-      enrollments!mentorships_mentee_id_fkey(program_id, progress, programs(name))
+      enrollments!mentorships_mentee_id_fkey(program_id, progress, programs(name, title))
     `, { count: 'exact' })
     .eq('mentor_id', user.id)
     .eq('status', 'active');
@@ -41,7 +41,7 @@ export default async function MentorDashboardPage() {
     recentMentees = mentorships.slice(0, 4).map((m: any) => ({
       id: m.mentee_id,
       name: m.profiles?.full_name || 'Mentee',
-      program: m.enrollments?.[0]?.programs?.name || 'Program',
+      program: (m.enrollments?.[0]?.programs as any)?.title || (m.enrollments?.[0]?.programs as any)?.name || 'Program',
       progress: m.enrollments?.[0]?.progress || 0,
     }));
   }

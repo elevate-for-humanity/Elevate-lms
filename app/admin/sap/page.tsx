@@ -29,17 +29,19 @@ export default async function SAPMonitoringPage() {
   // Check admin role
 
   // Get all active enrollments with student and program data
-  const { data: enrollments } = await supabase
+  const { data: rawSapEnrollments } = await supabase
     .from('program_enrollments')
-    .select(
-      `
-      *,
-      student:profiles!enrollments_student_id_fkey(id, full_name, email),
-      program:programs(name, total_hours)
-    `
-    )
+    .select(`*, program:programs(name, title, total_hours)`)
     .eq('status', 'active')
     .order('created_at', { ascending: false });
+
+  // Hydrate student profiles separately (user_id → auth.users, no FK to profiles)
+  const sapUserIds = [...new Set((rawSapEnrollments ?? []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: sapProfiles } = sapUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', sapUserIds)
+    : { data: [] };
+  const sapProfileMap = Object.fromEntries((sapProfiles ?? []).map((p: any) => [p.id, p]));
+  const enrollments = (rawSapEnrollments ?? []).map((e: any) => ({ ...e, student: sapProfileMap[e.user_id] ?? null }));
 
   // Calculate SAP status for each student
   const studentsWithSAP = await Promise.all(
@@ -122,7 +124,7 @@ export default async function SAPMonitoringPage() {
         studentId: enrollment.student?.id,
         studentName: enrollment.student?.full_name || 'Unknown',
         studentEmail: enrollment.student?.email || '',
-        programName: enrollment.program?.name || 'Unknown Program',
+        programName: enrollment.program?.title || enrollment.program?.name || 'Unknown Program',
         gpa: Math.round(gpa * 100) / 100,
         attendanceRate: Math.round(attendanceRate * 10) / 10,
         completionRate: Math.round(completionRate * 10) / 10,

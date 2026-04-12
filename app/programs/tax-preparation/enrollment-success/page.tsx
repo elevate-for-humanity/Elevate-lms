@@ -24,7 +24,7 @@ export default async function EnrollmentSuccessPage() {
   // Get enrollment — first by user_id, then by email for public-checkout users
   let { data: enrollment } = await supabase
     .from('program_enrollments')
-    .select('id, enrolled_at, status, program_id, user_id, programs(name, slug)')
+    .select('id, enrolled_at, status, program_id, user_id, programs(name, title, slug)')
     .eq('user_id', user.id)
     .order('enrolled_at', { ascending: false })
     .limit(1)
@@ -34,7 +34,7 @@ export default async function EnrollmentSuccessPage() {
     const normalizedEmail = user.email.toLowerCase().trim();
     const { data: emailMatch } = await supabase
       .from('program_enrollments')
-      .select('id, enrolled_at, status, program_id, user_id, programs(name, slug)')
+      .select('id, enrolled_at, status, program_id, user_id, programs(name, title, slug)')
       .ilike('email', normalizedEmail)
       .is('user_id', null)
       .order('enrolled_at', { ascending: false })

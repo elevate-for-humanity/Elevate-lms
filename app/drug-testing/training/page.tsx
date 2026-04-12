@@ -28,7 +28,7 @@ export default async function DrugTestingTrainingPage() {
     const category = course.category || 'Other';
     if (!acc[category]) acc[category] = [];
     acc[category].push({
-      name: course.name,
+      name: course.title || course.name,
       price: course.elevate_price || course.nds_wholesale_cost * 2,
       description: course.description,
       duration: course.duration,
@@ -95,7 +95,7 @@ export default async function DrugTestingTrainingPage() {
                   {coursesByCategory[category].map((course: any, index: number) => (
                     <div key={index} className="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition-shadow">
                       <div className="flex items-start justify-between mb-3">
-                        <h3 className="text-lg font-semibold text-gray-900 flex-1">{course.name}</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 flex-1">{course.title || course.title || course.name}</h3>
                         <div className="flex items-center gap-2">
                           {course.new && (
                             <span className="px-2 py-1 bg-brand-green-100 text-brand-green-700 text-xs font-medium rounded-full flex items-center gap-1">

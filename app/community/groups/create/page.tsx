@@ -30,9 +30,9 @@ export default async function CreateGroupPage() {
   // Fetch available programs for group topics
   const { data: programs } = await supabase
     .from('programs')
-    .select('id, name, slug')
+    .select('id, title, slug')
     .eq('is_active', true)
-    .order('name');
+    .order('title');
 
   return (
     <div className="min-h-screen bg-white py-8">

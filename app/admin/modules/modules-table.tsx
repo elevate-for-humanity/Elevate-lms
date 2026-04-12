@@ -46,7 +46,7 @@ export function ModulesTable({
   const filteredModules = modules.filter((module) => {
     const matchesSearch =
       module.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      module.program?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+      (module.program?.title || module.program?.name)?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesProgram =
       filterProgram === 'all' || module.program_id === filterProgram;
     const matchesType =
@@ -98,7 +98,7 @@ export function ModulesTable({
             <option value="all">All Programs</option>
             {programs.map((program: any) => (
               <option key={program.id} value={program.id}>
-                {program.name}
+                {program.title || program.name}
               </option>
             ))}
           </select>

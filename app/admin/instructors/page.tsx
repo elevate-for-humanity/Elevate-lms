@@ -35,7 +35,7 @@ export default function InstructorsPage() {
         `
         *,
         instructor_courses:course_instructors(
-          course:courses(name, slug)
+          course:courses(title, slug)
         ),
         instructor_ratings:instructor_reviews(rating)
       `

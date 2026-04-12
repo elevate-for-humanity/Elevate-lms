@@ -17,19 +17,31 @@ async function _GET(request: Request) {
     const supabase = await createClient();
 
     // Get recent enrollments
-    const { data: enrollments } = await supabase
+    const { data: rawEnrollments } = await supabase
       .from('program_enrollments')
-      .select('*, profiles(full_name), programs(name)')
+      .select('id, user_id, enrolled_at, program_id, programs:program_id(name, title)')
       .order('enrolled_at', { ascending: false })
       .limit(5);
 
     // Get recent completions
-    const { data: completions } = await supabase
+    const { data: rawCompletions } = await supabase
       .from('program_enrollments')
-      .select('*, profiles(full_name), programs(name)')
+      .select('id, user_id, completion_date, program_id, programs:program_id(name, title)')
       .eq('status', 'completed')
       .order('completion_date', { ascending: false })
       .limit(5);
+
+    // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+    const activityUserIds = [...new Set([
+      ...(rawEnrollments ?? []).map((e: any) => e.user_id),
+      ...(rawCompletions ?? []).map((e: any) => e.user_id),
+    ].filter(Boolean))];
+    const { data: activityProfiles } = activityUserIds.length
+      ? await supabase.from('profiles').select('id, full_name').in('id', activityUserIds)
+      : { data: [] };
+    const activityProfileMap = Object.fromEntries((activityProfiles ?? []).map((p: any) => [p.id, p]));
+    const enrollments = (rawEnrollments ?? []).map((e: any) => ({ ...e, profiles: activityProfileMap[e.user_id] ?? null }));
+    const completions = (rawCompletions ?? []).map((e: any) => ({ ...e, profiles: activityProfileMap[e.user_id] ?? null }));
 
     // Get recent placements
     const { data: placements } = await supabase
@@ -46,7 +58,7 @@ async function _GET(request: Request) {
       activities.push({
         id: `enroll-${e.id}`,
         type: 'enrollment',
-        message: `${e.profiles?.full_name || 'Student'} enrolled in ${e.programs?.name || 'program'}`,
+        message: `${e.profiles?.full_name || 'Student'} enrolled in ${(e.programs as any)?.title || (e.programs as any)?.name || 'program'}`,
         timestamp: e.enrolled_at,
         priority: 'low'
       });
@@ -56,7 +68,7 @@ async function _GET(request: Request) {
       activities.push({
         id: `complete-${c.id}`,
         type: 'completion',
-        message: `${c.profiles?.full_name || 'Student'} completed ${c.programs?.name || 'program'}`,
+        message: `${c.profiles?.full_name || 'Student'} completed ${(c.programs as any)?.title || (c.programs as any)?.name || 'program'}`,
         timestamp: c.completion_date,
         priority: 'medium'
       });

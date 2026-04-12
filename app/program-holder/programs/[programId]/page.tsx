@@ -31,12 +31,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   
   const { data: program } = await supabase
     .from('programs')
-    .select('name')
+    .select('title')
     .eq('id', programId)
     .single();
 
   return {
-    title: program ? `${program.name} | Program Holder` : 'Program | Program Holder',
+    title: program ? `${program.title || program?.title || program?.name} | Program Holder` : 'Program | Program Holder',
     robots: { index: false, follow: false },
   };
 }
@@ -56,12 +56,20 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
   if (error || !program) notFound();
 
   // Fetch enrollments
-  const { data: enrollments, count: enrollmentCount } = await supabase
+  const { data: rawEnrollments, count: enrollmentCount } = await supabase
     .from('program_enrollments')
-    .select('*, profiles(first_name, last_name, email)', { count: 'exact' })
+    .select('*', { count: 'exact' })
     .eq('program_id', programId)
     .order('enrolled_at', { ascending: false })
     .limit(10);
+
+  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+  const phUserIds = [...new Set((rawEnrollments ?? []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: phProfiles } = phUserIds.length
+    ? await supabase.from('profiles').select('id, first_name, last_name, email').in('id', phUserIds)
+    : { data: [] };
+  const phProfileMap = Object.fromEntries((phProfiles ?? []).map((p: any) => [p.id, p]));
+  const enrollments = (rawEnrollments ?? []).map((e: any) => ({ ...e, profiles: phProfileMap[e.user_id] ?? null }));
 
   // Fetch courses in program
   const { data: courses, count: courseCount } = await supabase
@@ -90,7 +98,7 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
 
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">{program.name}</h1>
+            <h1 className="text-2xl font-bold text-slate-900">{program.title || program?.title || program?.name}</h1>
             <p className="text-slate-600">{program.description}</p>
             <div className="flex items-center gap-2 mt-2">
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${

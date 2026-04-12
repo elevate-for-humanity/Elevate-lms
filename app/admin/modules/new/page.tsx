@@ -19,9 +19,9 @@ export default async function NewModulePage() {
   // Fetch programs for selection
   const { data: programs } = await supabase
     .from('programs')
-    .select('id, name, slug')
+    .select('id, title, slug')
     .eq('is_active', true)
-    .order('name');
+    .order('title');
 
   return (
     <div className="min-h-screen bg-white p-8">

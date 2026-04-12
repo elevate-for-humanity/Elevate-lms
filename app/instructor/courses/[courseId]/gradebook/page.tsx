@@ -17,7 +17,15 @@ export default async function GradebookPage({ params }: { params: { courseId: st
   if (!user) redirect('/login');
 
   const { data: course } = await supabase.from('training_courses').select('*').eq('id', params.courseId).single();
-  const { data: enrollments } = await supabase.from('program_enrollments').select('*, profiles!inner(full_name, email)').eq('course_id', params.courseId).order('created_at');
+  const { data: rawEnrollments } = await supabase.from('program_enrollments').select('*, progress_percent').eq('course_id', params.courseId).order('created_at');
+
+  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+  const gbUserIds = [...new Set((rawEnrollments ?? []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: gbProfiles } = gbUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', gbUserIds)
+    : { data: [] };
+  const gbProfileMap = Object.fromEntries((gbProfiles ?? []).map((p: any) => [p.id, p]));
+  const enrollments = (rawEnrollments ?? []).map((e: any) => ({ ...e, profiles: gbProfileMap[e.user_id] ?? null }));
 
   return (
     <div className="min-h-screen bg-white">
@@ -53,7 +61,7 @@ export default async function GradebookPage({ params }: { params: { courseId: st
               {enrollments && enrollments.length > 0 ? enrollments.map((e: any) => (
                 <tr key={e.id} className="hover:bg-white">
                   <td className="px-4 py-3"><p className="font-medium">{e.profiles?.full_name || 'Student'}</p><p className="text-sm text-gray-500">{e.profiles?.email}</p></td>
-                  <td className="px-4 py-3"><div className="w-24 bg-gray-200 rounded-full h-2"><div className="bg-white h-2 rounded-full" style={{ width: `${e.progress || 0}%` }}></div></div><span className="text-sm text-gray-500">{e.progress || 0}%</span></td>
+                  <td className="px-4 py-3"><div className="w-24 bg-gray-200 rounded-full h-2"><div className="bg-white h-2 rounded-full" style={{ width: `${e.progress_percent || 0}%` }}></div></div><span className="text-sm text-gray-500">{e.progress_percent || 0}%</span></td>
                   <td className="px-4 py-3">{e.quiz_average || '-'}%</td>
                   <td className="px-4 py-3">{e.assignment_score || '-'}%</td>
                   <td className="px-4 py-3 font-medium">{e.final_grade || '-'}</td>

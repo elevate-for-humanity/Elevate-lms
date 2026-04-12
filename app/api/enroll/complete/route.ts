@@ -54,7 +54,7 @@ async function _POST(req: Request) {
     // Step 1: Get program details
     const { data: program, error: programError } = await supabase
       .from('programs')
-      .select('id, name, slug')
+      .select('id, title, slug')
       .eq('slug', programSlug)
       .single();
 
@@ -201,7 +201,7 @@ async function _POST(req: Request) {
           user_id: admin.id,
           type: 'system',
           title: 'New Enrollment Pending Approval',
-          message: `${firstName} ${lastName} (${email}) has completed payment for ${program.name}. Enrollment ID: ${enrollmentId}`,
+          message: `${firstName} ${lastName} (${email}) has completed payment for ${program.title || program?.title || program?.name}. Enrollment ID: ${enrollmentId}`,
         }));
 
         await supabase.from('notifications').insert(notifications);
@@ -230,13 +230,13 @@ async function _POST(req: Request) {
     try {
       const { sendWelcomeEmail } = await import('@/lib/email/sendgrid');
       const isBarberProgram = programSlug === 'barber-apprenticeship' || 
-        program.name.toLowerCase().includes('barber') ||
-        program.name.toLowerCase().includes('apprentice');
+        program.title || program?.title || program?.name.toLowerCase().includes('barber') ||
+        program.title || program?.title || program?.name.toLowerCase().includes('apprentice');
       
       await sendWelcomeEmail({
         email: emailLower,
         name: `${firstName} ${lastName}`,
-        programName: program.name,
+        programName: program.title || program?.title || program?.name,
         dashboardUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/lms`,
         includesMilady: isBarberProgram, // param kept for compat — LMS section shown for barber
       });

@@ -35,7 +35,7 @@ export default async function ImpactPage() {
     supabase.from('courses').select('id', { count: 'exact', head: true }).eq('is_active', true),
     supabase.from('employment_outcomes').select('employment_status, wage_at_placement, wage_at_followup').limit(500),
     supabase.from('certificates').select('id, user_id, issued_at, profiles(full_name)').order('issued_at', { ascending: false }).limit(10),
-    supabase.from('programs').select('id, name, status').eq('status', 'active').limit(20),
+    supabase.from('programs').select('id, title, status').eq('status', 'active').limit(20),
     supabase.from('donations').select('amount, created_at').limit(500),
   ]);
 
@@ -135,7 +135,7 @@ export default async function ImpactPage() {
                     <div className="w-8 h-8 bg-brand-blue-100 rounded-full flex items-center justify-center">
                       <BookOpen className="w-4 h-4 text-brand-blue-600" />
                     </div>
-                    <p className="text-sm font-medium text-gray-900">{prog.name}</p>
+                    <p className="text-sm font-medium text-gray-900">{prog.title || prog.name}</p>
                   </div>
                   <span className="text-xs bg-brand-blue-100 text-brand-blue-700 px-2 py-1 rounded-full capitalize">{prog.status}</span>
                 </div>

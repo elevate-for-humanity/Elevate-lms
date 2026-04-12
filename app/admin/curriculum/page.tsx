@@ -55,7 +55,7 @@ export default async function CurriculumPage() {
   const { data: programs } = unresolvedIds.length
     ? await supabase
         .from('programs')
-        .select('id, name')
+        .select('id, title')
         .in('id', unresolvedIds)
     : { data: [] };
 
@@ -145,7 +145,7 @@ export default async function CurriculumPage() {
                 >
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-slate-800 group-hover:text-brand-blue-600 truncate">
-                      {course.name}
+                      {course.title || course.title || course.name}
                     </p>
                     <p className="text-xs text-slate-400 mt-0.5 font-mono">{course.id}</p>
                   </div>

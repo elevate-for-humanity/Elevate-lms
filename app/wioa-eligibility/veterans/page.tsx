@@ -19,7 +19,7 @@ export default async function VeteransPage() {
   // Get veteran-specific programs
   const { data: programs } = await supabase
     .from('programs')
-    .select('id, name, slug, description')
+    .select('id, title, slug, description')
     .eq('is_active', true)
     .eq('veteran_priority', true)
     .limit(6);
@@ -150,7 +150,7 @@ export default async function VeteransPage() {
                   href={`/programs/${program.slug || program.id}`}
                   className="border rounded-lg p-4 hover:shadow-md transition"
                 >
-                  <h4 className="font-semibold">{program.name}</h4>
+                  <h4 className="font-semibold">{program.title || program.name}</h4>
                   {program.description && (
                     <p className="text-sm text-gray-600 mt-1 line-clamp-2">{program.description}</p>
                   )}

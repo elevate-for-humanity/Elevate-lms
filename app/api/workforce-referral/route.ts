@@ -229,7 +229,7 @@ const supabase = await createClient();
       // Get referral with case manager info
       const { data: referral } = await supabase
         .from('workforce_referrals')
-        .select('*, enrollments(status, programs(name))')
+        .select('*, enrollments(status, programs(name, title))')
         .eq('id', referralId)
         .single();
 

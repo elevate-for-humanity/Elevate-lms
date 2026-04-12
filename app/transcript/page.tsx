@@ -15,7 +15,7 @@ export default async function TranscriptPage() {
   // Enrollment + program
   const { data: enrollment } = await db
     .from('program_enrollments')
-    .select('id, progress, enrolled_at, completed_at, course_id, training_courses(id, title)')
+    .select('id, progress_percent, enrolled_at, completed_at, course_id, training_courses(id, title)')
     .eq('user_id', user.id)
     .order('enrolled_at', { ascending: false })
     .limit(1)
@@ -91,7 +91,7 @@ export default async function TranscriptPage() {
         email: profile?.email ?? user.email ?? '',
         enrolled_at: enrollment?.enrolled_at ?? null,
         program_title: courseTitle,
-        progress: enrollment?.progress ?? 0,
+        progress: enrollment?.progress_percent ?? 0,
         completed_at: enrollment?.completed_at ?? null,
       }}
       domains={domains}

@@ -32,17 +32,23 @@ export default async function RecordAttendancePage() {
   }
 
   // Fetch active students with their enrollments
-  const { data: activeEnrollments } = await supabase
+  const { data: rawAttendEnrollments } = await supabase
     .from('program_enrollments')
-    .select(`
-      id,
-      student_id,
-      program_id,
-      student:profiles!enrollments_student_id_fkey(id, full_name, email),
-      program:programs(id, name)
-    `)
+    .select(`id, user_id, program_id, program:programs(id, name, title)`)
     .eq('status', 'active')
     .order('enrolled_at', { ascending: false });
+
+  // Hydrate student profiles separately (user_id → auth.users, no FK to profiles)
+  const attendUserIds = [...new Set((rawAttendEnrollments ?? []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: attendProfiles } = attendUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', attendUserIds)
+    : { data: [] };
+  const attendProfileMap = Object.fromEntries((attendProfiles ?? []).map((p: any) => [p.id, p]));
+  const activeEnrollments = (rawAttendEnrollments ?? []).map((e: any) => ({
+    ...e,
+    student_id: e.user_id,
+    student: attendProfileMap[e.user_id] ?? null,
+  }));
 
   // Fetch today's attendance records
   const today = new Date().toISOString().split('T')[0];

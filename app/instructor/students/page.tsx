@@ -32,25 +32,23 @@ export default async function InstructorStudentsPage() {
   }
 
   // Get students enrolled in instructor's courses
-  const { data: enrollments } = await supabase
+  const { data: rawStudentEnrollments } = await supabase
     .from('program_enrollments')
-    .select(`
-      id,
-      status,
-      progress,
-      enrolled_at,
-      completed_at,
-      profiles:user_id (
-        id,
-        full_name,
-        email
-      ),
-      programs (
-        name
-      )
-    `)
+    .select('id, status, progress_percent, enrolled_at, completed_at, user_id, programs ( name, title )')
     .order('enrolled_at', { ascending: false })
     .limit(100);
+
+  // Hydrate profiles separately (no FK from program_enrollments.user_id to profiles)
+  const instrUserIds = [...new Set((rawStudentEnrollments || []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: instrProfiles } = instrUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', instrUserIds)
+    : { data: [] };
+  const instrProfileMap = Object.fromEntries((instrProfiles || []).map((p: any) => [p.id, p]));
+  const enrollments = (rawStudentEnrollments || []).map((e: any) => ({
+    ...e,
+    progress: e.progress_percent,
+    profiles: instrProfileMap[e.user_id] ?? null,
+  }));
 
   const activeStudents = enrollments?.filter(e => e.status === 'active') || [];
   const completedStudents = enrollments?.filter(e => e.status === 'completed') || [];

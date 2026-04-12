@@ -47,16 +47,19 @@ export default async function AutomationLogPage() {
     .limit(50);
 
   // Fetch recent enrollments (automation trigger)
-  const { data: recentEnrollments } = await supabase
+  const { data: rawAutoEnrollments } = await supabase
     .from('program_enrollments')
-    .select(`
-      id,
-      created_at,
-      profiles!enrollments_user_id_fkey(full_name),
-      programs(name)
-    `)
+    .select(`id, user_id, created_at, programs:program_id(name, title)`)
     .order('created_at', { ascending: false })
     .limit(20);
+
+  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+  const autoUserIds = [...new Set((rawAutoEnrollments ?? []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: autoProfiles } = autoUserIds.length
+    ? await supabase.from('profiles').select('id, full_name').in('id', autoUserIds)
+    : { data: [] };
+  const autoProfileMap = Object.fromEntries((autoProfiles ?? []).map((p: any) => [p.id, p]));
+  const recentEnrollments = (rawAutoEnrollments ?? []).map((e: any) => ({ ...e, profiles: autoProfileMap[e.user_id] ?? null }));
 
   // Calculate stats
   const emailsSent = deliveryLogs?.filter(l => l.channel === 'email' && l.status === 'sent').length || 0;
@@ -191,7 +194,7 @@ export default async function AutomationLogPage() {
                             Enrollment completed
                           </p>
                           <p className="text-gray-500 text-xs">
-                            {enrollment.profiles?.full_name || 'Student'} → {enrollment.programs?.name || 'Program'}
+                            {enrollment.profiles?.full_name || 'Student'} → {(enrollment.programs as any)?.title || (enrollment.programs as any)?.name || 'Program'}
                           </p>
                         </div>
                       </div>

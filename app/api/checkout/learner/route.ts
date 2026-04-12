@@ -117,7 +117,7 @@ async function _POST(request: NextRequest) {
         // Get program details
         const { data: program } = await supabase
           .from('programs')
-          .select('id, name, slug, total_cost')
+          .select('id, title, slug, total_cost')
           .eq('id', programId)
           .single();
 
@@ -144,8 +144,8 @@ async function _POST(request: NextRequest) {
             price_data: {
               currency: 'usd',
               product_data: {
-                name: program.name,
-                description: `Enrollment in ${program.name}`,
+                name: program.title || program?.title || program?.name,
+                description: `Enrollment in ${program.title || program?.title || program?.name}`,
               },
               unit_amount: programAmount,
             },

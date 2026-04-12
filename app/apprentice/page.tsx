@@ -35,7 +35,7 @@ export default async function ApprenticePortalPage() {
   // Get active enrollment with program info
   const { data: enrollment } = await supabase
     .from('training_enrollments')
-    .select('*, programs(slug, name)')
+    .select('*, programs(slug, name, title)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(1)

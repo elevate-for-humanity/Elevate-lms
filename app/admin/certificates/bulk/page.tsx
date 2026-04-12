@@ -29,19 +29,20 @@ export default async function BulkCertificatesPage() {
     .order('name');
 
   // Fetch eligible participants (completed courses without certificates)
-  const { data: eligibleParticipants, count: eligibleCount } = await supabase
+  const { data: rawEligible, count: eligibleCount } = await supabase
     .from('program_enrollments')
-    .select(`
-      id,
-      user_id,
-      course_id,
-      completed_at,
-      profiles!inner(full_name, email),
-      courses!inner(title)
-    `, { count: 'exact' })
+    .select(`id, user_id, course_id, completed_at, courses!inner(title)`, { count: 'exact' })
     .eq('status', 'completed')
     .is('certificate_issued', null)
     .limit(20);
+
+  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+  const bulkUserIds = [...new Set((rawEligible ?? []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: bulkProfiles } = bulkUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', bulkUserIds)
+    : { data: [] };
+  const bulkProfileMap = Object.fromEntries((bulkProfiles ?? []).map((p: any) => [p.id, p]));
+  const eligibleParticipants = (rawEligible ?? []).map((e: any) => ({ ...e, profiles: bulkProfileMap[e.user_id] ?? null }));
 
   return (
     <div className="min-h-screen bg-white">

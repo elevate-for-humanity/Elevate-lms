@@ -111,7 +111,7 @@ export async function generateMetadata({
       if (supabase) {
         const { data } = await supabase
           .from('programs')
-          .select('name, description')
+          .select('title, description')
           .eq('slug', slug)
           .eq('status', 'active')
           .single();
@@ -128,13 +128,13 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${program.name} | Career Training | Elevate for Humanity`,
+    title: `${program.title || program.title || program.name} | Career Training | Elevate for Humanity`,
     description: program.shortDescription || program.description,
     alternates: {
       canonical: `https://www.elevateforhumanity.org/programs/${slug}`,
     },
     openGraph: {
-      title: program.name,
+      title: program.title || program.name,
       description: program.shortDescription,
       type: 'website',
       url: `https://www.elevateforhumanity.org/programs/${slug}`,
@@ -252,12 +252,12 @@ export default async function ProgramDetailPage({
   const breadcrumbItems = [
     { label: 'Programs', href: '/programs' },
     ...(category ? [{ label: category.name, href: category.href }] : []),
-    { label: program.name || slug },
+    { label: program.title || program.name || slug },
   ];
 
   // Map database fields to display fields
   const displayProgram = {
-    name: program.name || program.title,
+    name: program.title || program.name || program.title,
     description: program.full_description || program.description || program.longDescription || program.shortDescription || program.excerpt,
     shortDescription: program.excerpt || program.shortDescription || program.description,
     duration: program.duration_weeks ? `${program.duration_weeks} weeks` : program.duration || program.estimated_weeks ? `${program.estimated_weeks} weeks` : null,
@@ -447,7 +447,7 @@ export default async function ProgramDetailPage({
   const courseSchema = {
     '@context': 'https://schema.org',
     '@type': 'Course',
-    name: program.name,
+    name: program.title || program.name,
     description: program.shortDescription || program.description,
     provider: {
       '@type': 'EducationalOrganization',
@@ -457,7 +457,7 @@ export default async function ProgramDetailPage({
     url: `https://www.elevateforhumanity.org/programs/${slug}`,
     ...(program.duration && { timeRequired: program.duration }),
     ...(program.tuition && { offers: { '@type': 'Offer', price: program.tuition, priceCurrency: 'USD' } }),
-    educationalCredentialAwarded: program.credential || program.name,
+    educationalCredentialAwarded: program.credential || program.title || program.name,
     isAccessibleForFree: !program.price && program.fundingEligible !== false,
   };
 

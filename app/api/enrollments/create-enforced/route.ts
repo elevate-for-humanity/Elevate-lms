@@ -94,7 +94,7 @@ async function _POST(request: NextRequest) {
     // Get program details for tuition amount
     const { data: program } = await supabase
       .from('programs')
-      .select('price, name')
+      .select('price, title')
       .eq('id', programId)
       .single();
 

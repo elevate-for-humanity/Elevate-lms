@@ -90,7 +90,7 @@ export default function WaitlistPage() {
           <h2 className="text-2xl font-bold text-slate-800 mb-3">You're on the waitlist!</h2>
           <p className="text-black mb-2">
             You are <span className="font-bold text-brand-blue-600">#{result.position}</span> on the
-            waitlist for <strong>{program.name}</strong>.
+            waitlist for <strong>{program.title || program?.title || program?.name}</strong>.
           </p>
           <p className="text-black text-sm mb-6">
             We'll email you as soon as a seat opens. Check your inbox for a confirmation.
@@ -127,7 +127,7 @@ export default function WaitlistPage() {
           <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-3 py-1 rounded-full mb-4 uppercase tracking-wide">
             Waitlist Open
           </span>
-          <h1 className="text-3xl font-bold text-slate-800 mb-3">{program.name}</h1>
+          <h1 className="text-3xl font-bold text-slate-800 mb-3">{program.title || program?.title || program?.name}</h1>
           <p className="text-black">{program.description}</p>
           <p className="text-sm text-black mt-2">
             Estimated wait: <strong>{program.estimatedWait}</strong>

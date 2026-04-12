@@ -93,17 +93,20 @@ export default async function CaseManagerDashboardPage() {
   // ─── Recent enrollments needing attention ─────────────────────────────────
   let recentEnrollments: any[] = [];
   if (learnerIds.length > 0) {
-    const { data } = await supabase
+    const { data: rawCmEnrollments } = await supabase
       .from('program_enrollments')
-      .select(`
-        id, status, enrolled_at, funding_source,
-        user:profiles!user_id(id, full_name, email),
-        program:programs!program_id(id, title)
-      `)
+      .select(`id, user_id, status, enrolled_at, funding_source, program:programs!program_id(id, title)`)
       .in('user_id', learnerIds)
       .order('enrolled_at', { ascending: false })
       .limit(10);
-    recentEnrollments = data ?? [];
+
+    // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+    const cmEnrollUserIds = [...new Set((rawCmEnrollments ?? []).map((e: any) => e.user_id).filter(Boolean))];
+    const { data: cmEnrollProfiles } = cmEnrollUserIds.length
+      ? await supabase.from('profiles').select('id, full_name, email').in('id', cmEnrollUserIds)
+      : { data: [] };
+    const cmEnrollProfileMap = Object.fromEntries((cmEnrollProfiles ?? []).map((p: any) => [p.id, p]));
+    recentEnrollments = (rawCmEnrollments ?? []).map((e: any) => ({ ...e, user: cmEnrollProfileMap[e.user_id] ?? null }));
   }
 
   const stats = [

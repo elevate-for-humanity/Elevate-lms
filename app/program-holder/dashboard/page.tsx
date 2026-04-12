@@ -35,7 +35,7 @@ export default async function ProgramHolderDashboardPage() {
 
     programIds.length > 0
       ? db.from('program_enrollments')
-          .select('id, program_id, progress', { count: 'exact' })
+          .select('id, program_id, progress_percent', { count: 'exact' })
           .in('program_id', programIds)
           .eq('status', 'active')
       : Promise.resolve({ data: [], count: 0 }),
@@ -55,7 +55,7 @@ export default async function ProgramHolderDashboardPage() {
 
     programIds.length > 0
       ? db.from('program_enrollments')
-          .select('id, enrolled_at, status, progress, program_id, profiles!program_enrollments_user_id_fkey(full_name), programs!program_enrollments_program_id_fkey(name, title)')
+          .select('id, enrolled_at, status, progress_percent, program_id, user_id, programs ( name, title )')
           .in('program_id', programIds)
           .order('enrolled_at', { ascending: false })
           .limit(5)
@@ -97,11 +97,18 @@ export default async function ProgramHolderDashboardPage() {
   const totalCerts = (certsRes as any).count ?? 0;
   const totalRevenueCents = (paymentsRes.data ?? []).reduce((s: number, r: any) => s + Number(r.amount_cents ?? 0), 0);
 
+  // Hydrate learner names — program_enrollments.user_id → auth.users, not profiles
+  const learnerUserIds = [...new Set((recentLearnersRes.data ?? []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: learnerProfiles } = learnerUserIds.length
+    ? await db.from('profiles').select('id, full_name').in('id', learnerUserIds)
+    : { data: [] };
+  const learnerProfileMap = Object.fromEntries((learnerProfiles || []).map((p: any) => [p.id, p]));
+
   const recentLearners = (recentLearnersRes.data ?? []).map((e: any) => ({
     id: e.id,
-    name: e.profiles?.full_name ?? 'Learner',
-    program: e.programs?.name ?? e.programs?.title ?? 'Program',
-    progress: e.progress ?? 0,
+    name: learnerProfileMap[e.user_id]?.full_name ?? 'Learner',
+    program: (e.programs as any)?.name ?? (e.programs as any)?.title ?? 'Program',
+    progress: e.progress_percent ?? 0,
     enrolledAt: e.enrolled_at,
   }));
 

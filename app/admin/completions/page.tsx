@@ -38,18 +38,20 @@ export default async function CompletionsPage() {
     .gte('completed_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
 
   // Fetch recent completions
-  const { data: recentCompletions } = await supabase
+  const { data: rawCompletions } = await supabase
     .from('program_enrollments')
-    .select(`
-      id,
-      completed_at,
-      progress,
-      profiles!inner(full_name, email),
-      courses!inner(title)
-    `)
+    .select(`id, user_id, completed_at, progress_percent, courses!inner(title)`)
     .eq('status', 'completed')
     .order('completed_at', { ascending: false })
     .limit(20);
+
+  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+  const completionUserIds = [...new Set((rawCompletions ?? []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: completionProfiles } = completionUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', completionUserIds)
+    : { data: [] };
+  const completionProfileMap = Object.fromEntries((completionProfiles ?? []).map((p: any) => [p.id, p]));
+  const recentCompletions = (rawCompletions ?? []).map((e: any) => ({ ...e, profiles: completionProfileMap[e.user_id] ?? null }));
 
   return (
     <div className="min-h-screen bg-white">

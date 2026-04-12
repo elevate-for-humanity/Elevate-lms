@@ -71,8 +71,7 @@ export async function GET(req: NextRequest) {
         payment_id,
         amount_paid,
         refunded_at,
-        programs:program_id ( title ),
-        profiles:user_id ( email )
+        programs:program_id ( title )
       `)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
@@ -128,6 +127,15 @@ export async function GET(req: NextRequest) {
         if (!certMap.has(key)) certMap.set(key, []);
         certMap.get(key)!.push(c);
       }
+    }
+
+    // 2b) Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+    const { data: reconProfiles } = userIds.length
+      ? await db.from('profiles').select('id, email').in('id', userIds)
+      : { data: [] };
+    const reconProfileMap = Object.fromEntries((reconProfiles ?? []).map((p: any) => [p.id, p]));
+    for (const e of enrollments || []) {
+      (e as any).profiles = reconProfileMap[(e as any).user_id] ?? null;
     }
 
     // 3) Check webhook_events_processed for refund events

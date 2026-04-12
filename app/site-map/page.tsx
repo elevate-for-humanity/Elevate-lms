@@ -189,7 +189,7 @@ export default async function SitemapPage() {
   const supabase = await createClient();
   const { data: programs } = await supabase
     .from('programs')
-    .select('name, slug')
+    .select('title, slug')
     .eq('status', 'active');
 
   return (

@@ -44,7 +44,7 @@ export default function AdminApprenticeships() {
         `
         *,
         student:profiles!apprenticeship_enrollments_student_id_fkey(full_name, email),
-        program:programs(name, slug)
+        program:programs(name, title, slug)
       `
       )
       .order('created_at', { ascending: false });
@@ -255,7 +255,7 @@ export default function AdminApprenticeships() {
                       </td>
                       <td className="px-6 py-4">
                         <p className="font-medium">
-                          {apprenticeship.program?.name}
+                          {apprenticeship.program?.title || apprenticeship.program?.name}
                         </p>
                       </td>
                       <td className="px-6 py-4">

@@ -47,7 +47,7 @@ export default async function ChartsPage() {
 
   const programCounts: Record<string, number> = {};
   (programEnrollments ?? []).forEach((e: any) => {
-    const name = e.programs?.name || 'Unknown';
+    const name = (e.programs as any)?.title || (e.programs as any)?.name || 'Unknown';
     programCounts[name] = (programCounts[name] || 0) + 1;
   });
   const topPrograms = Object.entries(programCounts)

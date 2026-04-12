@@ -67,7 +67,7 @@ export default async function ProgramHolderProgramsPage() {
                         <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                           <BookOpen className="w-5 h-5 text-brand-blue-600" />
                         </div>
-                        <span className="font-medium text-gray-900">{program.name}</span>
+                        <span className="font-medium text-gray-900">{program.title || program?.title || program?.name}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-center">

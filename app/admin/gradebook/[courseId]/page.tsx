@@ -44,11 +44,23 @@ export default async function AdminGradebookPage({
   if (!course) redirect('/admin/courses');
 
   // Fetch enrollments with student profiles
-  const { data: enrollments } = await supabase
+  const { data: rawGradebookEnrollments } = await supabase
     .from('program_enrollments')
-    .select('id, user_id, progress, status, profiles!inner(full_name, email)')
+    .select('id, user_id, progress_percent, status')
     .eq('course_id', courseId)
     .order('created_at');
+
+  // Hydrate profiles separately (program_enrollments.user_id → auth.users, not profiles)
+  const gbUserIds = [...new Set((rawGradebookEnrollments || []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: gbProfiles } = gbUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', gbUserIds)
+    : { data: [] };
+  const gbProfileMap = Object.fromEntries((gbProfiles || []).map((p: any) => [p.id, p]));
+  const enrollments = (rawGradebookEnrollments || []).map((e: any) => ({
+    ...e,
+    progress: e.progress_percent,
+    profiles: gbProfileMap[e.user_id] ?? null,
+  }));
 
   // Fetch assignment submissions for this course
   const { data: submissions } = await supabase

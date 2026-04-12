@@ -89,7 +89,7 @@ async function _POST(request: NextRequest) {
 
     let contextMessage = `Student: ${profile?.full_name || 'Unknown'}`;
     if (enrollment) {
-      contextMessage += `\nEnrolled in: ${enrollment.program?.name}`;
+      contextMessage += `\nEnrolled in: ${enrollment.program?.title || enrollment.program?.name || 'Unknown Program'}`;
       contextMessage += `\nProgress: ${enrollment.progress_percentage || 0}%`;
       contextMessage += `\nStatus: ${enrollment.status}`;
     } else {

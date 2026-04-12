@@ -20,7 +20,7 @@ export default async function SampleReportsPage() {
     supabase.from('program_enrollments').select('id, status, created_at, program_id').order('created_at', { ascending: false }).limit(20),
     supabase.from('certificates').select('id, status, created_at').order('created_at', { ascending: false }).limit(20),
     supabase.from('completions').select('id, created_at').order('created_at', { ascending: false }).limit(20),
-    supabase.from('programs').select('id, name, status', { count: 'exact' }),
+    supabase.from('programs').select('id, title, status', { count: 'exact' }),
     supabase.from('courses').select('id, title, is_active', { count: 'exact' }),
   ]);
 
@@ -61,7 +61,7 @@ export default async function SampleReportsPage() {
       count: programs.count ?? 0,
       color: 'amber',
       rows: (programs.data ?? []).map((p: any) => ({
-        cols: [p.name || 'Unnamed', p.status || '—'],
+        cols: [p.title || p.name || 'Unnamed', p.status || '—'],
       })),
       headers: ['Program', 'Status'],
     },

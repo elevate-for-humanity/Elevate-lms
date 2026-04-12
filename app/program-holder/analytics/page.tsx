@@ -94,7 +94,7 @@ export default async function ProgramHolderAnalyticsPage() {
   // Program performance
   const { data: programs } = await db
     .from('programs')
-    .select('id, name, slug')
+    .select('id, title, slug')
     .eq('program_holder_id', programHolder.id);
 
   const programStats = await Promise.all(
@@ -281,7 +281,7 @@ export default async function ProgramHolderAnalyticsPage() {
               {programStats.length > 0 ? (
                 programStats.map((program: any) => (
                   <tr key={program.id} className="hover:bg-white">
-                    <td className="px-4 py-4 font-medium">{program.name}</td>
+                    <td className="px-4 py-4 font-medium">{program.title || program?.title || program?.name}</td>
                     <td className="px-4 py-4">{program.enrollments}</td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-2">

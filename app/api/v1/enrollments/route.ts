@@ -62,15 +62,7 @@ const startTime = Date.now();
     let query = supabase
       .from('program_enrollments')
       .select(
-        `
-        id,
-        enrolled_at,
-        completed_at,
-        progress_percentage,
-        status,
-        user:profiles!user_id(id, full_name, email),
-        course:courses!course_id(id, title, category)
-      `,
+        `id, user_id, enrolled_at, completed_at, progress_percent, status, course:courses!course_id(id, title, category)`,
         { count: 'exact' }
       )
       .order('enrolled_at', { ascending: false })
@@ -79,9 +71,17 @@ const startTime = Date.now();
     if (courseId) query = query.eq('course_id', courseId);
     if (userId) query = query.eq('user_id', userId);
 
-    const { data: enrollments, error: queryError, count } = await query;
+    const { data: rawEnrollments, error: queryError, count } = await query;
 
     if (queryError) throw queryError;
+
+    // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+    const v1UserIds = [...new Set((rawEnrollments ?? []).map((e: any) => e.user_id).filter(Boolean))];
+    const { data: v1Profiles } = v1UserIds.length
+      ? await supabase.from('profiles').select('id, full_name, email').in('id', v1UserIds)
+      : { data: [] };
+    const v1ProfileMap = Object.fromEntries((v1Profiles ?? []).map((p: any) => [p.id, p]));
+    const enrollments = (rawEnrollments ?? []).map((e: any) => ({ ...e, user: v1ProfileMap[e.user_id] ?? null }));
 
     const responseTime = Date.now() - startTime;
 
@@ -152,7 +152,7 @@ async function _POST(request: NextRequest) {
     const body = await parseBody<Record<string, any>>(request);
     const supabase = await createClient();
 
-    const { data: enrollment, error: createError } = await supabase
+    const { data: newEnrollment, error: createError } = await supabase
       .from('program_enrollments')
       .insert({
         user_id: body.user_id,
@@ -160,16 +160,16 @@ async function _POST(request: NextRequest) {
         enrolled_at: new Date().toISOString(),
         status: 'active',
       })
-      .select(
-        `
-        *,
-        user:profiles!user_id(id, full_name, email),
-        course:courses!course_id(id, title)
-      `
-      )
+      .select(`*, course:courses!course_id(id, title)`)
       .single();
 
     if (createError) throw createError;
+
+    // Hydrate profile separately (user_id → auth.users, no FK to profiles)
+    const { data: newProfile } = body.user_id
+      ? await supabase.from('profiles').select('id, full_name, email').eq('id', body.user_id).maybeSingle()
+      : { data: null };
+    const enrollment = { ...newEnrollment, user: newProfile ?? null };
 
     const responseTime = Date.now() - startTime;
 

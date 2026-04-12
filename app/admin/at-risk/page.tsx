@@ -25,7 +25,7 @@ export default async function AtRiskPage() {
       .order('flagged_at', { ascending: false })
       .limit(50),
     db.from('program_enrollments')
-      .select('id, enrolled_at, last_activity_at, student:profiles(id, full_name, email)', { count: 'exact' })
+      .select('id, user_id, enrolled_at, last_activity_at', { count: 'exact' })
       .eq('enrollment_state', 'active')
       .lte('last_activity_at', inactive14)
       .order('last_activity_at', { ascending: true })
@@ -37,8 +37,15 @@ export default async function AtRiskPage() {
 
   const flagged      = flaggedRes.data;
   const flaggedCount = flaggedRes.count;
-  const inactive     = inactiveRes.data;
   const inactiveCount = inactiveRes.count;
+
+  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+  const inactiveUserIds = [...new Set((inactiveRes.data ?? []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: inactiveProfiles } = inactiveUserIds.length
+    ? await db.from('profiles').select('id, full_name, email').in('id', inactiveUserIds)
+    : { data: [] };
+  const inactiveProfileMap = Object.fromEntries((inactiveProfiles ?? []).map((p: any) => [p.id, p]));
+  const inactive = (inactiveRes.data ?? []).map((e: any) => ({ ...e, student: inactiveProfileMap[e.user_id] ?? null }));
 
   return (
     <div className="min-h-screen bg-white">

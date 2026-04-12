@@ -18,7 +18,7 @@ export default async function PublicAssistancePage() {
   // Get programs
   const { data: programs } = await supabase
     .from('programs')
-    .select('id, name, slug, description')
+    .select('id, title, slug, description')
     .eq('is_active', true)
     .eq('accepts_wioa', true)
     .limit(6);
@@ -76,7 +76,7 @@ export default async function PublicAssistancePage() {
           <div className="grid md:grid-cols-2 gap-4">
             {qualifyingPrograms.map((program, index) => (
               <div key={index} className="bg-brand-green-50 rounded-lg p-4">
-                <div className="font-bold text-brand-green-700">{program.name}</div>
+                <div className="font-bold text-brand-green-700">{program.title || program.name}</div>
                 <div className="text-sm text-gray-600">{program.full}</div>
               </div>
             ))}
@@ -130,7 +130,7 @@ export default async function PublicAssistancePage() {
                   href={`/programs/${program.slug || program.id}`}
                   className="border rounded-lg p-4 hover:shadow-md transition"
                 >
-                  <h3 className="font-semibold">{program.name}</h3>
+                  <h3 className="font-semibold">{program.title || program.name}</h3>
                   {program.description && (
                     <p className="text-sm text-gray-600 mt-1 line-clamp-2">{program.description}</p>
                   )}

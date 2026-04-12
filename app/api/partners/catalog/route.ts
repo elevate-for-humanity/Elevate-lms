@@ -90,9 +90,9 @@ async function _GET(request: NextRequest) {
     // Also fetch available programs for context
     const { data: programs } = await supabase
       .from('programs')
-      .select('id, slug, name, category, is_active')
+      .select('id, slug, title, category, is_active')
       .eq('is_active', true)
-      .order('name')
+      .order('title')
       .limit(100);
 
     return NextResponse.json({

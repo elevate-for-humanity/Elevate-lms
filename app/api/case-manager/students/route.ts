@@ -66,15 +66,8 @@ async function _GET(request: Request) {
         // Get enrollments
         const { data: enrollments } = await supabase
           .from('program_enrollments')
-          .select(
-            `
-            id,
-            status,
-            enrolled_at,
-            programs(name, slug)
-          `
-          )
-          .eq('student_id', student.user_id);
+          .select(`id, status, enrolled_at, programs:program_id(name, title, slug)`)
+          .eq('user_id', student.user_id);
 
         // Get hours summary from consolidated hour_entries
         const { data: hours } = await supabase

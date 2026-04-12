@@ -34,35 +34,26 @@ async function _POST(request: Request) {
     );
 
     // Fetch enrollment details
-    const { data: enrollment } = await supabase
+    const { data: rawWelcomeEnrollment } = await supabase
       .from('program_enrollments')
-      .select(
-        `
-        id,
-        student_id,
-        courses!inner (
-          title
-        ),
-        profiles!enrollments_student_id_fkey!inner (
-          full_name,
-          email
-        )
-      `
-      )
+      .select(`id, user_id, courses!inner(title)`)
       .eq('id', enrollmentId)
       .single();
 
-    if (!enrollment) {
+    if (!rawWelcomeEnrollment) {
       return NextResponse.json(
         { error: 'Enrollment not found' },
         { status: 404 }
       );
     }
 
-    // Type guards: Extract nested relations
-    const profile = Array.isArray(enrollment.profiles)
-      ? enrollment.profiles[0]
-      : enrollment.profiles;
+    // Hydrate profile separately (user_id → auth.users, no FK to profiles)
+    const { data: welcomeProfile } = rawWelcomeEnrollment.user_id
+      ? await supabase.from('profiles').select('full_name, email').eq('id', rawWelcomeEnrollment.user_id).maybeSingle()
+      : { data: null };
+
+    const enrollment = rawWelcomeEnrollment;
+    const profile = welcomeProfile;
     const course = Array.isArray(enrollment.courses)
       ? enrollment.courses[0]
       : enrollment.courses;

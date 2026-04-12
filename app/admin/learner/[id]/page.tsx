@@ -57,7 +57,7 @@ export default async function LearnerDetailPage({ params }: Props) {
     .from('program_enrollments')
     .select(`
       *,
-      programs (id, title, slug, thumbnail_url)
+      programs (id, title, slug, image_url)
     `)
     .eq('user_id', id)
     .order('enrolled_at', { ascending: false });

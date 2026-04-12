@@ -19,7 +19,7 @@ export default async function EstheticianEnrollmentSuccessPage() {
 
   const { data: enrollment } = await supabase
     .from('program_enrollments')
-    .select('id, enrolled_at, status, program_id, programs(name, slug)')
+    .select('id, enrolled_at, status, program_id, programs(name, title, slug)')
     .eq('user_id', user.id)
     .order('enrolled_at', { ascending: false })
     .limit(1)

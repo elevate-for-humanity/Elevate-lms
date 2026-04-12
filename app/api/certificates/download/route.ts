@@ -33,7 +33,7 @@ async function _GET(request: NextRequest) {
       .select(`
         *,
         profiles:user_id (full_name, email),
-        programs:program_id (name, credential)
+        programs:program_id (name, title, credential)
       `)
       .eq('id', certificateId)
       .single();
@@ -62,7 +62,7 @@ async function _GET(request: NextRequest) {
       certificate: {
         id: certificate.id,
         recipientName: certificate.profiles?.full_name || 'Student',
-        programName: certificate.programs?.name || certificate.certificate_type,
+        programName: certificate.programs?.title || certificate.programs?.name || certificate.certificate_type,
         credential: certificate.programs?.credential || 'Certificate of Completion',
         issuedAt: certificate.issued_at,
         certificateNumber: certificate.certificate_number || certificate.id.slice(0, 8).toUpperCase(),

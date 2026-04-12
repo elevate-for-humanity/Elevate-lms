@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 async function getAccreditationData(supabase: any) {
   const [programs, courses, certificates, enrollments, completions] = await Promise.all([
-    supabase.from('programs').select('id, name, status, created_at').eq('status', 'active'),
+    supabase.from('programs').select('id, title, status, created_at').eq('status', 'active'),
     supabase.from('training_courses').select('id, course_name, is_active').eq('is_active', true),
     supabase.from('certificates').select('id, created_at, status'),
     supabase.from('program_enrollments').select('id, status, created_at'),
@@ -112,7 +112,7 @@ export default async function AccreditationReportPage() {
               <tbody className="divide-y divide-gray-100">
                 {data.programs.map((p: any) => (
                   <tr key={p.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-3 text-sm font-medium text-gray-900">{p.name || 'Unnamed'}</td>
+                    <td className="px-6 py-3 text-sm font-medium text-gray-900">{p.title || p.name || 'Unnamed'}</td>
                     <td className="px-6 py-3">
                       <span className="text-xs px-2 py-0.5 rounded-full bg-brand-green-100 text-brand-green-700 font-medium">{p.status}</span>
                     </td>

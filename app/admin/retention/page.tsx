@@ -30,16 +30,24 @@ export default async function RetentionPage() {
     { data: lessonActivity },
     { data: statusBreakdown },
   ] = await Promise.all([
-    supabase.from('program_enrollments').select('id, status, enrolled_at, progress, user_id').limit(2000),
+    supabase.from('program_enrollments').select('id, status, enrolled_at, progress_percent, user_id').limit(2000),
     supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student').eq('enrollment_status', 'at_risk'),
     supabase.from('program_enrollments')
-      .select('id, status, enrolled_at, profiles(full_name, email)')
+      .select('id, user_id, status, enrolled_at')
       .eq('status', 'dropped')
       .order('enrolled_at', { ascending: false })
       .limit(10),
     supabase.from('lesson_progress').select('user_id, completed_at').gte('completed_at', thirtyDaysAgo).limit(1000),
     supabase.from('profiles').select('enrollment_status').eq('role', 'student').limit(2000),
   ]);
+
+  // Hydrate dropout profiles separately (user_id → auth.users, no FK to profiles)
+  const dropoutUserIds = [...new Set((recentDropouts ?? []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: dropoutProfiles } = dropoutUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', dropoutUserIds)
+    : { data: [] };
+  const dropoutProfileMap = Object.fromEntries((dropoutProfiles ?? []).map((p: any) => [p.id, p]));
+  const dropoutsWithProfiles = (recentDropouts ?? []).map((e: any) => ({ ...e, profiles: dropoutProfileMap[e.user_id] ?? null }));
 
   // 30-day retention: enrolled in last 30 days still active
   const enrolledLast30 = (allEnrollments || []).filter((e: any) => e.enrolled_at && new Date(e.enrolled_at) >= new Date(thirtyDaysAgo));
@@ -174,7 +182,7 @@ export default async function RetentionPage() {
               <Link href="/admin/enrollments" className="text-sm text-brand-blue-600 hover:text-brand-blue-800">All enrollments</Link>
             </div>
             <div className="divide-y">
-              {recentDropouts && recentDropouts.length > 0 ? recentDropouts.map((e: any) => (
+              {dropoutsWithProfiles && dropoutsWithProfiles.length > 0 ? dropoutsWithProfiles.map((e: any) => (
                 <div key={e.id} className="px-5 py-3 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">

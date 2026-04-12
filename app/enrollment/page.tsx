@@ -99,9 +99,9 @@ export default async function EnrollmentPage() {
   if (supabase) {
     const { data } = await supabase
       .from('programs')
-      .select('id, name, slug, status, description')
+      .select('id, title, slug, status, description')
       .eq('status', 'active')
-      .order('name')
+      .order('title')
       .limit(20);
     livePrograms = data ?? [];
   }

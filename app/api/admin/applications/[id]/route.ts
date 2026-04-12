@@ -254,7 +254,7 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
           const programSlug = (before.program_interest || '').toLowerCase().replace(/\s+/g, '-').trim();
           const { data: programRow } = await auth.supabase
             .from('programs')
-            .select('id, name')
+            .select('id, title')
             .eq('slug', programSlug)
             .maybeSingle();
           const programId = programRow?.id || courseId;

@@ -65,7 +65,7 @@ export default async function ParticipantDetailPage({ params }: Props) {
   // Enrollments
   const { data: enrollments } = learnerId ? await supabase
     .from('program_enrollments')
-    .select('id, status, progress_percent, funding_source, enrolled_at, programs:program_id(name)')
+    .select('id, status, progress_percent, funding_source, enrolled_at, programs:program_id(name, title)')
     .eq('user_id', learnerId)
     .order('enrolled_at', { ascending: false }) : { data: [] };
 
@@ -133,7 +133,7 @@ export default async function ParticipantDetailPage({ params }: Props) {
                   <tbody className="divide-y divide-gray-100">
                     {enrollments.map((e: any) => (
                       <tr key={e.id}>
-                        <td className="px-3 py-2 font-medium text-gray-900">{(e.programs as any)?.name ?? '—'}</td>
+                        <td className="px-3 py-2 font-medium text-gray-900">{(e.programs as any)?.title || (e.programs as any)?.name || '—'}</td>
                         <td className="px-3 py-2">
                           <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusBadge(e.status)}`}>
                             {e.status}

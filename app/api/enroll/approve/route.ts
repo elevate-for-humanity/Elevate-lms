@@ -236,7 +236,7 @@ async function _POST(req: NextRequest) {
       // Get program info
       const { data: program } = await supabase
         .from('programs')
-        .select('id, name, total_hours')
+        .select('id, title, total_hours')
         .eq('id', enrollment.program_id)
         .single();
 
@@ -341,7 +341,7 @@ async function _POST(req: NextRequest) {
           // Get program name for the email
           const { data: program } = await supabase
             .from('programs')
-            .select('name')
+            .select('title')
             .eq('id', enrollment.program_id)
             .single();
 

@@ -49,7 +49,7 @@ export default async function CalendarPage() {
 
   const { data: programs } = await supabase
     .from('programs')
-    .select('id, name, start_date, schedule')
+    .select('id, title, start_date, schedule')
     .eq('is_active', true)
     .limit(10);
 
@@ -169,7 +169,7 @@ export default async function CalendarPage() {
             <div className="space-y-3">
               {programs && programs.length > 0 ? programs.map((program: any) => (
                 <Link key={program.id} href={`/programs/${program.id}`} className="block bg-white rounded-lg shadow-sm border p-4 hover:shadow-md transition">
-                  <h3 className="font-semibold text-gray-900">{program.name}</h3>
+                  <h3 className="font-semibold text-gray-900">{program.title || program?.title || program?.name}</h3>
                   {program.schedule && <p className="text-sm text-gray-600 mt-1">{program.schedule}</p>}
                   {program.start_date && (
                     <p className="text-xs text-brand-blue-600 mt-2">

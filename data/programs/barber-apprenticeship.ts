@@ -247,7 +247,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     'Indiana Barber Association',
   ],
   pricingIncludes: [
-    '900 hours of training (52 weeks)',
+    '500 hours of Related Technical Instruction (RTI) via Elevate LMS',
     'Starter barber tool kit',
     'Indiana Barber License exam fee',
     'LMS access for full program duration',

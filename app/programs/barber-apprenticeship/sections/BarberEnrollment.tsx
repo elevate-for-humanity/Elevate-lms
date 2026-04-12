@@ -12,10 +12,10 @@ export function BarberEnrollment() {
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 text-center">Tuition &amp; Payment Options</h2>
           <p className="text-black text-center mb-2 max-w-2xl mx-auto">
-            Total tuition: <strong>$4,980</strong>. Small down payment, small weekly payments — you pick.
+            Total tuition: <strong>$4,980</strong>. Multiple payment paths available — pick what works for you.
           </p>
           <p className="text-black text-center text-sm mb-8 max-w-2xl mx-auto">
-            Self-pay program. Payment plans and BNPL financing available — pick what works for you.
+            Indiana residents may qualify for WIOA workforce funding or employer-sponsored coverage. If you are self-paying, payment plans and BNPL financing are available.
           </p>
           <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
             <div className="bg-white rounded-xl p-5 border border-slate-200 text-center">
@@ -187,7 +187,7 @@ export function BarberEnrollment() {
             <div className="flex items-start gap-3">
               <Shield className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-brand-blue-800 leading-relaxed">
-                This is a self-pay program. Tuition is $4,980 with flexible payment options — pay in full, use a payment plan starting at $600 down, or finance through a BNPL provider. The program is structured to meet workforce training standards (RTI + OJT, mapped competencies, documented progress) and may be eligible for employer-sponsored or workforce funding on a case-by-case basis. Enrollment is contingent upon eligibility and employer participation.
+                Tuition is $4,980. Indiana residents may qualify for WIOA Title I workforce funding or employer-sponsored coverage — contact a career advisor to check eligibility before enrolling. If you are self-paying, flexible options are available: pay in full, use a payment plan starting at $600 down, or finance through a BNPL provider. Enrollment is contingent upon eligibility and employer participation.
               </p>
             </div>
           </div>
@@ -199,7 +199,7 @@ export function BarberEnrollment() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 bg-white text-amber-950 text-sm font-bold px-4 py-2 rounded-full mb-6">
             <span className="w-2 h-2 bg-amber-900 rounded-full animate-pulse" />
-            Classes Starting Late May – Early June 2025
+            Now Enrolling — Limited Spots
           </div>
           <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">
             Join the Waitlist

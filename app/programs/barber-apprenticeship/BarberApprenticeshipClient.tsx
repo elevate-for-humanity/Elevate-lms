@@ -21,6 +21,8 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
   const [waitlistPhone, setWaitlistPhone] = useState('');
   const [waitlistType, setWaitlistType] = useState<'apprentice' | 'shop'>('apprentice');
   const [waitlistSubmitted, setWaitlistSubmitted] = useState(false);
+  const [waitlistError, setWaitlistError] = useState('');
+  const [waitlistLoading, setWaitlistLoading] = useState(false);
 
   return (
     <div className="min-h-screen bg-white">
@@ -58,7 +60,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
           </div>
           <p className="text-black text-lg mb-6">{p.subtitle}</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-slate-50 rounded-lg p-4">
-            <SpecItem icon={Clock} label="Duration" value="15–24 months" />
+            <SpecItem icon={Clock} label="Duration" value="12 months" />
             <SpecItem icon={BookOpen} label="Total Hours" value="2,000 hrs" />
             <SpecItem icon={MapPin} label="Delivery" value="Hybrid" />
             <SpecItem icon={Award} label="Credentials" value={`${p.credentials.length} earned`} />
@@ -298,7 +300,40 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
                   <p className="text-sm text-black">We&apos;ll contact you when the next cohort opens or when a host shop spot becomes available.</p>
                 </div>
               ) : (
-                <form onSubmit={(e) => { e.preventDefault(); setWaitlistSubmitted(true); }} className="space-y-4">
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    setWaitlistError('');
+                    setWaitlistLoading(true);
+                    const [firstName, ...rest] = waitlistName.trim().split(' ');
+                    const lastName = rest.join(' ') || '-';
+                    try {
+                      const res = await fetch('/api/waitlist', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          firstName,
+                          lastName,
+                          email: waitlistEmail,
+                          phone: waitlistPhone || undefined,
+                          programSlug: 'barber-apprenticeship',
+                          notes: waitlistType === 'shop' ? 'Barbershop owner — interested as partner shop' : undefined,
+                        }),
+                      });
+                      const data = await res.json();
+                      if (!res.ok) {
+                        setWaitlistError(data.error ?? 'Something went wrong. Please try again.');
+                      } else {
+                        setWaitlistSubmitted(true);
+                      }
+                    } catch {
+                      setWaitlistError('Network error. Please try again.');
+                    } finally {
+                      setWaitlistLoading(false);
+                    }
+                  }}
+                  className="space-y-4"
+                >
                   <h3 className="font-semibold text-slate-900">Waiting List Signup</h3>
                   <div className="flex gap-3">
                     <button type="button" onClick={() => setWaitlistType('apprentice')}
@@ -325,9 +360,15 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
                     <input type="tel" value={waitlistPhone} onChange={(e) => setWaitlistPhone(e.target.value)}
                       className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" />
                   </div>
-                  <button type="submit"
-                    className={`w-full py-3 rounded-lg font-semibold text-sm text-white transition-colors ${waitlistType === 'shop' ? 'bg-brand-orange-600 hover:bg-brand-orange-700' : 'bg-brand-blue-600 hover:bg-brand-blue-700'}`}>
-                    {waitlistType === 'shop' ? 'Sign Up as Partner Shop' : 'Join Apprentice Waiting List'}
+                  {waitlistError && (
+                    <p className="text-sm text-red-600">{waitlistError}</p>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={waitlistLoading}
+                    className={`w-full py-3 rounded-lg font-semibold text-sm text-white transition-colors disabled:opacity-60 ${waitlistType === 'shop' ? 'bg-brand-orange-600 hover:bg-brand-orange-700' : 'bg-brand-blue-600 hover:bg-brand-blue-700'}`}
+                  >
+                    {waitlistLoading ? 'Submitting…' : waitlistType === 'shop' ? 'Sign Up as Partner Shop' : 'Join Apprentice Waiting List'}
                   </button>
                 </form>
               )}

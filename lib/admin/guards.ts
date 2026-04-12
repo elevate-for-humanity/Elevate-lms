@@ -141,6 +141,7 @@ export const SENSITIVE_ROUTES = [
 // API ROUTE GUARDS (canonical — import from here, not from lib/authGuards)
 // =====================================================
 
+import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { unauthorized, forbidden, serverError } from '@/lib/api/responses';
 
@@ -161,6 +162,7 @@ export type GuardedUser = {
   id: string;
   email: string | null;
   role: UserRole | null;
+  error?: NextResponse;
 };
 
 /**
@@ -172,32 +174,36 @@ export type GuardedUser = {
  *   const user = await apiAuthGuard(req);
  */
 export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
-  if (authError || !user) {
-    throw unauthorized();
+    if (authError || !user) {
+      return { id: '', email: null, role: null, error: unauthorized() };
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      return { id: user.id, email: user.email ?? null, role: null, error: serverError('PROFILE_LOOKUP_FAILED') };
+    }
+
+    return {
+      id: user.id,
+      email: user.email ?? null,
+      role: (profile?.role as UserRole) ?? null,
+    };
+  } catch (err) {
+    return { id: '', email: null, role: null, error: unauthorized() };
   }
-
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (profileError) {
-    throw serverError('PROFILE_LOOKUP_FAILED');
-  }
-
-  return {
-    id: user.id,
-    email: user.email ?? null,
-    role: (profile?.role as UserRole) ?? null,
-  };
 }
 
 const ADMIN_ROLES: UserRole[] = ['admin', 'super_admin', 'staff'];
@@ -212,9 +218,10 @@ const INSTRUCTOR_ROLES: UserRole[] = ['instructor', 'admin', 'super_admin', 'sta
  */
 export async function apiRequireAdmin(_req?: Request): Promise<GuardedUser> {
   const user = await apiAuthGuard(_req);
+  if (user.error) return user;
 
   if (!user.role || !ADMIN_ROLES.includes(user.role)) {
-    throw forbidden();
+    return { ...user, error: forbidden() };
   }
 
   return user;
@@ -226,9 +233,10 @@ export async function apiRequireAdmin(_req?: Request): Promise<GuardedUser> {
  */
 export async function apiRequireInstructor(_req?: Request): Promise<GuardedUser> {
   const user = await apiAuthGuard(_req);
+  if (user.error) return user;
 
   if (!user.role || !INSTRUCTOR_ROLES.includes(user.role)) {
-    throw forbidden();
+    return { ...user, error: forbidden() };
   }
 
   return user;

@@ -119,7 +119,7 @@ async function _POST(request: NextRequest) {
           .from('programs')
           .select('id, title, slug, total_cost')
           .eq('id', programId)
-          .single();
+          .maybeSingle();
 
         if (!program) {
           return NextResponse.json(
@@ -178,7 +178,7 @@ async function _POST(request: NextRequest) {
           .from('training_courses')
           .select('id, title, slug, price')
           .eq('id', courseId)
-          .single();
+          .maybeSingle();
 
         if (!course) {
           return NextResponse.json(

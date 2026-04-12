@@ -92,7 +92,7 @@ async function _POST(req: NextRequest) {
       .from('programs')
       .select('id, title, status')
       .eq('id', data.programId)
-      .single();
+      .maybeSingle();
 
     if (programError || !program || program.status !== 'ACTIVE') {
       return NextResponse.json(
@@ -129,12 +129,19 @@ async function _POST(req: NextRequest) {
     }
 
     // Also insert into applications table so admin dashboard sees intake applicants
+    const intakeEmail = (lead.email || '').toLowerCase().trim();
     await supabase.from('applications').insert({
       first_name: lead.first_name || '',
       last_name: lead.last_name || '',
       email: lead.email || '',
       phone: lead.phone || '',
+      normalized_email: intakeEmail,
+      normalized_phone: (lead.phone || '').replace(/\D/g, ''),
+      city: 'Not provided',
+      zip: '00000',
+      state: 'IN',
       program_interest: program.title,
+      program_id: program.id,
       status: 'submitted',
       source: 'intake-funnel',
       support_notes: `Lead ID: ${data.leadId} | ${data.additionalInfo || ''}`.trim(),

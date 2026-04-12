@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAdminClient } from '@/lib/supabase/admin';
+import { resolveProgramId } from '@/lib/programs/resolve';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { sendApplicationWelcomeEmail } from '@/lib/email/application-welcome';
@@ -38,15 +39,7 @@ async function _POST(req: Request) {
     }
 
     // Resolve program_id so the review page can approve without guessing
-    let resolvedProgramId: string | null = null;
-    if (program) {
-      const { data: matchedProgram } = await supabase
-        .from('programs')
-        .select('id')
-        .or(`slug.ilike.%${program}%,title.ilike.%${program}%`)
-        .maybeSingle();
-      resolvedProgramId = matchedProgram?.id ?? null;
-    }
+    const resolvedProgramId = await resolveProgramId(supabase, program);
 
     // Split name into first/last — applications table has NOT NULL on both
     const nameParts = (name || '').trim().split(/\s+/);

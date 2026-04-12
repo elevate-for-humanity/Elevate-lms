@@ -6,6 +6,7 @@ import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { resolveProgramId } from '@/lib/programs/resolve';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -26,50 +27,7 @@ async function requireAdmin() {
   return { user, profile, supabase };
 }
 
-// Common aliases for program_interest values that don't match course titles directly
-const PROGRAM_ALIASES: Record<string, string> = {
-  'cna certification': 'cna training',
-  'cna': 'cna training',
-  'cosmetology apprenticeship': 'hair stylist esthetician apprenticeship',
-  'cosmetology': 'hair stylist esthetician apprenticeship',
-  'accounting': 'bookkeeping',
-  'home health aide': 'direct support professional',
-  'entrepreneurship': 'entrepreneurship small business',
-  'phlebotomy': 'phlebotomy technician',
-  'barber apprenticeship': 'barber',
-};
-
-/**
- * Resolve program_interest text (slug or display name) to a course UUID.
- */
-async function resolveCourseId(supabase: any, programInterest: string): Promise<string | null> {
-  if (!programInterest) return null;
-
-  const normalized = programInterest.toLowerCase().replace(/-/g, ' ').trim();
-
-  const { data: courses } = await supabase
-    .from('courses')
-    .select('id, title');
-
-  if (!courses?.length) return null;
-
-  const exact = courses.find((c: any) => c.title.toLowerCase() === normalized);
-  if (exact) return exact.id;
-
-  const alias = PROGRAM_ALIASES[normalized];
-  if (alias) {
-    const aliasMatch = courses.find((c: any) => c.title.toLowerCase().includes(alias));
-    if (aliasMatch) return aliasMatch.id;
-  }
-
-  const partial = courses.find((c: any) => {
-    const t = c.title.toLowerCase();
-    return t.includes(normalized) || normalized.includes(t.replace(/\(.*\)/, '').trim());
-  });
-  if (partial) return partial.id;
-
-  return null;
-}
+// resolveCourseId replaced by canonical resolveProgramId from @/lib/programs/resolve
 
 /**
  * Find or create a Supabase auth user + profile for an applicant.
@@ -222,9 +180,10 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
     let enrollmentResult: any = null;
     if (updateData.status === 'approved' && before.status !== 'approved') {
       try {
-        // Step 1: Resolve course ID from program_interest
+        // Step 1: Resolve program ID from program_interest
+        const db = await getAdminClient();
         const courseId = before.program_id
-          || await resolveCourseId(auth.supabase, before.program_interest);
+          || await resolveProgramId(db, before.program_interest);
 
         if (!courseId) {
           logger.error('Could not resolve course for program_interest', {

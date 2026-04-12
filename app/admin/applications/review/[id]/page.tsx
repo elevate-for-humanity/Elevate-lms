@@ -5,6 +5,7 @@ import { getAdminClient } from '@/lib/supabase/admin';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import ApplicationActions from './ApplicationActions';
+import { resolveProgram } from '@/lib/programs/resolve';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,43 +66,11 @@ export default async function ReviewApplicationPage({
   const effectiveStatus = app.revoked_at ? 'revoked' : app.status;
 
   // Resolve program_interest to a program UUID for enrollment creation.
-  // Priority: application.program_id (already resolved) → programs table → courses table.
-  let resolvedProgramId: string | null = app.program_id ?? null;
-
-  if (!resolvedProgramId && app.program_interest) {
-    const searchTerm = (app.program_interest as string).toLowerCase().trim();
-
-    // 1. Exact slug match on programs table
-    const slugified = searchTerm.replace(/\s+/g, '-');
-    const { data: bySlug } = await db!
-      .from('programs')
-      .select('id')
-      .eq('slug', slugified)
-      .maybeSingle();
-    resolvedProgramId = bySlug?.id ?? null;
-
-    // 2. Case-insensitive title match on programs table
-    if (!resolvedProgramId) {
-      const { data: byTitle } = await db!
-        .from('programs')
-        .select('id')
-        .ilike('title', `%${searchTerm}%`)
-        .limit(1)
-        .maybeSingle();
-      resolvedProgramId = byTitle?.id ?? null;
-    }
-
-    // 3. Fallback: courses table (legacy path)
-    if (!resolvedProgramId) {
-      const { data: byCourse } = await db!
-        .from('courses')
-        .select('id')
-        .ilike('title', `%${searchTerm}%`)
-        .limit(1)
-        .maybeSingle();
-      resolvedProgramId = byCourse?.id ?? null;
-    }
-  }
+  // Priority: application.program_id (already resolved) → resolveProgram utility.
+  const resolvedProgramId: string | null =
+    app.program_id ??
+    (await resolveProgram(db!, app.program_interest))?.id ??
+    null;
 
   // Parse support_notes for structured data
   const notes = (app.support_notes || '') as string;

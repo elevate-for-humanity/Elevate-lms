@@ -12,6 +12,7 @@ import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { getRoutingRecommendations } from '@/lib/automation/shop-routing';
 import { insertWithPreAuthCheck } from '@/lib/pre-auth-guard';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { resolveProgramId } from '@/lib/programs/resolve';
 export const runtime = 'nodejs';
 export const maxDuration = 30;
 
@@ -59,15 +60,7 @@ export const POST = withRateLimit(
     }
     
       // Resolve program_id from slug or title so the review page can approve without guessing
-      let resolvedProgramId: string | null = null;
-      if (program) {
-        const { data: matchedProgram } = await supabase
-          .from('programs')
-          .select('id')
-          .or(`slug.ilike.${program},title.ilike.${program}`)
-          .maybeSingle();
-        resolvedProgramId = matchedProgram?.id ?? null;
-      }
+      const resolvedProgramId = await resolveProgramId(supabase, program);
 
       // Build insert object - only include pathway_slug/source if migration has been run
       const insertData: Record<string, any> = {

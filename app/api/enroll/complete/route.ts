@@ -9,6 +9,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { BARBER_PROGRAM_ID, BARBER_COURSE_ID } from '@/lib/barber/pricing';
+import { resolveProgram } from '@/lib/programs/resolve';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -52,14 +53,11 @@ async function _POST(req: Request) {
     });
 
     // Step 1: Get program details
-    const { data: program, error: programError } = await supabase
-      .from('programs')
-      .select('id, title, slug')
-      .eq('slug', programSlug)
-      .single();
+    const program = await resolveProgram(supabase, programSlug);
 
-    if (programError || !program) {
-      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    if (!program) {
+      logger.error('[enroll/complete] Could not resolve program', { programSlug });
+      return NextResponse.json({ error: 'Program not found' }, { status: 422 });
     }
 
     // Step 2: Check if user already exists

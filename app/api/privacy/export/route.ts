@@ -2,6 +2,7 @@
 // app/api/privacy/export/route.ts
 // GDPR/CCPA: Data export endpoint
 import { NextRequest, NextResponse } from 'next/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

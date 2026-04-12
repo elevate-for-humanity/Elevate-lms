@@ -17,8 +17,6 @@ async function confirmFunding(formData: FormData) {
   'use server';
   const { createClient: createServerClient } = await import('@/lib/supabase/server');
   const supabase = await createServerClient();
-  const admin = await getAdminClient();
-  const db = admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 

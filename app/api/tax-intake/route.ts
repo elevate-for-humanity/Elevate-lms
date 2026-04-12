@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getAdminClient } from '@/lib/supabase/admin';
 
 import { NextResponse } from "next/server";
 import { applyRateLimit } from '@/lib/api/withRateLimit';

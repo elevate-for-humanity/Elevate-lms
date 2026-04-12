@@ -1,6 +1,7 @@
 
 // app/api/xapi/route.ts
 import { NextResponse } from 'next/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { parseBody } from '@/lib/api-helpers';
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logger } from '@/lib/logger';

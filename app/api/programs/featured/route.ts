@@ -2,6 +2,7 @@
 // app/api/programs/featured/route.ts
 // Cached featured programs endpoint
 import { NextRequest, NextResponse } from 'next/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cacheGet, cacheSet } from '@/lib/cache';
 import { toErrorMessage } from '@/lib/safe';

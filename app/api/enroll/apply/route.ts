@@ -2,6 +2,7 @@
 // Using Node.js runtime for SendGrid
 
 import { z } from 'zod';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';

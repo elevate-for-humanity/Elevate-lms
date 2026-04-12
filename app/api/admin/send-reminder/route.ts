@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 import { applyRateLimit } from '@/lib/api/withRateLimit';

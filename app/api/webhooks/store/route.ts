@@ -1,5 +1,6 @@
 /* eslint-disable no-empty */
 import { getStripe } from '@/lib/stripe/client';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';

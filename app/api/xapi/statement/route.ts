@@ -2,6 +2,7 @@
 // app/api/xapi/statement/route.ts
 // xAPI Learning Record Store (LRS) endpoint
 import { NextRequest, NextResponse } from 'next/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { parseBody } from '@/lib/api-helpers';
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logger } from '@/lib/logger';

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { getAdminClient } from '@/lib/supabase/admin';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Calendar, User, ArrowRight } from 'lucide-react';

@@ -1,6 +1,7 @@
 
 // app/api/help/search/route.ts
 import { NextResponse } from 'next/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sanitizeSearchInput } from '@/lib/utils';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

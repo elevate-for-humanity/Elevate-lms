@@ -17,8 +17,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   // Resolve authenticated user for audit attribution
-  const db = await getAdminClient();
-  const supabase = await getAdminClient();
+  const supabase = await createAdminClient();
   let sessionUserId: string | null = null;
   try {
     const { data: { user } } = await supabase.auth.getUser();

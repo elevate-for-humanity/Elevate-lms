@@ -1,5 +1,6 @@
 
 import { NextResponse } from 'next/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

@@ -1,4 +1,5 @@
 import { requireAdmin } from '@/lib/auth';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 // app/api/admin/analytics/overview/route.ts
 // Real-time analytics overview

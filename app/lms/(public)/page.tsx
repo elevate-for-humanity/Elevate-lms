@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { buildLoginRedirect } from '@/lib/lms/redirect';
 import { StudentToolsStrip } from '@/components/lms/dashboard/StudentToolsStrip';

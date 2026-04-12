@@ -43,20 +43,29 @@ async function _POST(req: Request) {
       const { data: matchedProgram } = await supabase
         .from('programs')
         .select('id')
-        .or(`slug.ilike.${program},title.ilike.${program}`)
+        .or(`slug.ilike.%${program}%,title.ilike.%${program}%`)
         .maybeSingle();
       resolvedProgramId = matchedProgram?.id ?? null;
     }
 
+    // Split name into first/last for the not-null constraint
+    const nameParts = (name || '').trim().split(/\s+/);
+    const firstName = nameParts[0] || name || 'Unknown';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
     // @preAuthWrite table=applications mode=reconcile
     const { error } = await insertWithPreAuthCheck(supabase, 'applications', {
+      first_name: firstName,
+      last_name: lastName,
       name,
       email,
       phone,
-      program,
+      program_interest: program,
       program_id: resolvedProgramId,
-      funding,
+      funding_type: funding,
+      source: 'simple_form',
       notes: eligible ? "Prescreen passed — WIOA eligible" : "Needs review",
+      status: 'submitted',
     });
 
     if (error) {

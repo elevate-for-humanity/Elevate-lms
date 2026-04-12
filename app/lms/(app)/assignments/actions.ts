@@ -22,7 +22,12 @@ export async function submitAssignment(formData: FormData) {
 
   if (!assignmentId) return { error: 'Assignment ID is required' };
 
-  const db = await getAdminClient();
+  let db: Awaited<ReturnType<typeof getAdminClient>> | null = null;
+  try {
+    db = await getAdminClient();
+  } catch (err) {
+    logger.error('[Assignments] getAdminClient failed', err);
+  }
   if (!db) return { error: 'Service unavailable' };
 
   // Verify assignment exists and resolve course_id

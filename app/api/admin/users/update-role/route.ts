@@ -53,7 +53,7 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Only super_admin can grant admin roles' }, { status: 403 });
     }
 
-    const db = getAdminClient();
+    const db = await getAdminClient();
     const { error } = await db
       .from('profiles')
       .update({ role, updated_at: new Date().toISOString() })

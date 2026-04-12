@@ -44,7 +44,7 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Cannot deactivate your own account' }, { status: 400 });
     }
 
-    const db = getAdminClient();
+    const db = await getAdminClient();
     const { error } = await db
       .from('profiles')
       .update({ status, updated_at: new Date().toISOString() })

@@ -19,9 +19,13 @@ export async function sendRecoveryEmail(email: string): Promise<{ success: boole
     return { success: false, error: 'Please enter a valid email address.' };
   }
 
-  const supabase = await getAdminClient();
+  let supabase: Awaited<ReturnType<typeof getAdminClient>> | null = null;
+  try {
+    supabase = await getAdminClient();
+  } catch (err) {
+    logger.error('[Recovery] getAdminClient failed', err);
+  }
   if (!supabase) {
-    logger.error('[Recovery] Admin client unavailable');
     return { success: false, error: 'Service temporarily unavailable. Please try again later.' };
   }
 

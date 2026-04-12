@@ -21,7 +21,10 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  NODE_OPTIONS = "--max-old-space-size=8192"
+  # Cap heap per worker — 5 workers × 8GB exceeds Netlify container memory.
+  # 2 workers × 3GB stays well within the 7GB limit.
+  NODE_OPTIONS = "--max-old-space-size=3072"
+  NEXT_WORKER_POOL_MAX_WORKERS = "2"
   NETLIFY_USE_PNPM = "true"
   NEXT_DISABLE_TURBOPACK = "1"
   # Disable secret scanning - NEXT_PUBLIC_* vars are intentionally public

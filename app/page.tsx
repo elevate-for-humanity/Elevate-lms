@@ -141,10 +141,11 @@ export default function HomePage() {
               <p className="text-white/90 text-sm sm:text-base leading-relaxed mb-6">
                 Many of our programs qualify for federal and Indiana state workforce funding. Eligibility depends on the program, your background, and current funding availability. Check before you apply — it takes two minutes.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
                 {[
                   { label: 'WIOA',                  tag: 'Federal',       desc: 'For adults, dislocated workers, and youth 16–24. Covers eligible high-demand programs.' },
                   { label: 'Workforce Ready Grant', tag: 'Indiana State', desc: 'Covers tuition for high-demand certification programs on the INDemand list.' },
+                  { label: 'FSSA IMPACT',           tag: 'Indiana State', desc: 'Pays for training at no cost to current SNAP or TANF recipients. Elevate is a participating training provider.' },
                   { label: 'Job Ready Indy',        tag: 'Indianapolis',  desc: 'For justice-involved individuals and employer OJT partnerships.' },
                 ].map((f) => (
                   <div key={f.label} className="bg-white rounded-xl p-4">

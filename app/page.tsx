@@ -10,11 +10,11 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'Elevate for Humanity | Workforce Training — Indianapolis, Indiana',
-  description: 'DOL-registered apprenticeship sponsor. Healthcare, skilled trades, CDL, and more. Workforce funding available for eligible programs.',
-  keywords: 'workforce training Indianapolis, DOL registered apprenticeship, career training Indiana, Elevate for Humanity',
+  description: 'DOL-registered apprenticeship sponsor and ETPL-approved training provider. Healthcare, skilled trades, CDL, and more. WIOA and state funding available for eligible programs.',
+  keywords: 'workforce training Indianapolis, WIOA training Indiana, DOL registered apprenticeship, ETPL approved training provider, Elevate for Humanity',
   openGraph: {
     title: 'Elevate for Humanity | Workforce Training — Indianapolis, Indiana',
-    description: 'DOL-registered apprenticeship sponsor. Healthcare, skilled trades, CDL, and more. Workforce funding available for eligible programs.',
+    description: 'DOL-registered apprenticeship sponsor and ETPL-approved training provider. Healthcare, skilled trades, CDL, and more.',
   },
 };
 
@@ -34,7 +34,7 @@ export default function HomePage() {
         <div className="bg-slate-700 flex items-center">
           <div className="px-5 py-10 sm:px-8 sm:py-12 lg:px-14 lg:py-16 w-full">
             <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3">
-              DOL Registered Apprenticeship Sponsor · Indianapolis, Indiana
+              DOL Registered · ETPL Approved · WIOA Compliant
             </p>
             <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
               Workforce training for real jobs in Indiana.

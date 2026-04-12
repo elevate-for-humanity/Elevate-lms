@@ -10,7 +10,7 @@ export const revalidate = 86400;
 export const metadata: Metadata = {
   title: 'Programs | Elevate Workforce OS — Funded Training Pathways',
   description:
-    'Credential pathways powered by the Elevate Workforce OS. DOL-registered apprenticeship sponsor. Healthcare, trades, technology, and business programs in Indiana. Workforce funding available for eligible programs.',
+    'Credential pathways powered by the Elevate Workforce OS. WIOA-funded, DOL-registered, ETPL-approved. Healthcare, trades, technology, and business programs in Indiana.',
   alternates: { canonical: '/programs' },
 };
 
@@ -190,7 +190,7 @@ export default function ProgramsPage() {
       {/* Trust strip */}
       <section className="bg-slate-900 py-4 px-4">
         <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
-          {['WIOA & grant funding available for eligible programs', 'DOL Registered Apprenticeship Sponsor · RAPIDS tracked', 'Indiana DWD Listed Training Provider · WorkOne referrals accepted', 'Proctored credentialing on-site · Exam funding included'].map((t) => (
+          {['WIOA & grant funding authorized before training begins', 'DOL Registered Apprenticeship Sponsor · RAPIDS tracked', 'Indiana ETPL Approved · WorkOne referrals accepted', 'Proctored credentialing on-site · Exam funding included'].map((t) => (
             <span key={t} className="text-white text-xs font-medium flex items-center gap-2">
               <span className="w-1.5 h-1.5 bg-brand-red-500 rounded-full" />{t}
             </span>

@@ -90,8 +90,8 @@ export default async function CompliancePage() {
               <span className="text-gray-500">INTraining ID: 10004621</span>
             </div>
             <div className="flex justify-between">
-              <span className="font-medium">WIOA / WRG / Job Ready Indy — Eligible for qualifying programs</span>
-              <span className="text-gray-500">Eligibility determined per program and participant — via EmployIndy and regional workforce boards</span>
+              <span className="font-medium">WIOA / WRG / Job Ready Indy Eligible Programs</span>
+              <span className="text-gray-500">Via EmployIndy and regional workforce boards</span>
             </div>
           </div>
         </section>
@@ -129,7 +129,7 @@ export default async function CompliancePage() {
             </Link>
             <Link href="/workone-partner-packet" className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition block">
               <h3 className="font-semibold text-gray-900">WorkOne Partner Packet</h3>
-              <p className="text-sm text-gray-500 mt-1">Partnership documentation for WorkOne regions and workforce board review</p>
+              <p className="text-sm text-gray-500 mt-1">ETPL-ready partnership documentation for WorkOne regions</p>
             </Link>
           </div>
         </section>

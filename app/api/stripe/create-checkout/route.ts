@@ -1,7 +1,7 @@
 
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
-import { createServerSupabaseClient } from '@/lib/auth';
+import { createClient } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { paymentRateLimit } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -49,7 +49,7 @@ async function handler(req: Request) {
       );
     }
 
-    const supabase = await createServerSupabaseClient();
+    const supabase = await createClient();
     
     // Get course details
     const { data: course, error: courseError } = await supabase

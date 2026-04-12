@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { UserPlus, Mail, Phone, XCircle } from 'lucide-react';
+import AcceptDeclineButtons from './AcceptDeclineButtons';
 
 export const dynamic = 'force-dynamic';
 
@@ -213,14 +214,7 @@ export default async function PendingStudentsPage() {
                             </div>
                           </td>
                           <td className="py-3 px-4">
-                            <div className="flex gap-2">
-                              <button className="px-3 py-2 bg-brand-green-600 hover:bg-brand-green-700 text-white text-sm font-medium rounded transition-colors" aria-label="Action button">
-                                Accept
-                              </button>
-                              <button className="px-3 py-2 bg-brand-red-600 hover:bg-brand-red-700 text-white text-sm font-medium rounded transition-colors" aria-label="Action button">
-                                Decline
-                              </button>
-                            </div>
+                            <AcceptDeclineButtons enrollmentId={application.id} />
                           </td>
                         </tr>
                       ))}

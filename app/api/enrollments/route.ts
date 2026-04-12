@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { parseBody } from '@/lib/api-helpers';
-import { createServerSupabaseClient, getCurrentUser } from '@/lib/auth';
+import { createClient } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -15,12 +15,11 @@ async function _GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const user = await getCurrentUser();
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const supabase = await createServerSupabaseClient();
     const { data: enrollments, error } = await supabase
       .from('training_enrollments')
       .select(
@@ -58,7 +57,8 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const user = await getCurrentUser();
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -69,8 +69,6 @@ async function _POST(request: Request) {
     if (!courseId) {
       return NextResponse.json({ error: 'Missing courseId' }, { status: 400 });
     }
-
-    const supabase = await createServerSupabaseClient();
 
     // Check if already enrolled
     const { data: existing } = await supabase

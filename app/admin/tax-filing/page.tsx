@@ -23,17 +23,6 @@ export default async function TaxFilingAdminPage() {
 
 
 
-  const { data: items, count: totalItems } = await supabase
-    .from('profiles')
-    .select('*', { count: 'exact' })
-    .order('created_at', { ascending: false })
-    .limit(50);
-
-  const { count: activeItems } = await supabase
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'active');
-
   // Fetch applications
   const { data: applications, error } = await supabase
     .from('tax_filing_applications')
@@ -338,9 +327,10 @@ export default async function TaxFilingAdminPage() {
                   </ul>
                 </div>
                 <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
-                  <Image alt="Tax filing document" priority
+                  <Image
                     src="/images/pages/admin-tax-filing-hero.jpg"
                     alt="Tax filing preparation"
+                    priority
                     fill
                     className="object-cover"
                     quality={100}

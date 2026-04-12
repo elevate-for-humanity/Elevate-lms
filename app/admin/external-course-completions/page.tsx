@@ -30,32 +30,32 @@ export default async function ExternalCourseApprovalsPage() {
   }
 
   // Pending: certificate uploaded but not yet approved
-  const { data: pending } = await supabase
+  const { data: rawPending } = await supabase
     .from('external_course_completions')
-    .select(`
-      id, user_id, completed_at, certificate_url,
-      login_sent_at, login_instructions,
-      approved_at, rejection_reason, elevate_sponsored,
-      course:program_external_courses(id, title, partner_name, external_url, program_id),
-      student:profiles!external_course_completions_user_id_fkey(full_name, email),
-      program:programs(title, slug)
-    `)
+    .select(`id, user_id, completed_at, certificate_url, login_sent_at, login_instructions, approved_at, rejection_reason, elevate_sponsored, course:program_external_courses(id, title, partner_name, external_url, program_id), program:programs(title, slug)`)
     .not('certificate_url', 'is', null)
     .is('approved_at', null)
     .order('completed_at', { ascending: true });
 
   // Sponsored but no login sent yet
-  const { data: needsLogin } = await supabase
+  const { data: rawNeedsLogin } = await supabase
     .from('external_course_completions')
-    .select(`
-      id, user_id, elevate_sponsored, login_sent_at,
-      course:program_external_courses(id, title, partner_name, external_url),
-      student:profiles!external_course_completions_user_id_fkey(full_name, email),
-      program:programs(title, slug)
-    `)
+    .select(`id, user_id, elevate_sponsored, login_sent_at, course:program_external_courses(id, title, partner_name, external_url), program:programs(title, slug)`)
     .eq('elevate_sponsored', true)
     .is('login_sent_at', null)
     .order('created_at', { ascending: true });
+
+  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+  const extUserIds = [...new Set([
+    ...(rawPending ?? []).map((r: any) => r.user_id),
+    ...(rawNeedsLogin ?? []).map((r: any) => r.user_id),
+  ].filter(Boolean))];
+  const { data: extProfiles } = extUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', extUserIds)
+    : { data: [] };
+  const extProfileMap = Object.fromEntries((extProfiles ?? []).map((p: any) => [p.id, p]));
+  const pending = (rawPending ?? []).map((r: any) => ({ ...r, student: extProfileMap[r.user_id] ?? null }));
+  const needsLogin = (rawNeedsLogin ?? []).map((r: any) => ({ ...r, student: extProfileMap[r.user_id] ?? null }));
 
   return (
     <div className="min-h-screen bg-white">

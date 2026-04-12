@@ -79,16 +79,21 @@ async function _POST(request: NextRequest) {
       );
     }
 
-    // Fetch joined profile data for email notifications
+    // Fetch verification record
     const { data: verification } = await supabase
       .from('id_verifications')
-      .select(`*, profiles:user_id (id, full_name, email)`)
+      .select('*')
       .eq('id', verificationId)
       .single();
 
     if (!verification) {
       return NextResponse.json({ success: true });
     }
+
+    // Hydrate profile separately (user_id → auth.users, no FK to profiles)
+    const { data: verifProfile } = verification.user_id
+      ? await supabase.from('profiles').select('id, full_name, email').eq('id', verification.user_id).maybeSingle()
+      : { data: null };
 
     await logAdminAudit({
       action: AdminAction.VERIFICATION_REVIEWED,
@@ -99,7 +104,7 @@ async function _POST(request: NextRequest) {
       req: request,
     });
 
-    const userProfile = verification.profiles as any;
+    const userProfile = verifProfile as any;
     if (userProfile?.email) {
       await sendEmail({
         to: userProfile.email,

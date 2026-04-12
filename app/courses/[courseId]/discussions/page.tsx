@@ -37,22 +37,19 @@ export default function CourseDiscussionsPage() {
     setCourse(courseData);
 
     // Load discussions
-    const { data: discussionsData } = await supabase
+    const { data: rawDiscussions } = await supabase
       .from('course_discussions')
-      .select(
-        `
-        *,
-        profiles:user_id (
-          full_name,
-          avatar_url
-        ),
-        replies:course_discussion_replies (
-          count
-        )
-      `
-      )
+      .select(`*, replies:course_discussion_replies(count)`)
       .eq('course_id', courseId)
       .order('created_at', { ascending: false });
+
+    // Hydrate profiles separately (course_discussions.user_id has no FK to profiles)
+    const discUserIds = [...new Set((rawDiscussions ?? []).map((d: any) => d.user_id).filter(Boolean))];
+    const { data: discProfiles } = discUserIds.length
+      ? await supabase.from('profiles').select('id, full_name, avatar_url').in('id', discUserIds)
+      : { data: [] };
+    const discProfileMap = Object.fromEntries((discProfiles ?? []).map((p: any) => [p.id, p]));
+    const discussionsData = (rawDiscussions ?? []).map((d: any) => ({ ...d, profiles: discProfileMap[d.user_id] ?? null }));
 
     setDiscussions(discussionsData || []);
     setLoading(false);

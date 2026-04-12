@@ -23,21 +23,19 @@ export default async function ProgramHolderVerificationPage() {
 
 
   // Get pending verifications
-  const { data: pendingHolders } = await supabase
+  const { data: rawPendingHolders } = await supabase
     .from('program_holders')
-    .select(
-      `
-      *,
-      user:profiles!user_id(
-        id,
-        email,
-        first_name,
-        last_name
-      )
-    `
-    )
+    .select('*')
     .eq('verification_status', 'pending')
     .order('created_at', { ascending: false });
+
+  // Hydrate profiles separately (program_holders.user_id has no FK to profiles)
+  const phVerifUserIds = [...new Set((rawPendingHolders ?? []).map((h: any) => h.user_id).filter(Boolean))];
+  const { data: phVerifProfiles } = phVerifUserIds.length
+    ? await supabase.from('profiles').select('id, email, first_name, last_name').in('id', phVerifUserIds)
+    : { data: [] };
+  const phVerifProfileMap = Object.fromEntries((phVerifProfiles ?? []).map((p: any) => [p.id, p]));
+  const pendingHolders = (rawPendingHolders ?? []).map((h: any) => ({ ...h, user: phVerifProfileMap[h.user_id] ?? null }));
 
   // Get documents for each holder
   const holdersWithDocs = await Promise.all(

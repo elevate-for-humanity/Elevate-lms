@@ -22,20 +22,19 @@ export default async function ActivityLogPage() {
 
 
   // Fetch real activity from audit log
-  const { data: activityData } = await supabase
+  const { data: rawActivityData } = await supabase
     .from('audit_logs')
-    .select(`
-      id,
-      action,
-      target_type,
-      target_id,
-      metadata,
-      created_at,
-      user_id,
-      profiles!audit_logs_user_id_fkey(full_name, email)
-    `)
+    .select('id, action, target_type, target_id, metadata, created_at, user_id')
     .order('created_at', { ascending: false })
     .limit(50);
+
+  // Hydrate profiles separately (audit_logs.user_id has no FK constraint to profiles)
+  const auditUserIds = [...new Set((rawActivityData ?? []).map((a: any) => a.user_id).filter(Boolean))];
+  const { data: auditProfiles } = auditUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', auditUserIds)
+    : { data: [] };
+  const auditProfileMap = Object.fromEntries((auditProfiles ?? []).map((p: any) => [p.id, p]));
+  const activityData = (rawActivityData ?? []).map((a: any) => ({ ...a, profiles: auditProfileMap[a.user_id] ?? null }));
 
   const activities = (activityData || []).map((a: any) => {
     const createdAt = new Date(a.created_at);

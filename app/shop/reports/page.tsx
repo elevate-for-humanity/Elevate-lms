@@ -42,26 +42,26 @@ export default async function ShopReportsPage() {
 
   if (shopIds.length > 0) {
     // progress_entries is the live timeclock table; partner_id maps to shop
-    const { data: entries } = await supabase
+    const { data: rawEntries } = await supabase
       .from('progress_entries')
-      .select(`
-        id,
-        work_date,
-        week_ending,
-        hours_worked,
-        status,
-        created_at,
-        apprentice_id,
-        apprentices:apprentice_id (
-          profiles:user_id ( full_name )
-        )
-      `)
+      .select(`id, work_date, week_ending, hours_worked, status, created_at, apprentice_id, apprentices:apprentice_id(id, user_id)`)
       .in('partner_id', shopIds)
       .not('clock_out_at', 'is', null)
       .order('created_at', { ascending: false })
       .limit(100);
 
-    reports = (entries || []).map((e: any) => {
+    // Hydrate profiles via apprentice user_id (apprentices.user_id → auth.users, no FK to profiles)
+    const apprenticeUserIds = [...new Set((rawEntries ?? []).map((e: any) => (e.apprentices as any)?.user_id).filter(Boolean))];
+    const { data: apprenticeProfiles } = apprenticeUserIds.length
+      ? await supabase.from('profiles').select('id, full_name').in('id', apprenticeUserIds)
+      : { data: [] };
+    const apprenticeProfileMap = Object.fromEntries((apprenticeProfiles ?? []).map((p: any) => [p.id, p]));
+    const entries = (rawEntries ?? []).map((e: any) => ({
+      ...e,
+      apprentices: e.apprentices ? { ...e.apprentices, profiles: apprenticeProfileMap[(e.apprentices as any).user_id] ?? null } : null,
+    }));
+
+    reports = entries.map((e: any) => {
       const name = e.apprentices?.profiles?.full_name || `Apprentice ${e.apprentice_id?.slice(0, 8) || 'N/A'}`;
       const weekEnd = e.week_ending ? new Date(e.week_ending) : new Date(e.work_date);
       const weekStart = new Date(weekEnd);

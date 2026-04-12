@@ -22,22 +22,21 @@ async function _GET(request: NextRequest) {
     const thirtyDaysFromNow = new Date(today);
     thirtyDaysFromNow.setDate(today.getDate() + 30);
 
-    const { data: expiringDocs } = await supabase
+    const { data: rawExpiringDocs } = await supabase
       .from('documents')
-      .select(
-        `
-        *,
-        profiles:user_id (
-          id,
-          full_name,
-          email
-        )
-      `
-      )
+      .select('*')
       .eq('status', 'approved')
       .not('expiration_date', 'is', null)
       .lte('expiration_date', thirtyDaysFromNow.toISOString().split('T')[0])
       .gte('expiration_date', today.toISOString().split('T')[0]);
+
+    // Hydrate profiles separately (documents.user_id has no FK to profiles)
+    const expDocUserIds = [...new Set((rawExpiringDocs ?? []).map((d: any) => d.user_id).filter(Boolean))];
+    const { data: expDocProfiles } = expDocUserIds.length
+      ? await supabase.from('profiles').select('id, full_name, email').in('id', expDocUserIds)
+      : { data: [] };
+    const expDocProfileMap = Object.fromEntries((expDocProfiles ?? []).map((p: any) => [p.id, p]));
+    const expiringDocs = (rawExpiringDocs ?? []).map((d: any) => ({ ...d, profiles: expDocProfileMap[d.user_id] ?? null }));
 
     const notifications = [];
 

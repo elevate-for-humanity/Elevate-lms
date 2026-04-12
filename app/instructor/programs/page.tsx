@@ -68,7 +68,7 @@ export default async function InstructorProgramsPage() {
                       <BookOpen className="w-6 h-6 text-brand-blue-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{program.name}</h3>
+                      <h3 className="font-semibold text-gray-900">{program.title || program.name}</h3>
                       <p className="text-sm text-gray-500">{program.credential || 'Certificate'}</p>
                     </div>
                   </div>

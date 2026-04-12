@@ -15,7 +15,15 @@ export default async function LeavePage() {
   await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
 
-  const { data: requests } = await supabase.from('leave_requests').select('*, profiles!inner(full_name)').eq('status', 'pending').order('created_at', { ascending: false });
+  const { data: rawLeaveRequests } = await supabase.from('leave_requests').select('*').eq('status', 'pending').order('created_at', { ascending: false });
+
+  // Hydrate profiles via employee_id (no FK to profiles)
+  const leaveEmpIds = [...new Set((rawLeaveRequests ?? []).map((r: any) => r.employee_id).filter(Boolean))];
+  const { data: leaveProfiles } = leaveEmpIds.length
+    ? await supabase.from('profiles').select('id, full_name').in('id', leaveEmpIds)
+    : { data: [] };
+  const leaveProfileMap = Object.fromEntries((leaveProfiles ?? []).map((p: any) => [p.id, p]));
+  const requests = (rawLeaveRequests ?? []).map((r: any) => ({ ...r, profiles: leaveProfileMap[r.employee_id] ?? null }));
 
   return (
     <div className="min-h-screen bg-white">

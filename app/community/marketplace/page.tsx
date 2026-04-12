@@ -89,28 +89,22 @@ export default async function CommunityMarketplacePage() {
   let totalSellers = 0;
   
   try {
-    // Get creator courses
+    // Get creator courses (creator_profiles is a text column, not a join target)
     const { data: courseData, count: courseCount } = await supabase
       .from('creator_courses')
-      .select(`
-        *,
-        creator_profiles!inner(display_name, bio, verified)
-      `, { count: 'exact' })
+      .select('*', { count: 'exact' })
       .eq('published', true)
       .order('total_enrollments', { ascending: false })
       .limit(6);
-    
+
     if (courseData) {
       courses = courseData;
     }
 
-    // Get shop products
+    // Get shop products (no FK to shop_profiles — select separately)
     const { data: productData, count: productCount } = await supabase
       .from('shop_products')
-      .select(`
-        *,
-        shop_profiles!inner(shop_name, verified, rating)
-      `, { count: 'exact' })
+      .select('*', { count: 'exact' })
       .eq('status', 'active')
       .order('total_sales', { ascending: false })
       .limit(8);

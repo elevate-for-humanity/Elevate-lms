@@ -47,25 +47,23 @@ const supabase = await createClient();
   }
 
   // Fetch time entries for the period
-  const { data: entries, error } = await supabase
+  const { data: rawEntries, error } = await supabase
     .from('time_entries')
-    .select(
-      `
-      *,
-      profiles:user_id (
-        id,
-        full_name,
-        email,
-        external_payroll_id
-      )
-    `
-    )
+    .select('*')
     .gte('worked_at', periodStart)
     .lte('worked_at', periodEnd);
 
   if (error) {
     return NextResponse.json({ error: toErrorMessage(error) }, { status: 500 });
   }
+
+  // Hydrate profiles separately (time_entries.user_id has no FK to profiles)
+  const payrollUserIds = [...new Set((rawEntries ?? []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: payrollProfiles } = payrollUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email, external_payroll_id').in('id', payrollUserIds)
+    : { data: [] };
+  const payrollProfileMap = Object.fromEntries((payrollProfiles ?? []).map((p: any) => [p.id, p]));
+  const entries = (rawEntries ?? []).map((e: any) => ({ ...e, profiles: payrollProfileMap[e.user_id] ?? null }));
 
   const header = ['EmployeeId', 'Name', 'Date', 'Hours', 'PayCode'];
 

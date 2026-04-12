@@ -56,19 +56,18 @@ export async function POST(
   // Load the completion record with student + course info
   const { data: rec, error: fetchErr } = await db
     .from('external_course_completions')
-    .select(`
-      id, user_id, external_course_id, program_id,
-      login_sent_at, login_instructions,
-      approved_at, certificate_url,
-      course:program_external_courses(title, partner_name, external_url),
-      student:profiles!external_course_completions_user_id_fkey(full_name, email),
-      program:programs(title, slug)
-    `)
+    .select(`id, user_id, external_course_id, program_id, login_sent_at, login_instructions, approved_at, certificate_url, course:program_external_courses(title, partner_name, external_url), program:programs(title, slug)`)
     .eq('id', id)
     .maybeSingle();
 
   if (fetchErr) return safeDbError(fetchErr, 'Lookup failed');
   if (!rec) return safeError('Completion record not found', 404);
+
+  // Hydrate student profile separately (user_id → auth.users, no FK to profiles)
+  const { data: extStudentProfile } = rec.user_id
+    ? await db.from('profiles').select('full_name, email').eq('id', rec.user_id).maybeSingle()
+    : { data: null };
+  (rec as any).student = extStudentProfile ?? null;
 
   const studentEmail = (rec.student as any)?.email ?? '';
   const studentName  = (rec.student as any)?.full_name ?? 'Student';

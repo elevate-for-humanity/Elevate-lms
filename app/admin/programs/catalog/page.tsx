@@ -213,7 +213,7 @@ export default async function ProgramCatalogPage() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {categories.healthcare.slice(0, 6).map((program) => (
                   <div key={program.slug} className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="font-medium text-gray-900 text-sm">{program.name}</h4>
+                    <h4 className="font-medium text-gray-900 text-sm">{program.title || program.name}</h4>
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                       <span>{program.duration}</span>
                       {program.clockHours && <span className="text-brand-blue-600 font-medium">{program.clockHours} hrs</span>}
@@ -232,7 +232,7 @@ export default async function ProgramCatalogPage() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {categories.trades.slice(0, 6).map((program) => (
                   <div key={program.slug} className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="font-medium text-gray-900 text-sm">{program.name}</h4>
+                    <h4 className="font-medium text-gray-900 text-sm">{program.title || program.name}</h4>
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                       <span>{program.duration}</span>
                       {program.clockHours && <span className="text-brand-blue-600 font-medium">{program.clockHours} hrs</span>}
@@ -251,7 +251,7 @@ export default async function ProgramCatalogPage() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {categories.technology.slice(0, 6).map((program) => (
                   <div key={program.slug} className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="font-medium text-gray-900 text-sm">{program.name}</h4>
+                    <h4 className="font-medium text-gray-900 text-sm">{program.title || program.name}</h4>
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                       <span>{program.duration}</span>
                       {program.clockHours && <span className="text-brand-blue-600 font-medium">{program.clockHours} hrs</span>}
@@ -270,7 +270,7 @@ export default async function ProgramCatalogPage() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {categories.business.slice(0, 6).map((program) => (
                   <div key={program.slug} className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="font-medium text-gray-900 text-sm">{program.name}</h4>
+                    <h4 className="font-medium text-gray-900 text-sm">{program.title || program.name}</h4>
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                       <span>{program.duration}</span>
                       {program.clockHours && <span className="text-brand-blue-600 font-medium">{program.clockHours} hrs</span>}

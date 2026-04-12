@@ -86,7 +86,7 @@ export function ModuleForm({ programs, module }: ModuleFormProps) {
             <option value="">-- Select a program --</option>
             {programs.map((program: any) => (
               <option key={program.id} value={program.id}>
-                {program.name}
+                {program.title || program.name}
               </option>
             ))}
           </select>

@@ -50,23 +50,22 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     throw APIErrors.validation('rejectionReason', 'Rejection reason is required when rejecting');
   }
 
-  // Get document with user profile
+  // Get document record
   const { data: document, error: fetchError } = await supabase
     .from('documents')
-    .select(`
-      *,
-      profiles:user_id (
-        id,
-        full_name,
-        email
-      )
-    `)
+    .select('*')
     .eq('id', documentId)
     .single();
 
   if (fetchError || !document) {
     throw APIErrors.notFound('Document');
   }
+
+  // Hydrate profile separately (documents.user_id has no FK to profiles)
+  const { data: docVerifyProfile } = document.user_id
+    ? await supabase.from('profiles').select('id, full_name, email').eq('id', document.user_id).maybeSingle()
+    : { data: null };
+  (document as any).profiles = docVerifyProfile ?? null;
 
   // Use library functions for verification (includes audit trail fields)
   let success: boolean;

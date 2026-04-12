@@ -34,13 +34,21 @@ export default async function VerificationsPage() {
     { count: rejected },
   ] = await Promise.all([
     db.from('id_verifications')
-      .select('id, status, id_type, first_name, last_name, created_at, profiles:user_id(full_name, email)', { count: 'exact' })
+      .select('id, user_id, status, id_type, first_name, last_name, created_at', { count: 'exact' })
       .order('created_at', { ascending: false })
       .limit(50),
     db.from('id_verifications').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
     db.from('id_verifications').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
     db.from('id_verifications').select('*', { count: 'exact', head: true }).eq('status', 'rejected'),
   ]);
+
+  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+  const verifUserIds = [...new Set((verifications ?? []).map((v: any) => v.user_id).filter(Boolean))];
+  const { data: verifProfiles } = verifUserIds.length
+    ? await db.from('profiles').select('id, full_name, email').in('id', verifUserIds)
+    : { data: [] };
+  const verifProfileMap = Object.fromEntries((verifProfiles ?? []).map((p: any) => [p.id, p]));
+  const verificationsWithProfiles = (verifications ?? []).map((v: any) => ({ ...v, profiles: verifProfileMap[v.user_id] ?? null }));
 
   return (
     <AdminPageShell
@@ -63,7 +71,7 @@ export default async function VerificationsPage() {
       }
     >
       <AdminCard>
-        {verifications && verifications.length > 0 ? (
+        {verificationsWithProfiles && verificationsWithProfiles.length > 0 ? (
           <div className="divide-y divide-slate-100">
             <div className="grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
               <div className="col-span-3">Name</div>
@@ -73,7 +81,7 @@ export default async function VerificationsPage() {
               <div className="col-span-1">Submitted</div>
               <div className="col-span-1" />
             </div>
-            {verifications.map((v: any) => {
+            {verificationsWithProfiles.map((v: any) => {
               const profile = Array.isArray(v.profiles) ? v.profiles[0] : v.profiles;
               const name = v.first_name && v.last_name
                 ? `${v.first_name} ${v.last_name}`

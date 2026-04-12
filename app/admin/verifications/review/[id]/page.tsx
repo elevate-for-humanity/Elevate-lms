@@ -23,25 +23,21 @@ export default async function ReviewVerificationPage({
 
 
 
-  const { data: verification } = await supabase
+  const { data: rawVerification } = await supabase
     .from('id_verifications')
-    .select(
-      `
-      *,
-      profiles:user_id (
-        id,
-        full_name,
-        email,
-        role
-      )
-    `
-    )
+    .select('*')
     .eq('id', id)
     .single();
 
-  if (!verification) {
+  if (!rawVerification) {
     redirect('/admin/verifications/review');
   }
+
+  // Hydrate profile separately (id_verifications.user_id → auth.users, no FK to profiles)
+  const { data: verifReviewProfile } = rawVerification.user_id
+    ? await supabase.from('profiles').select('id, full_name, email, role').eq('id', rawVerification.user_id).maybeSingle()
+    : { data: null };
+  const verification = { ...rawVerification, profiles: verifReviewProfile ?? null };
 
   return (
     <div className="min-h-screen bg-white">

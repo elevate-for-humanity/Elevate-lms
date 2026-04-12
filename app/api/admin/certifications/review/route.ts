@@ -124,23 +124,27 @@ const supabase = await createClient();
 
   let query = supabase
     .from('certification_submissions')
-    .select(`
-      *,
-      profiles:user_id (id, full_name, email),
-      programs:program_id (id, name, title)
-    `)
+    .select(`*, programs:program_id (id, name, title)`)
     .order('created_at', { ascending: false });
 
   if (status) {
     query = query.eq('status', status);
   }
 
-  const { data, error } = await query;
+  const { data: rawCertSubs, error } = await query;
 
   if (error) {
     logger.error('Failed to fetch submissions:', error);
     return NextResponse.json({ error: 'Failed to fetch submissions' }, { status: 500 });
   }
+
+  // Hydrate profiles separately (certification_submissions.user_id → auth.users, no FK to profiles)
+  const certSubUserIds = [...new Set((rawCertSubs ?? []).map((s: any) => s.user_id).filter(Boolean))];
+  const { data: certSubProfiles } = certSubUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', certSubUserIds)
+    : { data: [] };
+  const certSubProfileMap = Object.fromEntries((certSubProfiles ?? []).map((p: any) => [p.id, p]));
+  const data = (rawCertSubs ?? []).map((s: any) => ({ ...s, profiles: certSubProfileMap[s.user_id] ?? null }));
 
   return NextResponse.json({ submissions: data });
 }

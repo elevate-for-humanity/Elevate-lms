@@ -21,26 +21,21 @@ export default async function ReviewVerificationPage({
 
 
   // Get program holder
-  const { data: holder } = await supabase
+  const { data: rawHolder } = await supabase
     .from('program_holders')
-    .select(
-      `
-      *,
-      user:profiles!user_id(
-        id,
-        email,
-        first_name,
-        last_name,
-        phone
-      )
-    `
-    )
+    .select('*')
     .eq('id', params.id)
     .single();
 
-  if (!holder) {
+  if (!rawHolder) {
     redirect('/admin/program-holders/verification');
   }
+
+  // Hydrate user profile separately (program_holders.user_id has no FK to profiles)
+  const { data: holderUserProfile } = rawHolder.user_id
+    ? await supabase.from('profiles').select('id, email, first_name, last_name, phone').eq('id', rawHolder.user_id).maybeSingle()
+    : { data: null };
+  const holder = { ...rawHolder, user: holderUserProfile ?? null };
 
   // Get documents
   const { data: documents } = await supabase

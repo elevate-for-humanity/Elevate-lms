@@ -52,20 +52,20 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
     .eq('assignment_id', assignmentId)
     .single();
 
-  // Fetch submissions with student info
-  const { data: submissions } = await supabase
+  // Fetch submissions
+  const { data: rawGradeSubmissions } = await supabase
     .from('assignment_submissions')
-    .select(`
-      id,
-      student_id,
-      content,
-      file_urls,
-      submitted_at,
-      is_late,
-      profiles!inner(full_name, email)
-    `)
+    .select(`id, student_id, content, file_urls, submitted_at, is_late`)
     .eq('assignment_id', assignmentId)
     .order('submitted_at', { ascending: true });
+
+  // Hydrate profiles separately (assignment_submissions has no FK to profiles)
+  const gradeStudentIds = [...new Set((rawGradeSubmissions ?? []).map((s: any) => s.student_id).filter(Boolean))];
+  const { data: gradeStudentProfiles } = gradeStudentIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', gradeStudentIds)
+    : { data: [] };
+  const gradeStudentMap = Object.fromEntries((gradeStudentProfiles ?? []).map((p: any) => [p.id, p]));
+  const submissions = (rawGradeSubmissions ?? []).map((s: any) => ({ ...s, profiles: gradeStudentMap[s.student_id] ?? null }));
 
   // Fetch existing grades for these submissions
   const submissionIds = (submissions || []).map((s: any) => s.id);

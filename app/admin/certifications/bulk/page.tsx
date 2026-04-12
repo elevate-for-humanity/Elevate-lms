@@ -26,18 +26,19 @@ export default async function BulkCertificationsPage() {
     .order('name');
 
   // Fetch pending certifications
-  const { data: pendingCertifications, count: pendingCount } = await supabase
+  const { data: rawPendingCerts, count: pendingCount } = await supabase
     .from('user_certifications')
-    .select(`
-      id,
-      user_id,
-      certification_type_id,
-      status,
-      earned_date,
-      profiles!inner(full_name, email)
-    `, { count: 'exact' })
+    .select(`id, user_id, certification_type_id, status, earned_date`, { count: 'exact' })
     .eq('status', 'pending')
     .limit(20);
+
+  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
+  const certUserIds = [...new Set((rawPendingCerts ?? []).map((c: any) => c.user_id).filter(Boolean))];
+  const { data: certProfiles } = certUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', certUserIds)
+    : { data: [] };
+  const certProfileMap = Object.fromEntries((certProfiles ?? []).map((p: any) => [p.id, p]));
+  const pendingCertifications = (rawPendingCerts ?? []).map((c: any) => ({ ...c, profiles: certProfileMap[c.user_id] ?? null }));
 
   return (
     <div className="min-h-screen bg-white">

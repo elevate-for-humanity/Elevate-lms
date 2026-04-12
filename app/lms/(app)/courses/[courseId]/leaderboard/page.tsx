@@ -44,22 +44,21 @@ export default function CourseLeaderboardPage() {
     }
 
     // Load leaderboard data
-    const { data: progressData } = await supabase
+    const { data: rawProgressData } = await supabase
       .from('course_progress')
-      .select(
-        `
-        *,
-        profiles:user_id (
-          id,
-          full_name,
-          avatar_url
-        )
-      `
-      )
+      .select('*')
       .eq('course_id', courseId)
       .gte('updated_at', dateFilter.toISOString())
       .order('progress_percentage', { ascending: false })
       .limit(100);
+
+    // Hydrate profiles separately (course_progress.user_id has no FK to profiles)
+    const lbCourseUserIds = [...new Set((rawProgressData ?? []).map((r: any) => r.user_id).filter(Boolean))];
+    const { data: lbCourseProfiles } = lbCourseUserIds.length
+      ? await supabase.from('profiles').select('id, full_name, avatar_url').in('id', lbCourseUserIds)
+      : { data: [] };
+    const lbCourseProfileMap = Object.fromEntries((lbCourseProfiles ?? []).map((p: any) => [p.id, p]));
+    const progressData = (rawProgressData ?? []).map((r: any) => ({ ...r, profiles: lbCourseProfileMap[r.user_id] ?? null }));
 
     // Calculate points and rank
     const rankedData = (progressData || []).map((item, index) => ({

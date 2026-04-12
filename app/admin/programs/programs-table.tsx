@@ -26,7 +26,7 @@ export function ProgramsTable({ programs }: { programs: Program[] }) {
 
   const filteredPrograms = programs.filter((program) => {
     const matchesSearch =
-      (program.name ?? '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      ((program.title || program.name) ?? '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (program.slug ?? '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter =
       filterStatus === 'all' ||
@@ -109,7 +109,7 @@ export function ProgramsTable({ programs }: { programs: Program[] }) {
                   <td className="px-6 py-4">
                     <div>
                       <div className="font-medium text-black">
-                        {program.name}
+                        {program.title || program.name}
                       </div>
                       <div className="text-sm text-black">
                         {program.slug}

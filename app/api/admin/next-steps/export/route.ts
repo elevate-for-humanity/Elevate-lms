@@ -52,27 +52,29 @@ const supabase = await createClient();
 
   let query = adminClient
     .from('student_next_steps')
-    .select(
-      `
-      *,
-      profiles!student_next_steps_user_id_fkey ( full_name, email ),
-      programs!student_next_steps_program_id_fkey ( name, slug )
-      `
-    )
+    .select(`*, programs!student_next_steps_program_id_fkey ( title, slug )`)
     .eq('organization_id', orgId)
     .order('updated_at', { ascending: false });
 
   if (status) query = query.eq('funding_status', status);
 
-  const { data, error } = await query;
+  const { data: rawExportSteps, error } = await query;
   if (error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 
-  let rows = (data || []).map((r: any) => ({
+  // Hydrate profiles separately (user_id has no FK to profiles)
+  const expUserIds = [...new Set((rawExportSteps ?? []).map((r: any) => r.user_id).filter(Boolean))];
+  const { data: expProfiles } = expUserIds.length
+    ? await adminClient.from('profiles').select('id, full_name, email').in('id', expUserIds)
+    : { data: [] };
+  const expProfileMap = Object.fromEntries((expProfiles ?? []).map((p: any) => [p.id, p]));
+  const data = (rawExportSteps ?? []).map((r: any) => ({ ...r, profiles: expProfileMap[r.user_id] ?? null }));
+
+  let rows = data.map((r: any) => ({
     ...r,
     student_name: r.profiles?.full_name || '',
     student_email: r.profiles?.email || '',
-    program_name: r.programs?.name || '',
+    program_name: r.programs?.title || r.programs?.name || '',
     program_slug: r.programs?.slug || '',
   }));
 

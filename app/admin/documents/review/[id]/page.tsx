@@ -24,25 +24,21 @@ export default async function ReviewDocumentPage({
 
 
 
-  const { data: document } = await supabase
+  const { data: rawDocument } = await supabase
     .from('documents')
-    .select(
-      `
-      *,
-      profiles:user_id (
-        id,
-        full_name,
-        email,
-        role
-      )
-    `
-    )
+    .select('*')
     .eq('id', id)
     .single();
 
-  if (!document) {
+  if (!rawDocument) {
     redirect('/admin/documents/review');
   }
+
+  // Hydrate profile separately (documents.user_id has no FK to profiles)
+  const { data: docReviewProfile } = rawDocument.user_id
+    ? await supabase.from('profiles').select('id, full_name, email, role').eq('id', rawDocument.user_id).maybeSingle()
+    : { data: null };
+  const document = { ...rawDocument, profiles: docReviewProfile ?? null };
 
   // Generate signed URL via centralized admin document access
   let viewUrl = document.file_url;

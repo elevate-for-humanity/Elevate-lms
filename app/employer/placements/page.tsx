@@ -16,7 +16,15 @@ export default async function PlacementsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: placements, count } = await supabase.from('job_placements').select('*, profiles!inner(full_name)', { count: 'exact' }).eq('employer_id', user.id).order('placement_date', { ascending: false }).limit(20);
+  const { data: rawPlacements, count } = await supabase.from('job_placements').select('*', { count: 'exact' }).eq('employer_id', user.id).order('placement_date', { ascending: false }).limit(20);
+
+  // Hydrate profiles separately (job_placements.user_id has no FK to profiles)
+  const placementUserIds = [...new Set((rawPlacements ?? []).map((p: any) => p.user_id).filter(Boolean))];
+  const { data: placementProfiles } = placementUserIds.length
+    ? await supabase.from('profiles').select('id, full_name').in('id', placementUserIds)
+    : { data: [] };
+  const placementProfileMap = Object.fromEntries((placementProfiles ?? []).map((p: any) => [p.id, p]));
+  const placements = (rawPlacements ?? []).map((p: any) => ({ ...p, profiles: placementProfileMap[p.user_id] ?? null }));
   const thisMonthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
   const { count: thisMonthCount } = await supabase.from('job_placements').select('*', { count: 'exact', head: true }).eq('employer_id', user.id).gte('placement_date', thisMonthStart);
   const { count: activeCount } = await supabase.from('job_placements').select('*', { count: 'exact', head: true }).eq('employer_id', user.id).eq('status', 'active');

@@ -20,21 +20,19 @@ export default async function AdminDocumentReviewPage() {
 
 
   // Get all documents with user info
-  const { data: documents, error: documentsError } = await supabase
+  const { data: rawDocuments, error: documentsError } = await supabase
     .from('documents')
-    .select(
-      `
-      *,
-      profiles:user_id (
-        id,
-        full_name,
-        email,
-        role
-      )
-    `
-    )
+    .select('*')
     .order('created_at', { ascending: false });
   if (documentsError) throw new Error(`documents query failed: ${documentsError.message}`);
+
+  // Hydrate profiles separately (user_id has no FK to profiles)
+  const docUserIds = [...new Set((rawDocuments ?? []).map((d: any) => d.user_id).filter(Boolean))];
+  const { data: docProfiles } = docUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email, role').in('id', docUserIds)
+    : { data: [] };
+  const docProfileMap = Object.fromEntries((docProfiles ?? []).map((p: any) => [p.id, p]));
+  const documents = (rawDocuments ?? []).map((d: any) => ({ ...d, profiles: docProfileMap[d.user_id] ?? null }));
 
   // Document viewing is handled on-demand via SecureDocumentLink,
   // which routes through /api/admin/documents/signed-url with audit logging.

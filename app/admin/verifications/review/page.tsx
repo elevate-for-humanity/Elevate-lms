@@ -18,21 +18,19 @@ export default async function AdminVerificationReviewPage() {
 
 
 
-  const { data: verifications, error: verificationsError } = await supabase
+  const { data: rawVerifications, error: verificationsError } = await supabase
     .from('id_verifications')
-    .select(
-      `
-      *,
-      profiles:user_id (
-        id,
-        full_name,
-        email,
-        role
-      )
-    `
-    )
+    .select('*')
     .order('created_at', { ascending: false });
   if (verificationsError) throw new Error(`id_verifications query failed: ${verificationsError.message}`);
+
+  // Hydrate profiles separately (id_verifications.user_id → auth.users, no FK to profiles)
+  const verifListUserIds = [...new Set((rawVerifications ?? []).map((v: any) => v.user_id).filter(Boolean))];
+  const { data: verifListProfiles } = verifListUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email, role').in('id', verifListUserIds)
+    : { data: [] };
+  const verifListProfileMap = Object.fromEntries((verifListProfiles ?? []).map((p: any) => [p.id, p]));
+  const verifications = (rawVerifications ?? []).map((v: any) => ({ ...v, profiles: verifListProfileMap[v.user_id] ?? null }));
 
   const pendingVerifications  = verifications.filter((v) => v.status === 'pending');
   const approvedVerifications = verifications.filter((v) => v.status === 'approved');

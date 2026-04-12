@@ -17,10 +17,18 @@ export default async function DelegatesPage() {
   
   
 
-  const { data: delegates } = await supabase
+  const { data: rawDelegates } = await supabase
     .from('delegates')
-    .select('*, profiles!inner(full_name, email)')
+    .select('*')
     .order('created_at', { ascending: false });
+
+  // Hydrate profiles separately (user_id has no FK to profiles)
+  const delegateUserIds = [...new Set((rawDelegates ?? []).map((d: any) => d.user_id).filter(Boolean))];
+  const { data: delegateProfiles } = delegateUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', delegateUserIds)
+    : { data: [] };
+  const delegateProfileMap = Object.fromEntries((delegateProfiles ?? []).map((p: any) => [p.id, p]));
+  const delegates = (rawDelegates ?? []).map((d: any) => ({ ...d, profiles: delegateProfileMap[d.user_id] ?? null }));
 
   return (
     <div className="min-h-screen bg-white">

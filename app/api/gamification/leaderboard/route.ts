@@ -18,18 +18,21 @@ async function _GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const limit = parseInt(searchParams.get('limit') || '10');
 
-    const { data, error }: any = await supabase
+    const { data: rawLeaderboard, error }: any = await supabase
       .from('leaderboard')
-      .select(
-        `
-        *,
-        user:profiles!user_id(full_name, email)
-      `
-      )
+      .select('*')
       .order('total_points', { ascending: false })
       .limit(limit);
 
     if (error) throw error;
+
+    // Hydrate profiles separately (leaderboard.user_id has no FK to profiles)
+    const lbUserIds = [...new Set((rawLeaderboard ?? []).map((r: any) => r.user_id).filter(Boolean))];
+    const { data: lbProfiles } = lbUserIds.length
+      ? await supabase.from('profiles').select('id, full_name, email').in('id', lbUserIds)
+      : { data: [] };
+    const lbProfileMap = Object.fromEntries((lbProfiles ?? []).map((p: any) => [p.id, p]));
+    const data = (rawLeaderboard ?? []).map((r: any) => ({ ...r, user: lbProfileMap[r.user_id] ?? null }));
 
     return NextResponse.json({ leaderboard: data });
   } catch (error) { 

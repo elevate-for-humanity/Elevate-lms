@@ -77,10 +77,10 @@ async function _POST(request: NextRequest) {
       );
     }
 
-    // Fetch joined profile data for email notifications
+    // Fetch document record
     const { data: document } = await supabase
       .from('documents')
-      .select(`*, profiles:user_id (id, full_name, email)`)
+      .select('*')
       .eq('id', documentId)
       .single();
 
@@ -88,7 +88,11 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ success: true, document: updatedDoc });
     }
 
-    const userProfile = document.profiles as any;
+    // Hydrate profile separately (documents.user_id has no FK to profiles)
+    const { data: docUserProfile } = document.user_id
+      ? await supabase.from('profiles').select('id, full_name, email').eq('id', document.user_id).maybeSingle()
+      : { data: null };
+    const userProfile = docUserProfile as any;
     const studentUserId = document.user_id;
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 

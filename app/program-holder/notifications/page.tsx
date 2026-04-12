@@ -17,13 +17,23 @@ export const metadata = {
 export default async function ProgramHolderNotificationsPage() {
   const supabase = await createClient();
 
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login?redirect=/program-holder/notifications');
+  }
+
+  // Role guard — program holder portal only
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile || !['program_holder', 'admin', 'super_admin', 'staff'].includes(profile.role)) {
+    redirect('/unauthorized');
   }
 
   // Get notifications for this user

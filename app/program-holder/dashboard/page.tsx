@@ -16,7 +16,22 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function ProgramHolderDashboardPage() {
-  const { db, programIds } = await requireProgramHolder();
+  const { db, user, holderId, programIds } = await requireProgramHolder();
+
+  // Check remaining onboarding steps (MOU already gated by requireProgramHolder)
+  const [acksRes, docsRes] = await Promise.all([
+    db.from('program_holder_acknowledgements').select('document_type').eq('user_id', user.id),
+    db.from('program_holder_documents').select('id').eq('user_id', user.id).limit(1),
+  ]);
+  const acks = acksRes.data ?? [];
+  const handbookDone = acks.some((a: any) => a.document_type === 'handbook');
+  const rightsDone = acks.some((a: any) => a.document_type === 'rights');
+  const docsDone = (docsRes.data ?? []).length > 0;
+  const pendingSteps = [
+    !handbookDone && { label: 'Acknowledge Handbook', href: '/program-holder/handbook' },
+    !rightsDone && { label: 'Acknowledge Rights & Responsibilities', href: '/program-holder/rights-responsibilities' },
+    !docsDone && { label: 'Upload Required Documents', href: '/program-holder/documents?required=true' },
+  ].filter(Boolean) as { label: string; href: string }[];
 
   const [
     programsRes,
@@ -142,6 +157,31 @@ export default async function ProgramHolderDashboardPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+
+        {/* Onboarding completion banner — shown until all steps are done */}
+        {pendingSteps.length > 0 && (
+          <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl p-5">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-amber-900 mb-2">
+                  Complete your onboarding — {pendingSteps.length} step{pendingSteps.length > 1 ? 's' : ''} remaining
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {pendingSteps.map((step) => (
+                    <Link
+                      key={step.href}
+                      href={step.href}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold bg-amber-100 hover:bg-amber-200 text-amber-900 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      {step.label} →
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Stats — image-backed cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

@@ -45,7 +45,7 @@ export default async function CompliancePage() {
     .single();
 
   if (!programHolder) {
-    redirect('/program-holder/apply');
+    redirect('/apply/program-holder');
   }
 
   // Calculate compliance score based on various factors

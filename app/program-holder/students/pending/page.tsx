@@ -42,7 +42,7 @@ export default async function PendingStudentsPage() {
     .single();
 
   if (!programHolder) {
-    redirect('/program-holder/apply');
+    redirect('/apply/program-holder');
   }
 
   // Fetch pending applications

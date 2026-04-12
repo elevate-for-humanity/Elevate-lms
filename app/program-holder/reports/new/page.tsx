@@ -41,7 +41,7 @@ export default async function NewReportPage() {
     .single();
 
   if (!programHolder) {
-    redirect('/program-holder/apply');
+    redirect('/apply/program-holder');
   }
 
   // Get active students for the report

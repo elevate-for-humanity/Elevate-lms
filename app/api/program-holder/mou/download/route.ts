@@ -24,9 +24,9 @@ const supabase = await createRouteHandlerClient({ cookies });
 
   // Get user's program holder ID
   const { data: prof } = await supabase
-    .from('user_profiles')
+    .from('profiles')
     .select('program_holder_id')
-    .eq('user_id', user.id)
+    .eq('id', user.id)
     .single();
 
   if (!prof?.program_holder_id) {

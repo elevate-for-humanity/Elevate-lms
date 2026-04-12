@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -12,6 +13,8 @@ import {
   FileText,
   HelpCircle,
   CheckCircle,
+  Circle,
+  ArrowRight,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -27,16 +30,74 @@ export const metadata: Metadata = {
 };
 
 export default async function ProgramHolderOnboarding() {
-  await requireRole(['program_holder', 'admin', 'super_admin', 'staff']);
+  const { user } = await requireRole(['program_holder', 'admin', 'super_admin', 'staff']);
   const supabase = await createClient();
+  const db = await getAdminClient();
 
-  
-  // Fetch onboarding resources
-  const { data: resources } = await supabase
-    .from('onboarding_resources')
-    .select('*')
-    .eq('role', 'program_holder')
-    .order('order_index');
+  // Resolve onboarding step completion for this user
+  const [profileRes, acksRes, docsRes] = await Promise.all([
+    db
+      .from('profiles')
+      .select('program_holder_id')
+      .eq('id', user.id)
+      .single(),
+    db
+      .from('program_holder_acknowledgements')
+      .select('document_type')
+      .eq('user_id', user.id),
+    db
+      .from('program_holder_documents')
+      .select('id')
+      .eq('user_id', user.id)
+      .limit(1),
+  ]);
+
+  const holderId = profileRes.data?.program_holder_id ?? null;
+  let mouSigned = false;
+  if (holderId) {
+    const { data: holder } = await db
+      .from('program_holders')
+      .select('mou_signed')
+      .eq('id', holderId)
+      .single();
+    mouSigned = holder?.mou_signed ?? false;
+  }
+
+  const acks = acksRes.data ?? [];
+  const handbookDone = acks.some((a: any) => a.document_type === 'handbook');
+  const rightsDone = acks.some((a: any) => a.document_type === 'rights');
+  const docsDone = (docsRes.data ?? []).length > 0;
+
+  const steps = [
+    {
+      label: 'Sign the Memorandum of Understanding',
+      detail: 'Legal agreement between you and Elevate for Humanity.',
+      href: '/program-holder/mou',
+      done: mouSigned,
+    },
+    {
+      label: 'Acknowledge the Program Holder Handbook',
+      detail: 'Policies, rules, and platform requirements.',
+      href: '/program-holder/handbook',
+      done: handbookDone,
+    },
+    {
+      label: 'Acknowledge Rights & Responsibilities',
+      detail: 'What you are entitled to and what is required of you.',
+      href: '/program-holder/rights-responsibilities',
+      done: rightsDone,
+    },
+    {
+      label: 'Upload Required Documents',
+      detail: 'Business license, insurance, and any program-specific docs.',
+      href: '/program-holder/documents?required=true',
+      done: docsDone,
+    },
+  ];
+
+  const allDone = steps.every((s) => s.done);
+  const nextStep = steps.find((s) => !s.done);
+
   return (
     <div className="min-h-screen bg-white">
       <Breadcrumbs
@@ -61,27 +122,78 @@ export default async function ProgramHolderOnboarding() {
       {/* Title Section */}
       <section className="py-12 sm:py-16 border-b">
         <div className="max-w-7xl mx-auto px-6">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-black mb-4">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-slate-900 mb-4">
             Program Holder Onboarding
           </h1>
-          <p className="text-base md:text-lg sm:text-xl text-black mb-6">
-            Welcome! This guide will help you understand your role, navigate the
-            platform, and manage your students effectively.
+          <p className="text-base md:text-lg sm:text-xl text-slate-700 mb-6">
+            Complete the steps below to activate your portal. Once all steps are done you&apos;ll receive a welcome email and full dashboard access.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link
-              href="/program-holder/dashboard"
-              className="bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-800 text-lg transition-all"
-            >
-              Go to Dashboard
-            </Link>
-            <Link
-              href="/program-holder/onboarding"
-              className="bg-white text-black px-8 py-4 rounded-lg font-semibold hover:bg-white border-2 border-slate-300 text-lg transition-all"
-            >
-              Apply as Program Holder
-            </Link>
+            {allDone ? (
+              <Link
+                href="/program-holder/dashboard"
+                className="bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-800 text-lg transition-all"
+              >
+                Go to Dashboard
+              </Link>
+            ) : nextStep ? (
+              <Link
+                href={nextStep.href}
+                className="inline-flex items-center gap-2 bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-800 text-lg transition-all"
+              >
+                Continue: {nextStep.label}
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            ) : null}
           </div>
+        </div>
+      </section>
+
+      {/* Onboarding Checklist */}
+      <section className="py-10 border-b bg-slate-50">
+        <div className="max-w-3xl mx-auto px-6">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-600 mb-4">
+            Required Steps
+          </p>
+          {allDone && (
+            <div className="mb-6 flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl px-5 py-4">
+              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+              <p className="text-sm font-semibold text-green-800">
+                All steps complete — your portal is fully activated.
+              </p>
+            </div>
+          )}
+          <ol className="space-y-3">
+            {steps.map((step, i) => (
+              <li key={step.href}>
+                <Link
+                  href={step.done ? '#' : step.href}
+                  className={`flex items-start gap-4 rounded-xl border p-5 transition-colors ${
+                    step.done
+                      ? 'bg-white border-green-200 cursor-default'
+                      : 'bg-white border-slate-200 hover:border-brand-blue-400 hover:shadow-sm'
+                  }`}
+                >
+                  <div className="flex-shrink-0 mt-0.5">
+                    {step.done ? (
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                    ) : (
+                      <Circle className="w-5 h-5 text-slate-300" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-semibold ${step.done ? 'text-slate-400 line-through' : 'text-slate-900'}`}>
+                      {i + 1}. {step.label}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-0.5">{step.detail}</p>
+                  </div>
+                  {!step.done && (
+                    <ArrowRight className="w-4 h-4 text-slate-400 flex-shrink-0 mt-1" />
+                  )}
+                </Link>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 

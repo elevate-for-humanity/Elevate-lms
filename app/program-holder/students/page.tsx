@@ -16,7 +16,7 @@ export default async function ProgramHolderStudentsPage() {
 
   // Get programs this holder can access
   const { data: myPrograms } = programIds.length > 0
-    ? await supabase
+    ? await db
         .from('programs')
         .select('id, name, title')
         .in('id', programIds)
@@ -39,7 +39,7 @@ export default async function ProgramHolderStudentsPage() {
   }> = [];
 
   if (programIds.length > 0) {
-    const { data: enrollments } = await supabase
+    const { data: enrollments } = await db
       .from('student_enrollments')
       .select('id, student_id, program_id, progress, status, created_at, profiles!student_enrollments_student_id_fkey(full_name, email)')
       .in('program_id', programIds)

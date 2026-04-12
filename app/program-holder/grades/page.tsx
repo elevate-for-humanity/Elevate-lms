@@ -19,7 +19,7 @@ export default async function GradesPage() {
 
   // Fetch student enrollments scoped to owned programs
   const { data: items, count } = programIds.length > 0
-    ? await supabase
+    ? await db
         .from('student_enrollments')
         .select('id, student_id, program_id, progress, status, grade, created_at, profiles!student_enrollments_student_id_fkey(full_name, email)', { count: 'exact' })
         .in('program_id', programIds)
@@ -28,8 +28,8 @@ export default async function GradesPage() {
     : { data: [], count: 0 };
 
   const programNames: Record<string, string> = {};
-  if (ownedPrograms) {
-    const { data: progDetails } = await supabase
+  if (programIds.length > 0) {
+    const { data: progDetails } = await db
       .from('programs')
       .select('id, name, title')
       .in('id', programIds);

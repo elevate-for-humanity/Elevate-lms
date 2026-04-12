@@ -41,7 +41,7 @@ export default async function AtRiskStudentsPage() {
     .single();
 
   if (!programHolder) {
-    redirect('/program-holder/apply');
+    redirect('/apply/program-holder');
   }
 
   // Fetch all active students

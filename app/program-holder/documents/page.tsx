@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, Upload, Clock, XCircle } from 'lucide-react';
@@ -40,11 +41,28 @@ export default async function ProgramHolderDocumentsPage({
 
   if (!profile || !['program_holder','admin','super_admin','staff'].includes(profile.role)) redirect('/login');
 
-  const { data: documents } = await supabase
+  const db = await getAdminClient();
+
+  const { data: rawDocuments } = await db
     .from('documents')
-    .select('*')
+    .select('id, file_name, file_path, file_url, document_type, status, rejection_reason, created_at')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
+
+  // Generate short-lived signed URLs for all docs that have a file_path.
+  // file_url is null for docs uploaded via /api/documents/upload (private bucket).
+  const documents = await Promise.all(
+    (rawDocuments || []).map(async (doc) => {
+      if (doc.file_path) {
+        const { data } = await db.storage
+          .from('documents')
+          .createSignedUrl(doc.file_path, 300); // 5-minute URL
+        return { ...doc, signedUrl: data?.signedUrl ?? null };
+      }
+      // Legacy rows that stored a public URL directly
+      return { ...doc, signedUrl: doc.file_url ?? null };
+    })
+  );
 
   const { data: requirements } = await supabase
     .from('document_requirements')
@@ -198,14 +216,18 @@ export default async function ProgramHolderDocumentsPage({
                     >
                       {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
                     </span>
-                    <a
-                      href={doc.file_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-brand-blue-600 hover:underline text-sm font-semibold"
-                    >
-                      View
-                    </a>
+                    {doc.signedUrl ? (
+                      <a
+                        href={doc.signedUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-brand-blue-600 hover:underline text-sm font-semibold"
+                      >
+                        View
+                      </a>
+                    ) : (
+                      <span className="text-slate-400 text-sm">Unavailable</span>
+                    )}
                   </div>
                 </div>
               ))}

@@ -1,5 +1,3 @@
-import { requireAdmin } from '@/lib/auth';
-
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { withAuth } from '@/lib/with-auth';
@@ -21,22 +19,19 @@ const _GET = withAuth(
         `
         id,
         name,
-        owner_user_id,
+        organization_name,
+        contact_name,
+        contact_email,
+        contact_phone,
         status,
         payout_share,
+        mou_signed,
         mou_status,
-        mou_signed_at,
         mou_holder_signed_at,
         mou_final_pdf_url,
+        approved_at,
         created_at,
-        owner:owner_user_id(email),
-        application:program_holder_applications(
-          contact_name,
-          contact_email,
-          phone,
-          training_focus,
-          funding_sources
-        )
+        user_id
       `
       )
       .order('created_at', { ascending: false });
@@ -45,20 +40,19 @@ const _GET = withAuth(
 
     const mapped = (holders || []).map((h: Record<string, any>) => ({
       id: h.id,
-      name: h.name,
-      owner_email: h.owner?.email || 'Unknown',
+      name: h.organization_name || h.name || 'Unnamed',
       status: h.status,
       payout_share: h.payout_share,
+      mou_signed: h.mou_signed,
       mou_status: h.mou_status,
-      mou_signed_at: h.mou_signed_at,
       mou_holder_signed_at: h.mou_holder_signed_at,
       mou_final_pdf_url: h.mou_final_pdf_url,
+      approved_at: h.approved_at,
       created_at: h.created_at,
-      contact_name: h.application?.[0]?.contact_name || null,
-      contact_email: h.application?.[0]?.contact_email || null,
-      phone: h.application?.[0]?.phone || null,
-      training_focus: h.application?.[0]?.training_focus || null,
-      funding_sources: h.application?.[0]?.funding_sources || null,
+      contact_name: h.contact_name || null,
+      contact_email: h.contact_email || null,
+      contact_phone: h.contact_phone || null,
+      user_id: h.user_id,
     }));
 
     return Response.json(mapped);

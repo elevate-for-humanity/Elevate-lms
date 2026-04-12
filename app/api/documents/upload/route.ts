@@ -163,8 +163,32 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     },
   });
 
-  // Document processing moved to Netlify function
-  // Call /.netlify/functions/ocr-extract for OCR if needed
+  // Run OCR for image uploads — non-fatal, result stored in documents.ocr_text
+  if (file.type.startsWith('image/')) {
+    try {
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.URL || '';
+      const ocrForm = new FormData();
+      ocrForm.append('file', file);
+      ocrForm.append('documentType', documentType);
+      ocrForm.append('programContext', 'learner');
+
+      const ocrRes = await fetch(`${siteUrl}/api/ocr/extract`, {
+        method: 'POST',
+        body: ocrForm,
+      });
+
+      if (ocrRes.ok) {
+        const ocrData = await ocrRes.json();
+        await db
+          .from('documents')
+          .update({ ocr_text: ocrData.rawText || null })
+          .eq('id', document.id)
+          .catch(() => {}); // column may not exist — non-fatal
+      }
+    } catch {
+      // Non-fatal — document goes to manual review
+    }
+  }
 
   // Check if this upload completes employer onboarding
   try {

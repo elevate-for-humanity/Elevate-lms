@@ -27,12 +27,12 @@ const { id } = await params;
 
   // Check if user is admin
   const { data: profile } = await supabase
-    .from('user_profiles')
+    .from('profiles')
     .select('role')
-    .eq('user_id', user.id)
+    .eq('id', user.id)
     .single();
 
-  if (!profile || profile.role !== 'admin') {
+  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
     return new Response('Forbidden', { status: 403 });
   }
 
@@ -43,15 +43,21 @@ const { id } = await params;
       `
       id,
       name,
+      organization_name,
+      contact_name,
+      contact_email,
+      contact_phone,
+      status,
       payout_share,
+      mou_signed,
       mou_status,
       mou_holder_name,
       mou_holder_signed_at,
       mou_holder_sig_url,
-      mou_admin_name,
-      mou_admin_signed_at,
-      mou_admin_sig_url,
-      mou_final_pdf_url
+      mou_final_pdf_url,
+      approved_at,
+      created_at,
+      user_id
     `
     )
     .eq('id', id)

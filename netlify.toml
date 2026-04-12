@@ -22,7 +22,6 @@
 [build.environment]
   NODE_VERSION = "20"
   NODE_OPTIONS = "--max-old-space-size=8192"
-  NEXT_WORKER_POOL_MAX_WORKERS = "2"
   NETLIFY_USE_PNPM = "true"
   NEXT_DISABLE_TURBOPACK = "1"
   # Disable secret scanning - NEXT_PUBLIC_* vars are intentionally public

@@ -31,13 +31,18 @@ async function updateProfile(formData: FormData) {
 
   if (error) {
     logger.error('Profile update failed:', error.message);
-    throw new Error('Failed to save profile');
+    redirect('/profile/edit?error=save-failed');
   }
 
   redirect('/onboarding/learner');
 }
 
-export default async function EditProfilePage() {
+export default async function EditProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error: errorParam } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
@@ -50,6 +55,11 @@ export default async function EditProfilePage() {
         <Breadcrumbs items={[{ label: 'Onboarding', href: '/onboarding/learner' }, { label: 'Edit Profile' }]} />
         <Link href="/onboarding/learner" className="text-sm text-brand-blue-600 flex items-center gap-1 mt-4 mb-4"><ArrowLeft className="w-4 h-4" /> Back to Onboarding</Link>
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Complete Your Profile</h1>
+        {errorParam === 'save-failed' && (
+          <div className="mb-4 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm">
+            Failed to save your profile. Please try again or call (317) 314-3757 for help.
+          </div>
+        )}
         <form action={updateProfile} className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>

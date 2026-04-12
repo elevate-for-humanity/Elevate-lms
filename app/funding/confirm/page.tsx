@@ -29,13 +29,18 @@ async function confirmFunding(formData: FormData) {
 
   if (error) {
     logger.error('Funding confirm failed:', error.message);
-    throw new Error('Failed to confirm funding');
+    redirect('/funding/confirm?error=save-failed');
   }
 
   redirect('/onboarding/learner');
 }
 
-export default async function ConfirmFundingPage() {
+export default async function ConfirmFundingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error: errorParam } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
@@ -53,8 +58,12 @@ export default async function ConfirmFundingPage() {
         <Breadcrumbs items={[{ label: 'Onboarding', href: '/onboarding/learner' }, { label: 'Confirm Funding' }]} />
         <Link href="/onboarding/learner" className="text-sm text-brand-blue-600 flex items-center gap-1 mt-4 mb-4"><ArrowLeft className="w-4 h-4" /> Back to Onboarding</Link>
         <h1 className="text-2xl font-bold text-slate-900 mb-2">Confirm Your Funding</h1>
-        <p className="text-sm text-black mb-6">Select your funding source. Most students qualify for $0 out-of-pocket through workforce funding.</p>
-
+        <p className="text-sm text-slate-600 mb-6">Select your funding source. Most students qualify for $0 out-of-pocket through workforce funding.</p>
+        {errorParam === 'save-failed' && (
+          <div className="mb-4 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm">
+            Failed to save your funding selection. Please try again or call (317) 314-3757 for help.
+          </div>
+        )}
         <form action={confirmFunding} className="space-y-4">
           {fundingOptions.map((f, i) => (
             <label key={i} className="block bg-white rounded-xl border border-slate-200 p-5 cursor-pointer hover:border-brand-blue-300 transition-colors">

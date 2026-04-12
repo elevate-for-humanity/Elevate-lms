@@ -128,7 +128,7 @@ async function createStudentAccount(
         }, { onConflict: 'id' });
       } else if (createError) {
         // User exists in auth but not profiles — look up directly by email
-        const { data: authLookup } = await supabase.rpc('get_user_id_by_email', { lookup_email: normalizedEmail }).maybeSingle();
+        const { data: authLookup } = await supabase.rpc('get_user_id_by_email', { user_email: normalizedEmail }).maybeSingle();
         if (authLookup?.id) {
           userId = authLookup.id;
         } else {

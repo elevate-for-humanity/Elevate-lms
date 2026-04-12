@@ -38,7 +38,7 @@ export default async function AssignmentsPage() {
     if (courseIds.length > 0) {
       const { data: assignmentData } = await supabase
         .from('assignments')
-        .select('*, courses (id, title)')
+        .select('id, title, description, due_date, course_id, max_points, submission_type')
         .in('course_id', courseIds)
         .order('due_date', { ascending: true });
 

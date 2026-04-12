@@ -27,7 +27,7 @@ export default async function ScormPage({ params }: Props) {
 
   const { data: scorm, error } = await supabase
     .from('scorm_packages')
-    .select('*, courses (id, title)')
+    .select('id, title, description, course_id, launch_url, version, created_at')
     .eq('id', scormId)
     .single();
   if (error || !scorm) notFound();

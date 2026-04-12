@@ -31,10 +31,7 @@ const getCachedUserData = unstable_cache(
         .single(),
       supabase
         .from('program_enrollments')
-        .select(`
-          id, status, progress, created_at,
-          courses (id, title, description, thumbnail_url)
-        `)
+        .select('id, status, progress_percent, course_id, created_at')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(10),
@@ -50,18 +47,34 @@ const getCachedUserData = unstable_cache(
         .eq('status', 'completed'),
       supabase
         .from('student_progress')
-        .select(`id, updated_at, courses (title)`)
+        .select('id, course_id, updated_at')
         .eq('student_id', userId)
         .order('updated_at', { ascending: false })
         .limit(5),
     ]);
 
+    // Hydrate course details for enrollments
+    const lpCourseIds = [...new Set((enrollmentsResult.data || []).map((e: any) => e.course_id).filter(Boolean))];
+    const { data: lpCourses } = lpCourseIds.length
+      ? await supabase.from('courses').select('id, title, description, thumbnail_url').in('id', lpCourseIds)
+      : { data: [] };
+    const lpCourseMap = Object.fromEntries((lpCourses || []).map((c: any) => [c.id, c]));
+    const hydratedEnrollments = (enrollmentsResult.data || []).map((e: any) => ({ ...e, courses: lpCourseMap[e.course_id] ?? null }));
+
+    // Hydrate course titles for recent progress
+    const lpProgCourseIds = [...new Set((progressResult.data || []).map((p: any) => p.course_id).filter(Boolean))];
+    const { data: lpProgCourses } = lpProgCourseIds.length
+      ? await supabase.from('courses').select('id, title').in('id', lpProgCourseIds)
+      : { data: [] };
+    const lpProgCourseMap = Object.fromEntries((lpProgCourses || []).map((c: any) => [c.id, c]));
+    const hydratedProgress = (progressResult.data || []).map((p: any) => ({ ...p, courses: lpProgCourseMap[p.course_id] ?? null }));
+
     return {
       profile: profileResult.data,
-      enrollments: enrollmentsResult.data,
+      enrollments: hydratedEnrollments,
       activeCourses: activeResult.count,
       completedCourses: completedResult.count,
-      recentProgress: progressResult.data,
+      recentProgress: hydratedProgress,
     };
   },
   ['learning-paths-user-data'],

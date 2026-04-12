@@ -26,21 +26,18 @@ export default async function SchedulePage() {
     redirect('/login?redirect=/lms/schedule');
   }
 
-  // Get user's enrollments for schedule
-  const { data: enrollments } = await supabase
+  // Get user's active enrollments then hydrate course details separately
+  const { data: rawSchedEnrollments } = await supabase
     .from('program_enrollments')
-    .select(
-      `
-      *,
-      courses (
-        id,
-        title,
-        description
-      )
-    `
-    )
+    .select('id, status, course_id, progress_percent')
     .eq('user_id', user.id)
     .eq('status', 'active');
+  const schedCourseIds = [...new Set((rawSchedEnrollments || []).map((e: any) => e.course_id).filter(Boolean))];
+  const { data: schedCourses } = schedCourseIds.length
+    ? await supabase.from('courses').select('id, title, description').in('id', schedCourseIds)
+    : { data: [] };
+  const schedCourseMap = Object.fromEntries((schedCourses || []).map((c: any) => [c.id, c]));
+  const enrollments = (rawSchedEnrollments || []).map((e: any) => ({ ...e, courses: schedCourseMap[e.course_id] ?? null }));
 
   return (
     <div className="min-h-screen bg-white py-8">

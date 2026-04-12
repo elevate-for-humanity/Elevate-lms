@@ -50,28 +50,25 @@ export default async function ProgressPage() {
   };
 
   try {
-    // Get enrollments with course details
+    // Get enrollments
     const { data: enrollmentData } = await supabase
       .from('program_enrollments')
-      .select(`
-        *,
-        courses (
-          id,
-          title,
-          description,
-          thumbnail_url,
-          total_lessons,
-          duration_hours
-        )
-      `)
+      .select('id, status, progress_percent, course_id, program_id, updated_at, completed_lessons, enrolled_at')
       .eq('user_id', user.id)
       .order('updated_at', { ascending: false });
 
     if (enrollmentData) {
-      enrollments = enrollmentData;
+      // Hydrate course details separately (no FK on program_enrollments.course_id)
+      const courseIds = [...new Set(enrollmentData.map(e => e.course_id).filter(Boolean))];
+      const { data: coursesData } = courseIds.length
+        ? await supabase.from('courses').select('id, title, description, thumbnail_url, total_lessons, duration_hours').in('id', courseIds)
+        : { data: [] };
+      const courseMap = Object.fromEntries((coursesData || []).map(c => [c.id, c]));
+
+      enrollments = enrollmentData.map(e => ({ ...e, courses: courseMap[e.course_id] ?? null }));
       stats.totalCourses = enrollments.length;
       stats.completedCourses = enrollments.filter(e => e.status === 'completed').length;
-      
+
       enrollments.forEach(e => {
         stats.totalLessons += e.courses?.total_lessons || 0;
         stats.completedLessons += e.completed_lessons || 0;
@@ -79,20 +76,27 @@ export default async function ProgressPage() {
       });
     }
 
-    // Get recent progress activity
+    // Get recent progress activity (student_progress has no FK to courses/lessons)
     const { data: progressData } = await supabase
       .from('student_progress')
-      .select(`
-        *,
-        courses (title),
-        lessons (title)
-      `)
+      .select('id, course_id, lesson_id, progress_percentage, completed, last_accessed_at, updated_at')
       .eq('student_id', user.id)
       .order('updated_at', { ascending: false })
       .limit(10);
 
     if (progressData) {
-      recentActivity = progressData;
+      // Hydrate course titles
+      const pCourseIds = [...new Set(progressData.map(p => p.course_id).filter(Boolean))];
+      const { data: pCourses } = pCourseIds.length
+        ? await supabase.from('courses').select('id, title').in('id', pCourseIds)
+        : { data: [] };
+      const pCourseMap = Object.fromEntries((pCourses || []).map(c => [c.id, c]));
+
+      recentActivity = progressData.map(p => ({
+        ...p,
+        courses: pCourseMap[p.course_id] ?? null,
+        lessons: null, // lesson title lookup omitted — lesson_id references curriculum_lessons
+      }));
     }
 
     // Calculate streak (days of consecutive activity)

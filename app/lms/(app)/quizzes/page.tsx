@@ -38,7 +38,7 @@ export default async function QuizzesPage() {
     if (courseIds.length > 0) {
       const { data: quizData } = await supabase
         .from('quizzes')
-        .select('*, courses (id, title)')
+        .select('id, title, description, course_id, time_limit, passing_score, is_published, created_at')
         .in('course_id', courseIds)
         .eq('is_published', true)
         .order('created_at', { ascending: false });

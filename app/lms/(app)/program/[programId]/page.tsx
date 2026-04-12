@@ -109,12 +109,16 @@ export default async function ProgramDashboardPage({ params }: { params: Params 
   const completedLessons = (allLessons || []).filter((l: any) => progressMap.get(l.id)).length;
   const overallPercent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
-  // Get certificates for this program
-  const { data: certificates } = await supabase
+  // Get certificates for this program — issued_at added by migration, falls back to issued_date
+  const { data: rawCerts } = await supabase
     .from('certificates')
-    .select('id, title, issued_at')
+    .select('id, title, issued_at, issued_date')
     .eq('user_id', user.id)
     .eq('program_id', program.id);
+  const certificates = (rawCerts || []).map((c: any) => ({
+    ...c,
+    issued_at: c.issued_at ?? c.issued_date ?? null,
+  }));
 
   // Evaluate completion rules
   const firstCourseId = courseStats[0]?.id;

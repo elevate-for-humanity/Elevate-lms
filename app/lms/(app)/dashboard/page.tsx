@@ -35,18 +35,18 @@ export default async function StudentDashboard() {
   ] = await Promise.all([
     supabase
       .from('program_enrollments')
-      .select('id, status, enrolled_at, progress_percent, program_id, programs(id, title, slug, code)')
+      .select('id, status, enrolled_at, progress_percent, program_id')
       .eq('user_id', user.id)
       .order('enrolled_at', { ascending: false }),
     supabase
       .from('program_enrollments')
-      .select('id, status, enrolled_at, progress_percent, course_id, courses(id, title, description)')
+      .select('id, status, enrolled_at, progress_percent, course_id')
       .eq('user_id', user.id)
       .not('course_id', 'is', null)
       .order('enrolled_at', { ascending: false }),
     supabase
       .from('certificates')
-      .select('id, title, certificate_type, issued_at')
+      .select('id, title, certificate_type, issued_at, issued_date')
       .eq('user_id', user.id),
     supabase
       .from('applications')
@@ -65,9 +65,29 @@ export default async function StudentDashboard() {
       .limit(5),
   ]);
 
-  const programEnrollments = programEnrollmentsRes.data ?? [];
-  const courseEnrollments = courseEnrollmentsRes.data ?? [];
-  const certifications = certificationsRes.data ?? [];
+  // Hydrate programs for program enrollments (no FK on program_id)
+  const rawProgramEnrollments = programEnrollmentsRes.data ?? [];
+  const dashProgramIds = [...new Set(rawProgramEnrollments.map((e: any) => e.program_id).filter(Boolean))];
+  const { data: dashPrograms } = dashProgramIds.length
+    ? await supabase.from('programs').select('id, title, slug').in('id', dashProgramIds)
+    : { data: [] };
+  const dashProgramMap = Object.fromEntries((dashPrograms || []).map((p: any) => [p.id, p]));
+  const programEnrollments = rawProgramEnrollments.map((e: any) => ({ ...e, programs: dashProgramMap[e.program_id] ?? null }));
+
+  // Hydrate courses for course enrollments (no FK on course_id)
+  const rawCourseEnrollments = courseEnrollmentsRes.data ?? [];
+  const dashCourseIds = [...new Set(rawCourseEnrollments.map((e: any) => e.course_id).filter(Boolean))];
+  const { data: dashCourses } = dashCourseIds.length
+    ? await supabase.from('courses').select('id, title, description').in('id', dashCourseIds)
+    : { data: [] };
+  const dashCourseMap = Object.fromEntries((dashCourses || []).map((c: any) => [c.id, c]));
+  const courseEnrollments = rawCourseEnrollments.map((e: any) => ({ ...e, courses: dashCourseMap[e.course_id] ?? null }));
+
+  // Normalize issued_at — column added by migration, falls back to issued_date
+  const certifications = (certificationsRes.data ?? []).map((c: any) => ({
+    ...c,
+    issued_at: c.issued_at ?? c.issued_date ?? null,
+  }));
   const workoneApp = workoneAppRes.data;
   const isPendingWorkone = !!workoneApp;
   const recentQuizAttempts = quizAttemptsRes.data ?? [];

@@ -37,23 +37,14 @@ export default async function QuizResultsPage({ params }: Props) {
     redirect('/login?redirect=/lms/quizzes/' + quizId + '/results/' + attemptId);
   }
 
-  // Fetch attempt with quiz details
+  // Fetch attempt with quiz details (quizzes has no FK to courses — hydrate separately)
   const { data: attempt, error: attemptError } = await supabase
     .from('quiz_attempts')
     .select(`
       *,
       quizzes (
-        id,
-        title,
-        description,
-        passing_score,
-        show_correct_answers,
-        max_attempts,
-        course_id,
-        courses (
-          id,
-          title
-        )
+        id, title, description,
+        passing_score, show_correct_answers, max_attempts, course_id
       )
     `)
     .eq('id', attemptId)
@@ -62,6 +53,15 @@ export default async function QuizResultsPage({ params }: Props) {
 
   if (attemptError || !attempt) {
     notFound();
+  }
+
+  // Hydrate course title for the quiz
+  const quizCourseId = (attempt as any).quizzes?.course_id;
+  const { data: resultCourse } = quizCourseId
+    ? await supabase.from('courses').select('id, title').eq('id', quizCourseId).maybeSingle()
+    : { data: null };
+  if ((attempt as any).quizzes && resultCourse) {
+    (attempt as any).quizzes.courses = resultCourse;
   }
 
   // Fetch attempt answers with question details

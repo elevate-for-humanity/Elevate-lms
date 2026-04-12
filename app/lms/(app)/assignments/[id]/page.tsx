@@ -47,14 +47,17 @@ export default async function AssignmentDetailPage({ params }: Props) {
   // Fetch assignment
   const { data: assignment, error } = await supabase
     .from('assignments')
-    .select(`
-      *,
-      courses (id, title)
-    `)
+    .select('id, title, description, due_date, course_id, max_points, submission_type, instructions')
     .eq('id', id)
     .single();
 
   if (error || !assignment) notFound();
+
+  // Hydrate course title separately (no FK on assignments.course_id)
+  const { data: assignmentCourse } = assignment.course_id
+    ? await supabase.from('courses').select('id, title').eq('id', assignment.course_id).maybeSingle()
+    : { data: null };
+  const assignmentWithCourse = { ...assignment, courses: assignmentCourse };
 
   // Fetch user's submission
   const { data: submission } = await supabase

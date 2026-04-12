@@ -76,13 +76,16 @@ export default async function CertificationPage({ params }: Props) {
     .limit(1)
     .maybeSingle();
 
-  // Existing certificate
-  const { data: certificate } = await supabase
+  // Existing certificate — issued_at added by migration, falls back to issued_date
+  const { data: rawCertificate } = await supabase
     .from('certificates')
-    .select('id, issued_at, certificate_url')
+    .select('id, issued_at, issued_date, certificate_url')
     .eq('user_id', user.id)
     .eq('course_id', courseId)
     .maybeSingle();
+  const certificate = rawCertificate
+    ? { ...rawCertificate, issued_at: rawCertificate.issued_at ?? rawCertificate.issued_date ?? null }
+    : null;
 
   return (
     <div className="min-h-screen bg-white">

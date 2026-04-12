@@ -40,20 +40,18 @@ export default async function LibraryPage() {
     redirect('/login');
   }
 
-  // Fetch user's enrolled courses
-  const { data: enrollments } = await supabase
+  // Fetch enrollments then hydrate course details separately (no FK on course_id)
+  const { data: rawLibEnrollments } = await supabase
     .from('program_enrollments')
-    .select(`
-      *,
-      courses (
-        id,
-        title,
-        description,
-        thumbnail_url
-      )
-    `)
+    .select('id, status, course_id, progress_percent, created_at')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
+  const libCourseIds = [...new Set((rawLibEnrollments || []).map((e: any) => e.course_id).filter(Boolean))];
+  const { data: libCourses } = libCourseIds.length
+    ? await supabase.from('courses').select('id, title, description, thumbnail_url').in('id', libCourseIds)
+    : { data: [] };
+  const libCourseMap = Object.fromEntries((libCourses || []).map((c: any) => [c.id, c]));
+  const enrollments = (rawLibEnrollments || []).map((e: any) => ({ ...e, courses: libCourseMap[e.course_id] ?? null }));
 
   // Fetch library resources
   const { data: resources } = await supabase
@@ -67,7 +65,7 @@ export default async function LibraryPage() {
   const courseIds = enrollments?.map(e => e.course_id) || [];
   const { data: courseMaterials } = await supabase
     .from('course_materials')
-    .select('*, courses (title)')
+    .select('id, title, description, file_url, url, course_id, created_at')
     .in('course_id', courseIds.length > 0 ? courseIds : ['00000000-0000-0000-0000-000000000000'])
     .order('created_at', { ascending: false });
 

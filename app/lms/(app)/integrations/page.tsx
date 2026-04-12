@@ -38,22 +38,18 @@ export default async function IntegrationsPage() {
     .eq('id', user.id)
     .single();
 
-  // Fetch student's courses
-  const { data: enrollments } = await supabase
+  // Fetch enrollments then hydrate course details separately (no FK on course_id)
+  const { data: rawIntEnrollments } = await supabase
     .from('program_enrollments')
-    .select(
-      `
-      *,
-      courses (
-        id,
-        title,
-        description,
-        thumbnail_url
-      )
-    `
-    )
+    .select('id, status, course_id, progress_percent, created_at')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
+  const intCourseIds = [...new Set((rawIntEnrollments || []).map((e: any) => e.course_id).filter(Boolean))];
+  const { data: intCourses } = intCourseIds.length
+    ? await supabase.from('courses').select('id, title, description, thumbnail_url').in('id', intCourseIds)
+    : { data: [] };
+  const intCourseMap = Object.fromEntries((intCourses || []).map((c: any) => [c.id, c]));
+  const enrollments = (rawIntEnrollments || []).map((e: any) => ({ ...e, courses: intCourseMap[e.course_id] ?? null }));
 
   const { count: activeCourses } = await supabase
     .from('program_enrollments')
@@ -67,17 +63,18 @@ export default async function IntegrationsPage() {
     .eq('user_id', user.id)
     .eq('status', 'completed');
 
-  const { data: recentProgress } = await supabase
+  const { data: rawRecentProgress } = await supabase
     .from('student_progress')
-    .select(
-      `
-      *,
-      courses (title)
-    `
-    )
+    .select('id, course_id, lesson_id, progress_percentage, completed, updated_at')
     .eq('student_id', user.id)
     .order('updated_at', { ascending: false })
     .limit(5);
+  const progCourseIds = [...new Set((rawRecentProgress || []).map((p: any) => p.course_id).filter(Boolean))];
+  const { data: progCourses } = progCourseIds.length
+    ? await supabase.from('courses').select('id, title').in('id', progCourseIds)
+    : { data: [] };
+  const progCourseMap = Object.fromEntries((progCourses || []).map((c: any) => [c.id, c]));
+  const recentProgress = (rawRecentProgress || []).map((p: any) => ({ ...p, courses: progCourseMap[p.course_id] ?? null }));
 
   return (
     <div className="min-h-screen bg-white">

@@ -54,14 +54,21 @@ export default async function CalendarPage() {
   let enrolledCourses: any[] = [];
 
   try {
-    const { data: enrollments } = await supabase
+    const { data: calEnrollments } = await supabase
       .from('program_enrollments')
-      .select('*, courses (id, title, description, start_date, end_date)')
+      .select('id, course_id')
       .eq('user_id', user.id)
       .eq('status', 'active');
 
-    if (enrollments) {
-      enrolledCourses = enrollments.map(e => e.courses).filter(Boolean);
+    if (calEnrollments) {
+      const calCourseIds = calEnrollments.map((e: any) => e.course_id).filter(Boolean);
+      if (calCourseIds.length) {
+        const { data: calCourses } = await supabase
+          .from('courses')
+          .select('id, title, description')
+          .in('id', calCourseIds);
+        enrolledCourses = calCourses || [];
+      }
     }
 
     const { data: calendarEvents } = await supabase
@@ -78,8 +85,8 @@ export default async function CalendarPage() {
 
     const { data: assignments } = await supabase
       .from('assignments')
-      .select('*, courses (title)')
-      .in('course_id', enrolledCourses.map(c => c.id))
+      .select('id, title, description, due_date, course_id, max_points')
+      .in('course_id', enrolledCourses.map((c: any) => c.id).filter(Boolean).concat(['00000000-0000-0000-0000-000000000000']))
       .gte('due_date', now.toISOString())
       .order('due_date')
       .limit(5);

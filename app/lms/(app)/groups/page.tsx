@@ -31,24 +31,25 @@ export default async function GroupsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/lms/groups');
 
-  // Fetch user's group memberships
+  // Fetch user's group memberships (study_groups has no FK to courses)
   const { data: memberships } = await supabase
     .from('study_group_members')
     .select(`
       *,
       study_groups (
-        id,
-        name,
-        description,
-        course_id,
-        max_members,
-        meeting_schedule,
-        is_virtual,
-        is_active,
-        courses (title)
+        id, name, description, course_id,
+        max_members, meeting_schedule, is_virtual, is_active
       )
     `)
     .eq('user_id', user.id);
+
+  // Hydrate course titles for groups
+  const groupCourseIds = [...new Set((memberships || [])
+    .map((m: any) => m.study_groups?.course_id).filter(Boolean))];
+  const { data: groupCourses } = groupCourseIds.length
+    ? await supabase.from('courses').select('id, title').in('id', groupCourseIds)
+    : { data: [] };
+  const groupCourseMap = Object.fromEntries((groupCourses || []).map((c: any) => [c.id, c]));
 
   // Fetch member counts for each group
   const groups = await Promise.all(

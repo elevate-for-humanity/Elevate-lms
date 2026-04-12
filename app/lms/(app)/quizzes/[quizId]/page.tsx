@@ -27,10 +27,16 @@ export default async function QuizPage({ params }: Props) {
 
   const { data: quiz, error: quizError } = await supabase
     .from('quizzes')
-    .select('id, title, description, course_id, time_limit_minutes, passing_score, max_attempts, shuffle_questions, show_correct_answers, requires_proctoring, created_at, courses (id, title)')
+    .select('id, title, description, course_id, time_limit_minutes, passing_score, max_attempts, shuffle_questions, show_correct_answers, requires_proctoring, created_at')
     .eq('id', quizId)
     .single();
   if (quizError || !quiz) notFound();
+
+  // Hydrate course title separately (no FK on quizzes.course_id)
+  const { data: quizCourse } = quiz.course_id
+    ? await supabase.from('courses').select('id, title').eq('id', quiz.course_id).maybeSingle()
+    : { data: null };
+  const quizWithCourse = { ...quiz, courses: quizCourse };
 
   const { data: questions } = await supabase
     .from('quiz_questions')

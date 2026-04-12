@@ -36,12 +36,12 @@ export default async function CertificatesPage() {
     .eq('id', user.id)
     .single();
 
-  // Fetch certificates (no FK to courses table, use stored course_title/program_name)
+  // Fetch certificates — issued_at added by migration, issued_date is the legacy column
   const { data: certificates } = await supabase
     .from('certificates')
     .select('*')
     .eq('user_id', user.id)
-    .order('issued_at', { ascending: false });
+    .order('issued_date', { ascending: false });
 
   // Fetch transcripts (program completions)
   const { data: transcripts } = await supabase

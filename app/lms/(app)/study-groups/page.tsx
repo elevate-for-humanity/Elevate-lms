@@ -73,49 +73,62 @@ export default async function StudyGroupsPage() {
     redirect('/login');
   }
 
-  // Fetch user's study groups
+  // Fetch user's study group memberships with group details
   const { data: myGroupMemberships } = await supabase
     .from('study_group_members')
     .select(`
       *,
       study_groups (
-        id,
-        name,
-        description,
-        course_id,
-        max_members,
-        meeting_schedule,
-        is_virtual,
-        meeting_link,
-        created_at,
-        courses (title)
+        id, name, description, course_id,
+        max_members, meeting_schedule, is_virtual, meeting_link, created_at
       )
     `)
     .eq('user_id', user.id);
 
   const typedMemberships = (myGroupMemberships || []) as GroupMembership[];
 
+  // Hydrate course titles for my groups
+  const myGroupCourseIds = [...new Set(typedMemberships
+    .map((m: any) => m.study_groups?.course_id).filter(Boolean))];
+  const { data: myGroupCourses } = myGroupCourseIds.length
+    ? await supabase.from('courses').select('id, title').in('id', myGroupCourseIds)
+    : { data: [] };
+  const myGroupCourseMap = Object.fromEntries((myGroupCourses || []).map((c: any) => [c.id, c]));
+
   // Fetch available study groups (not joined)
-  const joinedGroupIds = typedMemberships.map(m => m.study_group_id);
-  
-  const { data: availableGroups } = await supabase
+  const joinedGroupIds = typedMemberships.map((m: any) => m.study_group_id);
+
+  const { data: rawAvailableGroups } = await supabase
     .from('study_groups')
-    .select(`
-      *,
-      courses (title),
-      study_group_members (user_id)
-    `)
+    .select('*, study_group_members (user_id)')
     .eq('is_active', true)
     .not('id', 'in', `(${joinedGroupIds.length > 0 ? joinedGroupIds.join(',') : '00000000-0000-0000-0000-000000000000'})`)
     .order('created_at', { ascending: false })
     .limit(20);
 
-  // Fetch user's enrolled courses for creating groups
-  const { data: enrollments } = await supabase
+  // Hydrate course titles for available groups
+  const availCourseIds = [...new Set((rawAvailableGroups || []).map((g: any) => g.course_id).filter(Boolean))];
+  const { data: availCourses } = availCourseIds.length
+    ? await supabase.from('courses').select('id, title').in('id', availCourseIds)
+    : { data: [] };
+  const availCourseMap = Object.fromEntries((availCourses || []).map((c: any) => [c.id, c]));
+  const availableGroups = (rawAvailableGroups || []).map((g: any) => ({
+    ...g,
+    courses: availCourseMap[g.course_id] ?? null,
+  }));
+
+  // Fetch user's active enrollments for creating groups
+  const { data: rawEnrollments } = await supabase
     .from('program_enrollments')
-    .select('courses (id, title)')
+    .select('id, course_id')
     .eq('user_id', user.id)
     .eq('status', 'active');
+  const sgCourseIds = [...new Set((rawEnrollments || []).map((e: any) => e.course_id).filter(Boolean))];
+  const { data: sgCourses } = sgCourseIds.length
+    ? await supabase.from('courses').select('id, title').in('id', sgCourseIds)
+    : { data: [] };
+  const sgCourseMap = Object.fromEntries((sgCourses || []).map((c: any) => [c.id, c]));
+  const enrollments = (rawEnrollments || []).map((e: any) => ({ ...e, courses: sgCourseMap[e.course_id] ?? null }));
 
   const typedEnrollments = (enrollments || []) as Enrollment[];
   const typedAvailableGroups = (availableGroups || []) as StudyGroup[];

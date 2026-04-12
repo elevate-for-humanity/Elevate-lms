@@ -40,9 +40,9 @@ export default async function CertificationPage() {
   const [certsRes, attemptsRes, inProgressRes, availableRes] = await Promise.all([
     supabase
       .from('certificates')
-      .select('id, title, issued_at, expires_at, certificate_url, credential_id, course:courses(id, course_name)')
+      .select('id, title, issued_at, issued_date, expires_at, certificate_url, credential_id, course_id')
       .eq('user_id', user.id)
-      .order('issued_at', { ascending: false }),
+      .order('issued_date', { ascending: false }),
 
     supabase
       .from('credential_attempts')
@@ -52,10 +52,9 @@ export default async function CertificationPage() {
 
     supabase
       .from('program_enrollments')
-      .select('id, progress, course:courses(id, title, certification_name)')
+      .select('id, progress_percent, course_id')
       .eq('user_id', user.id)
-      .lt('progress', 100)
-      .not('course.certification_name', 'is', null),
+      .lt('progress_percent', 100),
 
     supabase
       .from('training_courses')
@@ -65,7 +64,11 @@ export default async function CertificationPage() {
       .limit(6),
   ]);
 
-  const certificates = certsRes.data ?? [];
+  // Normalize issued_at from issued_date for display
+  const certificates = (certsRes.data ?? []).map((c: any) => ({
+    ...c,
+    issued_at: c.issued_at ?? c.issued_date ?? null,
+  }));
   const attempts = attemptsRes.data ?? [];
   const inProgress = inProgressRes.data ?? [];
   const availableCerts = availableRes.data ?? [];

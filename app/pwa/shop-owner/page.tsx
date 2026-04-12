@@ -339,9 +339,12 @@ export default function ShopOwnerPWAHome() {
         }
 
         if (response.status === 404) {
-          // Logged in but not a partner
+          // Logged in but not a partner yet — still attempt claim in case
+          // their shop application was approved and a shop_supervisors row
+          // exists for their email.
           setIsLoggedIn(true);
           setIsPartner(false);
+          fetch('/api/supervisor/claim-account', { method: 'POST' }).catch(() => {});
           setLoading(false);
           return;
         }
@@ -354,6 +357,11 @@ export default function ShopOwnerPWAHome() {
           setApprentices(data.apprentices || []);
           setPendingEntries(data.pendingEntries || 0);
           setTotalHoursThisWeek(data.totalHoursThisWeek || 0);
+
+          // Silently claim shop_supervisors row if one exists for this user's
+          // email but has no user_id yet (post-approval onboarding path).
+          // Idempotent — safe to call on every load.
+          fetch('/api/supervisor/claim-account', { method: 'POST' }).catch(() => {});
         } else {
           setIsLoggedIn(false);
         }

@@ -22,14 +22,14 @@ async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    const { studentId, shopId, shopName, shopAddress, supervisorName, supervisorEmail } =
+    const { studentId, shopId, shopName, shopAddress, supervisorName, supervisorEmail, programSlug } =
       await req.json();
 
     if (!studentId) {
-      return NextResponse.json(
-        { error: 'Student ID required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Student ID required' }, { status: 400 });
+    }
+    if (!programSlug) {
+      return NextResponse.json({ error: 'programSlug required — placement must be tied to a specific program' }, { status: 400 });
     }
 
     const supabase = await createClient();
@@ -54,10 +54,34 @@ async function _POST(req: Request) {
     }
 
     // =========================================================================
+    // PROGRAM CONTEXT VALIDATION
+    // Confirm the student has an active enrollment in the specified program.
+    // Placement writes are rejected if the slug does not match the student's
+    // actual enrollment — no defaults, no inference.
+    // =========================================================================
+    const { data: enrollment, error: enrollmentErr } = await supabase
+      .from('program_enrollments')
+      .select('id, program_slug, program_id')
+      .eq('user_id', studentId)
+      .eq('program_slug', programSlug)
+      .in('status', ['active', 'enrolled', 'in_progress', 'confirmed'])
+      .maybeSingle();
+
+    if (enrollmentErr) {
+      return NextResponse.json({ error: 'Failed to verify enrollment' }, { status: 500 });
+    }
+    if (!enrollment) {
+      return NextResponse.json(
+        { error: `Student has no active enrollment in program '${programSlug}'. Verify the program slug and enrollment status before assigning a placement.` },
+        { status: 422 }
+      );
+    }
+
+    // =========================================================================
     // MANDATORY VERIFICATION GATE
     // Matching is BLOCKED until required documents are VERIFIED
     // =========================================================================
-    
+
     // Get apprentice ID from student
     const { data: apprentice } = await supabase
       .from('apprentices')
@@ -96,7 +120,43 @@ async function _POST(req: Request) {
       }
     }
 
-    // Create or update shop placement record
+    // Write canonical placement to apprentice_placements (FK-based).
+    // This is the table the OJT enforcement and supervisor verification
+    // routes read from. shop_id is required for supervisor auth.
+    // program_slug comes from the validated enrollment — never inferred.
+    if (shopId) {
+      // Deactivate any existing active placement for this student+program
+      // before writing the new one. Prevents two active placements existing
+      // simultaneously for the same student/program context.
+      await supabase
+        .from('apprentice_placements')
+        .update({ status: 'inactive', end_date: new Date().toISOString().split('T')[0] })
+        .eq('student_id', studentId)
+        .eq('program_slug', programSlug)
+        .eq('status', 'active')
+        .neq('shop_id', shopId); // only deactivate if reassigning to a different shop
+
+      const { error: canonicalErr } = await supabase
+        .from('apprentice_placements')
+        .upsert(
+          {
+            student_id: studentId,
+            shop_id: shopId,
+            program_slug: programSlug,           // validated against enrollment above
+            supervisor_user_id: null,            // populated when supervisor registers
+            start_date: new Date().toISOString().split('T')[0],
+            status: 'active',
+          },
+          { onConflict: 'student_id,shop_id,program_slug' }
+        );
+
+      if (canonicalErr) {
+        return NextResponse.json({ error: 'Placement failed' }, { status: 500 });
+      }
+    }
+
+    // Also write to shop_placements (text-based legacy record) so existing
+    // admin UI reads continue to work until fully migrated.
     const { error: placementError } = await supabase
       .from('shop_placements')
       .upsert(
@@ -113,11 +173,7 @@ async function _POST(req: Request) {
       );
 
     if (placementError) {
-      // Error: $1
-      return NextResponse.json(
-        { error: 'Placement failed' },
-        { status: 500 }
-      );
+      // Non-fatal — canonical write already succeeded
     }
 
     // Mark onboarding step complete

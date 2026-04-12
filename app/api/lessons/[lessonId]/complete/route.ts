@@ -144,6 +144,16 @@ async function _POST(
       throw gateErr; // unexpected — re-throw to 500 handler
     }
 
+    // OJT gate: lab lessons cannot be completed until required shop reps are verified
+    const { canCompleteLesson } = await import('@/lib/ojt/canCompleteLesson');
+    const ojtAllowed = await canCompleteLesson(user.id, lessonId);
+    if (!ojtAllowed) {
+      return NextResponse.json(
+        { error: 'Complete required shop work before finishing this lesson', code: 'OJT_INCOMPLETE' },
+        { status: 403 },
+      );
+    }
+
     // Fetch lesson details for type-specific enforcement
     const { data: lessonDetail, error: detailError } = await db
       .from('lms_lessons')

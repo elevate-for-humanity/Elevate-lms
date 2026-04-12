@@ -67,6 +67,8 @@ export async function POST(
     .from('barbershop_partner_applications')
     .update({
       status: 'approved',
+      reviewed_by: user.id,
+      reviewed_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     })
     .eq('id', id);
@@ -74,6 +76,78 @@ export async function POST(
   if (updateError) {
     logger.error('barbershop application approval failed', undefined, { id, detail: updateError.message });
     return NextResponse.json({ error: 'Failed to approve application' }, { status: 500 });
+  }
+
+  // =========================================================================
+  // PROVISION SHOP + SUPERVISOR ROWS
+  // Creates the canonical identity records used by OJT enforcement and
+  // supervisor verification. Must happen at approval — not at application time,
+  // because user_id is not known until the supervisor claims their account.
+  //
+  // shops row: the physical training site
+  // shop_supervisors row: the licensed barber who will verify apprentice reps
+  //   user_id is null until the supervisor completes account claim via the
+  //   onboarding email link. The verify-rep route falls back to email matching
+  //   until user_id is populated.
+  // =========================================================================
+  let provisionedShopId: string | null = null;
+
+  try {
+    // Upsert shop — idempotent on re-approval
+    const { data: shopRow, error: shopErr } = await supabase
+      .from('shops')
+      .upsert(
+        {
+          name:    application.shop_legal_name,
+          address1: application.shop_address_line1 ?? application.shop_physical_address ?? null,
+          city:    application.shop_city ?? null,
+          state:   application.shop_state ?? null,
+          zip:     application.shop_zip ?? null,
+          email:   application.contact_email,
+          active:  true,
+        },
+        { onConflict: 'name,city,state' }  // prevent duplicate shops on re-approval
+      )
+      .select('id')
+      .single();
+
+    if (shopErr) {
+      logger.warn('[barber-approve] shops upsert failed (non-fatal)', { id, detail: shopErr.message });
+    } else {
+      provisionedShopId = shopRow.id;
+
+      // Upsert shop_supervisors row.
+      // user_id is null — populated when supervisor claims account via email link.
+      // name + email are the durable identity anchors until then.
+      const { error: supervisorErr } = await supabase
+        .from('shop_supervisors')
+        .upsert(
+          {
+            shop_id:        provisionedShopId,
+            user_id:        null,           // claimed post-approval via onboarding link
+            name:           application.supervisor_name ?? application.contact_name ?? application.owner_name,
+            email:          application.contact_email,
+            phone:          application.contact_phone ?? null,
+            license_number: application.supervisor_license_number ?? null,
+            license_type:   'barber',
+            is_active:      true,
+          },
+          { onConflict: 'shop_id,email' }
+        );
+
+      if (supervisorErr) {
+        logger.warn('[barber-approve] shop_supervisors upsert failed (non-fatal)', { id, detail: supervisorErr.message });
+      } else {
+        logger.info('[barber-approve] shop + supervisor provisioned', {
+          applicationId: id,
+          shopId: provisionedShopId,
+          supervisorEmail: application.contact_email,
+        });
+      }
+    }
+  } catch (provisionErr) {
+    // Non-fatal — approval is recorded. Admin can manually provision if needed.
+    logger.warn('[barber-approve] Provisioning failed (non-fatal)', { id, error: String(provisionErr) });
   }
 
   // Send approval notification email (non-blocking)

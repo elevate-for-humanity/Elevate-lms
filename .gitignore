@@ -2,6 +2,10 @@
 .env
 .env.*
 !.env.example
+
+# Video generation cache and temp render dirs
+public/videos/scene-video-cache/
+public/videos/barber-lessons/render-*/
 !.env.*.example
 !.env.structure.md
 !.env.template.complete
@@ -192,3 +196,4 @@ audit_artifacts/
 playwright-report/
 .github/workflows-disabled-all/
 scripts/archive/
+public/videos/barber-lessons/barber-lesson-15.mp4

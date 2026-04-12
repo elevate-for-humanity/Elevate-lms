@@ -56,11 +56,12 @@ async function _POST(req: Request) {
       program,
       program_id: resolvedProgramId,
       funding,
-      eligible,
-      notes: eligible ? "Prescreen passed" : "Needs review",
+      notes: eligible ? "Prescreen passed — WIOA eligible" : "Needs review",
     });
 
-    if (error) throw error;
+    if (error) {
+      return NextResponse.json({ error: 'Submission failed. Please try again.' }, { status: 500 });
+    }
 
     // Welcome and onboarding emails fire when application moves to 'in_review'
     // via the transition route — not on submission.

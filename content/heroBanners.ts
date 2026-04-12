@@ -394,6 +394,27 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     analyticsName: 'programs',
   },
 
+  learner: {
+    pageKey: 'learner',
+    videoSrcDesktop: '/videos/dashboard-student-narrated.mp4',
+    voiceoverSrc: '/audio/heroes/learner.mp3',
+    microLabel: 'Your Training',
+    belowHeroHeadline: 'Your credential is the goal. Everything here moves you toward it.',
+    belowHeroSubheadline:
+      'Complete your lessons, pass your checkpoints, and earn the credential your employer will verify. Your progress is tracked automatically.',
+    primaryCta: { label: 'Continue Training', href: '/lms/courses' },
+    secondaryCta: { label: 'Check My Progress', href: '/learner/dashboard', variant: 'secondary' },
+    trustIndicators: [
+      'Progress tracked automatically',
+      'Credentials issued on completion',
+      'Employer-verified outcomes',
+      'Support available throughout',
+    ],
+    transcript:
+      'Welcome to Elevate. Your program is structured, your progress is tracked, and your credential is waiting at the finish line. Complete each lesson, pass your checkpoints, and your certification is issued automatically. If you need help at any point, your advisor is one message away.',
+    analyticsName: 'learner',
+  },
+
   'skilled-trades': {
     pageKey: 'skilled-trades',
     videoSrcDesktop: '/videos/electrician-trades.mp4',

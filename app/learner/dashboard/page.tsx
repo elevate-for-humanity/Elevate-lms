@@ -26,6 +26,8 @@ import {
   ScrollText,
 } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import HeroVideo from '@/components/marketing/HeroVideo';
+import heroBanners from '@/content/heroBanners';
 
 export const metadata: Metadata = {
   title: 'Learner Dashboard | Elevate LMS',
@@ -198,6 +200,11 @@ export default async function LearnerDashboardPage({ searchParams }: Props) {
           </div>
         </div>
       </header>
+
+      {/* Learner hero — only shown on first visit (no active enrollments) */}
+      {activeEnrollments.length === 0 && (
+        <HeroVideo banner={heroBanners.learner} />
+      )}
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome + How to use */}

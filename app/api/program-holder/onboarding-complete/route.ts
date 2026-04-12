@@ -75,9 +75,9 @@ export async function POST(req: Request) {
       .from('profiles')
       .select('email, full_name')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
-    if (!profile?.email) return NextResponse.json({ complete: false, reason: 'no_profile' });
+    if (!profile?.email) return NextResponse.json({ complete: false, reason: 'no_profile_email' });
 
     const firstName = profile.full_name?.split(' ')[0] || 'Program Holder';
     const organizationName = holder.organization_name || 'your organization';
@@ -116,7 +116,7 @@ async function sendProgramHolderFullWelcomeEmail(opts: {
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
-  const logoUrl = `${siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
+  const logoUrl = `${siteUrl}/logo.jpg`;
   const dashboardUrl = `${siteUrl}/program-holder/dashboard`;
 
   const html = `<!DOCTYPE html>

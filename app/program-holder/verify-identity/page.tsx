@@ -29,7 +29,7 @@ export default async function IdentityVerificationPage() {
     .from('profiles')
     .select('*')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   if (!profile || !['program_holder','admin','super_admin','staff'].includes(profile.role)) {
     redirect('/unauthorized');
@@ -40,7 +40,7 @@ export default async function IdentityVerificationPage() {
     .from('program_holders')
     .select('*')
     .eq('user_id', user.id)
-    .single();
+    .maybeSingle();
 
   if (!programHolder) {
     redirect('/program-holder/onboarding/setup');
@@ -58,7 +58,7 @@ export default async function IdentityVerificationPage() {
     .eq('program_holder_id', user.id)
     .order('created_at', { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
 
   // Get uploaded documents
   const { data: documents } = await supabase

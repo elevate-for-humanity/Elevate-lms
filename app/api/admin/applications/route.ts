@@ -13,7 +13,7 @@ async function requireAdmin() {
 const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Unauthorized', status: 401 };
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+  if (!profile || !['admin', 'super_admin', 'staff', 'org_admin'].includes(profile.role)) {
     return { error: 'Forbidden', status: 403 };
   }
   return { user, profile, supabase };
@@ -52,7 +52,7 @@ async function _POST(request: Request) {
     
     // Log audit
     await auth.supabase.from('audit_logs').insert({
-      actor_id: auth.id,
+      actor_id: auth.user.id,
       actor_role: auth.profile.role,
       action: 'create',
       resource_type: 'application',

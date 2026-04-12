@@ -121,15 +121,16 @@ CREATE TABLE IF NOT EXISTS public.social_campaigns (
 
 -- ── 7. v_admin_financial_assurance_summary (view) ────────────────────────────
 -- Used by: /admin/compliance/financial-assurance
+-- Must be created AFTER financial_assurance_records table above.
 CREATE OR REPLACE VIEW public.v_admin_financial_assurance_summary AS
 SELECT
-  COUNT(*)                                                          AS total_records,
-  COUNT(*) FILTER (WHERE status = 'active')                        AS active_count,
-  COUNT(*) FILTER (WHERE status = 'expired')                       AS expired_count,
-  COUNT(*) FILTER (WHERE expiration_date < now() AND status = 'active') AS expiring_soon_count,
-  COALESCE(SUM(amount_cents) FILTER (WHERE status = 'active'), 0)  AS total_coverage_cents,
-  MAX(updated_at)                                                   AS last_updated_at
-FROM public.financial_assurance_records;
+  COUNT(*)                                                                    AS total_records,
+  COUNT(*) FILTER (WHERE status = 'active')                                  AS active_count,
+  COUNT(*) FILTER (WHERE status = 'expired')                                 AS expired_count,
+  COUNT(*) FILTER (WHERE expiration_date < now() AND status = 'active')      AS expiring_soon_count,
+  COALESCE(SUM(f.amount_cents) FILTER (WHERE f.status = 'active'), 0)        AS total_coverage_cents,
+  MAX(updated_at)                                                             AS last_updated_at
+FROM public.financial_assurance_records f;
 
 -- ── 8. Missing columns on program_enrollments ────────────────────────────────
 -- Admin enrollments page queries: access_granted_at, at_risk, amount_paid_cents

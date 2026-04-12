@@ -1,8 +1,7 @@
 /**
- * @deprecated Use /api/auth/signin instead.
- * This route duplicates /api/auth/signin and uses the deprecated in-memory
- * rate limiter (lib/rateLimit). It is kept only for backward compatibility
- * with any existing callers. Do not add new callers — use /api/auth/signin.
+ * @deprecated No active callers. Canonical endpoint is /api/auth/signin.
+ * Kept to avoid 404s from any external integrations — forwards to signin.
+ * Do not add new callers.
  */
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';

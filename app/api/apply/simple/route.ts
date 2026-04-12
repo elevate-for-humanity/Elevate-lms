@@ -48,10 +48,10 @@ async function _POST(req: Request) {
       resolvedProgramId = matchedProgram?.id ?? null;
     }
 
-    // Split name into first/last for the not-null constraint
+    // Split name into first/last — applications table has NOT NULL on both
     const nameParts = (name || '').trim().split(/\s+/);
-    const firstName = nameParts[0] || name || 'Unknown';
-    const lastName = nameParts.slice(1).join(' ') || '';
+    const firstName = nameParts[0] || 'Unknown';
+    const lastName = nameParts.slice(1).join(' ') || 'Unknown';
 
     // @preAuthWrite table=applications mode=reconcile
     const { error } = await insertWithPreAuthCheck(supabase, 'applications', {
@@ -66,6 +66,10 @@ async function _POST(req: Request) {
       source: 'simple_form',
       notes: eligible ? "Prescreen passed — WIOA eligible" : "Needs review",
       status: 'submitted',
+      // Required NOT NULL columns — simple form doesn't collect address
+      city: 'Unknown',
+      zip: '00000',
+      state: 'IN',
     });
 
     if (error) {

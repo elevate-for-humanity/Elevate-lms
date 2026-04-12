@@ -58,7 +58,7 @@ export default function StoreCoursesPage() {
                 <div className="relative h-48 overflow-hidden">
                   <Image
                     src={course.image || '/images/pages/course-create-hero.jpg'}
-                    alt={course.title || course.title || course.name}
+                    alt={course.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
@@ -69,7 +69,7 @@ export default function StoreCoursesPage() {
 
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-blue-600 transition-colors">
-                    {course.title || course.title || course.name}
+                    {course.name}
                   </h3>
                   <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                     {course.shortDescription}

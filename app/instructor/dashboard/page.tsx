@@ -46,7 +46,7 @@ export default async function ProgramHolderDashboard() {
   const { data: students } = courseIds.length > 0
     ? await supabase
         .from('training_enrollments')
-        .select(`*, profiles (id, full_name, email), programs (id, title, name, training_hours)`)
+        .select(`*, profiles (id, full_name, email)`)
         .in('course_id', courseIds)
         .order('enrolled_at', { ascending: false })
         .limit(10)

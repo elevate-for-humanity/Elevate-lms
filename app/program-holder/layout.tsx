@@ -111,15 +111,6 @@ export default async function ProgramHolderLayout({
     }
   }
 
-  }
-
-  // Get user profile to check role
-  const { data: profile } = await db
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
   // If not a program holder, just render children (for public landing page)
   if (!profile || profile.role !== 'program_holder') {
     return <>{children}</>;

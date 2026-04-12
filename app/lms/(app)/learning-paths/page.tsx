@@ -31,7 +31,7 @@ const getCachedUserData = unstable_cache(
         .single(),
       supabase
         .from('program_enrollments')
-        .select('id, status, progress_percent, course_id, created_at')
+        .select('id, status, progress_percent, course_id, created_at, courses ( id, title, description, thumbnail_url )')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(10),
@@ -53,15 +53,7 @@ const getCachedUserData = unstable_cache(
         .limit(5),
     ]);
 
-    // Hydrate course details for enrollments
-    const lpCourseIds = [...new Set((enrollmentsResult.data || []).map((e: any) => e.course_id).filter(Boolean))];
-    const { data: lpCourses } = lpCourseIds.length
-      ? await supabase.from('courses').select('id, title, description, thumbnail_url').in('id', lpCourseIds)
-      : { data: [] };
-    const lpCourseMap = Object.fromEntries((lpCourses || []).map((c: any) => [c.id, c]));
-    const hydratedEnrollments = (enrollmentsResult.data || []).map((e: any) => ({ ...e, courses: lpCourseMap[e.course_id] ?? null }));
-
-    // Hydrate course titles for recent progress
+    // Hydrate course titles for recent progress (student_progress still has no FK)
     const lpProgCourseIds = [...new Set((progressResult.data || []).map((p: any) => p.course_id).filter(Boolean))];
     const { data: lpProgCourses } = lpProgCourseIds.length
       ? await supabase.from('courses').select('id, title').in('id', lpProgCourseIds)
@@ -71,7 +63,7 @@ const getCachedUserData = unstable_cache(
 
     return {
       profile: profileResult.data,
-      enrollments: hydratedEnrollments,
+      enrollments: enrollmentsResult.data ?? [],
       activeCourses: activeResult.count,
       completedCourses: completedResult.count,
       recentProgress: hydratedProgress,

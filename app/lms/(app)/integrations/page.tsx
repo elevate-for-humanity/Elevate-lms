@@ -38,18 +38,11 @@ export default async function IntegrationsPage() {
     .eq('id', user.id)
     .single();
 
-  // Fetch enrollments then hydrate course details separately (no FK on course_id)
-  const { data: rawIntEnrollments } = await supabase
+  const { data: enrollments } = await supabase
     .from('program_enrollments')
-    .select('id, status, course_id, progress_percent, created_at')
+    .select('id, status, course_id, progress_percent, created_at, courses ( id, title, description, thumbnail_url )')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
-  const intCourseIds = [...new Set((rawIntEnrollments || []).map((e: any) => e.course_id).filter(Boolean))];
-  const { data: intCourses } = intCourseIds.length
-    ? await supabase.from('courses').select('id, title, description, thumbnail_url').in('id', intCourseIds)
-    : { data: [] };
-  const intCourseMap = Object.fromEntries((intCourses || []).map((c: any) => [c.id, c]));
-  const enrollments = (rawIntEnrollments || []).map((e: any) => ({ ...e, courses: intCourseMap[e.course_id] ?? null }));
 
   const { count: activeCourses } = await supabase
     .from('program_enrollments')

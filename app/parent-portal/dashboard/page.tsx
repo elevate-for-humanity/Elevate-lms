@@ -33,41 +33,49 @@ export default async function ParentDashboardPage() {
     .eq('id', user.id)
     .single();
 
-  // Fetch linked students with their enrollment and progress data
+  // Fetch linked students
   const { data: links } = await supabase
     .from('parent_student_links')
-    .select(`
-      student_id,
-      relationship,
-      verified,
-      profiles!parent_student_links_student_id_fkey (
-        full_name,
-        email
-      ),
-      program_enrollments (
-        id,
-        status,
-        progress_percent,
-        enrolled_at,
-        programs ( title, slug )
-      )
-    `)
+    .select('student_id, relationship, verified')
     .eq('parent_id', user.id)
     .limit(20);
 
+  const studentIds = (links || []).map((l: any) => l.student_id).filter(Boolean);
+
+  // Hydrate student profiles and enrollments in parallel
+  const [{ data: studentProfiles }, { data: studentEnrollments }] = await Promise.all([
+    studentIds.length
+      ? supabase.from('profiles').select('id, full_name, email').in('id', studentIds)
+      : Promise.resolve({ data: [] }),
+    studentIds.length
+      ? supabase
+          .from('program_enrollments')
+          .select('id, user_id, status, progress_percent, enrolled_at, programs ( title, slug )')
+          .in('user_id', studentIds)
+      : Promise.resolve({ data: [] }),
+  ]);
+
+  const profileMap = Object.fromEntries((studentProfiles || []).map((p: any) => [p.id, p]));
+  const enrollmentsByStudent: Record<string, any[]> = {};
+  for (const e of studentEnrollments || []) {
+    const uid = (e as any).user_id;
+    if (!enrollmentsByStudent[uid]) enrollmentsByStudent[uid] = [];
+    enrollmentsByStudent[uid].push(e);
+  }
+
   const students = (links ?? []).map((row: any) => ({
     id:           row.student_id as string,
-    fullName:     row.profiles?.full_name ?? 'Student',
-    email:        row.profiles?.email ?? null,
+    fullName:     profileMap[row.student_id]?.full_name ?? 'Student',
+    email:        profileMap[row.student_id]?.email ?? null,
     relationship: row.relationship ?? 'guardian',
     verified:     row.verified ?? false,
-    enrollments:  (row.program_enrollments ?? []).map((e: any) => ({
+    enrollments:  (enrollmentsByStudent[row.student_id] ?? []).map((e: any) => ({
       id:              e.id,
       status:          e.status,
       progressPercent: e.progress_percent ?? 0,
       enrolledAt:      e.enrolled_at,
-      programTitle:    e.programs?.title ?? 'Program',
-      programSlug:     e.programs?.slug ?? '',
+      programTitle:    (e.programs as any)?.title ?? 'Program',
+      programSlug:     (e.programs as any)?.slug ?? '',
     })),
   }));
 

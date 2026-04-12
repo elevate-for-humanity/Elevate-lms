@@ -56,19 +56,12 @@ export default async function CalendarPage() {
   try {
     const { data: calEnrollments } = await supabase
       .from('program_enrollments')
-      .select('id, course_id')
+      .select('id, course_id, courses ( id, title, description )')
       .eq('user_id', user.id)
       .eq('status', 'active');
 
     if (calEnrollments) {
-      const calCourseIds = calEnrollments.map((e: any) => e.course_id).filter(Boolean);
-      if (calCourseIds.length) {
-        const { data: calCourses } = await supabase
-          .from('courses')
-          .select('id, title, description')
-          .in('id', calCourseIds);
-        enrolledCourses = calCourses || [];
-      }
+      enrolledCourses = calEnrollments.map((e: any) => e.courses).filter(Boolean);
     }
 
     const { data: calendarEvents } = await supabase

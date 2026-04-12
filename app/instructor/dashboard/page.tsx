@@ -71,7 +71,7 @@ export default async function ProgramHolderDashboard() {
   // Course-level performance — aggregate from program_enrollments
   const { data: enrollmentRows } = await supabase
     .from('program_enrollments')
-    .select('program_id, status, programs(title)')
+    .select('program_id, status, programs ( title )')
     .limit(200);
 
   const programMap: Record<string, { name: string; students: number; completed: number }> = {};

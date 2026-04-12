@@ -83,19 +83,36 @@ export default async function WorkforceBoardDashboard() {
   const completionRate = totalEnrollments > 0 ? Math.round((completedEnrollments / totalEnrollments) * 100) : 0;
 
   // Get recent enrollments
-  const { data: recentEnrollments } = await supabase
+  // Fetch recent enrollments — hydrate profiles separately (no FK on user_id to profiles)
+  const { data: rawRecentEnrollments } = await supabase
     .from('program_enrollments')
-    .select('id, status, created_at, profiles (full_name), programs (name, title)')
+    .select('id, status, created_at, user_id, programs ( title )')
     .order('created_at', { ascending: false })
     .limit(5);
+  const wfUserIds = [...new Set((rawRecentEnrollments || []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: wfProfiles } = wfUserIds.length
+    ? await supabase.from('profiles').select('id, full_name').in('id', wfUserIds)
+    : { data: [] };
+  const wfProfileMap = Object.fromEntries((wfProfiles || []).map((p: any) => [p.id, p]));
+  const recentEnrollments = (rawRecentEnrollments || []).map((e: any) => ({
+    ...e, profiles: wfProfileMap[e.user_id] ?? null,
+  }));
 
-  // Get at-risk participants
-  const { data: atRiskParticipants, count: atRiskCount } = await supabase
+  // Get at-risk participants — hydrate profiles separately
+  const { data: rawAtRisk, count: atRiskCount } = await supabase
     .from('program_enrollments')
-    .select('*, profiles (full_name, email)', { count: 'exact' })
+    .select('id, status, user_id, program_id', { count: 'exact' })
     .eq('at_risk', true)
     .eq('status', 'active')
     .limit(5);
+  const arUserIds = [...new Set((rawAtRisk || []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: arProfiles } = arUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', arUserIds)
+    : { data: [] };
+  const arProfileMap = Object.fromEntries((arProfiles || []).map((p: any) => [p.id, p]));
+  const atRiskParticipants = (rawAtRisk || []).map((e: any) => ({
+    ...e, profiles: arProfileMap[e.user_id] ?? null,
+  }));
 
   // Derive WIOA indicators from real data
   const { data: certificatesIssued } = await supabase

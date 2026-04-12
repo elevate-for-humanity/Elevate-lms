@@ -46,18 +46,11 @@ export default async function AchievementsPage() {
     .eq('id', user.id)
     .single();
 
-  // Fetch enrollments then hydrate course details separately (no FK on course_id)
-  const { data: rawAchEnrollments } = await supabase
+  const { data: enrollments } = await supabase
     .from('program_enrollments')
-    .select('id, status, course_id, progress_percent, created_at')
+    .select('id, status, course_id, progress_percent, created_at, courses ( id, title, description, thumbnail_url )')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
-  const achCourseIds = [...new Set((rawAchEnrollments || []).map((e: any) => e.course_id).filter(Boolean))];
-  const { data: achCourses } = achCourseIds.length
-    ? await supabase.from('courses').select('id, title, description, thumbnail_url').in('id', achCourseIds)
-    : { data: [] };
-  const achCourseMap = Object.fromEntries((achCourses || []).map((c: any) => [c.id, c]));
-  const enrollments = (rawAchEnrollments || []).map((e: any) => ({ ...e, courses: achCourseMap[e.course_id] ?? null }));
 
   // Fetch completed courses
   const { count: completedCourses } = await supabase

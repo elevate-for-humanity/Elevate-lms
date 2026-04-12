@@ -65,22 +65,20 @@ export default async function StaffDashboard() {
   // Get recent enrollments for activity feed
   const { data: recentEnrollments } = await supabase
     .from('program_enrollments')
-    .select(
-      `
-      id,
-      status,
-      created_at,
-      profiles!enrollments_user_id_fkey (
-        full_name,
-        email
-      ),
-      programs (
-        name
-      )
-    `
-    )
+    .select('id, status, created_at, user_id, program_id, programs ( title )')
     .order('created_at', { ascending: false })
     .limit(10);
+
+  // Hydrate user profiles separately (program_enrollments.user_id has no FK to profiles)
+  const staffUserIds = [...new Set((recentEnrollments || []).map((e: any) => e.user_id).filter(Boolean))];
+  const { data: staffProfiles } = staffUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', staffUserIds)
+    : { data: [] };
+  const staffProfileMap = Object.fromEntries((staffProfiles || []).map((p: any) => [p.id, p]));
+  const recentEnrollmentsWithProfiles = (recentEnrollments || []).map((e: any) => ({
+    ...e,
+    profiles: staffProfileMap[e.user_id] ?? null,
+  }));
 
   return (
     <div className="min-h-screen bg-white">
@@ -247,7 +245,7 @@ export default async function StaffDashboard() {
             <h2 className="text-xl font-semibold">Recent Enrollments</h2>
           </div>
           <div className="overflow-x-auto">
-            {recentEnrollments && recentEnrollments.length > 0 ? (
+            {recentEnrollmentsWithProfiles && recentEnrollmentsWithProfiles.length > 0 ? (
               <table className="w-full">
                 <thead className="bg-white">
                   <tr>
@@ -266,7 +264,7 @@ export default async function StaffDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
-                  {recentEnrollments.map((enrollment) => (
+                  {recentEnrollmentsWithProfiles.map((enrollment: any) => (
                     <tr key={enrollment.id} className="hover:bg-white">
                       <td className="px-6 py-4 text-sm text-black">
                         {enrollment.profiles?.full_name ||
@@ -274,7 +272,7 @@ export default async function StaffDashboard() {
                           'N/A'}
                       </td>
                       <td className="px-6 py-4 text-sm text-black">
-                        {enrollment.programs?.name || 'N/A'}
+                        {enrollment.programs?.title || 'N/A'}
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <span

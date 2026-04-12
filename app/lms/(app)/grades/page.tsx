@@ -42,18 +42,11 @@ export default async function GradesPage() {
     .eq('id', user.id)
     .single();
 
-  // Fetch enrollments then hydrate course details separately (no FK on course_id)
-  const { data: rawGradeEnrollments } = await supabase
+  const { data: enrollments } = await supabase
     .from('program_enrollments')
-    .select('id, status, course_id, progress_percent, created_at, updated_at')
+    .select('id, status, course_id, progress_percent, created_at, updated_at, courses ( id, title, description, thumbnail_url )')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
-  const gradeCourseIds = [...new Set((rawGradeEnrollments || []).map((e: any) => e.course_id).filter(Boolean))];
-  const { data: gradeCourses } = gradeCourseIds.length
-    ? await supabase.from('courses').select('id, title, description, thumbnail_url').in('id', gradeCourseIds)
-    : { data: [] };
-  const gradeCourseMap = Object.fromEntries((gradeCourses || []).map((c: any) => [c.id, c]));
-  const enrollments = (rawGradeEnrollments || []).map((e: any) => ({ ...e, courses: gradeCourseMap[e.course_id] ?? null }));
 
   // Fetch assignment submissions with grades
   const { data: assignmentSubmissions } = await supabase

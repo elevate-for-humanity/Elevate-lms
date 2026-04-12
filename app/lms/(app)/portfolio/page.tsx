@@ -41,20 +41,12 @@ export default async function PortfolioPage() {
     .eq('user_id', user.id)
     .order('issued_date', { ascending: false });
 
-  // Fetch completed enrollments then hydrate course details separately
-  const { data: rawCompleted } = await supabase
+  const { data: completedCourses } = await supabase
     .from('program_enrollments')
-    .select('id, status, course_id, completed_at, progress_percent')
+    .select('id, status, course_id, completed_at, progress_percent, course:courses ( id, title, description, thumbnail_url, slug )')
     .eq('user_id', user.id)
     .eq('status', 'completed')
     .order('completed_at', { ascending: false });
-
-  const completedCourseIds = [...new Set((rawCompleted || []).map((e: any) => e.course_id).filter(Boolean))];
-  const { data: completedCoursesData } = completedCourseIds.length
-    ? await supabase.from('courses').select('id, title, description, thumbnail_url, slug').in('id', completedCourseIds)
-    : { data: [] };
-  const completedCourseMap = Object.fromEntries((completedCoursesData || []).map((c: any) => [c.id, c]));
-  const completedCourses = (rawCompleted || []).map((e: any) => ({ ...e, course: completedCourseMap[e.course_id] ?? null }));
 
   return (
     <div className="min-h-screen bg-white">

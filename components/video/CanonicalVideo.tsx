@@ -59,6 +59,8 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.1
   const [reducedMotion, setReducedMotion] = useState(false);
   // True once the video is actually playing — drives the poster → video cross-fade
   const [playing, setPlaying] = useState(false);
+  // True once the video has played through once — fades poster back in, stays there
+  const [ended, setEnded] = useState(false);
 
   // Detect prefers-reduced-motion once on mount
   useEffect(() => {
@@ -152,19 +154,21 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.1
           aria-hidden="true"
           fetchPriority={autoPlayOnMount ? 'high' : 'auto'}
           decoding="async"
-          className={`${className} transition-opacity duration-700 ${playing ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+          className={`${className} transition-opacity duration-700 ${playing && !ended ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
           style={{ objectFit: 'cover', zIndex: 0 }}
         />
         {/* Video — z-10, fades in once onPlaying fires (first real frame on screen).
+            Fades back out when ended — poster takes over for the rest of the session.
             No poster attr — handled by <img> above to guarantee object-cover. */}
         <video
           ref={ref}
-          className={`${className} transition-opacity duration-700 ${playing ? 'opacity-100' : 'opacity-0'}`}
+          className={`${className} transition-opacity duration-700 ${playing && !ended ? 'opacity-100' : 'opacity-0'}`}
           muted
           playsInline
           preload={preloadFull ? 'auto' : 'metadata'}
           aria-hidden="true"
           onPlaying={() => setPlaying(true)}
+          onEnded={() => setEnded(true)}
           onError={() => setFailed(true)}
           style={{ zIndex: 10 }}
         >
@@ -174,15 +178,16 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.1
     );
   }
 
-  // No poster — single video element, no cross-fade needed
+  // No poster — single video element, hide it after playback ends
   return (
     <video
       ref={ref}
-      className={className}
+      className={`${className} transition-opacity duration-700 ${ended ? 'opacity-0' : ''}`}
       muted
       playsInline
       preload={preloadFull ? 'auto' : 'metadata'}
       aria-hidden="true"
+      onEnded={() => setEnded(true)}
       onError={() => setFailed(true)}
     >
       <source src={src} type="video/mp4" />

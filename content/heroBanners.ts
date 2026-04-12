@@ -1129,7 +1129,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
   'peer-recovery-specialist': programBanner('peer-recovery-specialist', {
     pageKey: 'peer-recovery-specialist',
     videoSrcDesktop: '/videos/career-services-hero.mp4',
-    posterImage: '/hero-images/dsp-hero.jpg',
     voiceoverSrc: '/audio/heroes/peer-recovery.mp3',
     microLabel: 'Indiana CPRS Credential',
     credentialLabel: 'Indiana CPRS',

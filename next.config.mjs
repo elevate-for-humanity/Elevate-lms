@@ -119,8 +119,8 @@ const nextConfig = {
 
   // Experimental features for better performance
   experimental: {
-    // Limit page-data workers to 2 — Netlify's build container OOMs at 5 workers
-    cpus: 2,
+    // Limit page-data workers to 1 — Netlify's build container OOMs at 2+ workers
+    cpus: 1,
     serverActions: {
       allowedOrigins: [
         'localhost:3000',

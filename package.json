@@ -258,7 +258,7 @@
     "make:logo": "python3 tools/make_logo_assets.py",
     "lint:ts-nocheck": "bash -c '! grep -r \"@ts-nocheck\" app lib components --include=\"*.ts\" --include=\"*.tsx\" 2>/dev/null || echo \"Warning: @ts-nocheck found in codebase\"'",
     "prebuild": "echo 'Migrations already run in Supabase - skipping' && node scripts/write-build-marker.mjs",
-    "build": "NODE_OPTIONS='--max-old-space-size=8192' node scripts/check-redirect-conflicts.mjs && NODE_OPTIONS='--max-old-space-size=8192' next build",
+    "build": "NODE_OPTIONS='--max-old-space-size=8192' node scripts/check-redirect-conflicts.mjs && NODE_OPTIONS='--max-old-space-size=8192' next build --no-turbopack",
     "build:fast": "NODE_OPTIONS='--max-old-space-size=8192' SKIP_ENV_VALIDATION=true next build",
     "postbuild": "echo 'Next.js build complete'",
     "verify:build": "bash scripts/verify-build.sh || true",

@@ -72,7 +72,7 @@ export const BUSINESS_ADMIN: ProgramSchema = {
   deliveryModel: 'partner',
   deliveryModelDetail: 'hybrid',
   partnerProvider: 'employindy',
-  fundingOptions: ['wioa', 'self_pay'],
+  fundingOptions: ['wioa', 'impact', 'self_pay'],
   enrollmentType: 'internal',
   partnerCourses: [
     {

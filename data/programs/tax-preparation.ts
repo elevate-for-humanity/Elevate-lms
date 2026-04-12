@@ -10,6 +10,7 @@ export const TAX_PREPARATION: ProgramSchema = {
   schedule: 'Mon/Wed/Fri, 9:00 AM–12:00 PM', eveningSchedule: 'Evening cohorts available during tax season.',
   cohortSize: '10–15 participants per cohort',
   fundingStatement: '$0 with WIOA or Next Level Jobs funding', selfPayCost: '$2,000',
+  fundingOptions: ['wioa', 'impact', 'self_pay'],
   badge: 'Funding Available', badgeColor: 'green',
   credentials: [
     { name: 'IRS Preparer Tax Identification Number (PTIN)', issuer: 'Internal Revenue Service', description: 'Required federal registration to prepare tax returns for compensation.', validity: 'Annual renewal' },

@@ -137,6 +137,7 @@ export type DeliveryModel =
 export type FundingType =
   | 'wioa'
   | 'wrg'
+  | 'impact'
   | 'self_pay'
   | 'employer_paid'
   | 'unknown';

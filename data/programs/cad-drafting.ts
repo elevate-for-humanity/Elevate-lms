@@ -8,6 +8,7 @@ export const CAD_DRAFTING: ProgramSchema = {
   hoursBreakdown: { onlineInstruction: 50, handsOnLab: 130, examPrep: 20, careerPlacement: 20 },
   schedule: 'Mon–Fri, 9:00 AM–1:00 PM (20 hrs/week)', cohortSize: '10–14 participants per cohort',
   fundingStatement: 'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.', selfPayCost: '$4,000',
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: 'Funding Available', badgeColor: 'green',
   credentials: [
     { name: 'Autodesk Certified User — AutoCAD', issuer: 'Autodesk / Certiport', description: 'Certification in AutoCAD 2D and 3D drafting.', validity: 'Lifetime (version-specific)' },

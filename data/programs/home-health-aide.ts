@@ -18,6 +18,7 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
   cohortSize: '10–15 participants per cohort',
   fundingStatement: '$0 with WIOA or Workforce Ready Grant. Self-pay: $4,700.',
   selfPayCost: '$4,700',
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: 'ETPL Approved',
   badgeColor: 'green',
 

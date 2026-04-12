@@ -17,6 +17,7 @@ export const CONSTRUCTION_TRADES: ProgramSchema = {
   cohortSize: '12–16 participants per cohort',
   fundingStatement: 'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.',
   selfPayCost: '$3,800',
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: 'Funding Available',
   badgeColor: 'green',
   credentials: [

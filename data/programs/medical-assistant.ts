@@ -105,7 +105,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   deliveryModel: 'hybrid',
   deliveryModelDetail: 'hybrid',
   partnerProvider: 'careersafe',
-  fundingOptions: ['wioa', 'self_pay'],
+  fundingOptions: ['wioa', 'impact', 'self_pay'],
   enrollmentType: 'internal',
   partnerCourses: [
     {

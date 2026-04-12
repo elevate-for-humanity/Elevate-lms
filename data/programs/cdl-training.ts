@@ -164,7 +164,7 @@ export const CDL_TRAINING: ProgramSchema = {
   // ─── Content model ──────────────────────────────────────────────
   deliveryModel: 'internal',
   deliveryModelDetail: 'internal_lms',
-  fundingOptions: ['wioa', 'self_pay'],
+  fundingOptions: ['wioa', 'impact', 'self_pay'],
   enrollmentType: 'internal',
 
   faqs: [

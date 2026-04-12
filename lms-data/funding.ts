@@ -3,6 +3,7 @@ import { allPrograms } from "./programs";
 export type FundingKey =
   | "jri"
   | "wrg"
+  | "impact"
   | "wex"
   | "ojt"
   | "apprenticeship"
@@ -46,6 +47,20 @@ export const fundingSources: FundingSource[] = [
     ],
     notes:
       "Exact coverage depends on current state-approved lists and eligibility; not all programs are state funded."
+  },
+  {
+    key: "impact",
+    label: "FSSA IMPACT (Indiana Manpower Placement and Comprehensive Training)",
+    shortLabel: "FSSA IMPACT",
+    description:
+      "IMPACT is a no-cost employment and training program administered by the Indiana Family and Social Services Administration (FSSA) / Division of Family Resources. IMPACT pays for training courses for current SNAP or TANF recipients. A case manager determines eligibility and stays in contact throughout training.",
+    idealFor: [
+      "Current SNAP (food assistance) recipients.",
+      "Current TANF (cash assistance) recipients.",
+      "Adults seeking short-term training that leads directly to employment.",
+    ],
+    notes:
+      "Must be enrolled in SNAP or TANF first. Contact FSSA at 800-403-0864 (press 3) or ask your DFR eligibility worker for a referral. A high school diploma or GED is preferred for job skills training but not always required.",
   },
   {
     key: "wex",
@@ -126,10 +141,10 @@ export type ProgramFundingMap = Record<string, FundingKey[]>;
  * This is a planning/intent map; actual eligibility depends on board approvals and partner agreements.
  */
 export const programFundingMap: ProgramFundingMap = {
-  // Healthcare
-  "prog-cna": ["tuition", "wex", "employer"],
+  // Healthcare — IMPACT covers CNA, Medical Assistant, Pharmacy Tech (listed on FSSA site)
+  "prog-cna": ["impact", "tuition", "wex", "employer"],
 
-  // Barber / Beauty
+  // Barber / Beauty — IMPACT does not cover barber (not short-term; employer-pay model)
   "prog-barber": ["apprenticeship", "wex", "ojt", "tuition", "employer"],
   "prog-nail-technician-apprenticeship": [
     "apprenticeship",
@@ -147,7 +162,7 @@ export const programFundingMap: ProgramFundingMap = {
   ],
 
   // Tax & Business
-  "prog-tax-vita": ["jri", "wex", "tuition", "employer"],
+  "prog-tax-vita": ["impact", "jri", "wex", "tuition", "employer"],
   "prog-business-ems-apprenticeship": [
     "wex",
     "ojt",
@@ -155,6 +170,7 @@ export const programFundingMap: ProgramFundingMap = {
     "employer"
   ],
   "prog-business-technician-apprenticeship": [
+    "impact",
     "wex",
     "ojt",
     "apprenticeship",
@@ -162,28 +178,31 @@ export const programFundingMap: ProgramFundingMap = {
     "employer"
   ],
 
-  // Trades & Facilities
+  // Trades & Facilities — IMPACT covers CDL, Welding, Culinary (listed on FSSA site)
   "prog-culinary-apprenticeship": [
+    "impact",
     "apprenticeship",
     "wex",
     "ojt",
     "employer",
     "tuition"
   ],
-  "prog-hvac": ["wex", "ojt", "tuition", "employer"],
+  "prog-hvac": ["impact", "wex", "ojt", "tuition", "employer"],
   "prog-building-maintenance": [
+    "impact",
     "apprenticeship",
     "wex",
     "ojt",
     "employer"
   ],
 
-  // Transportation
-  "prog-cdl": ["wex", "ojt", "employer", "tuition"],
+  // Transportation — IMPACT explicitly lists CDL
+  "prog-cdl": ["impact", "wex", "ojt", "employer", "tuition"],
 
-  // Tech & Customer Service
-  "prog-it-support": ["wex", "ojt", "tuition", "employer"],
+  // Tech & Customer Service — IMPACT lists Computer Support Specialist
+  "prog-it-support": ["impact", "wex", "ojt", "tuition", "employer"],
   "prog-customer-service": [
+    "impact",
     "jri",
     "wex",
     "ojt",
@@ -191,7 +210,7 @@ export const programFundingMap: ProgramFundingMap = {
     "employer"
   ],
 
-  // Entrepreneurship
+  // Entrepreneurship — IMPACT focuses on employment, not self-employment; excluded
   "prog-entrepreneurship": ["tuition", "employer"]
 };
 
@@ -206,6 +225,7 @@ export function getProgramsByFundingKey() {
   const result: Record<FundingKey, typeof allPrograms> = {
     jri: [],
     wrg: [],
+    impact: [],
     wex: [],
     ojt: [],
     apprenticeship: [],

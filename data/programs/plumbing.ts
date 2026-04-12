@@ -21,6 +21,7 @@ export const PLUMBING: ProgramSchema = {
   cohortSize: '10–15 participants per cohort',
   fundingStatement: '$0 with WIOA or Next Level Jobs funding',
   selfPayCost: '$5,000',
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: 'Funding Available',
   badgeColor: 'orange',
 

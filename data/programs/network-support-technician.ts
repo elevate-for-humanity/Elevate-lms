@@ -8,6 +8,7 @@ export const NETWORK_SUPPORT: ProgramSchema = {
   hoursBreakdown: { onlineInstruction: 40, handsOnLab: 80, examPrep: 10, careerPlacement: 10 },
   schedule: 'Mon–Fri, 9:00 AM–1:00 PM', cohortSize: '12–16 participants per cohort',
   fundingStatement: '$0 with WIOA or Next Level Jobs funding', selfPayCost: '$2,500',
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: 'Funding Available', badgeColor: 'green',
   credentials: [
     { name: 'IT Specialist — Networking', issuer: 'Certiport', description: 'Certification in networking fundamentals.', validity: 'Lifetime' },

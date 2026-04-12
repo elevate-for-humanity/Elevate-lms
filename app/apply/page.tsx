@@ -12,7 +12,7 @@ import { resolveProgram } from '@/lib/program-registry';
 
 export const metadata: Metadata = {
   title: 'Apply | Check Eligibility for Funded Training | Elevate for Humanity',
-  description: 'Check eligibility for WIOA and WRG-funded training in healthcare, trades, technology, and business. Many programs are no cost to eligible Indiana residents.',
+  description: 'Check eligibility for WIOA, WRG, and FSSA IMPACT-funded training in healthcare, trades, technology, and business. Many programs are no cost to eligible Indiana residents.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/apply',
   },
@@ -62,7 +62,7 @@ export default async function ApplyPage({
             Check eligibility first. Apply in minutes.
           </h1>
           <p className="text-slate-600 max-w-xl mx-auto">
-            Many programs are fully funded through WIOA or WRG for eligible Indiana residents. Check your eligibility before you apply — takes 2 minutes, no account needed.
+            Many programs are fully funded through WIOA, WRG, or FSSA IMPACT for eligible Indiana residents. Check your eligibility before you apply — takes 2 minutes, no account needed.
           </p>
         </div>
       </section>
@@ -138,7 +138,7 @@ export default async function ApplyPage({
                 have tuition with flexible payment options available.
               </p>
               <ul className="text-black text-sm space-y-1 mb-4 list-disc list-inside">
-                <li>Many programs qualify for WIOA or WRG funding — check eligibility first</li>
+                <li>Many programs qualify for WIOA, WRG, or FSSA IMPACT funding — check eligibility first</li>
                 <li>Takes 2 minutes to check eligibility</li>
                 <li>Self-pay options with payment plans and BNPL available if you don't qualify</li>
                 <li>Response within 1–2 business days</li>

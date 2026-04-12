@@ -26,6 +26,7 @@ export const OFFICE_ADMINISTRATION: ProgramSchema = {
   cohortSize: '12–16 participants per cohort',
   fundingStatement: '$0 with WIOA or Next Level Jobs funding',
   selfPayCost: '$1,800',
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: 'Funding Available',
   badgeColor: 'green',
 

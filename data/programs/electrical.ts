@@ -21,6 +21,7 @@ export const ELECTRICAL: ProgramSchema = {
   cohortSize: '10–15 participants per cohort',
   fundingStatement: 'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.',
   selfPayCost: '$5,000',
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: 'Funding Available',
   badgeColor: 'orange',
 

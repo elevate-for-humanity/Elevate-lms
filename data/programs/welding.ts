@@ -20,6 +20,7 @@ export const WELDING: ProgramSchema = {
   cohortSize: '10–14 participants per cohort',
   fundingStatement: '$0 with WIOA or Next Level Jobs funding',
   selfPayCost: '$4,800',
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: 'Funding Available',
   badgeColor: 'green',
 

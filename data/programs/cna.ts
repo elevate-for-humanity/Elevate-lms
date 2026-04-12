@@ -171,5 +171,5 @@ export const CNA: ProgramSchema = {
 
   enrollmentType: 'internal',
   deliveryModel: 'internal',
-  fundingOptions: ['wioa', 'wrg'],
+  fundingOptions: ['wioa', 'wrg', 'impact'],
 };

@@ -9,6 +9,7 @@ export const NETWORK_ADMIN: ProgramSchema = {
   hoursBreakdown: { onlineInstruction: 60, handsOnLab: 120, examPrep: 20, careerPlacement: 20 },
   schedule: 'Mon–Fri, 9:00 AM–1:00 PM', cohortSize: '10–14 participants per cohort',
   fundingStatement: '$0 with WIOA or Next Level Jobs funding', selfPayCost: '$4,500',
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: 'Funding Available', badgeColor: 'green',
   credentials: [
     { name: 'CompTIA Network+', issuer: 'CompTIA', description: 'Industry-standard certification for network administration and troubleshooting.', validity: '3 years (renewable with CE)' },

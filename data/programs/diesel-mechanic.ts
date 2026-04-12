@@ -19,6 +19,7 @@ export const DIESEL_MECHANIC: ProgramSchema = {
   cohortSize: '10–12 participants per cohort',
   fundingStatement: 'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.',
   selfPayCost: '$5,500',
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: 'Accepting Interest',
   badgeColor: 'orange',
 

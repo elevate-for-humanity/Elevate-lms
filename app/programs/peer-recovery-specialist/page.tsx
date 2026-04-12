@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { getPublishedProgramBySlug, formatTrackCost } from '@/lib/programs/getProgramBySlug';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import heroBanners from '@/content/heroBanners';
+import { BNPL_PROVIDER_SUMMARY, BNPL_DESCRIPTION } from '@/lib/bnpl-config';
 
 export const revalidate = 600;
 
@@ -82,14 +83,14 @@ export default async function PeerRecoverySpecialistPage() {
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 py-12 md:grid-cols-2 md:items-center">
           <div>
-            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-black">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-brand-blue-700">
               Workforce Training Program
             </p>
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
+            <h1 className="text-4xl font-bold tracking-tight text-slate-950 md:text-5xl">
               {(program as any).hero_headline ?? program.title}
             </h1>
             {(program as any).hero_subheadline && (
-              <p className="mt-4 max-w-2xl text-lg text-black">{(program as any).hero_subheadline}</p>
+              <p className="mt-4 max-w-2xl text-lg text-slate-600">{(program as any).hero_subheadline}</p>
             )}
             <div className="mt-6 flex flex-wrap gap-3">
               {program.program_ctas.map((cta: any) => {
@@ -101,7 +102,7 @@ export default async function PeerRecoverySpecialistPage() {
                 return <Link key={cta.id} href={cta.href} className={variant}>{cta.label}</Link>;
               })}
             </div>
-            <div className="mt-8 flex flex-wrap gap-6 text-sm text-black">
+            <div className="mt-8 flex flex-wrap gap-6 text-sm font-medium text-slate-600">
               {program.length_weeks && <span>{program.length_weeks} weeks</span>}
               {program.delivery_model && <span className="capitalize">{program.delivery_model}</span>}
               {program.certificate_title && <span>{program.certificate_title}</span>}
@@ -125,17 +126,17 @@ export default async function PeerRecoverySpecialistPage() {
       <section className="mx-auto max-w-7xl px-6 py-12">
         <div className="grid gap-10 lg:grid-cols-[1.4fr,0.9fr]">
           <div>
-            <h2 className="text-2xl font-bold">About this program</h2>
+            <h2 className="text-2xl font-bold text-slate-950">About this program</h2>
             {program.description && <p className="mt-4 text-slate-700 leading-relaxed">{program.description}</p>}
             {program.outcomes && (
               <>
-                <h3 className="mt-8 text-xl font-semibold">Outcomes</h3>
+                <h3 className="mt-8 text-xl font-semibold text-slate-950">Outcomes</h3>
                 <p className="mt-3 text-slate-700">{program.outcomes}</p>
               </>
             )}
             {program.requirements && (
               <>
-                <h3 className="mt-8 text-xl font-semibold">Requirements</h3>
+                <h3 className="mt-8 text-xl font-semibold text-slate-950">Requirements</h3>
                 <p className="mt-3 text-slate-700">{program.requirements}</p>
               </>
             )}
@@ -150,7 +151,7 @@ export default async function PeerRecoverySpecialistPage() {
             )}
           </div>
           <aside className="self-start rounded-2xl border border-slate-200 p-6">
-            <h2 className="text-xl font-bold">Enrollment options</h2>
+            <h2 className="text-xl font-bold text-slate-950">Enrollment options</h2>
             <div className="mt-4 space-y-4">
               {program.program_tracks.map((track: any) => (
                 <div key={track.id} className="rounded-xl border border-slate-200 p-4">
@@ -160,10 +161,21 @@ export default async function PeerRecoverySpecialistPage() {
                       {typeof formatTrackCost === 'function' ? formatTrackCost(track.cost_cents) : track.cost_cents === 0 ? '$0 (Funded)' : `$${(track.cost_cents / 100).toFixed(0)}`}
                     </span>
                   </div>
-                  {track.description && <p className="mt-2 text-sm text-black">{track.description}</p>}
+                  {track.description && <p className="mt-2 text-sm text-slate-600">{track.description}</p>}
                 </div>
               ))}
+
+              {/* BNPL — shown for self-pay path */}
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <h3 className="font-semibold text-slate-900">Pay Over Time</h3>
+                  <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-slate-500">BNPL</span>
+                </div>
+                <p className="mt-2 text-sm text-slate-600">{BNPL_DESCRIPTION}</p>
+                <p className="mt-2 text-xs text-slate-500">Available providers: {BNPL_PROVIDER_SUMMARY}</p>
+              </div>
             </div>
+
             <div className="mt-6">
               <Link href="/apply?program=peer-recovery-specialist"
                 className="block w-full text-center bg-slate-900 text-white font-semibold py-3 rounded-xl hover:bg-slate-800 transition-colors">
@@ -183,14 +195,14 @@ export default async function PeerRecoverySpecialistPage() {
               <div className="border-b border-slate-200 bg-slate-50 px-6 py-4">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-black">Module {mod.module_number}</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Module {mod.module_number}</p>
                     <h3 className="text-lg font-semibold text-slate-900">{mod.title}</h3>
                   </div>
-                  <div className="text-sm text-black">
+                  <div className="text-sm font-medium text-slate-500">
                     {mod.lesson_count} lessons{mod.duration_hours ? ` · ${mod.duration_hours}h` : ''}
                   </div>
                 </div>
-                {mod.description && <p className="mt-2 text-sm text-black">{mod.description}</p>}
+                {mod.description && <p className="mt-2 text-sm text-slate-600">{mod.description}</p>}
               </div>
             </div>
           ))}
@@ -201,7 +213,7 @@ export default async function PeerRecoverySpecialistPage() {
       <section className="border-t border-slate-200 bg-slate-50 py-12">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <h2 className="text-2xl font-bold">Ready to start?</h2>
-          <p className="mt-3 text-black">WIOA and Justice Reinvestment Initiative funding available for eligible Indiana residents.</p>
+          <p className="mt-3 text-slate-600">WIOA, FSSA IMPACT, and Justice Reinvestment Initiative funding available for eligible Indiana residents.</p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link href="/apply?program=peer-recovery-specialist"
               className="rounded-xl bg-slate-900 px-6 py-3 font-semibold text-white hover:bg-slate-800 transition-colors">

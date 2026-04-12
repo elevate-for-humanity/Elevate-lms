@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { trySendEmail } from '@/lib/email';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -112,6 +113,31 @@ async function _POST(req: NextRequest) {
     .from('profiles')
     .update({ role: 'program_holder' })
     .eq('id', user.id);
+
+  // Notify admin of new program holder submission
+  await trySendEmail({
+    to: 'elevate4humanityedu@gmail.com',
+    subject: `New Program Holder Submission — ${organizationName}`,
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;">
+        <div style="border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:16px;">
+          <div style="font-size:14px;font-weight:bold;text-transform:uppercase;letter-spacing:1px;">Elevate for Humanity</div>
+          <div style="font-size:10px;color:#555;">Program Holder Application — Admin Notification</div>
+        </div>
+        <p style="font-size:13px;">A new program holder has completed onboarding and is awaiting approval.</p>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;margin:16px 0;">
+          <tr><td style="padding:6px 10px;border-bottom:1px solid #ddd;font-weight:bold;width:40%;">Organization</td><td style="padding:6px 10px;border-bottom:1px solid #ddd;">${organizationName}</td></tr>
+          <tr><td style="padding:6px 10px;border-bottom:1px solid #ddd;font-weight:bold;">Program</td><td style="padding:6px 10px;border-bottom:1px solid #ddd;">${body.programName || '—'}</td></tr>
+          <tr><td style="padding:6px 10px;border-bottom:1px solid #ddd;font-weight:bold;">Program Type</td><td style="padding:6px 10px;border-bottom:1px solid #ddd;">${body.programType || '—'}</td></tr>
+          <tr><td style="padding:6px 10px;border-bottom:1px solid #ddd;font-weight:bold;">User ID</td><td style="padding:6px 10px;border-bottom:1px solid #ddd;">${user.id}</td></tr>
+        </table>
+        <p style="font-size:12px;color:#555;">Log in to the admin dashboard to review and approve this application.</p>
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://www.elevateforhumanity.org'}/admin/program-holders"
+           style="display:inline-block;margin-top:12px;background:#111;color:white;padding:10px 20px;text-decoration:none;font-size:12px;font-weight:bold;">
+          Review Application →
+        </a>
+      </div>`,
+  });
 
   return NextResponse.json({ success: true, holderId: holder?.id });
 }

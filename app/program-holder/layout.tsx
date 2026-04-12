@@ -55,9 +55,62 @@ export default async function ProgramHolderLayout({
   } = await supabase.auth.getUser();
 
   // If not logged in, just render children (for public landing page)
-  // Dashboard pages will handle their own auth
   if (!user) {
     return <>{children}</>;
+  }
+
+  // Check approval status — block access to all portal pages until admin approves
+  const { data: profile } = await db
+    .from('profiles')
+    .select('role, program_holder_id')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  // Allow admins and staff through unconditionally
+  const isAdmin = ['admin', 'super_admin', 'staff'].includes(profile?.role ?? '');
+
+  if (!isAdmin && profile?.program_holder_id) {
+    const { data: holder } = await db
+      .from('program_holders')
+      .select('status, approved_at')
+      .eq('id', profile.program_holder_id)
+      .maybeSingle();
+
+    const isPending = !holder || !['approved', 'active'].includes(holder?.status ?? '') || !holder?.approved_at;
+
+    if (isPending) {
+      // Only allow onboarding pages while pending — block everything else
+      // Children will be the pending approval page rendered below
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+          <div className="bg-white rounded-lg border border-gray-200 shadow-sm max-w-md w-full p-8 text-center">
+            <div className="w-14 h-14 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h1 className="text-xl font-bold text-gray-900 mb-2">Thank You for Your Submission</h1>
+            <p className="text-gray-600 text-sm mb-4">
+              We have received your application and our team is currently reviewing your information. Once your account has been approved, you will receive an email with your next steps and access to your program holder portal.
+            </p>
+            <p className="text-gray-500 text-xs mb-6">
+              Questions? Contact us at{' '}
+              <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600 underline">
+                elevate4humanityedu@gmail.com
+              </a>
+            </p>
+            <a
+              href="/logout"
+              className="inline-block text-sm text-gray-500 hover:text-gray-700 underline"
+            >
+              Sign out
+            </a>
+          </div>
+        </div>
+      );
+    }
+  }
+
   }
 
   // Get user profile to check role

@@ -4,7 +4,7 @@ import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { BookOpen, FileText, CreditCard, Calendar, User, ArrowRight, Phone, Mail, HelpCircle, ClipboardCheck } from 'lucide-react';
+import { BookOpen, FileText, CreditCard, Calendar, User, ArrowRight, Phone, Mail, HelpCircle, ClipboardCheck, Clock } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import CanonicalVideo from '@/components/video/CanonicalVideo';
 import { logger } from '@/lib/logger';
@@ -121,6 +121,7 @@ export default async function LearnerOnboardingPage({
   const [
     profileResult,
     enrollmentResult,
+    applicationResult,
     docCountResult,
     agreementsResult,
     handbookResult,
@@ -133,6 +134,13 @@ export default async function LearnerOnboardingPage({
       .maybeSingle(),
     supabase.from('program_enrollments')
       .select('id, program_id, program_slug, status, enrollment_state')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    // Check application approval status — onboarding is locked until approved
+    supabase.from('applications')
+      .select('id, status, program_interest')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(1)
@@ -162,7 +170,15 @@ export default async function LearnerOnboardingPage({
 
   const profile = profileResult.data;
   const enrollment = enrollmentResult.data;
+  const application = applicationResult.data;
   const docCount = docCountResult.count || 0;
+
+  // Gate: onboarding is only available after the application is approved.
+  // Statuses that mean "not yet approved":
+  const PENDING_STATUSES = new Set(['submitted', 'in_review', 'under_review', 'pending_workone', 'waitlisted', 'funding_review']);
+  const applicationPending = application && PENDING_STATUSES.has(application.status);
+  // No application on record at all — user navigated here directly without applying
+  const noApplication = !application && profile?.enrollment_status !== 'active';
   const signedAgreementTypes = new Set(
     (agreementsResult.data || []).map((a: any) => a.agreement_key),
   );
@@ -335,6 +351,65 @@ export default async function LearnerOnboardingPage({
       </section>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+
+        {/* ── Gate: no application on record ─────────────────────────────── */}
+        {noApplication && (
+          <div className="max-w-lg mx-auto text-center py-16">
+            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-6">
+              <ClipboardCheck className="w-8 h-8 text-slate-400" />
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 mb-3">Start with an application</h2>
+            <p className="text-slate-500 mb-8">
+              You need to submit an application and have it approved before you can begin onboarding.
+              It only takes a few minutes.
+            </p>
+            <Link
+              href="/apply/student"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-brand-blue-600 text-white rounded-xl font-bold hover:bg-brand-blue-700 transition"
+            >
+              Apply Now <ArrowRight className="w-4 h-4" />
+            </Link>
+            <p className="text-sm text-slate-400 mt-6">
+              Already applied?{' '}
+              <Link href="/apply/status" className="underline text-slate-500 hover:text-slate-700">
+                Check your application status
+              </Link>
+            </p>
+          </div>
+        )}
+
+        {/* ── Gate: application submitted but not yet approved ────────────── */}
+        {applicationPending && !noApplication && (
+          <div className="max-w-lg mx-auto text-center py-16">
+            <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-6">
+              <Clock className="w-8 h-8 text-amber-500" />
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 mb-3">Application under review</h2>
+            <p className="text-slate-500 mb-2">
+              Your application for{' '}
+              <strong>{application?.program_interest || 'your program'}</strong> has been received
+              and is being reviewed by our team.
+            </p>
+            <p className="text-slate-500 mb-8">
+              Onboarding unlocks once your application is approved. You&apos;ll receive an email
+              when that happens — usually within 1 business day.
+            </p>
+            <Link
+              href="/apply/status"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-700 transition"
+            >
+              Check Application Status <ArrowRight className="w-4 h-4" />
+            </Link>
+            <p className="text-sm text-slate-400 mt-6">
+              Questions? Call{' '}
+              <a href="tel:+13173143757" className="underline">(317) 314-3757</a>
+            </p>
+          </div>
+        )}
+
+        {/* ── Main onboarding content — only shown when application is approved ── */}
+        {!noApplication && !applicationPending && <>
+
         {/* Enrollment approved — student can access courses */}
         {profile?.enrollment_status === 'active' && (
           <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 mb-10 flex flex-col sm:flex-row items-center gap-6">
@@ -507,6 +582,7 @@ export default async function LearnerOnboardingPage({
             </div>
           </div>
         </section>
+        </> /* end: !noApplication && !applicationPending */}
       </div>
     </div>
   );

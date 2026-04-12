@@ -2,8 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { requireApiAuth } from '@/lib/auth';
-import { createClient } from '@/lib/supabase/server';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { approveApplication } from '@/lib/enrollment/approve';
@@ -21,31 +20,10 @@ async function _POST(
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
 
-  // Auth guard
-  let adminUserId: string;
-  try {
-    await requireApiAuth();
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    adminUserId = user.id;
-    const adminDb = await getAdminClient();
-    const { data: profile } = await adminDb!
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-    if (!profile?.role || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
-      return NextResponse.json(
-        { error: 'Forbidden — requires admin or super_admin' },
-        { status: 403 },
-      );
-    }
-  } catch {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  // Auth guard — requires admin, super_admin, or staff
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
+  const adminUserId = auth.id;
 
   const { id } = await params;
   const db = await getAdminClient();
@@ -140,8 +118,10 @@ async function _POST(
   }
 }
 
+// critical: false — this route already calls logAdminAudit() internally.
+// Using critical:true caused the audit system to override a successful 200
+// response with 503 when the audit_logs table was unavailable.
 export const POST = withApiAudit(
   '/api/admin/applications/[id]/approve',
   _POST,
-  { critical: true },
 );

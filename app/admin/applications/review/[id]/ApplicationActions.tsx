@@ -62,11 +62,13 @@ export default function ApplicationActions({
       }
 
       setSuccess(
-        `Approved! User created (${data.user_id?.slice(0, 8)}...) and enrolled (${data.enrollment_id?.slice(0, 8)}...).`
+        data.enrollment_id
+          ? `Approved and enrolled. (enrollment ${data.enrollment_id?.slice(0, 8)}...)`
+          : `Approved. No program assigned — enrollment skipped. Assign a program to complete enrollment.`
       );
       router.refresh();
     } catch (err: unknown) {
-      setError('Action failed. Please try again.');
+      setError(err instanceof Error ? err.message : 'Action failed. Please try again.');
     } finally {
       setLoading(null);
     }
@@ -93,7 +95,7 @@ export default function ApplicationActions({
       setSuccess(`Application ${newStatus === 'rejected' ? 'rejected' : 'updated'}.`);
       router.refresh();
     } catch (err: unknown) {
-      setError('Action failed. Please try again.');
+      setError(err instanceof Error ? err.message : 'Action failed. Please try again.');
     } finally {
       setLoading(null);
     }

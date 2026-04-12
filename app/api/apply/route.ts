@@ -75,6 +75,8 @@ export const POST = withRateLimit(
         last_name: lastName,
         email,
         phone,
+        normalized_email: email.toLowerCase().trim(),
+        normalized_phone: phone.replace(/\D/g, ''),
         city: 'Not provided',
         zip: '00000',
         program_interest: program,

@@ -26,7 +26,12 @@ export default async function OrientationCompletePage() {
   const { data: { user } } = await sessionClient.auth.getUser();
   if (!user) redirect('/login');
 
-  const supabase = await getAdminClient();
+  let supabase: Awaited<ReturnType<typeof getAdminClient>>;
+  try {
+    supabase = await getAdminClient();
+  } catch {
+    redirect('/login');
+  }
 
   // Confirm orientation was actually completed — guard against direct navigation
   const { data: profile } = await supabase

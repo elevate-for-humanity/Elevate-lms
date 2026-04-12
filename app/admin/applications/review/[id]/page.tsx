@@ -64,20 +64,43 @@ export default async function ReviewApplicationPage({
   // applications.status stays 'enrolled' (terminal) after revocation.
   const effectiveStatus = app.revoked_at ? 'revoked' : app.status;
 
-  // Resolve program_interest slug to a courses ID for enrollment creation.
-  // Uses maybeSingle() — no match is valid (many applications predate course records).
-  const programSlug = (app.program_interest || '') as string;
-  let resolvedProgramId: string | null = null;
-  if (programSlug) {
-    const searchTerm = programSlug.replace(/-/g, ' ');
-    const { data: matchedCourse } = await db!
-      .from('courses')
-      .select('id, title')
-      .ilike('title', `%${searchTerm}%`)
-      .eq('is_active', true)
-      .limit(1)
+  // Resolve program_interest to a program UUID for enrollment creation.
+  // Priority: application.program_id (already resolved) → programs table → courses table.
+  let resolvedProgramId: string | null = app.program_id ?? null;
+
+  if (!resolvedProgramId && app.program_interest) {
+    const searchTerm = (app.program_interest as string).toLowerCase().trim();
+
+    // 1. Exact slug match on programs table
+    const slugified = searchTerm.replace(/\s+/g, '-');
+    const { data: bySlug } = await db!
+      .from('programs')
+      .select('id')
+      .eq('slug', slugified)
       .maybeSingle();
-    resolvedProgramId = matchedCourse?.id ?? null;
+    resolvedProgramId = bySlug?.id ?? null;
+
+    // 2. Case-insensitive title match on programs table
+    if (!resolvedProgramId) {
+      const { data: byTitle } = await db!
+        .from('programs')
+        .select('id')
+        .ilike('title', `%${searchTerm}%`)
+        .limit(1)
+        .maybeSingle();
+      resolvedProgramId = byTitle?.id ?? null;
+    }
+
+    // 3. Fallback: courses table (legacy path)
+    if (!resolvedProgramId) {
+      const { data: byCourse } = await db!
+        .from('courses')
+        .select('id')
+        .ilike('title', `%${searchTerm}%`)
+        .limit(1)
+        .maybeSingle();
+      resolvedProgramId = byCourse?.id ?? null;
+    }
   }
 
   // Parse support_notes for structured data

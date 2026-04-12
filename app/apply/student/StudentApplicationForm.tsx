@@ -154,6 +154,29 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
     const password = formData.get('password') as string;
     const confirmPassword = formData.get('confirmPassword') as string;
 
+    // Validate required fields
+    const firstName = (formData.get('firstName') as string || '').trim();
+    const lastName  = (formData.get('lastName')  as string || '').trim();
+    const email     = (formData.get('email')     as string || '').trim();
+    const phone     = (formData.get('phone')     as string || '').trim();
+
+    if (!firstName || !lastName) {
+      setError('First and last name are required.');
+      setLoading(false);
+      return;
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('A valid email address is required.');
+      setLoading(false);
+      return;
+    }
+    const digitsOnly = phone.replace(/\D/g, '');
+    if (digitsOnly.length < 10) {
+      setError('A valid 10-digit phone number is required.');
+      setLoading(false);
+      return;
+    }
+
     if (!password || password.length < 8) {
       setError('Password must be at least 8 characters.');
       setLoading(false);
@@ -609,6 +632,8 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
               id="phone"
               name="phone"
               required
+              pattern="[\d\s\-\(\)\+]{10,}"
+              title="Enter a valid 10-digit phone number"
               className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             />
           </div>
@@ -733,6 +758,10 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
                 type="text"
                 id="zipCode"
                 name="zipCode"
+                pattern="\d{5}(-\d{4})?"
+                title="Enter a valid 5-digit ZIP code"
+                inputMode="numeric"
+                maxLength={10}
                 className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               />
             </div>

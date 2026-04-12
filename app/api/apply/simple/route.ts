@@ -60,6 +60,8 @@ async function _POST(req: Request) {
       name,
       email,
       phone,
+      normalized_email: (email || '').toLowerCase().trim(),
+      normalized_phone: (phone || '').replace(/\D/g, ''),
       program_interest: program,
       program_id: resolvedProgramId,
       funding_type: funding,

@@ -22,8 +22,12 @@ export default async function PartnerDashboardPage() {
 
   if (!user) redirect('/partner/login');
 
-  const db = await getAdminClient();
-  if (!db) redirect('/partner/login');
+  let db: Awaited<ReturnType<typeof getAdminClient>>;
+  try {
+    db = await getAdminClient();
+  } catch {
+    redirect('/partner/login');
+  }
 
   const { data: profile } = await db
     .from('profiles')

@@ -1,7 +1,7 @@
 import { safeInternalError } from '@/lib/api/safe-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminClient } from '@/lib/supabase/admin';
-import { createServerSupabaseClient } from '@/lib/auth';
+import { createClient } from '@/lib/supabase/server';
 import { approveApplication } from '@/lib/enrollment/approve';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
@@ -78,14 +78,14 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = await createServerSupabaseClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
     const db = await getAdminClient();
   if (!db) return NextResponse.json({ error: 'Admin client failed to initialize' }, { status: 500 });
 
@@ -168,7 +168,7 @@ async function _POST(request: NextRequest) {
       programName = application.program_interest.replace(/-/g, ' ');
     }
 
-    const email = profile?.email || session.user.email || '';
+    const email = profile?.email || user.email || '';
     const firstName = profile?.first_name || profile?.full_name?.split(' ')[0] || 'Student';
 
     if (email) {

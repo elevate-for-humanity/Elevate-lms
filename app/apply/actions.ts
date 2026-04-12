@@ -228,8 +228,46 @@ export interface StudentApplicationData extends BaseApplicationData {
   hasWorkOneApproval?: boolean;
   workoneApprovalRef?: string | null;
   eligibilityData?: {
-    recommended: string;
-    options: { source: string; status: string }[];
+    // Funding
+    hasSnap?: boolean | null;
+    hasTanf?: boolean | null;
+    hasReferral?: boolean | null;
+    referralSource?: string;
+    caseManagerName?: string;
+    caseManagerEmail?: string;
+    otherFundingSource?: string;
+    // Residency / age
+    isAdult?: boolean | null;
+    isIndianaResident?: boolean | null;
+    // Education
+    educationLevel?: string;
+    hasDiplomaOrGed?: boolean | null;
+    enrolledInGed?: boolean | null;
+    // Legal
+    workAuthorized?: boolean | null;
+    activeWarrant?: boolean | null;
+    pendingCharges?: boolean | null;
+    onProbationParole?: boolean | null;
+    legalNotes?: string;
+    // Readiness
+    canAttendSchedule?: boolean | null;
+    hasTransportationPlan?: boolean | null;
+    canMeetPhysical?: boolean | null;
+    willingToFollowRules?: boolean | null;
+    willingJobReadiness?: boolean | null;
+    unavailableTimes?: string;
+    motivation?: string;
+    // Acknowledgments
+    agreesVerification?: boolean;
+    agreesAttendance?: boolean;
+    // Computed fields added by the form
+    eligibilityStatus?: string;
+    eligibilityReasonCodes?: string[];
+    supportNeedsTransport?: boolean;
+    supportNeedsOther?: boolean;
+    // Legacy fields
+    recommended?: string;
+    options?: { source: string; status: string }[];
   } | null;
 }
 
@@ -494,6 +532,9 @@ async function insertApplication(payload: {
   // Path A: DB available — insert application, admin enrolls later
   if (supabase) {
     try {
+      const normalizedEmail = payload.email.toLowerCase().trim();
+      const normalizedPhone = payload.phone.replace(/\D/g, '');
+
       const { data, error } = await supabase
         .from('applications')
         .insert({
@@ -501,6 +542,8 @@ async function insertApplication(payload: {
           last_name: payload.lastName,
           email: payload.email,
           phone: payload.phone,
+          normalized_email: normalizedEmail,
+          normalized_phone: normalizedPhone,
           city: payload.city,
           zip: payload.zip,
           program_interest: payload.programInterest,

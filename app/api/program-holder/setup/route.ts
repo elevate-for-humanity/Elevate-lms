@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
@@ -57,8 +58,9 @@ async function _POST(req: NextRequest) {
   }
 
   // Upsert into program_holders using user_id as the conflict key.
-  // Program details go into metadata; banking is omitted until encryption is ready.
-  const { data: holder, error: upsertError } = await supabase
+  // Uses admin client to bypass RLS — user is already authenticated above.
+  const admin = await getAdminClient();
+  const { data: holder, error: upsertError } = await admin
     .from('program_holders')
     .upsert(
       {
@@ -96,7 +98,7 @@ async function _POST(req: NextRequest) {
       { onConflict: 'user_id' }
     )
     .select('id')
-    .single();
+    .maybeSingle();
 
   if (upsertError) {
     return NextResponse.json(
@@ -106,14 +108,10 @@ async function _POST(req: NextRequest) {
   }
 
   // Assign program_holder role so the portal layout and auth guards work.
-  // Uses service role to bypass RLS on profiles.
-  const admin = await getAdminClient();
-  if (admin) {
-    await admin
-      .from('profiles')
-      .update({ role: 'program_holder' })
-      .eq('id', user.id);
-  }
+  await admin
+    .from('profiles')
+    .update({ role: 'program_holder' })
+    .eq('id', user.id);
 
   return NextResponse.json({ success: true, holderId: holder?.id });
 }

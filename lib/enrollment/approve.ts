@@ -13,6 +13,7 @@
 import { logger } from '@/lib/logger';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { attachPartnerRouting } from '@/lib/enrollment/partner-routing';
+import { PROGRAM_COURSE_MAP } from '@/lib/barber/constants';
 
 export interface ApproveApplicationInput {
   applicationId: string;
@@ -184,6 +185,10 @@ export async function approveApplication(
   let enrollmentId: string | null = null;
 
   if (assignedRole === 'student' && resolvedProgramId) {
+    // Resolve course_id so the learner dashboard routes to the LMS, not the marketing page.
+    const programSlug = app.program_slug ?? app.pathway_slug ?? null;
+    const resolvedCourseId = programSlug ? (PROGRAM_COURSE_MAP[programSlug] ?? null) : null;
+
     const { data: pe } = await db
       .from('program_enrollments')
       .upsert({
@@ -195,6 +200,7 @@ export async function approveApplication(
         funding_source: fundingType || 'pending',
         status: 'active',
         enrollment_state: 'active',
+        ...(resolvedCourseId ? { course_id: resolvedCourseId } : {}),
       }, { onConflict: 'user_id,program_id', ignoreDuplicates: false })
       .select('id')
       .maybeSingle();

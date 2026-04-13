@@ -30,6 +30,7 @@ import { QuizSystem } from '@/components/lms/QuizSystem';
 import QuizPlayer from '@/components/lms/QuizPlayer';
 import LessonPlayer from '@/components/lms/LessonPlayer';
 import StepSubmissionForm from '@/components/lms/StepSubmissionForm';
+import OjtCompletionPanel from '@/components/lms/OjtCompletionPanel';
 import InteractiveVideoPlayer from '@/components/lms/InteractiveVideoPlayer';
 import HvacLessonVideo from '@/components/lms/HvacLessonVideo';
 import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
@@ -877,32 +878,41 @@ export default function LessonPage() {
             </div>
           </div>
         ) : lesson.step_type === 'lab' ? (
-          <div className="max-w-4xl mx-auto p-4 md:p-8">
-            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-brand-blue-100 flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-brand-blue-600" />
+          <div className="max-w-4xl mx-auto p-4 md:p-8 space-y-6">
+            {/* Lesson content / instructions */}
+            {lesson.content && (
+              <div className="bg-white border border-slate-200 rounded-xl p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-brand-blue-100 flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-brand-blue-600" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-wide text-brand-blue-600">Hands-On Lab</div>
+                    <h2 className="text-xl font-bold text-slate-900">{lesson.title}</h2>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-xs font-semibold uppercase tracking-wide text-brand-blue-600">Hands-On Lab</div>
-                  <h2 className="text-xl font-bold text-slate-900">{lesson.title}</h2>
-                </div>
-              </div>
-              {lesson.content && (
                 <div className="prose max-w-none"
                   dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }} />
-              )}
-              <StepSubmissionForm
-                lessonId={lessonId}
-                courseId={courseId}
-                stepType="lab"
-                lessonTitle={lesson.title}
-              />
-              {/* AR Training — beta, shown below lab submission */}
-              <div className="mt-6">
-                <ARTrainingModules />
               </div>
-            </div>
+            )}
+            {/* OJT enforcement panel — tracks shop reps + supervisor verification */}
+            <OjtCompletionPanel
+              lessonId={lessonId}
+              courseId={courseId}
+              lessonTitle={lesson.title}
+              onComplete={() => {
+                setCompletedLessonIds(prev => new Set([...prev, lessonId]));
+              }}
+            />
+            {/* File submission (evidence upload) — kept below OJT panel */}
+            <StepSubmissionForm
+              lessonId={lessonId}
+              courseId={courseId}
+              stepType="lab"
+              lessonTitle={lesson.title}
+            />
+            {/* AR Training — beta */}
+            <ARTrainingModules />
           </div>
         ) : lesson.step_type === 'assignment' ? (
           <div className="max-w-4xl mx-auto p-4 md:p-8">
@@ -1429,7 +1439,9 @@ export default function LessonPage() {
                       {(lesson.step_type === 'lab' || lesson.step_type === 'assignment') ? (
                         <StepSubmissionForm
                           lessonId={lessonId}
+                          courseId={courseId}
                           stepType={lesson.step_type}
+                          lessonTitle={lesson.title}
                           onSubmitted={() => { markAttempted('lab'); if (!isCompleted) markComplete(); }}
                         />
                       ) : (

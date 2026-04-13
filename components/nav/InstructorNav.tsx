@@ -10,6 +10,7 @@ import {
   Users,
   Settings,
   HelpCircle,
+  ClipboardCheck,
 } from 'lucide-react';
 
 /**
@@ -40,6 +41,11 @@ const navigation: NavItem[] = [
     name: 'Students',
     href: '/instructor/students',
     icon: Users,
+  },
+  {
+    name: 'Sign-off Queue',
+    href: '/instructor/submissions',
+    icon: ClipboardCheck,
   },
   {
     name: 'Settings',

@@ -13,6 +13,7 @@ import {
 } from '@/lib/lms/engine';
 import type { CheckpointGateError } from '@/lib/lms/engine';
 import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
+import { checkCompetencyGate } from '@/lib/lms/competency-gate';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -150,6 +151,20 @@ async function _POST(
     if (!ojtAllowed) {
       return NextResponse.json(
         { error: 'Complete required shop work before finishing this lesson', code: 'OJT_INCOMPLETE' },
+        { status: 403 },
+      );
+    }
+
+    // Competency gate: practical lessons require all instructor sign-offs before completion.
+    const gate = await checkCompetencyGate(db, { userId: user.id, lessonId });
+    if (!gate.allowed) {
+      return NextResponse.json(
+        {
+          error: 'Instructor sign-off required before this lesson can be marked complete.',
+          code: 'COMPETENCY_SIGNOFF_REQUIRED',
+          pendingChecks: gate.missingKeys,
+          message: `${gate.missingKeys.length} competency check(s) require instructor approval: ${gate.missingKeys.join(', ')}`,
+        },
         { status: 403 },
       );
     }

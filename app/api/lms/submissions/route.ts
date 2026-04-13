@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
  * Learner submits a lab or assignment for instructor sign-off.
  * Creates a step_submissions row with status='submitted'.
  *
- * Body: { course_lesson_id, course_id, step_type, submission_text?, file_urls? }
+ * Body: { course_lesson_id, course_id, step_type, submission_text?, file_urls?, competency_key? }
  */
 export async function POST(request: NextRequest) {
   try { const rl = await applyRateLimit(request, 'api'); if (rl) return rl; } catch {}
@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
     step_type: string;
     submission_text?: string;
     file_urls?: string[];
+    competency_key?: string;
   };
 
   try {
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
     return safeError('Invalid JSON', 400);
   }
 
-  const { course_lesson_id, course_id, step_type, submission_text, file_urls } = body;
+  const { course_lesson_id, course_id, step_type, submission_text, file_urls, competency_key } = body;
 
   if (!course_lesson_id || !course_id || !step_type) {
     return safeError('course_lesson_id, course_id, and step_type are required', 400);
@@ -87,17 +88,21 @@ export async function POST(request: NextRequest) {
     return safeError('Not enrolled in this course', 403);
   }
 
-  // Insert submission — upsert not used because each attempt is a new row
+  // Insert submission — upsert not used because each attempt is a new row.
+  // lesson_id mirrors course_lesson_id — both columns exist on the table,
+  // lesson_id has a NOT NULL constraint and must be populated.
   const { data: submission, error: insertErr } = await db
     .from('step_submissions')
     .insert({
       user_id:          user.id,
+      lesson_id:        course_lesson_id,
       course_lesson_id,
       course_id,
       step_type,
       submission_text:  submission_text?.trim() || null,
       file_urls:        file_urls ?? [],
       status:           'submitted',
+      competency_key:   competency_key ?? null,
       updated_at:       new Date().toISOString(),
     })
     .select('id, status, created_at')
@@ -123,6 +128,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const course_id        = searchParams.get('course_id');
   const course_lesson_id = searchParams.get('course_lesson_id');
+  const competency_key   = searchParams.get('competency_key');
 
   if (!course_id) return safeError('course_id is required', 400);
 
@@ -130,12 +136,13 @@ export async function GET(request: NextRequest) {
 
   let query = db
     .from('step_submissions')
-    .select('id, course_lesson_id, step_type, submission_text, file_urls, status, instructor_note, reviewed_at, created_at')
+    .select('id, course_lesson_id, step_type, submission_text, file_urls, status, instructor_note, reviewed_at, created_at, competency_key')
     .eq('user_id', user.id)
     .eq('course_id', course_id)
     .order('created_at', { ascending: false });
 
   if (course_lesson_id) query = query.eq('course_lesson_id', course_lesson_id);
+  if (competency_key)   query = query.eq('competency_key', competency_key);
 
   const { data, error } = await query;
   if (error) return safeDbError(error, 'Failed to fetch submissions');

@@ -18,9 +18,7 @@ import {
   Calendar,
   Mail,
 } from 'lucide-react';
-import { emailTemplates } from '@/lib/email-templates';
-
-export const dynamic = 'force-dynamic';
+import { emailTemplates, type EmailTemplateKey } from '@/lib/email-templates';
 
 export default function NewCampaignPage() {
   const router = useRouter();
@@ -102,7 +100,6 @@ export default function NewCampaignPage() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* Hero Image */}
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "New" }]} />
       </div>

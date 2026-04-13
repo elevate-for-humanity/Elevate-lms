@@ -274,14 +274,13 @@ interface StatCardProps {
   title: string;
   value: string;
   icon: React.ComponentType<{ className?: string }>;
-  color: 'blue' | 'green' | 'blue' | 'orange';
+  color: 'blue' | 'green' | 'orange';
 }
 
 function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
   const colorClasses = {
     blue: 'text-brand-blue-600',
     green: 'text-brand-green-600',
-    blue: 'text-brand-blue-600',
     orange: 'text-brand-orange-600',
   };
 
@@ -327,10 +326,7 @@ function ActionButton({ title, description, href }: ActionButtonProps) {
       rel="noopener noreferrer"
       className="p-4 border-2 border-gray-200 rounded-lg hover:border-brand-blue-500 hover:bg-gray-50 transition-colors"
     >
-      <div className="font-medium text-black mb-1">
-
-      {/* Hero Image */}
-{title}</div>
+      <div className="font-medium text-black mb-1">{title}</div>
       <div className="text-sm text-black mb-2">{description}</div>
       <div className="flex items-center text-sm text-brand-blue-600">
         <span>Open</span>

@@ -9,7 +9,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-
 import {
 
   ArrowLeft,
@@ -21,7 +20,6 @@ import {
   Sparkles,
   Share2,
 } from 'lucide-react';
-export const dynamic = 'force-dynamic';
 
 export default function NewSocialCampaignPage() {
   const router = useRouter();
@@ -576,10 +574,7 @@ function PlatformButton({
       <Icon
         className={`w-8 h-8 mb-2 ${selected ? 'text-brand-blue-600' : 'text-black'}`}
       />
-      <div className="font-medium text-black">
-
-      {/* Hero Image */}
-{name}</div>
+      <div className="font-medium text-black">{name}</div>
     </button>
   );
 }

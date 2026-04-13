@@ -715,3 +715,96 @@
   to = "/lms/courses/0ba9a61c-1f1b-4019-be6f-90e92eba2bc0"
   status = 301
   force = true
+
+# ── State SEO page consolidation (15 flat routes → 3 dynamic routes) ──────────
+# Old flat URLs permanently redirect to the new canonical dynamic paths.
+# SEO equity is preserved via 301s.
+[[redirects]]
+  from = "/career-training-indiana"
+  to = "/career-training/indiana"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/career-training-illinois"
+  to = "/career-training/illinois"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/career-training-ohio"
+  to = "/career-training/ohio"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/career-training-tennessee"
+  to = "/career-training/tennessee"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/career-training-texas"
+  to = "/career-training/texas"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/community-services-indiana"
+  to = "/community-services/indiana"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/community-services-illinois"
+  to = "/community-services/illinois"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/community-services-ohio"
+  to = "/community-services/ohio"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/community-services-tennessee"
+  to = "/community-services/tennessee"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/community-services-texas"
+  to = "/community-services/texas"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/supersonic-fast-cash/tax-preparation-indiana"
+  to = "/supersonic-fast-cash/tax-preparation/indiana"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/supersonic-fast-cash/tax-preparation-illinois"
+  to = "/supersonic-fast-cash/tax-preparation/illinois"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/supersonic-fast-cash/tax-preparation-ohio"
+  to = "/supersonic-fast-cash/tax-preparation/ohio"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/supersonic-fast-cash/tax-preparation-tennessee"
+  to = "/supersonic-fast-cash/tax-preparation/tennessee"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/supersonic-fast-cash/tax-preparation-texas"
+  to = "/supersonic-fast-cash/tax-preparation/texas"
+  status = 301
+  force = true

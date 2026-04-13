@@ -50,6 +50,43 @@ export type QuizQuestion = {
   explanation?: string;
 };
 
+// ─── Activity tab ─────────────────────────────────────────────────────────────
+
+export const ACTIVITY_TYPES = [
+  'video',
+  'reading',
+  'flashcards',
+  'practice',
+  'lab',
+  'checkpoint',
+  'quiz',
+  'notes',
+  'resources',
+] as const;
+
+export type ActivityType = typeof ACTIVITY_TYPES[number];
+
+export type LessonActivity = {
+  type: ActivityType;
+  label: string;
+};
+
+/**
+ * Default activity sets by lesson type.
+ * Used by the pipeline when activities are not explicitly declared.
+ * The validator enforces that declared activities match available content.
+ */
+export const DEFAULT_ACTIVITIES: Record<string, ActivityType[]> = {
+  lesson:      ['video', 'reading', 'flashcards', 'practice'],
+  video:       ['video', 'reading', 'flashcards', 'practice'],
+  lab:         ['video', 'reading', 'lab'],
+  assignment:  ['video', 'reading', 'lab'],
+  quiz:        ['video', 'flashcards', 'practice', 'quiz'],
+  checkpoint:  ['reading', 'flashcards', 'practice', 'checkpoint'],
+  exam:        ['flashcards', 'practice', 'quiz'],
+  certification: ['reading'],
+};
+
 // ─── Competency check ─────────────────────────────────────────────────────────
 
 export type CompetencyCheck = {
@@ -90,6 +127,13 @@ export type CourseLesson = {
   practicalRequired?: boolean;
   /** Competency checks the instructor must approve — keys must be in registry */
   competencyChecks?: CompetencyCheck[];
+
+  /**
+   * Explicit activity tab list for this lesson.
+   * When omitted, the pipeline uses DEFAULT_ACTIVITIES[type].
+   * When declared, the validator enforces that each activity has backing content.
+   */
+  activities?: LessonActivity[];
 
   // ── Metadata ─────────────────────────────────────────────────────────────
   durationMinutes?: number;

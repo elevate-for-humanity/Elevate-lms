@@ -53,6 +53,7 @@ const CNA_TEMPLATE: CourseTemplate = {
             'Demonstrate proper hand hygiene technique',
           ],
           videoUrl: '/videos/cna/cna-lesson-1.mp4',
+          content: '<h2>Introduction to Patient Care</h2><p>As a Certified Nursing Assistant, your primary role is to support patients with daily activities and report changes in condition to the charge nurse. This lesson covers the fundamentals of patient-centered care, communication, and your legal scope of practice.</p>',
         },
         {
           slug:  'cna-lesson-2',
@@ -64,6 +65,7 @@ const CNA_TEMPLATE: CourseTemplate = {
             'Identify normal vs abnormal vital sign ranges',
           ],
           videoUrl: '/videos/cna/cna-lesson-2.mp4',
+          content: '<h2>Vital Signs</h2><p>Vital signs are the four key measurements that indicate the state of a patient\'s essential body functions: temperature, pulse, respiration, and blood pressure. Accurate measurement and timely reporting are core CNA competencies required for state board certification.</p>',
         },
         {
           slug:  'cna-module-1-checkpoint',
@@ -71,7 +73,7 @@ const CNA_TEMPLATE: CourseTemplate = {
           type:  'checkpoint',
           order: 3,
           learningObjectives: ['Demonstrate mastery of patient care basics'],
-          videoUrl: '/videos/cna/cna-module-1-checkpoint.mp4',
+          content: '<h2>Module 1 Review</h2><p>Before attempting the checkpoint quiz, review the key concepts from this module: the CNA role in the care team, proper hand hygiene technique, normal vital sign ranges, and when to report changes in patient condition to the charge nurse. You must score 75% or higher to proceed to Module 2.</p>',
           passingScore: 75,
           quizQuestions: [
             { id: 'q1', question: 'What is the normal resting heart rate for an adult?', options: ['40-60 bpm', '60-100 bpm', '100-120 bpm', '120-140 bpm'], correctAnswer: 1 },
@@ -172,7 +174,7 @@ assert('Broken template is invalid',     !brokenResult.valid);
 const errorMessages = brokenResult.errors.map(e => e.message);
 assert('Catches empty objectives',       errorMessages.some(m => m.includes('learning objective')));
 assert('Catches missing quiz questions', errorMessages.some(m => m.includes('quiz questions')));
-assert('Catches missing passing_score',  errorMessages.some(m => m.includes('passing_score')));
+assert('Catches missing passing_score',  errorMessages.some(m => m.includes('passingScore') || m.includes('passing_score')));
 assert('Catches unregistered key',       errorMessages.some(m => m.includes('totally_fake_key_xyz')));
 assert('Catches duplicate slug',         errorMessages.some(m => m.includes('duplicate')));
 

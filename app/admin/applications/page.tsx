@@ -75,11 +75,12 @@ export default async function ApplicationsPage({
       description="Review, approve, and manage program applications."
       breadcrumbs={[{ label: 'Admin', href: '/admin/dashboard' }, { label: 'Applications' }]}
       stats={[
-        { label: 'Total',      value: totalApplications,                    icon: Inbox,        color: 'slate' },
-        { label: 'Pending',    value: pending,                              icon: Clock,        color: 'amber', alert: pending > 0 },
-        { label: 'In Review',  value: statusCounts['in_review'] || 0,       icon: Eye,          color: 'blue' },
-        { label: 'Approved',   value: statusCounts['approved'] || 0,        icon: CheckCircle,  color: 'green' },
-        { label: 'Rejected',   value: statusCounts['rejected'] || 0,        icon: XCircle,      color: 'red' },
+        { label: 'Total',            value: totalApplications,                                                                    icon: Inbox,        color: 'slate' },
+        { label: 'Needs Review',     value: pending,                                                                              icon: Clock,        color: 'amber', alert: pending > 0 },
+        { label: 'In Review',        value: (statusCounts['in_review'] || 0) + (statusCounts['under_review'] || 0),              icon: Eye,          color: 'blue' },
+        { label: 'Approved',         value: (statusCounts['approved'] || 0) + (statusCounts['ready_to_enroll'] || 0),            icon: CheckCircle,  color: 'green' },
+        { label: 'Enrolled',         value: statusCounts['enrolled'] || 0,                                                       icon: CheckCircle,  color: 'teal' },
+        { label: 'Rejected',         value: statusCounts['rejected'] || 0,                                                       icon: XCircle,      color: 'red' },
       ]}
       actions={
         <FollowUpBlastButton pendingCount={pending} />
@@ -94,11 +95,14 @@ export default async function ApplicationsPage({
               className="px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-brand-blue-500 focus:outline-none">
               <option value="all">All Statuses</option>
               <option value="submitted">Submitted</option>
-              <option value="pending">Pending (legacy)</option>
               <option value="in_review">In Review</option>
+              <option value="under_review">Under Review</option>
+              <option value="pending_workone">Pending WorkOne</option>
+              <option value="waitlisted">Waitlisted</option>
               <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
+              <option value="ready_to_enroll">Ready to Enroll</option>
               <option value="enrolled">Enrolled</option>
+              <option value="rejected">Rejected</option>
             </select>
           </div>
           <div>

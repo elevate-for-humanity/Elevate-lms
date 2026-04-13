@@ -15,6 +15,7 @@ export interface ApplicationRow {
   city: string | null;
   zip: string | null;
   program_interest: string | null;
+  program_id: string | null;
   support_notes: string | null;
   status: string;
   source: string | null;
@@ -23,23 +24,29 @@ export interface ApplicationRow {
 }
 
 const STATUS_LABELS: Record<string, string> = {
-  pending:    'Pending',
-  submitted:  'Submitted',
-  approved:   'Approved',
-  rejected:   'Rejected',
-  in_review:  'In Review',
-  enrolled:   'Enrolled',
-  waitlisted: 'Waitlisted',
+  pending:          'Pending',
+  submitted:        'Submitted',
+  in_review:        'In Review',
+  under_review:     'Under Review',
+  approved:         'Approved',
+  ready_to_enroll:  'Ready to Enroll',
+  enrolled:         'Enrolled',
+  rejected:         'Rejected',
+  waitlisted:       'Waitlisted',
+  pending_workone:  'Pending WorkOne',
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  pending:    'bg-yellow-100 text-yellow-800',
-  submitted:  'bg-blue-100 text-blue-800',
-  approved:   'bg-emerald-100 text-emerald-800',
-  rejected:   'bg-red-100 text-red-800',
-  in_review:  'bg-indigo-100 text-indigo-800',
-  enrolled:   'bg-teal-100 text-teal-800',
-  waitlisted: 'bg-purple-100 text-purple-800',
+  pending:          'bg-yellow-100 text-yellow-800',
+  submitted:        'bg-blue-100 text-blue-800',
+  in_review:        'bg-indigo-100 text-indigo-800',
+  under_review:     'bg-violet-100 text-violet-800',
+  approved:         'bg-emerald-100 text-emerald-800',
+  ready_to_enroll:  'bg-cyan-100 text-cyan-800',
+  enrolled:         'bg-teal-100 text-teal-800',
+  rejected:         'bg-red-100 text-red-800',
+  waitlisted:       'bg-purple-100 text-purple-800',
+  pending_workone:  'bg-orange-100 text-orange-800',
 };
 
 function ActionButton({
@@ -138,7 +145,8 @@ export default function ApplicationsTableClient({ applications }: { applications
               app.full_name ||
               'Unknown';
             const status = overrides[app.id] ?? app.status;
-            const isPending = ['pending', 'submitted', 'in_review'].includes(status);
+            const isActionable = ['pending', 'submitted', 'in_review', 'under_review', 'pending_workone', 'waitlisted'].includes(status);
+            const canMoveToReview = ['submitted', 'pending'].includes(status);
 
             return (
               <tr key={app.id} className="hover:bg-gray-50 transition-colors">
@@ -154,6 +162,9 @@ export default function ApplicationsTableClient({ applications }: { applications
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
                   {app.program_interest || <span className="text-gray-400">Not specified</span>}
+                  {!app.program_id && !['rejected', 'waitlisted'].includes(status) && (
+                    <div className="text-[10px] text-amber-600 font-medium mt-0.5">⚠ No program linked</div>
+                  )}
                   {app.source && (
                     <div className="text-xs text-gray-400">{app.source.replace(/-/g, ' ')}</div>
                   )}
@@ -177,13 +188,13 @@ export default function ApplicationsTableClient({ applications }: { applications
                     >
                       <Eye className="w-2.5 h-2.5" /> View
                     </Link>
-                    {isPending && (
+                    {isActionable && (
                       <>
                         <ActionButton appId={app.id} action="approved" currentStatus={status} onDone={handleStatusChange} onError={handleStatusError} />
                         <ActionButton appId={app.id} action="rejected" currentStatus={status} onDone={handleStatusChange} onError={handleStatusError} />
                       </>
                     )}
-                    {status === 'submitted' && (
+                    {canMoveToReview && (
                       <ActionButton appId={app.id} action="in_review" currentStatus={status} onDone={handleStatusChange} onError={handleStatusError} />
                     )}
                   </div>

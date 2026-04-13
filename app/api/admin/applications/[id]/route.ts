@@ -171,7 +171,7 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
 
     const updateData = { ...parsed.data };
     if (updateData.status === 'approved' || updateData.status === 'rejected') {
-      updateData.reviewer_id = auth.id;
+      updateData.reviewer_id = auth.user.id;
     }
 
     const data = await updateApplication(id, updateData);
@@ -259,11 +259,11 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
               if (peErr) logger.error('[Approve] program_enrollments upsert failed:', peErr.message);
             });
 
-          // Update application with resolved IDs and enrolled status
+          // Update application with resolved IDs — keep status as 'approved'
+          // (transition to ready_to_enroll → enrolled happens via /api/admin/applications/transition)
           await auth.supabase
             .from('applications')
             .update({
-              status: 'enrolled',
               program_id: programId,
               user_id: userId,
             })
@@ -271,7 +271,7 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
 
           // Audit log
           await auth.supabase.from('audit_logs').insert({
-            actor_id: auth.id,
+            actor_id: auth.user.id,
             actor_role: auth.profile.role,
             action: 'create',
             resource_type: 'enrollment',
@@ -300,7 +300,7 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
                    'status_change';
 
     await auth.supabase.from('audit_logs').insert({
-      actor_id: auth.id,
+      actor_id: auth.user.id,
       actor_role: auth.profile.role,
       action,
       resource_type: 'application',
@@ -332,7 +332,7 @@ async function _DELETE(request: Request, { params }: { params: Promise<{ id: str
     const data = await deleteApplication(id);
 
     await auth.supabase.from('audit_logs').insert({
-      actor_id: auth.id,
+      actor_id: auth.user.id,
       actor_role: auth.profile.role,
       action: 'delete',
       resource_type: 'application',

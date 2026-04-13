@@ -491,6 +491,13 @@
 # ROUTE REDIRECTS
 # ============================================
 # Canonical: NO trailing slashes (prevents 308 hops)
+# Netlify strips the slash at the edge (301) before Next.js can issue a 308,
+# breaking the redirect loop that occurs when a proxy re-adds the slash.
+[[redirects]]
+  from = "/:path+/"
+  to = "/:path+"
+  status = 301
+  force = true
 
 [[redirects]]
   from = "/wp-admin"

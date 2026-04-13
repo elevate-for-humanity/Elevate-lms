@@ -338,7 +338,7 @@ if (auth.error) return auth.error;
 
 All three legacy patterns check the same role set. Do not refactor them unless you are also adding tests. Silent regressions from mass-refactors are worse than style inconsistency.
 
-**Middleware perimeter** (`middleware.ts`) redirects unauthenticated browsers away from `/admin`, `/lms`, `/instructor`, `/learner`, `/onboarding`, `/employer`, `/partner/dashboard`, `/program-holder`, `/staff-portal`, `/mentor`. This is a perimeter layer only — every page and API route still enforces its own guard.
+**Middleware perimeter** (`proxy.ts` — the root Next.js middleware) handles multi-domain routing, auth perimeter, admin namespace gating, and role enforcement for protected routes. Do NOT create a separate `middleware.ts` — it will conflict with `proxy.ts` and break the build. All middleware logic goes in `proxy.ts`.
 
 **Page-level guards** — `app/admin/layout.tsx` calls `requireAdmin()` before rendering. All 337 admin pages inherit this. Do not add redundant page-level guards inside `/admin/` unless a page sits outside the layout subtree.
 

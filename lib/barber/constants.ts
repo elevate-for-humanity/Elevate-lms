@@ -1,21 +1,14 @@
 /**
- * Canonical constants for the barber apprenticeship program.
+ * Barber apprenticeship constants.
  *
- * Import from here — never hardcode slugs, IDs, or competency keys inline.
+ * PROGRAM_COURSE_MAP is now canonical in lib/course-builder/schema.ts.
+ * Re-exported here for backward compatibility with existing importers.
  */
+
+export { PROGRAM_COURSE_MAP, resolveCourseId } from '@/lib/course-builder/schema';
 
 export const BARBER_PROGRAM_SLUG = 'barber-apprenticeship';
 export const BARBER_COURSE_ID    = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';
-
-/**
- * Maps program slug → canonical LMS course ID.
- * Used wherever an enrollment needs a course_id resolved from a program slug.
- * Keep in sync with grant-access/route.ts.
- */
-export const PROGRAM_COURSE_MAP: Record<string, string> = {
-  'barber-apprenticeship': BARBER_COURSE_ID,
-  'hvac-technician':       'f0593164-55be-5867-98e7-8a86770a8dd0',
-};
 
 /**
  * Competency keys for the five practical lessons that require instructor sign-off.

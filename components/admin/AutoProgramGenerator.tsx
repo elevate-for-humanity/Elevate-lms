@@ -127,8 +127,8 @@ export function AutoProgramGenerator() {
         setGeneratedPrograms(formatted);
         return;
       }
-    } catch (err) {
-      console.error('Error loading programs:', err);
+    } catch {
+      // Programs unavailable — empty state shown below
     }
 
     // No programs found — show empty state

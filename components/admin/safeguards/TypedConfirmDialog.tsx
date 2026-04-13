@@ -43,9 +43,8 @@ export function TypedConfirmDialog({
     try {
       await onConfirm();
       close();
-    } catch (e) {
+    } catch {
       setBusy(false);
-      console.error(e);
     }
   };
 

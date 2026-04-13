@@ -75,6 +75,15 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+# Persist the webpack filesystem cache (.next/cache) between Netlify builds.
+# On a cold build this cache doesn't exist, so webpack compiles everything.
+# On subsequent builds webpack restores from disk and only recompiles changed
+# modules — dramatically reducing peak RAM and build time.
+[[plugins]]
+  package = "netlify-plugin-cache"
+  [plugins.inputs]
+    paths = [".next/cache"]
+
 # CDN caching — pages cached 60s at edge, static assets cached 1 year
 [[headers]]
   for = "/*"

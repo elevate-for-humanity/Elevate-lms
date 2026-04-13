@@ -185,12 +185,23 @@ const nextConfig = {
         tls: false,
       };
     }
+
+    // Filesystem cache: serialises the module graph to disk between builds.
+    // On Netlify this persists across deploys via the build cache, cutting
+    // both cold-start RAM and build time significantly.
+    config.cache = {
+      type: 'filesystem',
+      buildDependencies: {
+        config: [new URL(import.meta.url).pathname],
+      },
+    };
+
     config.optimization = {
       ...config.optimization,
       moduleIds: 'deterministic',
-      // Simplified splitChunks — the previous name(module) callback ran for every
-      // node_modules module during compilation, contributing to heap pressure.
-      // Next.js default chunking is sufficient; only override what's necessary.
+      // Drop the commons cacheGroup. With 1,600+ pages, minChunks:2 forces
+      // webpack to compare every module against every page's module set,
+      // causing O(n^2) RAM growth. The framework chunk is sufficient.
       splitChunks: {
         chunks: 'all',
         cacheGroups: {
@@ -202,12 +213,6 @@ const nextConfig = {
             test: /[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-subscription)[\\/]/,
             priority: 40,
             enforce: true,
-          },
-          commons: {
-            name: 'commons',
-            minChunks: 2,
-            priority: 20,
-            reuseExistingChunk: true,
           },
         },
       },

@@ -24,7 +24,7 @@
   # Netlify standard build containers have ~3 GB RAM. 8192 causes OOM kill (exit 137).
   # 3072 leaves ~900 MB headroom for the OS and pnpm install.
   # --expose-gc enables explicit GC calls; Next.js uses this during large builds.
-  NODE_OPTIONS = "--max-old-space-size=6144 --expose-gc"
+  NODE_OPTIONS = "--max-old-space-size=8192 --expose-gc"
   NETLIFY_USE_PNPM = "true"
   # Suppress Next.js telemetry pings during build — reduces network overhead
   NEXT_TELEMETRY_DISABLED = "1"

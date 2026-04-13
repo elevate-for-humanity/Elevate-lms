@@ -64,6 +64,9 @@ const nextConfig = {
     '@react-three/drei',
     'hls.js',
     '@mediapipe/tasks-vision',
+    // Monaco editor (75 MB) — client-only, loaded via dynamic import
+    '@monaco-editor/react',
+    'monaco-editor',
   ],
 
   // Disable dev indicators (static route indicator, build indicator)
@@ -185,10 +188,11 @@ const nextConfig = {
     config.optimization = {
       ...config.optimization,
       moduleIds: 'deterministic',
+      // Simplified splitChunks — the previous name(module) callback ran for every
+      // node_modules module during compilation, contributing to heap pressure.
+      // Next.js default chunking is sufficient; only override what's necessary.
       splitChunks: {
         chunks: 'all',
-        maxInitialRequests: 25,
-        minSize: 20000,
         cacheGroups: {
           default: false,
           vendors: false,
@@ -199,34 +203,11 @@ const nextConfig = {
             priority: 40,
             enforce: true,
           },
-          lib: {
-            test: /[\\/]node_modules[\\/]/,
-            name(module) {
-              const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)?.[1];
-              return `npm.${packageName?.replace('@', '')}`;
-            },
-            priority: 30,
-            minChunks: 1,
-            reuseExistingChunk: true,
-          },
-          // Split large UI libraries
-          ui: {
-            test: /[\\/]node_modules[\\/](@radix-ui|lucide-react)[\\/]/,
-            name: 'ui-libs',
-            priority: 35,
-            reuseExistingChunk: true,
-          },
-          // Split Supabase
-          supabase: {
-            test: /[\\/]node_modules[\\/](@supabase)[\\/]/,
-            name: 'supabase',
-            priority: 35,
-            reuseExistingChunk: true,
-          },
           commons: {
             name: 'commons',
             minChunks: 2,
             priority: 20,
+            reuseExistingChunk: true,
           },
         },
       },
@@ -314,6 +295,11 @@ const nextConfig = {
       '**/node_modules/.pnpm/hls.js*/**',
       '**/node_modules/@mediapipe/**',
       '**/node_modules/.pnpm/@mediapipe*/**',
+      // Monaco editor (75 MB) — client-only, never traced into server bundle
+      '**/node_modules/monaco-editor/**',
+      '**/node_modules/.pnpm/monaco-editor*/**',
+      '**/node_modules/@monaco-editor/**',
+      '**/node_modules/.pnpm/@monaco-editor*/**',
       // Source files not needed at runtime
       'app/**/*.tsx',
       'app/**/*.ts',
@@ -1046,6 +1032,12 @@ const sentryWebpackPluginOptions = {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   authToken: process.env.SENTRY_AUTH_TOKEN,
+  // Skip source map upload and webpack instrumentation when no auth token is
+  // configured. Without this, withSentryConfig wraps the entire webpack
+  // compilation even on builds where it cannot upload anything, adding
+  // measurable heap pressure on large codebases.
+  disableServerWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
+  disableClientWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
 };
 
 export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);

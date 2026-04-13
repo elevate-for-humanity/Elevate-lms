@@ -64,7 +64,8 @@ export async function POST(req: Request) {
         zip: validated.zipCode,
         program_interest: 'Barber Apprenticeship',
         program_slug: 'barber-apprenticeship', // required for approve.ts → resolveCourseId()
-        status: 'pending_payment',
+        program_id: '5ff21fcb-1968-41fd-99d3-37d69a31bd5c', // required for approve.ts enrollment block
+        status: 'submitted',
         // date_of_birth, address, state stored in eligibility_data (not in applications schema)
         eligibility_data: {
           date_of_birth: validated.dateOfBirth,
@@ -103,7 +104,7 @@ export async function POST(req: Request) {
       sponsor_name: RAPIDS_CONFIG.sponsorOfRecord,
       occupation_code: DOT_CODES.BARBER,
       occupation_title: 'Barber',
-      status: 'pending_payment',
+      status: 'submitted',
       created_at: new Date().toISOString(),
       // Additional RAPIDS enrollment data
       ...(rapidsEnrollmentData || {}),

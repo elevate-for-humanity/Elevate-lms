@@ -189,21 +189,29 @@ export async function approveApplication(
     const programSlug = app.program_slug ?? app.pathway_slug ?? null;
     const resolvedCourseId = programSlug ? (PROGRAM_COURSE_MAP[programSlug] ?? null) : null;
 
-    const { data: pe } = await db
+    const { data: pe, error: peErr } = await db
       .from('program_enrollments')
       .upsert({
         user_id: userId,
         program_id: resolvedProgramId,
+        program_slug: programSlug,
         email,
         full_name: `${app.first_name || ''} ${app.last_name || ''}`.trim(),
         amount_paid_cents: 0,
         funding_source: fundingType || 'pending',
         status: 'active',
         enrollment_state: 'active',
+        funding_verified: false,   // NOT NULL
+        payout_status: 'pending',  // NOT NULL
+        at_risk: false,            // NOT NULL
         ...(resolvedCourseId ? { course_id: resolvedCourseId } : {}),
-      }, { onConflict: 'user_id,program_id', ignoreDuplicates: false })
+      }, { onConflict: 'user_id,program_slug', ignoreDuplicates: false })
       .select('id')
       .maybeSingle();
+
+    if (peErr) {
+      logger.error('[approve] program_enrollments upsert failed', { error: peErr.message, userId, resolvedProgramId });
+    }
 
     enrollmentId = pe?.id || null;
 

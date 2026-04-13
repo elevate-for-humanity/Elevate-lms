@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: login endpoint — no auth possible
 /**
  * @deprecated No active callers. Canonical endpoint is /api/auth/signin.
  * Kept to avoid 404s from any external integrations — forwards to signin.

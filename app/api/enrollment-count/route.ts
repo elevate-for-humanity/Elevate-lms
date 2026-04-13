@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public enrollment count display
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

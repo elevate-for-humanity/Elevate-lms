@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
+import { apiRequireAdmin } from '@/lib/admin/guards';
 // Using Node.js runtime for email compatibility
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
@@ -14,6 +14,9 @@ async function _POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
+
   await hydrateProcessEnv();
     const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;

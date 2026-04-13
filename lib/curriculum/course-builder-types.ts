@@ -1,7 +1,14 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Canonical course builder types.
-// These are the locked schema definitions for all programs.
-// Do not add values to enums without updating the verifier and all seeds.
+// Barber seed types — used by scripts/course-builder/seeds/*.seed.ts only.
+//
+// These are NOT the canonical course builder types.
+// For the compiler pipeline, use lib/course-builder/schema.ts (CourseTemplate,
+// CourseModule, CourseLesson) and lib/curriculum/blueprints/types.ts
+// (CredentialBlueprint).
+//
+// These types represent the barber-specific seed shape (CourseSeed, LessonSeed,
+// CheckpointSeed) which predates the compiler pipeline and is used only by the
+// scripts/course-builder/ seed scripts. Do not use for new programs.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // State board exam domain — maps to written exam topic weights.

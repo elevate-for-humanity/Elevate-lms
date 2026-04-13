@@ -393,24 +393,20 @@ export default function HVACClassroomPreview() {
           {/* ── VIDEO TAB ── */}
           {activeTab === 'video' && (
             <div>
-              {currentModuleIndex === 0 ? (
-                <InteractiveVideoPlayer
-                  videoUrl={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/course-videos/hvac/hvac-module1-lesson1.mp4`}
-                  title={mod.title}
-                  onProgress={handleProgress}
-                  onComplete={() => completeTab('video')}
-                />
-              ) : (
-                <div className="bg-white aspect-video rounded-xl flex items-center justify-center">
-                  <div className="text-center text-white">
-                    <Video className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                    <p className="text-lg font-semibold">{mod.title}</p>
-                    <p className="text-sm text-slate-500 mt-1">
-                      {videoLessons.length} video{videoLessons.length !== 1 ? 's' : ''} · {videoLessons.reduce((s, l) => s + (l.durationMinutes || 15), 0)} min
-                    </p>
-                  </div>
-                </div>
-              )}
+              {(() => {
+                // Derive video path from current module index (1-based).
+                // Storage convention: hvac-module{N}-lesson1.mp4
+                const moduleNum = currentModuleIndex + 1;
+                const videoUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/course-videos/hvac/hvac-module${moduleNum}-lesson1.mp4`;
+                return (
+                  <InteractiveVideoPlayer
+                    videoUrl={videoUrl}
+                    title={mod.title}
+                    onProgress={handleProgress}
+                    onComplete={() => completeTab('video')}
+                  />
+                );
+              })()}
               <div className="mt-4 flex items-center gap-3 text-sm">
                 <div className="flex-1 bg-slate-200 rounded-full h-2">
                   <div className="bg-white h-2 rounded-full transition-all" style={{ width: `${videoProgress}%` }} />

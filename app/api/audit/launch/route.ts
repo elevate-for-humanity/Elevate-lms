@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public audit launch endpoint
 
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';

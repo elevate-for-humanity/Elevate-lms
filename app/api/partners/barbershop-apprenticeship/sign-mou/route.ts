@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: barbershop apprenticeship MOU form
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminClient } from '@/lib/supabase/admin';

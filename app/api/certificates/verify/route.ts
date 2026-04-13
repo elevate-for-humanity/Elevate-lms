@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: certificate verification for employers and third parties
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';

@@ -34,8 +34,9 @@ import {
   type CourseModule,
   type CourseTemplate,
 } from './schema';
-import { findUnregisteredKeys } from './competencies';
+import { findUnregisteredKeys, getCompetenciesForProgram } from './competencies';
 import { resolveCourseId } from './schema';
+import { validateHours } from './hours-engine';
 
 // ─── Result types ─────────────────────────────────────────────────────────────
 
@@ -140,6 +141,12 @@ export function validateCourseLesson(lesson: CourseLesson, moduleSlug: string): 
     if (!hasContent && !lesson.videoUrl)
       e('content', `${lesson.type} requires content (≥200 visible chars) or videoUrl`);
   }
+
+  // Duration — hard fail if null (hours engine must run before publish)
+  if (lesson.durationMinutes == null)
+    e('durationMinutes', `duration_minutes is null — run the hours engine before publishing`, 'warning');
+  else if (lesson.durationMinutes <= 0)
+    e('durationMinutes', `duration_minutes must be > 0 (got ${lesson.durationMinutes})`);
 
   // Assessment
   if (ASSESSED_LESSON_TYPES.includes(lesson.type as any)) {
@@ -272,10 +279,57 @@ export function validateCourseTemplate(template: CourseTemplate): CourseValidati
         `exam '${exams[0].slug}' is not the last lesson — move it to the end`));
   }
 
+  // requiresFinalExam enforcement
+  if (template.requiresFinalExam && exams.length === 0)
+    cErr('requiresFinalExam', 'requiresFinalExam=true but no exam lesson found');
+
+  // Final exam must have passingScore
+  if (exams.length > 0 && exams[0].passingScore == null)
+    cErr('finalExam', `final exam '${exams[0].slug}' has no passingScore`);
+
   // Warn if course doesn't end on exam or certification
   const last = allLessons[allLessons.length - 1];
   if (last && !['exam', 'certification'].includes(last.type))
     cErr('sequence', `course ends on '${last.type}' — consider ending with an exam or certification step`, 'warning');
+
+  // minimumHours check
+  if (template.minimumHours) {
+    const hoursResult = validateHours(template);
+    if (!hoursResult.valid) {
+      for (const e of hoursResult.errors) cErr('minimumHours', e);
+    }
+    for (const w of hoursResult.warnings) cErr('minimumHours', w, 'warning');
+  }
+
+  // Quiz-required module enforcement
+  for (const mod of template.modules ?? []) {
+    if (mod.quizRequired) {
+      const hasAssessment = mod.lessons.some(l =>
+        ASSESSED_LESSON_TYPES.includes(l.type as any)
+      );
+      if (!hasAssessment)
+        allErrors.push(mkErr(mod.slug, '_module', 'quizRequired',
+          `module '${mod.slug}' has quizRequired=true but no checkpoint/quiz/exam lesson`));
+    }
+    if (mod.practicalRequired) {
+      const hasPractical = mod.lessons.some(l => l.type === 'lab' || l.type === 'assignment');
+      if (!hasPractical)
+        allErrors.push(mkErr(mod.slug, '_module', 'practicalRequired',
+          `module '${mod.slug}' has practicalRequired=true but no lab/assignment lesson`));
+    }
+  }
+
+  // Critical competency coverage
+  const programCompetencies = getCompetenciesForProgram(template.programSlug);
+  const criticalKeys = programCompetencies.filter(c => c.isCritical).map(c => c.key);
+  if (criticalKeys.length > 0) {
+    const coveredKeys = new Set(
+      allLessons.flatMap(l => (l.competencyChecks ?? []).map(c => c.key))
+    );
+    const uncoveredCritical = criticalKeys.filter(k => !coveredKeys.has(k));
+    for (const key of uncoveredCritical)
+      cErr('competencyChecks', `critical competency '${key}' is not covered by any lesson`)
+  }
 
   const errors   = allErrors.filter(e => e.severity === 'error');
   const warnings = allErrors.filter(e => e.severity === 'warning');

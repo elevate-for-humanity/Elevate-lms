@@ -1,3 +1,4 @@
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { createClient } from '@/lib/supabase/server';
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -16,6 +17,9 @@ async function _GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await apiRequireAdmin(request);
+  if (auth.error) return auth.error;
+
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -82,6 +86,9 @@ async function _PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await apiRequireAdmin(request);
+  if (auth.error) return auth.error;
+
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -133,6 +140,9 @@ async function _DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await apiRequireAdmin(request);
+  if (auth.error) return auth.error;
+
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;

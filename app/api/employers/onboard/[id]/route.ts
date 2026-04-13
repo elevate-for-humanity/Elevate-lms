@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: employer onboarding step update
 import { NextResponse } from 'next/server';
 
 import { getAdminClient } from '@/lib/supabase/admin';

@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: testing booking status by token
 /**
  * GET /api/testing/booking-status?session_id=<stripe_session_id>
  *

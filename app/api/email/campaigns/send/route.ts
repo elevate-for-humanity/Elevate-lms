@@ -1,6 +1,8 @@
 
 
 import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { createClient } from '@/lib/supabase/server';
 import { resend } from '@/lib/resend';
 import { hydrateProcessEnv } from '@/lib/secrets';
@@ -13,7 +15,10 @@ export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
-async function _POST(req: Request) {
+async function _POST(req: NextRequest) {
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
+
   try {
   await hydrateProcessEnv();
     const rateLimited = await applyRateLimit(req, 'strict');

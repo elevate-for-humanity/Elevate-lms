@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: chatbot lead capture — public
 // AUTH: Intentionally public — no authentication required
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';

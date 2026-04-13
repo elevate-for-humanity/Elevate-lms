@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: partner course checkout
 
 
 import { NextRequest, NextResponse } from 'next/server';

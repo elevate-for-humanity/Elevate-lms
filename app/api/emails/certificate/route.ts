@@ -1,5 +1,5 @@
-
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { apiAuthGuard } from '@/lib/admin/guards';
 import { parseBody } from '@/lib/api-helpers';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
@@ -12,7 +12,10 @@ export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
-async function _POST(request: Request) {
+async function _POST(request: NextRequest) {
+  const auth = await apiAuthGuard(request);
+  if (auth.error) return auth.error;
+
   try {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;

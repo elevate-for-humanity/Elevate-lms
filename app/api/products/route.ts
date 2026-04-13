@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public product catalog
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getProducts, getCategories } from '@/lib/store/db';

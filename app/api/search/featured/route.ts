@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public featured search results
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getFeaturedForAudience } from '@/lib/store/db';

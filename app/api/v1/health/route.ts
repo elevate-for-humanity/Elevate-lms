@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: v1 health check
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: testing slot management
 /**
  * GET    /api/testing/slots       — list upcoming slots (admin)
  * POST   /api/testing/slots       — create a slot (admin)

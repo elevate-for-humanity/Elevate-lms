@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: v1 API — auth inside handler
 
 // Public REST API - Courses Endpoint
 import { NextRequest, NextResponse } from 'next/server';

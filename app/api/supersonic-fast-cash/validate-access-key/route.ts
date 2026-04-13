@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: access key validation
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

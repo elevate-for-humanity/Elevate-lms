@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public course list for catalog browsing
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';

@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public social media feeds
 // AUTH: Intentionally public — no authentication required
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';

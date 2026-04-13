@@ -25,7 +25,7 @@ export const maxDuration = 60;
 const SCHOOL_NAME  = 'Mesmerized by Beauty Cosmetology Academy';
 const SCHOOL_EMAIL = 'mesmerizedbybeautyl@yahoo.com';
 const ELEVATE_BCC  = 'info@elevateforhumanity.org';
-const SITE_URL     = 'https://elevateforhumanity.institute';
+const SITE_URL     = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
 
 const PROGRAM_LABELS: Record<string, string> = {
   'cosmetology-apprenticeship':     'Cosmetology',

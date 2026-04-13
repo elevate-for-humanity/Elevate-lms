@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public blog content feed
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { getAdminClient } from '@/lib/supabase/admin';

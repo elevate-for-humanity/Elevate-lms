@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public partner directory
 import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';

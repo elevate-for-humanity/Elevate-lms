@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: partner document upload form
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminClient } from '@/lib/supabase/admin'
 import { safeError, safeInternalError } from '@/lib/api/safe-error'

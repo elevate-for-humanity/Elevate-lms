@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: security scan event reporting — no auth possible
 import { NextResponse } from "next/server";
 import { detectAIBot, isRateLimited, logRequest } from '@/lib/security/ai-protection';
 

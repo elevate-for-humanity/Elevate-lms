@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: SupersonicFastCash appointment booking
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';

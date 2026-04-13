@@ -7,18 +7,21 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const dynamic = 'force-dynamic';
 
 async function _GET(request: NextRequest) {
-  
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
-const { searchParams } = new URL(request.url);
-  const programId = searchParams.get('programId');
-  const userId = searchParams.get('userId');
-
-  if (!programId || !userId) {
-    return NextResponse.json({ error: 'Missing programId or userId' }, { status: 400 });
-  }
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { searchParams } = new URL(request.url);
+  const programId = searchParams.get('programId');
+  // IDOR fix: ignore caller-supplied userId, always use session user
+  const userId = user.id;
+
+  if (!programId) {
+    return NextResponse.json({ error: 'Missing programId' }, { status: 400 });
+  }
 
   // Get program curriculum from JSON
   const programData = programCurriculum.programs.find(p => p.id === programId);

@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: OAuth initiation — no auth possible
 // AUTH: Intentionally public — no authentication required
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: live support chat — fetch messages by session_id (rate-limited)
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { applyRateLimit } from '@/lib/api/withRateLimit';

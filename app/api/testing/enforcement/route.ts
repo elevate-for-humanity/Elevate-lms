@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: enforcement testing
 /**
  * GET /api/testing/enforcement?email=...
  *

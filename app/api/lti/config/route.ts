@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: LTI tool configuration — public per LTI spec
 // AUTH: Intentionally public — no authentication required
 
 // app/api/lti/config/route.ts

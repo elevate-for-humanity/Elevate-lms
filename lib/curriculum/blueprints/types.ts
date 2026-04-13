@@ -113,6 +113,12 @@ export type BlueprintCompetency = {
   isCritical: boolean;
   /** Minimum number of lessons in this module that must cover this competency */
   minimumTouchpoints: number;
+  /** How this competency is assessed */
+  assessmentMethod?: 'quiz' | 'lab' | 'exam' | 'observation' | 'assignment';
+  /** Domain key for state board / credential alignment */
+  domainKey?: string;
+  /** When true, competency cannot be marked achieved by quiz alone */
+  requiresInstructorSignoff?: boolean;
 };
 
 // ─── Lesson type requirement (consumed by auditor) ────────────────────────────
@@ -196,6 +202,23 @@ export type BlueprintGenerationRules = {
   generatorMode: 'fixed' | 'flexible';
 };
 
+// ─── Final exam config ────────────────────────────────────────────────────────
+
+export type BlueprintFinalExamConfig = {
+  questionCount: number;
+  passingScore: number;
+  /** Domain key → percentage of questions from that domain (must sum to 100) */
+  domainDistribution?: Record<string, number>;
+};
+
+// ─── Certificate requirements ─────────────────────────────────────────────────
+
+export type BlueprintCertificateRequirements = {
+  includeHours: boolean;
+  includeCompetencies: boolean;
+  includeInstructorVerification: boolean;
+};
+
 // ─── Video config (locked into blueprint — drives automatic generation) ───────
 
 export type BlueprintVideoConfig = {
@@ -276,6 +299,22 @@ export type CredentialBlueprint = {
   trackVariants: string[];
 
   status: 'active' | 'draft' | 'archived';
+
+  // ── Credential alignment ──────────────────────────────────────────────────
+  /** Credential body this program aligns to */
+  credentialTarget?: 'IC&RC' | 'NAADAC' | 'STATE_BOARD' | 'DOL_APPRENTICESHIP' | 'INTERNAL';
+
+  /** Minimum total instructional hours — compiler hard-fails if not met */
+  minimumHours?: number;
+
+  /** When true, compiler enforces a final exam lesson at the end */
+  requiresFinalExam?: boolean;
+
+  /** Final exam configuration — required when requiresFinalExam is true */
+  finalExam?: BlueprintFinalExamConfig;
+
+  /** What evidence must be present before a certificate can be issued */
+  certificateRequirements?: BlueprintCertificateRequirements;
 
   generationRules: BlueprintGenerationRules;
 

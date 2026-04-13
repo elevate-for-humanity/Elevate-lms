@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: live support chat — anon users can open sessions before login
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { Ratelimit } from "@upstash/ratelimit";

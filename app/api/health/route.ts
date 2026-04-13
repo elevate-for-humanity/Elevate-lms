@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: health check — no auth possible
 import { NextResponse } from 'next/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 

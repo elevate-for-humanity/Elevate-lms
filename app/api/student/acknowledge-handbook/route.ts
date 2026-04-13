@@ -1,3 +1,4 @@
+import { apiAuthGuard } from '@/lib/admin/guards';
 import { NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
@@ -10,6 +11,9 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
+  const auth = await apiAuthGuard(request);
+  if (auth.error) return auth.error;
+
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;

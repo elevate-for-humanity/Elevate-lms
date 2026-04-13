@@ -1,3 +1,4 @@
+// CRON ROUTE: internal-key gated — server-to-server verification only
 /**
  * Internal proof route — verifies canonical DB state for a program slug.
  *

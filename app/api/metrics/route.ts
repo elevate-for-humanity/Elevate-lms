@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public metrics display
 
 // AUTH: Intentionally public — no authentication required
 

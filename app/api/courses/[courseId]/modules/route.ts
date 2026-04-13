@@ -16,6 +16,11 @@ async function _GET(
     const { courseId } = await params;
     const supabase = await createClient();
 
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { data, error } = await supabase
       .from('course_modules')
       .select('*')

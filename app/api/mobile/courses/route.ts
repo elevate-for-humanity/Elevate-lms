@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: mobile app course list — Bearer auth inside handler
 
 
 // app/api/mobile/courses/route.ts

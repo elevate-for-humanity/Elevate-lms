@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: marketplace purchase details by token
 import { NextResponse } from 'next/server';
 
 import { getAdminClient } from '@/lib/supabase/admin';

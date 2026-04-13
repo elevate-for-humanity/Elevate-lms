@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: magic link resend — no auth possible
 /**
  * POST /api/auth/resend-magic-link
  *

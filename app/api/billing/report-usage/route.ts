@@ -1,4 +1,4 @@
-
+// CRON ROUTE: internal-token gated — called by billing cron, not user-facing
 import { getAdminClient } from '@/lib/supabase/admin';
 
 // app/api/billing/report-usage/route.ts

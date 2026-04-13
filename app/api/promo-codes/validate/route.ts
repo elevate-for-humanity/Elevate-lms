@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public promo code validation at checkout
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';

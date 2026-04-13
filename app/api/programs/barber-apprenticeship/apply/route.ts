@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: barber apprenticeship application form
 import { logger } from '@/lib/logger';
 
 import { NextResponse } from 'next/server';

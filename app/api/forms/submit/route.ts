@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: generic public form submission
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeInternalError, safeError } from '@/lib/api/safe-error';

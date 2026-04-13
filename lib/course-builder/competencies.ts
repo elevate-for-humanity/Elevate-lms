@@ -14,6 +14,8 @@
  *   3. The validator will enforce them automatically.
  */
 
+import type { AssessmentMethod } from './schema';
+
 export type CompetencyDefinition = {
   /** Stable machine key — must match course_lessons.competency_checks[].key in DB */
   key: string;
@@ -25,6 +27,10 @@ export type CompetencyDefinition = {
   requiresInstructorSignoff: boolean;
   /** Whether failure on this competency is a program disqualifier */
   isCritical: boolean;
+  /** How this competency is assessed — drives mapper and gate logic */
+  assessmentMethod: AssessmentMethod;
+  /** Domain key for state board / credential alignment */
+  domainKey?: string;
   /** Optional description for instructor guidance */
   description?: string;
 };
@@ -39,6 +45,8 @@ export const COMPETENCY_REGISTRY: CompetencyDefinition[] = [
     programSlug: 'barber-apprenticeship',
     requiresInstructorSignoff: true,
     isCritical: true,
+    assessmentMethod: 'observation',
+    domainKey: 'infection_control',
     description: 'Student correctly prepares Barbicide solution and fully submerges tools for required contact time.',
   },
   {
@@ -47,6 +55,8 @@ export const COMPETENCY_REGISTRY: CompetencyDefinition[] = [
     programSlug: 'barber-apprenticeship',
     requiresInstructorSignoff: true,
     isCritical: true,
+    assessmentMethod: 'observation',
+    domainKey: 'infection_control',
     description: 'Student safely removes and replaces a razor blade using proper sharps handling technique.',
   },
   {
@@ -55,6 +65,8 @@ export const COMPETENCY_REGISTRY: CompetencyDefinition[] = [
     programSlug: 'barber-apprenticeship',
     requiresInstructorSignoff: true,
     isCritical: false,
+    assessmentMethod: 'observation',
+    domainKey: 'infection_control',
     description: 'Student applies neck strip and cape without skin contact, ensuring client protection.',
   },
 
@@ -65,6 +77,8 @@ export const COMPETENCY_REGISTRY: CompetencyDefinition[] = [
     programSlug: 'barber-apprenticeship',
     requiresInstructorSignoff: true,
     isCritical: true,
+    assessmentMethod: 'observation',
+    domainKey: 'chemical_services',
     description: 'Student correctly labels, stores, and segregates chemicals per OSHA HazCom standards.',
   },
   {
@@ -73,6 +87,8 @@ export const COMPETENCY_REGISTRY: CompetencyDefinition[] = [
     programSlug: 'barber-apprenticeship',
     requiresInstructorSignoff: true,
     isCritical: false,
+    assessmentMethod: 'observation',
+    domainKey: 'chemical_services',
     description: 'Student locates and reads a Safety Data Sheet, identifying hazard class and PPE requirements.',
   },
 
@@ -83,6 +99,8 @@ export const COMPETENCY_REGISTRY: CompetencyDefinition[] = [
     programSlug: 'barber-apprenticeship',
     requiresInstructorSignoff: true,
     isCritical: true,
+    assessmentMethod: 'observation',
+    domainKey: 'consultation',
     description: 'Student conducts a full consultation: service goals, contraindications, and written record.',
   },
 
@@ -93,6 +111,8 @@ export const COMPETENCY_REGISTRY: CompetencyDefinition[] = [
     programSlug: 'barber-apprenticeship',
     requiresInstructorSignoff: true,
     isCritical: false,
+    assessmentMethod: 'observation',
+    domainKey: 'haircutting',
     description: 'Student cleans, oils, and aligns clipper blades to manufacturer specification.',
   },
 
@@ -103,6 +123,8 @@ export const COMPETENCY_REGISTRY: CompetencyDefinition[] = [
     programSlug: 'barber-apprenticeship',
     requiresInstructorSignoff: true,
     isCritical: true,
+    assessmentMethod: 'observation',
+    domainKey: 'shaving',
     description: 'Student demonstrates correct razor grip, tension, and stroke angle on a mannequin.',
   },
 ];

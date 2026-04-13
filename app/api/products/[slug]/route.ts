@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public product page data
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getProduct, getRecommendations, getAvatarSalesMessage } from '@/lib/store/db';

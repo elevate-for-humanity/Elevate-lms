@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: testing checkout
 /**
  * POST /api/testing/checkout
  *

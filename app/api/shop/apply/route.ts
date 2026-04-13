@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: shop application form
 
 
 import { NextResponse } from 'next/server';

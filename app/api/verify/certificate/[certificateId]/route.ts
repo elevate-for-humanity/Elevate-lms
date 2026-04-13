@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public certificate verification
 
 // app/api/verify/certificate/[certificateId]/route.ts
 import { NextRequest, NextResponse } from "next/server";

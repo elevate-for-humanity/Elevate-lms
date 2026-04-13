@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public metrics endpoint
 
 
 import { NextResponse } from 'next/server';

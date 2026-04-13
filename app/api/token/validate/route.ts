@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public token validation
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { useToken } from '@/lib/notifications';

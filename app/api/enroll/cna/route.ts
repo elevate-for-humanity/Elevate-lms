@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: CNA program enrollment form
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';

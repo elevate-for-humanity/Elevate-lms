@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public reviews feed
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';

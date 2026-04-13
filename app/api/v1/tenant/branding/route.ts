@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: v1 tenant branding — API-key gated
 /**
  * Tenant Branding API
  * Allows license holders to customize their platform appearance

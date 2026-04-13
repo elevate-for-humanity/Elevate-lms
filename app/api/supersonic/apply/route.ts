@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: SupersonicFastCash application form
 import { safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';

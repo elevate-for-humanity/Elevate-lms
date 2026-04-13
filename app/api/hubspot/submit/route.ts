@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: HubSpot form submission relay
 
 // AUTH: Intentionally public — no authentication required
 

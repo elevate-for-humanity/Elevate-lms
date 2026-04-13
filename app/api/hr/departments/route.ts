@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: HR departments — internal reference data
 import { createClient } from '@/lib/supabase/server';
 
 import { NextRequest, NextResponse } from 'next/server';

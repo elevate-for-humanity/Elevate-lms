@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: testing lead capture
 /**
  * POST /api/testing/leads
  *

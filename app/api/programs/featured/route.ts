@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public featured programs list
 
 // app/api/programs/featured/route.ts
 // Cached featured programs endpoint

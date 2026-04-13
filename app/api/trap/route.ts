@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: honeypot trap endpoint
 import { NextRequest, NextResponse } from 'next/server';
 // AUTH: Intentionally public — no authentication required
 

@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: Sezzle BNPL checkout
 /**
  * Sezzle Checkout API - V2
  * 

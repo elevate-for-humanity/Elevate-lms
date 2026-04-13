@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public media URL resolver
 import { createClient } from '@/lib/supabase/server';
 
 import { toErrorMessage } from '@/lib/safe';

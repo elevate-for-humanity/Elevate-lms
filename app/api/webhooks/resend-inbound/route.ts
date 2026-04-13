@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: Resend inbound webhook
 /**
  * Resend inbound webhook — DEPRECATED.
  * Inbound email is now handled by SendGrid Inbound Parse.

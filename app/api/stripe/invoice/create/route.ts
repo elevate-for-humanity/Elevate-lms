@@ -1,3 +1,5 @@
+// PUBLIC ROUTE: Stripe invoice creation — admin only
+import { apiRequireAdmin } from '@/lib/admin/guards';
 
 
 import { getStripe } from '@/lib/stripe/client';
@@ -13,6 +15,9 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
+  const auth = await apiRequireAdmin(request);
+  if (auth.error) return auth.error;
+
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
@@ -106,6 +111,9 @@ async function _POST(req: Request) {
 }
 
 async function _GET(request: Request) {
+  const auth = await apiRequireAdmin(request);
+  if (auth.error) return auth.error;
+
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;

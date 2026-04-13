@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public programs catalog
 import { getAdminClient } from '@/lib/supabase/admin';
 
 import { NextResponse } from 'next/server';

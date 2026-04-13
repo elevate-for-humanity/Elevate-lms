@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public help center search
 
 // app/api/help/search/route.ts
 import { NextResponse } from 'next/server';

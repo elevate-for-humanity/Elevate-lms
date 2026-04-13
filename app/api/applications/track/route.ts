@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public application status tracking by token
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getAdminClient } from '@/lib/supabase/admin';

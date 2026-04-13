@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: SupersonicFastCash application form
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { resend } from '@/lib/resend';

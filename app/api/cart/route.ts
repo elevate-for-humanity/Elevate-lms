@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public shopping cart — pre-auth checkout
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';

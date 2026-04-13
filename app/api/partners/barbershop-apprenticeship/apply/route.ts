@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: barbershop apprenticeship application
 
 import { NextResponse } from 'next/server';
 import { getAdminClient } from '@/lib/supabase/admin';

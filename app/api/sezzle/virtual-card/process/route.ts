@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: Sezzle virtual card processing
 /**
  * Sezzle Virtual Card Processing API
  * 

@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public intake form
 import { safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { getAdminClient } from '@/lib/supabase/admin';

@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: CSP violation reports sent by browsers — no auth possible
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

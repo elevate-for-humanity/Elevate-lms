@@ -75,10 +75,54 @@ async function _POST(
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
+    // Require auth and derive userId from session — never trust caller-supplied userId.
+    const { createClient: createAuthClient } = await import('@/lib/supabase/server');
+    const authSupabase = await createAuthClient();
+    const { data: { session: authSession } } = await authSupabase.auth.getSession();
+    if (!authSession) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const supabase = await getAdminClient();
     const { quizId } = await params;
     const body = await parseBody<Record<string, any>>(request);
-    const { userId, enrollmentId, answers, timeTakenSeconds } = body;
+    // userId and enrollmentId both derived server-side — never trust caller-supplied values.
+    const { answers, timeTakenSeconds } = body;
+    const userId = authSession.user.id;
+
+    // Derive enrollmentId server-side: quiz → lesson → course → enrollment for this user.
+    // Accepting enrollmentId from the client would allow a user to submit attempts
+    // against another user's enrollment record.
+    let enrollmentId: string | null = null;
+    const { data: quizMeta } = await supabase
+      .from('interactive_quizzes')
+      .select('lesson_id')
+      .eq('id', quizId)
+      .single();
+
+    if (quizMeta?.lesson_id) {
+      const { data: lessonMeta } = await supabase
+        .from('course_lessons')
+        .select('course_id')
+        .eq('id', quizMeta.lesson_id)
+        .single();
+
+      if (lessonMeta?.course_id) {
+        const { data: enrollment } = await supabase
+          .from('program_enrollments')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('course_id', lessonMeta.course_id)
+          .eq('status', 'active')
+          .single();
+        enrollmentId = enrollment?.id ?? null;
+      }
+    }
+
+    // Enrollment required — no attempt without a valid enrollment for this user
+    if (!enrollmentId) {
+      return NextResponse.json({ error: 'Not enrolled in this course' }, { status: 403 });
+    }
 
     // Fetch quiz and questions
     const { data: quiz } = await supabase

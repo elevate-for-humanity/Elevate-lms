@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public program course list
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/auth';
 import { toErrorMessage } from '@/lib/safe';

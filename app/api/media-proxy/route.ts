@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public media proxy
 // AUTH: Intentionally public — no authentication required
 import { NextRequest, NextResponse } from 'next/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

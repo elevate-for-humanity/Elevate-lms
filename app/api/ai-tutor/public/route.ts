@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public AI tutor for prospective students
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { logger } from '@/lib/logger';

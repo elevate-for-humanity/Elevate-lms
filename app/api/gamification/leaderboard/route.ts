@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public leaderboard display
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/auth';

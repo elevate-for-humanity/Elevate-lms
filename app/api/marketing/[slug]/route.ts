@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public marketing page content
 import { NextRequest, NextResponse } from 'next/server';
 import { getMarketingPageBySlug } from '@/lib/api/marketing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

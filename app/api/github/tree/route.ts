@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: GitHub tree — dev tool, optional auth
 
 
 import { NextRequest, NextResponse } from 'next/server';

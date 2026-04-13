@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: Affirm payment capture — called by Affirm redirect
 /**
  * Affirm Capture/Authorize API
  * 

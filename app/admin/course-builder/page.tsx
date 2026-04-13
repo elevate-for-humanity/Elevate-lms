@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type {
   ProgramBuilderTemplate,
   BuilderModule,
@@ -42,6 +42,14 @@ export default function CourseBuilderPage() {
   const [selLes, setSelLes] = useState(0);
   const [auditResult, setAuditResult] = useState<any>(null);
   const [busy, setBusy] = useState(false);
+  const [complianceProfiles, setComplianceProfiles] = useState<{ key: string; label: string }[]>([]);
+
+  useEffect(() => {
+    fetch('/api/admin/course-builder/profiles')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.profiles) setComplianceProfiles(d.profiles.map((p: any) => ({ key: p.key, label: p.label ?? p.key }))); })
+      .catch(() => {}); // fall back to hardcoded options if fetch fails
+  }, []);
 
   const mod = program.modules[selMod];
   const les = mod?.lessons?.[selLes];
@@ -127,12 +135,17 @@ export default function CourseBuilderPage() {
           {['INTERNAL','STATE_BOARD','IC&RC','NAADAC','DOL_APPRENTICESHIP','CUSTOM'].map(v => <option key={v} value={v}>{v}</option>)}
         </select>
         <select className={sel} value={program.regulatory.complianceProfileKey} onChange={e => upReg({ complianceProfileKey: e.target.value })}>
-          <option value="internal_basic">Internal Basic</option>
-          <option value="state_board_strict">State Board Strict</option>
-          <option value="dol_apprenticeship">DOL Apprenticeship</option>
-          <option value="icrc_peer_recovery">IC&amp;RC Peer Recovery</option>
-          <option value="naadac_peer_support">NAADAC Peer Support</option>
-          <option value="custom_regulated">Custom Regulated</option>
+          {(complianceProfiles.length > 0
+            ? complianceProfiles
+            : [
+                { key: 'internal_basic', label: 'Internal Basic' },
+                { key: 'state_board_strict', label: 'State Board Strict' },
+                { key: 'dol_apprenticeship', label: 'DOL Apprenticeship' },
+                { key: 'icrc_peer_recovery', label: 'IC&RC Peer Recovery' },
+                { key: 'naadac_peer_support', label: 'NAADAC Peer Support' },
+                { key: 'custom_regulated', label: 'Custom Regulated' },
+              ]
+          ).map(p => <option key={p.key} value={p.key}>{p.label}</option>)}
         </select>
         <input className={inp} placeholder="Governing body" value={program.regulatory.governingBody ?? ''}
           onChange={e => upReg({ governingBody: e.target.value || null })} />

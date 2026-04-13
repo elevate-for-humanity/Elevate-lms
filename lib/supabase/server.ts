@@ -97,7 +97,12 @@ export async function createClient(): Promise<SupabaseClient<any>> {
       }
     );
   } catch (error) {
-    logger.error('[Supabase Server] Failed to create client:', error);
+    // cookies() throws during static prerender — this is expected and handled.
+    // Only log in development; at build time this fires for every static page
+    // and produces hundreds of noisy error lines in the Netlify build log.
+    if (process.env.NODE_ENV === 'development') {
+      logger.error('[Supabase Server] Failed to create client:', error);
+    }
     return mockClient;
   }
 }

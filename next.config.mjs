@@ -20,6 +20,7 @@ const nextConfig = {
     '@ffmpeg-installer/ffmpeg',
     '@ffprobe-installer/ffprobe',
     'canvas',
+    '@napi-rs/canvas',
     'tesseract.js',
     'tesseract.js-core',
     'sharp',
@@ -56,6 +57,13 @@ const nextConfig = {
     'jsdom',
     'typescript',
     'core-js',
+    // Client-only 3D/media packages — never needed server-side
+    'three',
+    'three-stdlib',
+    '@react-three/fiber',
+    '@react-three/drei',
+    'hls.js',
+    '@mediapipe/tasks-vision',
   ],
 
   // Disable dev indicators (static route indicator, build indicator)
@@ -260,9 +268,11 @@ const nextConfig = {
       '**/node_modules/.pnpm/@ffprobe-installer*/**',
       '**/node_modules/fluent-ffmpeg/**',
       '**/node_modules/.pnpm/fluent-ffmpeg*/**',
-      // Canvas native binary (24MB) — only used in video generator
+      // Canvas native binaries — only used in video generator
       '**/node_modules/canvas/**',
       '**/node_modules/.pnpm/canvas*/**',
+      '**/node_modules/@napi-rs/canvas/**',
+      '**/node_modules/.pnpm/@napi-rs+canvas*/**',
       // Other heavy packages
       '**/node_modules/googleapis/**',
       '**/node_modules/.pnpm/googleapis*/**',
@@ -294,6 +304,17 @@ const nextConfig = {
       '**/node_modules/.pnpm/pdf-lib*/**',
       '**/node_modules/@apm-js-collab/**',
       '**/node_modules/.pnpm/@apm-js-collab*/**',
+      // Client-only 3D / media packages (29MB + 24MB + 20MB) — never run server-side
+      '**/node_modules/three/**',
+      '**/node_modules/.pnpm/three*/**',
+      '**/node_modules/three-stdlib/**',
+      '**/node_modules/.pnpm/three-stdlib*/**',
+      '**/node_modules/@react-three/**',
+      '**/node_modules/.pnpm/@react-three*/**',
+      '**/node_modules/hls.js/**',
+      '**/node_modules/.pnpm/hls.js*/**',
+      '**/node_modules/@mediapipe/**',
+      '**/node_modules/.pnpm/@mediapipe*/**',
       // Source files not needed at runtime
       'app/**/*.tsx',
       'app/**/*.ts',

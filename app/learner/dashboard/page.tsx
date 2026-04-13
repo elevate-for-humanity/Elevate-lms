@@ -28,6 +28,7 @@ import {
 import { logger } from '@/lib/logger';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import heroBanners from '@/content/heroBanners';
+import { ResendMagicLinkForm } from '@/components/auth/ResendMagicLinkForm';
 
 export const metadata: Metadata = {
   title: 'Learner Dashboard | Elevate LMS',
@@ -109,10 +110,18 @@ export default async function LearnerDashboardPage({ searchParams }: Props) {
                 <li>Log back in to access your courses and start training</li>
               </ol>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 mb-6">
               Questions? Call <a href="tel:3173143757" className="text-gray-900 font-semibold">(317) 314-3757</a> or email{' '}
               <a href="mailto:info@elevateforhumanity.org" className="text-gray-900 font-semibold">info@elevateforhumanity.org</a>
             </p>
+            <div className="border-t pt-6 text-left">
+              <p className="text-sm text-gray-500 mb-1">Need another sign-in link?</p>
+              <ResendMagicLinkForm
+                defaultEmail={user.email ?? ''}
+                next="/learner/dashboard"
+                label="Resend sign-in link"
+              />
+            </div>
           </div>
         </div>
       );

@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, Mail, Phone, Calendar, CheckCircle, KeyRound, UserCheck, FileText, BookOpen } from 'lucide-react';
+import { ArrowRight, Mail, Phone, Calendar, CheckCircle, UserCheck, FileText, BookOpen } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { ResendMagicLinkForm } from '@/components/auth/ResendMagicLinkForm';
 
 export const metadata: Metadata = {
   title: 'Application Submitted | Elevate for Humanity',
@@ -17,14 +18,7 @@ const STUDENT_STEPS = [
   {
     icon: <Mail className="w-5 h-5 text-brand-blue-600" />,
     title: 'Check your email',
-    description: 'We sent a confirmation with your reference number and onboarding instructions. Check spam if you don\'t see it within a few minutes.',
-  },
-  {
-    icon: <KeyRound className="w-5 h-5 text-brand-blue-600" />,
-    title: 'Set your password',
-    description: 'We created your student account. Go to the password reset page and enter the email you applied with to set your password.',
-    link: '/forgot-password',
-    linkLabel: 'Set Password',
+    description: 'We sent a secure sign-in link to your email address. Use it to access your account, upload documents, and track your application. Check spam if you don\'t see it within a few minutes.',
   },
   {
     icon: <UserCheck className="w-5 h-5 text-brand-blue-600" />,
@@ -54,10 +48,10 @@ const ROLE_CONFIG: Record<string, {
 }> = {
   student: {
     title: 'Application Received',
-    message: 'Your application has been received and your account is ready. Complete the onboarding steps below to get enrolled.',
+    message: 'Your application has been received. We sent a secure sign-in link to your email — use it to access your account and complete onboarding.',
     steps: STUDENT_STEPS,
-    primaryLink: '/forgot-password',
-    primaryLabel: 'Set Your Password',
+    primaryLink: '/login?redirect=/onboarding/learner',
+    primaryLabel: 'Sign In',
   },
   'program-holder': {
     title: 'Partnership Application Submitted',
@@ -251,6 +245,19 @@ export default async function ApplicationSuccessPage({
               Return Home
             </Link>
           </div>
+
+          {/* Resend sign-in link — shown for student and enrolled paths */}
+          {(role === 'student' || isEnrolled) && (
+            <div className="mt-2 border-t pt-6">
+              <p className="text-sm text-slate-500 mb-1">
+                Didn&apos;t receive the sign-in email? Check spam, or request another link:
+              </p>
+              <ResendMagicLinkForm
+                next="/onboarding/learner"
+                label="Resend sign-in link"
+              />
+            </div>
+          )}
 
           {/* Track Application */}
           <div className="mt-6 text-center space-y-2">

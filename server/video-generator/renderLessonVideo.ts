@@ -116,7 +116,11 @@ export async function renderLessonVideo(
     return plan;
 
   } finally {
-    // Always clean up temp dir
-    await fs.rm(tempDir, { recursive: true, force: true });
+    // Keep temp dir when KEEP_RENDER_DIR=1 (for proof/debugging)
+    if (process.env.KEEP_RENDER_DIR !== '1') {
+      await fs.rm(tempDir, { recursive: true, force: true });
+    } else {
+      console.log(`\n📁  Render dir kept: ${tempDir}`);
+    }
   }
 }

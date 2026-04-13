@@ -39,12 +39,12 @@ export default async function ForEmployersPage() {
 
   try {
     const db = await getAdminClient();
-    const { count: ec } = await supabase
+    const { count: ec } = await db
       .from('employer_profiles')
       .select('*', { count: 'exact', head: true });
     employerCount = ec;
 
-    const { count: pc } = await supabase
+    const { count: pc } = await db
       .from('programs')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'active');
@@ -116,54 +116,68 @@ export default async function ForEmployersPage() {
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                image: '/images/pages/employers-page-1.jpg',
-                alt: 'Pre-screened talent pipeline of certified graduates',
-                title: 'Pre-Screened Talent Pipeline',
-                description: 'Candidates complete background checks, drug testing, and skills assessments before referral. You interview only qualified applicants.',
-              },
-              {
-                image: '/images/pages/admin-funding-hero.jpg',
-                alt: 'WOTC tax credit documentation and processing',
-                title: 'WOTC Tax Credits',
-                description: 'Claim up to $9,600 per eligible hire through the Work Opportunity Tax Credit. We handle the paperwork.',
-              },
-              {
-                image: '/images/pages/employers-page-2.jpg',
-                alt: 'Industry certification exams and credentialing',
-                title: 'Industry Certifications',
-                description: 'Candidates complete training and sit for recognized credential exams — EPA 608, CDL, CNA, Certiport IT Specialist, barber license, and more — before day one.',
-              },
-              {
-                image: '/images/pages/admin-apprenticeships-hero.jpg',
-                alt: 'DOL registered apprenticeship program management',
-                title: 'DOL Registered Apprenticeships',
-                description: 'Structured earn-and-learn programs with mentorship. We manage compliance, you develop loyal employees.',
-              },
-              {
-                image: '/images/pages/employers-page-3.jpg',
-                alt: 'Rapid candidate placement within weeks of training',
-                title: 'Rapid Placement',
-                description: 'Most programs are 2-16 weeks. We match candidates to your openings as they complete training.',
-              },
-              {
-                image: '/images/pages/admin-apprenticeships-hero.jpg',
-                alt: 'No-cost employer recruitment through workforce funding',
-                title: 'No Cost to You',
-                description: 'Training is funded through WIOA, DOL grants, and institutional funding. You pay nothing for recruitment or training.',
-              },
-            ].map((item) => (
-              <div key={item.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
-                  <Image src={item.image} alt={item.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
-                </div>
-                <div className="p-5">
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{item.description}</p>
-                </div>
+            {/* Path 1: Hire */}
+            <div className="bg-white rounded-xl border-t-4 border-green-500 shadow-sm p-6 flex flex-col">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                <Users className="w-5 h-5 text-green-700" />
               </div>
-            ))}
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Hire Pre-Credentialed Graduates</h3>
+              <p className="text-slate-600 text-sm leading-relaxed flex-1 mb-4">
+                Candidates complete training, earn industry credentials, pass background checks and drug testing — before you interview them. No recruiting fees. WOTC tax credits up to $9,600 per eligible hire.
+              </p>
+              <ul className="space-y-1.5 mb-5">
+                {['Healthcare (CNA, CCMA, CPT)', 'Skilled Trades (HVAC, Welding)', 'Technology (CompTIA, Certiport)', 'Business & Finance'].map(i => (
+                  <li key={i} className="flex items-center gap-2 text-xs text-slate-600">
+                    <CheckCircle className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />{i}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/employers/talent-pipeline" className="bg-green-600 hover:bg-green-700 text-white text-sm font-bold px-4 py-2.5 rounded-lg text-center transition-colors">
+                Browse Talent Pipeline →
+              </Link>
+            </div>
+
+            {/* Path 2: OJT / Sponsor */}
+            <div className="bg-white rounded-xl border-t-4 border-blue-500 shadow-sm p-6 flex flex-col">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <Award className="w-5 h-5 text-blue-700" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Sponsor a DOL Apprentice</h3>
+              <p className="text-slate-600 text-sm leading-relaxed flex-1 mb-4">
+                Earn-and-learn from day one. Apprentices work in your business while completing structured training. OJT wage reimbursement up to 50%. RAPIDS-tracked. DOL Certificate of Completion issued.
+              </p>
+              <ul className="space-y-1.5 mb-5">
+                {['OJT wage reimbursement up to 50%', 'RAPIDS-tracked — federal system of record', 'DOL Certificate of Completion', 'Barber, Cosmetology, Culinary, Trades'].map(i => (
+                  <li key={i} className="flex items-center gap-2 text-xs text-slate-600">
+                    <CheckCircle className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />{i}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/programs/apprenticeships" className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-4 py-2.5 rounded-lg text-center transition-colors">
+                Apprenticeship Programs →
+              </Link>
+            </div>
+
+            {/* Path 3: Co-design */}
+            <div className="bg-white rounded-xl border-t-4 border-purple-500 shadow-sm p-6 flex flex-col">
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                <Briefcase className="w-5 h-5 text-purple-700" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Co-Design a Training Cohort</h3>
+              <p className="text-slate-600 text-sm leading-relaxed flex-1 mb-4">
+                Work with Elevate to design a custom training cohort aligned to your specific job requirements. We handle curriculum, compliance, credentialing, and WIOA funding. You get a pipeline built for your roles.
+              </p>
+              <ul className="space-y-1.5 mb-5">
+                {['Custom curriculum to your job specs', 'WIOA-funded — no cost to employer', 'Cohort scheduling around your hiring timeline', 'Dedicated account manager'].map(i => (
+                  <li key={i} className="flex items-center gap-2 text-xs text-slate-600">
+                    <CheckCircle className="w-3.5 h-3.5 text-purple-500 flex-shrink-0" />{i}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/contact" className="bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold px-4 py-2.5 rounded-lg text-center transition-colors">
+                Talk to Our Team →
+              </Link>
+            </div>
           </div>
         </div>
       </section>

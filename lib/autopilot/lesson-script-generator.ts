@@ -48,10 +48,14 @@ interface LessonInput {
   contentType: string;
   nextLessonTitle?: string;
   courseName: string;
+  /** Entropy seed — include in prompt to guarantee unique output per call */
+  seed?: string;
 }
 
-const TARGET_WORDS = 1000;
-const MIN_CONTENT_LENGTH = 500; // chars — below this, we enrich with GPT-4o
+const TARGET_WORDS = 400;    // ~2m 45s at 144 WPM
+const MIN_WORDS    = 380;    // hard floor — below this, retry
+const MAX_WORDS    = 420;    // hard ceiling — above this, retry
+const MIN_CONTENT_LENGTH = 500; // chars — below this, enrich with GPT-4o
 
 /**
  * Strip HTML tags and normalize whitespace
@@ -86,8 +90,8 @@ export async function generateLessonScript(input: LessonInput): Promise<LessonSc
     ? buildFullGenerationPrompt(input)
     : buildStructuringPrompt(input, plainContent);
 
-  // Retry up to 2 times if word count is under 900
-  const MAX_ATTEMPTS = 2;
+  // Up to 3 attempts — retry if word count falls outside 380-420
+  const MAX_ATTEMPTS = 3;
   let parsed: { narration: string; slides: LessonSlide[] } | null = null;
   let wordCount = 0;
 
@@ -97,17 +101,21 @@ export async function generateLessonScript(input: LessonInput): Promise<LessonSc
     ];
 
     if (attempt > 0 && parsed) {
+      const direction = wordCount < MIN_WORDS ? 'too short' : 'too long';
+      const target = wordCount < MIN_WORDS
+        ? `Expand the concept section to reach 380-420 words.`
+        : `Trim the concept section to reach 380-420 words.`;
       messages.push(
         { role: 'assistant', content: JSON.stringify(parsed) },
-        { role: 'user', content: `The narration is only ${wordCount} words. It MUST be 950-1,050 words (the TTS voice speaks at 144 WPM, so we need ~1,000 words for a 7-minute video). Expand each concept subtopic to 150-200 words with more examples and explanations. Return the same JSON format with longer narration.` },
+        { role: 'user', content: `The narration is ${wordCount} words — ${direction}. It MUST be 380-420 words (144 WPM TTS, ~2m 45s). ${target} Return the same JSON format.` },
       );
     }
 
     const res = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages,
-      temperature: 0.6,
-      max_tokens: 6000,
+      temperature: attempt === 0 ? 0.7 : 0.5, // slightly higher temp on first call for variety
+      max_tokens: 3000,
     });
 
     const raw = res.choices[0].message.content;
@@ -117,7 +125,8 @@ export async function generateLessonScript(input: LessonInput): Promise<LessonSc
     parsed = JSON.parse(cleaned) as { narration: string; slides: LessonSlide[] };
     wordCount = parsed.narration.split(/\s+/).length;
 
-    if (wordCount >= 900) break;
+    if (wordCount >= MIN_WORDS && wordCount <= MAX_WORDS) break;
+    console.warn(`  ⚠ Attempt ${attempt + 1}: ${wordCount} words (target ${MIN_WORDS}-${MAX_WORDS}) — retrying`);
   }
 
   if (!parsed) throw new Error('Failed to generate lesson script');
@@ -141,39 +150,40 @@ MODULE ${input.moduleNumber}: ${input.moduleName}
 LESSON ${input.lessonNumber}: ${input.title}
 DESCRIPTION: ${input.description}
 TOPICS: ${input.topics.join(', ')}
+SEED: ${input.seed ?? input.title} (use this to vary your word choices and examples — do not include it in output)
 
 EXISTING LESSON CONTENT (use this as source material):
 ${plainContent.slice(0, 4000)}
 
 NEXT LESSON: ${input.nextLessonTitle || 'End of module'}
 
-Generate a structured lesson script with EXACTLY 5 segments. Target 950-1,050 words total narration. The TTS voice speaks at ~144 WPM, so 1,000 words = ~7 minutes.
+Generate a structured lesson script with EXACTLY 5 segments. Target 380-420 words total narration. The TTS voice speaks at ~144 WPM, so 400 words = ~2 minutes 45 seconds.
 
-SEGMENT 1 — INTRO (~50 words, ~20 seconds)
-Introduce the module number, lesson title, and what the student will learn.
+SEGMENT 1 — INTRO (~30 words)
+Introduce the lesson title and what the apprentice will learn.
 
-SEGMENT 2 — CONCEPT EXPLANATION (~700 words, ~4 minutes)
-Break the existing content into 3-4 subtopics. Each subtopic should be 150-200 words. Explain each clearly with examples from real bookkeeping/QuickBooks work. Do NOT just repeat the bullet points — explain them as an instructor would.
+SEGMENT 2 — CONCEPT EXPLANATION (~250 words)
+Cover 2-3 key points from the lesson content. Speak like a master barber instructor teaching an apprentice in the shop. Use real barbershop examples, tool names, and technique names.
 
-SEGMENT 3 — VISUAL REINFORCEMENT (~150 words, ~90 seconds)
-Describe a process, workflow, or system overview that reinforces the concept. Walk through it step by step as if pointing at a diagram.
+SEGMENT 3 — TECHNIQUE WALKTHROUGH (~60 words)
+Walk through one specific step or technique from this lesson as if demonstrating it.
 
-SEGMENT 4 — JOB APPLICATION (~100 words, ~45 seconds)
-Explain how a bookkeeper or QuickBooks user applies this knowledge on the job. Be specific — mention actual tasks, screens, or reports.
+SEGMENT 4 — JOB APPLICATION (~40 words)
+One sentence on how this applies in the chair or on the state board exam.
 
-SEGMENT 5 — WRAP-UP (~50 words, ~20 seconds)
-Summarize what was learned. Preview the next lesson: "${input.nextLessonTitle || 'the next topic'}".
+SEGMENT 5 — WRAP-UP (~20 words)
+Summarize in one sentence. Preview: "${input.nextLessonTitle || 'the next topic'}".
 
 Return ONLY valid JSON (no markdown fences):
 {
-  "narration": "Full narration text, all 5 segments combined as one continuous script. Use natural spoken language. Do not include segment labels in the narration.",
+  "narration": "Full narration text, all 5 segments combined as one continuous script. Use natural spoken language as a master barber instructor. Do not include segment labels in the narration.",
   "slides": [
-    { "title": "Slide Title", "bullets": ["bullet 1", "bullet 2", "bullet 3"], "segment": "intro", "imagePrompt": "2-5 word Pexels search phrase for a real photo matching this slide topic" },
+    { "title": "Slide Title", "bullets": ["bullet 1", "bullet 2", "bullet 3"], "segment": "intro", "imagePrompt": "2-5 word Pexels search phrase for a real barbershop photo matching this slide topic" },
     { "title": "Subtopic 1", "bullets": ["...", "..."], "segment": "concept", "imagePrompt": "..." },
     { "title": "Subtopic 2", "bullets": ["...", "..."], "segment": "concept", "imagePrompt": "..." },
     { "title": "Subtopic 3", "bullets": ["...", "..."], "segment": "concept", "imagePrompt": "..." },
-    { "title": "Process Overview", "bullets": ["Step 1...", "Step 2..."], "segment": "visual", "imagePrompt": "..." },
-    { "title": "On the Job", "bullets": ["...", "..."], "segment": "application", "imagePrompt": "..." },
+    { "title": "Technique Walkthrough", "bullets": ["Step 1...", "Step 2..."], "segment": "visual", "imagePrompt": "..." },
+    { "title": "In the Chair", "bullets": ["...", "..."], "segment": "application", "imagePrompt": "..." },
     { "title": "Lesson Summary", "bullets": ["...", "..."], "segment": "wrapup", "imagePrompt": "..." }
   ]
 }
@@ -181,14 +191,14 @@ Return ONLY valid JSON (no markdown fences):
 CRITICAL RULES:
 - Max 5 bullets per slide, short phrases not sentences
 - 6-8 slides total
-- **NARRATION MUST BE BETWEEN 950 AND 1,050 WORDS.** The TTS voice speaks at ~144 WPM, so 1,000 words = ~7 minutes. Under 900 words = video too short. Over 1,100 = too long.
+- **NARRATION MUST BE BETWEEN 380 AND 420 WORDS.** The TTS voice speaks at ~144 WPM, so 400 words = ~2m 45s. Under 350 words = too short. Over 450 = too long.
 - Each concept subtopic should be 150-200 words of narration with examples
 - Narration should explain the bullets, not repeat them verbatim
-- imagePrompt: 2-5 word Pexels search phrase (e.g. "bookkeeper reviewing spreadsheet", "small business owner laptop", "accountant office desk"). Must be a real-world photo subject, no abstract terms.`;
+- imagePrompt: 2-5 word Pexels search phrase for a real barbershop photo (e.g. "barber cutting hair", "barbershop tools clipper", "barber client consultation"). Must be a real-world photo subject, no abstract terms.`;
 }
 
 function buildFullGenerationPrompt(input: LessonInput): string {
-  return `You are an instructional designer for a workforce training program.
+  return `You are a master barber instructor creating lesson content for a DOL-registered barber apprenticeship program in Indiana.
 
 COURSE: ${input.courseName}
 MODULE ${input.moduleNumber}: ${input.moduleName}
@@ -196,37 +206,36 @@ LESSON ${input.lessonNumber}: ${input.title}
 DESCRIPTION: ${input.description}
 TOPICS: ${input.topics.join(', ')}
 NEXT LESSON: ${input.nextLessonTitle || 'End of module'}
+SEED: ${input.seed ?? input.title} (use this to vary your word choices and examples — do not include it in output)
 
 This lesson has minimal existing content. Generate a complete lesson from scratch.
 
-The lesson should teach "${input.title}" as part of a Bookkeeping & QuickBooks Certified User program. Students are adult learners in workforce training. Content must be practical and job-focused.
+Teach "${input.title}" as part of the Indiana Registered Barber License apprenticeship program. Students are adult learners working in a barbershop. Content must be practical, technique-focused, and aligned with Indiana State Board and NIC exam standards.
 
-Generate a structured lesson script with EXACTLY 5 segments. Target 950-1,050 words total narration. The TTS voice speaks at ~144 WPM, so 1,000 words = ~7 minutes.
+Generate a structured lesson script with EXACTLY 5 segments. Target 380-420 words total narration. The TTS voice speaks at ~144 WPM, so 400 words = ~2 minutes 45 seconds.
 
-SEGMENT 1 — INTRO (~50 words, ~20 seconds)
-SEGMENT 2 — CONCEPT EXPLANATION (~700 words, ~4 minutes, 3-4 subtopics, each 150-200 words with examples)
-SEGMENT 3 — VISUAL REINFORCEMENT (~150 words, ~90 seconds)
-SEGMENT 4 — JOB APPLICATION (~100 words, ~45 seconds)
-SEGMENT 5 — WRAP-UP (~50 words, ~20 seconds)
+SEGMENT 1 — INTRO (~30 words): Introduce the lesson and what the apprentice will learn.
+SEGMENT 2 — CONCEPT (~250 words): 2-3 key points, real barbershop examples, master barber instructor voice.
+SEGMENT 3 — TECHNIQUE (~60 words): One specific step demonstrated as if in the shop.
+SEGMENT 4 — APPLICATION (~40 words): How this applies in the chair or on the state board exam.
+SEGMENT 5 — WRAP-UP (~20 words): One sentence summary. Preview: "${input.nextLessonTitle || 'the next topic'}".
 
 Return ONLY valid JSON (no markdown fences):
 {
-  "narration": "Full narration text, all 5 segments combined. Natural spoken language. No segment labels.",
+  "narration": "Full narration text, all 5 segments combined. Natural spoken language as a master barber instructor. No segment labels.",
   "slides": [
-    { "title": "Slide Title", "bullets": ["bullet 1", "bullet 2"], "segment": "intro", "imagePrompt": "2-5 word Pexels search phrase for a real photo matching this slide topic" },
-    { "title": "Subtopic", "bullets": ["...", "..."], "segment": "concept", "imagePrompt": "..." },
-    { "title": "Process Overview", "bullets": ["Step 1", "Step 2"], "segment": "visual", "imagePrompt": "..." },
-    { "title": "On the Job", "bullets": ["...", "..."], "segment": "application", "imagePrompt": "..." },
+    { "title": "Slide Title", "bullets": ["bullet 1", "bullet 2"], "segment": "intro", "imagePrompt": "2-5 word Pexels search phrase for a real barbershop photo" },
+    { "title": "Key Concept", "bullets": ["...", "..."], "segment": "concept", "imagePrompt": "..." },
+    { "title": "Technique", "bullets": ["Step 1", "Step 2"], "segment": "visual", "imagePrompt": "..." },
+    { "title": "In the Chair", "bullets": ["...", "..."], "segment": "application", "imagePrompt": "..." },
     { "title": "Summary", "bullets": ["...", "..."], "segment": "wrapup", "imagePrompt": "..." }
   ]
 }
 
 CRITICAL RULES:
-- Max 5 bullets per slide, short phrases
-- 6-8 slides total
-- **NARRATION MUST BE BETWEEN 950 AND 1,050 WORDS.** The TTS voice speaks at ~144 WPM, so 1,000 words = ~7 minutes. Under 900 = too short, over 1,100 = too long.
-- Each concept subtopic should be 150-200 words with examples
-- Narration explains bullets, does not repeat them verbatim
-- Include real QuickBooks Online screen references and bookkeeping terminology
-- imagePrompt: 2-5 word Pexels search phrase (e.g. "bookkeeper reviewing spreadsheet", "small business owner laptop"). Must be a real-world photo subject, no abstract terms.`;
+- Max 5 bullets per slide, short phrases only
+- 5-6 slides total
+- **NARRATION MUST BE 380-420 WORDS EXACTLY**
+- Use correct barber terminology: guard sizes, clipper angles, razor technique, state board standards
+- imagePrompt: real barbershop photo search (e.g. "barber fade haircut", "straight razor shave", "barbershop clippers"). No abstract terms.`;
 }

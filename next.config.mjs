@@ -457,6 +457,18 @@ const nextConfig = {
       // LMS
       { source: '/lms/catalog', destination: '/lms/courses', permanent: true },
 
+      // Programs/Courses terminology split — temporary redirects (permanent: false)
+      // until canonical path is decided and all internal links are updated.
+      //
+      // Current state:
+      //   /lms/programs  → public catalog (unauthenticated, app/lms/(public)/programs)
+      //   /lms/courses   → authenticated learner experience (app/lms/(app)/courses)
+      //
+      // Canonical term for learners is "Program". /lms/courses is the legacy path.
+      // Do not flip these to permanent until all 20+ internal hrefs are updated.
+      // See AGENTS.md "Programs vs Courses" tracked UX debt.
+      { source: '/lms/program/:programId', destination: '/lms/courses/:programId', permanent: false },
+
       // Mentor / Mentorship
       { source: '/mentor', destination: '/mentor/dashboard', permanent: false },
       { source: '/mentor/apply', destination: '/mentorship', permanent: true },

@@ -148,9 +148,8 @@ const nextConfig = {
       '@radix-ui/react-popover',
       'recharts',
       'react-hot-toast',
-      '@react-three/fiber',
-      '@react-three/drei',
-      'three',
+      // @react-three/* and three removed — they are in serverExternalPackages.
+      // Turbopack forbids a package appearing in both optimizePackageImports and serverExternalPackages.
       'date-fns',
       'framer-motion',
       '@stripe/stripe-js',

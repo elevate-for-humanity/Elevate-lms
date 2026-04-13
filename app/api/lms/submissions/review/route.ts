@@ -98,11 +98,28 @@ export async function PATCH(request: NextRequest) {
       }, { onConflict: 'user_id,lesson_id' })
       .then(({ error }) => {
         if (error) {
-          // Non-fatal — log but don't fail the response
           logger.error('[submissions/review] lesson_progress upsert failed:', error);
         }
       });
   }
+
+  // Audit trail — non-fatal
+  db.from('audit_logs').insert({
+    action: `step_submission_${status}`,
+    event_type: 'instructor_review',
+    user_id: user.id,
+    details: {
+      submission_id,
+      student_id:  submission.user_id,
+      lesson_id:   submission.course_lesson_id,
+      course_id:   submission.course_id,
+      step_type:   submission.step_type,
+      note:        note?.trim() || null,
+      previous_status: submission.status,
+    },
+  }).then(({ error }) => {
+    if (error) logger.error('[submissions/review] audit_logs insert failed:', error);
+  });
 
   return NextResponse.json({ submission: updated });
 }

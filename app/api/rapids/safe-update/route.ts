@@ -7,6 +7,7 @@ import {
   type RapidsStatus,
 } from '@/lib/rapids';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { auditedMutation } from '@/lib/audit/transactional';
 export const runtime = 'nodejs';
@@ -18,6 +19,9 @@ async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+
+    const auth = await apiRequireAdmin(req);
+    if (auth.error) return auth.error;
 
     const body = await req.json();
     const { apprentice_id, status, rapids_id } = body;

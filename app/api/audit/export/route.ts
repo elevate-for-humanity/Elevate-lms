@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { auditExport } from '@/lib/auditLog';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -12,6 +13,9 @@ export async function GET(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+
+    const auth = await apiRequireAdmin(req);
+    if (auth.error) return auth.error;
 
     const { searchParams } = new URL(req.url);
     const format = searchParams.get('format') || 'csv';

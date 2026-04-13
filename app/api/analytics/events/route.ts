@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { apiAuthGuard } from '@/lib/admin/guards';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -14,8 +15,13 @@ async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
+    const auth = await apiAuthGuard(req);
+    if (auth.error) return auth.error;
+
   const supabase = await getAdminClient();
-  const { tenantId, userId, eventType, payload, path } = await req.json();
+  const { tenantId, eventType, payload, path } = await req.json();
+  // userId is always the authenticated user — never trust client-supplied userId
+  const userId = auth.user.id;
 
   if (!eventType || !tenantId) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });

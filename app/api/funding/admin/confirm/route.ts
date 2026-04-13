@@ -9,11 +9,14 @@ export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
+// PUBLIC ROUTE (intentional): magic-link approval for case managers.
+// Auth is the single-use token in the query string — no session required.
+// Token is validated against approval_tokens table and marked used on first click.
 async function _GET(req: NextRequest) {
-  
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
-const supabase = await createRouteHandlerClient({ cookies });
+
+    const supabase = await createRouteHandlerClient({ cookies });
 
   const url = new URL(req.url);
   const token = url.searchParams.get('token');

@@ -11,6 +11,9 @@ export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
+// PUBLIC ROUTE (intentional): xAPI statement receiver per ADL spec.
+// xAPI uses its own auth model (Basic Auth / OAuth token in Authorization header).
+// Session-based auth is not applicable to LRS endpoints.
 async function _POST(request: Request) {
   const supabase = await getAdminClient();
     const rateLimited = await applyRateLimit(request, 'api');

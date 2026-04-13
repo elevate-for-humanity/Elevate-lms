@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -15,6 +16,9 @@ async function _POST(
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+
+    const auth = await apiRequireAdmin(request);
+    if (auth.error) return auth.error;
 
     const { id } = await params;
     const { reason } = await request.json();

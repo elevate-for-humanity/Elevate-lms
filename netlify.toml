@@ -21,10 +21,10 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  # Netlify standard build containers have ~3 GB RAM. 8192 causes OOM kill (exit 137).
-  # 3072 leaves ~900 MB headroom for the OS and pnpm install.
-  # --expose-gc enables explicit GC calls; Next.js uses this during large builds.
-  NODE_OPTIONS = "--max-old-space-size=3072 --expose-gc"
+  # Container upgraded to high-performance (7–8 GB RAM).
+  # 6144 MB gives webpack ~5 GB for the module graph with headroom for OS + pnpm.
+  # --expose-gc enables explicit GC calls during large builds.
+  NODE_OPTIONS = "--max-old-space-size=6144 --expose-gc"
   # Limit webpack build workers to 1 — prevents parallel workers from doubling heap usage.
   NEXT_PRIVATE_BUILD_WORKER_COUNT = "1"
   NETLIFY_USE_PNPM = "true"

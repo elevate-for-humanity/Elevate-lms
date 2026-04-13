@@ -113,9 +113,14 @@ export default function CNAPage() {
                 </li>
               ))}
             </ul>
-            <Link href="/cna-waitlist" className="inline-block bg-brand-blue-700 hover:bg-brand-blue-800 text-white font-bold px-8 py-4 rounded-xl transition-colors">
-              Join the CNA Waitlist
-            </Link>
+            <div className="flex flex-wrap gap-4">
+              <Link href="/programs/cna/apply" className="inline-block bg-brand-blue-700 hover:bg-brand-blue-800 text-white font-bold px-8 py-4 rounded-xl transition-colors">
+                Apply Now
+              </Link>
+              <Link href="/start" className="inline-block border border-brand-blue-700 text-brand-blue-700 font-bold px-8 py-4 rounded-xl hover:bg-brand-blue-50 transition-colors">
+                See If You Qualify for Funding
+              </Link>
+            </div>
           </div>
           <div className="relative h-80 sm:h-96 rounded-2xl overflow-hidden shadow-xl">
             <Image
@@ -156,27 +161,86 @@ export default function CNAPage() {
         </div>
       </section>
 
-      {/* FUNDING */}
-      <section className="py-16 px-6 bg-brand-blue-700 border-b border-brand-blue-800">
+      {/* PRICING */}
+      <section className="py-16 px-6 border-b border-slate-100">
         <div className="max-w-4xl mx-auto">
-          <p className="text-white text-xs font-bold uppercase tracking-widest mb-3">Funding</p>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">Most participants pay $0.</h2>
-          <p className="text-white text-base leading-relaxed mb-8 max-w-2xl">
-            Federal and Indiana state workforce funding may cover 100% of tuition, books, and exam fees. We help you apply for every option you qualify for.
-          </p>
-          <div className="grid sm:grid-cols-3 gap-5 mb-8">
-            {FUNDING.map((f) => (
-              <div key={f.name} className="bg-white/10 rounded-xl p-5">
-                <p className="text-white text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>
-                <h3 className="text-white font-bold text-base mb-2">{f.name}</h3>
-                <p className="text-white text-sm leading-relaxed">{f.desc}</p>
+          <p className="text-brand-blue-600 text-xs font-bold uppercase tracking-widest mb-3">Pricing</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">CNA Program Pricing</h2>
+          <p className="text-slate-400 line-through text-sm mb-6">Full Program Value: $2,800</p>
+          <div className="grid sm:grid-cols-2 gap-8">
+            <div className="bg-blue-50 rounded-2xl p-6 space-y-4">
+              <p className="font-bold text-slate-900 text-base">Your Investment:</p>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-slate-800"><strong>$0–$500</strong> with workforce funding (if eligible)</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-slate-800"><strong>$1,500</strong> self-pay option available</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-slate-800">Flexible payment plans available</span>
+                </li>
+              </ul>
+              <div className="pt-2 space-y-3">
+                <Link href="/programs/cna/apply" className="block w-full text-center bg-brand-blue-700 hover:bg-brand-blue-800 text-white font-bold px-6 py-3.5 rounded-xl transition-colors">
+                  Start Application
+                </Link>
+                <Link href="/start" className="block w-full text-center border border-brand-blue-700 text-brand-blue-700 font-bold px-6 py-3.5 rounded-xl hover:bg-brand-blue-50 transition-colors">
+                  See If You Qualify for Funding
+                </Link>
               </div>
+            </div>
+            <div className="space-y-3">
+              <p className="font-bold text-slate-900 text-base mb-4">Includes:</p>
+              {[
+                '150–180 hours of training (above state minimum)',
+                'Clinical experience at licensed facilities',
+                'State exam preparation',
+                'Career pathway guidance',
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-brand-blue-600 mt-0.5 flex-shrink-0" />
+                  <span className="text-slate-700">{item}</span>
+                </div>
+              ))}
+              <div className="mt-6 pt-4 border-t border-slate-200">
+                <p className="font-bold text-slate-900 text-base mb-3">Funding sources:</p>
+                {FUNDING.map((f) => (
+                  <div key={f.name} className="mb-3">
+                    <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-600 mb-0.5">{f.tag}</p>
+                    <p className="font-semibold text-slate-900 text-sm">{f.name}</p>
+                    <p className="text-slate-600 text-sm">{f.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* VALUE POSITIONING */}
+      <section className="py-16 px-6 bg-slate-50 border-b border-slate-100">
+        <div className="max-w-3xl mx-auto">
+          <p className="text-brand-blue-600 text-xs font-bold uppercase tracking-widest mb-3">Why Elevate for Humanity</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">We&apos;re not just a CNA class.</h2>
+          <p className="text-slate-700 text-base mb-6">We help you move from training to employment with a clear path forward.</p>
+          <ul className="space-y-3 mb-8">
+            {[
+              'Structured, career-focused training — not just test prep',
+              'Hands-on clinical experience',
+              'Support navigating certification and next steps',
+              'Designed for students serious about entering healthcare quickly',
+            ].map((item) => (
+              <li key={item} className="flex items-start gap-3">
+                <CheckCircle className="w-5 h-5 text-brand-blue-600 mt-0.5 flex-shrink-0" />
+                <span className="text-slate-800">{item}</span>
+              </li>
             ))}
-          </div>
-          <div className="flex flex-wrap gap-4">
-            <Link href="/start" className="bg-white text-brand-blue-700 font-bold px-8 py-3.5 rounded-lg hover:bg-brand-blue-50 transition-colors">Check My Eligibility</Link>
-            <Link href="/funding" className="border border-white/30 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors">All Funding Options</Link>
-          </div>
+          </ul>
+          <p className="text-slate-900 font-bold text-lg">You&apos;re not paying for a class. You&apos;re investing in a pathway.</p>
         </div>
       </section>
 

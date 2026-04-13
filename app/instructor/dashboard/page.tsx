@@ -60,10 +60,18 @@ export default async function ProgramHolderDashboard() {
     .order('created_at', { ascending: false })
     .limit(50);
 
-  // program_instructors table does not exist yet — all instructors see all
-  // program_enrollments until the assignment table is created and populated.
-  // TODO: scope by program_instructors.instructor_id once table is live.
-  // Migration: supabase/migrations/20260412000001_program_instructors.sql
+  if (!isAdmin) {
+    // Scope to programs where this instructor is assigned
+    const { data: assignedPrograms } = await supabase
+      .from('program_instructors')
+      .select('program_id')
+      .eq('instructor_id', user.id);
+    const assignedIds = (assignedPrograms || []).map((p: any) => p.program_id);
+    if (assignedIds.length > 0) {
+      programEnrollQuery = programEnrollQuery.in('program_id', assignedIds);
+    }
+    // If no assignments yet, instructor sees all enrollments until populated
+  }
 
   const { data: currentStudents } = await programEnrollQuery;
 

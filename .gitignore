@@ -197,3 +197,24 @@ playwright-report/
 .github/workflows-disabled-all/
 scripts/archive/
 public/videos/barber-lessons/barber-lesson-15.mp4
+
+# Barber video build artifacts — not committed, served from local dev or CDN
+public/videos/barber-lessons/*-captions*.mp4
+public/videos/barber-lessons/*-preview*.mp4
+public/videos/barber-lessons/*-fullframe*.mp4
+public/videos/barber-lessons/*-proof*.mp4
+public/videos/barber-lessons/*-small*.mp4
+public/videos/barber-lessons/*-hybrid*.mp4
+public/videos/barber-lessons/*-v2*.mp4
+public/videos/barber-lessons/*-combined*.mp4
+public/videos/barber-lessons/barber-apprenticeship-intro*.mp4
+public/videos/barber-lessons/barber-clipper-demo.mp4
+public/videos/barber-lessons/barber-indiana-state-board-exam.mp4
+public/videos/barber-lessons/barber-module-*-checkpoint.mp4
+public/videos/barber-lessons/manifests/
+public/videos/barber-lessons/thumbs/
+public/videos/barber-lessons/preview.html
+public/videos/barber-lessons/*.srt
+public/videos/barber-clipper-options/
+public/videos/barber-infection-clips/
+public/videos/barber-orientation-clips/

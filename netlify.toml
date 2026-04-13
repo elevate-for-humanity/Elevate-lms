@@ -5,7 +5,7 @@
 [build]
   # libxml2-utils provides xmllint, required for IRS MeF XSD validation.
   # Without it, schema-validator.ts returns XMLLINT_NOT_AVAILABLE and blocks all submissions.
-  command = "corepack enable && pnpm install --no-frozen-lockfile && npx tsx scripts/ci-token-gate.ts && pnpm run audit:garbage && pnpm run audit:admin && pnpm run audit:dashboard && pnpm run build"
+  command = "corepack enable && pnpm install --frozen-lockfile && npx tsx scripts/ci-token-gate.ts && pnpm run audit:garbage && pnpm run audit:admin && pnpm run audit:dashboard && pnpm run build"
   # publish is intentionally omitted — @netlify/plugin-nextjs manages the output directory.
   # Setting publish = ".next" causes Turbopack to error: distDirRoot navigates outside projectPath.
   functions = "netlify/functions"
@@ -24,7 +24,7 @@
   # Netlify standard build containers have ~3 GB RAM. 8192 causes OOM kill (exit 137).
   # 3072 leaves ~900 MB headroom for the OS and pnpm install.
   # --expose-gc enables explicit GC calls; Next.js uses this during large builds.
-  NODE_OPTIONS = "--max-old-space-size=3072 --expose-gc"
+  NODE_OPTIONS = "--max-old-space-size=6144 --expose-gc"
   NETLIFY_USE_PNPM = "true"
   # Suppress Next.js telemetry pings during build — reduces network overhead
   NEXT_TELEMETRY_DISABLED = "1"

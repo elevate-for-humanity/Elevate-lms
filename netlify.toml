@@ -30,7 +30,8 @@
   NEXT_TELEMETRY_DISABLED = "1"
   # Next.js 16 defaults to Turbopack for production builds. Turbopack OOMs on
   # this codebase (1,486 pages) within Netlify's 3 GB container. Force webpack.
-  TURBOPACK = "0"
+  # --no-turbopack CLI flag is not supported on this Next.js version; use the env var.
+  NEXT_DISABLE_TURBOPACK = "1"
   # Turbopack disabled via --no-turbopack flag in package.json build script
   # Disable secret scanning - NEXT_PUBLIC_* vars are intentionally public
   SECRETS_SCAN_ENABLED = "false"

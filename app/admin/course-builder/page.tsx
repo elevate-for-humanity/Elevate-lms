@@ -35,7 +35,7 @@ export default async function CourseBuilderPage({ searchParams }: PageProps) {
     .from('programs')
     .select('*')
     .eq('id', programId)
-    .single();
+    .maybeSingle();
 
   if (!program) redirect('/admin/programs?error=not_found');
 

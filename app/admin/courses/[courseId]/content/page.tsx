@@ -19,7 +19,7 @@ export default async function CourseContentPage({ params }: { params: Promise<{ 
 
 
 
-  const { data: rawCourse } = await supabase.from('training_courses').select('*').eq('id', courseId).single();
+  const { data: rawCourse } = await supabase.from('training_courses').select('*').eq('id', courseId).maybeSingle();
   const course = rawCourse ? { ...rawCourse, title: rawCourse.course_name || rawCourse.title } : null;
   const { data: lessons } = await supabase.from('training_lessons').select('*').eq('course_id', courseId).order('lesson_number');
 

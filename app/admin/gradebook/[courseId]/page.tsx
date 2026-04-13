@@ -28,7 +28,7 @@ export default async function AdminGradebookPage({
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   if (!['admin', 'super_admin', 'instructor'].includes(profile?.role || '')) {
     redirect('/unauthorized');
@@ -39,7 +39,7 @@ export default async function AdminGradebookPage({
     .from('courses')
     .select('id, title')
     .eq('id', courseId)
-    .single();
+    .maybeSingle();
 
   if (!course) redirect('/admin/courses');
 

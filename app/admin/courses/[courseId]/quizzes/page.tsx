@@ -18,7 +18,7 @@ export default async function CourseQuizzesPage({ params }: { params: Promise<{ 
 
 
 
-  const { data: course } = await supabase.from('training_courses').select('*').eq('id', courseId).single();
+  const { data: course } = await supabase.from('training_courses').select('*').eq('id', courseId).maybeSingle();
   const { data: quizzes } = await supabase.from('quizzes').select('*').eq('course_id', courseId).order('created_at', { ascending: false });
 
   return (

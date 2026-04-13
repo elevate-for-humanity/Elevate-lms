@@ -26,7 +26,7 @@ export default async function EditCoursePage({
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   if (!['admin', 'super_admin', 'instructor'].includes(profile?.role || '')) {
     redirect('/unauthorized');
@@ -36,7 +36,7 @@ export default async function EditCoursePage({
     .from('training_courses')
     .select('*')
     .eq('id', courseId)
-    .single();
+    .maybeSingle();
 
   if (!course) notFound();
 

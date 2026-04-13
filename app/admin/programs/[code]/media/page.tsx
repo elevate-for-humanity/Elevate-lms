@@ -13,7 +13,7 @@ export default async function ProgramMediaPage({ params }: { params: Promise<{ c
   await requireAdmin();
   const supabase = await createClient();
 
-  const { data: program } = await supabase.from('programs').select('id, title').or(`code.eq.${code},slug.eq.${code}`).single();
+  const { data: program } = await supabase.from('programs').select('id, title').or(`code.eq.${code},slug.eq.${code}`).maybeSingle();
   if (!program) return <div className="p-8"><h1 className="text-2xl font-bold">Program not found</h1></div>;
 
   // Count lessons with video URLs

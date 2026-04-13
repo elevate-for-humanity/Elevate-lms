@@ -15,14 +15,14 @@ export default async function ProgramDashboardPage({ params }: { params: Promise
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
   if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 
   // Load program
-  const { data: program } = await supabase.from('programs').select('*').eq('code', code).single();
+  const { data: program } = await supabase.from('programs').select('*').eq('code', code).maybeSingle();
   if (!program) {
     // Try by slug
-    const { data: bySlug } = await supabase.from('programs').select('*').eq('slug', code).single();
+    const { data: bySlug } = await supabase.from('programs').select('*').eq('slug', code).maybeSingle();
     if (!bySlug) return <div className="p-8"><h1 className="text-2xl font-bold">Program not found</h1><p className="text-gray-600 mt-2">No program with code &quot;{code}&quot;</p></div>;
     redirect(`/admin/programs/${bySlug.code || bySlug.slug}/dashboard`);
   }

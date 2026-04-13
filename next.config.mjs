@@ -152,7 +152,9 @@ const nextConfig = {
       'swr',
     ],
     webpackBuildWorker: false,
-    optimizeCss: true,
+    // optimizeCss runs critters on every page — with 1,486 pages this causes OOM on Netlify (3 GB limit).
+    // Re-enable when build containers are upgraded or the page count is reduced.
+    optimizeCss: false,
     // Parallel routes for faster builds
     parallelServerCompiles: false,
     parallelServerBuildTraces: false,

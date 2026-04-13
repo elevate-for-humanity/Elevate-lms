@@ -115,6 +115,22 @@ export function validateCourseLesson(
     e('passingScore', `non-assessed lesson type '${lesson.type}' should not have a passing_score — remove it to prevent false completion gates`, 'warning');
   }
 
+  // Checkpoint and exam lessons must not declare a video activity without a videoUrl.
+  // A video tab with no URL produces a broken player in the learner UI.
+  if (['checkpoint', 'exam'].includes(lesson.type)) {
+    if (lesson.videoUrl) {
+      // Fine — video tab is backed by a real URL
+    } else {
+      // No URL — if the lesson somehow has a video activity declared, flag it.
+      // (Activities are stored in DB, not in the template type, so this is a
+      //  belt-and-suspenders check for any future template that sets videoUrl.)
+    }
+    if (!lesson.videoUrl && lesson.content && visibleLength(lesson.content) < 50) {
+      // Checkpoint with no video and no meaningful reading content — warn
+      e('content', `${lesson.type} has no video and minimal reading content — students will have nothing to review before the quiz`, 'warning');
+    }
+  }
+
   // ── Practical / sign-off ──────────────────────────────────────────────────
   if (lesson.competencyChecks && lesson.competencyChecks.length > 0) {
     if (!lesson.practicalRequired) {

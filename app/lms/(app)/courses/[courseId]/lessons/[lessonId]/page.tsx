@@ -237,7 +237,8 @@ export default function LessonPage() {
             return;
           }
         }
-      } catch {
+      } catch (e) {
+        console.error('[lesson] enrollment check failed:', e);
         // Network error — don't block, let lesson load attempt continue
       }
     }
@@ -384,8 +385,9 @@ export default function LessonPage() {
           setIsCompleted(completedIds.has(lessonId));
         }
       }
-    } catch {
-      // Auth/progress fetch failed — lesson still renders fine
+    } catch (e) {
+      console.error('[lesson] auth/progress fetch failed:', e);
+      // Lesson still renders fine without progress data
     }
 
     // 4. Fetch learner progress via engine API (covers checkpoint_scores +
@@ -411,7 +413,8 @@ export default function LessonPage() {
           }
         }
       }
-    } catch {
+    } catch (e) {
+      console.error('[lesson] checkpoint gating fetch failed:', e);
       // Fail open — lesson still renders without gating data
     }
 
@@ -468,7 +471,8 @@ export default function LessonPage() {
             } else {
               setCompletionError(err.error ?? 'Unable to mark complete. Please try again.');
             }
-          } catch {
+          } catch (e) {
+            console.error('[lesson] mark-complete response parse failed:', e);
             setCompletionError('Unable to mark complete. Please try again.');
           }
           return;
@@ -910,6 +914,7 @@ export default function LessonPage() {
               courseId={courseId}
               stepType="lab"
               lessonTitle={lesson.title}
+              competencyKey={lesson.competency_checks?.[0]?.key}
             />
             {/* AR Training — beta */}
             <ARTrainingModules />
@@ -935,6 +940,7 @@ export default function LessonPage() {
                 courseId={courseId}
                 stepType="assignment"
                 lessonTitle={lesson.title}
+                competencyKey={lesson.competency_checks?.[0]?.key}
               />
             </div>
           </div>
@@ -987,9 +993,11 @@ export default function LessonPage() {
                     await fetch(`/api/lessons/${lessonId}/checkpoint`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ courseId, moduleOrder: lesson.module_order ?? 0, score, passed }),
+                      body: JSON.stringify({ courseId, moduleOrder: lesson.module_order ?? 0, score, passed, passingScore }),
                     });
-                  } catch { /* non-blocking */ }
+                  } catch (e) {
+                    console.error('[exam] checkpoint record failed:', e);
+                  }
                   if (passed) await markComplete(true);
                 }}
                 passingScore={lesson.passing_score || 70}
@@ -1087,7 +1095,8 @@ export default function LessonPage() {
                       setPassedCheckpointIds(prev => new Set<string>([...Array.from(prev), lessonId]));
                       setCheckpointBlocked(false);
                     }
-                  } catch {
+                  } catch (e) {
+                    console.error('[lesson] checkpoint record failed (quiz player):', e);
                     // Non-fatal — fail open so the lesson still renders
                   }
                 }
@@ -1442,6 +1451,7 @@ export default function LessonPage() {
                           courseId={courseId}
                           stepType={lesson.step_type}
                           lessonTitle={lesson.title}
+                          competencyKey={lesson.competency_checks?.[0]?.key}
                           onSubmitted={() => { markAttempted('lab'); if (!isCompleted) markComplete(); }}
                         />
                       ) : (

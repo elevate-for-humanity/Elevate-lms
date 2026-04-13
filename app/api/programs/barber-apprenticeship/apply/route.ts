@@ -63,6 +63,7 @@ export async function POST(req: Request) {
         city: validated.city,
         zip: validated.zipCode,
         program_interest: 'Barber Apprenticeship',
+        program_slug: 'barber-apprenticeship', // required for approve.ts → resolveCourseId()
         status: 'pending_payment',
         // date_of_birth, address, state stored in eligibility_data (not in applications schema)
         eligibility_data: {

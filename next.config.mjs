@@ -204,6 +204,7 @@ const nextConfig = {
       // causing O(n^2) RAM growth. The framework chunk is sufficient.
       splitChunks: {
         chunks: 'all',
+        maxInitialRequests: 20, // cap chunk explosion on large page counts
         cacheGroups: {
           default: false,
           vendors: false,

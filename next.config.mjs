@@ -1047,8 +1047,9 @@ const nextConfig = {
           { key: 'X-Build-ID', value: process.env.COMMIT_REF?.slice(0, 7) || 'dev' },
         ],
       },
-      // 1) Public marketing pages — short CDN cache, revalidate in background.
-      //    Netlify edge will serve stale while fetching fresh, keeping TTFB fast.
+      // 1) Non-app routes (marketing stubs, public info pages) — short CDN cache.
+      //    Marketing content is served by Cloudflare Pages (www.elevateforhumanity.org).
+      //    These stubs just redirect there; short cache is fine.
       {
         source: '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|studio|api|lms|admin|learner|instructor|employer|partner|program-holder|staff-portal|mentor|student-portal|onboarding|franchise|tax|supersonic).*)',
         headers: [

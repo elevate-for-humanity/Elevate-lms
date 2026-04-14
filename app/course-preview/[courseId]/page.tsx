@@ -1,7 +1,10 @@
 'use client';
 
+// Auth enforced server-side in app/course-preview/layout.tsx.
+
 import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 import {
   BookOpen, CheckCircle, Award, Clock, BarChart3,
   Shield, FileText, Wrench,
@@ -99,8 +102,7 @@ export default function CoursePreviewPage() {
   }, [courseId]);
 
   const fetchCourse = async () => {
-    const { createClient } = await import('@/lib/supabase/client');
-    const supabase = await createClient();
+    const supabase = createClient();
 
     // Support both UUID and slug lookups
     const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(courseId);

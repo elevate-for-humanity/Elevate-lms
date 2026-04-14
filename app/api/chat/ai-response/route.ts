@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: live support chat AI — rate-limited, no PII stored
 import { logger } from '@/lib/logger';
 
 

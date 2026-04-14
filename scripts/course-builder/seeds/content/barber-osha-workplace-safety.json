@@ -1,0 +1,289 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is the primary mission of OSHA?",
+        "choices": [
+          "To prevent work-related injuries, illnesses, and deaths",
+          "To regulate barber licensing",
+          "To provide financial assistance to barbers",
+          "To promote barber shop marketing"
+        ],
+        "answerIndex": 0,
+        "rationale": "OSHA's mission is to ensure safe and healthful working conditions by setting and enforcing standards."
+      },
+      {
+        "prompt": "Which document must be accessible to all employees for every chemical product in a barber shop?",
+        "choices": [
+          "Safety Data Sheets (SDS)",
+          "Chemical Inventory List",
+          "Product Manual",
+          "Employee Handbook"
+        ],
+        "answerIndex": 0,
+        "rationale": "Safety Data Sheets (SDS) provide detailed information about chemical hazards and must be accessible to employees."
+      },
+      {
+        "prompt": "What does the Globally Harmonized System (GHS) standardize?",
+        "choices": [
+          "Chemical hazard classification and communication",
+          "Barber licensing exams",
+          "Hair styling techniques",
+          "Customer service protocols"
+        ],
+        "answerIndex": 0,
+        "rationale": "GHS standardizes the classification and labeling of chemicals worldwide to ensure consistent communication of hazards."
+      },
+      {
+        "prompt": "What is required when working with aerosols or volatile chemicals in poorly ventilated spaces?",
+        "choices": [
+          "Respiratory protection",
+          "Ear protection",
+          "Steel-toed boots",
+          "Fire extinguisher"
+        ],
+        "answerIndex": 0,
+        "rationale": "Respiratory protection is required to prevent inhalation of harmful substances in poorly ventilated areas."
+      },
+      {
+        "prompt": "Which pictogram represents a flammable substance under the GHS?",
+        "choices": [
+          "Flame",
+          "Skull and crossbones",
+          "Exclamation mark",
+          "Corrosion"
+        ],
+        "answerIndex": 0,
+        "rationale": "The flame pictogram indicates that a substance is flammable."
+      },
+      {
+        "prompt": "What should be done if a barber is exposed to blood?",
+        "choices": [
+          "Wash immediately with soap and water",
+          "Continue working",
+          "Ignore and move on",
+          "Apply a bandage"
+        ],
+        "answerIndex": 0,
+        "rationale": "Immediate washing with soap and water is crucial to reduce the risk of infection after exposure to blood."
+      },
+      {
+        "prompt": "Which PPE is required when applying chemical services such as relaxers or perms?",
+        "choices": [
+          "Eye protection",
+          "Ear protection",
+          "Steel-toed boots",
+          "Knee pads"
+        ],
+        "answerIndex": 0,
+        "rationale": "Eye protection is necessary to prevent chemical splashes from reaching the eyes during chemical services."
+      },
+      {
+        "prompt": "What is the purpose of an Exposure Control Plan in a barber shop?",
+        "choices": [
+          "To identify tasks with exposure risk and protective measures",
+          "To manage client appointments",
+          "To track inventory",
+          "To schedule employee shifts"
+        ],
+        "answerIndex": 0,
+        "rationale": "An Exposure Control Plan outlines tasks with potential exposure to bloodborne pathogens and the measures to protect workers."
+      },
+      {
+        "prompt": "A barber experiences wrist strain from repetitive motions. What ergonomic tool can help reduce this strain?",
+        "choices": [
+          "Tools with ergonomic handles",
+          "Standard scissors",
+          "Heavy-duty gloves",
+          "Regular combs"
+        ],
+        "answerIndex": 0,
+        "rationale": "Ergonomic handles are designed to reduce strain on the wrist during repetitive tasks."
+      },
+      {
+        "prompt": "Where should used razor blades be disposed of in a barber shop?",
+        "choices": [
+          "In a puncture-resistant sharps container",
+          "In the regular trash",
+          "In a recycling bin",
+          "In a paper bag"
+        ],
+        "answerIndex": 0,
+        "rationale": "Used razor blades must be disposed of in a puncture-resistant sharps container to prevent injury and contamination."
+      },
+      {
+        "prompt": "What should be done if a fire occurs in a barber shop?",
+        "choices": [
+          "Use a Class B fire extinguisher",
+          "Throw water on the fire",
+          "Ignore it",
+          "Call a friend"
+        ],
+        "answerIndex": 0,
+        "rationale": "Class B fire extinguishers are designed for chemical fires, which are common in barber shops due to flammable products."
+      },
+      {
+        "prompt": "How often must employers report a work-related fatality to OSHA?",
+        "choices": [
+          "Within 8 hours",
+          "Within 24 hours",
+          "Within 48 hours",
+          "Within 72 hours"
+        ],
+        "answerIndex": 0,
+        "rationale": "OSHA requires that any work-related fatality be reported within 8 hours to ensure timely investigation and response."
+      },
+      {
+        "prompt": "What is the recommended action to prevent musculoskeletal disorders from prolonged standing?",
+        "choices": [
+          "Use anti-fatigue mats",
+          "Wear high heels",
+          "Sit constantly",
+          "Ignore discomfort"
+        ],
+        "answerIndex": 0,
+        "rationale": "Anti-fatigue mats help reduce strain and discomfort from prolonged standing, minimizing the risk of musculoskeletal disorders."
+      },
+      {
+        "prompt": "Which of the following is NOT a component of the Hazard Communication Standard (HazCom)?",
+        "choices": [
+          "Employee Handbook",
+          "Safety Data Sheets (SDS)",
+          "Labels",
+          "Training"
+        ],
+        "answerIndex": 0,
+        "rationale": "The Employee Handbook is not part of HazCom; it typically includes company policies and procedures."
+      },
+      {
+        "prompt": "What should be done to ensure fire safety in a barber shop?",
+        "choices": [
+          "Store flammable products away from heat sources",
+          "Keep flammable products near heat sources",
+          "Ignore safety protocols",
+          "Use any type of fire extinguisher"
+        ],
+        "answerIndex": 0,
+        "rationale": "Flammable products should be stored away from heat sources to prevent accidental fires."
+      },
+      {
+        "prompt": "What is the signal word used on labels to indicate a high level of hazard?",
+        "choices": [
+          "Danger",
+          "Caution",
+          "Notice",
+          "Alert"
+        ],
+        "answerIndex": 0,
+        "rationale": "The signal word 'Danger' indicates a high level of hazard on chemical labels."
+      },
+      {
+        "prompt": "Why is it important for barbers to take micro-breaks and stretch regularly?",
+        "choices": [
+          "To prevent musculoskeletal disorders",
+          "To increase client wait times",
+          "To reduce chemical usage",
+          "To improve hair styling speed"
+        ],
+        "answerIndex": 0,
+        "rationale": "Regular micro-breaks and stretching help prevent musculoskeletal disorders by reducing strain from repetitive motions and prolonged standing."
+      },
+      {
+        "prompt": "What should be done if a barber shop has more than 10 employees?",
+        "choices": [
+          "Maintain an OSHA 300 Log",
+          "Ignore OSHA regulations",
+          "Reduce the number of employees",
+          "Close the shop"
+        ],
+        "answerIndex": 0,
+        "rationale": "Employers with more than 10 employees must maintain an OSHA 300 Log of work-related injuries and illnesses for record-keeping and compliance."
+      },
+      {
+        "prompt": "Which pictogram indicates a substance that is an irritant or harmful under the GHS?",
+        "choices": [
+          "Exclamation mark",
+          "Flame",
+          "Skull and crossbones",
+          "Corrosion"
+        ],
+        "answerIndex": 0,
+        "rationale": "The exclamation mark pictogram is used to indicate substances that are irritants or harmful."
+      },
+      {
+        "prompt": "What is the appropriate action if a barber is exposed to a bloodborne pathogen?",
+        "choices": [
+          "Seek medical evaluation",
+          "Continue working",
+          "Ignore the exposure",
+          "Apply a bandage"
+        ],
+        "answerIndex": 0,
+        "rationale": "Seeking medical evaluation is crucial to assess the risk and receive appropriate treatment after exposure to bloodborne pathogens."
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "OSHA",
+      "definition": "The Occupational Safety and Health Administration, responsible for ensuring safe working conditions by setting and enforcing standards."
+    },
+    {
+      "term": "HazCom Standard",
+      "definition": "OSHA's Hazard Communication Standard requires employers to inform workers about hazardous chemicals in the workplace."
+    },
+    {
+      "term": "Safety Data Sheets (SDS)",
+      "definition": "Documents that provide information on the properties of chemical products, including hazards, handling, and emergency measures."
+    },
+    {
+      "term": "Globally Harmonized System (GHS)",
+      "definition": "A worldwide standard for chemical hazard classification and communication adopted by OSHA in 2012."
+    },
+    {
+      "term": "Bloodborne Pathogens Standard",
+      "definition": "OSHA standard to protect workers from health hazards caused by bloodborne pathogens."
+    },
+    {
+      "term": "Universal Precautions",
+      "definition": "An approach to infection control where all human blood and certain body fluids are treated as if known to be infectious."
+    },
+    {
+      "term": "Personal Protective Equipment (PPE)",
+      "definition": "Equipment worn to minimize exposure to hazards that cause serious workplace injuries and illnesses."
+    },
+    {
+      "term": "Ergonomics",
+      "definition": "The study of people's efficiency in their working environment, focusing on reducing musculoskeletal disorders."
+    },
+    {
+      "term": "Fire Safety",
+      "definition": "Practices intended to reduce the destruction caused by fire, including the storage and handling of flammable chemicals."
+    },
+    {
+      "term": "Class B Fire Extinguisher",
+      "definition": "A fire extinguisher used for fires involving flammable liquids like alcohol-based products."
+    },
+    {
+      "term": "Exposure Control Plan",
+      "definition": "A written plan required by OSHA to eliminate or minimize employee exposure to bloodborne pathogens."
+    },
+    {
+      "term": "Sharps Disposal",
+      "definition": "The proper disposal of sharp objects like used razor blades in puncture-resistant containers."
+    },
+    {
+      "term": "OSHA 300 Log",
+      "definition": "A log that employers with 10 or more employees must maintain to record work-related injuries and illnesses."
+    },
+    {
+      "term": "Emergency Evacuation Plan",
+      "definition": "A plan that outlines how to safely exit a building during an emergency."
+    },
+    {
+      "term": "Pictograms",
+      "definition": "Standardized symbols used in the Globally Harmonized System to convey specific information about the hazards of a chemical."
+    }
+  ]
+}

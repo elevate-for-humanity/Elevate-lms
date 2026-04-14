@@ -155,9 +155,7 @@ async function _POST(req: NextRequest) {
     return NextResponse.json(
       {
         ok: false,
-        error:
-          err?.message ??
-          'Unexpected error while creating checkout. Please try again.',
+        error: 'Unexpected error while creating checkout. Please try again.',
       },
       { status: 500 }
     );

@@ -1,5 +1,5 @@
-
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { auditLog } from '@/lib/auditLog';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -8,7 +8,10 @@ export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
+
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;

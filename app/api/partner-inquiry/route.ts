@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public partner inquiry form
 
 
 import { NextRequest, NextResponse } from 'next/server';

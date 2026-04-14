@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public consultation scheduling form
 
 import { NextResponse } from 'next/server';
 import { getAdminClient } from '@/lib/supabase/admin';

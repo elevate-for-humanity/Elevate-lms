@@ -1,0 +1,289 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "Which layer of the skin contains no blood vessels?",
+        "choices": [
+          "Epidermis",
+          "Dermis",
+          "Hypodermis",
+          "Subcutaneous"
+        ],
+        "answerIndex": 0,
+        "rationale": "The epidermis is the outermost layer of the skin and contains no blood vessels."
+      },
+      {
+        "prompt": "Where are melanocytes primarily located?",
+        "choices": [
+          "Stratum corneum",
+          "Stratum lucidum",
+          "Stratum germinativum",
+          "Stratum spinosum"
+        ],
+        "answerIndex": 2,
+        "rationale": "Melanocytes, which produce melanin, are primarily located in the stratum germinativum."
+      },
+      {
+        "prompt": "Which layer of the skin is referred to as the 'true skin'?",
+        "choices": [
+          "Epidermis",
+          "Dermis",
+          "Hypodermis",
+          "Stratum corneum"
+        ],
+        "answerIndex": 1,
+        "rationale": "The dermis is referred to as the 'true skin' because it contains essential structures like collagen, elastin, and blood vessels."
+      },
+      {
+        "prompt": "What is the main function of sebaceous glands?",
+        "choices": [
+          "Produce sweat",
+          "Produce sebum",
+          "Insulate the body",
+          "Provide strength"
+        ],
+        "answerIndex": 1,
+        "rationale": "Sebaceous glands produce sebum, which lubricates the hair and skin."
+      },
+      {
+        "prompt": "Why is the acid mantle important?",
+        "choices": [
+          "It provides flexibility",
+          "It protects against bacteria and fungi",
+          "It insulates the body",
+          "It provides strength"
+        ],
+        "answerIndex": 1,
+        "rationale": "The acid mantle, with a pH of 4.5-5.5, protects the skin against bacteria and fungi."
+      },
+      {
+        "prompt": "Which layer of the epidermis is responsible for cell reproduction?",
+        "choices": [
+          "Stratum corneum",
+          "Stratum granulosum",
+          "Stratum spinosum",
+          "Stratum germinativum"
+        ],
+        "answerIndex": 3,
+        "rationale": "The stratum germinativum is the deepest layer of the epidermis and is responsible for cell reproduction."
+      },
+      {
+        "prompt": "In which layer do cells begin to die?",
+        "choices": [
+          "Stratum corneum",
+          "Stratum lucidum",
+          "Stratum granulosum",
+          "Stratum spinosum"
+        ],
+        "answerIndex": 2,
+        "rationale": "Cells begin to die in the stratum granulosum as they move towards the surface of the skin."
+      },
+      {
+        "prompt": "What stimulates melanin production in the skin?",
+        "choices": [
+          "Cold temperatures",
+          "UV radiation",
+          "Moisture",
+          "Friction"
+        ],
+        "answerIndex": 1,
+        "rationale": "UV radiation stimulates melanin production as a protective response, leading to tanning."
+      },
+      {
+        "prompt": "A client presents with oily skin. Which gland is likely overactive?",
+        "choices": [
+          "Sweat gland",
+          "Sebaceous gland",
+          "Hair follicle",
+          "Nerve ending"
+        ],
+        "answerIndex": 1,
+        "rationale": "Overproduction of sebum by the sebaceous glands can lead to oily skin."
+      },
+      {
+        "prompt": "A client has dry skin. What could be a contributing factor?",
+        "choices": [
+          "Underproduction of sebum",
+          "Overproduction of sweat",
+          "Excess melanin",
+          "Thick epidermis"
+        ],
+        "answerIndex": 0,
+        "rationale": "Underproduction of sebum by the sebaceous glands can lead to dry skin."
+      },
+      {
+        "prompt": "What should be applied after using alkaline products on the skin?",
+        "choices": [
+          "Moisturizer",
+          "pH-balanced products",
+          "Exfoliant",
+          "Sunscreen"
+        ],
+        "answerIndex": 1,
+        "rationale": "pH-balanced products should be used to restore the acid mantle disrupted by alkaline products."
+      },
+      {
+        "prompt": "A client has hyperpigmentation. What does this mean?",
+        "choices": [
+          "Lack of melanin",
+          "Excessive sweating",
+          "Dark spots on the skin",
+          "Increased elasticity"
+        ],
+        "answerIndex": 2,
+        "rationale": "Hyperpigmentation refers to dark spots on the skin due to uneven melanin distribution."
+      },
+      {
+        "prompt": "Which skin layer provides insulation and cushioning?",
+        "choices": [
+          "Epidermis",
+          "Dermis",
+          "Hypodermis",
+          "Stratum spinosum"
+        ],
+        "answerIndex": 2,
+        "rationale": "The hypodermis, or subcutaneous layer, is composed of fatty tissue that insulates and cushions the body."
+      },
+      {
+        "prompt": "Which layer of the epidermis is only found on the palms and soles?",
+        "choices": [
+          "Stratum corneum",
+          "Stratum lucidum",
+          "Stratum granulosum",
+          "Stratum spinosum"
+        ],
+        "answerIndex": 1,
+        "rationale": "The stratum lucidum is a layer of the epidermis found only on the palms and soles."
+      },
+      {
+        "prompt": "What is the role of sweat glands?",
+        "choices": [
+          "Lubricate the skin",
+          "Produce melanin",
+          "Regulate body temperature",
+          "Provide structural support"
+        ],
+        "answerIndex": 2,
+        "rationale": "Sweat glands help regulate body temperature through the process of perspiration."
+      },
+      {
+        "prompt": "A client has light spots on their skin. What is this condition called?",
+        "choices": [
+          "Hyperpigmentation",
+          "Hypopigmentation",
+          "Melanoma",
+          "Seborrhea"
+        ],
+        "answerIndex": 1,
+        "rationale": "Hypopigmentation refers to light spots on the skin due to uneven melanin distribution."
+      },
+      {
+        "prompt": "Which component of the dermis provides flexibility?",
+        "choices": [
+          "Collagen",
+          "Elastin",
+          "Sebum",
+          "Melanin"
+        ],
+        "answerIndex": 1,
+        "rationale": "Elastin in the dermis provides flexibility to the skin."
+      },
+      {
+        "prompt": "A barber notices a client with a disrupted acid mantle. What might have caused this?",
+        "choices": [
+          "Use of acidic products",
+          "Use of alkaline products",
+          "Excessive sweating",
+          "Lack of sebum"
+        ],
+        "answerIndex": 1,
+        "rationale": "Alkaline products can temporarily disrupt the skin's acid mantle."
+      },
+      {
+        "prompt": "What is the primary function of hair follicles?",
+        "choices": [
+          "Produce sebum",
+          "Provide insulation",
+          "Grow hair",
+          "Regulate temperature"
+        ],
+        "answerIndex": 2,
+        "rationale": "Hair follicles are responsible for hair growth, which is central to barber services."
+      },
+      {
+        "prompt": "What is the main structural protein found in the dermis?",
+        "choices": [
+          "Keratin",
+          "Elastin",
+          "Collagen",
+          "Melanin"
+        ],
+        "answerIndex": 2,
+        "rationale": "Collagen is the main structural protein in the dermis, providing strength to the skin."
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Epidermis",
+      "definition": "The outermost layer of the skin, containing no blood vessels and composed of five sublayers."
+    },
+    {
+      "term": "Dermis",
+      "definition": "The 'true skin' layer containing collagen, elastin, blood vessels, nerve endings, hair follicles, and glands."
+    },
+    {
+      "term": "Hypodermis",
+      "definition": "The subcutaneous layer of fatty tissue that insulates and cushions the body."
+    },
+    {
+      "term": "Stratum Corneum",
+      "definition": "The outermost sublayer of the epidermis, consisting of dead cells that shed continuously."
+    },
+    {
+      "term": "Stratum Germinativum",
+      "definition": "The deepest sublayer of the epidermis, where cell reproduction and melanin production occur."
+    },
+    {
+      "term": "Melanin",
+      "definition": "The pigment produced by melanocytes that gives skin and hair their color and provides UV protection."
+    },
+    {
+      "term": "Hair Follicles",
+      "definition": "Pockets in the dermis from which hair grows, essential to barber services."
+    },
+    {
+      "term": "Sebaceous Glands",
+      "definition": "Glands that produce sebum to lubricate hair and skin; overproduction causes oily skin."
+    },
+    {
+      "term": "Sweat Glands",
+      "definition": "Glands that regulate body temperature through perspiration."
+    },
+    {
+      "term": "Acid Mantle",
+      "definition": "The slightly acidic pH of 4.5–5.5 on the skin's surface that protects against bacteria and fungi."
+    },
+    {
+      "term": "Collagen",
+      "definition": "A protein in the dermis that provides strength to the skin."
+    },
+    {
+      "term": "Elastin",
+      "definition": "A protein in the dermis that provides flexibility to the skin."
+    },
+    {
+      "term": "Hyperpigmentation",
+      "definition": "Dark spots on the skin caused by uneven melanin distribution."
+    },
+    {
+      "term": "Hypopigmentation",
+      "definition": "Light spots on the skin caused by uneven melanin distribution."
+    },
+    {
+      "term": "Stratum Lucidum",
+      "definition": "A sublayer of the epidermis found only on the palms and soles."
+    }
+  ]
+}

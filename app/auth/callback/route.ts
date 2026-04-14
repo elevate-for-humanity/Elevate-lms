@@ -102,8 +102,9 @@ export async function GET(request: Request) {
         logger.warn('Failed to resolve role in callback:', roleErr);
       }
 
-      // Route by role — always, unless an explicit ?next= was provided
-      const hasExplicitNext = requestUrl.searchParams.has('next') && next !== '/learner/dashboard';
+      // Route by role — unless an explicit ?next= was provided.
+      // Any ?next= value takes priority over role-based routing.
+      const hasExplicitNext = requestUrl.searchParams.has('next');
       if (!hasExplicitNext) {
         const destination = getRoleDestination(resolvedRole);
         return NextResponse.redirect(new URL(destination, requestUrl.origin));

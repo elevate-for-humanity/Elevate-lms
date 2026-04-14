@@ -38,41 +38,51 @@ const STEP_TYPE_LABELS: Record<string, string> = {
 export default async function InstructorSubmissionsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; course?: string }>;
+  searchParams: Promise<{ status?: string; course?: string; competency?: string }>;
 }) {
   const { user, profile } = await requireRole(['instructor', 'admin', 'super_admin']);
 
   const supabase = await createClient();
 
   const params = await searchParams;
-  const filterStatus = params.status as SubmissionStatus | undefined;
-  const filterCourse = params.course;
+  const filterStatus    = params.status as SubmissionStatus | undefined;
+  const filterCourse    = params.course;
+  const filterCompetency = params.competency === '1';
 
   // Fetch submissions assigned to this instructor (or all, for admin)
   const isAdmin = profile.role === 'admin' || profile.role === 'super_admin';
 
   let query = supabase
     .from('step_submissions')
-    .select(`id, user_id, course_lesson_id, course_id, step_type, submission_text, file_urls, status, instructor_note, reviewed_at, created_at, course_lessons:course_lesson_id ( title, slug )`)
+    .select(`
+      id,
+      user_id,
+      course_lesson_id,
+      course_id,
+      step_type,
+      submission_text,
+      file_urls,
+      status,
+      instructor_note,
+      reviewed_at,
+      created_at,
+      competency_key,
+      profiles:user_id ( full_name, email ),
+      course_lessons:course_lesson_id ( title, slug )
+    `)
     .order('created_at', { ascending: false })
     .limit(100);
 
   if (!isAdmin) {
+    // Instructors see submissions for their assigned courses
     query = query.eq('instructor_id', user.id);
   }
 
-  if (filterStatus) query = query.eq('status', filterStatus);
-  if (filterCourse) query = query.eq('course_id', filterCourse);
+  if (filterStatus)     query = query.eq('status', filterStatus);
+  if (filterCourse)     query = query.eq('course_id', filterCourse);
+  if (filterCompetency) query = query.not('competency_key', 'is', null);
 
-  const { data: rawSubmissions, error } = await query;
-
-  // Hydrate profiles separately (step_submissions.user_id has no FK to profiles)
-  const subUserIds = [...new Set((rawSubmissions ?? []).map((s: any) => s.user_id).filter(Boolean))];
-  const { data: subProfiles } = subUserIds.length
-    ? await supabase.from('profiles').select('id, full_name, email').in('id', subUserIds)
-    : { data: [] };
-  const subProfileMap = Object.fromEntries((subProfiles ?? []).map((p: any) => [p.id, p]));
-  const submissions = (rawSubmissions ?? []).map((s: any) => ({ ...s, profiles: subProfileMap[s.user_id] ?? null }));
+  const { data: submissions, error } = await query;
 
   if (error) {
     return (
@@ -96,13 +106,19 @@ export default async function InstructorSubmissionsPage({
     : { data: [] };
   const courseNameMap = new Map((courses ?? []).map((c: any) => [c.id, c.course_name]));
 
-  const tabs: Array<{ label: string; value: string | undefined; count?: number }> = [
-    { label: 'All', value: undefined, count: submissions?.length ?? 0 },
-    { label: 'Needs Review', value: 'submitted', count: counts['submitted'] ?? 0 },
-    { label: 'Under Review', value: 'under_review', count: counts['under_review'] ?? 0 },
-    { label: 'Approved', value: 'approved', count: counts['approved'] ?? 0 },
-    { label: 'Rejected', value: 'rejected', count: counts['rejected'] ?? 0 },
-    { label: 'Revision', value: 'revision_requested', count: counts['revision_requested'] ?? 0 },
+  // Count pending competency sign-offs (submitted/under_review with a competency_key)
+  const pendingCompetencyCount = (submissions ?? []).filter(
+    s => s.competency_key && (s.status === 'submitted' || s.status === 'under_review')
+  ).length;
+
+  const tabs: Array<{ label: string; value: string | undefined; competencyOnly?: boolean; count?: number }> = [
+    { label: 'All',                  value: undefined,            count: submissions?.length ?? 0 },
+    { label: 'Needs Review',         value: 'submitted',          count: counts['submitted'] ?? 0 },
+    { label: 'Under Review',         value: 'under_review',       count: counts['under_review'] ?? 0 },
+    { label: 'Competency Sign-offs', value: 'submitted',          competencyOnly: true, count: pendingCompetencyCount },
+    { label: 'Approved',             value: 'approved',           count: counts['approved'] ?? 0 },
+    { label: 'Rejected',             value: 'rejected',           count: counts['rejected'] ?? 0 },
+    { label: 'Revision',             value: 'revision_requested', count: counts['revision_requested'] ?? 0 },
   ];
 
   return (
@@ -138,10 +154,15 @@ export default async function InstructorSubmissionsPage({
         {/* Filter tabs */}
         <div className="flex gap-1 mb-6 bg-white border border-slate-200 rounded-xl p-1 w-fit flex-wrap">
           {tabs.map(tab => {
-            const active = filterStatus === tab.value || (tab.value === undefined && !filterStatus);
-            const href = tab.value
-              ? `/instructor/submissions?status=${tab.value}${filterCourse ? `&course=${filterCourse}` : ''}`
-              : `/instructor/submissions${filterCourse ? `?course=${filterCourse}` : ''}`;
+            const isCompetencyTab = tab.competencyOnly === true;
+            const active = isCompetencyTab
+              ? filterCompetency
+              : (filterStatus === tab.value && !filterCompetency) || (tab.value === undefined && !filterStatus && !filterCompetency);
+            const qs = new URLSearchParams();
+            if (tab.value)      qs.set('status', tab.value);
+            if (filterCourse)   qs.set('course', filterCourse);
+            if (isCompetencyTab) qs.set('competency', '1');
+            const href = `/instructor/submissions${qs.toString() ? `?${qs}` : ''}`;
             return (
               <Link
                 key={tab.label}

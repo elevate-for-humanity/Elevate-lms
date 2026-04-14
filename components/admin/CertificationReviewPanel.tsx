@@ -68,8 +68,8 @@ export function CertificationReviewPanel({
         setPending(prev => prev.filter(p => p.id !== submission.id));
         setRecent(prev => [updated, ...prev]);
       }
-    } catch (error) {
-      console.error('Failed to approve:', error);
+    } catch {
+      // Approval failed — processing state cleared, user can retry
     } finally {
       setProcessing(null);
     }
@@ -99,8 +99,8 @@ export function CertificationReviewPanel({
         setPending(prev => prev.filter(p => p.id !== submission.id));
         setRecent(prev => [updated, ...prev]);
       }
-    } catch (error) {
-      console.error('Failed to reject:', error);
+    } catch {
+      // Rejection failed — processing state cleared, user can retry
     } finally {
       setProcessing(null);
     }

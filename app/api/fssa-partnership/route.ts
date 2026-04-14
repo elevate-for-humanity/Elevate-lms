@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: FSSA partnership inquiry form
 import { NextRequest, NextResponse } from 'next/server';
 
 // Using Node.js runtime for email compatibility

@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: marketing contact form
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';

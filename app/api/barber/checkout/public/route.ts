@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public barber program checkout
 // AUTH: Intentionally public — no authentication required
 // POLICY: Tuition is fixed. Transfer hours NEVER affect price.
 //         Only custom_setup_fee is user-influenced and is server-clamped.

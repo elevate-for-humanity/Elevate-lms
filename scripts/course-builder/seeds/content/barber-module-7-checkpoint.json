@@ -1,0 +1,227 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "A client walks into the barbershop visibly upset about a previous haircut they received. How should you professionally handle the situation?",
+        "choices": [
+          "Listen to their concerns and offer a solution",
+          "Tell them to calm down",
+          "Ignore their complaints",
+          "Refer them to another barber"
+        ],
+        "answerIndex": 0,
+        "rationale": "Listening and offering a solution shows professionalism and a commitment to customer satisfaction."
+      },
+      {
+        "prompt": "Which of the following is the most effective way to build a loyal clientele?",
+        "choices": [
+          "Offer consistent quality service",
+          "Lower your prices significantly",
+          "Gossip with clients",
+          "Rush through appointments"
+        ],
+        "answerIndex": 0,
+        "rationale": "Consistent quality service builds trust and encourages repeat business."
+      },
+      {
+        "prompt": "During a busy day at the barbershop, you realize you are running behind schedule. What is the best way to manage your appointments?",
+        "choices": [
+          "Rush through the remaining appointments",
+          "Cancel the rest of the day's appointments",
+          "Communicate with clients about the delay",
+          "Ignore the schedule"
+        ],
+        "answerIndex": 2,
+        "rationale": "Communicating delays shows respect for clients' time and maintains trust."
+      },
+      {
+        "prompt": "What is the most important factor in ensuring a successful consultation with a new client?",
+        "choices": [
+          "Understanding their needs and preferences",
+          "Talking about your personal life",
+          "Offering discounts",
+          "Using technical jargon"
+        ],
+        "answerIndex": 0,
+        "rationale": "Understanding the client's needs and preferences ensures the service meets their expectations."
+      },
+      {
+        "prompt": "You notice a coworker frequently arrives late to work, affecting the team’s performance. How should you address this professionally?",
+        "choices": [
+          "Discuss your concerns with them privately",
+          "Complain to other coworkers",
+          "Report them immediately to management",
+          "Ignore the issue"
+        ],
+        "answerIndex": 0,
+        "rationale": "Addressing the issue privately shows professionalism and respect for your coworker."
+      },
+      {
+        "prompt": "Which of the following is a key component of maintaining a professional image in the barbershop?",
+        "choices": [
+          "Wearing appropriate attire",
+          "Using slang with clients",
+          "Sharing personal problems",
+          "Ignoring client feedback"
+        ],
+        "answerIndex": 0,
+        "rationale": "Appropriate attire contributes to a professional image and client perception."
+      },
+      {
+        "prompt": "A client requests a hairstyle that you know will not suit them. How should you proceed?",
+        "choices": [
+          "Explain your concerns and suggest alternatives",
+          "Do exactly what they ask",
+          "Refuse to serve them",
+          "Laugh it off"
+        ],
+        "answerIndex": 0,
+        "rationale": "Suggesting alternatives while explaining your concerns shows expertise and care for the client's appearance."
+      },
+      {
+        "prompt": "What is the best way to handle a situation where a client is dissatisfied with their haircut?",
+        "choices": [
+          "Offer to fix it for free",
+          "Argue that the haircut is fine",
+          "Blame the client for poor communication",
+          "Ignore their dissatisfaction"
+        ],
+        "answerIndex": 0,
+        "rationale": "Offering to fix the haircut for free demonstrates a commitment to client satisfaction and quality service."
+      },
+      {
+        "prompt": "How can you effectively manage your time during a busy workday in the barbershop?",
+        "choices": [
+          "Prioritize tasks and appointments",
+          "Take frequent breaks",
+          "Chat with coworkers",
+          "Schedule all clients at the same time"
+        ],
+        "answerIndex": 0,
+        "rationale": "Prioritizing tasks helps ensure that all clients are served efficiently and effectively."
+      },
+      {
+        "prompt": "Why is it important to keep up with the latest trends and techniques in barbering?",
+        "choices": [
+          "To offer clients modern styles",
+          "To impress coworkers",
+          "To justify higher prices",
+          "To have more to talk about"
+        ],
+        "answerIndex": 0,
+        "rationale": "Offering modern styles keeps the barbershop competitive and meets client expectations."
+      },
+      {
+        "prompt": "A client complains about the hygiene standards in the barbershop. What is the best course of action?",
+        "choices": [
+          "Address the issue immediately and reassure the client",
+          "Dismiss their concerns",
+          "Blame the cleaning staff",
+          "Tell them it’s not your responsibility"
+        ],
+        "answerIndex": 0,
+        "rationale": "Addressing hygiene concerns immediately shows professionalism and commitment to a safe environment."
+      },
+      {
+        "prompt": "What is the most effective way to communicate with a client who has a hearing impairment?",
+        "choices": [
+          "Use visual aids and gestures",
+          "Speak louder",
+          "Avoid eye contact",
+          "Ignore their impairment"
+        ],
+        "answerIndex": 0,
+        "rationale": "Using visual aids and gestures helps ensure clear communication and shows respect for the client's needs."
+      },
+      {
+        "prompt": "How should you handle a situation where two clients are arguing in the barbershop?",
+        "choices": [
+          "Calmly intervene and separate them",
+          "Join the argument",
+          "Ignore the situation",
+          "Ask them to leave immediately"
+        ],
+        "answerIndex": 0,
+        "rationale": "Calmly intervening helps de-escalate the situation and maintains a peaceful environment."
+      },
+      {
+        "prompt": "What is the best way to ensure repeat business from clients?",
+        "choices": [
+          "Provide exceptional customer service",
+          "Offer the cheapest prices",
+          "Gossip with clients",
+          "Rush through services"
+        ],
+        "answerIndex": 0,
+        "rationale": "Exceptional customer service builds loyalty and encourages clients to return."
+      },
+      {
+        "prompt": "A client requests a service that you are not familiar with. What should you do?",
+        "choices": [
+          "Inform them and offer an alternative",
+          "Attempt it without preparation",
+          "Pretend to know how to do it",
+          "Refer them to another barber"
+        ],
+        "answerIndex": 0,
+        "rationale": "Informing the client and offering an alternative maintains trust and professionalism."
+      },
+      {
+        "prompt": "Why is it important to maintain accurate records of client preferences and services?",
+        "choices": [
+          "To provide personalized service",
+          "To sell client information",
+          "To avoid talking to clients",
+          "To reduce service time"
+        ],
+        "answerIndex": 0,
+        "rationale": "Accurate records help provide personalized service, enhancing client satisfaction and loyalty."
+      },
+      {
+        "prompt": "How can you effectively handle constructive criticism from a client?",
+        "choices": [
+          "Listen and make improvements",
+          "Argue with the client",
+          "Dismiss their feedback",
+          "Blame external factors"
+        ],
+        "answerIndex": 0,
+        "rationale": "Listening and making improvements shows professionalism and a willingness to grow."
+      },
+      {
+        "prompt": "What is the best way to manage stress during a busy workday in the barbershop?",
+        "choices": [
+          "Take deep breaths and stay organized",
+          "Complain to clients",
+          "Ignore your feelings",
+          "Rush through appointments"
+        ],
+        "answerIndex": 0,
+        "rationale": "Taking deep breaths and staying organized helps manage stress effectively, ensuring quality service."
+      },
+      {
+        "prompt": "A regular client has not visited the barbershop in a while. What is a professional way to encourage their return?",
+        "choices": [
+          "Send a personalized message offering a discount",
+          "Ignore their absence",
+          "Raise your prices",
+          "Criticize their absence on social media"
+        ],
+        "answerIndex": 0,
+        "rationale": "A personalized message with a discount can encourage their return while showing appreciation for their business."
+      },
+      {
+        "prompt": "Why is it important to maintain confidentiality regarding client information?",
+        "choices": [
+          "To build trust and protect privacy",
+          "To have secrets to share",
+          "To avoid talking to clients",
+          "To reduce service time"
+        ],
+        "answerIndex": 0,
+        "rationale": "Maintaining confidentiality builds trust and respects client privacy, which is crucial for professional relationships."
+      }
+    ]
+  }
+}

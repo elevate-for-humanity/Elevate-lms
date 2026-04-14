@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: mobile app login — no auth possible
 
 // app/api/mobile/login/route.ts
 import { NextRequest, NextResponse } from "next/server";

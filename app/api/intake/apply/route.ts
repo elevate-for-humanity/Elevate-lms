@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public intake apply form
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminClient } from '@/lib/supabase/admin';

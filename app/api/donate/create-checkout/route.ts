@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public donation checkout
 // AUTH: Intentionally public — no authentication required
 import { NextRequest, NextResponse } from 'next/server';
 

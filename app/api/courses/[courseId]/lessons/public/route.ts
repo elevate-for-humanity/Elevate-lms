@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { COURSE_DEFINITIONS } from '@/lib/courses/definitions';
@@ -117,8 +116,9 @@ async function _GET(
 ) {
   const { courseId } = await params;
 
-  const admin = await getAdminClient();
-  const supabase = admin || (await createClient());
+  // Use the server client (respects RLS) — never the admin client for public routes.
+  // The admin client bypasses RLS and would serve protected content to unauthenticated callers.
+  const supabase = await createClient();
   if (!supabase) {
     const slug = COURSE_ID_TO_SLUG[courseId];
     if (slug) {
@@ -129,8 +129,7 @@ async function _GET(
   }
 
   // Check auth + enrollment status
-  const userClient = await createClient();
-  const { data: { user } } = userClient ? await userClient.auth.getUser() : { data: { user: null } };
+  const { data: { user } } = await supabase.auth.getUser();
 
   let isEnrolled = false;
   const isAuthenticated = !!user;
@@ -178,7 +177,9 @@ async function _GET(
   // Fetch published lessons via admin client (bypasses RLS)
   const { data: lessons, error: lessonsErr } = await supabase
     .from('course_lessons')
-    .select('id, course_id, title, content, video_url, lesson_number, order_index, duration_minutes, is_required, is_published, content_type, quiz_id, quiz_questions, passing_score, description, topics')
+    // Select syllabus fields only — sensitive fields (quiz_questions, passing_score,
+    // video_url, content) are added below only when the user is enrolled.
+    .select('id, course_id, title, description, topics, lesson_number, order_index, duration_minutes, is_required, is_published, content_type, quiz_id')
     .eq('course_id', courseId)
     .eq('is_published', true)
     .order('lesson_number');
@@ -218,11 +219,23 @@ async function _GET(
     authenticated: isAuthenticated,
   };
 
-  // Known courses (HVAC etc.) serve full content publicly so lessons are
-  // viewable without sign-in. Other courses still require enrollment.
-  const isKnownCourse = !!COURSE_ID_TO_SLUG[courseId];
-  if (isEnrolled || isKnownCourse) {
-    return NextResponse.json(payload);
+  // Full content (video_url, quiz_questions, HTML) requires enrollment.
+  // Unauthenticated and non-enrolled callers receive syllabus only.
+  // Enrolled users get a second targeted fetch for sensitive fields —
+  // these are never fetched from the DB for unenrolled callers.
+  if (isEnrolled) {
+    const lessonIds = payload.lessons.map((l: any) => l.id);
+    const { data: enriched } = await supabase
+      .from('course_lessons')
+      .select('id, content, video_url, quiz_questions, passing_score')
+      .in('id', lessonIds);
+
+    const enrichMap = new Map((enriched ?? []).map((r: any) => [r.id, r]));
+    const fullLessons = payload.lessons.map((l: any) => ({
+      ...l,
+      ...(enrichMap.get(l.id) ?? {}),
+    }));
+    return NextResponse.json({ ...payload, lessons: fullLessons });
   }
   return NextResponse.json(stripSensitiveFields(payload));
 }

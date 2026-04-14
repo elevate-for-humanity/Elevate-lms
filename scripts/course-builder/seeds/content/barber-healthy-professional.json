@@ -1,0 +1,289 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is a common musculoskeletal disorder experienced by barbers due to repetitive motions?",
+        "choices": [
+          "Carpal tunnel syndrome",
+          "Asthma",
+          "Eczema",
+          "Hypertension"
+        ],
+        "answerIndex": 0,
+        "rationale": "Carpal tunnel syndrome is a common musculoskeletal disorder caused by repetitive motions such as clipper work and scissor cuts."
+      },
+      {
+        "prompt": "Which type of gloves should barbers wear when applying chemicals to protect their skin?",
+        "choices": [
+          "Latex gloves",
+          "Nitrile gloves",
+          "Vinyl gloves",
+          "Cotton gloves"
+        ],
+        "answerIndex": 1,
+        "rationale": "Nitrile gloves are recommended for chemical exposure as they provide better protection against chemicals compared to latex or vinyl gloves."
+      },
+      {
+        "prompt": "Why is it important for barbers to use anti-fatigue mats?",
+        "choices": [
+          "To improve posture",
+          "To prevent respiratory issues",
+          "To reduce lower back pain",
+          "To enhance concentration"
+        ],
+        "answerIndex": 2,
+        "rationale": "Anti-fatigue mats help reduce lower back pain by providing cushioning and support, reducing strain from standing for long periods."
+      },
+      {
+        "prompt": "What should a barber do if they experience signs of burnout?",
+        "choices": [
+          "Ignore the symptoms",
+          "Work longer hours",
+          "Set boundaries and take days off",
+          "Increase caffeine intake"
+        ],
+        "answerIndex": 2,
+        "rationale": "Setting boundaries and taking days off are effective strategies to manage and recover from burnout."
+      },
+      {
+        "prompt": "Which practice helps prevent contact dermatitis in barbers?",
+        "choices": [
+          "Using barrier cream",
+          "Increasing caffeine intake",
+          "Skipping meals",
+          "Avoiding water"
+        ],
+        "answerIndex": 0,
+        "rationale": "Using barrier cream helps protect the skin from irritants and allergens, reducing the risk of contact dermatitis."
+      },
+      {
+        "prompt": "What is the effect of dehydration on a barber's performance?",
+        "choices": [
+          "Improves concentration",
+          "Increases error rates",
+          "Reduces hand tremor",
+          "Enhances energy levels"
+        ],
+        "answerIndex": 1,
+        "rationale": "Dehydration impairs concentration and increases error rates, making it important for barbers to stay hydrated."
+      },
+      {
+        "prompt": "What should a barber do to ensure proper ventilation when using aerosol sprays?",
+        "choices": [
+          "Use in a closed area",
+          "Use in a well-ventilated area",
+          "Wear cotton gloves",
+          "Skip meals"
+        ],
+        "answerIndex": 1,
+        "rationale": "Using aerosol sprays in a well-ventilated area helps prevent the accumulation of fumes and reduces respiratory risks."
+      },
+      {
+        "prompt": "How does excessive caffeine intake affect barbers?",
+        "choices": [
+          "Improves focus",
+          "Increases hand tremor",
+          "Reduces fatigue",
+          "Enhances mood"
+        ],
+        "answerIndex": 1,
+        "rationale": "Excessive caffeine intake can increase hand tremor, which may affect the precision required in barbering."
+      },
+      {
+        "prompt": "A barber experiences wrist pain after a long day of work. What preventive measure should they consider?",
+        "choices": [
+          "Using a heavier tool",
+          "Skipping wrist stretches",
+          "Adjusting chair heights",
+          "Ignoring the pain"
+        ],
+        "answerIndex": 2,
+        "rationale": "Adjusting chair heights can help maintain proper posture and reduce strain on the wrists, preventing pain."
+      },
+      {
+        "prompt": "Which symptom is a sign of burnout in barbers?",
+        "choices": [
+          "Chronic fatigue",
+          "Increased energy",
+          "Heightened focus",
+          "Improved mood"
+        ],
+        "answerIndex": 0,
+        "rationale": "Chronic fatigue is a common symptom of burnout, indicating the need for rest and recovery."
+      },
+      {
+        "prompt": "What type of soap should barbers use to prevent skin irritation?",
+        "choices": [
+          "Antibacterial soap",
+          "Scented soap",
+          "pH-neutral soap",
+          "Exfoliating soap"
+        ],
+        "answerIndex": 2,
+        "rationale": "pH-neutral soap is gentle on the skin and helps prevent irritation and contact dermatitis."
+      },
+      {
+        "prompt": "A barber notices a persistent cough after working with chemical services. What should they consider using?",
+        "choices": [
+          "A cotton mask",
+          "An N95 mask",
+          "A surgical mask",
+          "No mask"
+        ],
+        "answerIndex": 1,
+        "rationale": "An N95 mask provides better protection against chemical fumes and is recommended when working with chemical services."
+      },
+      {
+        "prompt": "Why is it important for barbers to eat balanced meals during their shifts?",
+        "choices": [
+          "To increase hand tremor",
+          "To maintain concentration and energy",
+          "To reduce hydration",
+          "To increase fatigue"
+        ],
+        "answerIndex": 1,
+        "rationale": "Eating balanced meals helps maintain concentration and energy levels, which are essential for performing tasks accurately."
+      },
+      {
+        "prompt": "What is a recommended practice for barbers to prevent lower back pain?",
+        "choices": [
+          "Ignoring posture",
+          "Using anti-fatigue mats",
+          "Standing on hard surfaces",
+          "Skipping breaks"
+        ],
+        "answerIndex": 1,
+        "rationale": "Using anti-fatigue mats provides cushioning and support, reducing strain on the lower back and preventing pain."
+      },
+      {
+        "prompt": "Which personal protective equipment is essential when applying chemical treatments?",
+        "choices": [
+          "Cotton gloves",
+          "Nitrile gloves",
+          "Wool gloves",
+          "Leather gloves"
+        ],
+        "answerIndex": 1,
+        "rationale": "Nitrile gloves are essential for protecting the skin from chemical exposure during treatments."
+      },
+      {
+        "prompt": "A barber feels cynical toward clients and notices a reduced quality of work. What might they be experiencing?",
+        "choices": [
+          "Increased motivation",
+          "Burnout",
+          "Improved job satisfaction",
+          "Enhanced focus"
+        ],
+        "answerIndex": 1,
+        "rationale": "Cynicism toward clients and reduced quality of work are signs of burnout, indicating the need for self-care and possibly professional support."
+      },
+      {
+        "prompt": "How can barbers reduce the risk of developing tendinitis?",
+        "choices": [
+          "Using improper tool grip",
+          "Performing wrist stretches",
+          "Avoiding tool use",
+          "Skipping meals"
+        ],
+        "answerIndex": 1,
+        "rationale": "Performing wrist stretches can help maintain flexibility and reduce the risk of tendinitis caused by repetitive motions."
+      },
+      {
+        "prompt": "What should a barber do if they are experiencing chronic fatigue and reduced work quality?",
+        "choices": [
+          "Increase caffeine intake",
+          "Seek professional support",
+          "Work longer hours",
+          "Ignore the symptoms"
+        ],
+        "answerIndex": 1,
+        "rationale": "Seeking professional support can help address the underlying causes of chronic fatigue and improve work quality."
+      },
+      {
+        "prompt": "Which practice can help barbers maintain mental health and prevent burnout?",
+        "choices": [
+          "Setting boundaries",
+          "Skipping meals",
+          "Increasing work hours",
+          "Avoiding breaks"
+        ],
+        "answerIndex": 0,
+        "rationale": "Setting boundaries helps barbers manage stress and workload, which is crucial for maintaining mental health and preventing burnout."
+      },
+      {
+        "prompt": "What is the role of Indiana OSHA regarding ventilation in barber shops?",
+        "choices": [
+          "To ignore ventilation",
+          "To require adequate ventilation",
+          "To promote closed environments",
+          "To discourage ventilation"
+        ],
+        "answerIndex": 1,
+        "rationale": "Indiana OSHA requires adequate ventilation in cosmetology establishments to reduce the accumulation of harmful fumes and protect respiratory health."
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Musculoskeletal Disorders",
+      "definition": "Injuries affecting muscles, nerves, tendons, ligaments, joints, cartilage, or spinal discs caused by repetitive motions in barbering."
+    },
+    {
+      "term": "Carpal Tunnel Syndrome",
+      "definition": "A condition caused by pressure on the median nerve in the wrist, often due to repetitive motions such as clipper work."
+    },
+    {
+      "term": "Ergonomics",
+      "definition": "The study of people's efficiency in their working environment, crucial for preventing musculoskeletal disorders in barbers."
+    },
+    {
+      "term": "Nitrile Gloves",
+      "definition": "A type of glove made from synthetic rubber, recommended for barbers to protect skin from chemicals."
+    },
+    {
+      "term": "Contact Dermatitis",
+      "definition": "A skin condition resulting from exposure to irritants or allergens, preventable by using barrier creams and pH-neutral soaps."
+    },
+    {
+      "term": "Ventilation",
+      "definition": "The process of supplying fresh air and removing contaminated air, required by Indiana OSHA in barber shops to prevent respiratory issues."
+    },
+    {
+      "term": "N95 Mask",
+      "definition": "A respiratory protective device designed to achieve a very close facial fit and efficient filtration of airborne particles, used in chemical services."
+    },
+    {
+      "term": "Dehydration",
+      "definition": "A condition that occurs when the body loses more water than it takes in, affecting concentration and increasing error rates in barbers."
+    },
+    {
+      "term": "Burnout",
+      "definition": "A state of emotional, physical, and mental exhaustion caused by excessive and prolonged stress, common in service professions like barbering."
+    },
+    {
+      "term": "Cumulative Trauma Disorders",
+      "definition": "Injuries caused by repetitive motions over time, such as those experienced by barbers performing clipper work and scissor cuts."
+    },
+    {
+      "term": "Anti-fatigue Mats",
+      "definition": "Mats designed to reduce fatigue caused by standing for long periods, helping to prevent lower back pain in barbers."
+    },
+    {
+      "term": "pH-neutral Soap",
+      "definition": "Soap that maintains the skin's natural pH balance, used to prevent contact dermatitis in barbers."
+    },
+    {
+      "term": "Balanced Meals",
+      "definition": "Meals that include a variety of nutrients necessary for maintaining energy levels and concentration, important for barbers during busy shifts."
+    },
+    {
+      "term": "Chronic Fatigue",
+      "definition": "A symptom of burnout characterized by persistent tiredness, even after rest, affecting barbers' quality of work."
+    },
+    {
+      "term": "Indiana OSHA",
+      "definition": "The state agency responsible for ensuring safe and healthy working conditions, including requiring ventilation in barber shops."
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: browser perf reporting — no auth possible
 import { NextRequest, NextResponse } from 'next/server';
 
 import { parseBody } from '@/lib/api-helpers';

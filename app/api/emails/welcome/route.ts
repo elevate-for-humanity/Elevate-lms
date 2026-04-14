@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: welcome email trigger — called post-signup
 
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';

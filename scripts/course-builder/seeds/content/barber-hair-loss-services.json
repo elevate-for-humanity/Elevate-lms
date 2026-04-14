@@ -1,0 +1,289 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is the most common type of hair loss?",
+        "choices": [
+          "Androgenetic alopecia",
+          "Alopecia areata",
+          "Traction alopecia",
+          "Telogen effluvium"
+        ],
+        "answerIndex": 0,
+        "rationale": "Androgenetic alopecia, also known as male or female pattern baldness, is the most common type of hair loss."
+      },
+      {
+        "prompt": "Which hair loss condition is characterized by patchy loss and is autoimmune in nature?",
+        "choices": [
+          "Telogen effluvium",
+          "Alopecia areata",
+          "Androgenetic alopecia",
+          "Traction alopecia"
+        ],
+        "answerIndex": 1,
+        "rationale": "Alopecia areata is an autoimmune condition that causes patchy hair loss."
+      },
+      {
+        "prompt": "What is the role of a barber when a client presents with sudden and patchy hair loss?",
+        "choices": [
+          "Perform a scalp massage",
+          "Recommend minoxidil",
+          "Refer to a dermatologist",
+          "Apply prescription products"
+        ],
+        "answerIndex": 2,
+        "rationale": "Barbers should refer clients to a dermatologist when hair loss is sudden and patchy."
+      },
+      {
+        "prompt": "Which of the following treatments is FDA-approved for over-the-counter use for hair loss?",
+        "choices": [
+          "Caffeine shampoos",
+          "Biotin supplements",
+          "Minoxidil",
+          "DHT-blocking shampoos"
+        ],
+        "answerIndex": 2,
+        "rationale": "Minoxidil is the only FDA-approved OTC topical treatment for hair loss."
+      },
+      {
+        "prompt": "What should a barber avoid during a scalp massage?",
+        "choices": [
+          "Using fingertip pressure",
+          "Circular motions",
+          "Massaging inflamed skin",
+          "5–10 minute duration"
+        ],
+        "answerIndex": 2,
+        "rationale": "Barbers should avoid massaging inflamed or broken skin to prevent further irritation."
+      },
+      {
+        "prompt": "Which type of hair loss is often caused by tight hairstyles?",
+        "choices": [
+          "Androgenetic alopecia",
+          "Alopecia areata",
+          "Traction alopecia",
+          "Telogen effluvium"
+        ],
+        "answerIndex": 2,
+        "rationale": "Traction alopecia results from tight hairstyles that pull on the hair."
+      },
+      {
+        "prompt": "What is the primary action of scalp massage in promoting hair health?",
+        "choices": [
+          "Stimulates hair growth",
+          "Increases blood circulation",
+          "Cures hair loss",
+          "Thickens hair strands"
+        ],
+        "answerIndex": 1,
+        "rationale": "Scalp massage increases blood circulation to the hair follicles, which may support hair retention."
+      },
+      {
+        "prompt": "When is it appropriate for a barber to apply prescription hair loss products?",
+        "choices": [
+          "When prescribed by a physician",
+          "During a scalp treatment",
+          "Never",
+          "With client consent"
+        ],
+        "answerIndex": 2,
+        "rationale": "Barbers may not apply prescription products; this is outside their scope of practice."
+      },
+      {
+        "prompt": "A client reports hair shedding after a stressful event. What type of hair loss might this indicate?",
+        "choices": [
+          "Androgenetic alopecia",
+          "Alopecia areata",
+          "Traction alopecia",
+          "Telogen effluvium"
+        ],
+        "answerIndex": 3,
+        "rationale": "Telogen effluvium is a temporary shedding triggered by stress, illness, or nutritional deficiency."
+      },
+      {
+        "prompt": "Which treatment is NOT within the standard scope of practice for barbers in Indiana?",
+        "choices": [
+          "Scalp massage",
+          "Scalp micropigmentation",
+          "Applying OTC topicals",
+          "Recommending a dermatologist"
+        ],
+        "answerIndex": 1,
+        "rationale": "Scalp micropigmentation requires separate training and licensing and is not within the standard barber scope."
+      },
+      {
+        "prompt": "A barber notices scaling and inflammation on a client's scalp. What should they do?",
+        "choices": [
+          "Perform a scalp massage",
+          "Apply a soothing shampoo",
+          "Refer to a dermatologist",
+          "Recommend biotin supplements"
+        ],
+        "answerIndex": 2,
+        "rationale": "Scaling and inflammation are indications to refer the client to a dermatologist."
+      },
+      {
+        "prompt": "What is the cause of androgenetic alopecia?",
+        "choices": [
+          "DHT sensitivity",
+          "Autoimmune response",
+          "Nutritional deficiency",
+          "Tight hairstyles"
+        ],
+        "answerIndex": 0,
+        "rationale": "Androgenetic alopecia is caused by sensitivity to dihydrotestosterone (DHT) in hair follicles."
+      },
+      {
+        "prompt": "A client is interested in using minoxidil. What should a barber do?",
+        "choices": [
+          "Apply it during the appointment",
+          "Recommend consulting a physician",
+          "Prescribe it",
+          "Suggest caffeine shampoos instead"
+        ],
+        "answerIndex": 1,
+        "rationale": "Barbers should recommend that clients consult their physician about using minoxidil."
+      },
+      {
+        "prompt": "Which condition should prompt a barber to refer a client to a trichologist?",
+        "choices": [
+          "Regular hair thinning",
+          "Sudden patchy hair loss",
+          "Desire for a new hairstyle",
+          "Interest in hair coloring"
+        ],
+        "answerIndex": 1,
+        "rationale": "Sudden patchy hair loss is a condition that requires professional evaluation by a dermatologist or trichologist."
+      },
+      {
+        "prompt": "What is a common limitation of caffeine shampoos and biotin supplements in treating hair loss?",
+        "choices": [
+          "FDA approval",
+          "Availability",
+          "Clinical evidence",
+          "Cost"
+        ],
+        "answerIndex": 2,
+        "rationale": "Caffeine shampoos and biotin supplements have limited clinical evidence supporting their efficacy in treating hair loss."
+      },
+      {
+        "prompt": "A client with hair loss wants to try a new treatment. What should a barber avoid doing?",
+        "choices": [
+          "Discussing OTC options",
+          "Performing scalp massage",
+          "Diagnosing the condition",
+          "Referring to a dermatologist"
+        ],
+        "answerIndex": 2,
+        "rationale": "Barbers should avoid diagnosing hair loss conditions, as this is outside their scope of practice."
+      },
+      {
+        "prompt": "What should a barber document when referring a client to a medical professional?",
+        "choices": [
+          "The client's age",
+          "The referral recommendation",
+          "The client's hair color",
+          "The products used"
+        ],
+        "answerIndex": 1,
+        "rationale": "Barbers should document the referral recommendation in the client's records."
+      },
+      {
+        "prompt": "What is the primary benefit of scalp micropigmentation?",
+        "choices": [
+          "Stimulates hair growth",
+          "Creates appearance of density",
+          "Cures hair loss",
+          "Strengthens hair"
+        ],
+        "answerIndex": 1,
+        "rationale": "Scalp micropigmentation creates the appearance of a shaved head or adds density to thinning areas."
+      },
+      {
+        "prompt": "In what situation is it appropriate for a barber to recommend a dermatologist?",
+        "choices": [
+          "Client requests a new hairstyle",
+          "Client has scalp inflammation",
+          "Client wants a hair color change",
+          "Client inquires about hair extensions"
+        ],
+        "answerIndex": 1,
+        "rationale": "Scalp inflammation is a condition that warrants a referral to a dermatologist."
+      },
+      {
+        "prompt": "What is the recommended duration for a scalp massage to support hair retention?",
+        "choices": [
+          "1–2 minutes",
+          "3–4 minutes",
+          "5–10 minutes",
+          "15–20 minutes"
+        ],
+        "answerIndex": 2,
+        "rationale": "A scalp massage should last 5–10 minutes to effectively increase blood circulation to the hair follicles."
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Androgenetic Alopecia",
+      "definition": "Common type of hair loss caused by DHT sensitivity in hair follicles, known as male/female pattern baldness."
+    },
+    {
+      "term": "Alopecia Areata",
+      "definition": "An autoimmune condition causing patchy hair loss."
+    },
+    {
+      "term": "Traction Alopecia",
+      "definition": "Hair loss resulting from tight hairstyles pulling on hair."
+    },
+    {
+      "term": "Telogen Effluvium",
+      "definition": "Temporary hair shedding triggered by stress, illness, or nutritional deficiency."
+    },
+    {
+      "term": "Scalp Massage",
+      "definition": "Technique using fingertip pressure in circular motions to increase blood circulation to hair follicles."
+    },
+    {
+      "term": "Minoxidil",
+      "definition": "The only FDA-approved over-the-counter topical treatment for hair loss."
+    },
+    {
+      "term": "Scalp Micropigmentation (SMP)",
+      "definition": "A cosmetic tattooing technique that creates the appearance of a shaved head or adds density to thinning areas."
+    },
+    {
+      "term": "DHT",
+      "definition": "Dihydrotestosterone, a hormone linked to androgenetic alopecia."
+    },
+    {
+      "term": "Barber's Scope of Practice",
+      "definition": "Includes scalp treatments, scalp massage, and application of OTC products but not diagnosing conditions or prescribing medications."
+    },
+    {
+      "term": "Referral to Dermatologist",
+      "definition": "Recommended when hair loss is sudden, patchy, or accompanied by scalp inflammation, scaling, or pain."
+    },
+    {
+      "term": "Caffeine Shampoos",
+      "definition": "Popular hair loss treatment with limited clinical evidence."
+    },
+    {
+      "term": "Biotin Supplements",
+      "definition": "Dietary supplements often marketed for hair health, with limited evidence for effectiveness."
+    },
+    {
+      "term": "DHT-Blocking Shampoos",
+      "definition": "Shampoos that claim to block DHT, with limited clinical evidence supporting their efficacy."
+    },
+    {
+      "term": "Scalp Inflammation",
+      "definition": "A condition that requires referral to a medical professional if observed with hair loss."
+    },
+    {
+      "term": "Client Records",
+      "definition": "Documentation where referral recommendations should be recorded."
+    }
+  ]
+}

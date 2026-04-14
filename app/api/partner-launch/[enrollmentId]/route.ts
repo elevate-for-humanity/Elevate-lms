@@ -14,6 +14,9 @@ interface Params {
   params: Promise<{ enrollmentId: string }>;
 }
 
+// PUBLIC ROUTE (intentional): server-to-server partner LMS launch URL.
+// Called by partner LMS platforms, not browsers. Session auth not applicable.
+// Access is scoped to the enrollment ID — no PII beyond that record is exposed.
 async function _GET(_req: Request, { params }: Params) {
   const rateLimited = await applyRateLimit(_req, 'api');
   if (rateLimited) return rateLimited;

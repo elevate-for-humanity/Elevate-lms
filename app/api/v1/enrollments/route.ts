@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: v1 API — auth inside handler
 /**
  * @deprecated Use canonical enrollment routes:
  *   - /api/enroll (student enrollment)

@@ -1,5 +1,5 @@
-// Server component — no "use client", no useState, no useEffect.
-// Data is fetched in the parent page (app/admin/compliance/page.tsx) and passed as props.
+// Server component — props-only, no client hooks, no browser APIs.
+// Data is loaded in the parent page (app/admin/compliance/page.tsx) and passed as props.
 
 import Link from 'next/link';
 

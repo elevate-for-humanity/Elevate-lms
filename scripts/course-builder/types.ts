@@ -1,3 +1,14 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Barber seed types — used by scripts/course-builder/ only.
+//
+// NOT the canonical course builder types. For the compiler pipeline use:
+//   lib/course-builder/schema.ts       — CourseTemplate, CourseModule, CourseLesson
+//   lib/curriculum/blueprints/types.ts — CredentialBlueprint
+//
+// These types represent the barber-specific seed shape that predates the
+// compiler pipeline. Do not use for new programs.
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ── State board exam domains (Indiana barber written exam) ────────────────────
 export type BarberDomain =
   | 'infection_control'   // 25% of written exam

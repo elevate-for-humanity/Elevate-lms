@@ -1,4 +1,11 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+
+// Inherits robots: noindex from parent /preview/layout.tsx.
+// Explicit here for clarity — this is an internal sales/demo shell.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default async function Layout({
   children,

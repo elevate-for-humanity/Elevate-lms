@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: LTI launch — authenticated by LTI JWT
 // app/api/lti/launch/route.ts
 // LTI 1.3 launch endpoint — verifies state nonce (CSRF) + JWT signature via JWKS.
 import { NextResponse } from 'next/server';

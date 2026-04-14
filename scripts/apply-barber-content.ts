@@ -1,128 +1,115 @@
 /**
  * scripts/apply-barber-content.ts
  *
- * Applies barber lesson content to course_lessons via the Supabase JS client.
- * Reads content from the blueprint (all lessons) and quiz_questions from
- * the migration SQL files (Modules 1–3 only — others not yet authored).
+ * Writes all barber course content from seed files + sidecars to course_lessons.
+ * Single source of truth: scripts/course-builder/seeds/ + seeds/content/<slug>.json
+ *
+ * Writes per lesson:
+ *   content        → course_lessons.content
+ *   quiz_questions → course_lessons.quiz_questions (JSONB)
+ *   passing_score  → course_lessons.passing_score
+ *   activities     → course_lessons.activities { flashcards, procedures }
  *
  * Usage:
  *   pnpm tsx scripts/apply-barber-content.ts
  *   pnpm tsx scripts/apply-barber-content.ts --dry-run
+ *   pnpm tsx scripts/apply-barber-content.ts --slug barber-lesson-3
  */
 
 import { config } from 'dotenv';
 import path from 'path';
-import fs from 'fs';
 config({ path: path.resolve(process.cwd(), '.env.local') });
 
 import { createClient } from '@supabase/supabase-js';
-import { barberApprenticeshipBlueprint } from '../lib/curriculum/blueprints/barber-apprenticeship';
+import { barberCourse } from './course-builder/seeds/barber-course.seed';
 
-const COURSE_ID = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';
-const DRY_RUN   = process.argv.includes('--dry-run');
+const COURSE_ID   = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';
+const DRY_RUN     = process.argv.includes('--dry-run');
+const SLUG_FILTER = (() => {
+  const i = process.argv.indexOf('--slug');
+  return i !== -1 ? process.argv[i + 1] : null;
+})();
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-function extractQuizFromMigration(filepath: string): Map<string, unknown[]> {
-  const map = new Map<string, unknown[]>();
-  if (!fs.existsSync(filepath)) return map;
-  const sql = fs.readFileSync(filepath, 'utf8');
-  const slugPattern = /slug\s*=\s*'([^']+)'/g;
-  const quizPattern = /quiz_questions\s*=\s*'(\[[\s\S]*?\])'\s*::jsonb/g;
-  const slugs: string[] = [];
-  const quizzes: unknown[][] = [];
-  let m;
-  while ((m = slugPattern.exec(sql)) !== null) slugs.push(m[1]);
-  while ((m = quizPattern.exec(sql)) !== null) {
-    try { quizzes.push(JSON.parse(m[1])); } catch { quizzes.push([]); }
-  }
-  for (let i = 0; i < Math.min(slugs.length, quizzes.length); i++) {
-    map.set(slugs[i], quizzes[i]);
-  }
-  return map;
+async function applyLesson(slug: string, payload: Record<string, unknown>): Promise<'ok' | 'skip' | 'error'> {
+  if (SLUG_FILTER && slug !== SLUG_FILTER) return 'skip';
+  const fields = Object.keys(payload).filter(k => k !== 'updated_at').join(', ');
+  process.stdout.write(`  ${slug.padEnd(48)} [${fields}] ... `);
+  if (DRY_RUN) { console.log('dry-run'); return 'ok'; }
+  const { error } = await supabase
+    .from('course_lessons')
+    .update(payload)
+    .eq('course_id', COURSE_ID)
+    .eq('slug', slug);
+  if (error) { console.log(`ERROR: ${error.message}`); return 'error'; }
+  console.log('OK');
+  return 'ok';
 }
-
-function extractPassingScoreFromMigration(filepath: string): Map<string, number> {
-  const map = new Map<string, number>();
-  if (!fs.existsSync(filepath)) return map;
-  const sql = fs.readFileSync(filepath, 'utf8');
-  const blocks = sql.split(/(?=\n  UPDATE public\.course_lessons)/);
-  for (const block of blocks) {
-    const slugMatch  = block.match(/slug\s*=\s*'([^']+)'/);
-    const scoreMatch = block.match(/passing_score\s*=\s*(\d+)/);
-    if (slugMatch && scoreMatch) map.set(slugMatch[1], parseInt(scoreMatch[1]));
-  }
-  return map;
-}
-
-const migrationFiles = [
-  'supabase/migrations/20260618000001_module1_full_content.sql',
-  'supabase/migrations/20260618000003_module2_content.sql',
-  'supabase/migrations/20260618000004_module3_content_part1.sql',
-  'supabase/migrations/20260618000005_module3_content_part2.sql',
-];
-
-const quizMap         = new Map<string, unknown[]>();
-const passingScoreMap = new Map<string, number>();
-for (const f of migrationFiles) {
-  for (const [slug, qq] of extractQuizFromMigration(f))       quizMap.set(slug, qq);
-  for (const [slug, ps] of extractPassingScoreFromMigration(f)) passingScoreMap.set(slug, ps);
-}
-
-console.log(`Quiz data loaded for ${quizMap.size} lessons`);
-console.log(`Passing score loaded for ${passingScoreMap.size} lessons`);
 
 async function main() {
   let updated = 0, skipped = 0, errors = 0;
 
-  for (const mod of barberApprenticeshipBlueprint.modules) {
+  for (const mod of barberCourse.modules) {
+    console.log(`\n── ${mod.title}`);
+
     for (const lesson of mod.lessons) {
-      const l = lesson as any;
-      const hasContent = !!l.content;
-      const hasQuiz    = quizMap.has(lesson.slug) || !!l.quizQuestions;
-      const hasVideo   = !!l.videoFile;
+      const payload: Record<string, unknown> = { updated_at: new Date().toISOString() };
 
-      if (!hasContent && !hasQuiz && !hasVideo) { skipped++; continue; }
-
-      const payload: Record<string, unknown> = {
-        updated_at:   new Date().toISOString(),
-        is_published: true,
-      };
-
-      if (lesson.title)  payload.title     = lesson.title;
-      if (hasContent)    payload.content   = l.content;
-      if (hasVideo)      payload.video_url = l.videoFile;
-
-      const qq = quizMap.get(lesson.slug) ?? l.quizQuestions;
-      if (qq)  payload.quiz_questions = qq;
-
-      const ps = passingScoreMap.get(lesson.slug) ?? l.passingScore;
-      if (ps)  payload.passing_score  = ps;
-
-      process.stdout.write(`  ${lesson.slug} ... `);
-
-      if (DRY_RUN) {
-        const qCount = Array.isArray(qq) ? qq.length : 0;
-        console.log(`[dry-run] quiz_count=${qCount} fields=${Object.keys(payload).join(',')}`);
-        updated++;
-        continue;
+      if (lesson.content)              payload.content       = lesson.content;
+      if (lesson.quiz?.questions?.length) {
+        payload.quiz_questions = lesson.quiz.questions.map(q => ({
+          question:    q.prompt,
+          options:     q.choices,
+          correct:     q.answerIndex,
+          explanation: q.rationale,
+        }));
+        payload.passing_score = lesson.quiz.passingScore ?? 70;
       }
 
-      const { error } = await supabase
-        .from('course_lessons')
-        .update(payload)
-        .eq('course_id', COURSE_ID)
-        .eq('slug', lesson.slug);
+      // Build activities: flashcards + procedures
+      const activities: Record<string, unknown> = {};
+      if (lesson.flashcards?.length)  activities.flashcards  = lesson.flashcards;
+      if (lesson.procedures?.length)  activities.procedures  = lesson.procedures;
+      if (Object.keys(activities).length) payload.activities = activities;
 
-      if (error) { console.log(`ERROR: ${error.message}`); errors++; }
-      else       { console.log('OK'); updated++; }
+      if (Object.keys(payload).length === 1) { skipped++; continue; }
+
+      const result = await applyLesson(lesson.slug, payload);
+      if (result === 'ok')    updated++;
+      if (result === 'skip')  skipped++;
+      if (result === 'error') errors++;
+    }
+
+    // Checkpoint
+    if (mod.checkpoint) {
+      const cp = mod.checkpoint;
+      const payload: Record<string, unknown> = { updated_at: new Date().toISOString() };
+
+      if (cp.questions?.length) {
+        payload.quiz_questions = cp.questions.map(q => ({
+          question:    q.prompt,
+          options:     q.choices,
+          correct:     q.answerIndex,
+          explanation: q.rationale,
+        }));
+        payload.passing_score = cp.passingScore ?? 70;
+      }
+
+      if (Object.keys(payload).length === 1) { skipped++; continue; }
+
+      const result = await applyLesson(cp.slug, payload);
+      if (result === 'ok')    updated++;
+      if (result === 'skip')  skipped++;
+      if (result === 'error') errors++;
     }
   }
 
-  console.log(`\nDone. updated=${updated} skipped=${skipped} errors=${errors}`);
+  console.log(`\n── Summary: updated=${updated}  skipped=${skipped}  errors=${errors}`);
+  if (errors > 0) process.exit(1);
 }
 
-main().catch(console.error);
+main().catch(err => { console.error(err); process.exit(1); });

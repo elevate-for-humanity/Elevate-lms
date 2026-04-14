@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { writeAdminAuditEvent, AuditActions } from '@/lib/audit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -49,7 +50,8 @@ export async function POST(req: NextRequest) {
     .createSignedUrl(filePath, 3600);
 
   if (error || !data?.signedUrl) {
-    return NextResponse.json({ error: error?.message ?? 'Could not generate URL' }, { status: 500 });
+    logger.error('[signed-url] storage.createSignedUrl failed:', error);
+    return NextResponse.json({ error: 'Could not generate URL' }, { status: 500 });
   }
 
   // Audit the access

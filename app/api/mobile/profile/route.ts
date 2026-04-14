@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: mobile app profile — Bearer auth inside handler
 
 // app/api/mobile/profile/route.ts
 import { NextRequest, NextResponse } from "next/server";

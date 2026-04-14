@@ -1,3 +1,4 @@
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { NextResponse } from 'next/server';
 
 import OpenAI from 'openai';
@@ -34,6 +35,9 @@ const PROGRAM_INFO = {
 };
 
 async function _POST(req: Request) {
+  const auth = await apiRequireAdmin(request);
+  if (auth.error) return auth.error;
+
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;

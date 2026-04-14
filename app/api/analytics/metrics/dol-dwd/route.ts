@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { createServerSupabaseClient } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -9,10 +10,13 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
-  
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const supabase = await createServerSupabaseClient();
+
+    const auth = await apiRequireAdmin(request);
+    if (auth.error) return auth.error;
+
+    const supabase = await createServerSupabaseClient();
 
   // Get DOL/DWD reporting data
   const { data: rawDolEnrollments } = await supabase

@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public sitemap generation
 import { NextRequest, NextResponse } from 'next/server';
 // AUTH: Intentionally public — no authentication required
 

@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public forum thread read
 
 // app/api/forums/[forumId]/threads/[threadId]/route.ts
 import { NextRequest, NextResponse } from "next/server";

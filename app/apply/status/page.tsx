@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Search, Circle, Clock, XCircle, Phone } from 'lucide-react';
+import { Search, Circle, Clock, XCircle, Phone, Loader2 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 interface ApplicationStatus {
@@ -123,10 +123,11 @@ export default function ApplicationStatusPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-400 flex items-center gap-2"
+                className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 min-w-[100px] justify-center"
               >
-                <Search className="w-5 h-5" />
-                {loading ? 'Checking...' : 'Check'}
+                {loading
+                  ? <><Loader2 className="w-4 h-4 animate-spin" /> Checking</>
+                  : <><Search className="w-4 h-4" /> Check</>}
               </button>
             </div>
           </div>
@@ -176,9 +177,28 @@ export default function ApplicationStatusPage() {
           </div>
         )}
 
-        {searched && !application && !error && (
-          <div className="bg-white rounded-lg p-6 text-center">
-            <p className="text-black">No application found. Did you use a different email?</p>
+        {loading && (
+          <div className="bg-white rounded-lg border p-8 mb-6 animate-pulse space-y-4">
+            <div className="h-4 bg-slate-200 rounded w-3/4 mx-auto" />
+            <div className="h-4 bg-slate-200 rounded w-1/2 mx-auto" />
+            <div className="h-10 bg-slate-100 rounded" />
+          </div>
+        )}
+
+        {searched && !loading && !application && !error && (
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 text-center">
+            <p className="text-slate-700 font-medium mb-1">No application found</p>
+            <p className="text-slate-500 text-sm mb-4">
+              Double-check the Application ID from your confirmation email and the email address you applied with.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center text-sm">
+              <a href="tel:3173143757" className="text-emerald-600 font-medium hover:underline">
+                Call (317) 314-3757
+              </a>
+              <Link href="/apply" className="text-emerald-600 font-medium hover:underline">
+                Submit a new application
+              </Link>
+            </div>
           </div>
         )}
 

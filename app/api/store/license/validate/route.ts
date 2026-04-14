@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: license key validation
 import { hashLicenseKey, isValidLicenseKeyFormat } from '@/lib/store/license';
 
 import { getAdminClient } from '@/lib/supabase/admin';

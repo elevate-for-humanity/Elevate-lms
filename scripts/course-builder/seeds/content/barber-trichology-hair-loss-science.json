@@ -1,0 +1,289 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is the medical term for hair loss of any cause?",
+        "choices": [
+          "Alopecia",
+          "Effluvium",
+          "Trichorrhexis",
+          "Anagen"
+        ],
+        "answerIndex": 0,
+        "rationale": "Alopecia is the general term used to describe hair loss from any cause."
+      },
+      {
+        "prompt": "Which type of alopecia is characterized by patchy, round areas of hair loss?",
+        "choices": [
+          "Androgenetic Alopecia",
+          "Alopecia Areata",
+          "Telogen Effluvium",
+          "Traction Alopecia"
+        ],
+        "answerIndex": 1,
+        "rationale": "Alopecia Areata is an autoimmune condition that causes patchy, round areas of hair loss."
+      },
+      {
+        "prompt": "What is the most common cause of Androgenetic Alopecia?",
+        "choices": [
+          "Genetic sensitivity to DHT",
+          "Autoimmune response",
+          "Physical tension on hair",
+          "Psychological stress"
+        ],
+        "answerIndex": 0,
+        "rationale": "Androgenetic Alopecia is caused by genetic sensitivity to dihydrotestosterone (DHT), which affects hair follicles."
+      },
+      {
+        "prompt": "Which condition involves compulsive hair pulling?",
+        "choices": [
+          "Trichotillomania",
+          "Traction Alopecia",
+          "Telogen Effluvium",
+          "Anagen Effluvium"
+        ],
+        "answerIndex": 0,
+        "rationale": "Trichotillomania is a psychological condition where individuals compulsively pull out their hair."
+      },
+      {
+        "prompt": "A client with tight braids is experiencing hair loss along the hairline. What type of alopecia might this be?",
+        "choices": [
+          "Androgenetic Alopecia",
+          "Traction Alopecia",
+          "Alopecia Areata",
+          "Scarring Alopecia"
+        ],
+        "answerIndex": 1,
+        "rationale": "Traction Alopecia is caused by repeated tension on the hair follicles, often due to tight hairstyles."
+      },
+      {
+        "prompt": "What should barbers do if they encounter a client with an inflamed or infected scalp?",
+        "choices": [
+          "Proceed with service",
+          "Refer to a dermatologist",
+          "Use antiseptic shampoo",
+          "Apply hair oil"
+        ],
+        "answerIndex": 1,
+        "rationale": "Barbers should refer clients with inflamed or infected scalps to a dermatologist and not proceed with service."
+      },
+      {
+        "prompt": "Which type of hair loss is typically temporary and triggered by stress?",
+        "choices": [
+          "Telogen Effluvium",
+          "Anagen Effluvium",
+          "Alopecia Areata",
+          "Scarring Alopecia"
+        ],
+        "answerIndex": 0,
+        "rationale": "Telogen Effluvium is a temporary hair loss condition triggered by physical or emotional stress."
+      },
+      {
+        "prompt": "Which hair condition is characterized by weak points along the shaft causing breakage?",
+        "choices": [
+          "Trichorrhexis nodosa",
+          "Monilethrix",
+          "Pili torti",
+          "Alopecia Areata"
+        ],
+        "answerIndex": 0,
+        "rationale": "Trichorrhexis nodosa involves weak points along the hair shaft that lead to breakage."
+      },
+      {
+        "prompt": "How should barbers handle clients with known autoimmune conditions causing hair loss?",
+        "choices": [
+          "Proceed with service and refer to a dermatologist",
+          "Avoid service",
+          "Recommend over-the-counter treatments",
+          "Perform scalp massage"
+        ],
+        "answerIndex": 0,
+        "rationale": "Barbers can proceed with service for clients with autoimmune conditions like Alopecia Areata, but should refer them to a dermatologist."
+      },
+      {
+        "prompt": "What is the primary cause of Anagen Effluvium?",
+        "choices": [
+          "Chemotherapy",
+          "Genetic factors",
+          "Tight hairstyles",
+          "Nutritional deficiency"
+        ],
+        "answerIndex": 0,
+        "rationale": "Anagen Effluvium is most commonly caused by chemotherapy, which affects hair during the growth phase."
+      },
+      {
+        "prompt": "Which hair loss condition is NOT contagious and allows barbers to proceed with service?",
+        "choices": [
+          "Alopecia Areata",
+          "Scarring Alopecia",
+          "Fungal infection",
+          "Lice infestation"
+        ],
+        "answerIndex": 0,
+        "rationale": "Alopecia Areata is not contagious, so barbers can proceed with service, unlike conditions caused by infections."
+      },
+      {
+        "prompt": "A client reports sudden hair shedding after surgery. What is the likely diagnosis?",
+        "choices": [
+          "Telogen Effluvium",
+          "Anagen Effluvium",
+          "Trichotillomania",
+          "Traction Alopecia"
+        ],
+        "answerIndex": 0,
+        "rationale": "Telogen Effluvium can occur after surgery due to stress, leading to temporary hair shedding."
+      },
+      {
+        "prompt": "What should a barber recommend to a client experiencing Traction Alopecia?",
+        "choices": [
+          "Vary hairstyles and avoid tension",
+          "Use dandruff shampoo",
+          "Increase protein intake",
+          "Apply hair dye"
+        ],
+        "answerIndex": 0,
+        "rationale": "Clients with Traction Alopecia should vary hairstyles and avoid excessive tension to prevent further hair loss."
+      },
+      {
+        "prompt": "Which condition results in rapid, diffuse hair loss during the growth phase?",
+        "choices": [
+          "Anagen Effluvium",
+          "Telogen Effluvium",
+          "Alopecia Areata",
+          "Trichotillomania"
+        ],
+        "answerIndex": 0,
+        "rationale": "Anagen Effluvium involves rapid hair loss during the anagen (growth) phase, often due to chemotherapy."
+      },
+      {
+        "prompt": "What is the role of a barber when encountering a client with hair loss?",
+        "choices": [
+          "Diagnose the condition",
+          "Prescribe medication",
+          "Recognize the type and refer if needed",
+          "Perform medical treatment"
+        ],
+        "answerIndex": 2,
+        "rationale": "Barbers should recognize the type of hair loss and refer clients to a dermatologist or trichologist when appropriate."
+      },
+      {
+        "prompt": "Which condition is characterized by a beaded hair shaft that breaks easily?",
+        "choices": [
+          "Monilethrix",
+          "Pili torti",
+          "Trichorrhexis nodosa",
+          "Alopecia Areata"
+        ],
+        "answerIndex": 0,
+        "rationale": "Monilethrix is a genetic condition that causes a beaded appearance of the hair shaft, leading to breakage."
+      },
+      {
+        "prompt": "A client is experiencing hair loss after childbirth. What is the likely condition?",
+        "choices": [
+          "Telogen Effluvium",
+          "Anagen Effluvium",
+          "Trichotillomania",
+          "Scarring Alopecia"
+        ],
+        "answerIndex": 0,
+        "rationale": "Telogen Effluvium is common after childbirth due to hormonal changes and stress, causing temporary hair shedding."
+      },
+      {
+        "prompt": "What is the recommended action for barbers when dealing with clients with Scarring Alopecia?",
+        "choices": [
+          "Avoid traumatizing scarred areas",
+          "Use heat treatments",
+          "Recommend hair growth oils",
+          "Perform scalp massages"
+        ],
+        "answerIndex": 0,
+        "rationale": "Barbers should avoid traumatizing scarred areas as Scarring Alopecia involves permanent hair loss due to follicle destruction."
+      },
+      {
+        "prompt": "Which condition involves twisted hair shafts that appear dull?",
+        "choices": [
+          "Pili torti",
+          "Monilethrix",
+          "Trichorrhexis nodosa",
+          "Alopecia Areata"
+        ],
+        "answerIndex": 0,
+        "rationale": "Pili torti is characterized by twisted hair shafts, causing the hair to appear dull and break easily."
+      },
+      {
+        "prompt": "What scale is used to describe male pattern baldness in Androgenetic Alopecia?",
+        "choices": [
+          "Norwood Scale",
+          "Ludwig Scale",
+          "Hamilton Scale",
+          "Savage Scale"
+        ],
+        "answerIndex": 0,
+        "rationale": "The Norwood Scale is used to describe the pattern and progression of male pattern baldness in Androgenetic Alopecia."
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Trichology",
+      "definition": "The branch of dermatology that studies the hair and scalp."
+    },
+    {
+      "term": "Alopecia",
+      "definition": "The general medical term for hair loss of any cause."
+    },
+    {
+      "term": "Effluvium",
+      "definition": "Shedding of hair, such as telogen effluvium which is stress-related shedding."
+    },
+    {
+      "term": "Trichorrhexis",
+      "definition": "Breakage of the hair shaft, not true hair loss from the follicle."
+    },
+    {
+      "term": "Androgenetic Alopecia",
+      "definition": "Pattern baldness caused by genetic sensitivity to DHT, leading to follicle shrinkage."
+    },
+    {
+      "term": "Alopecia Areata",
+      "definition": "An autoimmune condition causing patchy hair loss; can progress to total scalp or body hair loss."
+    },
+    {
+      "term": "Traction Alopecia",
+      "definition": "Hair loss from repeated tension on the hair follicle, common with tight hairstyles."
+    },
+    {
+      "term": "Trichotillomania",
+      "definition": "A psychological condition involving compulsive hair pulling, resulting in irregular patches."
+    },
+    {
+      "term": "Telogen Effluvium",
+      "definition": "Diffuse, temporary hair shedding triggered by stress, usually resolving within 6 months."
+    },
+    {
+      "term": "Scarring Alopecia",
+      "definition": "Permanent hair loss caused by follicle destruction and replacement with scar tissue."
+    },
+    {
+      "term": "Anagen Effluvium",
+      "definition": "Rapid hair loss during the growth phase, often due to chemotherapy, with potential regrowth after treatment."
+    },
+    {
+      "term": "Trichorrhexis Nodosa",
+      "definition": "Weak points along the hair shaft causing breakage, often from over-processing or heat damage."
+    },
+    {
+      "term": "Monilethrix",
+      "definition": "A genetic condition characterized by a beaded hair shaft that breaks easily."
+    },
+    {
+      "term": "Pili Torti",
+      "definition": "A condition where the hair shaft is twisted, causing dull appearance and easy breakage."
+    },
+    {
+      "term": "Barber's Role in Hair Loss",
+      "definition": "Recognize hair loss types, proceed with safe services, refer clients to specialists, recommend scalp-healthy practices, and avoid services on inflamed or infected areas."
+    }
+  ]
+}

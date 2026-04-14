@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: v1 import — API-key gated
 import { logger } from '@/lib/logger';
 /**
  * Data Import API for License Holders

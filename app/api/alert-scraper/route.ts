@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public alert scraper for job board data
 
 
 import { NextRequest, NextResponse } from 'next/server';

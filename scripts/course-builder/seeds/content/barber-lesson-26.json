@@ -1,0 +1,377 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is a key reason for mastering lineup and edging in barbering?",
+        "choices": [
+          "To enhance the client's overall appearance",
+          "To reduce the time spent on each haircut",
+          "To increase the price of services",
+          "To avoid using razors"
+        ],
+        "answerIndex": 0,
+        "rationale": "Mastering lineup and edging enhances the overall appearance of the haircut, which is crucial for client satisfaction and professional quality.",
+        "type": "recall"
+      },
+      {
+        "prompt": "Which of the following is a contraindication for using a razor during a lineup?",
+        "choices": [
+          "Dry skin",
+          "Irritated skin",
+          "Oily skin",
+          "Thick hair"
+        ],
+        "answerIndex": 1,
+        "rationale": "Irritated skin is a contraindication because using a razor on it can exacerbate the condition and lead to discomfort or infection.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What is the importance of preserving the natural hairline during a lineup?",
+        "choices": [
+          "It prevents hair from growing back",
+          "It ensures client satisfaction",
+          "It makes the haircut easier",
+          "It reduces the use of razors"
+        ],
+        "answerIndex": 1,
+        "rationale": "Preserving the natural hairline ensures client satisfaction by maintaining their desired appearance.",
+        "type": "recall"
+      },
+      {
+        "prompt": "Why is symmetry important in lineup and edging?",
+        "choices": [
+          "It speeds up the haircutting process",
+          "It ensures a balanced and polished look",
+          "It reduces the need for razors",
+          "It makes hair grow evenly"
+        ],
+        "answerIndex": 1,
+        "rationale": "Symmetry ensures a balanced and polished look, which is a hallmark of a well-executed haircut.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What is the correct technique for using a razor during edging?",
+        "choices": [
+          "Use long sweeping strokes",
+          "Use short, controlled strokes",
+          "Apply excessive pressure",
+          "Hold the razor at a 90-degree angle"
+        ],
+        "answerIndex": 1,
+        "rationale": "Using short, controlled strokes minimizes the risk of cutting the skin and ensures a clean, sharp line.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What should be done with used razor blades after a lineup service?",
+        "choices": [
+          "Dispose of them in the trash",
+          "Store them for future use",
+          "Dispose of them in a sharps container",
+          "Clean and reuse them"
+        ],
+        "answerIndex": 2,
+        "rationale": "Used razor blades should be disposed of in a sharps container to prevent injuries and maintain hygiene.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What is the first step in the razor edging procedure?",
+        "choices": [
+          "Check for symmetry",
+          "Prepare the area",
+          "Dispose of blades",
+          "Use short strokes"
+        ],
+        "answerIndex": 1,
+        "rationale": "The first step is to prepare the area by ensuring the skin is clean and dry and applying a light layer of shaving gel.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What should a barber do if a client's skin is accidentally broken during a service?",
+        "choices": [
+          "Continue with the service",
+          "Apply more shaving gel",
+          "Stop and follow blood exposure protocol",
+          "Ignore the break"
+        ],
+        "answerIndex": 2,
+        "rationale": "If a client's skin is broken, the barber should stop immediately and follow the blood exposure protocol to ensure safety.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A client presents with redness and swelling on their hairline. What should the barber do?",
+        "choices": [
+          "Proceed with the razor service",
+          "Use extra shaving gel",
+          "Offer alternative styling options",
+          "Ignore the condition"
+        ],
+        "answerIndex": 2,
+        "rationale": "The barber should offer alternative styling options or reschedule the service to avoid exacerbating the condition.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "During a service, you notice an open wound on the client's scalp. What is the appropriate action?",
+        "choices": [
+          "Proceed with caution",
+          "Use a razor carefully",
+          "Refrain from using a razor",
+          "Apply more shaving gel"
+        ],
+        "answerIndex": 2,
+        "rationale": "Refraining from using a razor on an open wound prevents discomfort and potential infection.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "A new client asks for a significant change to their hairline. What should the barber do?",
+        "choices": [
+          "Make the change without consulting",
+          "Explain the risks and proceed",
+          "Consult with the client about their preferences",
+          "Refuse the service"
+        ],
+        "answerIndex": 2,
+        "rationale": "The barber should consult with the client to understand their preferences and ensure any changes are intentional and agreed upon.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "During a lineup, you notice one side of the hairline is uneven. What is the best course of action?",
+        "choices": [
+          "Adjust both sides",
+          "Ignore the discrepancy",
+          "Correct only the uneven side",
+          "Start over"
+        ],
+        "answerIndex": 2,
+        "rationale": "Correcting only the uneven side ensures symmetry and a balanced appearance.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "A client with a history of skin irritation requests a razor lineup. What should you do?",
+        "choices": [
+          "Proceed with caution",
+          "Use extra shaving gel",
+          "Offer alternative styling options",
+          "Ignore the history"
+        ],
+        "answerIndex": 2,
+        "rationale": "Offering alternative styling options prevents potential irritation and ensures client safety.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "You accidentally nick a client's skin during edging. What is the immediate step to take?",
+        "choices": [
+          "Continue the service",
+          "Apply pressure and continue",
+          "Stop and follow blood exposure protocol",
+          "Ignore the nick"
+        ],
+        "answerIndex": 2,
+        "rationale": "Stopping and following the blood exposure protocol ensures safety and compliance with health regulations.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "A client requests a lineup that pushes their natural hairline back. How should you proceed?",
+        "choices": [
+          "Proceed without consulting",
+          "Explain the potential impact and proceed if agreed",
+          "Refuse the request",
+          "Ignore the request"
+        ],
+        "answerIndex": 1,
+        "rationale": "Explaining the potential impact and proceeding if the client agrees ensures informed consent and satisfaction.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "During a lineup, you notice the client's hairline is not symmetrical. What should you do?",
+        "choices": [
+          "Adjust both sides",
+          "Ignore the asymmetry",
+          "Correct only the uneven side",
+          "Start over"
+        ],
+        "answerIndex": 2,
+        "rationale": "Correcting only the uneven side ensures the hairline is symmetrical and balanced.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What would you do if a client insists on a lineup that could potentially damage their hairline?",
+        "choices": [
+          "Proceed without question",
+          "Explain the risks and suggest alternatives",
+          "Ignore their request",
+          "Refuse to perform the service"
+        ],
+        "answerIndex": 1,
+        "rationale": "Explaining the risks and suggesting alternatives demonstrates professionalism and care for the client's well-being.",
+        "type": "applied"
+      },
+      {
+        "prompt": "Which is the BEST approach when a client has a visible skin condition on their hairline?",
+        "choices": [
+          "Proceed with the service",
+          "Use extra shaving gel",
+          "Offer to reschedule or suggest alternatives",
+          "Ignore the condition"
+        ],
+        "answerIndex": 2,
+        "rationale": "Offering to reschedule or suggesting alternatives ensures client safety and adheres to professional standards.",
+        "type": "applied"
+      },
+      {
+        "prompt": "What would you do if a client is unhappy with their lineup after the service?",
+        "choices": [
+          "Ignore their concerns",
+          "Offer a refund",
+          "Discuss their concerns and offer a solution",
+          "Refuse to address the issue"
+        ],
+        "answerIndex": 2,
+        "rationale": "Discussing their concerns and offering a solution helps maintain client satisfaction and trust.",
+        "type": "applied"
+      },
+      {
+        "prompt": "Which is the BEST practice for ensuring symmetry during a lineup?",
+        "choices": [
+          "Use a mirror to compare sides",
+          "Eyeball the hairline",
+          "Adjust both sides equally",
+          "Focus only on one side"
+        ],
+        "answerIndex": 0,
+        "rationale": "Using a mirror to compare sides ensures accurate assessment and correction for symmetry.",
+        "type": "applied"
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Lineup",
+      "definition": "A technique in barbering used to define the edges of a haircut, framing the face and enhancing the overall appearance."
+    },
+    {
+      "term": "Edging",
+      "definition": "The process of creating clean, sharp lines along the hairline using tools like clippers or razors."
+    },
+    {
+      "term": "Contraindications",
+      "definition": "Conditions that make it inadvisable to proceed with a service, such as irritated or broken skin."
+    },
+    {
+      "term": "Natural Hairline",
+      "definition": "The original contour of a person's hairline that should be preserved and enhanced during a haircut."
+    },
+    {
+      "term": "Symmetry",
+      "definition": "A balanced and even appearance on both sides of the hairline, crucial for a polished look."
+    },
+    {
+      "term": "Razor Technique",
+      "definition": "The method of using short, controlled strokes with a razor to achieve precise and safe edging."
+    },
+    {
+      "term": "Shaving Gel",
+      "definition": "A product applied to the skin to enhance visibility and reduce friction during razor edging."
+    },
+    {
+      "term": "Sharps Container",
+      "definition": "A safety device used to dispose of used razor blades to prevent injuries and maintain hygiene."
+    },
+    {
+      "term": "Blood Exposure Protocol",
+      "definition": "Procedures followed if a client's skin is accidentally broken, ensuring safety and compliance with health standards."
+    },
+    {
+      "term": "Precision",
+      "definition": "The careful and accurate execution of barbering techniques, essential for lineup and edging."
+    },
+    {
+      "term": "Hygiene Standards",
+      "definition": "Regulations that ensure cleanliness and safety in barbering, vital for client trust and exam success."
+    },
+    {
+      "term": "Facial Structure",
+      "definition": "The shape and features of a client's face, which should be considered to achieve a flattering haircut."
+    },
+    {
+      "term": "Controlled Strokes",
+      "definition": "Short, deliberate movements used in razor edging to maintain accuracy and avoid injury."
+    },
+    {
+      "term": "Client Consultation",
+      "definition": "The process of discussing preferences and expectations with a client before making changes to their hairline."
+    },
+    {
+      "term": "Indiana Barber Written Exam",
+      "definition": "A state-required test that assesses a barber's knowledge and skills, including lineup and edging techniques."
+    }
+  ],
+  "content": "## Understanding the Importance of Lineup & Edging\n\nIn the world of barbering, the lineup and edging are crucial skills that define the quality of a haircut and the satisfaction of clients. These techniques require precision and an eye for detail, as they frame the face and enhance the overall appearance of the haircut. For barbers in Indiana, mastering lineup and edging is not just about aesthetics; it is also about adhering to safety and hygiene standards, which are essential for passing the Indiana barber written exam. This lesson will guide you through the fundamentals of lineup and edging, ensuring you are well-prepared to excel both in practice and on the exam.\n\n## Recognizing Contraindications\n\nBefore beginning any lineup or edging service, it is vital to identify any contraindications that may affect the procedure. Contraindications refer to conditions that make it inadvisable to proceed with a particular service. For instance, irritated or broken skin can be exacerbated by the use of razors, leading to discomfort or infection. As a barber, it is your responsibility to assess the client's skin condition and decide whether it is safe to proceed. This step not only protects the client but also demonstrates your professionalism and adherence to safety protocols.\n\nBarbers must be vigilant in recognizing signs of irritation or infection, such as redness, swelling, or open wounds. If any of these are present, it is crucial to refrain from using a razor on the affected area. Instead, offer alternative styling options or reschedule the service once the skin has healed. This approach not only maintains client trust but also ensures compliance with health regulations.\n\n## Preserving the Natural Hairline\n\nOne of the key competencies in lineup and edging is preserving the client's natural hairline. The hairline is a defining feature of a person's appearance, and altering it without intention can lead to dissatisfaction. It is essential to work with the natural contours of the hairline, enhancing its shape without pushing it back unnecessarily.\n\nWhen redesigning a hairline, communicate clearly with your client about their preferences and any changes they wish to make. Use your skills to balance their desires with what is feasible, ensuring that any adjustments are intentional and agreed upon. This skill is critical for the Indiana barber written exam, where 25% of the content focuses on haircutting techniques, including lineup and edging.\n\n## Achieving Symmetry\n\nSymmetry is a hallmark of a well-executed haircut. During lineup and edging, it is important to check for symmetry from the front view and make corrections only to the uneven side. This practice ensures a balanced and polished look, enhancing the client's overall appearance.\n\nTo achieve symmetry, start by assessing the client's facial structure and hair growth patterns. Use a mirror to compare both sides of the hairline and identify any discrepancies. Make small, controlled adjustments to the uneven side, constantly checking your work to maintain balance. This meticulous attention to detail is not only a testament to your skill but also a requirement for the state board exam.\n\n## Mastering Razor Technique\n\nThe use of a razor in lineup and edging requires precision and control. It is essential to use short, controlled strokes rather than one long sweep to maintain accuracy and avoid injury. This technique minimizes the risk of cutting the skin and ensures a clean, sharp line.\n\n### Step-by-Step Procedure for Razor Edging\n\n1. **Prepare the Area**: Ensure the skin is clean and dry. Apply a light layer of shaving gel to enhance visibility and reduce friction.\n2. **Hold the Razor Correctly**: Grip the razor with a steady hand, maintaining a comfortable angle to the skin.\n3. **Use Short Strokes**: Begin at one end of the hairline, using short, controlled strokes to define the edge. Avoid applying excessive pressure.\n4. **Check Your Work**: Continuously check for symmetry and make adjustments as needed.\n5. **Dispose of Blades Safely**: Immediately place used razor blades in a sharps container to prevent accidents and adhere to safety protocols.\n\n## Safety and Hygiene Protocols\n\nAdhering to safety and hygiene protocols is non-negotiable in the barbering profession. Proper disposal of used razor blades in a sharps container is crucial to prevent injuries and maintain a clean workspace. Additionally, if a client's skin is accidentally broken during the service, it is imperative to stop immediately and follow the blood exposure protocol.\n\nThe Indiana state board exam tests your knowledge of these safety measures, emphasizing their importance in professional practice. Being well-versed in these protocols not only prepares you for the exam but also builds trust with your clients, ensuring their safety and satisfaction.\n\n## Key Takeaway\n\nMastering the art of lineup and edging is essential for any barber aiming to provide top-notch service in Indiana. By recognizing contraindications, preserving the natural hairline, achieving symmetry, mastering razor techniques, and adhering to safety protocols, you demonstrate professionalism and skill. These competencies are not only vital for passing the Indiana barber written exam but also for building a successful career in barbering. Remember, precision and attention to detail are the cornerstones of a great lineup and edging service.",
+  "procedures": [
+    {
+      "step": 1,
+      "instruction": "Consult with the client to understand their preferences and any specific requests for the lineup and edging.",
+      "safetyNote": null
+    },
+    {
+      "step": 2,
+      "instruction": "Assess the client's skin for any contraindications such as irritation or open wounds.",
+      "safetyNote": "Avoid using a razor on irritated or broken skin."
+    },
+    {
+      "step": 3,
+      "instruction": "Ensure all tools are sanitized before use.",
+      "safetyNote": "SAFETY: Disinfect all tools according to state board standards."
+    },
+    {
+      "step": 4,
+      "instruction": "Prepare the client's hair by washing and drying it thoroughly to ensure a clean working area.",
+      "safetyNote": null
+    },
+    {
+      "step": 5,
+      "instruction": "Apply a light layer of shaving gel to the hairline to enhance visibility and reduce friction.",
+      "safetyNote": null
+    },
+    {
+      "step": 6,
+      "instruction": "Hold the razor with a steady hand, maintaining a comfortable angle to the skin.",
+      "safetyNote": null
+    },
+    {
+      "step": 7,
+      "instruction": "Begin edging at one end of the hairline, using short, controlled strokes to define the edge.",
+      "safetyNote": "Avoid applying excessive pressure to prevent cuts."
+    },
+    {
+      "step": 8,
+      "instruction": "Continuously check for symmetry using a mirror and make adjustments as needed to ensure balance.",
+      "safetyNote": null
+    },
+    {
+      "step": 9,
+      "instruction": "Preserve the natural hairline by following its natural contours and avoid pushing it back unnecessarily.",
+      "safetyNote": null
+    },
+    {
+      "step": 10,
+      "instruction": "After completing the edging, wipe away any excess shaving gel and hair debris.",
+      "safetyNote": null
+    },
+    {
+      "step": 11,
+      "instruction": "Dispose of used razor blades immediately in a designated sharps container.",
+      "safetyNote": "SAFETY: Proper disposal prevents injuries and maintains hygiene."
+    },
+    {
+      "step": 12,
+      "instruction": "Clean and sanitize all tools and the workspace after completing the service.",
+      "safetyNote": "SAFETY: Follow state board sanitation protocols."
+    },
+    {
+      "step": 13,
+      "instruction": "Review the finished haircut with the client to ensure satisfaction and make any final adjustments if necessary.",
+      "safetyNote": null
+    }
+  ]
+}

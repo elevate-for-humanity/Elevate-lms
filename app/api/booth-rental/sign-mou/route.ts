@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: booth rental MOU signing — public form
 /**
  * POST /api/booth-rental/sign-mou
  *

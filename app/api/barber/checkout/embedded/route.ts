@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: Stripe embedded checkout for barber program
 // AUTH: Intentionally public — no authentication required
 // POLICY: Tuition is fixed. Transfer hours NEVER affect price.
 //         Only custom_setup_fee is user-influenced and is server-clamped.

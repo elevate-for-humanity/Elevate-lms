@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: studio recent — auth inside handler
 import { getAdminClient } from '@/lib/supabase/admin';
 
 import { NextRequest, NextResponse } from 'next/server';

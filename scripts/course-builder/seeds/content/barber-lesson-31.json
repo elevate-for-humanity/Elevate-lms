@@ -1,0 +1,377 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is the general guideline for setting the neckline in beard design?",
+        "choices": [
+          "Two finger-widths above the Adam's apple",
+          "At the base of the neck",
+          "One finger-width above the Adam's apple",
+          "Directly on the Adam's apple"
+        ],
+        "answerIndex": 0,
+        "rationale": "The correct position for setting the neckline is two finger-widths above the Adam's apple to ensure a clean and defined look.",
+        "type": "recall"
+      },
+      {
+        "prompt": "Which face shape is considered the most versatile for beard styles?",
+        "choices": [
+          "Round",
+          "Oval",
+          "Square",
+          "Triangular"
+        ],
+        "answerIndex": 1,
+        "rationale": "Oval faces are considered the most versatile because most beard styles work well with this shape.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A client presents with a round face and wants a beard that elongates their appearance. Which style should you recommend?",
+        "choices": [
+          "Circle beard",
+          "Classic full beard",
+          "Goatee",
+          "Fuller sides"
+        ],
+        "answerIndex": 2,
+        "rationale": "A goatee adds length to the face, creating the illusion of a more oval shape, which is ideal for round faces.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "During a service, you notice the trimmer blades have hair debris. What should you do before using them on the client?",
+        "choices": [
+          "Use them as is",
+          "Wipe with a dry cloth",
+          "Brush off debris and disinfect",
+          "Rinse with water"
+        ],
+        "answerIndex": 2,
+        "rationale": "It is essential to brush off debris and disinfect the blades to maintain hygiene and prevent infections.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What is the primary purpose of defining the cheek line in beard shaping?",
+        "choices": [
+          "To shorten the beard",
+          "To enhance symmetry and complement face shape",
+          "To make the beard look thicker",
+          "To match the neckline"
+        ],
+        "answerIndex": 1,
+        "rationale": "Defining the cheek line enhances the beard's symmetry and complements the client's face shape.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A new client asks for a beard style that softens their strong jawline. They have a square face. What style should you suggest?",
+        "choices": [
+          "Van Dyke",
+          "Circle beard",
+          "Goatee",
+          "Fuller sides"
+        ],
+        "answerIndex": 1,
+        "rationale": "A circle beard softens the angles of a square face, complementing the strong jawline.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "Which tool is primarily used to set the neckline in beard design?",
+        "choices": [
+          "Razor",
+          "Scissors",
+          "Trimmer",
+          "Comb"
+        ],
+        "answerIndex": 2,
+        "rationale": "A trimmer is used to set the neckline, ensuring precision and symmetry.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What is the BEST approach to disinfecting trimmer blades before a service?",
+        "choices": [
+          "Rinse with water",
+          "Wipe with a cloth",
+          "Spray with clipper disinfectant",
+          "Use alcohol wipes"
+        ],
+        "answerIndex": 2,
+        "rationale": "Spraying with clipper disinfectant ensures all surfaces are covered and properly sanitized.",
+        "type": "applied"
+      },
+      {
+        "prompt": "A client with a rectangular face wants to avoid a beard style that adds length. What should you recommend?",
+        "choices": [
+          "Goatee",
+          "Fuller sides",
+          "Van Dyke",
+          "Elongated styles"
+        ],
+        "answerIndex": 1,
+        "rationale": "Fuller sides help balance a rectangular face by avoiding additional length.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What is the first step in setting the neckline during a beard design service?",
+        "choices": [
+          "Create a straight line",
+          "Trim below the line",
+          "Ask the client to tilt their head up",
+          "Determine the starting point"
+        ],
+        "answerIndex": 2,
+        "rationale": "Asking the client to tilt their head up exposes the neck area for better precision.",
+        "type": "recall"
+      },
+      {
+        "prompt": "During a service, you notice the cheek line is set too low. What should you do?",
+        "choices": [
+          "Leave it as is",
+          "Raise the line to follow the natural curve",
+          "Lower it further",
+          "Ignore it"
+        ],
+        "answerIndex": 1,
+        "rationale": "Raising the line to follow the natural curve ensures a fuller and more robust appearance.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What is the primary consideration when choosing a beard style for a triangular face?",
+        "choices": [
+          "Adding length",
+          "Creating width at the top",
+          "Softening the jawline",
+          "Elongating the face"
+        ],
+        "answerIndex": 1,
+        "rationale": "Creating width at the top with fuller cheek lines balances the narrower forehead of a triangular face.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A client with an oval face wants a beard style that maintains balance. What should you avoid?",
+        "choices": [
+          "Styles that elongate the face",
+          "Circle beard",
+          "Classic full beard",
+          "Goatee"
+        ],
+        "answerIndex": 0,
+        "rationale": "Avoid styles that elongate the face to maintain balance for an oval face.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What is the BEST practice for ensuring symmetry when setting the neckline?",
+        "choices": [
+          "Eyeballing the line",
+          "Using a ruler",
+          "Creating a straight line from the starting point to the back of the jaw",
+          "Guessing"
+        ],
+        "answerIndex": 2,
+        "rationale": "Creating a straight line from the starting point to the back of the jaw ensures symmetry.",
+        "type": "applied"
+      },
+      {
+        "prompt": "What is the importance of disinfecting trimmer blades before each service?",
+        "choices": [
+          "To sharpen the blades",
+          "To maintain hygiene and prevent infections",
+          "To cool the blades",
+          "To lubricate the blades"
+        ],
+        "answerIndex": 1,
+        "rationale": "Disinfecting trimmer blades is crucial for maintaining hygiene and preventing the spread of infections.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A client wants a beard style that complements their strong jawline and square face. What is the BEST approach?",
+        "choices": [
+          "Suggest a style that elongates the face",
+          "Recommend a circle beard to soften angles",
+          "Advise a goatee to add length",
+          "Encourage fuller sides"
+        ],
+        "answerIndex": 1,
+        "rationale": "A circle beard softens the angles of a square face, complementing the strong jawline.",
+        "type": "applied"
+      },
+      {
+        "prompt": "What should a barber do if a client requests a beard style that does not suit their face shape?",
+        "choices": [
+          "Proceed with the client's request",
+          "Explain why it may not be flattering and suggest alternatives",
+          "Ignore the request",
+          "Do what other clients prefer"
+        ],
+        "answerIndex": 1,
+        "rationale": "Explaining and suggesting alternatives ensures the client receives a flattering style that enhances their appearance.",
+        "type": "applied"
+      },
+      {
+        "prompt": "What is the correct method for determining the starting point of the neckline?",
+        "choices": [
+          "One finger-width above the Adam's apple",
+          "Two finger-widths above the Adam's apple",
+          "Directly on the Adam's apple",
+          "At the base of the neck"
+        ],
+        "answerIndex": 1,
+        "rationale": "The correct starting point is two finger-widths above the Adam's apple for a clean and defined neckline.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A client with a triangular face wants a beard style that adds width at the top. What should you recommend?",
+        "choices": [
+          "Elongated styles",
+          "Goatee",
+          "Fuller cheek lines",
+          "Van Dyke"
+        ],
+        "answerIndex": 2,
+        "rationale": "Fuller cheek lines add width at the top, balancing a triangular face's narrower forehead.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What is the role of a trimmer disinfectant spray in maintaining barbering hygiene?",
+        "choices": [
+          "To lubricate the blades",
+          "To sharpen the blades",
+          "To disinfect and prevent infections",
+          "To cool the blades"
+        ],
+        "answerIndex": 2,
+        "rationale": "A trimmer disinfectant spray is used to disinfect the blades, preventing infections and maintaining hygiene.",
+        "type": "recall"
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Beard Design",
+      "definition": "The art of shaping and styling a beard to complement a client's facial features and personal style."
+    },
+    {
+      "term": "Face Shapes",
+      "definition": "Categories of facial structure including oval, round, square, rectangular, and triangular, each influencing suitable beard styles."
+    },
+    {
+      "term": "Oval Face",
+      "definition": "A versatile face shape where most beard styles are flattering, but balance is key to avoid elongating the face."
+    },
+    {
+      "term": "Neckline",
+      "definition": "A critical component of beard design set two finger-widths above the Adam's apple to enhance the beard's shape."
+    },
+    {
+      "term": "Cheek Line",
+      "definition": "The line that defines the upper boundary of the beard, following the natural growth pattern for a polished look."
+    },
+    {
+      "term": "Clipper Disinfectant Spray",
+      "definition": "A product used to sanitize trimmer blades, preventing the spread of bacteria and ensuring client safety."
+    },
+    {
+      "term": "Round Face",
+      "definition": "A face shape that benefits from beard styles adding length, such as a goatee, to create an oval appearance."
+    },
+    {
+      "term": "Square Face",
+      "definition": "Characterized by a strong jawline, this face shape is complemented by beards that soften angles, like a circle beard."
+    },
+    {
+      "term": "Rectangular Face",
+      "definition": "A face shape where fuller sides are preferred to balance the face, avoiding styles that add length."
+    },
+    {
+      "term": "Triangular Face",
+      "definition": "A face shape with a narrower forehead that benefits from fuller cheek lines to create width at the top."
+    },
+    {
+      "term": "Hygiene Standards",
+      "definition": "Practices ensuring cleanliness and safety, including disinfecting tools to prevent infection."
+    },
+    {
+      "term": "Adam's Apple",
+      "definition": "A protrusion in the neck used as a reference point for setting the neckline in beard design."
+    },
+    {
+      "term": "Van Dyke",
+      "definition": "A beard style that adds length to round faces, consisting of a goatee with a detached mustache."
+    },
+    {
+      "term": "Indiana State Board Exam",
+      "definition": "A certification test for barbers that includes assessing knowledge of beard design and hygiene practices."
+    },
+    {
+      "term": "Symmetry in Beard Design",
+      "definition": "The balance and proportion of the beard relative to the client's face shape, enhancing overall appearance."
+    }
+  ],
+  "content": "## Introduction to Beard Design & Shaping\n\nIn the barbering profession, mastering the art of beard design and shaping is essential for providing clients with tailored, stylish looks that suit their individual features. This skill is particularly important in Indiana, where a diverse clientele seeks personalized grooming services. Understanding the nuances of beard shaping can set you apart as a skilled barber, enhancing your reputation and client satisfaction. Being proficient in this area is not just about aesthetics; it’s about delivering a service that complements your clients' natural features and boosts their confidence.\n\n## Understanding Face Shapes and Beard Strategies\n\nA successful beard design begins with identifying the client's face shape, which is crucial in determining the most flattering beard style. The primary face shapes include oval, round, square, rectangular, and triangular, each requiring a different approach to beard styling.\n\nFor oval faces, which are considered the most versatile, most beard styles will work well. However, creating a balanced look is key, so avoid styles that elongate the face further. Round faces benefit from beards that add length, such as a goatee or a Van Dyke, to create the illusion of a more oval shape. Square faces, with their strong jawlines, are complemented by beards that soften the angles, like a circle beard or a classic full beard. Rectangular faces should avoid styles that add length; instead, opt for fuller sides to balance the face. Triangular faces, with a narrower forehead, can benefit from fuller cheek lines to create width at the top.\n\nBy assessing the face shape, a barber can select a beard strategy that enhances the natural symmetry and proportions of the client's face. This tailored approach not only improves the client's appearance but also demonstrates the barber's expertise and attention to detail.\n\n## Setting the Neckline\n\nThe neckline is a critical component of beard design that can significantly impact the overall look of the beard. Setting the neckline correctly involves precision and an understanding of facial anatomy. The general guideline is to position the neckline two finger-widths above the Adam's apple.\n\nTo set the neckline:\n\n1. Ask the client to tilt their head slightly upward to expose the neck area.\n2. Place two fingers horizontally above the Adam's apple to determine the starting point.\n3. Using a trimmer, create a straight line from this point to the back of the jaw on each side, ensuring symmetry.\n4. Trim any hair below this line to maintain a clean and defined neckline.\n\nA well-set neckline frames the face and enhances the beard's shape, while an incorrectly positioned neckline can make the beard appear unkempt or disproportionate. Mastering this skill is essential for any barber aiming to provide high-quality grooming services.\n\n## Defining the Cheek Line\n\nThe cheek line is another crucial aspect of beard shaping that can alter the beard's appearance dramatically. Setting the cheek line too low can lead to an overly sculpted look that may not suit all clients, while a natural cheek line can offer a fuller, more robust appearance.\n\nTo define the cheek line:\n\n1. Identify the natural growth pattern of the client's beard.\n2. Decide on the desired height of the cheek line based on the client's preferences and facial features.\n3. Use a trimmer to create a line from the sideburns to the corner of the mouth, following the natural curve of the cheek.\n4. Clean up any stray hairs above this line to ensure a neat and polished look.\n\nA well-defined cheek line can enhance the beard's symmetry and complement the client's face shape. This attention to detail is a hallmark of professional barbering and contributes to client satisfaction.\n\n## Disinfecting Trimmer Blades\n\nHygiene is a non-negotiable aspect of barbering, especially when it comes to tools that come into direct contact with the skin. Disinfecting trimmer blades is not only a requirement for client safety but also a standard practice that reflects professionalism.\n\nBefore each service, ensure that the trimmer blades are disinfected using a clipper disinfectant spray. This process helps prevent the spread of bacteria and infections, safeguarding both the client and the barber.\n\nTo disinfect trimmer blades:\n\n1. Turn off and unplug the trimmer.\n2. Remove any hair debris using a small brush.\n3. Spray the blades thoroughly with a clipper disinfectant spray, ensuring all surfaces are covered.\n4. Allow the blades to air dry before using them on the client.\n\nBy maintaining clean and disinfected tools, you demonstrate a commitment to hygiene and client care, which is crucial in building trust and a positive reputation.\n\n## Indiana State Board Exam Relevance\n\nUnderstanding beard design and shaping is not only important for practical application but also for passing the Indiana State Board Exam. This topic is a significant component of the shaving section, which constitutes approximately 20% of the exam. The exam tests your ability to identify face shapes, set necklines and cheek lines correctly, and adhere to hygiene standards. Mastery of these skills is essential for achieving certification and advancing in your barbering career.\n\n## Key Takeaway\n\nBeard design and shaping are fundamental skills for any barber in Indiana, combining artistry with technical precision. By understanding face shapes, setting necklines and cheek lines correctly, and maintaining hygiene standards, you can provide exceptional grooming services that enhance your clients' appearance and confidence. Mastery of these techniques not only prepares you for the state board exam but also sets the foundation for a successful and rewarding career in barbering.",
+  "procedures": [
+    {
+      "step": 1,
+      "instruction": "Greet the client and conduct a consultation to determine their desired beard style and assess their face shape.",
+      "safetyNote": null
+    },
+    {
+      "step": 2,
+      "instruction": "SAFETY: Disinfect trimmer blades before use by spraying thoroughly with a clipper disinfectant spray and allowing them to air dry.",
+      "safetyNote": "Ensure all surfaces of the blades are covered to prevent the spread of bacteria."
+    },
+    {
+      "step": 3,
+      "instruction": "Ask the client to tilt their head slightly upward to expose the neck area.",
+      "safetyNote": null
+    },
+    {
+      "step": 4,
+      "instruction": "Place two fingers horizontally above the Adam's apple to determine the starting point for the neckline.",
+      "safetyNote": null
+    },
+    {
+      "step": 5,
+      "instruction": "Using a trimmer, create a straight line from the starting point to the back of the jaw on each side, ensuring symmetry.",
+      "safetyNote": null
+    },
+    {
+      "step": 6,
+      "instruction": "Trim any hair below the neckline to maintain a clean and defined look.",
+      "safetyNote": null
+    },
+    {
+      "step": 7,
+      "instruction": "Identify the natural growth pattern of the client's beard to determine the cheek line.",
+      "safetyNote": null
+    },
+    {
+      "step": 8,
+      "instruction": "Decide on the desired height of the cheek line based on the client's preferences and facial features.",
+      "safetyNote": null
+    },
+    {
+      "step": 9,
+      "instruction": "Use a trimmer to create a line from the sideburns to the corner of the mouth, following the natural curve of the cheek.",
+      "safetyNote": null
+    },
+    {
+      "step": 10,
+      "instruction": "Clean up any stray hairs above the cheek line to ensure a neat and polished look.",
+      "safetyNote": null
+    },
+    {
+      "step": 11,
+      "instruction": "Conduct a final check to ensure symmetry and make any necessary adjustments to the beard shape.",
+      "safetyNote": null
+    },
+    {
+      "step": 12,
+      "instruction": "SAFETY: Clean and disinfect the trimmer blades after use, removing any hair debris and spraying with disinfectant.",
+      "safetyNote": "This prevents cross-contamination and maintains hygiene standards."
+    },
+    {
+      "step": 13,
+      "instruction": "Provide the client with aftercare advice to maintain their beard style and recommend any suitable grooming products.",
+      "safetyNote": null
+    }
+  ]
+}

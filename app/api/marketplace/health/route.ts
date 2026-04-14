@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: marketplace health check
 import { NextResponse } from 'next/server';
 
 import { getAdminClient } from '@/lib/supabase/admin';

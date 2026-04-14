@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: studio deploy tokens — auth inside handler
 import { logger } from '@/lib/logger';
 import { getAdminClient } from '@/lib/supabase/admin';
 

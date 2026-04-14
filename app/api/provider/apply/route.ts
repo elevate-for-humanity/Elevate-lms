@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: provider application form
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminClient as createAdminClient } from '@/lib/supabase/admin';

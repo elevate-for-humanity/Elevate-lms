@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: SCORM content delivery — auth inside handler
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';

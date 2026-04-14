@@ -22,9 +22,13 @@ interface Submission {
 
 interface Props {
   lessonId: string;
-  courseId: string;
+  courseId?: string;
   stepType: 'lab' | 'assignment';
-  lessonTitle: string;
+  lessonTitle?: string;
+  /** When set, this submission is for a specific competency check key. */
+  competencyKey?: string;
+  /** Called after a successful submission (activity-tab integration). */
+  onSubmitted?: () => void;
 }
 
 const STATUS_UI: Record<Submission['status'], { label: string; color: string; icon: React.ReactNode }> = {
@@ -35,7 +39,7 @@ const STATUS_UI: Record<Submission['status'], { label: string; color: string; ic
   revision_requested: { label: 'Revision requested',           color: 'bg-orange-50 border-orange-200 text-orange-700',              icon: <RotateCcw className="w-4 h-4" /> },
 };
 
-export default function StepSubmissionForm({ lessonId, courseId, stepType, lessonTitle }: Props) {
+export default function StepSubmissionForm({ lessonId, courseId, stepType, lessonTitle, competencyKey, onSubmitted }: Props) {
   const [prior, setPrior] = useState<Submission | null>(null);
   const [loading, setLoading] = useState(true);
   const [text, setText] = useState('');
@@ -45,10 +49,11 @@ export default function StepSubmissionForm({ lessonId, courseId, stepType, lesso
 
   useEffect(() => {
     async function loadPrior() {
+      if (!courseId) { setLoading(false); return; }
       try {
-        const res = await fetch(
-          `/api/lms/submissions?course_id=${courseId}&course_lesson_id=${lessonId}`
-        );
+        const qs = new URLSearchParams({ course_id: courseId, course_lesson_id: lessonId });
+        if (competencyKey) qs.set('competency_key', competencyKey);
+        const res = await fetch(`/api/lms/submissions?${qs}`);
         if (res.ok) {
           const { submissions } = await res.json();
           if (submissions?.length > 0) setPrior(submissions[0]);
@@ -63,6 +68,7 @@ export default function StepSubmissionForm({ lessonId, courseId, stepType, lesso
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!text.trim()) { setError('Submission text is required.'); return; }
+    if (!courseId) { setError('Course context missing — please reload the page.'); return; }
     setSubmitting(true);
     setError(null);
 
@@ -74,6 +80,7 @@ export default function StepSubmissionForm({ lessonId, courseId, stepType, lesso
         course_id:        courseId,
         step_type:        stepType,
         submission_text:  text.trim(),
+        ...(competencyKey ? { competency_key: competencyKey } : {}),
       }),
     });
 
@@ -82,6 +89,7 @@ export default function StepSubmissionForm({ lessonId, courseId, stepType, lesso
       setPrior(submission);
       setSubmitted(true);
       setText('');
+      onSubmitted?.();
     } else {
       const body = await res.json().catch(() => ({}));
       setError(body.error ?? 'Submission failed. Please try again.');

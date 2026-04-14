@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { useEffect } from 'react';
+import { logSecurityEventAction } from '@/app/actions/security';
 
 /**
  * Security Monitor Component
@@ -223,31 +224,16 @@ function logSecurityEvent(eventType: string, data: any) {
     data,
   };
 
-  // Send to analytics/monitoring service
-  try {
-    // Fire-and-forget with timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2000);
-    
-    fetch('/api/security/log', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(event),
-      signal: controller.signal
-    })
-      .then(() => clearTimeout(timeoutId))
-      .catch(() => clearTimeout(timeoutId));
+  // Fire-and-forget via server action (bypasses Netlify edge bot protection)
+  logSecurityEventAction(event).catch(() => { /* silent fail */ });
 
-    // Also send to Google Analytics if available
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'security_event', {
-        event_category: 'Security',
-        event_label: eventType,
-        value: 1,
-      });
-    }
-  } catch (error) { /* Error handled silently */ 
-    // Silently fail
+  // Also send to Google Analytics if available
+  if (typeof window !== 'undefined' && (window as any).gtag) {
+    (window as any).gtag('event', 'security_event', {
+      event_category: 'Security',
+      event_label: eventType,
+      value: 1,
+    });
   }
 }
 

@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: prospective student advising intake form
 
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';

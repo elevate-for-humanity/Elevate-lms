@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public client info lookup
 // AUTH: Intentionally public — no authentication required
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';

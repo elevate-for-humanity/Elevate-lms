@@ -1,0 +1,289 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "Which of the following is a primary lesion characterized by a flat, discolored spot?",
+        "choices": [
+          "A. Macule",
+          "B. Papule",
+          "C. Vesicle",
+          "D. Pustule"
+        ],
+        "answerIndex": 0,
+        "rationale": "A macule is a flat, discolored spot on the skin, such as a freckle."
+      },
+      {
+        "prompt": "A barber should refuse service if a client presents with which of the following conditions?",
+        "choices": [
+          "A. Seborrheic dermatitis",
+          "B. Tinea barbae",
+          "C. Psoriasis",
+          "D. Androgenetic alopecia"
+        ],
+        "answerIndex": 1,
+        "rationale": "Tinea barbae is a contagious fungal infection, requiring service refusal."
+      },
+      {
+        "prompt": "What is the recommended shaving technique to prevent pseudofolliculitis barbae?",
+        "choices": [
+          "A. Shave against the grain",
+          "B. Use a multi-blade razor",
+          "C. Use a single-blade razor",
+          "D. Shave dry"
+        ],
+        "answerIndex": 2,
+        "rationale": "Using a single-blade razor and shaving with the grain helps prevent razor bumps."
+      },
+      {
+        "prompt": "Which condition is characterized by patchy hair loss due to an autoimmune response?",
+        "choices": [
+          "A. Alopecia areata",
+          "B. Androgenetic alopecia",
+          "C. Folliculitis",
+          "D. Impetigo"
+        ],
+        "answerIndex": 0,
+        "rationale": "Alopecia areata is an autoimmune condition causing patchy hair loss."
+      },
+      {
+        "prompt": "What type of lesion is a small, fluid-filled blister?",
+        "choices": [
+          "A. Macule",
+          "B. Papule",
+          "C. Vesicle",
+          "D. Pustule"
+        ],
+        "answerIndex": 2,
+        "rationale": "A vesicle is a small, fluid-filled blister, such as a cold sore."
+      },
+      {
+        "prompt": "Which of the following is a non-contagious condition that allows service to proceed with care?",
+        "choices": [
+          "A. Impetigo",
+          "B. Pediculosis capitis",
+          "C. Seborrheic dermatitis",
+          "D. Tinea barbae"
+        ],
+        "answerIndex": 2,
+        "rationale": "Seborrheic dermatitis is not contagious, and service can proceed with care."
+      },
+      {
+        "prompt": "A client with which condition should be referred to a physician for treatment?",
+        "choices": [
+          "A. Keloid scars",
+          "B. Folliculitis",
+          "C. Open infected lesions",
+          "D. Psoriasis"
+        ],
+        "answerIndex": 2,
+        "rationale": "Open infected lesions require medical attention and the client should be referred to a physician."
+      },
+      {
+        "prompt": "What is the primary concern when a client has active herpes simplex?",
+        "choices": [
+          "A. It is non-contagious",
+          "B. It causes dandruff",
+          "C. It is contagious",
+          "D. It leads to hair loss"
+        ],
+        "answerIndex": 2,
+        "rationale": "Active herpes simplex is contagious, and service should be refused."
+      },
+      {
+        "prompt": "Which condition is often caused by unclean tools and can be prevented with proper sanitation?",
+        "choices": [
+          "A. Pseudofolliculitis barbae",
+          "B. Folliculitis",
+          "C. Keloid scars",
+          "D. Alopecia areata"
+        ],
+        "answerIndex": 1,
+        "rationale": "Folliculitis is a bacterial infection of hair follicles often caused by unclean tools."
+      },
+      {
+        "prompt": "What type of lesion is a pus-filled lesion, such as an infected follicle?",
+        "choices": [
+          "A. Macule",
+          "B. Papule",
+          "C. Vesicle",
+          "D. Pustule"
+        ],
+        "answerIndex": 3,
+        "rationale": "A pustule is a pus-filled lesion, often seen in infected follicles."
+      },
+      {
+        "prompt": "Which condition involves overgrown scar tissue and is more common in clients with darker skin tones?",
+        "choices": [
+          "A. Pseudofolliculitis barbae",
+          "B. Folliculitis",
+          "C. Keloid scars",
+          "D. Tinea barbae"
+        ],
+        "answerIndex": 2,
+        "rationale": "Keloid scars are overgrown scar tissue that can form after razor cuts or ingrown hairs."
+      },
+      {
+        "prompt": "A client with dandruff is likely experiencing which condition?",
+        "choices": [
+          "A. Seborrheic dermatitis",
+          "B. Psoriasis",
+          "C. Alopecia areata",
+          "D. Impetigo"
+        ],
+        "answerIndex": 0,
+        "rationale": "Seborrheic dermatitis is characterized by dandruff or a flaking scalp."
+      },
+      {
+        "prompt": "Which of the following is a contagious condition that requires a barber to refuse service?",
+        "choices": [
+          "A. Psoriasis",
+          "B. Androgenetic alopecia",
+          "C. Tinea barbae",
+          "D. Keloid scars"
+        ],
+        "answerIndex": 2,
+        "rationale": "Tinea barbae is a contagious fungal infection, thus service must be refused."
+      },
+      {
+        "prompt": "What is the correct action if a client presents with pediculosis capitis?",
+        "choices": [
+          "A. Proceed with service",
+          "B. Recommend anti-dandruff shampoo",
+          "C. Refuse service",
+          "D. Shave the head"
+        ],
+        "answerIndex": 2,
+        "rationale": "Pediculosis capitis, or head lice, is contagious, and service should be refused."
+      },
+      {
+        "prompt": "Which condition is characterized by scaly plaques and is not contagious?",
+        "choices": [
+          "A. Impetigo",
+          "B. Psoriasis",
+          "C. Tinea barbae",
+          "D. Folliculitis"
+        ],
+        "answerIndex": 1,
+        "rationale": "Psoriasis is characterized by scaly plaques and is not contagious."
+      },
+      {
+        "prompt": "What is the recommended aftercare for clients with pseudofolliculitis barbae?",
+        "choices": [
+          "A. Use a multi-blade razor",
+          "B. Shave against the grain",
+          "C. Use a single-blade razor",
+          "D. Avoid shaving"
+        ],
+        "answerIndex": 2,
+        "rationale": "Clients with pseudofolliculitis barbae should use a single-blade razor and shave with the grain."
+      },
+      {
+        "prompt": "Which condition involves parasitic infestation and requires service refusal?",
+        "choices": [
+          "A. Psoriasis",
+          "B. Pediculosis capitis",
+          "C. Alopecia areata",
+          "D. Seborrheic dermatitis"
+        ],
+        "answerIndex": 1,
+        "rationale": "Pediculosis capitis, or head lice, is a parasitic infestation that is contagious."
+      },
+      {
+        "prompt": "A barber notices a client with a raised, itchy area on the skin. What is this likely to be?",
+        "choices": [
+          "A. Macule",
+          "B. Papule",
+          "C. Wheal",
+          "D. Vesicle"
+        ],
+        "answerIndex": 2,
+        "rationale": "A wheal is a raised, itchy area on the skin, such as a hive."
+      },
+      {
+        "prompt": "Which of the following conditions is a viral infection and contagious?",
+        "choices": [
+          "A. Androgenetic alopecia",
+          "B. Active herpes simplex",
+          "C. Keloid scars",
+          "D. Psoriasis"
+        ],
+        "answerIndex": 1,
+        "rationale": "Active herpes simplex is a viral infection that is contagious."
+      },
+      {
+        "prompt": "What is the best practice to prevent folliculitis in a barbershop?",
+        "choices": [
+          "A. Use multi-blade razors",
+          "B. Ensure proper tool sanitation",
+          "C. Shave against the grain",
+          "D. Use cold water"
+        ],
+        "answerIndex": 1,
+        "rationale": "Proper sanitation of tools is essential to prevent folliculitis, a bacterial infection."
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Macule",
+      "definition": "A flat, discolored spot on the skin, such as a freckle."
+    },
+    {
+      "term": "Papule",
+      "definition": "A small, raised bump on the skin, like a pimple without pus."
+    },
+    {
+      "term": "Vesicle",
+      "definition": "A small, fluid-filled blister, such as a cold sore, which is contagious and requires service refusal."
+    },
+    {
+      "term": "Pustule",
+      "definition": "A pus-filled lesion, often seen in infected follicles."
+    },
+    {
+      "term": "Wheal",
+      "definition": "A raised, itchy area on the skin, like a hive."
+    },
+    {
+      "term": "Tinea barbae",
+      "definition": "A fungal infection of the beard area, also known as barber's itch, which is highly contagious."
+    },
+    {
+      "term": "Pediculosis capitis",
+      "definition": "A parasitic infestation of head lice, which is contagious and requires service refusal."
+    },
+    {
+      "term": "Impetigo",
+      "definition": "A contagious bacterial skin infection that requires service refusal."
+    },
+    {
+      "term": "Seborrheic dermatitis",
+      "definition": "A non-contagious condition characterized by dandruff or a flaking scalp."
+    },
+    {
+      "term": "Psoriasis",
+      "definition": "A non-contagious condition with scaly plaques, where care should be taken to avoid irritating affected areas."
+    },
+    {
+      "term": "Alopecia areata",
+      "definition": "A non-contagious condition causing patchy hair loss due to an autoimmune response."
+    },
+    {
+      "term": "Pseudofolliculitis barbae",
+      "definition": "Razor bumps caused by ingrown hairs, common in clients with tightly coiled hair."
+    },
+    {
+      "term": "Folliculitis",
+      "definition": "A bacterial infection of hair follicles, often caused by unclean tools."
+    },
+    {
+      "term": "Keloid scars",
+      "definition": "Overgrown scar tissue that can form after razor cuts or ingrown hairs, more common in clients with darker skin tones."
+    },
+    {
+      "term": "Active herpes simplex",
+      "definition": "A viral infection causing cold sores, which is contagious and requires service refusal."
+    }
+  ]
+}

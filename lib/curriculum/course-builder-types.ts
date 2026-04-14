@@ -1,7 +1,14 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Canonical course builder types.
-// These are the locked schema definitions for all programs.
-// Do not add values to enums without updating the verifier and all seeds.
+// Barber seed types — used by scripts/course-builder/seeds/*.seed.ts only.
+//
+// These are NOT the canonical course builder types.
+// For the compiler pipeline, use lib/course-builder/schema.ts (CourseTemplate,
+// CourseModule, CourseLesson) and lib/curriculum/blueprints/types.ts
+// (CredentialBlueprint).
+//
+// These types represent the barber-specific seed shape (CourseSeed, LessonSeed,
+// CheckpointSeed) which predates the compiler pipeline and is used only by the
+// scripts/course-builder/ seed scripts. Do not use for new programs.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // State board exam domain — maps to written exam topic weights.
@@ -17,10 +24,12 @@ export type Domain =
 
 // DOL apprenticeship OJT category — determines how hours are credited.
 export type OJTCategory =
-  | 'THEORY'          // RTI (related technical instruction) — classroom/online
-  | 'DEMONSTRATION'   // instructor-led demonstration
-  | 'PRACTICAL'       // hands-on OJT at the shop
-  | 'ASSESSMENT';     // checkpoint, quiz, or exam
+  | 'THEORY'                 // RTI (related technical instruction) — classroom/online
+  | 'DEMONSTRATION'          // instructor-led demonstration
+  | 'PRACTICAL'              // hands-on OJT at the shop
+  | 'ASSESSMENT'             // checkpoint, quiz, or exam
+  | 'PROFESSIONAL_DEVELOPMENT' // life skills, communication, professional image
+  | 'TECHNICAL_INSTRUCTION'; // specialized technical content (nail care, hair loss services)
 
 // Competency check type — classifies what the check is testing.
 export type CompetencyType =
@@ -39,6 +48,17 @@ export interface CompetencyCheck {
   required: boolean;        // true = hard fail if not demonstrated
 }
 
+export interface Flashcard {
+  term: string;
+  definition: string;
+}
+
+export interface ProcedureStep {
+  step: number;
+  instruction: string;      // what to do
+  safetyNote?: string;      // optional safety/sanitation callout
+}
+
 export interface LessonSeed {
   slug: string;             // durable identifier — never change after seeding
   title: string;
@@ -49,8 +69,23 @@ export interface LessonSeed {
   ojtCategory: OJTCategory;
   hoursCredit: number;      // durationMin / 60, rounded to nearest 0.25
 
-  content: string;          // instructional body — markdown or plain text
+  // Milady Standard Barbering 7th Ed. chapter alignment
+  miladyChapter?: string;   // e.g. "Barbering Ch. 9 — Haircutting"
+
+  content: string;          // instructional body — markdown, 800+ words
   competencyChecks: CompetencyCheck[];  // minimum 3, at least 3 required: true
+
+  // Step-by-step procedure (required for lab/practical lessons)
+  procedures?: ProcedureStep[];
+
+  // Quiz questions for this lesson (20 required for premium quality)
+  quiz?: {
+    passingScore?: number;  // default 70
+    questions: QuizQuestion[];
+  };
+
+  // Flashcard deck (15 minimum for premium quality)
+  flashcards?: Flashcard[];
 }
 
 export interface CheckpointSeed {
@@ -97,6 +132,7 @@ export const VALID_DOMAINS: Domain[] = [
 
 export const VALID_OJT_CATEGORIES: OJTCategory[] = [
   'THEORY', 'DEMONSTRATION', 'PRACTICAL', 'ASSESSMENT',
+  'PROFESSIONAL_DEVELOPMENT', 'TECHNICAL_INSTRUCTION',
 ];
 
 export const VALID_COMPETENCY_TYPES: CompetencyType[] = [

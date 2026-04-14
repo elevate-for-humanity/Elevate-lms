@@ -15,6 +15,7 @@ import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
+import { PROGRAM_COURSE_MAP } from '@/lib/barber/constants';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -55,6 +56,12 @@ export async function POST(
   if (fetchError || !enrollment) return safeError('Enrollment not found', 404);
   if (enrollment.access_granted_at) return safeError('Access already granted', 409);
 
+  // Resolve course_id for programs that have a canonical LMS course.
+  // Without this, the learner dashboard routes to the marketing page instead of the LMS.
+  const resolvedCourseId = enrollment.program_slug
+    ? (PROGRAM_COURSE_MAP[enrollment.program_slug] ?? null)
+    : null;
+
   // Grant access — move to active and record who granted it and when
   const { error: updateError } = await db
     .from('program_enrollments')
@@ -62,6 +69,7 @@ export async function POST(
       status: 'active',
       access_granted_at: now,
       updated_at: now,
+      ...(resolvedCourseId ? { course_id: resolvedCourseId } : {}),
     })
     .eq('id', enrollmentId);
 

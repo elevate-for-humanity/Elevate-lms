@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: LTI OIDC login — public per LTI spec
 // AUTH: Intentionally public — LTI 1.3 OIDC login initiation endpoint.
 // Generates a state + nonce, stores them in a signed HttpOnly cookie,
 // then redirects the platform to the authorization endpoint.

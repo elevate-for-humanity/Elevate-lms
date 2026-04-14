@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: Affirm checkout initiation — unauthenticated payment flow
 /**
  * Affirm Checkout API
  * 

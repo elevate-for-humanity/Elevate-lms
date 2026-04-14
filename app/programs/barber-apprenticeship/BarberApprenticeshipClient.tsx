@@ -138,6 +138,44 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
         </div>
       </section>
 
+      {/* ═══ CURRICULUM PREVIEW ═══ */}
+      <section className="bg-slate-50 border-y border-slate-200 py-10">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+              <BookOpen className="w-5 h-5 text-slate-700" />
+            </div>
+            <h2 className="text-xl font-bold text-slate-900">From the Curriculum</h2>
+          </div>
+          <p className="text-sm text-black mb-6">A look inside Lesson 1 — Introduction to Barbering.</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[
+              { src: '/images/programs/barber/lesson-1-scene-1.jpg', label: 'What barbers do every day' },
+              { src: '/images/programs/barber/lesson-1-scene-2.jpg', label: 'Barbering as a licensed profession' },
+              { src: '/images/programs/barber/lesson-1-scene-3.jpg', label: 'How the apprenticeship works' },
+              { src: '/images/programs/barber/lesson-1-scene-4.jpg', label: 'Professional standards from day one' },
+              { src: '/images/programs/barber/lesson-1-scene-5.jpg', label: 'Tools and their purpose' },
+              { src: '/images/programs/barber/lesson-1-scene-6.jpg', label: 'Client communication' },
+              { src: '/images/programs/barber/lesson-1-scene-7.jpg', label: 'What success looks like' },
+              { src: '/images/programs/barber/lesson-1-scene-8.jpg', label: 'Recap and next steps' },
+            ].map((scene, i) => (
+              <div key={i} className="rounded-lg overflow-hidden border border-slate-200 bg-white">
+                <div className="relative aspect-video">
+                  <Image
+                    src={scene.src}
+                    alt={scene.label}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 50vw, 25vw"
+                  />
+                </div>
+                <p className="text-xs text-black px-2 py-1.5 leading-snug">{scene.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ═══ CREDENTIALS EARNED (image blocks, no OSHA 10) ═══ */}
       <section className="max-w-6xl mx-auto px-4 py-10">
         <div className="flex items-center gap-3 mb-6">

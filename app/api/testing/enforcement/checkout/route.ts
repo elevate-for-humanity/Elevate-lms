@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: enforcement testing checkout
 /**
  * POST /api/testing/enforcement/checkout
  *

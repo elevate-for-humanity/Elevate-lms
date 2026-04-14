@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: anonymous usage tracking
 import { safeInternalError } from '@/lib/api/safe-error';
 
 import { getAdminClient } from '@/lib/supabase/admin';

@@ -1,3 +1,4 @@
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { NextResponse } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
@@ -12,6 +13,9 @@ async function _GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await apiRequireAdmin(request);
+  if (auth.error) return auth.error;
+
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;

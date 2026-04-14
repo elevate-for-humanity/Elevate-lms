@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public SAM.gov search proxy
 import { NextRequest, NextResponse } from 'next/server';
 // AUTH: Intentionally public — no authentication required
 

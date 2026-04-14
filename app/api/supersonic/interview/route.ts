@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: Supersonic interview scheduling form
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

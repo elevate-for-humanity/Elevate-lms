@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public newsletter subscription
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { Ratelimit } from "@upstash/ratelimit";

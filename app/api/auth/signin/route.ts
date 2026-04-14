@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: sign-in endpoint — no auth possible
 import { safeInternalError } from '@/lib/api/safe-error';
 /**
  * Auth API - Sign In

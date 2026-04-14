@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: demo reset — blocked in production
 import { logger } from '@/lib/logger';
 /**
  * Demo Reset API

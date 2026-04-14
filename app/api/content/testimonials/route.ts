@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public testimonials for marketing pages
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';

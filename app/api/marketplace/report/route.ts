@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: marketplace public report
 import { NextResponse } from 'next/server';
 
 import { getAdminClient } from '@/lib/supabase/admin';

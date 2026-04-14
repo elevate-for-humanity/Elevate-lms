@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: general waitlist form
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

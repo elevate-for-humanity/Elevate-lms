@@ -1,3 +1,4 @@
+// CRON ROUTE: processes scheduled email campaigns — called every 5 min by cron
 import { NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';

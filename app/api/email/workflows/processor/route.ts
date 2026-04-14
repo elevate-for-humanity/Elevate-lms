@@ -1,4 +1,4 @@
-
+// CRON ROUTE: processes triggered email workflows — called every 5 min by cron
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { resend } from '@/lib/resend';

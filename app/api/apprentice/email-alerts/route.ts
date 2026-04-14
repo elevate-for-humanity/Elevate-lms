@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: apprentice email alert subscription
 import { createClient } from '@/lib/supabase/server';
 
 import { NextResponse } from 'next/server';

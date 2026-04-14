@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: disabled endpoint — returns 404
 // AUTH: Intentionally public — no authentication required
 import { NextResponse } from 'next/server';
 

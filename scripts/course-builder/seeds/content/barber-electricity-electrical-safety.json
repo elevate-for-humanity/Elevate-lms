@@ -1,0 +1,289 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is the standard voltage for outlets in the United States?",
+        "choices": [
+          "120V",
+          "240V",
+          "110V",
+          "220V"
+        ],
+        "answerIndex": 0,
+        "rationale": "Standard US outlets provide 120 volts of electricity."
+      },
+      {
+        "prompt": "Which type of current is used in standard wall outlets?",
+        "choices": [
+          "Direct Current (DC)",
+          "Alternating Current (AC)",
+          "Static Current",
+          "Pulsating Current"
+        ],
+        "answerIndex": 1,
+        "rationale": "Alternating Current (AC) is used in standard wall outlets and powers most barber shop equipment."
+      },
+      {
+        "prompt": "What should you do if you notice a frayed cord on an electrical tool?",
+        "choices": [
+          "Continue using it",
+          "Tape it up",
+          "Replace it immediately",
+          "Ignore it"
+        ],
+        "answerIndex": 2,
+        "rationale": "Frayed cords pose a risk of electrical shock or fire and must be replaced immediately."
+      },
+      {
+        "prompt": "What is the primary function of a GFCI outlet?",
+        "choices": [
+          "To increase voltage",
+          "To prevent overheating",
+          "To cut power during a ground fault",
+          "To reduce resistance"
+        ],
+        "answerIndex": 2,
+        "rationale": "GFCI outlets cut power instantly if a ground fault is detected, preventing electrocution."
+      },
+      {
+        "prompt": "Which of the following is NOT a basic electrical concept?",
+        "choices": [
+          "Current",
+          "Voltage",
+          "Resistance",
+          "Frequency"
+        ],
+        "answerIndex": 3,
+        "rationale": "Frequency is not listed as a basic electrical concept in the lesson."
+      },
+      {
+        "prompt": "What should you do first if a client receives an electrical shock?",
+        "choices": [
+          "Touch the client",
+          "Call 911",
+          "Disconnect the power source",
+          "Administer first aid"
+        ],
+        "answerIndex": 2,
+        "rationale": "Disconnecting the power source is the first step to ensure safety before any other action."
+      },
+      {
+        "prompt": "What type of current is used in batteries and some facial devices?",
+        "choices": [
+          "Alternating Current (AC)",
+          "Direct Current (DC)",
+          "Static Current",
+          "Inductive Current"
+        ],
+        "answerIndex": 1,
+        "rationale": "Direct Current (DC) flows in one direction and is used in batteries and some facial devices."
+      },
+      {
+        "prompt": "Why should tools be pre-cleaned before using UV sanitizing lamps?",
+        "choices": [
+          "UV light is too weak",
+          "UV light cannot penetrate dirt",
+          "It saves time",
+          "It enhances UV light strength"
+        ],
+        "answerIndex": 1,
+        "rationale": "UV light cannot penetrate dirt or debris, so tools must be pre-cleaned for effective sanitization."
+      },
+      {
+        "prompt": "What happens if too much current flows through a conductor?",
+        "choices": [
+          "Increased resistance",
+          "Overheating and fire",
+          "Reduced voltage",
+          "Increased voltage"
+        ],
+        "answerIndex": 1,
+        "rationale": "Too much current can cause overheating and potentially lead to a fire."
+      },
+      {
+        "prompt": "Why should you never yank a cord from an outlet?",
+        "choices": [
+          "It can cause a short circuit",
+          "It damages the outlet",
+          "It can damage the cord",
+          "It increases voltage"
+        ],
+        "answerIndex": 2,
+        "rationale": "Yanking a cord can damage the cord, leading to exposure of wires and potential electrical hazards."
+      },
+      {
+        "prompt": "What is the relationship between watts, volts, and amps?",
+        "choices": [
+          "Watts = Volts + Amps",
+          "Watts = Volts × Amps",
+          "Watts = Volts - Amps",
+          "Watts = Volts / Amps"
+        ],
+        "answerIndex": 1,
+        "rationale": "Wattage is calculated by multiplying volts by amps: Watts = Volts × Amps."
+      },
+      {
+        "prompt": "What should you do if a client is unresponsive after an electrical shock?",
+        "choices": [
+          "Administer CPR immediately",
+          "Call 911",
+          "Wait for them to regain consciousness",
+          "Move them to a safe area"
+        ],
+        "answerIndex": 1,
+        "rationale": "Calling 911 is crucial if a client is unresponsive after an electrical shock."
+      },
+      {
+        "prompt": "What is the purpose of resistance in an electrical circuit?",
+        "choices": [
+          "To increase current flow",
+          "To oppose current flow",
+          "To increase voltage",
+          "To decrease voltage"
+        ],
+        "answerIndex": 1,
+        "rationale": "Resistance opposes the flow of current in an electrical circuit."
+      },
+      {
+        "prompt": "How should electrical tools be stored when not in use?",
+        "choices": [
+          "Left plugged in",
+          "Unplugged",
+          "Near heat sources",
+          "In water"
+        ],
+        "answerIndex": 1,
+        "rationale": "Electrical tools should be unplugged when not in use to prevent accidental activation and electrical hazards."
+      },
+      {
+        "prompt": "Which of the following is a safety measure when using electrical tools near water?",
+        "choices": [
+          "Use non-GFCI outlets",
+          "Keep tools plugged in",
+          "Use GFCI outlets",
+          "Ignore water presence"
+        ],
+        "answerIndex": 2,
+        "rationale": "GFCI outlets are designed to cut power instantly if a ground fault is detected, providing safety near water."
+      },
+      {
+        "prompt": "What is the first step in administering first aid to a client who has received an electrical shock?",
+        "choices": [
+          "Touch the client",
+          "Ensure the area is safe",
+          "Call 911",
+          "Perform CPR"
+        ],
+        "answerIndex": 1,
+        "rationale": "Ensuring the area is safe by disconnecting the power source is the first step before administering first aid."
+      },
+      {
+        "prompt": "Why is it important to keep cords away from heat sources?",
+        "choices": [
+          "To increase their lifespan",
+          "To prevent overheating",
+          "To save energy",
+          "To improve conductivity"
+        ],
+        "answerIndex": 1,
+        "rationale": "Heat can damage cords, leading to potential electrical hazards such as overheating."
+      },
+      {
+        "prompt": "What type of current reverses direction periodically?",
+        "choices": [
+          "Direct Current (DC)",
+          "Alternating Current (AC)",
+          "Static Current",
+          "Pulsating Current"
+        ],
+        "answerIndex": 1,
+        "rationale": "Alternating Current (AC) reverses direction periodically and is used in standard wall outlets."
+      },
+      {
+        "prompt": "What is the role of UV sanitizing lamps in a barber shop?",
+        "choices": [
+          "To replace chemical disinfection",
+          "To enhance tool sharpness",
+          "To sanitize tools by destroying bacteria",
+          "To clean tools from dirt"
+        ],
+        "answerIndex": 2,
+        "rationale": "UV sanitizing lamps are used to destroy bacteria and some viruses on tool surfaces, supplementing chemical disinfection."
+      },
+      {
+        "prompt": "What should you do if multiple high-wattage tools are needed simultaneously?",
+        "choices": [
+          "Use a single outlet",
+          "Overload the outlet",
+          "Use multiple outlets",
+          "Use an extension cord"
+        ],
+        "answerIndex": 2,
+        "rationale": "Using multiple outlets helps prevent overloading a single outlet, reducing the risk of electrical hazards."
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Current (Amperes/Amps)",
+      "definition": "The flow of electrons through a conductor. Too much current causes overheating and fire."
+    },
+    {
+      "term": "Voltage (Volts)",
+      "definition": "The force that pushes current through a circuit. Standard US outlets are 120V."
+    },
+    {
+      "term": "Resistance (Ohms)",
+      "definition": "Opposition to current flow. Higher resistance means less current flow."
+    },
+    {
+      "term": "Wattage (Watts)",
+      "definition": "Power consumed, calculated as Watts = Volts × Amps."
+    },
+    {
+      "term": "Alternating Current (AC)",
+      "definition": "Current that reverses direction periodically. Used in standard wall outlets and powers most barber shop equipment."
+    },
+    {
+      "term": "Direct Current (DC)",
+      "definition": "Current that flows in one direction only. Used in batteries and some facial devices."
+    },
+    {
+      "term": "GFCI (Ground Fault Circuit Interrupter)",
+      "definition": "Outlets that cut power instantly if a ground fault is detected, used near sinks."
+    },
+    {
+      "term": "UV Sanitizing Lamps",
+      "definition": "Ultraviolet lamps used to sanitize tools by destroying bacteria and some viruses on surfaces."
+    },
+    {
+      "term": "Electrocution Risk",
+      "definition": "Occurs when electrical tools are used near water."
+    },
+    {
+      "term": "Frayed Cords",
+      "definition": "Cords that are damaged and must be replaced immediately to prevent electrical hazards."
+    },
+    {
+      "term": "Overloading Outlets",
+      "definition": "Occurs when multiple high-wattage tools are plugged into one outlet, risking overheating."
+    },
+    {
+      "term": "Unplugging Tools",
+      "definition": "Tools should be unplugged when not in use and before cleaning to ensure safety."
+    },
+    {
+      "term": "Cord Handling",
+      "definition": "Cords should be gripped by the plug when unplugging and kept away from heat sources."
+    },
+    {
+      "term": "Electrical Shock Response",
+      "definition": "Do not touch the client; disconnect power, call 911 if unresponsive, and administer first aid if trained."
+    },
+    {
+      "term": "Pre-cleaning for UV Exposure",
+      "definition": "Tools must be cleaned before UV exposure as UV light cannot penetrate dirt or debris."
+    }
+  ]
+}

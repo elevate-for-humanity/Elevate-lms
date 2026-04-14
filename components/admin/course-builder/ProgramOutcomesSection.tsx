@@ -101,9 +101,9 @@ export default function ProgramOutcomesSection({ state, onChange }: Props) {
 
         {/* Progress indicator */}
         <div className="flex items-center gap-2 pt-2">
-          {[0, 1, 2].map(i => (
+          {(['dot-0', 'dot-1', 'dot-2'] as const).map((dotKey, i) => (
             <div
-              key={i}
+              key={dotKey}
               className={`h-1.5 flex-1 rounded-full transition-colors ${outcomes.length > i ? 'bg-emerald-500' : 'bg-slate-200'}`}
             />
           ))}

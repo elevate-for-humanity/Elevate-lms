@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: digital product download by purchase token
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getDigitalProduct } from '@/lib/store/digital-products';

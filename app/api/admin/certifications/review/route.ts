@@ -26,7 +26,7 @@ async function _POST(request: NextRequest) {
     .eq('id', user.id)
     .single();
 
-  if (!profile || profile.role !== 'admin') {
+  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
   }
 
@@ -115,7 +115,7 @@ const supabase = await createClient();
     .eq('id', user.id)
     .single();
 
-  if (!profile || profile.role !== 'admin') {
+  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
   }
 

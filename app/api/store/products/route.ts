@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public store product catalog
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';

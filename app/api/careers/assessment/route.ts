@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public career assessment tool
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminClient } from '@/lib/supabase/admin';

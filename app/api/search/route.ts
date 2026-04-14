@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public site search
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { searchStore } from '@/lib/store/db';

@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: sign-out endpoint — clears session
 /**
  * Auth API - Sign Out
  * Logs out the current user

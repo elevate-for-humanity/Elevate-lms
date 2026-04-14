@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: partner lead capture form
 
 // AUTH: Intentionally public — no authentication required
 

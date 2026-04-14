@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: employer partnership application form
 import { createClient } from '@/lib/supabase/server';
 
 import { NextRequest, NextResponse } from 'next/server';

@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: LTI JWKS endpoint — public per LTI spec
 // AUTH: Intentionally public — no authentication required
 
 // app/api/lti/jwks/route.ts

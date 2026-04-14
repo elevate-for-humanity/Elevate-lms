@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public inquiry form
 import { logger } from '@/lib/logger';
 
 import { NextResponse } from 'next/server';

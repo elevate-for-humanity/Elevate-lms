@@ -1,0 +1,362 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is the primary purpose of the scissor-over-comb technique in barbering?",
+        "choices": [
+          "To create seamless transitions and blend different lengths",
+          "To add color to the hair",
+          "To straighten curly hair",
+          "To add volume to thin hair"
+        ],
+        "answerIndex": 0,
+        "rationale": "The scissor-over-comb technique is used to create seamless transitions and blend different lengths, making it essential for precise and tailored haircuts.",
+        "type": "recall"
+      },
+      {
+        "prompt": "Which tool should be held in the non-dominant hand during the scissor-over-comb technique?",
+        "choices": [
+          "Scissors",
+          "Comb",
+          "Razor",
+          "Clippers"
+        ],
+        "answerIndex": 1,
+        "rationale": "The comb is held in the non-dominant hand to lift and control the hair while cutting with the dominant hand.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A client presents with thick hair and requests a lighter, more textured look. Which technique should you use?",
+        "choices": [
+          "Scissor-over-comb",
+          "Point cutting",
+          "Clipper cutting",
+          "Razor cutting"
+        ],
+        "answerIndex": 1,
+        "rationale": "Point cutting is ideal for creating texture and reducing bulk, making it suitable for a lighter, more textured look.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "During a service, you notice a small cut on your client's scalp. What should you do?",
+        "choices": [
+          "Continue the service as planned",
+          "Stop the service and follow blood exposure protocol",
+          "Apply hair product to cover it",
+          "Ignore it and finish quickly"
+        ],
+        "answerIndex": 1,
+        "rationale": "Stopping the service and following blood exposure protocol is crucial for safety and compliance with state regulations.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What angle should the scissors be held at during point cutting?",
+        "choices": [
+          "Horizontal",
+          "Vertical",
+          "Diagonal",
+          "Parallel to the comb"
+        ],
+        "answerIndex": 1,
+        "rationale": "Point cutting requires the scissors to be held at a vertical angle to create texture and soften the ends.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A new client asks for a haircut with smooth graduations. Which technique is most appropriate?",
+        "choices": [
+          "Scissor-over-comb",
+          "Clipper cutting",
+          "Razor cutting",
+          "Texturizing shears"
+        ],
+        "answerIndex": 0,
+        "rationale": "Scissor-over-comb is ideal for creating smooth graduations and blending different hair lengths.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What is the first step in the scissor-over-comb technique?",
+        "choices": [
+          "Position the comb",
+          "Prepare your tools",
+          "Cut the hair",
+          "Check your work"
+        ],
+        "answerIndex": 1,
+        "rationale": "The first step is to prepare your tools by ensuring they are clean and disinfected, which is crucial for safety and performance.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What is the purpose of maintaining a consistent angle during scissor-over-comb?",
+        "choices": [
+          "To speed up the cutting process",
+          "To ensure an even cut and smooth graduation",
+          "To create a jagged look",
+          "To add volume to the hair"
+        ],
+        "answerIndex": 1,
+        "rationale": "Maintaining a consistent angle ensures an even cut and smooth graduation, which is vital for a polished look.",
+        "type": "recall"
+      },
+      {
+        "prompt": "During a haircut, you accidentally nick your client's ear. What is the best course of action?",
+        "choices": [
+          "Apologize and continue",
+          "Stop the service and follow blood exposure protocol",
+          "Ignore it and finish quickly",
+          "Apply a bandage and continue"
+        ],
+        "answerIndex": 1,
+        "rationale": "It is important to stop the service and follow blood exposure protocol to ensure client safety and adhere to regulations.",
+        "type": "applied"
+      },
+      {
+        "prompt": "A client requests a haircut with more movement and less bulk. Which technique should you incorporate?",
+        "choices": [
+          "Scissor-over-comb",
+          "Point cutting",
+          "Clipper cutting",
+          "Razor cutting"
+        ],
+        "answerIndex": 1,
+        "rationale": "Point cutting is effective for adding movement and reducing bulk, making it suitable for this request.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What is a critical safety protocol before beginning any haircutting service?",
+        "choices": [
+          "Washing hands",
+          "Disinfecting tools with an EPA-registered disinfectant",
+          "Wearing gloves",
+          "Applying hair gel"
+        ],
+        "answerIndex": 1,
+        "rationale": "Disinfecting tools with an EPA-registered disinfectant is essential to prevent infection and maintain hygiene.",
+        "type": "recall"
+      },
+      {
+        "prompt": "During a haircut, you notice uneven blending. What should you do to correct it?",
+        "choices": [
+          "Ignore it",
+          "Use scissor-over-comb to refine the blending",
+          "Start over",
+          "Use clippers to fix it"
+        ],
+        "answerIndex": 1,
+        "rationale": "Using scissor-over-comb can help refine and correct uneven blending for a more polished look.",
+        "type": "applied"
+      },
+      {
+        "prompt": "What is the role of the comb in the scissor-over-comb technique?",
+        "choices": [
+          "To cut the hair",
+          "To lift and control the hair",
+          "To add texture",
+          "To color the hair"
+        ],
+        "answerIndex": 1,
+        "rationale": "The comb is used to lift and control the hair, allowing for precise cutting with the scissors.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A client with fine hair wants a haircut that adds texture. Which technique should you use?",
+        "choices": [
+          "Scissor-over-comb",
+          "Point cutting",
+          "Clipper cutting",
+          "Razor cutting"
+        ],
+        "answerIndex": 1,
+        "rationale": "Point cutting is ideal for adding texture and movement to fine hair without removing too much length.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What should you regularly do during a haircut to ensure uniformity?",
+        "choices": [
+          "Check your work by stepping back and assessing progress",
+          "Cut faster",
+          "Use more hair product",
+          "Switch tools frequently"
+        ],
+        "answerIndex": 0,
+        "rationale": "Regularly checking your work by stepping back helps ensure uniformity and allows for adjustments as needed.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What is the best approach to ensure a polished and professional look when using scissor-over-comb?",
+        "choices": [
+          "Cut quickly to save time",
+          "Maintain a consistent angle and steady hand",
+          "Use a razor for all cuts",
+          "Focus only on the front of the hair"
+        ],
+        "answerIndex": 1,
+        "rationale": "Maintaining a consistent angle and steady hand is crucial for achieving a polished and professional look.",
+        "type": "applied"
+      },
+      {
+        "prompt": "What is the primary benefit of mastering the scissor-over-comb technique?",
+        "choices": [
+          "It allows for faster haircuts",
+          "It enhances creativity and customization",
+          "It eliminates the need for other tools",
+          "It is only useful for long hair"
+        ],
+        "answerIndex": 1,
+        "rationale": "Mastering the scissor-over-comb technique enhances creativity and customization, allowing for tailored haircuts.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A client with a short hairstyle wants a smooth transition between lengths. Which technique is most suitable?",
+        "choices": [
+          "Scissor-over-comb",
+          "Point cutting",
+          "Clipper cutting",
+          "Razor cutting"
+        ],
+        "answerIndex": 0,
+        "rationale": "Scissor-over-comb is particularly useful for creating smooth transitions in shorter hairstyles.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What is the primary focus when performing point cutting?",
+        "choices": [
+          "Creating blunt ends",
+          "Adding texture and softening the ends",
+          "Cutting hair quickly",
+          "Removing length"
+        ],
+        "answerIndex": 1,
+        "rationale": "Point cutting focuses on adding texture and softening the ends to create a natural, blended finish.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What is the best way to ensure client satisfaction when using scissor-over-comb?",
+        "choices": [
+          "Cut as quickly as possible",
+          "Maintain precision and consistency",
+          "Use clippers instead",
+          "Focus only on the top of the head"
+        ],
+        "answerIndex": 1,
+        "rationale": "Maintaining precision and consistency ensures a high-quality haircut, leading to greater client satisfaction.",
+        "type": "applied"
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Scissor-Over-Comb Technique",
+      "definition": "A haircutting method using scissors and a comb to create smooth graduations and blend different lengths."
+    },
+    {
+      "term": "Point Cutting",
+      "definition": "A technique where hair is cut at a vertical angle to add texture and soften the ends."
+    },
+    {
+      "term": "Graduation",
+      "definition": "The effect achieved by cutting hair progressively shorter towards the nape or sides, creating a smooth transition."
+    },
+    {
+      "term": "EPA-Registered Disinfectant",
+      "definition": "A cleaning agent approved by the Environmental Protection Agency for use in disinfecting barber tools."
+    },
+    {
+      "term": "Consistent Angle",
+      "definition": "Maintaining the same angle with scissors and comb throughout a haircut to ensure an even cut."
+    },
+    {
+      "term": "Blood Exposure Protocol",
+      "definition": "Steps taken to manage a cut or nick during service, including cleaning the wound and disposing of contaminated materials."
+    },
+    {
+      "term": "Seamless Transition",
+      "definition": "A smooth blend between different hair lengths achieved through precise cutting techniques."
+    },
+    {
+      "term": "Tool Maintenance",
+      "definition": "The practice of keeping barber tools clean and disinfected to ensure safety and performance."
+    },
+    {
+      "term": "Vertical Shear Angle",
+      "definition": "The angle at which scissors are held to perform point cutting, typically perpendicular to the hair."
+    },
+    {
+      "term": "Haircutting",
+      "definition": "A core domain in barbering, making up 25% of the Indiana barber written exam content."
+    },
+    {
+      "term": "Client Satisfaction",
+      "definition": "The goal of delivering high-quality haircuts that meet or exceed client expectations."
+    },
+    {
+      "term": "Steady Hand",
+      "definition": "A crucial skill for maintaining control and precision during haircutting techniques like scissor-over-comb."
+    },
+    {
+      "term": "Polished Look",
+      "definition": "A professional and refined appearance achieved through skilled haircutting techniques."
+    },
+    {
+      "term": "State Board Exam",
+      "definition": "A certification test required for practicing as a licensed barber in Indiana, emphasizing haircutting skills."
+    },
+    {
+      "term": "Customized Styling",
+      "definition": "Tailoring haircuts to suit individual client preferences and hair types through advanced techniques."
+    }
+  ],
+  "content": "## The Importance of Scissor-Over-Comb Technique\n\nIn the world of barbering, mastering the scissor-over-comb technique is essential for delivering precise and tailored haircuts. This technique allows barbers to create seamless transitions and blend different lengths, making it a vital skill for any professional in Indiana. Given that haircutting comprises 25% of the Indiana barber written exam, proficiency in this technique not only enhances your service offerings but also prepares you for state certification.\n\n## Understanding Scissor-Over-Comb\n\nScissor-over-comb is a fundamental haircutting method that involves using scissors in conjunction with a comb to cut hair to a desired length. This technique is particularly useful for creating smooth graduations and is often employed in shorter hairstyles. The method provides greater control over the haircutting process, enabling barbers to achieve a polished and professional look.\n\nTo perform scissor-over-comb effectively, it's crucial to maintain a consistent angle and a steady hand. This ensures that the cut is even and that the hair blends naturally. The technique also allows for more creativity and customization in styling, as it can be adapted to suit various hair types and client preferences. Mastery of scissor-over-comb can set you apart as a skilled barber, capable of delivering high-quality haircuts.\n\n## Step-by-Step Guide to Scissor-Over-Comb\n\nExecuting scissor-over-comb requires practice and precision. Follow these steps to perfect your technique:\n\n1. **Prepare Your Tools**: Ensure your scissors and comb are clean and disinfected with an EPA-registered disinfectant. Proper tool maintenance is crucial for both safety and performance.\n   \n2. **Position the Comb**: Hold the comb in your non-dominant hand and insert it into the hair, lifting the section you intend to cut. The teeth of the comb should be angled slightly towards the scalp to create tension.\n\n3. **Cutting Technique**: With your dominant hand, position the scissors parallel to the comb. Begin cutting the hair that extends beyond the comb's edge. Use small, controlled snips to maintain precision.\n\n4. **Consistent Angle**: Maintain a consistent angle with both the comb and the scissors to ensure an even cut. This consistency is vital for achieving a smooth, graduated look.\n\n5. **Check Your Work**: Regularly step back to assess your progress and ensure uniformity throughout the haircut. Adjust your technique as needed to achieve the desired result.\n\nBy following these steps, you can develop a reliable scissor-over-comb technique that will enhance your barbering skills and improve client satisfaction.\n\n## Mastering Point Cutting\n\nPoint cutting is another critical aspect of haircutting that complements the scissor-over-comb technique. It involves cutting hair at a vertical shear angle to create texture and soften the ends. This method is particularly useful for reducing bulk and adding movement to the hair.\n\nTo perform point cutting, position the scissors at a vertical angle and make small snips into the ends of the hair. This technique requires a steady hand and keen attention to detail, as the goal is to create a natural, blended finish. Point cutting can be used on various hair types and styles, making it a versatile skill for any barber.\n\nIncorporating point cutting into your repertoire can help you achieve more dynamic and personalized haircuts. This technique is also tested on the Indiana state board exam, so proficiency is crucial for both your professional development and certification.\n\n## Safety and Sanitation Protocols\n\nMaintaining a clean and safe working environment is paramount in the barbering profession. Adhering to safety and sanitation protocols not only protects you and your clients but also ensures compliance with state regulations. Before beginning any service, it's essential to disinfect your tools with an EPA-registered disinfectant. This step helps prevent the spread of infections and maintains a hygienic workplace.\n\nIn the event of a blood exposure incident, such as a cut or nick, it's important to stop the service immediately and follow the blood exposure protocol. This typically involves cleaning the wound, applying a sterile bandage, and properly disposing of any contaminated materials. Understanding and implementing these safety measures is critical for your credibility and the well-being of your clients.\n\n## Relevance to the Indiana State Board Exam\n\nThe Indiana barber written exam places significant emphasis on haircutting techniques, including scissor-over-comb and point cutting. These skills are integral to the exam, comprising 25% of the total content. The exam tests your ability to execute these techniques with precision and consistency, as well as your knowledge of safety and sanitation protocols.\n\nBy mastering scissor-over-comb and point cutting, you not only enhance your practical skills but also improve your chances of passing the state board exam. This certification is essential for practicing as a licensed barber in Indiana, making it a critical milestone in your career.\n\n## Key Takeaway\n\nMastering the scissor-over-comb technique is essential for any aspiring barber in Indiana. This skill, along with point cutting and adherence to safety protocols, is crucial for delivering high-quality haircuts and ensuring client satisfaction. By honing these techniques, you prepare yourself for the Indiana state board exam and set the foundation for a successful career in barbering.",
+  "procedures": [
+    {
+      "step": 1,
+      "instruction": "SAFETY: Disinfect all tools, including scissors and comb, with an EPA-registered disinfectant before use.",
+      "safetyNote": "Ensures a hygienic environment and prevents infection."
+    },
+    {
+      "step": 2,
+      "instruction": "Position yourself comfortably and ensure good lighting to clearly see the hair sections.",
+      "safetyNote": null
+    },
+    {
+      "step": 3,
+      "instruction": "Hold the comb in your non-dominant hand and insert it into the hair, lifting the section you intend to cut.",
+      "safetyNote": null
+    },
+    {
+      "step": 4,
+      "instruction": "Angle the teeth of the comb slightly towards the scalp to create tension in the hair.",
+      "safetyNote": null
+    },
+    {
+      "step": 5,
+      "instruction": "With your dominant hand, position the scissors parallel to the comb's edge.",
+      "safetyNote": null
+    },
+    {
+      "step": 6,
+      "instruction": "Begin cutting the hair that extends beyond the comb's edge using small, controlled snips.",
+      "safetyNote": null
+    },
+    {
+      "step": 7,
+      "instruction": "Maintain a consistent angle with both the comb and scissors to ensure an even cut.",
+      "safetyNote": null
+    },
+    {
+      "step": 8,
+      "instruction": "Regularly step back to assess your progress, checking for uniformity and smooth graduations.",
+      "safetyNote": null
+    },
+    {
+      "step": 9,
+      "instruction": "Adjust your technique as needed to achieve the desired hairstyle and ensure all sections blend seamlessly.",
+      "safetyNote": null
+    },
+    {
+      "step": 10,
+      "instruction": "SAFETY: If a cut or nick occurs, stop immediately and follow the blood exposure protocol.",
+      "safetyNote": "Prevents cross-contamination and ensures client safety."
+    }
+  ]
+}

@@ -34,8 +34,7 @@ export default async function ProgramHolderDashboard() {
 
   const supabase = await createClient();
 
-
-  // Fetch courses assigned to this instructor, then get their enrollments
+  // ── Legacy path: training_courses → training_enrollments (HVAC) ──────────
   const { data: myCourses } = await supabase
     .from('training_courses')
     .select('id')
@@ -43,24 +42,88 @@ export default async function ProgramHolderDashboard() {
 
   const courseIds = (myCourses || []).map((c: any) => c.id);
 
-  const { data: students } = courseIds.length > 0
+  const { data: legacyStudents } = courseIds.length > 0
     ? await supabase
         .from('training_enrollments')
-        .select(`*, profiles (id, full_name, email)`)
+        .select('id, status, enrolled_at, started_at, created_at, course_id, profiles (id, full_name, email), programs:training_courses (title, training_hours)')
         .in('course_id', courseIds)
         .order('enrolled_at', { ascending: false })
-        .limit(10)
+        .limit(50)
     : { data: [] };
 
+  // ── Current path: program_enrollments (all non-legacy programs) ───────────
+  // Admins see all; instructors see programs where they are assigned.
+  const isAdmin = profile.role === 'admin' || profile.role === 'super_admin';
+  let programEnrollQuery = supabase
+    .from('program_enrollments')
+    .select('id, status, created_at, program_id, user_id, profiles (id, full_name, email), programs (title)')
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  if (!isAdmin) {
+    // Scope to programs where this instructor is assigned
+    const { data: assignedPrograms } = await supabase
+      .from('program_instructors')
+      .select('program_id')
+      .eq('instructor_id', user.id);
+    const assignedIds = (assignedPrograms || []).map((p: any) => p.program_id);
+    if (assignedIds.length > 0) {
+      programEnrollQuery = programEnrollQuery.in('program_id', assignedIds);
+    }
+    // If no assignments yet, instructor sees all enrollments until populated
+  }
+
+  const { data: currentStudents } = await programEnrollQuery;
+
+  // ── Merge and deduplicate by profile id ──────────────────────────────────
+  // Normalize both sources to a common shape for the UI
+  type StudentRow = {
+    id: string;
+    status: string;
+    started_at: string | null;
+    created_at: string | null;
+    profiles: { id: string; full_name: string | null; email: string | null } | null;
+    programs: { title: string | null; training_hours?: number | null } | null;
+    source: 'legacy' | 'current';
+  };
+
+  const legacyNorm: StudentRow[] = (legacyStudents || []).map((e: any) => ({
+    id: e.id,
+    status: e.status,
+    started_at: e.started_at || e.enrolled_at || e.created_at,
+    created_at: e.created_at,
+    profiles: e.profiles,
+    programs: e.programs,
+    source: 'legacy',
+  }));
+
+  const currentNorm: StudentRow[] = (currentStudents || []).map((e: any) => ({
+    id: e.id,
+    status: e.status,
+    started_at: e.created_at,
+    created_at: e.created_at,
+    profiles: e.profiles,
+    programs: e.programs,
+    source: 'current',
+  }));
+
+  // Deduplicate: if a user appears in both, prefer current enrollment
+  const seenProfileIds = new Set<string>();
+  const students: StudentRow[] = [];
+  for (const row of [...currentNorm, ...legacyNorm]) {
+    const pid = row.profiles?.id;
+    if (pid && seenProfileIds.has(pid)) continue;
+    if (pid) seenProfileIds.add(pid);
+    students.push(row);
+  }
+  students.sort((a, b) => new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime());
+
   // Calculate stats
-  const totalStudents = students?.length || 0;
-  const activeStudents =
-    students?.filter((e) => e.status === 'active').length || 0;
-  const completedStudents =
-    students?.filter((e) => e.status === 'completed').length || 0;
+  const totalStudents = students.length;
+  const activeStudents = students.filter((e) => e.status === 'active').length;
+  const completedStudents = students.filter((e) => e.status === 'completed').length;
 
   // Pending submissions needing review
-  const isAdmin = profile.role === 'admin' || profile.role === 'super_admin';
   let pendingQuery = supabase
     .from('step_submissions')
     .select('id', { count: 'exact', head: true })
@@ -179,7 +242,7 @@ export default async function ProgramHolderDashboard() {
               </div>
               <div>
                 <p className="text-base md:text-lg font-bold text-black">
-                  0
+                  {pendingSubmissions ?? 0}
                 </p>
                 <p className="text-sm text-black">Pending Review</p>
               </div>
@@ -205,7 +268,7 @@ export default async function ProgramHolderDashboard() {
               </div>
               {students && students.length > 0 ? (
                 <div className="space-y-4">
-                  {students.slice(0, 5).map((student: Record<string, any>) => (
+                  {students.slice(0, 5).map((student) => (
                     <div
                       key={student.id}
                       className="border border-slate-200 rounded-lg p-4 hover:border-brand-blue-300 transition"
@@ -216,11 +279,13 @@ export default async function ProgramHolderDashboard() {
                             {student.profiles?.full_name || 'Unknown'}
                           </h3>
                           <p className="text-sm text-black">
-                            {student.programs?.title || student.programs?.name}
+                            {student.programs?.title ?? '—'}
                           </p>
-                          <p className="text-xs text-slate-500 mt-1">
-                            {student.programs?.training_hours} hours
-                          </p>
+                          {student.programs?.training_hours && (
+                            <p className="text-xs text-slate-500 mt-1">
+                              {student.programs.training_hours} hours
+                            </p>
+                          )}
                         </div>
                         <div className="text-right">
                           <span

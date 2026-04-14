@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public store product page
 // AUTH: Intentionally public — no authentication required
 import { NextRequest, NextResponse } from 'next/server';
 import { getCatalogProduct } from '@/lib/store/db';

@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public program catalog
 
 // GET /api/catalog
 // Public, rate-limited. Returns paginated, filtered results from program_catalog_index.

@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: Stripe customer portal redirect
 import { stripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 

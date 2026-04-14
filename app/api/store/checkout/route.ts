@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public store checkout
 import { createCheckoutSession } from '@/lib/store/stripe';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';

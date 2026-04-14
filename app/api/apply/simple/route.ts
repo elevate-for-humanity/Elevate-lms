@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: simplified program application form
 import { NextResponse } from "next/server";
 import { getAdminClient } from '@/lib/supabase/admin';
 import { resolveProgramId } from '@/lib/programs/resolve';

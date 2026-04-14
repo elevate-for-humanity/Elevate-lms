@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public career course checkout
 import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';

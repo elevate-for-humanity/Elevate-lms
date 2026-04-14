@@ -1,0 +1,289 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "Which bones form the protective structure around the brain?",
+        "choices": [
+          "Cranium",
+          "Facial bones",
+          "Mandible",
+          "Maxilla"
+        ],
+        "answerIndex": 0,
+        "rationale": "The cranium consists of 8 bones that protect the brain."
+      },
+      {
+        "prompt": "Which muscle is targeted during a scalp massage?",
+        "choices": [
+          "Epicranius",
+          "Masseter",
+          "Orbicularis oris",
+          "Sternocleidomastoid"
+        ],
+        "answerIndex": 0,
+        "rationale": "The epicranius (occipitofrontalis) covers the skull and is targeted during scalp massages."
+      },
+      {
+        "prompt": "What is the primary function of the trigeminal nerve for barbers?",
+        "choices": [
+          "Control facial muscle movement",
+          "Control sensation in the face",
+          "Supply blood to the head",
+          "Remove waste from the body"
+        ],
+        "answerIndex": 1,
+        "rationale": "The trigeminal nerve controls sensation in the face, which is crucial during shaving."
+      },
+      {
+        "prompt": "Why must barbers be cautious of the common carotid arteries during neck shaving?",
+        "choices": [
+          "They supply blood to the head and neck",
+          "They control facial expressions",
+          "They are part of the lymphatic system",
+          "They regulate body temperature"
+        ],
+        "answerIndex": 0,
+        "rationale": "The common carotid arteries supply blood to the head and neck, and pressure on these arteries should be avoided."
+      },
+      {
+        "prompt": "Which system includes the skin, hair, and nails?",
+        "choices": [
+          "Integumentary System",
+          "Circulatory System",
+          "Nervous System",
+          "Skeletal System"
+        ],
+        "answerIndex": 0,
+        "rationale": "The integumentary system includes the skin, hair, and nails."
+      },
+      {
+        "prompt": "What is a contraindication for certain massage techniques?",
+        "choices": [
+          "Swollen lymph nodes",
+          "Dry skin",
+          "Thick hair",
+          "Short nails"
+        ],
+        "answerIndex": 0,
+        "rationale": "Swollen lymph nodes can indicate infection, which is a contraindication for certain massage techniques."
+      },
+      {
+        "prompt": "During a facial massage, which muscle is most relevant?",
+        "choices": [
+          "Masseter",
+          "Epicranius",
+          "Sternocleidomastoid",
+          "Orbicularis oris"
+        ],
+        "answerIndex": 0,
+        "rationale": "The masseter muscle, located in the jaw, is relevant during facial massages."
+      },
+      {
+        "prompt": "Which nerve controls facial muscle movement?",
+        "choices": [
+          "Facial nerve",
+          "Trigeminal nerve",
+          "Vagus nerve",
+          "Accessory nerve"
+        ],
+        "answerIndex": 0,
+        "rationale": "The facial nerve (7th cranial nerve) controls facial muscle movement."
+      },
+      {
+        "prompt": "How does the integumentary system contribute to barber services?",
+        "choices": [
+          "Regulates body temperature",
+          "Controls facial expressions",
+          "Supplies blood to the scalp",
+          "Removes waste"
+        ],
+        "answerIndex": 0,
+        "rationale": "The integumentary system regulates body temperature, which is relevant to barber services."
+      },
+      {
+        "prompt": "What should a barber do if a client has swollen lymph nodes?",
+        "choices": [
+          "Avoid massage techniques",
+          "Proceed with scalp massage",
+          "Apply pressure to the area",
+          "Ignore and continue service"
+        ],
+        "answerIndex": 0,
+        "rationale": "Swollen lymph nodes may indicate an infection, so massage techniques should be avoided."
+      },
+      {
+        "prompt": "Which muscle guides positioning during shaving services?",
+        "choices": [
+          "Sternocleidomastoid",
+          "Epicranius",
+          "Masseter",
+          "Orbicularis oris"
+        ],
+        "answerIndex": 0,
+        "rationale": "The sternocleidomastoid muscle in the neck helps guide positioning during shaving services."
+      },
+      {
+        "prompt": "Why is sanitation crucial in barbering?",
+        "choices": [
+          "To prevent pathogen introduction",
+          "To enhance hair growth",
+          "To improve haircut precision",
+          "To reduce hair tangling"
+        ],
+        "answerIndex": 0,
+        "rationale": "Proper sanitation prevents the introduction of pathogens into the lymphatic system through cuts or abrasions."
+      },
+      {
+        "prompt": "Which bone is NOT part of the cranium?",
+        "choices": [
+          "Mandible",
+          "Frontal",
+          "Parietal",
+          "Temporal"
+        ],
+        "answerIndex": 0,
+        "rationale": "The mandible is not part of the cranium; it is a facial bone."
+      },
+      {
+        "prompt": "What is the role of veins in the circulatory system?",
+        "choices": [
+          "Return deoxygenated blood",
+          "Carry oxygenated blood",
+          "Control facial expressions",
+          "Supply nutrients to hair"
+        ],
+        "answerIndex": 0,
+        "rationale": "Veins return deoxygenated blood to the heart."
+      },
+      {
+        "prompt": "Which muscle surrounds the mouth and is relevant to shaving?",
+        "choices": [
+          "Orbicularis oris",
+          "Masseter",
+          "Epicranius",
+          "Sternocleidomastoid"
+        ],
+        "answerIndex": 0,
+        "rationale": "The orbicularis oris surrounds the mouth and is relevant when shaving around the lips."
+      },
+      {
+        "prompt": "How does the lymphatic system protect the body?",
+        "choices": [
+          "Removes waste and fights infection",
+          "Supplies blood to the scalp",
+          "Controls facial muscle movement",
+          "Regulates body temperature"
+        ],
+        "answerIndex": 0,
+        "rationale": "The lymphatic system removes waste and fights infection, playing a crucial role in body protection."
+      },
+      {
+        "prompt": "What should a barber be aware of when performing neck shaving?",
+        "choices": [
+          "Avoid pressure on major arteries",
+          "Ensure hair is fully dry",
+          "Use a comb for precision",
+          "Apply oil to the scalp"
+        ],
+        "answerIndex": 0,
+        "rationale": "Barbers should avoid applying pressure on major arteries like the common carotid arteries during neck shaving."
+      },
+      {
+        "prompt": "Which system provides sensory information relevant to barber services?",
+        "choices": [
+          "Integumentary System",
+          "Skeletal System",
+          "Muscular System",
+          "Lymphatic System"
+        ],
+        "answerIndex": 0,
+        "rationale": "The integumentary system provides sensory information, which is directly relevant to barber services."
+      },
+      {
+        "prompt": "What is the significance of the facial bones in barbering?",
+        "choices": [
+          "They form the face and guide haircut sectioning",
+          "They control facial expressions",
+          "They supply blood to the scalp",
+          "They regulate body temperature"
+        ],
+        "answerIndex": 0,
+        "rationale": "Facial bones form the structure of the face and help guide haircut sectioning."
+      },
+      {
+        "prompt": "Which of the following is a key consideration when shaping a beard?",
+        "choices": [
+          "Masseter muscle relevance",
+          "Sternocleidomastoid positioning",
+          "Epicranius coverage",
+          "Trigeminal nerve sensitivity"
+        ],
+        "answerIndex": 0,
+        "rationale": "The masseter muscle is relevant when shaping a beard due to its location in the jaw area."
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Cranium",
+      "definition": "The part of the skull that encloses the brain, consisting of 8 bones."
+    },
+    {
+      "term": "Facial Bones",
+      "definition": "The 14 bones that form the face, important for defining head shape in haircutting."
+    },
+    {
+      "term": "Epicranius (occipitofrontalis)",
+      "definition": "A muscle covering the skull, targeted during scalp massages."
+    },
+    {
+      "term": "Orbicularis Oris",
+      "definition": "The muscle surrounding the mouth, relevant for shaving around the lips."
+    },
+    {
+      "term": "Masseter",
+      "definition": "A jaw muscle important for beard shaping and facial massage."
+    },
+    {
+      "term": "Sternocleidomastoid",
+      "definition": "A neck muscle that guides positioning during shaving services."
+    },
+    {
+      "term": "Trigeminal Nerve",
+      "definition": "The 5th cranial nerve controlling facial sensation, crucial during shaving."
+    },
+    {
+      "term": "Facial Nerve",
+      "definition": "The 7th cranial nerve that controls facial muscle movement."
+    },
+    {
+      "term": "Common Carotid Arteries",
+      "definition": "Arteries supplying blood to the head and neck, important to avoid during neck shaving."
+    },
+    {
+      "term": "Lymphatic System",
+      "definition": "A system that removes waste and fights infection, with nodes in the neck relevant to massage contraindications."
+    },
+    {
+      "term": "Integumentary System",
+      "definition": "Comprises the skin, hair, and nails, regulating temperature and protecting against pathogens."
+    },
+    {
+      "term": "Contraindication",
+      "definition": "A condition or factor that serves as a reason to withhold a certain medical treatment due to harm."
+    },
+    {
+      "term": "Sanitation",
+      "definition": "Practices that prevent the introduction of pathogens, crucial in barbering to avoid infections."
+    },
+    {
+      "term": "Arteries",
+      "definition": "Blood vessels that carry oxygenated blood away from the heart."
+    },
+    {
+      "term": "Veins",
+      "definition": "Blood vessels that return deoxygenated blood to the heart."
+    }
+  ]
+}

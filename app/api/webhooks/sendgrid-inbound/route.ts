@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: SendGrid inbound webhook
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';

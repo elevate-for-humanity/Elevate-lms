@@ -1,0 +1,227 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "A client comes in with thick, curly hair and wants a style that reduces volume but maintains length. Which haircutting technique should you use?",
+        "choices": [
+          "A. Slide cutting",
+          "B. Point cutting",
+          "C. Blunt cutting",
+          "D. Razor cutting"
+        ],
+        "answerIndex": 0,
+        "rationale": "Slide cutting is effective for reducing volume while maintaining length, especially on thick, curly hair."
+      },
+      {
+        "prompt": "While performing a layered haircut, you notice the layers are uneven. What is the most likely cause?",
+        "choices": [
+          "A. Incorrect sectioning",
+          "B. Dull scissors",
+          "C. Too much tension",
+          "D. Incorrect combing"
+        ],
+        "answerIndex": 0,
+        "rationale": "Incorrect sectioning can lead to uneven layers as it affects the uniformity of the cut."
+      },
+      {
+        "prompt": "A client requests a fade haircut with a gradual blend from short to long. Which tool is most appropriate for achieving the initial short length?",
+        "choices": [
+          "A. Clippers",
+          "B. Scissors",
+          "C. Razor",
+          "D. Thinning shears"
+        ],
+        "answerIndex": 0,
+        "rationale": "Clippers are best for achieving the precise, short lengths needed in a fade haircut."
+      },
+      {
+        "prompt": "You are cutting a client's hair who has a cowlick at the front. How should you approach cutting this area?",
+        "choices": [
+          "A. Cut it shorter than the surrounding area",
+          "B. Leave it longer than the surrounding area",
+          "C. Cut it the same length as the surrounding area",
+          "D. Avoid cutting it altogether"
+        ],
+        "answerIndex": 1,
+        "rationale": "Leaving the cowlick slightly longer can help it lay down better and blend with the surrounding hair."
+      },
+      {
+        "prompt": "A client wants a textured look with movement. Which cutting technique would best achieve this?",
+        "choices": [
+          "A. Blunt cutting",
+          "B. Point cutting",
+          "C. Over-direction",
+          "D. Slide cutting"
+        ],
+        "answerIndex": 1,
+        "rationale": "Point cutting creates texture and movement by removing weight and adding softness to the ends."
+      },
+      {
+        "prompt": "During a consultation, a client mentions they want a haircut that elongates their round face shape. Which style should you recommend?",
+        "choices": [
+          "A. A-line bob",
+          "B. Pixie cut",
+          "C. Long layers",
+          "D. Blunt cut"
+        ],
+        "answerIndex": 2,
+        "rationale": "Long layers can help elongate a round face by adding vertical lines and height."
+      },
+      {
+        "prompt": "A client with fine hair wants more volume. Which technique should you avoid?",
+        "choices": [
+          "A. Layering",
+          "B. Blunt cutting",
+          "C. Texturizing",
+          "D. Thinning"
+        ],
+        "answerIndex": 3,
+        "rationale": "Thinning fine hair can make it appear even thinner, reducing volume."
+      },
+      {
+        "prompt": "When cutting curly hair, what is the best approach to ensure an even cut?",
+        "choices": [
+          "A. Cut while dry",
+          "B. Cut while wet",
+          "C. Use a razor",
+          "D. Use thinning shears"
+        ],
+        "answerIndex": 0,
+        "rationale": "Cutting curly hair while dry allows you to see the natural curl pattern and avoid shrinkage issues."
+      },
+      {
+        "prompt": "A client requests a bob that is longer in the front and shorter in the back. What is this style called?",
+        "choices": [
+          "A. Inverted bob",
+          "B. Layered bob",
+          "C. Blunt bob",
+          "D. Graduated bob"
+        ],
+        "answerIndex": 0,
+        "rationale": "An inverted bob is characterized by being longer in the front and shorter in the back."
+      },
+      {
+        "prompt": "You are performing a haircut and notice the hair is not lying flat against the scalp. What could be the issue?",
+        "choices": [
+          "A. Too much tension",
+          "B. Incorrect sectioning",
+          "C. Hair is too wet",
+          "D. Hair is too dry"
+        ],
+        "answerIndex": 3,
+        "rationale": "If the hair is too dry, it may not lie flat, making it difficult to achieve an accurate cut."
+      },
+      {
+        "prompt": "A client with thick, straight hair wants a style with less bulk. Which tool should you use?",
+        "choices": [
+          "A. Clippers",
+          "B. Thinning shears",
+          "C. Razor",
+          "D. Scissors"
+        ],
+        "answerIndex": 1,
+        "rationale": "Thinning shears are ideal for removing bulk from thick hair without affecting the overall length."
+      },
+      {
+        "prompt": "What is the primary purpose of over-direction in haircutting?",
+        "choices": [
+          "A. To create layers",
+          "B. To add volume",
+          "C. To create length",
+          "D. To create weight lines"
+        ],
+        "answerIndex": 2,
+        "rationale": "Over-direction is used to create length in specific areas of a haircut by moving the hair away from its natural fall."
+      },
+      {
+        "prompt": "A client complains their hair looks too flat after a haircut. What technique could have caused this?",
+        "choices": [
+          "A. Over-direction",
+          "B. Texturizing",
+          "C. Blunt cutting",
+          "D. Layering"
+        ],
+        "answerIndex": 2,
+        "rationale": "Blunt cutting can make hair appear flat if not combined with other techniques to add volume or movement."
+      },
+      {
+        "prompt": "When cutting a client's hair, you notice one side is longer than the other. What should you do first?",
+        "choices": [
+          "A. Re-cut the longer side",
+          "B. Check the client's posture",
+          "C. Adjust your cutting angle",
+          "D. Change your cutting tool"
+        ],
+        "answerIndex": 1,
+        "rationale": "Checking the client's posture ensures they are sitting straight, which can affect the evenness of the cut."
+      },
+      {
+        "prompt": "A client wants a haircut that requires minimal styling effort. Which style should you recommend?",
+        "choices": [
+          "A. Layered cut",
+          "B. Pixie cut",
+          "C. Bob cut",
+          "D. Shag cut"
+        ],
+        "answerIndex": 1,
+        "rationale": "A pixie cut is low-maintenance and requires minimal styling effort, making it ideal for clients seeking simplicity."
+      },
+      {
+        "prompt": "Which haircutting technique involves cutting the hair at an angle to create a softer edge?",
+        "choices": [
+          "A. Blunt cutting",
+          "B. Point cutting",
+          "C. Slide cutting",
+          "D. Over-direction"
+        ],
+        "answerIndex": 1,
+        "rationale": "Point cutting involves cutting at an angle to create a softer, more textured edge."
+      },
+      {
+        "prompt": "A client with a square face shape wants a haircut that softens their features. What should you suggest?",
+        "choices": [
+          "A. Blunt bangs",
+          "B. Long layers",
+          "C. Straight bob",
+          "D. Short pixie"
+        ],
+        "answerIndex": 1,
+        "rationale": "Long layers can soften the angular features of a square face by adding movement and framing the face."
+      },
+      {
+        "prompt": "What is the best way to achieve a seamless blend in a fade haircut?",
+        "choices": [
+          "A. Use a razor",
+          "B. Use clipper guards",
+          "C. Use scissors over comb",
+          "D. Use thinning shears"
+        ],
+        "answerIndex": 2,
+        "rationale": "Using scissors over comb allows for precise control and a seamless blend in a fade haircut."
+      },
+      {
+        "prompt": "A client with wavy hair wants to enhance their natural texture. Which product should you recommend?",
+        "choices": [
+          "A. Mousse",
+          "B. Gel",
+          "C. Pomade",
+          "D. Hair spray"
+        ],
+        "answerIndex": 0,
+        "rationale": "Mousse is lightweight and helps enhance natural waves without weighing the hair down."
+      },
+      {
+        "prompt": "During a haircut, you accidentally cut a section too short. What is the best course of action?",
+        "choices": [
+          "A. Apologize and offer a discount",
+          "B. Blend the shorter section with the surrounding hair",
+          "C. Cut the rest of the hair to match",
+          "D. Ignore it and continue"
+        ],
+        "answerIndex": 1,
+        "rationale": "Blending the shorter section with the surrounding hair can help minimize the appearance of the mistake."
+      }
+    ]
+  }
+}

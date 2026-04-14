@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -15,6 +16,9 @@ async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+
+    const auth = await apiRequireAdmin(request);
+    if (auth.error) return auth.error;
 
     const supabase = await getAdminClient();
     const searchParams = request.nextUrl.searchParams;

@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public course metadata for SEO
 
 
 // AUTH: Intentionally public — no authentication required

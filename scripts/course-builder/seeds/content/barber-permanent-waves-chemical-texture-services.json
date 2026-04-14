@@ -1,0 +1,289 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is the primary chemical process involved in both permanent waving and chemical relaxing?",
+        "choices": [
+          "Altering disulfide bonds",
+          "Breaking hydrogen bonds",
+          "Changing peptide bonds",
+          "Modifying salt bonds"
+        ],
+        "answerIndex": 0,
+        "rationale": "Both processes chemically alter the disulfide bonds in the hair's cortex."
+      },
+      {
+        "prompt": "Which type of perm is known for being the strongest and is used on resistant hair?",
+        "choices": [
+          "Acid-balanced perm",
+          "Alkaline (cold wave) perm",
+          "Exothermic perm",
+          "Neutral perm"
+        ],
+        "answerIndex": 1,
+        "rationale": "Alkaline perms have a higher pH and are used on resistant hair due to their strength."
+      },
+      {
+        "prompt": "What is the active ingredient in an alkaline perm?",
+        "choices": [
+          "Ammonium thioglycolate",
+          "Glyceryl monothioglycolate",
+          "Sodium hydroxide",
+          "Hydrogen peroxide"
+        ],
+        "answerIndex": 0,
+        "rationale": "Alkaline perms use ammonium thioglycolate as the active ingredient."
+      },
+      {
+        "prompt": "Why should clients avoid shampooing their hair for 48 hours after a perm?",
+        "choices": [
+          "To prevent color fading",
+          "To allow disulfide bonds to fully stabilize",
+          "To avoid scalp irritation",
+          "To enhance shine"
+        ],
+        "answerIndex": 1,
+        "rationale": "Avoiding shampooing helps the newly formed disulfide bonds stabilize in their new configuration."
+      },
+      {
+        "prompt": "Which perm type requires external heat to activate?",
+        "choices": [
+          "Alkaline perm",
+          "Acid-balanced perm",
+          "Exothermic perm",
+          "Neutral perm"
+        ],
+        "answerIndex": 1,
+        "rationale": "Acid-balanced perms require heat to activate the chemical process."
+      },
+      {
+        "prompt": "What is the effect of using smaller rods during a perm?",
+        "choices": [
+          "Looser waves",
+          "Tighter curls",
+          "No effect on curl size",
+          "Straight hair"
+        ],
+        "answerIndex": 1,
+        "rationale": "Smaller rods create tighter curls due to the increased curvature."
+      },
+      {
+        "prompt": "What can result from under-neutralizing during a perm?",
+        "choices": [
+          "Weak, limp curls",
+          "Overly tight curls",
+          "Hair straightening",
+          "Hair discoloration"
+        ],
+        "answerIndex": 0,
+        "rationale": "Under-neutralizing results in weak, limp curls because the disulfide bonds are not fully reformed."
+      },
+      {
+        "prompt": "Which condition is a contraindication for performing a perm?",
+        "choices": [
+          "Healthy hair",
+          "Previously relaxed hair",
+          "Thick hair",
+          "Curly hair"
+        ],
+        "answerIndex": 1,
+        "rationale": "Previously relaxed hair is a contraindication due to the high risk of breakage from already broken disulfide bonds."
+      },
+      {
+        "prompt": "A client with fine, color-treated hair wants a perm. Which type is most suitable?",
+        "choices": [
+          "Alkaline perm",
+          "Acid-balanced perm",
+          "Exothermic perm",
+          "Neutral perm"
+        ],
+        "answerIndex": 1,
+        "rationale": "Acid-balanced perms are gentler and suitable for fine, color-treated, or damaged hair."
+      },
+      {
+        "prompt": "What should be avoided for the first week after a perm to maintain hair health?",
+        "choices": [
+          "Sulfate-free products",
+          "Heat styling",
+          "Cold water rinses",
+          "Brushing"
+        ],
+        "answerIndex": 1,
+        "rationale": "Avoiding heat styling helps prevent damage to the newly formed curls."
+      },
+      {
+        "prompt": "What is the role of a neutralizer in the perming process?",
+        "choices": [
+          "Breaks disulfide bonds",
+          "Reforms disulfide bonds",
+          "Adds moisture",
+          "Cleanses the hair"
+        ],
+        "answerIndex": 1,
+        "rationale": "The neutralizer reforms the disulfide bonds in the new configuration to lock in the curl."
+      },
+      {
+        "prompt": "What pH range is typical for an alkaline (cold wave) perm?",
+        "choices": [
+          "4.5–5.5",
+          "6.5–7.0",
+          "8.5–9.5",
+          "10.0–11.0"
+        ],
+        "answerIndex": 2,
+        "rationale": "Alkaline perms typically have a pH range of 8.5–9.5, making them strong and effective on resistant hair."
+      },
+      {
+        "prompt": "During a perm, what effect does rod placement have?",
+        "choices": [
+          "Curl size",
+          "Hair color",
+          "Volume and direction",
+          "Hair length"
+        ],
+        "answerIndex": 2,
+        "rationale": "Rod placement affects the volume and direction of the curls or waves."
+      },
+      {
+        "prompt": "What is a potential consequence of over-neutralizing during a perm?",
+        "choices": [
+          "Stronger curls",
+          "Hair damage",
+          "Longer-lasting curls",
+          "Increased shine"
+        ],
+        "answerIndex": 1,
+        "rationale": "Over-neutralizing can cause damage to the hair by over-processing the disulfide bonds."
+      },
+      {
+        "prompt": "A client has scalp abrasions. What should be your course of action regarding a perm?",
+        "choices": [
+          "Proceed with caution",
+          "Use a milder perm",
+          "Postpone the perm",
+          "Apply a protective cream"
+        ],
+        "answerIndex": 2,
+        "rationale": "Scalp abrasions are a contraindication for perms, so the service should be postponed."
+      },
+      {
+        "prompt": "What type of perm generates its own heat through a chemical reaction?",
+        "choices": [
+          "Alkaline perm",
+          "Acid-balanced perm",
+          "Exothermic perm",
+          "Neutral perm"
+        ],
+        "answerIndex": 2,
+        "rationale": "Exothermic perms generate their own heat and do not require external heat sources."
+      },
+      {
+        "prompt": "If a client has severely damaged hair, what is the recommended action regarding a perm?",
+        "choices": [
+          "Use a stronger perm",
+          "Proceed with a mild perm",
+          "Avoid perming",
+          "Use a conditioning treatment before perming"
+        ],
+        "answerIndex": 2,
+        "rationale": "Severely damaged hair is a contraindication for perming due to the risk of further damage."
+      },
+      {
+        "prompt": "What is the effect of using larger rods during a perm?",
+        "choices": [
+          "Tighter curls",
+          "Looser waves",
+          "No effect on curl size",
+          "Straight hair"
+        ],
+        "answerIndex": 1,
+        "rationale": "Larger rods create looser waves due to the decreased curvature."
+      },
+      {
+        "prompt": "Which ingredient is used in acid-balanced perms?",
+        "choices": [
+          "Ammonium thioglycolate",
+          "Glyceryl monothioglycolate",
+          "Sodium hydroxide",
+          "Hydrogen peroxide"
+        ],
+        "answerIndex": 1,
+        "rationale": "Glyceryl monothioglycolate is the active ingredient in acid-balanced perms."
+      },
+      {
+        "prompt": "What should clients use post-perm to enhance curl definition?",
+        "choices": [
+          "Sulfate-free, curl-enhancing products",
+          "Regular shampoo",
+          "Clarifying shampoo",
+          "Volumizing mousse"
+        ],
+        "answerIndex": 0,
+        "rationale": "Sulfate-free, curl-enhancing products help maintain and define curls without stripping moisture."
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Permanent Wave",
+      "definition": "A chemical process that alters the disulfide bonds in the hair's cortex to create curls or waves."
+    },
+    {
+      "term": "Chemical Relaxing",
+      "definition": "A process that chemically alters the disulfide bonds in the hair's cortex to straighten the hair."
+    },
+    {
+      "term": "Disulfide Bonds",
+      "definition": "Strong chemical side bonds in the hair's cortex that are altered during perming or relaxing."
+    },
+    {
+      "term": "Waving Lotion",
+      "definition": "A reducing agent applied to hair to break disulfide bonds and allow it to take the shape of perm rods."
+    },
+    {
+      "term": "Neutralizer",
+      "definition": "An oxidizing agent applied after waving lotion to reform disulfide bonds in the new shape."
+    },
+    {
+      "term": "Alkaline (Cold Wave) Perm",
+      "definition": "A type of perm with a pH of 8.5–9.5 that processes at room temperature using ammonium thioglycolate."
+    },
+    {
+      "term": "Acid-Balanced Perm",
+      "definition": "A gentler perm with a pH of 6.5–7.0 that requires heat to activate, using glyceryl monothioglycolate."
+    },
+    {
+      "term": "Exothermic Perm",
+      "definition": "A perm that generates its own heat through a chemical reaction, requiring no external heat."
+    },
+    {
+      "term": "Rod Size",
+      "definition": "Determines the size of the curl: smaller rods create tighter curls, larger rods create looser waves."
+    },
+    {
+      "term": "Neutralization",
+      "definition": "The process of stopping the waving action and reforming disulfide bonds in the new configuration."
+    },
+    {
+      "term": "Under-Neutralizing",
+      "definition": "Results in weak, limp curls due to insufficient reformation of disulfide bonds."
+    },
+    {
+      "term": "Over-Neutralizing",
+      "definition": "Can cause hair damage due to excessive reformation of disulfide bonds."
+    },
+    {
+      "term": "Contraindications for Perms",
+      "definition": "Conditions like previously relaxed hair, severe damage, or scalp abrasions that increase risk of damage."
+    },
+    {
+      "term": "Post-Perm Care",
+      "definition": "Includes avoiding shampooing for 48 hours, using sulfate-free products, and avoiding heat styling for a week."
+    },
+    {
+      "term": "Base Placement",
+      "definition": "Rod placement technique affecting volume and direction of curls: base, off-base, or half-base."
+    }
+  ]
+}

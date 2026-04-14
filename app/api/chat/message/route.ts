@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: live support chat — anon users can send messages
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { Ratelimit } from "@upstash/ratelimit";

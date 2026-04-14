@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: general program application form
 import { logger } from '@/lib/logger';
 
 import { NextResponse } from 'next/server';

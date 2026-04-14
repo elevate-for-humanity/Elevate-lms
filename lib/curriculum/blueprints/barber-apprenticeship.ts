@@ -436,12 +436,50 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
         },
         {
           slug: 'barber-lesson-4',
-          title: 'Sanitation & Infection Control',
+          title: 'Infection Control & Safety',
           order: 4,
           domainKey: 'infection_control',
           objective: 'Differentiate between cleaning, disinfecting, and sterilization; identify types of microorganisms and how they spread; apply OSHA infection control standards; execute blood exposure protocol; maintain a state board-compliant workstation.',
           durationMinutes: 35,
-          videoFile: '/videos/course-barber-sanitation-narrated.mp4',
+          // Locked to the semantically-mapped infection control video (alloy 0.88x, 20 segments)
+          videoFile: '/videos/barber-lessons/barber-infection-control.mp4',
+          learningObjectives: [
+            'Define sanitation, disinfection, and sterilization and state the difference between all three',
+            'Identify EPA-registered disinfectants and explain proper usage and contact time',
+            'Demonstrate correct Barbicide immersion protocol — full submersion, 10-minute minimum',
+            'Distinguish between single-use and multi-use tools and explain why the distinction matters',
+            'Explain proper razor blade disposal procedure and sharps container compliance',
+            'Apply client protection procedures — neck strip placement, cape handling, daily laundering',
+            'Recognize cross-contamination risks and describe prevention methods for each',
+          ],
+          competencyChecks: [
+            {
+              key: 'barbicide_immersion',
+              label: 'Barbicide Immersion Protocol',
+              description: 'Student submerges tools completely in Barbicide solution and waits the full 10-minute contact time before removing.',
+              isCritical: true,
+              requiresInstructorSignoff: true,
+            },
+            {
+              key: 'razor_blade_change',
+              label: 'Razor Blade Replacement',
+              description: 'Student removes a used blade safely, disposes of it in a sharps container, and inserts a fresh blade correctly.',
+              isCritical: true,
+              requiresInstructorSignoff: true,
+            },
+            {
+              key: 'neck_strip_application',
+              label: 'Neck Strip & Cape Application',
+              description: 'Student applies a clean neck strip before placing the cape so the cape does not contact the client\'s skin.',
+              isCritical: false,
+              requiresInstructorSignoff: true,
+            },
+          ],
+          instructorNotes: `Verify all three competency checks in person before marking this lesson complete.
+Barbicide check: watch the student submerge tools — partial submersion is a fail.
+Razor check: confirm the used blade goes directly into the sharps container — not the trash.
+Neck strip check: cape must not touch skin before the strip is placed.
+Indiana State Board inspectors check disinfection logs — remind students to document every session.`,
           content: `<h2>Sanitation & Infection Control</h2>
 
 <h3>Objective</h3>
@@ -658,6 +696,87 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
               correctAnswer: 1,
               explanation: 'Disinfectants work through a chemical reaction that requires time. Removing tools before the contact time is complete means the process failed — pathogens may still be present.',
             },
+            {
+              id: 'mod1-l4-q8',
+              question: 'What is the minimum time tools must remain submerged in Barbicide?',
+              options: ['2 minutes', '5 minutes', '10 minutes', '15 minutes'],
+              correctAnswer: 2,
+              explanation: 'Barbicide requires a minimum 10-minute full submersion to achieve proper disinfection. Partial soaking or early removal does not meet the standard.',
+            },
+            {
+              id: 'mod1-l4-q9',
+              question: 'What level of decontamination is primarily used in barbering between clients?',
+              options: ['Sanitation', 'Disinfection', 'Sterilization', 'Dehydration'],
+              correctAnswer: 1,
+              explanation: 'Disinfection with an EPA-registered product is the primary standard in barbering. Sterilization is not required for standard barbering tools.',
+            },
+            {
+              id: 'mod1-l4-q10',
+              question: 'Razor blades are classified as:',
+              options: [
+                'Reusable if cleaned with alcohol',
+                'Single-use only — replaced for every client',
+                'Optional replacement based on sharpness',
+                'Reusable if sterilized in an autoclave',
+              ],
+              correctAnswer: 1,
+              explanation: 'Razor blades are single-use. A fresh blade must be used for every client and the used blade disposed of immediately in a sharps container.',
+            },
+            {
+              id: 'mod1-l4-q11',
+              question: 'What item prevents the cape from directly touching the client\'s skin?',
+              options: ['A clean towel', 'A neck strip', 'Gloves', 'An apron'],
+              correctAnswer: 1,
+              explanation: 'A clean neck strip is applied before the cape to create a barrier between the cape and the client\'s skin. This is a client protection requirement.',
+            },
+            {
+              id: 'mod1-l4-q12',
+              question: 'Cross-contamination in a barbershop most commonly occurs through:',
+              options: [
+                'Mixing disinfectant chemicals',
+                'Using tools on multiple clients without disinfecting between uses',
+                'Drying tools with a clean towel',
+                'Wearing gloves during chemical services',
+              ],
+              correctAnswer: 1,
+              explanation: 'Cross-contamination is the transfer of pathogens from one client to another via contaminated tools, hands, or surfaces. Disinfecting between every client is the primary prevention.',
+            },
+            {
+              id: 'mod1-l4-q13',
+              question: 'A client presents with a circular, scaly patch on the scalp. What is the correct action?',
+              options: [
+                'Proceed with the service using gloves',
+                'Apply antifungal spray before the service',
+                'Decline the service — this is a contraindication',
+                'Use a fresh blade and proceed normally',
+              ],
+              correctAnswer: 2,
+              explanation: 'A circular scaly patch is a sign of ringworm (tinea capitis), a highly contagious fungal infection. Active ringworm is a contraindication — do not perform services and refer the client to a physician.',
+            },
+            {
+              id: 'mod1-l4-q14',
+              question: 'How often should Barbicide solution be changed?',
+              options: [
+                'Once a week',
+                'Every three days',
+                'Daily or when visibly contaminated',
+                'Only when it changes color',
+              ],
+              correctAnswer: 2,
+              explanation: 'Barbicide solution must be changed daily or whenever it becomes visibly contaminated. Using old or dirty solution does not meet disinfection standards.',
+            },
+            {
+              id: 'mod1-l4-q15',
+              question: 'Universal Precautions means:',
+              options: [
+                'Wearing gloves only when a client has a known infection',
+                'Treating every client as potentially infectious on every service',
+                'Asking clients about their health history before each service',
+                'Using sterilization instead of disinfection for all tools',
+              ],
+              correctAnswer: 1,
+              explanation: 'Universal Precautions require treating every client as potentially infectious on every service — not just clients who appear sick or disclose a condition. This is the OSHA standard.',
+            },
           ],
         },
 
@@ -669,6 +788,30 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           objective: 'Apply OSHA workplace safety standards and identify hazards specific to barbershop environments.',
           durationMinutes: 20,
           videoFile: '/videos/course-barber-sanitation.mp4',
+          learningObjectives: [
+            'Identify OSHA workplace safety standards applicable to barbershops',
+            'Recognize chemical, electrical, and ergonomic hazards in a barbershop environment',
+            'Demonstrate proper chemical storage and labeling procedures',
+            'Explain the purpose of a Safety Data Sheet (SDS) and locate one for a common barbershop chemical',
+            'Apply correct fire safety and emergency exit procedures',
+          ],
+          competencyChecks: [
+            {
+              key: 'chemical_storage',
+              label: 'Chemical Storage & SDS',
+              description: 'Student correctly stores chemicals, labels containers, and locates the SDS for at least one product.',
+              isCritical: true,
+              requiresInstructorSignoff: true,
+            },
+            {
+              key: 'hazard_identification',
+              label: 'Hazard Identification Walk-Through',
+              description: 'Student identifies at least 3 potential hazards in the shop and states the correct prevention for each.',
+              isCritical: false,
+              requiresInstructorSignoff: true,
+            },
+          ],
+          instructorNotes: `Chemical storage check: confirm all products are in original or labeled containers, stored away from heat sources. SDS check: student must locate and read the SDS for at least one product without assistance. Hazard walk-through: conduct in the actual shop, not from memory.`,
           content: `<h2>Workplace Safety</h2>
 
 <h3>Objective</h3>
@@ -760,6 +903,23 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           objective: 'Conduct a complete client consultation that identifies needs, contraindications, and service goals before beginning any service.',
           durationMinutes: 20,
           videoFile: '/videos/course-barber-consultation-narrated.mp4',
+          learningObjectives: [
+            'Conduct a complete client consultation using open-ended questions',
+            'Identify contraindications that require service refusal or modification',
+            'Document client service goals and preferences accurately',
+            'Recognize scalp and skin conditions that affect service decisions',
+            'Explain the consultation process to a client professionally',
+          ],
+          competencyChecks: [
+            {
+              key: 'consultation_live',
+              label: 'Live Client Consultation',
+              description: 'Student conducts a full consultation on a real or practice client — covers goals, contraindications, and service plan.',
+              isCritical: true,
+              requiresInstructorSignoff: true,
+            },
+          ],
+          instructorNotes: `Observe the full consultation — student must ask about scalp conditions, allergies, and service history. Refusal criteria must be stated correctly if a contraindication is present.`,
           content: `<h2>Client Consultation</h2>
 
 <h3>Objective</h3>
@@ -1003,6 +1163,12 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           objective: 'Identify the layers of the hair shaft and scalp anatomy.',
           durationMinutes: 20,
           videoFile: '/videos/course-barber-consultation-narrated.mp4',
+          learningObjectives: [
+            'Identify the three layers of the hair shaft: cuticle, cortex, and medulla',
+            'Describe the structure of the hair follicle and its role in hair growth',
+            'Explain how scalp anatomy affects service decisions',
+            'Distinguish between the five layers of the scalp',
+          ],
           content: `<h2>Hair and Scalp Anatomy</h2>
 <h3>The Hair Shaft</h3>
 <p>Each hair strand has three layers:</p>
@@ -1228,6 +1394,22 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           objective: 'Identify clipper types, guard sizes, and their uses.',
           durationMinutes: 20,
           videoFile: '/videos/course-barber-clipper-techniques.mp4',
+          learningObjectives: [
+            'Identify the difference between clippers and trimmers and when to use each',
+            'Match guard sizes to their corresponding hair lengths',
+            'Demonstrate correct clipper blade alignment and tension adjustment',
+            'Explain proper clipper maintenance: oiling, cleaning, and blade replacement',
+          ],
+          competencyChecks: [
+            {
+              key: 'clipper_maintenance',
+              label: 'Clipper Maintenance Demonstration',
+              description: 'Student oils, cleans, and correctly adjusts blade tension on a clipper in front of the instructor.',
+              isCritical: true,
+              requiresInstructorSignoff: true,
+            },
+          ],
+          instructorNotes: `Blade tension check: student must demonstrate both too-loose and correct tension settings. Oil application must be on the correct points — not flooded. Blade must be removed and cleaned, not just sprayed.`,
           content: `<h2>Clippers and Trimmers</h2>
 <h3>Types of Clippers</h3>
 <ul>
@@ -1282,6 +1464,30 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           objective: 'Safely handle, use, and maintain straight and safety razors.',
           durationMinutes: 20,
           videoFile: '/videos/course-barber-razor-narrated.mp4',
+          learningObjectives: [
+            'Demonstrate safe straight razor handling — correct grip, angle, and stroke direction',
+            'Replace a safety razor blade correctly and dispose of the used blade in a sharps container',
+            'Explain the difference between a straight razor and a shavette',
+            'Identify when a razor is too dull for safe use',
+            'Apply correct strop technique to maintain a straight razor edge',
+          ],
+          competencyChecks: [
+            {
+              key: 'razor_blade_change',
+              label: 'Safety Razor Blade Change',
+              description: 'Student removes used blade safely, places it in sharps container, and inserts a fresh blade correctly.',
+              isCritical: true,
+              requiresInstructorSignoff: true,
+            },
+            {
+              key: 'straight_razor_grip',
+              label: 'Straight Razor Grip & Angle',
+              description: 'Student demonstrates correct grip, 30-degree blade angle, and with-the-grain first pass on a practice surface.',
+              isCritical: true,
+              requiresInstructorSignoff: true,
+            },
+          ],
+          instructorNotes: `Blade change: used blade must go directly into sharps container — not the trash, not the counter. Straight razor grip: check thumb placement and blade angle before any live client work. Student must not proceed to live shaving until both checks are signed off.`,
           content: `<h2>Razors in Barbering</h2>
 <h3>Straight Razor (Cut-Throat Razor)</h3>
 <p>The traditional barber's razor. Requires skill and practice. Used for shaving, edging, and razor cutting techniques.</p>
@@ -1476,6 +1682,12 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           objective: 'Identify the sections of the head and use them to guide haircut structure.',
           durationMinutes: 20,
           videoFile: '/videos/course-barber-fade-narrated.mp4',
+          learningObjectives: [
+            'Identify the seven sections of the head and their boundaries',
+            'Use sectioning to guide haircut structure and ensure symmetry',
+            'Demonstrate correct parting technique for each head section',
+            'Explain how head shape affects sectioning decisions',
+          ],
           content: `<h2>Head Shape and Sectioning</h2>
 <h3>Sections of the Head</h3>
 <ul>
@@ -1536,6 +1748,13 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           objective: 'Execute low, mid, and high fade techniques with smooth transitions.',
           durationMinutes: 30,
           videoFile: '/videos/course-barber-fade-narrated.mp4',
+          learningObjectives: [
+            'Execute a low fade with a smooth transition from skin to length',
+            'Execute a mid fade with correct blending at the temple',
+            'Execute a high fade that maintains clean lines above the ear',
+            'Blend between guard sizes without visible lines or steps',
+            'Identify the correct starting point for each fade type',
+          ],
           content: `<h2>The Fade</h2>
 <p>The fade is the signature technique of modern barbering — a seamless gradient from short to shorter, ending at the skin or near-skin.</p>
 <h3>Types of Fades</h3>
@@ -1599,6 +1818,12 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           objective: 'Use the clipper-over-comb technique to cut and blend hair.',
           durationMinutes: 20,
           videoFile: '/videos/course-barber-clipper-techniques.mp4',
+          learningObjectives: [
+            'Use clipper-over-comb to cut and blend hair on the sides and back',
+            'Maintain consistent comb angle to produce even length',
+            'Blend clipper-over-comb work into scissor-cut top sections',
+            'Identify when clipper-over-comb is preferred over guard cutting',
+          ],
           content: `<h2>Clipper Over Comb</h2>
 <p>Clipper over comb is used to cut hair that is too long for guards but needs clipper precision. It is essential for blending and tapering.</p>
 <h3>Technique</h3>
@@ -1660,6 +1885,12 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           objective: 'Use scissor-over-comb to cut and blend the top and sides.',
           durationMinutes: 20,
           videoFile: '/videos/course-barber-scissors.mp4',
+          learningObjectives: [
+            'Use scissor-over-comb to cut and blend the top and sides',
+            'Maintain consistent comb angle and scissor position throughout',
+            'Blend scissor-over-comb work seamlessly into clipper sections',
+            'Control length removal to avoid over-cutting',
+          ],
           content: `<h2>Scissor Over Comb</h2>
 <p>Scissor over comb produces a softer result than clipper over comb. It is used for the top, blending, and on clients who prefer a scissor finish.</p>
 <h3>Technique</h3>
@@ -1719,6 +1950,13 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           objective: 'Create clean, sharp lines at the hairline, temples, around the ears, sideburns, and nape while preserving the natural hairline, protecting the skin, maintaining sanitation, and choosing shapes that suit the client and grow out cleanly.',
           durationMinutes: 20,
           videoFile: '/videos/course-barber-lineup-narrated.mp4',
+          learningObjectives: [
+            'Create a clean, sharp hairline lineup using a trimmer',
+            'Edge the temples, sideburns, around the ears, and nape correctly',
+            'Preserve the natural hairline — no artificial hairline recession',
+            'Choose a lineup shape that suits the client face shape and grows out cleanly',
+            'Protect the skin from nicks during edging',
+          ],
           content: `<h2>Lesson 26: Lineup &amp; Edging</h2>
 
 <h3>Why this skill matters</h3>
@@ -2067,6 +2305,12 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
           objective: 'Execute a flat top and classic taper haircut.',
           durationMinutes: 20,
           videoFile: '/videos/course-barber-scissors-narrated.mp4',
+          learningObjectives: [
+            'Execute a flat top with a level, even surface using a comb and clipper',
+            'Cut a classic taper with smooth graduation from short to long',
+            'Blend the flat top sides into the taper without visible lines',
+            'Identify the correct guard progression for a classic taper',
+          ],
           content: `<h2>Classic Barbering Cuts</h2>
 <h3>The Flat Top</h3>
 <p>The flat top requires a perfectly level surface on top of the head. It is one of the most technically demanding cuts in barbering.</p>

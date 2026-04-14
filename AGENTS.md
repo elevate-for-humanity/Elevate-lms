@@ -312,28 +312,37 @@ if (rateLimited) return rateLimited;
 
 ### API Auth Pattern
 
+**Canonical — use this for all new routes:**
+
 ```ts
 // Any authenticated user
 import { apiAuthGuard } from '@/lib/admin/guards';
 const auth = await apiAuthGuard(request);
 if (auth.error) return auth.error;
 
-// Admin or super_admin only
+// Admin routes (admin | super_admin | staff | org_admin)
 import { apiRequireAdmin } from '@/lib/admin/guards';
 const auth = await apiRequireAdmin(request);
 if (auth.error) return auth.error;
+
+// Instructor or admin
+import { apiRequireInstructor } from '@/lib/admin/guards';
+const auth = await apiRequireInstructor(request);
+if (auth.error) return auth.error;
 ```
 
-⚠️ **`apiRequireAdmin` previously only allowed `'admin'`** — this was fixed in PR #50. It now allows `['admin', 'super_admin', 'staff']`. If you see identity-only checks on admin routes, add an explicit role check:
+**Legacy patterns — do not use in new routes, do not remove from existing ones without testing:**
+- `withAuth({ roles: ['admin', 'super_admin'] })` from `@/lib/with-auth` — 23 routes, correct but non-canonical
+- `getCurrentUser()` + inline role array check — 12 routes, correct but non-canonical
+- Inline `supabase.auth.getUser()` + `profiles` role check — 57 routes, correct but non-canonical
 
-```ts
-const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
-if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
-  return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-}
-```
+All three legacy patterns check the same role set. Do not refactor them unless you are also adding tests. Silent regressions from mass-refactors are worse than style inconsistency.
 
-There is no root `middleware.ts`. Auth is enforced per-route. Every route that reads or writes user data must call one of the above before any DB access.
+**Middleware perimeter** (`proxy.ts` — the root Next.js middleware) handles multi-domain routing, auth perimeter, admin namespace gating, and role enforcement for protected routes. Do NOT create a separate `middleware.ts` — it will conflict with `proxy.ts` and break the build. All middleware logic goes in `proxy.ts`.
+
+**Page-level guards** — `app/admin/layout.tsx` calls `requireAdmin()` before rendering. All 337 admin pages inherit this. Do not add redundant page-level guards inside `/admin/` unless a page sits outside the layout subtree.
+
+Every route that reads or writes user data must call one of the above before any DB access. If a route is intentionally public, add a comment: `// PUBLIC ROUTE: <reason>`
 
 ### Audit Scripts
 

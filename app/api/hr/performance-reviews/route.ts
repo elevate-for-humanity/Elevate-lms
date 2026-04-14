@@ -1,3 +1,4 @@
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { createClient } from '@/lib/supabase/server';
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -13,6 +14,9 @@ export const dynamic = 'force-dynamic';
 
 // GET /api/hr/performance-reviews?employee_id=
 async function _GET(request: NextRequest) {
+  const auth = await apiRequireAdmin(request);
+  if (auth.error) return auth.error;
+
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -56,6 +60,9 @@ async function _GET(request: NextRequest) {
 
 // POST /api/hr/performance-reviews
 async function _POST(request: NextRequest) {
+  const auth = await apiRequireAdmin(request);
+  if (auth.error) return auth.error;
+
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;

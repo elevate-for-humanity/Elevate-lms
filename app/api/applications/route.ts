@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public program application submission
 
 // app/api/applications/route.ts
 import { NextResponse } from 'next/server';

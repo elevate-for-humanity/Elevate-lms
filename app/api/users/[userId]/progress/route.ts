@@ -12,8 +12,23 @@ async function _GET(
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const { userId } = await params;
+
+  const { userId } = await params;
   const supabase = await createClient();
+
+  // Auth: session user must match URL param (or be admin)
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+  const isAdmin = ['admin', 'super_admin', 'staff', 'org_admin'].includes(profile?.role ?? '');
+  if (!isAdmin && user.id !== userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   // Fetch user progress across courses and programs
   const [enrollmentsResult, progressResult, certificatesResult] = await Promise.all([

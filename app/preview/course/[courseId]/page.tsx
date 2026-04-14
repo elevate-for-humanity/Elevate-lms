@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import {
   BookOpen, CheckCircle, Award, Clock, BarChart3,
@@ -87,16 +87,9 @@ function getCompetencies(course: any): string[] {
 
 export default function CoursePreviewPage() {
   const params = useParams();
-  const router = useRouter();
   const courseId = params.courseId as string;
 
-  // Auth gate — preview pages expose curriculum data; require authenticated session
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) router.replace(`/login?redirect=/preview/course/${courseId}`);
-    });
-  }, [courseId, router]);
+  // Auth is enforced server-side in app/preview/course/layout.tsx.
 
   const [course, setCourse] = useState<any>(null);
   const [lessons, setLessons] = useState<any[]>([]);

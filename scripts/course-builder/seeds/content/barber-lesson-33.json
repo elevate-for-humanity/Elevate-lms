@@ -1,0 +1,362 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is the primary characteristic of a Chevron mustache?",
+        "choices": [
+          "A thick, full mustache covering the entire upper lip",
+          "A thin mustache sitting just above the lip line",
+          "A mustache with long, curled ends",
+          "A bushy and unkempt mustache"
+        ],
+        "answerIndex": 0,
+        "rationale": "The Chevron mustache is known for being thick and full, covering the entire upper lip.",
+        "type": "recall"
+      },
+      {
+        "prompt": "Which mustache style is characterized by its long, curled ends?",
+        "choices": [
+          "Chevron",
+          "Handlebar",
+          "Pencil",
+          "Walrus"
+        ],
+        "answerIndex": 1,
+        "rationale": "The Handlebar mustache is defined by its long, curled ends.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A client presents with a request for a Pencil mustache. What is the defining feature of this style?",
+        "choices": [
+          "Thick and full",
+          "Thin and precisely trimmed",
+          "Long and curled",
+          "Bushy and unkempt"
+        ],
+        "answerIndex": 1,
+        "rationale": "The Pencil mustache is thin and precisely trimmed, sitting just above the lip line.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "During a mustache trim, you notice that the mustache is overshadowing the client's facial features. What should you do?",
+        "choices": [
+          "Define the lip line first",
+          "Reduce the bulk of the mustache",
+          "Shape the edges",
+          "Ask the client for feedback"
+        ],
+        "answerIndex": 1,
+        "rationale": "Reducing the bulk of the mustache helps control the length and ensures it does not overshadow the client's facial features.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What is the first step in the mustache trimming process?",
+        "choices": [
+          "Shaping the edges",
+          "Defining the lip line",
+          "Bulk reduction",
+          "Final touches"
+        ],
+        "answerIndex": 2,
+        "rationale": "The first step in the trimming process is bulk reduction to control the length of the mustache.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A new client asks for a Walrus mustache. What is the main characteristic of this style?",
+        "choices": [
+          "Thin and precisely trimmed",
+          "Thick and full",
+          "Long and curled",
+          "Bushy and unkempt"
+        ],
+        "answerIndex": 3,
+        "rationale": "The Walrus mustache is known for its bushy and unkempt appearance.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "Which step follows bulk reduction in the mustache trimming process?",
+        "choices": [
+          "Final touches",
+          "Defining the lip line",
+          "Shaping the edges",
+          "Consulting with the client"
+        ],
+        "answerIndex": 1,
+        "rationale": "After reducing the bulk, the next step is to define the lip line.",
+        "type": "recall"
+      },
+      {
+        "prompt": "During a service, you notice your trimmer blades are not disinfected. What should you do?",
+        "choices": [
+          "Proceed with the trim",
+          "Disinfect the blades immediately",
+          "Ask the client for permission to continue",
+          "Use a different tool"
+        ],
+        "answerIndex": 1,
+        "rationale": "Disinfecting the blades immediately is crucial for maintaining hygiene and preventing skin irritations or infections.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What is the importance of defining the mustache's lip line?",
+        "choices": [
+          "To reduce bulk",
+          "To maintain symmetry",
+          "To follow the natural curve of the upper lip",
+          "To disinfect the trimmer"
+        ],
+        "answerIndex": 2,
+        "rationale": "Defining the lip line involves following the natural curve of the upper lip to ensure a precise and clean look.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A client presents with a request for a Horseshoe mustache. How should you shape the edges?",
+        "choices": [
+          "Symmetrically",
+          "In an inverted U shape",
+          "With long curls",
+          "Thin and precise"
+        ],
+        "answerIndex": 1,
+        "rationale": "The Horseshoe mustache is shaped in an inverted U, making the edges crucial to its style.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What is the best approach to ensure client satisfaction during a mustache trim?",
+        "choices": [
+          "Trim without consultation",
+          "Consult with the client before starting",
+          "Choose the style for the client",
+          "Focus only on hygiene"
+        ],
+        "answerIndex": 1,
+        "rationale": "Consulting with the client before starting ensures their preferences are understood and met.",
+        "type": "applied"
+      },
+      {
+        "prompt": "Which mustache style resembles an inverted U?",
+        "choices": [
+          "Chevron",
+          "Horseshoe",
+          "Walrus",
+          "Handlebar"
+        ],
+        "answerIndex": 1,
+        "rationale": "The Horseshoe mustache is characterized by its inverted U shape.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What is the recommended practice after shaping the mustache edges?",
+        "choices": [
+          "Consult with the client",
+          "Reduce bulk",
+          "Inspect for stray hairs",
+          "Define the lip line"
+        ],
+        "answerIndex": 2,
+        "rationale": "After shaping the edges, inspecting for stray hairs ensures a clean and polished look.",
+        "type": "recall"
+      },
+      {
+        "prompt": "During a mustache trimming service, you notice uneven areas. What should you do?",
+        "choices": [
+          "Ignore them",
+          "Make necessary adjustments",
+          "Ask the client to fix it at home",
+          "Start over"
+        ],
+        "answerIndex": 1,
+        "rationale": "Making necessary adjustments ensures a balanced and professional finish.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What is the best approach to maintain hygiene during a mustache trimming service?",
+        "choices": [
+          "Wash hands before and after each service",
+          "Only disinfect tools once a day",
+          "Ask the client to bring their own tools",
+          "Use disposable tools"
+        ],
+        "answerIndex": 0,
+        "rationale": "Washing hands before and after each service is a fundamental hygiene practice.",
+        "type": "applied"
+      },
+      {
+        "prompt": "Which step is crucial for controlling the length of the mustache?",
+        "choices": [
+          "Defining the lip line",
+          "Bulk reduction",
+          "Shaping the edges",
+          "Final touches"
+        ],
+        "answerIndex": 1,
+        "rationale": "Bulk reduction is crucial for controlling the length and ensuring the mustache does not overshadow facial features.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A client asks for advice on mustache styles. What should you do?",
+        "choices": [
+          "Choose a style for them",
+          "Show them different styles and discuss options",
+          "Ignore their request",
+          "Suggest they decide at home"
+        ],
+        "answerIndex": 1,
+        "rationale": "Showing different styles and discussing options helps the client make an informed decision.",
+        "type": "applied"
+      },
+      {
+        "prompt": "What is the significance of hygiene in the Indiana state board exam?",
+        "choices": [
+          "It is not tested",
+          "It accounts for 10% of the score",
+          "It accounts for 20% of the score",
+          "It is the only component tested"
+        ],
+        "answerIndex": 2,
+        "rationale": "Hygiene accounts for approximately 20% of the practical exam component in the Indiana state board exam.",
+        "type": "recall"
+      },
+      {
+        "prompt": "Which practice is essential before starting a mustache trimming service?",
+        "choices": [
+          "Consulting with the client",
+          "Starting without preparation",
+          "Ignoring client preferences",
+          "Using unclean tools"
+        ],
+        "answerIndex": 0,
+        "rationale": "Consulting with the client is essential to understand their preferences and ensure satisfaction.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What would you do if a client requests a style you are unfamiliar with?",
+        "choices": [
+          "Guess the style",
+          "Consult resources or colleagues",
+          "Refuse the service",
+          "Ignore the request"
+        ],
+        "answerIndex": 1,
+        "rationale": "Consulting resources or colleagues ensures you provide the client with the desired style accurately.",
+        "type": "applied"
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Chevron Mustache",
+      "definition": "A thick, full mustache that covers the entire upper lip."
+    },
+    {
+      "term": "Handlebar Mustache",
+      "definition": "Characterized by long, curled ends, requiring precise shaping."
+    },
+    {
+      "term": "Pencil Mustache",
+      "definition": "A thin, precisely trimmed mustache sitting just above the lip line."
+    },
+    {
+      "term": "Horseshoe Mustache",
+      "definition": "Resembles an inverted U, extending down the sides of the mouth."
+    },
+    {
+      "term": "Walrus Mustache",
+      "definition": "Known for its bushy and unkempt appearance."
+    },
+    {
+      "term": "Bulk Reduction",
+      "definition": "The initial step of trimming to control the length of mustache hair."
+    },
+    {
+      "term": "Defining the Lip Line",
+      "definition": "Involves trimming along the natural curve of the upper lip for precision."
+    },
+    {
+      "term": "Shaping the Edges",
+      "definition": "Trimming the sides of the mustache to achieve symmetry and style."
+    },
+    {
+      "term": "Hygiene in Barbering",
+      "definition": "Adhering to strict sanitation practices to ensure client safety and compliance with state regulations."
+    },
+    {
+      "term": "Disinfection of Tools",
+      "definition": "The process of cleaning and sanitizing barber tools to prevent infections."
+    },
+    {
+      "term": "Indiana State Board Exam",
+      "definition": "A test that evaluates proficiency in barbering skills, including mustache trimming and styling."
+    },
+    {
+      "term": "Practical Exam Component",
+      "definition": "Part of the state board exam that tests hands-on barbering skills."
+    },
+    {
+      "term": "Client Consultation",
+      "definition": "Discussing with the client to understand their desired mustache style and preferences."
+    },
+    {
+      "term": "Trimmer with a Guard",
+      "definition": "A tool used to control the length of hair during the bulk reduction process."
+    },
+    {
+      "term": "Final Touches",
+      "definition": "Inspecting and making adjustments to the mustache for a polished finish."
+    }
+  ],
+  "content": "## Introduction to Mustache Trimming & Styling\n\nIn the world of barbering, mastering the art of mustache trimming and styling is essential for providing comprehensive grooming services to clients. A well-groomed mustache can significantly enhance a client's appearance, giving them a polished and confident look. For barbers working in Indiana, understanding the nuances of mustache care is crucial, as it not only meets client expectations but also aligns with the standards set by the Indiana state board exam. This lesson will guide you through the techniques and knowledge required to excel in mustache trimming and styling.\n\n## Understanding Mustache Styles\n\nBefore you pick up your trimmers, it's important to familiarize yourself with the various mustache styles that clients might request. From the classic Chevron to the more intricate Handlebar, each style requires a unique approach and technique. Understanding these styles allows you to communicate effectively with your clients and deliver the precise look they desire.\n\nThe Chevron is a thick, full mustache that covers the entire upper lip, while the Handlebar is characterized by its long, curled ends. The Pencil mustache is thin and precisely trimmed, sitting just above the lip line. Other popular styles include the Horseshoe, which resembles an inverted U, and the Walrus, known for its bushy and unkempt appearance. By familiarizing yourself with these styles, you can confidently advise clients and execute their desired look with precision.\n\n## Preparing for the Trim\n\nPreparation is key to a successful mustache trim. Begin by consulting with your client to understand their desired style and any specific preferences they might have. This consultation is crucial, as it sets the stage for the service and ensures client satisfaction. Once you've identified the style, it's time to prepare your tools and workspace.\n\nEnsure that your trimmer blades are clean and disinfected before starting the service. This not only promotes hygiene but also prevents any potential skin irritations or infections. Proper disinfection involves using a suitable blade cleaner or disinfectant spray, allowing the solution to sit for the recommended time, and then wiping the blades clean. With your tools ready, position your client comfortably in the chair, ensuring good visibility and access to their facial hair.\n\n## The Trimming Process\n\nTrimming a mustache involves a series of precise steps to achieve the desired style while maintaining symmetry and balance. Follow the step-by-step procedure below to ensure a professional finish:\n\n1. **Bulk Reduction**: Begin by trimming the bulk of the mustache hair using a comb and scissors or a trimmer with a guard. This step is crucial for controlling the length and ensuring that the mustache does not overshadow the client's facial features.\n\n2. **Defining the Lip Line**: Once the bulk is reduced, carefully define the mustache's lip line. Use the trimmer without a guard or a pair of sharp scissors to follow the natural curve of the upper lip. This step requires a steady hand and attention to detail to prevent cutting too much hair.\n\n3. **Shaping the Edges**: With the lip line defined, focus on shaping the edges of the mustache. Depending on the desired style, you may need to trim the ends symmetrically or create curls for a Handlebar. Ensure that both sides are even for a balanced appearance.\n\n4. **Final Touches**: After shaping, inspect the mustache for any stray hairs or uneven areas. Make any necessary adjustments to achieve a clean and polished look. Encourage your client to provide feedback and make minor tweaks if needed.\n\n## The Importance of Hygiene\n\nMaintaining hygiene throughout the mustache trimming process is non-negotiable. As a barber, you must adhere to strict sanitation practices to protect both yourself and your clients. This includes regular disinfection of tools and surfaces, as well as personal hygiene practices such as washing your hands before and after each service.\n\nIn Indiana, the state board exam places significant emphasis on hygiene and sanitation, accounting for approximately 20% of the practical exam component. This section tests your knowledge of proper disinfection techniques and your ability to maintain a clean working environment. By prioritizing hygiene in your practice, you not only comply with state regulations but also build trust with your clients.\n\n## Relevance to the Indiana State Board Exam\n\nThe Indiana state board exam evaluates your proficiency in various barbering skills, including mustache trimming and styling. This topic is a crucial component of the practical exam, contributing to roughly 10% of the overall score. During the exam, you will be assessed on your ability to identify mustache styles, execute the correct trimming sequence, and maintain hygiene standards.\n\nTo succeed, focus on mastering the techniques outlined in this lesson and practicing regularly. Pay attention to detail, as examiners will look for precision in your trimming and styling. Additionally, ensure that you are well-versed in the different mustache styles and can execute each with confidence and skill.\n\n## Key Takeaway\n\nMastering mustache trimming and styling is an essential skill for any barber, especially those practicing in Indiana. By understanding various mustache styles, preparing meticulously, and executing precise trimming techniques, you can meet client expectations and excel in your field. Remember that hygiene is paramount, both for client safety and for success in the Indiana state board exam. With dedication and practice, you'll be well-equipped to deliver top-notch grooming services and achieve professional excellence.",
+  "procedures": [
+    {
+      "step": 1,
+      "instruction": "Consult with the client to determine their desired mustache style and any specific preferences.",
+      "safetyNote": null
+    },
+    {
+      "step": 2,
+      "instruction": "Ensure all tools, including trimmers and scissors, are clean and disinfected.",
+      "safetyNote": "SAFETY: Disinfect before use"
+    },
+    {
+      "step": 3,
+      "instruction": "Seat the client comfortably in the chair with good visibility of their facial hair.",
+      "safetyNote": null
+    },
+    {
+      "step": 4,
+      "instruction": "Use a comb and scissors or a trimmer with a guard to reduce the bulk of the mustache hair.",
+      "safetyNote": null
+    },
+    {
+      "step": 5,
+      "instruction": "Carefully define the mustache's lip line using a trimmer without a guard or sharp scissors.",
+      "safetyNote": null
+    },
+    {
+      "step": 6,
+      "instruction": "Shape the edges of the mustache, ensuring symmetry and balance according to the desired style.",
+      "safetyNote": null
+    },
+    {
+      "step": 7,
+      "instruction": "Inspect the mustache for any stray hairs or uneven areas and make necessary adjustments.",
+      "safetyNote": null
+    },
+    {
+      "step": 8,
+      "instruction": "Encourage client feedback and make minor tweaks to achieve the desired look.",
+      "safetyNote": null
+    },
+    {
+      "step": 9,
+      "instruction": "Clean and disinfect all tools and surfaces after the service.",
+      "safetyNote": "SAFETY: Disinfect after use"
+    },
+    {
+      "step": 10,
+      "instruction": "Wash your hands thoroughly after completing the service.",
+      "safetyNote": "SAFETY: Maintain personal hygiene"
+    }
+  ]
+}

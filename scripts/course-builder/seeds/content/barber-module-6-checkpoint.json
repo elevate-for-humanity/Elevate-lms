@@ -1,0 +1,227 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "A client comes in with previously colored hair and desires a lighter shade. Which chemical service should you recommend to safely achieve this result?",
+        "choices": [
+          "A. Color stripping",
+          "B. Lightening with bleach",
+          "C. Applying a lighter permanent color",
+          "D. Using a color glaze"
+        ],
+        "answerIndex": 1,
+        "rationale": "Lightening with bleach is necessary to lift the existing color to a lighter shade before applying a new color."
+      },
+      {
+        "prompt": "During a chemical relaxer service, you notice the client's scalp is becoming irritated. What is the best immediate action to take?",
+        "choices": [
+          "A. Apply a neutralizing shampoo",
+          "B. Rinse the relaxer out immediately",
+          "C. Apply more relaxer to finish quickly",
+          "D. Use a soothing cream on the irritated area"
+        ],
+        "answerIndex": 1,
+        "rationale": "Rinsing the relaxer out immediately stops the chemical process and prevents further irritation."
+      },
+      {
+        "prompt": "What is the primary purpose of a patch test before a chemical service?",
+        "choices": [
+          "A. To determine the processing time",
+          "B. To check for allergic reactions",
+          "C. To evaluate hair porosity",
+          "D. To assess hair elasticity"
+        ],
+        "answerIndex": 1,
+        "rationale": "A patch test is conducted to check for any allergic reactions to the chemical products used during the service."
+      },
+      {
+        "prompt": "A client with coarse, resistant hair wants a permanent wave. Which type of perm solution is most suitable for this hair type?",
+        "choices": [
+          "A. Acid-balanced perm",
+          "B. Alkaline perm",
+          "C. Exothermic perm",
+          "D. Neutral perm"
+        ],
+        "answerIndex": 1,
+        "rationale": "Alkaline perms are stronger and better suited for coarse, resistant hair as they provide a firm curl."
+      },
+      {
+        "prompt": "You are performing a strand test for a color service. What is the main reason for conducting this test?",
+        "choices": [
+          "A. To check for hair breakage",
+          "B. To determine the final color result",
+          "C. To assess the client's scalp condition",
+          "D. To evaluate the client's hair density"
+        ],
+        "answerIndex": 1,
+        "rationale": "A strand test helps to determine the final color result and ensures the desired outcome is achieved."
+      },
+      {
+        "prompt": "A client requests a chemical service to add volume and body to their fine, limp hair. Which service would you recommend?",
+        "choices": [
+          "A. Chemical relaxer",
+          "B. Permanent wave",
+          "C. Color glaze",
+          "D. Deep conditioning treatment"
+        ],
+        "answerIndex": 1,
+        "rationale": "A permanent wave adds curl and body to fine, limp hair, increasing volume and fullness."
+      },
+      {
+        "prompt": "What is the function of a neutralizer in a permanent waving process?",
+        "choices": [
+          "A. To soften the hair",
+          "B. To fix the curl shape",
+          "C. To open the cuticle",
+          "D. To add shine to the hair"
+        ],
+        "answerIndex": 1,
+        "rationale": "The neutralizer re-bonds the disulfide bonds in the hair, fixing the curl shape created during the perm process."
+      },
+      {
+        "prompt": "During a hair coloring service, the client's hair turns out too dark. What corrective action should you take?",
+        "choices": [
+          "A. Apply a lighter permanent color",
+          "B. Use a color remover",
+          "C. Wash with clarifying shampoo",
+          "D. Apply a deep conditioning treatment"
+        ],
+        "answerIndex": 1,
+        "rationale": "Using a color remover can help lift the excess color and lighten the hair to the desired shade."
+      },
+      {
+        "prompt": "A client complains of scalp sensitivity after a color service. What could be a potential cause?",
+        "choices": [
+          "A. Incorrect processing time",
+          "B. Use of a high-volume developer",
+          "C. Inadequate rinsing",
+          "D. Improper sectioning"
+        ],
+        "answerIndex": 1,
+        "rationale": "Using a high-volume developer can cause scalp sensitivity due to its stronger chemical composition."
+      },
+      {
+        "prompt": "Which of the following is a sign that a chemical relaxer has been left on the hair too long?",
+        "choices": [
+          "A. Increased shine",
+          "B. Hair feels slippery",
+          "C. Hair breakage",
+          "D. Enhanced curl pattern"
+        ],
+        "answerIndex": 2,
+        "rationale": "Hair breakage is a common sign of over-processing when a relaxer is left on the hair too long."
+      },
+      {
+        "prompt": "A client with color-treated hair wants to maintain their color vibrancy. Which product should you recommend?",
+        "choices": [
+          "A. Clarifying shampoo",
+          "B. Sulfate-free shampoo",
+          "C. Volumizing shampoo",
+          "D. Anti-dandruff shampoo"
+        ],
+        "answerIndex": 1,
+        "rationale": "Sulfate-free shampoos are gentler and help maintain color vibrancy by reducing color fading."
+      },
+      {
+        "prompt": "What is the main benefit of using a demi-permanent hair color?",
+        "choices": [
+          "A. It lightens natural hair color",
+          "B. It provides long-lasting color",
+          "C. It adds shine and tone without lifting",
+          "D. It permanently alters the hair structure"
+        ],
+        "answerIndex": 2,
+        "rationale": "Demi-permanent color adds shine and tone without lifting the natural hair color, making it ideal for enhancing color."
+      },
+      {
+        "prompt": "A client wants to transition from relaxed hair to natural curls. Which service should be avoided during this period?",
+        "choices": [
+          "A. Deep conditioning treatments",
+          "B. Protein treatments",
+          "C. Chemical relaxers",
+          "D. Moisturizing shampoos"
+        ],
+        "answerIndex": 2,
+        "rationale": "Chemical relaxers should be avoided as they alter the hair's natural curl pattern, hindering the transition to natural curls."
+      },
+      {
+        "prompt": "What is the role of porosity in determining the outcome of a chemical service?",
+        "choices": [
+          "A. It affects the hair's natural color",
+          "B. It determines the hair's elasticity",
+          "C. It influences how well the hair absorbs chemicals",
+          "D. It impacts the hair's density"
+        ],
+        "answerIndex": 2,
+        "rationale": "Porosity influences how well the hair absorbs and retains chemical treatments, affecting the final result."
+      },
+      {
+        "prompt": "A client with high porosity hair is concerned about color fading. What advice should you give them?",
+        "choices": [
+          "A. Use a clarifying shampoo regularly",
+          "B. Avoid heat styling tools",
+          "C. Use a leave-in conditioner",
+          "D. Rinse hair with cold water after washing"
+        ],
+        "answerIndex": 3,
+        "rationale": "Rinsing with cold water helps seal the cuticle, reducing color fading in high porosity hair."
+      },
+      {
+        "prompt": "Which ingredient in a chemical relaxer is responsible for breaking the disulfide bonds in the hair?",
+        "choices": [
+          "A. Ammonium thioglycolate",
+          "B. Sodium hydroxide",
+          "C. Hydrogen peroxide",
+          "D. Glycerin"
+        ],
+        "answerIndex": 1,
+        "rationale": "Sodium hydroxide is a strong alkaline ingredient that breaks the disulfide bonds in the hair during a relaxer service."
+      },
+      {
+        "prompt": "A client wants to cover gray hair with a natural look. Which type of color should you recommend?",
+        "choices": [
+          "A. Temporary color",
+          "B. Demi-permanent color",
+          "C. Permanent color",
+          "D. Semi-permanent color"
+        ],
+        "answerIndex": 2,
+        "rationale": "Permanent color is best for covering gray hair as it provides full coverage and long-lasting results."
+      },
+      {
+        "prompt": "What is a key consideration when performing a chemical service on previously bleached hair?",
+        "choices": [
+          "A. Hair density",
+          "B. Hair elasticity",
+          "C. Hair porosity",
+          "D. Hair length"
+        ],
+        "answerIndex": 2,
+        "rationale": "Hair porosity is crucial as bleached hair is often more porous, affecting how it absorbs and reacts to chemicals."
+      },
+      {
+        "prompt": "A client experiences excessive dryness after a chemical service. What could be a contributing factor?",
+        "choices": [
+          "A. Use of a moisturizing conditioner",
+          "B. Incorrect processing time",
+          "C. Application of a heat protectant",
+          "D. Use of a low pH product"
+        ],
+        "answerIndex": 1,
+        "rationale": "Incorrect processing time can lead to over-processing, resulting in excessive dryness and damage."
+      },
+      {
+        "prompt": "What is the primary function of a developer in hair coloring?",
+        "choices": [
+          "A. To add shine",
+          "B. To open the cuticle",
+          "C. To condition the hair",
+          "D. To neutralize the color"
+        ],
+        "answerIndex": 1,
+        "rationale": "The developer opens the hair cuticle, allowing the color to penetrate and deposit onto the hair shaft."
+      }
+    ]
+  }
+}

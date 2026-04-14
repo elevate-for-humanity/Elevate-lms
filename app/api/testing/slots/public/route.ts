@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: public testing slot availability
 /**
  * GET /api/testing/slots/public
  *

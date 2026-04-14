@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: managed trial start form
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';

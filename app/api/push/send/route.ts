@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: push notification — API-key gated
 import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';

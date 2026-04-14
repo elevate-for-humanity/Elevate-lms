@@ -8,9 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-
 import {
-
 
   Mail,
   TrendingUp,
@@ -23,7 +21,6 @@ import {
   Calendar,
   Download,
 } from 'lucide-react';
-export const dynamic = 'force-dynamic';
 
 interface AnalyticsData {
   overview: {
@@ -479,7 +476,7 @@ interface StatCardProps {
   title: string;
   value: string;
   icon: React.ComponentType<{ className?: string }>;
-  color: 'blue' | 'green' | 'blue' | 'red';
+  color: 'blue' | 'green' | 'red';
   trend: 'up' | 'down' | null;
 }
 
@@ -487,14 +484,12 @@ function StatCard({ title, value, icon: Icon, color, trend }: StatCardProps) {
   const colorClasses = {
     blue: 'text-brand-blue-600 bg-brand-blue-50',
     green: 'text-brand-green-600 bg-brand-green-50',
-    blue: 'text-brand-blue-600 bg-brand-blue-50',
     red: 'text-brand-orange-600 bg-brand-red-50',
   };
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
 
-      {/* Hero Image */}
       <div className="flex items-center justify-between mb-4">
         <div className={`p-3 rounded-lg ${colorClasses[color]}`}>
           <Icon className="w-6 h-6" />

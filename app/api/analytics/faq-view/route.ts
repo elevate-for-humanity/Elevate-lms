@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: anonymous FAQ view tracking
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

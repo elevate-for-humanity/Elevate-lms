@@ -1,3 +1,4 @@
+// PUBLIC ROUTE: studio favorites — auth inside handler
 import { getAdminClient } from '@/lib/supabase/admin';
 
 import { NextRequest, NextResponse } from 'next/server';

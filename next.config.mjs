@@ -369,6 +369,19 @@ const nextConfig = {
       '**/node_modules/@webcontainer/**',
       '**/node_modules/.pnpm/@webcontainer*/**',
 
+      // ── Next.js build-time binaries (never needed at runtime) ────────────
+      // @next/swc is the Rust compiler — 113 MB, build-only
+      '**/node_modules/@next/swc-*/**',
+      '**/node_modules/.pnpm/@next+swc-*/**',
+      // esbuild binary — build-only
+      '**/node_modules/@esbuild/**',
+      '**/node_modules/.pnpm/@esbuild*/**',
+      // webpack — build-only
+      '**/node_modules/webpack/**',
+      '**/node_modules/.pnpm/webpack*/**',
+      '**/node_modules/webpack-sources/**',
+      '**/node_modules/.pnpm/webpack-sources*/**',
+
       // ── Build / dev tools (not needed at runtime) ─────────────────────────
       '**/node_modules/typescript/**',
       '**/node_modules/.pnpm/typescript*/**',

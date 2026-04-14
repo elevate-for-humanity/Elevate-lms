@@ -260,7 +260,7 @@
     "prebuild": "echo 'Migrations already run in Supabase - skipping' && node scripts/write-build-marker.mjs",
     "build": "NODE_OPTIONS='--max-old-space-size=8192' node scripts/check-redirect-conflicts.mjs && NODE_OPTIONS='--max-old-space-size=8192' next build",
     "build:fast": "NODE_OPTIONS='--max-old-space-size=8192' SKIP_ENV_VALIDATION=true next build",
-    "postbuild": "echo 'Next.js build complete'",
+    "postbuild": "node scripts/prune-standalone.mjs",
     "verify:build": "bash scripts/verify-build.sh || true",
     "verify:pwa": "node scripts/verify-pwa.cjs",
     "generate:vapid": "node scripts/generate-vapid-keys.cjs",

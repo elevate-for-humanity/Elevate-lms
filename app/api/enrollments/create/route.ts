@@ -122,11 +122,18 @@ async function _POST(request: NextRequest) {
       );
     }
 
-    // Resolve latest published version — students are locked to this forever
-    const { data: courseVersion } = await db.rpc('get_latest_published_version', {
-      p_course_id: courseId,
-    });
-    const courseVersionId: string | null = courseVersion?.id ?? null;
+    // Resolve latest published version — students are locked to this forever.
+    // Non-fatal: if the RPC doesn't exist or fails, courseVersionId is null and
+    // the enrollment is created without a version lock (acceptable fallback).
+    let courseVersionId: string | null = null;
+    try {
+      const { data: courseVersion } = await supabase.rpc('get_latest_published_version', {
+        p_course_id: courseId,
+      });
+      courseVersionId = courseVersion?.id ?? null;
+    } catch {
+      // RPC may not be deployed in all environments — continue without version lock
+    }
 
     // Check existing enrollment
     const { data: existing } = await supabase

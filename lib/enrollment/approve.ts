@@ -138,8 +138,10 @@ export async function approveApplication(
     if (existingUser) {
       userId = existingUser.id;
     } else {
-      // Create new auth user with a random temp password
-      const tempPassword = `EFH-${Math.random().toString(36).slice(2, 10)}-Temp!`;
+      // Create new auth user with a cryptographically random temp password.
+      // Math.random() is predictable — use randomBytes instead.
+      const { randomBytes } = require('crypto') as typeof import('crypto');
+      const tempPassword = `EFH-${randomBytes(8).toString('hex')}-Temp!`;
       const { data: newUser, error: createError } = await db.auth.admin.createUser({
         email,
         password: tempPassword,

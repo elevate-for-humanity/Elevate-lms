@@ -14,6 +14,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { recordCheckpointAttempt } from '@/lib/lms/engine';
 import { logger } from '@/lib/logger';
 import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
+import { createClient } from '@/lib/supabase/server';
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -61,6 +62,22 @@ export async function POST(
 
   if (typeof score !== 'number' || score < 0 || score > 100) {
     return NextResponse.json({ error: 'score must be a number between 0 and 100' }, { status: 400 });
+  }
+
+  // assertLessonAccess checks the module unlock rule, but module-1 lessons are
+  // always unlocked (no prior module to gate on), so unenrolled users pass that
+  // check. Verify enrollment explicitly before writing checkpoint_scores.
+  const supabase = await createClient();
+  const { data: enrollment } = await supabase
+    .from('program_enrollments')
+    .select('id, status')
+    .eq('user_id', user.id)
+    .eq('course_id', courseId)
+    .in('status', ['active', 'completed'])
+    .maybeSingle();
+
+  if (!enrollment) {
+    return NextResponse.json({ error: 'Not enrolled in this course' }, { status: 403 });
   }
 
   try {

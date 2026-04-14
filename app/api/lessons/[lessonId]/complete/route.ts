@@ -240,36 +240,13 @@ async function _POST(
       );
     }
 
-    // Mark lesson as complete
-    const { data: progress, error: progressError } = await db
-      .from('lesson_progress')
-      .upsert(
-        {
-          user_id: user.id,
-          lesson_id: lessonId,
-          course_id: lesson.course_id,
-          enrollment_id: enrollment.id,
-          completed: true,
-          completed_at: new Date().toISOString(),
-          time_spent_seconds: timeSpentSeconds || 0,
-          updated_at: new Date().toISOString(),
-        },
-        {
-          onConflict: 'user_id,lesson_id',
-        }
-      )
-      .select()
-      .single();
+    // lesson_progress is written by recordStepCompletion() below via the engine.
+    // Writing it here as well would fire the DB checkpoint-gate trigger twice and
+    // overwrite completed_at with a slightly later timestamp on the second write.
+    // The completion timestamp used in the response is derived from the engine result.
+    const completedAt = new Date().toISOString();
 
-    if (progressError) {
-      logger.error('Lesson completion error:', progressError);
-      return NextResponse.json(
-        { error: 'Failed to mark lesson complete' },
-        { status: 500 }
-      );
-    }
-
-    logger.info('Lesson completed', {
+    logger.info('Lesson completing', {
       userId: user.id,
       lessonId,
       courseId: lesson.course_id,
@@ -419,7 +396,7 @@ async function _POST(
       lessonId,
       lessonTitle: lesson.title,
       completed: true,
-      completedAt: progress.completed_at,
+      completedAt,
       courseProgress: {
         progressPercent,
         courseCompleted,

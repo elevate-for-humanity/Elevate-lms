@@ -1,6 +1,12 @@
 
 import Stripe from 'stripe';
 import { NextRequest, NextResponse } from 'next/server';
+
+// Instantiated once at module scope. Null when STRIPE_SECRET_KEY is absent
+// (e.g. in test environments) — routes that need it check before use.
+const stripe: Stripe | null = process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' })
+  : null;
 import { parseBody } from '@/lib/api-helpers';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { logger } from '@/lib/logger';

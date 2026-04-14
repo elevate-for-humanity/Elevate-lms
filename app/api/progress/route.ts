@@ -144,6 +144,27 @@ async function _POST(request: Request) {
 
     const supabase = await createClient();
 
+    // Verify the user is enrolled in this course before writing progress.
+    // Without this check any authenticated user can write lesson_progress rows
+    // for courses they are not enrolled in, which can trigger completion and
+    // certificate issuance for arbitrary courses.
+    const { data: enrollment, error: enrollmentError } = await supabase
+      .from('program_enrollments')
+      .select('id, status')
+      .eq('user_id', user.id)
+      .eq('course_id', courseId)
+      .in('status', ['active', 'completed'])
+      .maybeSingle();
+
+    if (enrollmentError) {
+      logger.error('Progress POST: enrollment check failed', enrollmentError);
+      return NextResponse.json({ error: 'Failed to verify enrollment' }, { status: 500 });
+    }
+
+    if (!enrollment) {
+      return NextResponse.json({ error: 'Not enrolled in this course' }, { status: 403 });
+    }
+
     // Upsert lesson progress
     const { data, error } = await supabase
       .from('lesson_progress')

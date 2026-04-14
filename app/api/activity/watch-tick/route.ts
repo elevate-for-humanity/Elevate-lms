@@ -57,14 +57,33 @@ async function _POST(req: NextRequest) {
 
   const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
-  // 1) Upsert today's activity
+  // 1) Increment today's watch time.
+  //
+  // The Supabase JS upsert replaces the entire row on conflict, so
+  //   upsert({ seconds_watched: seconds })
+  // would overwrite the running total with just the latest tick (e.g. 8s),
+  // meaning the daily goal (e.g. 1200s) could never be reached.
+  //
+  // Fix: read the current total first, then upsert with the incremented value.
+  // This is a read-modify-write and is not strictly atomic, but watch-tick is
+  // best-effort (streak tracking, not financial data) and concurrent writes
+  // from the same user are extremely unlikely within the same 8-second window.
+  const { data: existingActivity } = await supabase
+    .from("learning_activity")
+    .select("seconds_watched")
+    .eq("user_id", user.id)
+    .eq("activity_date", today)
+    .maybeSingle();
+
+  const newTotal = (existingActivity?.seconds_watched ?? 0) + seconds;
+
   const { error: activityError } = await supabase
     .from("learning_activity")
     .upsert(
       {
         user_id: user.id,
         activity_date: today,
-        seconds_watched: seconds,
+        seconds_watched: newTotal,
       },
       {
         onConflict: "user_id,activity_date",
@@ -76,20 +95,7 @@ async function _POST(req: NextRequest) {
     return NextResponse.json({ error: "DB error" }, { status: 500 });
   }
 
-  // 2) Fetch updated total seconds for today
-  const { data: activityToday, error: activityTodayError } = await supabase
-    .from("learning_activity")
-    .select("seconds_watched")
-    .eq("user_id", user.id)
-    .eq("activity_date", today)
-    .maybeSingle();
-
-  if (activityTodayError) {
-    logger.error("learning_activity fetch error", activityTodayError);
-    return NextResponse.json({ error: "DB error" }, { status: 500 });
-  }
-
-  const secondsToday = activityToday?.seconds_watched || 0;
+  const secondsToday = newTotal;
 
   // 3) Get goal (default 20 minutes if none)
   const { data: goalRow } = await supabase

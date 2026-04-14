@@ -163,12 +163,15 @@ export async function verifyBackupCode(
   return true;
 }
 
-// Generate backup codes
+// Generate backup codes using a cryptographically secure PRNG.
+// Math.random() is not suitable for security tokens — it is predictable.
 function generateBackupCodes(count: number): string[] {
+  const { randomBytes } = require('crypto') as typeof import('crypto');
   const codes: string[] = [];
   for (let i = 0; i < count; i++) {
-    const code = Math.random().toString(36).substring(2, 10).toUpperCase();
-    codes.push(code);
+    // 6 random bytes → 12 hex chars, uppercased and split XXXX-XXXX for readability
+    const raw = randomBytes(6).toString('hex').toUpperCase();
+    codes.push(`${raw.slice(0, 4)}-${raw.slice(4, 8)}-${raw.slice(8, 12)}`);
   }
   return codes;
 }

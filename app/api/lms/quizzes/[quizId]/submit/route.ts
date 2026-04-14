@@ -107,17 +107,25 @@ async function _POST(
   const scorePercentage = totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0;
   const passed = scorePercentage >= (quiz?.passing_score || 70);
 
-  // Save individual answers
-  for (const result of answerResults) {
-    await db
+  // Save all answers in a single batch insert instead of one round-trip per
+  // question. For a 50-question quiz the old loop made 50 sequential DB calls.
+  if (answerResults.length > 0) {
+    const { error: answersError } = await db
       .from('quiz_attempt_answers')
-      .insert({
-        attempt_id: attemptId,
-        question_id: result.question_id,
-        selected_answer_id: result.selected_answer_id || null,
-        is_correct: result.is_correct,
-        points_earned: result.points_earned,
-      });
+      .insert(
+        answerResults.map((result) => ({
+          attempt_id: attemptId,
+          question_id: result.question_id,
+          selected_answer_id: result.selected_answer_id || null,
+          is_correct: result.is_correct,
+          points_earned: result.points_earned,
+        }))
+      );
+
+    if (answersError) {
+      logger.error('Error saving quiz answers:', answersError);
+      return NextResponse.json({ error: 'Failed to save answers' }, { status: 500 });
+    }
   }
 
   // Update attempt with results

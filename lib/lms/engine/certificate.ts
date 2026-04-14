@@ -106,7 +106,11 @@ export async function issueCertificateIfEligible(
 
   const checkpointsPassed = totalCheckpoints; // all required checkpoints passed (verified above)
 
-  const certNumber = `EFH-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+  // Use crypto.randomBytes for certificate numbers — Math.random() has only
+  // ~2.8 trillion combinations and is not collision-safe under load.
+  // 8 random bytes → 16 hex chars gives 1.8 × 10^19 combinations.
+  const { randomBytes } = require('crypto') as typeof import('crypto');
+  const certNumber = `EFH-${randomBytes(8).toString('hex').toUpperCase()}`;
   const verificationUrl = `/verify/${certNumber}`;
 
   const { error } = await db.from('program_completion_certificates').insert({

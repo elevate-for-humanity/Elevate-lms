@@ -6,8 +6,8 @@ import { PRICES } from './prices';
 
 export const STRIPE_PRICE_IDS: Record<string, string> = {
   // Capital Readiness Guide Products
-  "capital-readiness-guide": PRICES.CR_GUIDE || "price_1T1yGkIRNf5vPH3ALVeVuavY",
-  "capital-readiness-enterprise": PRICES.CR_ENTERPRISE || "price_1T1yGlIRNf5vPH3AdNlMlLAx",
+  "capital-readiness-guide": PRICES.CR_GUIDE || "price_1TM739H4a2yrVOt5sa7tHAqZ",
+  "capital-readiness-enterprise": PRICES.CR_ENTERPRISE || "price_1TM739H4a2yrVOt56SpjIuVx",
   
   // Platform Licenses
   "efh-core": PRICES.CORE_ONETIME,
@@ -39,8 +39,8 @@ export const STRIPE_PRICE_IDS: Record<string, string> = {
   "barber-license": PRICES.BARBER,
   "cosmetology-license": PRICES.COSMETOLOGY,
   "tax-preparation": PRICES.TAX_PREP,
-  "tax-prep-financial-services": "price_1SzM1VIRNf5vPH3APvgSpKRU", // $0 WIOA
-  "tax-prep-financial-services-full": "price_1SsY60IRNf5vPH3ApAUmWGJ9", // $4,950 self-pay
+  "tax-prep-financial-services": "price_1TM739H4a2yrVOt5aGFKqYPH", // $0 WIOA
+  "tax-prep-financial-services-full": "price_1TM739H4a2yrVOt5rAT6QPPF", // $4,950 self-pay
   
   // Technology Courses
   "it-support-specialist": PRICES.IT_SUPPORT,
@@ -56,38 +56,38 @@ export const STRIPE_PRICE_IDS: Record<string, string> = {
   // ============================================================================
   
   // Supervisor Training
-  "nds-dot-supervisor": "price_1Svz8qIRNf5vPH3AtY0AM9Ox", // $130 (NDS: $65)
-  "nds-nondot-supervisor": "price_1Svz8qIRNf5vPH3AoIf0pNax", // $130 (NDS: $65)
-  "nds-dot-supervisor-refresher": "price_1SvzA2IRNf5vPH3A03yUFSHP", // $90 (NDS: $45)
-  "nds-supervisor-bundle": "price_1SvzARIRNf5vPH3AFwwdDqYE", // $220 (NDS: $110)
-  "nds-fra-supervisor": "price_1SvzA7IRNf5vPH3AGlkbCwTV", // $440 (NDS: $220)
+  "nds-dot-supervisor": "price_1TM73qH4a2yrVOt56xkFtovp", // $130 (NDS: $65)
+  "nds-nondot-supervisor": "price_1TM73qH4a2yrVOt5m5A3J7FZ", // $130 (NDS: $65)
+  "nds-dot-supervisor-refresher": "price_1TM73qH4a2yrVOt56ZEdRzW7", // $90 (NDS: $45)
+  "nds-supervisor-bundle": "price_1TM73rH4a2yrVOt5k7ye5zET", // $220 (NDS: $110)
+  "nds-fra-supervisor": "price_1TM73rH4a2yrVOt5y6IVf3TJ", // $440 (NDS: $220)
   
   // Employee Training
-  "nds-dfwp-employee": "price_1Svz8rIRNf5vPH3ABz5zU1UW", // $44 (NDS: $22)
+  "nds-dfwp-employee": "price_1TM73rH4a2yrVOt583dRVp7F", // $44 (NDS: $22)
   
   // Collector Certification
-  "nds-dot-urine-full": "price_1Svz8yIRNf5vPH3ADpVzcaYT", // $1,310 (NDS: $655)
-  "nds-dot-urine-mocks": "price_1Svz8zIRNf5vPH3Auu8QZyT1", // $660 (NDS: $330)
-  "nds-dot-oral-full": "price_1Svz8zIRNf5vPH3AfraNLRot", // $1,398 (NDS: $699)
-  "nds-dot-oral-nomocks": "price_1Svz9wIRNf5vPH3ASrjCCZQc", // $998 (NDS: $499)
-  "nds-oral-nondot": "price_1Svz8zIRNf5vPH3AubLEClix", // $700 (NDS: $350)
-  "nds-stt": "price_1SvzACIRNf5vPH3AqdXR56ce", // $598 (NDS: $299)
-  "nds-hair-collector": "price_1SvzAHIRNf5vPH3AolTMpnM8", // $798 (NDS: $399)
-  "nds-dna-collector": "price_1SvzANIRNf5vPH3AhlPcOdfX", // $598 (NDS: $299)
+  "nds-dot-urine-full": "price_1TM73rH4a2yrVOt5q3Nm7P1z", // $1,310 (NDS: $655)
+  "nds-dot-urine-mocks": "price_1TM73sH4a2yrVOt5tZcADPNi", // $660 (NDS: $330)
+  "nds-dot-oral-full": "price_1TM73sH4a2yrVOt5NYgBplDU", // $1,398 (NDS: $699)
+  "nds-dot-oral-nomocks": "price_1TM73sH4a2yrVOt5vhi8MHn3", // $998 (NDS: $499)
+  "nds-oral-nondot": "price_1TM73tH4a2yrVOt5huW4pto0", // $700 (NDS: $350)
+  "nds-stt": "price_1TM73tH4a2yrVOt5QfcjhejZ", // $598 (NDS: $299)
+  "nds-hair-collector": "price_1TM73tH4a2yrVOt57KpmLmBu", // $798 (NDS: $399)
+  "nds-dna-collector": "price_1TM73tH4a2yrVOt5MoVAzS2r", // $598 (NDS: $299)
   
   // DER Training (Designated Employer Representative)
-  "nds-der-fmcsa": "price_1Svz96IRNf5vPH3Ap9VFD314", // $440 (NDS: $220)
-  "nds-der-faa": "price_1Svz96IRNf5vPH3ATdvWWy7x", // $440 (NDS: $220)
-  "nds-der-fra": "price_1Svz9PIRNf5vPH3AisCDpbQD", // $440 (NDS: $220)
-  "nds-der-fta": "price_1Svz9TIRNf5vPH3AcZZPARQk", // $440 (NDS: $220)
-  "nds-der-phmsa": "price_1Svz9YIRNf5vPH3AUReVz4ph", // $440 (NDS: $220)
-  "nds-der-uscg": "price_1Svz9cIRNf5vPH3AKvxdKFJe", // $440 (NDS: $220)
-  "nds-der-nondot": "price_1Svz96IRNf5vPH3Ai9YE9aZy", // $440 (NDS: $220)
+  "nds-der-fmcsa": "price_1TM73uH4a2yrVOt57HimwibJ", // $440 (NDS: $220)
+  "nds-der-faa": "price_1TM73uH4a2yrVOt54H3VIugq", // $440 (NDS: $220)
+  "nds-der-fra": "price_1TM73uH4a2yrVOt5DpEuTd40", // $440 (NDS: $220)
+  "nds-der-fta": "price_1TM73uH4a2yrVOt5v4K3oDMk", // $440 (NDS: $220)
+  "nds-der-phmsa": "price_1TM73vH4a2yrVOt5LeIlE5gO", // $440 (NDS: $220)
+  "nds-der-uscg": "price_1TM73vH4a2yrVOt54LIDAPG7", // $440 (NDS: $220)
+  "nds-der-nondot": "price_1TM73vH4a2yrVOt5JuATKIY3", // $440 (NDS: $220)
   
   // Advanced & Business Training
-  "nds-startup": "price_1Svz9hIRNf5vPH3AYYMncT7Q", // $198 (NDS: $99)
-  "nds-ttt-urine": "price_1Svz9mIRNf5vPH3A1bVgS4K4", // $3,500 (NDS: $1,750)
-  "nds-ttt-oral": "price_1Svz9rIRNf5vPH3AXdbAxxh1", // $3,998 (NDS: $1,999)
+  "nds-startup": "price_1TM73vH4a2yrVOt5arZTwfbS", // $198 (NDS: $99)
+  "nds-ttt-urine": "price_1TM73wH4a2yrVOt5fdQDVTaK", // $3,500 (NDS: $1,750)
+  "nds-ttt-oral": "price_1TM73wH4a2yrVOt5RjHXY9Rt", // $3,998 (NDS: $1,999)
   
   // ============================================================================
   // CDL Program & Included Courses
@@ -109,43 +109,43 @@ export const STRIPE_PRICE_IDS: Record<string, string> = {
   // ============================================================================
   
   // Healthcare Programs
-  "cna-certification-program": "price_1Sw0MjIRNf5vPH3AsbrosRzm", // $1,200
+  "cna-certification-program": "price_1TM734H4a2yrVOt576980dOP", // $1,200
   "medical-assistant-program": "price_1TL78pH4a2yrVOt5e1fNELc1", // $5,000
-  "phlebotomy-technician-program": "price_1Sw0MoIRNf5vPH3AkuXr8MH2", // $1,305
-  "home-health-aide-program": "price_1Sw0MvIRNf5vPH3AVqaHbVEk", // $4,700
-  "emergency-health-safety-program": "price_1Sw0MvIRNf5vPH3A9fiqsHgk", // $4,750
+  "phlebotomy-technician-program": "price_1TM735H4a2yrVOt5EUodG4oW", // $1,305
+  "home-health-aide-program": "price_1TM735H4a2yrVOt5mCepG1xj", // $4,700
+  "emergency-health-safety-program": "price_1TM735H4a2yrVOt5z3cwMbJY", // $4,750
   
   // Skilled Trades Programs
-  "hvac-technician-program": "price_1Sw0MiIRNf5vPH3AtfgR47tM", // $5,500
+  "hvac-technician-program": "price_1TM736H4a2yrVOt58I9gWXg3", // $5,500
   "building-maintenance-program": "price_1TL78qH4a2yrVOt5pPwKb1FN", // $5,000
-  "welding-certification-program": "price_1Sw0N1IRNf5vPH3AxgRLR0Tc", // $4,999
+  "welding-certification-program": "price_1TM736H4a2yrVOt5sUkSXAiU", // $4,999
   "electrical-apprenticeship-program": "price_1TL78qH4a2yrVOt5sMge9iWo", // $5,000
-  "plumbing-apprenticeship-program": "price_1Sw0N7IRNf5vPH3AKxaVMVu7", // $4,999
+  "plumbing-apprenticeship-program": "price_1TM736H4a2yrVOt5o6hHlfEh", // $4,999
   
   // Beauty & Cosmetology Programs
-  "barber-apprenticeship-program": "price_1Sw0MiIRNf5vPH3AQm0MtqGP", // $4,980
+  "barber-apprenticeship-program": "price_1TM736H4a2yrVOt5z6NbBkUl", // $4,980
   "cosmetology-apprenticeship-program": "price_1TL78oH4a2yrVOt55kVJPUm4", // $6,000
   "esthetician-apprenticeship-program": "price_1TL78nH4a2yrVOt5nF6hrDxl", // $6,000
   "nail-technician-apprenticeship-program": "price_1TL78mH4a2yrVOt5V1FmZlrB", // $5,000
-  "beauty-career-educator-program": "price_1Sw0MpIRNf5vPH3AoiFUXQUY", // $4,575
+  "beauty-career-educator-program": "price_1TM737H4a2yrVOt5isaWBbHM", // $4,575
   
   // Transportation Programs
-  "cdl-training-program": "price_1Sw0KEIRNf5vPH3A0v7RlAZK", // $4,999
+  "cdl-training-program": "price_1TM737H4a2yrVOt54Vd6Peog", // $4,999
   
   // Technology Programs
-  "it-support-specialist-program": "price_1Sw0N7IRNf5vPH3AYhZD45UF", // $4,499
-  "cybersecurity-program": "price_1Sw0N8IRNf5vPH3A6NdTRo3a", // $4,499
+  "it-support-specialist-program": "price_1TM737H4a2yrVOt5LeCDx7pS", // $4,499
+  "cybersecurity-program": "price_1TM737H4a2yrVOt5ZrrVSqaR", // $4,499
   
   // Human Services Programs
   "peer-recovery-coach-program": "price_1TL6nOH4a2yrVOt5uVAEh7Y7", // $5,000 self-pay
   // Peer Recovery — $5,000 = $1,750 (35%) + $542 × 6
   "peer-recovery-deposit": "price_1TL6npH4a2yrVOt58BKj4ff7", // $1,750 (35%)
-  "peer-recovery-installment": "price_PEER_RECOVERY_INSTALLMENT", // TODO: create $542 recurring installment in Stripe Dashboard
-  "public-safety-reentry-program": "price_1Sw0N1IRNf5vPH3AU4qwlgnV", // $4,325
-  "drug-collector-certification-program": "price_1Sw0N1IRNf5vPH3ASlJFEiv8", // $4,750
+  "peer-recovery-installment": "price_1TM71xH4a2yrVOt5tnSOTDIz", // $542
+  "public-safety-reentry-program": "price_1TM738H4a2yrVOt5HsdNFgRy", // $4,325
+  "drug-collector-certification-program": "price_1TM738H4a2yrVOt5HovjAY5f", // $4,750
   
   // Business Programs
-  "business-startup-marketing-program": "price_1Sw0MvIRNf5vPH3AKGMFKJJA", // $4,750
+  "business-startup-marketing-program": "price_1TM738H4a2yrVOt58h0sGxWt", // $4,750
   
   // ============================================================================
   // PAYMENT PLANS (Self-Pay Installments) - 35% Deposit + 65% in 6 Installments
@@ -154,61 +154,61 @@ export const STRIPE_PRICE_IDS: Record<string, string> = {
   // ============================================================================
   
   // Barber Apprenticeship - $4,980 = $1,743 (35%) + $540 × 6
-  "barber-deposit": "price_1Sw3XrIRNf5vPH3AV9CpXMQD", // $1,743
-  "barber-installment": "price_1Sw3YiIRNf5vPH3A0HdYRJtK", // $540
+  "barber-deposit": "price_1TM73QH4a2yrVOt5ttSVuX0j", // $1,743
+  "barber-installment": "price_1TM73QH4a2yrVOt52CuDtRJW", // $540
   
   // CNA Certification - $1,200 = $600 (min deposit) + $100 × 6
   // Note: 35% of $1,200 = $420, but $600 minimum floor applies
   "cna-deposit": "price_1TL6sCH4a2yrVOt5oCumO34g", // $600
-  "cna-installment": "price_1Sw3YjIRNf5vPH3AqtrrnWP0", // $100 (TODO: update price in Stripe Dashboard)
+  "cna-installment": "price_1TM73RH4a2yrVOt5fydlNf0u", // $100 (TODO: update price in Stripe Dashboard)
   
   // HVAC Technician - $5,500 = $1,925 (35%) + $596 × 6
-  "hvac-deposit": "price_1Sw3XsIRNf5vPH3ATDbqt5QL", // $1,925
-  "hvac-installment": "price_1Sw3YjIRNf5vPH3AQHvq4yd1", // $596
+  "hvac-deposit": "price_1TM73RH4a2yrVOt58WxaWYKk", // $1,925
+  "hvac-installment": "price_1TM73RH4a2yrVOt5T5Hyzbnk", // $596
   
   // CDL Training - $5,000 = $1,750 (35%) + $542 × 6
   "cdl-deposit": "price_1TL78pH4a2yrVOt5C5MpaAtq", // $1,750
-  "cdl-installment": "price_1Sw3YjIRNf5vPH3AxkT8PNbx", // $542
+  "cdl-installment": "price_1TM73RH4a2yrVOt5sTtE2yzC", // $542
 
   // Cosmetology - $6,000 = $2,100 (35%) + $650 × 6
   "cosmetology-deposit": "price_1TL78oH4a2yrVOt5s3YPcgck", // $2,100
-  "cosmetology-installment": "price_1Sw3YqIRNf5vPH3AAB0Obzjp", // $650 (TODO: update to $650 in Stripe Dashboard)
+  "cosmetology-installment": "price_1TM71wH4a2yrVOt5hSnbzd1w", // $650
 
   // Esthetician - $6,000 = $2,100 (35%) + $650 × 6
   "esthetician-deposit": "price_1TL78nH4a2yrVOt5DsjMkXwl", // $2,100
-  "esthetician-installment": "price_1Sw3YqIRNf5vPH3AOC6VVohj", // $650 (TODO: update to $650 in Stripe Dashboard)
+  "esthetician-installment": "price_1TM71wH4a2yrVOt52MaUVQBC", // $650
 
   // Nail Technician - $5,000 = $1,750 (35%) + $542 × 6
   "nail-technician-deposit": "price_1TL78mH4a2yrVOt5UCtbaZ6c", // $1,750
-  "nail-technician-installment": "price_1Sw3YqIRNf5vPH3AAB0Obzjp", // $542 (TODO: create in Stripe Dashboard)
+  "nail-technician-installment": "price_1TM71xH4a2yrVOt542VwjCuw", // $542
 
   // Medical Assistant - $5,000 = $1,750 (35%) + $542 × 6
   "medical-assistant-deposit": "price_1TL78pH4a2yrVOt5HYh0t4JF", // $1,750
-  "medical-assistant-installment": "price_1Sw3YrIRNf5vPH3ANZfn2u9m", // $542 (TODO: update in Stripe Dashboard)
+  "medical-assistant-installment": "price_1TM71xH4a2yrVOt5DL2XpL29", // $542
 
   // Welding - $4,999 = $1,750 (35%) + $542 × 6
-  "welding-deposit": "price_1Sw3Y3IRNf5vPH3A30fWmtg3", // $1,750
-  "welding-installment": "price_1Sw3YrIRNf5vPH3Ap1OsYkwq", // $542
+  "welding-deposit": "price_1TM73SH4a2yrVOt5GdwLAHwp", // $1,750
+  "welding-installment": "price_1TM73SH4a2yrVOt51EGukCpE", // $542
 
   // Electrical - $5,000 = $1,750 (35%) + $542 × 6
   "electrical-deposit": "price_1TL78qH4a2yrVOt52WqyvdBm", // $1,750
-  "electrical-installment": "price_1Sw3Z3IRNf5vPH3AYxrQp4HL", // $542
+  "electrical-installment": "price_1TM73SH4a2yrVOt51PM2gr6F", // $542
 
   // Plumbing - $4,999 = $1,750 (35%) + $542 × 6
-  "plumbing-deposit": "price_1Sw3YEIRNf5vPH3AIeqemem8", // $1,750
-  "plumbing-installment": "price_1Sw3Z4IRNf5vPH3AboQGZeSP", // $542
+  "plumbing-deposit": "price_1TM73SH4a2yrVOt5w2YKY9t2", // $1,750
+  "plumbing-installment": "price_1TM73TH4a2yrVOt5cMAS8rUP", // $542
 
   // IT Support - $4,499 = $1,575 (35%) + $487 × 6
-  "it-support-deposit": "price_1Sw3YFIRNf5vPH3AULx56Eyc", // $1,575
-  "it-support-installment": "price_1Sw3Z4IRNf5vPH3AEzQRlqTJ", // $487
+  "it-support-deposit": "price_1TM73TH4a2yrVOt5JWEYj9jw", // $1,575
+  "it-support-installment": "price_1TM73TH4a2yrVOt5wTPP9FzJ", // $487
 
   // Cybersecurity - $4,499 = $1,575 (35%) + $487 × 6
-  "cybersecurity-deposit": "price_1Sw3YFIRNf5vPH3AqtXyw81e", // $1,575
-  "cybersecurity-installment": "price_1Sw3Z4IRNf5vPH3AIpbLLryI", // $487
+  "cybersecurity-deposit": "price_1TM73UH4a2yrVOt5a5lE4lGX", // $1,575
+  "cybersecurity-installment": "price_1TM73UH4a2yrVOt5geQfvjtl", // $487
 
   // Building Maintenance - $5,000 = $1,750 (35%) + $542 × 6
   "building-maintenance-deposit": "price_1TL78rH4a2yrVOt50iYCGjXu", // $1,750
-  "building-maintenance-installment": "price_1Sw3Z5IRNf5vPH3Av1R9U6qa", // $542 (TODO: update in Stripe Dashboard)
+  "building-maintenance-installment": "price_1TM71xH4a2yrVOt5ADW5qbBg", // $542
 };
 
 // ============================================================================

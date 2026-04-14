@@ -132,21 +132,16 @@
 
 [functions]
   node_bundler = "esbuild"
+  # All heavy / browser-only / build-time packages excluded from every function zip.
+  # The per-function [functions."___netlify-server-handler"] block is ignored by
+  # @netlify/plugin-nextjs — this top-level block is the only one that takes effect.
   external_node_modules = [
-    "pg"
-  ]
-
-[functions."run-migrations"]
-  node_bundler = "esbuild"
-  timeout = 300
-
-# Externalize heavy deps from the Next.js SSR handler to stay under 250MB zip limit
-[functions."___netlify-server-handler"]
-  external_node_modules = [
-    # Google APIs (194MB alone)
+    # Database
+    "pg",
+    # Google APIs (194MB)
     "googleapis",
     "google-auth-library",
-    # Editor / terminal (75MB + 63MB — browser-only)
+    # Editor / terminal (browser-only)
     "monaco-editor",
     "node-pty",
     # OCR / image processing
@@ -169,8 +164,7 @@
     # AWS SDK
     "@aws-sdk/client-s3",
     "@aws-sdk/s3-request-presigner",
-    # Database / cache
-    "pg",
+    # Cache
     "ioredis",
     "redis",
     "@upstash/redis",
@@ -205,10 +199,53 @@
     "core-js",
     "prettier",
     "es-toolkit",
+    "tailwindcss",
+    "autoprefixer",
+    "postcss",
+    "eslint",
+    "eslint-plugin-react",
+    "eslint-plugin-react-hooks",
+    "@typescript-eslint/eslint-plugin",
+    "@typescript-eslint/parser",
     # Sockets (not used in serverless)
     "socket.io",
     "socket.io-client",
+    # 3D / WebGL (browser-only, ~43MB)
+    "three",
+    "@react-three/fiber",
+    "@react-three/drei",
+    # Icon library (browser-only, 42MB)
+    "lucide-react",
+    # Charting (browser-only)
+    "recharts",
+    # Canvas / screenshot (browser-only)
+    "html2canvas",
+    # Document generation / parsing
+    "docx",
+    "mammoth",
+    # Collaborative editing (browser-only)
+    "yjs",
+    "y-protocols",
+    "lib0",
+    # WebContainer (browser-only)
+    "@webcontainer/api",
+    # Mailchimp
+    "@mailchimp/mailchimp_marketing",
+    # Not needed in SSR hot path
+    "csv-parse",
+    "sitemap",
+    "schema-dts",
+    "jszip",
+    "fast-xml-parser",
+    "marked",
+    "cheerio",
+    # Test-only
+    "vitest",
   ]
+
+[functions."run-migrations"]
+  node_bundler = "esbuild"
+  timeout = 300
 
 # PDF export function - isolated bundle with PDF libraries
 [functions."export-pdf"]

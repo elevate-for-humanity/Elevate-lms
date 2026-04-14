@@ -1,0 +1,227 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "A client comes in with dry, brittle hair and a flaky scalp. What is the most likely cause of these symptoms?",
+        "choices": [
+          "A. Lack of moisture",
+          "B. Excessive oil production",
+          "C. Fungal infection",
+          "D. Overuse of styling products"
+        ],
+        "answerIndex": 0,
+        "rationale": "Dry, brittle hair and a flaky scalp are often caused by a lack of moisture, which can lead to dryness and flaking."
+      },
+      {
+        "prompt": "During a scalp analysis, you notice your client's scalp is red and irritated. What should be your first step?",
+        "choices": [
+          "A. Recommend a moisturizing treatment",
+          "B. Suggest a medicated shampoo",
+          "C. Refer to a dermatologist",
+          "D. Perform a deep conditioning treatment"
+        ],
+        "answerIndex": 2,
+        "rationale": "Red and irritated scalps may indicate a medical condition that requires professional diagnosis, so referring the client to a dermatologist is the best course of action."
+      },
+      {
+        "prompt": "A client complains of hair thinning. What is the most appropriate initial step to address this concern?",
+        "choices": [
+          "A. Recommend a volumizing shampoo",
+          "B. Conduct a thorough scalp analysis",
+          "C. Suggest a new hairstyle",
+          "D. Advise on a balanced diet"
+        ],
+        "answerIndex": 1,
+        "rationale": "Conducting a thorough scalp analysis helps identify the underlying causes of hair thinning before recommending any treatments or products."
+      },
+      {
+        "prompt": "Which layer of the hair shaft is primarily responsible for the hair's strength and elasticity?",
+        "choices": [
+          "A. Cuticle",
+          "B. Cortex",
+          "C. Medulla",
+          "D. Follicle"
+        ],
+        "answerIndex": 1,
+        "rationale": "The cortex is the middle layer of the hair shaft and is responsible for the hair's strength and elasticity due to its fibrous protein structure."
+      },
+      {
+        "prompt": "A client with oily hair wants advice on reducing oiliness. What is the best recommendation?",
+        "choices": [
+          "A. Wash hair less frequently",
+          "B. Use a clarifying shampoo",
+          "C. Apply more conditioner",
+          "D. Increase scalp massages"
+        ],
+        "answerIndex": 1,
+        "rationale": "Using a clarifying shampoo can help remove excess oil and product buildup, making it suitable for clients with oily hair."
+      },
+      {
+        "prompt": "What is the primary function of the sebaceous glands in the scalp?",
+        "choices": [
+          "A. Produce sweat",
+          "B. Secrete sebum",
+          "C. Generate new hair cells",
+          "D. Provide nutrients to hair"
+        ],
+        "answerIndex": 1,
+        "rationale": "Sebaceous glands secrete sebum, an oily substance that helps moisturize and protect the scalp and hair."
+      },
+      {
+        "prompt": "A client reports experiencing dandruff. Which ingredient should you look for in a shampoo to address this issue?",
+        "choices": [
+          "A. Keratin",
+          "B. Salicylic acid",
+          "C. Panthenol",
+          "D. Argan oil"
+        ],
+        "answerIndex": 1,
+        "rationale": "Salicylic acid is effective in treating dandruff as it helps exfoliate the scalp and reduce flakiness."
+      },
+      {
+        "prompt": "What is the primary role of the cuticle layer of the hair shaft?",
+        "choices": [
+          "A. Protect the cortex",
+          "B. Provide color to the hair",
+          "C. Absorb moisture",
+          "D. Generate new hair cells"
+        ],
+        "answerIndex": 0,
+        "rationale": "The cuticle is the outermost layer of the hair shaft that protects the inner layers, particularly the cortex, from damage."
+      },
+      {
+        "prompt": "You notice a client has patches of hair loss on their scalp. What condition might this indicate?",
+        "choices": [
+          "A. Alopecia areata",
+          "B. Seborrheic dermatitis",
+          "C. Telogen effluvium",
+          "D. Trichotillomania"
+        ],
+        "answerIndex": 0,
+        "rationale": "Alopecia areata is characterized by sudden patchy hair loss on the scalp and other areas of the body."
+      },
+      {
+        "prompt": "Which of the following is a common cause of scalp psoriasis?",
+        "choices": [
+          "A. Fungal infection",
+          "B. Autoimmune disorder",
+          "C. Vitamin deficiency",
+          "D. Excessive shampooing"
+        ],
+        "answerIndex": 1,
+        "rationale": "Scalp psoriasis is an autoimmune disorder where the immune system mistakenly attacks healthy skin cells, leading to rapid skin cell turnover."
+      },
+      {
+        "prompt": "A client with curly hair wants to reduce frizz. What is the best styling tip you can provide?",
+        "choices": [
+          "A. Use a wide-tooth comb",
+          "B. Blow-dry with high heat",
+          "C. Apply leave-in conditioner",
+          "D. Wash hair daily"
+        ],
+        "answerIndex": 2,
+        "rationale": "Applying a leave-in conditioner helps to moisturize curly hair and reduce frizz by sealing the hair cuticle."
+      },
+      {
+        "prompt": "Which part of the hair structure is primarily responsible for hair color?",
+        "choices": [
+          "A. Cuticle",
+          "B. Cortex",
+          "C. Medulla",
+          "D. Follicle"
+        ],
+        "answerIndex": 1,
+        "rationale": "The cortex contains melanin, the pigment responsible for hair color."
+      },
+      {
+        "prompt": "A client asks why their hair feels rough and looks dull. What is a likely explanation?",
+        "choices": [
+          "A. Damaged cuticle",
+          "B. Excessive sebum",
+          "C. High protein content",
+          "D. Overactive follicles"
+        ],
+        "answerIndex": 0,
+        "rationale": "A damaged cuticle can cause hair to feel rough and look dull because it no longer lies flat to reflect light."
+      },
+      {
+        "prompt": "What is the main purpose of performing a scalp massage during a treatment?",
+        "choices": [
+          "A. Stimulate blood circulation",
+          "B. Remove dead skin cells",
+          "C. Enhance hair color absorption",
+          "D. Increase hair density"
+        ],
+        "answerIndex": 0,
+        "rationale": "Scalp massages help stimulate blood circulation, which can promote a healthy scalp and hair growth."
+      },
+      {
+        "prompt": "A client with a sensitive scalp is concerned about using hair dye. What ingredient should they avoid?",
+        "choices": [
+          "A. Ammonia",
+          "B. Keratin",
+          "C. Argan oil",
+          "D. Aloe vera"
+        ],
+        "answerIndex": 0,
+        "rationale": "Ammonia is a common ingredient in hair dyes that can irritate sensitive scalps, so it should be avoided."
+      },
+      {
+        "prompt": "Which of the following is a sign of healthy hair?",
+        "choices": [
+          "A. Split ends",
+          "B. High porosity",
+          "C. Elasticity",
+          "D. Brittle texture"
+        ],
+        "answerIndex": 2,
+        "rationale": "Elasticity is a sign of healthy hair, indicating that the hair can stretch and return to its original shape without breaking."
+      },
+      {
+        "prompt": "A client wants to know why their hair is breaking easily. Which factor is most likely contributing to this issue?",
+        "choices": [
+          "A. Excessive heat styling",
+          "B. Regular conditioning",
+          "C. Balanced diet",
+          "D. Low humidity environment"
+        ],
+        "answerIndex": 0,
+        "rationale": "Excessive heat styling can weaken the hair shaft, leading to breakage."
+      },
+      {
+        "prompt": "What is the function of keratin in hair?",
+        "choices": [
+          "A. Provide moisture",
+          "B. Offer structural support",
+          "C. Enhance color",
+          "D. Increase shine"
+        ],
+        "answerIndex": 1,
+        "rationale": "Keratin is a protein that provides structural support to the hair, making it strong and resilient."
+      },
+      {
+        "prompt": "During a consultation, a client mentions their hair feels greasy soon after washing. What could be a contributing factor?",
+        "choices": [
+          "A. Overactive sebaceous glands",
+          "B. High protein diet",
+          "C. Low humidity",
+          "D. Frequent conditioning"
+        ],
+        "answerIndex": 0,
+        "rationale": "Overactive sebaceous glands can lead to excessive oil production, causing hair to feel greasy shortly after washing."
+      },
+      {
+        "prompt": "A client with color-treated hair is concerned about fading. What advice would you give to maintain their hair color?",
+        "choices": [
+          "A. Use sulfate-free shampoo",
+          "B. Wash hair with hot water",
+          "C. Apply heavy oils",
+          "D. Increase sun exposure"
+        ],
+        "answerIndex": 0,
+        "rationale": "Using sulfate-free shampoo helps preserve hair color by reducing the stripping of color molecules from the hair shaft."
+      }
+    ]
+  }
+}

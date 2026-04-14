@@ -1,0 +1,289 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is the visible hard portion of the nail called?",
+        "choices": [
+          "Nail plate",
+          "Nail bed",
+          "Lunula",
+          "Cuticle"
+        ],
+        "answerIndex": 0,
+        "rationale": "The nail plate is the visible hard portion of the nail, composed of keratin."
+      },
+      {
+        "prompt": "Which part of the nail is the white half-moon shape at the base?",
+        "choices": [
+          "Nail plate",
+          "Nail bed",
+          "Lunula",
+          "Cuticle"
+        ],
+        "answerIndex": 2,
+        "rationale": "The lunula is the white half-moon at the base of the nail."
+      },
+      {
+        "prompt": "What should be done if a client has onychomycosis?",
+        "choices": [
+          "Perform the service with caution",
+          "Refer to a physician",
+          "Use stronger disinfectants",
+          "Ignore it"
+        ],
+        "answerIndex": 1,
+        "rationale": "Onychomycosis is a nail fungus, and barbers should refer clients with this condition to a physician."
+      },
+      {
+        "prompt": "How should metal nail implements be sanitized between clients?",
+        "choices": [
+          "Rinse with water",
+          "Wipe with alcohol",
+          "Disinfect in an EPA-registered disinfectant",
+          "Use a UV light"
+        ],
+        "answerIndex": 2,
+        "rationale": "All metal nail implements must be disinfected in an EPA-registered disinfectant between clients."
+      },
+      {
+        "prompt": "What is the correct action if a client has a bruised nail?",
+        "choices": [
+          "Perform nail service as usual",
+          "Apply extra pressure",
+          "Refer to a physician",
+          "Avoid applying pressure"
+        ],
+        "answerIndex": 3,
+        "rationale": "Bruised nails may be painful, so avoid applying pressure during the service."
+      },
+      {
+        "prompt": "Which of the following is a single-use item in nail services?",
+        "choices": [
+          "Metal nail file",
+          "Orangewood stick",
+          "Cuticle pusher",
+          "Nail clippers"
+        ],
+        "answerIndex": 1,
+        "rationale": "Orangewood sticks are single-use items and must be discarded after each client."
+      },
+      {
+        "prompt": "What is the first step in the basic manicure procedure?",
+        "choices": [
+          "File nails",
+          "Soak hands",
+          "Remove existing polish",
+          "Apply cuticle oil"
+        ],
+        "answerIndex": 2,
+        "rationale": "The first step in the basic manicure procedure is to remove existing polish with non-acetone remover."
+      },
+      {
+        "prompt": "What shape can nails be filed into during a manicure?",
+        "choices": [
+          "Square",
+          "Oval",
+          "Round",
+          "All of these"
+        ],
+        "answerIndex": 3,
+        "rationale": "Nails can be filed into square, oval, or round shapes during a manicure."
+      },
+      {
+        "prompt": "What should be done if a client has an ingrown nail that is infected?",
+        "choices": [
+          "Perform the service carefully",
+          "Refer to a physician",
+          "Use antiseptic",
+          "Cut the nail deeply"
+        ],
+        "answerIndex": 1,
+        "rationale": "Ingrown nails that are infected require medical attention, so refer the client to a physician."
+      },
+      {
+        "prompt": "What is the purpose of applying cuticle oil during a manicure?",
+        "choices": [
+          "To soften the nail plate",
+          "To moisturize the cuticle",
+          "To harden the nail",
+          "To disinfect the nail"
+        ],
+        "answerIndex": 1,
+        "rationale": "Cuticle oil is applied to moisturize and nourish the cuticle area."
+      },
+      {
+        "prompt": "During a manicure, why should living tissue not be cut?",
+        "choices": [
+          "It can cause infection",
+          "It is painful",
+          "It slows nail growth",
+          "It is unnecessary"
+        ],
+        "answerIndex": 0,
+        "rationale": "Cutting living tissue can lead to infection and should be avoided."
+      },
+      {
+        "prompt": "What should be done with foot baths after each client?",
+        "choices": [
+          "Rinse with water",
+          "Wipe with a towel",
+          "Clean and disinfect",
+          "Leave to dry"
+        ],
+        "answerIndex": 2,
+        "rationale": "Foot baths must be cleaned and disinfected per Indiana state board requirements after each client."
+      },
+      {
+        "prompt": "Which nail disorder presents as thickened, discolored, brittle nails?",
+        "choices": [
+          "Hangnails",
+          "Onychomycosis",
+          "Bruised nails",
+          "Ingrown nails"
+        ],
+        "answerIndex": 1,
+        "rationale": "Onychomycosis, or nail fungus, presents as thickened, discolored, brittle nails."
+      },
+      {
+        "prompt": "What is the final step in the basic manicure procedure?",
+        "choices": [
+          "Apply base coat",
+          "Apply top coat",
+          "Buff nail surface",
+          "Clean up edges"
+        ],
+        "answerIndex": 3,
+        "rationale": "The final step in the basic manicure procedure is to clean up edges with a brush dipped in remover."
+      },
+      {
+        "prompt": "Why should non-acetone remover be used to remove existing polish?",
+        "choices": [
+          "It is less drying",
+          "It is faster",
+          "It is cheaper",
+          "It is more effective"
+        ],
+        "answerIndex": 0,
+        "rationale": "Non-acetone remover is less drying to the nails and surrounding skin."
+      },
+      {
+        "prompt": "What should be done if a client has hangnails?",
+        "choices": [
+          "Cut them off",
+          "Moisturize the area",
+          "Ignore them",
+          "Refer to a physician"
+        ],
+        "answerIndex": 1,
+        "rationale": "Moisturizing the area can help prevent hangnails from worsening."
+      },
+      {
+        "prompt": "What is the appropriate action if a nail implement falls on the floor?",
+        "choices": [
+          "Rinse with water",
+          "Use a disinfectant wipe",
+          "Disinfect in an EPA-registered disinfectant",
+          "Continue using it"
+        ],
+        "answerIndex": 2,
+        "rationale": "Any implement that falls on the floor must be disinfected in an EPA-registered disinfectant before use."
+      },
+      {
+        "prompt": "How long should hands be soaked in warm soapy water during a manicure?",
+        "choices": [
+          "1-2 minutes",
+          "3-5 minutes",
+          "6-8 minutes",
+          "10 minutes"
+        ],
+        "answerIndex": 1,
+        "rationale": "Hands should be soaked in warm soapy water for 3-5 minutes to soften the skin and nails."
+      },
+      {
+        "prompt": "What is the purpose of buffing the nail surface during a manicure?",
+        "choices": [
+          "To remove ridges",
+          "To add shine",
+          "To strengthen the nail",
+          "To clean the nail"
+        ],
+        "answerIndex": 0,
+        "rationale": "Buffing the nail surface helps to remove ridges and create a smooth surface for polish application."
+      },
+      {
+        "prompt": "What is an important sanitation requirement for single-use items?",
+        "choices": [
+          "They must be disinfected",
+          "They must be washed",
+          "They must be discarded after each client",
+          "They must be stored properly"
+        ],
+        "answerIndex": 2,
+        "rationale": "Single-use items must be discarded after each client to prevent cross-contamination."
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Nail Plate",
+      "definition": "The visible hard portion of the nail, composed of keratin."
+    },
+    {
+      "term": "Nail Bed",
+      "definition": "The skin beneath the nail plate."
+    },
+    {
+      "term": "Lunula",
+      "definition": "The white half-moon shape at the base of the nail."
+    },
+    {
+      "term": "Cuticle",
+      "definition": "The overlapping skin at the base of the nail."
+    },
+    {
+      "term": "Free Edge",
+      "definition": "The part of the nail that extends beyond the fingertip."
+    },
+    {
+      "term": "Onychomycosis",
+      "definition": "A nail fungus presenting as thickened, discolored, brittle nails."
+    },
+    {
+      "term": "Hangnail",
+      "definition": "A torn piece of skin at the edge of the nail."
+    },
+    {
+      "term": "Bruised Nail",
+      "definition": "Also known as subungual hematoma, appears dark and may be painful."
+    },
+    {
+      "term": "Ingrown Nail",
+      "definition": "A nail that grows into the skin, requiring medical attention if infected."
+    },
+    {
+      "term": "EPA-Registered Disinfectant",
+      "definition": "A disinfectant approved by the Environmental Protection Agency for use on metal implements."
+    },
+    {
+      "term": "Single-Use Items",
+      "definition": "Items like nail files and buffers that must be discarded after each client."
+    },
+    {
+      "term": "Basic Manicure Step 1",
+      "definition": "Remove existing polish with non-acetone remover."
+    },
+    {
+      "term": "Basic Manicure Step 4",
+      "definition": "Push back cuticles gently with an orangewood stick."
+    },
+    {
+      "term": "Indiana State Board Nail Content",
+      "definition": "The barber exam includes questions on nail anatomy, disorders, and sanitation."
+    },
+    {
+      "term": "Foot Bath Sanitation",
+      "definition": "Foot baths must be cleaned and disinfected per Indiana state board requirements."
+    }
+  ]
+}

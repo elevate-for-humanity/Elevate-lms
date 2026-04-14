@@ -1,0 +1,227 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "A client comes in with curly hair and requests a layered haircut to reduce bulk. What technique should you use to achieve this?",
+        "choices": [
+          "Slide cutting",
+          "Blunt cutting",
+          "Clipper over comb",
+          "Point cutting"
+        ],
+        "answerIndex": 3,
+        "rationale": "Point cutting is effective for reducing bulk and adding texture, especially in curly hair."
+      },
+      {
+        "prompt": "When performing a fade haircut, what is the primary purpose of using clipper guards?",
+        "choices": [
+          "To add shine to the hair",
+          "To ensure even length",
+          "To create texture",
+          "To protect the scalp"
+        ],
+        "answerIndex": 1,
+        "rationale": "Clipper guards help maintain consistent hair length, which is crucial for an even fade."
+      },
+      {
+        "prompt": "A client with straight, fine hair wants a haircut that adds volume. Which cutting technique is most suitable?",
+        "choices": [
+          "Razor cutting",
+          "Blunt cutting",
+          "Layering",
+          "Undercutting"
+        ],
+        "answerIndex": 2,
+        "rationale": "Layering can add volume and movement to fine hair, making it appear fuller."
+      },
+      {
+        "prompt": "During a haircut, you notice the client’s hair has uneven growth patterns. What should you do to ensure an even cut?",
+        "choices": [
+          "Ignore the patterns",
+          "Use thinning shears",
+          "Adjust your cutting angle",
+          "Cut against the grain"
+        ],
+        "answerIndex": 2,
+        "rationale": "Adjusting the cutting angle can help accommodate uneven growth patterns and ensure a uniform result."
+      },
+      {
+        "prompt": "What is the main advantage of using a razor over scissors for certain haircuts?",
+        "choices": [
+          "Faster cutting time",
+          "Sharper lines",
+          "Softer edges",
+          "Better for thick hair"
+        ],
+        "answerIndex": 2,
+        "rationale": "Razors create softer edges and a more textured look compared to scissors."
+      },
+      {
+        "prompt": "A client wants a disconnected undercut. How should you approach this style?",
+        "choices": [
+          "Blend the top and sides seamlessly",
+          "Create a visible contrast between top and sides",
+          "Use only scissors",
+          "Avoid using clippers"
+        ],
+        "answerIndex": 1,
+        "rationale": "A disconnected undercut features a clear distinction between the longer top and shorter sides."
+      },
+      {
+        "prompt": "While cutting a client’s hair, you notice the hair is very dry and prone to breakage. What should you do?",
+        "choices": [
+          "Use a razor for a softer cut",
+          "Apply a moisturizing treatment before cutting",
+          "Proceed with blunt cutting",
+          "Use thinning shears to reduce weight"
+        ],
+        "answerIndex": 1,
+        "rationale": "Applying a moisturizing treatment can help protect dry hair from further damage during cutting."
+      },
+      {
+        "prompt": "In a barbershop setting, what is the most important factor when deciding the length of a client’s haircut?",
+        "choices": [
+          "Current trends",
+          "Client's face shape",
+          "Barber's preference",
+          "Client's lifestyle"
+        ],
+        "answerIndex": 3,
+        "rationale": "Understanding the client's lifestyle ensures the haircut is practical and manageable for them."
+      },
+      {
+        "prompt": "A client requests a textured crop haircut. Which tool is best suited for creating texture in this style?",
+        "choices": [
+          "Clippers",
+          "Razor",
+          "Thinning shears",
+          "Blunt scissors"
+        ],
+        "answerIndex": 2,
+        "rationale": "Thinning shears are ideal for adding texture and removing bulk without altering the overall length significantly."
+      },
+      {
+        "prompt": "What is the purpose of cross-checking a haircut?",
+        "choices": [
+          "To ensure evenness and balance",
+          "To speed up the cutting process",
+          "To create layers",
+          "To add shine"
+        ],
+        "answerIndex": 0,
+        "rationale": "Cross-checking helps verify that the haircut is even and balanced across all sections."
+      },
+      {
+        "prompt": "A client with thick, wavy hair wants a short, manageable style. Which technique should you consider?",
+        "choices": [
+          "Blunt cutting",
+          "Texturizing",
+          "Razor cutting",
+          "Layering"
+        ],
+        "answerIndex": 1,
+        "rationale": "Texturizing can help reduce bulk and make thick, wavy hair easier to manage."
+      },
+      {
+        "prompt": "When cutting hair with scissors, what is the significance of maintaining proper tension?",
+        "choices": [
+          "To ensure a faster cut",
+          "To achieve precise lines",
+          "To prevent hair damage",
+          "To enhance shine"
+        ],
+        "answerIndex": 1,
+        "rationale": "Proper tension ensures that hair is cut evenly and precisely, resulting in clean lines."
+      },
+      {
+        "prompt": "A client asks for a crew cut. What is a key characteristic of this style?",
+        "choices": [
+          "Long layers on top",
+          "Tapered sides and back",
+          "Disconnected top",
+          "Asymmetrical fringe"
+        ],
+        "answerIndex": 1,
+        "rationale": "A crew cut typically features short, tapered sides and back with slightly longer hair on top."
+      },
+      {
+        "prompt": "In a barbershop, what is the best way to handle a client who is unsure about the haircut they want?",
+        "choices": [
+          "Choose a style for them",
+          "Show them pictures of different styles",
+          "Ask them to come back later",
+          "Ignore their indecision"
+        ],
+        "answerIndex": 1,
+        "rationale": "Showing pictures can help clients visualize different styles and make a more informed decision."
+      },
+      {
+        "prompt": "What is the primary reason for using sectioning clips during a haircut?",
+        "choices": [
+          "To speed up the process",
+          "To keep hair organized and manageable",
+          "To add texture",
+          "To create volume"
+        ],
+        "answerIndex": 1,
+        "rationale": "Sectioning clips help keep hair organized, making it easier to cut precisely and efficiently."
+      },
+      {
+        "prompt": "A client with a square face shape wants a haircut that softens their features. What should you consider?",
+        "choices": [
+          "Blunt bangs",
+          "Short layers",
+          "Long, soft layers",
+          "High fade"
+        ],
+        "answerIndex": 2,
+        "rationale": "Long, soft layers can help soften the angles of a square face, creating a more balanced appearance."
+      },
+      {
+        "prompt": "When performing a scissor-over-comb technique, what is the main advantage?",
+        "choices": [
+          "Creates sharp lines",
+          "Allows for precise control",
+          "Adds volume",
+          "Speeds up the process"
+        ],
+        "answerIndex": 1,
+        "rationale": "The scissor-over-comb technique allows for precise control over the length and shape of the cut."
+      },
+      {
+        "prompt": "A client with a round face wants a haircut that elongates their appearance. What style should you suggest?",
+        "choices": [
+          "Short bob",
+          "Long layers",
+          "Pixie cut",
+          "Flat top"
+        ],
+        "answerIndex": 1,
+        "rationale": "Long layers can help elongate a round face by adding height and drawing the eye downward."
+      },
+      {
+        "prompt": "What is the benefit of using a texturizing technique on thick hair?",
+        "choices": [
+          "Adds weight",
+          "Reduces bulk",
+          "Creates blunt edges",
+          "Increases shine"
+        ],
+        "answerIndex": 1,
+        "rationale": "Texturizing reduces bulk, making thick hair more manageable and easier to style."
+      },
+      {
+        "prompt": "In a barbershop, how should you handle a situation where a client is unhappy with their haircut?",
+        "choices": [
+          "Offer a refund immediately",
+          "Ignore their concerns",
+          "Listen to their feedback and offer a solution",
+          "Tell them to try another barber"
+        ],
+        "answerIndex": 2,
+        "rationale": "Listening to client feedback and offering a solution demonstrates professionalism and a commitment to customer satisfaction."
+      }
+    ]
+  }
+}

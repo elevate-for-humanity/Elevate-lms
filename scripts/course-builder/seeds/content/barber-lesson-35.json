@@ -1,0 +1,310 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What are the primary colors in hair color theory?",
+        "choices": [
+          "Red, Blue, Yellow",
+          "Red, Green, Blue",
+          "Yellow, Green, Purple",
+          "Blue, Orange, Green"
+        ],
+        "answerIndex": 0,
+        "rationale": "Primary colors are red, blue, and yellow; they cannot be created by mixing other colors.",
+        "type": "recall"
+      },
+      {
+        "prompt": "Which of the following is a secondary color?",
+        "choices": [
+          "Red",
+          "Green",
+          "Blue",
+          "Yellow"
+        ],
+        "answerIndex": 1,
+        "rationale": "Green is a secondary color, created by mixing the primary colors blue and yellow.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A client presents with brassy orange tones in their blonde hair. Which complementary color should you use to neutralize the unwanted tones?",
+        "choices": [
+          "Blue",
+          "Red",
+          "Green",
+          "Yellow"
+        ],
+        "answerIndex": 0,
+        "rationale": "Blue is the complementary color to orange and will neutralize brassy tones.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "During a consultation, a client wants to cover their gray hair with a long-lasting solution. Which type of hair color should you recommend?",
+        "choices": [
+          "Temporary",
+          "Semi-Permanent",
+          "Demi-Permanent",
+          "Permanent"
+        ],
+        "answerIndex": 3,
+        "rationale": "Permanent hair color is ideal for covering gray hair as it offers long-lasting results.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What is the lightest level on the hair color level system?",
+        "choices": [
+          "Level 1",
+          "Level 5",
+          "Level 7",
+          "Level 10"
+        ],
+        "answerIndex": 3,
+        "rationale": "Level 10 is the lightest level, representing pale blonde on the hair color level system.",
+        "type": "recall"
+      },
+      {
+        "prompt": "Which type of hair color requires a low-volume developer and lasts up to 24 shampoos?",
+        "choices": [
+          "Temporary",
+          "Semi-Permanent",
+          "Demi-Permanent",
+          "Permanent"
+        ],
+        "answerIndex": 2,
+        "rationale": "Demi-permanent hair color uses a low-volume developer and lasts longer than semi-permanent options.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A new client asks for a temporary hair color for a weekend event. What should you consider when choosing a product?",
+        "choices": [
+          "It requires a high-volume developer",
+          "It will last up to 24 shampoos",
+          "It sits on the hair's surface and washes out easily",
+          "It penetrates deeply for gray coverage"
+        ],
+        "answerIndex": 2,
+        "rationale": "Temporary hair color sits on the hair's surface and washes out after one or two shampoos, making it ideal for short-term changes.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What is the correct order of steps when applying demi-permanent hair color?",
+        "choices": [
+          "Consultation, Application, Preparation, Processing, Rinse and Condition",
+          "Consultation, Preparation, Application, Processing, Rinse and Condition",
+          "Preparation, Consultation, Application, Processing, Rinse and Condition",
+          "Application, Consultation, Preparation, Processing, Rinse and Condition"
+        ],
+        "answerIndex": 1,
+        "rationale": "The correct order is Consultation, Preparation, Application, Processing, Rinse and Condition.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A client with dark brown hair wants to achieve a medium blonde shade. What is the first step you should take?",
+        "choices": [
+          "Apply a temporary color",
+          "Consult the hair color level system",
+          "Use a high-volume developer",
+          "Mix primary colors to achieve the desired shade"
+        ],
+        "answerIndex": 1,
+        "rationale": "Consulting the hair color level system helps determine the starting level and the target level for the desired shade.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "Which of the following describes a complementary color relationship?",
+        "choices": [
+          "Red and Green",
+          "Blue and Yellow",
+          "Yellow and Orange",
+          "Purple and Blue"
+        ],
+        "answerIndex": 0,
+        "rationale": "Red and green are complementary colors, meaning they neutralize each other when combined.",
+        "type": "recall"
+      },
+      {
+        "prompt": "During a service, you notice the client's hair has turned too red after coloring. What should you do to correct it?",
+        "choices": [
+          "Apply a blue-based product",
+          "Apply a green-based product",
+          "Apply a yellow-based product",
+          "Apply more red color"
+        ],
+        "answerIndex": 1,
+        "rationale": "A green-based product will neutralize the excess red tones in the hair.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "Which hair color type is best for clients who want to experiment with color without a long-term commitment?",
+        "choices": [
+          "Temporary",
+          "Semi-Permanent",
+          "Demi-Permanent",
+          "Permanent"
+        ],
+        "answerIndex": 1,
+        "rationale": "Semi-permanent hair color is ideal for clients wanting to experiment without long-term commitment, lasting 4 to 12 shampoos.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A client wants a subtle color change that enhances their natural shade. Which hair color type should you recommend?",
+        "choices": [
+          "Temporary",
+          "Semi-Permanent",
+          "Demi-Permanent",
+          "Permanent"
+        ],
+        "answerIndex": 2,
+        "rationale": "Demi-permanent color is excellent for enhancing natural color with a subtle change.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What is the BEST approach to neutralize unwanted yellow tones in blonde hair?",
+        "choices": [
+          "Use a red-based toner",
+          "Use a blue-based toner",
+          "Use a purple-based toner",
+          "Use a green-based toner"
+        ],
+        "answerIndex": 2,
+        "rationale": "Purple is the complementary color to yellow, making a purple-based toner the best choice to neutralize yellow tones.",
+        "type": "applied"
+      },
+      {
+        "prompt": "Which level on the hair color level system represents medium brown?",
+        "choices": [
+          "Level 3",
+          "Level 5",
+          "Level 7",
+          "Level 9"
+        ],
+        "answerIndex": 1,
+        "rationale": "Level 5 is medium brown on the hair color level system.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A client requests a hair color that will last only for a special event. Which product should you use?",
+        "choices": [
+          "Temporary",
+          "Semi-Permanent",
+          "Demi-Permanent",
+          "Permanent"
+        ],
+        "answerIndex": 0,
+        "rationale": "Temporary hair color is ideal for short-term use, as it washes out after one or two shampoos.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What would you do if a client wants to transition from a dark color to a lighter shade?",
+        "choices": [
+          "Use a semi-permanent color",
+          "Apply a temporary color",
+          "Consult the hair color level system and use a lightener",
+          "Use a demi-permanent color"
+        ],
+        "answerIndex": 2,
+        "rationale": "Consulting the hair color level system and using a lightener is necessary to lift dark color to a lighter shade.",
+        "type": "applied"
+      },
+      {
+        "prompt": "Which type of hair color penetrates the hair shaft slightly and lasts through 4 to 12 shampoos?",
+        "choices": [
+          "Temporary",
+          "Semi-Permanent",
+          "Demi-Permanent",
+          "Permanent"
+        ],
+        "answerIndex": 1,
+        "rationale": "Semi-permanent hair color penetrates slightly and lasts through 4 to 12 shampoos.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What is the BEST approach to achieve gray coverage with a long-lasting effect?",
+        "choices": [
+          "Use a temporary color",
+          "Use a semi-permanent color",
+          "Use a demi-permanent color",
+          "Use a permanent color"
+        ],
+        "answerIndex": 3,
+        "rationale": "Permanent color is the best choice for long-lasting gray coverage.",
+        "type": "applied"
+      },
+      {
+        "prompt": "A client wants to enhance their natural hair color with minimal commitment. What should you suggest?",
+        "choices": [
+          "Temporary color",
+          "Semi-Permanent color",
+          "Demi-Permanent color",
+          "Permanent color"
+        ],
+        "answerIndex": 2,
+        "rationale": "Demi-permanent color enhances natural color with minimal commitment and lasts longer than semi-permanent options.",
+        "type": "scenario"
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Primary Colors",
+      "definition": "Red, blue, and yellow; the foundational colors that cannot be created by mixing other colors."
+    },
+    {
+      "term": "Secondary Colors",
+      "definition": "Colors created by mixing two primary colors, such as purple, green, and orange."
+    },
+    {
+      "term": "Complementary Colors",
+      "definition": "Color pairs that neutralize each other, like red and green, used to correct unwanted tones in hair."
+    },
+    {
+      "term": "Color Wheel",
+      "definition": "A tool that illustrates the relationship between colors, essential for understanding hair color interactions."
+    },
+    {
+      "term": "Hair Color Level System",
+      "definition": "A scale from 1 (black) to 10 (pale blonde) used to determine the depth of hair color."
+    },
+    {
+      "term": "Temporary Hair Color",
+      "definition": "A non-developer color that sits on the hair surface and washes out in 1-2 shampoos."
+    },
+    {
+      "term": "Semi-Permanent Hair Color",
+      "definition": "A developer-free color that penetrates slightly and lasts 4-12 shampoos."
+    },
+    {
+      "term": "Demi-Permanent Hair Color",
+      "definition": "Uses a low-volume developer, penetrates deeper, and lasts up to 24 shampoos."
+    },
+    {
+      "term": "Permanent Hair Color",
+      "definition": "Involves a high-volume developer for deep penetration, providing long-lasting color."
+    },
+    {
+      "term": "Developer",
+      "definition": "A chemical agent used to open the hair cuticle, allowing color to penetrate."
+    },
+    {
+      "term": "Gray Coverage",
+      "definition": "The process of using hair color to cover gray hair, often requiring permanent color."
+    },
+    {
+      "term": "Consultation",
+      "definition": "A discussion with the client to understand their hair color goals and current hair level."
+    },
+    {
+      "term": "Processing Time",
+      "definition": "The duration color must remain on hair to achieve desired results, usually 20-30 minutes for demi-permanent."
+    },
+    {
+      "term": "Color-Safe Conditioner",
+      "definition": "A product used post-coloring to seal in color and add shine, preventing color fade."
+    },
+    {
+      "term": "Indiana Barber Exam",
+      "definition": "A state exam where hair color theory constitutes 15%, testing knowledge of color principles and applications."
+    }
+  ],
+  "content": "## Introduction to Hair Color Theory\n\nUnderstanding hair color theory is essential for any barber working in Indiana. This knowledge not only enhances your ability to provide a full range of services but also ensures you can meet client expectations with precision and creativity. Hair color services are a significant component of the barbering profession, and mastering this skill can set you apart in a competitive industry.\n\n## The Color Wheel: Primary, Secondary, and Complementary Colors\n\nAt the heart of hair color theory lies the color wheel, a fundamental tool that helps barbers understand how different colors interact. Primary colors—red, blue, and yellow—are the building blocks of all other colors. These colors cannot be created by mixing other colors together, making them essential in hair coloring.\n\nSecondary colors are created by mixing two primary colors. For instance, mixing red and blue yields purple, blue and yellow produce green, and red and yellow result in orange. These colors play a crucial role in achieving the desired hair color outcomes.\n\nComplementary colors are pairs that, when combined, cancel each other out by producing a neutral color like gray or brown. In hair color, complementary colors are used to neutralize unwanted tones. For example, if a client's hair has too much red, a green-based product can help neutralize the red tones. Understanding how to use complementary colors effectively is vital for correcting hair color and achieving the perfect shade.\n\n## The Hair Color Level System\n\nThe hair color level system is a standardized scale that ranges from 1 to 10, with 1 being the darkest (black) and 10 being the lightest (pale blonde). Each level represents a specific depth of color, which is critical when formulating hair color. \n\nLevel 1 is black, the darkest shade. As you move up the scale, the colors become progressively lighter. Level 5 is a medium brown, and Level 7 is a medium blonde. Finally, Level 10 is the lightest blonde. Understanding this system allows barbers to accurately assess a client's current hair color and determine the best approach for achieving the desired result.\n\nKnowing the hair color level system is not only crucial for performing color services but is also a key component of the Indiana barber written exam, where chemical services account for 15% of the test. Expect questions on this topic to evaluate your understanding of color depth and how to apply this knowledge in real-world scenarios.\n\n## Types of Hair Color: Temporary, Semi-Permanent, Demi-Permanent, and Permanent\n\nHair color products are categorized based on their longevity and the type of developer used. Temporary hair color is the least permanent option, sitting on the hair's surface and washing out after one or two shampoos. It does not require a developer and is ideal for short-term color changes or special occasions.\n\nSemi-permanent hair color penetrates the hair shaft slightly more than temporary color. It typically lasts through 4 to 12 shampoos and does not require a developer. This type of color is perfect for clients looking to experiment with different shades without a long-term commitment.\n\nDemi-permanent hair color uses a low-volume developer to open the hair cuticle slightly, allowing color to penetrate deeper than semi-permanent options. It lasts longer, usually up to 24 shampoos, and is excellent for blending grays or enhancing natural color.\n\nPermanent hair color involves a higher-volume developer, which opens the hair cuticle and allows color to penetrate deeply. This type of color is long-lasting and ideal for clients seeking a significant color change or gray coverage. Understanding these distinctions is crucial for providing the right service to your clients and is an area tested on the Indiana barber exam.\n\n## Step-by-Step: Applying Demi-Permanent Hair Color\n\n1. **Consultation**: Begin with a thorough consultation to understand the client's color goals and assess their current hair color level.\n2. **Preparation**: Mix the demi-permanent color with the appropriate developer as per the manufacturer's instructions.\n3. **Application**: Section the hair and apply the color evenly, starting from the roots and working towards the ends.\n4. **Processing**: Allow the color to process for the recommended time, usually between 20 to 30 minutes.\n5. **Rinse and Condition**: Rinse the hair thoroughly with lukewarm water until the water runs clear. Apply a color-safe conditioner to help seal the color and add shine.\n\n## Importance of Hair Color Theory in the Indiana Barber Exam\n\nHair color theory is a critical component of the Indiana barber written exam, comprising 15% of the test. This section evaluates your ability to identify and apply color theory principles, understand the hair color level system, and distinguish between different types of hair color products. Mastery of this material is essential not only for passing the exam but also for building a successful career as a barber.\n\n## Key Takeaway\n\nHair color theory is a vital skill for any barber in Indiana, providing the foundation for delivering exceptional color services. By mastering the color wheel, understanding the hair color level system, and distinguishing between different types of hair color, you will be well-prepared to meet your clients' needs and excel in your career. Remember, this knowledge is not only crucial for practical applications but also for achieving success on the Indiana barber written exam."
+}

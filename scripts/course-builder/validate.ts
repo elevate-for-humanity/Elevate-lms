@@ -28,6 +28,8 @@ function validateLesson(l: LessonSeed, moduleSlug: string): AuditRow {
   if (!l.title) fail(`Missing title: ${l.slug}`);
   if (!l.durationMin || l.durationMin < 10) fail(`Invalid durationMin: ${l.slug}`);
   if (!l.content || l.content.trim().length < 20) fail(`Missing/empty content: ${l.slug}`);
+  const wordCount = l.content.trim().split(/\s+/).length;
+  if (wordCount < 800) fail(`${l.slug}: content too thin (${wordCount}w, need 800w) — run: pnpm course:generate-content --slug ${l.slug}`);
 
   if (!l.domain)      fail(`Missing domain: ${l.slug}`);
   if (!VALID_DOMAINS.includes(l.domain)) fail(`Invalid domain "${l.domain}": ${l.slug}`);
@@ -47,12 +49,37 @@ function validateLesson(l: LessonSeed, moduleSlug: string): AuditRow {
     if (!c.description) fail(`Competency missing description in ${l.slug}`);
   }
 
+  const qCount = l.quiz?.questions?.length ?? 0;
+  if (qCount < 20) fail(`${l.slug}: needs 20 quiz questions (has ${qCount}) — run: pnpm course:generate-content --slug ${l.slug}`);
+
+  // Enforce scenario question minimum
+  const scenarioCount = (l.quiz?.questions ?? []).filter(q => {
+    const p = q.prompt.toLowerCase();
+    return p.startsWith('a client') || p.startsWith('during a') || p.startsWith('a new client') ||
+      p.startsWith('you notice') || p.startsWith('while performing') || p.includes('presents with') ||
+      (q as unknown as Record<string,string>).type === 'scenario' || (q as unknown as Record<string,string>).type === 'applied';
+  }).length;
+  if (scenarioCount < 8) fail(`${l.slug}: needs ≥8 scenario questions (has ${scenarioCount}) — run: pnpm course:generate-content --slug ${l.slug} --quiz-only --force`);
+
+  const fcCount = l.flashcards?.length ?? 0;
+  if (fcCount < 15) fail(`${l.slug}: needs 15 flashcards (has ${fcCount}) — run: pnpm course:generate-content --slug ${l.slug}`);
+
+  // Lab lessons must have procedures
+  const isLab = l.ojtCategory === 'PRACTICAL' || l.ojtCategory === 'DEMONSTRATION';
+  if (isLab && !l.procedures?.length) {
+    fail(`${l.slug}: lab/practical lesson needs procedures — run: pnpm course:generate-content --slug ${l.slug}`);
+  }
+
   return {
     moduleSlug, lessonSlug: l.slug, title: l.title,
     hasDomain: true, hasOjtCategory: true, hasHoursCredit: true, hasCompetencyChecks: true,
     competencyCount: l.competencyChecks.length, status: 'COMPLETE',
   };
 }
+
+const CHECKPOINT_QUESTION_OVERRIDES: Record<string, number> = {
+  'barber-indiana-state-board-exam': 60,
+};
 
 function validateCheckpoint(c: CheckpointSeed, moduleSlug: string): void {
   if (!c.slug)  fail(`Checkpoint missing slug in ${moduleSlug}`);
@@ -62,7 +89,9 @@ function validateCheckpoint(c: CheckpointSeed, moduleSlug: string): void {
   if (!VALID_OJT_CATEGORIES.includes(c.ojtCategory)) fail(`Invalid ojtCategory on checkpoint: ${c.slug}`);
   if (c.hoursCredit === undefined || c.hoursCredit <= 0) fail(`Invalid hoursCredit on checkpoint: ${c.slug}`);
   if (!c.passingScore || c.passingScore <= 0) fail(`Missing passingScore on checkpoint: ${c.slug}`);
-  if (!c.questions?.length) fail(`No questions on checkpoint: ${c.slug}`);
+  const required = CHECKPOINT_QUESTION_OVERRIDES[c.slug] ?? 20;
+  const actual = c.questions?.length ?? 0;
+  if (actual < required) fail(`${c.slug}: needs ${required} questions (has ${actual})`);
 }
 
 function validateCourse(course: CourseSeed): void {

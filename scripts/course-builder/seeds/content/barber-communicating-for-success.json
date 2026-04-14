@@ -1,0 +1,289 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is the primary goal of the client consultation?",
+        "choices": [
+          "To upsell products",
+          "To confirm the client's appointment",
+          "To understand the client's needs and expectations",
+          "To demonstrate technical skills"
+        ],
+        "answerIndex": 2,
+        "rationale": "The client consultation is primarily about understanding the client's needs and expectations to ensure satisfaction."
+      },
+      {
+        "prompt": "Which question is an example of an open-ended question during a client consultation?",
+        "choices": [
+          "Do you want a haircut?",
+          "What are you looking for today?",
+          "Would you like a shampoo?",
+          "Is this your first visit?"
+        ],
+        "answerIndex": 1,
+        "rationale": "Open-ended questions encourage clients to share more information, helping barbers understand their needs better."
+      },
+      {
+        "prompt": "What is a key component of active listening?",
+        "choices": [
+          "Planning your next response",
+          "Nodding and making eye contact",
+          "Talking more than the client",
+          "Ignoring client feedback"
+        ],
+        "answerIndex": 1,
+        "rationale": "Active listening involves giving full attention, including nodding and making eye contact to show engagement."
+      },
+      {
+        "prompt": "How should a barber manage a client's expectation for a dramatic change?",
+        "choices": [
+          "Promise to achieve it in one visit",
+          "Avoid discussing the limitations",
+          "Clearly explain it may require multiple sessions",
+          "Ignore the client's request"
+        ],
+        "answerIndex": 2,
+        "rationale": "Managing expectations involves being honest about what can be achieved in one visit to maintain trust."
+      },
+      {
+        "prompt": "What should a barber do first when a client complains?",
+        "choices": [
+          "Defend their work",
+          "Interrupt to explain",
+          "Listen without interrupting",
+          "Offer a discount immediately"
+        ],
+        "answerIndex": 2,
+        "rationale": "Listening without interrupting helps understand the client's issue and shows respect for their concerns."
+      },
+      {
+        "prompt": "What is the effect of resolving a client complaint effectively?",
+        "choices": [
+          "The client never returns",
+          "The client becomes more loyal",
+          "The client tells others not to visit",
+          "The client demands a refund"
+        ],
+        "answerIndex": 1,
+        "rationale": "Effectively resolving complaints can create a more loyal client because they feel valued and heard."
+      },
+      {
+        "prompt": "Why is it important to repeat back what you heard during a consultation?",
+        "choices": [
+          "To fill time",
+          "To confirm understanding",
+          "To impress the client",
+          "To avoid making mistakes"
+        ],
+        "answerIndex": 1,
+        "rationale": "Repeating back what you heard ensures both parties have the same understanding of the client's desires."
+      },
+      {
+        "prompt": "How should conflicts with colleagues be addressed?",
+        "choices": [
+          "Publicly in front of clients",
+          "Through gossip",
+          "Privately and professionally",
+          "By ignoring them"
+        ],
+        "answerIndex": 2,
+        "rationale": "Conflicts should be resolved privately and professionally to maintain a positive work environment."
+      },
+      {
+        "prompt": "What is an example of professional communication in the shop?",
+        "choices": [
+          "Interrupting a colleague's service",
+          "Respecting others' clients",
+          "Engaging in gossip",
+          "Ignoring client needs"
+        ],
+        "answerIndex": 1,
+        "rationale": "Professional communication includes respecting colleagues and their clients, contributing to a positive atmosphere."
+      },
+      {
+        "prompt": "Why should a barber avoid planning their response while a client is talking?",
+        "choices": [
+          "It wastes time",
+          "It shows disinterest",
+          "It prevents active listening",
+          "It is considered rude"
+        ],
+        "answerIndex": 2,
+        "rationale": "Planning a response while the client is talking prevents the barber from fully listening and understanding the client's needs."
+      },
+      {
+        "prompt": "A client wants a style that requires multiple visits. What should the barber do?",
+        "choices": [
+          "Promise to achieve it in one visit",
+          "Explain the process and set realistic expectations",
+          "Ignore the client's request",
+          "Tell the client it's impossible"
+        ],
+        "answerIndex": 1,
+        "rationale": "The barber should explain the process and set realistic expectations to manage the client's expectations effectively."
+      },
+      {
+        "prompt": "What is NOT a part of active listening?",
+        "choices": [
+          "Nodding",
+          "Making eye contact",
+          "Interrupting",
+          "Asking clarifying questions"
+        ],
+        "answerIndex": 2,
+        "rationale": "Interrupting is not part of active listening; it disrupts the flow of communication and shows a lack of engagement."
+      },
+      {
+        "prompt": "What should a barber do if they don't understand a client's request?",
+        "choices": [
+          "Guess what the client wants",
+          "Ask clarifying questions",
+          "Ignore the request",
+          "Do what they think is best"
+        ],
+        "answerIndex": 1,
+        "rationale": "Asking clarifying questions ensures the barber fully understands the client's request, preventing misunderstandings."
+      },
+      {
+        "prompt": "How can a barber demonstrate they are actively listening?",
+        "choices": [
+          "By talking over the client",
+          "By nodding and maintaining eye contact",
+          "By thinking about their next appointment",
+          "By ignoring the client's feedback"
+        ],
+        "answerIndex": 1,
+        "rationale": "Nodding and maintaining eye contact are signs of active listening, showing the client they have the barber's full attention."
+      },
+      {
+        "prompt": "What is an effective way to handle a client's unrealistic expectation?",
+        "choices": [
+          "Promise to meet it anyway",
+          "Explain the limitations and offer alternatives",
+          "Ignore the expectation",
+          "Argue with the client"
+        ],
+        "answerIndex": 1,
+        "rationale": "Explaining limitations and offering alternatives helps manage expectations and maintain trust with the client."
+      },
+      {
+        "prompt": "Why is gossip discouraged in a professional shop environment?",
+        "choices": [
+          "It is entertaining",
+          "It reduces shop morale and client experience",
+          "It is a form of communication",
+          "It helps resolve conflicts"
+        ],
+        "answerIndex": 1,
+        "rationale": "Gossip is discouraged because it reduces morale and negatively impacts the client experience."
+      },
+      {
+        "prompt": "In what way does effective communication contribute to client retention?",
+        "choices": [
+          "It allows for more sales",
+          "It ensures clients feel heard and understood",
+          "It reduces the need for consultations",
+          "It guarantees perfect results every time"
+        ],
+        "answerIndex": 1,
+        "rationale": "Effective communication ensures clients feel heard and understood, which is crucial for client retention."
+      },
+      {
+        "prompt": "What is the first step in resolving a client's complaint?",
+        "choices": [
+          "Apologize immediately",
+          "Listen without interrupting",
+          "Offer a refund",
+          "Defend your work"
+        ],
+        "answerIndex": 1,
+        "rationale": "Listening without interrupting is the first step in resolving a complaint, as it helps understand the issue fully."
+      },
+      {
+        "prompt": "How should a barber respond if a client feels their haircut is not what they expected?",
+        "choices": [
+          "Argue that it is correct",
+          "Listen to their concerns and offer a solution",
+          "Ignore their feedback",
+          "Tell them they are wrong"
+        ],
+        "answerIndex": 1,
+        "rationale": "Listening to the client's concerns and offering a solution helps resolve the issue and maintain a positive relationship."
+      },
+      {
+        "prompt": "What is a benefit of handling a complaint effectively?",
+        "choices": [
+          "The client will always ask for a discount",
+          "The client will never return",
+          "The client will feel valued and may become more loyal",
+          "The client will spread negative reviews"
+        ],
+        "answerIndex": 2,
+        "rationale": "Handling complaints effectively makes clients feel valued and can lead to increased loyalty."
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Effective Communication",
+      "definition": "The foundation of client retention, involving listening, asking questions, and managing expectations."
+    },
+    {
+      "term": "Client Consultation",
+      "definition": "The initial conversation with a client to understand their needs and preferences before starting a service."
+    },
+    {
+      "term": "Open-ended Questions",
+      "definition": "Questions that encourage detailed responses, such as 'What are you looking for today?'"
+    },
+    {
+      "term": "Active Listening",
+      "definition": "Giving full attention to the speaker, showing understanding through nodding and eye contact, and asking clarifying questions."
+    },
+    {
+      "term": "Managing Expectations",
+      "definition": "Being honest about what can be achieved in a single visit to avoid surprises and build trust."
+    },
+    {
+      "term": "Conflict Resolution",
+      "definition": "Handling disagreements or complaints by listening, apologizing, and offering solutions without arguing."
+    },
+    {
+      "term": "Client Retention",
+      "definition": "The ability to keep clients returning for services through effective communication and satisfaction."
+    },
+    {
+      "term": "Clarifying Questions",
+      "definition": "Questions asked to ensure understanding of what the client has said, such as 'Can you explain further?'"
+    },
+    {
+      "term": "Handling Complaints",
+      "definition": "The process of addressing client dissatisfaction by listening, apologizing, and resolving the issue."
+    },
+    {
+      "term": "Professional Communication",
+      "definition": "Respectful and appropriate interaction with colleagues and clients, avoiding gossip and drama."
+    },
+    {
+      "term": "Colleague Interaction",
+      "definition": "Communicating respectfully with coworkers, not interrupting their services, and resolving conflicts privately."
+    },
+    {
+      "term": "Client Trust",
+      "definition": "Confidence clients have in a barber's ability to meet their needs, built through honesty and effective communication."
+    },
+    {
+      "term": "Service Expectations",
+      "definition": "What a client anticipates from a service, which should be clearly communicated and managed by the barber."
+    },
+    {
+      "term": "Listening Skills",
+      "definition": "The ability to effectively hear and understand what a client is communicating, crucial for successful consultations."
+    },
+    {
+      "term": "Shop Morale",
+      "definition": "The overall mood and atmosphere in a barber shop, influenced by communication and relationships among staff."
+    }
+  ]
+}

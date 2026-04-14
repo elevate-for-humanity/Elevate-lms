@@ -1,0 +1,289 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is the first step in a basic facial service sequence?",
+        "choices": [
+          "Cleanse",
+          "Steam/Hot towel",
+          "Exfoliate",
+          "Massage"
+        ],
+        "answerIndex": 0,
+        "rationale": "The first step is to cleanse the skin to remove surface oils, dirt, and product buildup."
+      },
+      {
+        "prompt": "Which massage movement involves light, gliding strokes to promote relaxation?",
+        "choices": [
+          "Effleurage",
+          "Petrissage",
+          "Friction",
+          "Tapotement"
+        ],
+        "answerIndex": 0,
+        "rationale": "Effleurage is characterized by light, gliding strokes and is used to begin and end a massage."
+      },
+      {
+        "prompt": "Which skin type is most likely to benefit from a clay mask during a facial?",
+        "choices": [
+          "Oily",
+          "Dry",
+          "Sensitive",
+          "Normal"
+        ],
+        "answerIndex": 0,
+        "rationale": "Clay masks are ideal for oily skin as they help absorb excess oil and reduce shine."
+      },
+      {
+        "prompt": "Why should a hot towel be tested on the barber's wrist before applying it to a client's face?",
+        "choices": [
+          "To ensure it is not scalding",
+          "To check for cleanliness",
+          "To verify the scent",
+          "To confirm the size"
+        ],
+        "answerIndex": 0,
+        "rationale": "Testing on the wrist ensures the towel's temperature is warm but not scalding, preventing burns."
+      },
+      {
+        "prompt": "Which of the following is a contraindication for facial massage?",
+        "choices": [
+          "Inflamed acne",
+          "Normal skin",
+          "Combination skin",
+          "Dry skin"
+        ],
+        "answerIndex": 0,
+        "rationale": "Facial massage should not be performed on clients with inflamed acne as it can worsen the condition."
+      },
+      {
+        "prompt": "What is the purpose of the exfoliation step in a facial?",
+        "choices": [
+          "Remove dead skin cells",
+          "Close the pores",
+          "Hydrate the skin",
+          "Reduce redness"
+        ],
+        "answerIndex": 0,
+        "rationale": "Exfoliation removes dead skin cells, allowing for better absorption of subsequent products."
+      },
+      {
+        "prompt": "Which massage technique involves kneading and lifting movements?",
+        "choices": [
+          "Petrissage",
+          "Effleurage",
+          "Tapotement",
+          "Vibration"
+        ],
+        "answerIndex": 0,
+        "rationale": "Petrissage involves kneading and lifting movements that stimulate deeper tissue and circulation."
+      },
+      {
+        "prompt": "What should be applied to the skin after a mask in the facial sequence?",
+        "choices": [
+          "Toner",
+          "Exfoliant",
+          "Steam",
+          "Moisturizer"
+        ],
+        "answerIndex": 0,
+        "rationale": "Toner is applied after a mask to close the pores and remove any residue."
+      },
+      {
+        "prompt": "A client has recently had Botox injections. How long should you wait before performing a facial massage?",
+        "choices": [
+          "2 weeks",
+          "1 week",
+          "3 days",
+          "1 month"
+        ],
+        "answerIndex": 0,
+        "rationale": "Facial massage should be avoided for at least 2 weeks after Botox injections to prevent altering the results."
+      },
+      {
+        "prompt": "During a facial, which step is specifically used to stimulate circulation and relax facial muscles?",
+        "choices": [
+          "Massage",
+          "Cleanse",
+          "Mask",
+          "Tone"
+        ],
+        "answerIndex": 0,
+        "rationale": "The massage step is designed to stimulate circulation and relax facial muscles."
+      },
+      {
+        "prompt": "A client presents with sunburn. What should you do regarding facial services?",
+        "choices": [
+          "Avoid facial massage",
+          "Proceed with normal service",
+          "Use a clay mask",
+          "Perform deep exfoliation"
+        ],
+        "answerIndex": 0,
+        "rationale": "Facial massage should be avoided on sunburned skin to prevent further irritation."
+      },
+      {
+        "prompt": "Which massage movement is used to invigorate and stimulate nerve endings?",
+        "choices": [
+          "Tapotement",
+          "Effleurage",
+          "Petrissage",
+          "Friction"
+        ],
+        "answerIndex": 0,
+        "rationale": "Tapotement involves light tapping or percussion movements that invigorate and stimulate nerve endings."
+      },
+      {
+        "prompt": "What is the main purpose of using a hot towel during a facial?",
+        "choices": [
+          "Open pores",
+          "Close pores",
+          "Hydrate skin",
+          "Remove makeup"
+        ],
+        "answerIndex": 0,
+        "rationale": "A hot towel is used to open pores, soften the skin, and prepare it for deeper treatment."
+      },
+      {
+        "prompt": "Which condition is a contraindication for facial services due to potential irritation?",
+        "choices": [
+          "Rosacea flare-up",
+          "Oily skin",
+          "Normal skin",
+          "Combination skin"
+        ],
+        "answerIndex": 0,
+        "rationale": "A rosacea flare-up is a contraindication because facial treatments can exacerbate the condition."
+      },
+      {
+        "prompt": "How long should a hot towel be left on the client's face during a facial?",
+        "choices": [
+          "2-3 minutes",
+          "5-6 minutes",
+          "10 minutes",
+          "1 minute"
+        ],
+        "answerIndex": 0,
+        "rationale": "A hot towel should be left on for 2-3 minutes to effectively open pores and soften the skin."
+      },
+      {
+        "prompt": "Which facial step involves using an astringent to close pores?",
+        "choices": [
+          "Tone",
+          "Cleanse",
+          "Exfoliate",
+          "Mask"
+        ],
+        "answerIndex": 0,
+        "rationale": "Toning involves using an astringent or toner to close pores and remove residue."
+      },
+      {
+        "prompt": "A client has open cuts on their face. What should you do?",
+        "choices": [
+          "Avoid facial services",
+          "Proceed with caution",
+          "Use a hydrating mask",
+          "Perform a deep massage"
+        ],
+        "answerIndex": 0,
+        "rationale": "Facial services should be avoided on clients with open cuts to prevent infection and irritation."
+      },
+      {
+        "prompt": "Which massage movement involves deep, circular movements to break up tension?",
+        "choices": [
+          "Friction",
+          "Effleurage",
+          "Petrissage",
+          "Vibration"
+        ],
+        "answerIndex": 0,
+        "rationale": "Friction involves deep, circular movements that help break up tension and stimulate blood flow."
+      },
+      {
+        "prompt": "What is the final step in the basic facial service sequence?",
+        "choices": [
+          "Moisturize",
+          "Tone",
+          "Exfoliate",
+          "Mask"
+        ],
+        "answerIndex": 0,
+        "rationale": "Moisturizing is the final step, sealing in hydration and protecting the skin barrier."
+      },
+      {
+        "prompt": "Which facial treatment is optional and involves removing dead skin cells?",
+        "choices": [
+          "Exfoliate",
+          "Cleanse",
+          "Tone",
+          "Moisturize"
+        ],
+        "answerIndex": 0,
+        "rationale": "Exfoliation is an optional step that involves removing dead skin cells to improve skin texture."
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Skin Analysis",
+      "definition": "The process of assessing a client's skin type and identifying any contraindications before a facial service."
+    },
+    {
+      "term": "Contraindications",
+      "definition": "Conditions that prevent the performance of a facial service, such as inflamed acne or recent cosmetic procedures."
+    },
+    {
+      "term": "Effleurage",
+      "definition": "A massage technique involving light, gliding strokes to promote relaxation and begin or end a massage."
+    },
+    {
+      "term": "Petrissage",
+      "definition": "A massage technique involving kneading and lifting movements to stimulate deeper tissue and circulation."
+    },
+    {
+      "term": "Friction",
+      "definition": "A massage technique using deep, circular movements to break up tension and stimulate blood flow."
+    },
+    {
+      "term": "Tapotement",
+      "definition": "A massage technique involving light tapping or percussion to invigorate and stimulate nerve endings."
+    },
+    {
+      "term": "Vibration",
+      "definition": "A massage technique using rapid shaking movements to finish a massage and stimulate nerves."
+    },
+    {
+      "term": "Hot Towel Service",
+      "definition": "A service using a warm towel to open pores, soften beard hair, and relax the client before shaving."
+    },
+    {
+      "term": "Exfoliate",
+      "definition": "The process of removing dead skin cells using a gentle scrub or enzyme exfoliant."
+    },
+    {
+      "term": "Moisturize",
+      "definition": "The step in a facial service that seals in hydration and protects the skin barrier."
+    },
+    {
+      "term": "Tone",
+      "definition": "The use of an astringent or toner to close pores and remove residue after a facial treatment."
+    },
+    {
+      "term": "Mask",
+      "definition": "A treatment applied to address specific skin concerns, such as clay for oily skin or hydrating for dry skin."
+    },
+    {
+      "term": "Steam/Hot Towel",
+      "definition": "Used to open pores and soften skin, preparing it for deeper treatment during a facial service."
+    },
+    {
+      "term": "Inflamed Acne",
+      "definition": "A contraindication for facial massage due to the risk of aggravating the condition."
+    },
+    {
+      "term": "Recent Botox or Filler Injections",
+      "definition": "A contraindication for facial services if performed within the last two weeks."
+    }
+  ]
+}

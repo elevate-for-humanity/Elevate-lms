@@ -1,0 +1,667 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "While cleaning your tools after a busy day at the barbershop, you accidentally drop a pair of scissors on the floor. What is the correct procedure to ensure they are sanitized before the next use?",
+        "choices": [
+          "Rinse them with water",
+          "Wipe them with a dry cloth",
+          "Clean them with soap and water, then disinfect",
+          "Use them immediately since they were only on the floor briefly"
+        ],
+        "answerIndex": 2,
+        "rationale": "Cleaning with soap and water removes debris, and disinfecting ensures any remaining pathogens are eliminated."
+      },
+      {
+        "prompt": "A client comes in with visible dandruff and an itchy scalp. What is the first step you should take before proceeding with a haircut?",
+        "choices": [
+          "Begin the haircut",
+          "Recommend a medicated shampoo",
+          "Perform a scalp analysis",
+          "Apply conditioner"
+        ],
+        "answerIndex": 2,
+        "rationale": "Performing a scalp analysis helps identify the underlying issue and determine the appropriate treatment or service."
+      },
+      {
+        "prompt": "During a haircut, you notice a small cut on your client's scalp. What should you do?",
+        "choices": [
+          "Ignore it and continue",
+          "Apply a styptic powder and continue",
+          "Stop the service and recommend medical attention",
+          "Clean the area with antiseptic and proceed carefully"
+        ],
+        "answerIndex": 3,
+        "rationale": "Cleaning with antiseptic prevents infection and allows you to continue with caution."
+      },
+      {
+        "prompt": "What is the primary reason for using a neck strip during a haircut?",
+        "choices": [
+          "To catch falling hair",
+          "To prevent the cape from touching the client's skin",
+          "To keep the client warm",
+          "To absorb sweat"
+        ],
+        "answerIndex": 1,
+        "rationale": "The neck strip acts as a barrier to maintain hygiene by preventing the cape from touching the skin."
+      },
+      {
+        "prompt": "Which of the following is a key characteristic of healthy hair?",
+        "choices": [
+          "Dull appearance",
+          "Brittle texture",
+          "Elasticity",
+          "Split ends"
+        ],
+        "answerIndex": 2,
+        "rationale": "Elasticity indicates that the hair can stretch and return to its original shape without breaking, a sign of healthy hair."
+      },
+      {
+        "prompt": "A client requests a chemical relaxer service. What should you do first?",
+        "choices": [
+          "Apply the relaxer immediately",
+          "Conduct a strand test",
+          "Wash the hair with conditioner",
+          "Cut the hair shorter"
+        ],
+        "answerIndex": 1,
+        "rationale": "A strand test helps determine the hair's reaction to the chemical and prevents damage."
+      },
+      {
+        "prompt": "In Indiana, how often must a barber renew their license?",
+        "choices": [
+          "Every year",
+          "Every two years",
+          "Every three years",
+          "Every five years"
+        ],
+        "answerIndex": 1,
+        "rationale": "Barbers in Indiana are required to renew their licenses every two years to ensure they meet current standards and regulations."
+      },
+      {
+        "prompt": "What is the most effective level of decontamination used in barbershops to prevent the spread of disease?",
+        "choices": [
+          "Sanitation",
+          "Disinfection",
+          "Sterilization",
+          "Cleaning"
+        ],
+        "answerIndex": 2,
+        "rationale": "Sterilization is the most effective level of decontamination, eliminating all forms of microbial life."
+      },
+      {
+        "prompt": "A client comes in with very oily hair and scalp. Which type of shampoo should you use?",
+        "choices": [
+          "Moisturizing shampoo",
+          "Clarifying shampoo",
+          "Volumizing shampoo",
+          "Color-protecting shampoo"
+        ],
+        "answerIndex": 1,
+        "rationale": "Clarifying shampoo is designed to remove excess oil and product buildup, making it ideal for oily hair."
+      },
+      {
+        "prompt": "During a haircut, you notice your clippers are pulling the client's hair. What should you do?",
+        "choices": [
+          "Continue cutting",
+          "Oil the clippers",
+          "Change the blade",
+          "Adjust the tension"
+        ],
+        "answerIndex": 1,
+        "rationale": "Oiling the clippers reduces friction and prevents hair from being pulled."
+      },
+      {
+        "prompt": "What is the purpose of using a pre-shave oil before a straight razor shave?",
+        "choices": [
+          "To dry out the skin",
+          "To soften the beard and protect the skin",
+          "To exfoliate the skin",
+          "To create a matte finish"
+        ],
+        "answerIndex": 1,
+        "rationale": "Pre-shave oil softens the beard and provides a protective layer, reducing irritation during the shave."
+      },
+      {
+        "prompt": "A client has a round face shape. Which haircut technique can help elongate their face?",
+        "choices": [
+          "Adding volume at the sides",
+          "Keeping hair flat on top",
+          "Creating height at the crown",
+          "Cutting bangs straight across"
+        ],
+        "answerIndex": 2,
+        "rationale": "Creating height at the crown elongates the face, making it appear less round."
+      },
+      {
+        "prompt": "What is the main purpose of using a conditioner after shampooing?",
+        "choices": [
+          "To cleanse the hair",
+          "To add texture",
+          "To close the cuticle and add moisture",
+          "To strip natural oils"
+        ],
+        "answerIndex": 2,
+        "rationale": "Conditioner helps close the hair cuticle and adds moisture, improving the hair's texture and manageability."
+      },
+      {
+        "prompt": "Which of the following is a sign of a chemical burn during a hair coloring service?",
+        "choices": [
+          "Itching",
+          "Redness and blistering",
+          "Dryness",
+          "Dandruff"
+        ],
+        "answerIndex": 1,
+        "rationale": "Redness and blistering are signs of a chemical burn, indicating a severe reaction to the product."
+      },
+      {
+        "prompt": "During a consultation, a client mentions they have a cowlick at the front of their hairline. How should you adjust your cutting technique?",
+        "choices": [
+          "Cut the hair shorter in that area",
+          "Leave the hair longer to weigh it down",
+          "Ignore it and cut as usual",
+          "Use thinning shears"
+        ],
+        "answerIndex": 1,
+        "rationale": "Leaving the hair longer can help weigh down the cowlick, making it less noticeable."
+      },
+      {
+        "prompt": "In Indiana, what is the minimum age requirement to apply for a barber license?",
+        "choices": [
+          "16 years old",
+          "18 years old",
+          "21 years old",
+          "25 years old"
+        ],
+        "answerIndex": 1,
+        "rationale": "The minimum age requirement to apply for a barber license in Indiana is 18 years old."
+      },
+      {
+        "prompt": "What is the correct ratio of bleach to water for disinfecting surfaces in a barbershop?",
+        "choices": [
+          "1:10",
+          "1:5",
+          "1:20",
+          "1:100"
+        ],
+        "answerIndex": 0,
+        "rationale": "A 1:10 ratio of bleach to water is commonly recommended for effective disinfection of surfaces."
+      },
+      {
+        "prompt": "A client wants a style that requires significant volume. Which tool is best suited for this purpose?",
+        "choices": [
+          "Flat iron",
+          "Round brush",
+          "Straight comb",
+          "Thinning shears"
+        ],
+        "answerIndex": 1,
+        "rationale": "A round brush is ideal for creating volume and lift when blow-drying hair."
+      },
+      {
+        "prompt": "Which layer of the hair shaft is responsible for its strength and elasticity?",
+        "choices": [
+          "Cuticle",
+          "Cortex",
+          "Medulla",
+          "Follicle"
+        ],
+        "answerIndex": 1,
+        "rationale": "The cortex is the middle layer of the hair shaft, providing strength and elasticity."
+      },
+      {
+        "prompt": "What should you do if a client has a contagious scalp condition?",
+        "choices": [
+          "Proceed with the service",
+          "Refer them to a physician",
+          "Use extra conditioner",
+          "Cut their hair dry"
+        ],
+        "answerIndex": 1,
+        "rationale": "Referring the client to a physician is necessary to prevent spreading the condition to others."
+      },
+      {
+        "prompt": "A client requests a fade haircut. Which tool is essential for achieving a smooth transition between lengths?",
+        "choices": [
+          "Razor",
+          "Scissors",
+          "Clippers",
+          "Comb"
+        ],
+        "answerIndex": 2,
+        "rationale": "Clippers are essential for creating a smooth transition in a fade haircut."
+      },
+      {
+        "prompt": "What is the maximum amount of time you should leave a chemical relaxer on the hair?",
+        "choices": [
+          "10 minutes",
+          "20 minutes",
+          "30 minutes",
+          "40 minutes"
+        ],
+        "answerIndex": 2,
+        "rationale": "Leaving a relaxer on for more than 30 minutes can cause excessive damage to the hair."
+      },
+      {
+        "prompt": "A client has fine, limp hair and wants more body. Which product should you recommend?",
+        "choices": [
+          "Heavy cream",
+          "Volumizing mousse",
+          "Leave-in conditioner",
+          "Oil serum"
+        ],
+        "answerIndex": 1,
+        "rationale": "Volumizing mousse adds body and lift to fine, limp hair without weighing it down."
+      },
+      {
+        "prompt": "Which of the following is a requirement for maintaining a sanitary workstation?",
+        "choices": [
+          "Using the same cape for all clients",
+          "Disinfecting tools after each use",
+          "Storing combs in a drawer",
+          "Wiping surfaces weekly"
+        ],
+        "answerIndex": 1,
+        "rationale": "Disinfecting tools after each use is crucial for preventing the spread of infections."
+      },
+      {
+        "prompt": "What is the primary purpose of a scalp massage during a shampoo service?",
+        "choices": [
+          "To entertain the client",
+          "To increase blood circulation",
+          "To dry the scalp",
+          "To straighten the hair"
+        ],
+        "answerIndex": 1,
+        "rationale": "A scalp massage increases blood circulation, promoting a healthy scalp and hair growth."
+      },
+      {
+        "prompt": "A client wants to cover their gray hair. Which type of hair color should you recommend?",
+        "choices": [
+          "Temporary",
+          "Semi-permanent",
+          "Permanent",
+          "Lightener"
+        ],
+        "answerIndex": 2,
+        "rationale": "Permanent hair color provides the best coverage for gray hair."
+      },
+      {
+        "prompt": "What is the proper way to store disinfected tools?",
+        "choices": [
+          "In a drawer",
+          "In a sealed container",
+          "On the countertop",
+          "In a plastic bag"
+        ],
+        "answerIndex": 1,
+        "rationale": "Storing disinfected tools in a sealed container keeps them sanitary and ready for use."
+      },
+      {
+        "prompt": "A client has a square face shape. Which haircut technique can help soften their features?",
+        "choices": [
+          "Adding layers around the face",
+          "Cutting blunt bangs",
+          "Keeping hair one length",
+          "Creating a center part"
+        ],
+        "answerIndex": 0,
+        "rationale": "Adding layers around the face softens the angles of a square face shape."
+      },
+      {
+        "prompt": "Which of the following is NOT a function of the hair's cuticle layer?",
+        "choices": [
+          "Protecting the cortex",
+          "Providing elasticity",
+          "Adding shine",
+          "Preventing damage"
+        ],
+        "answerIndex": 1,
+        "rationale": "The cortex, not the cuticle, is responsible for the hair's elasticity."
+      },
+      {
+        "prompt": "What is the recommended method for handling a client with lice?",
+        "choices": [
+          "Proceed with the service",
+          "Use a lice comb",
+          "Refer them to a physician",
+          "Apply conditioner"
+        ],
+        "answerIndex": 2,
+        "rationale": "Referring the client to a physician is necessary to address the lice infestation properly."
+      },
+      {
+        "prompt": "What is the main advantage of using a razor over scissors for cutting hair?",
+        "choices": [
+          "Faster cutting",
+          "More precise lines",
+          "Softer, more textured look",
+          "Easier to handle"
+        ],
+        "answerIndex": 2,
+        "rationale": "A razor creates a softer, more textured look compared to scissors."
+      },
+      {
+        "prompt": "A client wants to lighten their hair several shades. Which product should you use?",
+        "choices": [
+          "Semi-permanent color",
+          "Permanent color",
+          "Lightener",
+          "Gloss"
+        ],
+        "answerIndex": 2,
+        "rationale": "Lightener is necessary to lift the hair several shades lighter."
+      },
+      {
+        "prompt": "What is the purpose of a patch test before a chemical service?",
+        "choices": [
+          "To check the hair's porosity",
+          "To determine the processing time",
+          "To test for allergic reactions",
+          "To see the final color result"
+        ],
+        "answerIndex": 2,
+        "rationale": "A patch test checks for allergic reactions to the chemicals used in the service."
+      },
+      {
+        "prompt": "What is the first step in performing a basic facial shave?",
+        "choices": [
+          "Apply shaving cream",
+          "Trim the beard",
+          "Wash the face",
+          "Apply pre-shave oil"
+        ],
+        "answerIndex": 3,
+        "rationale": "Applying pre-shave oil prepares the skin and hair for a smoother shave."
+      },
+      {
+        "prompt": "A client complains of dry, brittle hair. What is a suitable treatment to recommend?",
+        "choices": [
+          "Clarifying shampoo",
+          "Protein treatment",
+          "Volumizing mousse",
+          "Texturizing spray"
+        ],
+        "answerIndex": 1,
+        "rationale": "A protein treatment can help strengthen and repair dry, brittle hair."
+      },
+      {
+        "prompt": "In Indiana, what is the consequence of practicing barbering without a valid license?",
+        "choices": [
+          "A warning",
+          "A fine",
+          "License suspension",
+          "Community service"
+        ],
+        "answerIndex": 1,
+        "rationale": "Practicing without a valid license can result in a fine as a penalty."
+      },
+      {
+        "prompt": "What is the best way to handle a client who is dissatisfied with their haircut?",
+        "choices": [
+          "Ignore their concerns",
+          "Argue with them",
+          "Listen and offer a solution",
+          "Tell them to come back another day"
+        ],
+        "answerIndex": 2,
+        "rationale": "Listening to the client's concerns and offering a solution demonstrates professionalism and customer service."
+      },
+      {
+        "prompt": "Which type of hair is most prone to tangling?",
+        "choices": [
+          "Straight hair",
+          "Wavy hair",
+          "Curly hair",
+          "Coarse hair"
+        ],
+        "answerIndex": 2,
+        "rationale": "Curly hair is more prone to tangling due to its texture and shape."
+      },
+      {
+        "prompt": "What is the purpose of using a diffuser attachment on a blow dryer?",
+        "choices": [
+          "To straighten hair",
+          "To add volume",
+          "To reduce frizz",
+          "To cool the hair"
+        ],
+        "answerIndex": 2,
+        "rationale": "A diffuser reduces frizz and enhances natural curls by distributing air evenly."
+      },
+      {
+        "prompt": "A client wants a haircut that requires minimal styling. Which option should you recommend?",
+        "choices": [
+          "Layered cut",
+          "Blunt cut",
+          "Textured cut",
+          "Undercut"
+        ],
+        "answerIndex": 1,
+        "rationale": "A blunt cut is low maintenance and requires minimal styling."
+      },
+      {
+        "prompt": "What is the recommended action if you accidentally cut a client's skin during a service?",
+        "choices": [
+          "Ignore it",
+          "Apply a bandage",
+          "Apply antiseptic and a bandage",
+          "Continue without addressing it"
+        ],
+        "answerIndex": 2,
+        "rationale": "Applying antiseptic and a bandage helps prevent infection and addresses the injury."
+      },
+      {
+        "prompt": "Which of the following is a benefit of using a leave-in conditioner?",
+        "choices": [
+          "Adds weight",
+          "Provides heat protection",
+          "Strips natural oils",
+          "Increases drying time"
+        ],
+        "answerIndex": 1,
+        "rationale": "Leave-in conditioner provides heat protection and adds moisture without weighing down the hair."
+      },
+      {
+        "prompt": "What is the main function of the medulla in the hair shaft?",
+        "choices": [
+          "Adds color",
+          "Provides strength",
+          "Insulates the hair",
+          "Protects the cuticle"
+        ],
+        "answerIndex": 2,
+        "rationale": "The medulla is the innermost layer of the hair shaft and is thought to provide insulation."
+      },
+      {
+        "prompt": "A client has a heart-shaped face. Which haircut can help balance their features?",
+        "choices": [
+          "Short layers",
+          "Chin-length bob",
+          "Pixie cut",
+          "Long layers"
+        ],
+        "answerIndex": 1,
+        "rationale": "A chin-length bob helps balance a heart-shaped face by adding width at the jawline."
+      },
+      {
+        "prompt": "What is the recommended procedure for cleaning a barber chair?",
+        "choices": [
+          "Wipe with a damp cloth",
+          "Spray with disinfectant and wipe down",
+          "Use a vacuum cleaner",
+          "Polish with furniture wax"
+        ],
+        "answerIndex": 1,
+        "rationale": "Spraying with disinfectant and wiping down ensures the chair is sanitized between clients."
+      },
+      {
+        "prompt": "Which of the following is an indication of over-processed hair?",
+        "choices": [
+          "Shiny appearance",
+          "Elasticity",
+          "Brittle texture",
+          "Smooth cuticle"
+        ],
+        "answerIndex": 2,
+        "rationale": "Brittle texture indicates that the hair has been over-processed and damaged."
+      },
+      {
+        "prompt": "What is the primary purpose of using a heat protectant spray?",
+        "choices": [
+          "To add shine",
+          "To speed up drying",
+          "To protect hair from heat damage",
+          "To hold a style"
+        ],
+        "answerIndex": 2,
+        "rationale": "Heat protectant spray shields the hair from damage caused by high temperatures during styling."
+      },
+      {
+        "prompt": "In Indiana, what is the required number of hours for a barber apprenticeship program?",
+        "choices": [
+          "1000 hours",
+          "1200 hours",
+          "1500 hours",
+          "1800 hours"
+        ],
+        "answerIndex": 3,
+        "rationale": "The state of Indiana requires 1800 hours for a barber apprenticeship program to ensure comprehensive training."
+      },
+      {
+        "prompt": "A client wants to add highlights to their hair. Which technique should you use?",
+        "choices": [
+          "Balayage",
+          "Single-process color",
+          "Glossing",
+          "Toning"
+        ],
+        "answerIndex": 0,
+        "rationale": "Balayage is a technique used to add natural-looking highlights to the hair."
+      },
+      {
+        "prompt": "What is the best way to ensure even color application during a hair coloring service?",
+        "choices": [
+          "Apply color to wet hair",
+          "Use a wide-tooth comb",
+          "Section the hair properly",
+          "Apply color quickly"
+        ],
+        "answerIndex": 2,
+        "rationale": "Properly sectioning the hair ensures even color application and prevents missed spots."
+      },
+      {
+        "prompt": "What is the proper way to dispose of single-use items in a barbershop?",
+        "choices": [
+          "Reuse them",
+          "Throw them in the trash",
+          "Place in a designated disposal container",
+          "Store them for later use"
+        ],
+        "answerIndex": 2,
+        "rationale": "Single-use items should be placed in a designated disposal container to maintain hygiene and safety."
+      },
+      {
+        "prompt": "A client wants a hairstyle that enhances their natural curls. Which product should you recommend?",
+        "choices": [
+          "Curl-enhancing cream",
+          "Smoothing serum",
+          "Volumizing spray",
+          "Dry shampoo"
+        ],
+        "answerIndex": 0,
+        "rationale": "Curl-enhancing cream defines and enhances natural curls without weighing them down."
+      },
+      {
+        "prompt": "What is the primary benefit of using a clarifying shampoo?",
+        "choices": [
+          "Adds moisture",
+          "Removes buildup",
+          "Protects color",
+          "Adds volume"
+        ],
+        "answerIndex": 1,
+        "rationale": "Clarifying shampoo is designed to remove product buildup and impurities from the hair."
+      },
+      {
+        "prompt": "Which of the following is a characteristic of hair with high porosity?",
+        "choices": [
+          "Resistant to moisture",
+          "Absorbs moisture quickly",
+          "Shiny appearance",
+          "Smooth texture"
+        ],
+        "answerIndex": 1,
+        "rationale": "Hair with high porosity absorbs moisture quickly due to gaps in the cuticle layer."
+      },
+      {
+        "prompt": "While performing a haircut, you notice that your client's hair has become increasingly difficult to manage due to excessive dryness and frizz. What is the best approach to address this issue during the appointment?",
+        "choices": [
+          "A. Recommend a deep conditioning treatment before proceeding with the haircut",
+          "B. Use a fine-tooth comb to detangle the hair",
+          "C. Apply more water to the hair to make it easier to cut",
+          "D. Cut the hair dry to better see the shape"
+        ],
+        "answerIndex": 0,
+        "rationale": "A deep conditioning treatment can help restore moisture and manageability to dry, frizzy hair, making it easier to cut and style."
+      },
+      {
+        "prompt": "You are preparing a chemical relaxer for a client. What is the most important step to take before applying the relaxer to ensure client safety?",
+        "choices": [
+          "A. Perform a strand test",
+          "B. Apply petroleum jelly to the hair",
+          "C. Mix the relaxer with water",
+          "D. Shampoo the client's hair"
+        ],
+        "answerIndex": 0,
+        "rationale": "Performing a strand test helps determine the hair's reaction to the chemical relaxer and ensures the desired outcome without causing damage."
+      },
+      {
+        "prompt": "A client requests a layered haircut. During the consultation, you learn that they have very fine hair. What technique should you use to ensure the haircut adds volume?",
+        "choices": [
+          "A. Use a razor to create texture",
+          "B. Cut the hair using vertical sections",
+          "C. Use thinning shears to remove bulk",
+          "D. Cut the hair at a 90-degree angle"
+        ],
+        "answerIndex": 1,
+        "rationale": "Cutting the hair using vertical sections helps create layers that add volume and movement, which is beneficial for clients with fine hair."
+      },
+      {
+        "prompt": "In Indiana, what is the maximum fine for a first-time violation of barbering regulations?",
+        "choices": [
+          "A. $500",
+          "B. $1,000",
+          "C. $2,000",
+          "D. $5,000"
+        ],
+        "answerIndex": 1,
+        "rationale": "Indiana state regulations specify that the maximum fine for a first-time violation is $1,000."
+      },
+      {
+        "prompt": "A client comes in with a request for a permanent wave. During the consultation, you discover they have color-treated hair. How should you proceed?",
+        "choices": [
+          "A. Use a regular perm solution",
+          "B. Use a mild perm solution formulated for color-treated hair",
+          "C. Refuse to perform the service",
+          "D. Apply a protein treatment before the perm"
+        ],
+        "answerIndex": 1,
+        "rationale": "Using a mild perm solution formulated for color-treated hair helps prevent damage and ensures the integrity of the hair is maintained."
+      },
+      {
+        "prompt": "During a busy day at the barbershop, you notice that one of your clippers is not cutting properly. What should be your immediate course of action?",
+        "choices": [
+          "A. Continue using the clippers and adjust your technique",
+          "B. Replace the blades immediately",
+          "C. Clean and oil the clippers before using them again",
+          "D. Use a different pair of clippers for the rest of the day"
+        ],
+        "answerIndex": 3,
+        "rationale": "Switching to a different pair of clippers ensures you can continue providing quality service without delay, while you address the maintenance issue with the original clippers later."
+      }
+    ]
+  }
+}

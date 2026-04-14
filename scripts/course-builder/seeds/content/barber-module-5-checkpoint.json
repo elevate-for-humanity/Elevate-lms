@@ -1,0 +1,227 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "While performing a straight razor shave, you notice a small cut on the client's cheek. What is the best immediate course of action?",
+        "choices": [
+          "Apply a styptic pencil to stop the bleeding",
+          "Continue shaving and address it after",
+          "Use a towel to wipe it and move on",
+          "Ask the client if they want to stop"
+        ],
+        "answerIndex": 0,
+        "rationale": "A styptic pencil is used to stop minor bleeding quickly and hygienically."
+      },
+      {
+        "prompt": "A client has very sensitive skin and requests a shave. Which shaving cream would be most appropriate?",
+        "choices": [
+          "Menthol-based cream",
+          "Unscented hypoallergenic cream",
+          "Alcohol-based gel",
+          "Eucalyptus oil-infused cream"
+        ],
+        "answerIndex": 1,
+        "rationale": "An unscented hypoallergenic cream minimizes irritation for sensitive skin."
+      },
+      {
+        "prompt": "During a beard trim, a client requests a specific style that requires precise lines. Which tool is best suited for this task?",
+        "choices": [
+          "Straight razor",
+          "Electric clipper",
+          "Scissors",
+          "Beard comb"
+        ],
+        "answerIndex": 0,
+        "rationale": "A straight razor allows for the most precise lines and detailing in beard styling."
+      },
+      {
+        "prompt": "You are performing a hot towel shave and the client mentions they feel the towel is too hot. What should you do?",
+        "choices": [
+          "Ignore and continue",
+          "Remove the towel immediately",
+          "Add more towels on top",
+          "Ask the client to endure it"
+        ],
+        "answerIndex": 1,
+        "rationale": "Removing the towel immediately prevents burns or discomfort."
+      },
+      {
+        "prompt": "What is the primary reason for stretching the skin during a straight razor shave?",
+        "choices": [
+          "To make the client more comfortable",
+          "To allow a closer shave",
+          "To prevent nicks and cuts",
+          "To exfoliate the skin"
+        ],
+        "answerIndex": 2,
+        "rationale": "Stretching the skin helps prevent nicks and cuts by providing a smooth surface for the razor."
+      },
+      {
+        "prompt": "A client with a full beard wants to transition to a goatee. What is the first step in this process?",
+        "choices": [
+          "Outline the goatee shape",
+          "Trim the entire beard to a shorter length",
+          "Shave the cheeks and neck",
+          "Discuss the desired style with the client"
+        ],
+        "answerIndex": 3,
+        "rationale": "Discussing the desired style ensures the barber understands the client's expectations before starting."
+      },
+      {
+        "prompt": "A client has ingrown hairs on their neck. Which shaving technique should you use to minimize irritation?",
+        "choices": [
+          "Shave against the grain",
+          "Use a dull blade",
+          "Shave with the grain",
+          "Apply pressure while shaving"
+        ],
+        "answerIndex": 2,
+        "rationale": "Shaving with the grain reduces the risk of further irritation and ingrown hairs."
+      },
+      {
+        "prompt": "What is the most appropriate action if a client expresses dissatisfaction with their beard trim?",
+        "choices": [
+          "Offer to redo the trim",
+          "Ignore their feedback",
+          "Charge them less",
+          "Tell them it looks fine"
+        ],
+        "answerIndex": 0,
+        "rationale": "Offering to redo the trim shows professionalism and a commitment to client satisfaction."
+      },
+      {
+        "prompt": "When sanitizing a straight razor, what is the minimum recommended contact time with a disinfectant solution?",
+        "choices": [
+          "10 seconds",
+          "1 minute",
+          "5 minutes",
+          "15 minutes"
+        ],
+        "answerIndex": 2,
+        "rationale": "A contact time of 5 minutes is generally recommended to ensure effective disinfection."
+      },
+      {
+        "prompt": "A client requests a hot lather shave. What is the purpose of using hot lather in this service?",
+        "choices": [
+          "To soften the hair and open pores",
+          "To cool the skin",
+          "To exfoliate dead skin cells",
+          "To remove excess oil"
+        ],
+        "answerIndex": 0,
+        "rationale": "Hot lather softens the hair and opens pores, making the shave smoother and more effective."
+      },
+      {
+        "prompt": "Which of the following is a contraindication for a straight razor shave?",
+        "choices": [
+          "Dry skin",
+          "Acne",
+          "Oily skin",
+          "Thick beard"
+        ],
+        "answerIndex": 1,
+        "rationale": "Acne can be irritated or cut during a straight razor shave, making it a contraindication."
+      },
+      {
+        "prompt": "You notice your razor is pulling at the hair rather than cutting smoothly. What should you do?",
+        "choices": [
+          "Apply more shaving cream",
+          "Sharpen or replace the blade",
+          "Use more pressure",
+          "Change the shaving angle"
+        ],
+        "answerIndex": 1,
+        "rationale": "A dull blade can pull hair; sharpening or replacing it ensures a smooth shave."
+      },
+      {
+        "prompt": "A client with a patchy beard wants advice on how to make it look fuller. What is the best advice you can give?",
+        "choices": [
+          "Shave it all off",
+          "Use beard oil for growth",
+          "Style with a fuller shape",
+          "Dye the beard darker"
+        ],
+        "answerIndex": 2,
+        "rationale": "Styling the beard with a fuller shape can help create the appearance of a fuller beard."
+      },
+      {
+        "prompt": "What is the main benefit of using a pre-shave oil before a straight razor shave?",
+        "choices": [
+          "To moisturize the skin",
+          "To provide a protective barrier",
+          "To exfoliate the skin",
+          "To cool the skin"
+        ],
+        "answerIndex": 1,
+        "rationale": "Pre-shave oil provides a protective barrier that reduces friction and irritation during shaving."
+      },
+      {
+        "prompt": "A client asks for a clean-shaven look but has a history of razor bumps. What shaving technique should you use?",
+        "choices": [
+          "Shave against the grain",
+          "Use a safety razor",
+          "Shave with the grain",
+          "Apply more pressure"
+        ],
+        "answerIndex": 2,
+        "rationale": "Shaving with the grain minimizes irritation and reduces the risk of razor bumps."
+      },
+      {
+        "prompt": "What is the purpose of using a cold towel after a shave?",
+        "choices": [
+          "To close the pores",
+          "To soften the skin",
+          "To open the pores",
+          "To exfoliate the skin"
+        ],
+        "answerIndex": 0,
+        "rationale": "A cold towel helps close the pores and soothe the skin after shaving, reducing irritation."
+      },
+      {
+        "prompt": "A client wants to maintain their beard's natural oils. What is the best way to wash their beard?",
+        "choices": [
+          "Use regular shampoo",
+          "Wash with water only",
+          "Use a beard-specific shampoo",
+          "Apply conditioner only"
+        ],
+        "answerIndex": 2,
+        "rationale": "A beard-specific shampoo is formulated to clean without stripping natural oils."
+      },
+      {
+        "prompt": "During a shave, the client mentions they have a latex allergy. What should you avoid using?",
+        "choices": [
+          "Latex gloves",
+          "Shaving cream",
+          "Aftershave lotion",
+          "Straight razor"
+        ],
+        "answerIndex": 0,
+        "rationale": "Latex gloves should be avoided to prevent allergic reactions in clients with latex allergies."
+      },
+      {
+        "prompt": "What is the most effective way to prevent cross-contamination between clients during beard services?",
+        "choices": [
+          "Washing hands before each client",
+          "Using disposable blades",
+          "Sanitizing tools after each use",
+          "Wearing a face mask"
+        ],
+        "answerIndex": 2,
+        "rationale": "Sanitizing tools after each use is crucial to prevent cross-contamination between clients."
+      },
+      {
+        "prompt": "A client with a thick beard wants a close shave. Which razor type is most suitable for this task?",
+        "choices": [
+          "Disposable razor",
+          "Electric razor",
+          "Safety razor",
+          "Straight razor"
+        ],
+        "answerIndex": 3,
+        "rationale": "A straight razor provides a closer shave and is ideal for thick beards."
+      }
+    ]
+  }
+}

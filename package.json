@@ -357,7 +357,9 @@
     "guard:enrollment-writes": "bash scripts/guard-enrollment-writes.sh",
     "guard:admin-routes": "bash scripts/guard-admin-routes.sh",
     "guard:authguards-imports": "bash scripts/guard-authguards-imports.sh",
-    "lint:guards": "bash scripts/guard-enrollment-writes.sh && bash scripts/guard-authguards-imports.sh"
+    "lint:guards": "bash scripts/guard-enrollment-writes.sh && bash scripts/guard-authguards-imports.sh",
+    "course:generate-content": "tsx scripts/course-builder/generate-lesson-content.ts",
+    "course:apply": "tsx scripts/apply-barber-content.ts"
   },
   "overrides": {
     "inflight": "npm:lru-cache@^10.0.0"

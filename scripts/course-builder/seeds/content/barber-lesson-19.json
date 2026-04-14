@@ -1,0 +1,367 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is the primary purpose of the Scissor Over Comb technique?",
+        "choices": [
+          "To create smooth transitions and blend different lengths of hair",
+          "To add volume to the hair",
+          "To straighten curly hair",
+          "To color hair evenly"
+        ],
+        "answerIndex": 0,
+        "rationale": "The Scissor Over Comb technique is used to create smooth transitions and blend different lengths of hair without leaving harsh lines.",
+        "type": "recall"
+      },
+      {
+        "prompt": "Which tool acts as a guide in the Scissor Over Comb technique?",
+        "choices": [
+          "Scissors",
+          "Comb",
+          "Razor",
+          "Clippers"
+        ],
+        "answerIndex": 1,
+        "rationale": "In the Scissor Over Comb technique, the comb acts as a guide, determining the length of hair to be cut.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What is the key to maintaining a smooth, even cut in the Scissor Over Comb technique?",
+        "choices": [
+          "Using sharp scissors",
+          "Maintaining a consistent angle and keeping the comb in continuous motion",
+          "Using a wide-tooth comb",
+          "Cutting hair when it is completely dry"
+        ],
+        "answerIndex": 1,
+        "rationale": "Maintaining a consistent angle and keeping the comb in continuous motion ensures a smooth, even cut.",
+        "type": "recall"
+      },
+      {
+        "prompt": "Why is it important to have the client's hair slightly damp before using the Scissor Over Comb technique?",
+        "choices": [
+          "It helps in adding shine to the hair",
+          "It makes the hair easier to manage and cut",
+          "It prevents hair damage",
+          "It reduces the cutting time"
+        ],
+        "answerIndex": 1,
+        "rationale": "Slightly damp hair is easier to manage and cut, allowing for more precise execution of the technique.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What should you do after completing a haircut using the Scissor Over Comb technique?",
+        "choices": [
+          "Apply hair gel",
+          "Check your work for uneven areas or lines",
+          "Wash the client's hair",
+          "Apply hair color"
+        ],
+        "answerIndex": 1,
+        "rationale": "After completing the haircut, it's important to check for any uneven areas or lines and make necessary adjustments.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What is the role of the scissors in the Scissor Over Comb technique?",
+        "choices": [
+          "To guide the comb",
+          "To cut the hair that extends beyond the comb",
+          "To add texture to the hair",
+          "To style the hair"
+        ],
+        "answerIndex": 1,
+        "rationale": "In the Scissor Over Comb technique, the scissors are used to cut the hair that extends beyond the comb.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What is a critical aspect of blending clipper and scissor work?",
+        "choices": [
+          "Ensuring no visible lines or discrepancies in length",
+          "Using only scissors",
+          "Using a razor for finishing",
+          "Cutting hair dry"
+        ],
+        "answerIndex": 0,
+        "rationale": "Blending clipper and scissor work requires ensuring there are no visible lines or discrepancies in length for a polished look.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What percentage of the Indiana state board barber exam is dedicated to haircutting skills?",
+        "choices": [
+          "10%",
+          "25%",
+          "50%",
+          "75%"
+        ],
+        "answerIndex": 1,
+        "rationale": "The Indiana state board barber exam dedicates 25% of the exam to haircutting skills.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A client presents with uneven hair lengths after a previous haircut. How should you address this using the Scissor Over Comb technique?",
+        "choices": [
+          "Use a razor to even out the lengths",
+          "Start with clippers and finish with Scissor Over Comb to blend",
+          "Cut all hair to the shortest length",
+          "Use only clippers for the whole haircut"
+        ],
+        "answerIndex": 1,
+        "rationale": "Using clippers to establish the initial length and then blending with Scissor Over Comb will help even out and blend the uneven lengths.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "During a service, you notice the client's hair is very dry. What should you do before using the Scissor Over Comb technique?",
+        "choices": [
+          "Proceed with the cut",
+          "Slightly dampen the hair",
+          "Apply hair oil",
+          "Use a razor instead"
+        ],
+        "answerIndex": 1,
+        "rationale": "Slightly dampening the hair will make it easier to manage and cut, allowing for more precise execution of the technique.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "A new client asks for a modern, textured look. How can you achieve this with the Scissor Over Comb technique?",
+        "choices": [
+          "Use only clippers",
+          "Use Scissor Over Comb to create smooth transitions and blend different lengths",
+          "Use a razor for the entire haircut",
+          "Cut the hair uniformly"
+        ],
+        "answerIndex": 1,
+        "rationale": "The Scissor Over Comb technique allows for smooth transitions and blending, which is essential for creating modern, textured looks.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "A client requests a classic cut with no visible lines. Which technique should you use to achieve this?",
+        "choices": [
+          "Clipper Over Comb",
+          "Scissor Over Comb",
+          "Razor Cutting",
+          "Point Cutting"
+        ],
+        "answerIndex": 1,
+        "rationale": "The Scissor Over Comb technique is ideal for creating classic cuts with smooth transitions and no visible lines.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "During a haircut, you notice a visible line between clipper and scissor work. What should you do?",
+        "choices": [
+          "Ignore it",
+          "Use Scissor Over Comb to blend the sections",
+          "Start the haircut over",
+          "Use a razor to remove the line"
+        ],
+        "answerIndex": 1,
+        "rationale": "Using Scissor Over Comb to blend the sections will help eliminate the visible line and create a seamless transition.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "A client with thick hair wants a polished look. How can you ensure a balanced and even finish?",
+        "choices": [
+          "Use thinning shears",
+          "Use Scissor Over Comb to control the amount of hair being cut",
+          "Cut all hair to the same length",
+          "Use a razor for texture"
+        ],
+        "answerIndex": 1,
+        "rationale": "The Scissor Over Comb technique allows for precise control over the amount of hair being cut, ensuring a balanced and even finish.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "A client wants a seamless blend between the top and sides of their haircut. Which technique should you prioritize?",
+        "choices": [
+          "Clipper Over Comb",
+          "Scissor Over Comb",
+          "Razor Cutting",
+          "Point Cutting"
+        ],
+        "answerIndex": 1,
+        "rationale": "The Scissor Over Comb technique is essential for creating a seamless blend between different lengths of hair.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "A client complains about visible lines in their haircut from a previous barber. How can you address this?",
+        "choices": [
+          "Use Scissor Over Comb to blend the lines",
+          "Use clippers to cut shorter",
+          "Apply styling gel",
+          "Ignore the lines"
+        ],
+        "answerIndex": 0,
+        "rationale": "Using Scissor Over Comb will help blend the visible lines and create a smoother transition between lengths.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What would you do if you notice your comb is not guiding the hair smoothly during a Scissor Over Comb cut?",
+        "choices": [
+          "Continue cutting",
+          "Stop and replace the comb with one that has evenly spaced teeth",
+          "Use a razor instead",
+          "Switch to clippers"
+        ],
+        "answerIndex": 1,
+        "rationale": "Using a comb with evenly spaced teeth is crucial for guiding the hair smoothly and achieving a precise cut.",
+        "type": "applied"
+      },
+      {
+        "prompt": "Which is the BEST approach to ensure a consistent comb angle during the Scissor Over Comb technique?",
+        "choices": [
+          "Use a mirror to check angles",
+          "Practice maintaining the same hand position",
+          "Rely on client feedback",
+          "Change angles frequently"
+        ],
+        "answerIndex": 1,
+        "rationale": "Practicing to maintain the same hand position helps ensure a consistent comb angle, which is vital for an even cut.",
+        "type": "applied"
+      },
+      {
+        "prompt": "What would you do if you notice fatigue during a long Scissor Over Comb session?",
+        "choices": [
+          "Take a short break to rest",
+          "Continue working without pause",
+          "Switch to clippers",
+          "Ask the client to stand"
+        ],
+        "answerIndex": 0,
+        "rationale": "Taking a short break to rest can help prevent fatigue and ensure precision in your work.",
+        "type": "applied"
+      },
+      {
+        "prompt": "Which is the BEST approach to ensure a smooth blend when transitioning from clipper to scissor work?",
+        "choices": [
+          "Use a razor for finishing",
+          "Use Scissor Over Comb to refine and blend the cut",
+          "Cut all hair to the same length",
+          "Apply hair gel"
+        ],
+        "answerIndex": 1,
+        "rationale": "Using Scissor Over Comb to refine and blend the cut ensures a smooth transition between clipper and scissor work.",
+        "type": "applied"
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Scissor Over Comb",
+      "definition": "A haircutting technique used to create smooth transitions and blend different hair lengths without harsh lines."
+    },
+    {
+      "term": "Comb Angle",
+      "definition": "The angle at which the comb is held against the scalp, determining the length of the cut."
+    },
+    {
+      "term": "Consistent Motion",
+      "definition": "The practice of keeping the comb in continuous movement to ensure an even cut without stops."
+    },
+    {
+      "term": "Blending",
+      "definition": "The process of smoothing transitions between different hair lengths to eliminate visible lines."
+    },
+    {
+      "term": "Clipper and Scissor Work",
+      "definition": "A technique that involves using both clippers and scissors to achieve a polished, professional haircut."
+    },
+    {
+      "term": "Sectioning",
+      "definition": "Dividing the hair into manageable parts to focus on one area at a time for consistent cutting."
+    },
+    {
+      "term": "Hair Preparation",
+      "definition": "Ensuring the client's hair is clean and slightly damp to facilitate easier cutting and control."
+    },
+    {
+      "term": "Tool Maintenance",
+      "definition": "Keeping scissors sharp and combs in good condition to ensure precision and ease of use."
+    },
+    {
+      "term": "Posture",
+      "definition": "Maintaining a comfortable and ergonomic stance to execute techniques accurately and prevent fatigue."
+    },
+    {
+      "term": "Indiana State Board Exam",
+      "definition": "A licensing exam for barbers in Indiana, with 25% dedicated to haircutting skills, including Scissor Over Comb."
+    },
+    {
+      "term": "Precision",
+      "definition": "The ability to execute haircuts with accuracy, ensuring even lengths and seamless blending."
+    },
+    {
+      "term": "Transition Areas",
+      "definition": "Sections of the haircut where different lengths meet, requiring careful blending to avoid visible lines."
+    },
+    {
+      "term": "Comb as a Guide",
+      "definition": "Using the comb to determine the length of hair to be cut, guiding the scissors for precision."
+    },
+    {
+      "term": "Client Positioning",
+      "definition": "Adjusting the client's chair for optimal height and comfort to facilitate precise cutting."
+    },
+    {
+      "term": "Haircut Assessment",
+      "definition": "Reviewing the completed haircut for any uneven areas or lines that need further blending."
+    }
+  ],
+  "content": "## Introduction to Scissor Over Comb\n\nIn the world of barbering, mastering the \"Scissor Over Comb\" technique is crucial for delivering precise and tailored haircuts that meet client expectations. This technique is particularly important in Indiana, where clients often seek a clean, polished look that blends seamlessly. As a barber, your ability to execute this technique can distinguish you as a skilled professional, capable of crafting the perfect haircut that complements each client's unique style.\n\n## Understanding the Scissor Over Comb Technique\n\nThe Scissor Over Comb method is a fundamental skill in a barber's toolkit. This technique is essential for creating smooth transitions and blending different lengths of hair without leaving harsh lines. It allows barbers to control the amount of hair being cut with precision, ensuring a balanced and even finish. By mastering this technique, you will be able to provide your clients with a variety of styles, from classic cuts to modern, textured looks.\n\nTo effectively perform Scissor Over Comb, you must understand the dynamics between the scissors and the comb. The comb acts as a guide, determining the length of hair that will be cut, while the scissors do the actual cutting. The key to success lies in maintaining a consistent angle and keeping the comb in continuous motion. This ensures a smooth, even cut that blends seamlessly with the surrounding hair.\n\n## Essential Tools and Preparation\n\nBefore you begin practicing the Scissor Over Comb technique, it's important to have the right tools and ensure they are in optimal condition. High-quality scissors and a sturdy comb are essential. The scissors should be sharp and comfortable to handle, allowing for precise cuts. The comb should be straight, with evenly spaced teeth, to facilitate smooth guiding of the hair.\n\nPreparation is also key. Ensure that the client's hair is clean and slightly damp, as this makes it easier to manage and cut. Position the client comfortably in the chair, and adjust the chair height so that you can maintain good posture while working. This will help you execute the technique with precision and avoid fatigue during longer sessions.\n\n## Step-by-Step Guide to Scissor Over Comb\n\nExecuting the Scissor Over Comb technique requires practice and attention to detail. Follow these steps to achieve a flawless finish:\n\n1. **Section the Hair**: Begin by sectioning the hair to ensure you have a clear working area. This will help you focus on one section at a time, ensuring consistency throughout the haircut.\n\n2. **Position the Comb**: Hold the comb parallel to the scalp at the desired angle. The angle of the comb will determine the length of the cut, so maintain a consistent angle throughout the process.\n\n3. **Guide the Scissors**: With the comb in place, use your scissors to cut the hair that extends beyond the comb. Keep the comb moving continuously as you cut, avoiding any stops mid-stroke to prevent uneven lines.\n\n4. **Blend the Sections**: As you move from one section to another, ensure that the transition is smooth and seamless. Use the comb to blend the different lengths, eliminating any visible lines between sections.\n\n5. **Check Your Work**: Once you have completed the haircut, take a step back and assess your work. Look for any uneven areas or lines that need further blending, and adjust as necessary.\n\n## Blending Clipper and Scissor Work\n\nA critical aspect of the Scissor Over Comb technique is the ability to blend clipper and scissor work seamlessly. This skill is vital for achieving a polished and professional look. When transitioning from clipper-cut sections to scissor-cut sections, it's important to ensure that there are no visible lines or discrepancies in length.\n\nTo achieve this, start by using the clippers to establish the initial length and shape. Then, use the Scissor Over Comb technique to refine the cut, focusing on blending the two sections. Pay close attention to the transition areas, using the comb to guide and blend the hair smoothly. This will create a harmonious flow from one section to the next, enhancing the overall appearance of the haircut.\n\n## Indiana State Board Exam Relevance\n\nThe Scissor Over Comb technique is an integral part of the Indiana state board barber exam, which dedicates 25% of the exam to haircutting skills. During the exam, you will be tested on your ability to execute this technique with precision and consistency. Examiners will assess your ability to maintain a consistent comb angle, keep the comb moving continuously, and blend clipper and scissor work without visible lines. Mastery of this technique is essential for passing the exam and obtaining your barber license in Indiana.\n\n## Key Takeaway\n\nMastering the Scissor Over Comb technique is a critical skill for any aspiring barber in Indiana. This technique allows you to deliver precise, tailored haircuts that meet client expectations and enhance your professional reputation. By practicing this technique and understanding its importance in the state board exam, you will be well-equipped to succeed in your barbering career. Remember, consistency, precision, and seamless blending are the hallmarks of a skilled barber.",
+  "procedures": [
+    {
+      "step": 1,
+      "instruction": "Ensure all tools are clean and sanitized before beginning the haircut.",
+      "safetyNote": "SAFETY: Disinfect scissors and comb before use."
+    },
+    {
+      "step": 2,
+      "instruction": "Position the client comfortably in the chair and adjust the chair height for optimal posture.",
+      "safetyNote": null
+    },
+    {
+      "step": 3,
+      "instruction": "Section the hair to create a clear working area, focusing on one section at a time.",
+      "safetyNote": null
+    },
+    {
+      "step": 4,
+      "instruction": "Hold the comb parallel to the scalp at the desired angle to determine the length of the cut.",
+      "safetyNote": null
+    },
+    {
+      "step": 5,
+      "instruction": "Use the scissors to cut the hair that extends beyond the comb, keeping the comb in continuous motion.",
+      "safetyNote": null
+    },
+    {
+      "step": 6,
+      "instruction": "Maintain a consistent angle with the comb to ensure an even cut throughout the process.",
+      "safetyNote": null
+    },
+    {
+      "step": 7,
+      "instruction": "Blend the sections by using the comb to guide and eliminate any visible lines between different lengths.",
+      "safetyNote": null
+    },
+    {
+      "step": 8,
+      "instruction": "Transition smoothly between clipper-cut and scissor-cut sections, ensuring no visible lines are present.",
+      "safetyNote": null
+    },
+    {
+      "step": 9,
+      "instruction": "Continuously check your work by stepping back and assessing the haircut for any uneven areas.",
+      "safetyNote": null
+    },
+    {
+      "step": 10,
+      "instruction": "Make any necessary adjustments to blend and refine the haircut further.",
+      "safetyNote": null
+    },
+    {
+      "step": 11,
+      "instruction": "Clean and sanitize all tools after completing the haircut to maintain hygiene standards.",
+      "safetyNote": "SAFETY: Disinfect scissors and comb after use."
+    }
+  ]
+}

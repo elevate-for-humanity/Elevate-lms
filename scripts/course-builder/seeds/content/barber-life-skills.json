@@ -1,0 +1,289 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "Which of the following is a characteristic of a SMART goal?",
+        "choices": [
+          "Specific",
+          "Broad",
+          "Vague",
+          "Infinite"
+        ],
+        "answerIndex": 0,
+        "rationale": "SMART goals are Specific, Measurable, Achievable, Relevant, and Time-bound."
+      },
+      {
+        "prompt": "What is an example of a short-term goal for a barber?",
+        "choices": [
+          "Owning a barber shop",
+          "Passing the state board exam",
+          "Retiring comfortably",
+          "Expanding to multiple locations"
+        ],
+        "answerIndex": 1,
+        "rationale": "Passing the state board exam is a short-term goal that can be achieved relatively quickly."
+      },
+      {
+        "prompt": "Why is time management crucial for barbers?",
+        "choices": [
+          "It increases the number of clients served",
+          "It reduces the number of haircuts needed",
+          "It allows for more personal time",
+          "It decreases the need for scheduling"
+        ],
+        "answerIndex": 0,
+        "rationale": "Efficient time management allows barbers to serve more clients, thereby increasing their income."
+      },
+      {
+        "prompt": "What should a barber do if they are running late for an appointment?",
+        "choices": [
+          "Ignore the delay",
+          "Communicate the delay to the client",
+          "Cancel the appointment",
+          "Rush through the service"
+        ],
+        "answerIndex": 1,
+        "rationale": "Communicating delays proactively helps maintain good client relationships."
+      },
+      {
+        "prompt": "Which technique is NOT recommended for stress management in barbering?",
+        "choices": [
+          "Ignoring stress",
+          "Taking regular breaks",
+          "Practicing proper ergonomics",
+          "Exercising regularly"
+        ],
+        "answerIndex": 0,
+        "rationale": "Ignoring stress can lead to burnout, while the other options help manage stress effectively."
+      },
+      {
+        "prompt": "What is a key component of a professional mindset in barbering?",
+        "choices": [
+          "Arriving late",
+          "Maintaining a clean station",
+          "Wearing casual clothes",
+          "Ignoring client preferences"
+        ],
+        "answerIndex": 1,
+        "rationale": "Maintaining a clean station is essential for professionalism and client satisfaction."
+      },
+      {
+        "prompt": "What is an ethical responsibility of a licensed barber in Indiana?",
+        "choices": [
+          "Practicing beyond their scope",
+          "Discriminating against clients",
+          "Reporting unsanitary conditions",
+          "Ignoring licensing requirements"
+        ],
+        "answerIndex": 2,
+        "rationale": "Barbers must report unsanitary conditions to uphold health and safety standards."
+      },
+      {
+        "prompt": "What could happen if a barber violates ethical standards?",
+        "choices": [
+          "Receive a bonus",
+          "License suspension or revocation",
+          "Promotion to manager",
+          "Increase in client base"
+        ],
+        "answerIndex": 1,
+        "rationale": "Violating ethical standards can lead to license suspension or revocation by the licensing agency."
+      },
+      {
+        "prompt": "A client complains about a haircut and refuses to pay. How should a professional barber handle this situation?",
+        "choices": [
+          "Argue with the client",
+          "Politely discuss the issue and seek a resolution",
+          "Call the police",
+          "Ignore the client"
+        ],
+        "answerIndex": 1,
+        "rationale": "Professionals should address client complaints calmly and seek a resolution to maintain good relationships."
+      },
+      {
+        "prompt": "A barber notices a colleague not sanitizing tools between clients. What should they do?",
+        "choices": [
+          "Ignore it",
+          "Report the unsanitary practice",
+          "Join in the practice",
+          "Laugh about it"
+        ],
+        "answerIndex": 1,
+        "rationale": "Reporting unsanitary practices is an ethical obligation to ensure client safety."
+      },
+      {
+        "prompt": "Which of the following is a long-term goal for a barber?",
+        "choices": [
+          "Passing a certification exam",
+          "Owning a barber shop",
+          "Completing a haircut",
+          "Scheduling an appointment"
+        ],
+        "answerIndex": 1,
+        "rationale": "Owning a barber shop is a long-term goal that requires significant planning and resources."
+      },
+      {
+        "prompt": "What is a consequence of poor time management for barbers?",
+        "choices": [
+          "Increased client satisfaction",
+          "Reduced earnings",
+          "More free time",
+          "Better scheduling"
+        ],
+        "answerIndex": 1,
+        "rationale": "Poor time management can lead to reduced earnings due to fewer clients being served."
+      },
+      {
+        "prompt": "Why is it important for barbers to maintain work-life boundaries?",
+        "choices": [
+          "To increase stress",
+          "To ensure a balanced lifestyle",
+          "To work longer hours",
+          "To avoid client interactions"
+        ],
+        "answerIndex": 1,
+        "rationale": "Maintaining work-life boundaries helps prevent burnout and ensures a balanced lifestyle."
+      },
+      {
+        "prompt": "How can barbers effectively manage their schedules?",
+        "choices": [
+          "By double-booking clients",
+          "Using appointment software",
+          "Ignoring appointment times",
+          "Overbooking clients"
+        ],
+        "answerIndex": 1,
+        "rationale": "Using appointment software helps barbers manage their schedules efficiently and avoid conflicts."
+      },
+      {
+        "prompt": "What is a sign of professionalism in barbering?",
+        "choices": [
+          "Arriving late",
+          "Dressing inappropriately",
+          "Showing respect to all clients",
+          "Ignoring client feedback"
+        ],
+        "answerIndex": 2,
+        "rationale": "Showing respect to all clients, regardless of tip size, is a sign of professionalism."
+      },
+      {
+        "prompt": "A barber is feeling physically exhausted after a long day. What should they do to manage stress?",
+        "choices": [
+          "Continue working without breaks",
+          "Take regular breaks and exercise",
+          "Ignore the exhaustion",
+          "Complain to clients"
+        ],
+        "answerIndex": 1,
+        "rationale": "Taking regular breaks and exercising can help manage physical and mental stress."
+      },
+      {
+        "prompt": "What is the primary reason for barbers to set goals?",
+        "choices": [
+          "To impress clients",
+          "To provide direction and motivation",
+          "To avoid work",
+          "To compete with colleagues"
+        ],
+        "answerIndex": 1,
+        "rationale": "Setting goals provides direction and motivation, helping barbers achieve personal and professional success."
+      },
+      {
+        "prompt": "A barber wants to improve client satisfaction. What should they focus on?",
+        "choices": [
+          "Ignoring client feedback",
+          "Maintaining a clean and organized station",
+          "Rushing through services",
+          "Being unavailable"
+        ],
+        "answerIndex": 1,
+        "rationale": "Maintaining a clean and organized station contributes to a positive client experience and satisfaction."
+      },
+      {
+        "prompt": "What action should a barber take if they notice they are consistently running late?",
+        "choices": [
+          "Ignore the issue",
+          "Reevaluate and adjust their scheduling practices",
+          "Blame clients",
+          "Shorten service times"
+        ],
+        "answerIndex": 1,
+        "rationale": "Reevaluating and adjusting scheduling practices can help manage time better and improve punctuality."
+      },
+      {
+        "prompt": "A barber is considering expanding their services. What should be their first step?",
+        "choices": [
+          "Start offering new services immediately",
+          "Research and plan the expansion",
+          "Ignore client demand",
+          "Reduce current services"
+        ],
+        "answerIndex": 1,
+        "rationale": "Researching and planning are crucial steps before expanding services to ensure feasibility and success."
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "SMART Goals",
+      "definition": "Goals that are Specific, Measurable, Achievable, Relevant, and Time-bound."
+    },
+    {
+      "term": "Short-term Goal",
+      "definition": "An objective intended to be achieved in the near future, such as passing the state board exam."
+    },
+    {
+      "term": "Long-term Goal",
+      "definition": "A future objective requiring planning and dedication, like owning a barber shop."
+    },
+    {
+      "term": "Time Management",
+      "definition": "The process of organizing and planning how to divide your time between activities to maximize efficiency."
+    },
+    {
+      "term": "Appointment Software",
+      "definition": "A digital tool used to schedule client appointments and manage barber shop calendars."
+    },
+    {
+      "term": "Buffer Time",
+      "definition": "Extra time scheduled between appointments to accommodate delays and prevent running late."
+    },
+    {
+      "term": "Ergonomics",
+      "definition": "The study of people's efficiency in their working environment, important for reducing physical strain in barbering."
+    },
+    {
+      "term": "Professional Mindset",
+      "definition": "A set of attitudes and behaviors that reflect a commitment to professionalism, such as punctuality and respect."
+    },
+    {
+      "term": "Scope of Licensure",
+      "definition": "The range of services a licensed barber is legally permitted to perform."
+    },
+    {
+      "term": "Ethical Violations",
+      "definition": "Actions that breach professional ethics, potentially leading to license suspension or revocation."
+    },
+    {
+      "term": "Indiana Professional Licensing Agency",
+      "definition": "The state agency responsible for issuing and regulating barber licenses in Indiana."
+    },
+    {
+      "term": "Stress Management",
+      "definition": "Techniques and strategies used to handle stress, such as taking breaks and exercising."
+    },
+    {
+      "term": "Professional Conduct",
+      "definition": "Behavior that meets the standards set by the licensing board, including maintaining a clean station and respecting clients."
+    },
+    {
+      "term": "Work-life Boundaries",
+      "definition": "Limits set to balance professional responsibilities and personal life, important for stress management."
+    },
+    {
+      "term": "Discrimination",
+      "definition": "Unfair treatment of clients based on personal characteristics, prohibited in professional barbering."
+    }
+  ]
+}

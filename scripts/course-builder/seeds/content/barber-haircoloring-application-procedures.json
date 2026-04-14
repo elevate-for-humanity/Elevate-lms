@@ -1,0 +1,289 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is the purpose of a patch test in haircoloring?",
+        "choices": [
+          "To check for allergic reactions",
+          "To determine hair porosity",
+          "To test color fading",
+          "To measure hair strength"
+        ],
+        "answerIndex": 0,
+        "rationale": "A patch test is conducted to check for any allergic reactions to the haircolor product."
+      },
+      {
+        "prompt": "Which developer volume is used for maximum lift with bleach?",
+        "choices": [
+          "10 volume",
+          "20 volume",
+          "30 volume",
+          "40 volume"
+        ],
+        "answerIndex": 3,
+        "rationale": "40 volume developer is used for maximum lift and is suitable for use with bleach."
+      },
+      {
+        "prompt": "What should you do if a client shows signs of redness, swelling, or itching during a patch test?",
+        "choices": [
+          "Proceed with the service",
+          "Use a lower volume developer",
+          "Do not perform the service",
+          "Perform a strand test instead"
+        ],
+        "answerIndex": 2,
+        "rationale": "If a client shows signs of an allergic reaction during a patch test, the service should not be performed."
+      },
+      {
+        "prompt": "Which highlighting technique involves painting color freehand onto the hair surface?",
+        "choices": [
+          "Foiling",
+          "Balayage",
+          "Tipping",
+          "Frosting"
+        ],
+        "answerIndex": 1,
+        "rationale": "Balayage is a technique where color is painted freehand onto the hair surface for a natural effect."
+      },
+      {
+        "prompt": "What is the primary use of a 10 volume developer?",
+        "choices": [
+          "Maximum lift",
+          "Deposit only",
+          "Gray coverage",
+          "Lightening darker hair"
+        ],
+        "answerIndex": 1,
+        "rationale": "10 volume developer is used for deposit only, with no lift, suitable for toning or darkening."
+      },
+      {
+        "prompt": "During a single-process application on previously colored hair, when should color be applied to the ends?",
+        "choices": [
+          "At the beginning",
+          "After processing the new growth",
+          "Simultaneously with the roots",
+          "Not at all"
+        ],
+        "answerIndex": 1,
+        "rationale": "For previously colored hair, color should be applied to the new growth first and then pulled through the ends for the last 5-10 minutes."
+      },
+      {
+        "prompt": "Which color neutralizes yellow tones after lightening?",
+        "choices": [
+          "Red",
+          "Green",
+          "Violet",
+          "Blue"
+        ],
+        "answerIndex": 2,
+        "rationale": "Violet is used to neutralize yellow tones according to the color wheel."
+      },
+      {
+        "prompt": "What is the purpose of a strand test in haircoloring?",
+        "choices": [
+          "To check for allergic reactions",
+          "To determine processing time and result",
+          "To test hair elasticity",
+          "To measure hair density"
+        ],
+        "answerIndex": 1,
+        "rationale": "A strand test is conducted to predict the color result and determine the appropriate processing time."
+      },
+      {
+        "prompt": "A client wants a natural, sun-kissed look. Which technique should be used?",
+        "choices": [
+          "Foiling",
+          "Balayage",
+          "Tipping",
+          "Permanent color"
+        ],
+        "answerIndex": 1,
+        "rationale": "Balayage creates a natural, sun-kissed effect by painting color freehand onto the hair."
+      },
+      {
+        "prompt": "Which developer volume is typically used for gray coverage?",
+        "choices": [
+          "10 volume",
+          "20 volume",
+          "30 volume",
+          "40 volume"
+        ],
+        "answerIndex": 1,
+        "rationale": "20 volume developer is standard for gray coverage and most color services."
+      },
+      {
+        "prompt": "What should be checked during a scalp analysis before haircoloring?",
+        "choices": [
+          "Hair length",
+          "Scalp cuts or abrasions",
+          "Hair texture",
+          "Client's age"
+        ],
+        "answerIndex": 1,
+        "rationale": "Scalp analysis involves checking for cuts, abrasions, or irritation, which are contraindications for chemical services."
+      },
+      {
+        "prompt": "Which technique involves isolating sections of hair in foil for coloring?",
+        "choices": [
+          "Foiling",
+          "Balayage",
+          "Tipping",
+          "Ombre"
+        ],
+        "answerIndex": 0,
+        "rationale": "Foiling involves isolating sections of hair in foil to create precise highlights or lowlights."
+      },
+      {
+        "prompt": "What is the effect of using a 30 volume developer?",
+        "choices": [
+          "Deposit only",
+          "1-2 levels of lift",
+          "2-3 levels of lift",
+          "Maximum lift"
+        ],
+        "answerIndex": 2,
+        "rationale": "A 30 volume developer provides 2-3 levels of lift, suitable for lightening darker hair."
+      },
+      {
+        "prompt": "After bleaching, which color stage comes immediately before pale yellow?",
+        "choices": [
+          "Black",
+          "Orange",
+          "Red",
+          "Yellow"
+        ],
+        "answerIndex": 3,
+        "rationale": "After bleaching, hair passes through stages of lift, with yellow coming immediately before pale yellow."
+      },
+      {
+        "prompt": "What should be applied after rinsing haircolor to maintain color longevity?",
+        "choices": [
+          "Regular conditioner",
+          "Color-safe conditioner",
+          "Leave-in treatment",
+          "Volumizing mousse"
+        ],
+        "answerIndex": 1,
+        "rationale": "A color-safe conditioner should be applied after rinsing to help maintain color longevity."
+      },
+      {
+        "prompt": "A client wants to lighten their dark hair by 3 levels. Which developer should be used?",
+        "choices": [
+          "10 volume",
+          "20 volume",
+          "30 volume",
+          "40 volume"
+        ],
+        "answerIndex": 2,
+        "rationale": "A 30 volume developer is used to achieve 2-3 levels of lift, suitable for lightening darker hair."
+      },
+      {
+        "prompt": "Which technique is used to apply color only to the tips of the hair?",
+        "choices": [
+          "Foiling",
+          "Balayage",
+          "Tipping/Frosting",
+          "Ombre"
+        ],
+        "answerIndex": 2,
+        "rationale": "Tipping/Frosting involves applying color only to the ends or tips of the hair."
+      },
+      {
+        "prompt": "What should a client use to maintain haircolor and protect it from UV rays?",
+        "choices": [
+          "Regular shampoo",
+          "Sulfate-free shampoo",
+          "Clarifying shampoo",
+          "Anti-dandruff shampoo"
+        ],
+        "answerIndex": 1,
+        "rationale": "Clients should use sulfate-free shampoo and UV-protective products to maintain haircolor and protect it from UV rays."
+      },
+      {
+        "prompt": "If a client wants to tone down orange tones after lightening, which color should be used?",
+        "choices": [
+          "Red",
+          "Green",
+          "Violet",
+          "Blue"
+        ],
+        "answerIndex": 3,
+        "rationale": "Blue is used to neutralize orange tones according to the color wheel."
+      },
+      {
+        "prompt": "What is the result of using a 20 volume developer?",
+        "choices": [
+          "Deposit only",
+          "1-2 levels of lift",
+          "2-3 levels of lift",
+          "Maximum lift"
+        ],
+        "answerIndex": 1,
+        "rationale": "A 20 volume developer provides 1-2 levels of lift and is standard for gray coverage and most color services."
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Patch test",
+      "definition": "A skin allergy test performed 24–48 hours before a haircoloring service to check for allergic reactions."
+    },
+    {
+      "term": "Strand test",
+      "definition": "A test where color is applied to a small section of hair to predict the result and processing time."
+    },
+    {
+      "term": "Scalp analysis",
+      "definition": "An examination of the scalp for cuts, abrasions, or irritation before chemical services."
+    },
+    {
+      "term": "10 volume developer",
+      "definition": "Used for deposit only with no lift, suitable for toning or darkening hair."
+    },
+    {
+      "term": "20 volume developer",
+      "definition": "Provides 1–2 levels of lift, standard for gray coverage and most color services."
+    },
+    {
+      "term": "30 volume developer",
+      "definition": "Offers 2–3 levels of lift, used for lightening darker hair."
+    },
+    {
+      "term": "40 volume developer",
+      "definition": "Provides maximum lift and is used with bleach only, not for permanent color."
+    },
+    {
+      "term": "Single-process application",
+      "definition": "A technique where color is applied to all hair in one step, with special attention to new growth."
+    },
+    {
+      "term": "Foiling",
+      "definition": "A highlighting technique where sections of hair are isolated in foil for precise highlights or lowlights."
+    },
+    {
+      "term": "Balayage",
+      "definition": "A freehand painting technique for a natural, sun-kissed effect on the hair."
+    },
+    {
+      "term": "Tipping/Frosting",
+      "definition": "A technique where color is applied to the ends or tips of the hair only."
+    },
+    {
+      "term": "Toner",
+      "definition": "A product used after bleaching to neutralize unwanted warm tones using the color wheel."
+    },
+    {
+      "term": "Stages of lift",
+      "definition": "The progression of hair color during bleaching: black → brown → red → orange → yellow → pale yellow."
+    },
+    {
+      "term": "Color-safe conditioner",
+      "definition": "A conditioner designed to maintain color longevity by protecting the hair after coloring."
+    },
+    {
+      "term": "Sulfate-free shampoo",
+      "definition": "A shampoo that does not contain sulfates, recommended to maintain hair color and health."
+    }
+  ]
+}

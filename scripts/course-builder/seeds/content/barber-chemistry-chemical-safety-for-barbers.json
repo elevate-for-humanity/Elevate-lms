@@ -1,0 +1,289 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is the natural pH range of hair?",
+        "choices": [
+          "4.5–5.5",
+          "5.5–6.5",
+          "6.5–7.5",
+          "7.5–8.5"
+        ],
+        "answerIndex": 0,
+        "rationale": "Hair has a natural pH of 4.5–5.5, which is slightly acidic."
+      },
+      {
+        "prompt": "Which type of product is used to close the hair cuticle and add shine?",
+        "choices": [
+          "Acidic products",
+          "Alkaline products",
+          "Neutral products",
+          "Volatile substances"
+        ],
+        "answerIndex": 0,
+        "rationale": "Acidic products, such as conditioners and rinses, close the cuticle and add shine."
+      },
+      {
+        "prompt": "What is the role of oxidation in hair coloring?",
+        "choices": [
+          "Releases oxygen",
+          "Absorbs heat",
+          "Closes the cuticle",
+          "Neutralizes pH"
+        ],
+        "answerIndex": 0,
+        "rationale": "Oxidation occurs when oxygen is released, such as when a developer activates hair color."
+      },
+      {
+        "prompt": "Why is it important to perform a patch test before a chemical service?",
+        "choices": [
+          "To check for allergic reactions",
+          "To measure pH levels",
+          "To ensure proper ventilation",
+          "To test product expiration"
+        ],
+        "answerIndex": 0,
+        "rationale": "A patch test is performed to check for any allergic reactions to the chemical product."
+      },
+      {
+        "prompt": "Which type of reaction releases heat?",
+        "choices": [
+          "Exothermic",
+          "Endothermic",
+          "Oxidation",
+          "Reduction"
+        ],
+        "answerIndex": 0,
+        "rationale": "Exothermic reactions release heat."
+      },
+      {
+        "prompt": "What should you do if a client experiences a chemical burn?",
+        "choices": [
+          "Rinse with cool water",
+          "Apply heat",
+          "Cover with a bandage",
+          "Use a neutralizer"
+        ],
+        "answerIndex": 0,
+        "rationale": "Rinsing with cool water is the first step to soothe a chemical burn."
+      },
+      {
+        "prompt": "What is the purpose of wearing gloves during chemical services?",
+        "choices": [
+          "To protect skin from chemicals",
+          "To improve grip",
+          "To prevent hair tangling",
+          "To enhance product absorption"
+        ],
+        "answerIndex": 0,
+        "rationale": "Gloves protect the skin from potential irritation or damage caused by chemicals."
+      },
+      {
+        "prompt": "Which of the following is a volatile substance?",
+        "choices": [
+          "Acetone",
+          "Conditioner",
+          "Water",
+          "Shampoo"
+        ],
+        "answerIndex": 0,
+        "rationale": "Acetone is a volatile substance that evaporates quickly at room temperature."
+      },
+      {
+        "prompt": "Why should chemicals be stored away from direct sunlight?",
+        "choices": [
+          "To prevent degradation",
+          "To enhance potency",
+          "To maintain color",
+          "To reduce weight"
+        ],
+        "answerIndex": 0,
+        "rationale": "Direct sunlight can cause chemicals to degrade, reducing their effectiveness."
+      },
+      {
+        "prompt": "What is a key safety measure when using aerosols in a barber shop?",
+        "choices": [
+          "Ensure proper ventilation",
+          "Mix with water",
+          "Use in a closed space",
+          "Store in a refrigerator"
+        ],
+        "answerIndex": 0,
+        "rationale": "Proper ventilation is necessary to prevent inhalation of potentially harmful fumes from aerosols."
+      },
+      {
+        "prompt": "Which chemical reaction is involved in breaking disulfide bonds in hair?",
+        "choices": [
+          "Reduction",
+          "Oxidation",
+          "Endothermic",
+          "Exothermic"
+        ],
+        "answerIndex": 0,
+        "rationale": "Reduction reactions break disulfide bonds, which is a process used in relaxers and perms."
+      },
+      {
+        "prompt": "What is the recommended pH range for products used to open the hair cuticle?",
+        "choices": [
+          "Above 7",
+          "Below 7",
+          "Around 7",
+          "Exactly 7"
+        ],
+        "answerIndex": 0,
+        "rationale": "Alkaline products with a pH above 7 are used to open the hair cuticle."
+      },
+      {
+        "prompt": "How should you respond if a client shows signs of an allergic reaction during a service?",
+        "choices": [
+          "Stop the service immediately",
+          "Continue with caution",
+          "Apply more product",
+          "Ignore the signs"
+        ],
+        "answerIndex": 0,
+        "rationale": "Stopping the service immediately is crucial to prevent further allergic reaction."
+      },
+      {
+        "prompt": "What is the function of the Safety Data Sheet (SDS)?",
+        "choices": [
+          "Provides safety information about chemical products",
+          "Lists client preferences",
+          "Describes hair cutting techniques",
+          "Outlines salon decor"
+        ],
+        "answerIndex": 0,
+        "rationale": "The SDS provides essential safety information about chemical products, including handling and emergency measures."
+      },
+      {
+        "prompt": "Why is it important to know the location of the eyewash station?",
+        "choices": [
+          "For immediate response to chemical exposure",
+          "To clean tools",
+          "To wash hair",
+          "To sanitize hands"
+        ],
+        "answerIndex": 0,
+        "rationale": "Knowing the location of the eyewash station is crucial for immediate response to chemical exposure in the eyes."
+      },
+      {
+        "prompt": "What is the effect of using a product with a pH significantly higher than the hair's natural pH?",
+        "choices": [
+          "Opens the cuticle",
+          "Closes the cuticle",
+          "Balances the pH",
+          "Strengthens hair"
+        ],
+        "answerIndex": 0,
+        "rationale": "Products with a higher pH than the hair's natural pH open the cuticle to allow chemical penetration."
+      },
+      {
+        "prompt": "Which personal protective equipment (PPE) is essential when performing chemical services?",
+        "choices": [
+          "Gloves and eye protection",
+          "Apron and hat",
+          "Face mask and earplugs",
+          "Boots and helmet"
+        ],
+        "answerIndex": 0,
+        "rationale": "Gloves and eye protection are essential PPE to prevent chemical exposure and injury."
+      },
+      {
+        "prompt": "What should you do if you accidentally mix two chemicals that should not be combined?",
+        "choices": [
+          "Evacuate the area",
+          "Continue using them",
+          "Add water to dilute",
+          "Ignore the mixture"
+        ],
+        "answerIndex": 0,
+        "rationale": "Evacuating the area is the safest action to prevent exposure to potentially hazardous reactions."
+      },
+      {
+        "prompt": "How does an endothermic reaction differ from an exothermic reaction?",
+        "choices": [
+          "Endothermic absorbs heat, exothermic releases heat",
+          "Endothermic releases heat, exothermic absorbs heat",
+          "Both absorb heat",
+          "Both release heat"
+        ],
+        "answerIndex": 0,
+        "rationale": "Endothermic reactions absorb heat, while exothermic reactions release heat."
+      },
+      {
+        "prompt": "What is the primary concern when using chemical straighteners in a poorly ventilated area?",
+        "choices": [
+          "Inhalation of toxic fumes",
+          "Increased humidity",
+          "Reduced effectiveness",
+          "Longer processing time"
+        ],
+        "answerIndex": 0,
+        "rationale": "Inhalation of toxic fumes is a primary concern when using volatile chemical straighteners without proper ventilation."
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "pH Scale",
+      "definition": "Measures the acidity or alkalinity of a substance on a scale of 0–14. A pH of 7 is neutral."
+    },
+    {
+      "term": "Neutral pH",
+      "definition": "A pH of 7, which is neither acidic nor alkaline."
+    },
+    {
+      "term": "Acidic Products",
+      "definition": "Products with a pH below 7, such as conditioners and toners, which close the cuticle and add shine."
+    },
+    {
+      "term": "Alkaline Products",
+      "definition": "Products with a pH above 7, such as relaxers and permanent waves, which open the cuticle for chemical penetration."
+    },
+    {
+      "term": "Oxidation",
+      "definition": "A chemical reaction where oxygen is released, commonly seen in haircolor activation."
+    },
+    {
+      "term": "Reduction",
+      "definition": "A chemical reaction that breaks disulfide bonds in hair, used in relaxers and perms."
+    },
+    {
+      "term": "Exothermic Reaction",
+      "definition": "A chemical reaction that releases heat."
+    },
+    {
+      "term": "Endothermic Reaction",
+      "definition": "A chemical reaction that absorbs heat."
+    },
+    {
+      "term": "Safety Data Sheet (SDS)",
+      "definition": "A document that provides information on the properties and safe handling of chemical products."
+    },
+    {
+      "term": "Personal Protective Equipment (PPE)",
+      "definition": "Equipment such as gloves and eye protection worn to ensure safety when handling chemicals."
+    },
+    {
+      "term": "Patch Test",
+      "definition": "A test performed 24–48 hours before a chemical service to check for allergic reactions."
+    },
+    {
+      "term": "Volatile Substances",
+      "definition": "Substances that evaporate quickly and may be flammable or toxic, requiring proper ventilation."
+    },
+    {
+      "term": "Disulfide Bonds",
+      "definition": "Strong chemical bonds in hair that are broken during chemical treatments like perms and relaxers."
+    },
+    {
+      "term": "Chemical Storage",
+      "definition": "The practice of storing chemicals in a cool, dry place away from direct sunlight."
+    },
+    {
+      "term": "Eyewash Station",
+      "definition": "A safety feature in salons used to rinse eyes in case of chemical exposure."
+    }
+  ]
+}

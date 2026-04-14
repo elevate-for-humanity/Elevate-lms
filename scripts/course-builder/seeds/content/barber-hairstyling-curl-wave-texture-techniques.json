@@ -1,0 +1,289 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is the primary purpose of using a diffuser in hairstyling?",
+        "choices": [
+          "Enhance natural curl and reduce frizz",
+          "Straighten hair",
+          "Add volume",
+          "Create tight curls"
+        ],
+        "answerIndex": 0,
+        "rationale": "A diffuser is a blow dryer attachment that disperses airflow to enhance natural curl and reduce frizz."
+      },
+      {
+        "prompt": "Which styling product is known for adding shine and reducing frizz with minimal hold?",
+        "choices": [
+          "Mousse",
+          "Gel",
+          "Pomade",
+          "Serum"
+        ],
+        "answerIndex": 3,
+        "rationale": "Serum is used to add shine and reduce frizz, providing minimal hold."
+      },
+      {
+        "prompt": "When using a flat iron, what is the recommended temperature range for fine hair?",
+        "choices": [
+          "150°F",
+          "300°F",
+          "400°F",
+          "450°F"
+        ],
+        "answerIndex": 1,
+        "rationale": "Fine hair should be styled with a flat iron at around 300°F to prevent damage."
+      },
+      {
+        "prompt": "Which technique involves twisting damp hair with styling cream and allowing it to dry before unraveling?",
+        "choices": [
+          "Finger waves",
+          "Twist-out",
+          "Braid-out",
+          "Roller sets"
+        ],
+        "answerIndex": 1,
+        "rationale": "A twist-out involves twisting damp hair with styling cream, allowing it to dry, and then unraveling for a defined curl pattern."
+      },
+      {
+        "prompt": "What determines the curl size when using a curling iron?",
+        "choices": [
+          "Hair length",
+          "Barrel size",
+          "Hair texture",
+          "Heat setting"
+        ],
+        "answerIndex": 1,
+        "rationale": "The barrel size of the curling iron determines the curl size."
+      },
+      {
+        "prompt": "Which wet styling technique is best for creating S-shaped waves?",
+        "choices": [
+          "Pin curls",
+          "Finger waves",
+          "Roller sets",
+          "Braid-out"
+        ],
+        "answerIndex": 1,
+        "rationale": "Finger waves are created using the fingers, a comb, and setting lotion to mold hair into S-shaped waves."
+      },
+      {
+        "prompt": "In a roller set, what effect do larger rollers have on the hair?",
+        "choices": [
+          "Tighter curls",
+          "Looser waves",
+          "More volume",
+          "Less volume"
+        ],
+        "answerIndex": 1,
+        "rationale": "Larger rollers create looser waves in a roller set."
+      },
+      {
+        "prompt": "What is the key difference between a twist-out and a braid-out?",
+        "choices": [
+          "The use of heat",
+          "The use of setting lotion",
+          "The type of braid used",
+          "The method of twisting versus braiding"
+        ],
+        "answerIndex": 3,
+        "rationale": "A twist-out involves twisting sections of hair, while a braid-out involves braiding sections, resulting in different wave patterns."
+      },
+      {
+        "prompt": "Which product is ideal for adding volume with a light hold?",
+        "choices": [
+          "Mousse",
+          "Gel",
+          "Pomade",
+          "Serum"
+        ],
+        "answerIndex": 0,
+        "rationale": "Mousse is known for adding volume with a light hold."
+      },
+      {
+        "prompt": "During blow drying with a round brush, why is it important to use a heat protectant?",
+        "choices": [
+          "To enhance curl",
+          "To protect hair from heat damage",
+          "To add shine",
+          "To reduce drying time"
+        ],
+        "answerIndex": 1,
+        "rationale": "Using a heat protectant helps prevent damage to the hair from the high temperatures involved in blow drying."
+      },
+      {
+        "prompt": "What is a key characteristic of pin curls?",
+        "choices": [
+          "They use a flat iron",
+          "They are secured with clips",
+          "They require a diffuser",
+          "They are best for long hair only"
+        ],
+        "answerIndex": 1,
+        "rationale": "Pin curls involve winding small sections of hair into circles and securing them with clips."
+      },
+      {
+        "prompt": "Which technique is used to create volume, smoothness, and bend while blow drying?",
+        "choices": [
+          "Flat iron",
+          "Diffuser",
+          "Round brush",
+          "Pin curls"
+        ],
+        "answerIndex": 2,
+        "rationale": "Blow drying with a round brush is used to create volume, smoothness, and bend."
+      },
+      {
+        "prompt": "What is the effect of using a stand-up base in pin curls?",
+        "choices": [
+          "Flat curl",
+          "Volume",
+          "Tight curl",
+          "Loose wave"
+        ],
+        "answerIndex": 1,
+        "rationale": "A stand-up base in pin curls creates volume."
+      },
+      {
+        "prompt": "Which styling product provides strong hold and defines curls but can cause crunch if over-applied?",
+        "choices": [
+          "Mousse",
+          "Gel",
+          "Pomade",
+          "Serum"
+        ],
+        "answerIndex": 1,
+        "rationale": "Gel provides strong hold and defines curls but can cause crunch if over-applied."
+      },
+      {
+        "prompt": "What is the purpose of a wash-and-go technique?",
+        "choices": [
+          "To straighten hair",
+          "To enhance natural curl pattern",
+          "To create tight curls",
+          "To add volume"
+        ],
+        "answerIndex": 1,
+        "rationale": "A wash-and-go technique involves applying product to wet hair and allowing it to air dry to enhance the natural curl pattern."
+      },
+      {
+        "prompt": "Which styling product is ideal for classic barber styles due to its medium to strong hold and shine?",
+        "choices": [
+          "Mousse",
+          "Gel",
+          "Pomade",
+          "Serum"
+        ],
+        "answerIndex": 2,
+        "rationale": "Pomade is ideal for classic barber styles because it offers medium to strong hold and adds shine."
+      },
+      {
+        "prompt": "Why should a flat iron be used only on completely dry hair?",
+        "choices": [
+          "To prevent frizz",
+          "To avoid burning the hair",
+          "To create tighter curls",
+          "To enhance volume"
+        ],
+        "answerIndex": 1,
+        "rationale": "Using a flat iron on wet hair can cause the water in the hair to boil, leading to damage and burning."
+      },
+      {
+        "prompt": "What is the effect of using a leave-in conditioner?",
+        "choices": [
+          "Adds shine and reduces frizz",
+          "Moisturizes and detangles",
+          "Provides strong hold",
+          "Creates tight curls"
+        ],
+        "answerIndex": 1,
+        "rationale": "Leave-in conditioner moisturizes and detangles hair, providing light hold."
+      },
+      {
+        "prompt": "Which technique involves molding hair into waves using fingers and a comb?",
+        "choices": [
+          "Pin curls",
+          "Finger waves",
+          "Roller sets",
+          "Braid-out"
+        ],
+        "answerIndex": 1,
+        "rationale": "Finger waves are created by molding hair into S-shaped waves using fingers and a comb."
+      },
+      {
+        "prompt": "For which hair texture is a flat iron temperature of up to 450°F suitable?",
+        "choices": [
+          "Fine hair",
+          "Coarse hair",
+          "Curly hair",
+          "Wavy hair"
+        ],
+        "answerIndex": 1,
+        "rationale": "Coarse hair can withstand higher temperatures, up to 450°F, when using a flat iron."
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Finger waves",
+      "definition": "A wet styling technique using fingers, a comb, and setting lotion to create S-shaped waves in short, straight to wavy hair."
+    },
+    {
+      "term": "Pin curls",
+      "definition": "Small sections of hair wound into circles and secured with clips, with the base direction determining curl direction and volume."
+    },
+    {
+      "term": "Roller sets",
+      "definition": "Hair is wound onto rollers of varying sizes to create different wave or curl patterns; larger rollers create looser waves."
+    },
+    {
+      "term": "Blow drying with a round brush",
+      "definition": "A thermal styling technique that creates volume, smoothness, and bend using a round brush and heat protectant."
+    },
+    {
+      "term": "Flat iron",
+      "definition": "A thermal tool used to straighten or create bends and waves in hair, with temperature adjusted based on hair texture."
+    },
+    {
+      "term": "Curling iron",
+      "definition": "A tool used to create curls and waves, where the barrel size determines the curl size."
+    },
+    {
+      "term": "Diffuser",
+      "definition": "A blow dryer attachment that disperses airflow to enhance natural curl and reduce frizz."
+    },
+    {
+      "term": "Twist-out",
+      "definition": "A natural texture technique where hair is twisted with styling cream and unraveled after drying to reveal a defined curl pattern."
+    },
+    {
+      "term": "Braid-out",
+      "definition": "Similar to a twist-out, but using braids to create a more angular wave pattern."
+    },
+    {
+      "term": "Wash-and-go",
+      "definition": "A natural texture technique where product is applied to wet hair and allowed to air dry to enhance the natural curl pattern."
+    },
+    {
+      "term": "Mousse",
+      "definition": "A styling product that provides light hold and adds volume to hair."
+    },
+    {
+      "term": "Gel",
+      "definition": "A strong hold styling product that defines curls but can cause crunch if over-applied."
+    },
+    {
+      "term": "Pomade",
+      "definition": "A medium to strong hold product that adds shine, ideal for classic barber styles."
+    },
+    {
+      "term": "Serum",
+      "definition": "A product that adds shine and reduces frizz with minimal hold."
+    },
+    {
+      "term": "Leave-in conditioner",
+      "definition": "A product that moisturizes and detangles hair, providing a light hold."
+    }
+  ]
+}

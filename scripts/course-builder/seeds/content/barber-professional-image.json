@@ -1,0 +1,289 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is the primary reason for maintaining personal hygiene as a barber?",
+        "choices": [
+          "To prevent the spread of infections",
+          "To make a good impression on clients",
+          "To comply with Indiana state board standards",
+          "To avoid strong fragrances"
+        ],
+        "answerIndex": 1,
+        "rationale": "Clients judge competence and cleanliness quickly, so maintaining personal hygiene helps create a positive first impression."
+      },
+      {
+        "prompt": "According to Indiana regulations, how should a barber's nails be maintained?",
+        "choices": [
+          "Long and polished",
+          "Trimmed and clean",
+          "Short and unpolished",
+          "Painted with clear polish"
+        ],
+        "answerIndex": 1,
+        "rationale": "Indiana regulations require barbers to have trimmed and clean nails to ensure personal cleanliness and professionalism."
+      },
+      {
+        "prompt": "Why are closed-toe shoes required for barbers?",
+        "choices": [
+          "They are more comfortable",
+          "They are part of the uniform",
+          "To prevent injuries from dropped tools and spills",
+          "They look more professional"
+        ],
+        "answerIndex": 2,
+        "rationale": "Closed-toe shoes protect barbers from occupational hazards like dropped tools and chemical spills."
+      },
+      {
+        "prompt": "What is the impact of a barber's own grooming on their business?",
+        "choices": [
+          "It has no impact",
+          "It is only important for personal satisfaction",
+          "It serves as a marketing tool",
+          "It is required by law"
+        ],
+        "answerIndex": 2,
+        "rationale": "A barber's grooming reflects their craft and serves as a walking advertisement, influencing client choices."
+      },
+      {
+        "prompt": "How should a barber greet a client to make a positive first impression?",
+        "choices": [
+          "By waving",
+          "By nodding",
+          "By greeting them by name and offering a handshake",
+          "By asking them to sit"
+        ],
+        "answerIndex": 2,
+        "rationale": "Greeting clients by name, making eye contact, and offering a handshake helps form a positive first impression."
+      },
+      {
+        "prompt": "Which posture practice helps prevent repetitive strain injuries for barbers?",
+        "choices": [
+          "Standing with feet together",
+          "Keeping the client at elbow height",
+          "Bending at the waist",
+          "Leaning on one leg"
+        ],
+        "answerIndex": 1,
+        "rationale": "Keeping the client at elbow height helps maintain proper posture and prevents strain injuries."
+      },
+      {
+        "prompt": "What type of attire is commonly required in barber shops?",
+        "choices": [
+          "Casual wear",
+          "Formal suits",
+          "Barber jackets or aprons",
+          "Sportswear"
+        ],
+        "answerIndex": 2,
+        "rationale": "Many barber shops require barber jackets or aprons as part of professional attire."
+      },
+      {
+        "prompt": "Why is it important for barbers to avoid strong fragrances?",
+        "choices": [
+          "They can be overwhelming",
+          "They are not fashionable",
+          "They may affect clients with sensitivities",
+          "They are expensive"
+        ],
+        "answerIndex": 2,
+        "rationale": "Strong fragrances may affect clients with sensitivities, so barbers should avoid them to ensure client comfort."
+      },
+      {
+        "prompt": "A client enters the shop and seems hesitant. How should the barber proceed?",
+        "choices": [
+          "Ignore them until they speak",
+          "Greet them warmly by name and offer assistance",
+          "Wait for them to approach",
+          "Ask them to wait"
+        ],
+        "answerIndex": 1,
+        "rationale": "Greeting clients warmly by name and offering assistance helps ease their hesitation and builds rapport."
+      },
+      {
+        "prompt": "What should a barber do if they notice their uniform is stained before a client arrives?",
+        "choices": [
+          "Ignore it",
+          "Try to cover it",
+          "Change into a clean uniform",
+          "Apologize to the client"
+        ],
+        "answerIndex": 2,
+        "rationale": "Changing into a clean uniform maintains a professional image and adheres to hygiene standards."
+      },
+      {
+        "prompt": "A barber is experiencing back pain during long shifts. What ergonomic solution could help?",
+        "choices": [
+          "Standing on one leg",
+          "Using ergonomic mats",
+          "Bending at the waist more often",
+          "Wearing high heels"
+        ],
+        "answerIndex": 1,
+        "rationale": "Ergonomic mats can reduce fatigue and alleviate back pain during long shifts by providing better support."
+      },
+      {
+        "prompt": "Which of the following is a key component of a barber's professional image?",
+        "choices": [
+          "Their social media presence",
+          "Their grooming and attire",
+          "Their pricing strategy",
+          "Their shop's location"
+        ],
+        "answerIndex": 1,
+        "rationale": "A barber's grooming and attire are essential components of their professional image and influence client perceptions."
+      },
+      {
+        "prompt": "How can a barber ensure they maintain proper posture while working?",
+        "choices": [
+          "By taking frequent breaks",
+          "By keeping their tools within reach",
+          "By adjusting the client's chair to elbow height",
+          "By sitting down often"
+        ],
+        "answerIndex": 2,
+        "rationale": "Adjusting the client's chair to elbow height helps maintain proper posture and reduces the risk of strain."
+      },
+      {
+        "prompt": "In what time frame do clients typically form a lasting impression of a barber?",
+        "choices": [
+          "Within 30 seconds",
+          "Within 7 seconds",
+          "Within 1 minute",
+          "Within 5 minutes"
+        ],
+        "answerIndex": 1,
+        "rationale": "Research shows that clients form lasting impressions within 7 seconds, highlighting the importance of first impressions."
+      },
+      {
+        "prompt": "What should a barber do if they have a cold and are scheduled to work?",
+        "choices": [
+          "Go to work and wear a mask",
+          "Stay home to prevent spreading illness",
+          "Work but avoid close contact",
+          "Take over-the-counter medication and work"
+        ],
+        "answerIndex": 1,
+        "rationale": "Staying home prevents the spread of illness to clients and colleagues, maintaining a healthy environment."
+      },
+      {
+        "prompt": "A barber's uniform is part of their professional image. What is a key characteristic of this attire?",
+        "choices": [
+          "It should be colorful",
+          "It should be expensive",
+          "It should be clean and pressed",
+          "It should be trendy"
+        ],
+        "answerIndex": 2,
+        "rationale": "A clean and pressed uniform is essential for maintaining a professional image and adhering to hygiene standards."
+      },
+      {
+        "prompt": "Why is it important for barbers to use a client's name throughout the service?",
+        "choices": [
+          "To remember their name",
+          "To build loyalty and referrals",
+          "To fill conversation gaps",
+          "To avoid mistakes"
+        ],
+        "answerIndex": 1,
+        "rationale": "Using a client's name throughout the service builds a personal connection, fostering loyalty and encouraging referrals."
+      },
+      {
+        "prompt": "What is the benefit of a barber maintaining well-groomed hair and beard?",
+        "choices": [
+          "It takes less time to style",
+          "It sets a standard for clients",
+          "It is required by law",
+          "It is easier to manage"
+        ],
+        "answerIndex": 1,
+        "rationale": "Well-groomed hair and beard set a standard for clients and reflect the barber's skill and professionalism."
+      },
+      {
+        "prompt": "A barber notices their client is sensitive to fragrances. What should they do?",
+        "choices": [
+          "Use unscented products",
+          "Apologize and continue",
+          "Open a window",
+          "Ignore the sensitivity"
+        ],
+        "answerIndex": 0,
+        "rationale": "Using unscented products accommodates the client's sensitivity and ensures their comfort during the service."
+      },
+      {
+        "prompt": "How can a barber's physical presentation influence their business success?",
+        "choices": [
+          "It has no influence",
+          "It determines pricing",
+          "It attracts and retains clients",
+          "It affects shop location"
+        ],
+        "answerIndex": 2,
+        "rationale": "A barber's physical presentation attracts and retains clients by showcasing their skills and professionalism."
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Professional Image",
+      "definition": "A barber's most visible marketing tool, judged by clients on competence, cleanliness, and trustworthiness."
+    },
+    {
+      "term": "Personal Hygiene Standards",
+      "definition": "Regulations requiring daily bathing, clean attire, trimmed nails, and absence of strong fragrances."
+    },
+    {
+      "term": "Professional Attire",
+      "definition": "Clean, pressed clothing appropriate to shop culture, often including barber jackets or aprons."
+    },
+    {
+      "term": "Closed-Toe Shoes",
+      "definition": "Required footwear for safety against dropped tools and chemical spills."
+    },
+    {
+      "term": "Posture",
+      "definition": "Standing with feet shoulder-width apart and keeping the client at elbow height to prevent strain."
+    },
+    {
+      "term": "Ergonomics",
+      "definition": "The practice of using ergonomic mats and proper posture to reduce fatigue and prevent injuries."
+    },
+    {
+      "term": "Physical Presentation",
+      "definition": "A barber's own grooming that reflects their craft and serves as a personal advertisement."
+    },
+    {
+      "term": "First Impressions",
+      "definition": "Clients form lasting impressions within 7 seconds, influenced by greetings, eye contact, and handshake."
+    },
+    {
+      "term": "Client Loyalty",
+      "definition": "Built through personal interactions such as using the client's name and providing consistent service."
+    },
+    {
+      "term": "Indiana Barber Regulations",
+      "definition": "State rules requiring licensees to maintain personal cleanliness and professional presentation."
+    },
+    {
+      "term": "Barber Jacket",
+      "definition": "A common piece of professional attire that is clean and pressed, often required in barbershops."
+    },
+    {
+      "term": "Repetitive Strain Injuries",
+      "definition": "Injuries prevented by maintaining proper posture and using ergonomic tools and mats."
+    },
+    {
+      "term": "Grooming Standards",
+      "definition": "Expectations for a barber's own hair, beard, and skin to be well-maintained and professional."
+    },
+    {
+      "term": "Occupational Hazards",
+      "definition": "Risks such as dropped tools and chemical spills that require safety measures like closed-toe shoes."
+    },
+    {
+      "term": "Client Referrals",
+      "definition": "New clients gained through positive impressions and recommendations from satisfied customers."
+    }
+  ]
+}

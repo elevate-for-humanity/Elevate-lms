@@ -1,0 +1,289 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "Which business structure offers the strongest liability protection for a barber shop owner?",
+        "choices": [
+          "Sole Proprietorship",
+          "Partnership",
+          "Limited Liability Company (LLC)",
+          "Corporation (S-Corp or C-Corp)"
+        ],
+        "answerIndex": 3,
+        "rationale": "A corporation provides the strongest liability protection because it is a separate legal entity from its owners."
+      },
+      {
+        "prompt": "What is the primary tax responsibility of a booth renter in a barber shop?",
+        "choices": [
+          "Employer withholds taxes",
+          "No taxes are paid",
+          "Pay self-employment tax",
+          "Only state tax is paid"
+        ],
+        "answerIndex": 2,
+        "rationale": "Booth renters are considered independent contractors and must pay self-employment tax, which includes both the employee and employer portions of Social Security and Medicare."
+      },
+      {
+        "prompt": "Under the Fair Labor Standards Act (FLSA), what is the minimum overtime pay rate for hours worked over 40 in a week?",
+        "choices": [
+          "1.25 times regular pay",
+          "1.5 times regular pay",
+          "2 times regular pay",
+          "Regular pay"
+        ],
+        "answerIndex": 1,
+        "rationale": "The FLSA mandates that overtime pay must be at least 1.5 times the employee's regular pay rate for hours worked over 40 in a week."
+      },
+      {
+        "prompt": "Which of the following is a requirement for maintaining a barber license in Indiana?",
+        "choices": [
+          "Complete 500 hours of training",
+          "Renew license every year",
+          "Display license prominently in the shop",
+          "Pass only the written exam"
+        ],
+        "answerIndex": 2,
+        "rationale": "Barbers in Indiana are required by law to display their license prominently in the shop."
+      },
+      {
+        "prompt": "If a barber is classified incorrectly as an independent contractor, what could be a consequence for the employer?",
+        "choices": [
+          "No consequences",
+          "Increased tips",
+          "Back taxes and penalties",
+          "Loss of business license"
+        ],
+        "answerIndex": 2,
+        "rationale": "Misclassifying an employee as an independent contractor can result in back taxes, penalties, and potential lawsuits for the employer."
+      },
+      {
+        "prompt": "What does the Americans with Disabilities Act (ADA) require of barber shops?",
+        "choices": [
+          "Provide free services to disabled individuals",
+          "Hire only disabled employees",
+          "Prohibit discrimination and provide reasonable accommodations",
+          "Pay higher wages to disabled employees"
+        ],
+        "answerIndex": 2,
+        "rationale": "The ADA requires that barber shops prohibit discrimination against qualified individuals with disabilities and provide reasonable accommodations."
+      },
+      {
+        "prompt": "What must a booth rental agreement specify?",
+        "choices": [
+          "Client records ownership",
+          "Employee benefits",
+          "Rent amount and payment schedule",
+          "Tax responsibilities"
+        ],
+        "answerIndex": 2,
+        "rationale": "A booth rental agreement should specify the rent amount, payment schedule, hours of access, utilities included, and termination terms."
+      },
+      {
+        "prompt": "What is the role of the Indiana Professional Licensing Agency (IPLA) in barber licensing?",
+        "choices": [
+          "Provides tax advice",
+          "Issues barber licenses",
+          "Sets booth rental prices",
+          "Conducts shop inspections"
+        ],
+        "answerIndex": 1,
+        "rationale": "The IPLA is responsible for issuing barber licenses in Indiana."
+      },
+      {
+        "prompt": "A barber shop owner wants to protect their personal assets from business debts. Which business structure should they consider?",
+        "choices": [
+          "Sole Proprietorship",
+          "Partnership",
+          "Limited Liability Company (LLC)",
+          "Corporation (S-Corp or C-Corp)"
+        ],
+        "answerIndex": 2,
+        "rationale": "An LLC provides liability protection for personal assets while offering tax simplicity."
+      },
+      {
+        "prompt": "If a barber working as an employee is injured on the job, what should they do first?",
+        "choices": [
+          "Report the injury to their employer immediately",
+          "File a lawsuit",
+          "Ignore the injury",
+          "Contact the IRS"
+        ],
+        "answerIndex": 0,
+        "rationale": "Employees should report any workplace injury to their employer immediately to ensure their workers' compensation claim is not jeopardized."
+      },
+      {
+        "prompt": "What is a key difference between an employee and a booth renter regarding tools?",
+        "choices": [
+          "Employer provides tools for both",
+          "Barber provides their own tools as a booth renter",
+          "Booth renter receives tools from the shop owner",
+          "Tools are not necessary for booth renters"
+        ],
+        "answerIndex": 1,
+        "rationale": "Booth renters, as independent contractors, are responsible for providing their own tools."
+      },
+      {
+        "prompt": "Which law requires equal pay for equal work regardless of gender?",
+        "choices": [
+          "Fair Labor Standards Act",
+          "Title VII of the Civil Rights Act",
+          "Americans with Disabilities Act",
+          "Equal Pay Act"
+        ],
+        "answerIndex": 3,
+        "rationale": "The Equal Pay Act mandates that men and women receive equal pay for equal work."
+      },
+      {
+        "prompt": "A barber wishes to deduct business expenses on their taxes. Which of the following can they deduct?",
+        "choices": [
+          "Personal groceries",
+          "Tools and supplies",
+          "Vacation expenses",
+          "Clothing"
+        ],
+        "answerIndex": 1,
+        "rationale": "Self-employed barbers can deduct business-related expenses such as tools and supplies."
+      },
+      {
+        "prompt": "How often must a barber in Indiana renew their license?",
+        "choices": [
+          "Every year",
+          "Every two years",
+          "Every five years",
+          "Every ten years"
+        ],
+        "answerIndex": 1,
+        "rationale": "Barbers in Indiana must renew their license every two years."
+      },
+      {
+        "prompt": "A barber is considering forming a partnership. What is essential for this business structure?",
+        "choices": [
+          "No formal agreement needed",
+          "Partnership agreement",
+          "Single owner",
+          "Corporate bylaws"
+        ],
+        "answerIndex": 1,
+        "rationale": "A partnership requires a partnership agreement to outline the sharing of profits, losses, and liabilities."
+      },
+      {
+        "prompt": "What is the tax rate for self-employment tax that booth renters must pay?",
+        "choices": [
+          "7.65%",
+          "10%",
+          "15.3%",
+          "20%"
+        ],
+        "answerIndex": 2,
+        "rationale": "Booth renters must pay a self-employment tax rate of 15.3%, which covers both the employee and employer portions of Social Security and Medicare."
+      },
+      {
+        "prompt": "A barber shop has 20 employees. Which law prohibits discrimination based on race, color, religion, sex, or national origin?",
+        "choices": [
+          "Fair Labor Standards Act",
+          "Title VII of the Civil Rights Act",
+          "Americans with Disabilities Act",
+          "Family and Medical Leave Act"
+        ],
+        "answerIndex": 1,
+        "rationale": "Title VII of the Civil Rights Act applies to employers with 15 or more employees and prohibits discrimination based on race, color, religion, sex, or national origin."
+      },
+      {
+        "prompt": "What must a barber do if they change their address in Indiana?",
+        "choices": [
+          "Notify IPLA within 30 days",
+          "Notify IPLA within a year",
+          "No notification needed",
+          "Notify IPLA within 60 days"
+        ],
+        "answerIndex": 0,
+        "rationale": "Barbers must notify the Indiana Professional Licensing Agency (IPLA) of any address change within 30 days."
+      },
+      {
+        "prompt": "A barber wants to ensure they are classified correctly for tax purposes. What test does the IRS use to determine classification?",
+        "choices": [
+          "Behavioral, financial, and type-of-relationship test",
+          "Income test",
+          "Hours worked test",
+          "Employment length test"
+        ],
+        "answerIndex": 0,
+        "rationale": "The IRS uses a behavioral, financial, and type-of-relationship test to determine whether a worker is an employee or an independent contractor."
+      },
+      {
+        "prompt": "What is a consequence of not reporting tips as a barber?",
+        "choices": [
+          "No consequences",
+          "Increased tax refund",
+          "Penalties for underreporting income",
+          "Higher wages"
+        ],
+        "answerIndex": 2,
+        "rationale": "Failing to report tips can result in penalties for underreporting income, as all tips are taxable."
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Sole Proprietorship",
+      "definition": "A business structure with one owner who has full control and personal liability. Business income is reported on the owner's personal tax return."
+    },
+    {
+      "term": "Limited Liability Company (LLC)",
+      "definition": "A business structure that offers liability protection like a corporation while maintaining tax simplicity like a sole proprietorship."
+    },
+    {
+      "term": "Booth Renter",
+      "definition": "An independent contractor who rents a station in a barber shop and is responsible for their own taxes and tools."
+    },
+    {
+      "term": "Fair Labor Standards Act (FLSA)",
+      "definition": "A federal law that sets minimum wage, overtime pay, and child labor standards."
+    },
+    {
+      "term": "Workers' Compensation",
+      "definition": "Insurance providing wage replacement and medical benefits to employees injured at work. Required for most employers in Indiana."
+    },
+    {
+      "term": "Self-employment Tax",
+      "definition": "A tax for self-employed individuals covering Social Security and Medicare, totaling 15.3%."
+    },
+    {
+      "term": "Non-compete Agreement",
+      "definition": "A contract where an employee agrees not to work for competitors within a certain area for a specified time after leaving a job."
+    },
+    {
+      "term": "Schedule C",
+      "definition": "A tax form used by sole proprietors to report income and expenses from their business."
+    },
+    {
+      "term": "Title VII of the Civil Rights Act",
+      "definition": "A law prohibiting employment discrimination based on race, color, religion, sex, or national origin."
+    },
+    {
+      "term": "Misclassification",
+      "definition": "Incorrectly labeling an employee as an independent contractor, which can lead to legal and tax penalties."
+    },
+    {
+      "term": "Indiana Professional Licensing Agency (IPLA)",
+      "definition": "The state agency responsible for issuing barber licenses in Indiana."
+    },
+    {
+      "term": "Client Records",
+      "definition": "Information about clients that belongs to the barber shop, not the individual barber, unless otherwise agreed."
+    },
+    {
+      "term": "Family and Medical Leave Act (FMLA)",
+      "definition": "A law allowing eligible employees to take up to 12 weeks of unpaid, job-protected leave for family or medical reasons."
+    },
+    {
+      "term": "Booth Rental Agreement",
+      "definition": "A contract specifying rent, payment schedule, and terms for renting a station in a barber shop."
+    },
+    {
+      "term": "Americans with Disabilities Act (ADA)",
+      "definition": "A law prohibiting discrimination against individuals with disabilities and requiring reasonable accommodations in the workplace."
+    }
+  ]
+}

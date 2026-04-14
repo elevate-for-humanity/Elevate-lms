@@ -1,2 +1,4 @@
-import { permanentRedirect } from 'next/navigation';
-export default function Page() { permanentRedirect(`/community-services/tennessee`); }
+import { redirect } from 'next/navigation';
+export default function Page() {
+  redirect('https://www.elevateforhumanity.org/community-services');
+}

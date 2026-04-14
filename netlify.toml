@@ -220,6 +220,12 @@
     "recharts",
     # Canvas / screenshot (browser-only)
     "html2canvas",
+    # Video / media (browser-only)
+    "hls.js",
+    # MediaPipe (browser-only, 20MB)
+    "@mediapipe/tasks-vision",
+    # 3D stdlib (browser-only, 29MB)
+    "three-stdlib",
     # Document generation / parsing
     "docx",
     "mammoth",
@@ -327,168 +333,33 @@
   schedule = "0 14 * * *"
 
 # ============================================
-# ADMIN DOMAIN (www.elevateconnectsdirectory.org)
-# Rewrites admin domain to /admin dashboard
+# ============================================
+# DOMAIN REDIRECTS
+# www.elevateforhumanity.org = LMS (this site)
+# www.elevateforhumanity.org/admin = admin portal
 # ============================================
 
+# Admin domain → /admin
 [[redirects]]
   from = "https://www.elevateconnectsdirectory.org"
   to = "https://www.elevateforhumanity.org/admin"
-  status = 200
+  status = 301
   force = true
 
 [[redirects]]
   from = "https://www.elevateconnectsdirectory.org/*"
   to = "https://www.elevateforhumanity.org/admin/:splat"
-  status = 200
+  status = 301
   force = true
 
 [[redirects]]
   from = "https://elevateconnectsdirectory.org/*"
-  to = "https://www.elevateconnectsdirectory.org/:splat"
+  to = "https://www.elevateforhumanity.org/admin/:splat"
   status = 301
   force = true
 
 # ============================================
-# LMS DOMAIN (elevateforhumanityeducation.com)
-# Root -> /admin dashboard
-# All sub-routes pass through to the full site
-# ============================================
-
-[[redirects]]
-  from = "https://elevateforhumanityeducation.com"
-  to = "https://www.elevateforhumanity.org/admin"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "https://www.elevateforhumanityeducation.com"
-  to = "https://www.elevateforhumanity.org/admin"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "https://elevateforhumanityeducation.com/*"
-  to = "https://www.elevateforhumanity.org/:splat"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "https://www.elevateforhumanityeducation.com/*"
-  to = "https://www.elevateforhumanity.org/:splat"
-  status = 200
-  force = true
-
-# ============================================
-# SUPERSONIC DOMAIN (supersonicfastermoney.com)
-# Serves Supersonic Fast Cash + VITA tax content from this domain.
-# /tax/* and /supersonic-fast-cash/* both map through.
-# HTTP naked → HTTPS www first, then path rules apply.
-# ============================================
-
-# HTTP → HTTPS canonicalization (must come first)
-[[redirects]]
-  from = "http://supersonicfastermoney.com/*"
-  to = "https://www.supersonicfastermoney.com/:splat"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "http://www.supersonicfastermoney.com/*"
-  to = "https://www.supersonicfastermoney.com/:splat"
-  status = 301
-  force = true
-
-# Naked → www
-[[redirects]]
-  from = "https://supersonicfastermoney.com/*"
-  to = "https://www.supersonicfastermoney.com/:splat"
-  status = 301
-  force = true
-
-# VITA / tax pages — live at /tax/* on the main site
-[[redirects]]
-  from = "https://www.supersonicfastermoney.com/tax/*"
-  to = "https://www.elevateforhumanity.org/tax/:splat"
-  status = 200
-  force = true
-
-# Supersonic Fast Cash pages — live at /supersonic-fast-cash/* on the main site
-[[redirects]]
-  from = "https://www.supersonicfastermoney.com/supersonic-fast-cash/*"
-  to = "https://www.elevateforhumanity.org/supersonic-fast-cash/:splat"
-  status = 200
-  force = true
-
-# API routes — must come before the catch-all so Stripe webhooks and other
-# API calls reach the correct path on elevateforhumanity.org.
-# Without this, the catch-all below prepends /supersonic-fast-cash/ and 404s.
-[[redirects]]
-  from = "https://www.supersonicfastermoney.com/api/*"
-  to = "https://www.elevateforhumanity.org/api/:splat"
-  status = 200
-  force = true
-
-# Root and all other paths → Supersonic homepage
-[[redirects]]
-  from = "https://www.supersonicfastermoney.com/*"
-  to = "https://www.elevateforhumanity.org/supersonic-fast-cash/:splat"
-  status = 200
-  force = true
-
-# ============================================
-# CANONICAL DOMAIN REDIRECTS (301 = permanent)
-# All traffic funnels to www.elevateforhumanity.org
-# ============================================
-
-# Naked org -> www org (canonical)
-
-[[redirects]]
-  from = "https://elevateforhumanity.org/*"
-  to = "https://www.elevateforhumanity.org/:splat"
-  status = 301
-  force = true
-# HTTP -> HTTPS
-
-[[redirects]]
-  from = "http://elevateforhumanity.org/*"
-  to = "https://www.elevateforhumanity.org/:splat"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "http://www.elevateforhumanity.org/*"
-  to = "https://www.elevateforhumanity.org/:splat"
-  status = 301
-  force = true
-# Old .institute domain -> canonical .org (preserves path + query)
-
-[[redirects]]
-  from = "https://www.elevateforhumanity.institute/*"
-  to = "https://www.elevateforhumanity.org/:splat"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "https://elevateforhumanity.institute/*"
-  to = "https://www.elevateforhumanity.org/:splat"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "http://www.elevateforhumanity.institute/*"
-  to = "https://www.elevateforhumanity.org/:splat"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "http://elevateforhumanity.institute/*"
-  to = "https://www.elevateforhumanity.org/:splat"
-  status = 301
-  force = true
-# ============================================
-# PORTAL URL CANONICALIZATION
-# Collapse duplicate portal paths to one canonical URL each
+# NETLIFY FUNCTION REWRITES
 # ============================================
 
 [[redirects]]
@@ -496,38 +367,34 @@
   to = "/.netlify/functions/export-pdf"
   status = 200
   force = true
-# OCR extraction - routed to dedicated Netlify function
 
 [[redirects]]
   from = "/api/ocr/extract"
   to = "/.netlify/functions/ocr-extract"
   status = 200
   force = true
-# Image optimization - routed to dedicated Netlify function
 
 [[redirects]]
   from = "/api/image/optimize"
   to = "/.netlify/functions/image-optimize"
   status = 200
   force = true
-# SFC: File tax return - routed to dedicated Netlify function
 
 [[redirects]]
   from = "/api/file-return"
   to = "/.netlify/functions/file-return"
   status = 200
   force = true
-# SFC: Refund tracking (public, anon key) - routed to dedicated Netlify function
 
 [[redirects]]
   from = "/api/refund-tracking"
   to = "/.netlify/functions/refund-tracking"
   status = 200
   force = true
+
 # ============================================
-# ROUTE REDIRECTS
+# SECURITY — block common scanner probes
 # ============================================
-# Canonical: NO trailing slashes (prevents 308 hops)
 
 [[redirects]]
   from = "/wp-admin"
@@ -537,18 +404,6 @@
 
 [[redirects]]
   from = "/wp-admin/*"
-  to = "/410.html"
-  status = 410
-  force = true
-
-[[redirects]]
-  from = "/wp-includes/*"
-  to = "/410.html"
-  status = 410
-  force = true
-
-[[redirects]]
-  from = "/wp-content/*"
   to = "/410.html"
   status = 410
   force = true
@@ -566,51 +421,63 @@
   force = true
 
 [[redirects]]
+  from = "/wp-includes/*"
+  to = "/410.html"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/wp-content/*"
+  to = "/410.html"
+  status = 410
+  force = true
+
+[[redirects]]
   from = "/cgi-bin/*"
   to = "/410.html"
   status = 410
   force = true
-# Common PHP shell probes
 
-[[redirects]]
-  from = "/info.php"
-  to = "/410.html"
-  status = 410
-  force = true
+# ============================================
+# PATH REDIRECTS
+# ============================================
 
-[[redirects]]
-  from = "/admin.php"
-  to = "/410.html"
-  status = 410
-  force = true
-
-[[redirects]]
-  from = "/about.php"
-  to = "/410.html"
-  status = 410
-  force = true
-
-[[redirects]]
-  from = "/wp-cron.php"
-  to = "/410.html"
-  status = 410
-  force = true
-# Malformed typos bots hit
-
-[[redirects]]
-  from = "/xmrlpc.php"
-  to = "/410.html"
-  status = 410
-  force = true
-
-# /signin → /login (canonical auth route)
 [[redirects]]
   from = "/signin"
   to = "/login"
   status = 301
   force = true
 
-# Dead legacy paths — redirect to correct destinations
+[[redirects]]
+  from = "/courses/epa-608"
+  to = "/lms/courses/0ba9a61c-1f1b-4019-be6f-90e92eba2bc0"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/courses/hvac"
+  to = "/lms/courses/0ba9a61c-1f1b-4019-be6f-90e92eba2bc0"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/courses/hvac/*"
+  to = "/lms/courses/0ba9a61c-1f1b-4019-be6f-90e92eba2bc0"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/courses/catalog"
+  to = "/lms/programs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/courses/capital-readiness"
+  to = "/lms/programs"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "/student-portal/education"
   to = "/student-portal"
@@ -634,8 +501,6 @@
   to = "/admin/licenses"
   status = 301
   force = true
-
-# /student, /student/dashboard → /student-portal handled by next.config.mjs (auth/app route, Rule B)
 
 [[headers]]
   for = "/*"
@@ -692,36 +557,4 @@
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
 
-# ── Course consolidation redirects ────────────────────────────────────────────
-# Static hardcoded course pages removed — all traffic goes to DB-driven LMS
-# /courses redirect is owned by next.config.mjs → /lms/courses
 
-[[redirects]]
-  from = "/courses/epa-608"
-  to = "/lms/courses/0ba9a61c-1f1b-4019-be6f-90e92eba2bc0"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "/courses/catalog"
-  to = "/lms/programs"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "/courses/capital-readiness"
-  to = "/lms/programs"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "/courses/hvac"
-  to = "/lms/courses/0ba9a61c-1f1b-4019-be6f-90e92eba2bc0"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "/courses/hvac/*"
-  to = "/lms/courses/0ba9a61c-1f1b-4019-be6f-90e92eba2bc0"
-  status = 301
-  force = true

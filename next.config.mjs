@@ -232,120 +232,186 @@ const nextConfig = {
   // Removed staticPageGenerationTimeout - use route segment config instead
   // See: https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
   outputFileTracingExcludes: {
+    // Exclude everything from the accreditation report route — it uses a dedicated function
     '/api/accreditation/report': ['**/*'],
-    // Exclude heavy/dev files from ALL routes to reduce Netlify handler size
+    // Exclude heavy packages from ALL routes to keep ___netlify-server-handler under 50 MB zipped.
+    // Rule: if a package is only used in a specific API route or Netlify function, exclude it here
+    // and load it via dynamic import() or move it to netlify/functions/.
     '*': [
-      // Generated media — served by CDN, not the server function
+      // Generated media — served by CDN
       'public/generated/**',
       'public/generated-images/**',
       // Dev artifacts
       'reports/**',
       'audit-packet/**',
       'playwright-report/**',
-      // Browser automation
+
+      // ── Browser automation (never needed in SSR) ──────────────────────────
       '**/node_modules/playwright/**',
-      '**/node_modules/puppeteer/**',
+      '**/node_modules/.pnpm/playwright*/**',
       '**/node_modules/@playwright/**',
+      '**/node_modules/.pnpm/@playwright*/**',
       '**/node_modules/playwright-core/**',
+      '**/node_modules/.pnpm/playwright-core*/**',
+      '**/node_modules/puppeteer/**',
+      '**/node_modules/.pnpm/puppeteer*/**',
       '**/node_modules/puppeteer-core/**',
-      '**/node_modules/**/chromium/**',
+      '**/node_modules/.pnpm/puppeteer-core*/**',
+      '**/node_modules/chromium-bidi/**',
+      '**/node_modules/.pnpm/chromium-bidi*/**',
       '**/node_modules/@sparticuz/**',
+      '**/node_modules/.pnpm/@sparticuz*/**',
       '**/node_modules/chrome-aws-lambda/**',
-      // FFmpeg + FFprobe binaries (66MB + 76MB) — only used in video generator
+
+      // ── FFmpeg / FFprobe binaries (66 MB + 76 MB) ─────────────────────────
       '**/node_modules/@ffmpeg-installer/**',
       '**/node_modules/.pnpm/@ffmpeg-installer*/**',
       '**/node_modules/@ffprobe-installer/**',
       '**/node_modules/.pnpm/@ffprobe-installer*/**',
       '**/node_modules/fluent-ffmpeg/**',
       '**/node_modules/.pnpm/fluent-ffmpeg*/**',
-      // Canvas native binary (24MB) — only used in video generator
+
+      // ── Canvas / native image (30 MB) ─────────────────────────────────────
       '**/node_modules/canvas/**',
       '**/node_modules/.pnpm/canvas*/**',
-      // Other heavy packages
-      '**/node_modules/googleapis/**',
-      '**/node_modules/.pnpm/googleapis*/**',
-      '**/node_modules/monaco-editor/**',
-      '**/node_modules/.pnpm/monaco-editor*/**',
-      '**/node_modules/node-pty/**',
-      '**/node_modules/.pnpm/node-pty*/**',
-      '**/node_modules/video.js/**',
-      '**/node_modules/.pnpm/video.js*/**',
-      '**/node_modules/pdfjs-dist/**',
-      '**/node_modules/.pnpm/pdfjs-dist*/**',
-      '**/node_modules/happy-dom/**',
-      '**/node_modules/.pnpm/happy-dom*/**',
-      '**/node_modules/@sentry/cli-linux-x64/**',
-      '**/node_modules/.pnpm/@sentry+cli-linux*/**',
-      // Dev-only tools
-      '**/node_modules/typescript/**',
-      '**/node_modules/jsdom/**',
-      '**/node_modules/core-js/**',
-      '**/node_modules/prettier/**',
-      // Sharp native binaries
-      '**/node_modules/@img/sharp-libvips-*/**',
-      '**/node_modules/@img/sharp-linux-*/**',
-      '**/node_modules/@img/sharp-darwin-*/**',
-      '**/node_modules/@img/sharp-win32-*/**',
-      // Heavy PDF dist bundles
-      '**/node_modules/jspdf/dist/**',
+      '**/node_modules/@napi-rs/canvas/**',
+      '**/node_modules/.pnpm/@napi-rs+canvas*/**',
+
+      // ── OCR (44 MB core wasm + 1.7 MB js) ────────────────────────────────
+      '**/node_modules/tesseract.js/**',
+      '**/node_modules/.pnpm/tesseract.js*/**',
+      '**/node_modules/tesseract.js-core/**',
+      '**/node_modules/.pnpm/tesseract.js-core*/**',
+
+      // ── Sharp native binaries ─────────────────────────────────────────────
+      '**/node_modules/sharp/**',
+      '**/node_modules/.pnpm/sharp*/**',
+      '**/node_modules/@img/**',
+      '**/node_modules/.pnpm/@img*/**',
+
+      // ── PDF libraries ─────────────────────────────────────────────────────
       '**/node_modules/pdf-lib/**',
       '**/node_modules/.pnpm/pdf-lib*/**',
-      '**/node_modules/@apm-js-collab/**',
-      '**/node_modules/.pnpm/@apm-js-collab*/**',
-      // 3D / WebGL — browser-only (~43MB)
+      '**/node_modules/pdf-parse/**',
+      '**/node_modules/.pnpm/pdf-parse*/**',
+      '**/node_modules/pdfkit/**',
+      '**/node_modules/.pnpm/pdfkit*/**',
+      '**/node_modules/pdfjs-dist/**',
+      '**/node_modules/.pnpm/pdfjs-dist*/**',
+      '**/node_modules/jspdf/**',
+      '**/node_modules/.pnpm/jspdf*/**',
+      '**/node_modules/@react-pdf/**',
+      '**/node_modules/.pnpm/@react-pdf*/**',
+
+      // ── Google APIs (194 MB) ──────────────────────────────────────────────
+      '**/node_modules/googleapis/**',
+      '**/node_modules/.pnpm/googleapis*/**',
+      '**/node_modules/google-auth-library/**',
+      '**/node_modules/.pnpm/google-auth-library*/**',
+
+      // ── Monaco editor (75 MB) ─────────────────────────────────────────────
+      '**/node_modules/monaco-editor/**',
+      '**/node_modules/.pnpm/monaco-editor*/**',
+
+      // ── node-pty (63 MB) ──────────────────────────────────────────────────
+      '**/node_modules/node-pty/**',
+      '**/node_modules/.pnpm/node-pty*/**',
+
+      // ── Video / media (browser-only) ──────────────────────────────────────
+      '**/node_modules/video.js/**',
+      '**/node_modules/.pnpm/video.js*/**',
+      '**/node_modules/hls.js/**',
+      '**/node_modules/.pnpm/hls.js*/**',
+
+      // ── MediaPipe (20 MB, browser-only) ───────────────────────────────────
+      '**/node_modules/@mediapipe/**',
+      '**/node_modules/.pnpm/@mediapipe*/**',
+
+      // ── 3D / WebGL (43 MB + 29 MB stdlib, browser-only) ──────────────────
       '**/node_modules/three/**',
       '**/node_modules/.pnpm/three*/**',
+      '**/node_modules/three-stdlib/**',
+      '**/node_modules/.pnpm/three-stdlib*/**',
       '**/node_modules/@react-three/**',
       '**/node_modules/.pnpm/@react-three*/**',
-      // Icon library — browser-only (42MB)
+
+      // ── Icon library (42 MB, browser-only) ───────────────────────────────
       '**/node_modules/lucide-react/**',
       '**/node_modules/.pnpm/lucide-react*/**',
-      // Charting — browser-only
+
+      // ── Charting (browser-only) ───────────────────────────────────────────
       '**/node_modules/recharts/**',
       '**/node_modules/.pnpm/recharts*/**',
-      // Canvas / screenshot — browser-only
+
+      // ── Screenshot / canvas (browser-only) ───────────────────────────────
       '**/node_modules/html2canvas/**',
       '**/node_modules/.pnpm/html2canvas*/**',
-      // Build tools — not needed at runtime
-      '**/node_modules/tailwindcss/**',
-      '**/node_modules/.pnpm/tailwindcss*/**',
-      '**/node_modules/autoprefixer/**',
-      '**/node_modules/postcss/**',
-      '**/node_modules/eslint/**',
-      '**/node_modules/.pnpm/eslint*/**',
-      '**/node_modules/@typescript-eslint/**',
-      '**/node_modules/.pnpm/@typescript-eslint*/**',
-      // Document generation / parsing
+
+      // ── Sentry CLI binary (21 MB) ─────────────────────────────────────────
+      '**/node_modules/@sentry/cli-linux-x64/**',
+      '**/node_modules/.pnpm/@sentry+cli-linux*/**',
+
+      // ── Document generation / parsing ─────────────────────────────────────
       '**/node_modules/docx/**',
       '**/node_modules/.pnpm/docx*/**',
       '**/node_modules/mammoth/**',
       '**/node_modules/.pnpm/mammoth*/**',
-      // Collaborative editing — browser-only
+
+      // ── Collaborative editing (browser-only) ──────────────────────────────
       '**/node_modules/yjs/**',
       '**/node_modules/.pnpm/yjs*/**',
       '**/node_modules/y-protocols/**',
+      '**/node_modules/.pnpm/y-protocols*/**',
       '**/node_modules/lib0/**',
-      // WebContainer — browser-only
+      '**/node_modules/.pnpm/lib0*/**',
+
+      // ── WebContainer (browser-only) ───────────────────────────────────────
       '**/node_modules/@webcontainer/**',
       '**/node_modules/.pnpm/@webcontainer*/**',
-      // Not needed in SSR hot path
+
+      // ── Build / dev tools (not needed at runtime) ─────────────────────────
+      '**/node_modules/typescript/**',
+      '**/node_modules/.pnpm/typescript*/**',
+      '**/node_modules/core-js/**',
+      '**/node_modules/.pnpm/core-js*/**',
+      '**/node_modules/prettier/**',
+      '**/node_modules/.pnpm/prettier*/**',
+      '**/node_modules/tailwindcss/**',
+      '**/node_modules/.pnpm/tailwindcss*/**',
+      '**/node_modules/autoprefixer/**',
+      '**/node_modules/.pnpm/autoprefixer*/**',
+      '**/node_modules/postcss/**',
+      '**/node_modules/.pnpm/postcss*/**',
+      '**/node_modules/eslint/**',
+      '**/node_modules/.pnpm/eslint*/**',
+      '**/node_modules/@typescript-eslint/**',
+      '**/node_modules/.pnpm/@typescript-eslint*/**',
+      '**/node_modules/vitest/**',
+      '**/node_modules/.pnpm/vitest*/**',
+
+      // ── Test / DOM (not needed at runtime) ───────────────────────────────
+      '**/node_modules/jsdom/**',
+      '**/node_modules/.pnpm/jsdom*/**',
+      '**/node_modules/happy-dom/**',
+      '**/node_modules/.pnpm/happy-dom*/**',
+
+      // ── Misc not needed in SSR hot path ───────────────────────────────────
       '**/node_modules/@mailchimp/**',
       '**/node_modules/.pnpm/@mailchimp*/**',
       '**/node_modules/csv-parse/**',
+      '**/node_modules/.pnpm/csv-parse*/**',
       '**/node_modules/sitemap/**',
+      '**/node_modules/.pnpm/sitemap*/**',
       '**/node_modules/jszip/**',
+      '**/node_modules/.pnpm/jszip*/**',
       '**/node_modules/fast-xml-parser/**',
+      '**/node_modules/.pnpm/fast-xml-parser*/**',
       '**/node_modules/marked/**',
+      '**/node_modules/.pnpm/marked*/**',
       '**/node_modules/cheerio/**',
-      '**/node_modules/vitest/**',
-      '**/node_modules/.pnpm/vitest*/**',
-      // Source files not needed at runtime
-      'app/**/*.tsx',
-      'app/**/*.ts',
-      'components/**/*.tsx',
-      'components/**/*.ts',
-      'lib/**/*.ts',
-      'lib/**/*.tsx',
+      '**/node_modules/.pnpm/cheerio*/**',
+      '**/node_modules/@apm-js-collab/**',
+      '**/node_modules/.pnpm/@apm-js-collab*/**',
     ],
   },
 

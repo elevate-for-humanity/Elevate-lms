@@ -59,9 +59,9 @@ function SelfHostedAnalyticsContent() {
     }
   };
 
-  const sendToAnalytics = async (data: any) => {
+  const sendToAnalytics = async (metric: any) => {
     try {
-      const data = {
+      const payload = {
         event: 'web-vital',
         metric_name: metric.name,
         metric_value: metric.value,
@@ -73,11 +73,11 @@ function SelfHostedAnalyticsContent() {
       await fetch('/api/analytics/track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
-    } catch (error) { /* Error handled silently */ 
-    // Error handled
-  }
+    } catch {
+      // Silently fail — analytics must never break the app
+    }
   };
 
   // No UI - just tracking

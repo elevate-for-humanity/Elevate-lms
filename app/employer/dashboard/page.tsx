@@ -100,12 +100,12 @@ export default async function EmployerDashboardOrchestrated() {
     .eq('employer_id', user.id)
     .eq('status', 'pending');
 
-  // Check apprenticeship program
+  // Check apprenticeship program (maybeSingle — employer may not have one yet)
   const { data: apprenticeshipProgram } = await supabase
     .from('apprenticeships')
-    .select('*')
+    .select('id')
     .eq('employer_id', user.id)
-    .single();
+    .maybeSingle();
 
   // Calculate state
   const stateData = getEmployerState({

@@ -13,7 +13,7 @@ export default async function CertificatesPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
   const db = await getAdminClient();
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
   if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
   const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();

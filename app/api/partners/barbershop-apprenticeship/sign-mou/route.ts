@@ -177,24 +177,33 @@ async function _POST(req: NextRequest) {
         .from('mous')
         .upload(pdfFileName, pdfBytes, { contentType: 'application/pdf', upsert: false });
 
-      // Get public URL
-      const { data: pdfUrl } = supabase.storage.from('mous').getPublicUrl(pdfFileName);
+      // mous bucket is private — store the path, generate signed URLs on demand
+      const pdfStoragePath = pdfUpload?.path ?? pdfFileName;
 
-      // Update mou_signatures with PDF path (only if column exists in live schema)
+      // Update mou_signatures with PDF storage path (non-blocking — column may not exist yet)
       if (mouRecord?.id && pdfUpload) {
-        await supabase.from('mou_signatures').update({ pdf_url: pdfUrl.publicUrl }).eq('id', mouRecord.id)
-          .then(() => {}) // non-blocking — column may not exist yet
+        await supabase.from('mou_signatures')
+          .update({ pdf_url: pdfStoragePath })
+          .eq('id', mouRecord.id)
           .catch(() => {});
       }
 
-      // Update partners table
-      await supabase.from('partners').update({
-        mou_signed: true,
-        mou_signed_at: signed_at || now,
-        mou_final_pdf_url: pdfUrl.publicUrl,
-        onboarding_step: 'mou_signed',
-        updated_at: now,
-      }).ilike('contact_email', '%' + (body.contact_email || shop_name) + '%');
+      // Generate a short-lived signed URL for the email attachment reference only
+      const { data: signedUrlData } = await supabase.storage
+        .from('mous')
+        .createSignedUrl(pdfStoragePath, 60 * 60 * 24); // 24h for email delivery
+      const pdfUrl = { publicUrl: signedUrlData?.signedUrl ?? '' };
+
+      // Update partners table — only if we have an exact email to match on
+      if (body.contact_email) {
+        await supabase.from('partners').update({
+          mou_signed: true,
+          mou_signed_at: signed_at || now,
+          mou_final_pdf_url: pdfUrl.publicUrl,
+          onboarding_step: 'mou_signed',
+          updated_at: now,
+        }).eq('contact_email', body.contact_email.trim().toLowerCase());
+      }
 
       const pdfBase64 = Buffer.from(pdfBytes).toString('base64');
       const sgKey = process.env.SENDGRID_API_KEY;
@@ -286,44 +295,7 @@ async function _POST(req: NextRequest) {
       logger.warn('[sign-mou] PDF generation failed (non-blocking):', pdfErr);
     }
 
-    // Send admin notification email
-    try {
-      const ADMIN_EMAIL = process.env.PARTNER_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com';
-      const sgKey = process.env.SENDGRID_API_KEY;
-      if (sgKey) {
-        await fetch('https://api.sendgrid.com/v3/mail/send', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${sgKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            personalizations: [{ to: [{ email: ADMIN_EMAIL }] }],
-            from: { email: 'noreply@elevateforhumanity.org', name: 'Elevate for Humanity' },
-            reply_to: { email: 'elevate4humanityedu@gmail.com' },
-            subject: `[MOU SIGNED] ${shop_name.trim()} — Barber Apprenticeship Partnership`,
-            content: [{
-              type: 'text/html',
-              value: `<div style="font-family:Arial,sans-serif;max-width:600px">
-                <h2 style="color:#1e293b">MOU Signed — Barber Apprenticeship</h2>
-                <table style="width:100%;border-collapse:collapse;margin:16px 0">
-                  <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb;font-weight:bold;width:180px">Shop Name</td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${shop_name.trim()}</td></tr>
-                  <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb;font-weight:bold">Signer</td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${signer_name.trim()} (${signer_title.trim()})</td></tr>
-                  <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb;font-weight:bold">Supervising Barber</td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${supervisor_name?.trim() || 'N/A'} — License: ${supervisor_license?.trim() || 'N/A'}</td></tr>
-                  <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb;font-weight:bold">Compensation</td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${compensation_model || 'N/A'} — ${compensation_rate || 'N/A'}</td></tr>
-                  <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb;font-weight:bold">Signed At</td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${now}</td></tr>
-                  <tr><td style="padding:8px;font-weight:bold">IP Address</td><td style="padding:8px">${ipAddress}</td></tr>
-                </table>
-                <p style="color:#64748b;font-size:13px">Application match: ${application?.id ? 'Yes — status updated to mou_signed' : 'No matching application found'}</p>
-              </div>`,
-            }],
-          }),
-        });
-      }
-    } catch (emailErr) {
-      logger.warn('[sign-mou] Admin notification email failed:', emailErr);
-    }
-
+    // Admin notification with PDF is already sent inside the PDF generation block above.
     logger.info(`[sign-mou] MOU signed by ${signer_name} for ${shop_name}`);
 
     return NextResponse.json({

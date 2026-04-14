@@ -50,13 +50,11 @@ function Empty({ message }: { message: string }) {
   return <p className="text-slate-400 text-sm py-10">{message}</p>;
 }
 
-function isOperationallyEmpty(data: AdminDashboardData): boolean {
-  const { pendingApplications, activeEnrollments, revenueThisMonthCents, certificatesIssued } = data.counts;
-  const pendingHolders = data.kpis.find(k => k.label === 'Pending Program Holders')?.value ?? 0;
-  const pendingDocs    = data.kpis.find(k => k.label === 'Pending Documents')?.value ?? 0;
-  // Show dashboard if anything needs attention — not just student metrics
-  return pendingApplications === 0 && activeEnrollments === 0 && revenueThisMonthCents === 0
-    && certificatesIssued === 0 && pendingHolders === 0 && pendingDocs === 0;
+// Never hide the dashboard — even an empty DB should show system health,
+// the courses panel, and navigation. The "no data" state is shown inline
+// within each section rather than replacing the whole page.
+function isOperationallyEmpty(_data: AdminDashboardData): boolean {
+  return false;
 }
 
 function NoOperationalData() {

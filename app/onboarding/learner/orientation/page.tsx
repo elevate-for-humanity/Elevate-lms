@@ -60,16 +60,11 @@ async function completeOrientation() {
     if (profile?.email) {
       const firstName = profile.first_name || profile.full_name?.split(' ')[0] || 'there';
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
-      await fetch(`${siteUrl}/api/email/send`, {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        'x-internal-secret': process.env.CRON_SECRET ?? '',
-      },
-        body: JSON.stringify({
-          to: profile.email,
-          subject: 'Orientation complete — your course is ready',
-          html: `
+      const { sendEmail } = await import('@/lib/email/resend');
+      await sendEmail({
+        to: profile.email,
+        subject: 'Orientation complete — your course is ready',
+        html: `
 <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1e293b">
   <div style="background:#1e293b;padding:24px 32px">
     <p style="margin:0;color:#fff;font-size:18px;font-weight:700">Elevate for Humanity</p>
@@ -94,8 +89,7 @@ async function completeOrientation() {
     </p>
   </div>
 </div>`,
-        }),
-      });
+      }).catch((err: Error) => logger.error('[orientation] Post-orientation email failed', err));
     }
   } catch (emailErr) {
     logger.error('[orientation] Post-orientation email failed', emailErr);

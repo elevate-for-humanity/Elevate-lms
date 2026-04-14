@@ -68,7 +68,7 @@ export async function updateProgram(id: string, formData: FormData) {
 
   if (!user) redirect('/login');
 
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   const { data: existing } = await db.from('programs').select('id').eq('id', id).single();
@@ -119,7 +119,7 @@ export async function deleteProgram(id: string) {
 
   if (!user) throw new Error('Unauthorized');
 
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') throw new Error('Unauthorized');
 
   const { data: existing } = await db.from('programs').select('id').eq('id', id).single();

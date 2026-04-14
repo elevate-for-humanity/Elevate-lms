@@ -66,7 +66,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
   if (!user) redirect('/login');
 
   const db = await getAdminClient();
-  const { data: adminProfile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: adminProfile } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
   if (!['admin', 'super_admin', 'staff'].includes(adminProfile?.role ?? '')) redirect('/unauthorized');
 
   // Load student profile

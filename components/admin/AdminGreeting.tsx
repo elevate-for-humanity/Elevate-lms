@@ -2,13 +2,14 @@
 import { useEffect, useState } from 'react';
 
 export function AdminGreeting({ name }: { name: string }) {
-  const [greeting, setGreeting] = useState('');
+  // Default to 'Good morning' to avoid a blank flash before hydration.
+  // The useEffect corrects it to the actual time-of-day greeting client-side.
+  const [greeting, setGreeting] = useState('Good morning');
 
   useEffect(() => {
     const h = new Date().getHours();
     setGreeting(h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening');
   }, []);
 
-  if (!greeting) return null;
   return <>{greeting}, {name}.</>;
 }

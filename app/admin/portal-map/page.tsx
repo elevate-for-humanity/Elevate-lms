@@ -668,7 +668,7 @@ export default function AdminPortalMapPage() {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) { router.replace('/login?redirect=/admin/portal-map'); return; }
       const { data: profile } = await supabase
-        .from('profiles').select('role').eq('id', user.id).single();
+        .from('profiles').select('role').eq('id', user.id).maybeSingle();
       if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
         router.replace('/unauthorized');
         return;

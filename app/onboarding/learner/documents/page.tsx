@@ -248,14 +248,14 @@ export default function DocumentsPage() {
                   if (!user) { setError('Please log in.'); return; }
                   const { error: err } = await supabase.from('secure_identity').upsert({ user_id: user.id, ssn_last4: ssnDigits.slice(-4), updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
                   if (err) {
-                    setError('Failed to save: ' + err.message);
+                    setError('Failed to save your SSN. Please try again or contact support.');
                     return;
                   }
                   setError('');
                   setSsnDisplay('***-**-' + ssnDigits.slice(-4));
                   setSsnSaved(true);
-                } catch (e: any) {
-                  setError('Failed to save: ' + (e?.message || 'unknown error'));
+                } catch {
+                  setError('Failed to save your SSN. Please try again or contact support.');
                 }
               }}
             >Save</button>

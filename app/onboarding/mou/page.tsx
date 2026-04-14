@@ -225,7 +225,7 @@ export default function MOUOnboardingPage() {
         throw new Error(d.error || 'Failed to sign');
       }
       setSigned(true);
-      setTimeout(() => router.push('/onboarding'), 2000);
+      setTimeout(() => router.push('/program-holder/onboarding'), 2000);
     } catch (e: any) {
       setError(e.message || 'Failed to record signature. Please try again.');
     } finally {
@@ -272,7 +272,7 @@ export default function MOUOnboardingPage() {
             <CheckCircle2 className="w-10 h-10 text-brand-green-600 mx-auto mb-3" />
             <h2 className="text-lg font-semibold text-brand-green-900 mb-1">Agreement Already Signed</h2>
             <p className="text-brand-green-700">Your signature (v{MOU_VERSION}) is on file.</p>
-            <Link href="/onboarding" className="inline-block mt-4 text-brand-blue-600 hover:underline">← Back to Onboarding</Link>
+            <Link href="/program-holder/onboarding" className="inline-block mt-4 text-brand-blue-600 hover:underline">← Back to Onboarding</Link>
           </div>
         )}
 
@@ -450,7 +450,7 @@ export default function MOUOnboardingPage() {
         )}
 
         <div className="pb-8">
-          <Link href="/onboarding" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700">
+          <Link href="/program-holder/onboarding" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700">
             <ArrowLeft className="w-4 h-4" /> Back to Onboarding
           </Link>
         </div>

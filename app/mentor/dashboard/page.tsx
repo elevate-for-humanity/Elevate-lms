@@ -30,20 +30,38 @@ export default async function MentorDashboardPage() {
       mentee_id,
       status,
       created_at,
-      profiles!mentorships_mentee_id_fkey(id, full_name),
-      enrollments!mentorships_mentee_id_fkey(program_id, progress, programs(name, title))
+      profiles!mentorships_mentee_id_fkey(id, full_name)
     `, { count: 'exact' })
     .eq('mentor_id', user.id)
     .eq('status', 'active');
 
   if (mentorships) {
     menteeCount = count || 0;
-    recentMentees = mentorships.slice(0, 4).map((m: any) => ({
-      id: m.mentee_id,
-      name: m.profiles?.full_name || 'Mentee',
-      program: (m.enrollments?.[0]?.programs as any)?.title || (m.enrollments?.[0]?.programs as any)?.name || 'Program',
-      progress: m.enrollments?.[0]?.progress || 0,
-    }));
+
+    // Fetch enrollments for mentees separately — mentorships has no FK to enrollments
+    const menteeIds = mentorships.map((m: any) => m.mentee_id).filter(Boolean);
+    const enrollmentsByMentee: Record<string, any> = {};
+    if (menteeIds.length > 0) {
+      const { data: menteeEnrollments } = await supabase
+        .from('program_enrollments')
+        .select('user_id, progress_percent, programs ( title )')
+        .in('user_id', menteeIds)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+      for (const e of menteeEnrollments ?? []) {
+        if (!enrollmentsByMentee[e.user_id]) enrollmentsByMentee[e.user_id] = e;
+      }
+    }
+
+    recentMentees = mentorships.slice(0, 4).map((m: any) => {
+      const enr = enrollmentsByMentee[m.mentee_id];
+      return {
+        id: m.mentee_id,
+        name: (m.profiles as any)?.full_name || 'Mentee',
+        program: (enr?.programs as any)?.title || 'Program',
+        progress: enr?.progress_percent || 0,
+      };
+    });
   }
 
   // Get upcoming sessions

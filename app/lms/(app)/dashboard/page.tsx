@@ -40,7 +40,7 @@ export default async function StudentDashboard() {
       .order('enrolled_at', { ascending: false }),
     supabase
       .from('program_enrollments')
-      .select('id, status, enrolled_at, progress_percent, course_id, courses ( id, title, description )')
+      .select('id, status, enrolled_at, progress_percent, course_id, programs ( id, title, description )')
       .eq('user_id', user.id)
       .not('course_id', 'is', null)
       .order('enrolled_at', { ascending: false }),
@@ -167,7 +167,7 @@ export default async function StudentDashboard() {
   const isComplete = totalLessons > 0 && completedLessons >= totalLessons;
   const lessonsLeft = totalLessons - completedLessons;
   const firstName = profile?.full_name?.split(' ')[0] || user.email?.split('@')[0] || 'there';
-  const courseName = (activeEnrollment as any)?.courses?.title ?? (activeEnrollment as any)?.programs?.title ?? null;
+  const courseName = (activeEnrollment as any)?.programs?.title ?? null;
 
   // ── Phase calculation (rough bucketing for behavioral copy) ─────────────
   const phaseNumber = totalLessons > 0

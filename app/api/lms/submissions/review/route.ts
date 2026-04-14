@@ -24,7 +24,8 @@ export async function PATCH(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiAuthGuard();
+  const auth = await apiAuthGuard(request);
+  if (auth.error) return auth.error;
   const { user } = auth;
 
   // Require instructor or admin role
@@ -33,7 +34,7 @@ export async function PATCH(request: NextRequest) {
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   if (!profile || !ALLOWED_ROLES.includes(profile.role)) {
     return safeError('Forbidden', 403);

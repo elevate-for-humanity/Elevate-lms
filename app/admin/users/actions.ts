@@ -11,7 +11,7 @@ async function requireAdminActor() {
   if (!user) throw new Error('Not authenticated');
   const db = await getAdminClient();
   const { data: profile, error: profileError } = await db
-    .from('profiles').select('role').eq('id', user.id).single();
+    .from('profiles').select('role').eq('id', user.id).maybeSingle();
   if (profileError) throw new Error('Profile fetch failed');
   if (!['admin', 'super_admin'].includes(profile?.role ?? '')) throw new Error('Forbidden');
   return { supabase, db, actorId: user.id };
@@ -45,7 +45,7 @@ export async function deactivateUser(userId: string) {
 
   // Confirm user exists before mutating.
   const { data: target, error: fetchError } = await db
-    .from('profiles').select('id, is_active').eq('id', userId).single();
+    .from('profiles').select('id, is_active').eq('id', userId).maybeSingle();
   if (fetchError || !target) return { error: 'User not found' };
   if (target.is_active === false) return { error: 'User is already inactive' };
 
@@ -70,7 +70,7 @@ export async function activateUser(userId: string) {
 
   // Confirm user exists before mutating.
   const { data: target, error: fetchError } = await db
-    .from('profiles').select('id, is_active').eq('id', userId).single();
+    .from('profiles').select('id, is_active').eq('id', userId).maybeSingle();
   if (fetchError || !target) return { error: 'User not found' };
   if (target.is_active === true) return { error: 'User is already active' };
 
@@ -98,7 +98,7 @@ export async function deleteUser(userId: string) {
 
   // Confirm user exists before deleting.
   const { data: target, error: fetchError } = await db
-    .from('profiles').select('id').eq('id', userId).single();
+    .from('profiles').select('id').eq('id', userId).maybeSingle();
   if (fetchError || !target) return { error: 'User not found' };
 
   const { error } = await db.from('profiles').delete().eq('id', userId);

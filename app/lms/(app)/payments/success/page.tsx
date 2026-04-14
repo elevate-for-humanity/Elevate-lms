@@ -1,12 +1,9 @@
 'use client';
 
 import { Suspense } from 'react';
-import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Calendar, BookOpen } from 'lucide-react';
-
-import { createBrowserClient } from '@supabase/ssr';
 function SuccessContent() {
   const searchParams = useSearchParams();
   const program = searchParams.get('program') || 'cna';
@@ -80,15 +77,6 @@ function SuccessContent() {
 }
 
 export default function PaymentSuccessPage() {
-  const [dbRows, setDbRows] = useState<any[]>([]);
-  useEffect(() => {
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-    supabase.from('training_courses').select('*').limit(50)
-      .then(({ data }) => { if (data) setDbRows(data); });
-  }, []);
 
   return (
     <Suspense fallback={

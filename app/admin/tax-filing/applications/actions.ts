@@ -14,7 +14,7 @@ export async function createTaxApplication(formData: FormData) {
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
-  const { data: _p } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: _p } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
   if (!_p || !['admin', 'super_admin'].includes(_p.role)) throw new Error('Forbidden');
 
   const { error } = await db.from('tax_applications').insert({

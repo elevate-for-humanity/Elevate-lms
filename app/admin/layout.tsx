@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { AdminLicenseWrapper } from '@/components/licensing/AdminLicenseWrapper';
 import { getLicenseAccessMode } from '@/lib/licensing/billing-authority';
@@ -59,10 +60,10 @@ async function getLicenseContext() {
     .eq('status', 'active')
     .order('created_at', { ascending: false })
     .limit(1)
-    .single();
-  if (licenseError && licenseError.code !== 'PGRST116') {
-    // PGRST116 = no rows — tenant has no active license, not a query failure
-    throw new Error(`License fetch failed in getLicenseContext: ${licenseError.message}`);
+    .maybeSingle();
+  if (licenseError) {
+    // Non-fatal — tenant may have no license row yet; degrade to no-license mode
+    logger.error('[getLicenseContext] license fetch failed', licenseError);
   }
 
   return {

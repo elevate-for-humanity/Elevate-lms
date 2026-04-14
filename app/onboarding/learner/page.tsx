@@ -187,15 +187,36 @@ export default async function LearnerOnboardingPage({
   const identityVerified = !!idDocResult.data;
   const orientationDone = !!profile?.orientation_completed || (orientationResult.data?.length || 0) > 0;
 
-  // Look up program name from apprenticeship_programs (FK target for program_enrollments)
+  // Resolve program display name — try programs table first (canonical), then
+  // apprenticeship_programs (FK target for older enrollments), then fall back to slug.
   let enrollmentProgramName: string | null = null;
   if (enrollment?.program_id) {
-    const { data: prog } = await supabase
-      .from('apprenticeship_programs')
-      .select('name')
+    // Try canonical programs table first
+    const { data: canonicalProg } = await supabase
+      .from('programs')
+      .select('title')
       .eq('id', enrollment.program_id)
       .maybeSingle();
-    enrollmentProgramName = prog?.name ?? null;
+
+    if (canonicalProg?.title) {
+      enrollmentProgramName = canonicalProg.title;
+    } else {
+      // Fall back to apprenticeship_programs (legacy FK target)
+      const { data: apProg } = await supabase
+        .from('apprenticeship_programs')
+        .select('name')
+        .eq('id', enrollment.program_id)
+        .maybeSingle();
+      enrollmentProgramName = apProg?.name ?? null;
+    }
+  }
+
+  // Last resort: humanise the slug from the enrollment row
+  if (!enrollmentProgramName && enrollment?.program_slug) {
+    enrollmentProgramName = enrollment.program_slug
+      .split('-')
+      .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
   }
 
   // Determine completed steps from real DB state
@@ -213,9 +234,8 @@ export default async function LearnerOnboardingPage({
     completedSteps.push('documents');
   }
 
-  if (identityVerified) {
-    completedSteps.push('verification');
-  }
+  // 'verification' is tracked internally but has no step card in ONBOARDING_STEPS —
+  // do not push it into completedSteps or the progress bar exceeds 100%.
 
   if (handbookAcknowledged) {
     completedSteps.push('handbook');

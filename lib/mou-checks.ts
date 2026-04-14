@@ -1,54 +1,50 @@
-import { createBrowserClient } from '@supabase/ssr';
+/**
+ * MOU status helpers.
+ *
+ * These functions are called from both server components and API routes.
+ * They accept a pre-created Supabase client so the caller controls the
+ * auth context (server vs. browser). Do NOT create a browser client here.
+ */
+
+export type MOUStatus = {
+  status: string;
+  isFullyExecuted: boolean;
+  holderSigned: boolean;
+  adminSigned: boolean;
+  hasPDF: boolean;
+};
 
 /**
- * Check if a program holder has a fully executed MOU
- * @param programHolderId - The program holder ID to check
- * @returns Boolean indicating if MOU is fully executed
+ * Check if a program holder has a fully executed MOU.
+ * Pass the Supabase client from the calling context.
  */
 export async function hasMOUFullyExecuted(
+  supabase: { from: (table: string) => any },
   programHolderId: string
 ): Promise<boolean> {
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
-  const { data, error }: any = await supabase
+  const { data, error } = await supabase
     .from('program_holders')
     .select('mou_status')
     .eq('id', programHolderId)
-    .single();
+    .maybeSingle();
 
-  if (error || !data) {
-    return false;
-  }
-
+  if (error || !data) return false;
   return data.mou_status === 'fully_executed';
 }
 
 /**
- * Get MOU status for a program holder
- * @param programHolderId - The program holder ID
- * @returns MOU status object with details
+ * Get full MOU status for a program holder.
+ * Pass the Supabase client from the calling context.
  */
-export async function getMOUStatus(programHolderId: string) {
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
-  const { data, error }: any = await supabase
+export async function getMOUStatus(
+  supabase: { from: (table: string) => any },
+  programHolderId: string
+): Promise<MOUStatus> {
+  const { data, error } = await supabase
     .from('program_holders')
-    .select(
-      `
-      mou_status,
-      mou_holder_signed_at,
-      mou_admin_signed_at,
-      mou_final_pdf_url
-    `
-    )
+    .select('mou_status, mou_holder_signed_at, mou_admin_signed_at, mou_final_pdf_url')
     .eq('id', programHolderId)
-    .single();
+    .maybeSingle();
 
   if (error || !data) {
     return {
@@ -61,7 +57,7 @@ export async function getMOUStatus(programHolderId: string) {
   }
 
   return {
-    status: data.mou_status,
+    status: data.mou_status ?? 'unknown',
     isFullyExecuted: data.mou_status === 'fully_executed',
     holderSigned: !!data.mou_holder_signed_at,
     adminSigned: !!data.mou_admin_signed_at,
@@ -70,17 +66,18 @@ export async function getMOUStatus(programHolderId: string) {
 }
 
 /**
- * Server-side check for MOU status (for API routes)
+ * Server-side check for MOU status (for API routes).
+ * Kept for backward compatibility — prefer getMOUStatus.
  */
 export async function checkMOUStatusServer(
   supabase: { from: (table: string) => any },
   programHolderId: string
 ) {
-  const { data, error }: any = await supabase
+  const { data, error } = await supabase
     .from('program_holders')
     .select('mou_status')
     .eq('id', programHolderId)
-    .single();
+    .maybeSingle();
 
   if (error || !data) {
     return { isValid: false, status: 'unknown' };
@@ -88,6 +85,6 @@ export async function checkMOUStatusServer(
 
   return {
     isValid: data.mou_status === 'fully_executed',
-    status: data.mou_status,
+    status: data.mou_status ?? 'unknown',
   };
 }

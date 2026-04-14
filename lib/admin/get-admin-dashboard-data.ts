@@ -199,9 +199,11 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       .is('approved', null),
   ]);
 
-  if (pendingAppsRes.error)       throw new Error(`applications query failed`);
-  if (revenueAllTimeRes.error)    throw new Error(`revenue (all time) query failed`);
-  if (revenueThisMonthRes.error)  throw new Error(`revenue (this month) query failed`);
+  // Log failures but never throw — the error boundary shows a blank page with
+  // no actionable info. A degraded dashboard is always better than a 500.
+  if (pendingAppsRes.error)      logger.error('[dashboard] applications query failed', pendingAppsRes.error);
+  if (revenueAllTimeRes.error)   logger.error('[dashboard] revenue (all time) query failed', revenueAllTimeRes.error);
+  if (revenueThisMonthRes.error) logger.error('[dashboard] revenue (this month) query failed', revenueThisMonthRes.error);
 
   const totalPendingCount    = requireCount(allPendingAppsRes,       'applications count');
   const activeEnrollCount    = requireCount(activeEnrollmentsRes,    'active enrollments');
@@ -614,6 +616,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       staleJobs: 0,
       degraded: true,
       missingDocuments: 0,
+      missingCertifications: 0,
       unresolvedFlags: 0,
       alerts: [{ code: 'health_check_failed', severity: 'warning' as const, message: 'System health check failed to load.' }],
     })),

@@ -79,12 +79,22 @@ export default async function LearnerDashboardPage({ searchParams }: Props) {
       // Fetch program name for display
       let programName = enrollment?.program_slug?.replace(/-/g, ' ') || 'your program';
       if (enrollment?.program_id) {
-        const { data: ap } = await supabase
-          .from('apprenticeship_programs')
-          .select('name')
+        // Try canonical programs table first, then legacy apprenticeship_programs
+        const { data: canonProg } = await supabase
+          .from('programs')
+          .select('title')
           .eq('id', enrollment.program_id)
           .maybeSingle();
-        if (ap?.name) programName = ap.name;
+        if (canonProg?.title) {
+          programName = canonProg.title;
+        } else {
+          const { data: ap } = await supabase
+            .from('apprenticeship_programs')
+            .select('name')
+            .eq('id', enrollment.program_id)
+            .maybeSingle();
+          if (ap?.name) programName = ap.name;
+        }
       }
 
       return (

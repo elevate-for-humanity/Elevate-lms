@@ -44,9 +44,9 @@ const supabase = await createRouteHandlerClient({ cookies });
     return new Response('No signed MOU available', { status: 404 });
   }
 
-  // Download from storage
+  // Download from storage — MOUs are stored in the 'mous' bucket
   const { data, error }: any = await supabase.storage
-    .from('agreements')
+    .from('mous')
     .download(ph.mou_final_pdf_url);
 
   if (error || !data) {

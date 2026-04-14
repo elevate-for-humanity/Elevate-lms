@@ -25,7 +25,7 @@ export default async function AttachmentLibraryPage() {
   if (!user) redirect('/login');
   const db = await getAdminClient();
 
-  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
   if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/admin');
 
   const { data: org } = await db

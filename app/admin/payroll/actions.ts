@@ -13,7 +13,7 @@ export async function markPayrollPaid(payrollId: string) {
   const db = await getAdminClient();
 
   const { data: profile, error: profileError } = await db
-    .from('profiles').select('role').eq('id', user.id).single();
+    .from('profiles').select('role').eq('id', user.id).maybeSingle();
   if (profileError) throw new Error('Profile fetch failed');
   if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) throw new Error('Forbidden');
 

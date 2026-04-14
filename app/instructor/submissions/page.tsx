@@ -67,8 +67,8 @@ export default async function InstructorSubmissionsPage({
       reviewed_at,
       created_at,
       competency_key,
-      profiles:user_id ( full_name, email ),
-      course_lessons:course_lesson_id ( title, slug )
+      profiles!step_submissions_user_id_fkey ( full_name, email ),
+      course_lessons!step_submissions_course_lesson_id_fkey ( title, slug )
     `)
     .order('created_at', { ascending: false })
     .limit(100);
@@ -99,12 +99,24 @@ export default async function InstructorSubmissionsPage({
   }
   const pendingCount = (counts['submitted'] ?? 0) + (counts['under_review'] ?? 0);
 
-  // Resolve course names
-  const courseIds = [...new Set((submissions ?? []).map(s => s.course_id))];
-  const { data: courses } = courseIds.length
-    ? await supabase.from('training_courses').select('id, course_name').in('id', courseIds)
-    : { data: [] };
-  const courseNameMap = new Map((courses ?? []).map((c: any) => [c.id, c.course_name]));
+  // Resolve course names — try canonical courses table first, fall back to training_courses
+  const courseIds = [...new Set((submissions ?? []).map(s => s.course_id).filter(Boolean))];
+  let courseNameMap = new Map<string, string>();
+  if (courseIds.length) {
+    const { data: canonCourses } = await supabase
+      .from('courses')
+      .select('id, title')
+      .in('id', courseIds);
+    if (canonCourses?.length) {
+      courseNameMap = new Map(canonCourses.map((c: any) => [c.id, c.title]));
+    } else {
+      const { data: legacyCourses } = await supabase
+        .from('training_courses')
+        .select('id, course_name')
+        .in('id', courseIds);
+      courseNameMap = new Map((legacyCourses ?? []).map((c: any) => [c.id, c.course_name]));
+    }
+  }
 
   // Count pending competency sign-offs (submitted/under_review with a competency_key)
   const pendingCompetencyCount = (submissions ?? []).filter(

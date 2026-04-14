@@ -156,13 +156,7 @@ async function _POST(request: NextRequest) {
       isComplete: completionCheck,
     });
   } catch (err: any) {
-    return NextResponse.json(
-      {
-        err:
-          'Internal server error',
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 export const POST = withApiAudit('/api/onboarding/sign-document', _POST);

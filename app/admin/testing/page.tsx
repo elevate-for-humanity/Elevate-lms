@@ -18,7 +18,7 @@ export default async function TestingAdminPage() {
   if (!user) redirect('/login');
 
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
   if (!['admin', 'super_admin'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
   const { data: bookings } = await supabase

@@ -140,7 +140,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Determine overall result
-    const result = buildResult(checks, documentId, db);
+    const result = buildResult(checks);
 
     // Update document status in DB
     const failedChecks = checks.filter(c => !c.passed);
@@ -175,9 +175,7 @@ async function _POST(request: NextRequest) {
 }
 
 function buildResult(
-  checks: ValidationResult['checks'],
-  _documentId: string,
-  _db: any
+  checks: ValidationResult['checks']
 ): ValidationResult {
   const failedChecks = checks.filter(c => !c.passed);
   const hasCriticalFailure = failedChecks.some(c =>

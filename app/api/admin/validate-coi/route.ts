@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { apiRequireAdmin } from "@/lib/admin/guards";
 import { createClient } from "@/lib/supabase/server";
 import { scanApproveStrict } from "@/lib/insurance/scan-approve-strict";
 
@@ -6,26 +7,6 @@ export const runtime = "nodejs";
 
 // 10 MB max — COI PDFs are typically 1-3 MB
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
-
-async function requireAdmin() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false as const, status: 401, error: "Unauthorized" };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  const role = profile?.role;
-  if (role !== "admin" && role !== "super_admin") {
-    return { ok: false as const, status: 403, error: "Forbidden" };
-  }
-  return { ok: true as const, supabase };
-}
 
 /**
  * POST /api/admin/validate-coi
@@ -41,10 +22,10 @@ async function requireAdmin() {
  * Returns the strict APPROVED/REJECTED decision with full validation details.
  */
 export async function POST(req: NextRequest) {
-  const gate = await requireAdmin();
-  if (!gate.ok) {
-    return NextResponse.json({ error: gate.error }, { status: gate.status });
-  }
+  const gate = await apiRequireAdmin(req);
+  if (gate.error) return gate.error;
+
+  const supabase = await createClient();
 
   let form: FormData;
   try {
@@ -93,12 +74,12 @@ export async function POST(req: NextRequest) {
   let workerRelationship: WorkerRel | undefined;
   if (workerRelationshipRaw && validRelationships.includes(workerRelationshipRaw as WorkerRel)) {
     workerRelationship = workerRelationshipRaw as WorkerRel;
-  } else if (applicationId && gate.supabase) {
-    const { data: app } = await gate.supabase
+  } else if (applicationId && supabase) {
+    const { data: app } = await supabase
       .from("barbershop_partner_applications")
       .select("worker_relationship")
       .eq("id", applicationId)
-      .single();
+      .maybeSingle();
     if (app?.worker_relationship && validRelationships.includes(app.worker_relationship)) {
       workerRelationship = app.worker_relationship as WorkerRel;
     }
@@ -113,8 +94,8 @@ export async function POST(req: NextRequest) {
   });
 
   // Persist to partner application if applicationId provided
-  if (applicationId && gate.supabase) {
-    await gate.supabase
+  if (applicationId && supabase) {
+    await supabase
       .from("barbershop_partner_applications")
       .update({
         insurance_status: result.decision === "APPROVED" ? "approved" : "rejected",

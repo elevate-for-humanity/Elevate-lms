@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -38,6 +38,18 @@ const hiringTimelines = [
 
 export default function HiringNeedsPage() {
   const router = useRouter();
+
+  // Guard: redirect unauthenticated users immediately on mount
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) router.replace('/login?redirect=/onboarding/employer/hiring-needs');
+    });
+  }, [router]);
+
   const [formData, setFormData] = useState({
     industry: '',
     positionTypes: [] as string[],

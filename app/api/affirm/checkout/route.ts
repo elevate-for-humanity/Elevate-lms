@@ -84,7 +84,9 @@ async function _POST(request: NextRequest) {
     }
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
-    const orderId = `EFH-AFFIRM-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    // Use randomBytes — Math.random() has collision risk for concurrent checkouts.
+    const { randomBytes: _rb } = require('crypto') as typeof import('crypto');
+    const orderId = `EFH-AFFIRM-${Date.now()}-${_rb(6).toString('hex')}`;
 
     // Store checkout context in DB (server-side, not URL params)
     const supabase = await getAdminClient();

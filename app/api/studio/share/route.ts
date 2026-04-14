@@ -10,12 +10,10 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 function generateShareCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
-  let code = '';
-  for (let i = 0; i < 12; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
+  // Use randomBytes — Math.random() produces predictable, enumerable codes.
+  // 9 random bytes → 12 base64url chars (no padding, URL-safe).
+  const { randomBytes } = require('crypto') as typeof import('crypto');
+  return randomBytes(9).toString('base64url');
 }
 
 async function _GET(req: NextRequest) {

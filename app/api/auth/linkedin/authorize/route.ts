@@ -25,8 +25,10 @@ const clientId = process.env.LINKEDIN_CLIENT_ID;
     );
   }
 
-  // Generate random state for CSRF protection
-  const state = Math.random().toString(36).substring(7);
+  // Use crypto.randomBytes for the OAuth state parameter — Math.random() is
+  // predictable and makes CSRF protection ineffective.
+  const { randomBytes } = require('crypto') as typeof import('crypto');
+  const state = randomBytes(16).toString('hex');
 
   // LinkedIn OAuth scopes
   const scopes = [

@@ -2,6 +2,16 @@ import { logger } from '@/lib/logger';
 
 import Stripe from 'stripe';
 
+// Instantiate once at module scope using the canonical getStripe() helper so
+// the key is read at request time (after hydrateProcessEnv). Falls back to a
+// direct instantiation for environments where getStripe is unavailable.
+// Every method in StripeService must null-check `stripe` before use.
+const stripe: Stripe | null = (() => {
+  const key = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_RESTRICTED_KEY;
+  if (!key) return null;
+  return new Stripe(key, { apiVersion: '2024-06-20' });
+})();
+
 export interface PaymentIntent {
   id: string;
   amount: number;
@@ -46,6 +56,7 @@ export class StripeService {
     currency: string = 'usd',
     metadata?: Record<string, string>
   ): Promise<PaymentIntent> {
+    if (!stripe) throw new Error('Stripe is not configured');
     try {
       const paymentIntent = await stripe.paymentIntents.create({
         amount,
@@ -71,6 +82,7 @@ export class StripeService {
 
   // Confirm payment
   async confirmPayment(paymentIntentId: string): Promise<PaymentIntent> {
+    if (!stripe) throw new Error('Stripe is not configured');
     try {
       const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
@@ -89,6 +101,7 @@ export class StripeService {
 
   // Create customer
   async createCustomer(email: string, name: string): Promise<string> {
+    if (!stripe) throw new Error('Stripe is not configured');
     try {
       const customer = await stripe.customers.create({
         email,
@@ -107,6 +120,7 @@ export class StripeService {
     customerId: string,
     priceId: string
   ): Promise<Subscription> {
+    if (!stripe) throw new Error('Stripe is not configured');
     try {
       const subscription = await stripe.subscriptions.create({
         customer: customerId,
@@ -131,6 +145,7 @@ export class StripeService {
 
   // Cancel subscription
   async cancelSubscription(subscriptionId: string): Promise<Subscription> {
+    if (!stripe) throw new Error('Stripe is not configured');
     try {
       const subscription = await stripe.subscriptions.update(subscriptionId, {
         cancel_at_period_end: true,
@@ -152,9 +167,8 @@ export class StripeService {
 
   // Get subscription
   async getSubscription(subscriptionId: string): Promise<Subscription | null> {
-    if (!subscriptionId) {
-      return null;
-    }
+    if (!subscriptionId) return null;
+    if (!stripe) throw new Error('Stripe is not configured');
 
     try {
       const subscription = await stripe.subscriptions.retrieve(subscriptionId);
@@ -178,6 +192,7 @@ export class StripeService {
 
   // List products
   async listProducts(): Promise<Product[]> {
+    if (!stripe) throw new Error('Stripe is not configured');
     try {
       const products = await stripe.products.list({
         active: true,
@@ -206,9 +221,8 @@ export class StripeService {
     paymentIntentId: string,
     amount?: number
   ): Promise<boolean> {
-    if (!paymentIntentId) {
-      return false;
-    }
+    if (!paymentIntentId) return false;
+    if (!stripe) throw new Error('Stripe is not configured');
 
     try {
       const refundParams: Stripe.RefundCreateParams = {

@@ -73,6 +73,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, course: data });
   } catch (error) {
     console.error('[course-builder/program]', error);
-    return NextResponse.json({ ok: false, error: error instanceof Error ? error.message : 'Unknown error' }, { status: 400 });
+    return NextResponse.json({ ok: false, error: 'Failed to save program' }, { status: 400 });
   }
 }

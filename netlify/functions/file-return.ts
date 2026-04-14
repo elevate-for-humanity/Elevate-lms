@@ -70,7 +70,9 @@ export const handler: Handler = async (event) => {
       .toISOString()
       .replace(/[-:TZ.]/g, "")
       .slice(0, 17);
-    const rand = Math.random().toString(16).slice(2, 10);
+    // Use randomBytes — Math.random() has collision risk for concurrent submissions.
+    const { randomBytes } = require('crypto') as typeof import('crypto');
+    const rand = randomBytes(4).toString('hex');
     const tracking_id = body.tracking_id || `SFC-${timestamp}-${rand}`;
 
     const insertPayload = {

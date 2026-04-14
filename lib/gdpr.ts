@@ -110,10 +110,18 @@ export async function anonymizeUserData(userId: string) {
   const supabase = await createClient();
 
   try {
-    // Anonymize personal data while keeping records for analytics
-    const anonymousId = `anonymous_${Date.now()}`;
+    // Anonymize personal data while keeping records for analytics.
+    //
+    // Use randomBytes for the anonymous ID — Date.now() produces the same value
+    // for two users anonymized within the same millisecond, causing a unique
+    // constraint violation on the email column that silently fails.
+    const { randomBytes } = require('crypto') as typeof import('crypto');
+    const anonymousId = `anonymous_${randomBytes(8).toString('hex')}`;
 
-    await Promise.all([
+    // Check each update result — Promise.all swallows individual errors, so
+    // the old code returned success:true even when the profile update failed
+    // (e.g. email uniqueness violation) leaving PII intact.
+    const [profileResult, messagesResult, notesResult] = await Promise.all([
       supabase.from('profiles').update({
         full_name: 'Anonymous User',
         email: `${anonymousId}@anonymized.local`,
@@ -130,6 +138,16 @@ export async function anonymizeUserData(userId: string) {
         content: '[Note content removed]',
       }).eq('user_id', userId),
     ]);
+
+    if (profileResult.error) {
+      throw new Error(`Profile anonymization failed: ${profileResult.error.code}`);
+    }
+    if (messagesResult.error) {
+      throw new Error(`Messages anonymization failed: ${messagesResult.error.code}`);
+    }
+    if (notesResult.error) {
+      throw new Error(`Notes anonymization failed: ${notesResult.error.code}`);
+    }
 
     // Log the anonymization request
     await supabase.from('gdpr_requests').insert({

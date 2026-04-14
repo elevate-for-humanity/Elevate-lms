@@ -83,10 +83,10 @@ async function createStudentAccount(
 
     // Use the password the student provided on the application form.
     // Fall back to a generated password only if none was provided (e.g. admin-initiated enrollment).
+    // Math.random() is predictable — use randomBytes for the fallback password.
     const password = userPassword || (() => {
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
-      const randomPart = Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-      return `Efh-${randomPart}!`;
+      const { randomBytes } = require('crypto') as typeof import('crypto');
+      return `EFH-${randomBytes(8).toString('hex')}-Temp!`;
     })();
 
     // Check profiles first

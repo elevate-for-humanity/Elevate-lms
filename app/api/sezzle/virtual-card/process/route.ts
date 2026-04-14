@@ -152,7 +152,9 @@ async function _POST(request: NextRequest) {
     }
 
     // Generate internal order ID
-    const internalOrderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    // Use randomBytes — Math.random() has collision risk for concurrent requests.
+    const { randomBytes: _rb } = require('crypto') as typeof import('crypto');
+    const internalOrderId = `ORD-${Date.now()}-${_rb(6).toString('hex')}`;
 
     // Store the payment record
     if (supabase) {

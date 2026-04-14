@@ -38,7 +38,11 @@ const clientId = process.env.GOOGLE_CLIENT_ID;
   authUrl.searchParams.set('scope', scopes.join(' '));
   authUrl.searchParams.set('access_type', 'offline');
   authUrl.searchParams.set('prompt', 'consent');
-  authUrl.searchParams.set('state', Math.random().toString(36).substring(7));
+  // Use crypto.randomBytes for the OAuth state parameter — Math.random() is
+  // predictable and makes CSRF protection ineffective.
+  const { randomBytes } = require('crypto') as typeof import('crypto');
+  const state = randomBytes(16).toString('hex');
+  authUrl.searchParams.set('state', state);
 
   return NextResponse.redirect(authUrl.toString());
 }

@@ -50,12 +50,18 @@ export default function QuizTakingInterface({ quiz, questions, attemptId, visito
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
 
-  // Shuffle questions if enabled
+  // Shuffle questions if enabled.
+  // Array.sort(() => Math.random() - 0.5) is biased — some orderings are
+  // statistically impossible because the comparator is not consistent.
+  // Use a Fisher-Yates shuffle instead.
   const [shuffledQuestions] = useState(() => {
-    if (quiz.shuffle_questions) {
-      return [...questions].sort(() => Math.random() - 0.5);
+    if (!quiz.shuffle_questions) return questions;
+    const arr = [...questions];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
     }
-    return questions;
+    return arr;
   });
 
   const currentQuestion = shuffledQuestions[currentIndex];

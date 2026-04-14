@@ -118,8 +118,9 @@ async function _POST(request: NextRequest) {
     const supabase = await createClient();
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
-    // Generate a unique reference ID
-    const referenceId = `EFH-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    // Use randomBytes — Math.random() has collision risk for concurrent checkouts.
+    const { randomBytes: _rb } = require('crypto') as typeof import('crypto');
+    const referenceId = `EFH-${Date.now()}-${_rb(6).toString('hex')}`;
 
     // Determine redirect URLs - use custom if provided, otherwise default based on programSlug
     const programApplyBase = programSlug

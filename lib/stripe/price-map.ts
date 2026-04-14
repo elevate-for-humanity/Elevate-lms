@@ -160,7 +160,7 @@ export const STRIPE_PRICE_IDS: Record<string, string> = {
   // CNA Certification - $1,200 = $600 (min deposit) + $100 × 6
   // Note: 35% of $1,200 = $420, but $600 minimum floor applies
   "cna-deposit": "price_1TL6sCH4a2yrVOt5oCumO34g", // $600
-  "cna-installment": "price_1TM73RH4a2yrVOt5fydlNf0u", // $100 (TODO: update price in Stripe Dashboard)
+  "cna-installment": "price_1TM73RH4a2yrVOt5fydlNf0u", // $100
   
   // HVAC Technician - $5,500 = $1,925 (35%) + $596 × 6
   "hvac-deposit": "price_1TM73RH4a2yrVOt58WxaWYKk", // $1,925

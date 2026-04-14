@@ -292,6 +292,53 @@ const nextConfig = {
       '**/node_modules/.pnpm/pdf-lib*/**',
       '**/node_modules/@apm-js-collab/**',
       '**/node_modules/.pnpm/@apm-js-collab*/**',
+      // 3D / WebGL — browser-only (~43MB)
+      '**/node_modules/three/**',
+      '**/node_modules/.pnpm/three*/**',
+      '**/node_modules/@react-three/**',
+      '**/node_modules/.pnpm/@react-three*/**',
+      // Icon library — browser-only (42MB)
+      '**/node_modules/lucide-react/**',
+      '**/node_modules/.pnpm/lucide-react*/**',
+      // Charting — browser-only
+      '**/node_modules/recharts/**',
+      '**/node_modules/.pnpm/recharts*/**',
+      // Canvas / screenshot — browser-only
+      '**/node_modules/html2canvas/**',
+      '**/node_modules/.pnpm/html2canvas*/**',
+      // Build tools — not needed at runtime
+      '**/node_modules/tailwindcss/**',
+      '**/node_modules/.pnpm/tailwindcss*/**',
+      '**/node_modules/autoprefixer/**',
+      '**/node_modules/postcss/**',
+      '**/node_modules/eslint/**',
+      '**/node_modules/.pnpm/eslint*/**',
+      '**/node_modules/@typescript-eslint/**',
+      '**/node_modules/.pnpm/@typescript-eslint*/**',
+      // Document generation / parsing
+      '**/node_modules/docx/**',
+      '**/node_modules/.pnpm/docx*/**',
+      '**/node_modules/mammoth/**',
+      '**/node_modules/.pnpm/mammoth*/**',
+      // Collaborative editing — browser-only
+      '**/node_modules/yjs/**',
+      '**/node_modules/.pnpm/yjs*/**',
+      '**/node_modules/y-protocols/**',
+      '**/node_modules/lib0/**',
+      // WebContainer — browser-only
+      '**/node_modules/@webcontainer/**',
+      '**/node_modules/.pnpm/@webcontainer*/**',
+      // Not needed in SSR hot path
+      '**/node_modules/@mailchimp/**',
+      '**/node_modules/.pnpm/@mailchimp*/**',
+      '**/node_modules/csv-parse/**',
+      '**/node_modules/sitemap/**',
+      '**/node_modules/jszip/**',
+      '**/node_modules/fast-xml-parser/**',
+      '**/node_modules/marked/**',
+      '**/node_modules/cheerio/**',
+      '**/node_modules/vitest/**',
+      '**/node_modules/.pnpm/vitest*/**',
       // Source files not needed at runtime
       'app/**/*.tsx',
       'app/**/*.ts',

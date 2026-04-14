@@ -1,14 +1,4 @@
-import { Metadata } from 'next';
-import StudyGuideClient from './StudyGuideClient';
-
-export const dynamic = 'force-static'
-export const revalidate = 3600;
-
-export const metadata: Metadata = {
-  title: 'EPA 608 Study Guide — HVAC Technician | Elevate for Humanity',
-  description: 'Complete EPA 608 Universal certification study guide covering Core, Type I, Type II, and Type III. Printable and downloadable.',
-};
-
-export default function StudyGuidePage() {
-  return <StudyGuideClient />;
+import { redirect } from 'next/navigation';
+export default function Page() {
+  redirect('https://www.elevateforhumanity.org/programs/hvac-technician/study-guide');
 }

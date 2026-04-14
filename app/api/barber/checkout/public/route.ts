@@ -15,6 +15,7 @@ import {
   TUITION_CENTS,
   TUITION_DOLLARS,
   PAYMENT_TERM_WEEKS,
+  BARBER_PROGRAM_ID,
   clampSetupFeeCents,
   remainingHoursDisplay,
 } from '@/lib/barber/pricing';

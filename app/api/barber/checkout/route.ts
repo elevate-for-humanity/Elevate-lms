@@ -13,6 +13,7 @@ import {
 import {
   TUITION_CENTS,
   PAYMENT_TERM_WEEKS,
+  BARBER_PROGRAM_ID,
   remainingHoursDisplay,
 } from '@/lib/barber/pricing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

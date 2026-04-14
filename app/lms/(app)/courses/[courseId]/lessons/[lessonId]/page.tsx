@@ -370,41 +370,30 @@ export default function LessonPage() {
       });
     }
 
-    // 3. Fetch user progress in background
-    try {
-      if (user && lessonsData) {
-        const progressRes = await fetch(`/api/lms/progress?courseId=${courseId}`);
-        const progressData = progressRes.ok ? await progressRes.json() : { progress: [] };
-        const allProgress = progressData.progress;
-
-        if (allProgress) {
-          const completedIds = new Set(
-            allProgress.filter((p: any) => p.completed).map((p: any) => p.lesson_id)
-          );
-          setCompletedLessonIds(completedIds);
-          setIsCompleted(completedIds.has(lessonId));
-        }
-      }
-    } catch (e) {
-      console.error('[lesson] auth/progress fetch failed:', e);
-      // Lesson still renders fine without progress data
-    }
-
-    // 4. Fetch learner progress via engine API (covers checkpoint_scores +
-    //    step_submissions in one call). Replaces direct Supabase checkpoint query.
+    // 3. Fetch learner progress via engine API (covers lesson_progress, checkpoint_scores,
+    //    and step_submissions in one call).
+    //
+    // NOTE: When courseId is present, /api/lms/progress returns the engine shape:
+    //   { completedLessonIds, checkpointScores, progressPercent, ... }
+    // The legacy `data.progress` array is only returned when courseId is absent.
+    // A previous version of this function made two separate fetches to the same URL
+    // and read `data.progress` (undefined in the engine response) in the first one —
+    // that was a dead no-op. Both concerns are now handled in this single fetch.
+    let passedIds = new Set<string>();
     try {
       if (user) {
         const res = await fetch(`/api/lms/progress?courseId=${courseId}`);
         if (res.ok) {
           const data = await res.json();
-          // completedLessonIds already set above from lesson_progress; merge with engine result
+          // Completed lesson IDs
           if (Array.isArray(data.completedLessonIds)) {
             setCompletedLessonIds(new Set<string>(data.completedLessonIds));
             setIsCompleted(data.completedLessonIds.includes(lessonId));
           }
-          // Passed checkpoint IDs from engine checkpoint_scores
+          // Passed checkpoint IDs — built locally so step 4 can use them immediately
+          // without waiting for the setPassedCheckpointIds → useEffect → ref sync cycle.
           if (data.checkpointScores) {
-            const passedIds = new Set<string>(
+            passedIds = new Set<string>(
               Object.entries(data.checkpointScores as Record<string, { passed: boolean }>)
                 .filter(([, v]) => v.passed)
                 .map(([k]) => k)
@@ -414,21 +403,27 @@ export default function LessonPage() {
         }
       }
     } catch (e) {
-      console.error('[lesson] checkpoint gating fetch failed:', e);
-      // Fail open — lesson still renders without gating data
+      console.error('[lesson] progress fetch failed:', e);
+      // Fail open — lesson still renders without progress data
     }
 
-    // 5. Determine if the current lesson is blocked by an unpassed checkpoint.
+    // 4. Determine if the current lesson is blocked by an unpassed checkpoint.
     // A lesson is blocked when it is in module N and the checkpoint for module N-1
     // has not been passed. Applies to all DB-driven lessons.
     // lesson_source is 'course_lessons' from lms_lessons view, or 'canonical' from fallback path.
+    //
+    // Uses the locally-derived `passedIds` set from the fetch above rather than
+    // passedCheckpointIdsRef.current. The ref is synced by a useEffect that runs
+    // after the render triggered by setPassedCheckpointIds — it is always stale
+    // (empty Set) on the first call to fetchLessonData, which caused every learner
+    // in module 2+ to see their lesson incorrectly blocked on every page load.
     const isDbDrivenLesson = lessonData?.lesson_source === 'canonical' || lessonData?.lesson_source === 'course_lessons';
     if (lessonData && lessonsData && isDbDrivenLesson && lessonData.module_order > 1) {
       const prevModuleOrder = lessonData.module_order - 1;
       const prevCheckpoint = lessonsData.find(
         (l: any) => l.module_order === prevModuleOrder && l.step_type === 'checkpoint'
       );
-      if (prevCheckpoint && !passedCheckpointIdsRef.current.has(prevCheckpoint.id)) {
+      if (prevCheckpoint && !passedIds.has(prevCheckpoint.id)) {
         setCheckpointBlocked(true);
       }
     }

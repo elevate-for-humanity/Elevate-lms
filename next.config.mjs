@@ -69,8 +69,8 @@ const nextConfig = {
   generateBuildId: async () => {
     return `build-${Date.now()}-production`;
   },
-  // Netlify uses 'export' or default, not 'standalone'
-  // output: 'standalone', // Commented out for Netlify compatibility
+  // Required for @netlify/plugin-nextjs v5 — plugin reads .next/standalone
+  output: 'standalone',
   reactStrictMode: true,
   trailingSlash: false,
   poweredByHeader: false,

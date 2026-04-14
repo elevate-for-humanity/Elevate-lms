@@ -44,6 +44,15 @@ const clientId = process.env.FACEBOOK_CLIENT_ID;
   const state = randomBytes(16).toString('hex');
   authUrl.searchParams.set('state', state);
 
-  return NextResponse.redirect(authUrl.toString());
+  // Store state in an HttpOnly cookie so the callback can verify it.
+  const response = NextResponse.redirect(authUrl.toString());
+  response.cookies.set('oauth_state_facebook', state, {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 600,
+    path: '/',
+  });
+  return response;
 }
 export const GET = withApiAudit('/api/auth/facebook/authorize', _GET);

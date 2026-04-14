@@ -46,6 +46,15 @@ const clientId = process.env.LINKEDIN_CLIENT_ID;
   authUrl.searchParams.set('state', state);
   authUrl.searchParams.set('scope', scopes.join(' '));
 
-  return NextResponse.redirect(authUrl.toString());
+  // Store state in an HttpOnly cookie so the callback can verify it.
+  const response = NextResponse.redirect(authUrl.toString());
+  response.cookies.set('oauth_state_linkedin', state, {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 600,
+    path: '/',
+  });
+  return response;
 }
 export const GET = withApiAudit('/api/auth/linkedin/authorize', _GET);

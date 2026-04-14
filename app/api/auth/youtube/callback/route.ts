@@ -16,13 +16,24 @@ async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const searchParams = request.nextUrl.searchParams;
+  const searchParams = request.nextUrl.searchParams;
   const code = searchParams.get('code');
   const error = searchParams.get('error');
+  const returnedState = searchParams.get('state');
 
   if (error) {
     return NextResponse.redirect(
       new URL(`/admin/settings/social-media?error=${error}`, request.url)
+    );
+  }
+
+  // Validate the state parameter against the cookie set in the authorize route.
+  // A missing or mismatched state means the request was not initiated by this
+  // server — reject it to prevent CSRF attacks.
+  const storedState = request.cookies.get('oauth_state_youtube')?.value;
+  if (!storedState || !returnedState || storedState !== returnedState) {
+    return NextResponse.redirect(
+      new URL('/admin/settings/social-media?error=invalid_state', request.url)
     );
   }
 
@@ -98,9 +109,12 @@ const searchParams = request.nextUrl.searchParams;
       );
     }
 
-    return NextResponse.redirect(
+    // Clear the state cookie — it is single-use.
+    const successResponse = NextResponse.redirect(
       new URL('/admin/settings/social-media?success=youtube_connected', request.url)
     );
+    successResponse.cookies.set('oauth_state_youtube', '', { maxAge: 0, path: '/' });
+    return successResponse;
   } catch (error) {
     return NextResponse.redirect(
       new URL('/admin/settings/social-media?error=unexpected', request.url)

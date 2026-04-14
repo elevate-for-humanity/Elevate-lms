@@ -19,11 +19,19 @@ async function _GET(request: NextRequest) {
 const searchParams = request.nextUrl.searchParams;
   const code = searchParams.get('code');
   const error = searchParams.get('error');
-  const state = searchParams.get('state');
+  const returnedState = searchParams.get('state');
 
   if (error) {
     return NextResponse.redirect(
       new URL(`/admin/settings/social-media?error=${error}`, request.url)
+    );
+  }
+
+  // Validate state against the cookie set in the authorize route.
+  const storedState = request.cookies.get('oauth_state_linkedin')?.value;
+  if (!storedState || !returnedState || storedState !== returnedState) {
+    return NextResponse.redirect(
+      new URL('/admin/settings/social-media?error=invalid_state', request.url)
     );
   }
 
@@ -119,18 +127,15 @@ const searchParams = request.nextUrl.searchParams;
       );
     }
 
-    return NextResponse.redirect(
-      new URL(
-        '/admin/settings/social-media?success=linkedin_connected',
-        request.url
-      )
+    // Clear the state cookie — it is single-use.
+    const successResponse = NextResponse.redirect(
+      new URL('/admin/settings/social-media?success=linkedin_connected', request.url)
     );
+    successResponse.cookies.set('oauth_state_linkedin', '', { maxAge: 0, path: '/' });
+    return successResponse;
   } catch (error) {
     return NextResponse.redirect(
-      new URL(
-        `/admin/settings/social-media?error=unexpected_error`,
-        request.url
-      )
+      new URL('/admin/settings/social-media?error=unexpected_error', request.url)
     );
   }
 }

@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://elevate-marketing.pages.dev/about/team/delores-reynolds');
+  redirect('https://www.elevateforhumanity.org/about/team/delores-reynolds');
 }

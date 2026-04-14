@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://elevate-marketing.pages.dev/programs/diesel-mechanic');
+  redirect('https://www.elevateforhumanity.org/programs/diesel-mechanic');
 }

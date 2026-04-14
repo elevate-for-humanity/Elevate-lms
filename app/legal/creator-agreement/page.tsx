@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://elevate-marketing.pages.dev/legal/creator-agreement');
+  redirect('https://www.elevateforhumanity.org/legal/creator-agreement');
 }

@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://elevate-marketing.pages.dev/policies/wrg');
+  redirect('https://www.elevateforhumanity.org/policies/wrg');
 }

@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://elevate-marketing.pages.dev/programs/cpr-first-aid');
+  redirect('https://www.elevateforhumanity.org/programs/cpr-first-aid');
 }

@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://elevate-marketing.pages.dev/policies/academic-integrity');
+  redirect('https://www.elevateforhumanity.org/policies/academic-integrity');
 }

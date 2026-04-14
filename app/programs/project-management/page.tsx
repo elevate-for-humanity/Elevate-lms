@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://elevate-marketing.pages.dev/programs/project-management');
+  redirect('https://www.elevateforhumanity.org/programs/project-management');
 }

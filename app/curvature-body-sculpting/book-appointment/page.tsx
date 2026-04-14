@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://elevate-marketing.pages.dev/curvature-body-sculpting/book-appointment');
+  redirect('https://www.elevateforhumanity.org/curvature-body-sculpting/book-appointment');
 }

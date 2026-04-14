@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://elevate-marketing.pages.dev/platform/overview');
+  redirect('https://www.elevateforhumanity.org/platform/overview');
 }

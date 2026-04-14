@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://elevate-marketing.pages.dev/platform/program-holders');
+  redirect('https://www.elevateforhumanity.org/platform/program-holders');
 }

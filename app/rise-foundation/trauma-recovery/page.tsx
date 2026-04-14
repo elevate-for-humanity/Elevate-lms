@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://elevate-marketing.pages.dev/rise-foundation/trauma-recovery');
+  redirect('https://www.elevateforhumanity.org/rise-foundation/trauma-recovery');
 }

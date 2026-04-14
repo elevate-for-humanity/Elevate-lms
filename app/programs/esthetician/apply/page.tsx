@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://elevate-marketing.pages.dev/programs/esthetician/apply');
+  redirect('https://www.elevateforhumanity.org/programs/esthetician/apply');
 }

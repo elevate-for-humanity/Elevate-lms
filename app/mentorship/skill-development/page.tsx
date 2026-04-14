@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://elevate-marketing.pages.dev/mentorship/skill-development');
+  redirect('https://www.elevateforhumanity.org/mentorship/skill-development');
 }

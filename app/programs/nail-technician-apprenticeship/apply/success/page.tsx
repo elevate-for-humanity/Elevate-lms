@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://elevate-marketing.pages.dev/programs/nail-technician-apprenticeship/apply/success');
+  redirect('https://www.elevateforhumanity.org/programs/nail-technician-apprenticeship/apply/success');
 }

@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://elevate-marketing.pages.dev/legal/non-compete');
+  redirect('https://www.elevateforhumanity.org/legal/non-compete');
 }

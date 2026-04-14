@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://elevate-marketing.pages.dev/career-training');
+  redirect('https://www.elevateforhumanity.org/career-training');
 }

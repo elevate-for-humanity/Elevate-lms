@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://www.elevateforhumanity.org/drug-testing/hair-tests');
+  redirect('https://elevate-marketing.pages.dev/drug-testing/hair-tests');
 }

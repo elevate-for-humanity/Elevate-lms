@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://www.elevateforhumanity.org/community-services');
+  redirect('https://elevate-marketing.pages.dev/community-services');
 }

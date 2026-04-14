@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://www.elevateforhumanity.org/programs/business-administration');
+  redirect('https://elevate-marketing.pages.dev/programs/business-administration');
 }

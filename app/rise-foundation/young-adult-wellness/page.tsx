@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://www.elevateforhumanity.org/rise-foundation/young-adult-wellness');
+  redirect('https://elevate-marketing.pages.dev/rise-foundation/young-adult-wellness');
 }

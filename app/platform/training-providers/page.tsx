@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://www.elevateforhumanity.org/platform/training-providers');
+  redirect('https://elevate-marketing.pages.dev/platform/training-providers');
 }

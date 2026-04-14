@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://www.elevateforhumanity.org/rise-foundation/addiction-rehabilitation');
+  redirect('https://elevate-marketing.pages.dev/rise-foundation/addiction-rehabilitation');
 }

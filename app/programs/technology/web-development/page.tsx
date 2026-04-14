@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Page() {
-  redirect('https://www.elevateforhumanity.org/programs/technology/web-development');
+  redirect('https://elevate-marketing.pages.dev/programs/technology/web-development');
 }

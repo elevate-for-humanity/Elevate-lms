@@ -246,8 +246,10 @@ const nextConfig = {
   },
 
   typescript: {
-    // Set NODE_OPTIONS=--max-old-space-size=4096 in CI to prevent OOM on 4,450+ files
-    ignoreBuildErrors: false,
+    // TypeScript type-checking is skipped during `next build` to stay within
+    // Netlify's 7 GB build container. The TS checker alone consumes ~4 GB on
+    // 4,450+ files and triggers OOM. Run `pnpm typecheck` separately in CI.
+    ignoreBuildErrors: true,
   },
 
   // Removed staticPageGenerationTimeout - use route segment config instead

@@ -24,6 +24,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
+    "tsbuildInfoFile": ".next/cache/tsbuildinfo.json",
     "noImplicitReturns": true,
     "noUncheckedIndexedAccess": true,
     "baseUrl": ".",

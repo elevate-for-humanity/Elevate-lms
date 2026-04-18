@@ -25,7 +25,7 @@
  * Those are not configurable — they are the standard.
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 type Props = {
   src: string;
@@ -61,6 +61,23 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.1
   const [playing, setPlaying] = useState(false);
   // True once the video has played through once — fades poster back in, stays there
   const [ended, setEnded] = useState(false);
+
+  // Memoize event handlers to prevent re-registrations on each render
+  const handlePlaying = useCallback(() => setPlaying(true), []);
+  const handleEnded = useCallback(() => setEnded(true), []);
+  const handleError = useCallback(() => setFailed(true), []);
+
+  // Pause and clean up the video element on unmount to prevent background playback
+  useEffect(() => {
+    const video = ref.current;
+    return () => {
+      if (video) {
+        video.pause();
+        video.src = '';
+        video.load();
+      }
+    };
+  }, []);
 
   // Detect prefers-reduced-motion once on mount
   useEffect(() => {
@@ -172,16 +189,15 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.1
           playsInline
           preload={preloadFull ? 'auto' : 'metadata'}
           aria-hidden="true"
-          onPlaying={() => setPlaying(true)}
-          onEnded={() => setEnded(true)}
-          onError={() => setFailed(true)}
+          onPlaying={handlePlaying}
+          onEnded={handleEnded}
+          onError={handleError}
           style={{ zIndex: 10 }}
         />
       </>
     );
   }
 
-  // No poster — single video element, hide it after playback ends
   return (
     <video
       ref={ref}
@@ -191,8 +207,8 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.1
       playsInline
       preload={preloadFull ? 'auto' : 'metadata'}
       aria-hidden="true"
-      onEnded={() => setEnded(true)}
-      onError={() => setFailed(true)}
+      onEnded={handleEnded}
+      onError={handleError}
     />
   );
 }

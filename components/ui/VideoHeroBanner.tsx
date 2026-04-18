@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import CanonicalVideo from '@/components/video/CanonicalVideo';
 
@@ -16,13 +16,13 @@ export default function VideoHeroBanner({ videoSrc, posterSrc, caption }: VideoH
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [muted, setMuted] = useState(true);
 
-  function toggleMute() {
+  const toggleMute = useCallback(() => {
     const video = wrapperRef.current?.querySelector('video');
     if (!video) return;
     video.muted = !video.muted;
     if (!video.muted && video.paused) video.play().catch(() => {});
     setMuted(video.muted);
-  }
+  }, []);
 
   return (
     <div ref={wrapperRef} className="absolute inset-0 w-full h-full">

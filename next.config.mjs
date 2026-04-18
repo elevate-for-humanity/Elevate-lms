@@ -246,8 +246,8 @@ const nextConfig = {
   },
 
   typescript: {
-    // OOMs during type-check on 4,450+ files in CI — keep enabled until project is split or memory increased
-    ignoreBuildErrors: true,
+    // Set NODE_OPTIONS=--max-old-space-size=4096 in CI to prevent OOM on 4,450+ files
+    ignoreBuildErrors: false,
   },
 
   // Removed staticPageGenerationTimeout - use route segment config instead

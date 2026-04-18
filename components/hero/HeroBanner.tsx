@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Volume2, VolumeX } from 'lucide-react';
@@ -37,13 +37,13 @@ export default function HeroBanner({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [muted, setMuted] = useState(true);
 
-  function toggleMute() {
+  const toggleMute = useCallback(() => {
     const video = wrapperRef.current?.querySelector('video');
     if (!video) return;
     video.muted = !video.muted;
     if (!video.muted && video.paused) video.play().catch(() => {});
     setMuted(video.muted);
-  }
+  }, []);
 
   return (
     <section className="relative w-full overflow-hidden rounded-3xl">

@@ -131,7 +131,7 @@ describe('Session tables — migration existence', () => {
   }
 
   it('referral_pipeline_summary is defined as a VIEW (not a table)', () => {
-    expect(allMigrationsSql).toMatch(/CREATE OR REPLACE VIEW public\.referral_pipeline_summary/i);
+    expect(allMigrationsSql).toMatch(/CREATE(?:\s+OR\s+REPLACE)?\s+VIEW\s+public\.referral_pipeline_summary/i);
   });
 });
 
@@ -352,13 +352,13 @@ describe('participant_report — VIEW contract (4 refs)', () => {
   });
 });
 
-describe('student_practical_progress — gap detection (3 refs)', () => {
-  it('has NO CREATE TABLE in migrations (needs migration)', () => {
-    expect(tableExists('student_practical_progress')).toBe(false);
+describe('student_practical_progress — migration contract (3 refs)', () => {
+  it('has a CREATE TABLE in migrations (migration added 20260501000005)', () => {
+    expect(tableExists('student_practical_progress')).toBe(true);
   });
 
-  it('is not referenced in any migration at all', () => {
-    expect(tableHasAnyMigrationRef('student_practical_progress')).toBe(false);
+  it('is referenced in migrations', () => {
+    expect(tableHasAnyMigrationRef('student_practical_progress')).toBe(true);
   });
 
   it('code expects columns: id, accumulated_hours, approved_attempts, status, last_updated_at', () => {
@@ -377,9 +377,9 @@ describe('app_users — gap detection (4 refs)', () => {
   });
 });
 
-describe('practical_requirements — gap detection (3 refs)', () => {
-  it('has NO CREATE TABLE in migrations', () => {
-    expect(tableExists('practical_requirements')).toBe(false);
+describe('practical_requirements — migration contract (3 refs)', () => {
+  it('has a CREATE TABLE in migrations (migration added 20260501000009)', () => {
+    expect(tableExists('practical_requirements')).toBe(true);
   });
 
   it('code expects lesson_id column', () => {
@@ -398,7 +398,7 @@ describe('case_manager_approvals — gap detection (3 refs)', () => {
 
 describe('Low-risk missing tables — gap detection', () => {
   const lowRisk = [
-    'student_lesson_evidence',
+    // student_lesson_evidence: migration added 20260501000008 — removed from gap list
     'bnpl_subscriptions',
     'bnpl_payments',
     'signed_documents',

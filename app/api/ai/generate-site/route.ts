@@ -5,6 +5,8 @@ import { getRecommendedTemplate } from '@/lib/templates/designs';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { apiAuthGuard } from '@/lib/admin/guards';
+import { saveWebsiteConfig } from '@/lib/websites/save-site-config';
+import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 
 /**
  * POST /api/ai/generate-site

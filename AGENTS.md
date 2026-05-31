@@ -800,13 +800,11 @@ The hook attempts unmuted play and falls back silently. No mute button shown.
 
 ## Cursor Cloud specific instructions
 
-> **Operator workflow:** localhost + **admin dashboard** (`pnpm dev:admin` → http://localhost:3001). Gitpod is not required. See `docs/LOCAL_DEVELOPMENT.md`.
-
 ### Environment setup
 
 - **Node.js 20.19.2** required (pinned in `.node-version`). Use `nvm use 20.19.2`.
 - **pnpm 10.28.2** is the package manager — `corepack enable` activates it.
-- **No local database** — hosted Supabase. Use real keys in `.env.local` for full admin features; placeholders only boot the servers.
+- **No local database** — the app connects to hosted Supabase. A `.env.local` with placeholder keys is enough to start the dev server; DB-dependent features fail gracefully at runtime.
 - Minimum `.env.local` for dev server startup:
   ```
   NEXT_PUBLIC_SUPABASE_URL=https://cuxzzpsyufcewtmicszk.supabase.co
@@ -855,4 +853,13 @@ Precedence at runtime: `platform_secrets > app_secrets > process.env`
 **AI Console vs Dev Studio Command tab:** both use `/api/devstudio/execute` — AI Console is the standalone page, Dev Studio embeds the same in an IDE-like shell. Not a conflict.
 
 **Dev Studio AI Chat** (`/api/devstudio/chat`) uses Groq/Gemini with tool calling for platform operations. This is separate from `lib/ai/ai-service.ts` (`aiChat()`) which is for course content generation.
+
+### Managed trial + tenant public sites
+
+- **Trial start:** `POST /api/trial/start-managed` provisions org + `managed_licenses` + published `user_websites` via `lib/tenant/provision-trial-website.ts` (skipped for `websiteMode=api_embed`).
+- **Public URL:** `https://{slug}.app.elevateforhumanity.org` — `proxy.ts` sets `x-tenant-slug` and rewrites non-admin paths to `app/tenant-site/[[...slug]]`.
+- **Publish / edit:** `POST /api/websites/[id]/publish`, `PATCH /api/websites/[id]/config`, editor at `/apps/website-builder/edit/[websiteId]`.
+- **AI → builder:** `POST /api/ai/generate-site` with `websiteId` persists into `site_config`.
+- **DB:** Migration `20260530000001_tenant_website_builder.sql` must be applied manually before new columns work in production.
+- **Docs:** `docs/store-14-day-trial.md`
 

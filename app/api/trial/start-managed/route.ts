@@ -73,7 +73,7 @@ async function sendTrialWelcomeEmail(
   }
 
   await resend.emails.send({
-    from: `Elevate LMS <${PLATFORM_DEFAULTS.emailFromAddress}>`,
+    from: 'Elevate LMS <${PLATFORM_DEFAULTS.emailFromAddress}>',
     to: email,
     subject: `Your 14-day trial is ready — ${orgName}`,
     headers: { 'X-Correlation-ID': correlationId },
@@ -81,12 +81,13 @@ async function sendTrialWelcomeEmail(
       <h1>Your trial is live.</h1>
       <p>Organization: <strong>${orgName}</strong></p>
       <p><a href="${dashboardUrl}" style="display:inline-block;padding:12px 24px;background:#dc2626;color:#fff;font-weight:bold;text-decoration:none;border-radius:6px;">Open Your Dashboard</a></p>
+      <p>Your public site: <a href="${publicSiteUrl}">${publicSiteUrl}</a></p>
       <h2>What to do now:</h2>
       <ol>
-        <li>Log in at the link above</li>
-        <li>Configure your organization settings</li>
-        <li>Add your first course or program</li>
-        <li>Invite your team</li>
+        <li>Visit your public site and share it with your team</li>
+        <li>Log in to the admin dashboard to add programs and courses</li>
+        <li>Customize your site in Website Builder</li>
+        <li>Invite instructors and test enrollment</li>
       </ol>
       <p>Your trial runs for 14 days with full platform access. No credit card required.</p>
       <p>Questions? Reply to this email or visit <a href="${PLATFORM_DEFAULTS.siteUrl}/contact">our contact page</a>.</p>

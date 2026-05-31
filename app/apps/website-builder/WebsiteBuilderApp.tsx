@@ -7,15 +7,12 @@ import {
   Layout,
   Settings,
   Plus,
-  Globe,
   Eye,
   Trash2,
   Edit,
-  Monitor,
-  Smartphone,
-  ChevronRight,
   X,
 } from 'lucide-react';
+import { tenantPublicSiteUrl } from '@/lib/tenant/public-site-url';
 
 interface Props {
   user: any;

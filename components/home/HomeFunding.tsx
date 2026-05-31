@@ -1,7 +1,7 @@
 /**
  * HomeFunding
  *
- * Funding accessibility section — WIOA, Workforce Ready Grant,
+ * Funding accessibility section - WIOA, Workforce Ready Grant,
  * employer reimbursement, payment assistance.
  * Messaging: "Most learners qualify."
  */
@@ -76,7 +76,7 @@ export function HomeFunding() {
             </h2>
             <p className="text-slate-600 text-sm leading-relaxed mb-6 max-w-lg">
               WIOA, state grants, and employer reimbursement programs cover tuition, books,
-              and exam fees for most eligible Indiana residents. We handle the paperwork —
+              and exam fees for most eligible Indiana residents. We handle the paperwork -
               you focus on training.
             </p>
 
@@ -113,8 +113,8 @@ export function HomeFunding() {
               </Link>
             </div>
 
-            <p className="mt-4 text-xs text-slate-400">
-              Eligibility varies by program and funding source. Check in 2 minutes — no commitment.
+            <p className="mt-4 text-xs text-slate-600">
+              Eligibility varies by program and funding source. Check in 2 minutes - no commitment.
             </p>
           </div>
 

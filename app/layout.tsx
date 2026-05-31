@@ -40,8 +40,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
   title: {
-    default: `${PLATFORM_DEFAULTS.orgName} | Career Training at No Cost for Eligible Participants`,
-    template: `%s | ${PLATFORM_DEFAULTS.orgName}`,
+    default: '${PLATFORM_DEFAULTS.orgName} | Career Training at No Cost for Eligible Participants',
+    template: '%s | ${PLATFORM_DEFAULTS.orgName}',
   },
 
   description:

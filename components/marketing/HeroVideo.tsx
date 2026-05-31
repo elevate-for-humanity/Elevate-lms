@@ -84,16 +84,13 @@ export default function HeroVideo({
   const transcriptId = useId();
   // Resolve the correct src synchronously on first render so there is no
   // desktop→mobile src swap after hydration that causes a poster flash.
-  // Always start with desktop src to match SSR — swap to mobile in useEffect
-  // after hydration to avoid server/client mismatch.
-  const [videoSrc, setVideoSrc] = useState(videoSrcDesktop);
-  const [ttsSupported, setTtsSupported] = useState(false);
-
-  useEffect(() => {
-    if (videoSrcMobile && window.innerWidth < 768) {
-      setVideoSrc(videoSrcMobile);
+  const [videoSrc, setVideoSrc] = useState(() => {
+    if (typeof window !== 'undefined' && videoSrcMobile && window.innerWidth < 768) {
+      return videoSrcMobile;
     }
-  }, [videoSrcMobile]);
+    return videoSrcDesktop;
+  });
+  const [ttsSupported, setTtsSupported] = useState(false);
 
   const ttsText = useMemo(() => {
     const fallback = [belowHeroHeadline, belowHeroSubheadline].filter(Boolean).join(' ');
@@ -204,6 +201,7 @@ export default function HeroVideo({
         className="relative w-full overflow-hidden"
         style={{
           height: 'clamp(400px, 56vw, 780px)',
+          backgroundColor: '#0f172a',
           ...(posterImage ? {
             backgroundImage: `url(${posterImage})`,
             backgroundSize: 'cover',
@@ -215,7 +213,8 @@ export default function HeroVideo({
         {/* autoPlayOnMount — hero is always above the fold; start immediately.
             loop — prevents the poster fading back in when the video ends. */}
         <CanonicalVideo
-          src={videoSrc}
+          src={videoSrcDesktop}
+          srcMobile={videoSrcMobile}
           poster={posterImage}
           className="absolute inset-0 w-full h-full object-cover object-center"
           autoPlayOnMount
@@ -284,32 +283,32 @@ export default function HeroVideo({
       {/* BELOW-HERO CONTENT */}
       {/* All primary messaging lives here — never on the video */}
       {(belowHeroHeadline || belowHeroSubheadline || ctas || trustIndicators || children) && (
-        <section className="border-b border-slate-100 py-8 sm:py-14">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        <section className="border-b border-slate-100 py-10 sm:py-14">
+          <div className="max-w-4xl mx-auto px-6">
             {children ? (
               children
             ) : (
               <>
                 {belowHeroHeadline && (
-                  <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-3 sm:mb-4">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-4">
                     {belowHeroHeadline}
                   </h1>
                 )}
                 {belowHeroSubheadline && (
-                  <p className="text-slate-700 text-base sm:text-lg leading-relaxed mb-6 sm:mb-8 max-w-2xl">
+                  <p className="text-slate-900 text-lg leading-relaxed mb-8 max-w-2xl">
                     {belowHeroSubheadline}
                   </p>
                 )}
                 {ctas && ctas.length > 0 && (
-                  <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                  <div className="flex flex-wrap gap-3 mb-6">
                     {ctas.map((cta) => (
                       <a
                         key={cta.href}
                         href={cta.href}
                         className={
                           cta.variant === 'secondary'
-                            ? 'text-center border border-slate-300 text-slate-700 font-bold px-7 py-3.5 rounded-lg hover:bg-slate-50 transition-colors text-sm'
-                            : 'text-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3.5 rounded-lg transition-colors text-sm'
+                            ? 'border border-slate-300 text-slate-700 font-bold px-7 py-3 rounded-lg hover:bg-slate-50 transition-colors text-sm'
+                            : 'bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-lg transition-colors text-sm'
                         }
                       >
                         {cta.label}

@@ -575,15 +575,12 @@ export async function middleware(request: NextRequest) {
       });
     }
 
-    if (tenantSlug) {
-      const publicRewrite = rewriteTenantPublicSite(pathname, request, requestHeadersWithTenant);
-      if (publicRewrite) return publicRewrite;
-    }
-
     return NextResponse.next({ request: { headers: requestHeadersWithTenant } });
   }
 
-  // {subdomain}.app.elevateforhumanity.org — public site + admin on same host
+  // {subdomain}.app.elevateforhumanity.org — tenant portal subdomain form.
+  // e.g. elizabeth-greene-kkx3.app.elevateforhumanity.org/admin
+  // Tenant slug is extracted from the subdomain prefix.
   if (hostWithoutPort.endsWith('.app.elevateforhumanity.org')) {
     const tenantSlug = hostWithoutPort.replace('.app.elevateforhumanity.org', '');
     const requestHeadersWithTenant = new Headers(requestHeaders);

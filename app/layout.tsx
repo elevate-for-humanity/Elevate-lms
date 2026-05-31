@@ -40,8 +40,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
   title: {
-    default: `${PLATFORM_DEFAULTS.orgName} | Career Training at No Cost for Eligible Participants`,
-    template: `%s | ${PLATFORM_DEFAULTS.orgName}`,
+    default: '${PLATFORM_DEFAULTS.orgName} | Career Training at No Cost for Eligible Participants',
+    template: '%s | ${PLATFORM_DEFAULTS.orgName}',
   },
 
   description:
@@ -168,8 +168,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               '@type': 'Organization',
               name: PLATFORM_DEFAULTS.orgName,
               url: PLATFORM_DEFAULTS.siteUrl,
-              logo: '${PLATFORM_DEFAULTS.siteUrl}/logo.png',
-              image: 'https://${PLATFORM_DEFAULTS.canonicalDomain}/images/og-image.jpg',
+              logo: `${PLATFORM_DEFAULTS.siteUrl}/logo.png`,
+              image: `https://${PLATFORM_DEFAULTS.canonicalDomain}/images/og-image.jpg`,
               sameAs: [
                 'https://www.facebook.com/elevateforhumanity',
                 'https://www.linkedin.com/company/elevate-for-humanity',

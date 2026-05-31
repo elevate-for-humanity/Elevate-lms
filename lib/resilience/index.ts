@@ -229,6 +229,7 @@ export async function withResilience<T>(
 export const breakers = {
   stripe:   CircuitBreaker.for('stripe',   { failureThreshold: 3, resetTimeoutMs: 60_000 }),
   openai:   CircuitBreaker.for('openai',   { failureThreshold: 5, resetTimeoutMs: 30_000 }),
+  gemini:   CircuitBreaker.for('gemini',   { failureThreshold: 5, resetTimeoutMs: 30_000 }),
   sendgrid: CircuitBreaker.for('sendgrid', { failureThreshold: 3, resetTimeoutMs: 60_000 }),
   supabase: CircuitBreaker.for('supabase', { failureThreshold: 5, resetTimeoutMs: 15_000 }),
   groq:     CircuitBreaker.for('groq',     { failureThreshold: 5, resetTimeoutMs: 30_000 }),

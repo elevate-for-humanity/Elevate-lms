@@ -1,5 +1,5 @@
 import { logger } from '@/lib/logger';
-import { withResilience, breakers } from '@/lib/resilience';
+import { withResilience, breakers, CircuitOpenError, type CircuitBreaker } from '@/lib/resilience';
 import type {
   AIProvider,
   AIImageProvider,

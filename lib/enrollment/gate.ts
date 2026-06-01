@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { BARBER_LMS_COURSE_PATH } from '@/lib/barber/branding';
 
 export type EnrollmentState =
   | 'applied'
@@ -49,28 +50,11 @@ export function getNextRequiredAction(enrollment: {
     };
   }
 
-  const courseId = resolveCourseId(programSlug);
-  if (courseId) {
-    return {
-      label: 'Begin Your Program',
-      href: `/lms/courses/${courseId}`,
-      description: 'Open your training program and start the first lesson',
-    };
-  }
-
-  const portalPath = SLUG_TO_PORTAL[programSlug];
-  if (portalPath) {
-    return {
-      label: 'Go to Your Dashboard',
-      href: portalPath,
-      description: 'Track hours, documents, and apprenticeship progress',
-    };
-  }
-
+  // 3. Start first course
   return {
-    label: 'View Programs',
-    href: '/programs',
-    description: 'Explore available training programs',
+    label: 'Begin Course 1',
+    href: '/apprentice/courses/1',
+    description: 'Start your first course module',
   };
 }
 

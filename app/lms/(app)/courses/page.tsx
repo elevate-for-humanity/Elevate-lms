@@ -103,9 +103,23 @@ export default async function MyCoursesPage() {
                     className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col"
                   >
                     <div className="relative h-44 bg-slate-100 flex-shrink-0">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <BookOpen className="w-12 h-12 text-slate-300" />
-                      </div>
+                      {(course.thumbnail_url ||
+                        (course.id === BARBER_COURSE_ID ? BARBER_CURRICULUM_COVER : null)) ? (
+                        <Image
+                          src={
+                            course.thumbnail_url ||
+                            (course.id === BARBER_COURSE_ID ? BARBER_CURRICULUM_COVER : '')
+                          }
+                          alt=""
+                          fill
+                          className="object-cover object-top"
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <BookOpen className="w-12 h-12 text-slate-300" />
+                        </div>
+                      )}
                       {isEnrolled && (
                         <span className="absolute top-3 right-3 bg-brand-green-600 text-white px-2 py-0.5 rounded text-xs font-semibold">
                           Enrolled

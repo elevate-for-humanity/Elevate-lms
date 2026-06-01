@@ -20,12 +20,24 @@ export const dynamic = 'force-dynamic';
 
 export default async function ApprenticePortalPage() {
   const supabase = await createClient();
-  
 
   const { data: { user } } = await supabase.auth.getUser();
-  
+
   if (!user) {
     redirect('/login?redirect=/apprentice');
+  }
+
+  const { data: barberEnrollment } = await supabase
+    .from('program_enrollments')
+    .select('program_slug')
+    .eq('user_id', user.id)
+    .eq('program_slug', 'barber-apprenticeship')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (barberEnrollment?.program_slug === 'barber-apprenticeship') {
+    redirect('/portal/barber');
   }
 
   const { data: profile } = await supabase
@@ -145,12 +157,12 @@ export default async function ApprenticePortalPage() {
               <p className="text-red-700 text-sm mt-1">
                 You don&apos;t have automatic weekly payments set up. Your down payment credit will cover your weekly payments, but you need a card on file before it runs out.
               </p>
-              <Link
-                href="/apprentice/billing"
+              <a
+                href="https://billing.stripe.com/p/session/live_YWNjdF8xT0tTVnlINGEyeXJWT3Q1LF9VWHRLRWVrSng2VjdNSEpCaFF1TFUwRnd4azJWa0d20100dmjZ1uiI"
                 className="inline-flex items-center gap-2 mt-3 bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-red-700 transition"
               >
                 <CreditCard className="w-4 h-4" /> Add Payment Method
-              </Link>
+              </a>
             </div>
           </div>
         )}

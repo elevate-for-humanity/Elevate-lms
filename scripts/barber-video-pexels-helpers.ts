@@ -1,17 +1,15 @@
 /**
  * Pexels b-roll helpers for Prestige Elevation barber lesson videos.
- * Uses lib/video/pexels.ts (free API: https://www.pexels.com/api/)
+ * Free API: https://www.pexels.com/api/
  */
 
 import fs from 'fs';
-import path from 'path';
 import { execSync } from 'child_process';
 import { getPexelsVideoClip } from '../lib/video/pexels';
 
 const W = 1920;
 const H = 1080;
 
-/** Segments that use stock video on the right panel when PEXELS_API_KEY is set */
 export const PEXELS_SEGMENTS = new Set(['visual', 'application']);
 
 export function pexelsSearchForLesson(lessonTitle: string, segment: string): string {
@@ -32,8 +30,7 @@ export function pexelsSearchForLesson(lessonTitle: string, segment: string): str
 export async function downloadPexelsClip(url: string, destPath: string): Promise<void> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Pexels download failed (${res.status})`);
-  const buf = Buffer.from(await res.arrayBuffer());
-  fs.writeFileSync(destPath, buf);
+  fs.writeFileSync(destPath, Buffer.from(await res.arrayBuffer()));
 }
 
 export async function fetchLessonPexelsClip(
@@ -49,7 +46,6 @@ export async function fetchLessonPexelsClip(
   return fs.existsSync(destPath) && fs.statSync(destPath).size > 10_000;
 }
 
-/** Slide left (~42%) + looping Pexels b-roll right (~58%) + narration */
 export function buildSegmentSlidePlusPexels(
   slidePng: string,
   pexelsMp4: string,

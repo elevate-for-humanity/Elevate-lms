@@ -15,10 +15,17 @@
  */
 
 import path from 'path';
+import os from 'os';
 import fs from 'fs';
 import { execSync } from 'child_process';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
+import {
+  PEXELS_SEGMENTS,
+  fetchLessonPexelsClip,
+  buildSegmentSlidePlusPexels,
+  buildSegmentSlideOnly,
+} from './barber-video-pexels-helpers';
 
 const BARBER_COURSE_ID = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';
 const INSTRUCTOR_IMAGE = path.join(
@@ -27,9 +34,9 @@ const INSTRUCTOR_IMAGE = path.join(
 );
 const INSTRUCTOR_NAME = 'James Carter';
 const INSTRUCTOR_TITLE = 'Master Barber & Educator';
-const COURSE_NAME = 'Professional Barbering — Indiana State Board Prep';
+const COURSE_NAME = 'Prestige Elevation™ Barber Curriculum';
 const OUTPUT_DIR = path.join(process.cwd(), 'public/videos/barber-lessons');
-const TEMP_DIR = path.join(process.cwd(), 'temp/barber-lesson-videos');
+const TEMP_DIR = path.join(os.tmpdir(), 'barber-lesson-videos');
 const W = 1920;
 const H = 1080;
 
@@ -42,12 +49,9 @@ const onlyArg = args.find((a) => a === '--only')
   : args.find((a) => a.startsWith('--only='))?.replace('--only=', '');
 const onlySlugs = onlyArg ? onlyArg.split(',').map((s) => s.trim()) : null;
 
-const db = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { persistSession: false } },
-);
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+let db: ReturnType<typeof createClient>;
+let openai: OpenAI;
+let groqChat: OpenAI;
 
 const ACCENTS: Record<string, string> = {
   intro: '#f97316',
@@ -93,8 +97,10 @@ async function planLesson(
 ): Promise<Slide[]> {
   const plain = stripHtml(content).slice(0, 6000);
 
-  const res = await openai.chat.completions.create({
-    model: 'gpt-4o',
+  const chat = process.env.GROQ_API_KEY ? groqChat : openai;
+  const model = process.env.GROQ_API_KEY ? 'llama-3.3-70b-versatile' : 'gpt-4o';
+  const res = await chat.chat.completions.create({
+    model,
     temperature: 0.3,
     max_tokens: 3000,
     messages: [
@@ -321,10 +327,33 @@ function assembleVideo(segmentPaths: string[], outPath: string): void {
 }
 
 async function main() {
-  if (!process.env.OPENAI_API_KEY) {
-    console.error('OPENAI_API_KEY not set.');
+  const preEnv: Record<string, string | undefined> = {
+    PEXELS_API_KEY: process.env.PEXELS_API_KEY,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    GROQ_API_KEY: process.env.GROQ_API_KEY,
+  };
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith('https://')) {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://cuxzzpsyufcewtmicszk.supabase.co';
+  }
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    const { hydrateProcessEnv } = await import('../lib/secrets');
+    await hydrateProcessEnv();
+    for (const [k, v] of Object.entries(preEnv)) {
+      if (v && v.trim().length > 8) process.env[k] = v.trim();
+    }
+  }
+  if (!process.env.GROQ_API_KEY && !process.env.OPENAI_API_KEY) {
+    console.error('Set GROQ_API_KEY or OPENAI_API_KEY.');
     process.exit(1);
   }
+  db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+    auth: { persistSession: false },
+  });
+  openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'unused' });
+  if (process.env.GROQ_API_KEY) {
+    groqChat = new OpenAI({ apiKey: process.env.GROQ_API_KEY, baseURL: 'https://api.groq.com/openai/v1' });
+  }
+  const usePexels = !!process.env.PEXELS_API_KEY?.trim() && !process.argv.includes('--no-pexels');
 
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
   if (!DRY_RUN) fs.mkdirSync(TEMP_DIR, { recursive: true });
@@ -351,7 +380,8 @@ async function main() {
   console.log(`DB lessons   : ${allLessons.length}`);
   console.log(`To process   : ${toProcess.length}`);
   console.log(`Need video   : ${missing.length}`);
-  console.log(`Mode         : ${DRY_RUN ? 'DRY RUN' : 'LIVE'} | Force: ${FORCE}\n`);
+  console.log(`Mode         : ${DRY_RUN ? 'DRY RUN' : 'LIVE'} | Force: ${FORCE}`);
+  console.log(`Pexels       : ${usePexels ? 'ON' : 'OFF'}\n`);
 
   let ok = 0,
     skipped = 0,
@@ -402,7 +432,15 @@ async function main() {
         await renderSlide(slide, moduleTitle, slidePng);
         process.stdout.write(` Encode...`);
         const segPath = path.join(dir, `seg-${s}.mp4`);
-        buildSegment(slidePng, audioPath, duration, segPath);
+        const pexelsPath = path.join(dir, `pexels-${s}.mp4`);
+        if (usePexels && PEXELS_SEGMENTS.has(slide.segment)) {
+          process.stdout.write(' Pexels...');
+          const got = await fetchLessonPexelsClip(lesson.title, slide.segment, pexelsPath);
+          if (got) buildSegmentSlidePlusPexels(slidePng, pexelsPath, audioPath, duration, segPath);
+          else buildSegmentSlideOnly(slidePng, audioPath, duration, segPath);
+        } else {
+          buildSegmentSlideOnly(slidePng, audioPath, duration, segPath);
+        }
         segmentPaths.push(segPath);
         console.log(' ✓');
       }

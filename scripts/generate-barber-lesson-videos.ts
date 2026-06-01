@@ -24,10 +24,8 @@ import fs from 'fs';
 import os from 'os';
 import { execSync } from 'child_process';
 import { createClient } from '@supabase/supabase-js';
+import { hydrateProcessEnv } from '../lib/secrets';
 
-const OPENAI_KEY = process.env.OPENAI_API_KEY ?? '';
-const USE_EDGE_TTS = process.argv.includes('--edge-tts') || !OPENAI_KEY;
-const MISSING_ONLY = process.argv.includes('--missing');
 const COURSE_ID = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';
 const OUT_DIR = path.join(process.cwd(), 'public/videos/barber-lessons');
 const BROLL = path.join(process.cwd(), 'public/videos');
@@ -61,7 +59,7 @@ function clip(key: string) {
 function resolveClipPath(candidate: string | null): string {
   if (candidate && fs.existsSync(candidate)) return candidate;
   if (fs.existsSync(FALLBACK_BROLL)) return FALLBACK_BROLL;
-  throw new Error(`No b-roll clip (need ${FALLBACK_BROLL})`);
+  throw new Error(`No b-roll clip found (expected ${FALLBACK_BROLL} or public/videos/broll/*.mp4)`);
 }
 
 // matchText runs the same keyword rules against any string (heading or body)
@@ -128,7 +126,7 @@ function matchText(t: string): string | null {
 function pickClip(heading: string, body: string, _lessonSlug: string): string {
   const h = heading.toLowerCase();
   const b = body.toLowerCase();
-  return resolveClipPath(matchText(h) ?? matchText(b) ?? clip('barbershop-intro'));
+  return matchText(h) ?? matchText(b) ?? clip('barbershop-intro');
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -235,29 +233,29 @@ function splitIntoScenes(
 // ─── TTS ──────────────────────────────────────────────────────────────────────
 
 async function generateTTS(text: string, outPath: string): Promise<void> {
-  const input = text.slice(0, 4000);
-  if (!USE_EDGE_TTS && OPENAI_KEY) {
-    const res = await fetch('https://api.openai.com/v1/audio/speech', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${OPENAI_KEY}` },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini-tts',
-        input,
-        voice: 'onyx',
-        instructions: `You are Brandon Williams, a master barber with 12 years of experience teaching at a DOL-registered barbering apprenticeship program in Indiana.
+  const apiKey = process.env.OPENAI_API_KEY?.trim();
+  if (!apiKey) {
+    throw new Error(
+      'OPENAI_API_KEY not set. Add it in Admin → Dev Studio → Secrets or .env.local',
+    );
+  }
+  const res = await fetch('https://api.openai.com/v1/audio/speech', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini-tts',
+      input: text,
+      voice: 'onyx',
+      instructions: `You are Brandon Williams, a master barber with 12 years of experience teaching at a DOL-registered barbering apprenticeship program in Indiana.
 Speak directly to your apprentices — confident, clear, and practical.
 Steady professional pace. Emphasize key terms when you say them.
 Natural pauses between paragraphs. Sound like you are in the shop teaching, not reading from a textbook.`,
-        response_format: 'mp3',
-        speed: 1.0,
-      }),
-    });
-    if (!res.ok) throw new Error(`TTS failed (${res.status}): ${await res.text()}`);
-    fs.writeFileSync(outPath, Buffer.from(await res.arrayBuffer()));
-    return;
-  }
-  const { ttsSave } = await import('edge-tts');
-  await ttsSave(input, outPath, { voice: 'en-US-GuyNeural', rate: '-5%', pitch: '0Hz', volume: '+0%' });
+      response_format: 'mp3',
+      speed: 1.0,
+    }),
+  });
+  if (!res.ok) throw new Error(`TTS failed (${res.status}): ${await res.text()}`);
+  fs.writeFileSync(outPath, Buffer.from(await res.arrayBuffer()));
 }
 
 // ─── Video assembly ───────────────────────────────────────────────────────────
@@ -304,6 +302,12 @@ function concatScenes(scenePaths: string[], outPath: string, tmpDir: string): vo
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
+  await hydrateProcessEnv();
+  if (!process.env.OPENAI_API_KEY?.trim()) {
+    console.error('OPENAI_API_KEY missing. Set Admin → Dev Studio → Secrets.');
+    process.exit(1);
+  }
+  console.log('OPENAI_API_KEY loaded from platform_secrets / env\n');
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
   const { data: lessons, error } = await sb
@@ -321,12 +325,6 @@ async function main() {
   if (SLUG_FILTER) targets = targets.filter((l) => l.slug === SLUG_FILTER);
   if (MODULE_FILTER)
     targets = targets.filter((l) => Math.floor((l as any).order_index / 1000) === MODULE_FILTER);
-  if (MISSING_ONLY) {
-    targets = targets.filter((l) => {
-      const outPath = path.join(OUT_DIR, `${l.slug}.mp4`);
-      return !fs.existsSync(outPath) || getFileDur(outPath) < 60;
-    });
-  }
   if (targets.length === 0) {
     console.error('No lessons found');
     process.exit(1);
@@ -343,9 +341,7 @@ async function main() {
     8: 'Module 8: State Board Exam Preparation',
   };
 
-  console.log(
-    `\n═══ Barber Video Generator — ${targets.length} lesson(s) — TTS: ${USE_EDGE_TTS ? 'edge-tts' : 'OpenAI'} ═══\n`,
-  );
+  console.log(`\n═══ Barber Video Generator — ${targets.length} lesson(s) ═══\n`);
 
   let ok = 0,
     skipped = 0,

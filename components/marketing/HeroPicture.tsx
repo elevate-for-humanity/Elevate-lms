@@ -101,7 +101,7 @@ export default function HeroPicture({
         {/* Brand bug — top-left, only when requested */}
         {showBrandBug && (
           <div className="absolute top-4 left-4 z-10">
-            // IMAGE-CONTRACT: allow raw img because legacy markup
+            {/* IMAGE-CONTRACT: allow raw img because legacy markup */}
             <img
               src="/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
               alt={PLATFORM_DEFAULTS.orgName}

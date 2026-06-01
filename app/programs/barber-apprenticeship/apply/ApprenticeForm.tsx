@@ -14,6 +14,7 @@ import {
   clampSetupFeeCents,
   weeklyPaymentCents,
   remainingHoursDisplay,
+  TOTAL_HOURS_REQUIRED,
 } from '@/lib/barber/pricing';
 import { loadStripe } from '@stripe/stripe-js';
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe-js';
@@ -1030,7 +1031,7 @@ export default function ApprenticeForm({
                 <strong>Have questions?</strong> Contact us for payment plan options or
                 employer-sponsored funding.{' '}
                 <Link
-                  href="/programs/barber-apprenticeship/request-info"
+                  href="/inquiry?program=barber-apprenticeship"
                   className="text-brand-blue-700 font-medium hover:underline"
                 >
                   Request information →

@@ -82,7 +82,7 @@ function StoryCard({ story }: { story: Testimonial }) {
           {story.role && <p className="text-[11px] text-slate-500">{story.role}</p>}
         </div>
         {story.program && (
-          <span className="ml-auto text-[10px] font-semibold text-brand-red-600 bg-brand-red-50 px-2 py-0.5 rounded-full">
+          <span className="ml-auto text-[10px] font-semibold text-brand-red-800 bg-brand-red-50 px-2 py-0.5 rounded-full">
             {story.program}
           </span>
         )}

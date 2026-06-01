@@ -40,7 +40,7 @@ export async function GET() {
     const diskPath = path.join(BARBER_VIDEO_DIR, fileName);
     const onDisk = mp4OnDisk.has(fileName);
     let sizeMb: number | null = null;
-    let durationSec: number | null = null;
+    const durationSec: number | null = null;
     if (onDisk && fs.existsSync(diskPath)) {
       sizeMb = Math.round((fs.statSync(diskPath).size / 1024 / 1024) * 10) / 10;
     }

@@ -209,7 +209,7 @@ export default function MOUPage() {
             </li>
             <li>
               <strong>Related Technical Instruction (RTI)</strong> coordinated by the Sponsor via
-              Milady RISE
+              Prestige Elevation™ on the Elevate LMS
             </li>
             <li>Progressive skill development tracked through competency assessments</li>
           </ul>
@@ -227,7 +227,7 @@ export default function MOUPage() {
           </ul>
           <h3>Related Instruction</h3>
           <ul>
-            <li>Coordinate and provide access to required online instruction (Milady RISE)</li>
+            <li>Coordinate and provide access to required online instruction (Elevate LMS RTI)</li>
             <li>Track completion of related instruction requirements</li>
             <li>Provide learning materials and resources at no cost to the Shop or apprentice</li>
           </ul>

@@ -27,7 +27,7 @@ const HANDBOOK_SLIDES = [
     title: 'Your Apprenticeship',
     content: [
       'This is a U.S. Department of Labor Registered Apprenticeship — a nationally recognized credential.',
-      'You must complete 2,000 apprenticeship hours total: 1,500 on-the-job training (OJT) hours at your host barbershop and 500 related technical instruction (RTI) hours via Milady online coursework.',
+      'You must complete 2,000 apprenticeship hours total: 1,500 on-the-job training (OJT) hours at your host barbershop and 500 related technical instruction (RTI) hours through Prestige Elevation™ on the Elevate LMS.',
       'Upon completion you are eligible to sit for the Indiana Barber License exam.',
       'Your host shop supervisor signs off on your hours weekly. Hours not signed off do not count.',
     ],
@@ -57,15 +57,15 @@ const HANDBOOK_SLIDES = [
     ],
   },
   {
-    id: 'milady',
+    id: 'rti-lms',
     icon: BookOpen,
-    title: 'Milady Online Coursework',
+    title: 'Prestige Elevation™ RTI (Elevate LMS)',
     content: [
-      'Your Milady account will be activated within 24 hours of completing this orientation.',
-      'You will receive a separate email with your Milady login credentials.',
-      'Milady coursework counts toward your 2,000 hour total. You must complete all assigned modules.',
-      'Do not share your Milady login. Each account is tied to your enrollment record.',
-      'Milady progress is reviewed monthly. Falling behind on coursework may affect your program standing.',
+      'Your Elevate LMS access is activated after you complete this orientation and sign program documents.',
+      'Log in at the learner portal to open your barber apprenticeship course — lessons, videos, quizzes, and checkpoints.',
+      'RTI lesson completion counts toward your 500 hours of related instruction (tracked with your OJT hours for the 2,000-hour total).',
+      'Do not share your login. Each account is tied to your enrollment record.',
+      'RTI progress is reviewed monthly. Falling behind on lessons may affect your program standing.',
     ],
   },
   {
@@ -363,7 +363,7 @@ export default function BarberOrientationClient({ payment }: { payment: BarberPa
               className="w-5 h-5 mt-0.5 rounded border-slate-500 text-brand-blue-600 focus:ring-brand-blue-500 flex-shrink-0"
             />
             <span className="text-slate-300 text-sm leading-relaxed">
-              I have watched the orientation video and read all sections of the student handbook. I understand the clocking requirements, auto clock-out rules, Milady coursework expectations, payment auto-draft schedule, and the consequences of missed payments or conduct violations. I agree to proceed.
+              I have watched the orientation video and read all sections of the student handbook. I understand the clocking requirements, auto clock-out rules, Elevate LMS RTI expectations, payment auto-draft schedule, and the consequences of missed payments or conduct violations. I agree to proceed.
             </span>
           </label>
           <button

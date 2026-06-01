@@ -20,7 +20,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   videoSrc: '/videos/barber-hero-final.mp4',
 
   deliveryMode: 'hybrid',
-  deliveredBy: 'Partner',
+  deliveredBy: 'Elevate',
   durationWeeks: 52,
   hoursPerWeekMin: 15,
   hoursPerWeekMax: 20,
@@ -273,13 +273,13 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   enrollmentType: 'internal',
   partnerCourses: [
     {
-      courseId: 'milady-barbering',
-      label: 'Milady Standard Barbering',
-      partnerName: 'Milady/Cengage',
-      credentialIssued: 'Barbering Certificate',
+      courseId: 'barber-apprenticeship-v1',
+      label: 'Prestige Elevation™ Barbering RTI',
+      partnerName: 'Elevate for Humanity',
+      credentialIssued: 'Related Technical Instruction (500 hrs)',
       duration: '500 hours RTI',
       required: true,
-      enrollmentUrl: 'https://www.milady.com/barbering',
+      enrollmentUrl: '/lms/courses/3fb5ce19-1cde-434c-a8c6-f138d7d7aa17',
     },
   ],
   microCourses: [

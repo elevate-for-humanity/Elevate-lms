@@ -27,7 +27,7 @@ const INSTRUCTOR_IMAGE = path.join(
 );
 const INSTRUCTOR_NAME = 'James Carter';
 const INSTRUCTOR_TITLE = 'Master Barber & Educator';
-const COURSE_NAME = 'Professional Barbering — Indiana State Board Prep';
+const COURSE_NAME = 'Prestige Elevation™ Barber Curriculum';
 const OUTPUT_DIR = path.join(process.cwd(), 'public/videos/barber-lessons');
 const TEMP_DIR = path.join(process.cwd(), 'temp/barber-lesson-videos');
 const W = 1920;

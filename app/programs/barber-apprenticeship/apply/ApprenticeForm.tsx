@@ -63,6 +63,8 @@ function resolveInitialPayment(param: string | null): PaymentOption {
   return 'weekly';
 }
 
+type TransferHoursChoice = 'undecided' | 'yes' | 'no';
+
 export default function ApprenticeForm({
   initialPayment,
   initialEmail,
@@ -83,7 +85,14 @@ export default function ApprenticeForm({
   const [embeddedClientSecret, setEmbeddedClientSecret] = useState<string | null>(null);
 
   // Transfer hours — progress credit only, does not affect price or term.
-  const [transferHours, setTransferHours] = useState(0);
+  const [transferHoursChoice, setTransferHoursChoice] =
+    useState<TransferHoursChoice>('undecided');
+  const [transferHoursStr, setTransferHoursStr] = useState('');
+  const maxTransferHours = TOTAL_HOURS_REQUIRED - 100;
+  const transferHours = Math.min(
+    maxTransferHours,
+    Math.max(0, parseInt(transferHoursStr, 10) || 0),
+  );
 
   // Payment option — pre-selected from URL param if provided
   const [paymentOption, setPaymentOption] = useState<PaymentOption>(() =>
@@ -141,6 +150,21 @@ export default function ApprenticeForm({
       return;
     }
 
+    if (transferHoursChoice === 'undecided') {
+      setError(
+        'Please answer whether you have documented barber training hours to transfer.',
+      );
+      setErrorSeverity('info');
+      return;
+    }
+    if (transferHoursChoice === 'yes' && transferHours <= 0) {
+      setError(
+        'Enter your transfer hours in the Payment Calculator on the left (for example, 500), then continue.',
+      );
+      setErrorSeverity('info');
+      return;
+    }
+
     setLoading(true);
     setError('');
     setErrorSeverity('info');
@@ -165,6 +189,8 @@ export default function ApprenticeForm({
           source: 'barber-apply-page',
           paymentOption,
           turnstileToken,
+          transferHours,
+          transfer_hours_claimed: transferHours,
           support_notes: [
             formData.hasHostShop ? `Host shop: ${formData.hasHostShop}` : '',
             formData.hostShopName ? `Shop name: ${formData.hostShopName}` : '',
@@ -190,7 +216,7 @@ export default function ApprenticeForm({
           // If we found the existing application, continue to checkout
           if (!applicationId) {
             setError(
-              'You already have an application on file. Please call ${PLATFORM_DEFAULTS.supportPhone} or email info@${PLATFORM_DEFAULTS.canonicalDomain} to continue.',
+              `You already have an application on file. Please call ${PLATFORM_DEFAULTS.supportPhone} or email info@${PLATFORM_DEFAULTS.canonicalDomain} to continue.`,
             );
             setErrorSeverity('info');
             setLoading(false);
@@ -202,7 +228,7 @@ export default function ApprenticeForm({
           const isBotError = apiError.toLowerCase().includes('bot') || apiError.toLowerCase().includes('verification');
           setError(
             isBotError
-              ? 'Security check failed. Please scroll up, complete the verification widget, and try again. Need help? Call ${PLATFORM_DEFAULTS.supportPhone}.'
+              ? `Security check failed. Please scroll up, complete the verification widget, and try again. Need help? Call {PLATFORM_DEFAULTS.supportPhone}.`
               : apiError || `Failed to save your application. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`,
           );
           setErrorSeverity('critical');
@@ -490,14 +516,25 @@ export default function ApprenticeForm({
                   <input
                     type="number"
                     min="0"
-                    max="1900"
+                    max={maxTransferHours}
                     step="50"
-                    value={transferHours}
+                    value={transferHoursStr}
                     onChange={(e) => {
-                      const val = Math.min(1900, Math.max(0, parseInt(e.target.value) || 0));
-                      setTransferHours(val);
+                      const raw = e.target.value;
+                      if (raw === '') {
+                        setTransferHoursStr('');
+                        return;
+                      }
+                      const parsed = parseInt(raw, 10);
+                      if (Number.isNaN(parsed)) return;
+                      const val = Math.min(maxTransferHours, Math.max(0, parsed));
+                      setTransferHoursStr(String(val));
+                      if (transferHoursChoice === 'undecided' || transferHoursChoice === 'no') {
+                        setTransferHoursChoice(val > 0 ? 'yes' : 'no');
+                      }
                     }}
-                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-slate-900 placeholder-white/50"
+                    disabled={transferHoursChoice === 'no'}
+                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-slate-900 placeholder-white/50 disabled:opacity-60"
                     placeholder="0"
                   />
                   <p className="text-xs text-white/70 mt-1">
@@ -582,7 +619,7 @@ export default function ApprenticeForm({
                     href="/support"
                     className="inline-block mt-2 text-brand-red-600 font-medium hover:underline"
                   >
-                    Need help? Call ${PLATFORM_DEFAULTS.supportPhone}
+                    Need help? Call {PLATFORM_DEFAULTS.supportPhone}
                   </a>
                 )}
               </div>
@@ -655,7 +692,7 @@ export default function ApprenticeForm({
                     className="mt-1 w-4 h-4 text-brand-blue-600 border-slate-300 rounded"
                   />
                   <label htmlFor="smsConsent" className="text-sm text-black">
-                    I agree to receive text messages from ${PLATFORM_DEFAULTS.orgName} about my enrollment,
+                    I agree to receive text messages from {PLATFORM_DEFAULTS.orgName} about my enrollment,
                     program updates, and important notices. Message and data rates may apply. Reply
                     STOP to opt out.
                   </label>
@@ -671,8 +708,8 @@ export default function ApprenticeForm({
                       <input
                         type="radio"
                         name="hasTransferHours"
-                        checked={transferHours > 0}
-                        onChange={() => setTransferHours(500)}
+                        checked={transferHoursChoice === 'yes'}
+                        onChange={() => setTransferHoursChoice('yes')}
                         className="w-4 h-4 text-amber-600"
                       />
                       <span className="text-amber-800">Yes, I have hours to transfer</span>
@@ -681,14 +718,17 @@ export default function ApprenticeForm({
                       <input
                         type="radio"
                         name="hasTransferHours"
-                        checked={transferHours === 0}
-                        onChange={() => setTransferHours(0)}
+                        checked={transferHoursChoice === 'no'}
+                        onChange={() => {
+                          setTransferHoursChoice('no');
+                          setTransferHoursStr('');
+                        }}
                         className="w-4 h-4 text-amber-600"
                       />
                       <span className="text-amber-800">No, I'm starting fresh</span>
                     </label>
                   </div>
-                  {transferHours > 0 && (
+                  {transferHoursChoice === 'yes' && (
                     <p className="text-xs text-amber-700 mt-2">
                       Adjust your transfer hours in the calculator on the left.
                     </p>
@@ -1031,7 +1071,7 @@ export default function ApprenticeForm({
                 <strong>Have questions?</strong> Contact us for payment plan options or
                 employer-sponsored funding.{' '}
                 <Link
-                  href="/inquiry?program=barber-apprenticeship"
+                  href="/programs/barber-apprenticeship/request-info"
                   className="text-brand-blue-700 font-medium hover:underline"
                 >
                   Request information →

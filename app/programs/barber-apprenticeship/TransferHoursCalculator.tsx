@@ -24,8 +24,13 @@ function formatCurrency(amount: number): string {
 }
 
 export function TransferHoursCalculator() {
-  const [transferHours, setTransferHours] = useState(0);
+  const [transferHoursStr, setTransferHoursStr] = useState('');
   const [hoursPerWeek, setHoursPerWeek] = useState(40);
+  const maxTransferHours = TOTAL_HOURS_REQUIRED - 100;
+  const transferHours = Math.min(
+    maxTransferHours,
+    Math.max(0, parseInt(transferHoursStr, 10) || 0),
+  );
 
   const remainingHours = Math.max(0, TOTAL_HOURS_REQUIRED - transferHours);
   // Duration estimate is display-only — does not affect price

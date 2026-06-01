@@ -356,6 +356,12 @@ export default function LessonPage() {
 
     // 2. Set state
     if (lessonData) {
+      lessonData = await enrichLessonRowFromCourseLessons(
+        supabase,
+        lessonId,
+        lessonData as Record<string, unknown>,
+      );
+
       let quizQuestions = lessonData.quiz_questions;
       const quizPassingScore = lessonData.passing_score;
 

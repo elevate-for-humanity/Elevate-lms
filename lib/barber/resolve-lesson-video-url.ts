@@ -21,7 +21,8 @@ function mapLocalBarberPath(url: string, slug: string | null | undefined): strin
   const derivedSlug =
     slug ?? url.replace(LOCAL_BARBER_PREFIX, '').replace(/\.mp4$/i, '').split('/').pop();
   if (!derivedSlug) return url;
-  return supabaseBarberCdnUrl(derivedSlug) ?? url;
+  const cdn = supabaseBarberCdnUrl(derivedSlug);
+  return cdn ?? url;
 }
 
 export function resolveBarberLessonVideoUrl(

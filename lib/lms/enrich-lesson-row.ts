@@ -1,5 +1,4 @@
 export type LessonRowLike = Record<string, unknown> & {
-  id?: string;
   slug?: string | null;
   lesson_slug?: string | null;
   video_url?: string | null;

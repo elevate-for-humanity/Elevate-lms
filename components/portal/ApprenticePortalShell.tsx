@@ -126,6 +126,16 @@ export const SLUG_TO_PORTAL: Record<string, string> = Object.fromEntries(
   Object.values(APPRENTICE_PORTAL_CONFIGS).map((c) => [c.programSlug, c.portalPath]),
 );
 
+export interface RtiDashboardSummary {
+  courseId: string;
+  courseTitle: string;
+  progressPercent: number;
+  status: string | null;
+  publishedLessonCount: number;
+  completedLessonCount: number;
+  lastActivityAt: string | null;
+}
+
 interface Props {
   config: ApprenticePortalConfig;
   firstName: string;
@@ -140,11 +150,23 @@ interface Props {
   } | null;
   hours: { ojl: number; rti: number };
   docs: { document_type: string; status: string; verification_status: string }[];
-  /** Ignored — present in loadApprenticePortalData return but not used by shell */
   apprentice?: unknown;
+  brandSubtitle?: string;
+  rti?: RtiDashboardSummary | null;
+  complianceLinks?: { label: string; href: string }[];
 }
 
-export function ApprenticePortalShell({ config, firstName, shopName, enrollment, hours, docs }: Props) {
+export function ApprenticePortalShell({
+  config,
+  firstName,
+  shopName,
+  enrollment,
+  hours,
+  docs,
+  brandSubtitle,
+  rti,
+  complianceLinks = [],
+}: Props) {
   const ProgramIcon = config.icon;
 
   const requiredOjl = config.requiredOjl;
@@ -216,6 +238,9 @@ export function ApprenticePortalShell({ config, firstName, shopName, enrollment,
                   Indiana Registered Apprenticeship
                 </p>
                 <h1 className="text-xl sm:text-2xl font-bold text-white">{config.label}</h1>
+                {brandSubtitle ? (
+                  <p className="text-white/70 text-xs mt-0.5">{brandSubtitle}</p>
+                ) : null}
               </div>
             </div>
             <p className="text-white/80 text-sm mt-2">
@@ -333,6 +358,43 @@ export function ApprenticePortalShell({ config, firstName, shopName, enrollment,
             </ol>
           </div>
         )}
+
+        {rti && rti.publishedLessonCount > 0 ? (
+          <div className="bg-white rounded-xl border border-slate-200 p-5">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <BookOpen className={`w-4 h-4 ${config.accentText}`} />
+                  <h2 className="text-sm font-semibold text-slate-900">RTI course lessons</h2>
+                </div>
+                <p className="text-sm text-slate-600">{rti.courseTitle}</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  {rti.completedLessonCount} of {rti.publishedLessonCount} lessons complete
+                </p>
+                <div className="mt-3 h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full ${config.accentBg} rounded-full transition-all duration-700`}
+                    style={{ width: `${Math.min(rti.progressPercent, 100)}%` }}
+                  />
+                </div>
+                <p className="text-xs text-slate-500 mt-1">{Math.round(rti.progressPercent)}% through RTI</p>
+              </div>
+              <Link
+                href={`/lms/courses/${rti.courseId}`}
+                className={`inline-flex items-center justify-center gap-2 ${config.accentBg} text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:opacity-90 transition shrink-0`}
+              >
+                <Play className="w-4 h-4" />
+                {rti.completedLessonCount > 0 ? 'Continue training' : 'Start RTI lessons'}
+              </Link>
+            </div>
+          </div>
+        ) : null}
+
+        {rti && rti.publishedLessonCount === 0 ? (
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+            Your RTI course is being prepared. Check back soon or contact your program advisor.
+          </div>
+        ) : null}
 
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -457,6 +519,24 @@ export function ApprenticePortalShell({ config, firstName, shopName, enrollment,
             </ul>
           </div>
         </div>
+
+        {complianceLinks.length > 0 ? (
+          <div className="bg-white rounded-xl border border-slate-200 p-5">
+            <h2 className="text-sm font-semibold text-slate-900 mb-3">Compliance & verification</h2>
+            <div className="grid sm:grid-cols-3 gap-2">
+              {complianceLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="flex items-center gap-2 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 transition text-sm font-medium text-slate-800"
+                >
+                  <ClipboardCheck className={`w-4 h-4 ${config.accentText} shrink-0`} />
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         {/* Resources */}
         <div className="grid sm:grid-cols-3 gap-3">

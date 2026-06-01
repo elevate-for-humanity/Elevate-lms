@@ -814,6 +814,7 @@ The hook attempts unmuted play and falls back silently. No mute button shown.
   NEXT_TELEMETRY_DISABLED=1
   SKIP_ENV_VALIDATION=true
   ```
+- **Pexels (free b-roll):** get a key at [https://www.pexels.com/api/](https://www.pexels.com/api/) → set `PEXELS_API_KEY` in Container secrets or `platform_secrets`. Barber lesson videos use it for `visual` + `application` segments (`scripts/generate-barber-videos.ts`). See `docs/prestige-elevation-media-pipeline.md`.
 
 ### Running services
 
@@ -827,7 +828,7 @@ The hook attempts unmuted play and falls back silently. No mute button shown.
 - `pnpm lint` — ESLint (expect ~37 pre-existing `no-console` errors in non-app files)
 - `pnpm test` — Vitest unit tests (74 test files, 1634 tests)
 - `pnpm typecheck` — TypeScript type check (requires `--max-old-space-size=8192`)
-- `pnpm build` — Full production build (requires `--max-old-space-size=8192`, 2600+ pages)
+- `pnpm build` — Full production build (requires `--max-old-space-size=6144`, 2600+ pages)
 
 ### Gotchas
 

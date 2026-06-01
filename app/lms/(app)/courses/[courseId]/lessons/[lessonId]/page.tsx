@@ -59,14 +59,18 @@ import { transformLessonContent, isAiJsonBlob } from '@/lib/lms/transformLessonC
 // HVAC_COURSE_ID removed — isHvacCourse now derived from course slug (see fetchLesson)
 
 import { resolveBarberLessonVideoUrl } from '@/lib/barber/resolve-lesson-video-url';
+import { enrichLessonRowFromCourseLessons } from '@/lib/lms/enrich-lesson-row';
 
-function barberVideoUrl(
-  slug: string | null | undefined,
-  videoConfig?: Record<string, string> | null,
-  videoUrl?: string | null,
-): string | null {
-  return resolveBarberLessonVideoUrl(slug, videoUrl, videoConfig);
+function barberVideoUrl(lesson: {
+  slug?: string | null;
+  lesson_slug?: string | null;
+  video_url?: string | null;
+  video_config?: Record<string, string> | null;
+}): string | null {
+  const slug = lesson.slug ?? lesson.lesson_slug ?? null;
+  return resolveBarberLessonVideoUrl(slug, lesson.video_url, lesson.video_config);
 }
+
 import { lessonUuidToSimulationKey } from '@/lib/lms/hvac-simulations';
 import { getActivitiesForLesson, getDefaultActivity } from '@/lib/lms/activity-map';
 import type { ActivityId } from '@/lib/lms/activity-map';
@@ -271,6 +275,8 @@ export default function LessonPage() {
       .select('*')
       .eq('id', lessonId)
       .maybeSingle();
+
+    let lessonData = lessonDataRaw;
 
     // Fallback: lms_lessons view may filter out unpublished lessons
     if (!lessonData) {
@@ -1320,9 +1326,9 @@ export default function LessonPage() {
           ) : isBarberLesson ? (
             /* Barber: per-lesson MP4s for lessons 1–5; video_url for all others */
             <div className="max-w-4xl mx-auto p-4 md:p-8">
-              {barberVideoUrl(lesson.slug, lesson.video_config, lesson.video_url) ? (
+              {barberVideoUrl(lesson) ? (
                 <InteractiveVideoPlayer
-                  videoUrl={barberVideoUrl(lesson.slug, lesson.video_config, lesson.video_url)!}
+                  videoUrl={barberVideoUrl(lesson)!}
                   title={lesson.title}
                   onComplete={async () => {
                     await markComplete(true);
@@ -1552,10 +1558,10 @@ export default function LessonPage() {
                     {activeActivity === 'video' && (
                       <div role="tabpanel" aria-label="Video">
                         {isBarberLesson ? (
-                          barberVideoUrl(lesson.slug, lesson.video_config, lesson.video_url) ? (
+                          barberVideoUrl(lesson) ? (
                             <InteractiveVideoPlayer
                               videoUrl={
-                                barberVideoUrl(lesson.slug, lesson.video_config, lesson.video_url)!
+                                barberVideoUrl(lesson)!
                               }
                               title={lesson.title}
                               onProgress={(p) => onVideoProgress(p, 100)}

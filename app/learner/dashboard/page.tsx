@@ -49,16 +49,36 @@ export default async function LearnerDashboardPage({ searchParams }: Props) {
   const supabase = await createClient();
   const sp = await searchParams;
 
-  // Smart router: apprenticeship program_slug wins over generic portal_type `apprentice`.
+  // Students with a portal_type get redirected to their industry-specific dashboard.
+  // This makes /learner/dashboard a smart router — no more generic one-size-fits-all.
+  const profileAny = profile as any;
+  if (profile?.role === 'student' && profileAny.portal_type) {
+    redirect(`/portal/${profileAny.portal_type}`);
+  }
+
+  // Apprenticeship students each get their own dedicated portal dashboard.
   if (profile?.role === 'student') {
-    const { resolveStudentHomePath } = await import('@/lib/portal/resolve-student-home');
-    const home = await resolveStudentHomePath(
-      supabase,
-      user.id,
-      (profile as { portal_type?: string | null }).portal_type,
-    );
-    if (home !== '/learner/dashboard') {
-      redirect(home);
+    const APPRENTICESHIP_SLUG_TO_PORTAL: Record<string, string> = {
+      'barber-apprenticeship':          '/portal/barber',
+      'cosmetology-apprenticeship':     '/portal/cosmetology',
+      'esthetician-apprenticeship':     '/portal/esthetician',
+      'nail-technician-apprenticeship': '/portal/nail-technician',
+      'culinary-apprenticeship':        '/portal/culinary',
+      'electrical':                     '/portal/electrical',
+      'plumbing':                       '/portal/plumbing',
+    };
+    const { data: apEnrollment } = await supabase
+      .from('program_enrollments')
+      .select('program_slug')
+      .eq('user_id', user.id)
+      .in('program_slug', Object.keys(APPRENTICESHIP_SLUG_TO_PORTAL))
+      .in('enrollment_state', ['active', 'confirmed', 'orientation_complete', 'documents_complete'])
+      .order('enrolled_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (apEnrollment?.program_slug) {
+      redirect(APPRENTICESHIP_SLUG_TO_PORTAL[apEnrollment.program_slug] ?? '/portal/apprentice');
     }
   }
 
@@ -204,6 +224,7 @@ export default async function LearnerDashboardPage({ searchParams }: Props) {
     attendanceHours,
   } = data!;
 
+  // Barber and other self-pay programs must never see WIOA / WorkOne intake UI
   const isPendingWorkone = !!workoneApp;
 
   const userName = profile?.full_name || user.email?.split('@')[0] || 'Learner';

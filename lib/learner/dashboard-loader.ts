@@ -143,7 +143,13 @@ export interface LearnerDashboardData {
   attendanceHours: number;
   recentMessages: MessageDTO[];
   upcomingSchedule: ScheduleSessionDTO[];
-  workoneApp: { id: string; status: string | null; program_id: string | null } | null;
+  workoneApp: {
+    id: string;
+    status: string | null;
+    program_id: string | null;
+    program_slug: string | null;
+    funding_type: string | null;
+  } | null;
   externalEnrollments: Array<{
     id: string;
     program_slug: string | null;

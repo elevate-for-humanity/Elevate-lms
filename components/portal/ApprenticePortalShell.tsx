@@ -20,6 +20,11 @@ import {
   Hammer,
   Droplets,
 } from 'lucide-react';
+import {
+  apprenticeshipDocumentsPath,
+  apprenticeshipLmsCoursePath,
+  apprenticeshipOrientationPath,
+} from '@/lib/portal/program-portal-paths';
 
 export interface ApprenticePortalConfig {
   programSlug: string;
@@ -207,11 +212,19 @@ export function ApprenticePortalShell({
       : transferHoursClaimed;
   const showTransferCredit = transferCredit > 0;
 
+  const orientationHref = apprenticeshipOrientationPath(config.programSlug);
+  const documentsHref = apprenticeshipDocumentsPath(config.programSlug);
+  const lmsCourseHref = apprenticeshipLmsCoursePath(config.programSlug);
+
   const onboardingItems = [
-    { label: 'Orientation completed', done: !!enrollment?.orientation_completed_at, href: '/apprentice/handbook' },
-    { label: 'Photo ID uploaded', done: hasPhotoId, href: '/apprentice/documents' },
-    { label: 'Proof of residency uploaded', done: hasResidency, href: '/apprentice/documents' },
-    { label: 'Documents approved', done: docsApproved, href: '/apprentice/documents' },
+    {
+      label: 'Orientation completed',
+      done: !!enrollment?.orientation_completed_at,
+      href: orientationHref,
+    },
+    { label: 'Photo ID uploaded', done: hasPhotoId, href: documentsHref },
+    { label: 'Proof of residency uploaded', done: hasResidency, href: documentsHref },
+    { label: 'Documents approved', done: docsApproved, href: documentsHref },
     {
       label: 'Payment method on file',
       done: hasPaidEnrollment && !needsPaymentMethod && !showPaymentSetupAlert,
@@ -223,10 +236,13 @@ export function ApprenticePortalShell({
 
   const navTabs = [
     { id: 'dashboard', label: 'Dashboard', href: config.portalPath },
+    ...(lmsCourseHref
+      ? [{ id: 'course', label: 'Online Course', href: lmsCourseHref }]
+      : []),
     { id: 'hours', label: 'Hours', href: '/apprentice/hours' },
     { id: 'timeclock', label: 'Timeclock', href: '/apprentice/timeclock' },
     { id: 'competencies', label: 'Competencies', href: '/apprentice/competencies' },
-    { id: 'documents', label: 'Documents', href: '/apprentice/documents' },
+    { id: 'documents', label: 'Documents', href: documentsHref },
     { id: 'billing', label: 'Billing', href: '/apprentice/billing' },
     { id: 'handbook', label: 'Handbook', href: '/apprentice/handbook' },
   ];
@@ -490,6 +506,18 @@ export function ApprenticePortalShell({
                   <p className="text-xs text-white/80">Start or end your shift</p>
                 </div>
               </Link>
+              {lmsCourseHref && (
+                <Link
+                  href={lmsCourseHref}
+                  className={`flex items-center gap-3 p-3 rounded-lg border-2 border-slate-200 hover:border-slate-300 bg-white transition`}
+                >
+                  <BookOpen className={`w-5 h-5 ${config.accentText}`} />
+                  <div>
+                    <p className="font-semibold text-sm text-slate-900">Milady Online Course</p>
+                    <p className="text-xs text-slate-500">RTI lessons &amp; practice</p>
+                  </div>
+                </Link>
+              )}
               <Link href="/apprentice/hours/log" className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 hover:bg-slate-200 transition">
                 <TrendingUp className={`w-5 h-5 ${config.accentText}`} />
                 <div>
@@ -561,11 +589,22 @@ export function ApprenticePortalShell({
             <p className="font-semibold text-sm text-slate-900">Skills Checklist</p>
             <p className="text-xs text-slate-500 mt-0.5">Track competency mastery</p>
           </Link>
-          <Link href="/apprentice/handbook" className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-sm hover:border-slate-300 transition">
-            <BookOpen className={`w-5 h-5 ${config.accentText} mb-2`} />
-            <p className="font-semibold text-sm text-slate-900">Handbook</p>
-            <p className="text-xs text-slate-500 mt-0.5">Rules & guidelines</p>
-          </Link>
+          {lmsCourseHref ? (
+            <Link
+              href={lmsCourseHref}
+              className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-sm hover:border-slate-300 transition"
+            >
+              <BookOpen className={`w-5 h-5 ${config.accentText} mb-2`} />
+              <p className="font-semibold text-sm text-slate-900">Milady Course</p>
+              <p className="text-xs text-slate-500 mt-0.5">Online RTI &amp; theory</p>
+            </Link>
+          ) : (
+            <Link href="/apprentice/handbook" className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-sm hover:border-slate-300 transition">
+              <BookOpen className={`w-5 h-5 ${config.accentText} mb-2`} />
+              <p className="font-semibold text-sm text-slate-900">Handbook</p>
+              <p className="text-xs text-slate-500 mt-0.5">Rules & guidelines</p>
+            </Link>
+          )}
           <Link href="/apprentice/transfer-hours" className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-sm hover:border-slate-300 transition">
             <MapPin className={`w-5 h-5 ${config.accentText} mb-2`} />
             <p className="font-semibold text-sm text-slate-900">Transfer Hours</p>

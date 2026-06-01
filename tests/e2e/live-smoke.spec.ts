@@ -11,8 +11,10 @@ test.describe('Live Production Smoke', () => {
     expect(linkCount).toBeGreaterThan(5);
   });
 
-  test('public API health endpoints are not 5xx', async ({ request, baseURL }) => {
-    const root = baseURL || 'https://www.elevateforhumanity.org';
+  test('public API health endpoints are not 5xx', async ({ request }) => {
+    // Always probe production — CI Playwright uses localhost without full secrets.
+    const root =
+      process.env.PLAYWRIGHT_SMOKE_API_ROOT || 'https://www.elevateforhumanity.org';
     const candidates = ['/api/enrollment-count', '/api/public/metrics'];
 
     for (const path of candidates) {

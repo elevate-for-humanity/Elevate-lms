@@ -43,7 +43,7 @@ jobs:
 
       # tsconfig.json writes tsBuildInfoFile to .next/cache/tsbuildinfo.json.
       # Caching that path (not the root .tsbuildinfo) lets tsc skip unchanged files.
-      # webpack cache lives alongside it — restoring both makes incremental builds fast.
+      # webpack cache lives alongside it - restoring both makes incremental builds fast.
       - name: Cache Next.js build artifacts
         uses: actions/cache@v4
         with:
@@ -121,11 +121,17 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Browser E2E (CI-safe)
-        run: pnpm run test:e2e:ci
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            pnpm exec playwright test tests/e2e/live-smoke.spec.ts --config=playwright.config.ts
+          else
+            pnpm run test:e2e:ci
+          fi
 
       - name: Build
         env:
-          # 6 GB heap — ubuntu-latest has 7 GB RAM; the LMS build peaks ~3 GB
+          # 6 GB heap - ubuntu-latest has 7 GB RAM; the LMS build peaks ~3 GB
           # without this flag the SWC compiler OOMs on large page counts.
           NODE_OPTIONS: '--max-old-space-size=6144'
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -229,7 +235,7 @@ jobs:
             response=$(curl -s -w "\n%{http_code}" --max-time 15 "$HEALTH_URL")
             status_code=$(echo "$response" | tail -n1)
             body=$(echo "$response" | head -n-1)
-            echo "Attempt $attempt — Status: $status_code"
+            echo "Attempt $attempt - Status: $status_code"
             if [ "$status_code" = "200" ]; then
               echo "Health check passed"
               echo "healthy=true" >> $GITHUB_OUTPUT
@@ -251,7 +257,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Health check failed — initiating rollback to previous commit"
+          echo "Health check failed - initiating rollback to previous commit"
           PREV_SHA=$(git rev-parse HEAD~1)
           echo "Rolling back to: $PREV_SHA"
           # Create a revert commit and push

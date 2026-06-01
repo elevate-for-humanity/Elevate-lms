@@ -28,6 +28,28 @@ export default async function ApprenticePortalPage() {
     redirect('/login?redirect=/apprentice');
   }
 
+  const { data: barberEnrollment } = await supabase
+    .from('program_enrollments')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('program_slug', 'barber-apprenticeship')
+    .limit(1)
+    .maybeSingle();
+
+  if (!barberEnrollment) {
+    const { data: barberSub } = await supabase
+      .from('barber_subscriptions')
+      .select('id')
+      .eq('user_id', user.id)
+      .limit(1)
+      .maybeSingle();
+    if (barberSub) {
+      redirect('/portal/barber');
+    }
+  } else {
+    redirect('/portal/barber');
+  }
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('full_name')
@@ -145,12 +167,12 @@ export default async function ApprenticePortalPage() {
               <p className="text-red-700 text-sm mt-1">
                 You don&apos;t have automatic weekly payments set up. Your down payment credit will cover your weekly payments, but you need a card on file before it runs out.
               </p>
-              <Link
-                href="/apprentice/billing"
+              <a
+                href="https://billing.stripe.com/p/session/live_YWNjdF8xT0tTVnlINGEyeXJWT3Q1LF9VWHRLRWVrSng2VjdNSEpCaFF1TFUwRnd4azJWa0d20100dmjZ1uiI"
                 className="inline-flex items-center gap-2 mt-3 bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-red-700 transition"
               >
                 <CreditCard className="w-4 h-4" /> Add Payment Method
-              </Link>
+              </a>
             </div>
           </div>
         )}

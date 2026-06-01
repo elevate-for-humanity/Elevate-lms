@@ -32,8 +32,6 @@ export interface ApprenticePortalConfig {
   requiredOjl: number;
   requiredRti: number;
   portalPath: string; // e.g. /portal/barber
-  /** Canonical LMS course for RTI — barber course on production */
-  lmsCourseId?: string;
 }
 
 export const APPRENTICE_PORTAL_CONFIGS: Record<string, ApprenticePortalConfig> = {
@@ -141,11 +139,32 @@ interface Props {
   } | null;
   hours: { ojl: number; rti: number };
   docs: { document_type: string; status: string; verification_status: string }[];
-  /** Ignored — present in loadApprenticePortalData return but not used by shell */
+  billing?: {
+    weeklyPaymentCents: number | null;
+    remainingBalance: number | null;
+    setupFeePaid: boolean;
+    fullyPaid: boolean;
+    paymentStatus: string | null;
+    bnplProvider: string | null;
+  } | null;
+  transferHoursClaimed?: number;
+  transferHoursVerified?: number | null;
+  hoursRemainingDisplay?: number;
   apprentice?: unknown;
 }
 
-export function ApprenticePortalShell({ config, firstName, shopName, enrollment, hours, docs }: Props) {
+export function ApprenticePortalShell({
+  config,
+  firstName,
+  shopName,
+  enrollment,
+  hours,
+  docs,
+  billing = null,
+  transferHoursClaimed = 0,
+  transferHoursVerified = null,
+  hoursRemainingDisplay,
+}: Props) {
   const ProgramIcon = config.icon;
 
   const requiredOjl = config.requiredOjl;
@@ -164,21 +183,40 @@ export function ApprenticePortalShell({ config, firstName, shopName, enrollment,
   );
   const docsApproved =
     docs.length > 0 && docs.every((d) => d.status === 'approved' || d.verification_status === 'verified');
-  const hasSubscription = !!enrollment?.stripe_subscription_id;
-  const subStatus = enrollment?.stripe_subscription_status ?? null;
+  const hasPaidEnrollment =
+    !!enrollment?.stripe_subscription_id || billing?.setupFeePaid || billing?.fullyPaid;
+  const subStatus =
+    enrollment?.stripe_subscription_status ?? billing?.paymentStatus ?? null;
+  const weeklyPaymentLabel =
+    billing?.weeklyPaymentCents != null && billing.weeklyPaymentCents > 0
+      ? (billing.weeklyPaymentCents / 100).toFixed(2)
+      : '151.03';
   const needsPaymentMethod =
-    hasSubscription &&
+    !!enrollment &&
+    !billing?.fullyPaid &&
     (subStatus === 'pending_payment_method' ||
       subStatus === 'past_due' ||
       subStatus === 'incomplete' ||
-      subStatus === 'incomplete_expired');
+      subStatus === 'incomplete_expired' ||
+      (!enrollment.stripe_subscription_id && !billing?.setupFeePaid));
+  const showPaymentSetupAlert =
+    !!enrollment && !billing?.fullyPaid && !enrollment.stripe_subscription_id && !billing?.setupFeePaid;
+  const transferCredit =
+    transferHoursVerified != null && transferHoursVerified > 0
+      ? transferHoursVerified
+      : transferHoursClaimed;
+  const showTransferCredit = transferCredit > 0;
 
   const onboardingItems = [
     { label: 'Orientation completed', done: !!enrollment?.orientation_completed_at, href: '/apprentice/handbook' },
     { label: 'Photo ID uploaded', done: hasPhotoId, href: '/apprentice/documents' },
     { label: 'Proof of residency uploaded', done: hasResidency, href: '/apprentice/documents' },
     { label: 'Documents approved', done: docsApproved, href: '/apprentice/documents' },
-    { label: 'Payment method on file', done: hasSubscription && !needsPaymentMethod, href: '/apprentice/billing' },
+    {
+      label: 'Payment method on file',
+      done: hasPaidEnrollment && !needsPaymentMethod && !showPaymentSetupAlert,
+      href: '/apprentice/billing',
+    },
   ];
   const onboardingComplete = onboardingItems.every((i) => i.done);
   const completedCount = onboardingItems.filter((i) => i.done).length;
@@ -252,7 +290,7 @@ export function ApprenticePortalShell({ config, firstName, shopName, enrollment,
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
         {/* Payment alert — no subscription at all */}
-        {!hasSubscription && enrollment && (
+        {showPaymentSetupAlert && (
           <div className="rounded-xl border border-red-200 bg-red-50 overflow-hidden">
             <div className="p-4 flex items-start gap-3 border-b border-red-200">
               <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
@@ -274,7 +312,10 @@ export function ApprenticePortalShell({ config, firstName, shopName, enrollment,
                 { n: 1, text: 'Click "Set Up Payment" above — you\'ll be taken to a secure Stripe page.' },
                 { n: 2, text: 'Enter your debit or credit card number, expiration date, and CVC.' },
                 { n: 3, text: 'Click "Save" — Stripe will verify your card. No charge happens yet.' },
-                { n: 4, text: 'Return here. Your first weekly payment of $' + (config.requiredOjl === 1500 ? '151.03' : '76.41') + ' will process on the next billing date.' },
+                {
+                  n: 4,
+                  text: `Return here. Your first weekly payment of $${weeklyPaymentLabel} will process on the next billing date.`,
+                },
               ].map(({ n, text }) => (
                 <li key={n} className="flex items-start gap-3 text-xs text-red-800">
                   <span className="w-5 h-5 rounded-full bg-red-200 text-red-700 font-bold flex items-center justify-center shrink-0 text-[11px]">{n}</span>
@@ -332,6 +373,60 @@ export function ApprenticePortalShell({ config, firstName, shopName, enrollment,
                 </li>
               ))}
             </ol>
+          </div>
+        )}
+
+        {showTransferCredit && (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <p className="text-sm font-semibold text-amber-900">Transfer hours on file</p>
+            <p className="text-sm text-amber-800 mt-1">
+              {transferHoursVerified != null && transferHoursVerified > 0 ? (
+                <>
+                  <strong>{transferHoursVerified.toLocaleString()} hours</strong> verified toward your
+                  apprenticeship — about{' '}
+                  <strong>
+                    {(hoursRemainingDisplay ?? config.requiredOjl + config.requiredRti).toLocaleString()}
+                  </strong>{' '}
+                  hours remaining in the program.
+                </>
+              ) : (
+                <>
+                  You reported <strong>{transferHoursClaimed.toLocaleString()} hours</strong> at enrollment.
+                  Staff will verify your documentation and apply credit. Until verified, progress is tracked
+                  against the full {(config.requiredOjl + config.requiredRti).toLocaleString()} hour requirement.
+                </>
+              )}
+            </p>
+            <Link
+              href="/apprentice/transfer-hours"
+              className="inline-block mt-2 text-xs font-semibold text-amber-900 hover:underline"
+            >
+              View transfer hours →
+            </Link>
+          </div>
+        )}
+
+        {billing && !billing.fullyPaid && billing.remainingBalance != null && billing.remainingBalance > 0 && (
+          <div className="rounded-xl border border-slate-200 bg-white p-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Tuition balance</p>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {billing.bnplProvider
+                  ? `Payment plan via ${billing.bnplProvider}`
+                  : 'Weekly payment plan'}
+                {billing.weeklyPaymentCents
+                  ? ` · $${weeklyPaymentLabel}/week`
+                  : ''}
+              </p>
+            </div>
+            <p className="text-lg font-bold text-slate-900">
+              $
+              {Number(billing.remainingBalance).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+              <span className="text-sm font-normal text-slate-500"> remaining</span>
+            </p>
           </div>
         )}
 

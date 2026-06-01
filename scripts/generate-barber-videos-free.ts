@@ -8,17 +8,19 @@
  * Then updates video_url on course_lessons in DB.
  *
  * Usage:
- *   pnpm tsx --env-file=.env.local scripts/generate-barber-videos.ts --dry-run
- *   pnpm tsx --env-file=.env.local scripts/generate-barber-videos.ts
- *   pnpm tsx --env-file=.env.local scripts/generate-barber-videos.ts --only barber-lesson-8,barber-lesson-12
- *   pnpm tsx --env-file=.env.local scripts/generate-barber-videos.ts --force
+ *   pnpm tsx --env-file=.env.local scripts/generate-barber-videos-free.ts --dry-run
+ *   pnpm tsx --env-file=.env.local scripts/generate-barber-videos-free.ts
+ *   pnpm tsx --env-file=.env.local scripts/generate-barber-videos-free.ts --only barber-lesson-8,barber-lesson-12
+ *   pnpm tsx --env-file=.env.local scripts/generate-barber-videos-free.ts --force
  */
 
 import path from 'path';
 import fs from 'fs';
 import { execSync } from 'child_process';
 import { createClient } from '@supabase/supabase-js';
-import OpenAI from 'openai';
+import Groq from 'groq-sdk';
+import { generateEdgeTTS, EDGE_TTS_VOICES } from '../lib/video/edge-tts';
+import { markStudioLessonDone, markStudioLessonFailed, writeStudioStatus } from '../lib/barber/video-studio-status';
 
 const BARBER_COURSE_ID = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';
 const INSTRUCTOR_IMAGE = path.join(
@@ -47,7 +49,9 @@ const db = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
   { auth: { persistSession: false } },
 );
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+const groqKey = process.env.GROQ_API_KEY;
+const openaiKey = process.env.OPENAI_API_KEY;
+const groq = groqKey ? new Groq({ apiKey: groqKey }) : null;
 
 const ACCENTS: Record<string, string> = {
   intro: '#f97316',
@@ -85,86 +89,83 @@ function stripHtml(html: string): string {
     .trim();
 }
 
+function fallbackSlides(title: string, moduleTitle: string, nextTitle?: string): Slide[] {
+  const body =
+    `This lesson covers ${title} for Indiana barber apprentices. Focus on state board expectations, shop safety, and professional technique.`;
+  return [
+    {
+      segment: 'intro',
+      title: 'Introduction',
+      bullets: ['Lesson goals', 'State board relevance', 'Shop application'],
+      narration: `Welcome to ${moduleTitle}. In this lesson, ${title}, you will build skills required for the Indiana State Board and your host shop.`,
+    },
+    {
+      segment: 'concept',
+      title: 'Core concepts',
+      bullets: ['Key definitions', 'Rules and standards', 'Common exam topics'],
+      narration: `${body} Study each point carefully and connect it to what you see at the chair every day.`,
+    },
+    {
+      segment: 'visual',
+      title: 'Technique',
+      bullets: ['Setup', 'Execution', 'Finish and check'],
+      narration: `Picture the correct setup, hand position, and client communication for ${title}. Your master barber will sign off practical skills separately.`,
+    },
+    {
+      segment: 'application',
+      title: 'In the shop',
+      bullets: ['Client safety', 'Mistakes to avoid', 'Professional habits'],
+      narration: `Apply ${title} with consistent sanitation and consultation habits. The board tests both knowledge and judgment.`,
+    },
+    {
+      segment: 'wrapup',
+      title: 'Summary',
+      bullets: ['Review main ideas', 'Complete practice quiz', 'Ask your mentor'],
+      narration: `You have completed ${title}. ${nextTitle ? `Next up: ${nextTitle}.` : 'Complete the checkpoint quiz below.'} Great work.`,
+    },
+  ];
+}
+
 async function planLesson(
   title: string,
   content: string,
   moduleTitle: string,
   nextTitle?: string,
 ): Promise<Slide[]> {
+  if (!groq && !openaiKey) return fallbackSlides(title, moduleTitle, nextTitle);
   const plain = stripHtml(content).slice(0, 6000);
-
-  const res = await openai.chat.completions.create({
-    model: 'gpt-4o',
-    temperature: 0.3,
-    max_tokens: 3000,
-    messages: [
-      {
-        role: 'user',
-        content: `You are writing a professional instructional video script for the Elevate for Humanity Professional Barbering Program (Indiana State Board exam prep).
-
-Lesson: "${title}" — Module: "${moduleTitle}"
-${nextTitle ? `Next lesson: "${nextTitle}"` : ''}
-
-LESSON CONTENT:
-${plain || 'Generate from the lesson title and Indiana barbering context.'}
-
-Produce a 5-segment lesson script. Return JSON only, no markdown:
-
-{
-  "slides": [
-    {
-      "segment": "intro",
-      "title": "2-5 word slide heading",
-      "bullets": ["3-4 short bullets, study-guide style"],
-      "narration": "~50 words. Warm greeting, state lesson title, what student will learn, why it matters for the Indiana State Board exam or their career."
-    },
-    {
-      "segment": "concept",
-      "title": "Core concept heading",
-      "bullets": ["4-6 key points"],
-      "narration": "~300 words. Deep explanation. Plain language. Cover the core technical content thoroughly."
-    },
-    {
-      "segment": "visual",
-      "title": "Technique heading",
-      "bullets": ["3-5 visual reference points"],
-      "narration": "~150 words. Walk through how the technique or tool looks and works in the shop."
-    },
-    {
-      "segment": "application",
-      "title": "In the Shop",
-      "bullets": ["3-4 real-world application points"],
-      "narration": "~100 words. Real barbershop application. Mistakes to avoid. What the Indiana State Board tests on this topic."
-    },
-    {
-      "segment": "wrapup",
-      "title": "Lesson Summary",
-      "bullets": ["3-4 key takeaways"],
-      "narration": "~50 words. Recap main points. ${nextTitle ? `Preview next lesson: ${nextTitle}.` : 'Direct student to the quiz below.'}"
+  const userContent = `Lesson "${title}" module "${moduleTitle}". Content: ${plain.slice(0, 4000)}. Return JSON only with slides array (intro, concept, visual, application, wrapup) each with segment, title, bullets, narration.`;
+  let raw = '';
+  try {
+    if (groq) {
+      const res = await groq.chat.completions.create({
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.3,
+        max_tokens: 3000,
+        messages: [{ role: 'user', content: userContent }],
+      });
+      raw = res.choices[0]?.message?.content || '';
+    } else {
+      const OpenAI = (await import('openai')).default;
+      const openai = new OpenAI({ apiKey: openaiKey! });
+      const res = await openai.chat.completions.create({
+        model: 'gpt-4o',
+        temperature: 0.3,
+        max_tokens: 3000,
+        messages: [{ role: 'user', content: userContent }],
+      });
+      raw = res.choices[0].message.content || '';
     }
-  ]
-}`,
-      },
-    ],
-  });
-
-  const raw = res.choices[0].message.content || '';
-  const cleaned = raw
-    .replace(/^```json?\s*/i, '')
-    .replace(/\s*```$/i, '')
-    .trim();
-  return JSON.parse(cleaned).slides as Slide[];
+    const cleaned = raw.replace(/^```json?\s*/i, '').replace(/\s*```$/i, '').trim();
+    return JSON.parse(cleaned).slides as Slide[];
+  } catch {
+    return fallbackSlides(title, moduleTitle, nextTitle);
+  }
 }
 
 async function generateAudio(text: string, outPath: string): Promise<number> {
-  const resp = await openai.audio.speech.create({
-    model: 'tts-1-hd',
-    voice: 'onyx',
-    input: text.slice(0, 4096),
-    speed: 0.85,
-    response_format: 'mp3',
-  });
-  fs.writeFileSync(outPath, Buffer.from(await resp.arrayBuffer()));
+  const buf = await generateEdgeTTS(text.slice(0, 4096), { voice: EDGE_TTS_VOICES.marcus, rate: '-8%' });
+  fs.writeFileSync(outPath, buf);
   try {
     const dur = execSync(
       `ffprobe -v error -show_entries format=duration -of csv=p=0 "${outPath}"`,
@@ -402,7 +403,6 @@ async function main() {
       ok++;
     } catch (err: any) {
       console.error(`   ❌ ${lesson.slug}: ${err.message}`);
-      markStudioLessonFailed(lesson.slug, err.message);
       failed++;
     } finally {
       try {

@@ -32,57 +32,6 @@ const imageProviders: Record<string, () => AIImageProvider> = {
   stability: () => new StabilityProvider(),
 };
 
-const CHAT_PROVIDER_FALLBACK_ORDER: AIProviderName[] = ['openai', 'gemini', 'groq', 'azure'];
-
-function breakerForProvider(providerName: string): CircuitBreaker {
-  switch (providerName) {
-    case 'groq':
-      return breakers.groq;
-    case 'gemini':
-      return breakers.gemini;
-    default:
-      return breakers.openai;
-  }
-}
-
-/** Ordered list of configured chat providers (env preference first). */
-export function getChatProviderChain(preferred?: AIProviderName): AIProvider[] {
-  const envPreferred = (process.env.AI_PROVIDER || 'openai') as AIProviderName;
-  const head = preferred && preferred !== 'none' ? preferred : envPreferred;
-  const order = [head, ...CHAT_PROVIDER_FALLBACK_ORDER.filter((name) => name !== head)];
-
-  const seen = new Set<string>();
-  const chain: AIProvider[] = [];
-  for (const name of order) {
-    if (name === 'none' || seen.has(name)) continue;
-    seen.add(name);
-    const factory = chatProviders[name];
-    if (!factory) continue;
-    const provider = factory();
-    if (provider.isAvailable()) chain.push(provider);
-  }
-  return chain;
-}
-
-function isRetryableProviderError(err: unknown): boolean {
-  if (err instanceof CircuitOpenError) return false;
-  const msg = err instanceof Error ? err.message : String(err);
-  return !msg.includes('401') && !msg.includes('400') && !msg.includes('content_policy');
-}
-
-function shouldTryNextProvider(err: unknown): boolean {
-  if (err instanceof CircuitOpenError) return true;
-  const msg = err instanceof Error ? err.message : String(err);
-  return (
-    msg.includes('429') ||
-    msg.includes('503') ||
-    msg.includes('502') ||
-    msg.includes('timeout') ||
-    msg.includes('ECONNRESET') ||
-    msg.includes('fetch failed')
-  );
-}
-
 // -- Provider Resolution --
 // No singleton cache — process.env may be hydrated from the DB mid-request
 // (via hydrateProcessEnv), so we resolve fresh each call. Provider instances
@@ -139,24 +88,42 @@ function resolveImageProvider(): AIImageProvider {
  * Falls back automatically if the preferred provider is unavailable.
  */
 export async function aiChat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
-  let provider;
-  if (options.provider && options.provider !== 'none' && chatProviders[options.provider]) {
-    const explicit = chatProviders[options.provider]();
-    provider = explicit.isAvailable() ? explicit : resolveChatProvider();
-  } else {
-    provider = resolveChatProvider();
+  const preferred =
+    options.provider && options.provider !== 'none' ? options.provider : undefined;
+  const chain = getChatProviderChain(preferred);
+
+  if (chain.length === 0) {
+    throw new Error(
+      'No AI chat provider available. Set OPENAI_API_KEY, GEMINI_API_KEY, GROQ_API_KEY, or AZURE_OPENAI_API_KEY.',
+    );
   }
-  return withResilience(() => provider.chat(options), {
-    circuitBreaker: breakers.openai,
-    attempts: 2,
-    baseDelayMs: 1000,
-    label: 'aiChat',
-    shouldRetry: (err) => {
-      // Don't retry on auth errors or content policy violations
-      const msg = err instanceof Error ? err.message : String(err);
-      return !msg.includes('401') && !msg.includes('400') && !msg.includes('content_policy');
-    },
-  });
+
+  let lastError: unknown;
+  for (let i = 0; i < chain.length; i++) {
+    const provider = chain[i]!;
+    const hasNext = i < chain.length - 1;
+    try {
+      return await withResilience(() => provider.chat(options), {
+        circuitBreaker: breakerForProvider(provider.name),
+        attempts: 2,
+        baseDelayMs: 1000,
+        label: `aiChat:${provider.name}`,
+        shouldRetry: isRetryableProviderError,
+      });
+    } catch (err) {
+      lastError = err;
+      if (hasNext && shouldTryNextProvider(err)) {
+        logger.warn('[aiChat] Provider unavailable; trying next in chain', {
+          provider: provider.name,
+          error: err instanceof Error ? err.message : String(err),
+        });
+        continue;
+      }
+      throw err;
+    }
+  }
+
+  throw lastError ?? new Error('All AI chat providers failed');
 }
 
 /**

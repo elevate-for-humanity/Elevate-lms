@@ -126,7 +126,7 @@ export default function ProgramIdentitySection({ state, onChange }: Props) {
           />
           {state.hero_image_url && (
             <div className="mt-2 h-24 w-full overflow-hidden rounded-lg border border-slate-200">
-              // IMAGE-CONTRACT: allow raw img because legacy markup
+              {/* IMAGE-CONTRACT: allow raw img because legacy markup */}
               <img
                 src={state.hero_image_url}
                 alt="Hero preview"

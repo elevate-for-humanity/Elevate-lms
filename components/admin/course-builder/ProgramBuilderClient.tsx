@@ -244,7 +244,7 @@ function PreviewDrawer({
           {/* Hero */}
           {state.hero_image_url && (
             <div className="h-40 w-full overflow-hidden rounded-xl bg-slate-100">
-              // IMAGE-CONTRACT: allow raw img because legacy markup
+              {/* IMAGE-CONTRACT: allow raw img because legacy markup */}
               <img src={state.hero_image_url} alt="" className="h-full w-full object-cover" />
             </div>
           )}

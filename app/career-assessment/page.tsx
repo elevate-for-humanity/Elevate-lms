@@ -68,7 +68,7 @@ export default function CareerAssessmentPage() {
             rel="noopener noreferrer"
             title="This site incorporates information from O*NET Web Services. Click to learn more."
           >
-            // IMAGE-CONTRACT: allow raw img because legacy markup
+            {/* IMAGE-CONTRACT: allow raw img because legacy markup */}
             <img
               src="https://www.onetcenter.org/image/link/onet-in-it.svg"
               alt="O*NET in-it"

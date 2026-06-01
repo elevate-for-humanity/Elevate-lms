@@ -101,7 +101,7 @@ export function ComponentLabeling({
         className="relative rounded-xl overflow-hidden border-2 border-slate-200 bg-slate-50 mb-4"
         style={{ aspectRatio: '16/10' }}
       >
-        // IMAGE-CONTRACT: allow raw img because legacy markup
+        {/* IMAGE-CONTRACT: allow raw img because legacy markup */}
         <img src={diagramSrc} alt="System diagram" className="w-full h-full object-contain" />
 
         {zones.map((zone) => {

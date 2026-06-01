@@ -177,7 +177,7 @@ export async function OnetLaborData({ slug, socCode }: Props) {
             title="This site incorporates information from O*NET Web Services. Click to learn more."
             className="flex-shrink-0"
           >
-            // IMAGE-CONTRACT: allow raw img because legacy markup
+            {/* IMAGE-CONTRACT: allow raw img because legacy markup */}
             <img
               src="https://www.onetcenter.org/image/link/onet-in-it.svg"
               alt="O*NET in-it"

@@ -1,13 +1,47 @@
 // PUBLIC ROUTE: public metrics endpoint
 
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient, isSupabaseConfigured } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
+
+type PublicMetricsDataSource = 'live_database' | 'not_configured' | 'unavailable';
+
+function emptyPublicMetrics(dataSource: Exclude<PublicMetricsDataSource, 'live_database'>) {
+  const now = new Date().toISOString();
+
+  return {
+    timestamp: now,
+    verified: false,
+    metrics: {
+      totalUsers: 0,
+      activeStudents: 0,
+      totalEnrollments: 0,
+      completedCourses: 0,
+      totalApplications: 0,
+      recentLogins24h: 0,
+      activeCourses: 0,
+      totalCertificates: 0,
+      completionRate: 0,
+    },
+    recentActivity: [],
+    dataSource,
+    lastUpdated: now,
+  };
+}
+
+function metricsResponse(metrics: ReturnType<typeof emptyPublicMetrics> | Record<string, unknown>) {
+  return NextResponse.json(metrics, {
+    headers: {
+      'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+    },
+  });
+}
 
 /**
  * Public Metrics API
@@ -19,7 +53,11 @@ async function _GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = await createClient();
+    if (!isSupabaseConfigured()) {
+      return metricsResponse(emptyPublicMetrics('not_configured'));
+    }
+
+    const supabase = createPublicClient();
 
     // Get real metrics from database
     const [
@@ -103,17 +141,17 @@ async function _GET(request: Request) {
           courseTitle: activity.courses?.title || 'Course',
           type: 'enrollment',
         })) || [],
-      dataSource: 'live_database',
+      dataSource: 'live_database' satisfies PublicMetricsDataSource,
       lastUpdated: new Date().toISOString(),
     };
 
-    return NextResponse.json(metrics, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
-      },
-    });
+    return metricsResponse(metrics);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch metrics' }, { status: 500 });
+    logger.warn('/api/public/metrics returning fallback metrics', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+
+    return metricsResponse(emptyPublicMetrics('unavailable'));
   }
 }
 export const GET = withApiAudit('/api/public/metrics', _GET);

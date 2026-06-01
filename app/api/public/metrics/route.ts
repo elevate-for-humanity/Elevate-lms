@@ -1,7 +1,8 @@
 // PUBLIC ROUTE: public metrics endpoint
 
 import { NextResponse } from 'next/server';
-import { createClient, isSupabaseConfigured } from '@/lib/supabase/server';
+import { isSupabaseConfigured } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -53,12 +54,7 @@ async function _GET(request: Request) {
       return degradedMetricsResponse();
     }
 
-    let supabase;
-    try {
-      supabase = await createClient();
-    } catch {
-      return degradedMetricsResponse();
-    }
+    const supabase = createPublicClient();
 
     // Get real metrics from database
     const [

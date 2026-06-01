@@ -49,6 +49,7 @@ export function createPublicClient(): SupabaseClient<any> {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
+    // Return mock client during static prerender / CI — never throw on missing public env vars
     return mockClient;
   }
 

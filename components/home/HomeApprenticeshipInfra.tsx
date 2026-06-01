@@ -2,7 +2,7 @@
  * HomeApprenticeshipInfra
  *
  * Communicates the apprenticeship + employer infrastructure in human language.
- * Shows RAPIDS tracking, OJT oversight, employer dashboards — framed as
+ * Shows RAPIDS tracking, OJT oversight, employer dashboards - framed as
  * "what this means for you" not "look at our tech stack."
  */
 
@@ -22,7 +22,7 @@ const EMPLOYER_CAPABILITIES = [
 
 const LEARNER_CAPABILITIES = [
   'Earn wages while you train',
-  'Hours tracked automatically — no paperwork',
+  'Hours tracked automatically - no paperwork',
   'Geofenced check-in at employer sites',
   'Apprenticeship progress visible in your portal',
   'Credential issued on completion, publicly verifiable',
@@ -49,7 +49,7 @@ export function HomeApprenticeshipInfra() {
           </h2>
           <p className="text-slate-500 text-sm max-w-2xl mx-auto leading-relaxed">
             Elevate is a DOL-registered apprenticeship sponsor. That means structured OJT,
-            employer coordination, RAPIDS-compatible tracking, and compliance documentation —
+            employer coordination, RAPIDS-compatible tracking, and compliance documentation -
             all managed so employers and learners can focus on the work.
           </p>
         </div>
@@ -70,7 +70,7 @@ export function HomeApprenticeshipInfra() {
               />
             </div>
             <div className="px-6 pt-4 pb-1 border-b border-slate-100">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">For Learners</p>
+              <p className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">For Learners</p>
               <h3 className="text-base font-extrabold text-slate-900">Earn while you learn</h3>
             </div>
             <div className="p-6">
@@ -105,7 +105,7 @@ export function HomeApprenticeshipInfra() {
               />
             </div>
             <div className="px-6 pt-4 pb-1 border-b border-slate-100">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">For Employers</p>
+              <p className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">For Employers</p>
               <h3 className="text-base font-extrabold text-slate-900">Hire, train, retain</h3>
             </div>
             <div className="p-6">
@@ -146,7 +146,7 @@ export function HomeApprenticeshipInfra() {
                 Apprenticeship isn&apos;t a program add-on. It&apos;s the pathway.
               </p>
               <p className="text-slate-500 text-sm leading-relaxed">
-                Structured OJT, employer coordination, and RAPIDS-compatible reporting — built
+                Structured OJT, employer coordination, and RAPIDS-compatible reporting - built
                 into every eligible program from day one.
               </p>
             </div>

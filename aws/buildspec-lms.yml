@@ -86,6 +86,7 @@ phases:
       - export NEXT_TELEMETRY_DISABLED=1
       - export BUILD_SCOPE=1
       - export SERVICE_ROLE=lms
+      - export NODE_OPTIONS='--max-old-space-size=4096'
       - pnpm run build:lms:phased
       - echo Packaging Docker image...
       - docker buildx build --platform linux/amd64 --load -f Dockerfile.package --build-arg COMMIT_REF=$COMMIT_REF --cache-from type=registry,ref=$CACHE_IMAGE_URI --cache-to type=registry,ref=$CACHE_IMAGE_URI,mode=max -t $IMAGE_URI:latest -t $IMAGE_URI:$COMMIT_HASH .

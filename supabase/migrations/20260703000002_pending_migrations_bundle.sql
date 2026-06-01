@@ -1,4 +1,4 @@
--- Pending migrations bundle — apply all at once in Supabase Dashboard SQL Editor.
+-- Pending migrations bundle - apply all at once in Supabase Dashboard SQL Editor.
 --
 -- Includes (in order):
 --   20260702000009  normalize_two_factor_auth
@@ -6,29 +6,58 @@
 --   20260702000011  ensure_storage_buckets
 --   20260702000012  external_courses_support_fee
 --
--- All are idempotent — safe to re-run.
+-- All are idempotent - safe to re-run.
 
 -- ============================================================================
--- 20260702000009 — normalize_two_factor_auth
+-- 20260702000009 - normalize_two_factor_auth
 -- ============================================================================
 
-UPDATE public.two_factor_auth
-SET enabled = TRUE
-WHERE is_enabled = TRUE AND (enabled IS NULL OR enabled = FALSE);
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'two_factor_auth'
+      AND column_name = 'is_enabled'
+  ) THEN
+    UPDATE public.two_factor_auth
+    SET enabled = TRUE
+    WHERE is_enabled = TRUE AND (enabled IS NULL OR enabled = FALSE);
 
-ALTER TABLE public.two_factor_auth
-  DROP COLUMN IF EXISTS is_enabled;
+    ALTER TABLE public.two_factor_auth DROP COLUMN IF EXISTS is_enabled;
+  END IF;
+END $$;
 
 ALTER TABLE public.two_factor_auth
   ALTER COLUMN enabled SET DEFAULT false,
   ALTER COLUMN enabled SET NOT NULL;
 
-ALTER TABLE public.two_factor_auth
-  ADD CONSTRAINT IF NOT EXISTS two_factor_auth_user_id_fkey
-    FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'two_factor_auth_user_id_fkey'
+      AND conrelid = 'public.two_factor_auth'::regclass
+  ) THEN
+    ALTER TABLE public.two_factor_auth
+      ADD CONSTRAINT two_factor_auth_user_id_fkey
+      FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+  END IF;
+END $$;
 
-ALTER TABLE public.two_factor_auth
-  ADD CONSTRAINT IF NOT EXISTS two_factor_auth_user_id_unique UNIQUE (user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'two_factor_auth_user_id_unique'
+      AND conrelid = 'public.two_factor_auth'::regclass
+  ) THEN
+    ALTER TABLE public.two_factor_auth
+      ADD CONSTRAINT two_factor_auth_user_id_unique UNIQUE (user_id);
+  END IF;
+END $$;
 
 CREATE INDEX IF NOT EXISTS idx_two_factor_auth_user_id
   ON public.two_factor_auth (user_id);
@@ -53,7 +82,7 @@ BEGIN
 END $$;
 
 -- ============================================================================
--- 20260702000010 — onboarding_progress_unique
+-- 20260702000010 - onboarding_progress_unique
 -- ============================================================================
 
 DELETE FROM public.onboarding_progress op
@@ -63,12 +92,21 @@ WHERE id NOT IN (
   ORDER BY user_id, step, completed_at DESC NULLS LAST, created_at DESC NULLS LAST
 );
 
-ALTER TABLE public.onboarding_progress
-  ADD CONSTRAINT IF NOT EXISTS onboarding_progress_user_step_unique
-    UNIQUE (user_id, step);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'onboarding_progress_user_step_unique'
+      AND conrelid = 'public.onboarding_progress'::regclass
+  ) THEN
+    ALTER TABLE public.onboarding_progress
+      ADD CONSTRAINT onboarding_progress_user_step_unique UNIQUE (user_id, step);
+  END IF;
+END $$;
 
 -- ============================================================================
--- 20260702000011 — ensure_storage_buckets
+-- 20260702000011 - ensure_storage_buckets
 -- ============================================================================
 
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
@@ -106,7 +144,7 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================================
--- 20260702000012 — external_courses_support_fee
+-- 20260702000012 - external_courses_support_fee
 -- ============================================================================
 
 ALTER TABLE public.program_external_courses

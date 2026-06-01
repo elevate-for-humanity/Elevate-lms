@@ -1,7 +1,7 @@
 /**
  * HomeCareerPathways
  *
- * Featured program cards — server-rendered from static catalog with
+ * Featured program cards - server-rendered from static catalog with
  * live data overlay (funding availability, apprenticeship flag).
  * Falls back gracefully if DB is unavailable.
  */
@@ -12,7 +12,7 @@ import { ArrowRight } from 'lucide-react';
 import { ALL_PROGRAMS } from '@/data/programs/catalog';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 
-// Featured programs shown on homepage — ordered by demand/visibility
+// Featured programs shown on homepage - ordered by demand/visibility
 const FEATURED_SLUGS = [
   'cdl-training',
   'hvac-technician',
@@ -26,7 +26,7 @@ const FEATURED_SLUGS = [
 
 const SECTOR_COLORS: Record<string, string> = {
   healthcare: 'bg-blue-600',
-  'skilled-trades': 'bg-amber-600',
+  'skilled-trades': 'bg-amber-700',
   transportation: 'bg-emerald-700',
   technology: 'bg-purple-600',
   'personal-services': 'bg-pink-600',
@@ -84,7 +84,7 @@ function PathwayCard({ prog }: { prog: ProgramSchema }) {
       <div className="flex flex-col flex-1 p-4 gap-2">
         <h3 className="font-extrabold text-slate-900 text-sm leading-snug line-clamp-2">{prog.title}</h3>
 
-        {/* Meta row — text only, no icons */}
+        {/* Meta row - text only, no icons */}
         <div className="flex flex-col gap-0.5">
           {duration && (
             <span className="text-[11px] text-slate-500">{duration}</span>
@@ -94,7 +94,7 @@ function PathwayCard({ prog }: { prog: ProgramSchema }) {
           )}
         </div>
 
-        {/* Credential + apprenticeship flags — text only */}
+        {/* Credential + apprenticeship flags - text only */}
         <div className="flex flex-wrap gap-1.5">
           {prog.credentials?.slice(0, 1).map((c) => (
             <span
@@ -155,7 +155,7 @@ export function HomeCareerPathways() {
                 Pick a career. Start in weeks.
               </h2>
               <p className="text-slate-500 text-sm mt-2 max-w-lg">
-                Healthcare, skilled trades, CDL, technology, and more — each with a real
+                Healthcare, skilled trades, CDL, technology, and more - each with a real
                 credential, funding options, and job placement support.
               </p>
             </div>

@@ -814,7 +814,6 @@ The hook attempts unmuted play and falls back silently. No mute button shown.
   NEXT_TELEMETRY_DISABLED=1
   SKIP_ENV_VALIDATION=true
   ```
-- **Pexels (free b-roll):** get a key at [https://www.pexels.com/api/](https://www.pexels.com/api/) → set `PEXELS_API_KEY` in Container secrets or `platform_secrets`. Barber lesson videos use it for `visual` + `application` segments (`scripts/generate-barber-videos.ts`). See `docs/prestige-elevation-media-pipeline.md`.
 
 ### Running services
 
@@ -854,4 +853,11 @@ Precedence at runtime: `platform_secrets > app_secrets > process.env`
 **AI Console vs Dev Studio Command tab:** both use `/api/devstudio/execute` — AI Console is the standalone page, Dev Studio embeds the same in an IDE-like shell. Not a conflict.
 
 **Dev Studio AI Chat** (`/api/devstudio/chat`) uses Groq/Gemini with tool calling for platform operations. This is separate from `lib/ai/ai-service.ts` (`aiChat()`) which is for course content generation.
+
+### Apprenticeship program dashboards
+
+- **Routes:** `/portal/barber`, `/portal/cosmetology`, `/portal/esthetician`, `/portal/nail-technician`, `/portal/culinary`, `/portal/electrical`, `/portal/plumbing` (and `/portal/apprentice` resolves slug from enrollment).
+- **Loader:** `loadApprenticeshipDashboard()` in `lib/apprenticeship/load-apprenticeship-dashboard.ts` — hours/onboarding from `loadApprenticePortalData` plus RTI lesson progress when `resolveCourseIdFromDb()` returns a course (barber uses legacy fallback UUID).
+- **UI:** `ApprenticeshipProgramDashboard` → `ApprenticePortalShell` with an RTI course card (`/lms/courses/[courseId]`) and optional compliance links (barber + cosmetology).
+- **Barber videos:** `lib/barber/resolve-lesson-video-url.ts` maps local `/videos/barber-lessons/{slug}.mp4` to Supabase CDN; lesson page hydrates from `course_lessons` via `lib/lms/enrich-lesson-row.ts`. Upload: `pnpm tsx scripts/upload-videos-to-supabase.ts`; missing slugs: `pnpm tsx scripts/list-missing-barber-videos.ts`; generate: `pnpm tsx scripts/generate-barber-lesson-videos.ts` (requires `OPENAI_API_KEY` for TTS).
 

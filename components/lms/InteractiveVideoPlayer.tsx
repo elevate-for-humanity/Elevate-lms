@@ -426,10 +426,10 @@ export default function InteractiveVideoPlayer({
           <video
             ref={videoRef}
             src={videoUrl}
-            className="w-full aspect-video bg-slate-950"
-            playsInline
+            className="w-full aspect-video"
             controls
             preload="metadata"
+            playsInline
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
             onError={() => setLoadError(true)}

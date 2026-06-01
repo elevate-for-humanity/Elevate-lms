@@ -1,52 +1,42 @@
-/**
- * Resolve barber lesson video URLs for LMS playback.
- *
- * course_lessons often store `/videos/barber-lessons/{slug}.mp4` after local generation.
- * Those files are not deployed to ECS (gitignored). Canonical playback uses Supabase
- * Storage: course-videos/barber/{slug}.mp4
- */
+const LOCAL_BARBER_PREFIX = '/videos/barber-lessons/';
 
-const BARBER_LOCAL_PREFIX = '/videos/barber-lessons/';
-const BARBER_STORAGE_PREFIX = 'barber/';
+function supabaseBarberCdnUrl(slug: string): string | null {
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!base) return null;
+  return `${base.replace(/\/$/, '')}/storage/v1/object/public/course-videos/barber/${slug}.mp4`;
+}
+
+const AUDIO_FALLBACK_MAP: Record<string, string> = {
+  '/videos/barber-client-experience.mp4': '/videos/barber-client-experience.mp3',
+  '/videos/barber-shop-culture.mp4': '/videos/barber-shop-culture.mp3',
+};
+
+function withAudioFallback(url: string | null | undefined): string | null {
+  if (!url) return null;
+  return AUDIO_FALLBACK_MAP[url] ?? url;
+}
+
+function mapLocalBarberPath(url: string, slug: string | null | undefined): string {
+  if (!url.includes(LOCAL_BARBER_PREFIX)) return url;
+  const derivedSlug =
+    slug ?? url.replace(LOCAL_BARBER_PREFIX, '').replace(/\.mp4$/i, '').split('/').pop();
+  if (!derivedSlug) return url;
+  return supabaseBarberCdnUrl(derivedSlug) ?? url;
+}
 
 export function resolveBarberLessonVideoUrl(
   slug: string | null | undefined,
-  videoUrl?: string | null,
   videoConfig?: Record<string, string> | null,
+  videoUrl?: string | null,
 ): string | null {
-  const fromConfig = videoConfig?.videoFile?.trim() || null;
-  const raw = (videoUrl?.trim() || fromConfig) ?? null;
-
-  if (raw?.startsWith('http://') || raw?.startsWith('https://')) {
-    return raw;
+  if (!slug && !videoUrl && !videoConfig?.videoFile) return null;
+  if (videoUrl) return withAudioFallback(mapLocalBarberPath(videoUrl, slug ?? null));
+  if (videoConfig?.videoFile) {
+    return withAudioFallback(mapLocalBarberPath(videoConfig.videoFile, slug ?? null));
   }
-
-  const lessonSlug =
-    slug ||
-    (raw?.startsWith(BARBER_LOCAL_PREFIX)
-      ? raw.slice(BARBER_LOCAL_PREFIX.length).replace(/\.mp4$/i, '')
-      : null);
-
-  if (!lessonSlug) {
-    return raw;
+  if (slug) {
+    const cdn = supabaseBarberCdnUrl(slug);
+    if (cdn) return cdn;
   }
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '');
-  const shouldUseCdn =
-    supabaseUrl && (!raw || raw.startsWith(BARBER_LOCAL_PREFIX) || raw.startsWith('/videos/'));
-
-  if (shouldUseCdn) {
-    return `${supabaseUrl}/storage/v1/object/public/course-videos/${BARBER_STORAGE_PREFIX}${lessonSlug}.mp4`;
-  }
-
-  if (raw) {
-    return raw;
-  }
-
-  return `${BARBER_LOCAL_PREFIX}${lessonSlug}.mp4`;
-}
-
-/** Local dev URL — works as soon as MP4 is written under public/ */
-export function localBarberLessonVideoPath(slug: string): string {
-  return `${BARBER_LOCAL_PREFIX}${slug}.mp4`;
+  return null;
 }

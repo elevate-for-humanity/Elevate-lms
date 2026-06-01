@@ -3,15 +3,18 @@ import { internalFetch } from '@/lib/api/internal-fetch';
 import { NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
-import { toErrorMessage } from '@/lib/safe';
+import { getAdminClient } from '@/lib/supabase/admin';
+import {
+  isProgramHolderUploadDocumentType,
+  programHolderDocumentStatus,
+} from '@/lib/program-holder/document-requirements';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
-
 export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
@@ -28,7 +31,6 @@ async function _POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Verify user is a program holder
     const { data: profile } = await supabase
       .from('profiles')
       .select('role, organization_id')
@@ -54,37 +56,19 @@ async function _POST(req: Request) {
       );
     }
 
-    // Validate document type
-    const validTypes = [
-      'syllabus',
-      'license',
-      'insurance',
-      'accreditation',
-      'instructor_credentials',
-      'facility_photos',
-      'mou',
-      'hvac_license',
-      'w9',
-      'other',
-    ];
-
-    if (!validTypes.includes(documentType)) {
-      return NextResponse.json(
-        {
-          error: `Invalid document_type. Must be one of: ${validTypes.join(', ')}`,
-        },
-        { status: 400 },
-      );
+    if (!isProgramHolderUploadDocumentType(documentType)) {
+      return NextResponse.json({ error: 'Invalid document_type' }, { status: 400 });
     }
 
-    // Get file extension
     const fileExt = file.name.split('.').pop();
     const fileName = file.name;
-
-    // Upload to storage with organized path
     const path = `${user.id}/${documentType}/${Date.now()}.${fileExt}`;
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const adminDb = await getAdminClient();
+    const storageClient = adminDb ?? supabase;
+    const dbClient = adminDb ?? supabase;
+
+    const { data: uploadData, error: uploadError } = await storageClient.storage
       .from('program_holder_documents')
       .upload(path, file, {
         upsert: false,
@@ -92,16 +76,16 @@ async function _POST(req: Request) {
       });
 
     if (uploadError) {
+      logger.warn('[PH Upload] storage upload failed', uploadError);
       return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
     }
 
-    // Get public URL
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from('program_holder_documents').getPublicUrl(uploadData.path);
+    const { data: signedForAccess } = await storageClient.storage
+      .from('program_holder_documents')
+      .createSignedUrl(uploadData.path, 3600);
+    const fileAccessUrl = signedForAccess?.signedUrl ?? uploadData.path;
 
-    // Save document record to database
-    const { data: document, error: dbError } = await supabase
+    const { data: document, error: dbError } = await dbClient
       .from('program_holder_documents')
       .insert({
         user_id: user.id,
@@ -113,31 +97,32 @@ async function _POST(req: Request) {
         mime_type: file.type,
         description: description || null,
         uploaded_by: user.id,
-        approved: null, // null = pending review; false = rejected; true = approved
+        approved: null,
+        status: 'pending',
       })
       .select()
       .maybeSingle();
 
-    if (dbError) {
-      // Clean up uploaded file
-      await supabase.storage.from('program_holder_documents').remove([uploadData.path]);
-
+    if (dbError || !document) {
+      await storageClient.storage.from('program_holder_documents').remove([uploadData.path]);
       return NextResponse.json({ error: 'Database operation failed' }, { status: 500 });
     }
 
-    // If this is an HVAC license, write the URL to program_holders.hvac_license_url
     if (documentType === 'hvac_license') {
       try {
-        const { data: phLink } = await supabase
+        const { data: phLink } = await dbClient
           .from('profiles')
           .select('program_holder_id')
           .eq('id', user.id)
           .maybeSingle();
         const holderId = phLink?.program_holder_id;
         if (holderId) {
-          await supabase
+          await dbClient
             .from('program_holders')
-            .update({ hvac_license_url: publicUrl, hvac_license_uploaded_at: new Date().toISOString() })
+            .update({
+              hvac_license_url: fileAccessUrl,
+              hvac_license_uploaded_at: new Date().toISOString(),
+            })
             .eq('id', holderId);
         }
       } catch {
@@ -145,7 +130,6 @@ async function _POST(req: Request) {
       }
     }
 
-    // Run OCR validation for image files — non-fatal, routes to manual review on failure
     if (file.type.startsWith('image/')) {
       try {
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.URL || '';
@@ -161,12 +145,14 @@ async function _POST(req: Request) {
 
         if (ocrRes.ok) {
           const ocrData = await ocrRes.json();
-          // Update document record with OCR result
-          await supabase
+          await dbClient
             .from('program_holder_documents')
             .update({ ocr_text: ocrData.rawText || null })
             .eq('id', document.id)
-            .then(()=>{}, ()=>{}); // column may not exist yet — ignore
+            .then(
+              () => {},
+              () => {},
+            );
           logger.info('[PH Upload] OCR complete', { documentId: document.id, documentType });
         }
       } catch (ocrErr) {
@@ -174,9 +160,7 @@ async function _POST(req: Request) {
       }
     }
 
-    // Notify admin of new document upload
     try {
-      const admin = await requireAdminClient();
       const { data: phProfile } = await supabase
         .from('profiles')
         .select('full_name, email')
@@ -201,19 +185,21 @@ async function _POST(req: Request) {
 <p><strong>Type:</strong> ${documentType.replace(/_/g, ' ')}<br>
 <strong>File:</strong> ${fileName}<br>
 <strong>Size:</strong> ${(file.size / 1024).toFixed(0)} KB</p>
-<p><a href="${siteUrl}/admin/dashboard">Review in Admin Dashboard →</a></p>`,
+<p><a href="${siteUrl}/admin/program-holder-documents">Review program holder documents →</a></p>`,
               },
             ],
           }),
-        }).then(()=>{}, ()=>{});
+        }).then(
+          () => {},
+          () => {},
+        );
       }
     } catch {
-      // Non-fatal — don't block upload response
+      // Non-fatal
     }
 
-    // Check if all onboarding steps are now complete and fire welcome email
     try {
-      const admin = await requireAdminClient();
+      const admin = await getAdminClient();
       if (admin) {
         const { data: profileLink } = await admin
           .from('profiles')
@@ -237,7 +223,7 @@ async function _POST(req: Request) {
               .select('mou_signed, welcome_email_sent, organization_name')
               .eq('id', holderId)
               .maybeSingle()
-          : { data: null as any };
+          : { data: null as { mou_signed?: boolean; welcome_email_sent?: boolean } | null };
 
         if (holder?.mou_signed && !holder?.welcome_email_sent) {
           const { data: acks } = await admin
@@ -245,11 +231,10 @@ async function _POST(req: Request) {
             .select('document_type')
             .eq('user_id', user.id);
 
-          const hasHandbook = acks?.some((a: any) => a.document_type === 'handbook');
-          const hasRights = acks?.some((a: any) => a.document_type === 'rights');
+          const hasHandbook = acks?.some((a: { document_type: string }) => a.document_type === 'handbook');
+          const hasRights = acks?.some((a: { document_type: string }) => a.document_type === 'rights');
 
           if (hasHandbook && hasRights) {
-            // All steps done — send full welcome email inline
             const { checkAndSendOnboardingCompleteEmail } =
               await import('@/lib/program-holder/onboarding-complete');
             await checkAndSendOnboardingCompleteEmail(admin, user.id).catch((err: unknown) => {
@@ -268,7 +253,8 @@ async function _POST(req: Request) {
         id: document.id,
         document_type: document.document_type,
         file_name: document.file_name,
-        file_url: publicUrl,
+        file_url: fileAccessUrl,
+        status: programHolderDocumentStatus(document),
         approved: document.approved,
         created_at: document.created_at,
       },
@@ -277,4 +263,5 @@ async function _POST(req: Request) {
     return safeInternalError(err as Error, 'Upload failed');
   }
 }
+
 export const POST = withApiAudit('/api/program-holder/documents/upload', _POST);

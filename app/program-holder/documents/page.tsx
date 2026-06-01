@@ -1,10 +1,14 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, Upload, Clock, XCircle } from 'lucide-react';
+import {
+  PROGRAM_HOLDER_DOCUMENT_REQUIREMENTS,
+  programHolderDocumentStatus,
+} from '@/lib/program-holder/document-requirements';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,41 +39,39 @@ export default async function ProgramHolderDocumentsPage({
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*')
+    .select('role')
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['program_holder', 'admin', 'super_admin', 'staff'].includes(profile.role))
+  if (!profile || !['program_holder', 'admin', 'super_admin', 'staff'].includes(profile.role)) {
     redirect('/login');
+  }
 
-  const db = await requireAdminClient();
-
-  const { data: rawDocuments } = await db
-    .from('documents')
+  const { data: rawDocuments } = await supabase
+    .from('program_holder_documents')
     .select(
-      'id, file_name, file_path, file_url, document_type, status, rejection_reason, created_at',
+      'id, file_name, file_url, document_type, status, approved, rejection_reason, created_at',
     )
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
-  // Generate short-lived signed URLs for all docs that have a file_path.
-  // file_url is null for docs uploaded via /api/documents/upload (private bucket).
+  const storageDb = (await getAdminClient()) ?? supabase;
+
   const documents = await Promise.all(
     (rawDocuments || []).map(async (doc) => {
-      if (doc.file_path) {
-        const { data } = await db.storage.from('documents').createSignedUrl(doc.file_path, 300); // 5-minute URL
-        return { ...doc, signedUrl: data?.signedUrl ?? null };
+      const status = programHolderDocumentStatus(doc);
+      const storagePath = doc.file_url;
+      if (storagePath && !storagePath.startsWith('http')) {
+        const { data } = await storageDb.storage
+          .from('program_holder_documents')
+          .createSignedUrl(storagePath, 300);
+        return { ...doc, status, signedUrl: data?.signedUrl ?? null };
       }
-      // Legacy rows that stored a public URL directly
-      return { ...doc, signedUrl: doc.file_url ?? null };
+      return { ...doc, status, signedUrl: storagePath?.startsWith('http') ? storagePath : null };
     }),
   );
 
-  const { data: requirements } = await supabase
-    .from('document_requirements')
-    .select('*')
-    .eq('role', 'program_holder')
-    .order('is_required', { ascending: false });
+  const requirements = PROGRAM_HOLDER_DOCUMENT_REQUIREMENTS;
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -97,20 +99,25 @@ export default async function ProgramHolderDocumentsPage({
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs
-          items={[{ label: 'Program Holder', href: '/program-holder' }, { label: 'Documents' }]}
+          items={[
+            { label: 'Program Holder', href: '/program-holder/dashboard' },
+            { label: 'Documents' },
+          ]}
         />
       </div>
       <section className="border-b py-8">
         <div className="max-w-7xl mx-auto px-6">
-          <h1 className="text-4xl font-bold text-black mb-2">My Documents</h1>
-          <p className="text-lg text-black">Upload and manage your required documents</p>
+          <h1 className="text-4xl font-bold text-slate-900 mb-2">My Documents</h1>
+          <p className="text-lg text-slate-700">
+            Upload and manage compliance documents for your program holder account
+          </p>
         </div>
       </section>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-black">Upload New Document</h2>
+            <h2 className="text-2xl font-bold text-slate-900">Upload New Document</h2>
             <Link
               href="/program-holder/documents/upload"
               className="px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2"
@@ -119,64 +126,62 @@ export default async function ProgramHolderDocumentsPage({
               Upload Document
             </Link>
           </div>
-          <p className="text-black">
-            Upload required documents to complete your profile and maintain compliance.
+          <p className="text-slate-700">
+            Files are stored securely and reviewed by our team. You will see status updates below.
           </p>
         </div>
 
-        {requirements && requirements.length > 0 && (
-          <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-            <h2 className="text-2xl font-bold text-black mb-4">Required Documents</h2>
-            <div className="space-y-3">
-              {requirements.map((req) => {
-                const uploaded = documents?.find((d) => d.document_type === req.document_type);
-                return (
-                  <div
-                    key={req.id}
-                    className="flex items-center justify-between p-4 bg-white rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      {uploaded ? (
-                        getStatusIcon(uploaded.status)
-                      ) : (
-                        <FileText className="w-5 h-5 text-slate-400" />
-                      )}
-                      <div>
-                        <h3 className="font-semibold text-black">
-                          {req.description}
-                          {req.is_required && <span className="text-brand-red-600 ml-1">*</span>}
-                        </h3>
-                        <p className="text-sm text-black">{req.instructions}</p>
-                      </div>
-                    </div>
-                    {uploaded && (
-                      <span
-                        className={`px-3 py-2 rounded-full text-xs font-semibold border ${getStatusBadge(uploaded.status)}`}
-                      >
-                        {uploaded.status.charAt(0).toUpperCase() + uploaded.status.slice(1)}
-                      </span>
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">Required Documents</h2>
+          <div className="space-y-3">
+            {requirements.map((req) => {
+              const uploaded = documents.find((d) => d.document_type === req.document_type);
+              return (
+                <div
+                  key={req.id}
+                  className="flex items-center justify-between p-4 bg-slate-50 rounded-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    {uploaded ? (
+                      getStatusIcon(uploaded.status)
+                    ) : (
+                      <FileText className="w-5 h-5 text-slate-400" />
                     )}
+                    <div>
+                      <h3 className="font-semibold text-slate-900">
+                        {req.description}
+                        {req.is_required && <span className="text-brand-red-600 ml-1">*</span>}
+                      </h3>
+                      <p className="text-sm text-slate-600">{req.instructions}</p>
+                    </div>
                   </div>
-                );
-              })}
-            </div>
+                  {uploaded && (
+                    <span
+                      className={`px-3 py-2 rounded-full text-xs font-semibold border ${getStatusBadge(uploaded.status)}`}
+                    >
+                      {uploaded.status.charAt(0).toUpperCase() + uploaded.status.slice(1)}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
           </div>
-        )}
+        </div>
 
         <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h2 className="text-2xl font-bold text-black mb-4">Uploaded Documents</h2>
-          {documents && documents.length > 0 ? (
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">Uploaded Documents</h2>
+          {documents.length > 0 ? (
             <div className="space-y-3">
               {documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-white transition"
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 transition"
                 >
                   <div className="flex items-center gap-3">
                     {getStatusIcon(doc.status)}
                     <div>
-                      <h3 className="font-semibold text-black">{doc.file_name}</h3>
-                      <p className="text-sm text-black">
+                      <h3 className="font-semibold text-slate-900">{doc.file_name}</h3>
+                      <p className="text-sm text-slate-600">
                         {doc.document_type
                           .replace(/_/g, ' ')
                           .replace(/\b\w/g, (l) => l.toUpperCase())}{' '}
@@ -214,7 +219,7 @@ export default async function ProgramHolderDocumentsPage({
           ) : (
             <div className="text-center py-12">
               <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <p className="text-black mb-4">No documents uploaded yet</p>
+              <p className="text-slate-700 mb-4">No documents uploaded yet</p>
               <Link
                 href="/program-holder/documents/upload"
                 className="inline-block px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
@@ -224,13 +229,14 @@ export default async function ProgramHolderDocumentsPage({
             </div>
           )}
         </div>
+
         {isOnboarding && nextStep === 'set-password' && (
           <div className="mt-8 bg-brand-blue-50 border-2 border-brand-blue-200 rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
               <h3 className="font-bold text-slate-900 text-lg mb-1">
                 Last step — create your password
               </h3>
-              <p className="text-sm text-black">
+              <p className="text-sm text-slate-700">
                 Set a permanent password so you can log in anytime without a magic link.
               </p>
             </div>

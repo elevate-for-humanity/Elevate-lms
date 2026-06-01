@@ -37,6 +37,9 @@ export function DocumentUploadForm({ requirements, apiEndpoint, successRedirect 
   const [prefillDone, setPrefillDone] = useState(false);
   const [pendingRedirect, setPendingRedirect] = useState('');
 
+  const isProgramHolderUpload =
+    apiEndpoint?.includes('/api/program-holder/documents/upload') ?? false;
+
   // Load previously uploaded documents from DB
   useEffect(() => {
     async function loadUploadedDocs() {
@@ -45,16 +48,30 @@ export function DocumentUploadForm({ requirements, apiEndpoint, successRedirect 
       } = await supabase.auth.getUser();
       if (!user) return;
 
+      const table = isProgramHolderUpload ? 'program_holder_documents' : 'documents';
       const { data } = await supabase
-        .from('documents')
-        .select('id, document_type, file_name, status, created_at')
+        .from(table)
+        .select('id, document_type, file_name, status, created_at, approved')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (data) setUploadedDocs(data);
+      if (data) {
+        setUploadedDocs(
+          data.map((row: { status?: string; approved?: boolean | null }) => ({
+            ...row,
+            status:
+              row.status ??
+              (row.approved === true
+                ? 'approved'
+                : row.approved === false
+                  ? 'rejected'
+                  : 'pending'),
+          })),
+        );
+      }
     }
     loadUploadedDocs();
-  }, [supabase]);
+  }, [supabase, isProgramHolderUpload]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

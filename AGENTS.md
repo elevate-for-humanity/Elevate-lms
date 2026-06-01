@@ -827,7 +827,7 @@ The hook attempts unmuted play and falls back silently. No mute button shown.
 - `pnpm lint` — ESLint (expect ~37 pre-existing `no-console` errors in non-app files)
 - `pnpm test` — Vitest unit tests (74 test files, 1634 tests)
 - `pnpm typecheck` — TypeScript type check (requires `--max-old-space-size=8192`)
-- `pnpm build` — Full production build (requires `--max-old-space-size=6144`, 2600+ pages)
+- `pnpm build` — Full production build (requires `--max-old-space-size=8192`, 2600+ pages)
 
 ### Gotchas
 
@@ -853,13 +853,4 @@ Precedence at runtime: `platform_secrets > app_secrets > process.env`
 **AI Console vs Dev Studio Command tab:** both use `/api/devstudio/execute` — AI Console is the standalone page, Dev Studio embeds the same in an IDE-like shell. Not a conflict.
 
 **Dev Studio AI Chat** (`/api/devstudio/chat`) uses Groq/Gemini with tool calling for platform operations. This is separate from `lib/ai/ai-service.ts` (`aiChat()`) which is for course content generation.
-
-### Managed trial + tenant public sites
-
-- **Trial start:** `POST /api/trial/start-managed` provisions org + `managed_licenses` + published `user_websites` via `lib/tenant/provision-trial-website.ts` (skipped for `websiteMode=api_embed`).
-- **Public URL:** `https://{slug}.app.elevateforhumanity.org` — `proxy.ts` sets `x-tenant-slug` and rewrites non-admin paths to `app/tenant-site/[[...slug]]`.
-- **Publish / edit:** `POST /api/websites/[id]/publish`, `PATCH /api/websites/[id]/config`, editor at `/apps/website-builder/edit/[websiteId]`.
-- **AI → builder:** `POST /api/ai/generate-site` with `websiteId` persists into `site_config`.
-- **DB:** Migration `20260530000001_tenant_website_builder.sql` must be applied manually before new columns work in production.
-- **Docs:** `docs/store-14-day-trial.md`
 

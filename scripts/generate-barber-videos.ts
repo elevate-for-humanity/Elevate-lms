@@ -15,6 +15,7 @@
  */
 
 import path from 'path';
+import os from 'os';
 import fs from 'fs';
 import { execSync } from 'child_process';
 import { createClient } from '@supabase/supabase-js';
@@ -27,7 +28,7 @@ const INSTRUCTOR_IMAGE = path.join(
 );
 const INSTRUCTOR_NAME = 'James Carter';
 const INSTRUCTOR_TITLE = 'Master Barber & Educator';
-const COURSE_NAME = 'Prestige Elevation™ Barber Curriculum';
+const COURSE_NAME = 'Professional Barbering — Indiana State Board Prep';
 const OUTPUT_DIR = path.join(process.cwd(), 'public/videos/barber-lessons');
 const TEMP_DIR = path.join(process.cwd(), 'temp/barber-lesson-videos');
 const W = 1920;
@@ -42,12 +43,9 @@ const onlyArg = args.find((a) => a === '--only')
   : args.find((a) => a.startsWith('--only='))?.replace('--only=', '');
 const onlySlugs = onlyArg ? onlyArg.split(',').map((s) => s.trim()) : null;
 
-const db = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { persistSession: false } },
-);
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+let db: ReturnType<typeof createClient>;
+let openai: OpenAI;
+let groqChat: OpenAI;
 
 const ACCENTS: Record<string, string> = {
   intro: '#f97316',
@@ -93,14 +91,16 @@ async function planLesson(
 ): Promise<Slide[]> {
   const plain = stripHtml(content).slice(0, 6000);
 
-  const res = await openai.chat.completions.create({
-    model: 'gpt-4o',
+  const chat = process.env.GROQ_API_KEY ? groqChat : openai;
+  const model = process.env.GROQ_API_KEY ? 'llama-3.3-70b-versatile' : 'gpt-4o';
+  const res = await chat.chat.completions.create({
+    model,
     temperature: 0.3,
     max_tokens: 3000,
     messages: [
       {
         role: 'user',
-        content: `You are writing a professional instructional video script for the Elevate for Humanity Professional Barbering Program (Indiana State Board exam prep).
+        content: `You are writing a professional instructional video script for the Prestige Elevation™ Barber Curriculum by Elevate for Humanity (Indiana State Board exam prep).
 
 Lesson: "${title}" — Module: "${moduleTitle}"
 ${nextTitle ? `Next lesson: "${nextTitle}"` : ''}
@@ -156,15 +156,58 @@ Produce a 5-segment lesson script. Return JSON only, no markdown:
   return JSON.parse(cleaned).slides as Slide[];
 }
 
-async function generateAudio(text: string, outPath: string): Promise<number> {
-  const resp = await openai.audio.speech.create({
-    model: 'tts-1-hd',
-    voice: 'onyx',
-    input: text.slice(0, 4096),
-    speed: 0.85,
-    response_format: 'mp3',
+
+async function generateAudioEdge(text: string, outPath: string): Promise<void> {
+  const edgeBin = process.env.EDGE_TTS_BIN || '/home/ubuntu/.local/bin/edge-tts';
+  const voice = process.env.EDGE_TTS_VOICE || 'en-US-GuyNeural';
+  const tmpTxt = outPath.replace(/\.mp3$/, '.txt');
+  fs.writeFileSync(tmpTxt, text.slice(0, 5000), 'utf8');
+  execSync(
+    `${edgeBin} --voice ${voice} --file "${tmpTxt}" --write-media "${outPath}"`,
+    { stdio: 'pipe', maxBuffer: 10 * 1024 * 1024 },
+  );
+  try { fs.unlinkSync(tmpTxt); } catch {}
+}
+
+async function generateAudioEleven(text: string, outPath: string): Promise<void> {
+  const key = process.env.ELEVENLABS_API_KEY;
+  if (!key) throw new Error('ELEVENLABS_API_KEY not set');
+  const voiceId = process.env.ELEVENLABS_VOICE_ID || 'pNInz6obpgDQGcFmaJgB';
+  const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+    method: 'POST',
+    headers: {
+      'xi-api-key': key,
+      'Content-Type': 'application/json',
+      Accept: 'audio/mpeg',
+    },
+    body: JSON.stringify({
+      text: text.slice(0, 5000),
+      model_id: 'eleven_multilingual_v2',
+    }),
   });
-  fs.writeFileSync(outPath, Buffer.from(await resp.arrayBuffer()));
+  if (!res.ok) throw new Error(`ElevenLabs TTS failed (${res.status}): ${await res.text()}`);
+  fs.writeFileSync(outPath, Buffer.from(await res.arrayBuffer()));
+}
+
+async function generateAudio(text: string, outPath: string): Promise<number> {
+  try {
+    const resp = await openai.audio.speech.create({
+      model: 'tts-1-hd',
+      voice: 'onyx',
+      input: text.slice(0, 4096),
+      speed: 0.85,
+      response_format: 'mp3',
+    });
+    fs.writeFileSync(outPath, Buffer.from(await resp.arrayBuffer()));
+  } catch (err) {
+    console.warn('   OpenAI TTS unavailable:', (err as Error).message);
+    try {
+      await generateAudioEleven(text, outPath);
+    } catch (e2) {
+      console.warn('   ElevenLabs failed, using Edge TTS:', (e2 as Error).message);
+      await generateAudioEdge(text, outPath);
+    }
+  }
   try {
     const dur = execSync(
       `ffprobe -v error -show_entries format=duration -of csv=p=0 "${outPath}"`,
@@ -300,10 +343,34 @@ function assembleVideo(segmentPaths: string[], outPath: string): void {
 }
 
 async function main() {
-  if (!process.env.OPENAI_API_KEY) {
-    console.error('OPENAI_API_KEY not set.');
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith('https://')) {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://cuxzzpsyufcewtmicszk.supabase.co';
+  }
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    const { hydrateProcessEnv } = await import('../lib/secrets');
+    await hydrateProcessEnv();
+  }
+  if (!process.env.GROQ_API_KEY && !process.env.OPENAI_API_KEY) {
+    console.error('Set GROQ_API_KEY or OPENAI_API_KEY in platform_secrets.');
     process.exit(1);
   }
+  if (!process.env.GROQ_API_KEY && !process.env.ELEVENLABS_API_KEY) {
+    console.warn('No GROQ_API_KEY — OpenAI billing must be active for script+TTS.');
+  }
+  if (process.env.GROQ_API_KEY && !process.env.ELEVENLABS_API_KEY && !process.env.OPENAI_API_KEY) {
+    console.error('GROQ_API_KEY set but need ELEVENLABS_API_KEY when OpenAI billing is inactive.');
+    process.exit(1);
+  }
+  db = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } },
+  );
+  openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+  groqChat = new OpenAI({
+    apiKey: process.env.GROQ_API_KEY!,
+    baseURL: 'https://api.groq.com/openai/v1',
+  });
 
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
   if (!DRY_RUN) fs.mkdirSync(TEMP_DIR, { recursive: true });

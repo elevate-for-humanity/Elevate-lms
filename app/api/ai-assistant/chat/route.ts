@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { isAiDegradedError } from '@/lib/ai/degraded';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -126,13 +127,7 @@ export async function POST(req: NextRequest) {
       assistantMessage =
         aiResult.content || buildAssistantFallback(message);
     } catch (aiError) {
-      if (isAiDegradedError(aiError)) {
-        logger.warn('AI Assistant degraded; using guided fallback', {
-          error: aiError instanceof Error ? aiError.message : String(aiError),
-        });
-      } else {
-        logger.error('AI Assistant model unavailable; using guided fallback:', aiError);
-      }
+      logger.error('AI Assistant model unavailable; using guided fallback:', aiError);
       assistantMessage = buildAssistantFallback(message);
     }
 

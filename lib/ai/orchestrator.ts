@@ -28,6 +28,7 @@
  */
 
 import { aiChat, aiReason, isReasoningAvailable } from '@/lib/ai/ai-service';
+import { isAiDegradedError } from '@/lib/ai/degraded';
 import { logger } from '@/lib/logger';
 import type { ChatMessage } from '@/lib/ai/types';
 import { getRAGContext } from '@/lib/platform/rag';
@@ -411,23 +412,7 @@ export async function runAITask(input: AITaskInput): Promise<AITaskResult> {
 
     return taskResult;
   } catch (err) {
-    if (task === 'prospective_student_chat' && isAiDegradedError(err)) {
-      logger.warn('[ai-orchestrator] Public chat degraded; caller should use fallback', {
-        task,
-        error: err instanceof Error ? err.message : String(err),
-      });
-      return {
-        content: '',
-        provider: 'degraded',
-        task,
-      };
-    }
-
-    if (isAiDegradedError(err)) {
-      logger.warn('[ai-orchestrator] Task degraded', { task, err });
-    } else {
-      logger.error('[ai-orchestrator] Task failed', undefined, { task, err });
-    }
+    logger.error('[ai-orchestrator] Task failed', undefined, { task, err });
     throw err;
   }
 }

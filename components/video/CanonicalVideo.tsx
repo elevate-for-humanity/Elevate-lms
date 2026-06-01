@@ -60,7 +60,6 @@ type Props = {
 
 export default function CanonicalVideo({
   src,
-  srcMobile,
   poster,
   className,
   threshold = 0.1,
@@ -299,7 +298,7 @@ export default function CanonicalVideo({
   return (
     <video
       ref={ref}
-      src={src}
+      src={srcMobile ? undefined : src}
       className={`${className} transition-opacity duration-700 ${ended ? 'opacity-0' : ''}`}
       muted
       playsInline
@@ -310,6 +309,13 @@ export default function CanonicalVideo({
       onError={handleError}
       onStalled={handleStalled}
       onWaiting={handleStalled}
-    />
+    >
+      {srcMobile ? (
+        <>
+          <source src={srcMobile} media="(max-width: 767px)" type="video/mp4" />
+          <source src={src} type="video/mp4" />
+        </>
+      ) : null}
+    </video>
   );
 }

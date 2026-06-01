@@ -1,5 +1,5 @@
 import { logger } from '@/lib/logger';
-import { withResilience, breakers, CircuitOpenError, type CircuitBreaker } from '@/lib/resilience';
+import { withResilience, breakers } from '@/lib/resilience';
 import type {
   AIProvider,
   AIImageProvider,
@@ -31,6 +31,57 @@ const imageProviders: Record<string, () => AIImageProvider> = {
   azure: () => new AzureProvider(),
   stability: () => new StabilityProvider(),
 };
+
+const CHAT_PROVIDER_FALLBACK_ORDER: AIProviderName[] = ['openai', 'gemini', 'groq', 'azure'];
+
+function breakerForProvider(providerName: string): CircuitBreaker {
+  switch (providerName) {
+    case 'groq':
+      return breakers.groq;
+    case 'gemini':
+      return breakers.gemini;
+    default:
+      return breakers.openai;
+  }
+}
+
+/** Ordered list of configured chat providers (env preference first). */
+export function getChatProviderChain(preferred?: AIProviderName): AIProvider[] {
+  const envPreferred = (process.env.AI_PROVIDER || 'openai') as AIProviderName;
+  const head = preferred && preferred !== 'none' ? preferred : envPreferred;
+  const order = [head, ...CHAT_PROVIDER_FALLBACK_ORDER.filter((name) => name !== head)];
+
+  const seen = new Set<string>();
+  const chain: AIProvider[] = [];
+  for (const name of order) {
+    if (name === 'none' || seen.has(name)) continue;
+    seen.add(name);
+    const factory = chatProviders[name];
+    if (!factory) continue;
+    const provider = factory();
+    if (provider.isAvailable()) chain.push(provider);
+  }
+  return chain;
+}
+
+function isRetryableProviderError(err: unknown): boolean {
+  if (err instanceof CircuitOpenError) return false;
+  const msg = err instanceof Error ? err.message : String(err);
+  return !msg.includes('401') && !msg.includes('400') && !msg.includes('content_policy');
+}
+
+function shouldTryNextProvider(err: unknown): boolean {
+  if (err instanceof CircuitOpenError) return true;
+  const msg = err instanceof Error ? err.message : String(err);
+  return (
+    msg.includes('429') ||
+    msg.includes('503') ||
+    msg.includes('502') ||
+    msg.includes('timeout') ||
+    msg.includes('ECONNRESET') ||
+    msg.includes('fetch failed')
+  );
+}
 
 // -- Provider Resolution --
 // No singleton cache — process.env may be hydrated from the DB mid-request

@@ -281,6 +281,13 @@ export default function LessonPage() {
           order_index: clLesson.order_index,
         };
       }
+    } else {
+      const { data: clHydrate } = await supabase
+        .from('course_lessons')
+        .select('slug, video_url')
+        .eq('id', lessonId)
+        .maybeSingle();
+      lessonData = mergeCourseLessonFields(lessonData, clHydrate);
     }
 
     let { data: lessonsData } = await supabase

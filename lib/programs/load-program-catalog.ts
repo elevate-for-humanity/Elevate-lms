@@ -272,7 +272,7 @@ export async function loadProgramCatalog(
  */
 export async function loadPublishedProgramsListing(
   client: SupabaseClient,
-  options?: { suppressSlugs?: Set<string> },
+  options?: { suppressSlugs?: Set<string>; suppressFallbackWarning?: boolean },
 ): Promise<{
   programs: ProgramsListingItem[];
   error?: string;
@@ -293,10 +293,12 @@ export async function loadPublishedProgramsListing(
     return { programs: dbPrograms, error: error?.message, source: 'database' };
   }
 
-  logger.warn(
-    '[loadPublishedProgramsListing] DB returned 0 published programs — using static catalog fallback',
-    error ? { dbError: error.message } : undefined,
-  );
+  if (!options?.suppressFallbackWarning) {
+    logger.warn(
+      '[loadPublishedProgramsListing] DB returned 0 published programs — using static catalog fallback',
+      error ? { dbError: error.message } : undefined,
+    );
+  }
 
   return {
     programs: listingFromStaticCatalog(suppressed),

@@ -1,7 +1,7 @@
 'use server';
 
 import { logger } from '@/lib/logger';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/server';
 import { headers } from 'next/headers';
 
 interface SecurityEvent {
@@ -16,6 +16,10 @@ import { getSeverity, CRITICAL_EVENTS } from '@/lib/security-utils';
 
 export async function logSecurityEventAction(event: SecurityEvent): Promise<void> {
   try {
+    if (!isSupabaseConfigured()) {
+      return;
+    }
+
     const headersList = await headers();
     const ip =
       headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ??

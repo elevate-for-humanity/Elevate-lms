@@ -4,7 +4,7 @@
  */
 
 import type { Metadata } from 'next';
-import { createPublicClient } from '@/lib/supabase/public';
+import { createPublicClient, isPublicSupabaseConfigured } from '@/lib/supabase/public';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { buildSiteMetadata } from '@/lib/seo/build-site-metadata';
 import { SITE_STATS } from '@/lib/site-stats';
@@ -84,6 +84,7 @@ export async function getPublicProgramsPageData(): Promise<PublicProgramsPageDat
   const db = createPublicClient();
   const { programs: listing, source } = await loadPublishedProgramsListing(db, {
     suppressSlugs: PROGRAMS_PAGE_SUPPRESSED_SLUGS,
+    suppressFallbackWarning: !isPublicSupabaseConfigured(),
   });
 
   const programs = mapListingToRows(listing);

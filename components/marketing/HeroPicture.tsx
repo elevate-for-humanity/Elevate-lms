@@ -179,7 +179,7 @@ export default function HeroPicture({
               onClick={() => setTranscriptOpen((o) => !o)}
               aria-expanded={transcriptOpen}
               aria-controls={transcriptId}
-              className="flex items-center gap-2 text-slate-500 text-xs font-semibold hover:text-slate-700 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-red-500 rounded"
+              className="flex items-center gap-2 rounded text-xs font-semibold text-slate-500 transition-colors hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red-500 focus-visible:ring-offset-2"
             >
               <span>{transcriptOpen ? '▲' : '▼'}</span>
               Image transcript

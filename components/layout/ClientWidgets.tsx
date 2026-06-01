@@ -61,6 +61,11 @@ const Toaster = dynamic(() => import('react-hot-toast').then((m) => m.Toaster), 
   loading: () => null,
 });
 
+const SearchDialog = dynamic(
+  () => import('@/components/SearchDialog').then((mod) => ({ default: mod.SearchDialog })),
+  { ssr: false, loading: () => null },
+);
+
 // Avatar is now added to each page individually via PageAvatar component
 // This ensures proper positioning under hero banners
 
@@ -84,6 +89,17 @@ export default function ClientWidgets() {
     pathname?.startsWith('/profile') ||
     pathname?.startsWith('/settings') ||
     pathname?.startsWith('/notifications');
+
+  const showSecurityMonitor =
+    showBottomNav ||
+    pathname?.startsWith('/admin') ||
+    pathname?.startsWith('/instructor') ||
+    pathname?.startsWith('/learner') ||
+    pathname?.startsWith('/employer') ||
+    pathname?.startsWith('/partner') ||
+    pathname?.startsWith('/program-holder') ||
+    pathname?.startsWith('/staff-portal') ||
+    pathname?.startsWith('/mentor');
 
   useEffect(() => {
     // Load deferred widgets after 4 seconds — keeps initial paint fast
@@ -122,7 +138,7 @@ export default function ClientWidgets() {
       {showDeferredWidgets && (
         <>
           <SearchDialog />
-          <SecurityMonitor />
+          {showSecurityMonitor && <SecurityMonitor />}
           <OfflineIndicator />
         </>
       )}

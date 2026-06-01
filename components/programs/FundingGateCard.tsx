@@ -51,6 +51,7 @@ export default function FundingGateCard({
   description,
   enrollHref,
   inquiryHref,
+  routeFundedToEnrollment = false,
   accentColor = 'brand-red',
 }: Props) {
   const router = useRouter();

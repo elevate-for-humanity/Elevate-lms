@@ -24,7 +24,7 @@ export default function BarberEligibilityPage() {
         microLabel="Barber Apprenticeship"
         analyticsName="barber-eligibility"
         belowHeroHeadline="Funding & Enrollment"
-        belowHeroSubheadline="The Barber Apprenticeship is not on Indiana's ETPL — it does not qualify for WIOA or Workforce Ready Grant. FSSA IMPACT (SNAP/TANF), employer sponsorship, and self-pay are all available."
+        belowHeroSubheadline="Indiana residents may qualify for WIOA, Workforce Ready Grant, or FSSA IMPACT. Employer sponsorship and self-pay with flexible weekly payments are also available."
         ctas={[
           {
             label: '← Back to Program',

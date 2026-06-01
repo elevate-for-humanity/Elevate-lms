@@ -815,13 +815,6 @@ The hook attempts unmuted play and falls back silently. No mute button shown.
   SKIP_ENV_VALIDATION=true
   ```
 
-### Barber apprenticeship apply URLs
-
-- **Apprentice enrollment form:** `/programs/barber-apprenticeship/apply/apprentice` (canonical)
-- **Apply chooser (apprentice vs partner shop):** `/programs/barber-apprenticeship/apply`
-- Legacy `/programs/barber-apprenticeship/apply?type=apprentice` and `?payment=*` redirect to `/apply/apprentice` with query preserved
-- `/apply/barber` redirects to apprentice apply (not partner shop)
-
 ### Running services
 
 | Service | Command | Port |
@@ -860,4 +853,6 @@ Precedence at runtime: `platform_secrets > app_secrets > process.env`
 **AI Console vs Dev Studio Command tab:** both use `/api/devstudio/execute` — AI Console is the standalone page, Dev Studio embeds the same in an IDE-like shell. Not a conflict.
 
 **Dev Studio AI Chat** (`/api/devstudio/chat`) uses Groq/Gemini with tool calling for platform operations. This is separate from `lib/ai/ai-service.ts` (`aiChat()`) which is for course content generation.
+
+**Barber apprentice apply:** RTI is branded **Prestige Elevation Barber Curriculum** (`lib/barber/branding.ts`). WIOA/WRG/FSSA funding uses `FundingEligibilityFlow` with `program="barber"` on `ApprenticeForm`; funded applicants skip Stripe (`?funded=1` on success). Apply index uses `FundingGateCard` with `routeFundedToEnrollment` so WIOA/WRG go to `/apply/apprentice?funding=…`.
 

@@ -32,9 +32,13 @@ export type FundingType = 'wioa' | 'wrg' | 'fssa';
 
 export type EligibilityStatus = 'approved' | 'in_process' | 'needs_appointment' | 'not_resident';
 
+export type FundingEligibilityProgram = 'hvac' | 'barber';
+
 interface Props {
   fundingType: FundingType;
   onReady: (status: EligibilityStatus) => void;
+  /** ICC search label and WRG/FSSA copy (default: HVAC) */
+  program?: FundingEligibilityProgram;
 }
 
 const CFG = {

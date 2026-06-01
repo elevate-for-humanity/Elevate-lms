@@ -273,13 +273,13 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   enrollmentType: 'internal',
   partnerCourses: [
     {
-      courseId: 'milady-barbering',
-      label: 'Milady Standard Barbering',
-      partnerName: 'Milady/Cengage',
-      credentialIssued: 'Barbering Certificate',
+      courseId: 'prestige-elevation-barber-curriculum',
+      label: 'Prestige Elevation Barber Curriculum',
+      partnerName: 'Elevate for Humanity',
+      credentialIssued: 'RTI completion (500 hours)',
       duration: '500 hours RTI',
       required: true,
-      enrollmentUrl: 'https://www.milady.com/barbering',
+      enrollmentUrl: '/lms/courses/3fb5ce19-1cde-434c-a8c6-f138d7d7aa17',
     },
   ],
   microCourses: [

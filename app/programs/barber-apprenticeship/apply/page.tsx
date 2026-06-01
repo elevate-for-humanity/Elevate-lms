@@ -14,42 +14,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/programs/barber-apprenticeship/apply' },
 };
 
-type SearchParams = Record<string, string | string[] | undefined>;
-
-function shouldRouteToApprenticeForm(searchParams: SearchParams): boolean {
-  return APPRENTICE_APPLY_QUERY_KEYS.some((key) => {
-    const value = searchParams[key];
-    if (value == null) return false;
-    if (key === 'type') {
-      const v = Array.isArray(value) ? value[0] : value;
-      return v === 'apprentice';
-    }
-    return String(Array.isArray(value) ? value[0] : value).trim() !== '';
-  });
-}
-
-function apprenticeApplyUrl(searchParams: SearchParams): string {
-  const qs = new URLSearchParams();
-  for (const [key, raw] of Object.entries(searchParams)) {
-    if (raw == null) continue;
-    const val = Array.isArray(raw) ? raw[0] : raw;
-    if (val) qs.set(key, val);
-  }
-  const query = qs.toString();
-  return query
-    ? `/programs/barber-apprenticeship/apply/apprentice?${query}`
-    : '/programs/barber-apprenticeship/apply/apprentice';
-}
-
-export default function BarberApplyIndexPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
-  if (shouldRouteToApprenticeForm(searchParams)) {
-    redirect(apprenticeApplyUrl(searchParams));
-  }
-
+export default function BarberApplyIndexPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
@@ -96,6 +61,7 @@ export default function BarberApplyIndexPage({
             description="I want to enroll in the barber apprenticeship program as a student."
             enrollHref="/programs/barber-apprenticeship/apply/apprentice"
             inquiryHref="/programs/barber-apprenticeship/request-info"
+            routeFundedToEnrollment
             accentColor="brand-red"
           />
 

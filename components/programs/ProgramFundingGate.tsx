@@ -4,7 +4,9 @@
  * ProgramFundingGate
  *
  * Pre-selection questionnaire shown before a learner picks a funding path.
- * Handles programs that are NOT WIOA/WRG eligible (e.g. barber, cosmetology,
+ * Handles programs with mixed funding (e.g. cosmetology, esthetician) or routes
+ * barber WIOA/WRG to the apprentice application when `routeFundedToEnrollment` is set.
+ * Legacy: programs that are NOT WIOA/WRG eligible (e.g. nail
  * esthetician, nail) — routes to FSSA/IMPACT, employer-paid, or self-pay.
  *
  * Flow:

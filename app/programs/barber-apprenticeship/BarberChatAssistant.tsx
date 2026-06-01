@@ -22,7 +22,7 @@ const BARBER_FAQ: Record<string, string> = {
   // Program basics
   'hours': `The Barber Apprenticeship requires **2,000 hours** of training:
 • On-the-job training (OJT) at a licensed barbershop
-• Related instruction (Milady theory curriculum)
+• Related instruction (Prestige Elevation Barber Curriculum on Elevate LMS)
 
 At 40 hours/week, this takes about 50 weeks (12-15 months).
 At 30 hours/week, it takes about 67 weeks (15-18 months).`,
@@ -165,7 +165,7 @@ export default function BarberChatAssistant() {
       if (data.error) {
         setMessages(prev => [...prev, {
           role: 'assistant',
-          content: `I'm not sure about that. For specific questions, please contact us at ${PLATFORM_DEFAULTS.supportPhone} or email our contact form.`,
+          content: "I'm not sure about that. For specific questions, please contact us at ${PLATFORM_DEFAULTS.supportPhone} or email our contact form.",
         }]);
       } else {
         setMessages(prev => [...prev, {
@@ -176,7 +176,7 @@ export default function BarberChatAssistant() {
     } catch {
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: `I'm having trouble connecting. Please try again or contact us at ${PLATFORM_DEFAULTS.supportPhone}.`,
+        content: "I'm having trouble connecting. Please try again or contact us at ${PLATFORM_DEFAULTS.supportPhone}.",
       }]);
     } finally {
       setIsLoading(false);

@@ -1,6 +1,7 @@
 'use client';
 
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
+import { mapApplyFundingParam } from '@/lib/barber/apply-funding';
 import ApprenticeForm from './ApprenticeForm';
 
 // Reads ?payment=, ?reason=, ?email=, ?name=, ?application_id= from the URL.

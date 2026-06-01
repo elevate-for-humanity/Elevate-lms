@@ -259,9 +259,9 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   paymentTerms: '$4,980. Payment plans available.',
 
   // ─── Content model ──────────────────────────────────────────────
-  deliveryModel: 'partner',
+  deliveryModel: 'internal',
   deliveryModelDetail: 'hybrid',
-  partnerProvider: 'milady',
+  partnerProvider: 'elevate-lms',
   fundingOptions: ['impact', 'employer_paid', 'self_pay'],
   funding: {
     fssa_eligible: true,

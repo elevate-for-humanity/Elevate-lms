@@ -208,7 +208,7 @@ export default function BarberOrientationClient({ payment }: { payment: BarberPa
                   <Play className="w-7 h-7 text-white fill-white ml-1" />
                 </div>
                 <span className="text-white font-semibold text-sm">Watch your orientation video</span>
-                <span className="text-slate-300 text-xs">Covers: program overview · clocking in/out · Milady · payment terms</span>
+                <span className="text-slate-300 text-xs">Covers: program overview · clocking in/out · RTI on Elevate LMS · payment terms</span>
               </button>
             )}
           </div>

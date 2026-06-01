@@ -274,7 +274,7 @@ export default function MOUPage() {
           <ul>
             <li>Provide structured on-the-job training opportunities</li>
             <li>Allow apprentice to practice and develop required competencies</li>
-            <li>Support apprentice completion of Milady RISE coursework</li>
+            <li>Support apprentice completion of Elevate LMS RTI lessons and checkpoints</li>
           </ul>
           <h3>Hour Verification</h3>
           <ul>

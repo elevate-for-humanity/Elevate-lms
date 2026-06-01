@@ -206,7 +206,7 @@ function EnrollConfirmationContent() {
                 <Lock className="w-5 h-5 text-slate-500" />
               </div>
               <div>
-                <p className="font-medium text-slate-700">Training Materials (Milady)</p>
+                <p className="font-medium text-slate-700">Training Materials (Elevate LMS)</p>
                 <p className="text-sm text-slate-500">Unlocks after approval + agreement</p>
               </div>
             </div>

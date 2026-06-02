@@ -14,7 +14,7 @@
  *   Admin → admin.elevateforhumanity.org
  */
 
-import { nfFetch, projectApiPath, resolveProjectId, resolveLmsServiceId, resolveAdminServiceId } from './lib';
+import { nfFetch, projectApiPath, resolveProjectId, resolveLmsServiceId, resolveAdminServiceId, resolveTeamId } from './lib';
 
 type Port = {
   id: string;
@@ -28,6 +28,46 @@ type Port = {
 
 const LMS_DOMAINS = ['www.elevateforhumanity.org', 'elevateforhumanity.org'];
 const ADMIN_DOMAINS = ['admin.elevateforhumanity.org'];
+
+
+import { resolveTeamId } from './lib';
+
+async function getSubdomainCname(domain: string): Promise<{ verified: boolean; content?: string }> {
+  const teamId = resolveTeamId();
+  if (!teamId) return { verified: false };
+  try {
+    const row = await nfFetch<{ verified?: boolean; content?: string }>(
+      `/teams/${teamId}/domains/${encodeURIComponent(domain)}/subdomains/@`,
+    );
+    return { verified: !!row.verified, content: row.content };
+  } catch {
+    return { verified: false };
+  }
+}
+
+async function assignDomainToService(domain: string, projectId: string, serviceId: string, dryRun: boolean) {
+  const { verified, content } = await getSubdomainCname(domain);
+  console.log(`\nDomain ${domain} → service ${serviceId}`);
+  console.log(`  CNAME target: ${content ?? '(see print-cname-targets.ts)'}`);
+  console.log(`  CNAME verified: ${verified}`);
+  if (!verified) {
+    console.warn('  Skip assign until CNAME points to Northflank (run print-cname-targets.ts).');
+    return;
+  }
+  if (dryRun) return;
+  const teamId = resolveTeamId();
+  const pathEnc = encodeURIComponent('/');
+  await nfFetch(
+    `/teams/${teamId}/domains/${encodeURIComponent(domain)}/subdomains/@/paths/${pathEnc}/assign`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        assignment: { project: projectId, service: serviceId, port: 'site' },
+      }),
+    },
+  );
+  console.log('  Assigned path / to port site.');
+}
 
 async function updateServiceDomains(
   projectId: string,
@@ -95,10 +135,13 @@ async function main() {
 
   console.log(dryRun ? '=== DRY RUN ===' : '=== EXECUTE ===');
 
-  await updateServiceDomains(projectId, lmsId, LMS_DOMAINS, dryRun);
-
+  for (const d of LMS_DOMAINS) {
+    await assignDomainToService(d, projectId, lmsId, dryRun);
+  }
   if (adminId) {
-    await updateServiceDomains(projectId, adminId, ADMIN_DOMAINS, dryRun);
+    for (const d of ADMIN_DOMAINS) {
+      await assignDomainToService(d, projectId, adminId, dryRun);
+    }
   } else {
     console.warn(
       '\nNo NORTHFLANK_ADMIN_SERVICE_ID — attaching admin hostname to LMS service (combined deploy).\n' +

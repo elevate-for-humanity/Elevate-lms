@@ -554,8 +554,7 @@ export async function middleware(request: NextRequest) {
 
   // Unknown-host fallback for the main marketing/LMS host.
   // Any other Host header that reaches this build (stale A records, raw
-  // app.elevateforhumanity.org subdomain, etc.) is force-redirected to www so
-  // traffic never gets served under the wrong host.
+  // *.elb.amazonaws.com, legacy subdomains, etc.) is redirected to apex.
   // app.elevateforhumanity.org — tenant portal entry point (query-param form).
   // e.g. app.elevateforhumanity.org/admin?org=elizabeth-greene
   if (hostWithoutPort === 'app.elevateforhumanity.org') {

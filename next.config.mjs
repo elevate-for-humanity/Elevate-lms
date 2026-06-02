@@ -355,6 +355,19 @@ const nextConfig = {
     }));
 
     return [
+      // Canonical host: apex only (no www in the address bar). Backup to proxy.ts.
+      {
+        source: '/',
+        has: [{ type: 'host', value: 'www.elevateforhumanity.org' }],
+        destination: 'https://elevateforhumanity.org/',
+        permanent: true,
+      },
+      {
+        source: '/:path+',
+        has: [{ type: 'host', value: 'www.elevateforhumanity.org' }],
+        destination: 'https://elevateforhumanity.org/:path+',
+        permanent: true,
+      },
       // NOTE: /sign-in and /signin redirects are handled in proxy.ts (middleware)
       // so they work on the live dev-build server. No next.config.mjs entries needed.
       // ============================================

@@ -832,7 +832,7 @@ The hook attempts unmuted play and falls back silently. No mute button shown.
 ### Production hostnames (Northflank / Durable)
 
 - **Canonical browser URLs:** `https://elevateforhumanity.org` and `https://admin.elevateforhumanity.org` (no `www`, no `.code.run`). `proxy.ts` 308-redirects `www` → apex.
-- **Durable DNS:** Apex row must CNAME to `elevateforhumanity.org.elev-5vfk.dns.northflank.app` (remove conflicting `@` A records). Admin → `admin.elevateforhumanity.org.elev-5vfk.dns.northflank.app`. After DNS propagates: `pnpm tsx scripts/northflank/register-domains.ts --verify` then `configure-domains.ts --execute`, then `sync-env.ts --execute` so Northflank env matches apex URLs.
+- **Durable DNS:** If Durable blocks the apex CNAME, use **A `@` → `20.232.216.67`** (Northflank LB; re-check with `dig +short elevateforhumanity.org.elev-5vfk.dns.northflank.app` if deploys fail). Admin CNAME → `admin.elevateforhumanity.org.elev-5vfk.dns.northflank.app`. After DNS: `register-domains.ts --verify`, `configure-domains.ts --execute`, `sync-env.ts --execute`, redeploy both services.
 
 ### Gotchas
 

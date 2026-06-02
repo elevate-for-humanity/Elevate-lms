@@ -48,7 +48,9 @@ async function assignDomainToService(domain: string, projectId: string, serviceI
   console.log(`  CNAME target: ${content ?? '(see print-cname-targets.ts)'}`);
   console.log(`  CNAME verified: ${verified}`);
   if (!verified) {
-    console.warn('  Skip assign until CNAME points to Northflank (run print-cname-targets.ts).');
+    console.warn(
+      '  CNAME not verified — path assign skipped. Use updateServiceDomains (A record apex is OK on Durable).',
+    );
     return;
   }
   if (dryRun) return;
@@ -135,6 +137,8 @@ async function main() {
   for (const d of LMS_DOMAINS) {
     await assignDomainToService(d, projectId, lmsId, dryRun);
   }
+  // Durable apex often uses an A record (no CNAME verify). Still attach hostnames on the port.
+  await updateServiceDomains(projectId, lmsId, LMS_DOMAINS, dryRun);
   if (adminId) {
     for (const d of ADMIN_DOMAINS) {
       await assignDomainToService(d, projectId, adminId, dryRun);

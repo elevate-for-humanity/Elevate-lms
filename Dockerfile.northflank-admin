@@ -27,6 +27,13 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_OPTIONS=--max-old-space-size=8192
 ENV BUILD_SCOPE=1
+# Required at `next build` (overridden by Northflank secret group / build args when set)
+ENV NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org
+ENV NEXT_PUBLIC_SITE_URL=https://admin.elevateforhumanity.org
+ENV NEXT_PUBLIC_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
+ENV NEXT_PUBLIC_SUPABASE_URL=https://cuxzzpsyufcewtmicszk.supabase.co
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=build-placeholder
+ENV SKIP_ENV_VALIDATION=true
 
 RUN cd apps/admin && pnpm exec next build
 

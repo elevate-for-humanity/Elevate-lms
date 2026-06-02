@@ -844,7 +844,7 @@ Full runbook: `docs/northflank-migration.md`. Automation: `scripts/northflank/`.
 - Project `elevate-platform`, service `elevate-lms`, HTTP port **8080** (set `PORT=8080` in secret group — not 3000).
 - `NORTHFLANK_API_TOKEN` must be in `.env.local` or Cursor secrets; run `audit.ts` then `sync-env.ts --execute`.
 - Domains: register with `register-domains.ts` (TXT at DNS), verify, then `configure-domains.ts --execute`. Domains cannot attach until verified.
-- Only one Northflank service today — no `NORTHFLANK_ADMIN_SERVICE_ID`; admin hostname attaches to LMS until a separate admin service is created.
+- Services: `elevate-lms` (main app) and `elevate-admin` (`Dockerfile.northflank-admin`, `SERVICE_ROLE=admin` on service runtime). Set `NORTHFLANK_ADMIN_SERVICE_ID=elevate-admin`.
 
 ### Admin dashboard architecture (Dev Studio, AI, Settings, Container)
 

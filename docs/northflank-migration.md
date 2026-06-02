@@ -8,11 +8,11 @@ Production is moving from AWS ECS (`elevate-lms-service` + `elevate-admin-servic
 |----------|-----------|
 | Team | `elevates-team` |
 | Project | `elevate-platform` |
-| Service | `elevate-lms` (combined build+deploy, port **8080**) |
-| Secret group | `elevate-production-env` (restricted to `elevate-lms`) |
-| Default URL | `site--elevate-lms--pknyktykz4wg.code.run` |
+| LMS service | `elevate-lms` (combined, port **8080**) → `site--elevate-lms--pknyktykz4wg.code.run` |
+| Admin service | `elevate-admin` (Docker `Dockerfile.northflank-admin`, port **8080**) → `site--elevate-admin--pknyktykz4wg.code.run` |
+| Secret group | `elevate-production-env` (restricted to **both** services) |
 
-There is **no separate admin service** yet. Until `elevate-admin` exists on Northflank, `admin.elevateforhumanity.org` can point at the same LMS service only if that image serves admin routes (today AWS uses `Dockerfile.admin` separately).
+Admin runtime sets `SERVICE_ROLE=admin` on the service (overrides shared secret `SERVICE_ROLE=lms`).
 
 ## Prerequisites
 
@@ -23,9 +23,16 @@ There is **no separate admin service** yet. Until `elevate-admin` exists on Nort
 export NORTHFLANK_TEAM_ID=elevates-team
 export NORTHFLANK_PROJECT_ID=elevate-platform
 export NORTHFLANK_LMS_SERVICE_ID=elevate-lms
-# optional when admin service exists:
-# export NORTHFLANK_ADMIN_SERVICE_ID=elevate-admin
+export NORTHFLANK_ADMIN_SERVICE_ID=elevate-admin
 ```
+
+## 0. Admin service (one-time)
+
+```bash
+pnpm tsx scripts/northflank/create-admin-service.ts --execute
+```
+
+Uses branch `NORTHFLANK_GIT_BRANCH` (default `cursor/northflank-setup-c4c6` until merged to `main`). Merge `Dockerfile.northflank-admin` to `main`, then set `NORTHFLANK_GIT_BRANCH=main` and redeploy.
 
 ## 1. Sync environment variables
 
@@ -49,7 +56,7 @@ Important runtime values:
 - `HOSTNAME=0.0.0.0`
 - All `NEXT_PUBLIC_*` build-time keys from `aws/buildspec-lms.yml` / manifest
 
-After sync, **redeploy** `elevate-lms` in the Northflank UI.
+After sync, **redeploy** `elevate-lms` and `elevate-admin` in the Northflank UI.
 
 ## 2. Register and verify domains
 
@@ -94,4 +101,5 @@ Northflank shows **CNAME targets** per port in the UI. Point DNS there after ver
 | `scripts/northflank/sync-env.ts` | Push env to `elevate-production-env` |
 | `scripts/northflank/register-domains.ts` | Register team domains + print TXT |
 | `scripts/northflank/configure-domains.ts` | Attach hostnames to HTTP port |
+| `scripts/northflank/create-admin-service.ts` | Create/update `elevate-admin` combined service |
 | `scripts/northflank/export-ssm-env.sh` | Export AWS SSM `/elevate/*` to JSON |

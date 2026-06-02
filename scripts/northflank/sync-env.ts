@@ -161,7 +161,7 @@ async function main() {
   }
 
   const lmsId = resolveLmsServiceId();
-  const adminId = resolveAdminServiceId();
+  const adminId = resolveAdminServiceId() || 'elevate-admin';
   const serviceIds = [lmsId, adminId].filter(Boolean) as string[];
 
   const groupId = await findOrCreateSecretGroup(projectId, secretId, serviceIds);

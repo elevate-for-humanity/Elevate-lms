@@ -1,6 +1,5 @@
-# Northflank / AWS env exports (contain secrets)
+# Northflank / AWS migration exports (secrets)
 exports/northflank-env.production.json
-exports/northflank-env.*.json
 
 # Environment variables
 .env

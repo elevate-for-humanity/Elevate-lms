@@ -859,7 +859,7 @@ Precedence at runtime: `platform_secrets > app_secrets > process.env`
 Production may run on [Northflank](https://app.northflank.com/t/elevates-team) (LMS + Admin) instead of ECS. Full guide: `docs/northflank-migration.md`.
 
 - **Secrets UI:** https://cursor.com/dashboard/cloud-agents — add `NORTHFLANK_API_TOKEN` and service IDs from `pnpm tsx scripts/northflank/audit.ts`
-- **Sync env from AWS SSM:** `bash scripts/northflank/export-ssm-env.sh` then `pnpm tsx scripts/northflank/sync-secrets.ts --execute`
+- **Sync env from AWS SSM:** `bash scripts/northflank/export-ssm-env.sh` then `pnpm tsx scripts/northflank/sync-env.ts --execute`
 - **Domains:** `pnpm tsx scripts/northflank/configure-domains.ts --execute` then point DNS CNAMEs in registrar
 - **Do not commit** `exports/northflank-env.production.json`
 

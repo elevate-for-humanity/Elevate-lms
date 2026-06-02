@@ -25,7 +25,7 @@ Northflank: project **secret group** `elevate-production-env` (environment type)
 # Requires AWS CLI credentials for account 954718262498
 bash scripts/northflank/export-ssm-env.sh exports/northflank-env.production.json
 
-pnpm tsx scripts/northflank/sync-secrets.ts --file exports/northflank-env.production.json --execute
+pnpm tsx scripts/northflank/sync-env.ts --file exports/northflank-env.production.json --execute
 ```
 
 Do **not** commit `exports/northflank-env.production.json`.
@@ -35,7 +35,7 @@ Do **not** commit `exports/northflank-env.production.json`.
 Add keys from `scripts/northflank/env-keys-manifest.txt` (64+ names) in [Cloud Agents secrets](https://cursor.com/dashboard/cloud-agents), then:
 
 ```bash
-pnpm tsx scripts/northflank/sync-secrets.ts --execute
+pnpm tsx scripts/northflank/sync-env.ts --execute
 ```
 
 The script merges manifest keys from `process.env` + production URL defaults.
@@ -55,7 +55,7 @@ Runtime still loads **`platform_secrets`** from Supabase over `process.env` when
 | Script | Purpose |
 |--------|---------|
 | `pnpm tsx scripts/northflank/audit.ts` | List project/service IDs, ports, domains |
-| `pnpm tsx scripts/northflank/sync-secrets.ts` | Push env vars to Northflank secret group |
+| `pnpm tsx scripts/northflank/sync-env.ts` | Push env vars to Northflank secret group |
 | `pnpm tsx scripts/northflank/configure-domains.ts` | Attach custom domains to HTTP ports |
 | `bash scripts/northflank/export-ssm-env.sh` | Dump SSM → JSON |
 

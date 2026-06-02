@@ -6,7 +6,7 @@
 #   bash scripts/northflank/export-ssm-env.sh exports/northflank-env.production.json
 #
 # Then upload via Northflank UI or:
-#   pnpm tsx scripts/northflank/sync-secrets.ts --file exports/northflank-env.production.json
+#   pnpm tsx scripts/northflank/sync-env.ts --file exports/northflank-env.production.json
 
 set -euo pipefail
 

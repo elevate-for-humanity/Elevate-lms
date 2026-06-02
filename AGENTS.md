@@ -854,11 +854,14 @@ Precedence at runtime: `platform_secrets > app_secrets > process.env`
 
 **Dev Studio AI Chat** (`/api/devstudio/chat`) uses Groq/Gemini with tool calling for platform operations. This is separate from `lib/ai/ai-service.ts` (`aiChat()`) which is for course content generation.
 
-### Stripe webhooks (production)
+### Northflank hosting (production migration)
 
-- **Canonical URL:** `https://www.elevateforhumanity.org/api/webhooks/stripe` — register in Stripe Dashboard (live), then set signing secret in SSM `/elevate/STRIPE_WEBHOOK_SECRET` on the **LMS** ECS task (`aws/ecs-task-lms.json`).
-- **Barber apprenticeship** events may also use `/api/barber/webhook` with `STRIPE_WEBHOOK_SECRET_BARBER` — keep both endpoints’ secrets in SSM if both are registered.
-- Handler tries all configured `STRIPE_WEBHOOK_SECRET*` env vars (`lib/stripe/construct-webhook-event.ts`) so a mismatched secondary endpoint secret does not cause repeated 400s.
-- After fixing SSM, redeploy LMS and **Enable** the endpoint in Stripe Dashboard. `GET /api/webhooks/stripe` returns `{ ok: true }` for smoke checks.
-- **Jordan / Natalia weekly billing (manual):** `POST /api/admin/stripe-apprentice-payments` (admin auth) or `pnpm tsx scripts/run-apprentice-stripe-billing.ts` with live `STRIPE_SECRET_KEY`. Defaults to customers `cus_UGFxoJKjtlNoy8` and `cus_UTVa6pmsYlWBsp`.
+Production may run on [Northflank](https://app.northflank.com/t/elevates-team) (LMS + Admin) instead of ECS. Full guide: `docs/northflank-migration.md`.
+
+- **Secrets UI:** https://cursor.com/dashboard/cloud-agents — add `NORTHFLANK_API_TOKEN` and service IDs from `pnpm tsx scripts/northflank/audit.ts`
+- **Sync env from AWS SSM:** `bash scripts/northflank/export-ssm-env.sh` then `pnpm tsx scripts/northflank/sync-secrets.ts --execute`
+- **Domains:** `pnpm tsx scripts/northflank/configure-domains.ts --execute` then point DNS CNAMEs in registrar
+- **Do not commit** `exports/northflank-env.production.json`
+
+After adding `NORTHFLANK_API_TOKEN` in Cursor secrets, **restart the cloud agent** so the token is injected into the shell.
 

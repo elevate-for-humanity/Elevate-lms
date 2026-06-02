@@ -1137,7 +1137,7 @@ const nextConfig = {
       process.env.CONTEXT === 'deploy-preview' || process.env.CONTEXT === 'branch-deploy';
     const host = process.env.URL || '';
 
-    // No special handling needed - single canonical domain: www.elevateforhumanity.org
+    // No special handling needed - single canonical domain: elevateforhumanity.org (www → apex in proxy.ts)
     const robotsHeaders = [];
 
     // Base security headers for all environments

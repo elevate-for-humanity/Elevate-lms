@@ -81,7 +81,7 @@ function adminServicePayload(serviceId: string, branch: string) {
       NEXT_TELEMETRY_DISABLED: '1',
       NEXT_PUBLIC_SITE_URL: 'https://admin.elevateforhumanity.org',
       NEXT_PUBLIC_ADMIN_URL: 'https://admin.elevateforhumanity.org',
-      NEXT_PUBLIC_PUBLIC_SITE_URL: 'https://www.elevateforhumanity.org',
+      NEXT_PUBLIC_PUBLIC_SITE_URL: 'https://elevateforhumanity.org',
     },
     healthChecks: [
       {

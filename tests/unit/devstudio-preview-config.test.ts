@@ -32,7 +32,7 @@ describe('resolvePublicSiteUrl', () => {
 
   it('does not treat admin NEXT_PUBLIC_SITE_URL as the public site', () => {
     process.env.NEXT_PUBLIC_SITE_URL = 'https://admin.elevateforhumanity.org';
-    expect(resolvePublicSiteUrl()).toBe('https://www.elevateforhumanity.org');
+    expect(resolvePublicSiteUrl()).toBe('https://elevateforhumanity.org');
   });
 });
 

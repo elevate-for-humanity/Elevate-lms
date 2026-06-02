@@ -194,7 +194,8 @@ test.describe('SEO Elements', () => {
     await page.goto('/');
 
     const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
-    expect(canonical).toContain('www.elevateforhumanity.org');
+    expect(canonical).toContain('elevateforhumanity.org');
+    expect(canonical).not.toContain('www.');
   });
 
   test('should have Open Graph tags', async ({ page }) => {

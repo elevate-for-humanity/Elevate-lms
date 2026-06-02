@@ -829,6 +829,11 @@ The hook attempts unmuted play and falls back silently. No mute button shown.
 - `pnpm typecheck` — TypeScript type check (requires `--max-old-space-size=8192`)
 - `pnpm build` — Full production build (requires `--max-old-space-size=6144`, 2600+ pages)
 
+### Production hostnames (Northflank / Durable)
+
+- **Canonical browser URLs:** `https://elevateforhumanity.org` and `https://admin.elevateforhumanity.org` (no `www`, no `.code.run`). `proxy.ts` 308-redirects `www` → apex.
+- **Durable DNS:** Apex row must CNAME to `elevateforhumanity.org.elev-5vfk.dns.northflank.app` (remove conflicting `@` A records). Admin → `admin.elevateforhumanity.org.elev-5vfk.dns.northflank.app`. After DNS propagates: `pnpm tsx scripts/northflank/register-domains.ts --verify` then `configure-domains.ts --execute`, then `sync-env.ts --execute` so Northflank env matches apex URLs.
+
 ### Gotchas
 
 - The `predev` script runs `scripts/setup-env-auto.sh` which will fail if `.env.local` doesn't exist. Create it first or set `SKIP_ENV_VALIDATION=true`.

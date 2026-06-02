@@ -47,7 +47,7 @@ export function resolvePublicSiteUrl(): string {
     }
   }
 
-  return 'https://www.elevateforhumanity.org';
+  return 'https://elevateforhumanity.org';
 }
 
 /** Canonical admin app origin. */

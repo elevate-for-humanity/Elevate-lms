@@ -10,7 +10,7 @@
  *   NORTHFLANK_LMS_SERVICE_ID, NORTHFLANK_ADMIN_SERVICE_ID
  *
  * Defaults:
- *   LMS  → www.elevateforhumanity.org (+ elevateforhumanity.org if second port exists)
+ *   LMS  → elevateforhumanity.org (apex) + www (redirects to apex in app)
  *   Admin → admin.elevateforhumanity.org
  */
 
@@ -26,11 +26,8 @@ type Port = {
   dns?: string;
 };
 
-const LMS_DOMAINS = ['www.elevateforhumanity.org', 'elevateforhumanity.org'];
+const LMS_DOMAINS = ['elevateforhumanity.org', 'www.elevateforhumanity.org'];
 const ADMIN_DOMAINS = ['admin.elevateforhumanity.org'];
-
-
-import { resolveTeamId } from './lib';
 
 async function getSubdomainCname(domain: string): Promise<{ verified: boolean; content?: string }> {
   const teamId = resolveTeamId();
@@ -153,9 +150,9 @@ async function main() {
   console.log(`
 --- DNS (at your registrar / Cloudflare) ---
 For each custom domain Northflank shows a CNAME target in the service → Ports UI.
-Point:
-  www.elevateforhumanity.org     → LMS service CNAME
-  elevateforhumanity.org         → LMS (apex: ALIAS/ANAME or redirect www)
+Point (browser should show apex, not www):
+  elevateforhumanity.org         → LMS apex CNAME (primary)
+  www.elevateforhumanity.org     → LMS www CNAME (app 308-redirects to apex)
   admin.elevateforhumanity.org   → Admin service CNAME
 
 After DNS propagates, TLS certificates provision automatically in Northflank.

@@ -86,9 +86,9 @@ async function main() {
   const lmsId = resolveLmsServiceId();
   const adminId = resolveAdminServiceId();
 
-  if (!projectId || !lmsId || !adminId) {
+  if (!projectId || !lmsId) {
     console.error(
-      'Set NORTHFLANK_PROJECT_ID, NORTHFLANK_LMS_SERVICE_ID, NORTHFLANK_ADMIN_SERVICE_ID\nRun: pnpm tsx scripts/northflank/audit.ts',
+      'Set NORTHFLANK_PROJECT_ID and NORTHFLANK_LMS_SERVICE_ID\nRun: pnpm tsx scripts/northflank/audit.ts',
     );
     process.exit(1);
   }
@@ -96,7 +96,16 @@ async function main() {
   console.log(dryRun ? '=== DRY RUN ===' : '=== EXECUTE ===');
 
   await updateServiceDomains(projectId, lmsId, LMS_DOMAINS, dryRun);
-  await updateServiceDomains(projectId, adminId, ADMIN_DOMAINS, dryRun);
+
+  if (adminId) {
+    await updateServiceDomains(projectId, adminId, ADMIN_DOMAINS, dryRun);
+  } else {
+    console.warn(
+      '\nNo NORTHFLANK_ADMIN_SERVICE_ID — attaching admin hostname to LMS service (combined deploy).\n' +
+        'Create a separate admin service later and move admin.elevateforhumanity.org to it.\n',
+    );
+    await updateServiceDomains(projectId, lmsId, ADMIN_DOMAINS, dryRun);
+  }
 
   console.log(`
 --- DNS (at your registrar / Cloudflare) ---

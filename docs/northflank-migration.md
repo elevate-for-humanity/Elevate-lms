@@ -1,100 +1,97 @@
-# Northflank production migration (from AWS ECS)
+# Northflank migration (Elevate LMS)
 
-Staging on Northflank is validated. Production cutover = **two services** (LMS + Admin), **env parity** with AWS SSM, **custom domains**, then DNS.
+Production is moving from AWS ECS (`elevate-lms-service` + `elevate-admin-service`) to **Northflank** project `elevate-platform`.
 
-## Services
+## Current Northflank layout
 
-| Service | Dockerfile | Build (CI / Northflank) | Domain |
-|---------|--------------|-------------------------|--------|
-| **LMS** | `Dockerfile.package` | `pnpm install --frozen-lockfile` → `pnpm run build:lms:phased` | `www.elevateforhumanity.org` |
-| **Admin** | `Dockerfile.admin` | `cd apps/admin && NODE_OPTIONS='--max-old-space-size=8192' pnpm build` | `admin.elevateforhumanity.org` |
+| Resource | ID / name |
+|----------|-----------|
+| Team | `elevates-team` |
+| Project | `elevate-platform` |
+| Service | `elevate-lms` (combined build+deploy, port **8080**) |
+| Secret group | `elevate-production-env` (restricted to `elevate-lms`) |
+| Default URL | `site--elevate-lms--pknyktykz4wg.code.run` |
 
-Runtime: port **3000**, health check **`GET /api/health`**, command `node server.js` (LMS) / `node apps/admin/server.js` (Admin).
+There is **no separate admin service** yet. Until `elevate-admin` exists on Northflank, `admin.elevateforhumanity.org` can point at the same LMS service only if that image serves admin routes (today AWS uses `Dockerfile.admin` separately).
 
-Recommended plan size: **≥ 4 vCPU / 8–16 GB RAM** per service (match or beat what worked in staging).
+## Prerequisites
 
-## Secrets (migrate from AWS)
-
-AWS today: SSM path `/elevate/*` + ECS task `secrets` (see `aws/ecs-task-lms.json`, `aws/buildspec-lms.yml`).
-
-Northflank: project **secret group** `elevate-production-env` (environment type), attached to LMS + Admin services.
-
-### Option A — Export SSM (complete)
+1. `NORTHFLANK_API_TOKEN` in `.env.local` or Cursor Cloud secrets (exact name).
+2. Node 20 + pnpm: `corepack enable && pnpm install`.
 
 ```bash
-# Requires AWS CLI credentials for account 954718262498
-bash scripts/northflank/export-ssm-env.sh exports/northflank-env.production.json
-
-pnpm tsx scripts/northflank/sync-env.ts --file exports/northflank-env.production.json --execute
+export NORTHFLANK_TEAM_ID=elevates-team
+export NORTHFLANK_PROJECT_ID=elevate-platform
+export NORTHFLANK_LMS_SERVICE_ID=elevate-lms
+# optional when admin service exists:
+# export NORTHFLANK_ADMIN_SERVICE_ID=elevate-admin
 ```
 
-Do **not** commit `exports/northflank-env.production.json`.
-
-### Option B — Cursor Cloud secrets + sync script
-
-Add keys from `scripts/northflank/env-keys-manifest.txt` (64+ names) in [Cloud Agents secrets](https://cursor.com/dashboard/cloud-agents), then:
+## 1. Sync environment variables
 
 ```bash
+set -a && source .env.local && set +a
+pnpm tsx scripts/northflank/audit.ts
+pnpm tsx scripts/northflank/sync-env.ts --dry-run
 pnpm tsx scripts/northflank/sync-env.ts --execute
 ```
 
-The script merges manifest keys from `process.env` + production URL defaults.
+**Full parity with AWS SSM** (recommended before cutover):
 
-### Minimum required (same as `scripts/validate-env.js`)
+```bash
+bash scripts/northflank/export-ssm-env.sh > exports/northflank-env.production.json
+pnpm tsx scripts/northflank/sync-env.ts --file exports/northflank-env.production.json --execute
+```
 
-- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
-- `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_ADMIN_URL`, `NEXTAUTH_SECRET`
-- `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `SENDGRID_API_KEY`
-- `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
-- `CRON_SECRET`, `OPENAI_API_KEY` or `GROQ_API_KEY`
+Important runtime values:
 
-Runtime still loads **`platform_secrets`** from Supabase over `process.env` when set in Dev Studio.
+- `PORT=8080` (Northflank public port — not 3000)
+- `HOSTNAME=0.0.0.0`
+- All `NEXT_PUBLIC_*` build-time keys from `aws/buildspec-lms.yml` / manifest
 
-## Automation scripts
+After sync, **redeploy** `elevate-lms` in the Northflank UI.
+
+## 2. Register and verify domains
+
+Domains must exist on the **team** before they can attach to a service port.
+
+```bash
+pnpm tsx scripts/northflank/register-domains.ts
+# Add TXT records at DNS provider, then:
+pnpm tsx scripts/northflank/register-domains.ts --verify
+```
+
+Targets:
+
+- `elevateforhumanity.org` (apex — requires CNAME flattening / ALIAS at DNS)
+- `www.elevateforhumanity.org`
+- `admin.elevateforhumanity.org`
+
+## 3. Attach domains to the service port
+
+```bash
+pnpm tsx scripts/northflank/configure-domains.ts --dry-run
+pnpm tsx scripts/northflank/configure-domains.ts --execute
+```
+
+Northflank shows **CNAME targets** per port in the UI. Point DNS there after verification.
+
+## 4. Cutover checklist
+
+- [ ] Secret group has production keys (not `dev-secret` placeholders)
+- [ ] Domains verified + TLS active on Northflank
+- [ ] DNS CNAMEs updated (www, admin, apex)
+- [ ] Stripe webhook URLs → Northflank hostnames
+- [ ] Cron / external callbacks updated
+- [ ] Smoke: login, LMS lesson, admin dashboard, webhooks
+- [ ] Decommission ECS after stable window
+
+## Scripts
 
 | Script | Purpose |
 |--------|---------|
-| `pnpm tsx scripts/northflank/audit.ts` | List project/service IDs, ports, domains |
-| `pnpm tsx scripts/northflank/sync-env.ts` | Push env vars to Northflank secret group |
-| `pnpm tsx scripts/northflank/configure-domains.ts` | Attach custom domains to HTTP ports |
-| `bash scripts/northflank/export-ssm-env.sh` | Dump SSM → JSON |
-
-### Cursor / agent env for automation
-
-```
-NORTHFLANK_API_TOKEN=...
-NORTHFLANK_TEAM_ID=elevates-team
-NORTHFLANK_PROJECT_ID=...        # from audit.ts
-NORTHFLANK_LMS_SERVICE_ID=...
-NORTHFLANK_ADMIN_SERVICE_ID=...
-```
-
-Restart the cloud agent after adding secrets.
-
-## Custom domains
-
-1. Run `pnpm tsx scripts/northflank/configure-domains.ts --execute` (or set domains in Northflank UI → Service → Ports).
-2. Copy each **CNAME target** from Northflank.
-3. DNS:
-   - `www` → LMS CNAME
-   - `admin` → Admin CNAME
-   - Apex `elevateforhumanity.org` → redirect to `www` or ALIAS to Northflank (registrar-dependent)
-4. Wait for TLS (Let’s Encrypt via Northflank).
-
-## Cutover checklist
-
-- [ ] Env secret group synced; redeploy LMS + Admin
-- [ ] Health checks green on `*.code.run` URLs
-- [ ] Custom domains + TLS active
-- [ ] Stripe webhooks → production Northflank URLs
-- [ ] Cron / external integrations updated
-- [ ] Smoke: login, enrollment, email, payment test mode
-- [ ] DNS cutover (low TTL)
-- [ ] Keep AWS ECS scaled down 3–7 days for rollback
-
-## Decommission AWS (after stable)
-
-- ECS services `elevate-lms-service`, admin service
-- CodeBuild projects `elevate-lms-build`, admin build
-- ALB rules (if only used for Elevate)
-- SSM can remain as backup until Northflank is proven
+| `scripts/northflank/audit.ts` | List projects, services, secrets, ports |
+| `scripts/northflank/sync-env.ts` | Push env to `elevate-production-env` |
+| `scripts/northflank/register-domains.ts` | Register team domains + print TXT |
+| `scripts/northflank/configure-domains.ts` | Attach hostnames to HTTP port |
+| `scripts/northflank/export-ssm-env.sh` | Export AWS SSM `/elevate/*` to JSON |

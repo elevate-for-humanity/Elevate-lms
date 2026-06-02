@@ -28,7 +28,7 @@ const MANIFEST = join(__dir, 'env-keys-manifest.txt');
 const STATIC_ENV: Record<string, string> = {
   NODE_ENV: 'production',
   HOSTNAME: '0.0.0.0',
-  PORT: '3000',
+  PORT: '8080',
   NEXT_TELEMETRY_DISABLED: '1',
   SUPABASE_PROJECT_REF: 'cuxzzpsyufcewtmicszk',
   PUPPETEER_EXECUTABLE_PATH: '/usr/bin/chromium',
@@ -101,7 +101,7 @@ async function findOrCreateSecretGroup(
   await nfFetch(projectApiPath(projectId, '/secrets'), {
     method: 'POST',
     body: JSON.stringify({
-      id: secretId,
+      name: secretId,
       description: 'Elevate production env (migrated from AWS SSM / ECS)',
       priority: 10,
       type: 'secret',
@@ -166,13 +166,24 @@ async function main() {
 
   const groupId = await findOrCreateSecretGroup(projectId, secretId, serviceIds);
 
+  const restrictions =
+    serviceIds.length > 0
+      ? {
+          restricted: true,
+          nfObjects: serviceIds.map((id) => ({ id, type: 'service' as const })),
+          tagMatchCondition: 'or' as const,
+        }
+      : { restricted: false };
+
   await nfFetch(projectApiPath(projectId, `/secrets/${groupId}`), {
     method: 'POST',
     body: JSON.stringify({
+      name: groupId,
       description: 'Elevate production env (synced from AWS/Cursor)',
       priority: 10,
       type: 'secret',
       secretType: 'environment',
+      restrictions,
       secrets: { variables },
     }),
   });

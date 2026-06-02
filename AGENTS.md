@@ -837,6 +837,15 @@ The hook attempts unmuted play and falls back silently. No mute button shown.
 - `pnpm approve-builds` is interactive — do not run in CI/agent. Build dependencies are already allowlisted in `pnpm.onlyBuiltDependencies`.
 - The admin app shares `lib/`, `components/`, and `data/` with the root via tsconfig path aliases (`@/*` → `../../*`).
 
+### Northflank production (migration from ECS)
+
+Full runbook: `docs/northflank-migration.md`. Automation: `scripts/northflank/`.
+
+- Project `elevate-platform`, service `elevate-lms`, HTTP port **8080** (set `PORT=8080` in secret group — not 3000).
+- `NORTHFLANK_API_TOKEN` must be in `.env.local` or Cursor secrets; run `audit.ts` then `sync-env.ts --execute`.
+- Domains: register with `register-domains.ts` (TXT at DNS), verify, then `configure-domains.ts --execute`. Domains cannot attach until verified.
+- Only one Northflank service today — no `NORTHFLANK_ADMIN_SERVICE_ID`; admin hostname attaches to LMS until a separate admin service is created.
+
 ### Admin dashboard architecture (Dev Studio, AI, Settings, Container)
 
 Four configuration stores exist — they are **intentionally separate** and do NOT overlap:
@@ -853,15 +862,4 @@ Precedence at runtime: `platform_secrets > app_secrets > process.env`
 **AI Console vs Dev Studio Command tab:** both use `/api/devstudio/execute` — AI Console is the standalone page, Dev Studio embeds the same in an IDE-like shell. Not a conflict.
 
 **Dev Studio AI Chat** (`/api/devstudio/chat`) uses Groq/Gemini with tool calling for platform operations. This is separate from `lib/ai/ai-service.ts` (`aiChat()`) which is for course content generation.
-
-### Northflank hosting (production migration)
-
-Production may run on [Northflank](https://app.northflank.com/t/elevates-team) (LMS + Admin) instead of ECS. Full guide: `docs/northflank-migration.md`.
-
-- **Secrets UI:** https://cursor.com/dashboard/cloud-agents — add `NORTHFLANK_API_TOKEN` and service IDs from `pnpm tsx scripts/northflank/audit.ts`
-- **Sync env from AWS SSM:** `bash scripts/northflank/export-ssm-env.sh` then `pnpm tsx scripts/northflank/sync-env.ts --execute`
-- **Domains:** `pnpm tsx scripts/northflank/configure-domains.ts --execute` then point DNS CNAMEs in registrar
-- **Do not commit** `exports/northflank-env.production.json`
-
-After adding `NORTHFLANK_API_TOKEN` in Cursor secrets, **restart the cloud agent** so the token is injected into the shell.
 

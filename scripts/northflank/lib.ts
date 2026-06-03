@@ -74,3 +74,8 @@ export function projectApiPath(projectId: string, suffix: string): string {
   }
   return `/projects/${projectId}${suffix}`;
 }
+
+/** PATCH/GET combined CI/CD service (elevate-lms, elevate-admin). */
+export function combinedServicePath(projectId: string, serviceId: string): string {
+  return projectApiPath(projectId, `/services/combined/${serviceId}`);
+}

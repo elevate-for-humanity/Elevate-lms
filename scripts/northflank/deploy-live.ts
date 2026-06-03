@@ -6,10 +6,10 @@
  *   DEPLOY_BRANCH=cursor/fix-header-mobile-desktop-c4c6 pnpm tsx scripts/northflank/deploy-live.ts --execute
  */
 
-import { nfFetch, projectApiPath, resolveProjectId } from './lib';
+import { combinedServicePath, nfFetch, projectApiPath, resolveProjectId } from './lib';
 
 async function setBranch(projectId: string, serviceId: string, branch: string) {
-  await nfFetch(projectApiPath(projectId, `/services/${serviceId}`), {
+  await nfFetch(combinedServicePath(projectId, serviceId), {
     method: 'PATCH',
     body: JSON.stringify({ vcsData: { projectBranch: branch } }),
   });

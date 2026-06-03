@@ -32,7 +32,7 @@ const LEARNER_CAPABILITIES = [
 export function HomeApprenticeshipInfra() {
   return (
     <section
-      className="bg-slate-50 py-16 px-4 border-t border-slate-100"
+      className="bg-slate-50 py-12 sm:py-14 lg:py-12 px-4 border-t border-slate-100"
       aria-labelledby="apprenticeship-heading"
     >
       <div className="max-w-6xl mx-auto">
@@ -58,7 +58,7 @@ export function HomeApprenticeshipInfra() {
         <div className="grid md:grid-cols-2 gap-6 mb-12">
           {/* Learner side */}
           <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-            <div className="relative h-48 w-full">
+            <div className="relative h-40 lg:h-44 w-full">
               <Image
                 src="/images/learners/coaching-session.webp"
                 alt="Learner in apprenticeship training session"
@@ -93,7 +93,7 @@ export function HomeApprenticeshipInfra() {
 
           {/* Employer side */}
           <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-            <div className="relative h-48 w-full">
+            <div className="relative h-40 lg:h-44 w-full">
               <Image
                 src="/images/pages/about-employer-partners.webp"
                 alt="Employer partner working with Elevate team"

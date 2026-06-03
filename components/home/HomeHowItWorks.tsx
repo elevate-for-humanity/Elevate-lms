@@ -9,6 +9,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
+import { card, layout } from '@/lib/page-design-tokens';
 
 const STEPS = [
   {
@@ -70,7 +71,7 @@ const STEPS = [
 export function HomeHowItWorks() {
   return (
     <section
-      className="bg-slate-950 py-16 px-4"
+      className={`bg-slate-950 ${layout.sectionTight} px-4`}
       aria-labelledby="how-it-works-heading"
     >
       <div className="max-w-6xl mx-auto">
@@ -91,7 +92,7 @@ export function HomeHowItWorks() {
         </div>
 
         {/* Step grid — 1 col mobile, 2 col sm, 3 col md, 6 col lg */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-10">
           {STEPS.map((step, i) => (
             <Link
               key={step.n}
@@ -99,7 +100,7 @@ export function HomeHowItWorks() {
               className={`group relative flex flex-col rounded-2xl overflow-hidden bg-slate-900 border-t-4 ${step.accent} hover:ring-1 hover:ring-slate-600 transition-all hover:-translate-y-0.5`}
             >
               {/* Photo */}
-              <div className="relative w-full aspect-[16/9] sm:aspect-[3/2] overflow-hidden">
+              <div className={`${card.image16x9Desktop} sm:aspect-[3/2] lg:h-32`}>
                 <Image
                   src={step.img}
                   alt={step.imgAlt}

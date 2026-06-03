@@ -275,14 +275,14 @@ export default function HeroVideo({
       {/* BELOW-HERO CONTENT */}
       {/* All primary messaging lives here — never on the video */}
       {(belowHeroHeadline || belowHeroSubheadline || ctas || trustIndicators || children) && (
-        <section className="border-b border-slate-100 py-8 sm:py-14">
+        <section className={heroTokens.belowPanel}>
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             {children ? (
               children
             ) : (
               <>
                 {belowHeroHeadline && (
-                  <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-3 sm:mb-4">
+                  <h1 className={heroTokens.belowHeadline}>
                     {belowHeroHeadline}
                   </h1>
                 )}

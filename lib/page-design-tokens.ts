@@ -57,7 +57,13 @@ export const hero = {
    * No gradient overlay. No text on top of image.
    * Content goes in a white panel BELOW the image.
    */
-  imageWrap: 'relative h-[32vh] min-h-[200px] max-h-[360px] w-full overflow-hidden',
+  /** Video/image band — capped lower on large screens so copy appears above the fold */
+  imageWrap:
+    'relative h-[30vh] min-h-[180px] max-h-[300px] sm:max-h-[320px] lg:max-h-[280px] w-full overflow-hidden',
+  /** Below-hero white panel (headline, CTAs) */
+  belowPanel: 'border-b border-slate-100 py-8 sm:py-10 lg:py-8',
+  belowHeadline:
+    'text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 leading-tight mb-3 sm:mb-4',
   /** Responsive sizes for next/image fill heroes — caps decoded width for LCP */
   imageSizes: '(max-width: 768px) 100vw, (max-width: 1200px) 720px, 960px',
   /** Content panel that sits below the hero image — white background */
@@ -71,6 +77,9 @@ export const card = {
   base: 'bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all',
   /** Card image container — 16:9 */
   image16x9: 'relative aspect-[16/9] overflow-hidden',
+  /** Homepage / pathway cards — shorter image band on desktop */
+  image16x9Desktop:
+    'relative aspect-[16/9] lg:aspect-auto lg:h-36 overflow-hidden bg-slate-100',
   /** Card image container — 4:3 */
   image4x3: 'relative aspect-[4/3] overflow-hidden',
   /** Card body padding */

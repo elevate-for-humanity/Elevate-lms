@@ -11,6 +11,7 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { ALL_PROGRAMS } from '@/data/programs/catalog';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
+import { card, layout } from '@/lib/page-design-tokens';
 
 // Featured programs shown on homepage - ordered by demand/visibility
 const FEATURED_SLUGS = [
@@ -52,7 +53,7 @@ function PathwayCard({ prog }: { prog: ProgramSchema }) {
   return (
     <article className="group flex flex-col rounded-2xl overflow-hidden bg-white border border-slate-200 hover:border-brand-red-300 hover:shadow-lg transition-all hover:-translate-y-0.5">
       {/* Image */}
-      <div className="relative w-full aspect-[16/9] overflow-hidden bg-slate-100">
+      <div className={card.image16x9Desktop}>
         <Image
           src={prog.heroImage}
           alt={prog.heroImageAlt || prog.title}
@@ -138,7 +139,7 @@ export function HomeCareerPathways() {
 
   return (
     <section
-      className="bg-white py-16 px-4"
+      className={`bg-white ${layout.sectionTight} px-4`}
       aria-labelledby="career-pathways-heading"
     >
       <div className="max-w-6xl mx-auto">

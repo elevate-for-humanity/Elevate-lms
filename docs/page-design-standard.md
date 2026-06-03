@@ -52,7 +52,7 @@ Pages that omit sections 3–8 are considered incomplete and must be expanded.
 
 ## 3. Hero Rules
 
-- Hero height: `h-[38vh] min-h-[220px] max-h-[420px]` (see `hero.imageWrap` in `lib/page-design-tokens.ts`)
+- Hero height: use `hero.imageWrap` from `lib/page-design-tokens.ts` (do not use `45vw` / `560px` clamps)
 - No gradient overlay on the hero image or video
 - No text, badges, or CTAs rendered on top of the hero media
 - All identity content goes in the white panel **below** the hero
@@ -61,7 +61,7 @@ Pages that omit sections 3–8 are considered incomplete and must be expanded.
 **Correct:**
 
 ```tsx
-<section className="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden">
+<section className={hero.imageWrap}>
   <Image src="..." alt="..." fill className="object-cover" priority />
 </section>
 <section className="bg-white border-b border-slate-100 py-10 px-4">

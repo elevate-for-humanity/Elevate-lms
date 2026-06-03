@@ -101,7 +101,7 @@ export function HomeSegmentedCTA() {
               className={`group flex flex-col rounded-2xl border bg-white overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5 ${seg.accent}`}
             >
               {/* Photo */}
-              <div className="relative w-full aspect-[16/10] max-h-52 overflow-hidden bg-slate-100">
+              <div className="relative w-full aspect-[16/10] max-h-44 lg:max-h-40 overflow-hidden bg-slate-100">
                 <Image
                   src={seg.img}
                   alt={seg.alt}

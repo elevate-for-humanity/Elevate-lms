@@ -49,6 +49,19 @@ RUN set -eux; \
   cp -a "${WS_DIR}/." /export/ws/; \
   test -f /export/ws/package.json
 
+# Bundle sharp + linux x64 @img bindings (runtime npm install fails in slim CI images)
+RUN set -eux; \
+  mkdir -p /export/sharp-node_modules/@img; \
+  SHARP_DIR="$(node -p "require('path').dirname(require.resolve('sharp/package.json'))")"; \
+  cp -a "${SHARP_DIR}/." /export/sharp-node_modules/sharp/; \
+  for pkg in node_modules/.pnpm/@img+sharp-linux-x64@*/node_modules/@img/sharp-linux-x64 \
+    node_modules/.pnpm/@img+sharp-libvips-linux-x64@*/node_modules/@img/sharp-libvips-linux-x64; do \
+    name="$(basename "$pkg")"; \
+    cp -a "$pkg" "/export/sharp-node_modules/@img/${name}"; \
+  done; \
+  test -f /export/sharp-node_modules/sharp/package.json; \
+  test -d /export/sharp-node_modules/@img/sharp-linux-x64
+
 # --- runtime (same as Dockerfile.admin) ---
 FROM public.ecr.aws/docker/library/node:20-bookworm-slim
 
@@ -67,10 +80,10 @@ ENV COMMIT_REF=$COMMIT_REF
 
 WORKDIR /app
 
-RUN npm install --os=linux --cpu=x64 sharp@0.33.5 --no-save 2>/dev/null || \
-    npm install sharp@0.33.5 --no-save
-
 COPY --from=builder /app/apps/admin/.next/standalone ./
+RUN mkdir -p node_modules
+COPY --from=builder /export/sharp-node_modules/sharp ./node_modules/sharp
+COPY --from=builder /export/sharp-node_modules/@img ./node_modules/@img
 COPY --from=builder /app/apps/admin/.next/server ./apps/admin/.next/server
 COPY --from=builder /app/apps/admin/.next/static ./apps/admin/.next/static
 COPY --from=builder /app/apps/admin/.next/required-server-files.json ./apps/admin/.next/required-server-files.json

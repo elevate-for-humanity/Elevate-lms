@@ -28,9 +28,9 @@ ENV COMMIT_REF=$COMMIT_REF
 
 WORKDIR /app
 
-# Install sharp for Next.js image optimization (must match runtime arch)
-RUN npm install --os=linux --cpu=x64 sharp@0.33.5 --no-save 2>/dev/null || \
-    npm install sharp@0.33.5 --no-save
+# Install sharp for Next.js image optimization (ECS host-built image; Northflank uses Dockerfile.northflank-admin)
+RUN npm install --os=linux --cpu=x64 sharp@0.34.5 --no-save 2>/dev/null || \
+    npm install sharp@0.34.5 --no-save
 
 # Copy standalone server output produced by `next build` in apps/admin/
 COPY apps/admin/.next/standalone ./

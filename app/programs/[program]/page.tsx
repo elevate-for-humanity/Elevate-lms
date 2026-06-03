@@ -221,7 +221,7 @@ function ProgramPage({
           microLabel={banner?.microLabel}
           analyticsName={banner?.analyticsName ?? slug}
           belowHeroHeadline={banner?.belowHeroHeadline ?? title}
-          belowHeroSubheadline={banner?.belowHeroSubheadline ?? summary || description}
+          belowHeroSubheadline={banner?.belowHeroSubheadline ?? (summary || description)}
           ctas={
             banner?.pageKey
               ? [banner.primaryCta, ...(banner.secondaryCta ? [banner.secondaryCta] : [])]

@@ -4,4 +4,4 @@ export {
   runtime,
   maxDuration,
   dynamic,
-} from '../barber-host-shop/apply/route';
+} from '../../barber-host-shop/apply/route';

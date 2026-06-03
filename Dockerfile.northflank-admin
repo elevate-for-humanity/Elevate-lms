@@ -42,8 +42,12 @@ ENV SKIP_ENV_VALIDATION=true
 
 RUN cd apps/admin && pnpm exec next build
 
-# Bundle ws for runtime (avoid npm install in slim image — npm peer-resolve fails in CI)
-RUN mkdir -p /export && cp -rL apps/admin/node_modules/ws /export/ws
+# Bundle ws for runtime (custom server.js). Do NOT npm install ws in slim stage — peer-resolve fails.
+RUN set -eux; \
+  mkdir -p /export/ws; \
+  WS_DIR="$(node -p "require('path').dirname(require.resolve('ws/package.json',{paths:[require('path').join(process.cwd(),'apps/admin')]}))")"; \
+  cp -a "${WS_DIR}/." /export/ws/; \
+  test -f /export/ws/package.json
 
 # --- runtime (same as Dockerfile.admin) ---
 FROM public.ecr.aws/docker/library/node:20-bookworm-slim
@@ -72,7 +76,9 @@ COPY --from=builder /app/apps/admin/.next/static ./apps/admin/.next/static
 COPY --from=builder /app/apps/admin/.next/required-server-files.json ./apps/admin/.next/required-server-files.json
 COPY --from=builder /app/public ./apps/admin/public
 COPY --from=builder /app/apps/admin/server.js ./apps/admin/server.js
+RUN mkdir -p apps/admin/node_modules
 COPY --from=builder /export/ws ./apps/admin/node_modules/ws
+RUN test -f apps/admin/node_modules/ws/package.json
 
 RUN addgroup --gid 1001 nodejs && \
     adduser --uid 1001 --ingroup nodejs --disabled-password --gecos "" nextjs && \

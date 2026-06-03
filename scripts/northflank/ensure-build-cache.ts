@@ -6,7 +6,7 @@
  *   pnpm tsx scripts/northflank/ensure-build-cache.ts --execute
  */
 
-import { nfFetch, projectApiPath, resolveProjectId } from './lib';
+import { combinedServicePath, nfFetch, resolveProjectId } from './lib';
 
 const SERVICES = [
   {
@@ -45,7 +45,7 @@ async function main() {
     };
     console.log(`${dryRun ? '[dry-run]' : '[patch]'} ${id} → ${dockerfile} cache ${BUILDKIT.cacheStorageSize}MB`);
     if (!dryRun) {
-      await nfFetch(projectApiPath(projectId, `/services/${id}`), {
+      await nfFetch(combinedServicePath(projectId, id), {
         method: 'PATCH',
         body: JSON.stringify(patch),
       });

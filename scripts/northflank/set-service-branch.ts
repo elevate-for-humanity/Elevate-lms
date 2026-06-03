@@ -5,7 +5,7 @@
  *   pnpm tsx scripts/northflank/set-service-branch.ts elevate-lms cursor/northflank-setup-c4c6 --build
  */
 
-import { nfFetch, projectApiPath, resolveProjectId } from './lib';
+import { combinedServicePath, nfFetch, projectApiPath, resolveProjectId } from './lib';
 
 async function main() {
   const serviceId = process.argv[2];
@@ -23,7 +23,7 @@ async function main() {
     process.exit(1);
   }
 
-  await nfFetch(projectApiPath(projectId, `/services/${serviceId}`), {
+  await nfFetch(combinedServicePath(projectId, serviceId), {
     method: 'PATCH',
     body: JSON.stringify({
       vcsData: {

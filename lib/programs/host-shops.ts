@@ -88,7 +88,7 @@ function parseAddress(raw: string): { address: string; city: string; state: stri
 
 /** Normalize shop names for deduplication (not for display). */
 export function normalizeShopKey(name: string): string {
-  let key = name
+  const key = name
     .toLowerCase()
     .trim()
     .replace(/\s+/g, ' ')

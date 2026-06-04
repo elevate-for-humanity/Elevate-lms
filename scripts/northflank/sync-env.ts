@@ -45,7 +45,8 @@ const STATIC_ENV: Record<string, string> = {
   NEXT_PUBLIC_EMAIL_FROM_NAME: 'Elevate for Humanity',
   NEXT_PUBLIC_EMAIL_FROM_ADDRESS: 'noreply@elevateforhumanity.org',
   NEXT_PUBLIC_CERT_HOLDER: 'Elevate for Humanity',
-  SERVICE_ROLE: 'lms',
+  // SERVICE_ROLE is set per-service in configure-services.ts (lms vs admin) — do not put in shared secrets.
+  DEVSTUDIO_DEVCONTAINER_MODE: 'github-only',
 };
 
 function loadManifestKeys(): string[] {

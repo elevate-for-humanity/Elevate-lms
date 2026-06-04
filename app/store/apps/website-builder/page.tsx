@@ -73,16 +73,16 @@ export default function WebsiteBuilderAppPage() {
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
-                  href="/apps/website-builder/start-trial"
+                  href="/store/trial?app=website-builder&mode=new"
                   className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors"
                 >
                   Start 14-day free trial
                 </Link>
                 <Link
-                  href="/import"
+                  href="/store/trial?app=website-builder&mode=existing"
                   className="inline-flex items-center gap-2 border border-slate-300 hover:bg-slate-50 text-slate-900 px-8 py-4 rounded-lg font-bold text-lg transition-colors"
                 >
-                  Import existing site
+                  Connect existing site
                 </Link>
               </div>
             </div>
@@ -159,7 +159,7 @@ export default function WebsiteBuilderAppPage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href="/apps/website-builder/start-trial"
+              href="/store/trial?app=website-builder&mode=new"
               className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold"
             >
               Start Free Trial

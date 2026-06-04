@@ -9,6 +9,8 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 import { withRuntime } from '@/lib/api/withRuntime';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { provisionTrialWebsite } from '@/lib/tenant/provision-trial-website';
+import { tenantAdminUrl } from '@/lib/tenant/public-site-url';
 
 const TRIAL_DURATION_DAYS = 14;
 
@@ -56,30 +58,30 @@ function slugify(name: string): string {
     .slice(0, 30);
 }
 
-
 async function sendTrialWelcomeEmail(
   email: string,
   orgName: string,
   subdomain: string,
   dashboardUrl: string,
+  publicSiteUrl: string,
   correlationId: string,
 ) {
   const sendgridKey = process.env.SENDGRID_API_KEY;
   if (!sendgridKey) {
     logger.warn(
-      `[trial] ${correlationId} — SENDGRID_API_KEY not configured, skipping welcome email`,
+      `[trial] ${correlationId} - SENDGRID_API_KEY not configured, skipping welcome email`,
     );
     return;
   }
 
   await resend.emails.send({
-    from: 'Elevate LMS <${PLATFORM_DEFAULTS.emailFromAddress}>',
+    from: `${PLATFORM_DEFAULTS.emailFromName} <${PLATFORM_DEFAULTS.emailFromAddress}>`,
     to: email,
-    subject: `Your 14-day trial is ready — ${orgName}`,
-    headers: { 'X-Correlation-ID': correlationId },
+    subject: `Your 14-day trial is ready - ${orgName}`,
     html: `
       <h1>Your trial is live.</h1>
       <p>Organization: <strong>${orgName}</strong></p>
+      <p>Workspace: <strong>${subdomain}</strong></p>
       <p><a href="${dashboardUrl}" style="display:inline-block;padding:12px 24px;background:#dc2626;color:#fff;font-weight:bold;text-decoration:none;border-radius:6px;">Open Your Dashboard</a></p>
       <p>Your public site: <a href="${publicSiteUrl}">${publicSiteUrl}</a></p>
       <h2>What to do now:</h2>
@@ -99,15 +101,15 @@ async function sendTrialWelcomeEmail(
  * POST /api/trial/start-managed
  *
  * Public self-service endpoint. Creates a 14-day managed platform trial.
- * No auth required — rate-limited by email.
+ * No auth required - rate-limited by email.
  *
- * Body: { orgName, adminName, adminEmail }
- * Returns: { ok, tenantUrl, subdomain, trialEndsAt, correlationId }
+ * Body: { orgName, adminName, adminEmail, websiteMode, existingUrl, programs }
+ * Returns: { ok, tenantUrl, publicPreviewUrl, websiteId, subdomain, trialEndsAt, correlationId }
  */
 async function _POST(request: NextRequest) {
   await hydrateProcessEnv();
 
-  // Correlation ID for tracing failures across client ↔ server
+  // Correlation ID for tracing failures across client/server.
   const correlationId = `trial_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 
   try {
@@ -141,6 +143,9 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid email address', correlationId }, { status: 400 });
     }
 
+    const connectionMode: 'new_site' | 'existing_site' | 'api_embed' =
+      websiteMode === 'existing' ? 'existing_site' : 'new_site';
+
     // Rate limit (Upstash Redis if available, in-memory fallback)
     if (!(await checkTrialRateLimit(email))) {
       return NextResponse.json(
@@ -151,7 +156,7 @@ async function _POST(request: NextRequest) {
 
     const supabase = await getSupabaseAdmin();
     if (!supabase) {
-      logger.error(`[trial] ${correlationId} — Supabase not configured`);
+      logger.error(`[trial] ${correlationId} - Supabase not configured`);
       return NextResponse.json({ error: 'Service unavailable', correlationId }, { status: 503 });
     }
 
@@ -163,10 +168,12 @@ async function _POST(request: NextRequest) {
       .maybeSingle();
 
     if (existingOrg) {
+      const tenantUrl = tenantAdminUrl(existingOrg.slug, '/admin');
       return NextResponse.json(
         {
           error: 'A trial already exists for this email address',
-          tenantUrl: `https://${existingOrg.slug}.app.elevateforhumanity.org/admin`,
+          tenantUrl,
+          publicPreviewUrl: `https://${existingOrg.slug}.app.elevateforhumanity.org`,
           subdomain: existingOrg.slug,
         },
         { status: 409 },
@@ -221,7 +228,7 @@ async function _POST(request: NextRequest) {
       const detail = orgError
         ? (orgError as { message?: string }).message ?? JSON.stringify(orgError)
         : 'insert returned no row (RLS or trigger blocked read-back)';
-      logger.error(`[trial] ${correlationId} — Org creation error: ${detail}`, orgError instanceof Error ? orgError : new Error(detail));
+      logger.error(`[trial] ${correlationId} - Org creation error: ${detail}`, orgError instanceof Error ? orgError : new Error(detail));
       return NextResponse.json(
         { error: 'Failed to create organization', correlationId },
         { status: 500 },
@@ -250,7 +257,7 @@ async function _POST(request: NextRequest) {
       const detail = licenseError
         ? (licenseError as { message?: string }).message ?? JSON.stringify(licenseError)
         : 'insert returned no row (RLS or trigger blocked read-back)';
-      logger.error(`[trial] ${correlationId} — License creation error: ${detail}`, licenseError instanceof Error ? licenseError : new Error(detail));
+      logger.error(`[trial] ${correlationId} - License creation error: ${detail}`, licenseError instanceof Error ? licenseError : new Error(detail));
       // Rollback org
       await supabase.from('organizations').delete().eq('id', org.id);
       return NextResponse.json(
@@ -259,9 +266,28 @@ async function _POST(request: NextRequest) {
       );
     }
 
-    // Resolve connection mode from websiteMode field
-    const connectionMode: 'new_site' | 'existing_site' | 'api_embed' =
-      websiteMode === 'existing' ? 'existing_site' : 'new_site';
+    const website = await provisionTrialWebsite({
+      organizationId: org.id,
+      organizationName: orgName.trim(),
+      subdomain,
+      trialEndsAt: trialEndsAt.toISOString(),
+      contactEmail: email,
+      industry: typeof programs === 'string' && programs.trim() ? programs.trim() : 'Training Provider',
+      websiteMode: connectionMode,
+    });
+
+    if (!website.ok) {
+      logger.error(
+        `[trial] ${correlationId} - Website provisioning error: ${website.error}`,
+        new Error(website.error),
+      );
+      await supabase.from('managed_licenses').delete().eq('id', license.id).then(() => {}, () => {});
+      await supabase.from('organizations').delete().eq('id', org.id).then(() => {}, () => {});
+      return NextResponse.json(
+        { error: 'Failed to provision trial website', correlationId },
+        { status: 500 },
+      );
+    }
 
     // Log provisioning event
     await supabase
@@ -279,9 +305,11 @@ async function _POST(request: NextRequest) {
           connection_mode: connectionMode,
           existing_url: existingUrl || null,
           programs: programs || null,
+          website_id: website.websiteId,
+          public_preview_url: website.publicUrl,
         },
       })
-      .then(()=>{}, ()=>{}); // Non-critical
+      .then(() => {}, () => {}); // Non-critical
 
     // Store extra intake fields on the org record if columns exist (best-effort)
     if (existingUrl || programs) {
@@ -292,24 +320,25 @@ async function _POST(request: NextRequest) {
           ...(programs ? { notes: `Programs: ${programs}` } : {}),
         })
         .eq('id', org.id)
-        .then(()=>{}, ()=>{});
+        .then(() => {}, () => {});
     }
 
-    const dashboardUrl = `https://${subdomain}.app.elevateforhumanity.org/admin`;
-    const publicPreviewUrl = `https://${subdomain}.app.elevateforhumanity.org`;
+    const dashboardUrl = tenantAdminUrl(subdomain, '/admin');
+    const publicPreviewUrl = website.publicUrl;
 
     // Send welcome email
     try {
-      await sendTrialWelcomeEmail(email, orgName.trim(), subdomain, dashboardUrl, correlationId);
+      await sendTrialWelcomeEmail(email, orgName.trim(), subdomain, dashboardUrl, publicPreviewUrl, correlationId);
     } catch (emailError) {
-      logger.error(`[trial] ${correlationId} — Failed to send welcome email:`, emailError);
-      // Don't fail — trial is created
+      logger.error(`[trial] ${correlationId} - Failed to send welcome email:`, emailError);
+      // Don't fail - trial is created
     }
 
     return NextResponse.json({
       ok: true,
       tenantUrl: dashboardUrl,
       publicPreviewUrl,
+      websiteId: website.websiteId,
       subdomain,
       trialEndsAt: trialEndsAt.toISOString(),
       correlationId,
@@ -319,7 +348,7 @@ async function _POST(request: NextRequest) {
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : JSON.stringify(error);
     logger.error(
-      `[trial] ${correlationId} — Unexpected error: ${errMsg}`,
+      `[trial] ${correlationId} - Unexpected error: ${errMsg}`,
       error instanceof Error ? error : new Error(errMsg),
     );
     return NextResponse.json({ error: 'Internal server error', correlationId }, { status: 500 });

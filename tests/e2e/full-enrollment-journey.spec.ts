@@ -58,7 +58,7 @@ test.describe('Full Enrollment Journey: Apply → Auth → Checkout → Enrollme
     await expect(page).toHaveURL(/\/apply/);
 
     // Step 2.2: Verify apply landing page content
-    await expect(page.locator('h1')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Check Your Eligibility', level: 1 })).toBeVisible();
 
     // Step 2.3: Verify the canonical intake form and program path are presented
     const formSection = page.locator('#application, form, [id*="form"]');
@@ -110,8 +110,9 @@ test.describe('Full Enrollment Journey: Apply → Auth → Checkout → Enrollme
    * Phase 4: Authentication - User creates account or logs in
    */
   test('Phase 4: Authentication Flow', async ({ page }) => {
-    // Step 4.1: Navigate to registration page
-    await page.goto('/register');
+    // Step 4.1: Navigate to canonical signup page
+    await page.goto('/signup');
+    await expect(page.getByRole('heading', { name: 'Create Your Account', level: 1 })).toBeVisible();
 
     // Step 4.2: Verify registration form exists
     const emailInput = page.locator('input[type="email"]');
@@ -216,7 +217,7 @@ test.describe('Full Enrollment Journey: Apply → Auth → Checkout → Enrollme
 
     // Application Landing
     await page.goto('/apply');
-    await expect(page.locator('h1')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Check Your Eligibility', level: 1 })).toBeVisible();
     journeySteps.push('✓ Apply landing page displayed');
 
     // Intake Form
@@ -229,7 +230,8 @@ test.describe('Full Enrollment Journey: Apply → Auth → Checkout → Enrollme
     await expect(page.locator('input[type="email"]').first()).toBeVisible();
     journeySteps.push('✓ Login page accessible');
 
-    await page.goto('/register');
+    await page.goto('/signup');
+    await expect(page.getByRole('heading', { name: 'Create Your Account', level: 1 })).toBeVisible();
     await expect(page.locator('input[type="email"]').first()).toBeVisible();
     journeySteps.push('✓ Registration page accessible');
 
@@ -412,7 +414,7 @@ test.describe('Enrollment Journey Mobile Experience', () => {
   });
 
   test('no horizontal scroll on enrollment pages', async ({ page }) => {
-    const pages = ['/apply', '/login', '/register', '/funding'];
+    const pages = ['/apply', '/login', '/signup', '/funding'];
 
     for (const url of pages) {
       await page.goto(url);

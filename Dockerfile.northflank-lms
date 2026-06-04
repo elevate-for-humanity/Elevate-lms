@@ -32,15 +32,14 @@ COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
 
-RUN pnpm config set store-dir /app/.pnpm-store \
-    && pnpm fetch --frozen-lockfile
-
+# See Dockerfile.northflank-admin — avoid separate `pnpm fetch` (ERR_PNPM_ENOSPC on ~2GB builders).
 COPY . .
 
 ENV HUSKY=0
 ENV CI=true
 RUN pnpm config set store-dir /app/.pnpm-store \
-    && pnpm install --frozen-lockfile --offline --prefer-offline
+    && pnpm install --frozen-lockfile \
+    && pnpm store prune
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1

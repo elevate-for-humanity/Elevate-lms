@@ -73,6 +73,9 @@ jobs:
       - name: Configure Northflank services
         run: pnpm tsx scripts/northflank/configure-services.ts --execute
 
+      - name: Ensure build ephemeral storage
+        run: pnpm tsx scripts/northflank/patch-ephemeral-storage.ts --execute
+
       - name: Point LMS service at main
         run: pnpm tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_LMS_SERVICE_ID" "$DEPLOY_BRANCH"
 

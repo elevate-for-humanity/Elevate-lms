@@ -49,6 +49,10 @@ require('next');
 
 const { startServer } = require('next/dist/server/lib/start-server');
 
+console.log(
+  `[admin] starting standalone server host=${host} port=${port} cwd=${process.cwd()}`,
+);
+
 startServer({
   dir,
   isDev: false,

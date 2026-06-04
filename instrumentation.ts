@@ -5,7 +5,15 @@ export async function register() {
     const { applyNormalizedSupabaseUrlToEnv } = await import('./lib/supabase/normalize-url');
     applyNormalizedSupabaseUrlToEnv();
     const { hydrateProcessEnv } = await import('./lib/secrets');
-    await hydrateProcessEnv();
+    try {
+      await hydrateProcessEnv();
+    } catch (err) {
+      // Must not prevent Next from listening — /api/ping and smoke tests need the process up.
+      console.warn(
+        '[instrumentation] hydrateProcessEnv failed (server will still start):',
+        err instanceof Error ? err.message : err,
+      );
+    }
 
     // Only load Sentry when a DSN is configured — avoids crashing dev servers
     // that don't have @sentry/node-core resolved in the pnpm isolated store.

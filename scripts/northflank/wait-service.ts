@@ -10,13 +10,35 @@
 import { nfFetch, projectApiPath, resolveProjectId } from './lib';
 
 type ServiceStatus = {
-  deploymentStatus?: { status?: string };
+  deploymentStatus?: { status?: string; reason?: string };
   buildStatus?: string;
   status?: {
-    build?: { status?: string };
+    build?: { status?: string; reason?: string };
     deployment?: { status?: string; reason?: string };
   };
 };
+
+function printFailureContext(serviceId: string, service: ServiceStatus) {
+  const build = service.status?.build?.status ?? service.buildStatus;
+  const deploy = service.status?.deployment?.status ?? service.deploymentStatus?.status;
+  const buildReason = service.status?.build?.reason;
+  const deployReason =
+    service.status?.deployment?.reason ?? service.deploymentStatus?.reason;
+
+  console.error(`\n--- ${serviceId} failure context ---`);
+  console.error(`build.status=${build ?? 'n/a'} deployment.status=${deploy ?? 'n/a'}`);
+  if (buildReason) console.error(`build.reason: ${buildReason}`);
+  if (deployReason) console.error(`deployment.reason: ${deployReason}`);
+  console.error(
+    'Check actual failure: pnpm tsx scripts/northflank/fetch-build-logs.ts <service> --grep ENOSPC',
+  );
+  console.error(
+    'Cached COPY standalone in build logs does not mean this build succeeded — see docs/northflank-admin-post-build-runtime.md',
+  );
+  console.error(
+    `Full status: pnpm tsx scripts/northflank/diagnose-service.ts ${serviceId}`,
+  );
+}
 
 function resolveServicePhase(service: ServiceStatus): string {
   const build = service.status?.build?.status ?? service.buildStatus;
@@ -65,7 +87,8 @@ async function main() {
     }
 
     if (build === 'FAILURE' || build === 'ERROR' || build === 'FAILED') {
-      console.error(`${serviceId} build failed (${build})`);
+      console.error(`${serviceId} Northflank reported build phase FAILURE (${build})`);
+      printFailureContext(serviceId, service);
       process.exit(1);
     }
 
@@ -80,6 +103,7 @@ async function main() {
 
     if (['FAILED', 'ERROR'].includes(deploy ?? '')) {
       console.error(`${serviceId} deployment failed (${deploy})`);
+      printFailureContext(serviceId, service);
       process.exit(1);
     }
 

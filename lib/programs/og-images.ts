@@ -14,7 +14,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
  * All paths are relative to /public and must exist in the repo.
  */
 
-export const PROGRAM_OG_DEFAULT = '/images/og-image.jpg';
+export const PROGRAM_OG_DEFAULT = '/images/og-image.webp';
 
 export const PROGRAM_OG_IMAGES: Record<string, string> = {
   // ── Skilled Trades ────────────────────────────────────────────────────────

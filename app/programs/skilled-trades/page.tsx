@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description: 'HVAC, Electrical, Welding, Plumbing, CDL, and Diesel Mechanic training. Free for eligible participants. Hands-on training with job placement.',
     url: 'https://www.elevateforhumanity.org/programs/skilled-trades',
     siteName: PLATFORM_DEFAULTS.orgName,
-    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Skilled Trades Training Programs | Free with WIOA | Indianapolis' }],
+    images: [{ url: '/images/og-image.webp', width: 1200, height: 630, alt: 'Skilled Trades Training Programs | Free with WIOA | Indianapolis' }],
     type: 'website',
   },
 };

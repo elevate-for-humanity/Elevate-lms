@@ -43,15 +43,21 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'Phlebotomy Technician', href: '/programs/phlebotomy' },
       { name: 'Medical Assistant', href: '/programs/medical-assistant' },
       { name: 'Peer Recovery Specialist', href: '/programs/peer-recovery-specialist' },
-      { name: 'Direct Support Professional', href: canonicalRoutes.programs.directSupportProfessional },
-      { name: 'Drug & Alcohol Collector', href: '/programs/drug-collector' },
+      {
+        name: 'Direct Support Professional',
+        href: canonicalRoutes.programs.directSupportProfessional,
+      },
+      { name: 'Drug & Alcohol Collector', href: '/programs/drug-alcohol-specimen-collector' },
       { name: 'CPR / First Aid', href: '/programs/cpr-first-aid' },
       { name: 'All Healthcare →', href: '/programs/healthcare', isSectionLink: true },
 
       // Skilled Trades
       { name: '— Skilled Trades —', href: '/programs/skilled-trades', isHeader: true },
       { name: 'HVAC Technician', href: canonicalRoutes.programs.hvacTechnician },
-      { name: 'Building Services Technician', href: canonicalRoutes.programs.buildingServicesTechnician },
+      {
+        name: 'Building Services Technician',
+        href: canonicalRoutes.programs.buildingServicesTechnician,
+      },
       { name: 'Electrical', href: '/programs/electrical' },
       { name: 'Plumbing', href: '/programs/plumbing' },
       { name: 'CDL Training', href: '/programs/cdl-training' },
@@ -60,8 +66,14 @@ export const NAV_ITEMS: NavItem[] = [
       // Beauty & Cosmetology
       { name: '— Beauty & Cosmetology —', href: '/programs/beauty', isHeader: true },
       { name: 'Barber Apprenticeship', href: canonicalRoutes.programs.barberApprenticeship },
-      { name: 'Cosmetology Apprenticeship', href: canonicalRoutes.programs.cosmetologyApprenticeship },
-      { name: 'Esthetician Apprenticeship', href: canonicalRoutes.programs.estheticianApprenticeship },
+      {
+        name: 'Cosmetology Apprenticeship',
+        href: canonicalRoutes.programs.cosmetologyApprenticeship,
+      },
+      {
+        name: 'Esthetician Apprenticeship',
+        href: canonicalRoutes.programs.estheticianApprenticeship,
+      },
       { name: 'Nail Technician Apprenticeship', href: '/programs/nail-technician-apprenticeship' },
       { name: 'All Beauty →', href: '/apprenticeships', isSectionLink: true },
 
@@ -72,8 +84,15 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'All Technology →', href: '/programs/technology', isSectionLink: true },
 
       // Business & Finance
-      { name: '— Business & Finance —', href: '/programs/finance-bookkeeping-accounting', isHeader: true },
-      { name: 'Finance, Bookkeeping & Accounting', href: '/programs/finance-bookkeeping-accounting' },
+      {
+        name: '— Business & Finance —',
+        href: '/programs/finance-bookkeeping-accounting',
+        isHeader: true,
+      },
+      {
+        name: 'Finance, Bookkeeping & Accounting',
+        href: '/programs/finance-bookkeeping-accounting',
+      },
 
       // Short Courses (partner)
       { name: '— Short Courses —', href: '/courses', isHeader: true },
@@ -99,8 +118,14 @@ export const NAV_ITEMS: NavItem[] = [
       { name: '— DOL Registered —', href: '/apprenticeships', isHeader: true },
       { name: 'All Apprenticeships', href: '/apprenticeships' },
       { name: 'Barber Apprenticeship', href: canonicalRoutes.programs.barberApprenticeship },
-      { name: 'Cosmetology Apprenticeship', href: canonicalRoutes.programs.cosmetologyApprenticeship },
-      { name: 'Esthetician Apprenticeship', href: canonicalRoutes.programs.estheticianApprenticeship },
+      {
+        name: 'Cosmetology Apprenticeship',
+        href: canonicalRoutes.programs.cosmetologyApprenticeship,
+      },
+      {
+        name: 'Esthetician Apprenticeship',
+        href: canonicalRoutes.programs.estheticianApprenticeship,
+      },
       { name: 'Skilled Trades Apprenticeships', href: '/programs/skilled-trades' },
       // Host a site
       { name: '— Host a Site —', href: '/partners/barbershop-apprenticeship', isHeader: true },
@@ -206,7 +231,11 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'Referral Partner Program', href: '/partners/referral' },
       { name: 'Submit a Referral', href: '/apply/intake' },
       // Beauty Apprenticeship Partnerships
-      { name: '— Beauty Partnerships —', href: '/partners/barbershop-apprenticeship', isHeader: true },
+      {
+        name: '— Beauty Partnerships —',
+        href: '/partners/barbershop-apprenticeship',
+        isHeader: true,
+      },
       { name: 'Barbershop Partnership', href: '/partners/barbershop-apprenticeship' },
       { name: 'Cosmetology Partnership', href: '/partners/cosmetology-apprenticeship' },
       // Training Providers & Program Holders

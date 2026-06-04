@@ -9,6 +9,7 @@ import { InView } from '@/components/ui/InView';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
 import HeroVideo from '@/components/marketing/HeroVideo';
+import HeroPicture from '@/components/marketing/HeroPicture';
 import heroBanners from '@/content/heroBanners';
 
 /* ------------------------------------------------------------------ */
@@ -195,19 +196,16 @@ export default function ProgramPageLayout({
             />
           );
         }
-        if (c.heroImage) {
+        const fallbackHeroImage = c.heroImage || c.overviewImage;
+        if (fallbackHeroImage) {
           return (
-            <div className="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-              <Image
-                src={c.heroImage}
-                alt={c.heroImageAlt || c.title}
-                fill
-                sizes="100vw"
-                className="object-cover"
-                priority placeholder="empty"
-              />
-            </div>
+            <HeroPicture
+              src={fallbackHeroImage}
+              alt={c.heroImageAlt || c.overviewImageAlt || c.title}
+              microLabel={c.badge || 'Career Training'}
+              analyticsName={`${c.title} hero`}
+              heightStyle="h-[45vh] min-h-[280px] max-h-[560px]"
+            />
           );
         }
         return null;
@@ -342,7 +340,8 @@ export default function ProgramPageLayout({
                     alt={c.overviewImageAlt}
                     fill
                     sizes="(max-width: 1024px) 100vw, 40vw"
-                    className="object-cover" placeholder="empty"
+                    className="object-cover"
+                    placeholder="empty"
                   />
                 </div>
                 {/* Salary callout */}
@@ -941,13 +940,15 @@ export default function ProgramPageLayout({
               { src: '/images/partners/workone.webp', alt: 'WorkOne Indiana' },
               { src: '/images/partners/nextleveljobs.webp', alt: 'Next Level Jobs' },
             ].map((logo) => (
-              <Image sizes="100vw"
+              <Image
+                sizes="100vw"
                 key={logo.alt}
                 src={logo.src}
                 alt={logo.alt}
                 width={100}
                 height={40}
-                className="object-contain h-8 w-auto opacity-70 hover:opacity-100 transition-opacity" placeholder="empty"
+                className="object-contain h-8 w-auto opacity-70 hover:opacity-100 transition-opacity"
+                placeholder="empty"
               />
             ))}
           </div>

@@ -7,17 +7,17 @@ import CanonicalVideo from '@/components/video/CanonicalVideo';
 import type { Program } from '@/lib/lms/types';
 
 const programImages: Record<string, string> = {
-  cna: '/images/healthcare/hero-program-patient-care.jpg',
-  'cna-cert': '/images/healthcare/hero-program-patient-care.jpg',
-  'cna-training-wrg': '/images/healthcare/hero-program-patient-care.jpg',
-  'direct-support-professional': '/images/healthcare/hero-program-medical-assistant.jpg',
-  'dsp-training': '/images/healthcare/hero-program-medical-assistant.jpg',
+  cna: '/images/healthcare/hero-program-patient-care.webp',
+  'cna-cert': '/images/healthcare/hero-program-patient-care.webp',
+  'cna-training-wrg': '/images/healthcare/hero-program-patient-care.webp',
+  'direct-support-professional': '/images/healthcare/hero-program-medical-assistant.webp',
+  'dsp-training': '/images/healthcare/hero-program-medical-assistant.webp',
   'drug-collector': '/images/healthcare/hero-program-phlebotomy.jpg',
-  'medical-assistant': '/images/healthcare/hero-program-medical-assistant.jpg',
+  'medical-assistant': '/images/healthcare/hero-program-medical-assistant.webp',
   'phlebotomy-technician': '/images/healthcare/hero-program-phlebotomy.jpg',
-  'pharmacy-technician': '/images/healthcare/hero-program-medical-assistant.jpg',
-  'dental-assistant': '/images/healthcare/hero-program-patient-care.jpg',
-  default: '/images/healthcare/hero-program-patient-care.jpg',
+  'pharmacy-technician': '/images/healthcare/hero-program-medical-assistant.webp',
+  'dental-assistant': '/images/healthcare/hero-program-patient-care.webp',
+  default: '/images/healthcare/hero-program-patient-care.webp',
 };
 
 function formatDuration(weeks: number) {

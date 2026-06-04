@@ -27,7 +27,7 @@ export const programsData: Record<string, ProgramData> = {
       'Launch your healthcare career as a Medical Assistant. Provide essential clinical and administrative support in hospitals, clinics, and medical offices. Get certified in just 12 weeks with 100% funded training.',
     duration: '12 Weeks',
     salaryRange: '$35K-$45K',
-    heroImage: '/images/healthcare/program-medical-assistant.jpg',
+    heroImage: '/images/healthcare/program-medical-assistant.webp',
     skills: [
       {
         title: 'Clinical Skills',
@@ -78,7 +78,7 @@ export const programsData: Record<string, ProgramData> = {
       'Become a certified Phlebotomy Technician and specialize in blood collection and laboratory procedures. This fast-track 8-week program prepares you for immediate employment in hospitals, labs, and clinics.',
     duration: '8 Weeks',
     salaryRange: '$32K-$42K',
-    heroImage: '/images/healthcare/video-thumbnail-phlebotomy.jpg',
+    heroImage: '/images/healthcare/video-thumbnail-phlebotomy.webp',
     skills: [
       {
         title: 'Venipuncture Techniques',
@@ -134,7 +134,7 @@ export const programsData: Record<string, ProgramData> = {
       'Train to become an EKG Technician and perform vital cardiac monitoring tests. This specialized 6-week program prepares you for a focused career in cardiovascular diagnostics.',
     duration: '6 Weeks',
     salaryRange: '$33K-$43K',
-    heroImage: '/images/healthcare/program-healthcare-overview.jpg',
+    heroImage: '/images/healthcare/program-healthcare-overview.webp',
     skills: [
       {
         title: 'EKG Procedures',
@@ -238,7 +238,7 @@ export const programsData: Record<string, ProgramData> = {
       'Start your dental career as a Dental Assistant. Support dental professionals in patient care and office operations. This 10-week program prepares you for immediate employment in dental practices.',
     duration: '10 Weeks',
     salaryRange: '$36K-$46K',
-    heroImage: '/images/healthcare/video-thumbnail-dental-assistant.jpg',
+    heroImage: '/images/healthcare/video-thumbnail-dental-assistant.webp',
     skills: [
       {
         title: 'Chairside Assisting',
@@ -301,7 +301,7 @@ export const programsData: Record<string, ProgramData> = {
       'Become a Patient Care Technician and provide direct patient care in hospitals and healthcare facilities. This comprehensive 14-week program combines CNA, EKG, and phlebotomy skills.',
     duration: '14 Weeks',
     salaryRange: '$35K-$45K',
-    heroImage: '/images/healthcare/program-cna-training.jpg',
+    heroImage: '/images/healthcare/program-cna-training.webp',
     skills: [
       {
         title: 'Basic Nursing Skills',
@@ -361,7 +361,7 @@ export const programsData: Record<string, ProgramData> = {
       'Train as a Sterile Processing Technician and ensure medical instruments are properly sterilized and maintained. This critical 12-week program prepares you for behind-the-scenes healthcare work.',
     duration: '12 Weeks',
     salaryRange: '$37K-$47K',
-    heroImage: '/images/healthcare/healthcare-professional-portrait-2.jpg',
+    heroImage: '/images/healthcare/healthcare-professional-portrait-2.webp',
     skills: [
       {
         title: 'Decontamination',

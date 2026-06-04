@@ -116,7 +116,7 @@ export const PROGRAMS: ProgramData[] = [
       'Start a high-paying skilled trade career. 12-week evening program covering heating, cooling, refrigeration theory, and EPA 608 certification prep. Includes employer site days with HVAC contractors and apprenticeship pathway guidance. 4-star Indiana Top Jobs demand rating.',
     funding: 'WIOA • Next Level Jobs • Workforce Grants',
     duration: '12 Weeks • 144 Hours • Hybrid (Classroom + LMS + Employer Site Days)',
-    image: '/images/trades/hero-program-hvac.jpg',
+    image: '/images/trades/hero-program-hvac.webp',
     etplApproved: true,
   },
   {

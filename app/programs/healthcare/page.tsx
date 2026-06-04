@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     description: 'CNA, Medical Assistant, Phlebotomy, and CPR certification programs. Free for eligible participants. Job placement included.',
     url: 'https://www.elevateforhumanity.org/programs/healthcare',
     siteName: PLATFORM_DEFAULTS.orgName,
-    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Healthcare Training Programs | Free with WIOA | Indianapolis' }],
+    images: [{ url: '/images/og-image.webp', width: 1200, height: 630, alt: 'Healthcare Training Programs | Free with WIOA | Indianapolis' }],
     type: 'website',
   },
 };

@@ -43,7 +43,7 @@ export const cnaBlueprint: CredentialBlueprint = {
     template: 'elevate-slide',
     instructorName: 'Lisa Thompson, RN',
     instructorTitle: 'Certified Nursing Assistant Program Director',
-    instructorImagePath: '/images/instructors/lisa-thompson.jpg',
+    instructorImagePath: '/images/avatar-default.svg',
     topBarColor: '#0ea5e9',
     accentColor: '#6366f1',
     backgroundColor: '#0f172a',

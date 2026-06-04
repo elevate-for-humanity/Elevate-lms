@@ -35,7 +35,7 @@ export const electricalBlueprint: CredentialBlueprint = {
     template: 'elevate-slide',
     instructorName: 'Darnell Hayes',
     instructorTitle: 'Journeyman Electrician & NCCER Instructor',
-    instructorImagePath: '/images/instructors/darnell-hayes.jpg',
+    instructorImagePath: '/images/avatar-default.svg',
     topBarColor: '#eab308',
     accentColor: '#1e3a5f',
     backgroundColor: '#1e293b',

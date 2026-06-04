@@ -80,7 +80,7 @@ const services = [
     description:
       'Accommodations for students with disabilities, assistive technology, and individualized support plans. ADA-compliant facilities and programs.',
     link: '/student-support/accessibility',
-    image: '/images/pages/accessibility-hero.webp',
+    image: '/images/pages/accessibility-hero.jpg',
   },
   {
     title: 'Scheduling & Advising',
@@ -151,13 +151,14 @@ export default function StudentSupportPage() {
                 className="group bg-white rounded-xl overflow-hidden border hover:shadow-lg transition"
               >
                 <div className="relative h-44 overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
+                  {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
                   <Image
                     src={service.image}
                     alt={service.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    placeholder="empty"
                   />
                   <div className="absolute bottom-3 left-4">
                     <h3 className="text-lg font-bold text-slate-900">{service.title}</h3>
@@ -168,7 +169,9 @@ export default function StudentSupportPage() {
                   <Link
                     href={service.link}
                     className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-brand-green-700 transition"
-                  >See Details<ArrowRight className="w-4 h-4" />
+                  >
+                    See Details
+                    <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
               </div>
@@ -186,14 +189,14 @@ export default function StudentSupportPage() {
               <Phone className="w-10 h-10 text-brand-green-600 mx-auto mb-4" />
               <h3 className="font-bold text-slate-900 mb-1">Phone Support</h3>
               <a
-                href="tel:{PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g,"")}"
+                href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
                 className="text-brand-green-600 font-semibold hover:underline"
               >
                 {PLATFORM_DEFAULTS.supportPhone}
               </a>
               <p className="text-sm text-slate-500 mt-1">Mon–Fri 8am–6pm EST</p>
               <Link
-                href="tel:{PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g,"")}"
+                href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
                 className="inline-flex items-center gap-2 mt-4 bg-brand-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-green-700 transition"
               >
                 Call Now
@@ -234,7 +237,8 @@ export default function StudentSupportPage() {
           alt="Students succeeding in workforce training"
           fill
           className="object-cover"
-          sizes="100vw" placeholder="empty"
+          sizes="100vw"
+          placeholder="empty"
         />
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">

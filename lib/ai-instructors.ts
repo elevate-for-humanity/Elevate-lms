@@ -86,7 +86,7 @@ export const AI_INSTRUCTORS: AIInstructor[] = [
     title: 'CDL Training Director',
     specialty: 'Transportation & Logistics',
     voice: 'fable',
-    avatar: '/images/team/instructors/instructor-safety.jpg',
+    avatar: '/images/avatar-default.svg',
     bio: 'Robert is a veteran truck driver with over 2 million safe miles. He now trains new drivers in CDL certification, safety protocols, and career success.',
     categories: ['cdl', 'truck', 'driving', 'transportation', 'logistics', 'forklift', 'warehouse'],
   },

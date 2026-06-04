@@ -65,7 +65,7 @@ export const APPRENTICE_PORTAL_CONFIGS: Record<string, ApprenticePortalConfig> =
     icon: Scissors,
     accentBg: 'bg-rose-500',
     accentText: 'text-rose-600',
-    heroImage: '/images/pages/esthetician.webp',
+    heroImage: '/images/beauty/esthetician.webp',
     shopLabel: 'Spa / Salon',
     requiredOjl: 525,
     requiredRti: 175,

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description: 'IT Help Desk, Cybersecurity, Web Development, Software Development, and more. Industry certifications with job placement.',
     url: 'https://www.elevateforhumanity.org/programs/technology',
     siteName: PLATFORM_DEFAULTS.orgName,
-    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Technology Training Programs | Certified | Indianapolis' }],
+    images: [{ url: '/images/og-image.webp', width: 1200, height: 630, alt: 'Technology Training Programs | Certified | Indianapolis' }],
     type: 'website',
   },
 };

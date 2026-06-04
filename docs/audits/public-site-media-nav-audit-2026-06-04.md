@@ -1,0 +1,98 @@
+# Public Site Media + Navigation Audit
+
+- Image references checked: 2029
+- Missing image files: 0
+- Header/hamburger hrefs checked: 108
+- Missing app routes: 0
+- Header-linked concrete page files without detectable hero pattern: 88
+
+## Header-Linked Concrete Pages Without Detected Hero
+
+- app/about/mission/page.tsx
+- app/about/page.tsx
+- app/about/partners/page.tsx
+- app/about/team/page.tsx
+- app/accreditation/page.tsx
+- app/advising/page.tsx
+- app/apply/employer/page.tsx
+- app/apply/fssa/page.tsx
+- app/apply/intake/page.tsx
+- app/apply/page.tsx
+- app/apply/program-holder/page.tsx
+- app/apply/staff/page.tsx
+- app/apply/status/page.tsx
+- app/apply/student/page.tsx
+- app/apply/track/page.tsx
+- app/apprenticeships/page.tsx
+- app/apps/grants/page.tsx
+- app/apps/page.tsx
+- app/apps/sam-gov/page.tsx
+- app/apps/website-builder/page.tsx
+- app/blog/page.tsx
+- app/booth-rental/apply/page.tsx
+- app/booth-rental/page.tsx
+- app/check-eligibility/page.tsx
+- app/compliance/page.tsx
+- app/contact/page.tsx
+- app/courses/page.tsx
+- app/donate/page.tsx
+- app/eligibility/page.tsx
+- app/employer/apprenticeships/page.tsx
+- app/employer/dashboard/page.tsx
+- app/employer/post-job/page.tsx
+- app/employer/wotc/page.tsx
+- app/employers/directory/page.tsx
+- app/events/page.tsx
+- app/faq/page.tsx
+- app/federal-compliance/page.tsx
+- app/financing/page.tsx
+- app/for-agencies/page.tsx
+- app/for-employers/page.tsx
+- app/for-providers/page.tsx
+- app/fssa/page.tsx
+- app/funding/federal-programs/page.tsx
+- app/funding/grant-programs/page.tsx
+- app/funding/wrg/page.tsx
+- app/impact/page.tsx
+- app/instructor-credentials/page.tsx
+- app/jobs/page.tsx
+- app/metrics/page.tsx
+- app/ojt-and-funding/page.tsx
+- app/onboarding/employer/page.tsx
+- app/onboarding/instructor/page.tsx
+- app/partners/apply/page.tsx
+- app/partners/barbershop-apprenticeship/apply/page.tsx
+- app/partners/barbershop-apprenticeship/page.tsx
+- app/partners/cosmetology-apprenticeship/page.tsx
+- app/partners/cosmetology-partner-shop/apply/page.tsx
+- app/partners/create-program/page.tsx
+- app/partners/jri/page.tsx
+- app/partners/page.tsx
+- app/partners/reentry/page.tsx
+- app/partners/referral/page.tsx
+- app/partners/workforce/page.tsx
+- app/platform/sponsors/page.tsx
+- app/platform/workforce-boards/page.tsx
+- app/press/page.tsx
+- app/program-holder/dashboard/page.tsx
+- app/programs/cdl-training/page.tsx
+- app/programs/cna/page.tsx
+- app/programs/cpr-first-aid/page.tsx
+- app/programs/drug-alcohol-specimen-collector/page.tsx
+- app/programs/electrical/page.tsx
+- app/programs/federal-funded/page.tsx
+- app/programs/finance-bookkeeping-accounting/page.tsx
+- app/programs/medical-assistant/page.tsx
+- app/programs/nail-technician-apprenticeship/page.tsx
+- app/programs/peer-recovery-specialist/page.tsx
+- app/programs/plumbing/page.tsx
+- app/programs/qma/page.tsx
+- app/schedule-consultation/page.tsx
+- app/scholarships/page.tsx
+- app/store/guides/capital-readiness/page.tsx
+- app/store/guides/licensing/page.tsx
+- app/store/guides/page.tsx
+- app/success-stories/page.tsx
+- app/testing/accommodations/page.tsx
+- app/testing/book/page.tsx
+- app/verify/page.tsx

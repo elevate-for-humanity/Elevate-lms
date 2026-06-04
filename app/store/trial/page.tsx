@@ -56,6 +56,11 @@ function TrialPageContent() {
     if (searchParams.get('vertical') === 'beauty') {
       setPrograms((prev) => (prev.trim() ? prev : BEAUTY_TRIAL_PROGRAMS_PREFILL));
     }
+
+    const mode = searchParams.get('mode');
+    if (mode === 'existing' || mode === 'new') {
+      setWebsiteMode(mode);
+    }
   }, [searchParams]);
   const [error, setError] = useState<string | null>(null);
   const [correlationId, setCorrelationId] = useState<string | null>(null);
@@ -213,7 +218,7 @@ function TrialPageContent() {
     );
   }
 
-  // ── Form state ─────────────────────────────────────────────────────────────
+  // ── Form state ────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-white border-b">

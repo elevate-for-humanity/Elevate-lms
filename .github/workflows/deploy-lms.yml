@@ -77,10 +77,11 @@ jobs:
         run: pnpm tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_LMS_SERVICE_ID" "$DEPLOY_BRANCH"
 
       - name: Trigger LMS build
+        id: trigger_lms_build
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_LMS_SERVICE_ID"
 
       - name: Wait for LMS deployment
-        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_LMS_SERVICE_ID" --timeout-ms 3600000
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_LMS_SERVICE_ID" --build-id "${{ steps.trigger_lms_build.outputs.build_id }}" --timeout-ms 3600000
 
       - name: Smoke LMS
         run: |

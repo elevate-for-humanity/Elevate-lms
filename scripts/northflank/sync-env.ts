@@ -21,6 +21,7 @@ import { readFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { nfFetch, projectApiPath, resolveProjectId, resolveLmsServiceId, resolveAdminServiceId } from './lib';
+import { dedupeSecretVariables } from './canonical-env.mjs';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const MANIFEST = join(__dir, 'env-keys-manifest.txt');
@@ -130,6 +131,7 @@ async function main() {
     variables = { ...variables, ...loadFromFile(file) };
   }
   variables = { ...variables, ...loadFromProcessEnv(keys) };
+  variables = dedupeSecretVariables(variables);
 
   const missing = keys.filter((k) => !variables[k] && k.startsWith('NEXT_PUBLIC_'));
   const missingCritical = [

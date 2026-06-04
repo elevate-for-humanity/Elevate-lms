@@ -44,9 +44,7 @@ jobs:
     name: Build and deploy LMS on Northflank
     runs-on: ubuntu-latest
     env:
-      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN || secrets.NORTHFLANK_API_KEY || secrets.NF_API_TOKEN }}
-      NORTHFLANK_API_KEY: ${{ secrets.NORTHFLANK_API_KEY || secrets.NORTHFLANK_API_TOKEN || secrets.NF_API_TOKEN }}
-      NF_API_TOKEN: ${{ secrets.NF_API_TOKEN || secrets.NORTHFLANK_API_TOKEN || secrets.NORTHFLANK_API_KEY }}
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
       NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
       NORTHFLANK_LMS_SERVICE_ID: ${{ secrets.NORTHFLANK_LMS_SERVICE_ID || 'elevate-lms' }}

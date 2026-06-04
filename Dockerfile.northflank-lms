@@ -32,16 +32,14 @@ COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
 
-RUN --mount=type=cache,id=pnpm-store-lms,target=/app/.pnpm-store \
-    pnpm config set store-dir /app/.pnpm-store \
+RUN pnpm config set store-dir /app/.pnpm-store \
     && pnpm fetch --frozen-lockfile
 
 COPY . .
 
 ENV HUSKY=0
 ENV CI=true
-RUN --mount=type=cache,id=pnpm-store-lms,target=/app/.pnpm-store \
-    pnpm config set store-dir /app/.pnpm-store \
+RUN pnpm config set store-dir /app/.pnpm-store \
     && pnpm install --frozen-lockfile --offline --prefer-offline
 
 ENV NODE_ENV=production

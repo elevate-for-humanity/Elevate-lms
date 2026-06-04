@@ -34,16 +34,16 @@ COPY packages/ui/package.json packages/ui/package.json
 
 # Store on /app so pnpm can hardlink into node_modules (same filesystem as /app).
 # Do NOT use --package-import-method=copy — it duplicates every package and causes ENOSPC.
-RUN --mount=type=cache,id=pnpm-store-admin,target=/app/.pnpm-store \
-    pnpm config set store-dir /app/.pnpm-store \
+# No RUN --mount=type=cache here — Northflank BuildKit does not always bind external
+# cache mounts; rely on /app/.pnpm-store on the build volume + internal BuildKit cache.
+RUN pnpm config set store-dir /app/.pnpm-store \
     && pnpm fetch --frozen-lockfile
 
 COPY . .
 
 ENV HUSKY=0
 ENV CI=true
-RUN --mount=type=cache,id=pnpm-store-admin,target=/app/.pnpm-store \
-    pnpm config set store-dir /app/.pnpm-store \
+RUN pnpm config set store-dir /app/.pnpm-store \
     && pnpm install --frozen-lockfile --offline --prefer-offline
 
 ENV NODE_ENV=production

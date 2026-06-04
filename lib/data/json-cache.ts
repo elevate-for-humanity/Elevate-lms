@@ -19,8 +19,8 @@ export function loadJsonOnce<T = unknown>(filename: string): T {
   }
 
   try {
-    const { readFileSync } = require('node:fs') as typeof import('node:fs');
-    const { join } = require('node:path') as typeof import('node:path');
+    const { readFileSync } = require('fs') as typeof import('fs');
+    const { join } = require('path') as typeof import('path');
     const raw = readFileSync(join(process.cwd(), 'public/data', filename), 'utf8');
     const parsed = JSON.parse(raw) as T;
     _cache.set(filename, parsed);

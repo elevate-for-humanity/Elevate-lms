@@ -44,9 +44,9 @@ RUN pnpm config set store-dir /app/.pnpm-store \
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-# nf-compute-800-32 builder; leave headroom for native compile + BuildKit
-ENV NODE_OPTIONS=--max-old-space-size=6144
-ENV BUILD_SCOPE=1
+# nf-compute-800-32 builder — full LMS graph (do not set BUILD_SCOPE=1 here;
+# scoped builds pull server-only json-cache into client chunks and fail webpack).
+ENV NODE_OPTIONS=--max-old-space-size=8192
 ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 # Required at `next build` because NEXT_PUBLIC_* values are inlined into the
 # client bundle. Northflank must provide the real anon key as a build arg or

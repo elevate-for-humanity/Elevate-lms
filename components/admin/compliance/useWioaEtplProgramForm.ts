@@ -47,7 +47,12 @@ export function useWioaEtplProgramForm(programId: string) {
     try {
       const res = await fetch(`/api/admin/compliance/wioa-etpl/${programId}`);
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? 'Failed to load forms');
+      if (!res.ok) {
+        if (res.status === 404) {
+          setProgram(null);
+        }
+        throw new Error(json.error ?? 'Failed to load forms');
+      }
 
       const p = json.program as ProgramMeta;
       setProgram(p);

@@ -144,12 +144,12 @@ These are the **only** routes that grow filesystem inside the container (ephemer
 
 ## 9. WIOA / compliance dashboard (new work)
 
-| Path | Storage |
-|------|---------|
-| `app/admin/compliance/wioa-etpl/*` | Client + server components; **Supabase rows only** |
-| `app/api/admin/compliance/wioa-etpl/*` | JSON API; no file writes |
+| Path | Data access |
+|------|-------------|
+| `app/admin/compliance/wioa-etpl/*` | **Server:** `requireRole` only (no Supabase on RSC). **Client:** `fetch('/api/admin/compliance/wioa-etpl…')` |
+| `app/api/admin/compliance/wioa-etpl/*` | Supabase read/write via `requireAdminClient`; no filesystem writes |
 
-**Verdict:** Compliance UI does not contribute to container storage bloat.
+**Verdict:** Compliance UI does not contribute to container storage bloat. All persistence goes through the API routes into `program_wioa_compliance_forms`.
 
 ---
 

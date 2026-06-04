@@ -46,9 +46,8 @@ export function dedupeSecretVariables(variables) {
     }
   }
 
-  const defaultUrl = defaultSupabaseUrl();
-  if (!out[SUPABASE_CANONICAL_PUBLIC]?.trim() && defaultUrl) {
-    out[SUPABASE_CANONICAL_PUBLIC] = defaultUrl;
+  if (!out[SUPABASE_CANONICAL_PUBLIC]?.trim()) {
+    out[SUPABASE_CANONICAL_PUBLIC] = SUPABASE_URL_FALLBACK;
   }
 
   if (!out.SUPABASE_URL?.trim() && out.SUPABASE_SERVICE_ROLE_KEY) {

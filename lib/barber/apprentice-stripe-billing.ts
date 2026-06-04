@@ -132,6 +132,7 @@ async function ensureWeeklySubscription(
     proration_behavior: 'none',
     metadata: {
       program: 'barber-apprenticeship',
+      program_holder: 'Elevate Prestige Barber and Beauty Institute',
       enrollment_id: meta.enrollmentId,
       apprentice_name: meta.name,
     },

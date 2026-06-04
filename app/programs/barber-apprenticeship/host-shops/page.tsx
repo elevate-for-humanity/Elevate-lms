@@ -3,10 +3,11 @@ export const dynamic = 'force-dynamic';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Shield, Users, Award, Building2 } from 'lucide-react';
+import { Shield, Users, Award, Building2, MapPin } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import HostShopSyllabusRequirement from '@/components/programs/beauty/HostShopSyllabusRequirement';
+import { getApprovedShops, PROGRAM_LABELS } from '@/lib/programs/host-shops';
 
 export const metadata: Metadata = {
   title: 'Become a Host Barbershop | Barber Apprenticeship',
@@ -16,7 +17,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HostShopsPage() {
+export default async function HostShopsPage() {
+  const approvedShops = await getApprovedShops('barber');
 
   return (
     <main className="bg-white">
@@ -226,6 +228,54 @@ export default function HostShopsPage() {
 
       <HostShopSyllabusRequirement programSlug="barber-apprenticeship" />
 
+      {/* Approved host shops */}
+      <section className="py-16 px-6 bg-slate-50 border-y border-slate-200">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-3 text-slate-900">Approved Host Shops</h2>
+          <p className="text-center text-slate-700 mb-10 max-w-2xl mx-auto">
+            These partner barbershops are approved to host DOL-registered barber apprentices in the
+            Indianapolis metro area. Apprentices may be placed based on availability.
+          </p>
+          {approvedShops.length === 0 ? (
+            <p className="text-center text-slate-600">
+              Approved host shop list is loading. Contact us for current placement partners.
+            </p>
+          ) : (
+            <ul className="grid gap-4 sm:grid-cols-2">
+              {approvedShops.map((shop) => (
+                <li
+                  key={shop.id}
+                  className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+                >
+                  <div className="flex items-start gap-3">
+                    <MapPin className="mt-1 h-5 w-5 shrink-0 text-brand-red-600" aria-hidden />
+                    <div>
+                      <h3 className="text-lg font-bold text-slate-900">{shop.name}</h3>
+                      <p className="mt-1 text-sm text-slate-700">
+                        {[shop.address, shop.city, shop.state, shop.zip].filter(Boolean).join(', ')}
+                      </p>
+                      {shop.supervisor ? (
+                        <p className="mt-2 text-sm text-slate-600">
+                          Supervisor: {shop.supervisor}
+                        </p>
+                      ) : null}
+                      <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-brand-green-700">
+                        Approved host shop
+                      </p>
+                      <p className="mt-1 text-sm text-slate-600">
+                        {shop.programs
+                          .map((slug) => PROGRAM_LABELS[slug] ?? slug)
+                          .join(' · ')}
+                      </p>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
+
       {/* Approval Process */}
       <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
@@ -272,7 +322,7 @@ export default function HostShopsPage() {
               General Inquiry
             </Link>
             <Link
-              href="/programs/barber-apprenticeship/host-shops"
+              href="/partners/barber-host-shop/apply"
               className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold transition"
             >
               Enroll as a Host Shop

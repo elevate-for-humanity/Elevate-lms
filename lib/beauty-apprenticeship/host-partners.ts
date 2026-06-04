@@ -13,7 +13,7 @@ export type FeaturedHostPartner = {
 
 export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
   {
-    name: 'Prestige Elevation Barber and Beauty Institute LLC',
+    name: 'Elevate Prestige Barber and Beauty Institute',
     dba: 'Prestige Kountry Kuts',
     city: 'Indianapolis',
     state: 'IN',

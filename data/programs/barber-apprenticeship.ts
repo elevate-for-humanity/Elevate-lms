@@ -246,7 +246,8 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   facilityInfo: 'Host barbershops across Indianapolis metro area',
   bilingualSupport: 'Bilingual (English/Spanish) instruction available.',
   employerPartners: [
-    'Partner barbershops in Indianapolis (host shops)',
+    'Elevate Prestige Barber and Beauty Institute',
+    'Kountry Kutz Barbershop',
     'Indiana Barber Association',
   ],
   pricingIncludes: [

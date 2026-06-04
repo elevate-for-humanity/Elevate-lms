@@ -27,17 +27,30 @@ async function triggerBuild(projectId: string, serviceId: string) {
 async function waitForRunning(projectId: string, serviceId: string, maxMs = 900_000) {
   const start = Date.now();
   while (Date.now() - start < maxMs) {
-    const s = await nfFetch<{ deploymentStatus?: { status?: string }; buildStatus?: string }>(
-      projectApiPath(projectId, `/services/${serviceId}`),
-    );
-    const st = s.deploymentStatus?.status ?? s.buildStatus ?? 'unknown';
+    const s = await nfFetch<{
+      deploymentStatus?: { status?: string };
+      buildStatus?: string;
+      status?: { build?: { status?: string }; deployment?: { status?: string } };
+    }>(projectApiPath(projectId, `/services/${serviceId}`));
+    const build = s.status?.build?.status ?? s.buildStatus;
+    const deploy = s.status?.deployment?.status ?? s.deploymentStatus?.status;
+    const st =
+      build && !['SUCCESS', 'COMPLETED'].includes(build)
+        ? build
+        : (deploy ?? build ?? 'unknown');
     process.stdout.write(`\r  ${serviceId}: ${st}   `);
-    if (st === 'COMPLETED' || st === 'RUNNING' || st === 'SUCCESS') {
+    if (build === 'FAILURE' || build === 'FAILED' || build === 'ERROR') {
+      console.log('\n  BUILD FAILED');
+      return false;
+    }
+    const deployReady = deploy && ['COMPLETED', 'RUNNING', 'SUCCESS'].includes(deploy);
+    const buildDone = !build || ['SUCCESS', 'COMPLETED', 'SKIPPED'].includes(build);
+    if (buildDone && deployReady) {
       console.log('');
       return true;
     }
-    if (st === 'FAILED' || st === 'ERROR') {
-      console.log('\n  FAILED');
+    if (deploy === 'FAILED' || deploy === 'ERROR') {
+      console.log('\n  DEPLOY FAILED');
       return false;
     }
     await new Promise((r) => setTimeout(r, 15_000));

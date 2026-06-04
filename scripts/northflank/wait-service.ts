@@ -12,7 +12,22 @@ import { nfFetch, projectApiPath, resolveProjectId } from './lib';
 type ServiceStatus = {
   deploymentStatus?: { status?: string };
   buildStatus?: string;
+  status?: {
+    build?: { status?: string };
+    deployment?: { status?: string; reason?: string };
+  };
 };
+
+function resolveServicePhase(service: ServiceStatus): string {
+  const build = service.status?.build?.status ?? service.buildStatus;
+  const deploy = service.status?.deployment?.status ?? service.deploymentStatus?.status;
+
+  if (build && !['SUCCESS', 'COMPLETED'].includes(build)) {
+    return build;
+  }
+  if (deploy) return deploy;
+  return build ?? deploy ?? 'unknown';
+}
 
 function argValue(name: string): string | undefined {
   const index = process.argv.indexOf(name);
@@ -38,18 +53,33 @@ async function main() {
 
   while (Date.now() - start < timeoutMs) {
     const service = await nfFetch<ServiceStatus>(projectApiPath(projectId, `/services/${serviceId}`));
-    const status = service.deploymentStatus?.status ?? service.buildStatus ?? 'unknown';
+    const build = service.status?.build?.status ?? service.buildStatus;
+    const deploy = service.status?.deployment?.status ?? service.deploymentStatus?.status;
+    const phase = resolveServicePhase(service);
+    const label =
+      build && deploy && build !== deploy ? `${build} (deploy: ${deploy})` : phase;
 
-    if (status !== last) {
-      console.log(`${serviceId}: ${status}`);
-      last = status;
+    if (label !== last) {
+      console.log(`${serviceId}: ${label}`);
+      last = label;
     }
 
-    if (['COMPLETED', 'RUNNING', 'SUCCESS'].includes(status)) {
+    if (build === 'FAILURE' || build === 'ERROR' || build === 'FAILED') {
+      console.error(`${serviceId} build failed (${build})`);
+      process.exit(1);
+    }
+
+    const deployReady =
+      deploy && ['COMPLETED', 'RUNNING', 'SUCCESS'].includes(deploy);
+    const buildDone =
+      !build || ['SUCCESS', 'COMPLETED', 'SKIPPED'].includes(build);
+
+    if (buildDone && deployReady) {
       return;
     }
-    if (['FAILED', 'ERROR'].includes(status)) {
-      console.error(`${serviceId} failed with status ${status}`);
+
+    if (['FAILED', 'ERROR'].includes(deploy ?? '')) {
+      console.error(`${serviceId} deployment failed (${deploy})`);
       process.exit(1);
     }
 

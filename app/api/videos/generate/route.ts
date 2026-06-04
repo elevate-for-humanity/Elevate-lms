@@ -19,15 +19,12 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { createJob, markRendering, markComplete, markFailed } from '@/lib/video/job-queue';
 import { renderLessonVideo, inferDomainKey } from '@/lib/video/remotion-render';
-import { readFile, unlink } from 'fs/promises';
-import path from 'path';
 
 export const runtime = 'nodejs';
 export const maxDuration = 600;
@@ -49,9 +46,6 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = await createClient();
-  const adminDb = await requireAdminClient();
-  if (!adminDb) return safeError('Service unavailable', 503);
-
   // Fetch lesson + course
   const { data: lesson, error: lessonErr } = await supabase
     .from('course_lessons')
@@ -87,7 +81,6 @@ export async function POST(request: NextRequest) {
     script: lesson.script ?? lesson.title,
     bulletPoints: Array.isArray(lesson.bullet_points) ? lesson.bullet_points : [],
     durationSecs: lesson.duration_seconds ?? undefined,
-    adminDb,
   }).catch((err) => {
     // audit-safe: err goes to logger only, not HTTP response
     logger.error('[VideoGenerate] Background render threw', err);
@@ -115,9 +108,8 @@ async function runRender(opts: {
   script: string;
   bulletPoints: string[];
   durationSecs?: number;
-  adminDb: NonNullable<Awaited<ReturnType<typeof requireAdminClient>>>;
 }) {
-  const { jobId, lessonId, courseTitle, lessonTitle, script, bulletPoints, adminDb } = opts;
+  const { jobId, lessonId, courseTitle, lessonTitle, script, bulletPoints } = opts;
 
   await markRendering(jobId);
 
@@ -144,37 +136,9 @@ async function runRender(opts: {
       return;
     }
 
-    // Upload MP4 from public/generated to Supabase Storage
-    const localPath = path.join(process.cwd(), 'public', result.videoUrl);
-    let storageUrl = result.videoUrl; // fallback to local public path
-
-    try {
-      const buffer = await readFile(localPath);
-      const storagePath = `lessons/${lessonId}/lesson-video.mp4`;
-
-      const { error: uploadErr } = await adminDb.storage
-        .from('course-videos')
-        .upload(storagePath, buffer, { contentType: 'video/mp4', upsert: true });
-
-      if (!uploadErr) {
-        const { data: urlData } = adminDb.storage.from('course-videos').getPublicUrl(storagePath);
-        storageUrl = urlData.publicUrl;
-        // Clean up local file after successful upload
-        await unlink(localPath).catch(() => {});
-      } else {
-        logger.warn(
-          '[VideoGenerate] Storage upload failed, keeping local URL: ' + uploadErr.message,
-        );
-      }
-    } catch (readErr) {
-      logger.warn(
-        '[VideoGenerate] Could not read local MP4 for upload: ' +
-          (readErr instanceof Error ? readErr.message : readErr),
-      );
-    }
-
+    // renderLessonVideo uploads to Supabase course-videos and removes os.tmpdir() temps
     await markComplete(jobId, {
-      video_url: storageUrl,
+      video_url: result.videoUrl,
       audio_url: result.audioUrl ?? undefined,
       duration_seconds: result.duration,
       scene_count: undefined,

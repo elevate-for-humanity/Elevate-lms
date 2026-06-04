@@ -99,9 +99,11 @@
 
 ---
 
-## 6. Runtime disk writers (admin API routes)
+## 6. Line-by-line: what can fill disk at runtime (admin API routes)
 
-These are the **only** routes that grow filesystem inside the container (ephemeral disk on Northflank):
+**Do not use the pre–PR #233 table** (`public/generated/`, `public/videos/slide-image-cache/` growing until redeploy). Current behavior:
+
+These are the **only** routes that touch the container filesystem (ephemeral disk on Northflank). Durable media belongs in **Supabase Storage**, not `public/`:
 
 | Route | Writes to | Cleaned? | Risk |
 |-------|-----------|----------|------|

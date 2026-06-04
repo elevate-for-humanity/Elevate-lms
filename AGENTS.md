@@ -855,6 +855,19 @@ Durable cannot CNAME-flatten apex to Northflank. **Do not** use apex **A** → N
 - **Build context:** `.dockerignore` excludes `node_modules`, `.next`, `supabase/`, `tests/`, `docs/`, etc. Verify with `tar -cf - --exclude-from=.dockerignore . | wc -c` (expect well under 1 GB).
 - **LMS:** service `elevate-lms`, Dockerfile `Dockerfile.northflank-lms`, branch `main`, readiness path `/api/ping`
 - **Admin (Northflank):** service `elevate-admin`, Dockerfile `Dockerfile.northflank-admin`, branch `main`, readiness path `/api/ping`. Same pnpm fetch/offline flow as LMS (no `--package-import-method=copy`). After `next build`, **`node scripts/prune-admin-standalone.mjs`**. Lesson video/TTS output → **Supabase `course-videos`** (`lib/video/upload-lesson-media.ts`), not `public/generated/`. Runtime image copies slim `public/` subtrees + `remotion-src/` only. Northflank secret group `elevate-production-env`: canonical **`NORTHFLANK_API_TOKEN`** only (no `NORTHFLANK_API_KEY` / `NF_API_TOKEN` duplicates); set **`DEVSTUDIO_DEVCONTAINER_MODE=github-only`**. Sync: `pnpm tsx scripts/northflank/sync-env.ts --execute`.
+
+**Admin runtime disk (line-by-line — do not write under `public/` in production):**
+
+| Route | Writes | Cleaned? |
+|-------|--------|----------|
+| `POST /api/admin/generate-lesson-videos` | `os.tmpdir()` during Remotion/TTS; durable → Supabase `course-videos/generated-lessons/` | Yes — temp removed after upload (`lib/video/remotion-render.ts`, `upload-lesson-media.ts`) |
+| `POST /api/admin/courses/[id]/generate-videos` | `os.tmpdir()/vid-gen-*` | Yes — `rmSync` in `finally` |
+| `POST /api/admin/preview-slide` | `os.tmpdir()/elevate-slide-cache/`; durable cache → Supabase `course-videos/slide-cache/` | Yes — temp per request (`lib/video/slide-image-cache.ts`) |
+| `POST /api/admin/wioa/pirl-export` | `os.tmpdir()/pirl-*` | Yes — after upload |
+| `PUT /api/devstudio/devcontainer` | `.devcontainer/` only in `local-only` without `GITHUB_TOKEN` | Blocked in prod (`github-only`) |
+| Dashboard UI (`app/admin/*`, WIOA ETPL) | None | N/A — API → Supabase only |
+
+Full audit: `docs/audits/ADMIN_DASHBOARD_STORAGE_AUDIT.md` §6. LMS video jobs: `POST /api/videos/generate` uses the same Supabase upload path (no `public/generated/`).
 - **Admin (AWS ECS, legacy):** `elevate-admin-service` on `elevate-cluster`, `Dockerfile.admin`, CodeBuild `elevate-admin-build`. Deploy: `.github/workflows/deploy-admin.yml` on `main`.
 - `apps/admin/server.js` must load `.next/required-server-files.json` at startup.
 - **BuildKit cache:** `pnpm tsx scripts/northflank/ensure-build-cache.ts --execute` (10GB `useCache` on both services)

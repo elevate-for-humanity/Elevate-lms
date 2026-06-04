@@ -44,7 +44,8 @@ RUN pnpm config set store-dir /app/.pnpm-store \
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_OPTIONS=--max-old-space-size=8192
+# nf-compute-800-32 builder; leave headroom for native compile + BuildKit
+ENV NODE_OPTIONS=--max-old-space-size=6144
 ENV BUILD_SCOPE=1
 ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 # Required at `next build` because NEXT_PUBLIC_* values are inlined into the
@@ -62,7 +63,8 @@ ENV SKIP_ENV_VALIDATION=true
 
 RUN test -n "$NEXT_PUBLIC_SUPABASE_URL" \
     && test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
-    && pnpm exec next build
+    && pnpm exec next build \
+    && node scripts/prune-standalone.mjs
 
 # Bundle sharp + linux x64 @img bindings (runtime npm install fails in slim CI images)
 RUN set -eux; \

@@ -70,10 +70,11 @@ jobs:
         run: pnpm tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_ADMIN_SERVICE_ID" "$DEPLOY_BRANCH"
 
       - name: Trigger admin build
+        id: trigger_admin_build
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
 
       - name: Wait for admin deployment
-        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --timeout-ms 1200000
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" --timeout-ms 1200000
 
       - name: Smoke admin
         run: |

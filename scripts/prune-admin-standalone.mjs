@@ -74,6 +74,8 @@ const ADMIN_PRUNE_PACKAGES = [
   'happy-dom',
   'es-toolkit',
   'web-streams-polyfill',
+  // Remotion Studio UI — pulled transitively; not needed for server render API
+  '@remotion/studio',
 ];
 
 await pruneStandaloneNodeModules(STANDALONE_NODE_MODULES, ADMIN_PRUNE_PACKAGES, 'prune-admin-standalone');

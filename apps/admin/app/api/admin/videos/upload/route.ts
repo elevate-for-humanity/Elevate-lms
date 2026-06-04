@@ -12,6 +12,9 @@ export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
+/** Prevent unbounded memory use — stream to Supabase after this cap. */
+const MAX_BYTES = 200 * 1024 * 1024; // 200 MB
+
 const _POST = withAuth(
   async (request: NextRequest, user) => {
     const rateLimited = await applyRateLimit(request, 'strict');
@@ -26,6 +29,13 @@ const _POST = withAuth(
 
       if (!file) {
         return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+      }
+
+      if (file.size > MAX_BYTES) {
+        return NextResponse.json(
+          { error: `File exceeds ${Math.round(MAX_BYTES / (1024 * 1024))} MB limit` },
+          { status: 413 },
+        );
       }
 
       const supabase = await createServerSupabaseClient();

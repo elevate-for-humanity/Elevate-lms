@@ -15,6 +15,10 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
 export const maxDuration = 120;
 
+/** CSV is loaded entirely into memory — cap file size and row count. */
+const MAX_CSV_BYTES = 10 * 1024 * 1024; // 10 MB
+const MAX_CSV_ROWS = 25_000;
+
 interface ImportResult {
   success: boolean;
   imported: number;

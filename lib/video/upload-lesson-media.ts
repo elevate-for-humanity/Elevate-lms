@@ -20,13 +20,11 @@ export function lessonMediaPublicUrl(storagePath: string): string {
   return `${base}/storage/v1/object/public/${BUCKET}/${storagePath}`;
 }
 
-export async function uploadLessonMediaBuffer(
+export async function uploadCourseVideosObject(
   buffer: Buffer,
-  lessonId: string,
-  ext: 'mp3' | 'mp4',
+  storagePath: string,
+  contentType: string,
 ): Promise<string> {
-  const storagePath = lessonMediaStoragePath(lessonId, ext);
-  const contentType = ext === 'mp3' ? 'audio/mpeg' : 'video/mp4';
   const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '');
   const svc = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!supaUrl || !svc) {
@@ -45,10 +43,20 @@ export async function uploadLessonMediaBuffer(
 
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Lesson media upload failed: ${text.slice(0, 200)}`);
+    throw new Error(`Storage upload failed (${storagePath}): ${text.slice(0, 200)}`);
   }
 
   return lessonMediaPublicUrl(storagePath);
+}
+
+export async function uploadLessonMediaBuffer(
+  buffer: Buffer,
+  lessonId: string,
+  ext: 'mp3' | 'mp4',
+): Promise<string> {
+  const storagePath = lessonMediaStoragePath(lessonId, ext);
+  const contentType = ext === 'mp3' ? 'audio/mpeg' : 'video/mp4';
+  return uploadCourseVideosObject(buffer, storagePath, contentType);
 }
 
 /** Temp paths for Remotion/ffmpeg — always under os.tmpdir(), never public/. */

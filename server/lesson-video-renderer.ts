@@ -7,76 +7,14 @@
  */
 
 import fs from 'fs/promises';
-import fssync from 'fs';
 import path from 'path';
-import crypto from 'crypto';
 import { execSync } from 'child_process';
 import type { LessonSlide } from '../lib/autopilot/lesson-script-generator';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-
-const IMAGE_CACHE_DIR = path.join(process.cwd(), 'public', 'videos', 'slide-image-cache');
+import { cleanupSlideImageTemp, getSlideImageLocalPath } from '@/lib/video/slide-image-cache';
 
 async function fetchSlideImage(prompt: string | undefined): Promise<string | null> {
-  if (!prompt) return null;
-  const cacheKey = crypto.createHash('md5').update(prompt).digest('hex');
-  const cachePath = path.join(IMAGE_CACHE_DIR, `${cacheKey}.jpg`);
-  if (fssync.existsSync(cachePath)) return cachePath;
-  await fs.mkdir(IMAGE_CACHE_DIR, { recursive: true });
-
-  const pexelsKey = process.env.PEXELS_API_KEY;
-  if (pexelsKey) {
-    try {
-      const res = await fetch(
-        `https://api.pexels.com/v1/search?query=${encodeURIComponent(prompt)}&per_page=1&orientation=landscape`,
-        { headers: { Authorization: pexelsKey } },
-      );
-      if (res.ok) {
-        const data = (await res.json()) as { photos: { src: { large: string } }[] };
-        const url = data.photos?.[0]?.src?.large;
-        if (url) {
-          const img = await fetch(url);
-          if (img.ok) {
-            await fs.writeFile(cachePath, Buffer.from(await img.arrayBuffer()));
-            return cachePath;
-          }
-        }
-      }
-    } catch {
-      /* fall through */
-    }
-  }
-
-  const openaiKey = process.env.OPENAI_API_KEY;
-  if (openaiKey) {
-    try {
-      const res = await fetch('https://api.openai.com/v1/images/generations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${openaiKey}` },
-        body: JSON.stringify({
-          model: 'dall-e-3',
-          prompt: `Photorealistic professional training photo: ${prompt}. Clean, well-lit, no text overlays.`,
-          n: 1,
-          size: '1792x1024',
-          quality: 'standard',
-          style: 'natural',
-        }),
-      });
-      if (res.ok) {
-        const data = (await res.json()) as { data: { url: string }[] };
-        const url = data.data?.[0]?.url;
-        if (url) {
-          const img = await fetch(url);
-          if (img.ok) {
-            await fs.writeFile(cachePath, Buffer.from(await img.arrayBuffer()));
-            return cachePath;
-          }
-        }
-      }
-    } catch {
-      /* fall through */
-    }
-  }
-  return null;
+  return getSlideImageLocalPath(prompt);
 }
 
 let _createCanvas: any;
@@ -408,7 +346,11 @@ export async function renderSlideFrameForPreview(
   opts: RenderOptions,
 ): Promise<Buffer> {
   const imagePath = await fetchSlideImage(slide.imagePrompt).catch(() => null);
-  return renderSlideFrame(slide, slideIndex, totalSlides, opts, imagePath, 0);
+  try {
+    return await renderSlideFrame(slide, slideIndex, totalSlides, opts, imagePath, 0);
+  } finally {
+    await cleanupSlideImageTemp(imagePath);
+  }
 }
 
 async function getFFmpeg() {
@@ -580,6 +522,11 @@ export async function renderLessonVideo(
     );
   });
 
+  await Promise.all(
+    [...new Set(slideImages.filter((p): p is string => Boolean(p)))].map((p) =>
+      cleanupSlideImageTemp(p),
+    ),
+  );
   await fs.rm(tempDir, { recursive: true, force: true });
   return { duration: finalDuration, fileSize: fileStat.size };
 }

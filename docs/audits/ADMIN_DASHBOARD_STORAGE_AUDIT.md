@@ -1,6 +1,6 @@
 # Admin dashboard — storage & memory audit (line-by-line)
 
-**Date:** 2026-05-30  
+**Date:** 2026-05-30 (updated after PR #233 / follow-up)  
 **Scope:** `apps/admin` (421 API routes, 362 admin pages), Northflank `Dockerfile.northflank-admin`, shared `@/*` monorepo imports.  
 **Goal:** Confirm nothing duplicates heavy deps or fills disk/memory unexpectedly.
 
@@ -10,13 +10,13 @@
 
 | Area | Status | Notes |
 |------|--------|--------|
-| Build / standalone image | **Improved (PR #233)** | `outputFileTracingExcludes` + `prune-admin-standalone.mjs`; playwright/puppeteer not in trace |
-| Runtime container disk | **Risk — video routes** | Writes under `public/generated/`, `public/videos/slide-image-cache/`, `os.tmpdir()` |
-| Docker image `public/` | **~190 MB** | Full repo `public/` copied into admin image (mostly `public/images` 165 MB) |
+| Build / standalone image | **Fixed (PR #233)** | `outputFileTracingExcludes` + `prune-admin-standalone.mjs`; playwright/puppeteer not in trace |
+| Runtime container disk | **Fixed** | Lesson/slide media → Supabase `course-videos`; temps under `os.tmpdir()` only |
+| Docker image `public/` | **Slimmed (PR #233)** | Selective `public/` subtrees in `Dockerfile.northflank-admin` (not full ~190 MB tree) |
 | Dashboard UI pages | **OK** | No server imports of Remotion/ffmpeg; data via Supabase APIs |
-| WIOA compliance UI | **OK** | JSON to Supabase only; no local file cache |
-| Dev Studio | **Caution** | Shell/autofix/stabilize can spike CPU/RAM; devcontainer can write `.devcontainer/` in `local-only` mode |
-| Missing upload caps | **Fix pending** | `/api/admin/videos/upload`, `/api/admin/import` had no size limits |
+| WIOA compliance UI | **OK** | RSC: `requireRole` only; data via `/api/admin/compliance/wioa-etpl/*` |
+| Dev Studio | **Caution** | CPU/RAM spikes on stabilize/autofix; prod uses `DEVSTUDIO_DEVCONTAINER_MODE=github-only` |
+| Upload caps | **Fixed (PR #233)** | Video 200 MB; CSV import 10 MB / 25k rows |
 
 **Not a duplicate-deps problem:** Admin does not import puppeteer/playwright in any route (only `scripts/`). The earlier bloat was **file tracing + missing post-build prune**, not duplicate WIOA/compliance code.
 
@@ -52,7 +52,7 @@
 | 52–54 | `NODE_OPTIONS=4096`, `DISABLE_WEBPACK_FILESYSTEM_CACHE=1` | RAM/disk tradeoff for build |
 | 70–75 | `next build` + `prune-admin-standalone.mjs` | Drops playwright/puppeteer/three/etc. from standalone |
 | 77–95 | Export `ws`, `sharp`, `@img/*` | Explicit runtime copies (sharp excluded from trace globs) |
-| 115–122 | Runtime: standalone + `.next/server` + `.next/static` + **`public/`** | **~190 MB** `public/` in every admin pod |
+| 115–122 | Runtime: standalone + `.next/server` + `.next/static` + **selective `public/`** | Slim copy (images subset + remotion assets); not full repo `public/` |
 | 137 | Healthcheck `/api/ping` | No storage |
 
 **Gap:** `remotion-src/` must exist at runtime for Remotion `bundle({ entryPoint })` — ensure it is included in standalone trace (do not add `remotion-src/**` to admin excludes).
@@ -105,13 +105,13 @@ These are the **only** routes that grow filesystem inside the container (ephemer
 
 | Route | Writes to | Cleaned? | Risk |
 |-------|-----------|----------|------|
-| `POST /api/admin/generate-lesson-videos` | `public/generated/lessons/*.mp3`, Remotion `*.mp4` | **No** — persists until redeploy | **High** if batch-run |
-| `POST /api/admin/courses/[courseId]/generate-videos` | `os.tmpdir()/vid-gen-*` | **Yes** — `rmSync` in `finally` block | Medium if crash mid-batch |
-| `POST /api/admin/preview-slide` | `public/videos/slide-image-cache/` (via `lesson-video-renderer`) | **No** — cache grows | Medium |
-| `POST /api/admin/wioa/pirl-export` | `os.tmpdir()/pirl-{jobId}/` | After upload to storage | Low if cleanup runs |
-| `POST /api/devstudio/devcontainer` | `.devcontainer/devcontainer.json` | N/A | **Only if `DEVSTUDIO_DEVCONTAINER_MODE=local-only`** — use `github-only` in prod |
+| `POST /api/admin/generate-lesson-videos` | `os.tmpdir()` + Supabase `course-videos/generated-lessons/` | Temp deleted after upload | Low |
+| `POST /api/admin/courses/[courseId]/generate-videos` | `os.tmpdir()/vid-gen-*` | **Yes** — `rmSync` in `finally` | Medium if crash mid-batch |
+| `POST /api/admin/preview-slide` | `os.tmpdir()/elevate-slide-cache/` + Supabase `course-videos/slide-cache/` | Temp cleaned per request | Low |
+| `POST /api/admin/wioa/pirl-export` | `os.tmpdir()/pirl-{jobId}/` | After upload to storage | Low |
+| `PUT /api/devstudio/devcontainer` | `.devcontainer/` **blocked** unless `local-only` + no `GITHUB_TOKEN` | N/A in prod (`github-only`) | Low in prod |
 
-**Recommendation:** Point video outputs to Supabase Storage/R2 only; treat container `public/` as read-only in production.
+**Production:** Treat container `public/` as read-only; all durable media in Supabase Storage.
 
 ---
 
@@ -137,8 +137,8 @@ These are the **only** routes that grow filesystem inside the container (ephemer
 | `/api/admin/contracts/upload` | 50 MB | OK |
 | `/api/admin/courses/parse-file` | 10 MB | OK |
 | `/api/admin/validate-coi` | 10 MB | OK |
-| `/api/admin/videos/upload` | **None** | **Fixed in branch** — add cap |
-| `/api/admin/import` | **None** | **Fixed in branch** — add CSV cap |
+| `/api/admin/videos/upload` | 200 MB | OK (PR #233) |
+| `/api/admin/import` | 10 MB / 25k rows | OK (PR #233) |
 
 ---
 
@@ -176,11 +176,13 @@ Command: `pnpm audit:admin-standalone` (after `cd apps/admin && pnpm exec next b
 ## 12. Action checklist
 
 - [x] Shared trace excludes + admin prune (PR #233)
-- [ ] Merge PR #233 and verify Northflank admin build size
-- [ ] Set `DEVSTUDIO_DEVCONTAINER_MODE=github-only` on production admin
-- [ ] Add upload caps on videos/import (this audit branch)
-- [ ] Move `public/generated` video output to Supabase Storage (follow-up)
-- [ ] Optional: slim Docker `public/` copy to admin-needed assets only (follow-up)
+- [x] Merge PR #233; Northflank env dedupe + `NEXT_PUBLIC_SUPABASE_ANON_KEY` fix (PR #234)
+- [x] `DEVSTUDIO_DEVCONTAINER_MODE=github-only` in Northflank sync (`canonical-env.mjs`)
+- [x] Upload caps on videos/import
+- [x] Lesson/slide media → Supabase (`lib/video/upload-lesson-media.ts`, `lib/video/slide-image-cache.ts`)
+- [x] Slim Docker `public/` copy in `Dockerfile.northflank-admin`
+- [x] GitHub Actions: single `NORTHFLANK_API_TOKEN` (no duplicate secret names)
+- [ ] Verify latest `elevate-admin` Northflank build after each merge to `main`
 
 ---
 

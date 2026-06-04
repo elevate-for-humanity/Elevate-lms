@@ -322,18 +322,20 @@ export async function PUT(request: NextRequest) {
     }
 
     if (!hasGitHubToken()) {
-      try {
-        const result = await writeLocalDevcontainer(content, sha);
-        if (result.conflict) return safeError('sha mismatch; reload before saving', 409);
-
-        return NextResponse.json({
-          ok: true,
-          sha: result.sha,
-          commit: 'local write (GITHUB_TOKEN not configured)',
-        });
-      } catch {
-        return safeError('Save requires GITHUB_TOKEN in production environments', 503);
+      if (mode !== 'local-only') {
+        return safeError(
+          'Save requires GITHUB_TOKEN. Production admin must use DEVSTUDIO_DEVCONTAINER_MODE=github-only.',
+          503,
+        );
       }
+      const result = await writeLocalDevcontainer(content, sha);
+      if (result.conflict) return safeError('sha mismatch; reload before saving', 409);
+
+      return NextResponse.json({
+        ok: true,
+        sha: result.sha,
+        commit: 'local write (dev only — local-only mode)',
+      });
     }
 
     const encoded = Buffer.from(content, 'utf-8').toString('base64');

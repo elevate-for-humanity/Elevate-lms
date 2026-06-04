@@ -70,7 +70,9 @@ ENV SKIP_ENV_VALIDATION=true
 RUN test -n "$NEXT_PUBLIC_SUPABASE_URL" \
     && test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
     && cd apps/admin \
-    && pnpm exec next build
+    && pnpm exec next build \
+    && cd ../.. \
+    && node scripts/prune-admin-standalone.mjs
 
 # Bundle ws for runtime (custom server.js). Do NOT npm install ws in slim stage — peer-resolve fails.
 RUN set -eux; \

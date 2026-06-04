@@ -11,6 +11,7 @@
 
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { sharedStandaloneTraceExcludes } from '../../scripts/next-standalone-trace-excludes.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
@@ -91,20 +92,21 @@ const adminConfig = {
   // Standalone output — trace files from repo root so shared lib/ etc. are included
   outputFileTracingRoot: ROOT,
 
+  // Same monorepo-wide excludes as LMS — keeps playwright/puppeteer/three/etc.
+  // out of standalone. Admin keeps Remotion (see lmsOnly excludes in shared module).
+  outputFileTracingExcludes: {
+    '*': sharedStandaloneTraceExcludes,
+  },
+
   serverExternalPackages: [
-    // Remotion — ships native binaries and .mjs workers webpack can't bundle
+    // Remotion — /api/admin/generate-lesson-videos (dynamic import of remotion-render)
     'remotion',
     '@remotion/bundler',
     '@remotion/renderer',
-    '@remotion/studio',
     '@remotion/compositor-linux-x64-gnu',
-    '@remotion/core',
-    '@remotion/cli',
-    // rspack — bundled by remotion, has native bindings
     '@rspack/core',
     '@rspack/binding',
     '@rspack/binding-linux-x64-gnu',
-    // esbuild — .d.ts files get picked up by webpack, must stay external
     'esbuild',
     // Sentry + OpenTelemetry — dynamic require() patterns break webpack
     '@sentry/nextjs',
@@ -117,15 +119,10 @@ const adminConfig = {
     '@opentelemetry/exporter-trace-otlp-http',
     '@opentelemetry/resources',
     '@opentelemetry/semantic-conventions',
-    // Other heavy server-only deps
     'sharp',
-    'ffmpeg-static',
-    '@sparticuz/chromium',
-    'puppeteer',
-    'puppeteer-core',
-    // ws — used only in the custom server.js, not in any Next.js route
+    // ws — custom server.js only
     'ws',
-    'playwright',
+    // Document OCR / extract admin APIs
     'tesseract.js',
     'tesseract.js-core',
     'pdf-parse',
@@ -144,9 +141,6 @@ const adminConfig = {
     '@octokit/rest',
     '@octokit/auth-oauth-app',
     'socket.io',
-    'yjs',
-    'y-websocket',
-    'typescript',
   ],
 
   devIndicators: { position: 'bottom-right' },

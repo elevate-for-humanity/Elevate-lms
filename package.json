@@ -293,6 +293,7 @@
     "video:render": "remotion render remotion-src/index.ts ElevateLesson",
     "build:fast": "NODE_OPTIONS='--max-old-space-size=3072' SKIP_ENV_VALIDATION=true next build",
     "postbuild": "node scripts/prune-standalone.mjs",
+    "audit:admin-standalone": "node scripts/audit-admin-standalone-size.mjs",
     "verify:build": "bash scripts/verify-build.sh || true",
     "verify:pwa": "node scripts/verify-pwa.cjs",
     "generate:vapid": "node scripts/generate-vapid-keys.cjs",

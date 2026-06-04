@@ -1,15 +1,15 @@
 /**
  * /api/devstudio/container-env
  *
- * Read and write environment variables directly on the ECS task definitions.
- * Variables are stored in AWS SSM Parameter Store at /elevate/<KEY> and
+ * Legacy AWS-only environment mutation endpoint. Northflank production env vars are configured in Northflank.
+ * Legacy variables are stored in AWS SSM Parameter Store at /elevate/<KEY> and
  * referenced from the task definition secrets array.
  *
- * GET  — returns current env vars from the active task definition
- * POST { key, value, services? } — writes to SSM + registers new task def revision + updates service
- * DELETE { key, services? }      — removes from SSM + task def + updates service
+ * GET  — returns current legacy AWS env vars from the active task definition
+ * POST { key, value, services? } — legacy SSM + task-def update flow
+ * DELETE { key, services? }      — legacy SSM + task-def delete flow
  *
- * Admin-only. AWS credentials resolved from platform_secrets → process.env.
+ * Admin-only. Legacy AWS credentials resolved from platform_secrets → process.env.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -37,7 +37,7 @@ const SSM_PATH = '/elevate/';
 const SERVICE_MAP: Record<string, string> = {
   lms:    'elevate-lms-service',
   admin:  'elevate-admin-service',
-  studio: 'elevate-studio',
+  studio: 'elevate-studio-service',
 };
 
 const TASK_DEF_MAP: Record<string, string> = {

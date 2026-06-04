@@ -114,7 +114,7 @@ async function main() {
   // Check for Stripe key
   const stripeKey = process.env.STRIPE_SECRET_KEY;
 
-  if (!stripeKey || stripeKey.includes('sk_test_...') || stripeKey.includes('sk_live_...')) {
+  if (!stripeKey || stripeKey === '<stripe-secret-key>') {
     const continueAnyway = await question('Continue with manual setup instructions? (y/n): ');
     if (continueAnyway.toLowerCase() !== 'y') {
       rl.close();

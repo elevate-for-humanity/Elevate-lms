@@ -26,11 +26,26 @@ RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
 WORKDIR /app
 
 # Copy lockfile and manifests first for layer caching
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY .npmrc* ./
+COPY apps/admin/package.json apps/admin/package.json
+COPY packages/ui/package.json packages/ui/package.json
+COPY packages/shared/package.json packages/shared/package.json
+COPY packages/db/package.json packages/db/package.json
+COPY scripts/verify-package-registry.mjs scripts/verify-package-registry.mjs
+
+# pnpm may need to recreate node_modules when a build cache restores it.
+# Northflank Docker builds are non-interactive, so force CI mode to avoid
+# ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY during frozen installs.
+ENV CI=true
+ENV NPM_CONFIG_REGISTRY=https://registry.npmjs.org/
+ENV npm_config_registry=https://registry.npmjs.org/
+
+# Fail fast with the real registry HTTP status before the larger pnpm install.
+RUN node scripts/verify-package-registry.mjs next
 
 # Install all deps (including devDeps needed for build)
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --store-dir .pnpm-store --package-import-method=hardlink
 
 # ── Stage 2: builder ──────────────────────────────────────────────────────────
 FROM deps AS builder

@@ -5,7 +5,7 @@
  *
  * Runtime detection:
  *   LOCAL (.git present) — runs git commands via execSync
- *   ECS   (no .git)      — falls back to GitHub REST API for reads;
+ *   Runtime without .git  — falls back to GitHub REST API for reads;
  *                          single-file commits via GitHub Contents API;
  *                          push/pull/checkout require the studio-shell container
  *
@@ -38,7 +38,7 @@ export const dynamic = 'force-dynamic';
 const REPO = process.env.GITHUB_REPO ?? 'elevate-for-humanity/Elevate-lms';
 const GH_API = 'https://api.github.com';
 
-// LOCAL: .git present (Gitpod / dev). ECS: no .git — use GitHub API.
+// LOCAL: .git present (Gitpod / dev). Hosted runtime: no .git — use GitHub API.
 const REPO_DIR = (() => {
   const candidates = ['/workspaces/Elevate-lms', '/app', process.cwd()];
   return candidates.find(p => existsSync(`${p}/.git`)) ?? null;
@@ -48,7 +48,7 @@ const HAS_GIT = REPO_DIR !== null;
 // ── Local git helper ──────────────────────────────────────────────────────────
 
 function git(cmd: string, opts?: { timeout?: number }): string {
-  if (!HAS_GIT) throw new Error('No local .git — ECS mode uses GitHub API');
+  if (!HAS_GIT) throw new Error('No local .git — hosted runtime uses GitHub API');
   const token = process.env.GITHUB_TOKEN ?? '';
   const env: NodeJS.ProcessEnv = { ...process.env, GIT_TERMINAL_PROMPT: '0', GIT_ASKPASS: 'echo' };
   if (token) {
@@ -59,7 +59,7 @@ function git(cmd: string, opts?: { timeout?: number }): string {
   return execSync(`git -C ${REPO_DIR} ${cmd}`, { timeout: opts?.timeout ?? 15000, encoding: 'utf8', env }).trim();
 }
 
-// ── GitHub API helper (ECS fallback) ─────────────────────────────────────────
+// ── GitHub API helper (hosted-runtime fallback) ─────────────────────────────────────────
 
 async function ghFetch(path: string, opts?: RequestInit) {
   const token = process.env.GITHUB_TOKEN ?? '';
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
         });
         return NextResponse.json({ branch, changed, commits, ahead: +ahead, behind: +behind, mode: 'local' });
       }
-      // ECS: GitHub API
+      // Hosted runtime: GitHub API
       const [branchData, commitsData] = await Promise.all([
         ghFetch(`/repos/${REPO}/branches/main`),
         ghFetch(`/repos/${REPO}/commits?per_page=10`),
@@ -120,10 +120,10 @@ export async function GET(request: NextRequest) {
         const diff = git(`diff HEAD ${file ? `-- ${file}` : ''}`, { timeout: 10000 });
         return NextResponse.json({ diff, mode: 'local' });
       }
-      if (!file) return NextResponse.json({ diff: '', note: 'Specify ?file= for diff in ECS mode', mode: 'github-api' });
+      if (!file) return NextResponse.json({ diff: '', note: 'Specify ?file= for diff in hosted-runtime mode', mode: 'github-api' });
       const data = await ghFetch(`/repos/${REPO}/contents/${encodeURIComponent(file)}?ref=main`) as { content?: string };
       const content = data.content ? Buffer.from(data.content, 'base64').toString('utf8') : '';
-      return NextResponse.json({ diff: content, mode: 'github-api', note: 'Showing file content (no local diff in ECS)' });
+      return NextResponse.json({ diff: content, mode: 'github-api', note: 'Showing file content (no local diff in hosted runtime)' });
     }
 
     if (action === 'log') {
@@ -173,11 +173,11 @@ export async function POST(request: NextRequest) {
 
   const { action } = body;
 
-  // ECS: no local git — single-file commits via GitHub API; everything else needs shell
+  // Hosted runtime: no local git — single-file commits via GitHub API; everything else needs shell
   if (!HAS_GIT) {
     if (action === 'commit') {
       const { path: filePath, content, message } = body;
-      if (!filePath || !content || !message) return safeError('path, content, and message required in ECS mode', 400);
+      if (!filePath || !content || !message) return safeError('path, content, and message required in hosted-runtime mode', 400);
       const current = await ghFetch(`/repos/${REPO}/contents/${encodeURIComponent(filePath)}?ref=main`) as { sha: string };
       const token = process.env.GITHUB_TOKEN ?? '';
       const res = await fetch(`${GH_API}/repos/${REPO}/contents/${encodeURIComponent(filePath)}`, {
@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json({
       ok: false,
-      error: `"${action}" requires local git. Use the Terminal tab (studio-shell) to run git commands in ECS.`,
+      error: `"${action}" requires local git. Use the Terminal tab (studio-shell) to run git commands in the hosted runtime.`,
       mode: 'github-api',
     }, { status: 422 });
   }

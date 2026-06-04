@@ -6,9 +6,9 @@
  *
  * Supported playbooks:
  *   auth-gap          — adds apiAuthGuard to unprotected API routes
- *   env-gap           — syncs missing SSM params into the running ECS task env
+ *   env-gap           — legacy AWS check for missing SSM params
  *   devcontainer-readonly — rotates/sets GITHUB_TOKEN + switches mode to github-only
- *   stale-image       — force-redeploys ECS service to pull latest ECR image
+ *   stale-image       — legacy AWS force-redeploy check
  *   ssm-placeholder   — lists SSM params still set to PLACEHOLDER
  *
  * POST body: { playbook: string; dryRun?: boolean; options?: Record<string, unknown> }
@@ -166,7 +166,7 @@ async function playbookDevcontainerReadonly(dryRun: boolean): Promise<ActionResu
 
   const hasToken = Boolean(process.env.GITHUB_TOKEN);
   if (!hasToken) {
-    actions.push(error('check-github-token', 'GITHUB_TOKEN is not set — set /elevate/GITHUB_TOKEN in SSM'));
+    actions.push(error('check-github-token', 'GITHUB_TOKEN is not set — configure GITHUB_TOKEN in Northflank runtime env'));
     return actions;
   }
   actions.push(ok('check-github-token', 'GITHUB_TOKEN is present'));
@@ -182,7 +182,7 @@ async function playbookDevcontainerReadonly(dryRun: boolean): Promise<ActionResu
       `aws ssm put-parameter --name /elevate/DEVSTUDIO_DEVCONTAINER_MODE --value github-only --type String --overwrite 2>&1`
     );
     actions.push(code === 0
-      ? ok('set-mode', 'SSM /elevate/DEVSTUDIO_DEVCONTAINER_MODE set to github-only — redeploy to apply')
+      ? ok('set-mode', 'DEVSTUDIO_DEVCONTAINER_MODE set to github-only — redeploy to apply')
       : error('set-mode', `SSM update failed: ${err}`)
     );
   } else {
@@ -285,8 +285,8 @@ export async function GET(request: NextRequest) {
     playbooks: {
       'auth-gap':              'Scan for unprotected API routes; mark with TODO in non-dry-run',
       'env-gap':               'Find SSM params still set to PLACEHOLDER',
-      'devcontainer-readonly': 'Switch DEVSTUDIO_DEVCONTAINER_MODE to github-only in SSM',
-      'stale-image':           'Force-redeploy ECS services to pull latest ECR image',
+      'devcontainer-readonly': 'Switch DEVSTUDIO_DEVCONTAINER_MODE to github-only',
+      'stale-image':           'Legacy AWS redeploy check',
       'ssm-placeholder':       'List all SSM placeholder params (read-only)',
     },
     body: {

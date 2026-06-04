@@ -14,7 +14,7 @@
  * Security:
  *  - Requires admin role on every request.
  *  - .env* files and node_modules are blocked.
- *  - Uses GITHUB_TOKEN from environment (SSM-injected in ECS).
+ *  - Uses GITHUB_TOKEN from environment (Northflank/runtime env or local .env.local).
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -43,7 +43,7 @@ function isBlocked(filePath: string): boolean {
 let _ghTokenCache: { token: string; expiresAt: number } | null = null;
 
 async function getGhToken(): Promise<string> {
-  // 1. process.env (ECS SSM-injected or local .env.local)
+  // 1. process.env (Northflank/runtime env or local .env.local)
   if (process.env.GITHUB_TOKEN) return process.env.GITHUB_TOKEN;
 
   // 2. In-process cache

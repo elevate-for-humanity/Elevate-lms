@@ -103,17 +103,9 @@ export default async function RefundPolicyPage() {
               Tax Refund Advances
             </h2>
             <p className="text-black mb-6">
-              Refund advances are loans provided by third-party lenders and
-              are subject to separate terms and conditions:
+              Tax refund advance products are currently unavailable while we focus production
+              operations on enrollment, payment, training, credentialing, and placement workflows.
             </p>
-            <ul className="list-disc pl-6 mb-6 text-black space-y-2">
-              <li>
-                Refund advances are <strong>non-refundable</strong> once disbursed
-              </li>
-              <li>Fees are disclosed upfront before you accept the advance</li>
-              <li>You may decline the advance before funds are disbursed</li>
-              <li>Refer to your loan agreement for complete terms</li>
-            </ul>
 
             <h2 className="text-2xl md:text-3xl font-bold text-black mb-6 mt-12">
               Maximum Refund Guarantee

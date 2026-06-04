@@ -41,8 +41,13 @@ COPY apps/admin/.next/static ./apps/admin/.next/static
 # __dirname (apps/admin/), so copy root public/ to that location.
 COPY public ./apps/admin/public
 
-# The standalone-generated server.js is used as-is.
-# WebSocket proxy for Dev Studio shell is handled at the ALB/NLB layer.
+# Override the generated server with the admin custom server so Dev Studio can
+# terminate /api/devstudio/shell-ws upgrades and proxy them to studio-shell.
+COPY apps/admin/server.js ./apps/admin/server.js
+
+# The custom server requires ws directly at runtime. Next output tracing may not
+# include dependencies only used by the server wrapper, so install it explicitly.
+RUN npm install ws@8.18.0 --no-save
 
 RUN addgroup --gid 1001 nodejs && \
     adduser --uid 1001 --ingroup nodejs --disabled-password --gecos "" nextjs && \

@@ -576,7 +576,7 @@ const TOOLS: unknown[] = [
     type: 'function',
     function: {
       name: 'deploy_autopilot',
-      description: 'Trigger an autopilot deployment — prepares build artifacts and initiates ECS deploy',
+      description: 'Trigger an autopilot deployment — prepares build artifacts and initiates Northflank/GitHub deploy',
       parameters: {
         type: 'object',
         properties: {
@@ -800,7 +800,7 @@ const TOOLS: unknown[] = [
     type: 'function',
     function: {
       name: 'smoke_test',
-      description: 'Run a full platform smoke test — checks all critical endpoints, DB, storage, AI providers, env vars, and ECS services. Use when asked to smoke test, health check, or verify the platform is working.',
+      description: 'Run a full platform smoke test — checks all critical endpoints, DB, storage, AI providers, env vars, and runtime services. Use when asked to smoke test, health check, or verify the platform is working.',
       parameters: { type: 'object', properties: {}, required: [] },
     },
   },
@@ -1986,7 +1986,7 @@ async function executeAction(
       // build_courses triggers the deploy-lms GitHub Actions workflow via the
       // admin's own /api/devstudio/shell endpoint (which calls workflow_dispatch).
       // The old path called getSiteUrl()/api/autopilots/build-courses — that is
-      // the LMS app's stub and does not trigger a real AWS CodeBuild.
+      // the LMS app's stub and does not trigger a real Northflank/GitHub deploy.
       // Pre-flight: verify GITHUB_TOKEN is set before attempting the push
       if (!process.env.GITHUB_TOKEN) {
         write('\x1b[31m✗  GITHUB_TOKEN is not set\x1b[0m');
@@ -1994,7 +1994,7 @@ async function executeAction(
         write('   To fix:');
         write('   1. Generate a GitHub Personal Access Token with repo + workflow scopes');
         write('      → https://github.com/settings/tokens/new');
-        write('   2. Add it to AWS SSM: /elevate/GITHUB_TOKEN');
+        write('   2. Add it to Northflank runtime env as GITHUB_TOKEN');
         write('   3. Redeploy the admin service to pick up the new secret');
         break;
       }
@@ -2014,7 +2014,7 @@ async function executeAction(
             write('');
             write('   GITHUB_TOKEN may be expired or missing repo/workflow scopes.');
             write('   Regenerate at: https://github.com/settings/tokens/new');
-            write('   Then update SSM /elevate/GITHUB_TOKEN and redeploy admin.');
+            write('   Then update Northflank GITHUB_TOKEN and redeploy admin.');
           }
         } else {
           write(`\x1b[32m✓  LMS deploy queued\x1b[0m`);
@@ -2038,7 +2038,7 @@ async function executeAction(
         write('   To fix:');
         write('   1. Generate a GitHub PAT with repo + workflow scopes');
         write('      → https://github.com/settings/tokens/new');
-        write('   2. Add it to AWS SSM: /elevate/GITHUB_TOKEN');
+        write('   2. Add it to Northflank runtime env as GITHUB_TOKEN');
         write('   3. Redeploy the admin service to pick up the new secret');
         break;
       }
@@ -2046,7 +2046,7 @@ async function executeAction(
       // Dispatch one or both workflows via /api/devstudio/shell which calls
       // GitHub Actions workflow_dispatch directly. The old path called
       // getSiteUrl()/api/autopilots/deploy — that is the LMS app's stub and
-      // does not trigger a real AWS CodeBuild.
+      // does not trigger a real Northflank/GitHub deploy.
       const workflows: Array<'deploy-lms' | 'deploy-admin' | 'deploy-studio'> =
         service === 'both'   ? ['deploy-lms', 'deploy-admin', 'deploy-studio'] :
         service === 'admin'  ? ['deploy-admin'] :
@@ -2070,7 +2070,7 @@ async function executeAction(
               write('');
               write('   GITHUB_TOKEN may be expired or missing workflow scope.');
               write('   Regenerate at: https://github.com/settings/tokens/new');
-              write('   Then update SSM /elevate/GITHUB_TOKEN and redeploy admin.');
+              write('   Then update Northflank GITHUB_TOKEN and redeploy admin.');
             }
           } else {
             write(`\x1b[32m✓  ${workflow} queued\x1b[0m`);
@@ -2093,7 +2093,7 @@ async function executeAction(
       if (!process.env.GITHUB_TOKEN) {
         write('\x1b[31m✗  GITHUB_TOKEN is not set — cannot trigger CI workflow\x1b[0m');
         write('');
-        write('   Add GITHUB_TOKEN to AWS SSM /elevate/GITHUB_TOKEN and redeploy admin.');
+        write('   Add GITHUB_TOKEN to Northflank runtime env and redeploy admin.');
         break;
       }
       write('🧪  Triggering CI workflow via GitHub Actions...');

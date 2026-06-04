@@ -1,16 +1,17 @@
 /**
- * TOMBSTONE — cash-advance application management belongs in the finance repo.
- * The admin portal reads cash_advances directly from Supabase.
- * These routes are not called by any LMS page.
+ * DISABLED — cash-advance functionality is not part of the production learner journey.
+ * Tables/data are preserved, but all LMS API access is intentionally unavailable.
  */
 import { NextResponse } from 'next/server';
 
-const GONE = { error: 'Cash-advance management has moved. Use the admin portal directly.' };
+const DISABLED = {
+  error: 'Cash advance functionality is disabled for production stabilization.',
+};
 
 export async function GET() {
-  return NextResponse.json(GONE, { status: 410 });
+  return NextResponse.json(DISABLED, { status: 410 });
 }
 
 export async function POST() {
-  return NextResponse.json(GONE, { status: 410 });
+  return NextResponse.json(DISABLED, { status: 410 });
 }

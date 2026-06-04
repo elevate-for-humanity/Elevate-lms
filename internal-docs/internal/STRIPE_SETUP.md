@@ -4,10 +4,10 @@
 
 Stripe is configured with live keys:
 
-- ✅ Publishable Key: `pk_live_51Rvqjz...`
-- ✅ Secret Key: `sk_live_51Rvqjz...`
-- ✅ Webhook Secret: `whsec_9FCfU8B...`
-- ✅ License Webhook Secret: `whsec_O5TdVYR...`
+- ✅ Publishable Key: configured in the environment / SSM
+- ✅ Secret Key: configured in the environment / SSM
+- ✅ Webhook Secret: configured in the environment / SSM
+- ✅ License Webhook Secret: configured in the environment / SSM
 
 ## Products to Create in Stripe Dashboard
 

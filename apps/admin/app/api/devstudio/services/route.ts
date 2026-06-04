@@ -2,11 +2,11 @@
  * /api/devstudio/services
  *
  * Self-contained service management — no Gitpod dependency.
- * Combines ECS status + local port health checks + service control.
+ * Combines legacy ECS status + local port health checks + service control.
  *
  * GET  → list all services with health, ports, URLs
  * POST { action: 'start'|'stop'|'restart', service: string }
- *      → scale ECS service desired count up/down
+ *      → scale legacy ECS service desired count up/down
  * POST { action: 'deploy', service: 'lms'|'admin' }
  *      → trigger GitHub Actions deploy workflow
  *
@@ -48,7 +48,7 @@ const SERVICES_CONFIG = [
   {
     key: 'studio',
     label: 'Dev Studio Shell',
-    ecsService: 'elevate-studio',
+    ecsService: 'elevate-studio-service',
     url: null,
     healthPath: null,
     color: 'green',
@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
 
   const hasAws = !!(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY);
 
-  // Fetch ECS status + health checks in parallel
+  // Fetch legacy ECS status + health checks in parallel
   const [ecsData, ...healthResults] = await Promise.allSettled([
     hasAws
       ? ecsPost('AmazonEC2ContainerServiceV20141113.DescribeServices', {

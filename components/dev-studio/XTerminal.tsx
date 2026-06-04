@@ -1,12 +1,12 @@
 'use client';
 
 /**
- * XTerminal — real xterm.js terminal connected to the studio-shell ECS container.
+ * XTerminal — real xterm.js terminal connected to the studio-shell runtime/container.
  *
  * Connection flow:
  *   1. POST /api/devstudio/shell-token  → short-lived HMAC token (60s TTL)
- *   2. WebSocket upgrade to /api/devstudio/shell-ws with X-Studio-Token header
- *      (custom Next.js server apps/admin/server.js proxies to ECS container)
+ *   2. WebSocket upgrade to /api/devstudio/shell-ws and send token as the first frame
+ *      (custom Next.js server apps/admin/server.js proxies to the shell runtime)
  *   3. Bidirectional PTY frames:
  *        browser → shell: { type: 'input', data: string }
  *                         { type: 'resize', cols: number, rows: number }
@@ -45,11 +45,23 @@ export default function XTerminal({ onConnect, onDisconnect, onOutput, onReady }
   const [errorMsg, setErrorMsg] = useState('');
   const wsRef = useRef<WebSocket | null>(null);
   const pingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const closeReasonRef = useRef<'idle' | 'auth' | 'proxy' | 'shell' | 'manual'>('idle');
   const onReadyFiredRef = useRef(false);
 
   const connect = useCallback(async () => {
     setStatus('connecting');
     setErrorMsg('');
+    closeReasonRef.current = 'idle';
+    if (pingRef.current) {
+      clearInterval(pingRef.current);
+      pingRef.current = null;
+    }
+    if (wsRef.current) {
+      closeReasonRef.current = 'manual';
+      wsRef.current.close(1000, 'Reconnect requested');
+      wsRef.current = null;
+    }
+    closeReasonRef.current = 'idle';
 
     // Step 1 — get short-lived token
     let token: string;
@@ -77,27 +89,13 @@ export default function XTerminal({ onConnect, onDisconnect, onOutput, onReady }
     const ws = new WebSocket(wsUrl, ['studio-shell']);
     ws.binaryType = 'arraybuffer';
 
-    // Attach token before upgrade fires (custom header via subprotocol trick)
-    // The server.js proxy reads X-Studio-Token from the upgrade request headers.
-    // Since browser WebSocket API doesn't support custom headers, we send the
-    // token as the first message immediately after open.
+    // Browser WebSocket cannot send custom headers, so the proxy validates the
+    // token from the first frame and only sends `ready` after the shell runtime opens.
     wsRef.current = ws;
 
     ws.onopen = () => {
       // Send token as first frame — server.js validates before forwarding
       ws.send(JSON.stringify({ type: 'auth', token }));
-      setStatus('connected');
-      onConnect?.();
-
-      // Expose send function to parent — fired once per component lifetime
-      if (onReady && !onReadyFiredRef.current) {
-        onReadyFiredRef.current = true;
-        onReady((cmd: string) => {
-          if (wsRef.current?.readyState === WebSocket.OPEN) {
-            wsRef.current.send(JSON.stringify({ type: 'input', data: cmd + '\r' }));
-          }
-        });
-      }
 
       // Keepalive ping every 30s
       pingRef.current = setInterval(() => {
@@ -107,23 +105,78 @@ export default function XTerminal({ onConnect, onDisconnect, onOutput, onReady }
       }, 30_000);
     };
 
-    ws.onclose = () => {
+    ws.addEventListener('message', (event) => {
+      if (typeof event.data !== 'string') return;
+      try {
+        const msg = JSON.parse(event.data) as { type?: string; message?: string };
+        if (msg.type === 'ready') {
+          setStatus('connected');
+          onConnect?.();
+
+          // Expose send function to parent — fired once per component lifetime
+          if (onReady && !onReadyFiredRef.current) {
+            onReadyFiredRef.current = true;
+            onReady((cmd: string) => {
+              if (wsRef.current?.readyState === WebSocket.OPEN) {
+                wsRef.current.send(JSON.stringify({ type: 'input', data: cmd + '\r' }));
+              }
+            });
+          }
+        }
+
+        if (msg.type === 'error') {
+          closeReasonRef.current = 'shell';
+          setStatus('error');
+          setErrorMsg(msg.message || 'Shell connection failed');
+        }
+      } catch {
+        // TerminalRenderer handles raw terminal output and malformed frames.
+      }
+    });
+
+    ws.onclose = (event) => {
+      if (wsRef.current !== ws) return;
+      if (pingRef.current) {
+        clearInterval(pingRef.current);
+        pingRef.current = null;
+      }
+
+      if (event.code === 4003) {
+        closeReasonRef.current = 'auth';
+        setStatus('error');
+        setErrorMsg('Shell auth token was rejected. Refresh the page and try again.');
+        return;
+      }
+
+      if (event.code === 1011) {
+        closeReasonRef.current = 'proxy';
+        setStatus('error');
+        setErrorMsg(event.reason || 'Shell proxy could not reach the studio container.');
+        return;
+      }
+
+      if (['auth', 'manual', 'proxy', 'shell'].includes(closeReasonRef.current)) return;
+
       setStatus('disconnected');
-      if (pingRef.current) clearInterval(pingRef.current);
       onDisconnect?.();
     };
 
     ws.onerror = () => {
+      closeReasonRef.current = 'proxy';
       setStatus('error');
       setErrorMsg('WebSocket connection failed');
-      if (pingRef.current) clearInterval(pingRef.current);
+      if (pingRef.current) {
+        clearInterval(pingRef.current);
+        pingRef.current = null;
+      }
     };
-  }, [onConnect, onDisconnect]);
+  }, [onConnect, onDisconnect, onReady]);
 
   useEffect(() => {
     connect();
     return () => {
       if (pingRef.current) clearInterval(pingRef.current);
+      closeReasonRef.current = 'manual';
       wsRef.current?.close(1001, 'Component unmounted');
     };
   }, [connect]);
@@ -134,8 +187,8 @@ export default function XTerminal({ onConnect, onDisconnect, onOutput, onReady }
         <p className="text-sm font-mono">Studio shell not configured.</p>
         <p className="text-xs text-slate-500 text-center max-w-sm">
           Set <code className="text-slate-300">STUDIO_SHELL_WS_URL</code> and{' '}
-          <code className="text-slate-300">STUDIO_SHELL_SECRET</code> in SSM, then
-          deploy the studio ECS task.
+          <code className="text-slate-300">STUDIO_SHELL_SECRET</code> in Northflank runtime env, then
+          deploy the studio shell service.
         </p>
       </div>
     );
@@ -172,6 +225,7 @@ export default function XTerminal({ onConnect, onDisconnect, onOutput, onReady }
   return (
     <div className="w-full h-full overflow-hidden">
       <TerminalRenderer
+        key={status}
         ws={wsRef.current}
         connecting={status === 'connecting'}
         onOutput={onOutput}

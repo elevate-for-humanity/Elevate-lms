@@ -25,7 +25,6 @@ async function _POST(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-
   let emailTo = '';
   let emailSubject = '';
 
@@ -73,4 +72,7 @@ async function _POST(req: Request) {
     return NextResponse.json({ error: 'Unexpected error sending email' }, { status: 500 });
   }
 }
-export const POST = withRuntime(withApiAudit('/api/email/send', _POST));
+export const POST = withRuntime(
+  { secrets: ['CRON_SECRET'], rateLimit: 'strict' },
+  withApiAudit('/api/email/send', _POST),
+);

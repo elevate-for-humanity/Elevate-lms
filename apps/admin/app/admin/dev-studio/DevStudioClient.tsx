@@ -1060,9 +1060,9 @@ interface RunStatus {
 }
 
 const WORKFLOW_BUTTONS: { key: WorkflowKey; label: string; description: string }[] = [
-  { key: 'deploy-lms',    label: 'Deploy LMS',    description: 'Build + push LMS to ECS' },
-  { key: 'deploy-admin',  label: 'Deploy Admin',  description: 'Build + push Admin to ECS' },
-  { key: 'deploy-studio', label: 'Deploy Studio', description: 'Build + push Studio shell to ECS' },
+  { key: 'deploy-lms',    label: 'Deploy LMS',    description: 'Build + deploy LMS through Northflank' },
+  { key: 'deploy-admin',  label: 'Deploy Admin',  description: 'Build + deploy Admin through Northflank' },
+  { key: 'deploy-studio', label: 'Deploy Studio', description: 'Build + deploy Studio shell through Northflank' },
   { key: 'ci',           label: 'Run CI',        description: 'Full CI pipeline' },
   { key: 'lint',         label: 'Lint',          description: 'Run pnpm lint' },
 ];
@@ -1191,16 +1191,16 @@ function TerminalTab({
           </a>
         )}
       </div>
-      {/* Shell info — WebSocket PTY requires a dedicated studio-shell ECS task.
-         Until that task is deployed, the workflow buttons above are the shell. */}
+      {/* Shell info — WebSocket PTY requires a dedicated studio-shell runtime/container.
+         Until that runtime is deployed, the workflow buttons above are the shell. */}
       <div className="flex-1 min-h-0 overflow-y-auto p-4" style={{ background: '#1e1e1e' }}>
         <div className="font-mono text-[11px] space-y-1" style={{ color: '#858585' }}>
           <p style={{ color: '#4ec9b0' }}>// Dev Studio — GitHub Actions shell</p>
           <p>// Use the workflow buttons above to trigger deployments and CI.</p>
-          <p>// A real PTY terminal requires the studio-shell ECS task to be running.</p>
+          <p>// A real PTY terminal requires the studio-shell runtime/container to be running.</p>
           <p></p>
           <p style={{ color: '#858585' }}>// To enable the PTY terminal:</p>
-          <p>// 1. Deploy the studio-shell ECS task (aws/ecs-task-studio.json)</p>
+          <p>// 1. Deploy the studio-shell runtime/container in Northflank</p>
           <p>// 2. Set STUDIO_SHELL_WS_URL in Admin → Integrations → Env Manager</p>
           <p>// 3. Set STUDIO_SHELL_SECRET in the same place</p>
           <p>// 4. Redeploy the admin service to pick up the new secrets</p>
@@ -1215,12 +1215,12 @@ function TerminalTab({
 // ── Files Tab ────────────────────────────────────────────────────────────────
 
 // ── ContainerTab ─────────────────────────────────────────────────────────────
-// Split vertically: ECS status (capped at 280px) on top, DevContainer fills rest.
+// Split vertically: runtime status (capped at 280px) on top, DevContainer fills rest.
 // Both children must be overflow-hidden so h-full resolves correctly inside them.
 function ContainerTab() {
   return (
     <div className="h-full flex flex-col overflow-hidden bg-white">
-      {/* ECS status — capped height, scrolls internally */}
+      {/* Runtime status — capped height, scrolls internally */}
       <div className="flex-shrink-0 overflow-hidden border-b border-slate-200" style={{ maxHeight: 280 }}>
         <div className="h-full overflow-y-auto">
           <EcsStatusPanel />

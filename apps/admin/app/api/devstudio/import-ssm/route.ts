@@ -1,7 +1,7 @@
 /**
  * POST /api/devstudio/import-ssm
  *
- * Pulls all parameters from AWS SSM at /elevate/* and upserts them into
+ * Legacy AWS helper: pulls all parameters from AWS SSM at /elevate/* and upserts them into
  * platform_secrets. AWS credentials are read from platform_secrets first,
  * falling back to process.env.
  *

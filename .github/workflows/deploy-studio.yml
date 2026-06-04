@@ -17,7 +17,8 @@ env:
   ECR_REGISTRY:         954718262498.dkr.ecr.us-east-1.amazonaws.com
   ECR_REPOSITORY:       elevate-studio
   ECS_CLUSTER:          elevate-cluster
-  ECS_SERVICE:          elevate-studio
+  ECS_SERVICE:          elevate-studio-service
+  TASK_FAMILY:          elevate-studio
   TASK_DEFINITION:      aws/ecs-task-studio.json
   CONTAINER_NAME:       elevate-studio
   # Cloud Map service discovery — stable DNS, no IP hardcoding needed
@@ -82,7 +83,7 @@ jobs:
             aws ecs create-service \
               --cluster $ECS_CLUSTER \
               --service-name $ECS_SERVICE \
-              --task-definition $ECS_SERVICE \
+              --task-definition $TASK_FAMILY \
               --desired-count 1 \
               --launch-type FARGATE \
               --network-configuration "awsvpcConfiguration={subnets=[$SUBNETS],securityGroups=[$SECURITY_GROUPS],assignPublicIp=ENABLED}" \

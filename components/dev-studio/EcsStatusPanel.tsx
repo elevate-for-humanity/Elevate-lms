@@ -25,7 +25,7 @@ interface EcsStatusData {
 const TASK_CONFIG: Record<string, { cpu: string; memory: string; port: number }> = {
   'elevate-lms-service':   { cpu: '4 vCPU', memory: '16 GB', port: 3000 },
   'elevate-admin-service': { cpu: '4 vCPU', memory: '16 GB', port: 3000 },
-  'elevate-studio':        { cpu: '1 vCPU', memory: '2 GB',  port: 8888 },
+  'elevate-studio-service': { cpu: '1 vCPU', memory: '4 GB',  port: 8888 },
 };
 
 function StatusBadge({ healthy, status }: { healthy: boolean; status: string }) {
@@ -52,7 +52,14 @@ function StatusBadge({ healthy, status }: { healthy: boolean; status: string }) 
 
 function ServiceCard({ svc }: { svc: EcsService }) {
   const cfg = TASK_CONFIG[svc.name];
-  const label = svc.name === 'elevate-lms-service' ? 'LMS' : 'Admin';
+  const label =
+    svc.name === 'elevate-lms-service'
+      ? 'LMS'
+      : svc.name === 'elevate-admin-service'
+        ? 'Admin'
+        : svc.name === 'elevate-studio-service'
+          ? 'Dev Studio Shell'
+          : svc.name;
   const deployedAt = svc.lastDeployedAt
     ? new Date(svc.lastDeployedAt).toLocaleString('en-US', {
         month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
@@ -153,7 +160,7 @@ export default function EcsStatusPanel() {
       <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200 flex-shrink-0">
         <div className="flex items-center gap-2">
           <Server className="w-4 h-4 text-slate-500" />
-          <span className="font-semibold text-sm text-slate-700">ECS Services — elevate-cluster</span>
+          <span className="font-semibold text-sm text-slate-700">Legacy ECS Services</span>
         </div>
         <div className="flex items-center gap-3">
           {fetchedAt && <span className="text-xs text-slate-400">Updated {fetchedAt}</span>}
@@ -171,7 +178,7 @@ export default function EcsStatusPanel() {
       <div className="flex-1 p-4">
         {loading && !data && (
           <div className="flex items-center justify-center h-40 text-slate-400 text-sm gap-2">
-            <RefreshCw className="w-4 h-4 animate-spin" /> Fetching ECS status…
+            <RefreshCw className="w-4 h-4 animate-spin" /> Fetching runtime status…
           </div>
         )}
 
@@ -179,10 +186,10 @@ export default function EcsStatusPanel() {
           <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
             <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
             <div>
-              <p className="font-medium">Could not reach ECS</p>
+              <p className="font-medium">Could not reach runtime status</p>
               <p className="text-xs mt-1 text-red-500">{error}</p>
               <p className="text-xs mt-2 text-red-400">
-                Requires AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY with ecs:DescribeServices permission.
+                Legacy AWS status requires AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY with ecs:DescribeServices permission. Northflank status is checked in the provider dashboard.
               </p>
             </div>
           </div>

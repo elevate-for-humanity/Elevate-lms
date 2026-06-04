@@ -37,7 +37,7 @@ export const runtime = 'nodejs';
 
 const REGION  = process.env.AWS_REGION ?? 'us-east-1';
 const CLUSTER = 'elevate-cluster';
-const SERVICES = ['elevate-lms-service', 'elevate-admin-service', 'elevate-studio'];
+const SERVICES = ['elevate-lms-service', 'elevate-admin-service', 'elevate-studio-service'];
 
 // ── SigV4 helpers ─────────────────────────────────────────────────────────────
 
@@ -200,6 +200,6 @@ export async function GET(request: NextRequest) {
       fetchedAt: new Date().toISOString(),
     });
   } catch (err) {
-    return safeInternalError(err, 'Failed to fetch ECS status');
+    return safeInternalError(err, 'Failed to fetch legacy ECS status');
   }
 }

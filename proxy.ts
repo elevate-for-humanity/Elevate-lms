@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { randomUUID } from 'crypto';
 import { checkAdminIPAsync } from '@/lib/api/admin-ip-guard';
 import { getSecuritySettings } from '@/lib/admin/security-settings';
 
@@ -318,7 +317,7 @@ export async function middleware(request: NextRequest) {
 
   // Propagate or generate a trace_id for every request.
   // Downstream handlers read x-trace-id from headers() for structured logging.
-  const traceId = request.headers.get('x-trace-id') ?? randomUUID();
+  const traceId = request.headers.get('x-trace-id') ?? crypto.randomUUID();
   requestHeaders.set('x-trace-id', traceId);
   requestHeaders.set('x-pathname', pathname);
 

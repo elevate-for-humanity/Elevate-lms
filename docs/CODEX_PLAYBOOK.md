@@ -39,34 +39,168 @@ This playbook defines how to use Codex safely and effectively across the full El
 
 ---
 
+## 2A. Active Codex Mission — Production Stabilization Sprint
+
+When handing work to Codex, use this precise mission. Do **not** ask Codex to "fix everything" or broadly polish the platform.
+
+### MISSION: Production Stabilization Sprint
+
+**Objective:**
+Bring the Elevate platform to production-ready status by eliminating critical technical debt and completing unfinished user workflows without introducing new features.
+
+**Rules:**
+
+- Do NOT add new features.
+- Do NOT redesign architecture.
+- Do NOT change business logic unless required to fix defects.
+- Keep changes in focused PRs.
+- Produce a report after each phase.
+
+### PHASE 1 — COMPLETE CRITICAL USER FLOWS
+
+Verify and repair end-to-end functionality for:
+
+1. **Enrollment Flow**
+   - Application
+   - Intake
+   - Enrollment
+   - Status updates
+   - Notifications
+
+2. **Testing Center**
+   - Registration
+   - Payment processing
+   - Confirmation workflow
+   - Admin reporting
+
+3. **Trial Application**
+   - Data collection
+   - Validation
+   - Storage
+   - Notifications
+
+4. **Admin Studio**
+   - Remove dead routes
+   - Repair broken forms
+   - Verify create/edit/delete workflows
+   - Verify save operations
+
+**Deliverables:**
+
+- List of repaired workflows
+- Remaining blockers
+- Screenshots or verification evidence
+
+### PHASE 2 — AUTHENTICATION CONSOLIDATION
+
+**Tasks:**
+
+- Locate all inline `supabase.auth.getUser()` implementations.
+- Replace with centralized `apiAuthGuard` pattern.
+- Remove duplicate role verification logic.
+- Preserve existing permissions.
+
+**Deliverables:**
+
+- Number of files migrated
+- Remaining auth exceptions
+- Security review summary
+
+### PHASE 3 — TYPESCRIPT STABILIZATION
+
+**Tasks:**
+
+- Reduce TypeScript errors aggressively.
+- Prioritize:
+  - Authentication
+  - Payments
+  - Enrollment
+  - Testing Center
+  - Admin Studio
+
+**Goal:**
+
+- Reduce baseline errors as much as possible.
+- Document unresolved issues.
+
+**Deliverables:**
+
+- Before/after error count
+- Categorized error summary
+
+### PHASE 4 — LOGGING CLEANUP
+
+**Tasks:**
+
+- Replace `console.log` statements with structured logging.
+- Preserve:
+  - error logging
+  - security logging
+  - audit logging
+
+**Deliverables:**
+
+- Number of console statements removed
+- Logging standard implemented
+
+### PHASE 5 — FINAL PRODUCTION AUDIT
+
+Verify:
+
+- Build passes
+- No critical route failures
+- No broken forms
+- No payment failures
+- Authentication functioning
+- Environment variables validated
+- Database connectivity validated
+
+Produce:
+
+- Final readiness score
+- Critical issues remaining
+- Recommended next actions
+
+**Success Criteria:**
+The platform supports a complete user journey from application → enrollment → payment → training → completion without critical failures.
+
+---
+
 ## 3. Standard Workflow (Every Task)
 
 ### Step 1 — Define scope
+
 - State the user-visible goal.
 - List touched files/modules.
 - Identify blast radius and rollback path.
 
 ### Step 2 — Prompt Codex with constraints
+
 - Ask for minimal diff.
 - Explicitly require canonical patterns.
 - For APIs: require auth guard + safe error helpers + rate limiting tier choice.
 
 ### Step 3 — Implement in small increments
+
 - Prefer one logical change set per commit.
 - Keep legacy paths unless removal is explicitly requested and tested.
 
 ### Step 4 — Run checks locally
+
 ```bash
 pnpm lint
 pnpm next build
 ```
+
 Run targeted tests/scripts when relevant.
 
 ### Step 5 — Review diff critically
+
 - Validate no secrets, no dead imports, no non-canonical utility reintroduction.
 - Confirm naming and route conventions.
 
 ### Step 6 — Commit and PR
+
 - Include intent, risk, test evidence, and migration/manual steps.
 
 ---
@@ -75,13 +209,13 @@ Run targeted tests/scripts when relevant.
 
 Run these before merge unless a task is docs-only:
 
-| Check | Command |
-|---|---|
-| Lint | `pnpm lint` |
-| Build | `pnpm next build` |
-| LMS routing | Click-through `?activity=` behavior on lesson/accordion |
-| API routes | Auth role path, error responses, rate limits |
-| Storage | Bucket usage via Supabase storage client (no hardcoded URLs) |
+| Check       | Command                                                      |
+| ----------- | ------------------------------------------------------------ |
+| Lint        | `pnpm lint`                                                  |
+| Build       | `pnpm next build`                                            |
+| LMS routing | Click-through `?activity=` behavior on lesson/accordion      |
+| API routes  | Auth role path, error responses, rate limits                 |
+| Storage     | Bucket usage via Supabase storage client (no hardcoded URLs) |
 
 If a command cannot run due to environment limitations, document exactly why and what remains to verify.
 
@@ -132,11 +266,11 @@ order and routing rules remain compliant.
 
 ## 6. Do / Don't Quick Reference
 
-| Do | Don't |
-|---|---|
-| Use focused prompts with explicit constraints | Run Codex with prod secrets or broad infrastructure credentials |
-| Keep PRs small and reversible | Introduce duplicate auth/supabase/rate-limit helpers |
-| Use canonical utilities and shared components | Return raw `error.message` from API responses |
+| Do                                                               | Don't                                                             |
+| ---------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Use focused prompts with explicit constraints                    | Run Codex with prod secrets or broad infrastructure credentials   |
+| Keep PRs small and reversible                                    | Introduce duplicate auth/supabase/rate-limit helpers              |
+| Use canonical utilities and shared components                    | Return raw `error.message` from API responses                     |
 | Preserve legacy behavior unless deprecation is explicitly scoped | Hardcode storage URLs, CTA placeholders, or LMS per-program logic |
 
 ---

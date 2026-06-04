@@ -6,6 +6,15 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
  * the single source of truth for AI Studio responsibilities and guardrails.
  */
 export const AI_STUDIO_DEVINT_CONTAINER = {
+  identity: {
+    name: 'Elevate DevInt Container',
+    purpose:
+      'A repo-aware operating container for Elevate LMS Dev Studio. It must reason from the actual Next.js/Supabase/AWS implementation instead of generic SaaS or generic devcontainer assumptions.',
+    defaultWorkingDirectory: '/workspace/Elevate-lms',
+    canonicalBranch: 'main',
+    packageManager: 'pnpm 10.28.2',
+    nodeVersion: '20.19.2',
+  },
   platform: {
     name: PLATFORM_DEFAULTS.orgName,
     domains: [
@@ -26,6 +35,37 @@ export const AI_STUDIO_DEVINT_CONTAINER = {
       local: process.env.NEXT_PUBLIC_SITE_URL || '',
     },
   },
+  repo: {
+    paths: {
+      lmsApp: 'app/',
+      adminApp: 'apps/admin/app/',
+      sharedComponents: 'components/',
+      supabaseClients: 'lib/supabase/',
+      curriculumBlueprints: 'lib/curriculum/blueprints/',
+      courseBuilder: 'lib/curriculum/',
+      migrations: 'supabase/migrations/',
+      awsTaskDefinitions: 'aws/',
+      devStudioUi: 'apps/admin/app/admin/dev-studio/',
+      devStudioApi: 'apps/admin/app/api/devstudio/',
+      studioShell: 'studio-shell/',
+      devContainer: '.devcontainer/',
+    },
+    canonicalCommands: [
+      'pnpm next build',
+      'pnpm lint',
+      'pnpm test',
+      'pnpm typecheck',
+      'pnpm dev',
+      'pnpm dev:admin',
+    ],
+    editingRules: [
+      'Respect AGENTS.md before changing files',
+      'Use ripgrep instead of recursive grep/ls',
+      'Commit on the current branch after code changes',
+      'Use lib/logger.ts instead of new console.log statements',
+      'Do not create middleware.ts; middleware belongs in proxy.ts',
+    ],
+  },
   architecture: {
     frontend: {
       framework: 'Next.js App Router',
@@ -34,7 +74,7 @@ export const AI_STUDIO_DEVINT_CONTAINER = {
       state: ['React Context', 'Server Components', 'Client Components'],
     },
     backend: {
-      database: 'Supabase Postgres',
+      database: 'Supabase Postgres project cuxzzpsyufcewtmicszk',
       storage: 'Supabase Storage',
       realtime: true,
       rowLevelSecurity: true,
@@ -49,6 +89,35 @@ export const AI_STUDIO_DEVINT_CONTAINER = {
         'All AI actions logged',
         'Rate limits enforced',
         'Tenant-safe isolation',
+      ],
+    },
+  },
+  deployment: {
+    lms: {
+      host: 'https://www.elevateforhumanity.org',
+      ecsService: 'elevate-lms-service',
+      taskDefinition: 'aws/ecs-task-lms.json',
+      dockerfile: 'Dockerfile.package',
+      workflow: '.github/workflows/deploy-lms.yml',
+    },
+    admin: {
+      host: 'https://admin.elevateforhumanity.org',
+      ecsService: 'elevate-admin-service',
+      taskDefinition: 'aws/ecs-task-admin.json',
+      dockerfile: 'Dockerfile.admin',
+      workflow: '.github/workflows/deploy-admin.yml',
+    },
+    studioShell: {
+      ecsService: 'elevate-studio-service',
+      taskDefinition: 'aws/ecs-task-studio.json',
+      dockerfile: 'Dockerfile.studio',
+      websocketProxy: 'apps/admin/server.js',
+      browserClient: 'components/dev-studio/XTerminal.tsx',
+      requiredEnv: [
+        'STUDIO_SHELL_WS_URL',
+        'STUDIO_SHELL_WS_URL_PUBLIC',
+        'STUDIO_SHELL_SECRET',
+        'STUDIO_TOKEN_SECRET',
       ],
     },
   },
@@ -75,6 +144,7 @@ export const AI_STUDIO_DEVINT_CONTAINER = {
       ],
     },
     enrollmentEngine: {
+      canonicalTables: ['program_enrollments', 'training_enrollments', 'student_enrollments'],
       responsibilities: [
         'Applications',
         'Approvals',
@@ -92,6 +162,18 @@ export const AI_STUDIO_DEVINT_CONTAINER = {
     },
     courseBuilder: {
       purpose: 'Institutional curriculum engine',
+      canonicalWritePath:
+        'CredentialBlueprint → buildCanonicalCourseFromBlueprint() → courses + course_modules + course_lessons → lms_lessons view',
+      canonicalTables: [
+        'courses',
+        'course_modules',
+        'course_lessons',
+        'curriculum_lessons',
+        'lesson_progress',
+        'lms_progress',
+        'checkpoint_scores',
+        'step_submissions',
+      ],
       responsibilities: [
         'Program Creation',
         'Module Management',
@@ -110,6 +192,9 @@ export const AI_STUDIO_DEVINT_CONTAINER = {
         'Drip Scheduling',
       ],
       rules: [
+        'New programs are blueprint-driven; do not replicate HVAC legacy hardcoded paths',
+        'Use course_lessons for new course writes; training_lessons is read-only archive',
+        'Lesson completion uses lesson_progress; course summary uses lms_progress; OJT hours use progress_entries',
         'No direct DB assumptions in UI',
         'No unsafe nested relational joins',
         'All curriculum data validated',
@@ -131,7 +216,8 @@ export const AI_STUDIO_DEVINT_CONTAINER = {
     },
   },
   aiStudio: {
-    mission: 'Autonomous institutional operations system',
+    mission:
+      'Autonomous institutional operations system for Elevate workforce development, not a generic chatbot or generic IDE assistant',
     capabilities: [
       'Curriculum Generation',
       'Student Risk Detection',
@@ -150,15 +236,144 @@ export const AI_STUDIO_DEVINT_CONTAINER = {
       'Student Support',
     ],
     agents: {
-      curriculumAgent: ['Generate programs', 'Create lessons', 'Create quizzes', 'Align competencies', 'Generate rubrics'],
-      complianceAgent: ['Track deadlines', 'Monitor regulations', 'Validate documentation', 'Detect missing compliance items'],
-      studentSuccessAgent: ['Track student engagement', 'Detect dropout risk', 'Recommend interventions', 'Monitor attendance'],
-      workforceAgent: ['Labor market analysis', 'Employer matching', 'Career pathways', 'Demand forecasting'],
-      fundingAgent: ['WIOA tracking', 'Grant alignment', 'Funding eligibility', 'ETPL optimization'],
+      curriculumAgent: [
+        'Generate programs',
+        'Create lessons',
+        'Create quizzes',
+        'Align competencies',
+        'Generate rubrics',
+      ],
+      complianceAgent: [
+        'Track deadlines',
+        'Monitor regulations',
+        'Validate documentation',
+        'Detect missing compliance items',
+      ],
+      studentSuccessAgent: [
+        'Track student engagement',
+        'Detect dropout risk',
+        'Recommend interventions',
+        'Monitor attendance',
+      ],
+      workforceAgent: [
+        'Labor market analysis',
+        'Employer matching',
+        'Career pathways',
+        'Demand forecasting',
+      ],
+      fundingAgent: [
+        'WIOA tracking',
+        'Grant alignment',
+        'Funding eligibility',
+        'ETPL optimization',
+      ],
     },
+  },
+  devContainer: {
+    name: 'Elevate LMS — DevInt Container',
+    requiredShape: {
+      baseImage: 'mcr.microsoft.com/devcontainers/typescript-node:1-20-bookworm',
+      ports: ['3000 LMS', '3001 Admin'],
+      packageManager: 'corepack + pnpm@10.28.2',
+      setupScripts: ['.devcontainer/setup-env.sh', '.devcontainer/setup-codex.sh'],
+      requiredPackages: ['ffmpeg', 'chromium', 'python3', 'python3-pip', 'libxml2-utils'],
+    },
+    mutationRules: [
+      'Preserve AWS SSM based .env.local hydration',
+      'Preserve apps/admin/.env.local symlink behavior',
+      'Preserve Codex CLI setup and docs/CODEX_PLAYBOOK.md instructions link',
+      'Do not replace with a generic Node devcontainer that drops ports, AWS CLI, Chromium, or pnpm pinning',
+    ],
+  },
+  productionStabilizationMission: {
+    title: 'Production Stabilization Sprint',
+    objective:
+      'Bring the Elevate platform to production-ready status by eliminating critical technical debt and completing unfinished user workflows without introducing new features.',
+    rules: [
+      'Do NOT add new features',
+      'Do NOT redesign architecture',
+      'Do NOT change business logic unless required to fix defects',
+      'Keep changes in focused PRs',
+      'Produce a report after each phase',
+    ],
+    phases: [
+      {
+        name: 'PHASE 1 — COMPLETE CRITICAL USER FLOWS',
+        focus:
+          'Verify and repair end-to-end functionality for enrollment, testing center, trial application, and Admin Studio workflows.',
+        workflows: [
+          'Enrollment Flow: application, intake, enrollment, status updates, notifications',
+          'Testing Center: registration, payment processing, confirmation workflow, admin reporting',
+          'Trial Application: data collection, validation, storage, notifications',
+          'Admin Studio: remove dead routes, repair broken forms, verify create/edit/delete workflows, verify save operations',
+        ],
+        deliverables: [
+          'List of repaired workflows',
+          'Remaining blockers',
+          'Screenshots or verification evidence',
+        ],
+      },
+      {
+        name: 'PHASE 2 — AUTHENTICATION CONSOLIDATION',
+        focus:
+          'Replace inline auth implementations with centralized auth guard patterns while preserving permissions.',
+        tasks: [
+          'Locate all inline supabase.auth.getUser() implementations',
+          'Replace with centralized apiAuthGuard pattern',
+          'Remove duplicate role verification logic',
+          'Preserve existing permissions',
+        ],
+        deliverables: [
+          'Number of files migrated',
+          'Remaining auth exceptions',
+          'Security review summary',
+        ],
+      },
+      {
+        name: 'PHASE 3 — TYPESCRIPT STABILIZATION',
+        focus: 'Reduce TypeScript errors aggressively, prioritizing critical production domains.',
+        priorities: ['Authentication', 'Payments', 'Enrollment', 'Testing Center', 'Admin Studio'],
+        goal: 'Reduce baseline errors as much as possible and document unresolved issues',
+        deliverables: ['Before/after error count', 'Categorized error summary'],
+      },
+      {
+        name: 'PHASE 4 — LOGGING CLEANUP',
+        focus:
+          'Replace console.log statements with structured logging while preserving important logs.',
+        tasks: [
+          'Replace console.log statements with structured logging',
+          'Preserve error logging',
+          'Preserve security logging',
+          'Preserve audit logging',
+        ],
+        deliverables: ['Number of console statements removed', 'Logging standard implemented'],
+      },
+      {
+        name: 'PHASE 5 — FINAL PRODUCTION AUDIT',
+        focus:
+          'Verify production readiness across build, routes, forms, payments, auth, env vars, and database connectivity.',
+        verify: [
+          'Build passes',
+          'No critical route failures',
+          'No broken forms',
+          'No payment failures',
+          'Authentication functioning',
+          'Environment variables validated',
+          'Database connectivity validated',
+        ],
+        deliverables: [
+          'Final readiness score',
+          'Critical issues remaining',
+          'Recommended next actions',
+        ],
+      },
+    ],
+    successCriteria:
+      'The platform supports a complete user journey from application → enrollment → payment → training → completion without critical failures.',
   },
   governance: {
     criticalRules: [
+      'No generic container rewrites; preserve Elevate-specific devcontainer, Dev Studio, ECS, and Supabase contracts',
       'No blind AI rewrites',
       'No schema changes without migration review',
       'No direct DB access from UI',
@@ -195,11 +410,6 @@ export const AI_STUDIO_DEVINT_CONTAINER = {
       'Capture first failed request',
     ],
   },
-  stabilizationPlan: {
-    phase1: ['Fix login/auth', 'Restore environment parity', 'Stabilize Course Builder', 'Fix enrollment gates', 'Repair dashboard loaders'],
-    phase2: ['Centralize APIs', 'Normalize schema', 'Consolidate routes', 'Extract service layers'],
-    phase3: ['Reduce type debt', 'Improve CI', 'Add contract testing', 'Add observability', 'Add runtime analytics'],
-  },
   antiPatterns: [
     'Hardcoded filesystem assumptions',
     'Inline Supabase queries in UI',
@@ -213,18 +423,36 @@ export const AI_STUDIO_DEVINT_CONTAINER = {
   ],
   finalDirective: {
     objective:
-      'Build a resilient institutional operating system capable of scaling workforce development, education, apprenticeships, compliance, and student success through AI-assisted automation while maintaining operational stability and governance.',
+      'Finish the platform through production stabilization. Do not wander into unnecessary refactors, new features, or broad redesigns outside the active mission phase.',
   },
 } as const;
 
 export function getDevIntPromptContext() {
   const c = AI_STUDIO_DEVINT_CONTAINER;
   return [
+    `Container identity: ${c.identity.name} — ${c.identity.purpose}`,
+    `Working directory: ${c.identity.defaultWorkingDirectory}; branch: ${c.identity.canonicalBranch}; Node: ${c.identity.nodeVersion}; package manager: ${c.identity.packageManager}`,
     `Platform: ${c.platform.name}`,
     `Domains: ${c.platform.domains.join(', ')}`,
+    `Repo map: ${Object.entries(c.repo.paths)
+      .map(([key, value]) => `${key}=${value}`)
+      .join('; ')}`,
+    `Canonical commands: ${c.repo.canonicalCommands.join('; ')}`,
+    `Deployment: LMS ${c.deployment.lms.ecsService} via ${c.deployment.lms.dockerfile}; Admin ${c.deployment.admin.ecsService} via ${c.deployment.admin.dockerfile}; Studio shell via ${c.deployment.studioShell.dockerfile} and ${c.deployment.studioShell.websocketProxy}`,
+    `Studio shell env: ${c.deployment.studioShell.requiredEnv.join(', ')}`,
+    `Devcontainer required shape: ${c.devContainer.requiredShape.baseImage}; ports ${c.devContainer.requiredShape.ports.join(', ')}; packages ${c.devContainer.requiredShape.requiredPackages.join(', ')}; scripts ${c.devContainer.requiredShape.setupScripts.join(', ')}`,
+    `Devcontainer mutation rules: ${c.devContainer.mutationRules.join('; ')}`,
+    `Active Codex mission: ${c.productionStabilizationMission.title}`,
+    `Mission objective: ${c.productionStabilizationMission.objective}`,
+    `Mission rules: ${c.productionStabilizationMission.rules.join('; ')}`,
+    `Mission phases: ${c.productionStabilizationMission.phases.map((phase) => phase.name).join(' | ')}`,
+    `Mission success criteria: ${c.productionStabilizationMission.successCriteria}`,
     `AI Studio mission: ${c.aiStudio.mission}`,
     `Capabilities: ${c.aiStudio.capabilities.join(', ')}`,
+    `Course Builder path: ${c.coreSystems.courseBuilder.canonicalWritePath}`,
+    `Course Builder tables: ${c.coreSystems.courseBuilder.canonicalTables.join(', ')}`,
     `Course Builder rules: ${c.coreSystems.courseBuilder.rules.join('; ')}`,
+    `Enrollment canonical tables: ${c.coreSystems.enrollmentEngine.canonicalTables.join(', ')}`,
     `Governance critical rules: ${c.governance.criticalRules.join('; ')}`,
     `Validation order: ${c.governance.validationHierarchy.join(' > ')}`,
     `Anti-patterns: ${c.antiPatterns.join('; ')}`,

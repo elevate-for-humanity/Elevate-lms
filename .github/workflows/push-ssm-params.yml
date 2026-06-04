@@ -20,7 +20,7 @@ on:
         required: false
         type: string
       stripe_secret_key:
-        description: 'STRIPE_SECRET_KEY (sk_live_... or sk_test_...). Leave blank to skip.'
+        description: 'STRIPE_SECRET_KEY (Stripe restricted/live/test secret key). Leave blank to skip.'
         required: false
         type: string
 

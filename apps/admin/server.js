@@ -104,6 +104,9 @@ function attachWsProxy(server) {
         });
 
         shellWs.on('open', () => {
+          if (browserWs.readyState === WebSocket.OPEN) {
+            browserWs.send(JSON.stringify({ type: 'ready' }));
+          }
           browserWs.on('message', (d) => { if (shellWs.readyState === WebSocket.OPEN) shellWs.send(d); });
           shellWs.on('message',  (d) => { if (browserWs.readyState === WebSocket.OPEN) browserWs.send(d); });
           browserWs.on('close', () => shellWs.close());

@@ -22,8 +22,8 @@ export default async function IntegrationSettingsPage() {
       href: '/admin/dev-studio?tab=secrets',
     },
     {
-      title: 'AWS / ECS Container',
-      description: 'Push environment variables to ECS task definitions and SSM Parameter Store',
+      title: 'Northflank / Runtime Container',
+      description: 'Manage runtime environment variables through Northflank env/secrets',
       href: '/admin/dev-studio?tab=container',
     },
     {
@@ -67,7 +67,7 @@ export default async function IntegrationSettingsPage() {
           <p><strong>platform_secrets</strong> (Dev Studio → Secrets) — encrypted, highest priority at runtime</p>
           <p><strong>app_secrets</strong> (Dev Studio → Container env) — development environment secrets</p>
           <p><strong>platform_settings</strong> (Env Manager) — plaintext config keys, integration settings</p>
-          <p><strong>process.env</strong> (ECS task def / .env.local) — base layer, lowest priority</p>
+          <p><strong>process.env</strong> (Northflank runtime env / .env.local) — base layer, lowest priority</p>
         </div>
       </div>
     </div>

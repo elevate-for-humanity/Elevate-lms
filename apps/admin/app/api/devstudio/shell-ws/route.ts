@@ -2,14 +2,14 @@
  * GET /api/devstudio/shell-ws
  *
  * WebSocket proxy between the browser (xterm.js) and the studio-shell
- * ECS container. Verifies the admin session before upgrading, then
+ * studio-shell runtime/container. Verifies the admin session before upgrading, then
  * forwards all frames bidirectionally.
  *
  * The studio-shell container is never publicly reachable — only this
  * route can connect to it, and only authenticated admins reach this route.
  *
  * Required env vars:
- *   STUDIO_SHELL_WS_URL   — ws://internal-host:8888  (ECS service discovery)
+ *   STUDIO_SHELL_WS_URL   — ws://internal-host:8888  (Northflank/internal service URL)
  *   STUDIO_SHELL_SECRET   — shared secret sent as X-Studio-Secret header
  */
 

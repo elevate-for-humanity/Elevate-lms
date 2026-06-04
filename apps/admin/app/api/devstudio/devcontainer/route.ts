@@ -2,7 +2,7 @@
  * /api/devstudio/devcontainer
  *
  * Unified DevContainer control plane:
- * - github-only  (recommended for ECS/prod): all reads/writes via GitHub API
+ * - github-only  (recommended for Northflank/prod): all reads/writes via GitHub API
  * - local-only   (dev): reads/writes from local checkout
  * - auto         (fallback): github -> local -> github-readonly
  *
@@ -307,7 +307,7 @@ export async function PUT(request: NextRequest) {
           commit: 'local write (GITHUB_TOKEN not configured)',
         });
       } catch {
-        return safeError('Save requires GITHUB_TOKEN in production/ECS environments', 503);
+        return safeError('Save requires GITHUB_TOKEN in production/Northflank environments', 503);
       }
     }
 

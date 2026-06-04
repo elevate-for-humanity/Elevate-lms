@@ -28,7 +28,10 @@ const footerLinks = {
   programs: [
     { name: 'All Programs', href: '/programs' },
     { name: 'HVAC Technician', href: canonicalRoutes.programs.hvacTechnician },
-    { name: 'Certified Nursing Assistant (CNA)', href: canonicalRoutes.programs.certifiedNursingAssistant },
+    {
+      name: 'Certified Nursing Assistant (CNA)',
+      href: canonicalRoutes.programs.certifiedNursingAssistant,
+    },
     { name: 'Medical Assistant', href: '/programs/medical-assistant' },
     { name: 'Phlebotomy', href: '/programs/phlebotomy' },
     { name: 'IT Help Desk', href: '/programs/it-help-desk' },
@@ -119,8 +122,8 @@ export default function ServerFooter() {
             <span className="text-lg font-bold text-white">{PLATFORM_DEFAULTS.orgName}</span>
           </div>
           <p className="text-sm text-white max-w-2xl leading-relaxed">
-            {PLATFORM_DEFAULTS.orgName} is an AI-powered workforce operating system — not just a training
-            provider. We handle credentialing, compliance tracking, employer placement,
+            {PLATFORM_DEFAULTS.orgName} is an AI-powered workforce operating system — not just a
+            training provider. We handle credentialing, compliance tracking, employer placement,
             apprenticeship coordination, and funding documentation so agencies and participants can
             focus on outcomes.
           </p>
@@ -180,9 +183,9 @@ export default function ServerFooter() {
         {/* Operational disclosure */}
         <div className="border-t border-slate-800 pt-6 pb-4">
           <p className="text-slate-500 text-xs text-center max-w-3xl mx-auto leading-relaxed">
-            {PLATFORM_DEFAULTS.orgName} operates as a workforce development system coordinating training,
-            funding, testing, and employment pathways. Program delivery may be conducted directly
-            by Elevate or through approved training providers depending on the program.
+            {PLATFORM_DEFAULTS.orgName} operates as a workforce development system coordinating
+            training, funding, testing, and employment pathways. Program delivery may be conducted
+            directly by Elevate or through approved training providers depending on the program.
           </p>
         </div>
 
@@ -199,7 +202,10 @@ export default function ServerFooter() {
 
             {/* Contact */}
             <div className="flex flex-wrap items-center justify-center gap-4 text-white text-sm mb-4">
-              <a href="tel:{PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g,"")}" className="hover:text-white">
+              <a
+                href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
+                className="hover:text-white"
+              >
                 {PLATFORM_DEFAULTS.supportPhone}
               </a>
               <span className="text-white">|</span>
@@ -293,10 +299,10 @@ export default function ServerFooter() {
                 NCCCO, etc.) upon passing the required exams — these are the same credentials
                 employers hire for. Training may be fully funded for eligible participants through
                 WIOA, Workforce Ready Grant, JRI, and approved workforce partners; eligibility is
-                determined by the applicable agency. {PLATFORM_DEFAULTS.orgName} Career &amp; Technical
-                Institute is a workforce training organization, not a degree-granting postsecondary
-                institution under the Indiana Department of Education — our programs lead to
-                industry certifications and employment, not academic degrees.
+                determined by the applicable agency. {PLATFORM_DEFAULTS.orgName} Career &amp;
+                Technical Institute is a workforce training organization, not a degree-granting
+                postsecondary institution under the Indiana Department of Education — our programs
+                lead to industry certifications and employment, not academic degrees.
               </p>
             </div>
           </div>

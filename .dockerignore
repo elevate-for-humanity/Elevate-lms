@@ -1,0 +1,40 @@
+# Keep Northflank/Docker build contexts small and deterministic.
+# Dependencies are installed inside the image from package manifests/lockfile.
+node_modules
+.pnpm-store
+
+# Next.js/build outputs
+.next
+apps/admin/.next
+out
+dist
+build
+coverage
+.turbo
+.vercel
+.netlify
+.northflank
+
+# Local/editor state
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+.DS_Store
+.vscode
+.idea
+
+# Test artifacts and logs
+playwright-report
+test-results
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Large local caches/artifacts
+.cache
+tmp
+temp

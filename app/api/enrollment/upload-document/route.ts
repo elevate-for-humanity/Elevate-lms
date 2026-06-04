@@ -80,13 +80,13 @@ async function _POST(req: Request) {
     // Get public URL
     const { data: urlData } = supabase.storage.from('documents').getPublicUrl(fileName);
 
-    // Create document record — linked to enrollment and binder
+    // Create document record — linked to enrollment; binder linkage is kept in metadata
+    // because the live documents schema does not include a digital_binder_id column.
     const { data: document, error: dbError } = await supabase
       .from('documents')
       .insert({
         user_id: user.id,
         enrollment_id: enrollmentId,
-        digital_binder_id: binderId,
         file_name: file.name,
         document_type: documentType,
         file_url: urlData.publicUrl,
@@ -94,6 +94,9 @@ async function _POST(req: Request) {
         file_size: file.size,
         mime_type: file.type,
         status: 'pending_review',
+        metadata: {
+          digital_binder_id: binderId,
+        },
       })
       .select()
       .maybeSingle();

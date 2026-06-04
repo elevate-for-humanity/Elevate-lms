@@ -8,7 +8,7 @@
 
 - **Framework**: Next.js 16.1.6 with Turbopack, App Router
 - **Database**: Supabase (project `cuxzzpsyufcewtmicszk`, 516+ tables)
-- **Hosting**: AWS ECS (Fargate) — self-hosted EC2 builder via GitHub Actions (`deploy-aws.yml`), Docker image packaged with `Dockerfile.package`, deployed to ECS cluster `elevate-cluster`
+- **Hosting**: Northflank is the current deployment target. AWS/ECS/CodeBuild files are legacy migration artifacts unless AWS is explicitly re-enabled. Use the Northflank/GitHub deploy pipeline and run LMS/Admin builds separately.
 - **Package Manager**: pnpm
 - **Build**: `pnpm next build` — must complete with zero errors (page count grows as features are added — do not hardcode it)
 
@@ -27,7 +27,7 @@
 - `data/team.ts` — Team member data (7 real members)
 - `lib/tax-software/` — MeF tax stack
 - `lib/curriculum/` — Blueprint system and course generator
-- `aws/` — ECS task definitions (`ecs-task-lms.json`, `ecs-task-admin.json`) and buildspecs
+- `aws/` — Legacy AWS/ECS task definitions and buildspecs retained for migration reference only
 - `supabase/migrations/` — SQL migration files (applied manually — see Migrations section)
 - `public/images/` — All site images
 
@@ -86,26 +86,27 @@ programs → modules → curriculum_lessons (step_type) → lesson_progress
 
 ### Key DB Objects
 
-| Object                            | Purpose                                                                                    |
-| --------------------------------- | ------------------------------------------------------------------------------------------ |
-| `curriculum_lessons`              | Canonical lesson store — `step_type`, `module_order`, `lesson_order`, `passing_score`      |
-| `training_lessons`                | Legacy HVAC lesson store (94 rows) — **read-only archive, do not write**                   |
-| `course_lessons`                  | Canonical lesson write target for all new courses — blueprint engine, Studio, LMS engine   |
-| `lms_lessons` (view)              | Unified lesson read source: `curriculum_lessons` (priority) UNION `training_lessons`       |
-| `courses`                         | Canonical course table — all new courses write here                                        |
-| `training_courses`                | Legacy course table — **do not write new courses here**                                    |
-| `lms_courses` (view)              | Unified course read source: `courses` (priority) UNION `training_courses` (fallback)       |
-| `course_modules`                  | Course-scoped modules — linked via `course_id`. Used by Studio, blueprint engine, LMS engine |
+| Object                            | Purpose                                                                                                                                                  |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `curriculum_lessons`              | Canonical lesson store — `step_type`, `module_order`, `lesson_order`, `passing_score`                                                                    |
+| `training_lessons`                | Legacy HVAC lesson store (94 rows) — **read-only archive, do not write**                                                                                 |
+| `course_lessons`                  | Canonical lesson write target for all new courses — blueprint engine, Studio, LMS engine                                                                 |
+| `lms_lessons` (view)              | Unified lesson read source: `curriculum_lessons` (priority) UNION `training_lessons`                                                                     |
+| `courses`                         | Canonical course table — all new courses write here                                                                                                      |
+| `training_courses`                | Legacy course table — **do not write new courses here**                                                                                                  |
+| `lms_courses` (view)              | Unified course read source: `courses` (priority) UNION `training_courses` (fallback)                                                                     |
+| `course_modules`                  | Course-scoped modules — linked via `course_id`. Used by Studio, blueprint engine, LMS engine                                                             |
 | `modules`                         | Program-scoped modules — linked via `program_id`. Used by transcript, analytics, mobile API. **Different scope from `course_modules` — not a duplicate** |
-| `lesson_progress`                 | Per-lesson completion — one row per user+lesson. Canonical for checkpoint gating           |
-| `lms_progress`                    | Per-course summary — one row per user+course. Tracks `status`, `progress_percent`, `last_activity_at`. **Not a duplicate of `lesson_progress`** |
-| `progress_entries`                | OJT apprenticeship timeclock — clock-in/out, geofencing. Unrelated to lesson progress      |
-| `checkpoint_scores`               | Per-user checkpoint pass/fail records — drives module gating                               |
-| `step_submissions`                | Lab/assignment submissions with instructor sign-off                                        |
-| `completion_rules`                | Per-course/program completion rule definitions                                             |
-| `program_completion_certificates` | Auto-issued on course completion when all checkpoints pass                                 |
+| `lesson_progress`                 | Per-lesson completion — one row per user+lesson. Canonical for checkpoint gating                                                                         |
+| `lms_progress`                    | Per-course summary — one row per user+course. Tracks `status`, `progress_percent`, `last_activity_at`. **Not a duplicate of `lesson_progress`**          |
+| `progress_entries`                | OJT apprenticeship timeclock — clock-in/out, geofencing. Unrelated to lesson progress                                                                    |
+| `checkpoint_scores`               | Per-user checkpoint pass/fail records — drives module gating                                                                                             |
+| `step_submissions`                | Lab/assignment submissions with instructor sign-off                                                                                                      |
+| `completion_rules`                | Per-course/program completion rule definitions                                                                                                           |
+| `program_completion_certificates` | Auto-issued on course completion when all checkpoints pass                                                                                               |
 
 **Progress table contract — do not create new progress tables:**
+
 - Lesson-level completion → `lesson_progress`
 - Course-level summary (started/completed/percent) → `lms_progress`
 - OJT hours / timeclock → `progress_entries`
@@ -267,6 +268,7 @@ All are idempotent — safe to re-run.
 **Canonical term:** "Program" — a student enrolls in a Program, not a Course.
 
 **Resolution applied:**
+
 - `/lms/programs` redirects to `/lms/courses` (permanent redirect in `next.config.mjs`)
 - Nav labels updated: "My Courses" → "My Programs" in `LMSNavigation.tsx`, `LmsAppShell.tsx`, breadcrumbs, sidebar, portal config, learner layout
 - `/lms/courses` remains the canonical authenticated route (106 inbound links preserved)
@@ -276,14 +278,14 @@ All are idempotent — safe to re-run.
 
 Full stack is built and wired:
 
-| Layer | File |
-|---|---|
-| Learner submission | `components/lms/StepSubmissionForm.tsx` |
-| Submission API | `app/api/lms/submissions/route.ts` |
-| Review API | `app/api/lms/submissions/review/route.ts` |
-| Instructor list | `apps/admin/app/instructor/submissions/page.tsx` |
-| Instructor detail | `apps/admin/app/instructor/submissions/[submissionId]/page.tsx` |
-| Lesson page | `app/lms/(app)/courses/[courseId]/lessons/[lessonId]/page.tsx` — renders `StepSubmissionForm` for `lab` and `assignment` step types |
+| Layer              | File                                                                                                                                |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Learner submission | `components/lms/StepSubmissionForm.tsx`                                                                                             |
+| Submission API     | `app/api/lms/submissions/route.ts`                                                                                                  |
+| Review API         | `app/api/lms/submissions/review/route.ts`                                                                                           |
+| Instructor list    | `apps/admin/app/instructor/submissions/page.tsx`                                                                                    |
+| Instructor detail  | `apps/admin/app/instructor/submissions/[submissionId]/page.tsx`                                                                     |
+| Lesson page        | `app/lms/(app)/courses/[courseId]/lessons/[lessonId]/page.tsx` — renders `StepSubmissionForm` for `lab` and `assignment` step types |
 
 ### Admin Curriculum Builder Page
 
@@ -705,6 +707,7 @@ Do not tighten without replacing admin remediation and enrollment-management beh
 There are two distinct quiz systems. They serve different purposes and must not be merged.
 
 **Model A — Standalone Quiz Engine** (`quizzes` + `quiz_questions` + `quiz_attempts` tables)
+
 - Full quiz objects with their own IDs, separate from lessons
 - Used by: `/lms/quizzes/[quizId]`, quiz submit/start API routes, admin quiz management pages
 - `quiz_attempts` written on every submission
@@ -712,6 +715,7 @@ There are two distinct quiz systems. They serve different purposes and must not 
 - Write path: `POST /api/lms/quizzes/[quizId]/start` → `quiz_attempts` → `POST /api/lms/quizzes/[quizId]/submit`
 
 **Model B — Inline Lesson Questions** (`course_lessons.quiz_questions` JSONB column)
+
 - Questions stored as JSONB on the lesson row — no separate quiz object
 - Used by: lesson page `QuizPlayer`, checkpoint gating, `lms_lessons` view
 - Completion written to `lesson_progress` and `checkpoint_scores` (not `quiz_attempts`)
@@ -817,10 +821,10 @@ The hook attempts unmuted play and falls back silently. No mute button shown.
 
 ### Running services
 
-| Service | Command | Port |
-|---------|---------|------|
-| LMS dev server | `pnpm dev` (or `pnpm next dev --turbopack`) | 3000 |
-| Admin app | `pnpm dev:admin` (or `cd apps/admin && pnpm dev`) | 3001 |
+| Service        | Command                                           | Port |
+| -------------- | ------------------------------------------------- | ---- |
+| LMS dev server | `pnpm dev` (or `pnpm next dev --turbopack`)       | 3000 |
+| Admin app      | `pnpm dev:admin` (or `cd apps/admin && pnpm dev`) | 3001 |
 
 ### Key commands
 
@@ -841,16 +845,15 @@ The hook attempts unmuted play and falls back silently. No mute button shown.
 
 Four configuration stores exist — they are **intentionally separate** and do NOT overlap:
 
-| Store | Table | UI surface | Purpose |
-|-------|-------|------------|---------|
-| **platform_secrets** | `platform_secrets` | Dev Studio → Secrets | Encrypted API keys; highest runtime priority |
-| **app_secrets** | `app_secrets` | Dev Studio → Container (env section) | Dev environment secrets |
-| **platform_settings** | `platform_settings` | Env Manager + Settings hub | Plaintext config, integration keys |
-| **process.env** | ECS task def / `.env.local` | Dev Studio → Container (ECS push) | Base layer |
+| Store                 | Table                                 | UI surface                           | Purpose                                      |
+| --------------------- | ------------------------------------- | ------------------------------------ | -------------------------------------------- |
+| **platform_secrets**  | `platform_secrets`                    | Dev Studio → Secrets                 | Encrypted API keys; highest runtime priority |
+| **app_secrets**       | `app_secrets`                         | Dev Studio → Container (env section) | Dev environment secrets                      |
+| **platform_settings** | `platform_settings`                   | Env Manager + Settings hub           | Plaintext config, integration keys           |
+| **process.env**       | Northflank runtime env / `.env.local` | Dev Studio → Container env view      | Base layer                                   |
 
 Precedence at runtime: `platform_secrets > app_secrets > process.env`
 
 **AI Console vs Dev Studio Command tab:** both use `/api/devstudio/execute` — AI Console is the standalone page, Dev Studio embeds the same in an IDE-like shell. Not a conflict.
 
 **Dev Studio AI Chat** (`/api/devstudio/chat`) uses Groq/Gemini with tool calling for platform operations. This is separate from `lib/ai/ai-service.ts` (`aiChat()`) which is for course content generation.
-

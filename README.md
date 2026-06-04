@@ -31,16 +31,16 @@ Programs run 4–18 weeks. Most are fully funded at no cost to eligible particip
 
 ## Who It Serves
 
-| Stakeholder | Role |
-|---|---|
-| **Adult learners** | Career changers, dislocated workers, justice-involved individuals, youth 16–24 |
-| **Workforce agencies** | WorkOne, Indiana DWD, EmployIndy — referring and funding participants |
-| **Employers** | Hiring partners, OJT sponsors, apprenticeship co-sponsors |
-| **Program holders** | Community organizations delivering training under Elevate's infrastructure |
-| **Booth renters** | Licensed cosmetology professionals renting space at partner salons |
-| **Workforce boards** | WIOA Title I administrators, EmployIndy, state DWD |
-| **Government** | DOL Office of Apprenticeship, WIOA Title I, FSSA, Indiana BMV |
-| **Parents / Guardians** | Monitoring progress of enrolled youth participants |
+| Stakeholder             | Role                                                                           |
+| ----------------------- | ------------------------------------------------------------------------------ |
+| **Adult learners**      | Career changers, dislocated workers, justice-involved individuals, youth 16–24 |
+| **Workforce agencies**  | WorkOne, Indiana DWD, EmployIndy — referring and funding participants          |
+| **Employers**           | Hiring partners, OJT sponsors, apprenticeship co-sponsors                      |
+| **Program holders**     | Community organizations delivering training under Elevate's infrastructure     |
+| **Booth renters**       | Licensed cosmetology professionals renting space at partner salons             |
+| **Workforce boards**    | WIOA Title I administrators, EmployIndy, state DWD                             |
+| **Government**          | DOL Office of Apprenticeship, WIOA Title I, FSSA, Indiana BMV                  |
+| **Parents / Guardians** | Monitoring progress of enrolled youth participants                             |
 
 ---
 
@@ -48,110 +48,110 @@ Programs run 4–18 weeks. Most are fully funded at no cost to eligible particip
 
 ### Healthcare
 
-| Program | Credential | Funding |
-|---|---|---|
-| Certified Nursing Assistant | Indiana ISDH CNA | WIOA · WRG |
-| Qualified Medication Aide (QMA) | Indiana QMA | WIOA · WRG |
-| Medical Assistant | NHA CCMA | WIOA · WRG |
-| Phlebotomy | NHA CPT | WIOA · WRG |
-| Pharmacy Technician | PTCB CPhT | WIOA · WRG |
-| Home Health Aide | Indiana HHA | WIOA |
-| Peer Recovery Specialist | CPRC Pathway | WIOA · JRI |
-| Direct Support Professional | DSP Credential | WIOA |
+| Program                           | Credential         | Funding             |
+| --------------------------------- | ------------------ | ------------------- |
+| Certified Nursing Assistant       | Indiana ISDH CNA   | WIOA · WRG          |
+| Qualified Medication Aide (QMA)   | Indiana QMA        | WIOA · WRG          |
+| Medical Assistant                 | NHA CCMA           | WIOA · WRG          |
+| Phlebotomy                        | NHA CPT            | WIOA · WRG          |
+| Pharmacy Technician               | PTCB CPhT          | WIOA · WRG          |
+| Home Health Aide                  | Indiana HHA        | WIOA                |
+| Peer Recovery Specialist          | CPRC Pathway       | WIOA · JRI          |
+| Direct Support Professional       | DSP Credential     | WIOA                |
 | Drug & Alcohol Specimen Collector | DOT Collector Cert | Self-Pay · Employer |
 
 ### Skilled Trades
 
-| Program | Credential | Funding |
-|---|---|---|
-| HVAC Technician | EPA Section 608 Universal | WIOA · WRG |
-| CDL Training (Class A / B) | Commercial Driver's License | WIOA · EmployIndy |
-| Welding | AWS / Industry Cert | WIOA · WRG |
-| Electrical | OSHA + Industry Cert | WIOA |
-| Plumbing | Industry Cert | WIOA |
-| Construction Trades Certification | NCCER / OSHA | WIOA · WRG |
-| Building Services Technician | Industry Cert | WIOA |
-| Diesel Mechanic | ASE Pathway | WIOA |
-| Forklift Operator | OSHA Forklift Cert | WIOA · Employer |
+| Program                           | Credential                  | Funding           |
+| --------------------------------- | --------------------------- | ----------------- |
+| HVAC Technician                   | EPA Section 608 Universal   | WIOA · WRG        |
+| CDL Training (Class A / B)        | Commercial Driver's License | WIOA · EmployIndy |
+| Welding                           | AWS / Industry Cert         | WIOA · WRG        |
+| Electrical                        | OSHA + Industry Cert        | WIOA              |
+| Plumbing                          | Industry Cert               | WIOA              |
+| Construction Trades Certification | NCCER / OSHA                | WIOA · WRG        |
+| Building Services Technician      | Industry Cert               | WIOA              |
+| Diesel Mechanic                   | ASE Pathway                 | WIOA              |
+| Forklift Operator                 | OSHA Forklift Cert          | WIOA · Employer   |
 
 ### Technology & Business
 
-| Program | Credential | Funding |
-|---|---|---|
-| IT Help Desk | CompTIA A+ | WIOA · WRG |
-| Cybersecurity Analyst | CompTIA Security+ | WIOA · WRG |
-| Network Administration | CompTIA Network+ | WIOA · WRG |
-| Network Support Technician | Industry Cert | WIOA |
-| Web Development | Portfolio + Cert | WIOA |
-| Software Development | Portfolio + Cert | WIOA |
-| Graphic Design | Adobe / Portfolio | WIOA |
-| CAD / Drafting | AutoCAD Cert | WIOA |
-| Business Administration | Industry Cert | WIOA |
-| Office Administration | MOS Certification | WIOA · WRG |
-| Bookkeeping | QuickBooks / NACPB | WIOA |
-| Finance & Accounting Pathway | NACPB / Industry | WIOA |
-| Tax Preparation | IRS AFSP / PTIN | Self-Pay · Employer |
-| Entrepreneurship | Certificate | WIOA |
-| Project Management | CAPM Pathway | WIOA |
+| Program                      | Credential         | Funding             |
+| ---------------------------- | ------------------ | ------------------- |
+| IT Help Desk                 | CompTIA A+         | WIOA · WRG          |
+| Cybersecurity Analyst        | CompTIA Security+  | WIOA · WRG          |
+| Network Administration       | CompTIA Network+   | WIOA · WRG          |
+| Network Support Technician   | Industry Cert      | WIOA                |
+| Web Development              | Portfolio + Cert   | WIOA                |
+| Software Development         | Portfolio + Cert   | WIOA                |
+| Graphic Design               | Adobe / Portfolio  | WIOA                |
+| CAD / Drafting               | AutoCAD Cert       | WIOA                |
+| Business Administration      | Industry Cert      | WIOA                |
+| Office Administration        | MOS Certification  | WIOA · WRG          |
+| Bookkeeping                  | QuickBooks / NACPB | WIOA                |
+| Finance & Accounting Pathway | NACPB / Industry   | WIOA                |
+| Tax Preparation              | IRS AFSP / PTIN    | Self-Pay · Employer |
+| Entrepreneurship             | Certificate        | WIOA                |
+| Project Management           | CAPM Pathway       | WIOA                |
 
 ### Apprenticeships (DOL Registered)
 
-| Program | License | Funding |
-|---|---|---|
-| Barber Apprenticeship | Indiana Barber License | DOL Apprenticeship |
-| Cosmetology Apprenticeship | Indiana Cosmetology License | DOL Apprenticeship |
-| Esthetics Apprenticeship | Indiana Esthetician License | DOL Apprenticeship |
-| Nail Technology Apprenticeship | Indiana Nail Tech License | DOL Apprenticeship |
-| Beauty Career Educator | Educator Credential | DOL Apprenticeship |
-| Culinary Arts Apprenticeship | Industry Cert | DOL Apprenticeship |
-| Hospitality | Industry Cert | DOL Apprenticeship |
+| Program                        | License                     | Funding            |
+| ------------------------------ | --------------------------- | ------------------ |
+| Barber Apprenticeship          | Indiana Barber License      | DOL Apprenticeship |
+| Cosmetology Apprenticeship     | Indiana Cosmetology License | DOL Apprenticeship |
+| Esthetics Apprenticeship       | Indiana Esthetician License | DOL Apprenticeship |
+| Nail Technology Apprenticeship | Indiana Nail Tech License   | DOL Apprenticeship |
+| Beauty Career Educator         | Educator Credential         | DOL Apprenticeship |
+| Culinary Arts Apprenticeship   | Industry Cert               | DOL Apprenticeship |
+| Hospitality                    | Industry Cert               | DOL Apprenticeship |
 
 ### Short-Duration Certifications
 
-| Program | Credential | Funding |
-|---|---|---|
-| CPR / First Aid | AHA / HSI BLS | Self-Pay · Employer |
-| OSHA / Emergency Health & Safety | OSHA 10/30 | WIOA · Employer |
-| Sanitation & Infection Control | Industry Cert | Self-Pay |
+| Program                          | Credential    | Funding             |
+| -------------------------------- | ------------- | ------------------- |
+| CPR / First Aid                  | AHA / HSI BLS | Self-Pay · Employer |
+| OSHA / Emergency Health & Safety | OSHA 10/30    | WIOA · Employer     |
+| Sanitation & Infection Control   | Industry Cert | Self-Pay            |
 
 ---
 
 ## Stakeholder Portals
 
-| Portal | Path | Audience |
-|---|---|---|
-| Learner LMS | `/lms` | Enrolled students |
-| Student Portal | `/student-portal` | Student self-service |
-| Admin | `/admin` | Staff, super admins |
-| Instructor | `/instructor` | Course instructors |
-| Employer Portal | `/employer-portal` | Hiring partners |
-| Program Holder | `/program-holder` | Community org partners |
-| Partner Portal | `/partners/dashboard` | Apprenticeship host shops |
-| Staff Portal | `/staff-portal` | Internal staff |
-| Workforce Board | `/workforce-board` | WIOA/DWD administrators |
-| Parent Portal | `/parent-portal` | Guardians of youth participants |
-| Apprentice | `/apprentice` | Registered apprentices |
-| Case Manager | `/cm` | WIOA case managers |
+| Portal          | Path                  | Audience                        |
+| --------------- | --------------------- | ------------------------------- |
+| Learner LMS     | `/lms`                | Enrolled students               |
+| Student Portal  | `/student-portal`     | Student self-service            |
+| Admin           | `/admin`              | Staff, super admins             |
+| Instructor      | `/instructor`         | Course instructors              |
+| Employer Portal | `/employer-portal`    | Hiring partners                 |
+| Program Holder  | `/program-holder`     | Community org partners          |
+| Partner Portal  | `/partners/dashboard` | Apprenticeship host shops       |
+| Staff Portal    | `/staff-portal`       | Internal staff                  |
+| Workforce Board | `/workforce-board`    | WIOA/DWD administrators         |
+| Parent Portal   | `/parent-portal`      | Guardians of youth participants |
+| Apprentice      | `/apprentice`         | Registered apprentices          |
+| Case Manager    | `/cm`                 | WIOA case managers              |
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 16 (App Router, Turbopack) |
-| Database | Supabase (PostgreSQL) — project `cuxzzpsyufcewtmicszk` |
-| Hosting | AWS ECS (Fargate) — `elevate-cluster`, two services: `elevate-lms-service` / `elevate-admin-service` |
-| CI/CD | GitHub Actions → AWS CodeBuild → ECS rolling deploy |
-| Package manager | pnpm |
-| Auth | Supabase Auth + custom role system |
-| Payments | Stripe + Affirm + Sezzle |
-| Email | SendGrid + Resend |
-| Rate limiting | Upstash Redis |
-| Storage | Cloudflare R2 + AWS S3 |
-| Analytics | Google Analytics |
-| Tax e-filing | IRS MeF stack (EFIN 358459) |
-| Secrets | AWS SSM Parameter Store (`/elevate/*`) + admin `platform_secrets` table |
+| Layer           | Technology                                                                                                                  |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Framework       | Next.js 16 (App Router, Turbopack)                                                                                          |
+| Database        | Supabase (PostgreSQL) — project `cuxzzpsyufcewtmicszk`                                                                      |
+| Hosting         | **Northflank** — AWS/ECS references are legacy migration artifacts unless AWS is explicitly re-enabled                      |
+| CI/CD           | GitHub → Northflank deploys — run LMS and Admin builds separately (`pnpm run build:lms:phased`, `pnpm run build:admin`)     |
+| Package manager | pnpm                                                                                                                        |
+| Auth            | Supabase Auth + custom role system                                                                                          |
+| Payments        | Stripe + Affirm + Sezzle                                                                                                    |
+| Email           | SendGrid + Resend                                                                                                           |
+| Rate limiting   | Upstash Redis                                                                                                               |
+| Storage         | Cloudflare R2 plus any active provider object storage; AWS S3 references are legacy unless explicitly re-enabled            |
+| Analytics       | Google Analytics                                                                                                            |
+| Tax e-filing    | IRS MeF stack (EFIN 358459)                                                                                                 |
+| Secrets         | Current provider environment/secrets plus admin `platform_secrets` table; AWS SSM references are legacy migration artifacts |
 
 ---
 
@@ -160,17 +160,17 @@ Programs run 4–18 weeks. Most are fully funded at no cost to eligible particip
 The admin platform now includes an operations-first automation center for curriculum, documents, and compliance workflows.
 
 - **Course Builder Control Center** (`/admin/course-builder/generate`):
-	- one-click course generation (blueprint + seed + queued videos)
-	- one-click staging and production deployment orchestration
-	- migration readiness checks and live platform feed
-	- **SCORM package linking** to canonical courses via the existing SCORM package system
+  - one-click course generation (blueprint + seed + queued videos)
+  - one-click staging and production deployment orchestration
+  - migration readiness checks and live platform feed
+  - **SCORM package linking** to canonical courses via the existing SCORM package system
 
 - **Documents Automation** (`/admin/documents`):
-	- **SAM.gov grant auto-lookup** and opportunity search
-	- one-click grant prefill package generation (DOCX + PDF)
-	- optional email distribution through SendGrid
-	- event timeline for generated grant packages
-	- **Minority certification one-click autofill** (DOCX + PDF + timeline + optional SendGrid email)
+  - **SAM.gov grant auto-lookup** and opportunity search
+  - one-click grant prefill package generation (DOCX + PDF)
+  - optional email distribution through SendGrid
+  - event timeline for generated grant packages
+  - **Minority certification one-click autofill** (DOCX + PDF + timeline + optional SendGrid email)
 
 - **File handling support** in document operations includes image uploads, PDF parsing, DOCX generation, and ZIP processing paths where applicable.
 
@@ -178,13 +178,13 @@ The admin platform now includes an operations-first automation center for curric
 
 ## Repository Scale
 
-| Metric | Count |
-|---|---|
-| `page.tsx` files | 1,293 |
+| Metric               | Count |
+| -------------------- | ----- |
+| `page.tsx` files     | 1,293 |
 | `route.ts` API files | 1,186 |
-| Supabase migrations | 687 |
-| Canonical programs | 37 |
-| Nav hrefs | 111 |
+| Supabase migrations  | 687   |
+| Canonical programs   | 37    |
+| Nav hrefs            | 111   |
 
 ---
 
@@ -307,15 +307,15 @@ UI:
 
 The admin app includes a built-in Dev Studio at `/admin/dev-studio` — a super-admin-only operations panel with the following tabs:
 
-| Tab | Purpose |
-|---|---|
-| **Files** | Browse and edit source files via GitHub API |
-| **Terminal** | WebSocket shell into the running ECS container |
-| **Website** | Embedded preview of the live site |
-| **Chat** | AI assistant (Groq / Gemini / OpenAI) with platform context and tool calling |
-| **Container** | Edit `devcontainer.json`, manage env vars, import from AWS SSM, push vars directly to ECS task definitions, upload documents |
-| **Secrets** | CRUD for `platform_secrets` — encrypted key/value store loaded at runtime by `lib/secrets.ts` |
-| **Docs** | Uploaded documents and files |
+| Tab           | Purpose                                                                                                                                                          |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Files**     | Browse and edit source files via GitHub API                                                                                                                      |
+| **Terminal**  | WebSocket shell into the active Northflank runtime/container                                                                                                     |
+| **Website**   | Embedded preview of the live site                                                                                                                                |
+| **Chat**      | AI assistant (Groq / Gemini / OpenAI) with platform context and tool calling                                                                                     |
+| **Container** | Edit `devcontainer.json`, manage env vars, and upload documents; AWS SSM/ECS push flows are legacy and Northflank env/secrets are the production source of truth |
+| **Secrets**   | CRUD for `platform_secrets` — encrypted key/value store loaded at runtime by `lib/secrets.ts`                                                                    |
+| **Docs**      | Uploaded documents and files                                                                                                                                     |
 
 ### Secret management flow
 
@@ -327,13 +327,11 @@ Admin Secrets tab → platform_secrets (Supabase)
          process.env at runtime — all routes pick up keys automatically
 ```
 
-### Pushing env vars to ECS
+### Runtime environment variables
 
-From the Container tab → Container Secrets and Variables:
-1. Enter key + value → **Push to Container** — writes to SSM at `/elevate/<KEY>`, registers a new ECS task definition revision, force-redeploys both services
-2. **Import from SSM** — pulls all `/elevate/*` parameters from AWS SSM into `platform_secrets`
+Use Northflank environment/secrets as the source of truth for production runtime variables. The old AWS SSM/ECS push flow is legacy and should not be used for current deployments unless AWS is intentionally re-enabled.
 
-Requires `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` to be set in the Secrets tab with permissions for `ssm:GetParametersByPath`, `ssm:PutParameter`, `ecs:DescribeTaskDefinition`, `ecs:RegisterTaskDefinition`, `ecs:UpdateService`.
+The Admin Secrets tab still stores application-level values in `platform_secrets`; provider-level runtime variables must be mirrored into Northflank before redeploy.
 
 ---
 
@@ -344,11 +342,13 @@ Files go in `supabase/migrations/`. Naming: `YYYYMMDD000NNN_description.sql`.
 **Migrations are NOT auto-applied by default.** After writing a migration file, apply it one of two ways:
 
 **Option A — Supabase Dashboard (manual):**
+
 1. Open Supabase Dashboard → SQL Editor
 2. Paste and run the migration
 3. Verify the schema change before marking work complete
 
 **Option B — Management API (scripted, requires PAT):**
+
 ```bash
 PAT="sbp_..."   # Supabase personal access token
 PROJECT="cuxzzpsyufcewtmicszk"
@@ -361,6 +361,7 @@ curl -s -X POST \
 ```
 
 **Check pending migrations:**
+
 ```bash
 pnpm tsx --env-file=.env.local scripts/check-pending-migrations.ts
 ```
@@ -369,15 +370,15 @@ pnpm tsx --env-file=.env.local scripts/check-pending-migrations.ts
 
 All 690 migrations are applied to production. Last applied:
 
-| Migration | Description | Status |
-|---|---|---|
-| `20260701000006_curriculum_uploads.sql` | `curriculum_uploads` table + storage bucket | ✅ Applied |
-| `20260701000009_fix_program_holders_user_id_constraint.sql` | Drop duplicate unique constraint on `program_holders.user_id` | ✅ Applied |
-| `20260701000010_platform_secrets.sql` | `platform_secrets` + `platform_settings` tables | ✅ Applied |
-| `20260701000011_bootstrap_missing_profiles.sql` | Upsert missing profile rows, promote admin emails | ✅ Applied |
-| `20260702000001_rls_and_security_hardening.sql` | Enable RLS on 4 tables, fix 9 storage policies using `{public}` role, clean up duplicate profile policies, add bucket mime/size limits | ✅ Applied |
-| `20260702000002_store_products_product_id.sql` | Add `product_id` FK to `store_products` — required for cart LMS access grant lookup | ✅ Applied |
-| `20260702000003_store_products_stripe_id.sql` | Add `stripe_product_id` to `store_products` — required for Stripe webhook refund → LMS revocation | ✅ Applied |
+| Migration                                                   | Description                                                                                                                            | Status     |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| `20260701000006_curriculum_uploads.sql`                     | `curriculum_uploads` table + storage bucket                                                                                            | ✅ Applied |
+| `20260701000009_fix_program_holders_user_id_constraint.sql` | Drop duplicate unique constraint on `program_holders.user_id`                                                                          | ✅ Applied |
+| `20260701000010_platform_secrets.sql`                       | `platform_secrets` + `platform_settings` tables                                                                                        | ✅ Applied |
+| `20260701000011_bootstrap_missing_profiles.sql`             | Upsert missing profile rows, promote admin emails                                                                                      | ✅ Applied |
+| `20260702000001_rls_and_security_hardening.sql`             | Enable RLS on 4 tables, fix 9 storage policies using `{public}` role, clean up duplicate profile policies, add bucket mime/size limits | ✅ Applied |
+| `20260702000002_store_products_product_id.sql`              | Add `product_id` FK to `store_products` — required for cart LMS access grant lookup                                                    | ✅ Applied |
+| `20260702000003_store_products_stripe_id.sql`               | Add `stripe_product_id` to `store_products` — required for Stripe webhook refund → LMS revocation                                      | ✅ Applied |
 
 ---
 
@@ -396,6 +397,7 @@ if (auth.error) return auth.error;
 ```
 
 All API error responses use `lib/api/safe-error.ts`:
+
 ```ts
 import { safeError, safeInternalError, safeDbError } from '@/lib/api/safe-error';
 return safeError('Not found', 404);
@@ -404,12 +406,14 @@ return safeError('Not found', 404);
 ### Security Audit — 2026-07-02
 
 **RLS gaps found and fixed:**
+
 - `ai_plan_executions`, `platform_events`, `platform_snapshots`, `program_holder_call_log` — had RLS disabled. Now enabled with admin-only policies.
 - 9 storage policies were using `{public}` role (unauthenticated) on private buckets — changed to `{authenticated}`.
 - `demo-audio` bucket had no file size limit or mime-type restriction — now capped at 50 MB, audio only.
 - `curriculum` bucket now restricted to PDF, video, image, and document mime types.
 
 **All tables now have RLS enabled.** Run this to verify:
+
 ```sql
 SELECT relname FROM pg_class c
 JOIN pg_namespace n ON n.oid = c.relnamespace
@@ -429,6 +433,7 @@ The admin portal at `admin.elevateforhumanity.org` requires a `profiles` row wit
 
 1. Confirm your user exists in Supabase Auth → Users
 2. Run this in Supabase Dashboard → SQL Editor:
+
 ```sql
 -- Replace with your email
 UPDATE public.profiles SET role = 'super_admin' WHERE email = 'your@email.com';
@@ -439,6 +444,7 @@ SELECT id, email, 'super_admin', '00000000-0000-0000-0000-000000000001', NOW(), 
 FROM auth.users WHERE email = 'your@email.com'
 ON CONFLICT (id) DO UPDATE SET role = 'super_admin';
 ```
+
 3. Sign in again at `admin.elevateforhumanity.org/login`
 
 **RLS note:** The `profiles` table has `relforcerowsecurity = true`. Authenticated users can read their own row via the `profiles_own_read` policy (`id = auth.uid()`). The admin login endpoint (`/api/auth/admin-login`) uses the service role key to bypass RLS for the role check, so login works even if RLS policies change.

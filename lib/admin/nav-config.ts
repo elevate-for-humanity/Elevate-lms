@@ -119,7 +119,6 @@ export const DEFAULT_NAV: NavSection[] = [
       { label: 'Contracts', href: '/admin/contracts' },
       { label: 'JRI', href: '/admin/jri' },
       { label: 'JRI — Participants', href: '/admin/jri/participants' },
-      { label: 'Cash Advances', href: '/admin/cash-advances' },
       { label: 'Payout Queue', href: '/admin/payout-queue' },
       { label: 'Payroll Cards', href: '/admin/payroll-cards' },
       { label: 'Incentives', href: '/admin/incentives' },

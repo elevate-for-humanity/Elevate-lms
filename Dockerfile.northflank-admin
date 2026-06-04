@@ -119,7 +119,15 @@ COPY --from=builder /export/sharp-node_modules/@img ./node_modules/@img
 COPY --from=builder /app/apps/admin/.next/server ./apps/admin/.next/server
 COPY --from=builder /app/apps/admin/.next/static ./apps/admin/.next/static
 COPY --from=builder /app/apps/admin/.next/required-server-files.json ./apps/admin/.next/required-server-files.json
-COPY --from=builder /app/public ./apps/admin/public
+# Slim public assets — skip large marketing-only trees (audio, generated, etc.)
+COPY --from=builder /app/public/fonts ./apps/admin/public/fonts
+COPY --from=builder /app/public/icons ./apps/admin/public/icons
+COPY --from=builder /app/public/forms ./apps/admin/public/forms
+COPY --from=builder /app/public/data ./apps/admin/public/data
+COPY --from=builder /app/public/images ./apps/admin/public/images
+COPY --from=builder /app/public/hero-images ./apps/admin/public/hero-images
+COPY --from=builder /app/public/downloads ./apps/admin/public/downloads
+COPY --from=builder /app/remotion-src ./remotion-src
 COPY --from=builder /app/apps/admin/server.js ./apps/admin/server.js
 RUN mkdir -p apps/admin/node_modules
 COPY --from=builder /export/ws ./apps/admin/node_modules/ws

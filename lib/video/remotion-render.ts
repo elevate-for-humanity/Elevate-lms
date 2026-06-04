@@ -11,7 +11,7 @@
 
 import path from 'path';
 import os from 'os';
-import { mkdir, writeFile, unlink } from 'fs/promises';
+import { mkdir, readFile, rm, writeFile, unlink } from 'fs/promises';
 import { bundle } from '@remotion/bundler';
 import { renderMedia, selectComposition } from '@remotion/renderer';
 import { registerUsageEvent } from '@remotion/licensing';
@@ -21,6 +21,11 @@ import { logger } from '@/lib/logger';
 // Type-only import — never bundled, only used for type checking
 import type { ElevateLessonProps } from '@/remotion-src/compositions/ElevateLesson';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import {
+  lessonRenderTempPaths,
+  uploadLessonFileFromDisk,
+  uploadLessonMediaBuffer,
+} from './upload-lesson-media';
 
 // Remotion's inputProps requires Record<string, unknown> — this cast is safe
 // because ElevateLessonProps is a plain serialisable object.
@@ -44,8 +49,8 @@ export interface RemotionLessonInput {
 
 export interface RemotionRenderResult {
   success: boolean;
-  videoUrl?: string; // public path, e.g. /generated/lessons/lesson-<id>.mp4
-  audioUrl?: string; // public path to the MP3 (kept for reuse)
+  videoUrl?: string; // Supabase course-videos public URL
+  audioUrl?: string; // Supabase course-videos public URL (MP3)
   duration?: number; // seconds
   method: 'remotion-free';
   error?: string;
@@ -157,19 +162,6 @@ function estimateDuration(script: string): number {
   return Math.ceil((words / 140) * 60);
 }
 
-// ── Output paths ──────────────────────────────────────────────────────────────
-
-function getOutputPaths(lessonId: string) {
-  const outputDir = path.join(process.cwd(), 'public', 'generated', 'lessons');
-  return {
-    outputDir,
-    audioPath: path.join(outputDir, `lesson-${lessonId}.mp3`),
-    videoPath: path.join(outputDir, `lesson-${lessonId}.mp4`),
-    audioUrl: `/generated/lessons/lesson-${lessonId}.mp3`,
-    videoUrl: `/generated/lessons/lesson-${lessonId}.mp4`,
-  };
-}
-
 // ── Remotion bundle cache ─────────────────────────────────────────────────────
 
 let _bundleUrl: string | null = null;
@@ -203,16 +195,15 @@ async function getBundleUrl(): Promise<string> {
  * Render a lesson MP4 using the free pipeline:
  *   edge-tts → Pexels/Pollinations → Remotion
  *
- * Output is written to public/generated/lessons/lesson-<id>.mp4
- * Returns the public URL path.
+ * Renders to a temp dir, uploads MP4 (+ MP3) to Supabase course-videos, then deletes temp files.
  */
 export async function renderLessonVideo(input: RemotionLessonInput): Promise<RemotionRenderResult> {
   const { lessonId, domainKey = 'default', instructorId } = input;
   const instructor = getInstructor(instructorId);
-  const paths = getOutputPaths(lessonId);
+  const paths = lessonRenderTempPaths(lessonId);
 
   try {
-    await mkdir(paths.outputDir, { recursive: true });
+    await mkdir(paths.dir, { recursive: true });
 
     // ── Step 1: Generate narration audio via edge-tts ─────────────────────────
     logger.info(`[RemotionRender] Generating TTS for lesson ${lessonId}`);
@@ -304,10 +295,14 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
 
     logger.info(`[RemotionRender] MP4 written: ${paths.videoPath}`);
 
+    const audioUrl = await uploadLessonMediaBuffer(await readFile(paths.audioPath), lessonId, 'mp3');
+    const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, lessonId, 'mp4');
+    await rm(paths.dir, { recursive: true, force: true }).catch(() => {});
+
     return {
       success: true,
-      videoUrl: paths.videoUrl,
-      audioUrl: paths.audioUrl,
+      videoUrl,
+      audioUrl,
       duration,
       method: 'remotion-free',
     };
@@ -315,8 +310,8 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
     const msg = err instanceof Error ? err.message : String(err);
     logger.error('[RemotionRender] Render failed: ' + msg);
 
-    // Clean up partial output
     await unlink(paths.videoPath).catch(() => {});
+    await rm(paths.dir, { recursive: true, force: true }).catch(() => {});
 
     return {
       success: false,

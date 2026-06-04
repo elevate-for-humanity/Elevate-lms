@@ -25,8 +25,7 @@ async function getRemotionRender(): Promise<RemotionRender> {
   return _remotionRender;
 }
 import { getInstructorForCourse } from '@/lib/ai-instructors';
-import { mkdir } from 'fs/promises';
-import path from 'path';
+import { uploadLessonMediaBuffer } from '@/lib/video/upload-lesson-media';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
@@ -172,13 +171,8 @@ async function generateForLesson(
   // 3. gpt-4o-mini-tts (natural voice with instructor personality)
   try {
     logger.info(`[VideoGen] gpt-4o-mini-tts: "${lesson.title}" (voice: ${voice})`);
-    const outputDir = path.join(process.cwd(), 'public', 'generated', 'lessons');
-    await mkdir(outputDir, { recursive: true });
-    const filename = `lesson-${lesson.id}.mp3`;
-    const outputPath = path.join(outputDir, filename);
-
-    await generateNaturalVoiceover(script, voice, instructor.id, outputPath);
-    const audioUrl = `/hvac/audio/${filename}`;
+    const { audioBuffer } = await generateNaturalVoiceover(script, voice, instructor.id);
+    const audioUrl = await uploadLessonMediaBuffer(audioBuffer, lesson.id, 'mp3');
 
     await supabase
       .from('lms_lessons')
@@ -194,13 +188,8 @@ async function generateForLesson(
   // 4. tts-1-hd fallback
   try {
     logger.info(`[VideoGen] tts-1-hd fallback: "${lesson.title}"`);
-    const outputDir = path.join(process.cwd(), 'public', 'generated', 'lessons');
-    await mkdir(outputDir, { recursive: true });
-    const filename = `lesson-${lesson.id}.mp3`;
-    const outputPath = path.join(outputDir, filename);
-
-    await generateVoiceover(script, voice as any, outputPath);
-    const audioUrl = `/hvac/audio/${filename}`;
+    const { audioBuffer } = await generateVoiceover(script, voice as any);
+    const audioUrl = await uploadLessonMediaBuffer(audioBuffer, lesson.id, 'mp3');
 
     await supabase
       .from('lms_lessons')

@@ -6,6 +6,7 @@
  *   pnpm tsx scripts/northflank/trigger-build.ts elevate-admin
  */
 
+import fs from 'node:fs';
 import { nfFetch, projectApiPath, resolveProjectId } from './lib';
 
 async function main() {
@@ -30,6 +31,10 @@ async function main() {
     body: JSON.stringify({}),
   });
   console.log(`Triggered build for ${serviceId}:`, build);
+
+  if (process.env.GITHUB_OUTPUT && build.id) {
+    fs.appendFileSync(process.env.GITHUB_OUTPUT, `build_id=${build.id}\n`, 'utf8');
+  }
 }
 
 main().catch((e) => {

@@ -72,23 +72,24 @@ export async function GET(request: NextRequest) {
       return {
         key: cfg.key,
         label: cfg.label,
-        ecsService: cfg.id,
+        serviceId: cfg.id,
         northflankService: cfg.id,
         url: cfg.url,
         color: cfg.color,
-        ecs: nf
+        northflank: nf
           ? {
               runningCount: running ? 1 : 0,
               desiredCount: 1,
               status,
               lastDeployedAt,
-              taskDefinition: String((nf.vcsData as { projectBranch?: string } | undefined)?.projectBranch ?? 'Northflank'),
+              deployBranch: String(
+                (nf.vcsData as { projectBranch?: string } | undefined)?.projectBranch ?? 'main',
+              ),
             }
           : null,
         health: health.status === 'fulfilled' ? health.value : null,
         running,
         healthy,
-        hasAws: false,
         hasNorthflank: nfReady,
       };
     }),

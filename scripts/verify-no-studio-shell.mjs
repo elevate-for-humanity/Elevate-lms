@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * CI guard: Studio Shell must not be wired into admin ECS or Lizzy UI.
+ * CI guard: Studio Shell must not be wired into Lizzy UI or admin server proxy.
+ * (Legacy ECS task env vars are no longer in-repo; check runtime wiring only.)
  */
 import fs from 'fs';
 import path from 'path';
@@ -13,17 +14,14 @@ function read(p) {
 }
 
 function mustNotContain(file, patterns) {
+  const filePath = path.join(root, file);
+  if (!fs.existsSync(filePath)) return;
   const text = read(file);
   for (const p of patterns) {
     if (text.includes(p)) failures.push(`${file}: must not contain "${p}"`);
   }
 }
 
-mustNotContain('aws/ecs-task-admin.json', [
-  'STUDIO_SHELL_WS_URL',
-  'STUDIO_SHELL_SECRET',
-  'STUDIO_SHELL_WS_URL_PUBLIC',
-]);
 mustNotContain('apps/admin/server.js', ['STUDIO_SHELL_WS_URL', 'attachWsProxy', 'shell-ws']);
 
 if (fs.existsSync(path.join(root, 'studio-shell'))) {
@@ -33,9 +31,12 @@ if (fs.existsSync(path.join(root, 'apps/admin/app/admin/dashboard/DevStudioClien
   failures.push('apps/admin/app/admin/dashboard/ legacy app must be deleted');
 }
 
-const lizzy = read('components/admin/dashboard/LizzyWorkspace.tsx');
-if (lizzy.includes('LizzyShellPanel') || lizzy.includes("id: 'shell'")) {
-  failures.push('LizzyWorkspace must not reference Shell tab / LizzyShellPanel');
+const lizzyRel = 'components/admin/dashboard/LizzyWorkspace.tsx';
+if (fs.existsSync(path.join(root, lizzyRel))) {
+  const lizzy = read(lizzyRel);
+  if (lizzy.includes('LizzyShellPanel') || lizzy.includes("id: 'shell'")) {
+    failures.push('LizzyWorkspace must not reference Shell tab / LizzyShellPanel');
+  }
 }
 
 if (failures.length) {

@@ -51,22 +51,22 @@ export function RealtimeSystemStatus() {
 
   // Only show the bar when something needs attention — keep it invisible when healthy
   const hasIssue =
-    m.ecs === 'degraded' || m.ecs === 'down' ||
+    m.hosting === 'degraded' || m.hosting === 'down' ||
     m.aiQueue === 'degraded' || m.aiQueue === 'down' ||
     m.failures > 0 ||
     m.applications > 0;
 
   // Always show during unknown state (first load) or when there are issues
-  if (m.ecs === 'healthy' && m.aiQueue === 'ok' && !hasIssue) {
+  if (m.hosting === 'healthy' && m.aiQueue === 'ok' && !hasIssue) {
     return null;
   }
 
   return (
     <div
       className={`flex items-center gap-5 border-b px-6 py-1.5 text-xs font-mono ${
-        m.ecs === 'down' || m.aiQueue === 'down'
+        m.hosting === 'down' || m.aiQueue === 'down'
           ? 'border-red-900/50 bg-red-950/30'
-          : m.ecs === 'degraded' || m.aiQueue === 'degraded' || m.failures > 0
+          : m.hosting === 'degraded' || m.aiQueue === 'degraded' || m.failures > 0
           ? 'border-amber-900/50 bg-amber-950/20'
           : 'border-zinc-800 bg-zinc-950'
       }`}
@@ -74,8 +74,8 @@ export function RealtimeSystemStatus() {
       <Metric
         icon={Activity}
         label="Runtime"
-        value={m.ecs}
-        status={m.ecs}
+        value={m.hosting}
+        status={m.hosting}
         href={ADMIN.SYSTEM_HEALTH}
       />
 

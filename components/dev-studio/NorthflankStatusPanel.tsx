@@ -9,7 +9,8 @@ interface PlatformService {
   runningCount: number;
   desiredCount: number;
   pendingCount: number;
-  taskDefinition: string;
+  deployBranch?: string;
+  taskDefinition?: string;
   lastDeployedAt: string | null;
   healthy: boolean;
   reason?: string;
@@ -86,10 +87,10 @@ function ServiceCard({ svc }: { svc: PlatformService }) {
             <span>{cfg.cpu} · {cfg.memory} · port {cfg.port}</span>
           </div>
         )}
-        {svc.taskDefinition && (
+        {(svc.deployBranch ?? svc.taskDefinition) && (
           <div className="flex items-center gap-1.5 font-mono text-slate-400 truncate">
             <span className="shrink-0">Branch:</span>
-            <span className="truncate">{svc.taskDefinition}</span>
+            <span className="truncate">{svc.deployBranch ?? svc.taskDefinition}</span>
           </div>
         )}
         {deployedAt && (
@@ -114,7 +115,7 @@ function Stat({ label, value, highlight, warn }: { label: string; value: string;
   );
 }
 
-export default function EcsStatusPanel() {
+export default function NorthflankStatusPanel() {
   const [data, setData] = useState<PlatformStatusData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -123,7 +124,7 @@ export default function EcsStatusPanel() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/devstudio/ecs-status');
+      const res = await fetch('/api/devstudio/northflank-status');
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
         throw new Error((d as { error?: string }).error ?? `HTTP ${res.status}`);

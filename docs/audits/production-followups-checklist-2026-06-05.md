@@ -17,8 +17,8 @@
 |------|--------|
 | Add R2 keys to Northflank `elevate-production-env` | Northflank → Secrets (or Cursor secrets + `sync-env --execute`) |
 | Set `CLOUDFLARE_R2_PUBLIC_URL` | e.g. `https://media.elevateforhumanity.org` |
-| Delete unused GitHub secrets `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | GitHub → Settings → Secrets (not used by workflows) |
-| Decommission ECS if still running | AWS Console (repo has no deploy-aws.yml) |
+| Delete unused GitHub secrets `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | GitHub → Settings → Secrets (see `docs/audits/aws-ecs-decommission-2026-06.md`) |
+| Decommission legacy ECS/ALB if still running | AWS Console (see same checklist) |
 | Wait for green **Deploy production (both services)** | GitHub Actions |
 | Optional: migrate old MP4s | `pnpm tsx scripts/migrate-course-videos-to-r2.ts --execute` |
 

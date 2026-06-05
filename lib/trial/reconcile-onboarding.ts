@@ -4,7 +4,7 @@ import type { SupabaseClient } from '@/lib/supabase';
 // skip further Supabase queries for this server process. Keyed by org ID.
 // TTL prevents stale entries from accumulating across long-lived processes.
 //
-// Scope: per-process only. On ECS, each container restart causes a
+// Scope: per-process only. Each container restart causes a
 // start gets a fresh cache. This is intentional — the cache avoids redundant
 // queries within a warm instance, not across all instances. The underlying
 // DB write is idempotent, so a cold-start re-check is harmless (one extra

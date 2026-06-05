@@ -1,5 +1,5 @@
 /**
- * Probe the elevate-studio ECS shell (PTY + repo clone) via its HTTP /health endpoint.
+ * Probe the elevate-studio runtime (PTY + repo clone) via its HTTP /health endpoint.
  */
 
 export type ShellProbe = {

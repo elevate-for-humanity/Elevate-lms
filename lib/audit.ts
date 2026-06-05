@@ -55,7 +55,7 @@ async function onAuditFailure(context: string, error: unknown, event: Record<str
   }
 
   // Channel 4: Local file — last resort if DB is completely unreachable.
-  // NOTE: On ECS, /tmp is ephemeral (wiped on container restart).
+  // NOTE: /tmp is ephemeral (wiped on container restart).
   // This channel is only durable in long-lived runtimes (dev, Docker, VMs).
   // On serverless, stderr (channel 1) is the real last resort.
   if (typeof globalThis.process !== 'undefined') {

@@ -15,7 +15,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 
 // Module-level cache — avoids repeated DB round-trips within a single process.
-// In ECS, each container restart repopulates. That's acceptable.
+// In production, each container restart repopulates. That's acceptable.
 const courseIdCache = new Map<string, string>();
 const programIdCache = new Map<string, string>();
 

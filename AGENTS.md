@@ -28,7 +28,6 @@
 - `lib/tax-software/` — MeF tax stack
 - `lib/curriculum/` — Blueprint system and course generator
 - `scripts/northflank/` — Northflank service configuration, env sync, DNS, and deploy helpers
-- `aws/` — legacy hosting task definitions/buildspecs retained only as migration reference; do not use for new deploys
 - `supabase/migrations/` — SQL migration files (applied manually — see Migrations section)
 - `public/images/` — All site images
 
@@ -835,7 +834,7 @@ The hook attempts unmuted play and falls back silently. No mute button shown.
 - **Deploy path:** GitHub Actions → `scripts/northflank/*` → **separate** services `elevate-lms` and `elevate-admin` (`.github/workflows/deploy-lms.yml` vs `deploy-admin.yml`). Full-platform manual deploy uses `--all`. No `deploy-aws.yml` or ECS in workflows.
 - **Health probes:** `configure-services.ts <service-id>` sets probes per service. Verify: `pnpm tsx scripts/northflank/verify-health-checks.ts elevate-admin` (or `elevate-lms`). Do not run unscoped configure in a single-service workflow.
 - **Build disk:** `NORTHFLANK_EPHEMERAL_STORAGE_MB=32768` (max allowed on project plan). Admin ENOSPC during `pnpm install` means configure must run **before** `trigger-build` on the same build.
-- **Secrets:** `elevate-production-env` secret group on project `elevate-platform`. GitHub may still list `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` — unused by deploy workflows; safe to delete in repo Settings.
+- **Secrets:** `elevate-production-env` secret group on project `elevate-platform`. Delete unused GitHub `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` (not used by deploy). Checklist: `docs/audits/aws-ecs-decommission-2026-06.md`.
 - **Legacy deploy API:** `POST /api/admin/deploy` returns **410**; use Northflank via CI or `/api/admin/env-vars/deploy`.
 
 ### Gotchas
@@ -878,7 +877,7 @@ Durable cannot CNAME-flatten apex to Northflank. **Do not** use apex **A** → N
 | Dashboard UI (`app/admin/*`, WIOA ETPL) | None | N/A — API → Supabase only |
 
 **Idle admin:** No in-process crons, no Remotion at startup, no autofix until POST. Crons = GitHub Actions → `/api/cron/*`. Storage map: `lib/media/storage-policy.ts`. Audits: `docs/audits/ADMIN_DASHBOARD_STORAGE_AUDIT.md`, `docs/audits/admin-runtime-idle-and-storage-2026-06-05.md`. Check env: `node scripts/check-media-storage-config.mjs`. Diagnostic: `GET /api/admin/runtime-footprint`.
-- **Admin (Northflank):** separate service `elevate-admin`, `Dockerfile.northflank-admin`. Deploy: `.github/workflows/deploy-admin.yml` on `main` (configures admin only; not AWS ECS).
+- **Admin (Northflank):** separate service `elevate-admin`, `Dockerfile.northflank-admin`. Deploy: `.github/workflows/deploy-admin.yml` on `main` (configures admin only).
 - `apps/admin/server.js` must load `.next/required-server-files.json` at startup.
 - **BuildKit cache:** `pnpm tsx scripts/northflank/ensure-build-cache.ts --execute` (10GB `useCache` on both services)
 - **Deploy both:** `DEPLOY_BRANCH=main pnpm tsx scripts/northflank/deploy-live.ts --execute`

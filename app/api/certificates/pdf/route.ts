@@ -48,7 +48,7 @@ async function _GET(req: NextRequest) {
   const origin = req.headers.get('origin') || PLATFORM_DEFAULTS.siteUrl;
   const verifyUrl = `${origin}/verify/${cert.verification_code || cert.serial}`;
 
-  // Generate PDF via internal API route (runs on same ECS container)
+  // Generate PDF via internal API route (runs on same runtime container)
   const pdfResponse = await fetch(`${origin}/api/internal/cert-pdf`, {
     method: 'POST',
     headers: {

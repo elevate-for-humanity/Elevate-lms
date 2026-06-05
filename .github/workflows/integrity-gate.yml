@@ -69,6 +69,12 @@ jobs:
       - name: Migration lint
         run: node scripts/lint-migrations.cjs
 
+      - name: No AWS ECS deploy artifacts
+        run: node scripts/verify-no-aws-deploy.mjs
+
+      - name: No legacy studio shell wiring
+        run: node scripts/verify-no-studio-shell.mjs
+
       - name: Production readiness gate
         run: SKIP_BUILD_GATE=1 bash scripts/production-readiness-gate.sh
 

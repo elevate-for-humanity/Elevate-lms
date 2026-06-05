@@ -1,7 +1,7 @@
 /**
  * Media Optimization Utilities
  *
- * Image optimization utilities. Sharp runs server-side on the ECS container.
+ * Image optimization utilities. Sharp runs server-side on the Node container.
  */
 
 // =====================================================
@@ -165,7 +165,7 @@ export function generatePrefetchLinks(images: string[]): string {
 // =====================================================
 // SERVER-SIDE IMAGE OPTIMIZATION
 /**
- * Optimize image using Sharp (runs server-side on ECS).
+ * Optimize image using Sharp (runs server-side in Node).
  */
 export async function optimizeImage(
   buffer: Buffer,

@@ -3,7 +3,7 @@
  *
  * Solves three problems:
  *   1. Discipline-based hydration: every route must remember hydrateProcessEnv().
- *      One missed call → silent secret failure on ECS cold starts.
+ *      One missed call → silent secret failure on container cold starts.
  *   2. Silent degradation: routes check `if (!secret) return safeError(...)` but
  *      never tell you *which* secret is missing or *when* it went missing.
  *   3. Auth boilerplate: every protected route repeats the same guard + check pattern.
@@ -119,7 +119,7 @@ export function withRuntime(optionsOrHandler: RuntimeOptions | AnyHandler, handl
   }
   const options = optionsOrHandler;
   return async function wrappedHandler(req: NextRequest): Promise<NextResponse> {
-    // 1. Hydrate process.env from Supabase app_secrets (ECS cold-start safe)
+    // 1. Hydrate process.env from Supabase app_secrets (cold-start safe)
     await hydrateProcessEnv();
 
     // 2. Validate required secrets — fail hard, not silent

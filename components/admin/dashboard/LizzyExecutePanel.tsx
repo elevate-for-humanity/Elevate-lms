@@ -13,7 +13,7 @@ const PLATFORM_QUICK_CMDS = [
 ];
 
 /**
- * Wired platform operations (SSE) — no ECS PTY / legacy shell.
+ * Wired platform operations (SSE) — no legacy PTY shell.
  */
 export function LizzyExecutePanel() {
   const [input, setInput] = useState('');

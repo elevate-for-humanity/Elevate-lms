@@ -1,4 +1,4 @@
-// PUBLIC ROUTE: health check — no auth, no rate limiting (ECS calls this every 30s)
+// PUBLIC ROUTE: health check — no auth, no rate limiting (Northflank probes every 30s)
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { probeSupabaseDatabase } from '@/lib/supabase/db-probe';

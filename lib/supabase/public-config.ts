@@ -3,7 +3,7 @@ import { normalizeSupabaseProjectUrl } from '@/lib/supabase/normalize-url';
 /**
  * Public Supabase URL + anon key (safe to expose to the browser).
  *
- * NEXT_PUBLIC_* values are inlined at build time. ECS/runtime env only applies on the server
+ * NEXT_PUBLIC_* values are inlined at build time. Runtime env on the server
  * unless we inject config per request (see SupabasePublicConfigScript).
  */
 
@@ -44,7 +44,7 @@ export function resolveServerSupabaseRawEnv(): { url?: string; anonKey?: string 
   return { url, anonKey };
 }
 
-/** Read from process.env (runtime ECS/Northflank + optional build-time NEXT_PUBLIC_*). */
+/** Read from process.env (runtime Northflank + optional build-time NEXT_PUBLIC_*). */
 export function getServerPublicSupabaseConfig(): SupabasePublicConfig | null {
   const { url, anonKey } = resolveServerSupabaseRawEnv();
   if (isPlaceholderSupabaseConfig(url, anonKey)) return null;

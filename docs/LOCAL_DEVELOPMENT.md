@@ -39,7 +39,7 @@ SKIP_ENV_VALIDATION=true
 NEXT_TELEMETRY_DISABLED=1
 ```
 
-For production-like admin behavior, use the same keys as ECS or configure them in **Dev Studio → Secrets** (stored in `platform_secrets` / `app_secrets` when connected to Supabase).
+For production-like admin behavior, use the same keys as Northflank production or configure them in **Dev Studio → Secrets** (stored in `platform_secrets` / `app_secrets` when connected to Supabase).
 
 ## Production
 
@@ -55,7 +55,7 @@ curl -s http://localhost:3001/api/health | jq .status    # admin
 curl -s http://localhost:3000/api/ready | jq .ready       # LMS
 ```
 
-See `aws/README-healthchecks.md` for ECS.
+See `docs/audits/aws-ecs-decommission-2026-06.md` and `pnpm tsx scripts/northflank/verify-health-checks.ts`.
 
 ## Not using Gitpod
 

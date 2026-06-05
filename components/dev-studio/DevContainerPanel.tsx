@@ -150,8 +150,8 @@ export default function DevContainerPanel() {
   const [profileEnvBlock, setProfileEnvBlock] = useState('');
 
   // Northflank push
-  const [ecsPushing, setEcsPushing] = useState<string | null>(null); // key being pushed, or 'all'
-  const [ecsResult, setEcsResult] = useState<string | null>(null);
+  const [nfPushing, setNfPushing] = useState<string | null>(null); // key being pushed, or 'all'
+  const [nfPushResult, setNfPushResult] = useState<string | null>(null);
 
 
 
@@ -415,8 +415,8 @@ export default function DevContainerPanel() {
   };
 
   const pushKeyToNorthflank = async (key: string, value?: string) => {
-    setEcsPushing(key);
-    setEcsResult(null);
+    setNfPushing(key);
+    setNfPushResult(null);
     try {
       const body: Record<string, unknown> = { key, services: ['lms', 'admin'] };
       if (value !== undefined) body.value = value;
@@ -427,11 +427,11 @@ export default function DevContainerPanel() {
       });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error ?? 'Push failed');
-      setEcsResult(`✅ ${key} pushed to Northflank (${d.updatedServices?.join(', ')})`);
+      setNfPushResult(`✅ ${key} pushed to Northflank (${d.updatedServices?.join(', ')})`);
     } catch (e) {
-      setEcsResult(`❌ ${(e as Error).message}`);
+      setNfPushResult(`❌ ${(e as Error).message}`);
     } finally {
-      setEcsPushing(null);
+      setNfPushing(null);
     }
   };
 
@@ -801,19 +801,19 @@ export default function DevContainerPanel() {
 
                 <button
                   onClick={() => envForm.key && pushKeyToNorthflank(envForm.key, envForm.value || undefined)}
-                  disabled={!envForm.key || !!ecsPushing}
+                  disabled={!envForm.key || !!nfPushing}
                   title="Write this key to the Northflank production secret group"
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded text-sm bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  {ecsPushing === envForm.key ? 'Pushing…' : 'Push to Northflank'}
+                  {nfPushing === envForm.key ? 'Pushing…' : 'Push to Northflank'}
                 </button>
               </div>
 
               {/* Result banners */}
-              {ecsResult && (
-                <p className={`mt-2 text-xs px-3 py-1.5 rounded ${ecsResult.startsWith('✅') ? 'bg-brand-green-50 text-brand-green-700' : 'bg-red-50 text-red-700'}`}>
-                  {ecsResult}
+              {nfPushResult && (
+                <p className={`mt-2 text-xs px-3 py-1.5 rounded ${nfPushResult.startsWith('✅') ? 'bg-brand-green-50 text-brand-green-700' : 'bg-red-50 text-red-700'}`}>
+                  {nfPushResult}
                 </p>
               )}
 
@@ -845,12 +845,12 @@ export default function DevContainerPanel() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => pushKeyToNorthflank(entry.key)}
-                          disabled={!!ecsPushing}
+                          disabled={!!nfPushing}
                           className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 disabled:opacity-40"
                           title={`Push ${entry.key} to Northflank`}
                         >
                           <Send className="w-3 h-3" />
-                          {ecsPushing === entry.key ? '…' : 'Push'}
+                          {nfPushing === entry.key ? '…' : 'Push'}
                         </button>
                         <button
                           onClick={() => deleteContainerEnvEntry(entry.key)}

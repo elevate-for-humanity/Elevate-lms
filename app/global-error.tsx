@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import * as Sentry from '@sentry/nextjs';
 
-// Server Action ID mismatch — happens when ECS deploys a new build while
+// Server Action ID mismatch — happens when production deploys a new build while
 // users still have the old page loaded. The old action IDs don't exist in
 // the new build. Hard reload fetches the new page with new action IDs.
 function isServerActionMismatch(error: Error): boolean {
@@ -101,13 +101,13 @@ export default function GlobalError({
                 Try Again
               </button>
 
-              <a
+              <Link
                 href="/"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-slate-300 text-black rounded-lg hover:bg-white transition-all font-semibold"
               >
                 <Home className="h-5 w-5" />
                 Go to Homepage
-              </a>
+              </Link>
             </div>
 
             <div className="pt-6 border-t border-slate-200">

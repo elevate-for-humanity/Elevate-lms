@@ -5,7 +5,9 @@ import { Activity, AlertTriangle, ExternalLink, Loader2, RefreshCw, Server } fro
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
-const EcsStatusPanel = dynamic(() => import('@/components/dev-studio/EcsStatusPanel'), { ssr: false });
+const NorthflankStatusPanel = dynamic(() => import('@/components/dev-studio/NorthflankStatusPanel'), {
+  ssr: false,
+});
 
 type HealthPayload = Record<string, unknown> & {
   hasGroq?: boolean;
@@ -135,7 +137,7 @@ export default function DevStudioHealthPanel() {
             <span className="text-xs font-semibold text-slate-800">Northflank services</span>
           </div>
           <div className="max-h-[320px] overflow-auto">
-            <EcsStatusPanel />
+            <NorthflankStatusPanel />
           </div>
         </div>
 

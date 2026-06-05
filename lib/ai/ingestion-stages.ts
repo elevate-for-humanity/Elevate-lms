@@ -1,7 +1,7 @@
 /**
  * Staged ingestion helpers for large documents.
  *
- * ECS: no hard timeout, but keep requests under 60s for reliability.
+ * Keep requests under 60s for reliability on long-running containers.
  * Safe budget breakdown:
  *   - File parse:        ~2s
  *   - Chunk summarize:   ~3s per chunk × max 4 chunks = ~12s

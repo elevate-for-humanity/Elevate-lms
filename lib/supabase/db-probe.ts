@@ -1,7 +1,7 @@
 /**
  * Direct Supabase REST probe for health/readiness checks.
  * Bypasses the timed-fetch circuit breaker so a tripped breaker does not
- * falsely fail ECS readiness while the database is actually reachable.
+ * falsely fail readiness while the database is actually reachable.
  */
 
 import { normalizeSupabaseProjectUrl } from '@/lib/supabase/normalize-url';

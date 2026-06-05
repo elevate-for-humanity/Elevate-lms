@@ -16,12 +16,12 @@ interface ServiceHealth {
   status: number | null;
 }
 
-interface EcsInfo {
+interface NorthflankDeploymentInfo {
   runningCount: number;
   desiredCount: number;
   status: string;
   lastDeployedAt: string | null;
-  taskDefinition: string;
+  deployBranch: string;
   pendingCount?: number;
 }
 
@@ -35,16 +35,16 @@ interface ShellProbeInfo {
 interface Service {
   key: string;
   label: string;
-  ecsService: string;
+  serviceId: string;
   url: string | null;
   color: string;
-  ecs: EcsInfo | null;
+  northflank: NorthflankDeploymentInfo | null;
   health: ServiceHealth | null;
   running: boolean | null;
   healthy: boolean | null;
   shellProbe?: ShellProbeInfo;
   shellSetupStatus?: string;
-  hasAws: boolean;
+  hasNorthflank?: boolean;
 }
 
 interface ServicesData {
@@ -72,19 +72,21 @@ function StatusDot({ running, healthy }: { running: boolean | null; healthy: boo
 function StatusLabel({
   running,
   healthy,
-  ecs,
+  northflank,
   shellSetupStatus,
   shellProbe,
 }: {
   running: boolean | null;
   healthy: boolean | null;
-  ecs: EcsInfo | null;
+  northflank: NorthflankDeploymentInfo | null;
   shellSetupStatus?: string;
   shellProbe?: ShellProbeInfo;
 }) {
-  if (running === null && !ecs) return <span className="text-xs text-slate-400">Unknown</span>;
-  if (ecs?.status === 'NOT_FOUND') return <span className="text-xs text-slate-400">Not deployed</span>;
-  if (!running && ecs) return <span className="text-xs text-slate-500">Stopped ({ecs.desiredCount} desired)</span>;
+  if (running === null && !northflank) return <span className="text-xs text-slate-400">Unknown</span>;
+  if (northflank?.status === 'NOT_FOUND') return <span className="text-xs text-slate-400">Not deployed</span>;
+  if (!running && northflank) {
+    return <span className="text-xs text-slate-500">Stopped ({northflank.desiredCount} desired)</span>;
+  }
   if (running && healthy === true) return <span className="text-xs text-brand-green-600">Running · ready</span>;
   if (running && healthy === false) {
     const detail = shellSetupStatus || shellProbe?.setupStatus || shellProbe?.status;
@@ -176,7 +178,7 @@ export default function ServicesPanel() {
                 <StatusLabel
                   running={svc.running}
                   healthy={svc.healthy}
-                  ecs={svc.ecs}
+                  northflank={svc.northflank}
                   shellSetupStatus={svc.shellSetupStatus}
                   shellProbe={svc.shellProbe}
                 />

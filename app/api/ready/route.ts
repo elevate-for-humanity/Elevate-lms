@@ -1,4 +1,4 @@
-// PUBLIC ROUTE: Kubernetes/ECS readiness probe — DB + critical env only (lighter than /api/health)
+// PUBLIC ROUTE: readiness probe — DB + critical env only (lighter than /api/health)
 import { NextResponse } from 'next/server';
 import { probeSupabaseDatabase } from '@/lib/supabase/db-probe';
 import { withRuntime } from '@/lib/api/withRuntime';

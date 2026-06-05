@@ -4,7 +4,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const runtime = 'nodejs';
 
-// PUBLIC ROUTE: internal-only — called from /api/cert/pdf on the same ECS container.
+// PUBLIC ROUTE: internal-only — called from /api/cert/pdf on the same runtime container.
 // Not exposed externally (no auth header needed — same-origin fetch only).
 
 export async function POST(req: NextRequest) {

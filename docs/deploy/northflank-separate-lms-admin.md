@@ -31,3 +31,5 @@ Or use workflow **Deploy production (both services)** (`deploy-production-dispat
 ## Guard
 
 `bash scripts/check-admin-lms-separation.sh` fails if `deploy-lms.yml` or `deploy-admin.yml` configure both services in one run.
+
+AWS/ECS hosting decommission: `docs/audits/aws-ecs-decommission-2026-06.md`.

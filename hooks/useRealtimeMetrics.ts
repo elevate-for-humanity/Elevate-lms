@@ -14,8 +14,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 export interface RealtimeMetrics {
-  /** ECS service health: 'healthy' | 'degraded' | 'down' | 'unknown' */
-  ecs: 'healthy' | 'degraded' | 'down' | 'unknown';
+  /** Northflank runtime health (from platform-health overall): 'healthy' | 'degraded' | 'down' | 'unknown' */
+  hosting: 'healthy' | 'degraded' | 'down' | 'unknown';
   /** Active enrollments count */
   enrollments: number;
   /** Pending applications count */
@@ -31,7 +31,7 @@ export interface RealtimeMetrics {
 }
 
 const INITIAL: RealtimeMetrics = {
-  ecs: 'unknown',
+  hosting: 'unknown',
   enrollments: 0,
   applications: 0,
   aiQueue: 'unknown',
@@ -52,11 +52,16 @@ export function useRealtimeMetrics(): RealtimeMetrics {
 
       setMetrics(prev => ({
         ...prev,
-        ecs:      h.services?.ecs?.status === 'healthy' ? 'healthy'
-                : h.services?.ecs?.status === 'degraded' ? 'degraded'
-                : h.overall === 'healthy' ? 'healthy'
-                : h.overall === 'degraded' ? 'degraded'
-                : 'unknown',
+        hosting:
+          h.services?.hosting?.status === 'healthy'
+            ? 'healthy'
+            : h.services?.hosting?.status === 'degraded'
+              ? 'degraded'
+              : h.overall === 'healthy'
+                ? 'healthy'
+                : h.overall === 'degraded'
+                  ? 'degraded'
+                  : 'unknown',
         aiQueue:  h.ai?.activeProvider ? 'ok' : 'degraded',
         failures: h.services?.email?.failedToday ?? 0,
         updatedAt: new Date(),

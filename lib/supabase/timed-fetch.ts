@@ -2,7 +2,7 @@
  * timedFetch — fetch with hard timeout + circuit breaker for all Supabase clients.
  *
  * Without the timeout, a stalled TCP connection to Supabase waits ~22s before
- * the OS gives up. On ECS/Lambda this shows as 21-23s request durations.
+ * the OS gives up. On serverless/container platforms this shows as 21-23s request durations.
  *
  * The circuit breaker opens after 5 consecutive failures and prevents
  * cascading DB timeouts from stalling the entire request pipeline.

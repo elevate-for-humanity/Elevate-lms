@@ -253,7 +253,7 @@ export async function GET(request: NextRequest) {
         write('');
         write('\x1b[33mChecking Northflank services…\x1b[0m');
         results.push(await check('Northflank elevate-lms', async () => {
-          const r = await fetch(`${adminUrl}/api/devstudio/ecs-status`, {
+          const r = await fetch(`${adminUrl}/api/devstudio/northflank-status`, {
             headers: { cookie: request.headers.get('cookie') ?? '' },
             signal: AbortSignal.timeout(12000),
           });
@@ -267,7 +267,7 @@ export async function GET(request: NextRequest) {
         write(fmt(results.at(-1)!));
 
         results.push(await check('Northflank elevate-admin', async () => {
-          const r = await fetch(`${adminUrl}/api/devstudio/ecs-status`, {
+          const r = await fetch(`${adminUrl}/api/devstudio/northflank-status`, {
             headers: { cookie: request.headers.get('cookie') ?? '' },
             signal: AbortSignal.timeout(12000),
           });

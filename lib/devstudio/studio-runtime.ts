@@ -9,7 +9,7 @@
 import type { ShellProbe } from '@/lib/devstudio/shell-probe';
 
 export const DEV_STUDIO_RUNTIME_LABEL = 'Dev Studio Runtime';
-export const DEV_STUDIO_RUNTIME_ECS_SERVICE = 'elevate-studio';
+export const DEV_STUDIO_RUNTIME_SERVICE = 'elevate-studio';
 
 export type StudioRuntimePhase =
   | 'not_configured'
@@ -92,7 +92,7 @@ export function buildStudioRuntimeCompletion(input: {
 
   const coreDone =
     steps.find((s) => s.id === 'admin-wiring')?.done &&
-    steps.find((s) => s.id === 'ecs-running')?.done &&
+    steps.find((s) => s.id === 'runtime-running')?.done &&
     steps.find((s) => s.id === 'repo-ready')?.done;
 
   let phase: StudioRuntimePhase = 'not_configured';

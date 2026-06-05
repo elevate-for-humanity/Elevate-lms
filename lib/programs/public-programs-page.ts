@@ -47,7 +47,6 @@ export const PROGRAMS_PAGE_SUPPRESSED_SLUGS = new Set([
   'jri-introduction',
   'jri',
   'micro-programs',
-  'emergency-health-safety',
   'nha-medical-assistant',
 ]);
 

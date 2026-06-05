@@ -2,7 +2,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { CheckCircle, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import HeroVideo from '@/components/marketing/HeroVideo';
+import heroBanners from '@/content/heroBanners';
+import { ApprenticeshipInfraSection } from '@/components/apprenticeships/ApprenticeshipInfraSection';
+import { ApprenticeshipPageSubnav } from '@/components/apprenticeships/ApprenticeshipPageSubnav';
+import { btn, card, layout, type } from '@/lib/page-design-tokens';
 
 export const revalidate = 3600;
 
@@ -14,85 +19,133 @@ export const metadata: Metadata = {
 };
 
 const tracks = [
-  { title: 'Barbering', href: '/programs/barber-apprenticeship', desc: 'DOL-registered apprenticeship. Earn while you complete your hours toward licensure.', img: '/images/pages/barber-apprenticeship-hero.jpg' },
-  { title: 'Cosmetology', href: '/programs/cosmetology-apprenticeship', desc: 'Complete your cosmetology hours through a structured earn-while-you-learn program.', img: '/images/pages/cosmetology-apprenticeship-hero.webp' },
-  { title: 'Culinary Arts', href: '/programs/culinary-apprenticeship', desc: 'Hands-on culinary training with employer partners in the food service industry.', img: '/images/pages/culinary-apprenticeship-hero.webp' },
-  { title: 'Skilled Trades', href: '/programs/skilled-trades', desc: 'Apprenticeship pathways in electrical, plumbing, and construction trades.', img: '/images/pages/skilled-trades-hero.webp' },
+  {
+    title: 'Barbering',
+    href: '/programs/barber-apprenticeship',
+    desc: 'DOL-registered apprenticeship. Earn while you complete your hours toward licensure.',
+    img: '/images/pages/barber-apprenticeship-hero.jpg',
+  },
+  {
+    title: 'Cosmetology',
+    href: '/programs/cosmetology-apprenticeship',
+    desc: 'Complete your cosmetology hours through a structured earn-while-you-learn program.',
+    img: '/images/pages/cosmetology-apprenticeship-hero.webp',
+  },
+  {
+    title: 'Culinary Arts',
+    href: '/programs/culinary-apprenticeship',
+    desc: 'Hands-on culinary training with employer partners in the food service industry.',
+    img: '/images/pages/culinary-apprenticeship-hero.webp',
+  },
+  {
+    title: 'Skilled Trades',
+    href: '/programs/skilled-trades',
+    desc: 'Apprenticeship pathways in electrical, plumbing, and construction trades.',
+    img: '/images/pages/skilled-trades-hero.webp',
+  },
 ];
 
-const employerBenefits = [
-  'Build a trained, job-ready workforce pipeline',
-  'Access OJT wage reimbursement through WIOA',
-  'Reduce turnover with earn-while-you-learn talent',
-  'Structured apprenticeship framework with compliance support',
-];
+const banner = heroBanners.apprenticeships;
 
 export default function ApprenticeshipsPage() {
+  const ctas = [banner.primaryCta, banner.secondaryCta].filter(Boolean);
+
   return (
-    <div className="min-h-screen bg-white">
-      <div className="bg-white border-b"><div className="max-w-6xl mx-auto px-4 py-3"><Breadcrumbs items={[{ label: 'Apprenticeships' }]} /></div></div>
-
-      <section className="bg-slate-900 py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-3">DOL Registered Apprenticeships</p>
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-white mb-5">Earn While You Learn</h1>
-          <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto mb-8">Registered apprenticeship pathways connecting individuals to structured, paid training in barbering, cosmetology, skilled trades, and other licensed professions.</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-sm">Apply for Apprenticeship</Link>
-            <Link href="/for-employers" className="border-2 border-white/40 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors text-sm">Host an Apprentice</Link>
-          </div>
+    <div className="min-h-screen bg-white pt-[60px]">
+      <div className="bg-white border-b">
+        <div className={`${layout.container} py-3`}>
+          <Breadcrumbs items={[{ label: 'Apprenticeships' }]} />
         </div>
-      </section>
+      </div>
 
-      <section className="py-16 px-6 bg-white">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest text-center mb-2">Available Tracks</p>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 text-center mb-10">Apprenticeship Pathways</h2>
-          <div className="grid sm:grid-cols-2 gap-6">
+      <div id="overview">
+        <HeroVideo
+          videoSrcDesktop={banner.videoSrcDesktop!}
+          videoSrcMobile={banner.videoSrcMobile}
+          voiceoverSrc={banner.voiceoverSrc}
+          microLabel={banner.microLabel}
+          belowHeroHeadline={banner.belowHeroHeadline}
+          belowHeroSubheadline={banner.belowHeroSubheadline}
+          ctas={ctas}
+          trustIndicators={banner.trustIndicators}
+          transcript={banner.transcript}
+          analyticsName={banner.analyticsName}
+        />
+      </div>
+
+      <ApprenticeshipPageSubnav />
+
+      <section id="pathways" className={`${layout.section} scroll-mt-28`}>
+        <div className={layout.containerMedium}>
+          <p className={`${type.eyebrow} text-center`}>Available tracks</p>
+          <h2 className={`${type.h2} text-center mt-2 mb-8`}>Apprenticeship pathways</h2>
+          <div className="grid sm:grid-cols-2 gap-5 sm:gap-6">
             {tracks.map((t) => (
-              <Link key={t.title} href={t.href} className="group rounded-2xl overflow-hidden border border-slate-200 hover:border-brand-red-300 hover:shadow-md transition-all flex flex-col">
-                <div className="relative h-48 w-full overflow-hidden">
-                  <Image src={t.img} alt={t.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 640px) 100vw, 50vw" />
+              <Link
+                key={t.title}
+                href={t.href}
+                className={`${card.base} group flex flex-col`}
+              >
+                <div className={card.programImage}>
+                  <Image
+                    src={t.img}
+                    alt={t.title}
+                    fill
+                    className="object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                  />
                 </div>
-                <div className="p-5 flex-1 flex flex-col">
-                  <h3 className="font-bold text-slate-900 text-base mb-2">{t.title}</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed flex-1 mb-3">{t.desc}</p>
-                  <span className="text-brand-red-600 text-sm font-bold group-hover:underline">View Program <ArrowRight className="inline w-4 h-4 ml-1" /></span>
+                <div className={`${card.body} flex-1 flex flex-col`}>
+                  <h3 className={type.h3}>{t.title}</h3>
+                  <p className={`${type.bodySmall} flex-1 mt-2 mb-3`}>{t.desc}</p>
+                  <span className="text-brand-red-600 text-sm font-bold group-hover:underline">
+                    View program <ArrowRight className="inline w-4 h-4 ml-0.5" aria-hidden="true" />
+                  </span>
                 </div>
               </Link>
             ))}
           </div>
+          <p className={`${type.bodySmall} text-center mt-8`}>
+            Also see{' '}
+            <Link
+              href="/programs/esthetician-apprenticeship"
+              className="font-semibold text-brand-red-600 hover:underline"
+            >
+              esthetics
+            </Link>
+            ,{' '}
+            <Link
+              href="/programs/nail-technician-apprenticeship"
+              className="font-semibold text-brand-red-600 hover:underline"
+            >
+              nail technology
+            </Link>
+            , and host-shop listings in the <strong className="font-semibold text-slate-800">Apprenticeships</strong>{' '}
+            menu in the site header.
+          </p>
         </div>
       </section>
 
-      <section className="py-16 px-6 bg-slate-50 border-t border-slate-100">
-        <div className="max-w-5xl mx-auto flex flex-col lg:flex-row gap-12 items-center">
-          <div className="flex-1">
-            <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-3">For Employers</p>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">Host an Apprentice. Build Your Workforce.</h2>
-            <p className="text-slate-600 text-sm leading-relaxed mb-6">Employers can host apprentices and build workforce pipelines through Elevate&apos;s DOL-registered apprenticeship program. We handle compliance, reporting, and coordination — you get trained, job-ready talent.</p>
-            <ul className="space-y-3 mb-8">
-              {employerBenefits.map((b) => (
-                <li key={b} className="flex items-start gap-3 text-sm text-slate-700">
-                  <CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />{b}
-                </li>
-              ))}
-            </ul>
-            <Link href="/for-employers" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3.5 rounded-lg transition-colors text-sm">Partner With Us →</Link>
-          </div>
-          <div className="relative w-full lg:w-96 h-64 rounded-2xl overflow-hidden shrink-0">
-            <Image src="/images/pages/about-employer-partners.webp" alt="Employer apprenticeship partnership" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 384px" />
-          </div>
-        </div>
-      </section>
+      <ApprenticeshipInfraSection showSectionIntro={false} />
 
-      <section className="bg-brand-red-700 py-16 px-6">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">Ready to Start Your Apprenticeship?</h2>
-          <p className="text-red-100 text-sm mb-8">Apply once. Get connected to training, funding, and employer placement.</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply" className="bg-white text-brand-red-700 font-bold px-8 py-3.5 rounded-lg hover:bg-red-50 transition-colors text-sm text-center">Apply Now</Link>
-            <Link href="/check-eligibility" className="border-2 border-white/60 text-slate-900 font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors text-sm text-center">Check Eligibility</Link>
+      <section className="bg-slate-900 py-12 sm:py-14 px-4">
+        <div className={`${layout.containerNarrow} text-center`}>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3">
+            Ready to start your apprenticeship?
+          </h2>
+          <p className="text-slate-300 text-sm mb-6">
+            Apply once. Get connected to training, funding, and employer placement.
+          </p>
+          <div className={`${btn.row} justify-center`}>
+            <Link href="/apply" className={btn.primary}>
+              Apply now
+            </Link>
+            <Link
+              href="/check-eligibility"
+              className="border-2 border-white/50 text-white font-bold px-8 py-3.5 rounded-xl hover:bg-white/10 transition-colors text-sm sm:text-base text-center"
+            >
+              Check eligibility
+            </Link>
           </div>
         </div>
       </section>

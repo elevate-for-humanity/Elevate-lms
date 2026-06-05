@@ -71,7 +71,10 @@ RUN --mount=type=cache,id=pnpm-northflank-admin-unified,target=/mnt/pnpm-cache \
     && ln -sfn /mnt/pnpm-cache/node_modules /app/node_modules \
     && test -n "$NEXT_PUBLIC_SUPABASE_URL" \
     && test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
-    && pnpm --filter @elevate/admin run build \
+    && test -x /app/node_modules/next/dist/bin/next \
+    && cd apps/admin \
+    && node /app/node_modules/next/dist/bin/next build \
+    && cd ../.. \
     && node scripts/prune-admin-standalone.mjs \
     && mkdir -p /export/ws \
     && WS_DIR="$(node -p "require('path').dirname(require.resolve('ws/package.json',{paths:[require('path').join(process.cwd(),'apps/admin')]}))")" \

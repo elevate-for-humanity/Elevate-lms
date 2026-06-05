@@ -67,7 +67,8 @@ RUN --mount=type=cache,id=pnpm-northflank-lms-unified,target=/mnt/pnpm-cache \
     && ln -sfn /mnt/pnpm-cache/node_modules /app/node_modules \
     && test -n "$NEXT_PUBLIC_SUPABASE_URL" \
     && test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
-    && pnpm exec next build \
+    && test -x /app/node_modules/next/dist/bin/next \
+    && node /app/node_modules/next/dist/bin/next build \
     && node scripts/prune-standalone.mjs \
     && mkdir -p /export/sharp-node_modules/@img \
     && SHARP_DIR="$(node -p "require('path').dirname(require.resolve('sharp/package.json'))")" \

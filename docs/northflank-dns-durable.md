@@ -44,7 +44,7 @@ Remove any **A** record on `www`.
 - Canonical host: **`www.elevateforhumanity.org`**
 - `proxy.ts` and `next.config.mjs` **308** apex → www (backup if traffic reaches Northflank)
 
-Set Northflank / ECS env:
+Set Northflank runtime env:
 
 ```bash
 NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org

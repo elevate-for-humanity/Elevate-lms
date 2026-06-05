@@ -9,7 +9,11 @@ import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
 import { TESTING_CENTER, TESTING_EMAIL, CALENDLY_CONFIG } from '@/lib/testing/testing-config';
 import { createSchedulingLink, getEventTypes } from '@/lib/testing/calendly';
-import { TestingSessionMeta, parseWebhookMeta } from '@/lib/stripe/webhook-schemas';
+import {
+  TestingEnforcementMeta,
+  TestingSessionMeta,
+  parseWebhookMeta,
+} from '@/lib/stripe/webhook-schemas';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 const FROM = TESTING_EMAIL.from;
@@ -121,15 +125,15 @@ export async function handleTestingCheckoutSession(
 
   if (paymentType === 'testing_enforcement') {
     const enforcementMeta = parseWebhookMeta(
-      TestingSessionMeta,
+      TestingEnforcementMeta,
       session.metadata,
       session.id,
       logger,
     );
     if (!enforcementMeta) return;
 
-    const enforcementId = (enforcementMeta as { enforcement_id?: string }).enforcement_id;
-    const email = (enforcementMeta as { email?: string }).email;
+    const enforcementId = enforcementMeta.enforcement_id;
+    const email = enforcementMeta.email;
     if (!enforcementId) return;
 
     await db

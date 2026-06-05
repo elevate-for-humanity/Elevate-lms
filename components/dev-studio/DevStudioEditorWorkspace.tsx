@@ -136,6 +136,7 @@ export default function DevStudioEditorWorkspace({
               const path = uploadPath || `devstudio-uploads/${file.name}`;
               setSelected(path);
               setContent(text);
+              setSha('');
               setMessage(`chore: add ${path}`);
             });
           }}

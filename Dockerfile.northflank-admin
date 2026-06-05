@@ -32,15 +32,15 @@ COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
 
-# Install from manifests only (no source yet) so peak disk is not repo + store + node_modules.
-# pnpm store lives on a BuildKit cache mount (not committed to the image layer).
+# Install from manifests only (no source yet). pnpm store + node_modules use BuildKit cache mounts.
 # Do NOT use --package-import-method=copy - it duplicates every package and causes ENOSPC.
 # Do NOT run `pnpm fetch` - it fills disk before install on tight Northflank builders.
 ENV HUSKY=0
 ENV CI=true
 ENV PUPPETEER_SKIP_DOWNLOAD=true
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-RUN --mount=type=cache,id=pnpm-northflank-admin,target=/pnpm/store \
+RUN --mount=type=cache,id=pnpm-northflank-admin-store,target=/pnpm/store \
+    --mount=type=cache,id=pnpm-northflank-admin-node_modules,target=/app/node_modules \
     pnpm config set store-dir /pnpm/store \
     && pnpm install --frozen-lockfile \
     && pnpm store prune
@@ -70,36 +70,33 @@ ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV SKIP_ENV_VALIDATION=true
 
-RUN test -n "$NEXT_PUBLIC_SUPABASE_URL" \
+RUN --mount=type=cache,id=pnpm-northflank-admin-store,target=/pnpm/store \
+    --mount=type=cache,id=pnpm-northflank-admin-node_modules,target=/app/node_modules \
+    pnpm config set store-dir /pnpm/store \
+    && pnpm install --frozen-lockfile \
+    && pnpm store prune \
+    && test -n "$NEXT_PUBLIC_SUPABASE_URL" \
     && test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
     && cd apps/admin \
     && pnpm exec next build \
     && cd ../.. \
-    && node scripts/prune-admin-standalone.mjs
-
-# Bundle ws for runtime (custom server.js). Do NOT npm install ws in slim stage - peer-resolve fails.
-RUN set -eux; \
-  mkdir -p /export/ws; \
-  WS_DIR="$(node -p "require('path').dirname(require.resolve('ws/package.json',{paths:[require('path').join(process.cwd(),'apps/admin')]}))")"; \
-  cp -a "${WS_DIR}/." /export/ws/; \
-  test -f /export/ws/package.json
-
-# Bundle sharp + linux x64 @img bindings (runtime npm install fails in slim CI images)
-RUN set -eux; \
-  mkdir -p /export/sharp-node_modules/@img; \
-  SHARP_DIR="$(node -p "require('path').dirname(require.resolve('sharp/package.json'))")"; \
-  cp -a "${SHARP_DIR}/." /export/sharp-node_modules/sharp/; \
-  for pkg in node_modules/.pnpm/@img+sharp-linux-x64@*/node_modules/@img/sharp-linux-x64 \
-    node_modules/.pnpm/@img+sharp-libvips-linux-x64@*/node_modules/@img/sharp-libvips-linux-x64; do \
-    name="$(basename "$pkg")"; \
-    cp -a "$pkg" "/export/sharp-node_modules/@img/${name}"; \
-  done; \
-  test -f /export/sharp-node_modules/sharp/package.json; \
-  test -d /export/sharp-node_modules/@img/sharp-linux-x64
-
-# pdf-parse → pdfjs-dist → @napi-rs/canvas (must survive standalone + prune)
-RUN node scripts/export-admin-pdf-deps.mjs \
-  && test -f /export/pdf-node_modules/@napi-rs/canvas/package.json
+    && node scripts/prune-admin-standalone.mjs \
+    && mkdir -p /export/ws \
+    && WS_DIR="$(node -p "require('path').dirname(require.resolve('ws/package.json',{paths:[require('path').join(process.cwd(),'apps/admin')]}))")" \
+    && cp -a "${WS_DIR}/." /export/ws/ \
+    && test -f /export/ws/package.json \
+    && mkdir -p /export/sharp-node_modules/@img \
+    && SHARP_DIR="$(node -p "require('path').dirname(require.resolve('sharp/package.json'))")" \
+    && cp -a "${SHARP_DIR}/." /export/sharp-node_modules/sharp/ \
+    && for pkg in node_modules/.pnpm/@img+sharp-linux-x64@*/node_modules/@img/sharp-linux-x64 \
+      node_modules/.pnpm/@img+sharp-libvips-linux-x64@*/node_modules/@img/sharp-libvips-linux-x64; do \
+      name="$(basename "$pkg")"; \
+      cp -a "$pkg" "/export/sharp-node_modules/@img/${name}"; \
+    done \
+    && test -f /export/sharp-node_modules/sharp/package.json \
+    && test -d /export/sharp-node_modules/@img/sharp-linux-x64 \
+    && node scripts/export-admin-pdf-deps.mjs \
+    && test -f /export/pdf-node_modules/@napi-rs/canvas/package.json
 
 # --- runtime (same as Dockerfile.admin) ---
 FROM node:20-bookworm-slim

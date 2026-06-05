@@ -32,12 +32,13 @@ COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
 
-# See Dockerfile.northflank-admin — install before COPY . . + BuildKit pnpm store cache.
+# See Dockerfile.northflank-admin — store + node_modules on BuildKit cache mounts.
 ENV HUSKY=0
 ENV CI=true
 ENV PUPPETEER_SKIP_DOWNLOAD=true
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-RUN --mount=type=cache,id=pnpm-northflank-lms,target=/pnpm/store \
+RUN --mount=type=cache,id=pnpm-northflank-lms-store,target=/pnpm/store \
+    --mount=type=cache,id=pnpm-northflank-lms-node_modules,target=/app/node_modules \
     pnpm config set store-dir /pnpm/store \
     && pnpm install --frozen-lockfile \
     && pnpm store prune
@@ -65,23 +66,25 @@ ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV SKIP_ENV_VALIDATION=true
 
-RUN test -n "$NEXT_PUBLIC_SUPABASE_URL" \
+RUN --mount=type=cache,id=pnpm-northflank-lms-store,target=/pnpm/store \
+    --mount=type=cache,id=pnpm-northflank-lms-node_modules,target=/app/node_modules \
+    pnpm config set store-dir /pnpm/store \
+    && pnpm install --frozen-lockfile \
+    && pnpm store prune \
+    && test -n "$NEXT_PUBLIC_SUPABASE_URL" \
     && test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
     && pnpm exec next build \
-    && node scripts/prune-standalone.mjs
-
-# Bundle sharp + linux x64 @img bindings (runtime npm install fails in slim CI images)
-RUN set -eux; \
-  mkdir -p /export/sharp-node_modules/@img; \
-  SHARP_DIR="$(node -p "require('path').dirname(require.resolve('sharp/package.json'))")"; \
-  cp -a "${SHARP_DIR}/." /export/sharp-node_modules/sharp/; \
-  for pkg in node_modules/.pnpm/@img+sharp-linux-x64@*/node_modules/@img/sharp-linux-x64 \
-    node_modules/.pnpm/@img+sharp-libvips-linux-x64@*/node_modules/@img/sharp-libvips-linux-x64; do \
-    name="$(basename "$pkg")"; \
-    cp -a "$pkg" "/export/sharp-node_modules/@img/${name}"; \
-  done; \
-  test -f /export/sharp-node_modules/sharp/package.json; \
-  test -d /export/sharp-node_modules/@img/sharp-linux-x64
+    && node scripts/prune-standalone.mjs \
+    && mkdir -p /export/sharp-node_modules/@img \
+    && SHARP_DIR="$(node -p "require('path').dirname(require.resolve('sharp/package.json'))")" \
+    && cp -a "${SHARP_DIR}/." /export/sharp-node_modules/sharp/ \
+    && for pkg in node_modules/.pnpm/@img+sharp-linux-x64@*/node_modules/@img/sharp-linux-x64 \
+      node_modules/.pnpm/@img+sharp-libvips-linux-x64@*/node_modules/@img/sharp-libvips-linux-x64; do \
+      name="$(basename "$pkg")"; \
+      cp -a "$pkg" "/export/sharp-node_modules/@img/${name}"; \
+    done \
+    && test -f /export/sharp-node_modules/sharp/package.json \
+    && test -d /export/sharp-node_modules/@img/sharp-linux-x64
 
 # --- runtime (Dockerfile.package layout) ---
 FROM node:20-bookworm-slim

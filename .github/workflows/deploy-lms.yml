@@ -50,7 +50,7 @@ jobs:
       NORTHFLANK_LMS_SERVICE_ID: ${{ secrets.NORTHFLANK_LMS_SERVICE_ID || 'elevate-lms' }}
       NORTHFLANK_ADMIN_SERVICE_ID: ${{ secrets.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin' }}
       DEPLOY_BRANCH: main
-      NORTHFLANK_EPHEMERAL_STORAGE_MB: "32768"
+      NORTHFLANK_EPHEMERAL_STORAGE_MB: "65536"
 
     steps:
       - name: Checkout
@@ -72,6 +72,9 @@ jobs:
 
       - name: Configure Northflank services
         run: pnpm tsx scripts/northflank/configure-services.ts --execute
+
+      - name: Patch Northflank build ephemeral storage
+        run: pnpm tsx scripts/northflank/patch-ephemeral-storage.ts --execute
 
       - name: Verify health probes on /api/ping
         run: pnpm tsx scripts/northflank/verify-health-checks.ts

@@ -47,9 +47,10 @@ WARN GET https://registry.npmjs.org/... error (ERR_PNPM_ENOSPC). Will retry ...
 
 1. Remove the separate **`pnpm fetch`** layer (never use on Northflank).
 2. **`pnpm install --frozen-lockfile`** from workspace manifests **before** `COPY . .` so install peak is not repo + store + `node_modules`.
-3. **BuildKit cache mount** for the pnpm store (`/pnpm/store`) so the store is not written into the image layer.
+3. **BuildKit cache mounts** for the pnpm store (`/pnpm/store`) **and** `node_modules` so hardlinks do not duplicate the lockfile onto the image layer (store-only mount still ENOSPC’d at ~1.7k/1964 packages with 32GB API setting).
 4. **`pnpm store prune`** after install; **`rm -rf /app/.pnpm-store`** after `COPY . .` if anything landed on `/app`.
 5. **`.dockerignore`**: exclude `export/`, `cloudflare-workers/`, `fly-containers/` from build context.
+6. **POST `/services/{id}/build-options`** with `storage.ephemeralStorage.storageSize` (65536 MB in deploy workflows) in addition to combined-service PATCH.
 
 This lowers peak disk versus fetch + offline install or `/app/.pnpm-store` in-layer on a small volume.
 

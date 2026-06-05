@@ -16,6 +16,7 @@
 import {
   combinedServicePatchPath,
   nfFetch,
+  projectApiPath,
   resolveAdminServiceId,
   resolveLmsServiceId,
   resolveProjectId,
@@ -155,6 +156,21 @@ async function main() {
         method: 'PATCH',
         body: JSON.stringify(patch),
       });
+      const buildOptionsBody = {
+        storage: { ephemeralStorage: { storageSize: ephemeralStorageSize } },
+      };
+      try {
+        await nfFetch(projectApiPath(projectId, `/services/${service.id}/build-options`), {
+          method: 'POST',
+          body: JSON.stringify(buildOptionsBody),
+        });
+        console.log(`[build-options-ok] ${service.id} ephemeral ${ephemeralStorageSize}MB`);
+      } catch (e) {
+        console.warn(
+          `[build-options-warn] ${service.id}:`,
+          e instanceof Error ? e.message.slice(0, 200) : e,
+        );
+      }
       const appliedBuild =
         response?.billing?.buildPlan ??
         response?.buildSettings?.billing?.buildPlan ??

@@ -77,10 +77,11 @@ export function resolveTargetServiceIds(argv: string[] = process.argv.slice(2)):
     }
   }
 
-  if (all || roles.size === 0) {
-    if (roles.size > 0) {
-      return NORTHFLANK_SERVICE_TARGETS.filter((t) => roles.has(t.role)).map((t) => t.id);
-    }
+  if (all) {
+    return allServiceIds();
+  }
+
+  if (roles.size === 0) {
     return allServiceIds();
   }
 

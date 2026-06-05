@@ -144,7 +144,7 @@ export async function generateCertificatePDF(data: CertificateData): Promise<Blo
   });
 
   // Issuer
-  const issuer = '${PLATFORM_DEFAULTS.orgName} Career & Technical Institute';
+  const issuer = `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`;
   const issuerWidth = timesBold.widthOfTextAtSize(issuer, 16);
   page.drawText(issuer, {
     x: (width - issuerWidth) / 2,

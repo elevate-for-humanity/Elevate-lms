@@ -105,7 +105,7 @@ for (const dir of SCAN_DIRS) {
 const heroBannersPath = path.join(ROOT, 'public/data/hero-banners.json');
 const heroBanners = JSON.parse(fs.readFileSync(heroBannersPath, 'utf8'));
 
-// ── Check cf-programs for duplicate titles ───────────────────────────────────
+// ── Check static program registry for duplicate titles ───────────────────────
 
 let cfPrograms = [];
 try {

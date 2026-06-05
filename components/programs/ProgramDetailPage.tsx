@@ -39,6 +39,8 @@ import {
   getEnrollmentTracks,
 } from '@/lib/programs/program-schema';
 import { DeliveryBadge, FundingSection } from './ProgramTruthBadges';
+import ProgramFundingProcessSection from './ProgramFundingProcessSection';
+import { resolveProgramFundingStatus } from '@/lib/programs/funding-visibility';
 import { ICC_URL, ICC_INSTRUCTION, hero as heroTokens } from '@/lib/page-design-tokens';
 import { DEFAULT_HERO_VIDEO, resolveHeroPosterSrc } from '@/lib/images/hero-banner-media';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -86,9 +88,12 @@ export default function ProgramDetailPage({
     bnplDepositStart && selfPayNumeric > bnplDepositStart && p.durationWeeks > 0
       ? Math.ceil((selfPayNumeric - bnplDepositStart) / p.durationWeeks)
       : null;
-  const hasIndianaFunding = p.fundingOptions?.some(f => f === 'wioa' || f === 'wrg' || f === 'impact');
-  const hasWIOAFunding = p.fundingOptions?.some(f => f === 'wioa' || f === 'wrg') ?? false;
-  const hasImpactOnly = !hasWIOAFunding && (p.fundingOptions?.includes('impact') ?? false);
+  const fundingStatus = resolveProgramFundingStatus(p);
+  const hasIndianaFunding =
+    fundingStatus.showWorkforceFundingProcess || fundingStatus.isImpactFundable;
+  const hasWIOAFunding = fundingStatus.isWioaFundable || fundingStatus.isWrgFundable;
+  const hasImpactOnly =
+    fundingStatus.isImpactFundable && !fundingStatus.showWorkforceFundingProcess;
   // Only beauty/apprenticeship programs have a working /eligibility page
   // (served by [program]/eligibility which calls getBeautyProgram)
   const eligibilityPageSlugs = new Set([
@@ -754,6 +759,8 @@ export default function ProgramDetailPage({
           </div>
         </div>{/* max-w-5xl */}
       </section>
+
+      <ProgramFundingProcessSection program={p} />
 
       {/* EMPLOYER PROOF */}
       <section className="py-12 border-t border-slate-100 bg-slate-50">

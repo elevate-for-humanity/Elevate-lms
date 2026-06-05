@@ -19,6 +19,7 @@ import { getProgramOgImage } from '@/lib/programs/og-images';
 import { CheckCircle, Clock, Award, DollarSign, ArrowRight, ShieldCheck } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { CredentialAuthorityFootnote } from '@/components/compliance/CredentialAuthorityFootnote';
+import WorkforceFundingIntakeCallout from '@/components/programs/WorkforceFundingIntakeCallout';
 
 export const dynamic = 'force-dynamic';
 
@@ -311,6 +312,12 @@ function ProgramPage({
           >
             Check My Eligibility
           </Link>
+        </div>
+      </section>
+
+      <section className="py-12 px-6 bg-slate-50 border-t border-slate-100">
+        <div className="max-w-4xl mx-auto">
+          <WorkforceFundingIntakeCallout programTitle={title} />
         </div>
       </section>
 

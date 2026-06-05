@@ -147,7 +147,7 @@ export const ICC_URL = 'https://www.indianacareerconnect.com';
  * Used in funding sections on any WIOA/apprenticeship-eligible program.
  */
 export const ICC_INSTRUCTION =
-  'For WIOA-eligible and apprenticeship pathway applicants, the next step may require Indiana Career Connect.';
+  'Start your workforce funding application online at Indiana Career Connect, or visit your nearest WorkOne career center to complete eligibility intake. WorkOne — not your training provider — approves WIOA and Workforce Ready Grant vouchers.';
 
 // ─── Responsive grid presets ─────────────────────────────────────────────────
 

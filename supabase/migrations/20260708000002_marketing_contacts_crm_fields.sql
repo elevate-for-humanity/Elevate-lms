@@ -32,6 +32,9 @@ WHERE created_at IS NOT NULL
 ALTER TABLE public.marketing_contacts
   ALTER COLUMN updated_at SET DEFAULT now();
 
+-- Drop potentially misindexed version if a prior draft was applied (plain email column)
+DROP INDEX IF EXISTS public.idx_marketing_contacts_email;
+
 CREATE INDEX IF NOT EXISTS idx_marketing_contacts_email ON public.marketing_contacts (lower(email));
 
 -- Drop misnamed/misindexed version if a prior draft was applied

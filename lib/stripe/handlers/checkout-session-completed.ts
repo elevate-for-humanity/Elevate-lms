@@ -348,6 +348,78 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
     return;
   }
 
+  // ── WORKFORCE FUNDED ENROLLMENT (WIOA / sponsor checkout) ───────────────
+  const paymentType = session.metadata?.payment_type;
+  if (kind === 'funded_enrollment' || paymentType === 'funded_enrollment') {
+    try {
+      const studentId = session.metadata?.student_id;
+      const programId = session.metadata?.program_id;
+      const programSlug = session.metadata?.program_slug;
+      const fundingSource = session.metadata?.funding_source ?? 'WIOA';
+      const amountPaidCents = session.amount_total ?? 0;
+
+      if (!studentId || !programId) {
+        logger.error('[webhook/checkout] funded_enrollment missing metadata', undefined, {
+          sessionId: session.id,
+          metadata: session.metadata,
+        });
+        return;
+      }
+
+      await supabase
+        .from('funding_payments')
+        .update({
+          status: 'paid',
+          paid_at: new Date().toISOString(),
+          amount: amountPaidCents / 100,
+        })
+        .eq('stripe_checkout_session_id', session.id);
+
+      const result = await createOrUpdateEnrollment(supabase, {
+        userId: studentId,
+        programId,
+        programSlug,
+        fundingSource: normalizeFundingSource(fundingSource),
+        amountPaidCents,
+        stripeCheckoutSessionId: session.id,
+        email: session.metadata?.student_email ?? session.customer_email ?? undefined,
+      });
+
+      if (result.error) {
+        logger.error('[webhook/checkout] funded_enrollment enrollment failed', undefined, {
+          error: result.error,
+        });
+        return;
+      }
+
+      await auditLog({
+        action: AuditAction.ENROLLMENT_CREATED,
+        entity: AuditEntity.ENROLLMENT,
+        entityId: result.id,
+        actorId: studentId,
+        metadata: {
+          program_id: programId,
+          program_slug: programSlug,
+          funding_source: fundingSource,
+          amount_paid_cents: amountPaidCents,
+          checkout_session_id: session.id,
+          action: result.action,
+          path: 'funded_enrollment',
+        },
+      });
+
+      logger.info('[webhook/checkout] funded_enrollment complete', {
+        enrollmentId: result.id,
+        programSlug,
+        studentId,
+      });
+    } catch (err) {
+      Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook', kind: 'funded_enrollment' } });
+      logger.error('[webhook/checkout] Error processing funded_enrollment:', err);
+    }
+    return;
+  }
+
   // ── UNRECOGNISED KIND — log and no-op ─────────────────────────────────────
   logger.info('[webhook/checkout] Unrecognised session kind — no-op', {
     sessionId: session.id,

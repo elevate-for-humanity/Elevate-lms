@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { createPublicClient } from '@/lib/supabase/public';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { loadVerifiedPublicStats } from '@/lib/site-stats-server';
 import {
   Users,
   Award,
@@ -35,19 +36,13 @@ export const metadata: Metadata = {
 
 export default async function EmployersPage() {
   let employerCount: number | null = null;
-  let programCount: number | null = null;
+  const verified = await loadVerifiedPublicStats();
+  const programsDisplay = verified.programsDisplay;
 
   try {
     const db = createPublicClient();
-    const [ecRes, pcRes] = await Promise.all([
-      db.from('employer_profiles').select('*', { count: 'exact', head: true }),
-      db
-        .from('programs')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'active'),
-    ]);
+    const ecRes = await db.from('employer_profiles').select('*', { count: 'exact', head: true });
     employerCount = ecRes.count;
-    programCount = pcRes.count;
   } catch {
     // DB unavailable — render static fallback
   }
@@ -111,7 +106,7 @@ export default async function EmployersPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <p className="text-3xl font-bold text-brand-blue-300">{programCount ?? '49'}+</p>
+              <p className="text-3xl font-bold text-brand-blue-300">{programsDisplay}</p>
               <p className="text-slate-300 text-sm mt-1">Training Programs</p>
             </div>
             <div>

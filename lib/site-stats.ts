@@ -31,3 +31,9 @@ export const statLabel = {
   employers: SITE_STATS.employerPartnersDisplay,
   funding: SITE_STATS.fundingSecuredDisplay,
 } as const;
+
+/** Canonical marketing display for program counts (e.g. "40+"). */
+export function formatProgramsDisplay(count: number | null | undefined): string {
+  if (count != null && count > 0) return `${count}+`;
+  return SITE_STATS.programsOfferedDisplay;
+}

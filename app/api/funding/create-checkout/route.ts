@@ -18,7 +18,7 @@ async function _POST(req: Request) {
 
     const { apiRequireAdmin } = await import('@/lib/admin/guards');
     try {
-      const auth = await apiRequireAdmin(request);
+      const auth = await apiRequireAdmin(req);
       if (auth.error) return auth.error;
     } catch (e) {
       return e instanceof Response
@@ -88,6 +88,7 @@ async function _POST(req: Request) {
       success_url: `${siteUrl}/funding/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/funding/canceled`,
       metadata: {
+        kind: 'funded_enrollment',
         // Standardized metadata for grant/license compliance
         payment_type: 'funded_enrollment',
         funding_source: fundingSource,

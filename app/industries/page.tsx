@@ -14,6 +14,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import ModernLandingHero from '@/components/landing/ModernLandingHero';
+import { loadVerifiedPublicStats } from '@/lib/site-stats-server';
 
 export const metadata: Metadata = {
   title: 'Industries We Serve',
@@ -100,7 +101,9 @@ const industries = [
   },
 ];
 
-export default function IndustriesPage() {
+export default async function IndustriesPage() {
+  const verified = await loadVerifiedPublicStats();
+
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
@@ -117,7 +120,7 @@ export default function IndustriesPage() {
         primaryCTA={{ text: 'Explore Programs', href: '#industries' }}
         secondaryCTA={{ text: 'Apply Now', href: '/apply' }}
         features={[
-          '8 high-demand industries • 20+ career programs',
+          `8 high-demand industries • ${verified.programsDisplay} career programs`,
           '100% funded training for eligible students',
           'Industry-recognized credentials and certifications',
         ]}

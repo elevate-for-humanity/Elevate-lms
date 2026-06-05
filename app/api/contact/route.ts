@@ -124,15 +124,21 @@ async function _POST(req: Request) {
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
+      const programInterest = data.program || data.interest || '';
+      const contactType = data.role || 'general';
+      const displayName = data.name.trim();
+
       const { error: dbError } = await supabase.from('marketing_contacts').insert({
         first_name: firstName,
         last_name: lastName,
+        name: displayName,
         email: data.email,
-        tags: [
-          'contact_form',
-          data.role || 'general',
-          data.program || data.interest || 'inquiry',
-        ].filter(Boolean),
+        phone: data.phone?.trim() || null,
+        message: data.message.trim(),
+        program_interest: programInterest || null,
+        contact_type: contactType,
+        status: 'Active',
+        tags: ['contact_form', contactType, programInterest || 'inquiry'].filter(Boolean),
       });
 
       if (dbError) {

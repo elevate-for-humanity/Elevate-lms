@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { canonicalRoutes } from '@/lib/routes/canonical-routes';
+import { loadVerifiedPublicStats } from '@/lib/site-stats-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,6 +29,7 @@ export const metadata: Metadata = {
 };
 
 export default async function StudentsPage() {
+  const verified = await loadVerifiedPublicStats();
   const supabase = await createClient();
 
   if (!supabase) {
@@ -217,7 +219,7 @@ export default async function StudentsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-black text-center mb-4">Popular Programs</h2>
           <p className="text-xl text-black text-center mb-12">
-            Choose from 20+ career training programs
+            Choose from {verified.programsDisplay} career training programs
           </p>
 
           <div className="grid md:grid-cols-3 gap-8 mb-8">

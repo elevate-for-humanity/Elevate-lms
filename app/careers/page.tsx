@@ -5,6 +5,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import ModernLandingHero from '@/components/landing/ModernLandingHero';
 import { getActivePositions } from '@/lib/data/careers';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { formatProgramsDisplay } from '@/lib/site-stats';
 
 export const metadata: Metadata = {
   title: 'Careers - Join Our Team',
@@ -134,7 +135,9 @@ export default async function CareersPage() {
             </p>
             <div className="grid md:grid-cols-3 gap-8 mt-12">
               <div className="text-center">
-                <div className="text-4xl font-bold text-brand-blue-600 mb-2">20+</div>
+                <div className="text-4xl font-bold text-brand-blue-600 mb-2">
+                  {formatProgramsDisplay(liveStats.programs)}
+                </div>
                 <div className="text-black">Training Programs</div>
               </div>
               <div className="text-center">

@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { SITE_STATS } from '@/lib/site-stats';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,7 +47,7 @@ async function _GET(request: Request) {
       completedEnrollments: completedEnrollments || 0,
       activeStudents: activeStudents || 0,
       certificatesIssued: certificatesIssued || 0,
-      programsOffered: programsOffered || 12,
+      programsOffered: programsOffered || SITE_STATS.programsOffered,
       // These would come from a placements table in production
       placementRate: 87,
       avgStartingSalary: 42500,

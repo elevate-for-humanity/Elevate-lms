@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { SITE_STATS } from '@/lib/site-stats';
 import {
   Heart, Users, Award, Briefcase, CheckCircle, ArrowRight,
   RefreshCw, DollarSign, Star, Shield, Globe, ChevronDown,
@@ -16,7 +17,7 @@ const IMPACT_STATS = [
   { icon: Users, value: 'Many', label: 'Students Trained', color: 'text-blue-600', bg: 'bg-blue-50' },
   { icon: Award, value: '200+', label: 'Credentials Issued', color: 'text-brand-green-600', bg: 'bg-brand-green-50' },
   { icon: Briefcase, value: '150+', label: 'Jobs Placed', color: 'text-purple-600', bg: 'bg-purple-50' },
-  { icon: Globe, value: '10+', label: 'Programs Offered', color: 'text-orange-600', bg: 'bg-orange-50' },
+  { icon: Globe, value: SITE_STATS.programsOfferedDisplay, label: 'Programs Offered', color: 'text-orange-600', bg: 'bg-orange-50' },
 ];
 
 const DONATION_IMPACT = [

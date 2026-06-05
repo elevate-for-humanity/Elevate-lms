@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { FileText, ArrowRight, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { loadVerifiedPublicStats } from '@/lib/site-stats-server';
 
 export const metadata: Metadata = {
   title: `Transparency | ${PLATFORM_DEFAULTS.orgName}`,
@@ -14,14 +15,16 @@ export const metadata: Metadata = {
   },
 };
 
-const STATS = [
-  { label: 'Programs Available', value: '10+' },
-  { label: 'Placement Goal', value: '85%' },
-  { label: 'Training Cost', value: '$0*' },
-  { label: 'Funding Sources', value: '5+' },
-  { label: 'Indiana Locations', value: '3+' },
-  { label: 'Learner Support', value: '24/7' },
-];
+function buildStats(programsDisplay: string) {
+  return [
+    { label: 'Programs Available', value: programsDisplay },
+    { label: 'Placement Goal', value: '85%' },
+    { label: 'Training Cost', value: '$0*' },
+    { label: 'Funding Sources', value: '5+' },
+    { label: 'Indiana Locations', value: '3+' },
+    { label: 'Learner Support', value: '24/7' },
+  ];
+}
 
 const FINANCIALS = [
   { category: 'Program Delivery', pct: 75, description: 'Training, instruction, and student support' },
@@ -52,7 +55,10 @@ const THIRD_PARTY = [
   'Employer feedback collection',
 ];
 
-export default function TransparencyPage() {
+export default async function TransparencyPage() {
+  const verified = await loadVerifiedPublicStats();
+  const STATS = buildStats(verified.programsDisplay);
+
   return (
     <div className="min-h-screen bg-white">
 

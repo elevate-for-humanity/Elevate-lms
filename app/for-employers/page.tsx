@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { loadVerifiedPublicStats } from '@/lib/site-stats-server';
 
 export const metadata: Metadata = {
   title: 'For Employers | Hire, Sponsor & Train | Elevate Workforce OS',
@@ -36,17 +37,13 @@ export const revalidate = 600;
 
 export default async function ForEmployersPage() {
   let employerCount: number | null = null;
-  let programCount: number | null = null;
+  const verified = await loadVerifiedPublicStats();
 
   // PUBLIC ROUTE: employer-facing marketing page — no auth required.
   try {
     const db = createPublicClient();
-    const [ecRes, pcRes] = await Promise.all([
-      db.from('employer_profiles').select('*', { count: 'exact', head: true }),
-      db.from('programs').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-    ]);
+    const ecRes = await db.from('employer_profiles').select('*', { count: 'exact', head: true });
     employerCount = ecRes.count;
-    programCount = pcRes.count;
   } catch {
     // DB unavailable — render static fallback
   }
@@ -107,7 +104,7 @@ export default async function ForEmployersPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <p className="text-3xl font-bold text-brand-blue-400">{programCount ?? '49'}+</p>
+              <p className="text-3xl font-bold text-brand-blue-400">{verified.programsDisplay}</p>
               <p className="text-slate-500 text-sm">Training Programs</p>
             </div>
             <div>

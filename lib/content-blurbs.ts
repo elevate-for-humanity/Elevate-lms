@@ -3,6 +3,8 @@
  * Use these in proposals, grants, LinkedIn, press kits, investor decks, etc.
  */
 
+import { SITE_STATS } from '@/lib/site-stats';
+
 export const EFH_CONTENT = {
   /**
    * Universal Short Description
@@ -31,7 +33,7 @@ export const EFH_CONTENT = {
    * What makes EFH different (bullet points)
    */
   differentiators: [
-    'A funded training catalog with 20+ workforce-aligned programs.',
+    `A funded training catalog with ${SITE_STATS.programsOfferedDisplay} workforce-aligned programs.`,
     'A single portal for students, employers, partners, and workforce staff.',
     'Transparent attendance, progress, credentialing, and placement tracking.',
     'Support for WIOA, WRG, JRI, ETPL, apprenticeships, OJT, and employer upskilling.',

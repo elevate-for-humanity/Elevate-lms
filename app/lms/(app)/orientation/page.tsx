@@ -5,6 +5,7 @@ import ProgramOrientationVideo from '@/components/student/ProgramOrientationVide
 import { Book, Users, Award, Briefcase } from 'lucide-react';
 import Link from 'next/link';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { loadVerifiedPublicStats } from '@/lib/site-stats-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,6 +18,7 @@ export const metadata = {
 };
 
 export default async function OrientationPage() {
+  const verified = await loadVerifiedPublicStats();
   const { user, profile } = await requireRole(['student', 'admin', 'super_admin']);
 
   // If already completed, show completion message
@@ -147,7 +149,7 @@ export default async function OrientationPage() {
                   </div>
                   <div>
                     <p className="font-medium text-black">Choose Program</p>
-                    <p className="text-sm text-black">Browse 20+ training programs</p>
+                    <p className="text-sm text-black">Browse {verified.programsDisplay} training programs</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">

@@ -4,6 +4,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { Heart, DollarSign, Users, Award, CheckCircle, ArrowRight, RefreshCw } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { loadVerifiedPublicStats } from '@/lib/site-stats-server';
 
 export const revalidate = 3600;
 
@@ -47,14 +48,15 @@ const MONTHLY_TIERS = [
   },
 ];
 
-const IMPACT_STATS = [
-  { value: '20+', label: 'Training Programs' },
-  { value: 'ETPL', label: 'Listed Provider' },
-  { value: 'DOL', label: 'Registered Sponsor' },
-  { value: 'WIOA', label: 'Funding Accepted' },
-];
-
 export default async function MonthlyDonationPage() {
+  const verified = await loadVerifiedPublicStats();
+  const impactStats = [
+    { value: verified.programsDisplay, label: 'Training Programs' },
+    { value: 'ETPL', label: 'Listed Provider' },
+    { value: 'DOL', label: 'Registered Sponsor' },
+    { value: 'WIOA', label: 'Funding Accepted' },
+  ];
+
   const db = await requireAdminClient();
 
   // Pull total donation count as social proof
@@ -95,7 +97,7 @@ export default async function MonthlyDonationPage() {
       {/* Social proof */}
       <section className="bg-brand-red-600 py-6 px-4">
         <div className="max-w-5xl mx-auto flex flex-wrap justify-center gap-10 text-center">
-          {IMPACT_STATS.map((s) => (
+          {impactStats.map((s) => (
             <div key={s.label}>
               <p className="text-2xl font-extrabold text-white">{s.value}</p>
               <p className="text-red-100 text-sm mt-1">{s.label}</p>

@@ -7,7 +7,7 @@ import type { Metadata } from 'next';
 import { createPublicClient, isPublicSupabaseConfigured } from '@/lib/supabase/public';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { buildSiteMetadata } from '@/lib/seo/build-site-metadata';
-import { SITE_STATS } from '@/lib/site-stats';
+import { SITE_STATS, formatProgramsDisplay } from '@/lib/site-stats';
 import {
   loadPublishedProgramsListing,
   type ProgramsListingItem,
@@ -100,6 +100,11 @@ export async function getPublicProgramsPageData(): Promise<PublicProgramsPageDat
 export function resolvePublicProgramCount(programCount: number): number {
   if (programCount > 0) return programCount;
   return SITE_STATS.programsOffered;
+}
+
+/** Marketing hero copy — matches homepage and employer stats. */
+export function formatPublicProgramsDisplay(programCount: number): string {
+  return formatProgramsDisplay(resolvePublicProgramCount(programCount));
 }
 
 export async function buildProgramsListingMetadata(): Promise<Metadata> {

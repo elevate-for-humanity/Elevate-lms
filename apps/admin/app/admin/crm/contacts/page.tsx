@@ -19,25 +19,34 @@ export default async function ContactsPage() {
   // Fetch real contacts from CRM
   const { data: contactData } = await supabase
     .from('marketing_contacts')
-    .select('id,name,email,phone,company,contact_type,status,updated_at')
-    .order('updated_at', { ascending: false })
+    .select(
+      'id,name,first_name,last_name,email,phone,company,contact_type,status,message,program_interest,created_at,updated_at',
+    )
+    .order('created_at', { ascending: false })
     .limit(50);
 
-  const contacts = (contactData || []).map((c: any) => {
-    const updatedAt = new Date(c.updated_at);
+  const contacts = (contactData || []).map((c: Record<string, string | null>) => {
+    const updatedAt = new Date(c.updated_at ?? c.created_at ?? Date.now());
     const now = new Date();
     const diffDays = Math.floor((now.getTime() - updatedAt.getTime()) / 86400000);
     const lastContact =
       diffDays === 0 ? 'Today' : diffDays === 1 ? 'Yesterday' : `${diffDays} days ago`;
 
+    const displayName =
+      c.name ||
+      [c.first_name, c.last_name].filter(Boolean).join(' ').trim() ||
+      'Contact';
+
     return {
       id: c.id,
-      name: c.name || 'Contact',
+      name: displayName,
       email: c.email || '',
       phone: c.phone || '',
       company: c.company || '',
       type: c.contact_type || 'Lead',
       status: c.status || 'Active',
+      message: c.message || '',
+      programInterest: c.program_interest || '',
       lastContact,
       image: null,
     };
@@ -162,10 +171,22 @@ export default async function ContactsPage() {
                     <Mail className="w-4 h-4 text-slate-700" />
                     {contact.email}
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-slate-700">
-                    <Phone className="w-4 h-4 text-slate-700" />
-                    {contact.phone}
-                  </div>
+                  {contact.phone ? (
+                    <div className="flex items-center gap-2 text-sm text-slate-700">
+                      <Phone className="w-4 h-4 text-slate-700" />
+                      {contact.phone}
+                    </div>
+                  ) : null}
+                  {contact.programInterest ? (
+                    <p className="text-xs text-slate-500">
+                      Program: <span className="font-medium text-slate-700">{contact.programInterest}</span>
+                    </p>
+                  ) : null}
+                  {contact.message ? (
+                    <p className="text-sm text-slate-600 line-clamp-3 border-l-2 border-slate-200 pl-3">
+                      {contact.message}
+                    </p>
+                  ) : null}
                 </div>
 
                 <div className="flex items-center gap-2 mb-4">

@@ -61,13 +61,16 @@ ENV CI=true
 ENV PUPPETEER_SKIP_DOWNLOAD=true
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-# Single cache volume for store + node_modules so pnpm hardlinks (no copyfile ENOSPC).
-# Do NOT use separate /pnpm/store and /app/node_modules mounts — different FS forces copy.
+# Unified pnpm cache mount (store + node_modules on same FS). Split install vs build
+# so next build output does not exhaust cache disk in the same layer as pnpm install.
+# Cache id is service-specific — do not share admin/lms ids on one builder.
 RUN --mount=type=cache,id=pnpm-northflank-admin-unified,target=/mnt/pnpm-cache \
     mkdir -p /mnt/pnpm-cache/store /mnt/pnpm-cache/node_modules \
     && printf '%s\n' 'store-dir=/mnt/pnpm-cache/store' 'modules-dir=/mnt/pnpm-cache/node_modules' >> .npmrc \
-    && pnpm install --frozen-lockfile --ignore-scripts \
-    && ln -sfn /mnt/pnpm-cache/node_modules /app/node_modules \
+    && pnpm install --frozen-lockfile --ignore-scripts
+
+RUN --mount=type=cache,id=pnpm-northflank-admin-unified,target=/mnt/pnpm-cache \
+    ln -sfn /mnt/pnpm-cache/node_modules /app/node_modules \
     && test -n "$NEXT_PUBLIC_SUPABASE_URL" \
     && test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
     && test -x /app/node_modules/next/dist/bin/next \

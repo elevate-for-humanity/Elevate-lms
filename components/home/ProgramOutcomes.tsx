@@ -27,9 +27,9 @@ const PROGRAMS = [
   {
     title: 'HVAC Technician',
     image: '/images/pages/cdl-truck-highway.webp',
-    duration: '12 weeks',
+    duration: '6 weeks',
     salary: '$45K–$65K',
-    placement: '85%',
+    placement: '—',
     href: '/programs/hvac-technician',
     category: 'Skilled Trades',
   },

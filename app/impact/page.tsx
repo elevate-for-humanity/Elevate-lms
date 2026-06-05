@@ -58,7 +58,7 @@ const PROGRAMS = [
   { name: 'Barbering Apprenticeship', credential: 'Indiana Barber License', duration: '2,000 hours', icon: '✂️' },
   { name: 'Cosmetology', credential: 'Indiana Cosmetology License', duration: '1,500 hours', icon: '💅' },
   { name: 'CNA Certification', credential: 'Indiana CNA License', duration: '6 weeks', icon: '🏥' },
-  { name: 'HVAC Technician', credential: 'EPA 608 Certification', duration: '8 weeks', icon: '🔧' },
+  { name: 'HVAC Technician', credential: 'EPA 608 Certification', duration: '6 weeks', icon: '🔧' },
   { name: 'Nail Technician', credential: 'Indiana Nail Tech License', duration: '450 hours', icon: '💎' },
   { name: 'Business Development', credential: 'Certificate of Completion', duration: '12 weeks', icon: '📊' },
 ];
@@ -144,7 +144,10 @@ export default async function ImpactPage() {
     },
     {
       icon: Briefcase,
-      value: stats ? `${SITE_STATS.jobPlacementRate}%` : '—',
+      value:
+        stats && SITE_STATS.careerServicesSupportRate != null
+          ? `${SITE_STATS.careerServicesSupportRate}%`
+          : 'Data upon request',
       label: 'Credential attainment rate',
       sublabel: 'among completers',
       color: 'text-red-600',

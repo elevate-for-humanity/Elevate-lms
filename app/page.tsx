@@ -6,6 +6,7 @@ import MarqueeBanner from '@/components/MarqueeBanner';
 import { HomeTrustBar } from '@/components/home/HomeTrustBar';
 import { HomeWhyChoose } from '@/components/home/HomeWhyChoose';
 import { HomeFundingStrip } from '@/components/home/HomeFundingStrip';
+import { HomePrimaryPathways } from '@/components/home/HomePrimaryPathways';
 import { HomeHowItWorks } from '@/components/home/HomeHowItWorks';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
 import { HomeApprenticeshipInfra } from '@/components/home/HomeApprenticeshipInfra';
@@ -111,6 +112,9 @@ export default async function HomePage() {
 
       {/* ── 1b. ROTATING MARQUEE BANNER ─────────────────────────────────── */}
       <MarqueeBanner />
+
+      {/* ── 1b2. FOUR PRIMARY PATHWAYS ──────────────────────────────────── */}
+      <HomePrimaryPathways />
 
       {/* ── 1c. FUNDING PATHWAYS (above the fold) ───────────────────────── */}
       <HomeFundingStrip />

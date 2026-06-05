@@ -151,7 +151,7 @@ export default function VideoTestimonials() {
   const placementDisplay =
     verifiedStats.placementRate != null
       ? `${verifiedStats.placementRate}%`
-      : SITE_STATS.careerServicesSupportRate > 0
+      : SITE_STATS.careerServicesSupportRate != null
         ? `${SITE_STATS.careerServicesSupportRate}%`
         : '—';
 

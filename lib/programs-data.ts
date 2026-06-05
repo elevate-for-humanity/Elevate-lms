@@ -113,9 +113,9 @@ export const PROGRAMS: ProgramData[] = [
     slug: 'hvac-technician',
     name: 'HVAC Technician',
     blurb:
-      'Start a high-paying skilled trade career. 12-week evening program covering heating, cooling, refrigeration theory, and EPA 608 certification prep. Includes employer site days with HVAC contractors and apprenticeship pathway guidance. 4-star Indiana Top Jobs demand rating.',
+      'Start a high-paying skilled trade career. 6-week program covering heating, cooling, refrigeration theory, and EPA 608 certification prep. Hands-on lab with EPA 608 proctored on-site. 4-star Indiana Top Jobs demand rating.',
     funding: 'WIOA • Next Level Jobs • Workforce Grants',
-    duration: '12 Weeks • 144 Hours • Hybrid (Classroom + LMS + Employer Site Days)',
+    duration: '6 Weeks • Hybrid (Classroom + LMS + Hands-On Lab)',
     image: '/images/trades/hero-program-hvac.jpg',
     etplApproved: true,
   },

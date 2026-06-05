@@ -32,7 +32,7 @@ export const HVAC_DATA: TradesProgramData = {
   heroImage: '/images/pages/hvac-technician.webp',
   secondaryImage: '/images/pages/training-classroom.webp',
   careerImage: '/images/pages/hvac-technician.webp',
-  duration: '20 weeks',
+  duration: '6 weeks',
   totalHours: '400+ hours',
   rtiHours: '240 hours (online / LMS)',
   ojtHours: '160+ hours (internship at employer)',

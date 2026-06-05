@@ -217,6 +217,8 @@ export interface ProgramSchema {
   schedule: string;
   eveningSchedule?: string;
   cohortSize: string;
+  /** Optional override for "When do I start?" on program pages */
+  enrollmentStartLabel?: string;
   fundingStatement: string;
   selfPayCost: string;
   /** Upfront deposit amount for BNPL enrollment (e.g., "$600"). Defaults to $600 for apprenticeship programs when omitted. */

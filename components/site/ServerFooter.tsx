@@ -11,6 +11,8 @@ import { SOCIAL_LINKS } from '@/config/social-links';
 import FooterAccordion from '@/components/site/FooterAccordion.client';
 import { canonicalRoutes } from '@/lib/routes/canonical-routes';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { formatHeadquartersLine } from '@/lib/org-locations';
+import { RAPIDS_SPONSOR_LABEL } from '@/lib/workforce-ids';
 
 // FOOTER STRUCTURE — 5 columns
 // Col 1: Programs
@@ -72,6 +74,8 @@ const footerLinks = {
   // Column 4 — About
   about: [
     { name: 'About Elevate', href: '/about' },
+    { name: 'Organization', href: '/about/organization' },
+    { name: 'Compliance Center', href: '/compliance/center' },
     { name: 'Our Team', href: '/about/team' },
     { name: 'Outcomes', href: '/impact' },
     { name: 'Impact', href: '/impact' },
@@ -126,12 +130,18 @@ export default function ServerFooter() {
           <div className="flex flex-wrap gap-4 mt-4 text-xs text-white">
             <span>DOL Registered Apprenticeship Sponsor</span>
             <span className="text-white">·</span>
+            <span>{RAPIDS_SPONSOR_LABEL}</span>
+            <span className="text-white">·</span>
             <span>ETPL Listed Training Provider</span>
             <span className="text-white">·</span>
             <span>WIOA Title I Approved</span>
             <span className="text-white">·</span>
             <span>WorkOne Workforce Partner</span>
           </div>
+          <p className="mt-3 text-xs text-slate-400 max-w-2xl">
+            HQ: {formatHeadquartersLine()} — administrative and enrollment support. Hands-on training
+            occurs at approved Indianapolis instructional sites by program.
+          </p>
         </div>
 
         {/* Footer Accordion — all screen sizes */}

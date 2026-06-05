@@ -57,28 +57,28 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
   outcomes: [
     {
       statement: 'Wire a 24V thermostat control circuit and verify operation on a live unit',
-      assessedAt: 'Week 4',
+      assessedAt: 'Week 2',
     },
     {
       statement:
         'Recover, evacuate to 500 microns, and recharge a system to manufacturer superheat spec',
-      assessedAt: 'Week 6',
+      assessedAt: 'Week 4',
     },
     {
-      statement: 'Install a split-system AC and gas furnace from line set to commissioning',
-      assessedAt: 'Week 8',
+      statement: 'Install a split-system AC unit to manufacturer specification',
+      assessedAt: 'Week 5',
     },
     {
       statement: 'Diagnose 5 distinct fault scenarios using a systematic electrical fault tree',
-      assessedAt: 'Week 10',
+      assessedAt: 'Week 5',
     },
     {
       statement: 'Pass the EPA 608 Universal exam — all four sections — proctored on-site',
-      assessedAt: 'Week 11',
+      assessedAt: 'Week 6',
     },
     {
       statement: 'Write a complete service ticket with parts, labor time, and customer explanation',
-      assessedAt: 'Week 10',
+      assessedAt: 'Week 6',
     },
   ],
 
@@ -115,105 +115,65 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
     },
   ],
 
+  enrollmentStartLabel: 'Rolling enrollment — monthly cohorts (8–12 seats)',
   weeklySchedule: [
     {
       week: 'Weeks 1–2',
-      title: 'HVAC Fundamentals',
+      title: 'HVAC Fundamentals & Electrical',
       competencyMilestone:
-        'Identify all major system components and explain heat transfer principles',
+        'Identify system components, read wiring diagrams, and test circuits with a multimeter',
     },
     {
       week: 'Weeks 3–4',
-      title: 'Electrical Systems',
-      competencyMilestone: 'Read wiring diagrams and safely test circuits with a multimeter',
-    },
-    {
-      week: 'Weeks 5–6',
-      title: 'Refrigeration Cycle',
+      title: 'Refrigeration Cycle & EPA 608 Prep',
       competencyMilestone:
-        'Explain the refrigeration cycle and pass EPA 608 Core practice exam at 80%+',
+        'Explain the refrigeration cycle, recover refrigerant, and pass EPA 608 Core practice at 80%+',
     },
     {
-      week: 'Weeks 7–8',
-      title: 'System Installation & Repair',
-      competencyMilestone: 'Install a split-system AC unit to manufacturer specification',
+      week: 'Week 5',
+      title: 'Installation & Diagnostics',
+      competencyMilestone: 'Install a split-system AC unit and diagnose common fault scenarios',
     },
     {
-      week: 'Weeks 9–10',
-      title: 'Advanced Diagnostics',
-      competencyMilestone: 'Diagnose 5 common fault scenarios using systematic troubleshooting',
-    },
-    {
-      week: 'Week 11',
-      title: 'EPA 608 Exam Prep',
-      competencyMilestone: 'Pass EPA 608 Universal proctored exam on-site',
-    },
-    {
-      week: 'Week 12',
-      title: 'Career Placement',
-      competencyMilestone: 'Complete resume, interview prep, and employer introductions',
+      week: 'Week 6',
+      title: 'EPA 608 Exam & Career Placement',
+      competencyMilestone:
+        'Pass EPA 608 Universal proctored on-site; complete resume and employer introductions',
     },
   ],
 
   curriculum: [
     {
-      title: 'Weeks 1–2: Systems & Safety',
+      title: 'Weeks 1–2: Systems, Safety & Electrical',
       topics: [
         'Identify every component on a live split-system unit by name and function',
-        'Use a multimeter to measure voltage, resistance, and continuity on real equipment',
         'Apply lockout/tagout procedures before every live-equipment exercise',
-        'Read a manufacturer wiring diagram and trace the control circuit',
-      ],
-    },
-    {
-      title: 'Weeks 3–4: Electrical Diagnostics',
-      topics: [
-        'Wire a 24V thermostat control circuit from scratch',
-        'Test and replace a failed capacitor, contactor, and relay on a training unit',
+        'Wire a 24V thermostat control circuit and read manufacturer wiring diagrams',
         'Diagnose a no-cooling call using a systematic electrical fault tree',
-        'Measure amperage draw and compare against nameplate rating to identify overload',
       ],
     },
     {
-      title: 'Weeks 5–6: Refrigeration & EPA 608',
+      title: 'Weeks 3–4: Refrigeration & EPA 608 Prep',
       topics: [
-        'Connect manifold gauges to a live system and record suction and discharge pressures',
-        'Recover refrigerant from a system using an EPA-compliant recovery machine',
-        'Evacuate a system to 500 microns and verify with an electronic micron gauge',
-        'Recharge a system to manufacturer spec and verify superheat and subcooling',
+        'Connect manifold gauges and record suction and discharge pressures',
+        'Recover refrigerant using an EPA-compliant recovery machine',
+        'Evacuate a system to 500 microns and recharge to manufacturer superheat spec',
+        'Complete EPA 608 Core practice exams at 80%+ before proctored testing',
       ],
     },
     {
-      title: 'Weeks 7–8: Installation',
+      title: 'Week 5: Installation & Diagnostics',
       topics: [
-        'Mount and level an outdoor condenser unit on a pad',
-        'Run and insulate refrigerant line sets between indoor and outdoor units',
-        'Install a gas furnace, connect venting, and perform a combustion analysis',
-        'Commission a completed system and verify airflow at every register',
-      ],
-    },
-    {
-      title: 'Weeks 9–10: Diagnostics on Real Calls',
-      topics: [
-        'Diagnose a system with a restricted metering device and document findings',
-        'Identify and repair a refrigerant leak using electronic leak detection',
-        'Troubleshoot a heat pump that fails to switch between heating and cooling modes',
+        'Mount and commission a split-system AC unit to manufacturer specification',
+        'Diagnose restricted metering devices and refrigerant leaks',
         'Write a service ticket with parts list, labor time, and customer explanation',
       ],
     },
     {
-      title: 'Week 11: EPA 608 Exam',
+      title: 'Week 6: EPA 608 Exam & Career Placement',
       topics: [
-        'Sit for the EPA 608 Universal proctored exam on-site at Elevate',
-        'Core, Type I, Type II, and Type III sections — all four required for Universal',
-      ],
-    },
-    {
-      title: 'Week 12: Career Placement',
-      topics: [
-        'Complete a resume reviewed by an industry employer',
-        'Participate in a mock technical interview with an HVAC contractor',
-        "Receive direct introductions to Elevate's employer partners in Indianapolis",
+        'Sit for the EPA 608 Universal proctored exam on-site (Core, Type I, II, III)',
+        'Complete resume review, mock interview, and employer partner introductions',
       ],
     },
   ],
@@ -272,7 +232,7 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
     {
       question: 'Is the EPA 608 exam included?',
       answer:
-        'Yes. The EPA 608 Universal exam is proctored on-site at Elevate during Week 11. The exam fee is included in tuition (or covered by funding when applicable).',
+        'Yes. The EPA 608 Universal exam is proctored on-site at Elevate during Week 6. The exam fee is included in tuition (or covered by funding when applicable).',
     },
     {
       question: 'What funding is available?',
@@ -287,7 +247,7 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
     {
       question: 'Is there job placement assistance?',
       answer:
-        'Yes. Week 12 is dedicated to career placement: resume review, interview preparation, and direct introductions to our employer partners in the Indianapolis area.',
+        'Yes. Week 6 includes career placement: resume review, interview preparation, and direct introductions to our employer partners in the Indianapolis area.',
     },
   ],
 

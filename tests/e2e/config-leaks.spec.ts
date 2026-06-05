@@ -9,6 +9,9 @@ const PATHS = [
   '/hvac-training-indianapolis',
   '/cdl-training-indianapolis',
   '/programs/culinary-apprenticeship',
+  '/programs/cdl-training',
+  '/programs/hvac-technician',
+  '/programs/cna',
   '/programs',
   '/employers',
 ];

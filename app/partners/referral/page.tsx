@@ -55,7 +55,7 @@ const WHO_CAN_REFER = [
 
 const PROGRAMS = [
   { name: 'CNA / Nursing Assistant', duration: '4 weeks', funding: 'FSSA IMPACT, WIOA', price: '$1,850' },
-  { name: 'HVAC Technician', duration: '16 weeks', funding: 'WIOA, WRG', price: '$3,200' },
+  { name: 'HVAC Technician', duration: '6 weeks', funding: 'WIOA, WRG', price: '$5,000' },
   { name: 'Medical Assistant', duration: '12 weeks', funding: 'WIOA, WRG', price: '$2,800' },
   { name: 'Phlebotomy Technician', duration: '4 weeks', funding: 'WIOA, FSSA', price: '$1,200' },
   { name: 'IT Help Desk', duration: '12 weeks', funding: 'WIOA, WRG', price: '$2,500' },

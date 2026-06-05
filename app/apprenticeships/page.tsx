@@ -3,6 +3,7 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { CheckCircle, ArrowRight } from 'lucide-react';
+import { RAPIDS_SPONSOR_LABEL } from '@/lib/workforce-ids';
 
 export const revalidate = 3600;
 
@@ -36,10 +37,33 @@ export default function ApprenticeshipsPage() {
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-3">DOL Registered Apprenticeships</p>
           <h1 className="text-3xl sm:text-5xl font-extrabold text-white mb-5">Earn While You Learn</h1>
-          <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto mb-8">Registered apprenticeship pathways connecting individuals to structured, paid training in barbering, cosmetology, skilled trades, and other licensed professions.</p>
+          <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto mb-4">Registered apprenticeship pathways connecting individuals to structured, paid training in barbering, cosmetology, skilled trades, and other licensed professions.</p>
+          <p className="text-brand-red-300 text-sm font-semibold mb-8">{RAPIDS_SPONSOR_LABEL}</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/apply" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-sm">Apply for Apprenticeship</Link>
             <Link href="/for-employers" className="border-2 border-white/40 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors text-sm">Host an Apprentice</Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 px-6 bg-brand-blue-50 border-y border-brand-blue-100">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-2xl font-extrabold text-slate-900 mb-4">Why apprenticeship sponsorship matters</h2>
+          <p className="text-slate-600 text-sm leading-relaxed mb-6">
+            Most training providers teach and test. Elevate also sponsors DOL-registered apprenticeships —
+            train, credential, place, and sponsor under one workforce umbrella.
+          </p>
+          <div className="grid sm:grid-cols-3 gap-4 text-left">
+            {[
+              { t: 'Earn while you learn', d: 'Paid OJT from day one with employer hosts' },
+              { t: 'Related technical instruction', d: 'RTI delivered online via Elevate LMS' },
+              { t: 'Federal system of record', d: 'RAPIDS-tracked hours and DOL completion certificate' },
+            ].map((item) => (
+              <div key={item.t} className="bg-white rounded-xl border border-slate-200 p-4">
+                <p className="font-bold text-slate-900 text-sm">{item.t}</p>
+                <p className="text-xs text-slate-600 mt-1">{item.d}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

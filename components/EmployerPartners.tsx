@@ -91,7 +91,7 @@ export default function EmployerPartners({
   const [partners, setPartners] = useState<Partner[]>(DEFAULT_PARTNERS);
   const [stats, setStats] = useState<Stats>({
     totalPartners: 50,
-    placementRate: SITE_STATS.jobPlacementRate,
+    placementRate: SITE_STATS.careerServicesSupportRate,
     graduatesHired: 0,
     avgSalary: 52000,
   });
@@ -150,7 +150,7 @@ export default function EmployerPartners({
           const parsedStats = JSON.parse(siteStats.value);
           setStats({
             totalPartners: partnerCount || parsedStats.totalPartners || 50,
-            placementRate: parsedStats.placementRate || SITE_STATS.jobPlacementRate,
+            placementRate: parsedStats.placementRate ?? SITE_STATS.careerServicesSupportRate,
             graduatesHired: parsedStats.graduatesHired || 0,
             avgSalary: parsedStats.avgSalary || 52000,
           });

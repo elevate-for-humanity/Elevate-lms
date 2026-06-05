@@ -40,7 +40,7 @@ export default function TuitionPage() {
         <h2 className="text-2xl font-bold text-slate-900 mb-6">Self-Pay Tuition Rates</h2>
         <div className="divide-y divide-slate-200 border border-slate-200 rounded-xl overflow-hidden mb-10">
           {[
-            { program: 'HVAC Technician (EPA 608)', cost: '$2,800', duration: '16 weeks' },
+            { program: 'HVAC Technician (EPA 608)', cost: '$5,000', duration: '6 weeks' },
             { program: 'Barber Apprenticeship', cost: '$4,980', duration: '2,000 hours' },
             { program: 'Medical Assistant', cost: '$3,200', duration: '20 weeks' },
             { program: 'Certified Nursing Assistant', cost: '$1,800', duration: '6 weeks' },

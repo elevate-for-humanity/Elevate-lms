@@ -18,6 +18,7 @@ import { hero as heroTokens } from '@/lib/page-design-tokens';
 import { getProgramOgImage } from '@/lib/programs/og-images';
 import { CheckCircle, Clock, Award, DollarSign, ArrowRight, ShieldCheck } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { sanitizePlatformValue } from '@/lib/config/sanitize-platform-value';
 import { CredentialAuthorityFootnote } from '@/components/compliance/CredentialAuthorityFootnote';
 
 export const dynamic = 'force-dynamic';
@@ -529,8 +530,13 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
       if (dbRow) {
         mergedProgram = {
           ...sp,
-          title: dbRow.title || sp.title,
-          subtitle: dbRow.short_description || dbRow.description || sp.subtitle,
+          title: sanitizePlatformValue(dbRow.title, sp.title),
+          subtitle: sanitizePlatformValue(
+            dbRow.short_description || dbRow.description,
+            sp.subtitle,
+          ),
+          // Static catalog duration is authoritative for ETPL-aligned programs
+          durationWeeks: sp.durationWeeks,
         };
       }
     }

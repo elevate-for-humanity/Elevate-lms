@@ -4,7 +4,7 @@ export const CNA: ProgramSchema = {
   slug: 'cna',
   title: 'Certified Nursing Assistant (CNA)',
   subtitle:
-    'Indiana state CNA certification in 4 weeks. Clinical rotations at licensed healthcare facilities. State exam proctored on-site. FSSA IMPACT funding available for eligible participants. Self-pay: $2,500 (Sale: $1,850).',
+    'Indiana state CNA certification in 6 weeks. Clinical rotations at licensed healthcare facilities. State exam proctored on-site. FSSA IMPACT funding available for eligible participants. Self-pay: $2,500 (Sale: $1,850).',
   sector: 'healthcare',
   category: 'Healthcare',
   programType: 'workforce',
@@ -15,7 +15,8 @@ export const CNA: ProgramSchema = {
 
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
-  durationWeeks: 4,
+  durationWeeks: 6,
+  enrollmentStartLabel: 'Waitlist open — next cohort date confirmed at intake',
   hoursPerWeekMin: 30,
   hoursPerWeekMax: 40,
   hoursBreakdown: {
@@ -82,7 +83,7 @@ export const CNA: ProgramSchema = {
     {
       statement:
         'Pass the Indiana state CNA written and skills exam — proctored on-site at Elevate',
-      assessedAt: 'Week 4',
+      assessedAt: 'Week 6',
     },
     {
       statement: 'Document patient care observations accurately in a simulated medical record',
@@ -143,9 +144,10 @@ export const CNA: ProgramSchema = {
         'Complete supervised clinical hours at a licensed Indiana facility with competency sign-offs',
     },
     {
-      week: 'Week 4',
-      title: 'State Exam',
-      competencyMilestone: 'Pass Indiana state CNA written and skills exam proctored on-site',
+      week: 'Weeks 5–6',
+      title: 'Exam Prep & State Testing',
+      competencyMilestone:
+        'Pass Indiana state CNA written and skills exam proctored on-site; career placement briefing',
     },
   ],
 
@@ -177,10 +179,12 @@ export const CNA: ProgramSchema = {
       ],
     },
     {
-      title: 'Week 4: State Exam',
+      title: 'Weeks 5–6: State Exam & Placement',
       topics: [
+        'Skills review and mock exams aligned to Indiana Nurse Aide Registry standards',
         'Sit for the Indiana state CNA written exam — 70 questions, 90-minute time limit',
         'Demonstrate 5 randomly selected clinical skills for the state skills examiner — proctored on-site at Elevate',
+        'Career placement briefing with healthcare employer partners',
       ],
     },
   ],
@@ -189,7 +193,7 @@ export const CNA: ProgramSchema = {
     {
       standard: 'Indiana State Department of Health — CNA Curriculum',
       description:
-        "Program meets Indiana's minimum 75-hour CNA training requirement including required clinical hours, delivered in an accelerated 4-week format.",
+        "Program meets Indiana's minimum 75-hour CNA training requirement including required clinical hours, delivered in a 6-week accelerated format.",
     },
     {
       standard: 'OBRA 1987 (Omnibus Budget Reconciliation Act)',
@@ -234,7 +238,7 @@ export const CNA: ProgramSchema = {
     {
       question: 'Is the state exam included?',
       answer:
-        'Yes. The Indiana state CNA written and skills exam is proctored on-site at Elevate during Week 4. The exam fee is included in tuition or covered by funding when applicable.',
+        'Yes. The Indiana state CNA written and skills exam is proctored on-site at Elevate during Weeks 5–6. The exam fee is included in tuition or covered by funding when applicable.',
     },
     {
       question: 'What funding is available?',

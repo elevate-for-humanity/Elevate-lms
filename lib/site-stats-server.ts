@@ -56,9 +56,13 @@ export async function loadVerifiedPublicStats(): Promise<VerifiedPublicStats> {
   return {
     programsOffered,
     programsDisplay: `${programsOffered}+`,
-    studentsDisplay: SITE_STATS.studentsDisplay,
-    placementDisplay: statLabel.placement,
-    placementRate: SITE_STATS.jobPlacementRate,
+    studentsDisplay: SITE_STATS.studentsDisplayVerified
+      ? SITE_STATS.studentsDisplay
+      : 'Data upon request',
+    placementDisplay: SITE_STATS.careerServicesSupportRate != null
+      ? `${SITE_STATS.careerServicesSupportRate}%`
+      : 'Data upon request',
+    placementRate: SITE_STATS.careerServicesSupportRate,
     dataAvailable: publishedFromDb != null,
   };
 }

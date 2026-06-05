@@ -38,7 +38,7 @@ async function _GET(request: Request) {
     const { data: completions, error: completionsError } = await supabase
       .from('qa_checklist_completions')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', auth.userId)
       .gte('completed_at', `${today}T00:00:00`)
       .lte('completed_at', `${today}T23:59:59`);
 

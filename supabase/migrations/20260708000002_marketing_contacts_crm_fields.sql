@@ -8,7 +8,8 @@ ALTER TABLE public.marketing_contacts
   ADD COLUMN IF NOT EXISTS contact_type text DEFAULT 'general',
   ADD COLUMN IF NOT EXISTS status text DEFAULT 'Active',
   ADD COLUMN IF NOT EXISTS company text,
-  ADD COLUMN IF NOT EXISTS name text;
+  ADD COLUMN IF NOT EXISTS name text,
+  ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
 
 -- Backfill display name from first/last where present
 UPDATE public.marketing_contacts
@@ -16,5 +17,13 @@ SET name = trim(concat_ws(' ', first_name, last_name))
 WHERE (name IS NULL OR name = '')
   AND (first_name IS NOT NULL OR last_name IS NOT NULL);
 
+UPDATE public.marketing_contacts
+SET updated_at = COALESCE(updated_at, created_at, now())
+WHERE updated_at IS NULL;
+
 CREATE INDEX IF NOT EXISTS idx_marketing_contacts_email ON public.marketing_contacts (lower(email));
-CREATE INDEX IF NOT EXISTS idx_marketing_contacts_updated ON public.marketing_contacts (created_at DESC);
+
+-- Drop misnamed/misindexed version if a prior draft was applied
+DROP INDEX IF EXISTS public.idx_marketing_contacts_updated;
+
+CREATE INDEX IF NOT EXISTS idx_marketing_contacts_updated ON public.marketing_contacts (updated_at DESC);

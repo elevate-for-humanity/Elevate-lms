@@ -83,7 +83,17 @@ const billing = {
   buildPlan: process.env.NORTHFLANK_BUILD_PLAN || 'nf-compute-800-32',
 };
 
-const ephemeralStorageSize = resolveEphemeralStorageMb();
+function storageAllowanceCandidates(requestedMb: number): number[] {
+  const ordered = [requestedMb, 32768, 16384].filter(
+    (size, index, arr) => ALLOWED_EPHEMERAL_STORAGE_MB.includes(size as (typeof ALLOWED_EPHEMERAL_STORAGE_MB)[number]) && arr.indexOf(size) === index,
+  );
+  return ordered;
+}
+
+function isStorageAllowanceError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  return msg.includes('build resource allowance') || msg.includes('ephemeral storage exceeds');
+}
 
 const healthChecks = [
   {
@@ -120,51 +130,82 @@ async function main() {
   console.log(dryRun ? '=== DRY RUN ===' : '=== EXECUTE ===');
   console.log(`Project: ${projectId}`);
 
-  for (const service of SERVICES) {
-    const patch = {
-      billing,
-      runtimeEnvironment: service.runtimeEnvironment,
-      healthChecks,
-      buildSettings: {
-        storage: {
-          ephemeralStorage: {
-            storageSize: ephemeralStorageSize,
-          },
-        },
-        dockerfile: {
-          buildEngine: 'buildkit',
-          dockerFilePath: service.dockerfile,
-          dockerWorkDir: '/',
-          buildkit: BUILDKIT,
-        },
-      },
-      buildConfiguration: {
-        storage: {
-          ephemeralStorage: {
-            storageSize: ephemeralStorageSize,
-          },
-        },
-      },
-    };
+  const requestedEphemeralMb = resolveEphemeralStorageMb();
 
+  for (const service of SERVICES) {
     console.log(
-      `${dryRun ? '[dry-run]' : '[patch]'} ${service.id} -> ${service.dockerfile}, build ${billing.buildPlan}, runtime ${billing.deploymentPlan}, ephemeral ${ephemeralStorageSize}MB, health /api/ping`,
+      `${dryRun ? '[dry-run]' : '[patch]'} ${service.id} -> ${service.dockerfile}, build ${billing.buildPlan}, runtime ${billing.deploymentPlan}, ephemeral ${requestedEphemeralMb}MB (with allowance fallback), health /api/ping`,
     );
 
     if (!dryRun) {
-      const response = await nfFetch(combinedServicePatchPath(projectId, service.id), {
-        method: 'PATCH',
-        body: JSON.stringify(patch),
-      });
+      let response: Record<string, unknown> | undefined;
+      let appliedEphemeralMb = requestedEphemeralMb;
+
+      for (const storageMb of storageAllowanceCandidates(requestedEphemeralMb)) {
+        const patch = {
+          billing,
+          runtimeEnvironment: service.runtimeEnvironment,
+          healthChecks,
+          buildSettings: {
+            storage: {
+              ephemeralStorage: {
+                storageSize: storageMb,
+              },
+            },
+            dockerfile: {
+              buildEngine: 'buildkit',
+              dockerFilePath: service.dockerfile,
+              dockerWorkDir: '/',
+              buildkit: BUILDKIT,
+            },
+          },
+          buildConfiguration: {
+            storage: {
+              ephemeralStorage: {
+                storageSize: storageMb,
+              },
+            },
+          },
+        };
+
+        try {
+          response = await nfFetch<Record<string, unknown>>(
+            combinedServicePatchPath(projectId, service.id),
+            {
+              method: 'PATCH',
+              body: JSON.stringify(patch),
+            },
+          );
+          appliedEphemeralMb = storageMb;
+          if (storageMb !== requestedEphemeralMb) {
+            console.warn(
+              `[patch-fallback] ${service.id} ephemeral ${requestedEphemeralMb}MB rejected; applied ${storageMb}MB`,
+            );
+          }
+          break;
+        } catch (e) {
+          if (!isStorageAllowanceError(e) || storageMb === storageAllowanceCandidates(requestedEphemeralMb).at(-1)) {
+            throw e;
+          }
+          console.warn(
+            `[patch-retry] ${service.id} ephemeral ${storageMb}MB exceeds project allowance; trying smaller`,
+          );
+        }
+      }
+
+      if (!response) {
+        throw new Error(`Failed to patch ${service.id}`);
+      }
+
       const buildOptionsBody = {
-        storage: { ephemeralStorage: { storageSize: ephemeralStorageSize } },
+        storage: { ephemeralStorage: { storageSize: appliedEphemeralMb } },
       };
       try {
         await nfFetch(projectApiPath(projectId, `/services/${service.id}/build-options`), {
           method: 'POST',
           body: JSON.stringify(buildOptionsBody),
         });
-        console.log(`[build-options-ok] ${service.id} ephemeral ${ephemeralStorageSize}MB`);
+        console.log(`[build-options-ok] ${service.id} ephemeral ${appliedEphemeralMb}MB`);
       } catch (e) {
         console.warn(
           `[build-options-warn] ${service.id}:`,
@@ -180,8 +221,8 @@ async function main() {
         response?.deployment?.billing?.deploymentPlan ??
         billing.deploymentPlan;
       const appliedStorage =
-        response?.buildSettings?.storage?.ephemeralStorage?.storageSize ??
-        ephemeralStorageSize;
+        (response?.buildSettings as { storage?: { ephemeralStorage?: { storageSize?: number } } })
+          ?.storage?.ephemeralStorage?.storageSize ?? appliedEphemeralMb;
       const probes = Array.isArray(response?.healthChecks) ? response.healthChecks : healthChecks;
       const probeSummary = probes
         .map(

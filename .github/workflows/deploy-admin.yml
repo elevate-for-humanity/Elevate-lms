@@ -43,7 +43,7 @@ jobs:
       NORTHFLANK_ADMIN_SERVICE_ID: ${{ secrets.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin' }}
       NORTHFLANK_LMS_SERVICE_ID: ${{ secrets.NORTHFLANK_LMS_SERVICE_ID || 'elevate-lms' }}
       DEPLOY_BRANCH: main
-      NORTHFLANK_EPHEMERAL_STORAGE_MB: "65536"
+      NORTHFLANK_EPHEMERAL_STORAGE_MB: "32768"
 
     steps:
       - name: Checkout

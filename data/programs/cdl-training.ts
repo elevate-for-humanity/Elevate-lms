@@ -15,20 +15,20 @@ export const CDL_TRAINING: ProgramSchema = {
 
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
-  durationWeeks: 6,
+  durationWeeks: 5,
   hoursPerWeekMin: 30,
   hoursPerWeekMax: 40,
   hoursBreakdown: {
-    onlineInstruction: 40,
-    handsOnLab: 120,
-    examPrep: 20,
-    careerPlacement: 10,
+    onlineInstruction: 30,
+    handsOnLab: 110,
+    examPrep: 15,
+    careerPlacement: 5,
   },
   schedule: 'Mon–Fri, 30–40 hours per week (accelerated format)',
   cohortSize: '8–12 participants per cohort',
   fundingStatement:
     'WIOA funding available for eligible Indiana residents. Covers tuition, DOT physical, drug screen, and CDL exam fees when approved. Eligibility not guaranteed. Self-pay: $5,000.',
-  selfPayCost: '$5,000',
+  selfPayCost: '$4,500',
   badge: 'Now Enrolling — Funding Available',
   badgeColor: 'green',
 

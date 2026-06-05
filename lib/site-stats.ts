@@ -7,6 +7,7 @@
  */
 
 import { STATIC_PROGRAM_MAP } from '@/data/programs/index';
+import { PUBLIC_CREDENTIALS_DISPLAY } from '@/lib/site-credentials';
 
 const STATIC_PROGRAM_COUNT = STATIC_PROGRAM_MAP.size;
 
@@ -16,7 +17,7 @@ export const SITE_STATS = {
   programsOffered: STATIC_PROGRAM_COUNT,
   programsOfferedDisplay: `${STATIC_PROGRAM_COUNT}+`,
   statesServed: 5,
-  credentialsDisplay: '—',
+  credentialsDisplay: PUBLIC_CREDENTIALS_DISPLAY,
   employerPartnersDisplay: '—',
   fundingSecuredDisplay: '—',
   /** @deprecated Use careerServicesSupportRate */

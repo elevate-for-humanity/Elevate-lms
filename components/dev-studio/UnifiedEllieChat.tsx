@@ -45,6 +45,8 @@ interface UnifiedEllieChatProps {
   onOpenPreview?: () => void;
   /** Parent provides header (mobile admin shell) */
   embedded?: boolean;
+  /** Open file context for platform/code route */
+  fileContext?: string;
 }
 
 const QUICK = [
@@ -56,7 +58,12 @@ const QUICK = [
   { label: 'Search code', text: 'Search code for middleware errors in apps/admin' },
 ];
 
-export default function UnifiedEllieChat({ onOpenDeploy, onOpenPreview, embedded = false }: UnifiedEllieChatProps) {
+export default function UnifiedEllieChat({
+  onOpenDeploy,
+  onOpenPreview,
+  embedded = false,
+  fileContext,
+}: UnifiedEllieChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -123,6 +130,7 @@ export default function UnifiedEllieChat({ onOpenDeploy, onOpenPreview, embedded
         setMessages((prev) => [...prev, { role: 'assistant', content: '', provider: 'platform', route }]);
         const history = [...messages, userMsg].map((m) => ({ role: m.role, content: m.content }));
         await streamPlatformChat(history, {
+          fileContext,
           onToken: (token) => {
             setMessages((prev) => {
               const next = [...prev];

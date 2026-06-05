@@ -18,7 +18,7 @@ import {
   linkOrphanedEnrollments,
   normalizeFundingSource,
 } from '@/lib/enrollment-service';
-import { runBarberPostPayment } from '@/lib/enrollment/barber-post-payment';
+import { handleTestingCheckoutSession } from '@/lib/stripe/handlers/testing-checkout-completed';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { logger } from '@/lib/logger';
 import * as Sentry from '@sentry/nextjs';
@@ -42,6 +42,30 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
   }
 
   const kind = session.metadata?.kind;
+  const metaProgram =
+    session.metadata?.program ?? session.metadata?.program_slug ?? '';
+
+  // ── TESTING CENTER (exam fees / enforcement) ─────────────────────────────
+  const testingPaymentType = session.metadata?.payment_type;
+  if (testingPaymentType === 'testing_fee' || testingPaymentType === 'testing_enforcement') {
+    await handleTestingCheckoutSession(session, supabase);
+    return;
+  }
+
+  // Barber/cosmetology use dedicated webhooks (subscription + weekly billing).
+  // Skip generic enrollment when only the canonical endpoint receives these events.
+  if (
+    metaProgram === 'barber-apprenticeship' ||
+    metaProgram === 'cosmetology-apprenticeship' ||
+    session.metadata?.checkout_type === 'barber_enrollment' ||
+    session.metadata?.checkout_type === 'cosmetology_enrollment'
+  ) {
+    logger.info('[webhook/checkout] apprenticeship checkout — use program webhook handler', {
+      sessionId: session.id,
+      metaProgram,
+    });
+    return;
+  }
 
   // ── CANONICAL PROGRAM ENROLLMENT ──────────────────────────────────────────
   if (kind === 'program_enrollment') {

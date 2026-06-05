@@ -32,20 +32,9 @@ COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
 
-# See Dockerfile.northflank-admin — store + node_modules on BuildKit cache mounts.
-ENV HUSKY=0
-ENV CI=true
-ENV PUPPETEER_SKIP_DOWNLOAD=true
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-RUN --mount=type=cache,id=pnpm-northflank-lms-store,target=/pnpm/store \
-    --mount=type=cache,id=pnpm-northflank-lms-node_modules,target=/app/node_modules \
-    pnpm config set store-dir /pnpm/store \
-    && pnpm install --frozen-lockfile \
-    && pnpm store prune
-
 COPY . .
 
-RUN rm -rf /app/.pnpm-store
+RUN rm -rf /app/.pnpm-store /app/node_modules
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -65,12 +54,17 @@ ENV NEXT_PUBLIC_PUBLIC_SITE_URL=$NEXT_PUBLIC_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV SKIP_ENV_VALIDATION=true
+ENV HUSKY=0
+ENV CI=true
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-RUN --mount=type=cache,id=pnpm-northflank-lms-store,target=/pnpm/store \
-    --mount=type=cache,id=pnpm-northflank-lms-node_modules,target=/app/node_modules \
-    pnpm config set store-dir /pnpm/store \
+RUN --mount=type=cache,id=pnpm-northflank-lms-unified,target=/mnt/pnpm-cache \
+    mkdir -p /mnt/pnpm-cache/store /mnt/pnpm-cache/node_modules \
+    && printf '%s\n' 'store-dir=/mnt/pnpm-cache/store' 'modules-dir=/mnt/pnpm-cache/node_modules' >> .npmrc \
     && pnpm install --frozen-lockfile \
     && pnpm store prune \
+    && ln -sfn /mnt/pnpm-cache/node_modules /app/node_modules \
     && test -n "$NEXT_PUBLIC_SUPABASE_URL" \
     && test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
     && pnpm exec next build \

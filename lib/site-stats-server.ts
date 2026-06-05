@@ -3,8 +3,7 @@
  * Use on SSR pages so raw HTML never shows fabricated marketing numbers.
  */
 
-import { createPublicClient } from '@/lib/supabase/public';
-import { SITE_STATS, statLabel } from '@/lib/site-stats';
+import { SITE_STATS, formatProgramsDisplay } from '@/lib/site-stats';
 import {
   getPublicProgramsPageData,
   resolvePublicProgramCount,
@@ -30,32 +29,22 @@ export async function loadVerifiedProgramCount(): Promise<number> {
  */
 export async function loadVerifiedPublicStats(): Promise<VerifiedPublicStats> {
   let programCount = SITE_STATS.programsOffered;
+  let catalogVerified = false;
   try {
-    programCount = await loadVerifiedProgramCount();
+    const verified = await loadVerifiedProgramCount();
+    if (verified > 0) {
+      programCount = verified;
+      catalogVerified = true;
+    }
   } catch {
     programCount = SITE_STATS.programsOffered;
   }
 
-  let publishedFromDb: number | null = null;
-  try {
-    const db = createPublicClient();
-    const { count, error } = await db
-      .from('programs')
-      .select('id', { count: 'exact', head: true })
-      .eq('published', true)
-      .eq('is_active', true)
-      .neq('status', 'archived');
-    if (!error && count != null && count > 0) publishedFromDb = count;
-  } catch {
-    publishedFromDb = null;
-  }
-
-  const programsOffered =
-    publishedFromDb ?? (programCount > 0 ? programCount : SITE_STATS.programsOffered);
+  const programsOffered = programCount > 0 ? programCount : SITE_STATS.programsOffered;
 
   return {
     programsOffered,
-    programsDisplay: `${programsOffered}+`,
+    programsDisplay: formatProgramsDisplay(programsOffered),
     studentsDisplay: SITE_STATS.studentsDisplayVerified
       ? SITE_STATS.studentsDisplay
       : 'Data upon request',
@@ -63,7 +52,7 @@ export async function loadVerifiedPublicStats(): Promise<VerifiedPublicStats> {
       ? `${SITE_STATS.careerServicesSupportRate}%`
       : 'Data upon request',
     placementRate: SITE_STATS.careerServicesSupportRate,
-    dataAvailable: publishedFromDb != null,
+    dataAvailable: catalogVerified,
   };
 }
 

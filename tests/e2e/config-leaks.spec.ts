@@ -12,6 +12,7 @@ const PATHS = [
   '/programs/cdl-training',
   '/programs/hvac-technician',
   '/programs/cna',
+  '/programs/bookkeeping',
   '/programs',
   '/employers',
 ];

@@ -9,7 +9,8 @@ describe('program marketing pages', () => {
   it('ProgramDetailPage uses interpolated org name for delivery disclosure', () => {
     const src = readFileSync(join(ROOT, 'components/programs/ProgramDetailPage.tsx'), 'utf8');
     expect(src).not.toContain("'Delivered directly by ${PLATFORM_DEFAULTS.orgName}.'");
-    expect(src).toContain('`Delivered directly by ${PLATFORM_DEFAULTS.orgName}.`');
+    expect(src).toContain('getPublicOrgName');
+    expect(src).toContain('`Delivered directly by ${orgName}.`');
   });
 
   it('dedicated program pages use ProgramMarketingPage (server-side hero banner)', () => {

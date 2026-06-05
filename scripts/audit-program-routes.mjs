@@ -56,6 +56,31 @@ function discoverAppRoutes(dir, prefix = '') {
 }
 
 const programAppRoutes = discoverAppRoutes(path.join(ROOT, 'app/programs'), '/programs');
+const hasDynamicProgramRoute = fs.existsSync(
+  path.join(ROOT, 'app/programs/[program]/page.tsx'),
+);
+
+/** Slugs served by app/programs/[program]/page.tsx via data/programs/*.ts */
+function loadStaticProgramSlugs() {
+  const slugs = new Set();
+  const dataDir = path.join(ROOT, 'data/programs');
+  if (!fs.existsSync(dataDir)) return slugs;
+  for (const file of fs.readdirSync(dataDir)) {
+    if (!file.endsWith('.ts') || file === 'index.ts' || file === 'catalog.ts') continue;
+    const content = fs.readFileSync(path.join(dataDir, file), 'utf8');
+    const m = content.match(/slug:\s*['"`]([a-z0-9-]+)['"`]/);
+    if (m) slugs.add(m[1]);
+  }
+  return slugs;
+}
+const staticProgramSlugs = loadStaticProgramSlugs();
+
+function isServedProgramRoute(appRoute) {
+  if (programAppRoutes.has(appRoute)) return true;
+  if (!hasDynamicProgramRoute) return false;
+  const slug = appRoute.replace('/programs/', '');
+  return staticProgramSlugs.has(slug);
+}
 
 // ── Scan codebase for /programs/* hrefs ─────────────────────────────────────
 
@@ -139,7 +164,7 @@ for (const [href, refs] of [...allLinks.entries()].sort()) {
 
   const slug = parts[0];
   const appRoute = `/programs/${slug}`;
-  const hasPage = programAppRoutes.has(appRoute);
+  const hasPage = isServedProgramRoute(appRoute);
   const hasRedirect = redirectSources.has(appRoute);
   const hasBanner = !!heroBanners[slug];
 
@@ -186,16 +211,10 @@ console.log(`  Duplicate titles:        ${duplicateTitles.length}`);
 console.log(`  Issues:                  ${issues}`);
 
 if (FIX_MODE && toAdd.length > 0) {
-  console.log(`\n[audit:program-routes] --fix: adding ${toAdd.length} redirects to /programs...`);
-  for (const route of toAdd) {
-    canonicalConfig.legacyAliases.push({
-      source: route,
-      destination: '/programs',
-      permanent: false,
-    });
-    console.log(`  Added: ${route} → /programs`);
-  }
-  fs.writeFileSync(canonicalRoutesPath, JSON.stringify(canonicalConfig, null, 2) + '\n');
+  console.error(
+    `\n[audit:program-routes] --fix is disabled: add a page.tsx or register the slug in data/programs/index.ts instead of redirecting to /programs.`,
+  );
+  for (const route of toAdd) console.error(`  Needs route: ${route}`);
 }
 
 if (issues > 0) {

@@ -590,72 +590,12 @@
       "permanent": true
     },
     {
-      "source": "/programs/bookkeeping",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/business",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
       "source": "/programs/business-administration",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/cad-drafting",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/construction-trades-certification",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/cpr-first-aid",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/cybersecurity-analyst",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/diesel-mechanic",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/business",
+      "permanent": true
     },
     {
       "source": "/programs/early-childhood-education",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/emergency-health-safety",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/entrepreneurship",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/forklift",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/graphic-design",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/home-health-aide",
       "destination": "/programs",
       "permanent": false
     },
@@ -665,52 +605,12 @@
       "permanent": false
     },
     {
-      "source": "/programs/it-help-desk",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
       "source": "/programs/nail-technician",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/network-administration",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/office-administration",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/phlebotomy",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/project-management",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/sanitation-infection-control",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/nail-technician-apprenticeship",
+      "permanent": true
     },
     {
       "source": "/programs/snap-et",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/software-development",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/web-development",
       "destination": "/programs",
       "permanent": false
     },

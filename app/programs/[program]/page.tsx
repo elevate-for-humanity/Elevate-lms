@@ -7,6 +7,7 @@ import { createPublicClient } from '@/lib/supabase/public';
 import { programs as staticPrograms } from '@/content/cf-programs';
 import { getStaticProgram } from '@/data/programs/index';
 import ProgramDetailPageComponent from '@/components/programs/ProgramDetailPage';
+import CdlEnrollmentOpenBanner from '@/components/programs/CdlEnrollmentOpenBanner';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 import { OnetLaborData } from '@/components/programs/onet/OnetLaborData';
 import { getProgramOgImageUrl } from '@/lib/programs/og-images';
@@ -550,7 +551,13 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
             outcomes: mergedProgram.outcomes.map((o) => o.statement),
           }}
         />
-        <ProgramDetailPageComponent program={mergedProgram} banner={banner} />
+        <ProgramDetailPageComponent
+          program={mergedProgram}
+          banner={banner}
+          announcement={
+            mergedProgram.slug === 'cdl-training' ? <CdlEnrollmentOpenBanner /> : undefined
+          }
+        />
         {LIVE_JOBS_PROGRAM_SLUGS.has(program) ? (
           <LiveJobPostings
             programSlug={program}
